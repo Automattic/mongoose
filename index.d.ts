@@ -1208,10 +1208,12 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  type SchemaDefinitionWithBuiltInClass<T extends number | string | Function> = T extends number
+  type SchemaDefinitionWithBuiltInClass<T extends number | string | boolean | Function> = T extends number
     ? (typeof Number | 'number' | 'Number' | typeof Schema.Types.Number)
     : T extends string
     ? (typeof String | 'string' | 'String' | typeof Schema.Types.String)
+    : T extends boolean
+    ? (typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean)
     : (Function | string);
 
   type SchemaDefinitionProperty<T = undefined> = T extends string | number | Function
@@ -1395,7 +1397,7 @@ declare module 'mongoose' {
 
   export class SchemaTypeOptions<T> {
     type?:
-      T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> :
+      T extends string | number | boolean | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends Schema ? T :
       T extends object[] ? Schema<Document<Unpacked<T>>>[] :
       T | typeof SchemaType | Schema;

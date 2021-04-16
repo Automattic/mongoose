@@ -95,7 +95,7 @@ async function gh9857() {
 
   const schemaDefinition: UserSchemaDefinition = {
     name: { type: String },
-    active: Boolean,
+    active: { type: Boolean },
     points: Number
   };
 

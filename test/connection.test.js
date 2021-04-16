@@ -1323,13 +1323,17 @@ describe('connections:', function() {
       console.log('connection', connection.config);
       const schema = new m.Schema({ name: String });
       schema.index({ name: 1 });
-  
-      let newDb = connection.useDb('test3');
+
+      const newDb = connection.useDb('test3');
       console.log('newDb', newDb.config);
       newDb.set('useCreateIndex', true);
       console.log('newDb again', newDb.config);
       const Model = newDb.model('Test', schema);
       yield Model.init();
+      process.on('warning', (warning) => {
+        console.log('hi');
+        console.log(warning.stack);
+      });
       assert.match(JSON.stringify(newDb.config), /useCreateIndex/);
     });
   });

@@ -2319,7 +2319,15 @@ declare module 'mongoose' {
     };
   };
 
-  export type UpdateQuery<T> = _UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
+  type UpdateWithAggregationPipeline = UpdateAggregationStage[];
+  type UpdateAggregationStage = { $addFields: any } |
+    { $set: any } |
+    { $project: any } |
+    { $unset: any } |
+    { $replaceRoot: any } |
+    { $replaceWith: any };
+
+  export type UpdateQuery<T> = (_UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>) | UpdateWithAggregationPipeline;
 
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;

@@ -12,7 +12,6 @@ const assert = require('assert');
 const co = require('co');
 const mongodb = require('mongodb');
 const server = require('./common').server;
-const { connect, connection } = require('mongoose');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -1312,19 +1311,19 @@ describe('connections:', function() {
     assert.deepStrictEqual(conn2.id, m1.connection.id + 1);
     assert.deepStrictEqual(conn3.id, m.connection.id + 2);
   });
-  it('should not have a deprecation message pop up (gh-8267-2)', function() {
+  it('should not have a deprecation message pop up eighttwosixseven', function() {
     return co(function*() {
       const m = new mongoose.Mongoose();
-      yield connect('mongodb://localhost:27017/test', {
+      yield mongoose.connect('mongodb://localhost:27017/test', {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true
       });
-      console.log('connection', connection.config);
+      console.log('connection', mongoose.connection.config);
       const schema = new m.Schema({ name: String });
       schema.index({ name: 1 });
 
-      const newDb = connection.useDb('test3');
+      const newDb = mongoose.connection.useDb('test3');
       console.log('newDb', newDb.config);
       newDb.set('useCreateIndex', true);
       console.log('newDb again', newDb.config);

@@ -1,4 +1,4 @@
-import { Schema, Document, Model, connection, model } from 'mongoose';
+import { Schema, Document, Model, connection, model, mongoose } from 'mongoose';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -62,6 +62,30 @@ function schemaStaticsWithoutGenerics() {
 
   const UserModel: IUserModel = model<IUserDocument, IUserModel>('User', UserSchema);
   UserModel.static1();
+}
+
+function gh10074() {
+  interface IDog {
+    breed: string;
+    name: string;
+    age: number;
+  }
+
+  type IDogDocument = IDog & Types.Document;
+
+  const DogSchema = new Schema<IDogDocument>(
+    {
+      breed: { type: String },
+      name: { type: String },
+      age: { type: Number }
+    }
+  );
+
+  const Dog = mongoose.model<IDogDocument, Model<IDogDocument>>('dog', DogSchema);
+
+  const rex = new Dog({
+    // type inference here
+  });
 }
 
 const ExpiresSchema = new Schema({

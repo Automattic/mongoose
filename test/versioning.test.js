@@ -540,6 +540,29 @@ describe('versioning', function() {
     });
   });
 
+  it('should persist correctly when optimisticConcurrency is true gh-10128', function() {
+    const thingSchema = new Schema({ price: Number }, { optimisticConcurrency: true });
+    const Thing = db.model('Thing', thingSchema);
+    return co(function*() {
+      const thing = yield Thing.create({ price: 1 });
+      yield thing.save();
+      assert.equal(thing.__v, 0);
+      const thing_1 = yield Thing.findById(thing.id);
+      const thing_2 = yield Thing.findById(thing.id); // this needs to throw an error
+      thing_1.set({ price: 2 });
+      yield thing_1.save();
+      assert.equal(thing_1.__v, 1);
+      thing_2.set({ price: 1 });
+      // thing_2.set({ price: 2 });
+      // yield thing_2.save();
+      const err = yield thing_2.save().then(() => null, err => err);
+      assert.ok(err);
+      // problem is thing_2 is not aware that price has changed and so
+      // when it wants to set it back, thing_2 thinks it is already 1 since
+      // that is what it had when it saved the value originally.
+    });
+  });
+
   describe('versioning is off', function() {
     it('when { safe: false } is set (gh-1520)', function(done) {
       const schema1 = new Schema({ title: String }, { safe: false });

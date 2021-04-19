@@ -443,11 +443,13 @@ declare module 'mongoose' {
 
     /** Removes this document from the db. */
     delete(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
-    delete(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
+    delete(options: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
+    delete(cb: (err: CallbackError, res: any) => void): void;
 
     /** Removes this document from the db. */
     deleteOne(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
-    deleteOne(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
+    deleteOne(options: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
+    deleteOne(cb: (err: CallbackError, res: any) => void): void;
 
     /** Takes a populated field and returns it to its unpopulated state. */
     depopulate(path: string): this;
@@ -601,8 +603,8 @@ declare module 'mongoose' {
 
   interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
-    discriminator<D extends Document>(name: string, schema: Schema<D>, value?: string): Model<D>;
-    discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
+    discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
+    discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
   }
 
   export const Model: Model<any>;
@@ -679,6 +681,8 @@ declare module 'mongoose' {
      * regardless of the `single` option.
      */
     deleteMany(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T, TQueryHelpers>;
+    deleteMany(filter: FilterQuery<T>, callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T, TQueryHelpers>;
+    deleteMany(callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T, TQueryHelpers>;
 
     /**
      * Deletes the first document that matches `conditions` from the collection.
@@ -686,6 +690,8 @@ declare module 'mongoose' {
      * `single` option.
      */
     deleteOne(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T, TQueryHelpers>;
+    deleteOne(filter: FilterQuery<T>, callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T, TQueryHelpers>;
+    deleteOne(callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T, TQueryHelpers>;
 
     /**
      * Sends `createIndex` commands to mongo for each index declared in the schema.
@@ -1208,10 +1214,12 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  type SchemaDefinitionWithBuiltInClass<T extends number | string | Function> = T extends number
+  type SchemaDefinitionWithBuiltInClass<T extends number | string | boolean | Function> = T extends number
     ? (typeof Number | 'number' | 'Number' | typeof Schema.Types.Number)
     : T extends string
     ? (typeof String | 'string' | 'String' | typeof Schema.Types.String)
+    : T extends boolean
+    ? (typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean)
     : (Function | string);
 
   type SchemaDefinitionProperty<T = undefined> = T extends string | number | Function
@@ -1395,7 +1403,7 @@ declare module 'mongoose' {
 
   export class SchemaTypeOptions<T> {
     type?:
-      T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> :
+      T extends string | number | boolean | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends Schema ? T :
       T extends object[] ? Schema<Document<Unpacked<T>>>[] :
       T | typeof SchemaType | Schema;
@@ -1605,8 +1613,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D extends Document>(name: string, schema: Schema<D>, value?: string): Model<D>;
-        discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
+        discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -1662,8 +1670,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D extends Document>(name: string, schema: Schema<D>, value?: string): Model<D>;
-        discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
+        discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
         schema: Schema;
@@ -1924,6 +1932,8 @@ declare module 'mongoose' {
      * collection, regardless of the value of `single`.
      */
     deleteMany(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
+    deleteMany(filter: FilterQuery<DocType>, callback: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
+    deleteMany(callback: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
 
     /**
      * Declare and/or execute this query as a `deleteOne()` operation. Works like
@@ -1931,6 +1941,8 @@ declare module 'mongoose' {
      * option.
      */
     deleteOne(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
+    deleteOne(filter: FilterQuery<DocType>, callback: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
+    deleteOne(callback: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct(field: string, filter?: FilterQuery<DocType>, callback?: (err: any, count: number) => void): QueryWithHelpers<Array<any>, DocType, THelpers>;
@@ -2298,7 +2310,7 @@ declare module 'mongoose' {
     $addToSet?: mongodb.SetFields<TSchema>;
     $pop?: mongodb.OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1>;
     $pull?: PullOperator<TSchema>;
-    $push?: mongodb.PushOperator<TSchema>;
+    $push?: mongodb.PushOperator<TSchema> | any;
     $pullAll?: mongodb.PullAllOperator<TSchema>;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
@@ -2307,7 +2319,15 @@ declare module 'mongoose' {
     };
   };
 
-  export type UpdateQuery<T> = _UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
+  type UpdateWithAggregationPipeline = UpdateAggregationStage[];
+  type UpdateAggregationStage = { $addFields: any } |
+    { $set: any } |
+    { $project: any } |
+    { $unset: any } |
+    { $replaceRoot: any } |
+    { $replaceWith: any };
+
+  export type UpdateQuery<T> = (_UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>) | UpdateWithAggregationPipeline;
 
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;

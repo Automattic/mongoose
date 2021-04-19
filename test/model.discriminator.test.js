@@ -1677,7 +1677,6 @@ describe('model', function() {
       });
 
       map = yield Map.findById(map).populate({ path: 'tiles.enemy' });
-      console.log(map.tiles);
       assert.equal(map.tiles[0][0].enemy.name, 'Bowser');
     });
   });

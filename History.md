@@ -1,3 +1,16 @@
+5.12.5 / 2021-04-19
+===================
+ * fix(populate): handle populating underneath document array when document array property doesn't exist in db #10003
+ * fix(populate): clear out dangling pointers to populated docs so query cursor with populate() can garbage collect populated subdocs #9864
+ * fix(connection): pull correct `autoCreate` value from Mongoose global when creating new model before calling `connect()` #10091
+ * fix(populate): handle populating paths on documents with discriminator keys that point to non-existent discriminators #10082
+ * fix(index.d.ts): allow numbers as discriminator names #10115
+ * fix(index.d.ts): allow `type: Boolean` in Schema definitions #10085
+ * fix(index.d.ts): allow passing array of aggregation pipeline stages to `updateOne()` and `updateMany()` #10095
+ * fix(index.d.ts): support legacy 2nd param callback syntax for `deleteOne()`, `deleteMany()` #10122
+ * docs(mongoose): make `useCreateIndex` always `false` in docs #10033
+ * docs(schema): fix incorrect links from schema API docs #10111
+
 5.12.4 / 2021-04-15
 ===================
  * fix: upgrade mongodb driver -> 3.6.6 #10079

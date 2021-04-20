@@ -1319,14 +1319,11 @@ describe('connections:', function() {
         useUnifiedTopology: true,
         useCreateIndex: true
       });
-      console.log('connection', mongoose.connection.config);
       const schema = new m.Schema({ name: String });
       schema.index({ name: 1 });
 
       const newDb = mongoose.connection.useDb('test3');
-      console.log('newDb', newDb.config);
       newDb.set('useCreateIndex', true);
-      console.log('newDb again', newDb.config);
       const Model = newDb.model('Test', schema);
       yield Model.init();
       assert.match(JSON.stringify(newDb.config), /useCreateIndex/);

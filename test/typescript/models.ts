@@ -1,4 +1,4 @@
-import { Schema, Document, Model, connection, model, mongoose } from 'mongoose';
+import { Schema, Document, Model, connection, model } from 'mongoose';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -71,7 +71,7 @@ function gh10074() {
     age: number;
   }
 
-  type IDogDocument = IDog & Types.Document;
+  type IDogDocument = IDog & Document;
 
   const DogSchema = new Schema<IDogDocument>(
     {
@@ -81,10 +81,12 @@ function gh10074() {
     }
   );
 
-  const Dog = mongoose.model<IDogDocument, Model<IDogDocument>>('dog', DogSchema);
+  const Dog = model<IDogDocument, Model<IDogDocument>>('dog', DogSchema);
 
   const rex = new Dog({
-    // type inference here
+    breed: 'test',
+    name: 'rex',
+    age: '50'
   });
 }
 

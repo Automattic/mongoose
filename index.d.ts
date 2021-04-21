@@ -368,7 +368,7 @@ declare module 'mongoose' {
   }
 
   class Document<T = any, TQueryHelpers = {}> {
-    constructor(doc?: any);
+    constructor(doc?: T | any);
 
     /** This documents _id. */
     _id?: T;
@@ -610,7 +610,7 @@ declare module 'mongoose' {
   export const Model: Model<any>;
   // eslint-disable-next-line no-undef
   interface Model<T extends Document, TQueryHelpers = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
-    new(doc?: any): T;
+    new(doc?: T | any): T;
 
     aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
     // eslint-disable-next-line @typescript-eslint/ban-types

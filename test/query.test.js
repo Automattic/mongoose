@@ -3805,7 +3805,7 @@ describe('Query', function() {
         }
       }
     );
-    const Test = db.model('Test', MySchema);
+    const Test = db.model('Test', MySchema); // pops up on creation of model
     return co(function*() {
       const entry = yield Test.create({ _id: 12345678, op: 'help', size: 54, totalSize: 104 });
       yield entry.save();

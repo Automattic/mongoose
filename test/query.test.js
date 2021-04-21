@@ -3788,4 +3788,27 @@ describe('Query', function() {
 
     assert.deepEqual(q.options.writeConcern, { w: 'majority', wtimeout: 1000 });
   });
+  it('no longer has the deprecation warning message with writeConcern gh-10083', function() {
+    const MySchema = new Schema(
+      {
+        _id: { type: Number, required: true },
+        op: { type: String, required: true },
+        size: { type: Number, required: true },
+        totalSize: { type: Number, required: true }
+      },
+      {
+        versionKey: false,
+        writeConcern: {
+          w: 'majority',
+          j: true,
+          wtimeout: 15000
+        }
+      }
+    );
+    const Test = db.model('Test', MySchema);
+    return co(function*() {
+      const entry = yield Test.create({ _id: 12345678, op: 'help', size: 54, totalSize: 104 });
+      yield entry.save();
+    });
+  });
 });

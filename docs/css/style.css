@@ -299,3 +299,100 @@ h2 a {
   position: relative;
   top: 5px;
 }
+
+/* Carbon Ads - Homepage */
+
+.carbon-home {
+    height: 100px;
+    margin: 3em 0;
+}
+
+.carbon-home #carbonads * {
+  margin: initial;
+  padding: initial;
+}
+
+.carbon-home #carbonads {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial,
+    sans-serif;
+    margin: 0 auto;
+}
+
+.carbon-home #carbonads {
+  display: flex;
+  max-width: 400px;
+  background-color: hsl(0, 0%, 98%);
+  box-shadow: 0 1px 4px 1px hsla(0, 0%, 0%, 0.1);
+  z-index: 100;
+}
+
+.carbon-home #carbonads a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.carbon-home #carbonads a:hover {
+  color: inherit;
+}
+
+.carbon-home #carbonads span {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.carbon-home #carbonads .carbon-wrap {
+  display: flex;
+}
+
+.carbon-home #carbonads .carbon-img {
+  display: block;
+  margin: 0;
+  line-height: 1;
+}
+
+.carbon-home #carbonads .carbon-img img {
+  display: block;
+}
+
+.carbon-home #carbonads .carbon-text {
+  font-size: 13px;
+  padding: 10px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.carbon-home #carbonads .carbon-poweredby {
+  display: block;
+  padding: 6px 8px;
+  background: #f1f1f2;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  font-size: 8px;
+  line-height: 1;
+  border-top-left-radius: 3px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+/* Sponsors */
+
+.sponsors .sponsor {
+    max-height: 50px;
+    width: auto;
+    border: 0;
+}
+
+.sponsors > div {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.sponsors a {
+    margin: 2px;
+}

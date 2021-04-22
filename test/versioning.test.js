@@ -554,7 +554,7 @@ describe('versioning', function() {
       assert.equal(thing_1.__v, 1);
       thing_2.set({ price: 1 });
       const err = yield thing_2.save().then(() => null, err => err);
-      assert.equal(err.name, 'VersionError');
+      assert.equal(err.name, 'DocumentNotFoundError');
     });
   });
 

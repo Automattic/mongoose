@@ -1302,8 +1302,10 @@ describe('Query', function() {
         }
       });
       assert.deepEqual(options, {
-        w: 'majority',
-        j: true
+        writeConcern: {
+          w: 'majority',
+          j: true
+        }
       });
       done();
     });

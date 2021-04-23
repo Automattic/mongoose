@@ -1,9 +1,5 @@
 extends layout
 
-block append style
-  link(rel="stylesheet" href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
-
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
@@ -11,16 +7,6 @@ block content
 
   :markdown
     <h1>Mongoose in the Browser</h1>
-
-    <script>
-      _native.init("CK7DT53U",{
-        targetClass: 'native-inline'
-      });
-    </script>
-
-    <div class="native-inline">
-      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
-    </div>
 
     Mongoose supports creating schemas and validating documents in the browser.
     Mongoose's browser library does **not** support saving documents, [queries](http://mongoosejs.com/docs/queries.html),

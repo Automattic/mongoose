@@ -1,9 +1,5 @@
 extends layout
 
-append style
-  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
-
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
@@ -12,16 +8,9 @@ block content
   :markdown
     ## Deprecation Warnings
 
-    <script>
-      _native.init("CK7DT53U",{
-        targetClass: 'native-inline'
-      });
-    </script>
+  include includes/native
 
-    <div class="native-inline">
-      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
-    </div>
-
+  :markdown
     There are several deprecations in the [MongoDB Node.js driver](http://npmjs.com/package/mongodb)
     that Mongoose users should be aware of. Mongoose provides options to work
     around these deprecation warnings, but you need to test whether these options

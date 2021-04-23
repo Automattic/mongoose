@@ -2,8 +2,6 @@ extends layout
 
 append style
   link(rel="stylesheet", href="/docs/css/api.css")
-  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
 
   style.
     .api-nav .nav-item-sub {
@@ -20,10 +18,7 @@ block content
   </a>
   h1 #{name}
 
-  div.
-    <div class="native-inline">
-      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
-    </div>
+  include includes/native
 
   div.api-nav
     div.api-nav-content
@@ -82,8 +77,3 @@ block content
           li <span class="method-type">&laquo;#{prop.inherits}&raquo;</span>
       div
         | !{prop.description}  
-
-  script.
-    _native.init("CK7DT53U",{
-      targetClass: 'native-inline'
-    });

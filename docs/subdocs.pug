@@ -1,9 +1,5 @@
 extends layout
 
-append style
-  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
-
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
@@ -12,16 +8,9 @@ block content
   :markdown
     ## Subdocuments
 
-    <script>
-      _native.init("CK7DT53U",{
-        targetClass: 'native-inline'
-      });
-    </script>
+  include includes/native
 
-    <div class="native-inline">
-      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
-    </div>
-
+  :markdown
     Subdocuments are documents embedded in other documents. In Mongoose, this
     means you can nest schemas in other schemas. Mongoose has two
     distinct notions of subdocuments: [arrays of subdocuments](https://masteringjs.io/tutorials/mongoose/array#document-arrays) and single nested

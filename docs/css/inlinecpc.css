@@ -1,14 +1,7 @@
 .native-inline {
-  visibility: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu,
   Cantarell, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  opacity: 0;
   transition: all .25s ease-in-out;
-}
-
-.native-show {
-  visibility: visible;
-  opacity: 1;
 }
 
 .native-inline {

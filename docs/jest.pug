@@ -1,9 +1,5 @@
 extends layout
 
-block append style
-  link(rel="stylesheet" href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
-
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
@@ -12,16 +8,9 @@ block content
   :markdown
     # Testing Mongoose with [Jest](https://www.npmjs.com/package/jest)
 
-    <script>
-      _native.init("CK7DT53U",{
-        targetClass: 'native-inline'
-      });
-    </script>
+  include includes/native
 
-    <div class="native-inline">
-      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
-    </div>
-
+  :markdown
     Jest is a client-side JavaScript testing library developed by Facebook.
     Because Jest is designed primarily for testing React applications, using
     it to test Node.js server-side applications comes with a lot of caveats.

@@ -1,8 +1,6 @@
 extends layout
 
 append style
-  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
   script(type="text/javascript" src="https://unpkg.com/unfetch/polyfill")
 
   style.
@@ -54,13 +52,7 @@ block content
   div
     h2 Search
 
-    script.
-      _native.init("CK7DT53U",{
-        targetClass: 'native-inline'
-      });
-
-    div.native-inline.
-      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+    include includes/native
 
     div.search-bar
       input#search-input(type="text", placeholder="Search")

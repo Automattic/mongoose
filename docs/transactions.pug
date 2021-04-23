@@ -1,9 +1,5 @@
 extends layout
 
-block append style
-  link(rel="stylesheet" href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
-
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
@@ -12,16 +8,9 @@ block content
   :markdown
     # Transactions in Mongoose
 
-    <script>
-      _native.init("CK7DT53U",{
-        targetClass: 'native-inline'
-      });
-    </script>
+  include includes/native
 
-    <div class="native-inline">
-      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
-    </div>
-
+  :markdown
     [Transactions](https://www.mongodb.com/transactions) are new in MongoDB
     4.0 and Mongoose 5.2.0. Transactions let you execute multiple operations
     in isolation and potentially undo all the operations if one of them fails.

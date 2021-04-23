@@ -1,9 +1,6 @@
 extends layout
 
 append style
-  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
-
   style.
     button {
       border-radius: 3px;
@@ -27,16 +24,9 @@ block content
   :markdown
     ## Mongoose for Enterprise
 
-    <script>
-      _native.init("CK7DT53U",{
-        targetClass: 'native-inline'
-      });
-    </script>
+  include includes/native
 
-    <div class="native-inline">
-      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
-    </div>
-
+  :markdown
     ### Available as part of the Tidelift Subscription
     
     Tidelift is working with the maintainers of Mongoose and thousands of other

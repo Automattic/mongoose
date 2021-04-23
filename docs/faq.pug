@@ -1,9 +1,5 @@
 extends layout
 
-append style
-  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
-
 block append style
   style.
     hr {
@@ -24,17 +20,9 @@ block content
   :markdown
     ## FAQ
 
-    <script>
-      _native.init("CK7DT53U",{
-        targetClass: 'native-inline'
-      });
-    </script>
+  include includes/native
 
-    <div class="native-inline">
-      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
-    </div>
-
-
+  :markdown
     <hr id="array-changes-not-saved" />
 
     <a href="#array-changes-not-saved">**Q**</a>. Why don't my changes to arrays get saved when I update an element

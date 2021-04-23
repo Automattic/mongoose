@@ -1,8 +1,6 @@
 extends layout
 
 append style
-  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
 
   style.
     img { width: auto; }
@@ -28,16 +26,9 @@ block content
   :markdown
     ## Further Reading
 
-    <script>
-      _native.init("CK7DT53U",{
-        targetClass: 'native-inline'
-      });
-    </script>
+  include includes/native
 
-    <div class="native-inline">
-      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
-    </div>
-
+  :markdown
     There's a lot of great content out there to learn more about Mongoose.
     This page has a list of video courses, books, and blog posts curated by
     Mongoose maintainers. We've gone through every course, book, and article

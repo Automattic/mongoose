@@ -70,7 +70,7 @@ extends ../layout
 
 append style
   link(rel="stylesheet", href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
+  script(type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js")
   style.
     p { line-height: 1.5em }
 
@@ -83,15 +83,22 @@ ${md.split('\n').map(line => '    ' + line).join('\n')}
 `;
 
 const cpc = `
+<div id="native-direct"></div>
 <script>
-  _native.init("CK7DT53U",{
-    targetClass: 'native-inline'
-  });
-</script>
-
+    (function() {
+        if (typeof _bsa !== 'undefined' && _bsa) {
+            _bsa.init('custom', 'CK7DT53U', 'placement:mongoosejscom', {
+                target: '#native-direct',
+                template: \`
 <div class="native-inline">
-  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+<a rel="sponsored noopener" target="_blank" href="##statlink##" title="##company## — ##tagline##"><span class="sponsor">Sponsor</span> ##company## — ##description##</a>
 </div>
+</a>
+\`
+            });
+        }
+    })();
+</script>
 `;
 
 function pugify(filename, options, newfile) {

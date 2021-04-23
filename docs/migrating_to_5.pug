@@ -6,23 +6,13 @@ block append style
       padding-right: 15px;
     }
 
-append style
-  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
-
 block content
   :markdown
     ## Migrating from 4.x to 5.x
+  
+  include includes/native
 
-    <script>
-      _native.init("CK7DT53U",{
-        targetClass: 'native-inline'
-      });
-    </script>
-
-    <div class="native-inline">
-      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
-    </div>
+  :markdown
 
     There are several [backwards-breaking changes](https://github.com/Automattic/mongoose/blob/master/History.md)
     you should be aware of when migrating from Mongoose 4.x to Mongoose 5.x.

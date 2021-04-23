@@ -6735,6 +6735,26 @@ describe('Model', function() {
     });
   });
 
+  it('Model.validate(...) uses document instance as context by default (gh-10132)', function() {
+    const userSchema = new Schema({
+      name: {
+        type: String,
+        required: function() {
+          return this.nameRequired;
+        }
+      },
+      nameRequired: Boolean
+    });
+
+    const User = db.model('User', userSchema);
+    return co(function*() {
+      const user = new User({ name: 'test', nameRequired: false });
+      const err = yield User.validate(user).catch(err => err);
+
+      assert.ifError(err);
+    });
+  });
+
   it('sets correct `Document#op` with `save()` (gh-8439)', function() {
     const schema = Schema({ name: String });
     const ops = [];

@@ -29,7 +29,7 @@
     "ms": "2.1.2",
     "regexp-clone": "1.0.0",
     "safe-buffer": "5.2.1",
-    "sift": "7.0.1",
+    "sift": "13.5.2",
     "sliced": "1.0.1"
   },
   "devDependencies": {
@@ -107,23 +107,25 @@
     "extends": [
       "eslint:recommended"
     ],
-    "overrides": [{
-      "files": [
-        "**/*.{ts,tsx}"
-      ],
-      "extends": [
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended"
-      ],
-      "plugins": [
-        "@typescript-eslint"
-      ],
-      "rules": {
-        "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/ban-types": "off",
-        "@typescript-eslint/no-unused-vars": "off"
+    "overrides": [
+      {
+        "files": [
+          "**/*.{ts,tsx}"
+        ],
+        "extends": [
+          "plugin:@typescript-eslint/eslint-recommended",
+          "plugin:@typescript-eslint/recommended"
+        ],
+        "plugins": [
+          "@typescript-eslint"
+        ],
+        "rules": {
+          "@typescript-eslint/no-explicit-any": "off",
+          "@typescript-eslint/ban-types": "off",
+          "@typescript-eslint/no-unused-vars": "off"
+        }
       }
-    }],
+    ],
     "plugins": [
       "mocha-no-only"
     ],

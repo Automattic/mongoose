@@ -64,6 +64,32 @@ function schemaStaticsWithoutGenerics() {
   UserModel.static1();
 }
 
+function gh10074() {
+  interface IDog {
+    breed: string;
+    name: string;
+    age: number;
+  }
+
+  type IDogDocument = IDog & Document;
+
+  const DogSchema = new Schema<IDogDocument>(
+    {
+      breed: { type: String },
+      name: { type: String },
+      age: { type: Number }
+    }
+  );
+
+  const Dog = model<IDogDocument, Model<IDogDocument>>('dog', DogSchema);
+
+  const rex = new Dog({
+    breed: 'test',
+    name: 'rex',
+    age: '50'
+  });
+}
+
 const ExpiresSchema = new Schema({
   ttl: {
     type: Date,

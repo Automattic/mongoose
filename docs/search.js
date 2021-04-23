@@ -50,7 +50,7 @@ for (const filename of files) {
   } else if (file.guide) {
     let text = fs.readFileSync(filename, 'utf8');
     text = text.substr(text.indexOf('block content') + 'block content\n'.length);
-    text = pug.render(`div\n${text}`, { filters: { markdown } });
+    text = pug.render(`div\n${text}`, { filters: { markdown }, filename });
 
     const content = new Content({
       title: file.title,

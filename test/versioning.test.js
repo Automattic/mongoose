@@ -540,6 +540,24 @@ describe('versioning', function() {
     });
   });
 
+  it('should persist correctly when optimisticConcurrency is true gh-10128', function() {
+    const thingSchema = new Schema({ price: Number }, { optimisticConcurrency: true });
+    const Thing = db.model('Thing', thingSchema);
+    return co(function*() {
+      const thing = yield Thing.create({ price: 1 });
+      yield thing.save();
+      assert.equal(thing.__v, 0);
+      const thing_1 = yield Thing.findById(thing.id);
+      const thing_2 = yield Thing.findById(thing.id);
+      thing_1.set({ price: 2 });
+      yield thing_1.save();
+      assert.equal(thing_1.__v, 1);
+      thing_2.set({ price: 1 });
+      const err = yield thing_2.save().then(() => null, err => err);
+      assert.equal(err.name, 'DocumentNotFoundError');
+    });
+  });
+
   describe('versioning is off', function() {
     it('when { safe: false } is set (gh-1520)', function(done) {
       const schema1 = new Schema({ title: String }, { safe: false });

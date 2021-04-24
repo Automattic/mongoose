@@ -101,3 +101,9 @@ function testGenericQuery(): void {
     return model.findOne({ something: 'test' }).orFail().exec();
   }
 }
+
+function eachAsync(): void {
+  Test.find().cursor().eachAsync((doc: ITest) => console.log(doc.name));
+
+  Test.find().cursor().eachAsync((docs: ITest[]) => console.log(docs[0].name), { batchSize: 2 });
+}

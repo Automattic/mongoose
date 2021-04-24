@@ -5049,7 +5049,7 @@ describe('model: populate:', function() {
         });
       });
 
-      it('with no results (gh-4284)', function(done) {
+      it('with no results XYZ (gh-4284)', function(done) {
         const PersonSchema = new Schema({
           name: String,
           authored: [Number]
@@ -10294,6 +10294,28 @@ describe('model: populate:', function() {
       assert.equal(populatedBooks.length, 2);
       assert.equal(populatedBooks[0].author.name, 'Author1');
       assert.equal(populatedBooks[1].author.name, 'Author1');
+    });
+  });
+
+  it('handles virtual populate when foreignField is an array with duplicates (gh-10117)', function() {
+    const bookSchema = new Schema({ name: String, author: String });
+    bookSchema.virtual('authors', {
+      ref: 'Person',
+      localField: 'author',
+      foreignField: 'aliases',
+      justOne: false
+    });
+    const Book = db.model('Book', bookSchema);
+    const Author = db.model('Person', new Schema({ aliases: [String] }));
+
+    return co(function*() {
+      yield Author.create({ aliases: ['author1', 'author2', 'author1'] });
+
+      const book = yield Book.create({ name: 'Book1', author: 'author1' });
+
+      const fromDb = yield Book.findById(book).populate('authors');
+      assert.equal(fromDb.authors.length, 1);
+      assert.deepEqual(fromDb.toObject({ virtuals: true }).authors[0].aliases, ['author1', 'author2', 'author1']);
     });
   });
 });

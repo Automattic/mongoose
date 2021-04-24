@@ -2379,8 +2379,10 @@ declare module 'mongoose' {
      * will wait for the promise to resolve before iterating on to the next one.
      * Returns a promise that resolves when done.
      */
-    eachAsync(fn: (doc: DocType| [DocType]) => any, options?: { parallel?: number, batchSize?: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType| [DocType]) => any, options?: { parallel?: number, batchSize?: number }, cb?: (err: CallbackError) => void): void;
+    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number, batchSize?: number }, cb?: (err: CallbackError) => void): void;
+    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }, cb?: (err: CallbackError) => void): void;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved

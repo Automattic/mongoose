@@ -10318,4 +10318,44 @@ describe('model: populate:', function() {
       assert.deepEqual(fromDb.toObject({ virtuals: true }).authors[0].aliases, ['author1', 'author2', 'author1']);
     });
   });
+
+  it('handles virtual populate with `$elemMatch` in custom match when `foreignField` is an array (gh-10117)', function() {
+    const User = db.model('User', mongoose.Schema({
+      name: String,
+      access: [{ role: String, deletedAt: Date, organization: 'ObjectId' }]
+    }));
+
+    const organizationSchema = mongoose.Schema({ name: String });
+    organizationSchema.virtual('administrators', {
+      ref: 'User',
+      localField: '_id',
+      foreignField: 'access.organization'
+    });
+    const Organization = db.model('Organization', organizationSchema);
+
+    return co(function*() {
+      const org = yield Organization.create({ name: 'test org' });
+      yield User.create([
+        { name: 'user1', access: [{ role: 'admin', organization: org._id }] },
+        { name: 'user2', access: [{ role: 'admin', organization: null }] },
+        {
+          name: 'user3',
+          access: [
+            { role: 'admin', organization: org._id, deletedAt: new Date() },
+            { role: 'admin', organization: null }
+          ]
+        }
+      ]);
+
+      const res = yield Organization.findById(org).populate({
+        path: 'administrators',
+        match: {
+          access: { $elemMatch: { role: 'admin', deletedAt: { $exists: false } } }
+        }
+      });
+      assert.equal(res.administrators.length, 1);
+      assert.equal(res.administrators[0].name, 'user1');
+
+    });
+  });
 });

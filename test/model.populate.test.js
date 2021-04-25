@@ -10341,6 +10341,9 @@ describe('model: populate:', function() {
         {
           name: 'user3',
           access: [
+            // Shouldn't end up in result because first entry matches on `_id` but
+            // not custom `$elemMatch`, and 2nd entry matches on custom `$elemMatch`
+            // but not on `_id`.
             { role: 'admin', organization: org._id, deletedAt: new Date() },
             { role: 'admin', organization: null }
           ]

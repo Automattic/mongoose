@@ -598,7 +598,7 @@ declare module 'mongoose' {
     validate(pathsToValidate: Array<string>, options: any, callback: (err: CallbackError) => void): void;
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
-    validateSync(pathsToValidate?: Array<string>, options?: any): NativeError | null;
+    validateSync(pathsToValidate?: Array<string>, options?: any): Error.ValidationError | null;
   }
 
   interface AcceptsDiscriminator {

@@ -14,6 +14,30 @@ function conventionalSyntax(): void {
   const bar = (SomeModel: Model<ITest>) => console.log(SomeModel);
 
   bar(Test);
+
+  const doc = new Test({ foo: '42' });
+  console.log(doc.foo);
+  doc.save();
+}
+
+function rawDocSyntax(): void {
+  interface ITest {
+    foo: string;
+  }
+
+  const TestSchema = new Schema<ITest & Document>({
+    foo: { type: String, required: true }
+  });
+
+  const Test = connection.model<ITest & Document>('Test', TestSchema);
+
+  const bar = (SomeModel: Model<ITest>) => console.log(SomeModel);
+
+  bar(Test);
+
+  const doc = new Test({ foo: '42' });
+  console.log(doc.foo);
+  doc.save();
 }
 
 function tAndDocSyntax(): void {

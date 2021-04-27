@@ -1,3 +1,19 @@
+5.12.6 / 2021-04-27
+===================
+ * fix(query): allow setting `writeConcern` schema option to work around MongoDB driver's `writeConcern` deprecation warning #10083 #10009 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(populate): dedupe when virtual populate foreignField is an array to avoid duplicate docs in result #10117
+ * fix(populate): add `localField` filter to `$elemMatch` on virtual populate when custom `match` has a `$elemMatch` and `foreignField` is an array #10117
+ * fix(query): convert projection string values to numbers as a workaround for #10142
+ * fix(document): set version key filter on `save()` when using `optimisticConcurrency` if no changes in document #10128 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(model): use `obj` as `context` in `Model.validate()` if `obj` is a document #10132
+ * fix(connection): avoid db events deprecation warning when using `useDb()` with `useUnifiedTopology` #8267
+ * fix: upgrade to sift@13.5.2 to work around transitive dev dependency security warning #10121
+ * fix(index.d.ts): allow any object as parameter to `create()` and `insertMany()` #10144
+ * fix(index.d.ts): clarify that `eachAsync()` callback receives a single doc rather than array of docs unless `batchSize` is set #10135
+ * fix(index.d.ts): clarify that return value from `validateSync()` is a ValidationError #10147 [michaln-q](https://github.com/michaln-q)
+ * fix(index.d.ts): add generic type for Model constructor #10074 [Duchynko](https://github.com/Duchynko)
+ * fix(index.d.ts): add parameter type in merge #10168 [yoonhoGo](https://github.com/yoonhoGo)
+
 5.12.5 / 2021-04-19
 ===================
  * fix(populate): handle populating underneath document array when document array property doesn't exist in db #10003

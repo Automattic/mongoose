@@ -607,6 +607,8 @@ declare module 'mongoose' {
     discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
   }
 
+  interface AnyObject { [k: string]: any }
+
   export const Model: Model<any>;
   // eslint-disable-next-line no-undef
   interface Model<T extends Document, TQueryHelpers = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
@@ -647,14 +649,14 @@ declare module 'mongoose' {
     countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): QueryWithHelpers<number, T, TQueryHelpers>;
 
     /** Creates a new document or documents */
-    create(doc: T | DocumentDefinition<T>): Promise<T>;
-    create(docs: (T | DocumentDefinition<T>)[], options?: SaveOptions): Promise<T[]>;
-    create(docs: (T | DocumentDefinition<T>)[], callback: (err: CallbackError, docs: T[]) => void): void;
-    create(doc: T | DocumentDefinition<T>, callback: (err: CallbackError, doc: T) => void): void;
+    create(docs: (T | DocumentDefinition<T> | AnyObject)[], options?: SaveOptions): Promise<T[]>;
+    create(docs: (T | DocumentDefinition<T> | AnyObject)[], callback: (err: CallbackError, docs: T[]) => void): void;
+    create(doc: T | DocumentDefinition<T> | AnyObject): Promise<T>;
+    create(doc: T | DocumentDefinition<T> | AnyObject, callback: (err: CallbackError, doc: T) => void): void;
     create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], options?: SaveOptions): Promise<T[]>;
+    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], callback: (err: CallbackError, docs: T[]) => void): void;
     create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<T>;
     create<DocContents = T | DocumentDefinition<T>>(...docs: DocContents[]): Promise<T[]>;
-    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], callback: (err: CallbackError, docs: T[]) => void): void;
     create<DocContents = T | DocumentDefinition<T>>(doc: DocContents, callback: (err: CallbackError, doc: T) => void): void;
 
     /**
@@ -734,12 +736,12 @@ declare module 'mongoose' {
     init(callback?: (err: any) => void): Promise<T>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
-    insertMany(doc: T | DocumentDefinition<T>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
-    insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions): Promise<T>;
-    insertMany(docs: Array<T | DocumentDefinition<T>>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
-    insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions): Promise<Array<T>>;
-    insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions, callback?: (err: CallbackError, res: T | InsertManyResult) => void): void;
-    insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions, callback?: (err: CallbackError, res: Array<T> | InsertManyResult) => void): void;
+    insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options?: InsertManyOptions): Promise<Array<T>>;
+    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions): Promise<T>;
+    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions, callback?: (err: CallbackError, res: T | InsertManyResult) => void): void;
+    insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options?: InsertManyOptions, callback?: (err: CallbackError, res: Array<T> | InsertManyResult) => void): void;
 
     /**
      * Lists the indexes currently defined in MongoDB. This may or may not be

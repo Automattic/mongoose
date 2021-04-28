@@ -2667,6 +2667,8 @@ declare module 'mongoose' {
       path: string;
       reason?: NativeError | null;
       model?: any;
+
+      constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
     }
 
     export class DisconnectedError extends Error {

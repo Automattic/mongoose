@@ -1721,14 +1721,14 @@ describe('model', function() {
     assert.deepEqual(nestedDocument.body.children[1].body.children[0].body.children[0].body.children, []);
   });
 
-  it('takes discriminator schema\'s single nested over base schema\'s (gh-10157)', function() {  
+  it('takes discriminator schema\'s single nested over base schema\'s (gh-10157)', function() {
     const personSchema = new Schema({
       name: Schema({ firstName: String, lastName: String }),
-       kind: { type: 'String', enum: ['normal', 'vip'], required: true },
+      kind: { type: 'String', enum: ['normal', 'vip'], required: true }
     }, { discriminatorKey: 'kind' });
-  
+
     const Person = db.model('Person', personSchema);
-  
+
     const vipSchema = Schema({
       name: Schema({
         firstName: { type: 'String', required: true },

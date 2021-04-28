@@ -10206,4 +10206,28 @@ describe('document', function() {
       assert.ok(resultObject.child.map instanceof Map);
     });
   });
+
+  it('does not double validate paths under mixed objects (gh-10141)', function() {
+    let validatorCallCount = 0;
+    const Test = db.model('Test', Schema({
+      name: String,
+      object: {
+        type: Object,
+        validate: () => {
+          validatorCallCount++;
+          return true;
+        }
+      }
+    }));
+
+    return co(function*() {
+      const doc = yield Test.create({ name: 'test', object: { answer: 42 } });
+
+      validatorCallCount = 0;
+      doc.set('object.question', 'secret');
+      doc.set('object.answer', 0);
+      yield doc.validate();
+      assert.equal(validatorCallCount, 0);
+    });
+  });
 });

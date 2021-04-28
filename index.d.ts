@@ -603,8 +603,8 @@ declare module 'mongoose' {
 
   interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
-    discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
-    discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
+    discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<D>;
+    discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
   interface AnyObject { [k: string]: any }

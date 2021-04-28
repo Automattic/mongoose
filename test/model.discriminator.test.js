@@ -1094,6 +1094,35 @@ describe('model', function() {
         });
     });
 
+    it('supports ObjectId as tied value (gh-10130)', function() {
+      const eventSchema = new Schema({ message: String, kind: 'ObjectId' },
+        { discriminatorKey: 'kind' });
+
+      const Event = db.model('Event', eventSchema);
+      const clickedId = new mongoose.Types.ObjectId();
+      const purchasedId = new mongoose.Types.ObjectId();
+      Event.discriminator('Clicked', new Schema({
+        element: String
+      }), clickedId);
+      Event.discriminator('Purchased', new Schema({
+        product: String
+      }), purchasedId);
+
+      return co(function*() {
+        yield Event.create([
+          { message: 'test', element: '#buy', kind: clickedId },
+          { message: 'test2', product: 'Turbo Man', kind: purchasedId }
+        ]);
+
+        const docs = yield Event.find().sort({ message: 1 });
+        assert.equal(docs.length, 2);
+        assert.equal(docs[0].kind.toHexString(), clickedId.toHexString());
+        assert.equal(docs[0].element, '#buy');
+        assert.equal(docs[1].kind.toHexString(), purchasedId.toHexString());
+        assert.equal(docs[1].product, 'Turbo Man');
+      });
+    });
+
     it('Embedded discriminators in nested doc arrays (gh-6202)', function() {
       const eventSchema = new Schema({ message: String }, {
         discriminatorKey: 'kind',

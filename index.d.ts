@@ -125,7 +125,7 @@ declare module 'mongoose' {
   export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): typeof mongoose;
 
   /** Getter/setter around function for pluralizing collection names. */
-  export function pluralize(fn?: (str: string) => string): (str: string) => string;
+  export function pluralize(fn?: ((str: string) => string) | null): ((str: string) => string) | null;
 
   /** Sets mongoose options */
   export function set(key: string, value: any): void;

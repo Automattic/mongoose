@@ -113,6 +113,47 @@ describe('validation docs', function() {
   });
 
   /**
+   * You can configure the error message for individual validators in your schema. There are two equivalent
+   * ways to set the validator error message:
+   *
+   * - Array syntax: `min: [6, 'Must be at least 6, got {VALUE}']`
+   * - Object syntax: `enum: { values: ['Coffee', 'Tea'], message: '{VALUE} is not supported' }`
+   *
+   * Mongoose also supports rudimentary templating for error messages.
+   * Mongoose replaces `{VALUE}` with the value being validated.
+   */
+
+  it('Custom Error Messages', function(done) {
+    const breakfastSchema = new Schema({
+      eggs: {
+        type: Number,
+        min: [6, 'Must be at least 6, got {VALUE}'],
+        max: 12
+      },
+      drink: {
+        type: String,
+        enum: {
+          values: ['Coffee', 'Tea'],
+          message: '{VALUE} is not supported'
+        }
+      }
+    });
+    const Breakfast = db.model('Breakfast', breakfastSchema);
+
+    const badBreakfast = new Breakfast({
+      eggs: 2,
+      drink: 'Milk'
+    });
+    let error = badBreakfast.validateSync();
+    assert.equal(error.errors['eggs'].message,
+      'Must be at least 6, got 2');
+    assert.equal(error.errors['drink'].message, 'Milk is not supported');
+    // acquit:ignore:start
+    done();
+    // acquit:ignore:end
+  });
+
+  /**
    * A common gotcha for beginners is that the `unique` option for schemas
    * is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://docs.mongodb.com/manual/core/index-unique/).
    * See the [FAQ](/docs/faq.html) for more information.

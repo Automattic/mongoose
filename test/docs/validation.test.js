@@ -138,6 +138,9 @@ describe('validation docs', function() {
         }
       }
     });
+    // acquit:ignore:start
+    db.deleteModel(/Breakfast/);
+    // acquit:ignore:end
     const Breakfast = db.model('Breakfast', breakfastSchema);
 
     const badBreakfast = new Breakfast({

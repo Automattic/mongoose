@@ -1094,6 +1094,35 @@ describe('model', function() {
         });
     });
 
+    it('supports ObjectId as tied value (gh-10130)', function() {
+      const eventSchema = new Schema({ message: String, kind: 'ObjectId' },
+        { discriminatorKey: 'kind' });
+
+      const Event = db.model('Event', eventSchema);
+      const clickedId = new mongoose.Types.ObjectId();
+      const purchasedId = new mongoose.Types.ObjectId();
+      Event.discriminator('Clicked', new Schema({
+        element: String
+      }), clickedId);
+      Event.discriminator('Purchased', new Schema({
+        product: String
+      }), purchasedId);
+
+      return co(function*() {
+        yield Event.create([
+          { message: 'test', element: '#buy', kind: clickedId },
+          { message: 'test2', product: 'Turbo Man', kind: purchasedId }
+        ]);
+
+        const docs = yield Event.find().sort({ message: 1 });
+        assert.equal(docs.length, 2);
+        assert.equal(docs[0].kind.toHexString(), clickedId.toHexString());
+        assert.equal(docs[0].element, '#buy');
+        assert.equal(docs[1].kind.toHexString(), purchasedId.toHexString());
+        assert.equal(docs[1].product, 'Turbo Man');
+      });
+    });
+
     it('Embedded discriminators in nested doc arrays (gh-6202)', function() {
       const eventSchema = new Schema({ message: String }, {
         discriminatorKey: 'kind',
@@ -1719,5 +1748,32 @@ describe('model', function() {
     });
 
     assert.deepEqual(nestedDocument.body.children[1].body.children[0].body.children[0].body.children, []);
+  });
+
+  it('takes discriminator schema\'s single nested over base schema\'s (gh-10157)', function() {
+    const personSchema = new Schema({
+      name: Schema({ firstName: String, lastName: String }),
+      kind: { type: 'String', enum: ['normal', 'vip'], required: true }
+    }, { discriminatorKey: 'kind' });
+
+    const Person = db.model('Person', personSchema);
+
+    const vipSchema = Schema({
+      name: Schema({
+        firstName: { type: 'String', required: true },
+        title: { type: 'String', required: true }
+      })
+    });
+    const Vip = Person.discriminator('vip', vipSchema);
+
+    const doc1 = new Vip({ name: { firstName: 'John' } });
+    let err = doc1.validateSync();
+    assert.ok(err);
+    assert.ok(err.errors['name.title']);
+
+    const doc2 = new Vip({ name: { title: 'Dr' } });
+    err = doc2.validateSync();
+    assert.ok(err);
+    assert.ok(err.errors['name.firstName']);
   });
 });

@@ -1,3 +1,20 @@
+5.12.7 / 2021-04-29
+===================
+ * fix(document): make $getPopulatedDocs() return populated virtuals #10148
+ * fix(discriminator): take discriminator schema's single nested paths over base schema's #10157
+ * fix(discriminator): allow numbers and ObjectIds as tied values for discriminators #10130
+ * fix(document): avoid double validating paths underneath mixed objects in save() #10141
+ * fix(schema): allow path() to return single nested paths within document arrays #10164
+ * fix(model+query): consistently wrap query callbacks in `process.nextTick()` to avoid clean stack traces causing memory leak when using synchronous recursion like `async.whilst()` #9864
+ * fix(cursor): correctly report CastError when using noCursorTimeout flag #10150
+ * fix(index.d.ts): add CastError constructor #10176
+ * fix(index.d.ts): allow setting mongoose.pluralize(null) in TypeScript #10185
+ * docs: add link to transactions guide from nav bar #10143
+ * docs(validation): add section about custom error messages #10140
+ * docs: make headers linkable via clicking #10156
+ * docs: broken link in document.js #10190 [joostdecock](https://github.com/joostdecock)
+ * docs: make navbar responsive on legacy 2.x docs #10171 [ad99526](https://github.com/ad99526)
+
 5.12.6 / 2021-04-27
 ===================
  * fix(query): allow setting `writeConcern` schema option to work around MongoDB driver's `writeConcern` deprecation warning #10083 #10009 [IslandRhythms](https://github.com/IslandRhythms)

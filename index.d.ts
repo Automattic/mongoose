@@ -125,7 +125,7 @@ declare module 'mongoose' {
   export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): typeof mongoose;
 
   /** Getter/setter around function for pluralizing collection names. */
-  export function pluralize(fn?: (str: string) => string): (str: string) => string;
+  export function pluralize(fn?: ((str: string) => string) | null): ((str: string) => string) | null;
 
   /** Sets mongoose options */
   export function set(key: string, value: any): void;
@@ -603,8 +603,8 @@ declare module 'mongoose' {
 
   interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
-    discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
-    discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
+    discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<D>;
+    discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
   interface AnyObject { [k: string]: any }
@@ -2667,6 +2667,8 @@ declare module 'mongoose' {
       path: string;
       reason?: NativeError | null;
       model?: any;
+
+      constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
     }
 
     export class DisconnectedError extends Error {

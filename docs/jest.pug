@@ -20,7 +20,7 @@ block content
     If you choose to delve into dangerous waters and test Mongoose apps with
     Jest, here's what you need to know:
 
-    ## Recommended `testEnvironment`
+    <h2 id="recommended-testenvironment"><a href="#recommended-testenvironment">Recommended <code>testEnvironment</code></a></h2>
 
     Do **not** use Jest's default [`jsdom` test environment](https://jestjs.io/docs/en/configuration.html#testenvironment-string)
     when testing Mongoose apps, _unless_ you are explicitly testing an
@@ -43,7 +43,7 @@ block content
     };
     ```
 
-    ## Timer Mocks
+    <h2 id="timer-mocks"><a href="#timer-mocks">Timer Mocks</a></h2>
 
     Absolutely do **not** use [timer mocks](https://jestjs.io/docs/en/timer-mocks.html)
     when testing Mongoose apps. Fake timers stub out global functions like
@@ -77,7 +77,7 @@ block content
     sinon.stub(time, 'setTimeout');
     ```
 
-    ## `globalSetup` and `globalTeardown`
+    <h2 id="globalsetup-and-globalteardown"><a href="#globalsetup-and-globalteardown"><code>globalSetup</code> and <code>globalTeardown</code></a></h2>
 
     Do **not** use `globalSetup` to call `mongoose.connect()` or
     `mongoose.createConnection()`. Jest runs `globalSetup` in

@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.12.6",
+  "version": "5.12.7",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -122,7 +122,8 @@
         "rules": {
           "@typescript-eslint/no-explicit-any": "off",
           "@typescript-eslint/ban-types": "off",
-          "@typescript-eslint/no-unused-vars": "off"
+          "@typescript-eslint/no-unused-vars": "off",
+          "@typescript-eslint/explicit-module-boundary-types": "off"
         }
       }
     ],

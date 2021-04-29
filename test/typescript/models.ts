@@ -25,18 +25,25 @@ function rawDocSyntax(): void {
     foo: string;
   }
 
-  const TestSchema = new Schema<ITest & Document>({
+  interface ITestMethods {
+    bar(): number;
+  }
+
+  type TestModel = Model<ITest, {}, ITestMethods>;
+
+  const TestSchema = new Schema<ITest, TestModel>({
     foo: { type: String, required: true }
   });
 
-  const Test = connection.model<ITest & Document>('Test', TestSchema);
+  const Test = connection.model<ITest, TestModel>('Test', TestSchema);
 
-  const bar = (SomeModel: Model<ITest>) => console.log(SomeModel);
+  const bar = (SomeModel: Model<any, any, any>) => console.log(SomeModel);
 
   bar(Test);
 
   const doc = new Test({ foo: '42' });
   console.log(doc.foo);
+  console.log(doc.bar());
   doc.save();
 }
 

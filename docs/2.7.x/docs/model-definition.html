@@ -8,7 +8,147 @@
         padding: 0 30px 30px;
         margin-top: 0;
       }
+      #model-definition-navToggle
+      {
+        display: block;
+        position: relative;
+        top: 50px;
+        left: 50px;
 
+        z-index: 1;
+
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      #model-definition-navToggle a
+      {
+        text-decoration: none;
+        color: #232323;
+
+        transition: color 0.3s ease;
+      }
+
+      #model-definition-navToggle a:hover
+      {
+        color: tomato;
+      }
+
+
+      #model-definition-navToggle input
+      {
+        display: block;
+        width: 40px;
+        height: 32px;
+        position: absolute;
+        top: -7px;
+        left: -5px;
+
+        cursor: pointer;
+
+        opacity: 0; /* hide this */
+        z-index: 2; /* and place it over the hamburger */
+
+        -webkit-touch-callout: none;
+      }
+
+      /*
+       * Just a quick hamburger
+       */
+      #model-definition-navToggle span
+      {
+        display: block;
+        width: 33px;
+        height: 4px;
+        margin-bottom: 5px;
+        position: relative;
+
+        background: #cdcdcd;
+        border-radius: 3px;
+
+        z-index: 1;
+
+        transform-origin: 4px 0px;
+
+        transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+                    background 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+                    opacity 0.55s ease;
+      }
+
+      #model-definition-navToggle span:first-child
+      {
+        transform-origin: 0% 0%;
+      }
+
+      #model-definition-navToggle span:nth-last-child(2)
+      {
+        transform-origin: 0% 100%;
+      }
+
+      /* 
+       * Transform all the slices of hamburger
+       * into a crossmark.
+       */
+      #model-definition-navToggle input:checked ~ span
+      {
+        opacity: 1;
+        transform: rotate(45deg) translate(-2px, -1px);
+        background: #232323;
+      }
+
+      /*
+       * But let's hide the middle one.
+       */
+      #model-definition-navToggle input:checked ~ span:nth-last-child(3)
+      {
+        opacity: 0;
+        transform: rotate(0deg) scale(0.2, 0.2);
+      }
+
+      /*
+       * Ohyeah and the last one should go the other direction
+       */
+      #model-definition-navToggle input:checked ~ span:nth-last-child(2)
+      {
+        transform: rotate(-45deg) translate(0, -1px);
+      }
+
+      /*
+       * Make this absolute positioned
+       * at the top left of the screen
+       */
+      .model-definition-nav
+      {
+        position: absolute;
+        width: 300px;
+        margin: -100px 0 0 -50px;
+        padding: 50px;
+        padding-top: 125px;
+
+        background: #ededed;
+        list-style-type: none;
+        -webkit-font-smoothing: antialiased;
+        /* to stop flickering of text in safari */
+
+        transform-origin: 0% 0%;
+        transform: translate(-100%, 0);
+
+        transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+      }
+
+      .model-definition-nav li
+      {
+        padding: 10px 0;
+        font-size: 22px;
+      }
+
+      /*
+       * And let's slide it in from the left
+       */
+      #model-definition-navToggle input:checked ~ ul
+      {
+        transform: none;
+      }
       #wrap {
         background: url('/docs/2.7.x/images/pattern.png') no-repeat -134px -211px;
         min-height: 600px;
@@ -178,29 +318,37 @@
     <div id="wrap">
       <div id="page">
         <div id="menu">
-          <ul>
-            <li><a href="../index.html">Home</a></li>
-            <li><a href="model-definition.html">Models/Schemas</a></li>
-            <li><a href="schematypes.html">Schema Types</a></li>
-            <li><a href="schema-options.html">Schema Options</a></li>
-            <li><a href="middleware.html">Middleware</a></li>
-            <li><a href="finding-documents.html">Finding Docs</a></li>
-            <li><a href="updating-documents.html">Updating Docs</a></li>
-            <li><a href="query.html">Queries</a></li>
-            <li><a href="querystream.html">Query Streams</a></li>
-            <li><a href="methods-statics.html">Methods &amp; Statics</a>
-            <li><a href="defaults.html">Defaults</a></li>
-            <li><a href="indexes.html">Indexes</a></li>
-            <li><a href="validation.html">Validation</a></li>
-            <li><a href="virtuals.html">Virtuals</a></li>
-            <li><a href="getters-setters.html">Getters / Setters</a></li>
-            <li><a href="embedded-documents.html">Embedded Docs</a></li>
-            <li><a href="populate.html">Populate (DBRef-like)</a></li>
-            <li><a href="plugins.html">Plugins</a></li>
-            <li><a href="errors.html">Errors</a></li>
-            <li><a href="migration-1x-2x.html">v1x - v2x Migration</a></li>
-            <li><a href="api.html">API</a></li>
-          </ul>
+          <nav role="navigation">
+            <div id="model-definition-navToggle">
+              <input type="checkbox" />
+              <span></span>
+              <span></span>
+              <span></span>
+              <ul class='model-definition-nav'>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="model-definition.html">Models/Schemas</a></li>
+                <li><a href="schematypes.html">Schema Types</a></li>
+                <li><a href="schema-options.html">Schema Options</a></li>
+                <li><a href="middleware.html">Middleware</a></li>
+                <li><a href="finding-documents.html">Finding Docs</a></li>
+                <li><a href="updating-documents.html">Updating Docs</a></li>
+                <li><a href="query.html">Queries</a></li>
+                <li><a href="querystream.html">Query Streams</a></li>
+                <li><a href="methods-statics.html">Methods &amp; Statics</a>
+                <li><a href="defaults.html">Defaults</a></li>
+                <li><a href="indexes.html">Indexes</a></li>
+                <li><a href="validation.html">Validation</a></li>
+                <li><a href="virtuals.html">Virtuals</a></li>
+                <li><a href="getters-setters.html">Getters / Setters</a></li>
+                <li><a href="embedded-documents.html">Embedded Docs</a></li>
+                <li><a href="populate.html">Populate (DBRef-like)</a></li>
+                <li><a href="plugins.html">Plugins</a></li>
+                <li><a href="errors.html">Errors</a></li>
+                <li><a href="migration-1x-2x.html">v1x - v2x Migration</a></li>
+                <li><a href="api.html">API</a></li>
+              </ul>
+            </div>
+          </nav>
         </div>
 
         <h1><a href="../index.html">Mongoose</a></h1>

@@ -9911,6 +9911,30 @@ describe('document', function() {
     });
   });
 
+  it('with virtual populate (gh-10148)', function() {
+    const childSchema = Schema({ name: String, parentId: 'ObjectId' });
+    childSchema.virtual('parent', {
+      ref: 'Parent',
+      localField: 'parentId',
+      foreignField: '_id',
+      justOne: true
+    });
+    const Child = db.model('Child', childSchema);
+
+    const Parent = db.model('Parent', Schema({ name: String }));
+
+    return co(function*() {
+      const p = yield Parent.create({ name: 'Anakin' });
+      yield Child.create({ name: 'Luke', parentId: p._id });
+
+      const res = yield Child.findOne().populate('parent');
+      assert.equal(res.parent.name, 'Anakin');
+      const docs = res.$getPopulatedDocs();
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].name, 'Anakin');
+    });
+  });
+
   it('handles paths named `db` (gh-9798)', function() {
     const schema = new Schema({
       db: String

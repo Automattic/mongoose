@@ -264,7 +264,7 @@ describe('ValidationError', function() {
     const entry = new Test({"text": false, "number": "fsfsf"});
       entry.validate(function(error) {
         console.log(JSON.parse(JSON.stringify(error.errors.number)));
-        assert.ok(JSON.parse(JSON.stringify(error.errors.number._message)));
+        assert.ok(JSON.parse(JSON.stringify(error.errors.number.message)));
         assert.ok(JSON.parse(JSON.stringify(error.errors.number.name)));
       });
     done();

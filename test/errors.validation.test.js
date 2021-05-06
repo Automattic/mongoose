@@ -261,7 +261,7 @@ describe('ValidationError', function() {
     const testSchema = new Schema({ text: { type: String, required: [true, 'Text is required'] }, number: {
       type: Number, required: [true, 'Number is required'] } });
     const Zeta = mongoose.model('Zeta', testSchema);
-    const entry = new Test({ text: false, number: 'fsfsf' });
+    const entry = new Zeta({ text: false, number: 'fsfsf' });
     entry.validate(function(error) {
       assert.ok(JSON.parse(JSON.stringify(error.errors.number.message)));
       assert.ok(JSON.parse(JSON.stringify(error.errors.number.name)));

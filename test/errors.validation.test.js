@@ -9,6 +9,8 @@ const start = require('./common');
 
 const ValidationError = require('../lib/error/validation');
 const assert = require('assert');
+const { constant } = require('async');
+const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -256,5 +258,20 @@ describe('ValidationError', function() {
         done();
       });
     });
+  });
+  it('should have error name in Cast error gh-10166', function(done) {
+    const testSchema = new Schema({text: {type:String, required: [true, "Text is required"]}, number: {
+      type: Number, required: [true, "Number is required"]}, });
+    const Test = mongoose.model('Test', testSchema);
+    const entry = new Test({"text": false, "number": "fsfsf"});
+      entry.validate(function(error) {
+        console.log(JSON.parse(JSON.stringify(error.errors.number)));
+        // wtf
+        console.log(JSON.parse(JSON.stringify(error.errors.number.message)))
+        console.log(JSON.parse(JSON.stringify(error.errors.number.name)))
+        assert.ok(JSON.parse(JSON.stringify(error.errors.number.message)));
+        assert.ok(JSON.parse(JSON.stringify(error.errors.number.name)));
+      });
+    done();
   });
 });

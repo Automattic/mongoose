@@ -263,7 +263,6 @@ describe('ValidationError', function() {
     const Zeta = mongoose.model('Zeta', zetaSchema);
     const entry = new Zeta({ text: false, number: 'fsfsf' });
     entry.validate(function(error) {
-      console.log(JSON.parse(JSON.stringify(error)));
       assert.ok(JSON.parse(JSON.stringify(error.errors.number.message)));
       assert.ok(JSON.parse(JSON.stringify(error.errors.number.name)));
     });

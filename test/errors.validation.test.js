@@ -257,4 +257,15 @@ describe('ValidationError', function() {
       });
     });
   });
+  it('should have error name in Cast error gh-10166', function(done) {
+    const zetaSchema = new Schema({ text: { type: String, required: [true, 'Text is required'] }, number: {
+      type: Number, required: [true, 'Number is required'] } });
+    const Zeta = mongoose.model('Zeta', zetaSchema);
+    const entry = new Zeta({ text: false, number: 'fsfsf' });
+    entry.validate(function(error) {
+      assert.ok(JSON.parse(JSON.stringify(error.errors.number.message)));
+      assert.ok(JSON.parse(JSON.stringify(error.errors.number.name)));
+    });
+    done();
+  });
 });

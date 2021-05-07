@@ -22,6 +22,13 @@ schema.pre(['save', 'validate'], { query: false, document: true }, async functio
   await Test.findOne({});
 });
 
+schema.pre<Query<any,any>>('distinct', () => {
+  console.log('Before Hello');
+});
+
+schema.pre<Query<any,any>>('distinct', () => {
+  console.log('After Hello');
+});
 interface ITest extends Document {
   name?: string;
 }

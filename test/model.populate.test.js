@@ -10358,7 +10358,26 @@ describe('model: populate:', function() {
       });
       assert.equal(res.administrators.length, 1);
       assert.equal(res.administrators[0].name, 'user1');
+    });
+  });
 
+  it('populates immutable array paths (gh-10159)', function() {
+    const Cat = db.model('Cat', {
+      name: String,
+      friends: [{
+        immutable: true,
+        type: mongoose.ObjectId,
+        ref: 'Cat'
+      }]
+    });
+
+    return co(function*() {
+      const friend = yield Cat.create({ name: 'Zildjian' });
+      const myCat = yield Cat.create({ name: 'Lord Fluffles', friends: [friend.id] });
+
+      yield myCat.populate('friends').execPopulate();
+
+      assert.equal(myCat.friends[0].name, 'Zildjian');
     });
   });
 });

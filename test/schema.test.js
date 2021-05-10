@@ -2594,4 +2594,18 @@ describe('schema', function() {
     assert.equal(testSchema.path('doesntpopulate.$').options.ref, 'features');
     assert.equal(testSchema.path('populatescorrectly.$').options.ref, 'features');
   });
+
+  it('path() gets single nested paths within document arrays (gh-10164)', function() {
+    const schema = mongoose.Schema({
+      field1: [mongoose.Schema({
+        field2: mongoose.Schema({
+          field3: Boolean
+        })
+      })]
+    });
+
+    assert.equal(schema.path('field1').instance, 'Array');
+    assert.equal(schema.path('field1.field2').instance, 'Embedded');
+    assert.equal(schema.path('field1.field2.field3').instance, 'Boolean');
+  });
 });

@@ -10358,7 +10358,61 @@ describe('model: populate:', function() {
       });
       assert.equal(res.administrators.length, 1);
       assert.equal(res.administrators[0].name, 'user1');
+    });
+  });
 
+  it('populates immutable array paths (gh-10159)', function() {
+    const Cat = db.model('Cat', {
+      name: String,
+      friends: [{
+        immutable: true,
+        type: mongoose.ObjectId,
+        ref: 'Cat'
+      }]
+    });
+
+    return co(function*() {
+      const friend = yield Cat.create({ name: 'Zildjian' });
+      const myCat = yield Cat.create({ name: 'Lord Fluffles', friends: [friend.id] });
+
+      yield myCat.populate('friends').execPopulate();
+
+      assert.equal(myCat.friends[0].name, 'Zildjian');
+    });
+  });
+
+  it('populates paths under mixed schematypes where some documents have non-object properties (gh-10191)', function() {
+    const schema = mongoose.Schema({
+      name: String,
+      params: [{
+        key: String,
+        value: 'Mixed'
+      }]
+    });
+    const Test = db.model('Test', schema);
+    const User = db.model('User', mongoose.Schema({ name: String }));
+
+    return co(function*() {
+      const user = yield User.create({ name: 'test' });
+
+      yield Test.create([
+        { name: 'test1', params: [{ key: 'textContext', value: 'asd' }] },
+        { name: 'test2', params: [{ key: 'logic', value: { optionLabels: [user._id] } }] }
+      ]);
+
+      const res = yield Test.find().sort({ name: 1 }).populate({
+        path: 'params.value.optionLabels',
+        model: User
+      });
+
+      assert.equal(res[0].name, 'test1');
+      assert.equal(res[0].params.length, 1);
+      assert.equal(res[0].params[0].value, 'asd');
+
+      assert.equal(res[1].name, 'test2');
+      assert.equal(res[1].params.length, 1);
+      assert.equal(res[1].params[0].value.optionLabels.length, 1);
+      assert.equal(res[1].params[0].value.optionLabels[0].name, 'test');
     });
   });
 });

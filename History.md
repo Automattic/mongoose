@@ -1,3 +1,36 @@
+5.12.7 / 2021-04-29
+===================
+ * fix(document): make $getPopulatedDocs() return populated virtuals #10148
+ * fix(discriminator): take discriminator schema's single nested paths over base schema's #10157
+ * fix(discriminator): allow numbers and ObjectIds as tied values for discriminators #10130
+ * fix(document): avoid double validating paths underneath mixed objects in save() #10141
+ * fix(schema): allow path() to return single nested paths within document arrays #10164
+ * fix(model+query): consistently wrap query callbacks in `process.nextTick()` to avoid clean stack traces causing memory leak when using synchronous recursion like `async.whilst()` #9864
+ * fix(cursor): correctly report CastError when using noCursorTimeout flag #10150
+ * fix(index.d.ts): add CastError constructor #10176
+ * fix(index.d.ts): allow setting mongoose.pluralize(null) in TypeScript #10185
+ * docs: add link to transactions guide from nav bar #10143
+ * docs(validation): add section about custom error messages #10140
+ * docs: make headers linkable via clicking #10156
+ * docs: broken link in document.js #10190 [joostdecock](https://github.com/joostdecock)
+ * docs: make navbar responsive on legacy 2.x docs #10171 [ad99526](https://github.com/ad99526)
+
+5.12.6 / 2021-04-27
+===================
+ * fix(query): allow setting `writeConcern` schema option to work around MongoDB driver's `writeConcern` deprecation warning #10083 #10009 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(populate): dedupe when virtual populate foreignField is an array to avoid duplicate docs in result #10117
+ * fix(populate): add `localField` filter to `$elemMatch` on virtual populate when custom `match` has a `$elemMatch` and `foreignField` is an array #10117
+ * fix(query): convert projection string values to numbers as a workaround for #10142
+ * fix(document): set version key filter on `save()` when using `optimisticConcurrency` if no changes in document #10128 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(model): use `obj` as `context` in `Model.validate()` if `obj` is a document #10132
+ * fix(connection): avoid db events deprecation warning when using `useDb()` with `useUnifiedTopology` #8267
+ * fix: upgrade to sift@13.5.2 to work around transitive dev dependency security warning #10121
+ * fix(index.d.ts): allow any object as parameter to `create()` and `insertMany()` #10144
+ * fix(index.d.ts): clarify that `eachAsync()` callback receives a single doc rather than array of docs unless `batchSize` is set #10135
+ * fix(index.d.ts): clarify that return value from `validateSync()` is a ValidationError #10147 [michaln-q](https://github.com/michaln-q)
+ * fix(index.d.ts): add generic type for Model constructor #10074 [Duchynko](https://github.com/Duchynko)
+ * fix(index.d.ts): add parameter type in merge #10168 [yoonhoGo](https://github.com/yoonhoGo)
+
 5.12.5 / 2021-04-19
 ===================
  * fix(populate): handle populating underneath document array when document array property doesn't exist in db #10003

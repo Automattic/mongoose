@@ -27,7 +27,7 @@ block content
     around these deprecation warnings, but you need to test whether these options
     cause any problems for your application. Please [report any issues on GitHub](https://github.com/Automattic/mongoose/issues/new).
 
-    ## Summary
+    <h2 id="summary"><a href="#summary">Summary</a></h2>
 
     To fix all deprecation warnings, follow the below steps:
 
@@ -41,7 +41,7 @@ block content
 
     Read below for more a more detailed description of each deprecation warning.
 
-    ## The `useNewUrlParser` Option
+    <h2 id="the-usenewurlparser-option"><a href="#the-usenewurlparser-option">The <code>useNewUrlParser</code> Option</a></h2>
 
     By default, `mongoose.connect()` will print out the below warning:
 
@@ -76,7 +76,7 @@ block content
     connected, the URL parser is no longer important. If you can't connect
     with `{ useNewUrlParser: true }`, please [open an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
 
-    ## `findAndModify()`
+    <h2 id="findandmodify"><a href="#findandmodify"><code>findAndModify()</code></a></h2>
 
     If you use [`Model.findOneAndUpdate()`](/docs/api.html#model_Model.findOneAndUpdate),
     by default you'll see one of the below deprecation warnings.
@@ -117,7 +117,10 @@ block content
     * [`Query.findOneAndRemove()`](/docs/api.html#query_Query-findOneAndRemove)
     * [`Query.findOneAndUpdate()`](/docs/api.html#query_Query-findOneAndUpdate)
 
-    ## `ensureIndex()`
+    You can also safely ignore this warning. Mongoose will not remove the legacy `useFindAndModify: true`
+    behavior until Mongoose 6.0.
+
+    <h2 id="ensureindex"><a href="#ensureindex"><code>ensureIndex()</code></a></h2>
 
     If you define [indexes in your Mongoose schemas](https://mongoosejs.com/docs/guide.html#indexes), you'll see the below
     deprecation warning.
@@ -145,7 +148,10 @@ block content
     this option on without any code changes. If you discover any issues,
     please [open an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
 
-    ## `remove()`
+    You can also safely ignore this warning. Mongoose will not remove the legacy `useCreateIndex: false`
+    behavior until Mongoose 6.0.
+
+    <h2 id="remove"><a href="#remove"><code>remove()</code></a></h2>
 
     The MongoDB driver's [`remove()` function](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#remove) is deprecated in favor of `deleteOne()` and `deleteMany()`. This is to comply with
     the [MongoDB CRUD specification](https://github.com/mongodb/specifications/blob/master/source/crud/crud.rst),
@@ -174,7 +180,7 @@ block content
     MyModel.deleteOne({ answer: 42 });
     ```
 
-    ## `useUnifiedTopology`
+    <h2 id="useunifiedtopology"><a href="#useunifiedtopology"><code>useUnifiedTopology</code></a></h2>
 
     By default, `mongoose.connect()` will print out the below warning:
 
@@ -210,7 +216,7 @@ block content
 
     If you find any unexpected behavior, please [open up an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
 
-    ## `update()`
+    <h2 id="update"><a href="#update"><code>update()</code></a></h2>
 
     Like `remove()`, the [`update()` function](/docs/api.html#model_Model.update) is deprecated in favor
     of the more explicit [`updateOne()`](/docs/api.html#model_Model.updateOne), [`updateMany()`](/docs/api.html#model_Model.updateMany), and [`replaceOne()`](/docs/api.html#model_Model.replaceOne) functions. You should replace
@@ -238,7 +244,7 @@ block content
     MyModel.updateMany(filter, update);
     ```
 
-    ## `count()`
+    <h2 id="count"><a href="#count"><code>count()</code></a></h2>
 
     The MongoDB server has deprecated the `count()` function in favor of two
     separate functions, [`countDocuments()`](#query_Query-countDocuments) and
@@ -281,7 +287,7 @@ block content
     MyModel.find().estimatedDocumentCount().exec();
     ```
 
-    ## `GridStore`
+    <h2 id="gridstore"><a href="#gridstore"><code>GridStore</code></a></h2>
 
     If you're using [gridfs-stream](https://www.npmjs.com/package/gridfs-stream),
     you'll see the below deprecation warning:

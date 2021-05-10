@@ -711,4 +711,26 @@ describe('QueryCursor', function() {
       assert.deepEqual(arr, ['KICKBOXER', 'IP MAN', 'ENTER THE DRAGON']);
     });
   });
+
+  it('reports CastError with noCursorTimeout set (gh-10150)', function() {
+    const schema = new mongoose.Schema({ name: String });
+    const Movie = db.model('Movie', schema);
+
+    return co(function*() {
+      yield Movie.deleteMany({});
+      yield Movie.create([
+        { name: 'Kickboxer' },
+        { name: 'Ip Man' },
+        { name: 'Enter the Dragon' }
+      ]);
+
+      const arr = [];
+      const err = yield Movie.find({ name: { lt: 'foo' } }).cursor().
+        addCursorFlag('noCursorTimeout', true).
+        eachAsync(doc => arr.push(doc.name)).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'CastError');
+    });
+  });
 });

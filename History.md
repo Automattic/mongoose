@@ -1,3 +1,19 @@
+5.12.8 / 2021-05-10
+===================
+ * fix(populate): handle populating immutable array paths #10159
+ * fix(CastError): add `toJSON()` function to ensure `name` property always ends up in `JSON.stringify()` output #10166 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(query): add allowDiskUse() method to improve setting MongoDB 4.4's new `allowDiskUse` option #10177
+ * fix(populate): allow populating paths under mixed schematypes where some documents have non-object properties #10191
+ * chore: remove unnecessary driver dynamic imports so Mongoose can work with Parcel #9603
+ * fix(index.d.ts): allow any object as parameter to create() and `insertMany()` #10144
+ * fix(index.d.ts): allow creating Model class with raw interface, no `extends Document` #10144
+ * fix(index.d.ts): separate UpdateQuery from `UpdateWithAggregationPipeline` for cases when `UpdateQuery` is used as a function param #10186
+ * fix(index.d.ts): don't require error value in pre/post hooks #10213 [michaln-q](https://github.com/michaln-q)
+ * docs(typescript): add a typescript intro tutorial and statics tutorial #10021
+ * docs(typescript): add query helpers tutorial #10021
+ * docs(deprecations): add note that you can safely ignore `useFindAndModify` and `useCreateIndex` deprecation warnings #10155
+ * chore(workflows): add node 16 to github actions #10201 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 5.12.7 / 2021-04-29
 ===================
  * fix(document): make $getPopulatedDocs() return populated virtuals #10148

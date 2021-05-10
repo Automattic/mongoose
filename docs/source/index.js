@@ -27,6 +27,7 @@ exports['docs/deprecations.pug'] = { guide: true, title: 'Deprecation Warnings' 
 exports['docs/further_reading.pug'] = { title: 'Further Reading' };
 exports['docs/jest.pug'] = { title: 'Testing Mongoose with Jest' };
 exports['docs/faq.pug'] = { guide: true, title: 'FAQ' };
+exports['docs/typescript.pug'] = { guide: true, title: 'Using TypeScript with Mongoose' };
 exports['docs/compatibility.pug'] = {
   title: 'MongoDB Version Compatibility',
   guide: true

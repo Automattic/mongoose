@@ -2608,4 +2608,19 @@ describe('schema', function() {
     assert.equal(schema.path('field1.field2').instance, 'Embedded');
     assert.equal(schema.path('field1.field2.field3').instance, 'Boolean');
   });
+
+  it('supports creating nested paths underneath document arrays (gh-10193)', function() {
+    const DynamicTextMatchFeaturesSchema = new Schema({ css: { color: String } });
+
+    const ElementSchema = new Schema({
+      image: { type: String },
+      possibleElements: [{
+        textMatchFeatures: {
+          dynamic: DynamicTextMatchFeaturesSchema
+        }
+      }]
+    });
+
+    assert.ok(ElementSchema.path('possibleElements').schema.path('textMatchFeatures.dynamic').schema.nested['css']);
+  });
 });

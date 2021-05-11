@@ -1317,7 +1317,7 @@ describe('schema', function() {
           required: false
         }
       });
-    
+
       const userSchema = new Schema({
         email: {
           type: String,
@@ -1328,7 +1328,7 @@ describe('schema', function() {
           required: true
         }
       });
-    
+
       const realSchema = baseSchema.clone();
       realSchema.add(userSchema);
 

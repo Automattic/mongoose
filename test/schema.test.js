@@ -1309,6 +1309,31 @@ describe('schema', function() {
 
       done();
     });
+
+    it('overwrites existing paths (gh-10203)', function() {
+      const baseSchema = new Schema({
+        username: {
+          type: String,
+          required: false
+        }
+      });
+    
+      const userSchema = new Schema({
+        email: {
+          type: String,
+          required: true
+        },
+        username: {
+          type: String,
+          required: true
+        }
+      });
+    
+      const realSchema = baseSchema.clone();
+      realSchema.add(userSchema);
+
+      assert.ok(realSchema.path('username').isRequired);
+    });
   });
 
   it('debugging msgs', function(done) {

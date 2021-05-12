@@ -2534,7 +2534,7 @@ describe('document', function() {
         const doc = docs[0];
         doc.other = 'something';
         doc.subdocs[1].name = 'test2';
-        assert.equal(doc.validateSync(undefined, { validateModifiedOnly: true }), null);
+        assert.equal(doc.validateSync({ validateModifiedOnly: true }), null);
         doc.save({ validateModifiedOnly: true }, function(error) {
           assert.equal(error, null);
           done();
@@ -2551,7 +2551,7 @@ describe('document', function() {
         assert.equal(createError, null);
         const doc = docs[0];
         doc.title = '';
-        assert.ok(doc.validateSync(undefined, { validateModifiedOnly: true }).errors);
+        assert.ok(doc.validateSync({ validateModifiedOnly: true }).errors);
         doc.save({ validateModifiedOnly: true }, function(error) {
           assert.ok(error.errors);
           done();

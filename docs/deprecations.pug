@@ -117,6 +117,9 @@ block content
     * [`Query.findOneAndRemove()`](/docs/api.html#query_Query-findOneAndRemove)
     * [`Query.findOneAndUpdate()`](/docs/api.html#query_Query-findOneAndUpdate)
 
+    You can also safely ignore this warning. Mongoose will not remove the legacy `useFindAndModify: true`
+    behavior until Mongoose 6.0.
+
     <h2 id="ensureindex"><a href="#ensureindex"><code>ensureIndex()</code></a></h2>
 
     If you define [indexes in your Mongoose schemas](https://mongoosejs.com/docs/guide.html#indexes), you'll see the below
@@ -144,6 +147,9 @@ block content
     option, so you should be able to turn
     this option on without any code changes. If you discover any issues,
     please [open an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
+
+    You can also safely ignore this warning. Mongoose will not remove the legacy `useCreateIndex: false`
+    behavior until Mongoose 6.0.
 
     <h2 id="remove"><a href="#remove"><code>remove()</code></a></h2>
 

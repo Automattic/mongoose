@@ -11,6 +11,7 @@ const pluginSave = (schema) => {
   schema.pre(["save"], function () {
     const contextData = callContext.get();
 
+    // verify asyncLocalStorage
     if (this.name !== contextData.name) {
       console.error("[static-hooks] [pre] [save]", this.name, contextData.name);
     } else {
@@ -21,6 +22,7 @@ const pluginSave = (schema) => {
   schema.post(["save"], function () {
     const contextData = callContext.get();
 
+    // verify asyncLocalStorage
     if (this.name !== contextData.name) {
       console.error(
         "[ERROR] [static-hooks] [post] [save]",
@@ -37,6 +39,7 @@ const pluginQuery = (schema) => {
   schema.pre(["find", "findOne", "count", "countDocuments"], function () {
     const contextData = callContext.get();
 
+    // verify asyncLocalStorage
     if (this._conditions.name !== contextData.name) {
       console.error(
         `[ERROR] [static-hooks] [pre] [${this.op}]`,
@@ -50,6 +53,8 @@ const pluginQuery = (schema) => {
 
   schema.post(["find", "findOne", "count", "countDocuments"], function () {
     const contextData = callContext.get();
+
+    // verify asyncLocalStorage
     if (this._conditions.name !== contextData.name) {
       console.error(
         `[ERROR] [static-hooks] [post] [${this.op}]`,
@@ -69,7 +74,8 @@ const pluginAggregate = (schema) => {
     this.__asyncLocalStore = contextData;
 
     const name = this._pipeline[0].$match.name;
-    // verification
+    
+    // verify asyncLocalStorage
     if (name !== contextData.name) {
       console.error(
         "[ERROR] [static-hooks] [pre] [aggregate]",
@@ -85,11 +91,7 @@ const pluginAggregate = (schema) => {
     const contextData = this.__asyncLocalStore;
     const name = this._pipeline[0].$match.name;
 
-    if (!contextData) {
-      console.log("[ERROR] [static-hooks] [post] [aggregate] undifined");
-    }
-
-    // verification
+    // verify asyncLocalStorage
     if (name !== contextData.name) {
       console.error(
         "[ERROR] [static-hooks] [post] [aggregate]",
@@ -159,12 +161,14 @@ const start = async () => {
       UserModel.find({ name }, (err, data) => {
         ++findCallbackCounter;
         data = data[0];
-        const store = callContext.get();
-        if (data.name !== store.name) {
+        const contextData = callContext.get();
+
+        // verify asyncLocalStorage
+        if (data.name !== contextData.name) {
           console.error(
             `[ERROR] ${findCallbackCounter}: post-find-in-callback`,
             data.name,
-            store.name
+            contextData.name
           );
         } else {
           console.log(`[OK] ${findCallbackCounter}: post-find-in-callback`);
@@ -176,12 +180,14 @@ const start = async () => {
       ++findPromiseCounter;
 
       data = data[0];
-      const store = callContext.get();
-      if (data.name !== store.name) {
+      const contextData = callContext.get();
+
+      // verify asyncLocalStorage
+      if (data.name !== contextData.name) {
         console.error(
           `[ERROR] ${findPromiseCounter}: post-find-in-promise`,
           data.name,
-          store.name
+          contextData.name
         );
       } else {
         console.log(`[OK] ${findPromiseCounter}: post-find-in-promise`);
@@ -189,13 +195,15 @@ const start = async () => {
 
       // aggregate
       UserModel.aggregate([{ $match: { name: name } }], (err, data) => {
-        const store = callContext.get();
+        const contextData = callContext.get();
         data = data[0];
-        if (data.name !== store.name) {
+
+        // verify asyncLocalStorage
+        if (data.name !== contextData.name) {
           console.error(
             `[ERROR] ${findCallbackCounter}: post-aggregate-in-callback`,
             data.name,
-            store.name
+            contextData.name
           );
         } else {
           console.log(
@@ -222,12 +230,6 @@ const start = async () => {
     } else {
       setTimeout(exit, 1000);
     }
-
-    // if (aggregateCounter === docCount) {
-    //     process.exit(0);
-    //   } else {
-    //     setTimeout(exit, 1000);
-    //   }
   };
 
   exit();

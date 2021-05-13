@@ -40,7 +40,8 @@ schema.post<ITest>('save', function(err: Error, res: ITest, next: Function) {
 });
 
 schema.pre<Model<ITest>>('insertMany', function() {
-  return Promise.resolve(this.name);
+  const name: string = this.name;
+  return Promise.resolve();
 });
 
 schema.pre<Model<ITest>>('insertMany', { document: false, query: false }, function() {

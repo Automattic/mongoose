@@ -3580,7 +3580,7 @@ describe('model: updateOne: ', function() {
   });
 
   describe('converts dot separated paths to nested structure (gh-10200)', () => {
-    it('works with Model.updateOne(...)', () => { // fails in 5.12.7
+    it('works with Model.updateOne(...)', () => {
       return co(function*() {
         const User = getPaymentModel();
         const userPOJO = getPaymentWithDotSeparatedPaths();
@@ -3592,7 +3592,7 @@ describe('model: updateOne: ', function() {
         assertDocumentStructure(user);
       });
     });
-    it('works with Model.bulkWrite(...)', () => { // fails in 5.12.7
+    it('works with Model.bulkWrite(...)', () => {
       return co(function*() {
         const Payment = getPaymentModel();
         const paymentPOJO = getPaymentWithDotSeparatedPaths();

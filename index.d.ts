@@ -1131,7 +1131,7 @@ declare module 'mongoose' {
      * [methods](http://mongoosejs.com/docs/guide.html#methods).
      */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    loadClass(model: Function, onlyVirtuals: boolean): this;
+    loadClass(model: Function, onlyVirtuals?: boolean): this;
 
     /** Adds an instance method to documents constructed from Models compiled from this schema. */
     // eslint-disable-next-line @typescript-eslint/ban-types

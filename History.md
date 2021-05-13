@@ -1,3 +1,13 @@
+5.12.9 / 2021-05-13
+===================
+ * fix(schema): ensure add() overwrites existing schema paths by default #10208 #10203
+ * fix(schema): support creating nested paths underneath document arrays #10193
+ * fix(update): convert nested dotted paths in update to nested paths to avoid ending up with dotted properties in update #10200
+ * fix(document): allow calling validate() and validateSync() with `options` as first parameter #10216
+ * fix(schema): apply static properties to model when using loadClass() #10206
+ * fix(index.d.ts): allow returning Promise<void> from middleware functions #10229
+ * fix(index.d.ts): add pre('distinct') hooks to TypeScript #10192
+
 5.12.8 / 2021-05-10
 ===================
  * fix(populate): handle populating immutable array paths #10159

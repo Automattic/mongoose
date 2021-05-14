@@ -7214,7 +7214,6 @@ describe('Model', function() {
     return co(function*() {
       const doc = yield Beta.create({ age: 21 });
       const test = yield Beta.findOne({ _id: doc.id }).setOptions({ defaults: false });
-      console.log('this is from the test', test);
       assert.ok(!test.name);
     });
   });

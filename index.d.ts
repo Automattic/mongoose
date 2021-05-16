@@ -1876,7 +1876,7 @@ declare module 'mongoose' {
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      * This is equivalent to calling `.cursor()` with no arguments.
      */
-    [Symbol.asyncIterator]: QueryCursor<DocType>;
+    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
 
     /** Executes the query */
     exec(): Promise<ResultType>;

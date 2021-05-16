@@ -1,3 +1,29 @@
+5.12.9 / 2021-05-13
+===================
+ * fix(schema): ensure add() overwrites existing schema paths by default #10208 #10203
+ * fix(schema): support creating nested paths underneath document arrays #10193
+ * fix(update): convert nested dotted paths in update to nested paths to avoid ending up with dotted properties in update #10200
+ * fix(document): allow calling validate() and validateSync() with `options` as first parameter #10216
+ * fix(schema): apply static properties to model when using loadClass() #10206
+ * fix(index.d.ts): allow returning Promise<void> from middleware functions #10229
+ * fix(index.d.ts): add pre('distinct') hooks to TypeScript #10192
+
+5.12.8 / 2021-05-10
+===================
+ * fix(populate): handle populating immutable array paths #10159
+ * fix(CastError): add `toJSON()` function to ensure `name` property always ends up in `JSON.stringify()` output #10166 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(query): add allowDiskUse() method to improve setting MongoDB 4.4's new `allowDiskUse` option #10177
+ * fix(populate): allow populating paths under mixed schematypes where some documents have non-object properties #10191
+ * chore: remove unnecessary driver dynamic imports so Mongoose can work with Parcel #9603
+ * fix(index.d.ts): allow any object as parameter to create() and `insertMany()` #10144
+ * fix(index.d.ts): allow creating Model class with raw interface, no `extends Document` #10144
+ * fix(index.d.ts): separate UpdateQuery from `UpdateWithAggregationPipeline` for cases when `UpdateQuery` is used as a function param #10186
+ * fix(index.d.ts): don't require error value in pre/post hooks #10213 [michaln-q](https://github.com/michaln-q)
+ * docs(typescript): add a typescript intro tutorial and statics tutorial #10021
+ * docs(typescript): add query helpers tutorial #10021
+ * docs(deprecations): add note that you can safely ignore `useFindAndModify` and `useCreateIndex` deprecation warnings #10155
+ * chore(workflows): add node 16 to github actions #10201 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 5.12.7 / 2021-04-29
 ===================
  * fix(document): make $getPopulatedDocs() return populated virtuals #10148

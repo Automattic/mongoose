@@ -441,7 +441,7 @@ describe('schema', function() {
         threw = true;
         assert.equal(error.name, 'CastError');
         assert.equal(error.message,
-          'Cast to [[Number]] failed for value "[["abcd"]]" at path "nums.0"');
+          'Cast to [[Number]] failed for value "[["abcd"]]" (type string) at path "nums.0"');
       }
       assert.ok(threw);
 
@@ -1308,6 +1308,31 @@ describe('schema', function() {
       assert.ok(s.s.hooks._pres.get('save'));
 
       done();
+    });
+
+    it('overwrites existing paths (gh-10203)', function() {
+      const baseSchema = new Schema({
+        username: {
+          type: String,
+          required: false
+        }
+      });
+
+      const userSchema = new Schema({
+        email: {
+          type: String,
+          required: true
+        },
+        username: {
+          type: String,
+          required: true
+        }
+      });
+
+      const realSchema = baseSchema.clone();
+      realSchema.add(userSchema);
+
+      assert.ok(realSchema.path('username').isRequired);
     });
   });
 
@@ -2607,5 +2632,20 @@ describe('schema', function() {
     assert.equal(schema.path('field1').instance, 'Array');
     assert.equal(schema.path('field1.field2').instance, 'Embedded');
     assert.equal(schema.path('field1.field2.field3').instance, 'Boolean');
+  });
+
+  it('supports creating nested paths underneath document arrays (gh-10193)', function() {
+    const DynamicTextMatchFeaturesSchema = new Schema({ css: { color: String } });
+
+    const ElementSchema = new Schema({
+      image: { type: String },
+      possibleElements: [{
+        textMatchFeatures: {
+          dynamic: DynamicTextMatchFeaturesSchema
+        }
+      }]
+    });
+
+    assert.ok(ElementSchema.path('possibleElements').schema.path('textMatchFeatures.dynamic').schema.nested['css']);
   });
 });

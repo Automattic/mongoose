@@ -3578,4 +3578,98 @@ describe('model: updateOne: ', function() {
       assert.equal(fromDb.children[0].name, 'Luke Skywalker');
     });
   });
+
+  describe('converts dot separated paths to nested structure (gh-10200)', () => {
+    it('works with Model.updateOne(...)', () => {
+      return co(function*() {
+        const User = getPaymentModel();
+        const userPOJO = getPaymentWithDotSeparatedPaths();
+
+        const emptyUser = yield User.create({});
+        yield User.updateOne({ _id: emptyUser._id }, userPOJO);
+        const user = yield User.findOne({ _id: emptyUser._id }).lean();
+
+        assertDocumentStructure(user);
+      });
+    });
+    it('works with Model.bulkWrite(...)', () => {
+      return co(function*() {
+        const Payment = getPaymentModel();
+        const paymentPOJO = getPaymentWithDotSeparatedPaths();
+
+        const emptyPayment = yield Payment.create({});
+
+        yield Payment.bulkWrite([
+          { updateOne: { filter: { _id: emptyPayment._id }, update: paymentPOJO } }
+        ]);
+        const payment = yield Payment.findOne({ _id: emptyPayment._id }).lean();
+
+        assertDocumentStructure(payment);
+      });
+    });
+
+
+    function getPaymentModel() {
+      const paymentSchema = new Schema({
+        paymentFor: String,
+        externalServiceResponse: {
+          id: String,
+          resultDetails: {
+            clearingInstituteName: String,
+            transaction: {
+              receipt: String,
+              authorizationCode: String,
+              acquirer: { settlementDate: String }
+            },
+            response: { acquirerCode: String, acquirerMessage: String },
+            authorizationResponse: { stan: String },
+            sourceOfFunds: { provided: { card: { issuer: String } } }
+          }
+        }
+      });
+
+      const Payment = db.model('Payment', paymentSchema);
+      return Payment;
+    }
+
+    function getPaymentWithDotSeparatedPaths() {
+      return {
+        paymentFor: 'order',
+        externalServiceResponse: {
+          id: '1',
+          resultDetails: {
+            clearingInstituteName: 'Our local bank',
+            'authorizationResponse.stan': '123456',
+            'transaction.receipt': 'I am a transaction receipt',
+            'transaction.authorizationCode': 'ABCDEF',
+            'transaction.acquirer.settlementDate': 'February 2021',
+            'sourceOfFunds.provided.card.issuer': 'Big bank corporation',
+            nonExistentField: 'I should not be present'
+          }
+        }
+      };
+    }
+
+    function assertDocumentStructure(payment) {
+      assert.equal(payment.paymentFor, 'order');
+      assert.equal(payment.externalServiceResponse.id, '1');
+      assert.equal(payment.externalServiceResponse.resultDetails.clearingInstituteName, 'Our local bank');
+      assert.deepEqual(
+        payment.externalServiceResponse.resultDetails.authorizationResponse,
+        { stan: '123456' }
+      );
+      assert.deepEqual(
+        payment.externalServiceResponse.resultDetails.transaction,
+        {
+          receipt: 'I am a transaction receipt',
+          authorizationCode: 'ABCDEF',
+          acquirer: { settlementDate: 'February 2021' }
+        }
+      );
+      assert.deepEqual(
+        payment.externalServiceResponse.resultDetails.sourceOfFunds,
+        { provided: { card: { issuer: 'Big bank corporation' } } }
+      );
+    }
+  });
 });

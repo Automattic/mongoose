@@ -2298,22 +2298,22 @@ declare module 'mongoose' {
   /** @see https://docs.mongodb.com/manual/reference/operator/update */
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, NativeDate | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }>;
-    $inc?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
+    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, NativeDate | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }> | any;
+    $inc?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined> | any;
     $min?: mongodb.MatchKeysAndValues<TSchema>;
     $max?: mongodb.MatchKeysAndValues<TSchema>;
-    $mul?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
+    $mul?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined> | any;
     $rename?: { [key: string]: string };
     $set?: mongodb.MatchKeysAndValues<TSchema>;
     $setOnInsert?: mongodb.MatchKeysAndValues<TSchema>;
-    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, any>;
+    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, any> | any;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: mongodb.SetFields<TSchema>;
-    $pop?: mongodb.OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1>;
+    $addToSet?: mongodb.SetFields<TSchema> | any;
+    $pop?: mongodb.OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1> | any;
     $pull?: PullOperator<TSchema>;
     $push?: mongodb.PushOperator<TSchema> | any;
-    $pullAll?: mongodb.PullAllOperator<TSchema>;
+    $pullAll?: mongodb.PullAllOperator<TSchema> | any;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: {

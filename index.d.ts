@@ -2368,6 +2368,8 @@ declare module 'mongoose' {
     T;
 
   class QueryCursor<DocType extends Document> extends stream.Readable {
+    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
+
     /**
      * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
      * Useful for setting the `noCursorTimeout` and `tailable` flags.

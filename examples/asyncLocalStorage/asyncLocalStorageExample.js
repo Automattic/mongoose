@@ -121,6 +121,17 @@ const start = function() {
   let UserModel = null;
   const names = [];
 
+  // // Test in local real mongo sever
+  // Promise
+  //   .resolve()
+  //   .then(() => {
+  //     return mongoose.connect('mongodb://test:test@127.0.0.1:27017/test', {
+  //       useNewUrlParser: true,
+  //       useUnifiedTopology: true
+  //     });
+  //   })
+
+  // Test in Mongo Memory Server
   const mongod = new MongoMemoryServer();
   mongod
     .getUri()

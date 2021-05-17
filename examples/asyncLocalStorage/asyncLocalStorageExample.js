@@ -121,7 +121,7 @@ const start = function() {
   let UserModel = null;
   const names = [];
 
-  // // Test in local real mongo sever
+  // // 1. Test in local real mongo sever
   // Promise
   //   .resolve()
   //   .then(() => {
@@ -131,7 +131,7 @@ const start = function() {
   //     });
   //   })
 
-  // Test in Mongo Memory Server
+  // 2. Test in Mongo Memory Server
   const mongod = new MongoMemoryServer();
   mongod
     .getUri()
@@ -142,6 +142,8 @@ const start = function() {
         useUnifiedTopology: true
       });
     })
+
+
     .then((connection) => {
       // prepare model
       userSchema = new mongoose.Schema({ name: String });

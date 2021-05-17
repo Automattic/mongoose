@@ -1,42 +1,42 @@
 
 'use strict';
 
-const mongoose = require("../..");
-const { MongoMemoryServer } = require("mongodb-memory-server");
-const uuid = require("uuid").v4;
-const _ = require("lodash");
-const callContext = require("./callContext");
+const mongoose = require('../..');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const uuid = require('uuid').v4;
+const _ = require('lodash');
+const callContext = require('./callContext');
 
 const pluginSave = (schema) => {
-  schema.pre(["save"], function () {
+  schema.pre(['save'], function() {
     const contextData = callContext.get();
 
     // verify asyncLocalStorage
     if (this.name !== contextData.name) {
-      console.error("[static-hooks] [pre] [save]", this.name, contextData.name);
+      console.error('[static-hooks] [pre] [save]', this.name, contextData.name);
     } else {
-      console.log("[OK] [static-hooks] [pre] [save]");
+      console.log('[OK] [static-hooks] [pre] [save]');
     }
   });
 
-  schema.post(["save"], function () {
+  schema.post(['save'], function() {
     const contextData = callContext.get();
 
     // verify asyncLocalStorage
     if (this.name !== contextData.name) {
       console.error(
-        "[ERROR] [static-hooks] [post] [save]",
+        '[ERROR] [static-hooks] [post] [save]',
         this.name,
         contextData.name
       );
     } else {
-      console.log("[OK] [static-hooks] [post] [save]");
+      console.log('[OK] [static-hooks] [post] [save]');
     }
   });
 };
 
 const pluginQuery = (schema) => {
-  schema.pre(["find", "findOne", "count", "countDocuments"], function () {
+  schema.pre(['find', 'findOne', 'count', 'countDocuments'], function() {
     const contextData = callContext.get();
 
     // verify asyncLocalStorage
@@ -51,7 +51,7 @@ const pluginQuery = (schema) => {
     }
   });
 
-  schema.post(["find", "findOne", "count", "countDocuments"], function () {
+  schema.post(['find', 'findOne', 'count', 'countDocuments'], function() {
     const contextData = callContext.get();
 
     // verify asyncLocalStorage
@@ -68,38 +68,38 @@ const pluginQuery = (schema) => {
 };
 
 const pluginAggregate = (schema) => {
-  schema.pre(["aggregate"], function () {
+  schema.pre(['aggregate'], function() {
     // Special Case: aggregate should keep store
     const contextData = callContext.get();
     this.__asyncLocalStore = contextData;
 
     const name = this._pipeline[0].$match.name;
-    
+
     // verify asyncLocalStorage
     if (name !== contextData.name) {
       console.error(
-        "[ERROR] [static-hooks] [pre] [aggregate]",
+        '[ERROR] [static-hooks] [pre] [aggregate]',
         name,
         contextData.name
       );
     } else {
-      console.log("[OK] [static-hooks] [pre] [aggregate]");
+      console.log('[OK] [static-hooks] [pre] [aggregate]');
     }
   });
 
-  schema.post(["aggregate"], function () {
+  schema.post(['aggregate'], function() {
     const contextData = this.__asyncLocalStore;
     const name = this._pipeline[0].$match.name;
 
     // verify asyncLocalStorage
     if (name !== contextData.name) {
       console.error(
-        "[ERROR] [static-hooks] [post] [aggregate]",
+        '[ERROR] [static-hooks] [post] [aggregate]',
         name,
         contextData.name
       );
     } else {
-      console.log("[OK] [static-hooks] [post] [aggregate]");
+      console.log('[OK] [static-hooks] [post] [aggregate]');
     }
   });
 };
@@ -108,115 +108,189 @@ mongoose.plugin(pluginSave);
 mongoose.plugin(pluginQuery);
 mongoose.plugin(pluginAggregate);
 
+const docCount = 50;
+
 let createCounter = 0;
 let findCallbackCounter = 0;
 let findPromiseCounter = 0;
 let aggregateCounter = 0;
 let countCounter = 0;
 
-const docCount = 50;
-
-const start = async () => {
-  const mongod = new MongoMemoryServer();
-  const uri = await mongod.getUri();
-
-  await mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-
-  const userSchema = new mongoose.Schema({ name: String });
-  const UserModel = mongoose.model("UserModel", userSchema);
-
+const start = function() {
+  let userSchema = null;
+  let UserModel = null;
   const names = [];
 
-  // prepare data
-  await new Promise(async (resolve, reject) => {
-    for (let i = 0; i < docCount; ++i) {
-      const name = uuid();
-      names.push(name);
-      callContext.enter({ name });
+  const mongod = new MongoMemoryServer();
+  mongod
+    .getUri()
+    .then((uri) => {
+      // prepare connection
+      return mongoose.connect(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      });
+    })
+    .then((connection) => {
+      // prepare model
+      userSchema = new mongoose.Schema({ name: String });
+      UserModel = connection.model('UserModel', userSchema);
+    })
+    .then(() => {
+      // prepare data
+      new Promise((resolve, reject) => {
+        for (let i = 0; i < docCount; ++i) {
+          const name = uuid();
+          names.push(name);
+          callContext.enter({ name });
 
-      const user = new UserModel({ name });
-      try {
-        await user.save();
-      } catch (err) {
-        reject(err);
-      }
-
-      createCounter++;
-
-      if (createCounter === docCount) {
-        resolve();
-      }
-    }
-  });
-
-  for (let i = 0; i < docCount; ++i) {
-    setTimeout(async () => {
-      const name = names[i];
-      callContext.enter({ name });
-
-      // for testing callback
-      UserModel.find({ name }, (err, data) => {
-        ++findCallbackCounter;
-        data = data[0];
-        const contextData = callContext.get();
-
-        // verify asyncLocalStorage
-        if (data.name !== contextData.name) {
-          console.error(
-            `[ERROR] ${findCallbackCounter}: post-find-in-callback`,
-            data.name,
-            contextData.name
-          );
-        } else {
-          console.log(`[OK] ${findCallbackCounter}: post-find-in-callback`);
+          const user = new UserModel({ name });
+          user
+            .save()
+            .then(() => {
+              createCounter++;
+              if (createCounter === docCount) {
+                resolve();
+              }
+            })
+            .catch(reject);
         }
       });
+    })
+    .then(() => {
+      // testing find callback in style
+      return new Promise((resolve, reject) => {
+        for (let i = 0; i < docCount; ++i) {
+          setTimeout(() => {
+            const name = names[i];
+            callContext.enter({ name });
 
-      // for tesing promise
-      let data = await UserModel.find({ name }).exec();
-      ++findPromiseCounter;
+            UserModel.find({ name }, (err, data) => {
+              if (err) {
+                reject(err);
+              }
 
-      data = data[0];
-      const contextData = callContext.get();
+              ++findCallbackCounter;
 
-      // verify asyncLocalStorage
-      if (data.name !== contextData.name) {
-        console.error(
-          `[ERROR] ${findPromiseCounter}: post-find-in-promise`,
-          data.name,
-          contextData.name
-        );
-      } else {
-        console.log(`[OK] ${findPromiseCounter}: post-find-in-promise`);
-      }
+              data = data[0];
+              const contextData = callContext.get();
 
-      // aggregate
-      UserModel.aggregate([{ $match: { name: name } }], (err, data) => {
-        const contextData = callContext.get();
-        data = data[0];
+              // verify asyncLocalStorage
+              if (data.name !== contextData.name) {
+                console.error(
+                  `[ERROR] ${findCallbackCounter}: post-find-in-callback`,
+                  data.name,
+                  contextData.name
+                );
+              } else {
+                console.log(`[OK] ${findCallbackCounter}: post-find-in-callback`);
+              }
 
-        // verify asyncLocalStorage
-        if (data.name !== contextData.name) {
-          console.error(
-            `[ERROR] ${findCallbackCounter}: post-aggregate-in-callback`,
-            data.name,
-            contextData.name
-          );
-        } else {
-          console.log(
-            `[OK] ${findCallbackCounter}: post-aggregate-in-callback`
-          );
+              if (findCallbackCounter === docCount) {
+                resolve();
+              }
+            });
+          }, _.random(10, 50));
         }
-        ++aggregateCounter;
       });
+    })
+    .then(() => {
+      // test find in promise style
+      return new Promise((resolve, reject) => {
+        for (let i = 0; i < docCount; ++i) {
+          setTimeout(() => {
+            const name = names[i];
+            callContext.enter({ name });
 
-      await UserModel.countDocuments({ name }).exec();
-      ++countCounter;
-    }, _.random(10, 50));
-  }
+            UserModel
+              .find({ name })
+              .exec()
+              .then(data => {
+                ++findPromiseCounter;
+                data = data[0];
+                const contextData = callContext.get();
+
+                // verify asyncLocalStorage
+                if (data.name !== contextData.name) {
+                  console.error(
+                    `[ERROR] ${findPromiseCounter}: post-find-in-promise`,
+                    data.name,
+                    contextData.name
+                  );
+                } else {
+                  console.log(`[OK] ${findPromiseCounter}: post-find-in-promise`);
+                }
+
+                if (findPromiseCounter === docCount) {
+                  resolve();
+                }
+              })
+              .catch(reject);
+          }, _.random(10, 50));
+        }
+      });
+    })
+    .then(() => {
+      return new Promise((resolve, reject) => {
+        for (let i = 0; i < docCount; ++i) {
+          setTimeout(() => {
+            const name = names[i];
+            callContext.enter({ name });
+
+            // aggregate
+            UserModel
+              .aggregate([{ $match: { name: name } }], (err, data) => {
+                if (err) {
+                  reject(err);
+                }
+
+                ++aggregateCounter;
+                const contextData = callContext.get();
+                data = data[0];
+
+                // verify asyncLocalStorage
+                if (data.name !== contextData.name) {
+                  console.error(
+                    `[ERROR] ${findCallbackCounter}: post-aggregate-in-callback`,
+                    data.name,
+                    contextData.name
+                  );
+                } else {
+                  console.log(
+                    `[OK] ${findCallbackCounter}: post-aggregate-in-callback`
+                  );
+                }
+
+                if (aggregateCounter === docCount) {
+                  resolve();
+                }
+              });
+          }, _.random(10, 50));
+        }
+      });
+    })
+    .then(() => {
+      return new Promise((resolve, reject) => {
+        for (let i = 0; i < docCount; ++i) {
+          setTimeout(() => {
+            const name = names[i];
+            callContext.enter({ name });
+
+            UserModel
+              .countDocuments({ name })
+              .exec()
+              .then(() => {
+                ++countCounter;
+
+                if (countCounter === docCount) {
+                  resolve();
+                }
+              })
+              .catch(reject);
+          }, _.random(10, 50));
+        }
+      });
+    });
 
   const exit = () => {
     if (

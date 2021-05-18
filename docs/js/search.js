@@ -1,4 +1,4 @@
-var root = 'https://8jekzv4pyd.execute-api.us-east-1.amazonaws.com/prod';
+var root = 'https://mongoosejs.azurewebsites.net/api';
 var pairs = window.location.search.replace(/^\?/, '').split('&');
 
 var q = null;

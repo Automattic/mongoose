@@ -1,3 +1,17 @@
+5.12.10 / 2021-05-18
+====================
+ * fix(query): allow setting `defaults` option on result documents from query options #7287 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(populate): handle populating embedded discriminator with custom tiedValue #10231
+ * fix(document): allow passing space-delimited string of `pathsToValidate` to `validate()` and `validateSync()` #10258
+ * fix(model+schema): support `loadClass()` on classes that have `collection` as a static property #10257 #10254 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(SchemaArrayOptions): correct property name #10236
+ * fix(index.d.ts): add any to all query operators to minimize likelihood of "type instantiation is excessively deep" when querying docs with 4-level deep subdocs #10189
+ * fix(index.d.ts): add $parent() in addition to parent() in TS definitions
+ * fix(index.d.ts): correct async iterator return type for QueryCursor #10253 #10252 #10251 [borfig](https://github.com/borfig)
+ * fix(index.d.ts): add `virtualsOnly` parameter to `loadClass()` function signature [IslandRhythms](https://github.com/IslandRhythms)
+ * docs(typescript): add typescript populate docs #10212
+ * docs: switch from AWS to Azure Functions for search #10244
+
 5.12.9 / 2021-05-13
 ===================
  * fix(schema): ensure add() overwrites existing schema paths by default #10208 #10203

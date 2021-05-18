@@ -2535,6 +2535,8 @@ describe('document', function() {
         doc.other = 'something';
         doc.subdocs[1].name = 'test2';
         assert.equal(doc.validateSync({ validateModifiedOnly: true }), null);
+        assert.equal(doc.validateSync('other'), null);
+        assert.ok(doc.validateSync('other title').errors['title']);
         doc.save({ validateModifiedOnly: true }, function(error) {
           assert.equal(error, null);
           done();

@@ -10415,4 +10415,51 @@ describe('model: populate:', function() {
       assert.equal(res[1].params[0].value.optionLabels[0].name, 'test');
     });
   });
+
+  it('populates embedded discriminator with tied value (gh-10231)', function() {
+    const GuestSchema = new Schema({
+      dummy: String
+    });
+
+    const ActivitySchema = new Schema({
+      title: String,
+      kind: { required: true, type: String, enum: ['TALK'] } },
+    { discriminatorKey: 'kind' });
+
+    const ActivityTalkSchema = new Schema({
+      speakers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Guest' }]
+    });
+
+    ActivityTalkSchema.add(ActivitySchema);
+
+    ActivityTalkSchema.paths.kind.options.$skipDiscriminatorCheck = true;
+
+    const ProgrammeSchema = new Schema({
+      activities: [{ required: true, type: ActivitySchema }]
+    });
+
+    ProgrammeSchema.path('activities').discriminator('ActivityTalk', ActivityTalkSchema, 'TALK');
+
+    const GuestModel = db.model('Guest', GuestSchema);
+    const ProgrammeModel = db.model('Test', ProgrammeSchema);
+
+    return co(function*() {
+      const guest1 = yield GuestModel.create({ dummy: '1' });
+      const guest2 = yield GuestModel.create({ dummy: '2' });
+
+      const programme1 = yield ProgrammeModel.create({
+        activities: [
+          { title: 'hello', kind: 'TALK', speakers: [guest1, guest2] }
+        ]
+      });
+
+      const event = yield ProgrammeModel.findOne({ _id: programme1._id }).orFail().exec();
+      yield event.populate({ path: 'activities.speakers' }).execPopulate();
+      assert.equal(event.activities.length, 1);
+      assert.equal(event.activities[0].speakers.length, 2);
+      assert.equal(event.activities[0].speakers[0].dummy, '1');
+      assert.equal(event.activities[0].speakers[1].dummy, '2');
+
+    });
+  });
 });

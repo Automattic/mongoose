@@ -28,7 +28,7 @@ describe('custom casting', function() {
     // "Cast to Number failed for value "二" at path "age""
     err.message;
     // acquit:ignore:start
-    assert.ok(err.message.indexOf('Cast to Number failed for value "二" at path "age"') !== -1, err.message);
+    assert.ok(err.message.indexOf('Cast to Number failed for value "二" (type string) at path "age"') !== -1, err.message);
     // acquit:ignore:end
   });
 

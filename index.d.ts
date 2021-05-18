@@ -543,6 +543,12 @@ declare module 'mongoose' {
     overwrite(obj: DocumentDefinition<this>): this;
 
     /**
+     * If this document is a subdocument or populated document, returns the
+     * document's parent. Returns undefined otherwise.
+     */
+    $parent(): Document | undefined;
+
+    /**
      * Populates document references, executing the `callback` when complete.
      * If you want to use promises instead, use this function with
      * [`execPopulate()`](#document_Document-execPopulate).
@@ -1828,6 +1834,9 @@ declare module 'mongoose' {
       /** Returns this sub-documents parent document. */
       parent(): Document;
 
+      /** Returns this sub-documents parent document. */
+      $parent(): Document;
+
       /** Returns this sub-documents parent array. */
       parentArray(): DocumentArray<Document>;
     }
@@ -1861,6 +1870,9 @@ declare module 'mongoose' {
 
       /** Returns this sub-documents parent document. */
       parent(): Document;
+
+      /** Returns this sub-documents parent document. */
+      $parent(): Document;
     }
   }
 
@@ -1876,7 +1888,7 @@ declare module 'mongoose' {
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      * This is equivalent to calling `.cursor()` with no arguments.
      */
-    [Symbol.asyncIterator]: QueryCursor<DocType>;
+    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
 
     /** Executes the query */
     exec(): Promise<ResultType>;
@@ -2304,22 +2316,22 @@ declare module 'mongoose' {
   /** @see https://docs.mongodb.com/manual/reference/operator/update */
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, NativeDate | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }>;
-    $inc?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
+    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, NativeDate | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }> | any;
+    $inc?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined> | any;
     $min?: mongodb.MatchKeysAndValues<TSchema>;
     $max?: mongodb.MatchKeysAndValues<TSchema>;
-    $mul?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
+    $mul?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined> | any;
     $rename?: { [key: string]: string };
     $set?: mongodb.MatchKeysAndValues<TSchema>;
     $setOnInsert?: mongodb.MatchKeysAndValues<TSchema>;
-    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, any>;
+    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, any> | any;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: mongodb.SetFields<TSchema>;
-    $pop?: mongodb.OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1>;
+    $addToSet?: mongodb.SetFields<TSchema> | any;
+    $pop?: mongodb.OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1> | any;
     $pull?: PullOperator<TSchema>;
     $push?: mongodb.PushOperator<TSchema> | any;
-    $pullAll?: mongodb.PullAllOperator<TSchema>;
+    $pullAll?: mongodb.PullAllOperator<TSchema> | any;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: {
@@ -2368,6 +2380,8 @@ declare module 'mongoose' {
     T;
 
   class QueryCursor<DocType extends Document> extends stream.Readable {
+    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
+
     /**
      * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
      * Useful for setting the `noCursorTimeout` and `tailable` flags.

@@ -1,20 +1,26 @@
 import { Schema, model, Document, PopulatedDoc } from 'mongoose';
 
-interface IChild extends Document { name?: string }
+interface Child {
+  name: string;
+}
 
 const childSchema: Schema = new Schema({ name: String });
-const Child = model<IChild>('Child', childSchema);
+const ChildModel = model<Child>('Child', childSchema);
 
-interface IParent extends Document {
-  child?: PopulatedDoc<IChild>,
+interface Parent {
+  child?: PopulatedDoc<Child & Document>,
   name?: string
 }
 
-const Parent = model<IParent>('Parent', new Schema({
+const ParentModel = model<Parent>('Parent', new Schema({
   child: { type: 'ObjectId', ref: 'Child' },
   name: String
 }));
 
-Parent.findOne({}).populate('child').orFail().then((doc: IParent) => {
-  doc.child.name.trim();
+ParentModel.findOne({}).populate('child').orFail().then((doc: Parent) => {
+  useChildDoc(doc.child);
 });
+
+function useChildDoc(child: Child): void {
+  console.log(child.name.trim());
+}

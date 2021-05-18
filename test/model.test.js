@@ -7203,4 +7203,19 @@ describe('Model', function() {
       }
     });
   });
+
+  it('supports skipping defaults on a find operation gh-7287', function() {
+    const betaSchema = new Schema({
+      name: { type: String, default: 'foo' },
+      age: { type: Number },
+      _id: { type: Number }
+    });
+
+    const Beta = db.model('Beta', betaSchema);
+    return co(function*() {
+      yield Beta.collection.insertOne({ age: 21, _id: 1 });
+      const test = yield Beta.findOne({ _id: 1 }).setOptions({ defaults: false });
+      assert.ok(!test.name);
+    });
+  });
 });

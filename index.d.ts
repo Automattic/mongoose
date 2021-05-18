@@ -546,7 +546,7 @@ declare module 'mongoose' {
      * If this document is a subdocument or populated document, returns the 
      * document's parent. Returns undefined otherwise.
      */
-    parent(): Document | undefined;
+    $parent(): Document | undefined;
 
     /**
      * Populates document references, executing the `callback` when complete.
@@ -1827,6 +1827,9 @@ declare module 'mongoose' {
 
       /** Returns this sub-documents parent document. */
       parent(): Document;
+      
+      /** Returns this sub-documents parent document. */
+      $parent(): Document;
 
       /** Returns this sub-documents parent array. */
       parentArray(): DocumentArray<Document>;
@@ -1861,6 +1864,9 @@ declare module 'mongoose' {
 
       /** Returns this sub-documents parent document. */
       parent(): Document;
+      
+      /** Returns this sub-documents parent document. */
+      $parent(): Document;
     }
   }
 

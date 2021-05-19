@@ -10273,10 +10273,10 @@ describe('document', function() {
     return co(function*() {
       const doc = new Model({});
 
-      let err = yield doc.validate({pathsToSkip: ['age']}).catch(err => err);
+      let err = yield doc.validate({ pathsToSkip: ['age'] }).catch(err => err);
       assert.deepEqual(Object.keys(err.errors), ['name']);
 
-      err = yield doc.validate({pathsToSkip:['name']}).catch(err => err);
+      err = yield doc.validate({ pathsToSkip: ['name'] }).catch(err => err);
       assert.deepEqual(Object.keys(err.errors), ['age']);
     });
   });

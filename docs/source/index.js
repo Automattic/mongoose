@@ -2,7 +2,7 @@
 'use strict';
 exports['index.pug'] = require('./home');
 exports['docs/api.pug'] = require('./api');
-exports['docs/browser.pug'] = { guide: true, title: 'Browser Library', acquit: true };
+exports['docs/browser.md'] = { guide: true, title: 'Browser Library', acquit: true, markdown: true };
 exports['docs/index.pug'] = { title: 'Getting Started' };
 exports['docs/production.pug'] = require('./production');
 exports['docs/prior.pug'] = require('./prior');
@@ -17,22 +17,23 @@ exports['docs/models.pug'] = { guide: true, title: 'Models' };
 exports['docs/queries.pug'] = { guide: true, title: 'Queries' };
 exports['docs/populate.pug'] = { guide: true, title: 'Query Population' };
 exports['docs/migration.pug'] = { guide: true, title: 'Migration Guide' };
-exports['docs/migrating_to_5.pug'] = { guide: true, title: 'Migrating to Mongoose 5' };
-exports['docs/contributing.pug'] = { guide: true, title: 'Contributing' };
-exports['docs/connections.pug'] = { guide: true, title: 'Connecting to MongoDB' };
-exports['docs/lambda.pug'] = { guide: true, title: 'Using Mongoose With AWS Lambda' };
-exports['docs/geojson.pug'] = { guide: true, title: 'Using GeoJSON', acquit: true };
-exports['docs/transactions.pug'] = { guide: true, title: 'Transactions', acquit: true };
-exports['docs/deprecations.pug'] = { guide: true, title: 'Deprecation Warnings' };
-exports['docs/further_reading.pug'] = { title: 'Further Reading' };
-exports['docs/jest.pug'] = { title: 'Testing Mongoose with Jest' };
-exports['docs/faq.pug'] = { guide: true, title: 'FAQ' };
-exports['docs/typescript.pug'] = { guide: true, title: 'Using TypeScript with Mongoose' };
-exports['docs/compatibility.pug'] = {
+exports['docs/migrating_to_5.md'] = { guide: true, title: 'Migrating to Mongoose 5', markdown: true };
+exports['docs/contributing.md'] = { guide: true, title: 'Contributing', markdown: true };
+exports['docs/connections.md'] = { guide: true, title: 'Connecting to MongoDB', markdown: true };
+exports['docs/lambda.md'] = { guide: true, title: 'Using Mongoose With AWS Lambda', markdown: true };
+exports['docs/geojson.md'] = { guide: true, title: 'Using GeoJSON', acquit: true, markdown: true };
+exports['docs/transactions.md'] = { guide: true, title: 'Transactions', acquit: true, markdown: true };
+exports['docs/deprecations.md'] = { guide: true, title: 'Deprecation Warnings', markdown: true };
+exports['docs/further_reading.md'] = { title: 'Further Reading', markdown: true };
+exports['docs/jest.md'] = { title: 'Testing Mongoose with Jest', markdown: true };
+exports['docs/faq.md'] = { guide: true, title: 'FAQ', markdown: true };
+exports['docs/typescript.md'] = { guide: true, title: 'Using TypeScript with Mongoose', markdown: true };
+exports['docs/compatibility.md'] = {
   title: 'MongoDB Version Compatibility',
-  guide: true
+  guide: true,
+  markdown: true
 };
 exports['docs/search.pug'] = { title: 'Search' };
-exports['docs/enterprise.pug'] = { title: 'Mongoose for Enterprise' };
-exports['docs/built-with-mongoose.pug'] = { title: 'Built with Mongoose' };
+exports['docs/enterprise.md'] = { title: 'Mongoose for Enterprise', markdown: true };
+exports['docs/built-with-mongoose.md'] = { title: 'Built with Mongoose', markdown: true };
 exports['docs/async-await.md'] = { title: 'Using Async/Await with Mongoose', markdown: true };

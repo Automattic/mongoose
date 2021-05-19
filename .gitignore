@@ -42,9 +42,9 @@ package-lock.json
 
 .config*
 
-# Compiled docs
-docs/*.html
-docs/tutorials/*.html
-docs/typescript/*.html
-docs/api/*.html
-index.html
+# Compiled docs allowed in gh-pages
+#docs/*.html
+#docs/tutorials/*.html
+#docs/typescript/*.html
+#docs/api/*.html
+#index.html

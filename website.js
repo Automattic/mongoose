@@ -4,6 +4,7 @@ Error.stackTraceLimit = Infinity;
 
 const acquit = require('acquit');
 const fs = require('fs');
+const path = require('path');
 const pug = require('pug');
 const pkg = require('./package');
 const linktype = require('./docs/helpers/linktype');
@@ -65,8 +66,8 @@ require('./docs/splitApiDocs');
 const filemap = Object.assign({}, require('./docs/source'), require('./docs/tutorials'), require('./docs/typescript'));
 const files = Object.keys(filemap);
 
-const wrapMarkdown = md => `
-extends ../layout
+const wrapMarkdown = (md, baseLayout) => `
+extends ${baseLayout}
 
 append style
   link(rel="stylesheet", href="/docs/css/inlinecpc.css")
@@ -114,7 +115,7 @@ function pugify(filename, options, newfile) {
     const lines = contents.split('\n');
     lines.splice(2, 0, cpc);
     contents = lines.join('\n');
-    contents = wrapMarkdown(contents);
+    contents = wrapMarkdown(contents, path.relative(path.dirname(filename), path.join(__dirname, 'docs/layout')));
     newfile = filename.replace('.md', '.html');
   }
 

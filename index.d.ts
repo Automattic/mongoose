@@ -1420,6 +1420,10 @@ declare module 'mongoose' {
       T extends string | number | boolean | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends Schema ? T :
       T extends object[] ? Schema<Document<Unpacked<T>>>[] :
+      T extends string[] ? SchemaDefinitionWithBuiltInClass<string>[] :
+      T extends number[] ? SchemaDefinitionWithBuiltInClass<number>[] :
+      T extends boolean[] ? SchemaDefinitionWithBuiltInClass<boolean>[] :
+      T extends Function[] ? SchemaDefinitionWithBuiltInClass<Function>[] :
       T | typeof SchemaType | Schema;
 
     /** Defines a virtual with the given name that gets/sets this path. */

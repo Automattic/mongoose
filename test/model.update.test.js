@@ -3429,10 +3429,11 @@ describe('model: updateOne: ', function() {
       yield Test.updateOne({ _id: doc._id }, { nested: { test: 'bar' } });
 
       const fromDb = yield Test.findOne({ _id: doc._id });
+      console.log(fromDb);
       assert.ok(fromDb.nested.updatedAt);
       assert.ok(fromDb.nested.updatedAt > doc.nested.updatedAt);
       assert.ok(fromDb.nested.createdAt);
-      assert.ok(fromDb.nested.createdAt > doc.nested.createdAt);
+      assert.equal(fromDb.nested.createdAt, doc.nested.createdAt);
     });
   });
 

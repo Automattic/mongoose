@@ -107,9 +107,10 @@ function gh10261() {
     values: string[];
   }
 
+  const type: ReadonlyArray<typeof String> = [String];
   const colorEntitySchemaDefinition: SchemaDefinition<DocumentDefinition<ValuesEntity>> = {
     values: {
-      type: [String],
+      type: type,
       required: true
     }
   };

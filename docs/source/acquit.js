@@ -8,11 +8,6 @@ require('acquit-ignore')();
 
 var files = [
   {
-    input: 'test/docs/defaults.test.js',
-    output: 'defaults.html',
-    title: 'Defaults'
-  },
-  {
     input: 'test/docs/discriminators.test.js',
     output: 'discriminators.html',
     title: 'Discriminators'

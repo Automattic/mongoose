@@ -2,13 +2,14 @@
 'use strict';
 exports['index.pug'] = require('./home');
 exports['docs/api.pug'] = require('./api');
-exports['docs/browser.md'] = { guide: true, title: 'Browser Library', acquit: true, markdown: true };
-exports['docs/index.pug'] = { title: 'Getting Started' };
-exports['docs/production.pug'] = require('./production');
 exports['docs/prior.pug'] = require('./prior');
-exports['docs/guides.pug'] = { guide: true, schema: true, title: 'Schemas' };
-exports['docs/guide.pug'] = { guide: true, schema: true, title: 'Schemas', acquit: true };
-exports['docs/schematypes.pug'] = { guide: true, schema: true, title: 'SchemaTypes' };
+
+exports['docs/defaults.md'] = { title: 'Defaults', acquit: true, markdown: true };
+exports['docs/index.md'] = { title: 'Getting Started', markdown: true };
+exports['docs/browser.md'] = { guide: true, title: 'Browser Library', acquit: true, markdown: true };
+exports['docs/guides.md'] = { guide: true, schema: true, title: 'Schemas', markdown: true };
+exports['docs/guide.md'] = { guide: true, schema: true, title: 'Schemas', acquit: true, markdown: true };
+exports['docs/schematypes.md'] = { guide: true, schema: true, title: 'SchemaTypes', markdown: true };
 exports['docs/middleware.md'] = { guide: true, title: 'Middleware', acquit: true, markdown: true };
 exports['docs/plugins.md'] = { guide: true, title: 'Plugins', markdown: true };
 exports['docs/subdocs.md'] = { guide: true, docs: true, title: 'SubDocuments', markdown: true };

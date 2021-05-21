@@ -3422,12 +3422,13 @@ describe('model: updateOne: ', function() {
 
     return co(function*() {
       const doc = yield Test.create({ nested: { test: 'foo' } });
+      console.log(doc)
       assert.ok(doc.nested.updatedAt);
       assert.ok(doc.nested.createdAt);
 
       yield cb => setTimeout(cb, 10);
-      yield Test.updateOne({ _id: doc._id }, { nested: { test: 'bar' } });
-
+      const check = yield Test.updateOne({ _id: doc._id }, { nested: { test: 'bar' } });
+      console.log(check)
       const fromDb = yield Test.findOne({ _id: doc._id });
       console.log(fromDb);
       assert.ok(fromDb.nested.updatedAt);

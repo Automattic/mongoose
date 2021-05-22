@@ -34,7 +34,12 @@ const tests = [
   ...acquit.parse(fs.readFileSync('./test/docs/custom-casting.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/es-next/getters-setters.test.es6.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/es-next/virtuals.test.es6.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/defaults.test.js').toString())
+  ...acquit.parse(fs.readFileSync('./test/docs/defaults.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/docs/discriminators.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/es-next/promises.test.es6.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/docs/schematypes.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/docs/validation.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/docs/schemas.test.js').toString())
 ];
 
 function getVersion() {
@@ -161,13 +166,4 @@ files.forEach(function(file) {
       }
     });
   }
-});
-
-const _acquit = require('./docs/source/acquit');
-const acquitFiles = Object.keys(_acquit);
-acquitFiles.forEach(function(file) {
-  const filename = __dirname + '/docs/acquit.pug';
-  _acquit[file].editLink = 'https://github.com/Automattic/mongoose/blob/master/' +
-    _acquit[file].input.replace(process.cwd(), '');
-  pugify(filename, _acquit[file], __dirname + '/docs/' + file);
 });

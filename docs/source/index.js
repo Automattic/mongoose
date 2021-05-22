@@ -4,6 +4,11 @@ exports['index.pug'] = require('./home');
 exports['docs/api.pug'] = require('./api');
 exports['docs/prior.pug'] = require('./prior');
 
+exports['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, markdown: true };
+exports['docs/validation.md'] = { title: 'Validation', acquit: true, markdown: true };
+exports['docs/customschematypes.md'] = { title: 'Custom Schema Types', acquit: true, markdown: true };
+exports['docs/promises.md'] = { title: 'Promises', acquit: true, markdown: true };
+exports['docs/discriminators.md'] = { title: 'Discriminators', acquit: true, markdown: true };
 exports['docs/defaults.md'] = { title: 'Defaults', acquit: true, markdown: true };
 exports['docs/index.md'] = { title: 'Getting Started', markdown: true };
 exports['docs/browser.md'] = { guide: true, title: 'Browser Library', acquit: true, markdown: true };

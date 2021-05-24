@@ -1,3 +1,15 @@
+5.12.11 / 2021-05-24
+====================
+ * fix(populate): skip applying setters when casting arrays for populate() to avoid issues with arrays of immutable elements #10264
+ * perf(schematype): avoid cloning setters every time we run setters #9588
+ * perf(get): add benchmarks and extra cases to speed up get() #9588
+ * perf(array): improve array constructor performance on small arrays to improve nested array perf #9588
+ * fix(index.d.ts): allow using type: [String] with string[] when using SchemaDefinition with generic #10261
+ * fix(index.d.ts): support ReadonlyArray as well as regular array where possible in schema definitions #10260
+ * docs(connection): document noListener option to useDb #10278 [stuartpb](https://github.com/stuartpb)
+ * docs: migrate raw tutorial content from pug / JS to markdown #10271
+ * docs: fix typo #10269 [sanjib](https://github.com/sanjib)
+
 5.12.10 / 2021-05-18
 ====================
  * fix(query): allow setting `defaults` option on result documents from query options #7287 [IslandRhythms](https://github.com/IslandRhythms)

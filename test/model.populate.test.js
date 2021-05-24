@@ -10459,7 +10459,29 @@ describe('model: populate:', function() {
       assert.equal(event.activities[0].speakers.length, 2);
       assert.equal(event.activities[0].speakers[0].dummy, '1');
       assert.equal(event.activities[0].speakers[1].dummy, '2');
+    });
+  });
 
+  it('supports populating an array of immutable elements (gh-10264)', function() {
+    const Cat = db.model('Cat', {
+      _id: String,
+      name: String,
+      friends: [{
+        immutable: true,
+        ref: 'Cat',
+        type: String
+      }]
+    });
+
+    return co(function*() {
+      const friend = new Cat({ _id: 'garfield', name: 'Garfield' });
+      yield friend.save();
+
+      const myCat = new Cat({ _id: 'arlene', name: 'Arlene', friends: [friend.id] });
+      yield myCat.save();
+
+      yield myCat.populate('friends').execPopulate();
+      assert.equal(myCat.friends[0].name, 'Garfield');
     });
   });
 });

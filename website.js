@@ -4,6 +4,7 @@ Error.stackTraceLimit = Infinity;
 
 const acquit = require('acquit');
 const fs = require('fs');
+const path = require('path');
 const pug = require('pug');
 const pkg = require('./package');
 const linktype = require('./docs/helpers/linktype');
@@ -32,7 +33,13 @@ const tests = [
   ...acquit.parse(fs.readFileSync('./test/es-next/findoneandupdate.test.es6.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/docs/custom-casting.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/es-next/getters-setters.test.es6.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/es-next/virtuals.test.es6.js').toString())
+  ...acquit.parse(fs.readFileSync('./test/es-next/virtuals.test.es6.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/docs/defaults.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/docs/discriminators.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/es-next/promises.test.es6.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/docs/schematypes.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/docs/validation.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/docs/schemas.test.js').toString())
 ];
 
 function getVersion() {
@@ -65,8 +72,8 @@ require('./docs/splitApiDocs');
 const filemap = Object.assign({}, require('./docs/source'), require('./docs/tutorials'), require('./docs/typescript'));
 const files = Object.keys(filemap);
 
-const wrapMarkdown = md => `
-extends ../layout
+const wrapMarkdown = (md, baseLayout) => `
+extends ${baseLayout}
 
 append style
   link(rel="stylesheet", href="/docs/css/inlinecpc.css")
@@ -121,7 +128,7 @@ function pugify(filename, options, newfile) {
     const lines = contents.split('\n');
     lines.splice(2, 0, cpc);
     contents = lines.join('\n');
-    contents = wrapMarkdown(contents);
+    contents = wrapMarkdown(contents, path.relative(path.dirname(filename), path.join(__dirname, 'docs/layout')));
     newfile = filename.replace('.md', '.html');
   }
 
@@ -166,13 +173,4 @@ files.forEach(function(file) {
       }
     });
   }
-});
-
-const _acquit = require('./docs/source/acquit');
-const acquitFiles = Object.keys(_acquit);
-acquitFiles.forEach(function(file) {
-  const filename = __dirname + '/docs/acquit.pug';
-  _acquit[file].editLink = 'https://github.com/Automattic/mongoose/blob/master/' +
-    _acquit[file].input.replace(process.cwd(), '');
-  pugify(filename, _acquit[file], __dirname + '/docs/' + file);
 });

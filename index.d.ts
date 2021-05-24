@@ -1242,10 +1242,13 @@ declare module 'mongoose' {
     typeof SchemaType |
     Schema<any> |
     Schema<any>[] |
+    ReadonlyArray<Schema<any>> |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
+    ReadonlyArray<SchemaTypeOptions<T extends undefined ? any : T>> |
     Function[] |
     SchemaDefinition<T> |
-    SchemaDefinition<T>[];
+    SchemaDefinition<T>[] |
+    ReadonlyArray<SchemaDefinition<T>>;
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
@@ -1419,7 +1422,11 @@ declare module 'mongoose' {
     type?:
       T extends string | number | boolean | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends Schema ? T :
-      T extends object[] ? Schema<Document<Unpacked<T>>>[] :
+      T extends object[] ? (Schema<Document<Unpacked<T>>>[] | ReadonlyArray<Schema<Document<Unpacked<T>>>>) :
+      T extends string[] ? (SchemaDefinitionWithBuiltInClass<string>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<string>>) :
+      T extends number[] ? (SchemaDefinitionWithBuiltInClass<number>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<number>>) :
+      T extends boolean[] ? (SchemaDefinitionWithBuiltInClass<boolean>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<boolean>>) :
+      T extends Function[] ? (SchemaDefinitionWithBuiltInClass<Function>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<Function>>) :
       T | typeof SchemaType | Schema;
 
     /** Defines a virtual with the given name that gets/sets this path. */
@@ -1501,16 +1508,16 @@ declare module 'mongoose' {
     set?: (value: T, schematype?: this) => any;
 
     /** array of allowed values for this path. Allowed for strings, numbers, and arrays of strings */
-    enum?: Array<string | number | null> | { [path: string]: string | number | null };
+    enum?: Array<string | number | null> | ReadonlyArray<string | number | null> | { [path: string]: string | number | null };
 
     /** The default [subtype](http://bsonspec.org/spec.html) associated with this buffer when it is stored in MongoDB. Only allowed for buffer paths */
     subtype?: number
 
     /** The minimum value allowed for this path. Only allowed for numbers and dates. */
-    min?: number | Date | [number, string] | [Date, string];
+    min?: number | Date | [number, string] | [Date, string] | readonly [number, string] | readonly [Date, string];
 
     /** The maximum value allowed for this path. Only allowed for numbers and dates. */
-    max?: number | Date | [number, string] | [Date, string];
+    max?: number | Date | [number, string] | [Date, string] | readonly [number, string] | readonly [Date, string];
 
     /** Defines a TTL index on this path. Only allowed for dates. */
     expires?: number | Date;
@@ -1541,10 +1548,10 @@ declare module 'mongoose' {
     uppercase?: boolean;
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at least the given number. */
-    minlength?: number | [number, string];
+    minlength?: number | [number, string] | readonly [number, string];
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at most the given number. */
-    maxlength?: number | [number, string];
+    maxlength?: number | [number, string] | readonly [number, string];
 
     [other: string]: any;
   }

@@ -3580,6 +3580,20 @@ describe('model: updateOne: ', function() {
   });
 
   describe('converts dot separated paths to nested structure (gh-10200)', () => {
+    it('works with new Model(...)', () => {
+      const Payment = getPaymentModel();
+      const paymentPOJO = getPaymentWithDotSeparatedPaths();
+      const payment = new Payment(paymentPOJO);
+      assertDocumentStructure(payment.toObject());
+    });
+    it('works with Model.create(...)', () => {
+      return co(function*() {
+        const Payment = getPaymentModel();
+        const paymentPOJO = getPaymentWithDotSeparatedPaths();
+        const payment = yield Payment.create(paymentPOJO);
+        assertDocumentStructure(payment);
+      });
+    });
     it('works with Model.updateOne(...)', () => {
       return co(function*() {
         const User = getPaymentModel();
@@ -3669,6 +3683,10 @@ describe('model: updateOne: ', function() {
       assert.deepEqual(
         payment.externalServiceResponse.resultDetails.sourceOfFunds,
         { provided: { card: { issuer: 'Big bank corporation' } } }
+      );
+      assert.deepEqual(
+        payment.externalServiceResponse.resultDetails.nonExistentField,
+        undefined
       );
     }
   });

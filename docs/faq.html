@@ -1,4 +1,26 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.12.10: FAQ</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><style>hr {
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.12.11: FAQ</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.12.11</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link selected" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/faq.md" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h2 id="faq">FAQ</h2>
+<div id="native-direct"></div>
+<script>
+    (function() {
+        if (typeof _bsa !== 'undefined' && _bsa) {
+            _bsa.init('custom', 'CK7DT53U', 'placement:mongoosejscom', {
+                target: '#native-direct',
+                template: `
+<div class="native-inline">
+<a rel="sponsored noopener" target="_blank" href="##statlink##" title="##company## — ##tagline##"><span class="sponsor">Sponsor</span> ##company## — ##description##</a>
+</div>
+</a>
+`
+            });
+        }
+    })();
+</script>
+
+<style>
+hr {
   display: block;
   margin-top: 40px;
   margin-bottom: 40px;
@@ -7,27 +29,12 @@
   background-color: #232323;
   width: 100%;
 }
-</style><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.12.10</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link selected" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/faq.pug" target="_blank">
-<img src="/docs/images/pencil.svg" />
-</a><h2 id="faq">FAQ</h2>
-<script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"><div id="native-direct"></div><script>(function() {
-if (typeof _bsa !== 'undefined' && _bsa) {
-_bsa.init('custom', 'CK7DT53U', 'placement:mongoosejscom',
-{
-target: '#native-direct',
-template: `
-<div class="native-inline">
-<a rel="sponsored noopener" target="_blank" href="##statlink##" title="##company## — ##tagline##"><span class="sponsor">Sponsor</span> ##company## — ##description##</a>
-</div>
-</a>
-`
-}
-);
-}
-})();</script><hr id="array-changes-not-saved" />
+</style>
+
+<hr id="array-changes-not-saved" />
 
 <p><a href="#array-changes-not-saved"><strong>Q</strong></a>. Why don&#39;t my changes to arrays get saved when I update an element
-directly?</p>
+    directly?</p>
 <pre><code class="language-javascript">doc.array[<span class="hljs-number">3</span>] = <span class="hljs-string">'changed'</span>;
 doc.save();</code></pre>
 <p><strong>A</strong>. Mongoose doesn&#39;t create getters/setters for array indexes; without
@@ -56,8 +63,7 @@ doc.docArray[<span class="hljs-number">3</span>] = { <span class="hljs-attr">nam
 doc.save();</code></pre>
 <hr id="unique-doesnt-work" />
 
-<p><a href="#unique-doesnt-work"><strong>Q</strong></a>. I declared a schema property as <code>unique</code> but I can still save
-duplicates. What gives?</p>
+<p><a href="#unique-doesnt-work"><strong>Q</strong></a>. I declared a schema property as <code>unique</code> but I can still save duplicates. What gives?</p>
 <p><strong>A</strong>. Mongoose doesn&#39;t handle <code>unique</code> on its own: <code>{ name: { type: String, unique: true } }</code>
 is just a shorthand for creating a <a href="https://docs.mongodb.com/manual/core/index-unique/">MongoDB unique index on <code>name</code></a>.
 For example, if MongoDB doesn&#39;t already have a unique index on <code>name</code>, the below code will not error despite the fact that <code>unique</code> is true.</p>
@@ -122,7 +128,7 @@ is undefined on the underlying <a href="./guide.html#minimize">POJO</a>.</p>
 <hr id="destructured-imports" />
 
 <p><a href="#destructured-imports"><strong>Q</strong></a>. When I use named imports like <code>import { set } from &#39;mongoose&#39;</code>, I
-get a <code>TypeError</code>. What causes this issue and how can I fix it?</p>
+    get a <code>TypeError</code>. What causes this issue and how can I fix it?</p>
 <p><strong>A</strong>. The only import syntax Mongoose supports is <code>import mongoose from &#39;mongoose&#39;</code>.
 Syntaxes like <code>import * from &#39;mongoose&#39;</code> or <code>import { model } from &#39;mongoose&#39;</code> do <strong>not</strong> work.
 The global Mongoose object stores types, <a href="/docs/api.html#mongoose_Mongoose-set">global options</a>, and other important
@@ -142,7 +148,7 @@ foo(); <span class="hljs-comment">// "undefined"</span></code></pre>
 <hr id="arrow-functions" />
 
 <p><a href="#arrow-functions"><strong>Q</strong></a>. I&#39;m using an arrow function for a <a href="./guide.html#virtuals">virtual</a>, <a href="./middleware.html">middleware</a>, <a href="./api.html#schematype_SchemaType-get">getter</a>/<a href="./api.html#schematype_SchemaType-set">setter</a>, or <a href="./guide.html#methods">method</a> and the value of <code>this</code> is wrong.</p>
-<p><strong>A</strong>. Arrow functions <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this">handle the <code>this</code> keyword much differently than conventional functions</a>.
+<p><strong>A</strong>. Arrow functions <a href="https://masteringjs.io/tutorials/fundamentals/arrow#why-not-arrow-functions">handle the <code>this</code> keyword much differently than conventional functions</a>.
 Mongoose getters/setters depend on <code>this</code> to give you access to the document that you&#39;re writing to, but this functionality does not work with arrow functions. Do <strong>not</strong> use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Do **NOT** use arrow functions as shown below unless you're certain</span>
 <span class="hljs-comment">// that's what you want. If you're reading this FAQ, odds are you should</span>
@@ -199,13 +205,12 @@ this instead:</p>
 <hr id="populate_sort_order" />
 
 <p><a href="#populate_sort_order"><strong>Q</strong></a>. I&#39;m populating a nested property under an array like the below code:</p>
-<pre><code class="language-javascript">  <span class="hljs-keyword">new</span> Schema({
-    <span class="hljs-attr">arr</span>: [{
-      <span class="hljs-attr">child</span>: { <span class="hljs-attr">ref</span>: <span class="hljs-string">'OtherModel'</span>, <span class="hljs-attr">type</span>: Schema.Types.ObjectId }
-    }]
-  });</code></pre>
-<p><code>.populate({ path: &#39;arr.child&#39;, options: { sort: &#39;name&#39; } })</code> won&#39;t sort
-by <code>arr.child.name</code>?</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">arr</span>: [{
+    <span class="hljs-attr">child</span>: { <span class="hljs-attr">ref</span>: <span class="hljs-string">'OtherModel'</span>, <span class="hljs-attr">type</span>: Schema.Types.ObjectId }
+  }]
+});</code></pre>
+<p><code>.populate({ path: &#39;arr.child&#39;, options: { sort: &#39;name&#39; } })</code> won&#39;t sort by <code>arr.child.name</code>?</p>
 <p><strong>A</strong>. See <a href="https://github.com/Automattic/mongoose/issues/2202">this GitHub issue</a>. It&#39;s a known issue but one that&#39;s exceptionally difficult to fix.</p>
 <hr id="model_functions_hanging" />
 
@@ -268,8 +273,7 @@ same name, create a new connection and bind the model to the connection.</p>
 <span class="hljs-keyword">const</span> Kitten = connection.model(<span class="hljs-string">'Kitten'</span>, kittySchema);</code></pre>
 <hr id="array-defaults" />
 
-<p><a href="#array-defaults"><strong>Q</strong></a>. How can I change mongoose&#39;s default behavior of initializing an array
-path to an empty array so that I can require real data on document creation?</p>
+<p><a href="#array-defaults"><strong>Q</strong></a>. How can I change mongoose&#39;s default behavior of initializing an array path to an empty array so that I can require real data on document creation?</p>
 <p><strong>A</strong>. You can set the default of the array to a function that returns <code>undefined</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> CollectionSchema = <span class="hljs-keyword">new</span> Schema({
   <span class="hljs-attr">field1</span>: {
@@ -289,8 +293,7 @@ path to an empty array so that I can require real data on document creation?</p>
 });</code></pre>
 <hr id="aggregate-casting" />
 
-<p><a href="#aggregate-casting"><strong>Q</strong></a>. Why does my aggregate $match fail to return the document that my find query
-returns when working with dates?</p>
+<p><a href="#aggregate-casting"><strong>Q</strong></a>. Why does my aggregate $match fail to return the document that my find query returns when working with dates?</p>
 <p><strong>A</strong>. Mongoose does not cast aggregation pipeline stages because with $project,
 $group, etc. the type of a property may change during the aggregation. If you want
 to query by date using the aggregation framework, you&#39;re responsible for ensuring
@@ -357,9 +360,7 @@ For example, the below code inserts 2 entries into the <code>tags</code> array, 
 <hr id="add_something" />
 
 <p><strong>Something to add?</strong></p>
-<p>If you&#39;d like to contribute to this page, please
-<a href="https://github.com/Automattic/mongoose/tree/master/docs/faq.pug">visit it</a>
-on github and use the <a href="https://github.com/blog/844-forking-with-the-edit-button">Edit</a> button to send a pull request.</p>
+<p>If you&#39;d like to contribute to this page, please <a href="https://github.com/Automattic/mongoose/tree/master/docs/faq.md">visit it</a> on github and use the <a href="https://github.com/blog/844-forking-with-the-edit-button">Edit</a> button to send a pull request.</p>
 </div></div><script type="text/javascript">var xhr = new XMLHttpRequest();
 xhr.open('POST', 'https://g0a3nbw0xa.execute-api.us-east-1.amazonaws.com/prod/track', true);
 xhr.setRequestHeader('Content-Type', 'application/json');

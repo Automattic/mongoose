@@ -924,6 +924,10 @@ declare module 'mongoose' {
      * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
      */
     returnOriginal?: boolean;
+    /**
+     * Another alias for the `new` option. `returnOriginal` is deprecated so this should be used.
+     */
+    returnDocument?: string;
     runValidators?: boolean;
     /** The session associated with this query. */
     session?: mongodb.ClientSession;
@@ -1883,7 +1887,7 @@ declare module 'mongoose' {
     }
   }
 
-  type ReturnsNewDoc = { new: true } | { returnOriginal: false };
+  type ReturnsNewDoc = { new: true } | { returnOriginal: false } | {returnDocument: 'after'};
 
   type QueryWithHelpers<ResultType, DocType extends Document, THelpers = {}> = Query<ResultType, DocType, THelpers> & THelpers;
 

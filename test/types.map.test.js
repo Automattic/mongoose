@@ -1035,4 +1035,63 @@ describe('Map', function() {
       assert.deepEqual(res.toObject().budgeted.get('2020'), [100, 200, 10]);
     });
   });
+  it('calling the inner Map\'s set function should automatically add the modified path to the path list (gh-10295)', function() {
+    const SecondMapSchema = new mongoose.Schema({
+      data: { type: Map, of: Number, default: {}, _id: false },
+    });
+    
+    const FirstMapSchema = new mongoose.Schema({
+      data: { type: Map, of: SecondMapSchema, default: {}, _id: false },
+    });
+    
+    const NestedSchema = new mongoose.Schema({
+      data: { type: Map, of: SecondMapSchema, default: {}, _id: false },
+    });
+    
+    const TestSchema = new mongoose.Schema({
+      _id: Number,
+      firstMap: { type: Map, of: FirstMapSchema, default: {}, _id: false },
+      nested: { type: NestedSchema, default: {}, _id: false },
+    });
+    
+    const Test = db.model("Test", TestSchema);
+
+    return co(function*() {
+      const doc = yield Test.create({ _id: Date.now() });
+    
+      // It's Ok!
+      doc.firstMap.set("first", {});
+      assert.deepStrictEqual(doc.modifiedPaths(), ['firstMap', 'firstMap.first']);
+      yield doc.save();
+    
+      // It's Ok!
+      doc.firstMap.get("first").data.set("second", {});
+      assert.deepStrictEqual(doc.modifiedPaths(), ['firstMap', 'firstMap.first', 'firstMap.first.data', 'firstMap.first.data.second']);
+      yield doc.save();
+    
+      // It's Ok!
+      doc.firstMap.get("first").data.get("second").data.set("final", 3);
+      assert.deepStrictEqual(doc.modifiedPaths(),
+      ['firstMap', 'firstMap.first', 'firstMap.first.data', 'firstMap.first.data.second', 'firstMap.first.data.second.data', 'firstMap.first.data.second.data.final']);
+      yield doc.save();
+    
+      // It's Ok!
+      doc.nested.data.set("second", {});
+      assert.deepStrictEqual(doc.modifiedPaths(), ['nested', 'nested.data', 'nested.data.second']);
+      yield doc.save();
+    
+      // It's ERROR!
+      doc.nested.data.get("second").data.set("final", 3);
+      assert.deepStrictEqual(doc.modifiedPaths(), ['nested', 'nested.data', 'nested.data.second', 'nested.data.second.data', 'nested.data.second.data.final']);
+      yield doc.save();
+    
+      // But this is OK, have to set the nested to {}, I don't know why
+      const okDoc = yield Test.create({ _id: Date.now(), nested: {} });
+      okDoc.nested.data.set("second", {});
+      yield okDoc.save();
+      okDoc.nested.data.get("second").data.set("final", 3);
+      assert.deepStrictEqual(okDoc.modifiedPaths(), ['nested', 'nested.data', 'nested.data.second', 'nested.data.second.data', 'nested.data.second.data.final']);
+      yield okDoc.save();
+    });
+  })
 });

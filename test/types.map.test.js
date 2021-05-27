@@ -1058,12 +1058,10 @@ describe('Map', function() {
 
     return co(function*() {
       const doc = yield Test.create({ _id: Date.now() });
-    
       // It's Ok!
       doc.firstMap.set("first", {});
       assert.deepStrictEqual(doc.modifiedPaths(), ['firstMap', 'firstMap.first']);
       yield doc.save();
-    
       // It's Ok!
       doc.firstMap.get("first").data.set("second", {});
       assert.deepStrictEqual(doc.modifiedPaths(), ['firstMap', 'firstMap.first', 'firstMap.first.data', 'firstMap.first.data.second']);
@@ -1082,11 +1080,13 @@ describe('Map', function() {
     
       // It's ERROR!
       doc.nested.data.get("second").data.set("final", 3);
-      assert.deepStrictEqual(doc.modifiedPaths(), ['nested', 'nested.data', 'nested.data.second', 'nested.data.second.data', 'nested.data.second.data.final']);
-      yield doc.save();
+      console.log('before the save');
+      //assert.deepStrictEqual(doc.modifiedPaths(), ['nested', 'nested.data', 'nested.data.second', 'nested.data.second.data', 'nested.data.second.data.final']);
+      yield doc.save(); // doing a findOne instead of an updateOne
     
       // But this is OK, have to set the nested to {}, I don't know why
       const okDoc = yield Test.create({ _id: Date.now(), nested: {} });
+      console.log('after the save and create');
       okDoc.nested.data.set("second", {});
       yield okDoc.save();
       okDoc.nested.data.get("second").data.set("final", 3);

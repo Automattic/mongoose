@@ -1,3 +1,9 @@
+5.12.12 / 2021-05-28
+====================
+ * fix(documentarray): retain atomics when setting to a new array #10272
+ * fix(query+model): fix deprecation warning for `returnOriginal` with `findOneAndUpdate()` #10298 #10297 #10292 #10285 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(index.d.ts): make `map()` result an array if used over an array #10288 [quantumsheep](https://github.com/quantumsheep)
+
 5.12.11 / 2021-05-24
 ====================
  * fix(populate): skip applying setters when casting arrays for populate() to avoid issues with arrays of immutable elements #10264

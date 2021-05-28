@@ -924,6 +924,10 @@ declare module 'mongoose' {
      * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
      */
     returnOriginal?: boolean;
+    /**
+     * Another alias for the `new` option. `returnOriginal` is deprecated so this should be used.
+     */
+    returnDocument?: string;
     runValidators?: boolean;
     /** The session associated with this query. */
     session?: mongodb.ClientSession;
@@ -1883,7 +1887,7 @@ declare module 'mongoose' {
     }
   }
 
-  type ReturnsNewDoc = { new: true } | { returnOriginal: false };
+  type ReturnsNewDoc = { new: true } | { returnOriginal: false } | {returnDocument: 'after'};
 
   type QueryWithHelpers<ResultType, DocType extends Document, THelpers = {}> = Query<ResultType, DocType, THelpers> & THelpers;
 
@@ -2096,7 +2100,7 @@ declare module 'mongoose' {
      * Runs a function `fn` and treats the return value of `fn` as the new value
      * for the query to resolve to.
      */
-    map<MappedType>(fn: (doc: DocType) => MappedType): QueryWithHelpers<MappedType, DocType, THelpers>;
+    map<MappedType>(fn: (doc: DocType) => MappedType): QueryWithHelpers<ResultType extends unknown[] ? MappedType[] : MappedType, DocType, THelpers>;
 
     /** Specifies an `$maxDistance` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     maxDistance(val: number): this;

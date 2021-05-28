@@ -1083,10 +1083,9 @@ describe('Map', function() {
       console.log('before the save');
       //assert.deepStrictEqual(doc.modifiedPaths(), ['nested', 'nested.data', 'nested.data.second', 'nested.data.second.data', 'nested.data.second.data.final']);
       yield doc.save(); // doing a findOne instead of an updateOne
-    
+      console.log('after the save');
       // But this is OK, have to set the nested to {}, I don't know why
       const okDoc = yield Test.create({ _id: Date.now(), nested: {} });
-      console.log('after the save and create');
       okDoc.nested.data.set("second", {});
       yield okDoc.save();
       okDoc.nested.data.get("second").data.set("final", 3);

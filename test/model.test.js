@@ -7114,7 +7114,7 @@ describe('Model', function() {
     });
   });
 
-  describe('buildBulkWriteOperations', () => {
+  describe('buildBulkWriteOperations() (gh-9673)', () => {
     it('builds write operations', () => {
       return co(function*() {
 
@@ -7204,6 +7204,23 @@ describe('Model', function() {
         },
         /documents\.1 was not a mongoose document/
       );
+    });
+    it('skips validation when given `skipValidation` true', () => {
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const users = [
+        new User({ name: 'a' }),
+        new User({ name: 'Hafez2_gh-9673-1' }),
+        new User({ name: 'b' })
+      ];
+
+      const writeOperations = User.buildBulkWriteOperations(users, { skipValidation: true });
+
+      assert.equal(writeOperations.length, 3);
     });
   });
 

@@ -7450,6 +7450,30 @@ describe('Model', function() {
       });
     });
   });
+
+  it('saves all error object properties to paths with type `Mixed` (gh-10126)', () => {
+    return co(function*() {
+      const userSchema = new Schema({ err: Schema.Types.Mixed });
+
+      const User = db.model('User', userSchema);
+
+      const err = new Error('I am a bad error');
+      err.metadata = { reasons: ['Cloudflare is down', 'DNS'] };
+
+      const user = yield User.create({ err });
+      const userFromDB = yield User.findOne({ _id: user._id });
+
+      assertErrorProperties(user);
+      assertErrorProperties(userFromDB);
+
+
+      function assertErrorProperties(user) {
+        assert.equal(user.err.message, 'I am a bad error');
+        assert.ok(user.err.stack);
+        assert.deepEqual(user.err.metadata, { reasons: ['Cloudflare is down', 'DNS'] });
+      }
+    });
+  });
 });
 
 

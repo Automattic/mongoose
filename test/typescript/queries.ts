@@ -79,6 +79,7 @@ const update = Math.random() > 0.5 ? { $unset: { 'docs.0': 1 } } : { age: 55 };
 Test.findOneAndUpdate({ name: 'test' }, update);
 
 Test.findOneAndUpdate({ name: 'test' }, { $currentDate: { endDate: true } });
+Test.findOneAndUpdate({ name: 'test' }, [{ $set: { endDate: true } }]);
 
 Test.findByIdAndUpdate({ name: 'test' }, { name: 'test2' }, (err, doc) => console.log(doc));
 
@@ -99,4 +100,10 @@ function testGenericQuery(): void {
   async function findSomething<T>(model: Model<CommonInterface<T>>): Promise<CommonInterface<T>> {
     return model.findOne({ something: 'test' }).orFail().exec();
   }
+}
+
+function eachAsync(): void {
+  Test.find().cursor().eachAsync((doc: ITest) => console.log(doc.name));
+
+  Test.find().cursor().eachAsync((docs: ITest[]) => console.log(docs[0].name), { batchSize: 2 });
 }

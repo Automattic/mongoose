@@ -61,7 +61,7 @@ describe('schemaTypes', function() {
     assert.ok(t.validateSync());
     assert.equal(t.validateSync().errors['test'].name, 'CastError');
     assert.equal(t.validateSync().errors['test'].message,
-      'Cast to Int8 failed for value "abc" at path "test"');
+      'Cast to Int8 failed for value "abc" (type string) at path "test"');
     assert.equal(t.validateSync().errors['test'].reason.message,
       'Int8: abc is not a number');
   });

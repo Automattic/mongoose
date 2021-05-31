@@ -391,8 +391,8 @@ describe('utils', function() {
     it('works with classes that extend `Error`', () => {
       // Arrange
       class OperationalError extends Error {
-        constructor() {
-          super(...arguments);
+        constructor(message) {
+          super(message);
         }
       }
 

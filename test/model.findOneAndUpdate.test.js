@@ -1691,7 +1691,7 @@ describe('model: findOneAndUpdate:', function() {
       Person.findOneAndUpdate({}, update, function(error) {
         assert.ok(error.message.indexOf('street') !== -1);
         assert.equal(error.reason.message,
-          'Cast to Number failed for value "not a num" at path "street"');
+          'Cast to Number failed for value "not a num" (type string) at path "street"');
         done();
       });
     });

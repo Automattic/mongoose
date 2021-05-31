@@ -100,8 +100,8 @@ declare module 'mongoose' {
    */
   export function isValidObjectId(v: any): boolean;
 
-  export function model<T extends Document>(name: string, schema?: Schema<any>, collection?: string, skipInit?: boolean): Model<T>;
-  export function model<T extends Document, U extends Model<T, TQueryHelpers>, TQueryHelpers = {}>(
+  export function model<T>(name: string, schema?: Schema<any>, collection?: string, skipInit?: boolean): Model<T>;
+  export function model<T, U extends Model<T, TQueryHelpers, any>, TQueryHelpers = {}>(
     name: string,
     schema?: Schema<T, U>,
     collection?: string,
@@ -125,7 +125,7 @@ declare module 'mongoose' {
   export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): typeof mongoose;
 
   /** Getter/setter around function for pluralizing collection names. */
-  export function pluralize(fn?: (str: string) => string): (str: string) => string;
+  export function pluralize(fn?: ((str: string) => string) | null): ((str: string) => string) | null;
 
   /** Sets mongoose options */
   export function set(key: string, value: any): void;
@@ -244,8 +244,8 @@ declare module 'mongoose' {
     models: { [index: string]: Model<any> };
 
     /** Defines or retrieves a model. */
-    model<T extends Document>(name: string, schema?: Schema<T>, collection?: string): Model<T>;
-    model<T extends Document, U extends Model<T, TQueryHelpers>, TQueryHelpers = {}>(
+    model<T>(name: string, schema?: Schema<T>, collection?: string): Model<T>;
+    model<T, U extends Model<T, TQueryHelpers, any>, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<T, U, TQueryHelpers>,
       collection?: string,
@@ -367,14 +367,14 @@ declare module 'mongoose' {
     getIndexes(): any;
   }
 
-  class Document<T = any, TQueryHelpers = {}> {
-    constructor(doc?: any);
+  class Document<T = any, TQueryHelpers = any> {
+    constructor(doc?: T | any);
 
     /** This documents _id. */
     _id?: T;
 
     /** This documents __v. */
-    __v?: number;
+    __v?: any;
 
     /* Get all subdocs (by bfs) */
     $getAllSubdocs(): Document[];
@@ -443,11 +443,13 @@ declare module 'mongoose' {
 
     /** Removes this document from the db. */
     delete(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
-    delete(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
+    delete(options: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
+    delete(cb: (err: CallbackError, res: any) => void): void;
 
     /** Removes this document from the db. */
     deleteOne(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
-    deleteOne(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
+    deleteOne(options: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
+    deleteOne(cb: (err: CallbackError, res: any) => void): void;
 
     /** Takes a populated field and returns it to its unpopulated state. */
     depopulate(path: string): this;
@@ -541,6 +543,12 @@ declare module 'mongoose' {
     overwrite(obj: DocumentDefinition<this>): this;
 
     /**
+     * If this document is a subdocument or populated document, returns the
+     * document's parent. Returns undefined otherwise.
+     */
+    $parent(): Document | undefined;
+
+    /**
      * Populates document references, executing the `callback` when complete.
      * If you want to use promises instead, use this function with
      * [`execPopulate()`](#document_Document-execPopulate).
@@ -584,10 +592,10 @@ declare module 'mongoose' {
     unmarkModified(path: string): void;
 
     /** Sends an update command with this document `_id` as the query selector. */
-    update(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, this>;
+    update(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, this>;
 
     /** Sends an updateOne command with this document `_id` as the query selector. */
-    updateOne(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, this>;
+    updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, this>;
 
     /** Executes registered validation rules for this document. */
     validate(pathsToValidate?: Array<string>, options?: any): Promise<void>;
@@ -596,13 +604,22 @@ declare module 'mongoose' {
     validate(pathsToValidate: Array<string>, options: any, callback: (err: CallbackError) => void): void;
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
-    validateSync(pathsToValidate?: Array<string>, options?: any): NativeError | null;
+    validateSync(pathsToValidate?: Array<string>, options?: any): Error.ValidationError | null;
   }
+
+  interface AcceptsDiscriminator {
+    /** Adds a discriminator type. */
+    discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<D>;
+    discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
+  }
+
+  interface AnyObject { [k: string]: any }
+  type EnforceDocument<T, TMethods> = T extends Document ? T : T & Document & TMethods;
 
   export const Model: Model<any>;
   // eslint-disable-next-line no-undef
-  interface Model<T extends Document, TQueryHelpers = {}> extends NodeJS.EventEmitter {
-    new(doc?: any): T;
+  interface Model<T, TQueryHelpers = {}, TMethods = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
+    new(doc?: T | any): EnforceDocument<T, TMethods>;
 
     aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -631,31 +648,31 @@ declare module 'mongoose' {
     collection: Collection;
 
     /** Creates a `count` query: counts the number of documents that match `filter`. */
-    count(callback?: (err: any, count: number) => void): QueryWithHelpers<number, T, TQueryHelpers>;
-    count(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): QueryWithHelpers<number, T, TQueryHelpers>;
+    count(callback?: (err: any, count: number) => void): QueryWithHelpers<number, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    count(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): QueryWithHelpers<number, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
-    countDocuments(callback?: (err: any, count: number) => void): QueryWithHelpers<number, T, TQueryHelpers>;
-    countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): QueryWithHelpers<number, T, TQueryHelpers>;
+    countDocuments(callback?: (err: any, count: number) => void): QueryWithHelpers<number, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): QueryWithHelpers<number, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a new document or documents */
-    create(doc: T | DocumentDefinition<T>): Promise<T>;
-    create(docs: (T | DocumentDefinition<T>)[], options?: SaveOptions): Promise<T[]>;
-    create(docs: (T | DocumentDefinition<T>)[], callback: (err: CallbackError, docs: T[]) => void): void;
-    create(doc: T | DocumentDefinition<T>, callback: (err: CallbackError, doc: T) => void): void;
-    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], options?: SaveOptions): Promise<T[]>;
-    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<T>;
-    create<DocContents = T | DocumentDefinition<T>>(...docs: DocContents[]): Promise<T[]>;
-    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], callback: (err: CallbackError, docs: T[]) => void): void;
-    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents, callback: (err: CallbackError, doc: T) => void): void;
+    create(docs: (T | DocumentDefinition<T> | AnyObject)[], options?: SaveOptions): Promise<EnforceDocument<T, TMethods>[]>;
+    create(docs: (T | DocumentDefinition<T> | AnyObject)[], callback: (err: CallbackError, docs: EnforceDocument<T, TMethods>[]) => void): void;
+    create(doc: T | DocumentDefinition<T> | AnyObject): Promise<EnforceDocument<T, TMethods>>;
+    create(doc: T | DocumentDefinition<T> | AnyObject, callback: (err: CallbackError, doc: EnforceDocument<T, TMethods>) => void): void;
+    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], options?: SaveOptions): Promise<EnforceDocument<T, TMethods>[]>;
+    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], callback: (err: CallbackError, docs: EnforceDocument<T, TMethods>[]) => void): void;
+    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<EnforceDocument<T, TMethods>>;
+    create<DocContents = T | DocumentDefinition<T>>(...docs: DocContents[]): Promise<EnforceDocument<T, TMethods>[]>;
+    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents, callback: (err: CallbackError, doc: EnforceDocument<T, TMethods>) => void): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,
      * mongoose will not create the collection for the model until any documents are
      * created. Use this method to create the collection explicitly.
      */
-    createCollection(options?: mongodb.CollectionCreateOptions): Promise<mongodb.Collection<T>>;
-    createCollection(options: mongodb.CollectionCreateOptions | null, callback: (err: CallbackError, collection: mongodb.Collection<T>) => void): void;
+    createCollection(options?: mongodb.CollectionCreateOptions): Promise<mongodb.Collection<EnforceDocument<T, TMethods>>>;
+    createCollection(options: mongodb.CollectionCreateOptions | null, callback: (err: CallbackError, collection: mongodb.Collection<EnforceDocument<T, TMethods>>) => void): void;
 
     /**
      * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
@@ -672,14 +689,18 @@ declare module 'mongoose' {
      * Behaves like `remove()`, but deletes all documents that match `conditions`
      * regardless of the `single` option.
      */
-    deleteMany(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T, TQueryHelpers>;
+    deleteMany(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    deleteMany(filter: FilterQuery<T>, callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    deleteMany(callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /**
      * Deletes the first document that matches `conditions` from the collection.
      * Behaves like `remove()`, but deletes at most one document regardless of the
      * `single` option.
      */
-    deleteOne(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T, TQueryHelpers>;
+    deleteOne(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    deleteOne(filter: FilterQuery<T>, callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    deleteOne(callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /**
      * Sends `createIndex` commands to mongo for each index declared in the schema.
@@ -700,16 +721,16 @@ declare module 'mongoose' {
      * equivalent to `findOne({ _id: id })`. If you want to query by a document's
      * `_id`, use `findById()` instead of `findOne()`.
      */
-    findById(id: any, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
+    findById(id: any, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods> | null) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Finds one document. */
-    findOne(filter?: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
+    findOne(filter?: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods> | null) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /**
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
      * The document returned has no paths marked as modified initially.
      */
-    hydrate(obj: any): T;
+    hydrate(obj: any): EnforceDocument<T, TMethods>;
 
     /**
      * This function is responsible for building [indexes](https://docs.mongodb.com/manual/indexes/),
@@ -719,15 +740,15 @@ declare module 'mongoose' {
      * [`connection.model()`](/docs/api.html#connection_Connection-model), so you
      * don't need to call it.
      */
-    init(callback?: (err: any) => void): Promise<T>;
+    init(callback?: (err: any) => void): Promise<EnforceDocument<T, TMethods>>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
-    insertMany(doc: T | DocumentDefinition<T>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
-    insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions): Promise<T>;
-    insertMany(docs: Array<T | DocumentDefinition<T>>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
-    insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions): Promise<Array<T>>;
-    insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions, callback?: (err: CallbackError, res: T | InsertManyResult) => void): void;
-    insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions, callback?: (err: CallbackError, res: Array<T> | InsertManyResult) => void): void;
+    insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options?: InsertManyOptions): Promise<Array<EnforceDocument<T, TMethods>>>;
+    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions): Promise<EnforceDocument<T, TMethods>>;
+    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions, callback?: (err: CallbackError, res: EnforceDocument<T, TMethods> | InsertManyResult) => void): void;
+    insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options?: InsertManyOptions, callback?: (err: CallbackError, res: Array<EnforceDocument<T, TMethods>> | InsertManyResult) => void): void;
 
     /**
      * Lists the indexes currently defined in MongoDB. This may or may not be
@@ -743,9 +764,9 @@ declare module 'mongoose' {
 
     /** Populates document references. */
     populate(docs: Array<any>, options: PopulateOptions | Array<PopulateOptions> | string,
-      callback?: (err: any, res: T[]) => void): Promise<Array<T>>;
+      callback?: (err: any, res: (EnforceDocument<T, TMethods>)[]) => void): Promise<Array<EnforceDocument<T, TMethods>>>;
     populate(doc: any, options: PopulateOptions | Array<PopulateOptions> | string,
-      callback?: (err: any, res: T) => void): Promise<T>;
+      callback?: (err: any, res: EnforceDocument<T, TMethods>) => void): Promise<EnforceDocument<T, TMethods>>;
 
     /**
      * Makes the indexes in MongoDB match the indexes defined in this model's
@@ -773,7 +794,7 @@ declare module 'mongoose' {
 
     /** Adds a `$where` clause to this query */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    $where(argument: string | Function): QueryWithHelpers<Array<T>, T, TQueryHelpers>;
+    $where(argument: string | Function): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Registered discriminators for this model. */
     discriminators: { [name: string]: Model<any> } | undefined;
@@ -781,15 +802,11 @@ declare module 'mongoose' {
     /** Translate any aliases fields/conditions so the final query or document object is pure */
     translateAliases(raw: any): any;
 
-    /** Adds a discriminator type. */
-    discriminator<D extends Document>(name: string, schema: Schema, value?: string): Model<D>;
-    discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
-
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): QueryWithHelpers<Array<any>, T, TQueryHelpers>;
+    distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): QueryWithHelpers<Array<any>, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
-    estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): QueryWithHelpers<number, T, TQueryHelpers>;
+    estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): QueryWithHelpers<number, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /**
      * Returns true if at least one document exists in the database that matches
@@ -799,38 +816,38 @@ declare module 'mongoose' {
     exists(filter: FilterQuery<T>, callback: (err: any, res: boolean) => void): void;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
-    find(callback?: (err: any, docs: T[]) => void): QueryWithHelpers<Array<T>, T, TQueryHelpers>;
-    find(filter: FilterQuery<T>, callback?: (err: any, docs: T[]) => void): QueryWithHelpers<Array<T>, T, TQueryHelpers>;
-    find(filter: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: any, docs: T[]) => void): QueryWithHelpers<Array<T>, T, TQueryHelpers>;
+    find(callback?: (err: any, docs: EnforceDocument<T, TMethods>[]) => void): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    find(filter: FilterQuery<T>, callback?: (err: any, docs: T[]) => void): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    find(filter: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: any, docs: EnforceDocument<T, TMethods>[]) => void): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
-    findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
+    findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `findByIdAndRemove` query, filtering by the given `_id`. */
-    findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
+    findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<T>, res: any) => void): QueryWithHelpers<mongodb.FindAndModifyWriteOpResultObject<T>, T, TQueryHelpers>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): QueryWithHelpers<T, T, TQueryHelpers>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
-    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T> | UpdateWithAggregationPipeline, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<EnforceDocument<T, TMethods>>, res: any) => void): QueryWithHelpers<mongodb.FindAndModifyWriteOpResultObject<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T> | UpdateWithAggregationPipeline, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: EnforceDocument<T, TMethods>, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods>, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T> | UpdateWithAggregationPipeline, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: any, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
-    findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
+    findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
-    findOneAndRemove(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
+    findOneAndRemove(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
-    findOneAndReplace(filter: FilterQuery<T>, replacement: DocumentDefinition<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): QueryWithHelpers<T, T, TQueryHelpers>;
-    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
+    findOneAndReplace(filter: FilterQuery<T>, replacement: DocumentDefinition<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: EnforceDocument<T, TMethods>, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods>, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<T>, res: any) => void): QueryWithHelpers<mongodb.FindAndModifyWriteOpResultObject<T>, T, TQueryHelpers>;
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): QueryWithHelpers<T, T, TQueryHelpers>;
-    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T> | UpdateWithAggregationPipeline, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<EnforceDocument<T, TMethods>>, res: any) => void): QueryWithHelpers<mongodb.FindAndModifyWriteOpResultObject<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T> | UpdateWithAggregationPipeline, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: EnforceDocument<T, TMethods>, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods>, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: any, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
-    geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: (err: CallbackError, res: Array<T>) => void): QueryWithHelpers<Array<T>, T, TQueryHelpers>;
+    geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: (err: CallbackError, res: Array<EnforceDocument<T, TMethods>>) => void): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Executes a mapReduce command. */
     mapReduce<Key, Value>(
@@ -838,10 +855,10 @@ declare module 'mongoose' {
       callback?: (err: any, res: any) => void
     ): Promise<any>;
 
-    remove(filter?: any, callback?: (err: CallbackError) => void): QueryWithHelpers<any, T, TQueryHelpers>;
+    remove(filter?: any, callback?: (err: CallbackError) => void): QueryWithHelpers<any, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
-    replaceOne(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<any, T, TQueryHelpers>;
+    replaceOne(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<any, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Schema the model uses. */
     schema: Schema;
@@ -850,18 +867,18 @@ declare module 'mongoose' {
      * @deprecated use `updateOne` or `updateMany` instead.
      * Creates a `update` query: updates one or many documents that match `filter` with `update`, based on the `multi` option.
      */
-    update(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<UpdateWriteOpResult, T, TQueryHelpers>;
+    update(filter?: FilterQuery<T>, update?: UpdateQuery<T> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<UpdateWriteOpResult, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
-    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<UpdateWriteOpResult, T, TQueryHelpers>;
+    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<UpdateWriteOpResult, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
-    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<UpdateWriteOpResult, T, TQueryHelpers>;
+    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<UpdateWriteOpResult, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */
-    where(path: string, val?: any): QueryWithHelpers<Array<T>, T, TQueryHelpers>;
-    where(obj: object): QueryWithHelpers<Array<T>, T, TQueryHelpers>;
-    where(): QueryWithHelpers<Array<T>, T, TQueryHelpers>;
+    where(path: string, val?: any): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    where(obj: object): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    where(): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
   }
 
   type _UpdateWriteOpResult = mongodb.UpdateWriteOpResult['result'];
@@ -907,6 +924,10 @@ declare module 'mongoose' {
      * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
      */
     returnOriginal?: boolean;
+    /**
+     * Another alias for the `new` option. `returnOriginal` is deprecated so this should be used.
+     */
+    returnDocument?: string;
     runValidators?: boolean;
     /** The session associated with this query. */
     session?: mongodb.ClientSession;
@@ -1063,14 +1084,19 @@ declare module 'mongoose' {
   }
 
   type MongooseDocumentMiddleware = 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init';
-  type MongooseQueryMiddleware = 'count' | 'deleteMany' | 'deleteOne' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndUpdate' | 'remove' | 'update' | 'updateOne' | 'updateMany';
+  type MongooseQueryMiddleware = 'count' | 'deleteMany' | 'deleteOne' | 'distinct' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndUpdate' | 'remove' | 'update' | 'updateOne' | 'updateMany';
 
   type SchemaPreOptions = { document?: boolean, query?: boolean };
   type SchemaPostOptions = { document?: boolean, query?: boolean };
 
   type ExtractQueryHelpers<M> = M extends Model<any, infer TQueryHelpers> ? TQueryHelpers : {};
+  type ExtractMethods<M> = M extends Model<any, any, infer TMethods> ? TMethods : {};
 
-  class Schema<DocType extends Document = Document, M extends Model<DocType, any> = Model<any, any>, SchemaDefinitionType = undefined> extends events.EventEmitter {
+  type PreMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void) => void | Promise<void>;
+  type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
+  type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
+
+  class Schema<DocType = Document, M extends Model<DocType, any, any> = Model<any, any, any>, SchemaDefinitionType = undefined> extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -1115,15 +1141,15 @@ declare module 'mongoose' {
      * [methods](http://mongoosejs.com/docs/guide.html#methods).
      */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    loadClass(model: Function): this;
+    loadClass(model: Function, onlyVirtuals?: boolean): this;
 
     /** Adds an instance method to documents constructed from Models compiled from this schema. */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    method(name: string, fn: (this: DocType, ...args: any[]) => any, opts?: any): this;
-    method(obj: { [name: string]: (this: DocType, ...args: any[]) => any }): this;
+    method(name: string, fn: (this: EnforceDocument<DocType, ExtractMethods<M>>, ...args: any[]) => any, opts?: any): this;
+    method(obj: { [name: string]: (this: EnforceDocument<DocType, ExtractMethods<M>>, ...args: any[]) => any }): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: { [name: string]: (this: DocType, ...args: any[]) => any };
+    methods: { [name: string]: (this: EnforceDocument<DocType, ExtractMethods<M>>, ...args: any[]) => any };
 
     /** The original object passed to the schema constructor */
     obj: any;
@@ -1144,36 +1170,36 @@ declare module 'mongoose' {
     plugin(fn: (schema: Schema<DocType, Model<DocType>, SchemaDefinitionType>, opts?: any) => void, opts?: any): this;
 
     /** Defines a post hook for the model. */
-    post<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: (this: T, res: any, next: (err?: CallbackError) => void) => void): this;
-    post<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: (this: T, res: any, next: (err?: CallbackError) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
-    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, res: Array<any>, next: (err: CallbackError) => void) => void): this;
-    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: (this: T, res: Array<any>, next: (err: CallbackError) => void) => void): this;
-    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
-    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T>): this;
+    post<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PostMiddlewareFunction<T>): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
+    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: PostMiddlewareFunction<T, Array<any>>): this;
+    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, Array<any>>): this;
+    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<T>): this;
+    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
 
-    post<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: (this: T, err: NativeError, res: any, next: (err?: CallbackError) => void) => void): this;
-    post<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: (this: T, err: NativeError, res: any, next: (err?: CallbackError) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
-    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, err: NativeError, res: Array<any>, next: (err: CallbackError) => void) => void): this;
-    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: (this: T, err: NativeError, res: Array<any>, next: (err: CallbackError) => void) => void): this;
-    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
-    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
+    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
+    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
 
     /** Defines a pre hook for the model. */
-    pre<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
-    pre<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
-    pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
-    pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err: CallbackError) => void) => void): this;
-    pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
-    pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err: CallbackError) => void) => void): this;
-    pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void): this;
-    pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void): this;
+    pre<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
+    pre<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
+    pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PreMiddlewareFunction<T>): this;
+    pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
+    pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;
+    pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
+    pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
+    pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
 
     /** Object of currently defined query helpers on this schema. */
-    query: { [name: string]: <T extends QueryWithHelpers<any, DocType, ExtractQueryHelpers<M>> = QueryWithHelpers<any, DocType, ExtractQueryHelpers<M>>>(this: T, ...args: any[]) => any };
+    query: { [name: string]: <T extends QueryWithHelpers<any, EnforceDocument<DocType, ExtractMethods<M>>, ExtractQueryHelpers<M>> = QueryWithHelpers<any, EnforceDocument<DocType, ExtractMethods<M>>, ExtractQueryHelpers<M>>>(this: T, ...args: any[]) => any };
 
     /** Adds a method call to the queue. */
     queue(name: string, args: any[]): this;
@@ -1206,10 +1232,12 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  type SchemaDefinitionWithBuiltInClass<T extends number | string | Function> = T extends number
+  type SchemaDefinitionWithBuiltInClass<T extends number | string | boolean | Function> = T extends number
     ? (typeof Number | 'number' | 'Number' | typeof Schema.Types.Number)
     : T extends string
     ? (typeof String | 'string' | 'String' | typeof Schema.Types.String)
+    : T extends boolean
+    ? (typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean)
     : (Function | string);
 
   type SchemaDefinitionProperty<T = undefined> = T extends string | number | Function
@@ -1218,10 +1246,13 @@ declare module 'mongoose' {
     typeof SchemaType |
     Schema<any> |
     Schema<any>[] |
+    ReadonlyArray<Schema<any>> |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
+    ReadonlyArray<SchemaTypeOptions<T extends undefined ? any : T>> |
     Function[] |
     SchemaDefinition<T> |
-    SchemaDefinition<T>[];
+    SchemaDefinition<T>[] |
+    ReadonlyArray<SchemaDefinition<T>>;
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
@@ -1393,9 +1424,13 @@ declare module 'mongoose' {
 
   export class SchemaTypeOptions<T> {
     type?:
-      T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> :
+      T extends string | number | boolean | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends Schema ? T :
-      T extends object[] ? Schema<Document<Unpacked<T>>>[] :
+      T extends object[] ? (Schema<Document<Unpacked<T>>>[] | ReadonlyArray<Schema<Document<Unpacked<T>>>>) :
+      T extends string[] ? (SchemaDefinitionWithBuiltInClass<string>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<string>>) :
+      T extends number[] ? (SchemaDefinitionWithBuiltInClass<number>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<number>>) :
+      T extends boolean[] ? (SchemaDefinitionWithBuiltInClass<boolean>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<boolean>>) :
+      T extends Function[] ? (SchemaDefinitionWithBuiltInClass<Function>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<Function>>) :
       T | typeof SchemaType | Schema;
 
     /** Defines a virtual with the given name that gets/sets this path. */
@@ -1477,16 +1512,16 @@ declare module 'mongoose' {
     set?: (value: T, schematype?: this) => any;
 
     /** array of allowed values for this path. Allowed for strings, numbers, and arrays of strings */
-    enum?: Array<string | number | null> | { [path: string]: string | number | null };
+    enum?: Array<string | number | null> | ReadonlyArray<string | number | null> | { [path: string]: string | number | null };
 
     /** The default [subtype](http://bsonspec.org/spec.html) associated with this buffer when it is stored in MongoDB. Only allowed for buffer paths */
     subtype?: number
 
     /** The minimum value allowed for this path. Only allowed for numbers and dates. */
-    min?: number | Date | [number, string] | [Date, string];
+    min?: number | Date | [number, string] | [Date, string] | readonly [number, string] | readonly [Date, string];
 
     /** The maximum value allowed for this path. Only allowed for numbers and dates. */
-    max?: number | Date | [number, string] | [Date, string];
+    max?: number | Date | [number, string] | [Date, string] | readonly [number, string] | readonly [Date, string];
 
     /** Defines a TTL index on this path. Only allowed for dates. */
     expires?: number | Date;
@@ -1517,10 +1552,10 @@ declare module 'mongoose' {
     uppercase?: boolean;
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at least the given number. */
-    minlength?: number | [number, string];
+    minlength?: number | [number, string] | readonly [number, string];
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at most the given number. */
-    maxlength?: number | [number, string];
+    maxlength?: number | [number, string] | readonly [number, string];
 
     [other: string]: any;
   }
@@ -1597,13 +1632,14 @@ declare module 'mongoose' {
 
   namespace Schema {
     namespace Types {
-      class Array extends SchemaType {
+      class Array extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
         static options: { castNonArrays: boolean; };
 
-        discriminator(name: string, schema: Schema, tag?: string): any;
+        discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -1653,13 +1689,14 @@ declare module 'mongoose' {
         static schemaName: string;
       }
 
-      class DocumentArray extends SchemaType {
+      class DocumentArray extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
         static options: { castNonArrays: boolean; };
 
-        discriminator(name: string, schema: Schema, tag?: string): any;
+        discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
         schema: Schema;
@@ -1808,6 +1845,9 @@ declare module 'mongoose' {
       /** Returns this sub-documents parent document. */
       parent(): Document;
 
+      /** Returns this sub-documents parent document. */
+      $parent(): Document;
+
       /** Returns this sub-documents parent array. */
       parentArray(): DocumentArray<Document>;
     }
@@ -1841,15 +1881,25 @@ declare module 'mongoose' {
 
       /** Returns this sub-documents parent document. */
       parent(): Document;
+
+      /** Returns this sub-documents parent document. */
+      $parent(): Document;
     }
   }
 
-  type ReturnsNewDoc = { new: true } | { returnOriginal: false };
+  type ReturnsNewDoc = { new: true } | { returnOriginal: false } | {returnDocument: 'after'};
 
   type QueryWithHelpers<ResultType, DocType extends Document, THelpers = {}> = Query<ResultType, DocType, THelpers> & THelpers;
 
   class Query<ResultType, DocType extends Document, THelpers = {}> {
     _mongooseOptions: MongooseQueryOptions;
+
+    /**
+     * Returns a wrapper around a [mongodb driver cursor](http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html).
+     * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
+     * This is equivalent to calling `.cursor()` with no arguments.
+     */
+    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
 
     /** Executes the query */
     exec(): Promise<ResultType>;
@@ -1913,6 +1963,8 @@ declare module 'mongoose' {
      * collection, regardless of the value of `single`.
      */
     deleteMany(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
+    deleteMany(filter: FilterQuery<DocType>, callback: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
+    deleteMany(callback: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
 
     /**
      * Declare and/or execute this query as a `deleteOne()` operation. Works like
@@ -1920,6 +1972,8 @@ declare module 'mongoose' {
      * option.
      */
     deleteOne(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
+    deleteOne(filter: FilterQuery<DocType>, callback: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
+    deleteOne(callback: (err: CallbackError, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct(field: string, filter?: FilterQuery<DocType>, callback?: (err: any, count: number) => void): QueryWithHelpers<Array<any>, DocType, THelpers>;
@@ -1970,17 +2024,17 @@ declare module 'mongoose' {
     findOneAndRemove(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<DocType>, res: any) => void): QueryWithHelpers<mongodb.FindAndModifyWriteOpResultObject<DocType>, DocType, THelpers>;
-    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): QueryWithHelpers<DocType, DocType, THelpers>;
-    findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers>;
+    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<DocType>, res: any) => void): QueryWithHelpers<mongodb.FindAndModifyWriteOpResultObject<DocType>, DocType, THelpers>;
+    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): QueryWithHelpers<DocType, DocType, THelpers>;
+    findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<DocType>, res: any) => void): QueryWithHelpers<mongodb.FindAndModifyWriteOpResultObject<DocType>, DocType, THelpers>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): QueryWithHelpers<DocType, DocType, THelpers>;
-    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<DocType>, res: any) => void): QueryWithHelpers<mongodb.FindAndModifyWriteOpResultObject<DocType>, DocType, THelpers>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): QueryWithHelpers<DocType, DocType, THelpers>;
+    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers>;
 
     /** Specifies a `$geometry` condition */
     geometry(object: { type: string, coordinates: any[] }): this;
@@ -2005,7 +2059,7 @@ declare module 'mongoose' {
     getQuery(): FilterQuery<DocType>;
 
     /** Returns the current update operations as a JSON object. */
-    getUpdate(): UpdateQuery<DocType> | null;
+    getUpdate(): UpdateQuery<DocType> | UpdateWithAggregationPipeline | null;
 
     /** Specifies a `$gt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gt(val: number): this;
@@ -2046,7 +2100,7 @@ declare module 'mongoose' {
      * Runs a function `fn` and treats the return value of `fn` as the new value
      * for the query to resolve to.
      */
-    map<MappedType>(fn: (doc: DocType) => MappedType): QueryWithHelpers<MappedType, DocType, THelpers>;
+    map<MappedType>(fn: (doc: DocType) => MappedType): QueryWithHelpers<ResultType extends unknown[] ? MappedType[] : MappedType, DocType, THelpers>;
 
     /** Specifies an `$maxDistance` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     maxDistance(val: number): this;
@@ -2063,7 +2117,7 @@ declare module 'mongoose' {
     maxTimeMS(ms: number): this;
 
     /** Merges another Query or conditions object into this one. */
-    merge(source: Query<any, any>): this;
+    merge(source: Query<any, any> | FilterQuery<DocType>): this;
 
     /** Specifies a `$mod` condition, filters documents for documents whose `path` property is a number that is equal to `remainder` modulo `divisor`. */
     mod(val: Array<number>): this;
@@ -2167,7 +2221,7 @@ declare module 'mongoose' {
     /** Sets the query conditions to the provided JSON object. */
     setQuery(val: FilterQuery<DocType> | null): void;
 
-    setUpdate(update: UpdateQuery<DocType>): void;
+    setUpdate(update: UpdateQuery<DocType> | UpdateWithAggregationPipeline): void;
 
     /** Specifies an `$size` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     size(val: number): this;
@@ -2202,7 +2256,7 @@ declare module 'mongoose' {
     toConstructor(): new (...args: any[]) => QueryWithHelpers<ResultType, DocType, THelpers>;
 
     /** Declare and/or execute this query as an update() operation. */
-    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: UpdateWriteOpResult) => void): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers>;
+    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: CallbackError, res: UpdateWriteOpResult) => void): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers>;
 
     /**
      * Declare and/or execute this query as an updateMany() operation. Same as
@@ -2210,13 +2264,13 @@ declare module 'mongoose' {
      * `filter` (as opposed to just the first one) regardless of the value of
      * the `multi` option.
      */
-    updateMany(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: UpdateWriteOpResult) => void): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers>;
+    updateMany(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: CallbackError, res: UpdateWriteOpResult) => void): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers>;
 
     /**
      * Declare and/or execute this query as an updateOne() operation. Same as
      * `update()`, except it does not support the `multi` or `overwrite` options.
      */
-    updateOne(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: UpdateWriteOpResult) => void): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers>;
+    updateOne(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: CallbackError, res: UpdateWriteOpResult) => void): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers>;
 
     /**
      * Sets the specified number of `mongod` servers, or tag set of `mongod` servers,
@@ -2273,22 +2327,22 @@ declare module 'mongoose' {
   /** @see https://docs.mongodb.com/manual/reference/operator/update */
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, NativeDate | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }>;
-    $inc?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
+    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, NativeDate | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }> | any;
+    $inc?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined> | any;
     $min?: mongodb.MatchKeysAndValues<TSchema>;
     $max?: mongodb.MatchKeysAndValues<TSchema>;
-    $mul?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
+    $mul?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined> | any;
     $rename?: { [key: string]: string };
     $set?: mongodb.MatchKeysAndValues<TSchema>;
     $setOnInsert?: mongodb.MatchKeysAndValues<TSchema>;
-    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, any>;
+    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, any> | any;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: mongodb.SetFields<TSchema>;
-    $pop?: mongodb.OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1>;
+    $addToSet?: mongodb.SetFields<TSchema> | any;
+    $pop?: mongodb.OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1> | any;
     $pull?: PullOperator<TSchema>;
-    $push?: mongodb.PushOperator<TSchema>;
-    $pullAll?: mongodb.PullAllOperator<TSchema>;
+    $push?: mongodb.PushOperator<TSchema> | any;
+    $pullAll?: mongodb.PullAllOperator<TSchema> | any;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: {
@@ -2296,7 +2350,15 @@ declare module 'mongoose' {
     };
   };
 
-  export type UpdateQuery<T> = _UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
+  type UpdateWithAggregationPipeline = UpdateAggregationStage[];
+  type UpdateAggregationStage = { $addFields: any } |
+    { $set: any } |
+    { $project: any } |
+    { $unset: any } |
+    { $replaceRoot: any } |
+    { $replaceWith: any };
+
+  export type UpdateQuery<T> = (_UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>);
 
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;
@@ -2329,6 +2391,8 @@ declare module 'mongoose' {
     T;
 
   class QueryCursor<DocType extends Document> extends stream.Readable {
+    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
+
     /**
      * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
      * Useful for setting the `noCursorTimeout` and `tailable` flags.
@@ -2348,8 +2412,10 @@ declare module 'mongoose' {
      * will wait for the promise to resolve before iterating on to the next one.
      * Returns a promise that resolves when done.
      */
-    eachAsync(fn: (doc: DocType| [DocType]) => any, options?: { parallel?: number, batchSize?: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType| [DocType]) => any, options?: { parallel?: number, batchSize?: number }, cb?: (err: CallbackError) => void): void;
+    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number, batchSize?: number }, cb?: (err: CallbackError) => void): void;
+    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }, cb?: (err: CallbackError) => void): void;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved
@@ -2632,6 +2698,8 @@ declare module 'mongoose' {
       path: string;
       reason?: NativeError | null;
       model?: any;
+
+      constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
     }
 
     export class DisconnectedError extends Error {

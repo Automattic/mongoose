@@ -2534,7 +2534,9 @@ describe('document', function() {
         const doc = docs[0];
         doc.other = 'something';
         doc.subdocs[1].name = 'test2';
-        assert.equal(doc.validateSync(undefined, { validateModifiedOnly: true }), null);
+        assert.equal(doc.validateSync({ validateModifiedOnly: true }), null);
+        assert.equal(doc.validateSync('other'), null);
+        assert.ok(doc.validateSync('other title').errors['title']);
         doc.save({ validateModifiedOnly: true }, function(error) {
           assert.equal(error, null);
           done();
@@ -2551,7 +2553,7 @@ describe('document', function() {
         assert.equal(createError, null);
         const doc = docs[0];
         doc.title = '';
-        assert.ok(doc.validateSync(undefined, { validateModifiedOnly: true }).errors);
+        assert.ok(doc.validateSync({ validateModifiedOnly: true }).errors);
         doc.save({ validateModifiedOnly: true }, function(error) {
           assert.ok(error.errors);
           done();
@@ -9911,6 +9913,30 @@ describe('document', function() {
     });
   });
 
+  it('with virtual populate (gh-10148)', function() {
+    const childSchema = Schema({ name: String, parentId: 'ObjectId' });
+    childSchema.virtual('parent', {
+      ref: 'Parent',
+      localField: 'parentId',
+      foreignField: '_id',
+      justOne: true
+    });
+    const Child = db.model('Child', childSchema);
+
+    const Parent = db.model('Parent', Schema({ name: String }));
+
+    return co(function*() {
+      const p = yield Parent.create({ name: 'Anakin' });
+      yield Child.create({ name: 'Luke', parentId: p._id });
+
+      const res = yield Child.findOne().populate('parent');
+      assert.equal(res.parent.name, 'Anakin');
+      const docs = res.$getPopulatedDocs();
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].name, 'Anakin');
+    });
+  });
+
   it('handles paths named `db` (gh-9798)', function() {
     const schema = new Schema({
       db: String
@@ -10204,6 +10230,30 @@ describe('document', function() {
 
       resultObject = resultDocument.toObject({ flattenMaps: false });
       assert.ok(resultObject.child.map instanceof Map);
+    });
+  });
+
+  it('does not double validate paths under mixed objects (gh-10141)', function() {
+    let validatorCallCount = 0;
+    const Test = db.model('Test', Schema({
+      name: String,
+      object: {
+        type: Object,
+        validate: () => {
+          validatorCallCount++;
+          return true;
+        }
+      }
+    }));
+
+    return co(function*() {
+      const doc = yield Test.create({ name: 'test', object: { answer: 42 } });
+
+      validatorCallCount = 0;
+      doc.set('object.question', 'secret');
+      doc.set('object.answer', 0);
+      yield doc.validate();
+      assert.equal(validatorCallCount, 0);
     });
   });
 });

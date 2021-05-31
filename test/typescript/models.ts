@@ -14,6 +14,37 @@ function conventionalSyntax(): void {
   const bar = (SomeModel: Model<ITest>) => console.log(SomeModel);
 
   bar(Test);
+
+  const doc = new Test({ foo: '42' });
+  console.log(doc.foo);
+  doc.save();
+}
+
+function rawDocSyntax(): void {
+  interface ITest {
+    foo: string;
+  }
+
+  interface ITestMethods {
+    bar(): number;
+  }
+
+  type TestModel = Model<ITest, {}, ITestMethods>;
+
+  const TestSchema = new Schema<ITest, TestModel>({
+    foo: { type: String, required: true }
+  });
+
+  const Test = connection.model<ITest, TestModel>('Test', TestSchema);
+
+  const bar = (SomeModel: Model<any, any, any>) => console.log(SomeModel);
+
+  bar(Test);
+
+  const doc = new Test({ foo: '42' });
+  console.log(doc.foo);
+  console.log(doc.bar());
+  doc.save();
 }
 
 function tAndDocSyntax(): void {
@@ -62,6 +93,32 @@ function schemaStaticsWithoutGenerics() {
 
   const UserModel: IUserModel = model<IUserDocument, IUserModel>('User', UserSchema);
   UserModel.static1();
+}
+
+function gh10074() {
+  interface IDog {
+    breed: string;
+    name: string;
+    age: number;
+  }
+
+  type IDogDocument = IDog & Document;
+
+  const DogSchema = new Schema<IDogDocument>(
+    {
+      breed: { type: String },
+      name: { type: String },
+      age: { type: Number }
+    }
+  );
+
+  const Dog = model<IDogDocument, Model<IDogDocument>>('dog', DogSchema);
+
+  const rex = new Dog({
+    breed: 'test',
+    name: 'rex',
+    age: '50'
+  });
 }
 
 const ExpiresSchema = new Schema({

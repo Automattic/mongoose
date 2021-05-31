@@ -1,4 +1,4 @@
-import { Schema, Document, SchemaDefinition, SchemaDefinitionProperty, Model } from 'mongoose';
+import { Schema, Document, SchemaDefinition, Model, DocumentDefinition } from 'mongoose';
 
 enum Genre {
   Action,
@@ -95,9 +95,23 @@ async function gh9857() {
 
   const schemaDefinition: UserSchemaDefinition = {
     name: { type: String },
-    active: Boolean,
+    active: { type: Boolean },
     points: Number
   };
 
   const schema = new Schema<UserDocument, UserModel, User>(schemaDefinition);
+}
+
+function gh10261() {
+  interface ValuesEntity {
+    values: string[];
+  }
+
+  const type: ReadonlyArray<typeof String> = [String];
+  const colorEntitySchemaDefinition: SchemaDefinition<DocumentDefinition<ValuesEntity>> = {
+    values: {
+      type: type,
+      required: true
+    }
+  };
 }

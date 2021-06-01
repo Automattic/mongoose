@@ -1093,6 +1093,7 @@ declare module 'mongoose' {
   type ExtractMethods<M> = M extends Model<any, any, infer TMethods> ? TMethods : {};
 
   type PreMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void) => void | Promise<void>;
+  type PreSaveMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void, opts: SaveOptions) => void | Promise<void>;
   type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
   type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
 
@@ -1189,6 +1190,7 @@ declare module 'mongoose' {
     post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
 
     /** Defines a pre hook for the model. */
+    pre<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PreMiddlewareFunction<T>): this;

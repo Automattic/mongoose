@@ -19,6 +19,7 @@ interface Movie {
   rating?: number,
   genre?: string,
   actionIntensity?: number,
+  status?: string,
   actors?: Actor[]
 }
 
@@ -51,6 +52,13 @@ const movieSchema = new Schema<Document<Movie>, Model<Document<Movie>>, Movie>({
       },
       'Action intensity required for action genre'
     ]
+  },
+  status: {
+    type: String,
+    enum: {
+      values: ['Announced', 'Released'],
+      message: 'Invalid value for `status`'
+    }
   },
   actors: {
     type: [actorSchema],

@@ -1246,9 +1246,9 @@ declare module 'mongoose' {
     ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
     SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
-    Schema<any> |
-    Schema<any>[] |
-    ReadonlyArray<Schema<any>> |
+    Schema<any, any> |
+    Schema<any, any>[] |
+    ReadonlyArray<Schema<any, any>> |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
     ReadonlyArray<SchemaTypeOptions<T extends undefined ? any : T>> |
     Function[] |
@@ -1427,13 +1427,13 @@ declare module 'mongoose' {
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | boolean | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends Schema ? T :
+      T extends Schema<any, any> ? T :
       T extends object[] ? (Schema<Document<Unpacked<T>>>[] | ReadonlyArray<Schema<Document<Unpacked<T>>>>) :
       T extends string[] ? (SchemaDefinitionWithBuiltInClass<string>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<string>>) :
       T extends number[] ? (SchemaDefinitionWithBuiltInClass<number>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<number>>) :
       T extends boolean[] ? (SchemaDefinitionWithBuiltInClass<boolean>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<boolean>>) :
       T extends Function[] ? (SchemaDefinitionWithBuiltInClass<Function>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<Function>>) :
-      T | typeof SchemaType | Schema;
+      T | typeof SchemaType | Schema<any, any>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;

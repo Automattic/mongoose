@@ -1,6 +1,6 @@
 # Testing Mongoose with [Jest](https://www.npmjs.com/package/jest)
 
-Jest is a client-side JavaScript testing library developed by Facebook.
+Jest is a JavaScript runtime developed by Facebook that is usually used for testing.
 Because Jest is designed primarily for testing React applications, using it to test Node.js server-side applications comes with a lot of caveats.
 We strongly recommend using a different testing framework, like [Mocha](https://mochajs.org/).
 

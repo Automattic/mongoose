@@ -2377,10 +2377,12 @@ declare module 'mongoose' {
     T extends TreatAsPrimitives ? T : // primitives
     LeanDocument<T>; // Documents and everything else
 
+  type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
+
   export type _LeanDocument<T> = {
     [K in keyof T]:
     0 extends (1 & T[K]) ? T[K] : // any
-    T[K] extends unknown[] ? LeanType<T[K][number]>[] : // Array
+    T[K] extends unknown[] ? LeanArray<T[K]> : // Array
     T[K] extends Document ? LeanDocument<T[K]> : // Subdocument
     T[K];
   };

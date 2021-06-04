@@ -2760,7 +2760,7 @@ declare module 'mongoose' {
     export class ValidationError extends Error {
       name: 'ValidationError';
 
-      errors: { [path: string]: ValidatorError | CastError | ValidationError};
+      errors: { [path: string]: ValidatorError | CastError | ValidationError };
     }
 
     export class ValidatorError extends Error {

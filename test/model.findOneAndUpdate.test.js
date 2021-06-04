@@ -2495,4 +2495,16 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(doc.jobCategory.value, 'from setter 2');
     });
   });
+
+  it('returnDocument should work (gh-10321)', function() {
+    const testSchema = Schema({ a: Number });
+    const Model = db.model('Test', testSchema);
+
+    const opts = { returnDocument: 'after' };
+    return co(function*() {
+      const tmp = yield Model.create({ a: 1 });
+      const doc = yield Model.findOneAndUpdate({ _id: tmp._id }, { a: 2 }, opts).lean();
+      assert.equal(doc.a, 2);
+    });
+  });
 });

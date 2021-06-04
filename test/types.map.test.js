@@ -1037,51 +1037,55 @@ describe('Map', function() {
   });
   it('calling the inner Map\'s set function should automatically add the modified path to the path list (gh-10295)', function() {
     const SecondMapSchema = new mongoose.Schema({
-      data: { type: Map, of: Number, default: {}, _id: false },
+      data: { type: Map, of: Number, default: () => ({}), _id: false }
     });
-    
+
     const FirstMapSchema = new mongoose.Schema({
-      data: { type: Map, of: SecondMapSchema, default: {}, _id: false },
+      data: { type: Map, of: SecondMapSchema, default: () => ({}), _id: false }
     });
-    
+
     const NestedSchema = new mongoose.Schema({
-      data: { type: Map, of: SecondMapSchema, default: {}, _id: false },
+      data: { type: Map, of: SecondMapSchema, default: () => ({}), _id: false }
     });
-    
+
     const TestSchema = new mongoose.Schema({
       _id: Number,
-      firstMap: { type: Map, of: FirstMapSchema, default: {}, _id: false },
-      nested: { type: NestedSchema, default: {}, _id: false },
+      firstMap: { type: Map, of: FirstMapSchema, default: () => ({}), _id: false },
+      nested: { type: NestedSchema, default: () => ({}), _id: false }
     });
-    
+
     const Test = db.model("Test", TestSchema);
 
     return co(function*() {
       const doc = yield Test.create({ _id: Date.now() });
       // It's Ok!
+      /*
       doc.firstMap.set("first", {});
       assert.deepStrictEqual(doc.modifiedPaths(), ['firstMap', 'firstMap.first']);
       yield doc.save();
+
       // It's Ok!
       doc.firstMap.get("first").data.set("second", {});
       assert.deepStrictEqual(doc.modifiedPaths(), ['firstMap', 'firstMap.first', 'firstMap.first.data', 'firstMap.first.data.second']);
       yield doc.save();
-    
+
       // It's Ok!
       doc.firstMap.get("first").data.get("second").data.set("final", 3);
       assert.deepStrictEqual(doc.modifiedPaths(),
       ['firstMap', 'firstMap.first', 'firstMap.first.data', 'firstMap.first.data.second', 'firstMap.first.data.second.data', 'firstMap.first.data.second.data.final']);
       yield doc.save();
-    
+      */
       // It's Ok!
       doc.nested.data.set("second", {});
       assert.deepStrictEqual(doc.modifiedPaths(), ['nested', 'nested.data', 'nested.data.second']);
       yield doc.save();
-    
+      console.log("==================================================================")
       // It's ERROR!
+      console.log('From the test file', doc.$__.activePaths);
+      console.log('global', global.__doc,"space", doc.nested, global.__doc === doc);
       doc.nested.data.get("second").data.set("final", 3);
-      console.log('before the save');
-      //assert.deepStrictEqual(doc.modifiedPaths(), ['nested', 'nested.data', 'nested.data.second', 'nested.data.second.data', 'nested.data.second.data.final']);
+      console.log('before the save', doc.nested === doc.nested.data.get("second").$__parent);
+      assert.deepStrictEqual(doc.modifiedPaths(), ['nested', 'nested.data', 'nested.data.second', 'nested.data.second.data', 'nested.data.second.data.final']);
       yield doc.save(); // doing a findOne instead of an updateOne
       console.log('after the save');
       // But this is OK, have to set the nested to {}, I don't know why
@@ -1092,5 +1096,5 @@ describe('Map', function() {
       assert.deepStrictEqual(okDoc.modifiedPaths(), ['nested', 'nested.data', 'nested.data.second', 'nested.data.second.data', 'nested.data.second.data.final']);
       yield okDoc.save();
     });
-  })
+  });
 });

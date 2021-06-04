@@ -2404,28 +2404,15 @@ describe('Query', function() {
       });
 
       it('throw on sync exceptions in callbacks (gh-6178)', function(done) {
-        const async = require('async');
         const schema = new Schema({});
         const Test = db.model('Test', schema);
 
         process.once('uncaughtException', err => {
-          assert.equal(err.message, 'woops');
+          assert.equal(err.message, 'Oops!');
           done();
         });
 
-        async.waterfall([
-          function(cb) {
-            Test.create({}, cb);
-          },
-          function(res, cb) {
-            Test.find({}, function() { cb(); });
-          },
-          function() {
-            throw new Error('woops');
-          }
-        ], function() {
-          assert.ok(false);
-        });
+        Test.find({}, function() { throw new Error('Oops!'); });
       });
     });
 

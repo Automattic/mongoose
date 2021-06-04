@@ -1,3 +1,13 @@
+5.12.13 / 2021-06-04
+====================
+ * perf(document): avoid creating nested paths when running `$getAllSubdocs()` #10275
+ * fix: make returnDocument option work with `findOneAndUpdate()` #10232 #10231 [cnwangjie](https://github.com/cnwangjie)
+ * fix(document): correctly reset subdocument when resetting a map subdocument underneath a single nested subdoc after save #10295
+ * perf(query): avoid setting non-null sessions to avoid overhead from $getAllSubdocs() #10275
+ * perf(document): pre split schematype paths when compiling schema to avoid extra overhead of splitting when hydrating documents #10275
+ * perf(schema): pre-calculate mapPaths to avoid looping over every path for each path when initing doc #10275
+ * fix(index.d.ts): drill down into nested arrays when creating LeanDocument type #10293
+
 5.12.12 / 2021-05-28
 ====================
  * fix(documentarray): retain atomics when setting to a new array #10272

@@ -10283,12 +10283,12 @@ describe('document', function() {
 
       // It's Ok!
       doc.nested.data.set('second', {});
-      assert.ok(doc.modifiedPaths().includes('nested.data.second'), doc.modifiedPaths());
+      assert.ok(doc.modifiedPaths().indexOf('nested.data.second') !== -1, doc.modifiedPaths());
       yield doc.save();
 
       // It's ERROR!
       doc.nested.data.get('second').data.set('final', 3);
-      assert.ok(doc.modifiedPaths().includes('nested.data.second.data.final'), doc.modifiedPaths());
+      assert.ok(doc.modifiedPaths().indexOf('nested.data.second.data.final') !== -1, doc.modifiedPaths());
       yield doc.save();
 
       const fromDb = yield Test.findById(doc).lean();

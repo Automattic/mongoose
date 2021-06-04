@@ -1093,6 +1093,7 @@ declare module 'mongoose' {
   type ExtractMethods<M> = M extends Model<any, any, infer TMethods> ? TMethods : {};
 
   type PreMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void) => void | Promise<void>;
+  type PreSaveMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void, opts: SaveOptions) => void | Promise<void>;
   type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
   type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
 
@@ -1189,6 +1190,7 @@ declare module 'mongoose' {
     post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
 
     /** Defines a pre hook for the model. */
+    pre<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PreMiddlewareFunction<T>): this;
@@ -1244,9 +1246,9 @@ declare module 'mongoose' {
     ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
     SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
-    Schema<any> |
-    Schema<any>[] |
-    ReadonlyArray<Schema<any>> |
+    Schema<any, any> |
+    Schema<any, any>[] |
+    ReadonlyArray<Schema<any, any>> |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
     ReadonlyArray<SchemaTypeOptions<T extends undefined ? any : T>> |
     Function[] |
@@ -1425,13 +1427,13 @@ declare module 'mongoose' {
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | boolean | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends Schema ? T :
+      T extends Schema<any, any> ? T :
       T extends object[] ? (Schema<Document<Unpacked<T>>>[] | ReadonlyArray<Schema<Document<Unpacked<T>>>>) :
       T extends string[] ? (SchemaDefinitionWithBuiltInClass<string>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<string>>) :
       T extends number[] ? (SchemaDefinitionWithBuiltInClass<number>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<number>>) :
       T extends boolean[] ? (SchemaDefinitionWithBuiltInClass<boolean>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<boolean>>) :
       T extends Function[] ? (SchemaDefinitionWithBuiltInClass<Function>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<Function>>) :
-      T | typeof SchemaType | Schema;
+      T | typeof SchemaType | Schema<any, any>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;
@@ -1512,7 +1514,7 @@ declare module 'mongoose' {
     set?: (value: T, schematype?: this) => any;
 
     /** array of allowed values for this path. Allowed for strings, numbers, and arrays of strings */
-    enum?: Array<string | number | null> | ReadonlyArray<string | number | null> | { [path: string]: string | number | null };
+    enum?: Array<string | number | null> | ReadonlyArray<string | number | null> | { values: Array<string | number | null> | ReadonlyArray<string | number | null>, message?: string } | { [path: string]: string | number | null };
 
     /** The default [subtype](http://bsonspec.org/spec.html) associated with this buffer when it is stored in MongoDB. Only allowed for buffer paths */
     subtype?: number
@@ -2375,10 +2377,12 @@ declare module 'mongoose' {
     T extends TreatAsPrimitives ? T : // primitives
     LeanDocument<T>; // Documents and everything else
 
+  type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
+
   export type _LeanDocument<T> = {
     [K in keyof T]:
     0 extends (1 & T[K]) ? T[K] : // any
-    T[K] extends unknown[] ? LeanType<T[K][number]>[] : // Array
+    T[K] extends unknown[] ? LeanArray<T[K]> : // Array
     T[K] extends Document ? LeanDocument<T[K]> : // Subdocument
     T[K];
   };

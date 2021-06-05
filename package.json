@@ -66,6 +66,8 @@
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
     "validator": "10.8.0",
+    "vue": "2.6.13",
+    "vue-server-renderer": "2.6.13",
     "webpack": "4.44.0"
   },
   "directories": {

@@ -12,6 +12,21 @@ const href = require('./docs/helpers/href');
 const klass = require('./docs/helpers/klass');
 const transform = require('acquit-require');
 
+const cheerio = require('cheerio');
+const Vue = require('vue');
+
+const layout = fs.readFileSync('./docs/layout.html', 'utf8');
+const layoutRenderer = require('vue-server-renderer').createRenderer({
+  template: (result, context) => {
+    const $ = cheerio.load(layout, { decodeEntities: false });
+    $('title').text(context.title);
+
+    $('div#content').html(result);
+
+    return $.html();
+  }
+});
+
 require('acquit-ignore')();
 
 const markdown = require('marked');
@@ -89,6 +104,12 @@ block content
 ${md.split('\n').map(line => '    ' + line).join('\n')}
 `;
 
+const cpcNoScript = `
+<div class="native-inline">
+  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+</div>
+`;
+
 const cpc = `
 <script>
   _native.init("CK7DT53U",{
@@ -119,9 +140,15 @@ function pugify(filename, options, newfile) {
   }
   if (options.markdown) {
     const lines = contents.split('\n');
-    lines.splice(2, 0, cpc);
-    contents = lines.join('\n');
-    contents = wrapMarkdown(contents, path.relative(path.dirname(filename), path.join(__dirname, 'docs/layout')));
+    if (options.vue) {
+      lines.splice(2, 0, cpcNoScript);
+      contents = lines.join('\n');
+      contents = markdown(contents);
+    } else {
+      lines.splice(2, 0, cpc);
+      contents = lines.join('\n');
+      contents = wrapMarkdown(contents, path.relative(path.dirname(filename), path.join(__dirname, 'docs/layout')));
+    }
     newfile = filename.replace('.md', '.html');
   }
 
@@ -139,20 +166,36 @@ function pugify(filename, options, newfile) {
   newfile = newfile || filename.replace('.pug', '.html');
   options.outputUrl = newfile.replace(process.cwd(), '');
 
-  pug.render(contents, options, function(err, str) {
-    if (err) {
-      console.error(err.stack);
-      return;
-    }
-
-    fs.writeFile(newfile, str, function(err) {
-      if (err) {
-        console.error('could not write', err.stack);
-      } else {
-        console.log('%s : rendered ', new Date, newfile);
-      }
+  if (options.vue) {
+    const app = new Vue({
+      template: '<div>\n' + contents + '\n</div>',
+      data: () => Object.assign({}, options)
     });
-  });
+    layoutRenderer.renderToString(app, Object.assign({}, options)).then(html => {
+      fs.writeFile(newfile, html, function(err) {
+        if (err) {
+          console.error('[VUE] could not write', err.stack);
+        } else {
+          console.log('[VUE] %s : rendered ', new Date, newfile);
+        }
+      });
+    });
+  } else {
+    pug.render(contents, options, function(err, str) {
+      if (err) {
+        console.error(err.stack);
+        return;
+      }
+
+      fs.writeFile(newfile, str, function(err) {
+        if (err) {
+          console.error('could not write', err.stack);
+        } else {
+          console.log('%s : rendered ', new Date, newfile);
+        }
+      });
+    });
+  }
 }
 
 files.forEach(function(file) {

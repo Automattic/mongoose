@@ -33,7 +33,12 @@ exports['docs/deprecations.md'] = { guide: true, title: 'Deprecation Warnings', 
 exports['docs/further_reading.md'] = { title: 'Further Reading', markdown: true };
 exports['docs/jest.md'] = { title: 'Testing Mongoose with Jest', markdown: true };
 exports['docs/faq.md'] = { guide: true, title: 'FAQ', markdown: true };
-exports['docs/typescript.md'] = { guide: true, title: 'Using TypeScript with Mongoose', markdown: true };
+exports['docs/typescript.md'] = {
+  guide: true,
+  title: 'Using TypeScript with Mongoose',
+  markdown: true,
+  vue: true
+};
 exports['docs/compatibility.md'] = {
   title: 'MongoDB Version Compatibility',
   guide: true,

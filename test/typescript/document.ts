@@ -1,6 +1,6 @@
 import { Schema, model, Document } from 'mongoose';
 
-const schema: Schema = new Schema({ name: { type: 'String' } });
+const schema: Schema = new Schema({ name: { type: 'String', required: true }, address: new Schema({ city: { type: String, required: true } }) });
 
 interface ITestBase {
   name?: string;
@@ -15,4 +15,10 @@ void async function main() {
 
   const p: Promise<ITest> = doc.remove();
   await p;
+
+}();
+
+void async function run() {
+  const user = new Test({ name: {}, address: {} });
+  user.validateSync();
 }();

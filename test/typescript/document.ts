@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document, Error } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String', required: true }, address: new Schema({ city: { type: String, required: true } }) });
 
@@ -21,6 +21,7 @@ void async function main() {
 void async function run() {
   const user = new Test({ name: {}, address: {} });
   const error = user.validateSync();
-  // its set in the ts file but not showing up here
-  error.errors.address.errors;
+  if (error != null) {
+    const _error: Error.ValidationError = error.errors.address as Error.ValidationError;
+  }
 }();

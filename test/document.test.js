@@ -10256,4 +10256,43 @@ describe('document', function() {
       assert.equal(validatorCallCount, 0);
     });
   });
+
+  it('clears child document modified when setting map path underneath single nested (gh-10295)', function() {
+    const SecondMapSchema = new mongoose.Schema({
+      data: { type: Map, of: Number, default: {}, _id: false }
+    });
+
+    const FirstMapSchema = new mongoose.Schema({
+      data: { type: Map, of: SecondMapSchema, default: {}, _id: false }
+    });
+
+    const NestedSchema = new mongoose.Schema({
+      data: { type: Map, of: SecondMapSchema, default: {}, _id: false }
+    });
+
+    const TestSchema = new mongoose.Schema({
+      _id: Number,
+      firstMap: { type: Map, of: FirstMapSchema, default: {}, _id: false },
+      nested: { type: NestedSchema, default: {}, _id: false }
+    });
+
+    const Test = db.model('Test', TestSchema);
+
+    return co(function*() {
+      const doc = yield Test.create({ _id: Date.now() });
+
+      // It's Ok!
+      doc.nested.data.set('second', {});
+      assert.ok(doc.modifiedPaths().indexOf('nested.data.second') !== -1, doc.modifiedPaths());
+      yield doc.save();
+
+      // It's ERROR!
+      doc.nested.data.get('second').data.set('final', 3);
+      assert.ok(doc.modifiedPaths().indexOf('nested.data.second.data.final') !== -1, doc.modifiedPaths());
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc).lean();
+      assert.equal(fromDb.nested.data.second.data.final, 3);
+    });
+  });
 });

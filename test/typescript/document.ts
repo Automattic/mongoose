@@ -20,5 +20,7 @@ void async function main() {
 
 void async function run() {
   const user = new Test({ name: {}, address: {} });
-  user.validateSync();
+  const error = user.validateSync();
+  // its set in the ts file but not showing up here
+  error.errors.address.errors;
 }();

@@ -619,7 +619,7 @@ declare module 'mongoose' {
   export const Model: Model<any>;
   // eslint-disable-next-line no-undef
   interface Model<T, TQueryHelpers = {}, TMethods = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
-    new(doc?: T | any): EnforceDocument<T, TMethods>;
+    new(doc?: T): EnforceDocument<T, TMethods>;
 
     aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
     // eslint-disable-next-line @typescript-eslint/ban-types

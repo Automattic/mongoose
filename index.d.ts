@@ -368,7 +368,7 @@ declare module 'mongoose' {
   }
 
   class Document<T = any, TQueryHelpers = any> {
-    constructor(doc?: T | any);
+    constructor(doc?: any);
 
     /** This documents _id. */
     _id?: T;

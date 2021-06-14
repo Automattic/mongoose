@@ -683,5 +683,16 @@ describe('model', function() {
         yield User.collection.drop();
       });
     });
+    it('should do a dryRun gh-10316', function() {
+      return co(function*() {
+        const userSchema = new mongoose.Schema({ username: String }, { password: String }, { email: String });
+        userSchema.index({ password: 1 });
+        userSchema.index({ email: 1 });
+        const User = db.model('User', userSchema);
+        yield User.collection.createIndex({ age: 1 });
+        const result = User.diffIndexes();
+        assert.ok(result);
+      });
+    });
   });
 });

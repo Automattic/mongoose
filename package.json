@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.12.13",
+  "version": "5.12.14",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -40,7 +40,6 @@
     "acquit": "1.x",
     "acquit-ignore": "0.1.x",
     "acquit-require": "0.1.x",
-    "async": "2.6.2",
     "babel-loader": "8.1.0",
     "benchmark": "2.1.4",
     "bluebird": "3.5.5",

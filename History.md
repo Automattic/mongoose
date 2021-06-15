@@ -1,3 +1,16 @@
+5.12.14 / 2021-06-15
+====================
+ * fix(schema): check that schema type is an object when setting isUnderneathDocArray #10361 [vmo-khanus](https://github.com/vmo-khanus)
+ * fix(document): avoid infinite recursion when setting single nested subdoc to array #10351
+ * fix(populate): allow populating nested path in schema using `Model.populate()` #10335
+ * fix(drivers): emit operation-start/operation-end events to allow inspecting when operations start and end
+ * fix(index.d.ts): improve typings for virtuals #10350 [thiagokisaki](https://github.com/thiagokisaki)
+ * fix(index.d.ts): correct constructor type for Document #10328
+ * fix(index.d.ts): add `ValidationError` as a possible type for `ValidationError#errors` #10320 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix: remove unnecessary async devDependency that's causing npm audit warnings #10281
+ * docs(typescript): add schemas guide #10308
+ * docs(model): add options parameter description to `Model.exists()` #10336 [Aminoiz](https://github.com/Aminoiz)
+
 5.12.13 / 2021-06-04
 ====================
  * perf(document): avoid creating nested paths when running `$getAllSubdocs()` #10275

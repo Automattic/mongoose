@@ -2648,4 +2648,17 @@ describe('schema', function() {
 
     assert.ok(ElementSchema.path('possibleElements').schema.path('textMatchFeatures.dynamic').schema.nested['css']);
   });
+
+  it('propagates map `ref` down to individual map elements (gh-10329)', function() {
+    const TestSchema = new mongoose.Schema({
+      testprop: {
+        type: Map,
+        of: Number,
+        ref: 'OtherModel'
+      }
+    });
+
+    assert.equal(TestSchema.path('testprop.$*').instance, 'Number');
+    assert.equal(TestSchema.path('testprop.$*').options.ref, 'OtherModel');
+  });
 });

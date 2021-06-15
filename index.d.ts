@@ -1225,13 +1225,13 @@ declare module 'mongoose' {
     statics: { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
-    virtual(name: string, options?: VirtualTypeOptions<DocType>): VirtualType<DocType>;
+    virtual(name: string, options?: VirtualTypeOptions): VirtualType;
 
     /** Object of currently defined virtuals on this schema */
     virtuals: any;
 
     /** Returns the virtual type with the given `name`. */
-    virtualpath(name: string): VirtualType<DocType> | null;
+    virtualpath(name: string): VirtualType | null;
   }
 
   type SchemaDefinitionWithBuiltInClass<T extends number | string | boolean | Function> = T extends number
@@ -1618,7 +1618,7 @@ declare module 'mongoose' {
     validator: ValidateFn<T> | LegacyAsyncValidateFn<T> | AsyncValidateFn<T>;
   }
 
-  interface VirtualTypeOptions<D = Document> {
+  interface VirtualTypeOptions {
     /** If `ref` is not nullish, this becomes a populated virtual. */
     ref?: string | Function;
 
@@ -1644,7 +1644,7 @@ declare module 'mongoose' {
     count?: boolean;
 
     /** Add an extra match condition to `populate()`. */
-    match?: FilterQuery<D> | ((doc: D) => FilterQuery<D>);
+    match?: FilterQuery<any> | Function;
 
     /** Add a default `limit` to the `populate()` query. */
     limit?: number;
@@ -1665,21 +1665,18 @@ declare module 'mongoose' {
     options?: QueryOptions;
   }
 
-  class VirtualType<D = Document> {
-    /** VirtualType constructor */
-    constructor(options?: VirtualTypeOptions);
-
+  class VirtualType {
     /** Applies getters to `value`. */
-    applyGetters(value: any, doc: D): any;
+    applyGetters(value: any, doc: Document): any;
 
     /** Applies setters to `value`. */
-    applySetters(value: any, doc: D): any;
+    applySetters(value: any, doc: Document): any;
 
     /** Adds a custom getter to this virtual. */
-    get(fn: (this: D, value: any, virtual: this, doc: D) => any): this;
+    get(fn: Function): this;
 
     /** Adds a custom setter to this virtual. */
-    set(fn: (this: D, value: any, virtual: this, doc: D) => any): this;
+    set(fn: Function): this;
   }
 
   namespace Schema {

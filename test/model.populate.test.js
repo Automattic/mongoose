@@ -10484,4 +10484,34 @@ describe('model: populate:', function() {
       assert.equal(myCat.friends[0].name, 'Garfield');
     });
   });
+
+  it('populates nested path in schema using `Model.populate()` static (gh-10335)', function() {
+    const Books = db.model('Book', new Schema({
+      name: String,
+      author: { _id: Schema.Types.ObjectId, name: String }
+    }));
+    const Authors = db.model('Author', new Schema({ name: String }));
+
+    return co(function*() {
+      const anAuthor = new Authors({ name: 'Author1' });
+      yield anAuthor.save();
+
+      const aBook1 = new Books({ name: 'Book1', author: { _id: anAuthor.id } });
+      yield aBook1.save();
+
+      const books = (yield Books.find().lean()).map(aBook => {
+        aBook.author = aBook.author._id;
+        return aBook;
+      });
+
+      const populatedBooks = yield Books.populate(books, [{
+        path: 'author',
+        model: 'Author',
+        select: '_id name'
+      }]);
+
+      assert.equal(populatedBooks.length, 1);
+      assert.equal(populatedBooks[0].author.name, 'Author1');
+    });
+  });
 });

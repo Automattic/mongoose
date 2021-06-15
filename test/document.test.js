@@ -10281,18 +10281,45 @@ describe('document', function() {
     return co(function*() {
       const doc = yield Test.create({ _id: Date.now() });
 
-      // It's Ok!
       doc.nested.data.set('second', {});
       assert.ok(doc.modifiedPaths().indexOf('nested.data.second') !== -1, doc.modifiedPaths());
       yield doc.save();
 
-      // It's ERROR!
       doc.nested.data.get('second').data.set('final', 3);
       assert.ok(doc.modifiedPaths().indexOf('nested.data.second.data.final') !== -1, doc.modifiedPaths());
       yield doc.save();
 
       const fromDb = yield Test.findById(doc).lean();
       assert.equal(fromDb.nested.data.second.data.final, 3);
+    });
+  });
+
+  it('avoids infinite recursion when setting single nested subdoc to array (gh-10351)', function() {
+    const userInfoSchema = new mongoose.Schema({ _id: String }, { _id: false });
+    const observerSchema = new mongoose.Schema({ user: {} }, { _id: false });
+
+    const entrySchema = new mongoose.Schema({
+      creator: userInfoSchema,
+      observers: [observerSchema]
+    });
+
+    entrySchema.pre('save', function(next) {
+      this.observers = [{ user: this.creator }];
+
+      next();
+    });
+
+    const Test = db.model('Test', entrySchema);
+
+    return co(function*() {
+      const entry = new Test({
+        creator: { _id: 'u1' }
+      });
+
+      yield entry.save();
+
+      const fromDb = yield Test.findById(entry);
+      assert.equal(fromDb.observers.length, 1);
     });
   });
 });

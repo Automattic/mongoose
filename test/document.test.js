@@ -10359,4 +10359,29 @@ describe('document', function() {
     assert.equal(obj.answer, null);
     assert.equal(obj.nested.hello, 'world');
   });
+
+  it('support `pathsToSkip` option for `validate()` (feat-10230)', function() {
+    const schema = Schema({
+      name: {
+        type: String,
+        required: true
+      },
+      age: {
+        type: Number,
+        required: true
+      },
+      rank: String
+    });
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = new Model({});
+
+      let err = yield doc.validate({ pathsToSkip: ['age'] }).catch(err => err);
+      assert.deepEqual(Object.keys(err.errors), ['name']);
+
+      err = yield doc.validate({ pathsToSkip: ['name'] }).catch(err => err);
+      assert.deepEqual(Object.keys(err.errors), ['age']);
+    });
+  });
 });

@@ -692,7 +692,7 @@ describe('model', function() {
         yield User.collection.createIndex({ age: 1 });
         const result = yield User.diffIndexes();
         assert.deepStrictEqual(result.toDrop, ['age_1']);
-        assert.deepStrictEqual(result.toCreate, [{ 'password': 1 }, { 'email': 1 }]);
+        assert.deepStrictEqual(result.toCreate, [{ password: 1 }, { email: 1 }]);
       });
     });
   });

@@ -10322,4 +10322,41 @@ describe('document', function() {
       assert.equal(fromDb.observers.length, 1);
     });
   });
+
+  it('supports passing a list of virtuals to `toObject()` (gh-10120)', function() {
+    const schema = new mongoose.Schema({
+      name: String,
+      age: Number,
+      nested: {
+        test: String
+      }
+    });
+    schema.virtual('nameUpper').get(function() { return this.name.toUpperCase(); });
+    schema.virtual('answer').get(() => 42);
+    schema.virtual('nested.hello').get(() => 'world');
+
+    const Model = db.model('Person', schema);
+
+    const doc = new Model({ name: 'Jean-Luc Picard', age: 59, nested: { test: 'hello' } });
+
+    let obj = doc.toObject({ virtuals: true });
+    assert.equal(obj.nameUpper, 'JEAN-LUC PICARD');
+    assert.equal(obj.answer, 42);
+    assert.equal(obj.nested.hello, 'world');
+
+    obj = doc.toObject({ virtuals: ['answer'] });
+    assert.ok(!obj.nameUpper);
+    assert.equal(obj.answer, 42);
+    assert.equal(obj.nested.hello, null);
+
+    obj = doc.toObject({ virtuals: ['nameUpper'] });
+    assert.equal(obj.nameUpper, 'JEAN-LUC PICARD');
+    assert.equal(obj.answer, null);
+    assert.equal(obj.nested.hello, null);
+
+    obj = doc.toObject({ virtuals: ['nested.hello'] });
+    assert.equal(obj.nameUpper, null);
+    assert.equal(obj.answer, null);
+    assert.equal(obj.nested.hello, 'world');
+  });
 });

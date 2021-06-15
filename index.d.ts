@@ -1066,7 +1066,7 @@ declare module 'mongoose' {
     /** apply all getters (path and virtual getters) */
     getters?: boolean;
     /** apply virtual getters (can override getters option) */
-    virtuals?: boolean;
+    virtuals?: boolean | string[];
     /** if `options.virtuals = true`, you can set `options.aliases = false` to skip applying aliases. This option is a no-op if `options.virtuals = false`. */
     aliases?: boolean;
     /** remove empty objects (defaults to true) */

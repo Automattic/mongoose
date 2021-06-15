@@ -688,11 +688,11 @@ describe('model', function() {
         const userSchema = new mongoose.Schema({ username: String }, { password: String }, { email: String });
         userSchema.index({ password: 1 });
         userSchema.index({ email: 1 });
-        const User = db.model('User', userSchema);
+        const User = db.model('Upson', userSchema);
         yield User.collection.createIndex({ age: 1 });
         const result = yield User.diffIndexes();
         assert.deepStrictEqual(result.toDrop, ['age_1']);
-        assert.deepStrictEqual(result.toCreate, [{"password": 1},{"email": 1}]);
+        assert.deepStrictEqual(result.toCreate, [{ 'password': 1 }, { 'email': 1 }]);
       });
     });
   });

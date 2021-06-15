@@ -23,11 +23,15 @@ exports.handler = async function(event, context) {
   // potentially expensive process of connecting to MongoDB every time.
   if (conn == null) {
     conn = mongoose.createConnection(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
       // Buffering means mongoose will queue up operations if it gets
       // disconnected from MongoDB and send them when it reconnects.
       // With serverless, better to fail fast if not connected.
       bufferCommands: false, // Disable mongoose buffering
-      bufferMaxEntries: 0 // and MongoDB driver buffering
+      // and tell the MongoDB driver to not wait more than 5 seconds
+      // before erroring out if it isn't connected
+      serverSelectionTimeoutMS: 5000
     });
     
     // `await`ing connection after assigning to the `conn` variable
@@ -45,38 +49,68 @@ exports.handler = async function(event, context) {
 };
 ```
 
-To import this function into Lambda, go [the AWS Lambda console](https://console.aws.amazon.com/lambda)
-and click "Create Function".
+## Connection Helper
 
-<a href="https://i.imgur.com/FlAD0vT.png"><img src="https://i.imgur.com/FlAD0vT.png"></a>
+The above code works fine for a single Lambda function, but what if you want to reuse the same connection logic in multiple Lambda functions?
+You can export the below function.
 
-Create a function called "mongoose-test" with the below settings:
+```javascript
+'use strict';
 
-<a href="https://i.imgur.com/YOYJzeO.png"><img src="https://i.imgur.com/YOYJzeO.png"></a>
+const mongoose = require('mongoose');
 
-Copy the source code into a file called `lambda.js`. Then run `npm install mongoose co`.
-Finally, run `zip -r mongoose-test.zip node_modules/ lambda.js` to create a
-zip that you can upload to Lambda using the "Upload a Zip File" option under "Function code".
-Make sure you also change the "Handler" input to `lambda.handler` to match the `lambda.js` file's `handler` function.
+let conn = null;
 
-<a href="https://i.imgur.com/BXc9egq.png"><img src="https://i.imgur.com/BXc9egq.png"></a>
+const uri = 'YOUR CONNECTION STRING HERE';
 
-Next, click the "Save" button and then the "Test" button. The "Test" button will
-ask you to create a new test event, just create one because your inputs don't matter
-for this example. Then, hit "Test" again to actually run your function:
+exports.connect = async function() {
+  if (conn == null) {
+    conn = mongoose.createConnection(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      bufferCommands: false, // Disable mongoose buffering
+      serverSelectionTimeoutMS: 5000
+    });
+    
+    // `await`ing connection after assigning to the `conn` variable
+    // to avoid multiple function calls creating new connections
+    await conn;
+  }
 
-<a href="https://i.imgur.com/2UKtWYq.png"><img src="https://i.imgur.com/2UKtWYq.png"></a>
-
-If your MongoDB database goes down in between function calls, you may
-see the below error message:
-
+  return conn;
+};
 ```
-cannot find account after reload: could not find config for <hostname>
-```
 
-Lambda's JavaScript framework recently added support for
-async/await as long as you're using Node 8.x, so make sure you're not
-using Node.js 6.x.
+## Using `mongoose.connect()`
+
+You can also use `mongoose.connect()`, so you can use `mongoose.model()` to create models.
+
+```javascript
+'use strict';
+
+const mongoose = require('mongoose');
+
+let conn = null;
+
+const uri = 'YOUR CONNECTION STRING HERE';
+
+exports.connect = async function() {
+  if (conn == null) {
+    conn = mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      bufferCommands: false, // Disable mongoose buffering
+      serverSelectionTimeoutMS: 5000
+    }).then(() => mongoose);
+    
+    // `await`ing connection after assigning to the `conn` variable
+    // to avoid multiple function calls creating new connections
+    await conn;
+  }
+
+  return conn;
+};
+```
 
 *Want to learn how to check whether your favorite JavaScript frameworks, like [Express](http://expressjs.com/) or [React](https://reactjs.org/), work with async/await? Spoiler alert: neither Express nor React support async/await. Chapter 4 of Mastering Async/Await explains the basic principles for determining whether a framework supports async/await. [Get your copy!](http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=lambda)*
 

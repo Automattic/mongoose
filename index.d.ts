@@ -368,7 +368,7 @@ declare module 'mongoose' {
   }
 
   class Document<T = any, TQueryHelpers = any> {
-    constructor(doc?: T | any);
+    constructor(doc?: any);
 
     /** This documents _id. */
     _id?: T;
@@ -1225,7 +1225,7 @@ declare module 'mongoose' {
     statics: { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
-    virtual(name: string, options?: any): VirtualType;
+    virtual(name: string, options?: VirtualTypeOptions): VirtualType;
 
     /** Object of currently defined virtuals on this schema */
     virtuals: any;
@@ -1618,17 +1618,64 @@ declare module 'mongoose' {
     validator: ValidateFn<T> | LegacyAsyncValidateFn<T> | AsyncValidateFn<T>;
   }
 
+  interface VirtualTypeOptions {
+    /** If `ref` is not nullish, this becomes a populated virtual. */
+    ref?: string | Function;
+
+    /**  The local field to populate on if this is a populated virtual. */
+    localField?: string | Function;
+
+    /** The foreign field to populate on if this is a populated virtual. */
+    foreignField?: string | Function;
+
+    /**
+     * By default, a populated virtual is an array. If you set `justOne`,
+     * the populated virtual will be a single doc or `null`.
+     */
+    justOne?: boolean;
+
+    /** If you set this to `true`, Mongoose will call any custom getters you defined on this virtual. */
+    getters?: boolean;
+
+    /**
+     * If you set this to `true`, `populate()` will set this virtual to the number of populated
+     * documents, as opposed to the documents themselves, using `Query#countDocuments()`.
+     */
+    count?: boolean;
+
+    /** Add an extra match condition to `populate()`. */
+    match?: FilterQuery<any> | Function;
+
+    /** Add a default `limit` to the `populate()` query. */
+    limit?: number;
+
+    /** Add a default `skip` to the `populate()` query. */
+    skip?: number;
+
+    /**
+     * For legacy reasons, `limit` with `populate()` may give incorrect results because it only
+     * executes a single query for every document being populated. If you set `perDocumentLimit`,
+     * Mongoose will ensure correct `limit` per document by executing a separate query for each
+     * document to `populate()`. For example, `.find().populate({ path: 'test', perDocumentLimit: 2 })`
+     * will execute 2 additional queries if `.find()` returns 2 documents.
+     */
+    perDocumentLimit?: number;
+
+    /** Additional options like `limit` and `lean`. */
+    options?: QueryOptions;
+  }
+
   class VirtualType {
     /** Applies getters to `value`. */
     applyGetters(value: any, doc: Document): any;
+
     /** Applies setters to `value`. */
     applySetters(value: any, doc: Document): any;
 
     /** Adds a custom getter to this virtual. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     get(fn: Function): this;
+
     /** Adds a custom setter to this virtual. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     set(fn: Function): this;
   }
 
@@ -2760,7 +2807,7 @@ declare module 'mongoose' {
     export class ValidationError extends Error {
       name: 'ValidationError';
 
-      errors: { [path: string]: ValidatorError | CastError };
+      errors: { [path: string]: ValidatorError | CastError | ValidationError };
     }
 
     export class ValidatorError extends Error {

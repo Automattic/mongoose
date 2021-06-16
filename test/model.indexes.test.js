@@ -690,8 +690,10 @@ describe('model', function() {
         userSchema.index({ email: 1 });
         const User = db.model('Upson', userSchema);
         yield User.collection.createIndex({ age: 1 });
+        yield User.collection.createIndex({ weight: 1 });
+        yield User.init();
         const result = yield User.diffIndexes();
-        assert.deepStrictEqual(result.toDrop, ['age_1']);
+        assert.deepStrictEqual(result.toDrop, ['age_1', 'weight_1']);
         assert.deepStrictEqual(result.toCreate, [{ password: 1 }, { email: 1 }]);
       });
     });

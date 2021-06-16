@@ -929,6 +929,7 @@ declare module 'mongoose' {
      */
     returnDocument?: string;
     runValidators?: boolean;
+    sanitizeProjection?: boolean;
     /** The session associated with this query. */
     session?: mongodb.ClientSession;
     setDefaultsOnInsert?: boolean;
@@ -949,7 +950,7 @@ declare module 'mongoose' {
     writeConcern?: any;
   }
 
-  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'omitUndefined' | 'strict' | 'useFindAndModify'>;
+  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'omitUndefined' | 'strict' | 'useFindAndModify' | 'sanitizeProjection'>;
 
   interface SaveOptions {
     checkKeys?: boolean;

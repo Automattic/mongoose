@@ -2834,7 +2834,7 @@ declare module 'mongoose' {
 
   /** Deprecated types for backwards compatibility. */
 
-  /** Alias for QueryOptions for backwards compatability. */
+  /** Alias for QueryOptions for backwards compatibility. */
   type ModelUpdateOptions = QueryOptions;
 
   type DocumentQuery<ResultType, DocType extends Document, THelpers = {}> = Query<ResultType, DocType, THelpers>;

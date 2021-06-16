@@ -10360,6 +10360,27 @@ describe('document', function() {
     assert.equal(obj.nested.hello, 'world');
   });
 
+  it('adds support for `pathsToSkip` for virtuals feat-10120', function() {
+    const schema = new mongoose.Schema({
+      name: String,
+      age: Number,
+      nested: {
+        test: String
+      }
+    });
+    schema.virtual('nameUpper').get(function() { return this.name.toUpperCase(); });
+    schema.virtual('answer').get(() => 42);
+    schema.virtual('nested.hello').get(() => 'world');
+
+    const Model = db.model('Person', schema);
+    const doc = new Model({ name: 'Jean-Luc Picard', age: 59, nested: { test: 'hello' } });
+    const obj = doc.toObject({ virtuals: { pathsToSkip: ['answer'] } });
+    assert.ok(obj.nameUpper);
+    assert.equal(obj.answer, null);
+    assert.equal(obj.nested.hello, 'world');
+
+  });
+
   it('support `pathsToSkip` option for `validate()` (feat-10230)', function() {
     const schema = Schema({
       name: {

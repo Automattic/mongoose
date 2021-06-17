@@ -15,7 +15,7 @@ const transform = require('acquit-require');
 const cheerio = require('cheerio');
 const Vue = require('vue');
 
-const layout = fs.readFileSync('./docs/layout.html', 'utf8');
+const layout = fs.readFileSync('./docs/templates/layout.html', 'utf8');
 const layoutRenderer = require('vue-server-renderer').createRenderer({
   template: (result, context) => {
     const $ = cheerio.load(layout, { decodeEntities: false });

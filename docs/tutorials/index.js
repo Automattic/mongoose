@@ -9,7 +9,8 @@ module.exports = tutorials.reduce((map, filename) => {
   map[`docs/tutorials/${filename}`] = {
     title: `Mongoose Tutorials: ${content.split('\n')[0].replace(/^#+/, '').trim()}`,
     acquit: true,
-    markdown: true
+    markdown: true,
+    vue: true
   };
   return map;
 }, {});

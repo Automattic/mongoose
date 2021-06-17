@@ -1689,7 +1689,7 @@ describe('model: findOneAndUpdate:', function() {
       Person.findOneAndUpdate({}, update, function(error) {
         assert.ok(error.message.indexOf('street') !== -1);
         assert.equal(error.reason.message,
-          'Cast to Number failed for value "not a num" at path "street"');
+          'Cast to Number failed for value "not a num" (type string) at path "street"');
         done();
       });
     });
@@ -2369,6 +2369,18 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(doc.num, 42);
       assert.equal(doc.jobCategory.name, 'from setter 1');
       assert.equal(doc.jobCategory.value, 'from setter 2');
+    });
+  });
+
+  it('returnDocument should work (gh-10321)', function() {
+    const testSchema = Schema({ a: Number });
+    const Model = db.model('Test', testSchema);
+
+    const opts = { returnDocument: 'after' };
+    return co(function*() {
+      const tmp = yield Model.create({ a: 1 });
+      const doc = yield Model.findOneAndUpdate({ _id: tmp._id }, { a: 2 }, opts).lean();
+      assert.equal(doc.a, 2);
     });
   });
 });

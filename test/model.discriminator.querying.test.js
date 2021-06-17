@@ -875,6 +875,43 @@ describe('model', function() {
           assert.ok(events[0].surveys[0] instanceof Survey);
         });
       });
+
+      it('correctly populates doc with nonexistent discriminator key (gh-10082)', function() {
+        const foodSchema = Schema({ name: String, animal: String });
+        const Food = db.model('Food', foodSchema);
+
+        const animalSchema = Schema({ type: String }, {
+          discriminatorKey: 'type',
+          toJSON: { virtuals: true },
+          toObject: { virtuals: true }
+        });
+        const catSchema = Schema({ catYears: Number });
+        animalSchema.virtual('foods', {
+          ref: 'Food',
+          localField: 'type',
+          foreignField: 'animal',
+          justOne: false
+        });
+        const Animal = db.model('Animal', animalSchema);
+        Animal.discriminator('cat', catSchema);
+        // const Rabbit = Animal.discriminator('rabbit', rabbitSchema);
+
+        return co(function*() {
+          yield Promise.all([
+            new Food({ name: 'Cat Food', animal: 'cat' }).save(),
+            new Food({ name: 'Rabbit Food', animal: 'rabbit' }).save()
+          ]);
+          yield Animal.collection.insertOne({ type: 'cat', catYears: 4 });
+          yield Animal.collection.insertOne({ type: 'rabbit' }); // <-- "rabbit" has no discriminator
+
+          const cat = yield Animal.findOne({ type: 'cat' }).populate('foods');
+          const rabbit = yield Animal.findOne({ type: 'rabbit' }).populate('foods');
+          assert.equal(cat.foods.length, 1);
+          assert.equal(cat.foods[0].name, 'Cat Food');
+          assert.equal(rabbit.foods.length, 1);
+          assert.equal(rabbit.foods[0].name, 'Rabbit Food');
+        });
+      });
     });
 
     describe('deleteOne and deleteMany (gh-8471)', function() {

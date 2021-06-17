@@ -2,35 +2,44 @@
 'use strict';
 exports['index.pug'] = require('./home');
 exports['docs/api.pug'] = require('./api');
-exports['docs/browser.pug'] = { guide: true, title: 'Browser Library', acquit: true };
-exports['docs/index.pug'] = { title: 'Getting Started' };
-exports['docs/production.pug'] = require('./production');
 exports['docs/prior.pug'] = require('./prior');
-exports['docs/guides.pug'] = { guide: true, schema: true, title: 'Schemas' };
-exports['docs/guide.pug'] = { guide: true, schema: true, title: 'Schemas', acquit: true };
-exports['docs/schematypes.pug'] = { guide: true, schema: true, title: 'SchemaTypes' };
-exports['docs/middleware.pug'] = { guide: true, title: 'Middleware', acquit: true };
-exports['docs/plugins.pug'] = { guide: true, title: 'Plugins' };
-exports['docs/subdocs.pug'] = { guide: true, docs: true, title: 'SubDocuments' };
-exports['docs/documents.pug'] = { guide: true, docs: true, title: 'Documents' };
-exports['docs/models.pug'] = { guide: true, title: 'Models' };
-exports['docs/queries.pug'] = { guide: true, title: 'Queries' };
-exports['docs/populate.pug'] = { guide: true, title: 'Query Population' };
-exports['docs/migration.pug'] = { guide: true, title: 'Migration Guide' };
-exports['docs/migrating_to_5.pug'] = { guide: true, title: 'Migrating to Mongoose 5' };
-exports['docs/contributing.pug'] = { guide: true, title: 'Contributing' };
-exports['docs/connections.pug'] = { guide: true, title: 'Connecting to MongoDB' };
-exports['docs/lambda.pug'] = { guide: true, title: 'Using Mongoose With AWS Lambda' };
-exports['docs/geojson.pug'] = { guide: true, title: 'Using GeoJSON', acquit: true };
-exports['docs/transactions.pug'] = { guide: true, title: 'Transactions', acquit: true };
-exports['docs/deprecations.pug'] = { guide: true, title: 'Deprecation Warnings' };
-exports['docs/further_reading.pug'] = { title: 'Further Reading' };
-exports['docs/jest.pug'] = { title: 'Testing Mongoose with Jest' };
-exports['docs/faq.pug'] = { guide: true, title: 'FAQ' };
-exports['docs/compatibility.pug'] = {
+
+exports['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, markdown: true };
+exports['docs/validation.md'] = { title: 'Validation', acquit: true, markdown: true };
+exports['docs/customschematypes.md'] = { title: 'Custom Schema Types', acquit: true, markdown: true };
+exports['docs/promises.md'] = { title: 'Promises', acquit: true, markdown: true };
+exports['docs/discriminators.md'] = { title: 'Discriminators', acquit: true, markdown: true };
+exports['docs/defaults.md'] = { title: 'Defaults', acquit: true, markdown: true };
+exports['docs/index.md'] = { title: 'Getting Started', markdown: true };
+exports['docs/browser.md'] = { guide: true, title: 'Browser Library', acquit: true, markdown: true };
+exports['docs/guides.md'] = { guide: true, schema: true, title: 'Schemas', markdown: true };
+exports['docs/guide.md'] = { guide: true, schema: true, title: 'Schemas', acquit: true, markdown: true };
+exports['docs/schematypes.md'] = { guide: true, schema: true, title: 'SchemaTypes', markdown: true };
+exports['docs/middleware.md'] = { guide: true, title: 'Middleware', acquit: true, markdown: true };
+exports['docs/plugins.md'] = { guide: true, title: 'Plugins', markdown: true };
+exports['docs/subdocs.md'] = { guide: true, docs: true, title: 'SubDocuments', markdown: true };
+exports['docs/documents.md'] = { guide: true, docs: true, title: 'Documents', markdown: true };
+exports['docs/models.md'] = { guide: true, title: 'Models', markdown: true };
+exports['docs/queries.md'] = { guide: true, title: 'Queries', markdown: true };
+exports['docs/populate.md'] = { guide: true, title: 'Query Population', markdown: true };
+exports['docs/migration.md'] = { guide: true, title: 'Migration Guide', markdown: true };
+exports['docs/migrating_to_5.md'] = { guide: true, title: 'Migrating to Mongoose 5', markdown: true };
+exports['docs/contributing.md'] = { guide: true, title: 'Contributing', markdown: true };
+exports['docs/connections.md'] = { guide: true, title: 'Connecting to MongoDB', markdown: true };
+exports['docs/lambda.md'] = { guide: true, title: 'Using Mongoose With AWS Lambda', markdown: true };
+exports['docs/geojson.md'] = { guide: true, title: 'Using GeoJSON', acquit: true, markdown: true };
+exports['docs/transactions.md'] = { guide: true, title: 'Transactions', acquit: true, markdown: true };
+exports['docs/deprecations.md'] = { guide: true, title: 'Deprecation Warnings', markdown: true };
+exports['docs/further_reading.md'] = { title: 'Further Reading', markdown: true };
+exports['docs/jest.md'] = { title: 'Testing Mongoose with Jest', markdown: true };
+exports['docs/faq.md'] = { guide: true, title: 'FAQ', markdown: true };
+exports['docs/typescript.md'] = { guide: true, title: 'Using TypeScript with Mongoose', markdown: true };
+exports['docs/compatibility.md'] = {
   title: 'MongoDB Version Compatibility',
-  guide: true
+  guide: true,
+  markdown: true
 };
 exports['docs/search.pug'] = { title: 'Search' };
-exports['docs/enterprise.pug'] = { title: 'Mongoose for Enterprise' };
-exports['docs/built-with-mongoose.pug'] = { title: 'Built with Mongoose' };
+exports['docs/enterprise.md'] = { title: 'Mongoose for Enterprise', markdown: true };
+exports['docs/built-with-mongoose.md'] = { title: 'Built with Mongoose', markdown: true };
+exports['docs/async-await.md'] = { title: 'Using Async/Await with Mongoose', markdown: true };

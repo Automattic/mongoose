@@ -47,10 +47,40 @@ for (const filename of files) {
         contents.push(content);
       }
     }
+  } else if (file.markdown) {
+    let text = fs.readFileSync(filename, 'utf8');
+    text = markdown(text);
+
+    const content = new Content({
+      title: file.title,
+      body: text,
+      url: filename.replace('.md', '.html').replace(/^docs/, '')
+    });
+
+    content.validateSync();
+
+    const $ = cheerio.load(text);
+
+    contents.push(content);
+
+    // Break up individual h3's into separate content for more fine grained search
+    $('h3').each((index, el) => {
+      el = $(el);
+      const title = el.text();
+      const html = el.nextUntil('h3').html();
+      const content = new Content({
+        title: `${file.title}: ${title}`,
+        body: html,
+        url: `${filename.replace('.md', '.html').replace(/^docs/, '')}#${el.prop('id')}`
+      });
+
+      content.validateSync();
+      contents.push(content);
+    });
   } else if (file.guide) {
     let text = fs.readFileSync(filename, 'utf8');
     text = text.substr(text.indexOf('block content') + 'block content\n'.length);
-    text = pug.render(`div\n${text}`, { filters: { markdown } });
+    text = pug.render(`div\n${text}`, { filters: { markdown }, filename });
 
     const content = new Content({
       title: file.title,

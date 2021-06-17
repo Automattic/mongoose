@@ -1251,8 +1251,10 @@ describe('Query', function() {
         }
       });
       assert.deepEqual(options, {
-        w: 'majority',
-        j: true
+        writeConcern: {
+          w: 'majority',
+          j: true
+        }
       });
       done();
     });
@@ -2310,28 +2312,15 @@ describe('Query', function() {
       });
 
       it('throw on sync exceptions in callbacks (gh-6178)', function(done) {
-        const async = require('async');
         const schema = new Schema({});
         const Test = db.model('Test', schema);
 
         process.once('uncaughtException', err => {
-          assert.equal(err.message, 'woops');
+          assert.equal(err.message, 'Oops!');
           done();
         });
 
-        async.waterfall([
-          function(cb) {
-            Test.create({}, cb);
-          },
-          function(res, cb) {
-            Test.find({}, function() { cb(); });
-          },
-          function() {
-            throw new Error('woops');
-          }
-        ], function() {
-          assert.ok(false);
-        });
+        Test.find({}, function() { throw new Error('Oops!'); });
       });
     });
 
@@ -3738,6 +3727,147 @@ describe('Query', function() {
 
       res = yield Person.findOne({ name: 'test2', pwd: { $eq: void 0 } });
       assert.equal(res.name, 'test2');
+    });
+  });
+
+  it('handles push with array filters (gh-9977)', function() {
+    const questionSchema = new Schema({
+      question_type: { type: String, enum: ['mcq', 'essay'] }
+    }, { discriminatorKey: 'question_type', strict: 'throw' });
+
+    const quizSchema = new Schema({
+      quiz_title: String,
+      questions: [questionSchema]
+    }, { strict: 'throw' });
+    const Quiz = db.model('Test', quizSchema);
+
+    const mcqQuestionSchema = new Schema({
+      text: String,
+      choices: [{ choice_text: String, is_correct: Boolean }]
+    }, { strict: 'throw' });
+
+    quizSchema.path('questions').discriminator('mcq', mcqQuestionSchema);
+
+    const id1 = new mongoose.Types.ObjectId();
+    const id2 = new mongoose.Types.ObjectId();
+
+    return co(function*() {
+      let quiz = yield Quiz.create({
+        quiz_title: 'quiz',
+        questions: [
+          {
+            _id: id1,
+            question_type: 'mcq',
+            text: 'A or B?',
+            choices: [
+              { choice_text: 'A', is_correct: false },
+              { choice_text: 'B', is_correct: true }
+            ]
+          },
+          {
+            _id: id2,
+            question_type: 'mcq'
+          }
+        ]
+      });
+
+      const filter = { questions: { $elemMatch: { _id: id2, question_type: 'mcq' } } };
+      yield Quiz.updateOne(filter, {
+        $push: {
+          'questions.$.choices': {
+            choice_text: 'choice 1',
+            is_correct: false
+          }
+        }
+      });
+
+      quiz = yield Quiz.findById(quiz);
+      assert.equal(quiz.questions[1].choices.length, 1);
+      assert.equal(quiz.questions[1].choices[0].choice_text, 'choice 1');
+
+      yield Quiz.updateOne({ questions: { $elemMatch: { _id: id2 } } }, {
+        $push: {
+          'questions.$[q].choices': {
+            choice_text: 'choice 3',
+            is_correct: false
+          }
+        }
+      }, { arrayFilters: [{ 'q.question_type': 'mcq' }] });
+
+      quiz = yield Quiz.findById(quiz);
+      assert.equal(quiz.questions[1].choices.length, 2);
+      assert.equal(quiz.questions[1].choices[1].choice_text, 'choice 3');
+    });
+  });
+
+  it('Query#pre() (gh-9784)', function() {
+    const Question = db.model('Test', Schema({ answer: Number }));
+    return co(function*() {
+      const q1 = Question.find({ answer: 42 });
+      const called = [];
+      q1.pre(function middleware() {
+        called.push(this.getFilter());
+      });
+      yield q1.exec();
+      assert.equal(called.length, 1);
+      assert.deepEqual(called[0], { answer: 42 });
+
+      yield Question.find({ answer: 42 });
+      assert.equal(called.length, 1);
+    });
+  });
+
+  it('applies schema-level `select` on arrays (gh-10029)', function() {
+    const testSchema = new mongoose.Schema({
+      doesntpopulate: {
+        type: [mongoose.Schema.Types.ObjectId],
+        select: false
+      },
+      populatescorrectly: [{
+        type: mongoose.Schema.Types.ObjectId,
+        select: false
+      }]
+    });
+    const Test = db.model('Test', testSchema);
+
+    const q = Test.find();
+    q._applyPaths();
+
+    assert.deepEqual(q._fields, { doesntpopulate: 0, populatescorrectly: 0 });
+  });
+
+  it('sets `writeConcern` option correctly (gh-10009)', function() {
+    const testSchema = new mongoose.Schema({
+      name: String
+    });
+    const Test = db.model('Test', testSchema);
+
+    const q = Test.find();
+    q.writeConcern({ w: 'majority', wtimeout: 1000 });
+
+    assert.deepEqual(q.options.writeConcern, { w: 'majority', wtimeout: 1000 });
+  });
+  it('no longer has the deprecation warning message with writeConcern gh-10083', function() {
+    const MySchema = new mongoose.Schema(
+      {
+        _id: { type: Number, required: true },
+        op: { type: String, required: true },
+        size: { type: Number, required: true },
+        totalSize: { type: Number, required: true }
+      },
+      {
+        versionKey: false,
+        writeConcern: {
+          w: 'majority',
+          j: true,
+          wtimeout: 15000
+        }
+      }
+    );
+    const Test = db.model('Test', MySchema); // pops up on creation of model
+    return co(function*() {
+      const entry = yield Test.create({ _id: 12345678, op: 'help', size: 54, totalSize: 104 });
+      yield entry.save();
     });
   });
 });

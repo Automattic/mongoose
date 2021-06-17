@@ -7,11 +7,12 @@ class Subdoc extends Document {
 }
 
 interface ITestBase {
+  _id?: number;
   name?: string;
   mixed?: any;
 }
 
-interface ITest extends ITestBase, Document {
+interface ITest extends ITestBase, Document<number> {
   subdoc?: Subdoc;
   testMethod: () => number;
   id: string;
@@ -32,13 +33,12 @@ void async function main() {
   const pojo = doc.toObject();
   await pojo.save();
 
-  const _doc: LeanDocument<ITest> = await Test.findOne().orFail().lean();
+  const _doc: ITestBase = await Test.findOne().orFail().lean();
   await _doc.save();
 
   _doc.testMethod();
   _doc.name = 'test';
   _doc.mixed = 42;
-  _doc.id = 'test2';
   console.log(_doc._id);
 
   const hydrated = Test.hydrate(_doc);

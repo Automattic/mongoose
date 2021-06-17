@@ -2560,7 +2560,9 @@ describe('document', function() {
         const doc = docs[0];
         doc.other = 'something';
         doc.subdocs[1].name = 'test2';
-        assert.equal(doc.validateSync(undefined, { validateModifiedOnly: true }), null);
+        assert.equal(doc.validateSync({ validateModifiedOnly: true }), null);
+        assert.equal(doc.validateSync('other'), null);
+        assert.ok(doc.validateSync('other title').errors['title']);
         doc.save({ validateModifiedOnly: true }, function(error) {
           assert.equal(error, null);
           done();
@@ -2577,7 +2579,7 @@ describe('document', function() {
         assert.equal(createError, null);
         const doc = docs[0];
         doc.title = '';
-        assert.ok(doc.validateSync(undefined, { validateModifiedOnly: true }).errors);
+        assert.ok(doc.validateSync({ validateModifiedOnly: true }).errors);
         doc.save({ validateModifiedOnly: true }, function(error) {
           assert.ok(error.errors);
           done();
@@ -9912,6 +9914,56 @@ describe('document', function() {
     assert.ok(user.createdAt instanceof Date);
   });
 
+  it('supports getting a list of populated docs (gh-9702)', function() {
+    const Child = db.model('Child', Schema({ name: String }));
+    const Parent = db.model('Parent', {
+      children: [{ type: ObjectId, ref: 'Child' }],
+      child: { type: ObjectId, ref: 'Child' }
+    });
+
+    return co(function*() {
+      const c = yield Child.create({ name: 'test' });
+      yield Parent.create({
+        children: [c._id],
+        child: c._id
+      });
+
+      const p = yield Parent.findOne().populate('children child');
+
+      p.children; // [{ _id: '...', name: 'test' }]
+
+      assert.equal(p.$getPopulatedDocs().length, 2);
+      assert.equal(p.$getPopulatedDocs()[0], p.children[0]);
+      assert.equal(p.$getPopulatedDocs()[0].name, 'test');
+      assert.equal(p.$getPopulatedDocs()[1], p.child);
+      assert.equal(p.$getPopulatedDocs()[1].name, 'test');
+    });
+  });
+
+  it('with virtual populate (gh-10148)', function() {
+    const childSchema = Schema({ name: String, parentId: 'ObjectId' });
+    childSchema.virtual('parent', {
+      ref: 'Parent',
+      localField: 'parentId',
+      foreignField: '_id',
+      justOne: true
+    });
+    const Child = db.model('Child', childSchema);
+
+    const Parent = db.model('Parent', Schema({ name: String }));
+
+    return co(function*() {
+      const p = yield Parent.create({ name: 'Anakin' });
+      yield Child.create({ name: 'Luke', parentId: p._id });
+
+      const res = yield Child.findOne().populate('parent');
+      assert.equal(res.parent.name, 'Anakin');
+      const docs = res.$getPopulatedDocs();
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].name, 'Anakin');
+    });
+  });
+
   it('handles paths named `db` (gh-9798)', function() {
     const schema = new Schema({
       db: String
@@ -9926,6 +9978,60 @@ describe('document', function() {
 
       const _doc = yield Test.findOne({ db: 'bar' });
       assert.ok(!_doc);
+    });
+  });
+
+  it('handles paths named `schema` gh-8798', function() {
+    const schema = new Schema({
+      schema: String,
+      name: String
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ schema: 'test', name: 'test' });
+      yield doc.save();
+      assert.ok(doc);
+      assert.equal(doc.schema, 'test');
+      assert.equal(doc.name, 'test');
+
+      const fromDb = yield Test.findById(doc);
+      assert.equal(fromDb.schema, 'test');
+      assert.equal(fromDb.name, 'test');
+
+      doc.schema = 'test2';
+      yield doc.save();
+
+      yield fromDb.remove();
+      doc.name = 'test3';
+      const err = yield doc.save().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'DocumentNotFoundError');
+    });
+  });
+
+  it('handles nested paths named `schema` gh-8798', function() {
+    const schema = new Schema({
+      nested: {
+        schema: String
+      },
+      name: String
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ nested: { schema: 'test' }, name: 'test' });
+      yield doc.save();
+      assert.ok(doc);
+      assert.equal(doc.nested.schema, 'test');
+      assert.equal(doc.name, 'test');
+
+      const fromDb = yield Test.findById(doc);
+      assert.equal(fromDb.nested.schema, 'test');
+      assert.equal(fromDb.name, 'test');
+
+      doc.nested.schema = 'test2';
+      yield doc.save();
     });
   });
 
@@ -10114,6 +10220,133 @@ describe('document', function() {
       assert.equal(fromDb.elements.length, 1);
       assert.equal(fromDb.elements[0].subelements.length, 1);
       assert.equal(fromDb.elements[0].subelements[0].text, 'my text');
+    });
+  });
+
+  it('toObject() uses child schema `flattenMaps` option by default (gh-9995)', function() {
+    const MapSchema = new Schema({
+      value: { type: Number }
+    }, { _id: false });
+
+    const ChildSchema = new Schema({
+      map: { type: Map, of: MapSchema }
+    });
+    ChildSchema.set('toObject', { flattenMaps: true });
+
+    const ParentSchema = new Schema({
+      child: { type: Schema.ObjectId, ref: 'Child' }
+    });
+
+    const ChildModel = db.model('Child', ChildSchema);
+    const ParentModel = db.model('Parent', ParentSchema);
+
+    return co(function*() {
+      const childDocument = new ChildModel({
+        map: { first: { value: 1 }, second: { value: 2 } }
+      });
+      yield childDocument.save();
+
+      const parentDocument = new ParentModel({ child: childDocument });
+      yield parentDocument.save();
+
+      const resultDocument = yield ParentModel.findOne().populate('child').exec();
+
+      let resultObject = resultDocument.toObject();
+      assert.ok(resultObject.child.map);
+      assert.ok(!(resultObject.child.map instanceof Map));
+
+      resultObject = resultDocument.toObject({ flattenMaps: false });
+      assert.ok(resultObject.child.map instanceof Map);
+    });
+  });
+
+  it('does not double validate paths under mixed objects (gh-10141)', function() {
+    let validatorCallCount = 0;
+    const Test = db.model('Test', Schema({
+      name: String,
+      object: {
+        type: Object,
+        validate: () => {
+          validatorCallCount++;
+          return true;
+        }
+      }
+    }));
+
+    return co(function*() {
+      const doc = yield Test.create({ name: 'test', object: { answer: 42 } });
+
+      validatorCallCount = 0;
+      doc.set('object.question', 'secret');
+      doc.set('object.answer', 0);
+      yield doc.validate();
+      assert.equal(validatorCallCount, 0);
+    });
+  });
+
+  it('clears child document modified when setting map path underneath single nested (gh-10295)', function() {
+    const SecondMapSchema = new mongoose.Schema({
+      data: { type: Map, of: Number, default: {}, _id: false }
+    });
+
+    const FirstMapSchema = new mongoose.Schema({
+      data: { type: Map, of: SecondMapSchema, default: {}, _id: false }
+    });
+
+    const NestedSchema = new mongoose.Schema({
+      data: { type: Map, of: SecondMapSchema, default: {}, _id: false }
+    });
+
+    const TestSchema = new mongoose.Schema({
+      _id: Number,
+      firstMap: { type: Map, of: FirstMapSchema, default: {}, _id: false },
+      nested: { type: NestedSchema, default: {}, _id: false }
+    });
+
+    const Test = db.model('Test', TestSchema);
+
+    return co(function*() {
+      const doc = yield Test.create({ _id: Date.now() });
+
+      doc.nested.data.set('second', {});
+      assert.ok(doc.modifiedPaths().indexOf('nested.data.second') !== -1, doc.modifiedPaths());
+      yield doc.save();
+
+      doc.nested.data.get('second').data.set('final', 3);
+      assert.ok(doc.modifiedPaths().indexOf('nested.data.second.data.final') !== -1, doc.modifiedPaths());
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc).lean();
+      assert.equal(fromDb.nested.data.second.data.final, 3);
+    });
+  });
+
+  it('avoids infinite recursion when setting single nested subdoc to array (gh-10351)', function() {
+    const userInfoSchema = new mongoose.Schema({ _id: String }, { _id: false });
+    const observerSchema = new mongoose.Schema({ user: {} }, { _id: false });
+
+    const entrySchema = new mongoose.Schema({
+      creator: userInfoSchema,
+      observers: [observerSchema]
+    });
+
+    entrySchema.pre('save', function(next) {
+      this.observers = [{ user: this.creator }];
+
+      next();
+    });
+
+    const Test = db.model('Test', entrySchema);
+
+    return co(function*() {
+      const entry = new Test({
+        creator: { _id: 'u1' }
+      });
+
+      yield entry.save();
+
+      const fromDb = yield Test.findById(entry);
+      assert.equal(fromDb.observers.length, 1);
     });
   });
 });

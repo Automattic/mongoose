@@ -4775,6 +4775,31 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() returns only inserted docs with `ordered = true`', function() {
+      const schema = new Schema({
+        name: { type: String, required: true, unique: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { name: 'The Phantom Menace' },
+        { name: 'The Empire Strikes Back' },
+        { name: 'The Phantom Menace' },
+        { name: 'Jingle All The Way' }
+      ];
+      const opts = { ordered: true };
+      return co(function*() {
+        yield Movie.init();
+        const err = yield Movie.insertMany(arr, opts).then(() => err, err => err);
+        assert.ok(err);
+        assert.ok(err.insertedDocs);
+
+        assert.equal(err.insertedDocs.length, 2);
+        assert.strictEqual(err.insertedDocs[0].name, 'The Phantom Menace');
+        assert.strictEqual(err.insertedDocs[1].name, 'The Empire Strikes Back');
+      });
+    });
+
     it('insertMany() validation error with ordered true and rawResult true when all documents are invalid', function(done) {
       const schema = new Schema({
         name: { type: String, required: true }
@@ -5780,6 +5805,35 @@ describe('Model', function() {
           assert.equal(people[3].age, 30);
         });
       });
+
+      it('insertOne and replaceOne should not throw an error when set `timestamps: false` in schmea (gh-10048)', function() {
+        const schema = new Schema({ name: String }, { timestamps: false });
+        const Model = db.model('Test', schema);
+
+        return co(function*() {
+          yield Model.create({ name: 'test' });
+
+          yield Model.bulkWrite([
+            {
+              insertOne: {
+                document: { name: 'insertOne-test' }
+              }
+            },
+            {
+              replaceOne: {
+                filter: { name: 'test' },
+                replacement: { name: 'replaceOne-test' }
+              }
+            }
+          ]);
+
+          for (const name of ['insertOne-test', 'replaceOne-test']) {
+            const doc = yield Model.findOne({ name });
+            assert.strictEqual(doc.createdAt, undefined);
+            assert.strictEqual(doc.updatedAt, undefined);
+          }
+        });
+      });
     });
 
     it('insertMany with Decimal (gh-5190)', function(done) {
@@ -6681,6 +6735,26 @@ describe('Model', function() {
     });
   });
 
+  it('Model.validate(...) uses document instance as context by default (gh-10132)', function() {
+    const userSchema = new Schema({
+      name: {
+        type: String,
+        required: function() {
+          return this.nameRequired;
+        }
+      },
+      nameRequired: Boolean
+    });
+
+    const User = db.model('User', userSchema);
+    return co(function*() {
+      const user = new User({ name: 'test', nameRequired: false });
+      const err = yield User.validate(user).catch(err => err);
+
+      assert.ifError(err);
+    });
+  });
+
   it('sets correct `Document#op` with `save()` (gh-8439)', function() {
     const schema = Schema({ name: String });
     const ops = [];
@@ -7082,6 +7156,67 @@ describe('Model', function() {
         const user3 = yield User.findOneAndReplace({ _id: createdUser._id }, { name: 'Hafez3' }, { new: false });
         assert.equal(user3.name, 'Hafez2');
       });
+    });
+  });
+  describe('Setting the explain flag', function() {
+    it('should give an object back rather than a boolean (gh-8275)', function() {
+      return co(function*() {
+        const MyModel = db.model('Character', mongoose.Schema({
+          name: String,
+          age: Number,
+          rank: String
+        }));
+
+        yield MyModel.create([
+          { name: 'Jean-Luc Picard', age: 59, rank: 'Captain' },
+          { name: 'William Riker', age: 29, rank: 'Commander' },
+          { name: 'Deanna Troi', age: 28, rank: 'Lieutenant Commander' },
+          { name: 'Geordi La Forge', age: 29, rank: 'Lieutenant' },
+          { name: 'Worf', age: 24, rank: 'Lieutenant' }
+        ]);
+        const res = yield MyModel.exists({}, { explain: true });
+
+        assert.equal(typeof res, 'object');
+      });
+    });
+  });
+
+  it('saves all error object properties to paths with type `Mixed` (gh-10126)', () => {
+    return co(function*() {
+      const userSchema = new Schema({ err: Schema.Types.Mixed });
+
+      const User = db.model('User', userSchema);
+
+      const err = new Error('I am a bad error');
+      err.metadata = { reasons: ['Cloudflare is down', 'DNS'] };
+
+      const user = yield User.create({ err });
+      const userFromDB = yield User.findOne({ _id: user._id });
+
+      assertErrorProperties(user);
+      assertErrorProperties(userFromDB);
+
+
+      function assertErrorProperties(user) {
+        assert.equal(user.err.message, 'I am a bad error');
+        assert.ok(user.err.stack);
+        assert.deepEqual(user.err.metadata, { reasons: ['Cloudflare is down', 'DNS'] });
+      }
+    });
+  });
+
+  it('supports skipping defaults on a find operation gh-7287', function() {
+    const betaSchema = new Schema({
+      name: { type: String, default: 'foo' },
+      age: { type: Number },
+      _id: { type: Number }
+    });
+
+    const Beta = db.model('Beta', betaSchema);
+    return co(function*() {
+      yield Beta.collection.insertOne({ age: 21, _id: 1 });
+      const test = yield Beta.findOne({ _id: 1 }).setOptions({ defaults: false });
+      assert.ok(!test.name);
     });
   });
 });

@@ -166,4 +166,22 @@ describe('getSchemaTypes', function() {
 
     done();
   });
+
+  it('handles embedded discriminators in nested arrays (gh-9984)', function() {
+    const mapSchema = new Schema({
+      tiles: [[new Schema({}, { discriminatorKey: 'kind', _id: false })]]
+    });
+
+    const contentPath = mapSchema.path('tiles');
+
+    contentPath.discriminator('Enemy', new Schema({
+      enemy: { type: Schema.Types.ObjectId, ref: 'Enemy' }
+    }));
+    contentPath.discriminator('Wall', new Schema({ color: String }));
+
+    const schemaTypes = getSchemaTypes(mapSchema, null, 'tiles.enemy');
+    assert.ok(Array.isArray(schemaTypes));
+    assert.equal(schemaTypes.length, 1);
+    assert.equal(schemaTypes[0].options.ref, 'Enemy');
+  });
 });

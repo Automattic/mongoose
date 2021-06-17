@@ -1118,7 +1118,7 @@ describe('schema', function() {
       bad.validate(function(error) {
         assert.ok(error);
         const errorMessage = 'foods: Cast to Object failed for value ' +
-            '"waffles" at path "foods"';
+            '"waffles" (type string) at path "foods"';
         assert.ok(error.toString().indexOf(errorMessage) !== -1, error.toString());
         done();
       });
@@ -1193,7 +1193,7 @@ describe('schema', function() {
       const bad = new Breakfast({ description: 'test' });
       bad.validate(function(error) {
         assert.ok(error);
-        const errorMessage = 'ValidationError: description: Cast to String failed for value "test" at path "description"';
+        const errorMessage = 'ValidationError: description: Cast to String failed for value "test" (type string) at path "description"';
         assert.equal(errorMessage, error.toString());
         assert.ok(error.errors.description);
         assert.equal(error.errors.description.reason.toString(), 'Error: oops');

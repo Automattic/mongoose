@@ -5062,7 +5062,7 @@ describe('model: populate:', function() {
         });
       });
 
-      it('with no results (gh-4284)', function(done) {
+      it('with no results XYZ (gh-4284)', function(done) {
         const PersonSchema = new Schema({
           name: String,
           authored: [Number]
@@ -9991,6 +9991,537 @@ describe('model: populate:', function() {
 
       assert.deepEqual(posts[0].toObject().commentsIds.map(c => c.content), ['Im used in two posts', 'Nice first post']);
       assert.deepEqual(posts[1].toObject().commentsIds.map(c => c.content), ['Im used in two posts', 'Nice second post']);
+    });
+  });
+
+  it('supports `transform` option (gh-3375)', function() {
+    const parentSchema = new Schema({
+      name: String,
+      children: [{ type: 'ObjectId', ref: 'Child' }],
+      child: { type: 'ObjectId', ref: 'Child' }
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const Child = db.model('Child', Schema({ name: String }));
+
+    return co(function*() {
+      const children = yield Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
+      let p = yield Parent.create({
+        name: 'Anakin',
+        children: children,
+        child: children[0]._id
+      });
+
+      let called = [];
+      function transform(doc, id) {
+        called.push({
+          doc: doc,
+          id: id
+        });
+
+        return id;
+      }
+
+      // Populate array of ids
+      p = yield Parent.findById(p).populate({
+        path: 'children',
+        transform: transform
+      });
+
+      assert.equal(called.length, 2);
+      assert.equal(called[0].doc.name, 'Luke');
+      assert.equal(called[0].id.toHexString(), children[0]._id.toHexString());
+
+      assert.equal(called[1].doc.name, 'Leia');
+      assert.equal(called[1].id.toHexString(), children[1]._id.toHexString());
+
+      // Populate single id
+      called = [];
+      p = yield Parent.findById(p).populate({
+        path: 'child',
+        transform: transform
+      });
+
+      assert.equal(called.length, 1);
+      assert.equal(called[0].doc.name, 'Luke');
+      assert.equal(called[0].id.toHexString(), children[0]._id.toHexString());
+
+      // Push a nonexistent id
+      const newId = new mongoose.Types.ObjectId();
+      yield Parent.updateOne({ _id: p._id }, { $push: { children: newId } });
+
+      called = [];
+      p = yield Parent.findById(p).populate({
+        path: 'children',
+        transform: transform
+      });
+      assert.equal(called.length, 3);
+      assert.strictEqual(called[2].doc, null);
+      assert.equal(called[2].id.toHexString(), newId.toHexString());
+
+      assert.equal(p.children[2].toHexString(), newId.toHexString());
+
+      // Populate 2 docs with same id
+      yield Parent.updateOne({ _id: p._id }, { $set: { children: [children[0], children[0]] } });
+      called = [];
+
+      p = yield Parent.findById(p).populate({
+        path: 'children',
+        transform: transform
+      });
+      assert.equal(called.length, 2);
+      assert.equal(called[0].id.toHexString(), children[0]._id.toHexString());
+      assert.equal(called[1].id.toHexString(), children[0]._id.toHexString());
+
+      // Populate single id that points to nonexistent doc
+      yield Parent.updateOne({ _id: p._id }, { $set: { child: newId } });
+      called = [];
+      p = yield Parent.findById(p).populate({
+        path: 'child',
+        transform: transform
+      });
+
+      assert.equal(called.length, 1);
+      assert.strictEqual(called[0].doc, null);
+      assert.equal(called[0].id.toHexString(), newId.toHexString());
+    });
+  });
+
+  it('transform to primitive (gh-10064)', function() {
+    const Child = db.model('Child', mongoose.Schema({ name: String }));
+    const Parent = db.model('Parent', mongoose.Schema({
+      child: { type: 'ObjectId', ref: 'Child' },
+      children: [{ type: 'ObjectId', ref: 'Child' }]
+    }));
+
+    return co(function*() {
+      const children = yield Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
+
+      let doc = yield Parent.create({ children, child: children[0] });
+      doc = yield Parent.findById(doc).populate([
+        {
+          path: 'child',
+          transform: getName
+        },
+        {
+          path: 'children',
+          options: { retainNullValues: true },
+          transform: getName
+        }
+      ]);
+
+      function getName(doc) {
+        return doc == null ? null : doc.name;
+      }
+
+      assert.equal(doc.child, 'Luke');
+      assert.deepEqual(doc.toObject().children.sort().reverse(), ['Luke', 'Leia']);
+    });
+  });
+
+  it('transform with virtual populate, justOne = true (gh-3375)', function() {
+    const parentSchema = new Schema({
+      name: String
+    });
+    parentSchema.virtual('child', {
+      ref: 'Child',
+      localField: '_id',
+      foreignField: 'parentId',
+      justOne: true
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const Child = db.model('Child', Schema({ name: String, parentId: 'ObjectId' }));
+
+    return co(function*() {
+      let p = yield Parent.create({ name: 'Anakin' });
+      yield Child.create({ name: 'Luke', parentId: p._id });
+
+      const called = [];
+
+      p = yield Parent.findById(p).populate({
+        path: 'child',
+        transform: function(doc, id) {
+          called.push({
+            doc: doc,
+            id: id
+          });
+
+          return id;
+        }
+      });
+
+      assert.equal(called.length, 1);
+      assert.strictEqual(called[0].doc.parentId.toHexString(), p._id.toHexString());
+      assert.equal(called[0].id.toHexString(), p._id.toHexString());
+    });
+  });
+
+  it('transform with virtual populate, justOne = false (gh-3375)', function() {
+    const parentSchema = new Schema({
+      name: String
+    });
+    parentSchema.virtual('children', {
+      ref: 'Child',
+      localField: '_id',
+      foreignField: 'parentId',
+      justOne: false
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const Child = db.model('Child', Schema({ name: String, parentId: 'ObjectId' }));
+
+    return co(function*() {
+      let p = yield Parent.create({ name: 'Anakin' });
+      yield Child.create([
+        { name: 'Luke', parentId: p._id },
+        { name: 'Leia', parentId: p._id }
+      ]);
+
+      const called = [];
+
+      p = yield Parent.findById(p).populate({
+        path: 'children',
+        transform: function(doc, id) {
+          called.push({
+            doc: doc,
+            id: id
+          });
+
+          return id;
+        }
+      });
+
+      assert.equal(called.length, 2);
+      assert.deepEqual(called.map(c => c.doc.name).sort(), ['Leia', 'Luke']);
+
+      assert.strictEqual(called[0].doc.parentId.toHexString(), p._id.toHexString());
+      assert.equal(called[0].id.toHexString(), p._id.toHexString());
+
+      assert.strictEqual(called[1].doc.parentId.toHexString(), p._id.toHexString());
+      assert.equal(called[1].id.toHexString(), p._id.toHexString());
+    });
+  });
+
+  it('supports populating dotted subpath of a populated doc that has the same id as a populated doc (gh-10005)', function() {
+    const ModelASchema = new mongoose.Schema({
+      _modelB: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Test1'
+      },
+      _rootModel: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Test'
+      }
+    });
+
+    const ModelBSchema = new mongoose.Schema({
+      _rootModel: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Test'
+      }
+    });
+
+    const RootModelSchema = new mongoose.Schema({ name: String });
+
+    return co(function*() {
+      const ModelA = db.model('Test2', ModelASchema);
+      const ModelB = db.model('Test1', ModelBSchema);
+      const RootModel = db.model('Test', RootModelSchema);
+
+      const rootModel = new RootModel({ name: 'my name' });
+      const modelB = new ModelB({ _rootModel: rootModel });
+      const modelA = new ModelA({ _rootModel: rootModel, _modelB: modelB });
+
+      yield Promise.all([rootModel.save(), modelB.save(), modelA.save()]);
+
+      const modelA1 = yield ModelA.findById(modelA._id);
+      yield modelA1.populate('_modelB _rootModel').execPopulate();
+      yield modelA1.populate('_modelB._rootModel').execPopulate();
+
+      assert.equal(modelA1._modelB._rootModel.name, 'my name');
+    });
+  });
+
+  it('prevents already populated fields from becoming null gh-10068', function() {
+    return co(function*() {
+      const Books = db.model('books', new Schema({ name: String, contributors: [{ author: Schema.Types.ObjectId }] }));
+      const Authors = db.model('authors', new Schema({ name: String }));
+
+      const anAuthor = new Authors({ name: 'Author1' });
+      yield anAuthor.save();
+
+      const aBook1 = new Books({ name: 'Book1', contributors: [{ author: anAuthor.id }] });
+      yield aBook1.save();
+      const aBook2 = new Books({ name: 'Book2', contributors: [{ author: anAuthor.id }] });
+      yield aBook2.save();
+
+      const populateOptions = [{
+        path: 'contributors.author',
+        model: 'authors',
+        select: '_id name'
+      }];
+      const populatedBooks = (yield Books.find().populate(populateOptions)).map(aBook => {
+        aBook = aBook.toObject();
+        if (!aBook._id.equals(aBook1.id)) {
+          aBook.contributors[0].author = aBook.contributors[0].author._id;
+        }
+        return aBook;
+      });
+
+      const populatedBooksAgain = yield Books.populate(populatedBooks, populateOptions);
+
+      assert.equal(populatedBooksAgain[0].contributors[0].author.name, 'Author1');
+    });
+  });
+
+  it('populates lean subdoc with `_id` property (gh-10069)', function() {
+    const Books = db.model('Book', new Schema({ name: String, author: Schema.Types.ObjectId }));
+    const Authors = db.model('Person', new Schema({ name: String }));
+
+    return co(function*() {
+      const anAuthor = new Authors({ name: 'Author1' });
+      yield anAuthor.save();
+
+      const aBook1 = new Books({ name: 'Book1', author: anAuthor.id });
+      yield aBook1.save();
+      const aBook2 = new Books({ name: 'Book2', author: anAuthor.id });
+      yield aBook2.save();
+
+      const populateOptions = [{
+        path: 'author',
+        model: 'Person'
+      }];
+
+      const books = (yield Books.find().lean()).map(aBook => {
+        if (!aBook._id.equals(aBook1.id)) {
+          aBook.author = { _id: aBook.author };
+        }
+        return aBook;
+      });
+
+      const populatedBooks = yield Books.populate(books, populateOptions);
+      assert.equal(populatedBooks.length, 2);
+      assert.equal(populatedBooks[0].author.name, 'Author1');
+      assert.equal(populatedBooks[1].author.name, 'Author1');
+    });
+  });
+
+  it('handles virtual populate when foreignField is an array with duplicates (gh-10117)', function() {
+    const bookSchema = new Schema({ name: String, author: String });
+    bookSchema.virtual('authors', {
+      ref: 'Person',
+      localField: 'author',
+      foreignField: 'aliases',
+      justOne: false
+    });
+    const Book = db.model('Book', bookSchema);
+    const Author = db.model('Person', new Schema({ aliases: [String] }));
+
+    return co(function*() {
+      yield Author.create({ aliases: ['author1', 'author2', 'author1'] });
+
+      const book = yield Book.create({ name: 'Book1', author: 'author1' });
+
+      const fromDb = yield Book.findById(book).populate('authors');
+      assert.equal(fromDb.authors.length, 1);
+      assert.deepEqual(fromDb.toObject({ virtuals: true }).authors[0].aliases, ['author1', 'author2', 'author1']);
+    });
+  });
+
+  it('handles virtual populate with `$elemMatch` in custom match when `foreignField` is an array (gh-10117)', function() {
+    const User = db.model('User', mongoose.Schema({
+      name: String,
+      access: [{ role: String, deletedAt: Date, organization: 'ObjectId' }]
+    }));
+
+    const organizationSchema = mongoose.Schema({ name: String });
+    organizationSchema.virtual('administrators', {
+      ref: 'User',
+      localField: '_id',
+      foreignField: 'access.organization'
+    });
+    const Organization = db.model('Organization', organizationSchema);
+
+    return co(function*() {
+      const org = yield Organization.create({ name: 'test org' });
+      yield User.create([
+        { name: 'user1', access: [{ role: 'admin', organization: org._id }] },
+        { name: 'user2', access: [{ role: 'admin', organization: null }] },
+        {
+          name: 'user3',
+          access: [
+            // Shouldn't end up in result because first entry matches on `_id` but
+            // not custom `$elemMatch`, and 2nd entry matches on custom `$elemMatch`
+            // but not on `_id`.
+            { role: 'admin', organization: org._id, deletedAt: new Date() },
+            { role: 'admin', organization: null }
+          ]
+        }
+      ]);
+
+      const res = yield Organization.findById(org).populate({
+        path: 'administrators',
+        match: {
+          access: { $elemMatch: { role: 'admin', deletedAt: { $exists: false } } }
+        }
+      });
+      assert.equal(res.administrators.length, 1);
+      assert.equal(res.administrators[0].name, 'user1');
+    });
+  });
+
+  it('populates immutable array paths (gh-10159)', function() {
+    const Cat = db.model('Cat', {
+      name: String,
+      friends: [{
+        immutable: true,
+        type: mongoose.ObjectId,
+        ref: 'Cat'
+      }]
+    });
+
+    return co(function*() {
+      const friend = yield Cat.create({ name: 'Zildjian' });
+      const myCat = yield Cat.create({ name: 'Lord Fluffles', friends: [friend.id] });
+
+      yield myCat.populate('friends').execPopulate();
+
+      assert.equal(myCat.friends[0].name, 'Zildjian');
+    });
+  });
+
+  it('populates paths under mixed schematypes where some documents have non-object properties (gh-10191)', function() {
+    const schema = mongoose.Schema({
+      name: String,
+      params: [{
+        key: String,
+        value: 'Mixed'
+      }]
+    });
+    const Test = db.model('Test', schema);
+    const User = db.model('User', mongoose.Schema({ name: String }));
+
+    return co(function*() {
+      const user = yield User.create({ name: 'test' });
+
+      yield Test.create([
+        { name: 'test1', params: [{ key: 'textContext', value: 'asd' }] },
+        { name: 'test2', params: [{ key: 'logic', value: { optionLabels: [user._id] } }] }
+      ]);
+
+      const res = yield Test.find().sort({ name: 1 }).populate({
+        path: 'params.value.optionLabels',
+        model: User
+      });
+
+      assert.equal(res[0].name, 'test1');
+      assert.equal(res[0].params.length, 1);
+      assert.equal(res[0].params[0].value, 'asd');
+
+      assert.equal(res[1].name, 'test2');
+      assert.equal(res[1].params.length, 1);
+      assert.equal(res[1].params[0].value.optionLabels.length, 1);
+      assert.equal(res[1].params[0].value.optionLabels[0].name, 'test');
+    });
+  });
+
+  it('populates embedded discriminator with tied value (gh-10231)', function() {
+    const GuestSchema = new Schema({
+      dummy: String
+    });
+
+    const ActivitySchema = new Schema({
+      title: String,
+      kind: { required: true, type: String, enum: ['TALK'] } },
+    { discriminatorKey: 'kind' });
+
+    const ActivityTalkSchema = new Schema({
+      speakers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Guest' }]
+    });
+
+    ActivityTalkSchema.add(ActivitySchema);
+
+    ActivityTalkSchema.paths.kind.options.$skipDiscriminatorCheck = true;
+
+    const ProgrammeSchema = new Schema({
+      activities: [{ required: true, type: ActivitySchema }]
+    });
+
+    ProgrammeSchema.path('activities').discriminator('ActivityTalk', ActivityTalkSchema, 'TALK');
+
+    const GuestModel = db.model('Guest', GuestSchema);
+    const ProgrammeModel = db.model('Test', ProgrammeSchema);
+
+    return co(function*() {
+      const guest1 = yield GuestModel.create({ dummy: '1' });
+      const guest2 = yield GuestModel.create({ dummy: '2' });
+
+      const programme1 = yield ProgrammeModel.create({
+        activities: [
+          { title: 'hello', kind: 'TALK', speakers: [guest1, guest2] }
+        ]
+      });
+
+      const event = yield ProgrammeModel.findOne({ _id: programme1._id }).orFail().exec();
+      yield event.populate({ path: 'activities.speakers' }).execPopulate();
+      assert.equal(event.activities.length, 1);
+      assert.equal(event.activities[0].speakers.length, 2);
+      assert.equal(event.activities[0].speakers[0].dummy, '1');
+      assert.equal(event.activities[0].speakers[1].dummy, '2');
+    });
+  });
+
+  it('supports populating an array of immutable elements (gh-10264)', function() {
+    const Cat = db.model('Cat', {
+      _id: String,
+      name: String,
+      friends: [{
+        immutable: true,
+        ref: 'Cat',
+        type: String
+      }]
+    });
+
+    return co(function*() {
+      const friend = new Cat({ _id: 'garfield', name: 'Garfield' });
+      yield friend.save();
+
+      const myCat = new Cat({ _id: 'arlene', name: 'Arlene', friends: [friend.id] });
+      yield myCat.save();
+
+      yield myCat.populate('friends').execPopulate();
+      assert.equal(myCat.friends[0].name, 'Garfield');
+    });
+  });
+
+  it('populates nested path in schema using `Model.populate()` static (gh-10335)', function() {
+    const Books = db.model('Book', new Schema({
+      name: String,
+      author: { _id: Schema.Types.ObjectId, name: String }
+    }));
+    const Authors = db.model('Author', new Schema({ name: String }));
+
+    return co(function*() {
+      const anAuthor = new Authors({ name: 'Author1' });
+      yield anAuthor.save();
+
+      const aBook1 = new Books({ name: 'Book1', author: { _id: anAuthor.id } });
+      yield aBook1.save();
+
+      const books = (yield Books.find().lean()).map(aBook => {
+        aBook.author = aBook.author._id;
+        return aBook;
+      });
+
+      const populatedBooks = yield Books.populate(books, [{
+        path: 'author',
+        model: 'Author',
+        select: '_id name'
+      }]);
+
+      assert.equal(populatedBooks.length, 1);
+      assert.equal(populatedBooks[0].author.name, 'Author1');
     });
   });
 });

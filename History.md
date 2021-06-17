@@ -1,3 +1,220 @@
+5.12.14 / 2021-06-15
+====================
+ * fix(schema): check that schema type is an object when setting isUnderneathDocArray #10361 [vmo-khanus](https://github.com/vmo-khanus)
+ * fix(document): avoid infinite recursion when setting single nested subdoc to array #10351
+ * fix(populate): allow populating nested path in schema using `Model.populate()` #10335
+ * fix(drivers): emit operation-start/operation-end events to allow inspecting when operations start and end
+ * fix(index.d.ts): improve typings for virtuals #10350 [thiagokisaki](https://github.com/thiagokisaki)
+ * fix(index.d.ts): correct constructor type for Document #10328
+ * fix(index.d.ts): add `ValidationError` as a possible type for `ValidationError#errors` #10320 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix: remove unnecessary async devDependency that's causing npm audit warnings #10281
+ * docs(typescript): add schemas guide #10308
+ * docs(model): add options parameter description to `Model.exists()` #10336 [Aminoiz](https://github.com/Aminoiz)
+
+5.12.13 / 2021-06-04
+====================
+ * perf(document): avoid creating nested paths when running `$getAllSubdocs()` #10275
+ * fix: make returnDocument option work with `findOneAndUpdate()` #10232 #10231 [cnwangjie](https://github.com/cnwangjie)
+ * fix(document): correctly reset subdocument when resetting a map subdocument underneath a single nested subdoc after save #10295
+ * perf(query): avoid setting non-null sessions to avoid overhead from $getAllSubdocs() #10275
+ * perf(document): pre split schematype paths when compiling schema to avoid extra overhead of splitting when hydrating documents #10275
+ * perf(schema): pre-calculate mapPaths to avoid looping over every path for each path when initing doc #10275
+ * fix(index.d.ts): drill down into nested arrays when creating LeanDocument type #10293
+
+5.12.12 / 2021-05-28
+====================
+ * fix(documentarray): retain atomics when setting to a new array #10272
+ * fix(query+model): fix deprecation warning for `returnOriginal` with `findOneAndUpdate()` #10298 #10297 #10292 #10285 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(index.d.ts): make `map()` result an array if used over an array #10288 [quantumsheep](https://github.com/quantumsheep)
+
+5.12.11 / 2021-05-24
+====================
+ * fix(populate): skip applying setters when casting arrays for populate() to avoid issues with arrays of immutable elements #10264
+ * perf(schematype): avoid cloning setters every time we run setters #9588
+ * perf(get): add benchmarks and extra cases to speed up get() #9588
+ * perf(array): improve array constructor performance on small arrays to improve nested array perf #9588
+ * fix(index.d.ts): allow using type: [String] with string[] when using SchemaDefinition with generic #10261
+ * fix(index.d.ts): support ReadonlyArray as well as regular array where possible in schema definitions #10260
+ * docs(connection): document noListener option to useDb #10278 [stuartpb](https://github.com/stuartpb)
+ * docs: migrate raw tutorial content from pug / JS to markdown #10271
+ * docs: fix typo #10269 [sanjib](https://github.com/sanjib)
+
+5.12.10 / 2021-05-18
+====================
+ * fix(query): allow setting `defaults` option on result documents from query options #7287 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(populate): handle populating embedded discriminator with custom tiedValue #10231
+ * fix(document): allow passing space-delimited string of `pathsToValidate` to `validate()` and `validateSync()` #10258
+ * fix(model+schema): support `loadClass()` on classes that have `collection` as a static property #10257 #10254 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(SchemaArrayOptions): correct property name #10236
+ * fix(index.d.ts): add any to all query operators to minimize likelihood of "type instantiation is excessively deep" when querying docs with 4-level deep subdocs #10189
+ * fix(index.d.ts): add $parent() in addition to parent() in TS definitions
+ * fix(index.d.ts): correct async iterator return type for QueryCursor #10253 #10252 #10251 [borfig](https://github.com/borfig)
+ * fix(index.d.ts): add `virtualsOnly` parameter to `loadClass()` function signature [IslandRhythms](https://github.com/IslandRhythms)
+ * docs(typescript): add typescript populate docs #10212
+ * docs: switch from AWS to Azure Functions for search #10244
+
+5.12.9 / 2021-05-13
+===================
+ * fix(schema): ensure add() overwrites existing schema paths by default #10208 #10203
+ * fix(schema): support creating nested paths underneath document arrays #10193
+ * fix(update): convert nested dotted paths in update to nested paths to avoid ending up with dotted properties in update #10200
+ * fix(document): allow calling validate() and validateSync() with `options` as first parameter #10216
+ * fix(schema): apply static properties to model when using loadClass() #10206
+ * fix(index.d.ts): allow returning Promise<void> from middleware functions #10229
+ * fix(index.d.ts): add pre('distinct') hooks to TypeScript #10192
+
+5.12.8 / 2021-05-10
+===================
+ * fix(populate): handle populating immutable array paths #10159
+ * fix(CastError): add `toJSON()` function to ensure `name` property always ends up in `JSON.stringify()` output #10166 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(query): add allowDiskUse() method to improve setting MongoDB 4.4's new `allowDiskUse` option #10177
+ * fix(populate): allow populating paths under mixed schematypes where some documents have non-object properties #10191
+ * chore: remove unnecessary driver dynamic imports so Mongoose can work with Parcel #9603
+ * fix(index.d.ts): allow any object as parameter to create() and `insertMany()` #10144
+ * fix(index.d.ts): allow creating Model class with raw interface, no `extends Document` #10144
+ * fix(index.d.ts): separate UpdateQuery from `UpdateWithAggregationPipeline` for cases when `UpdateQuery` is used as a function param #10186
+ * fix(index.d.ts): don't require error value in pre/post hooks #10213 [michaln-q](https://github.com/michaln-q)
+ * docs(typescript): add a typescript intro tutorial and statics tutorial #10021
+ * docs(typescript): add query helpers tutorial #10021
+ * docs(deprecations): add note that you can safely ignore `useFindAndModify` and `useCreateIndex` deprecation warnings #10155
+ * chore(workflows): add node 16 to github actions #10201 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+5.12.7 / 2021-04-29
+===================
+ * fix(document): make $getPopulatedDocs() return populated virtuals #10148
+ * fix(discriminator): take discriminator schema's single nested paths over base schema's #10157
+ * fix(discriminator): allow numbers and ObjectIds as tied values for discriminators #10130
+ * fix(document): avoid double validating paths underneath mixed objects in save() #10141
+ * fix(schema): allow path() to return single nested paths within document arrays #10164
+ * fix(model+query): consistently wrap query callbacks in `process.nextTick()` to avoid clean stack traces causing memory leak when using synchronous recursion like `async.whilst()` #9864
+ * fix(cursor): correctly report CastError when using noCursorTimeout flag #10150
+ * fix(index.d.ts): add CastError constructor #10176
+ * fix(index.d.ts): allow setting mongoose.pluralize(null) in TypeScript #10185
+ * docs: add link to transactions guide from nav bar #10143
+ * docs(validation): add section about custom error messages #10140
+ * docs: make headers linkable via clicking #10156
+ * docs: broken link in document.js #10190 [joostdecock](https://github.com/joostdecock)
+ * docs: make navbar responsive on legacy 2.x docs #10171 [ad99526](https://github.com/ad99526)
+
+5.12.6 / 2021-04-27
+===================
+ * fix(query): allow setting `writeConcern` schema option to work around MongoDB driver's `writeConcern` deprecation warning #10083 #10009 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(populate): dedupe when virtual populate foreignField is an array to avoid duplicate docs in result #10117
+ * fix(populate): add `localField` filter to `$elemMatch` on virtual populate when custom `match` has a `$elemMatch` and `foreignField` is an array #10117
+ * fix(query): convert projection string values to numbers as a workaround for #10142
+ * fix(document): set version key filter on `save()` when using `optimisticConcurrency` if no changes in document #10128 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(model): use `obj` as `context` in `Model.validate()` if `obj` is a document #10132
+ * fix(connection): avoid db events deprecation warning when using `useDb()` with `useUnifiedTopology` #8267
+ * fix: upgrade to sift@13.5.2 to work around transitive dev dependency security warning #10121
+ * fix(index.d.ts): allow any object as parameter to `create()` and `insertMany()` #10144
+ * fix(index.d.ts): clarify that `eachAsync()` callback receives a single doc rather than array of docs unless `batchSize` is set #10135
+ * fix(index.d.ts): clarify that return value from `validateSync()` is a ValidationError #10147 [michaln-q](https://github.com/michaln-q)
+ * fix(index.d.ts): add generic type for Model constructor #10074 [Duchynko](https://github.com/Duchynko)
+ * fix(index.d.ts): add parameter type in merge #10168 [yoonhoGo](https://github.com/yoonhoGo)
+
+5.12.5 / 2021-04-19
+===================
+ * fix(populate): handle populating underneath document array when document array property doesn't exist in db #10003
+ * fix(populate): clear out dangling pointers to populated docs so query cursor with populate() can garbage collect populated subdocs #9864
+ * fix(connection): pull correct `autoCreate` value from Mongoose global when creating new model before calling `connect()` #10091
+ * fix(populate): handle populating paths on documents with discriminator keys that point to non-existent discriminators #10082
+ * fix(index.d.ts): allow numbers as discriminator names #10115
+ * fix(index.d.ts): allow `type: Boolean` in Schema definitions #10085
+ * fix(index.d.ts): allow passing array of aggregation pipeline stages to `updateOne()` and `updateMany()` #10095
+ * fix(index.d.ts): support legacy 2nd param callback syntax for `deleteOne()`, `deleteMany()` #10122
+ * docs(mongoose): make `useCreateIndex` always `false` in docs #10033
+ * docs(schema): fix incorrect links from schema API docs #10111
+
+5.12.4 / 2021-04-15
+===================
+ * fix: upgrade mongodb driver -> 3.6.6 #10079
+ * fix: store fields set with select:false at schema-level when saving a new document #10101 [ptantiku](https://github.com/ptantiku)
+ * fix(populate): avoid turning already populated field to null when populating an existing lean document #10068 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(populate): correctly populate lean subdocs with `_id` property #10069
+ * fix(model): insertedDocs may contain docs that weren't inserted #10098 [olnazx](https://github.com/olnazx)
+ * fix(schemaType): make type Mixed cast error objects to pojos #10131 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(populate): support populating embedded discriminators in nested arrays #9984
+ * fix(populate): handle populating map paths using trailing `.$*` #10123
+ * fix(populate): allow returning primitive from `transform()` function for single conventional populate #10064
+ * fix(index.d.ts): allow generic classes of `T` to use `T & Document` internally #10046
+ * fix(index.d.ts): allow `$pull` with `$` paths #10075
+ * fix(index.d.ts): use correct `Date` type for `$currentDate` #10058
+ * fix(index.d.ts): add missing asyncInterator to Query type def #10094 [borfig](https://github.com/borfig)
+ * fix(index.d.ts): allow RHS of `$unset` properties to be any value #10066
+ * fix(index.d.ts): allow setting SchemaType `index` property to a string #10077
+ * refactor(index.d.ts): move discriminator() to common interface #10109 [LoneRifle](https://github.com/LoneRifle)
+
+5.12.3 / 2021-03-31
+===================
+ * fix: avoid setting schema-level collation on text indexes #10044 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(query): add `writeConcern()` method to avoid writeConcern deprecation warning #10009
+ * fix(connection): use queueing instead of event emitter for `createCollection()` and other helpers to avoid event emitter warning #9778
+ * fix(connection): scope `Connection#id` to Mongoose instance so id always lines up with `mongoose.connections` index #10025 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix: avoid throwing in `promiseOrCallback()` if 3rd param isn't an EventEmitter #10055 [emrebass](https://github.com/emrebass)
+ * fix(index.d.ts): add Model as 2nd generic param to `Model.discriminator()` #10054 [coro101](https://github.com/coro101)
+ * fix(index.d.ts): add docs to `next()` callback for `pre('insertMany')` hooks #10078 #10072 [pezzu](https://github.com/pezzu)
+ * fix(index.d.ts): add `transform` to PopulateOptions interface #10061
+ * fix(index.d.ts): add DocumentQuery type for backwards compatibility #10036
+
+5.12.2 / 2021-03-22
+===================
+ * fix(QueryCursor): consistently execute `post('find')` hooks with an array of docs #10015 #9982 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(schema): support setting `ref` as an option on an array SchemaType #10029
+ * fix(query): apply schema-level `select` option from array schematypes #10029
+ * fix(schema): avoid possible prototype pollution with `Schema()` constructor #10035 [zpbrent](https://github.com/zpbrent)
+ * fix(model): make bulkWrite skip timestamps with timestamps: false #10050 [SoftwareSing](https://github.com/SoftwareSing)
+ * fix(index.d.ts): make query methods return `QueryWithHelpers` so query helpers pass through chaining #10040
+ * fix(index.d.ts): add `upserted` array to `updateOne()`, `updateMany()`, `update()` result #10042
+ * fix(index.d.ts): add back `Aggregate#project()` types that were mistakenly removed in 5.12.0 #10043
+ * fix(index.d.ts): always allow setting `type` in Schema to a SchemaType class or a Schema instance #10030
+ * docs(transactions): introduce `session.withTransaction()` before `session.startTransaction()` because `withTransaction()` is the recommended approach #10008
+ * docs(mongoose+browser): fix broken links to info about `mongoose.Types` #10016
+
+5.12.1 / 2021-03-18
+===================
+ * fix: update mongodb -> 3.6.5 to fix circular dependency warning #9900
+ * fix(document): make `toObject()` use child schema `flattenMaps` option by default #9995
+ * fix(ObjectId): make `isValidObjectId()` check that length 24 strings are hex chars only #10010 #9996 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(query): correctly cast embedded discriminator paths when discriminator key is specified in array filter #9977
+ * fix(schema): skip `populated()` check when calling `applyGetters()` with a POJO for mongoose-lean-getters support #9986
+ * fix(populate): support populating dotted subpath of a populated doc that has the same id as a populated doc #10005
+ * fix(index.d.ts): correct `this` for query helpers #10028 [francescov1](https://github.com/francescov1)
+ * fix(index.d.ts): avoid omitting function property keys in LeanDocuments, because TS can't accurately infer what's a function if using generic functions #9989
+ * fix(index.d.ts): correct type definition for `SchemaType#cast()` #10039 #9980
+ * fix(index.d.ts): make SchemaTypeOptions a class, add missing `SchemaType#OptionsConstructor` #10001
+ * fix(index.d.ts): support calling `findByIdAndUpdate()` with filter, update, callback params #9981
+
+5.12.0 / 2021-03-11
+===================
+ * feat(populate): add `transform` option that Mongoose will call on every populated doc #3775
+ * feat(query): make `Query#pre()` and `Query#post()` public #9784
+ * feat(document): add `Document#getPopulatedDocs()` to return an array of all populated documents in a document #9702 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(document): add `Document#getAllSubdocs()` to return an array of all single nested and array subdocuments #9764 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(schema): allow `schema` as a schema path name #8798 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(QueryCursor): Add batch processing for eachAsync #9902 [khaledosama999](https://github.com/khaledosama999)
+ * feat(connection): add `noListener` option to help with use cases where you're using `useDb()` on every request #9961
+ * feat(index): emit 'createConnection' event when user calls `mongoose.createConnection()` #9985
+ * feat(connection+index): emit 'model' and 'deleteModel' events on connections when creating and deleting models #9983
+ * feat(query): allow passing `explain` option to `Model.exists()` #8098 [IslandRhythms](https://github.com/IslandRhythms)
+
+5.11.20 / 2021-03-11
+====================
+ * fix(query+populate): avoid unnecessarily projecting in subpath when populating a path that uses an elemMatch projection #9973
+ * fix(connection): avoid `db` events deprecation warning with 'close' events #10004 #9930
+ * fix(index.d.ts): make `$pull` more permissive to allow dotted paths #9993
+
+5.11.19 / 2021-03-05
+====================
+ * fix(document): skip validating array elements that aren't modified when `validateModifiedOnly` is set #9963
+ * fix(timestamps): apply timestamps on `findOneAndReplace()` #9951
+ * fix(schema): correctly handle trailing array filters when looking up schema paths #9977
+ * fix(schema): load child class getter for virtuals instead of base class when using `loadClass()` #9975
+ * fix(index.d.ts): allow creating statics without passing generics to `Schema` constructor #9969
+ * fix(index.d.ts): add QueryHelpers generic to schema and model, make all query methods instead return QueryWithHelpers #9850
+ * fix(index.d.ts): support setting `type` to an array of schemas when using SchemaDefinitionType #9962
+ * fix(index.d.ts): add generic to plugin schema definition #9968 [emiljanitzek](https://github.com/emiljanitzek)
+ * docs: small typo fix #9964 [KrishnaMoorthy12](https://github.com/KrishnaMoorthy12)
+
 5.11.18 / 2021-02-23
 ====================
  * fix(connection): set connection state to `disconnected` if connecting string failed to parse #9921

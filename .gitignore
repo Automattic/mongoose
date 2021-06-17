@@ -34,8 +34,6 @@ tools/31*
 
 *.key
 
-docs/*.html
-
 # Webpack output
 dist
 test/files/main.js
@@ -43,3 +41,10 @@ test/files/main.js
 package-lock.json
 
 .config*
+
+# Compiled docs
+docs/*.html
+docs/tutorials/*.html
+docs/typescript/*.html
+docs/api/*.html
+index.html

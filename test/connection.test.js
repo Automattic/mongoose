@@ -828,16 +828,22 @@ describe('connections:', function() {
   it('deleteModel()', function() {
     const conn = mongoose.createConnection('mongodb://localhost:27017/gh6813');
 
-    conn.model('gh6813', new Schema({ name: String }));
+    let Model = conn.model('gh6813', new Schema({ name: String }));
+
+    const events = [];
+    conn.on('deleteModel', model => events.push(model));
 
     assert.ok(conn.model('gh6813'));
     conn.deleteModel('gh6813');
+
+    assert.equal(events.length, 1);
+    assert.equal(events[0], Model);
 
     assert.throws(function() {
       conn.model('gh6813');
     }, /Schema hasn't been registered/);
 
-    const Model = conn.model('gh6813', new Schema({ name: String }));
+    Model = conn.model('gh6813', new Schema({ name: String }));
     assert.ok(Model);
     return Model.create({ name: 'test' });
   });
@@ -923,9 +929,20 @@ describe('connections:', function() {
   it('allows overwriting models (gh-9406)', function() {
     const m = new mongoose.Mongoose();
 
+    const events = [];
+    m.connection.on('model', model => events.push(model));
+
     const M1 = m.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+    assert.equal(events.length, 1);
+    assert.equal(events[0], M1);
+
     const M2 = m.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+    assert.equal(events.length, 2);
+    assert.equal(events[1], M2);
+
     const M3 = m.connection.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+    assert.equal(events.length, 3);
+    assert.equal(events[2], M3);
 
     assert.ok(M1 !== M2);
     assert.ok(M2 !== M3);
@@ -1091,5 +1108,18 @@ describe('connections:', function() {
         );
       });
     });
+  });
+
+  it('Connection id should be scoped per Mongoose Instance (gh-10025)', function() {
+    const m = new mongoose.Mongoose;
+    const conn = m.createConnection();
+    const m1 = new mongoose.Mongoose;
+    const conn2 = m1.createConnection();
+    const conn3 = m.createConnection();
+    assert.deepStrictEqual(m.connection.id, 0);
+    assert.deepStrictEqual(conn.id, m.connection.id + 1);
+    assert.deepStrictEqual(m1.connection.id, 0);
+    assert.deepStrictEqual(conn2.id, m1.connection.id + 1);
+    assert.deepStrictEqual(conn3.id, m.connection.id + 2);
   });
 });

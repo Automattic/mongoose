@@ -1,17 +1,40 @@
-import { Schema, model, Document, Types, Query } from 'mongoose';
+import { Schema, model, Document, Types, Query, Model, QueryWithHelpers } from 'mongoose';
 
-const schema: Schema = new Schema({ name: { type: 'String' }, tags: [String] });
+interface QueryHelpers {
+  byName(name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
+}
+
+const schema: Schema<ITest, Model<ITest, QueryHelpers>> = new Schema({
+  name: { type: 'String' },
+  tags: [String],
+  docs: [{ nested: { id: Number, tags: [String] } }],
+  endDate: Date
+});
+
+schema.query.byName = function(name: string): Query<any, ITest, QueryHelpers> & QueryHelpers {
+  return this.find({ name });
+};
+
+interface ISubdoc extends Document {
+  id?: number;
+  tags?: string[];
+}
 
 interface ITest extends Document {
   name?: string;
   age?: number;
   parent?: Types.ObjectId;
   tags?: string[];
+  docs?: ISubdoc[];
+  endDate?: Date;
 }
 
-const Test = model<ITest>('Test', schema);
+const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
+
+Test.find().byName('test').byName('test2').orFail().exec().then(console.log);
 
 Test.count({ name: /Test/ }).exec().then((res: number) => console.log(res));
+Test.findOne({ 'docs.id': 42 }).exec().then(console.log);
 
 // ObjectId casting
 Test.find({ parent: new Types.ObjectId('0'.repeat(24)) });
@@ -41,13 +64,24 @@ Test.findOneAndUpdate({ name: 'test' }, { $set: { name: 'test2' } }).then((res: 
 Test.findOneAndUpdate({ name: 'test' }, { $inc: { age: 2 } }).then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, new: true }).then((res: ITest) => { res.name = 'test4'; });
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, returnOriginal: false }).then((res: ITest) => { res.name = 'test4'; });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { rawResult: true }).then((res) => { console.log(res.ok); });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, rawResult: true }).then((res) => { console.log(res.ok); });
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { rawResult: true }).then((res: any) => { console.log(res.ok); });
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, rawResult: true }).then((res: any) => { console.log(res.ok); });
 
 Test.findOneAndReplace({ name: 'test' }, { _id: new Types.ObjectId(), name: 'test2' }).exec().then((res: ITest | null) => console.log(res));
 
 Test.findOneAndUpdate({ name: 'test' }, { $addToSet: { tags: 'each' } });
 Test.findOneAndUpdate({ name: 'test' }, { $push: { tags: 'each' } });
+Test.findOneAndUpdate({ name: 'test' }, { $pull: { docs: { 'nested.id': 1 } } });
+
+Test.findOneAndUpdate({ name: 'test', 'docs.id': 1 }, { $pull: { 'docs.$.tags': 'foo' } });
+
+const update = Math.random() > 0.5 ? { $unset: { 'docs.0': 1 } } : { age: 55 };
+Test.findOneAndUpdate({ name: 'test' }, update);
+
+Test.findOneAndUpdate({ name: 'test' }, { $currentDate: { endDate: true } });
+Test.findOneAndUpdate({ name: 'test' }, [{ $set: { endDate: true } }]);
+
+Test.findByIdAndUpdate({ name: 'test' }, { name: 'test2' }, (err, doc) => console.log(doc));
 
 const query: Query<ITest | null, ITest> = Test.findOne();
 query instanceof Query;
@@ -55,3 +89,21 @@ query instanceof Query;
 // Chaining
 Test.findOne().where({ name: 'test' });
 Test.where().find({ name: 'test' });
+
+// Super generic query
+function testGenericQuery(): void {
+  interface CommonInterface<T> extends Document {
+    something: string;
+    content: T;
+  }
+
+  async function findSomething<T>(model: Model<CommonInterface<T>>): Promise<CommonInterface<T>> {
+    return model.findOne({ something: 'test' }).orFail().exec();
+  }
+}
+
+function eachAsync(): void {
+  Test.find().cursor().eachAsync((doc: ITest) => console.log(doc.name));
+
+  Test.find().cursor().eachAsync((docs: ITest[]) => console.log(docs[0].name), { batchSize: 2 });
+}

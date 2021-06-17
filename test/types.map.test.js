@@ -424,12 +424,12 @@ describe('Map', function() {
         const foo = yield Scene.create({ name: 'foo' });
         let event = yield Event.create({ scenes: { foo: foo._id } });
 
-        event = yield Event.findOne().populate('scenes');
+        event = yield Event.findOne().populate('scenes.$*');
         const bar = yield Scene.create({ name: 'bar' });
         event.scenes.set('bar', bar);
         yield event.save();
 
-        event = yield Event.findOne().populate('scenes');
+        event = yield Event.findOne().populate('scenes.$*');
         assert.ok(event.scenes.has('bar'));
         assert.equal(event.scenes.get('bar').name, 'bar');
       });
@@ -465,9 +465,16 @@ describe('Map', function() {
           }
         });
 
-        const doc = yield Test.findOne().populate('books.$*.author');
+        let doc = yield Test.findOne().populate('books.$*.author');
 
         assert.equal(doc.books.get('key1').author.name, 'Ian Fleming');
+
+        doc.books.set('key2', { title: 'Live and Let Die', author: person._id });
+        yield doc.save();
+
+        doc = yield Test.findOne().populate('books.$*.author');
+
+        assert.equal(doc.books.get('key2').author.name, 'Ian Fleming');
       });
     });
   });

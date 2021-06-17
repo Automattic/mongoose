@@ -10236,8 +10236,8 @@ describe('model: populate:', function() {
       yield Promise.all([rootModel.save(), modelB.save(), modelA.save()]);
 
       const modelA1 = yield ModelA.findById(modelA._id);
-      yield modelA1.populate('_modelB _rootModel').execPopulate();
-      yield modelA1.populate('_modelB._rootModel').execPopulate();
+      yield modelA1.populate('_modelB _rootModel');
+      yield modelA1.populate('_modelB._rootModel');
 
       assert.equal(modelA1._modelB._rootModel.name, 'my name');
     });
@@ -10385,7 +10385,7 @@ describe('model: populate:', function() {
       const friend = yield Cat.create({ name: 'Zildjian' });
       const myCat = yield Cat.create({ name: 'Lord Fluffles', friends: [friend.id] });
 
-      yield myCat.populate('friends').execPopulate();
+      yield myCat.populate('friends');
 
       assert.equal(myCat.friends[0].name, 'Zildjian');
     });
@@ -10464,7 +10464,7 @@ describe('model: populate:', function() {
       });
 
       const event = yield ProgrammeModel.findOne({ _id: programme1._id }).orFail().exec();
-      yield event.populate({ path: 'activities.speakers' }).execPopulate();
+      yield event.populate({ path: 'activities.speakers' });
       assert.equal(event.activities.length, 1);
       assert.equal(event.activities[0].speakers.length, 2);
       assert.equal(event.activities[0].speakers[0].dummy, '1');
@@ -10490,7 +10490,7 @@ describe('model: populate:', function() {
       const myCat = new Cat({ _id: 'arlene', name: 'Arlene', friends: [friend.id] });
       yield myCat.save();
 
-      yield myCat.populate('friends').execPopulate();
+      yield myCat.populate('friends');
       assert.equal(myCat.friends[0].name, 'Garfield');
     });
   });

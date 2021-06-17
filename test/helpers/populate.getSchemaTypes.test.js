@@ -179,7 +179,7 @@ describe('getSchemaTypes', function() {
     }));
     contentPath.discriminator('Wall', new Schema({ color: String }));
 
-    const schemaTypes = getSchemaTypes(mapSchema, null, 'tiles.enemy');
+    const schemaTypes = getSchemaTypes(null, mapSchema, null, 'tiles.enemy');
     assert.ok(Array.isArray(schemaTypes));
     assert.equal(schemaTypes.length, 1);
     assert.equal(schemaTypes[0].options.ref, 'Enemy');

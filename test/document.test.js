@@ -10283,7 +10283,8 @@ describe('document', function() {
       assert.deepEqual(Object.keys(err2.errors), ['age']);
     });
 
-    it('support `pathsToSkip` option for `Model.validate()`', () => {
+    // skip until gh-10367 is implemented
+    xit('support `pathsToSkip` option for `Model.validate()`', () => {
       return co(function*() {
         const User = getUserModel();
         const err1 = yield User.validate({}, { pathsToSkip: ['age'] });
@@ -10291,6 +10292,25 @@ describe('document', function() {
 
         const err2 = yield User.validate({}, { pathsToSkip: ['name'] });
         assert.deepEqual(Object.keys(err2.errors), ['age']);
+      });
+    });
+    it('`pathsToSkip` accepts space separated paths', () => {
+      const userSchema = Schema({
+        name: { type: String, required: true },
+        age: { type: Number, required: true },
+        country: { type: String, required: true },
+        rank: { type: String, required: true }
+      });
+
+      const User = db.model('User', userSchema);
+      return co(function* () {
+        const user = new User({ name: 'Sam', age: 26 });
+
+        const err1 = user.validateSync(null, { pathsToSkip: 'country rank' });
+        assert.ok(err1 == null);
+
+        const err2 = yield user.validate({ pathsToSkip: 'country rank' }).then(() => null, err => err);
+        assert.ok(err2 == null);
       });
     });
 

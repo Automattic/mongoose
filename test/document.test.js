@@ -10306,7 +10306,7 @@ describe('document', function() {
       return co(function* () {
         const user = new User({ name: 'Sam', age: 26 });
 
-        const err1 = user.validateSync(null, { pathsToSkip: 'country rank' });
+        const err1 = user.validateSync({ pathsToSkip: 'country rank' });
         assert.ok(err1 == null);
 
         const err2 = yield user.validate({ pathsToSkip: 'country rank' }).then(() => null, err => err);

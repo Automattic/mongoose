@@ -598,14 +598,21 @@ declare module 'mongoose' {
     updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, this>;
 
     /** Executes registered validation rules for this document. */
-    validate(pathsToValidate?: Array<string>, options?: any): Promise<void>;
+    validate(options:{ pathsToSkip?: pathsToSkip }): Promise<void>;
+    validate(pathsToValidate?: pathsToValidate, options?: any): Promise<void>;
     validate(callback: (err: CallbackError) => void): void;
-    validate(pathsToValidate: Array<string>, callback: (err: CallbackError) => void): void;
-    validate(pathsToValidate: Array<string>, options: any, callback: (err: CallbackError) => void): void;
+    validate(pathsToValidate: pathsToValidate, callback: (err: CallbackError) => void): void;
+    validate(pathsToValidate: pathsToValidate, options: any, callback: (err: CallbackError) => void): void;
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
+    validateSync(options:{pathsToSkip?: pathsToSkip, [k:string]: any }): Error.ValidationError | null;
     validateSync(pathsToValidate?: Array<string>, options?: any): Error.ValidationError | null;
   }
+
+  /** A list of paths to validate. If set, Mongoose will validate only the modified paths that are in the given list. */
+  type pathsToValidate = string[] | string;
+  /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
+  type pathsToSkip = string[] | string;
 
   interface AcceptsDiscriminator {
     /** Adds a discriminator type. */

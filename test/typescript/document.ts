@@ -16,3 +16,10 @@ void async function main() {
   const p: Promise<ITest> = doc.remove();
   await p;
 }();
+
+
+const test = new Test();
+test.validate({ pathsToSkip: ['hello'] });
+test.validate({ pathsToSkip: 'name age' });
+test.validateSync({ pathsToSkip: ['name', 'age'] });
+test.validateSync({ pathsToSkip: 'name age' });

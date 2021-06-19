@@ -368,7 +368,7 @@ declare module 'mongoose' {
   }
 
   class Document<T = any, TQueryHelpers = any> {
-    constructor(doc?: T | any);
+    constructor(doc?: any);
 
     /** This documents _id. */
     _id?: T;
@@ -936,6 +936,7 @@ declare module 'mongoose' {
      */
     returnDocument?: string;
     runValidators?: boolean;
+    sanitizeProjection?: boolean;
     /** The session associated with this query. */
     session?: mongodb.ClientSession;
     setDefaultsOnInsert?: boolean;
@@ -956,7 +957,7 @@ declare module 'mongoose' {
     writeConcern?: any;
   }
 
-  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'omitUndefined' | 'strict' | 'useFindAndModify'>;
+  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'omitUndefined' | 'strict' | 'useFindAndModify' | 'sanitizeProjection'>;
 
   interface SaveOptions {
     checkKeys?: boolean;
@@ -1073,7 +1074,7 @@ declare module 'mongoose' {
     /** apply all getters (path and virtual getters) */
     getters?: boolean;
     /** apply virtual getters (can override getters option) */
-    virtuals?: boolean;
+    virtuals?: boolean | string[];
     /** if `options.virtuals = true`, you can set `options.aliases = false` to skip applying aliases. This option is a no-op if `options.virtuals = false`. */
     aliases?: boolean;
     /** remove empty objects (defaults to true) */
@@ -1100,10 +1101,11 @@ declare module 'mongoose' {
   type ExtractMethods<M> = M extends Model<any, any, infer TMethods> ? TMethods : {};
 
   type PreMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void) => void | Promise<void>;
+  type PreSaveMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void, opts: SaveOptions) => void | Promise<void>;
   type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
   type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
 
-  class Schema<DocType = Document, M extends Model<DocType, any, any> = Model<any, any, any>, SchemaDefinitionType = undefined> extends events.EventEmitter {
+  class Schema<DocType = Document, M extends Model<DocType, any, any> = Model<any, any, any>, SchemaDefinitionType = undefined, TInstanceMethods = ExtractMethods<M>> extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -1152,11 +1154,11 @@ declare module 'mongoose' {
 
     /** Adds an instance method to documents constructed from Models compiled from this schema. */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    method(name: string, fn: (this: EnforceDocument<DocType, ExtractMethods<M>>, ...args: any[]) => any, opts?: any): this;
-    method(obj: { [name: string]: (this: EnforceDocument<DocType, ExtractMethods<M>>, ...args: any[]) => any }): this;
+    method(name: string, fn: (this: EnforceDocument<DocType, TInstanceMethods>, ...args: any[]) => any, opts?: any): this;
+    method(obj: { [name: string]: (this: EnforceDocument<DocType, TInstanceMethods>, ...args: any[]) => any }): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: { [name: string]: (this: EnforceDocument<DocType, ExtractMethods<M>>, ...args: any[]) => any };
+    methods: { [name: string]: (this: EnforceDocument<DocType, TInstanceMethods>, ...args: any[]) => any };
 
     /** The original object passed to the schema constructor */
     obj: any;
@@ -1177,8 +1179,8 @@ declare module 'mongoose' {
     plugin(fn: (schema: Schema<DocType, Model<DocType>, SchemaDefinitionType>, opts?: any) => void, opts?: any): this;
 
     /** Defines a post hook for the model. */
-    post<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T>): this;
-    post<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
+    post<T = EnforceDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T>): this;
+    post<T = EnforceDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
     post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PostMiddlewareFunction<T>): this;
     post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: PostMiddlewareFunction<T, Array<any>>): this;
@@ -1186,8 +1188,8 @@ declare module 'mongoose' {
     post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<T>): this;
     post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
 
-    post<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
-    post<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = EnforceDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = EnforceDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
@@ -1196,8 +1198,9 @@ declare module 'mongoose' {
     post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
 
     /** Defines a pre hook for the model. */
-    pre<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
-    pre<T = EnforceDocument<DocType, ExtractMethods<M>>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
+    pre<T = EnforceDocument<DocType, TInstanceMethods>>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
+    pre<T = EnforceDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
+    pre<T = EnforceDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;
@@ -1206,7 +1209,7 @@ declare module 'mongoose' {
     pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
 
     /** Object of currently defined query helpers on this schema. */
-    query: { [name: string]: <T extends QueryWithHelpers<any, EnforceDocument<DocType, ExtractMethods<M>>, ExtractQueryHelpers<M>> = QueryWithHelpers<any, EnforceDocument<DocType, ExtractMethods<M>>, ExtractQueryHelpers<M>>>(this: T, ...args: any[]) => any };
+    query: { [name: string]: <T extends QueryWithHelpers<any, EnforceDocument<DocType, TInstanceMethods>, ExtractQueryHelpers<M>> = QueryWithHelpers<any, EnforceDocument<DocType, ExtractMethods<M>>, ExtractQueryHelpers<M>>>(this: T, ...args: any[]) => any };
 
     /** Adds a method call to the queue. */
     queue(name: string, args: any[]): this;
@@ -1230,7 +1233,7 @@ declare module 'mongoose' {
     statics: { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
-    virtual(name: string, options?: any): VirtualType;
+    virtual(name: string, options?: VirtualTypeOptions): VirtualType;
 
     /** Object of currently defined virtuals on this schema */
     virtuals: any;
@@ -1251,9 +1254,9 @@ declare module 'mongoose' {
     ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
     SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
-    Schema<any> |
-    Schema<any>[] |
-    ReadonlyArray<Schema<any>> |
+    Schema<any, any> |
+    Schema<any, any>[] |
+    ReadonlyArray<Schema<any, any>> |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
     ReadonlyArray<SchemaTypeOptions<T extends undefined ? any : T>> |
     Function[] |
@@ -1432,13 +1435,13 @@ declare module 'mongoose' {
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | boolean | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends Schema ? T :
+      T extends Schema<any, any> ? T :
       T extends object[] ? (Schema<Document<Unpacked<T>>>[] | ReadonlyArray<Schema<Document<Unpacked<T>>>>) :
       T extends string[] ? (SchemaDefinitionWithBuiltInClass<string>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<string>>) :
       T extends number[] ? (SchemaDefinitionWithBuiltInClass<number>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<number>>) :
       T extends boolean[] ? (SchemaDefinitionWithBuiltInClass<boolean>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<boolean>>) :
       T extends Function[] ? (SchemaDefinitionWithBuiltInClass<Function>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<Function>>) :
-      T | typeof SchemaType | Schema;
+      T | typeof SchemaType | Schema<any, any>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;
@@ -1519,7 +1522,7 @@ declare module 'mongoose' {
     set?: (value: T, schematype?: this) => any;
 
     /** array of allowed values for this path. Allowed for strings, numbers, and arrays of strings */
-    enum?: Array<string | number | null> | ReadonlyArray<string | number | null> | { [path: string]: string | number | null };
+    enum?: Array<string | number | null> | ReadonlyArray<string | number | null> | { values: Array<string | number | null> | ReadonlyArray<string | number | null>, message?: string } | { [path: string]: string | number | null };
 
     /** The default [subtype](http://bsonspec.org/spec.html) associated with this buffer when it is stored in MongoDB. Only allowed for buffer paths */
     subtype?: number
@@ -1623,17 +1626,64 @@ declare module 'mongoose' {
     validator: ValidateFn<T> | LegacyAsyncValidateFn<T> | AsyncValidateFn<T>;
   }
 
+  interface VirtualTypeOptions {
+    /** If `ref` is not nullish, this becomes a populated virtual. */
+    ref?: string | Function;
+
+    /**  The local field to populate on if this is a populated virtual. */
+    localField?: string | Function;
+
+    /** The foreign field to populate on if this is a populated virtual. */
+    foreignField?: string | Function;
+
+    /**
+     * By default, a populated virtual is an array. If you set `justOne`,
+     * the populated virtual will be a single doc or `null`.
+     */
+    justOne?: boolean;
+
+    /** If you set this to `true`, Mongoose will call any custom getters you defined on this virtual. */
+    getters?: boolean;
+
+    /**
+     * If you set this to `true`, `populate()` will set this virtual to the number of populated
+     * documents, as opposed to the documents themselves, using `Query#countDocuments()`.
+     */
+    count?: boolean;
+
+    /** Add an extra match condition to `populate()`. */
+    match?: FilterQuery<any> | Function;
+
+    /** Add a default `limit` to the `populate()` query. */
+    limit?: number;
+
+    /** Add a default `skip` to the `populate()` query. */
+    skip?: number;
+
+    /**
+     * For legacy reasons, `limit` with `populate()` may give incorrect results because it only
+     * executes a single query for every document being populated. If you set `perDocumentLimit`,
+     * Mongoose will ensure correct `limit` per document by executing a separate query for each
+     * document to `populate()`. For example, `.find().populate({ path: 'test', perDocumentLimit: 2 })`
+     * will execute 2 additional queries if `.find()` returns 2 documents.
+     */
+    perDocumentLimit?: number;
+
+    /** Additional options like `limit` and `lean`. */
+    options?: QueryOptions;
+  }
+
   class VirtualType {
     /** Applies getters to `value`. */
     applyGetters(value: any, doc: Document): any;
+
     /** Applies setters to `value`. */
     applySetters(value: any, doc: Document): any;
 
     /** Adds a custom getter to this virtual. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     get(fn: Function): this;
+
     /** Adds a custom setter to this virtual. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     set(fn: Function): this;
   }
 
@@ -2382,10 +2432,12 @@ declare module 'mongoose' {
     T extends TreatAsPrimitives ? T : // primitives
     LeanDocument<T>; // Documents and everything else
 
+  type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
+
   export type _LeanDocument<T> = {
     [K in keyof T]:
     0 extends (1 & T[K]) ? T[K] : // any
-    T[K] extends unknown[] ? LeanType<T[K][number]>[] : // Array
+    T[K] extends unknown[] ? LeanArray<T[K]> : // Array
     T[K] extends Document ? LeanDocument<T[K]> : // Subdocument
     T[K];
   };
@@ -2763,7 +2815,7 @@ declare module 'mongoose' {
     export class ValidationError extends Error {
       name: 'ValidationError';
 
-      errors: { [path: string]: ValidatorError | CastError };
+      errors: { [path: string]: ValidatorError | CastError | ValidationError };
     }
 
     export class ValidatorError extends Error {

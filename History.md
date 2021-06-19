@@ -1,3 +1,32 @@
+5.12.14 / 2021-06-15
+====================
+ * fix(schema): check that schema type is an object when setting isUnderneathDocArray #10361 [vmo-khanus](https://github.com/vmo-khanus)
+ * fix(document): avoid infinite recursion when setting single nested subdoc to array #10351
+ * fix(populate): allow populating nested path in schema using `Model.populate()` #10335
+ * fix(drivers): emit operation-start/operation-end events to allow inspecting when operations start and end
+ * fix(index.d.ts): improve typings for virtuals #10350 [thiagokisaki](https://github.com/thiagokisaki)
+ * fix(index.d.ts): correct constructor type for Document #10328
+ * fix(index.d.ts): add `ValidationError` as a possible type for `ValidationError#errors` #10320 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix: remove unnecessary async devDependency that's causing npm audit warnings #10281
+ * docs(typescript): add schemas guide #10308
+ * docs(model): add options parameter description to `Model.exists()` #10336 [Aminoiz](https://github.com/Aminoiz)
+
+5.12.13 / 2021-06-04
+====================
+ * perf(document): avoid creating nested paths when running `$getAllSubdocs()` #10275
+ * fix: make returnDocument option work with `findOneAndUpdate()` #10232 #10231 [cnwangjie](https://github.com/cnwangjie)
+ * fix(document): correctly reset subdocument when resetting a map subdocument underneath a single nested subdoc after save #10295
+ * perf(query): avoid setting non-null sessions to avoid overhead from $getAllSubdocs() #10275
+ * perf(document): pre split schematype paths when compiling schema to avoid extra overhead of splitting when hydrating documents #10275
+ * perf(schema): pre-calculate mapPaths to avoid looping over every path for each path when initing doc #10275
+ * fix(index.d.ts): drill down into nested arrays when creating LeanDocument type #10293
+
+5.12.12 / 2021-05-28
+====================
+ * fix(documentarray): retain atomics when setting to a new array #10272
+ * fix(query+model): fix deprecation warning for `returnOriginal` with `findOneAndUpdate()` #10298 #10297 #10292 #10285 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(index.d.ts): make `map()` result an array if used over an array #10288 [quantumsheep](https://github.com/quantumsheep)
+
 5.12.11 / 2021-05-24
 ====================
  * fix(populate): skip applying setters when casting arrays for populate() to avoid issues with arrays of immutable elements #10264

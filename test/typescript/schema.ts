@@ -19,6 +19,7 @@ interface Movie {
   rating?: number,
   genre?: string,
   actionIntensity?: number,
+  status?: string,
   actors?: Actor[]
 }
 
@@ -51,6 +52,13 @@ const movieSchema = new Schema<Document<Movie>, Model<Document<Movie>>, Movie>({
       },
       'Action intensity required for action genre'
     ]
+  },
+  status: {
+    type: String,
+    enum: {
+      values: ['Announced', 'Released'],
+      message: 'Invalid value for `status`'
+    }
   },
   actors: {
     type: [actorSchema],
@@ -114,4 +122,28 @@ function gh10261() {
       required: true
     }
   };
+}
+
+function gh10287() {
+  interface SubSchema {
+    testProp: string;
+  }
+
+  const subSchema = new Schema<Document & SubSchema, Model<Document & SubSchema>, SubSchema>({
+    testProp: Schema.Types.String
+  });
+
+  interface MainSchema {
+    subProp: SubSchema
+  }
+
+  const mainSchema1 = new Schema<Document & MainSchema, Model<Document & MainSchema>, MainSchema>({
+    subProp: subSchema
+  });
+
+  const mainSchema2 = new Schema<Document & MainSchema, Model<Document & MainSchema>, MainSchema>({
+    subProp: {
+      type: subSchema
+    }
+  });
 }

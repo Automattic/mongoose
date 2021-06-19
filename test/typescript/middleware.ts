@@ -1,4 +1,4 @@
-import { Schema, model, Model, Document, Types, Query, Aggregate } from 'mongoose';
+import { Schema, model, Model, Document, SaveOptions, Query, Aggregate } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
@@ -20,6 +20,11 @@ schema.post<Aggregate<any>>('aggregate', async function(res: Array<any>) {
 
 schema.pre(['save', 'validate'], { query: false, document: true }, async function applyChanges() {
   await Test.findOne({});
+});
+
+schema.pre('save', function(next, opts: SaveOptions) {
+  console.log(opts.session);
+  next();
 });
 
 interface ITest extends Document {

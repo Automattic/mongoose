@@ -707,4 +707,28 @@ describe('types.documentarray', function() {
       then(() => Model.findById(doc)).
       then(doc => assert.deepEqual(doc.toObject().subDocArray, [{ name: 'foo' }]));
   });
+
+  it('keeps atomics after setting (gh-10272)', function() {
+    const MyChildSchema = new Schema({
+      name: String
+    });
+
+    const MyModelSchema = new Schema({
+      children: [MyChildSchema]
+    });
+
+    const Test = db.model('Test', MyModelSchema);
+
+    const doc = new Test();
+    doc.init({
+      children: [{ name: 'John' }, { name: 'Jane' }]
+    });
+
+    doc.children = [{ name: 'John' }];
+    doc.children = doc.children.concat([]);
+    doc.children.push({ name: 'Mary' });
+
+    assert.ok(doc.children.$atomics().$set);
+    assert.deepEqual(doc.children.$atomics().$set.map(v => v.name), ['John', 'Mary']);
+  });
 });

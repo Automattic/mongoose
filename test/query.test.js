@@ -2404,28 +2404,15 @@ describe('Query', function() {
       });
 
       it('throw on sync exceptions in callbacks (gh-6178)', function(done) {
-        const async = require('async');
         const schema = new Schema({});
         const Test = db.model('Test', schema);
 
         process.once('uncaughtException', err => {
-          assert.equal(err.message, 'woops');
+          assert.equal(err.message, 'Oops!');
           done();
         });
 
-        async.waterfall([
-          function(cb) {
-            Test.create({}, cb);
-          },
-          function(res, cb) {
-            Test.find({}, function() { cb(); });
-          },
-          function() {
-            throw new Error('woops');
-          }
-        ], function() {
-          assert.ok(false);
-        });
+        Test.find({}, function() { throw new Error('Oops!'); });
       });
     });
 
@@ -3812,5 +3799,19 @@ describe('Query', function() {
       const entry = yield Test.create({ _id: 12345678, op: 'help', size: 54, totalSize: 104 });
       yield entry.save();
     });
+  });
+
+  it('sanitizeProjection option (gh-10243)', function() {
+    const MySchema = Schema({ name: String, email: String });
+    const Test = db.model('Test', MySchema);
+
+    let q = Test.find().select({ email: '$name' });
+    assert.deepEqual(q._fields, { email: '$name' });
+
+    q = Test.find().setOptions({ sanitizeProjection: true }).select({ email: '$name' });
+    assert.deepEqual(q._fields, { email: 1 });
+
+    q = Test.find().select({ email: '$name' }).setOptions({ sanitizeProjection: true });
+    assert.deepEqual(q._fields, { email: 1 });
   });
 });

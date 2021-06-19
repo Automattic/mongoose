@@ -10256,28 +10256,54 @@ describe('document', function() {
       assert.equal(validatorCallCount, 0);
     });
   });
-  it('support `pathsToSkip` option for `validate()` (feat-10230)', function() {
-    const schema = Schema({
-      name: {
-        type: String,
-        required: true
-      },
-      age: {
-        type: Number,
-        required: true
-      },
-      rank: String
+
+  describe('pathsToSkip (gh-10230)', () => {
+    it('support `pathsToSkip` option for `Document#validate()`', function() {
+      return co(function*() {
+        const User = getUserModel();
+        const user = new User();
+
+        const err1 = yield user.validate({ pathsToSkip: ['age'] }).then(() => null, err => err);
+        assert.deepEqual(Object.keys(err1.errors), ['name']);
+
+        const err2 = yield user.validate({ pathsToSkip: ['name'] }).then(() => null, err => err);
+        assert.deepEqual(Object.keys(err2.errors), ['age']);
+      });
     });
-    const Model = db.model('Test', schema);
 
-    return co(function*() {
-      const doc = new Model({});
+    it('support `pathsToSkip` option for `Document#validateSync()`', () => {
+      const User = getUserModel();
 
-      let err = yield doc.validate({ pathsToSkip: ['age'] }).catch(err => err);
-      assert.deepEqual(Object.keys(err.errors), ['name']);
+      const user = new User();
 
-      err = yield doc.validate({ pathsToSkip: ['name'] }).catch(err => err);
-      assert.deepEqual(Object.keys(err.errors), ['age']);
+      const err1 = user.validateSync({ pathsToSkip: ['age'] });
+      assert.deepEqual(Object.keys(err1.errors), ['name']);
+
+      const err2 = user.validateSync({ pathsToSkip: ['name'] });
+      assert.deepEqual(Object.keys(err2.errors), ['age']);
     });
+
+    it('support `pathsToSkip` option for `Model.validate()`', () => {
+      return co(function*() {
+        const User = getUserModel();
+        const err1 = yield User.validate({}, { pathsToSkip: ['age'] });
+        assert.deepEqual(Object.keys(err1.errors), ['name']);
+
+        const err2 = yield User.validate({}, { pathsToSkip: ['name'] });
+        assert.deepEqual(Object.keys(err2.errors), ['age']);
+      });
+    });
+
+    function getUserModel() {
+      const userSchema = Schema({
+        name: { type: String, required: true },
+        age: { type: Number, required: true },
+        rank: String
+      });
+
+      const User = db.model('User', userSchema);
+      return User;
+    }
   });
+
 });

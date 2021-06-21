@@ -2562,6 +2562,12 @@ declare module 'mongoose' {
      */
     model(model: any): this;
 
+    /**
+     * Append a new $near operator to this aggregation pipeline
+     * @param arg $near operator contents
+     */
+    near(arg: { near?: number[]; distanceField: string; maxDistance?: number; query?: Record<string, any>; includeLocs?: string; num?: number; uniqueDocs?: boolean }): this;
+
     /** Returns the current pipeline */
     pipeline(): any[];
 

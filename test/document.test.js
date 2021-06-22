@@ -10323,43 +10323,69 @@ describe('document', function() {
     });
   });
 
-  it('supports passing a list of virtuals to `toObject()` (gh-10120)', function() {
-    const schema = new mongoose.Schema({
-      name: String,
-      age: Number,
-      nested: {
-        test: String
-      }
+  describe('virtuals `pathsToSkip` (gh-10120)', () => {
+    it('adds support for `pathsToSkip` for virtuals feat-10120', function() {
+      const schema = new mongoose.Schema({
+        name: String,
+        age: Number,
+        nested: {
+          test: String
+        }
+      });
+      schema.virtual('nameUpper').get(function() { return this.name.toUpperCase(); });
+      schema.virtual('answer').get(() => 42);
+      schema.virtual('nested.hello').get(() => 'world');
+
+      const Model = db.model('Person', schema);
+      const doc = new Model({ name: 'Jean-Luc Picard', age: 59, nested: { test: 'hello' } });
+      let obj = doc.toObject({ virtuals: { pathsToSkip: ['answer'] } });
+      assert.ok(obj.nameUpper);
+      assert.equal(obj.answer, null);
+      assert.equal(obj.nested.hello, 'world');
+      obj = doc.toObject({ virtuals: { pathsToSkip: ['nested.hello'] } });
+      assert.equal(obj.nameUpper, 'JEAN-LUC PICARD');
+      assert.equal(obj.answer, 42);
+      assert.equal(obj.nested.hello, null);
     });
-    schema.virtual('nameUpper').get(function() { return this.name.toUpperCase(); });
-    schema.virtual('answer').get(() => 42);
-    schema.virtual('nested.hello').get(() => 'world');
 
-    const Model = db.model('Person', schema);
+    it('supports passing a list of virtuals to `toObject()` (gh-10120)', function() {
+      const schema = new mongoose.Schema({
+        name: String,
+        age: Number,
+        nested: {
+          test: String
+        }
+      });
+      schema.virtual('nameUpper').get(function() { return this.name.toUpperCase(); });
+      schema.virtual('answer').get(() => 42);
+      schema.virtual('nested.hello').get(() => 'world');
 
-    const doc = new Model({ name: 'Jean-Luc Picard', age: 59, nested: { test: 'hello' } });
+      const Model = db.model('Person', schema);
 
-    let obj = doc.toObject({ virtuals: true });
-    assert.equal(obj.nameUpper, 'JEAN-LUC PICARD');
-    assert.equal(obj.answer, 42);
-    assert.equal(obj.nested.hello, 'world');
+      const doc = new Model({ name: 'Jean-Luc Picard', age: 59, nested: { test: 'hello' } });
 
-    obj = doc.toObject({ virtuals: ['answer'] });
-    assert.ok(!obj.nameUpper);
-    assert.equal(obj.answer, 42);
-    assert.equal(obj.nested.hello, null);
+      let obj = doc.toObject({ virtuals: true });
+      assert.equal(obj.nameUpper, 'JEAN-LUC PICARD');
+      assert.equal(obj.answer, 42);
+      assert.equal(obj.nested.hello, 'world');
 
-    obj = doc.toObject({ virtuals: ['nameUpper'] });
-    assert.equal(obj.nameUpper, 'JEAN-LUC PICARD');
-    assert.equal(obj.answer, null);
-    assert.equal(obj.nested.hello, null);
+      obj = doc.toObject({ virtuals: ['answer'] });
+      assert.ok(!obj.nameUpper);
+      assert.equal(obj.answer, 42);
+      assert.equal(obj.nested.hello, null);
 
-    obj = doc.toObject({ virtuals: ['nested.hello'] });
-    assert.equal(obj.nameUpper, null);
-    assert.equal(obj.answer, null);
-    assert.equal(obj.nested.hello, 'world');
+      obj = doc.toObject({ virtuals: ['nameUpper'] });
+      assert.equal(obj.nameUpper, 'JEAN-LUC PICARD');
+      assert.equal(obj.answer, null);
+      assert.equal(obj.nested.hello, null);
+
+      obj = doc.toObject({ virtuals: ['nested.hello'] });
+      assert.equal(obj.nameUpper, null);
+      assert.equal(obj.answer, null);
+      assert.equal(obj.nested.hello, 'world');
+    });
   });
-  describe('pathsToSkip (gh-10230)', () => {
+  describe('validation `pathsToSkip` (gh-10230)', () => {
     it('support `pathsToSkip` option for `Document#validate()`', function() {
       return co(function*() {
         const User = getUserModel();
@@ -10430,29 +10456,6 @@ describe('document', function() {
       });
     });
 
-    it('adds support for `pathsToSkip` for virtuals feat-10120', function() {
-      const schema = new mongoose.Schema({
-        name: String,
-        age: Number,
-        nested: {
-          test: String
-        }
-      });
-      schema.virtual('nameUpper').get(function() { return this.name.toUpperCase(); });
-      schema.virtual('answer').get(() => 42);
-      schema.virtual('nested.hello').get(() => 'world');
-
-      const Model = db.model('Person', schema);
-      const doc = new Model({ name: 'Jean-Luc Picard', age: 59, nested: { test: 'hello' } });
-      let obj = doc.toObject({ virtuals: { pathsToSkip: ['answer'] } });
-      assert.ok(obj.nameUpper);
-      assert.equal(obj.answer, null);
-      assert.equal(obj.nested.hello, 'world');
-      obj = doc.toObject({ virtuals: { pathsToSkip: ['nested.hello'] } });
-      assert.equal(obj.nameUpper, 'JEAN-LUC PICARD');
-      assert.equal(obj.answer, 42);
-      assert.equal(obj.nested.hello, null);
-    });
 
     function getUserModel() {
       const userSchema = Schema({
@@ -10465,4 +10468,5 @@ describe('document', function() {
       return User;
     }
   });
+
 });

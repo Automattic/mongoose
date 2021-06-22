@@ -7,6 +7,11 @@ This guide will get you started using transactions with Mongoose.
 
 <h2 id="getting-started-with-transactions"><a href="#getting-started-with-transactions">Getting Started with Transactions</a></h2>
 
+If you haven't already, import mongoose:
+```javascript
+import mongoose from 'mongoose';
+```
+
 To create a transaction, you first need to create a session using or [`Mongoose#startSession`](/docs/api/mongoose.html#mongoose_Mongoose-startSession)
 or [`Connection#startSession()`](/docs/api/connection.html#connection_Connection-startSession).
 

@@ -25,6 +25,8 @@ in isolation and potentially undo all the operations if one of them fails.
 This guide will get you started using transactions with Mongoose.</p>
 <h2 id="getting-started-with-transactions"><a href="#getting-started-with-transactions">Getting Started with Transactions</a></h2>
 
+<p>If you haven&#39;t already, import mongoose:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> mongoose <span class="hljs-keyword">from</span> <span class="hljs-string">'mongoose'</span>;</code></pre>
 <p>To create a transaction, you first need to create a session using or <a href="/docs/api/mongoose.html#mongoose_Mongoose-startSession"><code>Mongoose#startSession</code></a>
 or <a href="/docs/api/connection.html#connection_Connection-startSession"><code>Connection#startSession()</code></a>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> session = <span class="hljs-keyword">await</span> mongoose.startSession();</code></pre>

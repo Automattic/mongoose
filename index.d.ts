@@ -1975,7 +1975,14 @@ declare module 'mongoose' {
     box(val: any): this;
     box(lower: number[], upper: number[]): this;
 
-    cast(model: Model<any, THelpers> | null, obj: any): UpdateQuery<DocType>;
+    /**
+     * Casts this query to the schema of `model`.
+     *
+     * @param {Model} [model] the model to cast to. If not set, defaults to `this.model`
+     * @param {Object} [obj] If not set, defaults to this query's conditions
+     * @return {Object} the casted `obj`
+     */
+    cast(model?: Model<any, THelpers> | null, obj?: any): any;
 
     /**
      * Executes the query returning a `Promise` which will be

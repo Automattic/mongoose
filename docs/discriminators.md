@@ -15,7 +15,7 @@ key (defaults to the model name). It returns a model whose schema
 is the union of the base schema and the discriminator schema.
 
 ```javascript
-[require:The `model.discriminator()` function]
+[require:The model.discriminator()]
 ```
 
 ### Discriminators save to the Event model's collection

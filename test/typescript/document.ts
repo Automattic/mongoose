@@ -15,8 +15,8 @@ void async function main() {
 
   const p: Promise<ITest> = doc.remove();
   await p;
-
 }();
+
 
 void async function run() {
   const user = new Test({ name: {}, address: {} });
@@ -25,3 +25,11 @@ void async function run() {
     const _error: Error.ValidationError = error.errors.address as Error.ValidationError;
   }
 }();
+
+(function() {
+  const test = new Test();
+  test.validate({ pathsToSkip: ['hello'] });
+  test.validate({ pathsToSkip: 'name age' });
+  test.validateSync({ pathsToSkip: ['name', 'age'] });
+  test.validateSync({ pathsToSkip: 'name age' });
+})();

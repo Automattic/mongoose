@@ -68,6 +68,11 @@ pkg.version = getVersion();
 pkg.latest4x = getLatestLegacyVersion('4.');
 pkg.latest38x = getLatestLegacyVersion('3.8');
 
+// Create api dir if it doesn't already exist
+try {
+  fs.mkdirSync('./docs/api');
+} catch (err) {}
+
 require('./docs/splitApiDocs');
 const filemap = Object.assign({}, require('./docs/source'), require('./docs/tutorials'), require('./docs/typescript'));
 const files = Object.keys(filemap);

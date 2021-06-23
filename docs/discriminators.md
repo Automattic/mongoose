@@ -15,6 +15,16 @@ key (defaults to the model name). It returns a model whose schema
 is the union of the base schema and the discriminator schema.
 
 ```javascript
+const db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+const eventSchema = new mongoose.Schema({ time: Date });
+Event = db.model('_event', eventSchema);
+ClickedLinkEvent = Event.discriminator('ClickedLink',
+  new mongoose.Schema({ url: String }));
+SignedUpEvent = Event.discriminator('SignedUp',
+  new mongoose.Schema({ username: String }));
+```
+
+```javascript
 [require:The model.discriminator()]
 ```
 

@@ -83,13 +83,6 @@ describe('discriminator docs', function() {
     const event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
     const event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
 
-    /*
-    const save = function(doc, callback) {
-      doc.save(function(error, doc) {
-        callback(error, doc);
-      });
-    }; */
-
     Promise.all([event1.save(), event2.save(), event3.save()]).
       then(() => Event.countDocuments()).
       then(count => {

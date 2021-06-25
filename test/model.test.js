@@ -6755,6 +6755,22 @@ describe('Model', function() {
       assert.ifError(err);
     });
   });
+  it('Model.validate(...) uses object as context by default (gh-10346)', () => {
+    return co(function* () {
+      const userSchema = new mongoose.Schema({
+        name: { type: String, required: true },
+        age: { type: Number, required() {return this && this.name === 'John';} }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const err1 = yield User.validate({ name: 'John' }).then(() => null, err => err);
+      assert.ok(err1);
+
+      const err2 = yield User.validate({ name: 'Sam' }).then(() => null, err => err);
+      assert.ok(err2 === null);
+    });
+  });
 
   it('sets correct `Document#op` with `save()` (gh-8439)', function() {
     const schema = Schema({ name: String });

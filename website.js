@@ -71,7 +71,7 @@ pkg.latest38x = getLatestLegacyVersion('3.8');
 // Create api dir if it doesn't already exist
 try {
   fs.mkdirSync('./docs/api');
-} catch (err) {}
+} catch (err) {} // eslint-disable-line no-empty
 
 require('./docs/splitApiDocs');
 const filemap = Object.assign({}, require('./docs/source'), require('./docs/tutorials'), require('./docs/typescript'));

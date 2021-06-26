@@ -4,12 +4,10 @@
  * Module dependencies.
  */
 
-const Server = require('mongodb-topology-manager').Server;
 const mongoose = require('../');
 const Collection = mongoose.Collection;
 const assert = require('assert');
 
-let server;
 const collectionNames = new Map();
 
 if (process.env.D === '1') {
@@ -192,15 +190,6 @@ function dropDBs(done) {
   });
 }
 
-before(function() {
-  return server.purge();
-});
-
-after(function() {
-  this.timeout(15000);
-
-  return server.stop();
-});
 
 before(function(done) {
   this.timeout(10 * 1000);
@@ -212,12 +201,6 @@ after(function(done) {
 
   // Give `dropDatabase()` some time to run
   setTimeout(() => done(), 250);
-});
-
-module.exports.server = server = new Server('mongod', {
-  bind_ip: '127.0.0.1',
-  port: 27000,
-  dbpath: './data/db/27000'
 });
 
 beforeEach(function() {

@@ -12,8 +12,9 @@ declare module 'mongoose' {
     uninitialized = 99,
   }
 
-  /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
   class NativeDate extends global.Date {}
+
+  /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
   export type Date = Schema.Types.Date;
 
   /**

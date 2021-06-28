@@ -566,6 +566,7 @@ declare module 'mongoose' {
 
     /** Sends a replaceOne command with this document `_id` as the query selector. */
     replaceOne(replacement?: DocumentDefinition<this>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, this>;
+    replaceOne(replacement?: Object, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, this>;
 
     /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
     save(options?: SaveOptions): Promise<this>;
@@ -859,6 +860,7 @@ declare module 'mongoose' {
 
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
     replaceOne(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<any, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    replaceOne(filter?: FilterQuery<T>, replacement?: Object, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<any, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Schema the model uses. */
     schema: Schema;
@@ -1974,7 +1976,14 @@ declare module 'mongoose' {
     box(val: any): this;
     box(lower: number[], upper: number[]): this;
 
-    cast(model: Model<any, THelpers> | null, obj: any): UpdateQuery<DocType>;
+    /**
+     * Casts this query to the schema of `model`.
+     *
+     * @param {Model} [model] the model to cast to. If not set, defaults to `this.model`
+     * @param {Object} [obj] If not set, defaults to this query's conditions
+     * @return {Object} the casted `obj`
+     */
+    cast(model?: Model<any, THelpers> | null, obj?: any): any;
 
     /**
      * Executes the query returning a `Promise` which will be
@@ -2238,6 +2247,7 @@ declare module 'mongoose' {
      * not accept any [atomic](https://docs.mongodb.com/manual/tutorial/model-data-for-atomic-operations/#pattern) operators (`$set`, etc.)
      */
     replaceOne(filter?: FilterQuery<DocType>, replacement?: DocumentDefinition<DocType>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
+    replaceOne(filter?: FilterQuery<DocType>, replacement?: Object, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<any, DocType, THelpers>;
 
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
     select(arg: string | any): this;
@@ -2560,6 +2570,12 @@ declare module 'mongoose' {
      */
     model(model: any): this;
 
+    /**
+     * Append a new $near operator to this aggregation pipeline
+     * @param arg $near operator contents
+     */
+    near(arg: { near?: number[]; distanceField: string; maxDistance?: number; query?: Record<string, any>; includeLocs?: string; num?: number; uniqueDocs?: boolean }): this;
+
     /** Returns the current pipeline */
     pipeline(): any[];
 
@@ -2835,7 +2851,7 @@ declare module 'mongoose' {
 
   /** Deprecated types for backwards compatibility. */
 
-  /** Alias for QueryOptions for backwards compatability. */
+  /** Alias for QueryOptions for backwards compatibility. */
   type ModelUpdateOptions = QueryOptions;
 
   type DocumentQuery<ResultType, DocType extends Document, THelpers = {}> = Query<ResultType, DocType, THelpers>;

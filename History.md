@@ -1,3 +1,12 @@
+5.12.15 / 2021-06-25
+====================
+ * fix(index.d.ts): add extra TInstanceMethods generic param to `Schema` for cases when we can't infer from Model #10358
+ * fix(index.d.ts): added typings for near() in model aggregation #10373 [tbhaxor](https://github.com/tbhaxor)
+ * fix(index.d.ts): correct function signature for `Query#cast()` #10388 [lkho](https://github.com/lkho)
+ * docs(transactions): add import statement #10365 [JimLynchCodes](https://github.com/JimLynchCodes)
+ * docs(schema): add missing `discriminatorKey` schema option #10386 #10376 [IslandRhythms](https://github.com/IslandRhythms)
+ * docs(index.d.ts): fix typo #10363 [houssemchebeb](https://github.com/houssemchebeb)
+
 5.12.14 / 2021-06-15
 ====================
  * fix(schema): check that schema type is an object when setting isUnderneathDocArray #10361 [vmo-khanus](https://github.com/vmo-khanus)

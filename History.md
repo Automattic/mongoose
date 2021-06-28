@@ -1,3 +1,13 @@
+5.13.0 / 2021-06-28
+===================
+ * feat(query): add sanitizeProjection option to opt in to automatically sanitizing untrusted query projections #10243
+ * feat(model): add `bulkSave()` function that saves multiple docs in 1 `bulkWrite()` #9727 #9673 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(document): allow passing a list of virtuals or `pathsToSkip` to apply in `toObject()` and `toJSON()` #10120
+ * fix(model): make Model.validate use object under validation as context by default #10360 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(document): add support for pathsToSkip in validate and validateSync #10375 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(model): add `diffIndexes()` function that calculates what indexes `syncIndexes()` will create/drop without actually executing any changes #10362 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(document): avoid using sessions that have ended, so you can use documents that were loaded in the session after calling `endSession()` #10306
+
 5.12.15 / 2021-06-25
 ====================
  * fix(index.d.ts): add extra TInstanceMethods generic param to `Schema` for cases when we can't infer from Model #10358

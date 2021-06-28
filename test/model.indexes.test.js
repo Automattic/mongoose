@@ -683,5 +683,19 @@ describe('model', function() {
         yield User.collection.drop();
       });
     });
+    it('should do a dryRun feat-10316', function() {
+      return co(function*() {
+        const userSchema = new mongoose.Schema({ username: String }, { password: String }, { email: String });
+        const User = db.model('Upson', userSchema);
+        yield User.collection.createIndex({ age: 1 });
+        yield User.collection.createIndex({ weight: 1 });
+        yield User.init();
+        userSchema.index({ password: 1 });
+        userSchema.index({ email: 1 });
+        const result = yield User.diffIndexes();
+        assert.deepStrictEqual(result.toDrop, ['age_1', 'weight_1']);
+        assert.deepStrictEqual(result.toCreate, [{ password: 1 }, { email: 1 }]);
+      });
+    });
   });
 });

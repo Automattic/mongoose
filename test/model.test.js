@@ -22,6 +22,7 @@ const EmbeddedDocument = mongoose.Types.Embedded;
 const MongooseError = mongoose.Error;
 
 describe('Model', function() {
+
   let db;
   let Comments;
   let BlogPost;
@@ -6754,6 +6755,22 @@ describe('Model', function() {
       assert.ifError(err);
     });
   });
+  it('Model.validate(...) uses object as context by default (gh-10346)', () => {
+    return co(function* () {
+      const userSchema = new mongoose.Schema({
+        name: { type: String, required: true },
+        age: { type: Number, required() {return this && this.name === 'John';} }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const err1 = yield User.validate({ name: 'John' }).then(() => null, err => err);
+      assert.ok(err1);
+
+      const err2 = yield User.validate({ name: 'Sam' }).then(() => null, err => err);
+      assert.ok(err2 === null);
+    });
+  });
 
   it('sets correct `Document#op` with `save()` (gh-8439)', function() {
     const schema = Schema({ name: String });
@@ -7157,6 +7174,338 @@ describe('Model', function() {
       });
     });
   });
+
+  describe('buildBulkWriteOperations() (gh-9673)', () => {
+    it('builds write operations', () => {
+      return co(function*() {
+
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+        const users = [
+          new User({ name: 'Hafez1_gh-9673-1' }),
+          new User({ name: 'Hafez2_gh-9673-1' }),
+          new User({ name: 'I am the third name' })
+        ];
+
+        yield users[2].save();
+        users[2].name = 'I am the updated third name';
+
+        const writeOperations = User.buildBulkWriteOperations(users);
+
+        const desiredWriteOperations = [
+          { insertOne: { document: users[0] } },
+          { insertOne: { document: users[1] } },
+          { updateOne: { filter: { _id: users[2]._id }, update: { $set: { name: 'I am the updated third name' } } } }
+        ];
+
+        assert.deepEqual(
+          writeOperations,
+          desiredWriteOperations
+        );
+      });
+    });
+
+    it('throws an error when one document is invalid', () => {
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const users = [
+        new User({ name: 'a' }),
+        new User({ name: 'Hafez2_gh-9673-1' }),
+        new User({ name: 'b' })
+      ];
+
+      let err;
+      try {
+        User.buildBulkWriteOperations(users);
+      } catch (error) {
+        err = error;
+      }
+
+
+      assert.ok(err);
+    });
+
+    it('throws an error if documents is not an array', function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+
+      assert.throws(
+        function() {
+          User.buildBulkWriteOperations(null);
+        },
+        /bulkSave expects an array of documents to be passed/
+      );
+    });
+    it('throws an error if one element is not a document', function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+
+      assert.throws(
+        function() {
+          User.buildBulkWriteOperations([
+            new User({ name: 'Hafez' }),
+            { name: 'I am not a document' }
+          ]);
+        },
+        /documents\.1 was not a mongoose document/
+      );
+    });
+    it('skips validation when given `skipValidation` true', () => {
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const users = [
+        new User({ name: 'a' }),
+        new User({ name: 'Hafez2_gh-9673-1' }),
+        new User({ name: 'b' })
+      ];
+
+      const writeOperations = User.buildBulkWriteOperations(users, { skipValidation: true });
+
+      assert.equal(writeOperations.length, 3);
+    });
+  });
+
+  describe('bulkSave() (gh-9673)', function() {
+    it('saves new documents', function() {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+
+        yield User.bulkSave([
+          new User({ name: 'Hafez1_gh-9673-1' }),
+          new User({ name: 'Hafez2_gh-9673-1' })
+        ]);
+
+        const users = yield User.find().sort('name');
+
+        assert.deepEqual(
+          users.map(user => user.name),
+          [
+            'Hafez1_gh-9673-1',
+            'Hafez2_gh-9673-1'
+          ]
+        );
+      });
+    });
+
+    it('updates documents', function() {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+
+        yield User.insertMany([
+          new User({ name: 'Hafez1_gh-9673-2' }),
+          new User({ name: 'Hafez2_gh-9673-2' })
+        ]);
+
+        const users = yield User.find().sort('name');
+
+        users[0].name = 'Hafez1_gh-9673-2-updated';
+        users[1].name = 'Hafez2_gh-9673-2-updated';
+
+        yield User.bulkSave(users);
+
+        const usersAfterUpdate = yield User.find().sort('name');
+
+        assert.deepEqual(
+          usersAfterUpdate.map(user => user.name),
+          [
+            'Hafez1_gh-9673-2-updated',
+            'Hafez2_gh-9673-2-updated'
+          ]
+        );
+      });
+    });
+
+    it('returns writeResult on success', () => {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+
+        yield User.insertMany([
+          new User({ name: 'Hafez1_gh-9673-2' }),
+          new User({ name: 'Hafez2_gh-9673-2' })
+        ]);
+
+        const users = yield User.find().sort('name');
+
+        users[0].name = 'Hafez1_gh-9673-2-updated';
+        users[1].name = 'Hafez2_gh-9673-2-updated';
+
+        const writeResult = yield User.bulkSave(users);
+        assert.ok(writeResult.result.ok);
+      });
+    });
+    it('throws an error on failure', () => {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: { type: String, unique: true }
+        });
+
+        const User = db.model('User', userSchema);
+        yield User.init();
+
+        yield User.insertMany([
+          new User({ name: 'Hafez1_gh-9673-2' }),
+          new User({ name: 'Hafez2_gh-9673-2' })
+        ]);
+
+        const users = yield User.find().sort('name');
+
+        users[0].name = 'duplicate-name';
+        users[1].name = 'duplicate-name';
+
+        const err = yield User.bulkSave(users).then(() => null, err => err);
+        assert.ok(err);
+      });
+    });
+    it('changes document state from `isNew` `false` to `true`', () => {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+        yield User.init();
+
+        const user1 = new User({ name: 'Hafez1_gh-9673-3' });
+        const user2 = new User({ name: 'Hafez1_gh-9673-3' });
+
+        assert.equal(user1.isNew, true);
+        assert.equal(user2.isNew, true);
+
+        yield User.bulkSave([user1, user2]);
+
+        assert.equal(user1.isNew, false);
+        assert.equal(user2.isNew, false);
+      });
+    });
+    it('sets `isNew` to false when a document succeds and `isNew` does not change when some fail', () => {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: { type: String, unique: true }
+        });
+
+        const User = db.model('User', userSchema);
+        yield User.init();
+
+        const user1 = new User({ name: 'Hafez1_gh-9673-4' });
+        const user2 = new User({ name: 'Hafez1_gh-9673-4' });
+
+        const err = yield User.bulkSave([user1, user2]).then(() => null, err => err);
+
+        assert.ok(err);
+        assert.equal(user1.isNew, false);
+        assert.equal(user2.isNew, true);
+      });
+    });
+    it('changes documents state for successful writes', () => {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: { type: String, unique: true },
+          age: Number
+        });
+
+        const User = db.model('User', userSchema);
+        yield User.init();
+
+        const user1 = new User({ name: 'Sam', age: 26 });
+        const user2 = new User({ name: 'Sam', age: 27 });
+
+        assert.equal(user1.isNew, true);
+        assert.equal(user2.isNew, true);
+
+        const err = yield User.bulkSave([user1, user2]).then(() => null, err => err);
+
+        assert.ok(err);
+        assert.deepEqual(user1.getChanges(), {});
+        assert.deepEqual(user2.getChanges(), { $set: { age: 27, name: 'Sam' } });
+      });
+    });
+    it('triggers pre/post-save hooks', () => {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: String,
+          age: Number
+        });
+
+        let preSaveCallCount = 0;
+        let postSaveCallCount = 0;
+
+        userSchema.pre('save', function() {
+          preSaveCallCount++;
+        });
+        userSchema.post('save', function() {
+          postSaveCallCount++;
+        });
+
+        const User = db.model('User', userSchema);
+
+        const user1 = new User({ name: 'Sam1' });
+        const user2 = new User({ name: 'Sam2' });
+
+
+        yield User.bulkSave([user1, user2]);
+        assert.equal(preSaveCallCount, 2);
+        assert.equal(postSaveCallCount, 2);
+      });
+    });
+    it('calls pre-save before actually saving', () => {
+      return co(function* () {
+        const userSchema = new Schema({ name: String });
+
+
+        userSchema.pre('save', function() {
+          this.name = 'name from pre-save';
+        });
+
+        const User = db.model('User', userSchema);
+
+        const user1 = new User({ name: 'Sam1' });
+        const user2 = new User({ name: 'Sam2' });
+
+
+        yield User.bulkSave([user1, user2]);
+
+        const usersFromDatabase = yield User.find({ _id: { $in: [user1._id, user2._id] } }).sort('_id');
+        assert.equal(usersFromDatabase[0].name, 'name from pre-save');
+        assert.equal(usersFromDatabase[1].name, 'name from pre-save');
+      });
+    });
+  });
+
   describe('Setting the explain flag', function() {
     it('should give an object back rather than a boolean (gh-8275)', function() {
       return co(function*() {
@@ -7219,3 +7568,5 @@ describe('Model', function() {
     });
   });
 });
+
+

@@ -1256,9 +1256,9 @@ declare module 'mongoose' {
     ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
     SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
-    Schema<any, any> |
-    Schema<any, any>[] |
-    ReadonlyArray<Schema<any, any>> |
+    Schema<any, any, any, any> |
+    Schema<any, any, any, any>[] |
+    ReadonlyArray<Schema<any, any, any, any>> |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
     ReadonlyArray<SchemaTypeOptions<T extends undefined ? any : T>> |
     Function[] |
@@ -1546,7 +1546,7 @@ declare module 'mongoose' {
 
     /** If set, specifies the type of this map's values. Mongoose will cast this map's values to the given type. */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    of?: Function | SchemaTypeOptions<any>;
+    of?: Function | SchemaDefinitionProperty<any>;
 
     /** If true, uses Mongoose's default `_id` settings. Only allowed for ObjectIds */
     auto?: boolean;

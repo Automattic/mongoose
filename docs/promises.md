@@ -47,7 +47,7 @@ However, we recommend using `.exec()` because that gives you
 better stack traces.
 
 ```javascript
-[require:Should You Use `exec()` With `await`]
+[require:Should You Use `exec\(\)` With `await`]
 ```
 
 ### Plugging in your own Promises Library

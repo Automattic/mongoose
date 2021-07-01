@@ -20,7 +20,7 @@ interface Movie {
   genre?: string,
   actionIntensity?: number,
   status?: string,
-  actors?: Actor[]
+  actors: Actor[]
 }
 
 const movieSchema = new Schema<Document<Movie>, Model<Document<Movie>>, Movie>({
@@ -144,6 +144,14 @@ function gh10287() {
   const mainSchema2 = new Schema<Document & MainSchema, Model<Document & MainSchema>, MainSchema>({
     subProp: {
       type: subSchema
+    }
+  });
+}
+
+function gh10370() {
+  const movieSchema = new Schema<Document & Movie, Model<Document & Movie>, Movie>({
+    actors: {
+      type: [actorSchema]
     }
   });
 }

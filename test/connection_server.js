@@ -26,7 +26,8 @@ class Server {
 
         // Wait for ready
         self.server.stdout.on('data', function(data) {
-          if (data.toString().includes('Waiting for connections')) {
+          if (data.toString().includes('Waiting for connections')
+              || data.toString().includes('waiting for connections')) {
             self.server.stdout.removeAllListeners('data');
             self.server.removeAllListeners('exit');
             resolve();

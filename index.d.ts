@@ -1948,9 +1948,9 @@ declare module 'mongoose' {
 
   type ReturnsNewDoc = { new: true } | { returnOriginal: false } | {returnDocument: 'after'};
 
-  type QueryWithHelpers<ResultType, DocType extends Document, THelpers = {}> = Query<ResultType, DocType, THelpers> & THelpers;
+  type QueryWithHelpers<ResultType, DocType, THelpers = {}> = Query<ResultType, DocType, THelpers> & THelpers;
 
-  class Query<ResultType, DocType extends Document, THelpers = {}> {
+  class Query<ResultType, DocType, THelpers = {}> {
     _mongooseOptions: MongooseQueryOptions;
 
     /**
@@ -2459,7 +2459,7 @@ declare module 'mongoose' {
     T extends Document ? LeanDocument<T> :
     T;
 
-  class QueryCursor<DocType extends Document> extends stream.Readable {
+  class QueryCursor<DocType> extends stream.Readable {
     [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
 
     /**
@@ -2490,7 +2490,7 @@ declare module 'mongoose' {
      * Registers a transform function which subsequently maps documents retrieved
      * via the streams interface or `.next()`
      */
-    map<ResultType extends Document>(fn: (res: DocType) => ResultType): QueryCursor<ResultType>;
+    map<ResultType>(fn: (res: DocType) => ResultType): QueryCursor<ResultType>;
 
     /**
      * Get the next document from this cursor. Will return `null` when there are

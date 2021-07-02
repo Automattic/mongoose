@@ -10,7 +10,6 @@ const assert = require('assert');
 const co = require('co');
 const utils = require('../lib/utils');
 const util = require('./util');
-const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

@@ -6,7 +6,6 @@
 
 const start = require('./common');
 
-const Buffer = require('safe-buffer').Buffer;
 const MongooseBuffer = require('../lib/types/buffer');
 const ObjectId = require('../lib/types/objectid');
 const StateMachine = require('../lib/statemachine');

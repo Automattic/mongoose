@@ -129,7 +129,7 @@
       "mocha-no-only"
     ],
     "parserOptions": {
-      "ecmaVersion": 2015
+      "ecmaVersion": 2018
     },
     "env": {
       "node": true,

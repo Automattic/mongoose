@@ -10352,7 +10352,7 @@ describe('document', function() {
 
   describe('reserved keywords can be used optionally (gh-9010)', () => {
     describe('Document#validate(...)', () => {
-      it('is available as $validate', async() => {
+      it('is available as `$validate`', async() => {
         const userSchema = new Schema({
           name: String
         });
@@ -10372,6 +10372,29 @@ describe('document', function() {
         const User = db.model('User', userSchema);
         const user = new User({ name: 'Sam', validate: true });
         assert.equal(user.validate, true);
+      });
+    });
+    describe('Document#save(...)', () => {
+      it('is available as `$save`', async() => {
+        const userSchema = new Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam' });
+        const userFromSave = await user.$save();
+        assert.ok(userFromSave === user);
+        assert.equal(user.$save, user.save);
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          save: Boolean
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', save: true });
+        assert.equal(user.save, true);
       });
     });
   });

@@ -136,7 +136,7 @@ describe('transactions', function() {
       assert.ok(user.$session());
       user.name = 'bar';
       // By default, `save()` uses the associated session
-      await user.save();
+      await user.$save();
 
       // Won't find the doc because `save()` is part of an uncommitted transaction
       const doc = await User.findOne({ name: 'bar' });
@@ -159,7 +159,7 @@ describe('transactions', function() {
 
     const users = await User.create([{ name: 'foo' }], { session: session });
     users[0].name = 'bar';
-    await users[0].save();
+    await users[0].$save();
 
     const user = await User.findOne({ name: 'bar' });
     assert.ok(!user);
@@ -348,7 +348,7 @@ describe('transactions', function() {
     const session = await db.startSession();
     await session.withTransaction(async () => {
       const test = await Test.create([{}], { session }).then(res => res[0]);
-      await test.save(); // throws DocumentNotFoundError
+      await test.$save(); // throws DocumentNotFoundError
     });
     session.endSession();
   });
@@ -362,7 +362,7 @@ describe('transactions', function() {
     const doc = new Test({ name: 'foo' });
     await db.
       transaction(async (session) =>  {
-        await doc.save({ session });
+        await doc.$save({ session });
         assert.ok(!doc.isNew);
         throw new Error('Oops');
       }).
@@ -386,7 +386,7 @@ describe('transactions', function() {
         doc.arr.pull('bar');
         doc.arr2.push('bar');
 
-        await doc.save({ session });
+        await doc.$save({ session });
         doc.name = 'baz';
         throw new Error('Oops');
       }).
@@ -400,7 +400,7 @@ describe('transactions', function() {
     assert.deepEqual(changes.$push.arr2, { $each: ['bar'] });
     assert.ok(!changes.$set.arr2);
 
-    await doc.save({ session: null });
+    await doc.$save({ session: null });
 
     const newDoc = await Test.findById(doc);
     assert.equal(newDoc.name, 'baz');
@@ -416,7 +416,7 @@ describe('transactions', function() {
     await Test.createCollection();
     const doc = new Test({ arr: ['foo'] });
     await db.transaction(async (session) => {
-      await doc.save({ session });
+      await doc.$save({ session });
     });
 
     const createdDoc = await Test.collection.findOne();
@@ -432,7 +432,7 @@ describe('transactions', function() {
     const doc = new Test({ arr: ['foo'] });
     await db.transaction(
       async (session) => {
-        await doc.save({ session });
+        await doc.$save({ session });
         const testDocs = await Test.find({}).session(session);
         assert.deepStrictEqual(testDocs.length, 1);
       },

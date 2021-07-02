@@ -26,7 +26,7 @@ describe('promises docs', function () {
   });
 
   /**
-   * Mongoose async operations, like `.save()` and queries, return thenables.
+   * Mongoose async operations, like `.$save()` and queries, return thenables.
    * This means that you can do things like `MyModel.findOne({}).then()` and
    * `await MyModel.findOne({}).exec()` if you're using
    * [async/await](http://thecodebarbarian.com/80-20-guide-to-async-await-in-node.js.html).
@@ -40,7 +40,7 @@ describe('promises docs', function () {
       members: ['Axl', 'Slash']
     });
 
-    const promise = gnr.save();
+    const promise = gnr.$save();
     assert.ok(promise instanceof Promise);
 
     promise.then(function (doc) {

@@ -377,7 +377,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
               res.author = 'soemthing new';
               res.comments.push(commentData);
               res.title = 'something newerrrr';
-              res.save(function(err) {
+              res.$save(function(err) {
                 if (err) {
                   throw err;
                 }
@@ -413,7 +413,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
               bp.author = 'soemthing new';
               bp.comments.push(commentData);
               bp.title = 'something newerrrr';
-              blogpost.save(bp, function(err) {
+              blogpost.$save(bp, function(err) {
                 if (err) {
                   throw err;
                 }

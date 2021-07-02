@@ -207,7 +207,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
           // The driver will send the full document, while mongoose will check
           // and only update fields that have been changed. This is meant to
           // illustrate that difference between the two
-          bp.save(function(err) {
+          bp.$save(function(err) {
             if (err) {
               throw err;
             }
@@ -225,7 +225,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
           bp.comments[3].title = 'this is a new title';
           bp.comments[0].date = new Date();
           bp.comments.push(commentData);
-          blogpost.save(bp, function(err) {
+          blogpost.$save(bp, function(err) {
             if (err) {
               throw err;
             }
@@ -266,7 +266,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       fn: function(deferred) {
         testBp.comments.push(commentData);
         testBp.comments.$shift();
-        testBp.save(function(err) {
+        testBp.$save(function(err) {
           if (err) {
             throw err;
           }
@@ -340,7 +340,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       for (let i = 0; i < 100; i++) {
         testBp.comments.push(commentData);
       }
-      testBp.save(function(err) {
+      testBp.$save(function(err) {
         if (err) {
           throw err;
         }

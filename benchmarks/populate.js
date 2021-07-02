@@ -34,7 +34,7 @@ mongoose.connect('localhost', 'benchmark-populate', function(err) {
         as: [a, a, a, a, a, a, a, a, a, a, a, a, a, a, a, a, a],
         a: a,
         nested: [{a: a}, {a: a}, {a: a}, {a: a}, {a: a}, {a: a}]
-      }).save(function(err) {
+      }).$save(function(err) {
         if (err) {
           return done(err);
         }

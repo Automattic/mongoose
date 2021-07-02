@@ -4,7 +4,7 @@ on:
     push:
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
       matrix:
@@ -26,16 +26,16 @@ jobs:
 
       - name: Setup
         run: |
-          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-4.4.6.tgz
-          tar xf mongodb-linux-x86_64-ubuntu2004-4.4.6.tgz
+          wget -q http://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-4.0.2.tgz
+          tar xf mongodb-linux-x86_64-ubuntu1804-4.0.2.tgz
           mkdir -p ./data/db/27017 ./data/db/27000
           printf "\n--timeout 8000" >> ./test/mocha.opts
-          ./mongodb-linux-x86_64-ubuntu2004-4.4.6/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
+          ./mongodb-linux-x86_64-ubuntu1804-4.0.2/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
           sleep 2
           mongod --version
           mkdir ./test/typescript/node_modules
           ln -s `pwd` ./test/typescript/node_modules/mongoose
-          echo `pwd`/mongodb-linux-x86_64-ubuntu2004-4.4.6/bin >> $GITHUB_PATH
+          echo `pwd`/mongodb-linux-x86_64-ubuntu1804-4.0.2/bin >> $GITHUB_PATH
 
       - run: npm test
 

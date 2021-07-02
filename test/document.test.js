@@ -10348,4 +10348,30 @@ describe('document', function() {
       assert.equal(fromDb.observers.length, 1);
     });
   });
+
+  describe('reserved keywords can be used optionally (gh-9010)', () => {
+    describe('Document#validate', () => {
+      it('is available as $validate', async() => {
+        const userSchema = new Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam' });
+        const err = await user.$validate();
+        assert.ok(err == null);
+        assert.equal(user.$validate, user.validate);
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          validate: Boolean
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', validate: true });
+        assert.equal(user.validate, true);
+      });
+    });
+  });
 });

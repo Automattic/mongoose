@@ -6,7 +6,6 @@
 
 const start = require('./common');
 
-const Buffer = require('safe-buffer').Buffer;
 const assert = require('assert');
 const mongoose = require('./common').mongoose;
 
@@ -529,6 +528,14 @@ describe('types.buffer', function() {
       assert.ok(doc.buf instanceof Buffer);
       assert.equal(doc.buf.toString('utf8'), 'gh-6863');
     });
+
+    it('is an `instanceof Buffer`', () => {
+      const schema = new Schema({ buf: Buffer });
+      mongoose.deleteModel(/Test/);
+      const MyModel = mongoose.model('Test', schema);
+
+      const doc = new MyModel({ buf: { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } });
+      assert.ok(doc.buf instanceof Buffer);
     });
   });
 });

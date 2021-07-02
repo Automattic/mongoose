@@ -10350,7 +10350,7 @@ describe('document', function() {
   });
 
   describe('reserved keywords can be used optionally (gh-9010)', () => {
-    describe('Document#validate', () => {
+    describe('Document#validate(...)', () => {
       it('is available as $validate', async() => {
         const userSchema = new Schema({
           name: String

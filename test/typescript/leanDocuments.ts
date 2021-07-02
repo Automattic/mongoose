@@ -49,3 +49,32 @@ void async function main() {
 
   const _doc2: ITestBase = await Test.findOne().lean<ITestBase>();
 }();
+
+function gh10345() {
+  (function() {
+    interface User {
+      name: string;
+      id: number;
+    }
+
+    const UserModel = model<User>('User', new Schema({ name: String, id: Number }));
+
+    const doc = new UserModel({ name: 'test', id: 42 });
+
+    const leanDoc = doc.toObject();
+    leanDoc.id = 43;
+  })();
+
+  (function() {
+    interface User {
+      name: string;
+    }
+
+    const UserModel = model<User>('User', new Schema({ name: String }));
+
+    const doc = new UserModel({ name: 'test' });
+
+    const leanDoc = doc.toObject<User>();
+    leanDoc.id = 43;
+  })();
+}

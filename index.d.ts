@@ -367,7 +367,7 @@ declare module 'mongoose' {
     getIndexes(): any;
   }
 
-  class Document<T = any, TQueryHelpers = any> {
+  class Document<T = any, TQueryHelpers = any, DocType = any> {
     constructor(doc?: any);
 
     /** This documents _id. */
@@ -583,11 +583,11 @@ declare module 'mongoose' {
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
     toJSON(options?: ToObjectOptions): LeanDocument<this>;
-    toJSON<T>(options?: ToObjectOptions): T;
+    toJSON<T = DocType>(options?: ToObjectOptions): T;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
     toObject(options?: ToObjectOptions): LeanDocument<this>;
-    toObject<T>(options?: ToObjectOptions): T;
+    toObject<T = DocType>(options?: ToObjectOptions): T;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string): void;
@@ -622,7 +622,7 @@ declare module 'mongoose' {
   }
 
   interface AnyObject { [k: string]: any }
-  type EnforceDocument<T, TMethods> = T extends Document ? T : T & Document & TMethods;
+  type EnforceDocument<T, TMethods> = T extends Document ? T : T & Document<any, any, T> & TMethods;
 
   export const Model: Model<any>;
   // eslint-disable-next-line no-undef

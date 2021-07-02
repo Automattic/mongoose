@@ -65,7 +65,7 @@ function gh10345() {
     leanDoc.id = 43;
   })();
 
-  (function() {
+  (async function() {
     interface User {
       name: string;
     }
@@ -76,5 +76,8 @@ function gh10345() {
 
     const leanDoc = doc.toObject<User>();
     leanDoc.id = 43;
+
+    const doc2 = await UserModel.findOne().orFail().lean();
+    doc2.id = 43;
   })();
 }

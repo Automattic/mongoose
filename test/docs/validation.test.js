@@ -58,9 +58,9 @@ describe('validation docs', function() {
   /**
    * Mongoose has several built-in validators.
    *
-   * - All [SchemaTypes](./schematypes.html) have the built-in [required](./api.html#schematype_SchemaType-required) validator. The required validator uses the [SchemaType's `checkRequired()` function](./api.html#schematype_SchemaType-checkRequired) to determine if the value satisfies the required validator.
-   * - [Numbers](./api.html#schema-number-js) have [`min` and `max`](./schematypes.html#number-validators) validators.
-   * - [Strings](./api.html#schema-string-js) have [`enum`, `match`, `minLength`, and `maxLength`](./schematypes.html#string-validators) validators.
+   * - All [SchemaTypes](/docs/schematypes.html) have the built-in [required](./api.html#schematype_SchemaType-required) validator. The required validator uses the [SchemaType's `checkRequired()` function](./api.html#schematype_SchemaType-checkRequired) to determine if the value satisfies the required validator.
+   * - [Numbers](/docs/schematypes.html#numbers) have [`min` and `max`](./schematypes.html#number-validators) validators.
+   * - [Strings](/docs/schematypes.html#strings) have [`enum`, `match`, `minLength`, and `maxLength`](./schematypes.html#string-validators) validators.
    *
    * Each of the validator links above provide more information about how to enable them and customize their error messages.
    */

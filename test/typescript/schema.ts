@@ -161,6 +161,6 @@ function gh10409() {
     field: Date;
   }
   const someSchema = new Schema<Something, Model<Something>, Something>({
-    field: {type: Date}
+    field: { type: Date }
   });
 }

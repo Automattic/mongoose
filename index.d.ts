@@ -1245,15 +1245,17 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  type SchemaDefinitionWithBuiltInClass<T extends number | string | boolean | Function> = T extends number
+  type SchemaDefinitionWithBuiltInClass<T extends number | string | boolean | NativeDate | Function> = T extends number
     ? (typeof Number | 'number' | 'Number' | typeof Schema.Types.Number)
     : T extends string
     ? (typeof String | 'string' | 'String' | typeof Schema.Types.String)
     : T extends boolean
     ? (typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean)
+    : T extends NativeDate
+    ? (typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date)
     : (Function | string);
 
-  type SchemaDefinitionProperty<T = undefined> = T extends string | number | Function
+  type SchemaDefinitionProperty<T = undefined> = T extends string | number | boolean | NativeDate | Function
     ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
     SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
@@ -1437,7 +1439,7 @@ declare module 'mongoose' {
 
   export class SchemaTypeOptions<T> {
     type?:
-      T extends string | number | boolean | Function ? SchemaDefinitionWithBuiltInClass<T> :
+      T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends Schema<any, any> ? T :
       T extends object[] ? (Schema<Document<Unpacked<T>>>[] | ReadonlyArray<Schema<Document<Unpacked<T>>>> | Schema<Document & Unpacked<T>>[] | ReadonlyArray<Schema<Document & Unpacked<T>>>) :
       T extends string[] ? (SchemaDefinitionWithBuiltInClass<string>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<string>>) :

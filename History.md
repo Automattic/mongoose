@@ -1,3 +1,12 @@
+5.13.2 / 2021-07-03
+===================
+ * fix: hardcode @types/node version for now to avoid breaking changes from DefinitelyTyped/DefinitelyTyped#53669 #10415
+ * fix(index.d.ts): allow using type: Date with Date paths in SchemaDefinitionType #10409
+ * fix(index.d.ts): allow extra VirtualTypeOptions for better plugin support #10412
+ * docs(api): add SchemaArray to docs #10397
+ * docs(schema+validation): fix broken links #10396
+ * docs(transactions): add note about creating a connection to transactions docs #10406
+
 5.13.1 / 2021-07-02
 ===================
  * fix(discriminator): allow using array as discriminator key in schema and as tied value #10303

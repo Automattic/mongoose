@@ -1674,6 +1674,9 @@ declare module 'mongoose' {
 
     /** Additional options like `limit` and `lean`. */
     options?: QueryOptions;
+
+    /** Additional options for plugins */
+    [extra: string]: any;
   }
 
   class VirtualType {

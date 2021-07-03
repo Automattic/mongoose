@@ -1,3 +1,25 @@
+5.13.2 / 2021-07-03
+===================
+ * fix: hardcode @types/node version for now to avoid breaking changes from DefinitelyTyped/DefinitelyTyped#53669 #10415
+ * fix(index.d.ts): allow using type: Date with Date paths in SchemaDefinitionType #10409
+ * fix(index.d.ts): allow extra VirtualTypeOptions for better plugin support #10412
+ * docs(api): add SchemaArray to docs #10397
+ * docs(schema+validation): fix broken links #10396
+ * docs(transactions): add note about creating a connection to transactions docs #10406
+
+5.13.1 / 2021-07-02
+===================
+ * fix(discriminator): allow using array as discriminator key in schema and as tied value #10303
+ * fix(index.d.ts): allow using & Document in schema definition for required subdocument arrays #10370
+ * fix(index.d.ts): if using DocType that doesn't extends Document, default to returning that DocType from `toObject()` and `toJSON()` #10345
+ * fix(index.d.ts): use raw DocType instead of LeanDocument when using `lean()` with queries if raw DocType doesn't `extends Document` #10345
+ * fix(index.d.ts): remove err: any in callbacks, use `err: CallbackError` instead #10340
+ * fix(index.d.ts): allow defining map of schemas in TypeScript #10389
+ * fix(index.d.ts): correct return type for Model.createCollection() #10359
+ * docs(promises+discriminators): correctly escape () in regexp to pull in examples correctly #10364
+ * docs(update): fix outdated URL about unindexed upsert #10406 [grimmer0125](https://github.com/grimmer0125)
+ * docs(index.d.ts): proper placement of mongoose.Date JSDoc [thiagokisaki](https://github.com/thiagokisaki)
+
 5.13.0 / 2021-06-28
 ===================
  * feat(query): add sanitizeProjection option to opt in to automatically sanitizing untrusted query projections #10243

@@ -24,6 +24,7 @@ const files = [
   'lib/virtualtype.js',
   'lib/error/index.js',
   'lib/types/core_array.js',
+  'lib/schema/array.js',
   'lib/schema/documentarray.js',
   'lib/schema/SingleNestedPath.js',
   'lib/options/SchemaTypeOptions.js',
@@ -60,9 +61,13 @@ function parse() {
       replace('.js', '').
       replace('/index', '');
     const lastSlash = name.lastIndexOf('/');
+    const fullName = name;
     name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
     if (name === 'core_array') {
       name = 'array';
+    }
+    if (fullName === 'schema/array') {
+      name = 'SchemaArray';
     }
     if (name === 'documentarray') {
       name = 'DocumentArrayPath';
@@ -101,13 +106,13 @@ function parse() {
             ctx.type = 'property';
             ctx.static = true;
             ctx.name = tag.string;
-            ctx.string = `${ctx.constructor}.${ctx.name}`;
+            ctx.string = `${data.name}.${ctx.name}`;
             break;
           case 'function':
             ctx.type = 'function';
             ctx.static = true;
             ctx.name = tag.string;
-            ctx.string = `${ctx.constructor}.${ctx.name}()`;
+            ctx.string = `${data.name}.${ctx.name}()`;
             break;
           case 'return':
             tag.description = tag.description ?

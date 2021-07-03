@@ -1,0 +1,113 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.13.2: </title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><style>.api-nav .nav-item-sub {
+  display: block !important;
+}
+
+.api-content {
+  margin-top: 3em;
+}
+</style><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.13.2</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/schema/array.js" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h1>SchemaArray</h1><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"><div id="native-direct"></div><script>(function() {
+if (typeof _bsa !== 'undefined' && _bsa) {
+_bsa.init('custom', 'CK7DT53U', 'placement:mongoosejscom',
+{
+target: '#native-direct',
+template: `
+<div class="native-inline">
+<a rel="sponsored noopener" target="_blank" href="##statlink##" title="##company## — ##tagline##"><span class="sponsor">Sponsor</span> ##company## — ##description##</a>
+</div>
+</a>
+`
+}
+);
+}
+})();</script><div class="api-nav"><div class="api-nav-content"><div class="nav-item" id="nav-Mongoose"><div class="nav-item-title"><a href="mongoose.html">Mongoose</a></div></div><div class="nav-item" id="nav-Schema"><div class="nav-item-title"><a href="schema.html">Schema</a></div></div><div class="nav-item" id="nav-Connection"><div class="nav-item-title"><a href="connection.html">Connection</a></div></div><div class="nav-item" id="nav-Document"><div class="nav-item-title"><a href="document.html">Document</a></div></div><div class="nav-item" id="nav-Model"><div class="nav-item-title"><a href="model.html">Model</a></div></div><div class="nav-item" id="nav-Query"><div class="nav-item-title"><a href="query.html">Query</a></div></div><div class="nav-item" id="nav-QueryCursor"><div class="nav-item-title"><a href="querycursor.html">QueryCursor</a></div></div><div class="nav-item" id="nav-Aggregate"><div class="nav-item-title"><a href="aggregate.html">Aggregate</a></div></div><div class="nav-item" id="nav-AggregationCursor"><div class="nav-item-title"><a href="aggregationcursor.html">AggregationCursor</a></div></div><div class="nav-item" id="nav-Schematype"><div class="nav-item-title"><a href="schematype.html">Schematype</a></div></div><div class="nav-item" id="nav-Virtualtype"><div class="nav-item-title"><a href="virtualtype.html">Virtualtype</a></div></div><div class="nav-item" id="nav-Error"><div class="nav-item-title"><a href="error.html">Error</a></div></div><div class="nav-item" id="nav-Array"><div class="nav-item-title"><a href="array.html">Array</a></div></div><div class="nav-item" id="nav-SchemaArray"><div class="nav-item-title" style="font-weight: bold"><a href="schemaarray.html">SchemaArray</a></div><ul class="nav-item-sub"><li><a href="#schemaarray_SchemaArray">SchemaArray()</a></li><li><a href="#schemaarray_SchemaArray.checkRequired">SchemaArray.checkRequired()</a></li><li><a href="#schemaarray_SchemaArray.options">SchemaArray.options</a></li><li><a href="#schemaarray_SchemaArray-checkRequired">SchemaArray.prototype.checkRequired()</a></li><li><a href="#schemaarray_SchemaArray-enum">SchemaArray.prototype.enum()</a></li><li><a href="#schemaarray_SchemaArray.schemaName">SchemaArray.schemaName</a></li><li><a href="#schemaarray_SchemaArray.set">SchemaArray.set()</a></li></ul></div><div class="nav-item" id="nav-DocumentArrayPath"><div class="nav-item-title"><a href="documentarraypath.html">DocumentArrayPath</a></div></div><div class="nav-item" id="nav-SingleNestedPath"><div class="nav-item-title"><a href="singlenestedpath.html">SingleNestedPath</a></div></div></div></div><div class="api-content"><ul><li><a href="#schemaarray_SchemaArray">SchemaArray()</a></li><li><a href="#schemaarray_SchemaArray.checkRequired">SchemaArray.checkRequired()</a></li><li><a href="#schemaarray_SchemaArray.options">SchemaArray.options</a></li><li><a href="#schemaarray_SchemaArray-checkRequired">SchemaArray.prototype.checkRequired()</a></li><li><a href="#schemaarray_SchemaArray-enum">SchemaArray.prototype.enum()</a></li><li><a href="#schemaarray_SchemaArray.schemaName">SchemaArray.schemaName</a></li><li><a href="#schemaarray_SchemaArray.set">SchemaArray.set()</a></li></ul><hr class="separate-api-elements"><h3 id="schemaarray_SchemaArray"><a href="#schemaarray_SchemaArray">SchemaArray()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">key
+<span class="method-type">&laquo;String&raquo;</span> </li><li class="param">cast
+<span class="method-type">&laquo;SchemaType&raquo;</span> </li><li class="param">options
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Inherits:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span></li></ul><div><p>Array SchemaType constructor</p>  </div><hr class="separate-api-elements"><h3 id="schemaarray_SchemaArray.checkRequired"><a href="#schemaarray_SchemaArray.checkRequired">SchemaArray.checkRequired()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fn
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Function&raquo;</span> </li></ul><div><p>Override the function the required validator uses to check whether an array passes the <code>required</code> check.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-comment">// Require non-empty array to pass `required` check</span>
+mongoose.Schema.Types.Array.checkRequired(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> <span class="hljs-built_in">Array</span>.isArray(v) &amp;amp;&amp;amp; v.length);
+
+<span class="hljs-keyword">const</span> M = mongoose.model({ <span class="hljs-attr">arr</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">Array</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> } });
+<span class="hljs-keyword">new</span> M({ <span class="hljs-attr">arr</span>: [] }).validateSync(); <span class="hljs-comment">// `null`, validation fails!</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="schemaarray_SchemaArray.options"><a href="#schemaarray_SchemaArray.options">SchemaArray.options</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Options for all arrays.</p>
+
+<ul>
+<li><code>castNonArrays</code>: <code>true</code> by default. If <code>false</code>, Mongoose will throw a CastError when a value isn't an array. If <code>true</code>, Mongoose will wrap the provided value in an array before casting.</li>
+</ul>  </div><hr class="separate-api-elements"><h3 id="schemaarray_SchemaArray-checkRequired"><a href="#schemaarray_SchemaArray-checkRequired">SchemaArray.prototype.checkRequired()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">value
+<span class="method-type">&laquo;Any&raquo;</span> </li><li class="param">doc
+<span class="method-type">&laquo;Document&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Check if the given value satisfies the <code>required</code> validator.</p>  </div><hr class="separate-api-elements"><h3 id="schemaarray_SchemaArray-enum"><a href="#schemaarray_SchemaArray-enum">SchemaArray.prototype.enum()</a></h3><h5>Parameters</h5><ul class="params"><ul style="margin-top: 0.5em"><li>[args...]
+<span class="method-type">&laquo;String|Object&raquo;</span> enumeration values</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaArray&raquo;</span> this</p>
+</li></ul><div><p>Adds an enum validator if this is an array of strings or numbers. Equivalent to <code>SchemaString.prototype.enum()</code> or <code>SchemaNumber.prototype.enum()</code></p>  </div><hr class="separate-api-elements"><h3 id="schemaarray_SchemaArray.schemaName"><a href="#schemaarray_SchemaArray.schemaName">SchemaArray.schemaName</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>This schema type's name, to defend against minifiers that mangle function names.</p>  </div><hr class="separate-api-elements"><h3 id="schemaarray_SchemaArray.set"><a href="#schemaarray_SchemaArray.set">SchemaArray.set()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">option
+<span class="method-type">&laquo;String&raquo;</span> <ul>
+<li>The option you&#39;d like to set the value for</li>
+</ul>
+</li><li class="param">value
+<span class="method-type">&laquo;*&raquo;</span> <ul>
+<li>value for option</li>
+</ul>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;undefined&raquo;</span> </li></ul><div><p>Sets a default option for all Array instances.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-comment">// Make all Array instances have `required` of true by default.</span>
+mongoose.Schema.Array.set(<span class="hljs-string">'required'</span>, <span class="hljs-literal">true</span>);
+
+<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">test</span>: <span class="hljs-built_in">Array</span> }));
+<span class="hljs-keyword">new</span> User({ }).validateSync().errors.test.message; <span class="hljs-comment">// Path `test` is required.</span></code></pre>  </div></div></div></div><script type="text/javascript">var xhr = new XMLHttpRequest();
+xhr.open('POST', 'https://g0a3nbw0xa.execute-api.us-east-1.amazonaws.com/prod/track', true);
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.onreadystatechange = function() {};
+xhr.send(JSON.stringify({
+  path: window.location.pathname,
+  hostname: window.location.hostname,
+  hash: window.location.hash
+}));</script><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript">(function (window, document) {
+  var layout   = document.getElementById('layout'),
+      menu     = document.getElementById('menu'),
+      menuLink = document.getElementById('menuLink'),
+      content  = document.getElementById('content');
+
+  function toggleClass(element, className) {
+      var classes = element.className.split(/\s+/),
+          length = classes.length,
+          i = 0;
+
+      for(; i < length; i++) {
+        if (classes[i] === className) {
+          classes.splice(i, 1);
+          break;
+        }
+      }
+      // The className is not found
+      if (length === classes.length) {
+          classes.push(className);
+      }
+
+      element.className = classes.join(' ');
+  }
+
+  function toggleAll(e) {
+      var active = 'active';
+
+      e.preventDefault();
+      toggleClass(layout, active);
+      toggleClass(menu, active);
+      toggleClass(menuLink, active);
+  }
+
+  menuLink.onclick = function (e) {
+      toggleAll(e);
+  };
+
+  content.onclick = function(e) {
+      if (menu.className.indexOf('active') !== -1) {
+          toggleAll(e);
+      }
+  };
+
+}(this, this.document));</script></div></body></html>

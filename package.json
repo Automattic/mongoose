@@ -30,7 +30,8 @@
     "regexp-clone": "1.0.0",
     "safe-buffer": "5.2.1",
     "sift": "7.0.1",
-    "sliced": "1.0.1"
+    "sliced": "1.0.1",
+    "@types/node": "^14.14.20"
   },
   "devDependencies": {
     "@babel/core": "7.10.5",

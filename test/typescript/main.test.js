@@ -195,9 +195,7 @@ describe('typescript syntax', function() {
 
   it('models', function() {
     const errors = runTest('models.ts');
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
+    printTSErrors(errors);
     assert.equal(errors.length, 0);
   });
 

@@ -690,18 +690,18 @@ declare module 'mongoose' {
      * Behaves like `remove()`, but deletes all documents that match `conditions`
      * regardless of the `single` option.
      */
-    deleteMany(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
-    deleteMany(filter: FilterQuery<T>, callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
-    deleteMany(callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    deleteMany(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteResult, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    deleteMany(filter: FilterQuery<T>, callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteResult, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    deleteMany(callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteResult, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /**
      * Deletes the first document that matches `conditions` from the collection.
      * Behaves like `remove()`, but deletes at most one document regardless of the
      * `single` option.
      */
-    deleteOne(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
-    deleteOne(filter: FilterQuery<T>, callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
-    deleteOne(callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    deleteOne(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteResult, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    deleteOne(filter: FilterQuery<T>, callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteResult, EnforceDocument<T, TMethods>, TQueryHelpers>;
+    deleteOne(callback: (err: CallbackError) => void): QueryWithHelpers<mongodb.DeleteResult, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /**
      * Sends `createIndex` commands to mongo for each index declared in the schema.
@@ -828,9 +828,10 @@ declare module 'mongoose' {
     findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: any, res: any) => void): Query<any, T>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
-    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: any, res: any) => void): Query<any, EnforceDocument<T, TMethods>>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, EnforceDocument<T, TMethods>>;
+    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, EnforceDocument<T, TMethods>>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, callback: (err: any, doc: T | null, res: any) => void): Query<T | null, EnforceDocument<T, TMethods>>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
@@ -843,9 +844,9 @@ declare module 'mongoose' {
     findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: any, res: any) => void): Query<any, T>;
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
-    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: any, res: any) => void): Query<any, EnforceDocument<T, TMethods>>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, EnforceDocument<T, TMethods>>;
+    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, EnforceDocument<T, TMethods>>;
 
     geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: (err: CallbackError, res: Array<EnforceDocument<T, TMethods>>) => void): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
 
@@ -882,10 +883,7 @@ declare module 'mongoose' {
     where(): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers>;
   }
 
-  type _UpdateWriteOpResult = mongodb.UpdateWriteOpResult['result'];
-  interface UpdateWriteOpResult extends _UpdateWriteOpResult {
-    upserted?: Array<{index: number, _id: any}>;
-  }
+  type UpdateWriteOpResult = mongodb.UpdateResult;
 
   interface QueryOptions {
     arrayFilters?: { [key: string]: any }[];
@@ -1423,7 +1421,9 @@ declare module 'mongoose' {
     currentTime?: () => (Date | number);
   }
 
-  type Unpacked<T> = T extends (infer U)[] ? U : T;
+  type Unpacked<T> = T extends (infer U)[] ?
+    U :
+    T extends ReadonlyArray<infer U> ? U : T;
 
   export class SchemaTypeOptions<T> {
     type?:
@@ -2070,9 +2070,10 @@ declare module 'mongoose' {
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: any, res: any) => void): Query<any, DocType>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
-    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: any, res?: any) => void): Query<any, DocType>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res?: any) => void): Query<DocType, DocType>;
+    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res?: any) => void): Query<DocType | null, DocType>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, callback: (err: any, doc: DocType, res?: any) => void): Query<DocType, DocType>;
 
     /** Specifies a `$geometry` condition */
     geometry(object: { type: string, coordinates: any[] }): this;
@@ -2427,8 +2428,6 @@ declare module 'mongoose' {
 
   export type FilterQuery<T> = _FilterQuery<DocumentDefinition<T>>;
 
-  type Unpacked<Type> = Type extends ReadonlyArray<infer Element> ? Element : Type;
-
   type AddToSetOperators<Type> = {
     $each: Type;
   };
@@ -2462,14 +2461,15 @@ declare module 'mongoose' {
 
   type ObjectQuerySelector<T> = T extends object ? { [key in keyof T]?: QuerySelector<T[key]> } : QuerySelector<T>;
 
-  type PullOperator<TSchema> = ({
-      readonly [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
-          | Partial<Unpacked<TSchema[key]>>
-          | ObjectQuerySelector<Unpacked<TSchema[key]>>;
-  } &
-      NotAcceptedFields<TSchema, ReadonlyArray<any>>) & {
-      readonly [key: string]: QuerySelector<any> | any;
-  };
+  type PullOperator<TSchema> = {
+    [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
+        | Partial<Unpacked<TSchema[key]>>
+        | ObjectQuerySelector<Unpacked<TSchema[key]>>
+        // Doesn't look like TypeScript has good support for creating an
+        // object containing dotted keys:
+        // https://stackoverflow.com/questions/58434389/typescript-deep-keyof-of-a-nested-object
+        | any;
+  } | any; // Because TS doesn't have good support for creating an object with dotted keys, including `.$.` re: #10075
 
   type PullAllOperator<TSchema> = ({
       readonly [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?: TSchema[key];
@@ -2506,7 +2506,7 @@ declare module 'mongoose' {
 
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: OnlyFieldsOfType<TSchema, Date, true | { $type: 'date' | 'timestamp' }>;
+    $currentDate?: OnlyFieldsOfType<TSchema, NativeDate, true | { $type: 'date' | 'timestamp' }>;
     $inc?: OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
     $min?: MatchKeysAndValues<TSchema>;
     $max?: MatchKeysAndValues<TSchema>;
@@ -2514,7 +2514,7 @@ declare module 'mongoose' {
     $rename?: { [key: string]: string };
     $set?: MatchKeysAndValues<TSchema>;
     $setOnInsert?: MatchKeysAndValues<TSchema>;
-    $unset?: OnlyFieldsOfType<TSchema, any, '' | 1 | true>;
+    $unset?: OnlyFieldsOfType<TSchema, any, any>;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
     $addToSet?: SetFields<TSchema>;
@@ -2528,6 +2528,14 @@ declare module 'mongoose' {
         [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
     };
   };
+
+  type UpdateWithAggregationPipeline = UpdateAggregationStage[];
+  type UpdateAggregationStage = { $addFields: any } |
+    { $set: any } |
+    { $project: any } |
+    { $unset: any } |
+    { $replaceRoot: any } |
+    { $replaceWith: any };
 
   export type UpdateQuery<T> = _UpdateQuery<DocumentDefinition<T>> & MatchKeysAndValues<DocumentDefinition<T>>;
 

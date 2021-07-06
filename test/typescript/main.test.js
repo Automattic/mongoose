@@ -1,17 +1,54 @@
 'use strict';
 
 const assert = require('assert');
+const fs = require('fs');
 const typescript = require('typescript');
 const tsconfig = require('./tsconfig.json');
+
+function printTSErrors(errors) {
+  if (!process.env.D) {
+    return;
+  }
+  if (!errors.length) {
+    return;
+  }
+  errors.forEach(e => {
+    if (typeof e.messageText === 'string') {
+      let lineStart = e.file.text.slice(0, e.start).lastIndexOf('\n');
+      if (lineStart === -1) {
+        lineStart = 0;
+      }
+      let lineEnd = e.file.text.slice(e.start).indexOf('\n');
+      if (lineEnd === -1) {
+        lineEnd = e.file.text.length;
+      } else {
+        lineEnd += e.start;
+      }
+      console.log(`-----\n\nERROR: ${e.messageText}\n\n${e.file.text.slice(lineStart, lineEnd - 1)}\n${' '.repeat(e.start - lineStart - 1)}^`);
+    } else if (e.messageText.messageText) {
+      let lineStart = e.file.text.slice(0, e.start).lastIndexOf('\n');
+      if (lineStart === -1) {
+        lineStart = 0;
+      }
+      let lineEnd = e.file.text.slice(e.start).indexOf('\n');
+      if (lineEnd === -1) {
+        lineEnd = e.file.text.length;
+      } else {
+        lineEnd += e.start;
+      }
+      console.log(`-----\n\nERROR: ${e.messageText.messageText}\n\n${e.file.text.slice(lineStart, lineEnd - 1)}\n${' '.repeat(e.start - lineStart - 1)}^`);
+    } else {
+      console.log(e);
+    }
+  });
+}
 
 describe('typescript syntax', function() {
   this.timeout(60000);
 
   it('base', function() {
     const errors = runTest('base.ts');
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
+    printTSErrors(errors);
     assert.equal(errors.length, 0);
   });
 
@@ -49,9 +86,7 @@ describe('typescript syntax', function() {
 
   it('queries', function() {
     const errors = runTest('queries.ts', { strict: true });
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
+    printTSErrors(errors);
     assert.equal(errors.length, 0);
   });
 

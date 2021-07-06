@@ -407,7 +407,7 @@ Error handling middleware can then transform the error however you want.
 const schema = new Schema({
   name: {
     type: String,
-    // Will trigger a MongoError with code 11000 when
+    // Will trigger a MongoServerError with code 11000 when
     // you save a duplicate
     unique: true
   }
@@ -416,7 +416,7 @@ const schema = new Schema({
 // Handler **must** take 3 parameters: the error that occurred, the document
 // in question, and the `next()` function
 schema.post('save', function(error, doc, next) {
-  if (error.name === 'MongoError' && error.code === 11000) {
+  if (error.name === 'MongoServerError' && error.code === 11000) {
     next(new Error('There was a duplicate key error'));
   } else {
     next();
@@ -437,7 +437,7 @@ errors.
 // `passRawResult` function, this function **must** take 4
 // parameters
 schema.post('update', function(error, res, next) {
-  if (error.name === 'MongoError' && error.code === 11000) {
+  if (error.name === 'MongoServerError' && error.code === 11000) {
     next(new Error('There was a duplicate key error'));
   } else {
     next(); // The `update()` call will still error out.

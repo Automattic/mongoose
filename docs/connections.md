@@ -340,7 +340,7 @@ const mongoose = require('mongoose');
 
 const uri = 'mongodb+srv://username:badpw@cluster0-OMITTED.mongodb.net/' +
   'test?retryWrites=true&w=majority';
-// Prints "MongoError: bad auth Authentication failed."
+// Prints "MongoServerError: bad auth Authentication failed."
 mongoose.connect(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

@@ -465,7 +465,7 @@ describe('QueryCursor', function() {
           assert.ok(closed);
           cursor.next(function(error) {
             assert.ok(error);
-            assert.equal(error.name, 'MongoError');
+            assert.equal(error.name, 'MongoServerError');
             done();
           });
         });

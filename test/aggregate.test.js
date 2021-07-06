@@ -1126,7 +1126,7 @@ describe('aggregate: ', function() {
       const err = yield MyModel.aggregate([{ $group: { foo: 'bar' } }]).
         catch(err => err);
       assert.ok(err instanceof Error);
-      assert.equal(err.name, 'MongoError');
+      assert.equal(err.name, 'MongoDriverError');
     });
   });
 

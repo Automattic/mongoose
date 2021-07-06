@@ -4287,7 +4287,7 @@ describe('Model', function() {
 
     test.save(function(error) {
       assert.ok(error);
-      assert.equal(error.name, 'MongoError');
+      assert.equal(error.name, 'MongoServerError');
       db.close(done);
     });
   });
@@ -4306,7 +4306,7 @@ describe('Model', function() {
     db.on('connected', function() {
       test.save(function(error) {
         assert.ok(error);
-        assert.equal(error.name, 'MongoError');
+        assert.equal(error.name, 'MongoServerError');
         db.close(done);
       });
     });
@@ -6369,7 +6369,7 @@ describe('Model', function() {
         const collectionName = Model.collection.name;
 
         // If the collection is not created, the following will throw
-        // MongoError: Collection [mongoose_test.User] not found.
+        // MongoServerError: Collection [mongoose_test.User] not found.
         yield db.collection(collectionName).stats();
 
         yield Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
@@ -6482,7 +6482,7 @@ describe('Model', function() {
 
       yield Model.aggregate([{ $group: { fail: true } }]).exec().catch(() => {});
       assert.equal(called.length, 1);
-      assert.equal(called[0].name, 'MongoError');
+      assert.equal(called[0].name, 'MongoServerError');
     });
   });
 

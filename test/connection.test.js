@@ -988,6 +988,7 @@ describe('connections:', function() {
       const disconnect = m.disconnect;
 
       yield disconnect();
+      yield cb => setTimeout(cb, 0);
 
       const errorOnConnect = yield connect('mongodb://localhost:27017/test_gh9597').then(() => null, err => err);
       assert.ifError(errorOnConnect);

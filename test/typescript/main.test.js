@@ -1,7 +1,6 @@
 'use strict';
 
 const assert = require('assert');
-const fs = require('fs');
 const typescript = require('typescript');
 const tsconfig = require('./tsconfig.json');
 

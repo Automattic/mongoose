@@ -227,9 +227,7 @@ describe('typescript syntax', function() {
 
   it('populate', function() {
     const errors = runTest('populate.ts', { strict: true });
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
+    printTSErrors(errors);
     assert.equal(errors.length, 0);
   });
 

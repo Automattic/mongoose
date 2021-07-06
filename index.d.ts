@@ -926,7 +926,7 @@ declare module 'mongoose' {
      * if true, returns the raw result from the MongoDB driver
      */
     rawResult?: boolean;
-    readPreference?: string | mongodb.ReadPreferenceModeId;
+    readPreference?: string | mongodb.ReadPreferenceMode;
     /**
      * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
      */
@@ -2226,7 +2226,7 @@ declare module 'mongoose' {
     projection(fields?: any | null): any;
 
     /** Determines the MongoDB nodes from which to read. */
-    read(pref: string | mongodb.ReadPreferenceModeId, tags?: any[]): this;
+    read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
 
     /** Sets the readConcern option for the query. */
     readConcern(level: string): this;
@@ -2728,7 +2728,7 @@ declare module 'mongoose' {
     project(arg: string | Object): this;
 
     /** Sets the readPreference option for the aggregation query. */
-    read(pref: string | mongodb.ReadPreferenceModeId, tags?: any[]): this;
+    read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
 
     /** Sets the readConcern level for the aggregation query. */
     readConcern(level: string): this;

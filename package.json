@@ -22,7 +22,7 @@
     "@types/node": "14.x || 15.x",
     "bson": "^4.2.2",
     "kareem": "2.3.2",
-    "mongodb": "4.0.0-beta.4",
+    "mongodb": "4.0.0-beta.5",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.8.3",
     "mquery": "3.2.5",

@@ -10398,12 +10398,12 @@ describe('document', function() {
           }
         }
       });
-
+      console.log('no name');
       Object.assign(user, {
         location1: { coordinates: [0,0] },
         location2: { coordinates: [0,0] }
       });
-
+      console.log('no name')
       let user2 = new User({
         location1: {
           coordinates: [ 2.3522219, 48.856614 ],
@@ -10418,7 +10418,9 @@ describe('document', function() {
           }
         }
       });
+      console.log('ye')
       user2.set(user.toObject());
+      console.log('yo');
       assert.ok(!user.location1.properties.name);
       assert.ok(!user.location2.properties.name);
       assert.ok(!user2.location1.properties.name);

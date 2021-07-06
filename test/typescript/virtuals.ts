@@ -37,22 +37,13 @@ personSchema.virtual('fullName')
     this.lastName = splittedName[1];
   });
 
-// Arrow functions should not be used for virtual getters/setters.
-// See https://mongoosejs.com/docs/faq.html#arrow-functions
-personSchema.virtual('wrongVirtual')
-  .get((value, virtual, doc) => {
-    return `${this.doesNotWork}!!`;
-  })
-  .set((value, virtual, doc) => {
-    this.value = 'is not document';
-  });
-
 // Populated virtuals
 petSchema.virtual('owner', {
   ref: 'Person',
   localField: 'ownerId',
   foreignField: '_id',
-  justOne: true
+  justOne: true,
+  autopopulate: true
 });
 
 const Person = model('Person', personSchema);
@@ -62,6 +53,6 @@ const Pet = model('Pet', petSchema);
   const person = await Person.create({ _id: 1, firstName: 'John', lastName: 'Wick' });
   await Pet.create({ name: 'Andy', ownerId: person._id });
 
-  const pet = await Pet.findOne().populate('owner');
+  const pet = await Pet.findOne().orFail().populate('owner');
   console.log(pet.owner.fullName); // John Wick
 })();

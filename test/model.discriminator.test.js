@@ -1816,4 +1816,24 @@ describe('model', function() {
     assert.ok(err);
     assert.ok(err.errors['name.firstName']);
   });
+
+  it('allows using array as tied value (gh-10303)', function() {
+    const mongooseSchema = new mongoose.Schema({
+      tenantRefs: [{
+        type: String,
+        required: true
+      }],
+      otherData: {
+        type: String,
+        required: true
+      }
+    }, { discriminatorKey: 'tenantRefs' });
+    const Model = db.model('Test', mongooseSchema);
+
+    const D = Model.discriminator('D', Schema({}), ['abc', '123']);
+
+    return D.create({ otherData: 'test', tenantRefs: ['abc', '123'] }).then(res => {
+      assert.deepEqual(res.toObject().tenantRefs, ['abc', '123']);
+    });
+  });
 });

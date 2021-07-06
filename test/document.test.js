@@ -10425,4 +10425,151 @@ describe('document', function() {
       assert.ok(!user2.location2.properties.name);
     });
   });
+
+  describe('virtuals `pathsToSkip` (gh-10120)', () => {
+    it('adds support for `pathsToSkip` for virtuals feat-10120', function() {
+      const schema = new mongoose.Schema({
+        name: String,
+        age: Number,
+        nested: {
+          test: String
+        }
+      });
+      schema.virtual('nameUpper').get(function() { return this.name.toUpperCase(); });
+      schema.virtual('answer').get(() => 42);
+      schema.virtual('nested.hello').get(() => 'world');
+
+      const Model = db.model('Person', schema);
+      const doc = new Model({ name: 'Jean-Luc Picard', age: 59, nested: { test: 'hello' } });
+      let obj = doc.toObject({ virtuals: { pathsToSkip: ['answer'] } });
+      assert.ok(obj.nameUpper);
+      assert.equal(obj.answer, null);
+      assert.equal(obj.nested.hello, 'world');
+      obj = doc.toObject({ virtuals: { pathsToSkip: ['nested.hello'] } });
+      assert.equal(obj.nameUpper, 'JEAN-LUC PICARD');
+      assert.equal(obj.answer, 42);
+      assert.equal(obj.nested.hello, null);
+    });
+
+    it('supports passing a list of virtuals to `toObject()` (gh-10120)', function() {
+      const schema = new mongoose.Schema({
+        name: String,
+        age: Number,
+        nested: {
+          test: String
+        }
+      });
+      schema.virtual('nameUpper').get(function() { return this.name.toUpperCase(); });
+      schema.virtual('answer').get(() => 42);
+      schema.virtual('nested.hello').get(() => 'world');
+
+      const Model = db.model('Person', schema);
+
+      const doc = new Model({ name: 'Jean-Luc Picard', age: 59, nested: { test: 'hello' } });
+
+      let obj = doc.toObject({ virtuals: true });
+      assert.equal(obj.nameUpper, 'JEAN-LUC PICARD');
+      assert.equal(obj.answer, 42);
+      assert.equal(obj.nested.hello, 'world');
+
+      obj = doc.toObject({ virtuals: ['answer'] });
+      assert.ok(!obj.nameUpper);
+      assert.equal(obj.answer, 42);
+      assert.equal(obj.nested.hello, null);
+
+      obj = doc.toObject({ virtuals: ['nameUpper'] });
+      assert.equal(obj.nameUpper, 'JEAN-LUC PICARD');
+      assert.equal(obj.answer, null);
+      assert.equal(obj.nested.hello, null);
+
+      obj = doc.toObject({ virtuals: ['nested.hello'] });
+      assert.equal(obj.nameUpper, null);
+      assert.equal(obj.answer, null);
+      assert.equal(obj.nested.hello, 'world');
+    });
+  });
+  describe('validation `pathsToSkip` (gh-10230)', () => {
+    it('support `pathsToSkip` option for `Document#validate()`', function() {
+      return co(function*() {
+        const User = getUserModel();
+        const user = new User();
+
+        const err1 = yield user.validate({ pathsToSkip: ['age'] }).then(() => null, err => err);
+        assert.deepEqual(Object.keys(err1.errors), ['name']);
+
+        const err2 = yield user.validate({ pathsToSkip: ['name'] }).then(() => null, err => err);
+        assert.deepEqual(Object.keys(err2.errors), ['age']);
+      });
+    });
+
+    it('support `pathsToSkip` option for `Document#validate()`', function() {
+      return co(function*() {
+        const User = getUserModel();
+        const user = new User();
+
+        const err1 = yield user.validate({ pathsToSkip: ['age'] }).then(() => null, err => err);
+        assert.deepEqual(Object.keys(err1.errors), ['name']);
+
+        const err2 = yield user.validate({ pathsToSkip: ['name'] }).then(() => null, err => err);
+        assert.deepEqual(Object.keys(err2.errors), ['age']);
+      });
+    });
+
+    it('support `pathsToSkip` option for `Document#validateSync()`', () => {
+      const User = getUserModel();
+
+      const user = new User();
+
+      const err1 = user.validateSync({ pathsToSkip: ['age'] });
+      assert.deepEqual(Object.keys(err1.errors), ['name']);
+
+      const err2 = user.validateSync({ pathsToSkip: ['name'] });
+      assert.deepEqual(Object.keys(err2.errors), ['age']);
+    });
+
+    // skip until gh-10367 is implemented
+    xit('support `pathsToSkip` option for `Model.validate()`', () => {
+      return co(function*() {
+        const User = getUserModel();
+        const err1 = yield User.validate({}, { pathsToSkip: ['age'] });
+        assert.deepEqual(Object.keys(err1.errors), ['name']);
+
+        const err2 = yield User.validate({}, { pathsToSkip: ['name'] });
+        assert.deepEqual(Object.keys(err2.errors), ['age']);
+      });
+    });
+
+    it('`pathsToSkip` accepts space separated paths', () => {
+      const userSchema = Schema({
+        name: { type: String, required: true },
+        age: { type: Number, required: true },
+        country: { type: String, required: true },
+        rank: { type: String, required: true }
+      });
+
+      const User = db.model('User', userSchema);
+      return co(function* () {
+        const user = new User({ name: 'Sam', age: 26 });
+
+        const err1 = user.validateSync({ pathsToSkip: 'country rank' });
+        assert.ok(err1 == null);
+
+        const err2 = yield user.validate({ pathsToSkip: 'country rank' }).then(() => null, err => err);
+        assert.ok(err2 == null);
+      });
+    });
+
+
+    function getUserModel() {
+      const userSchema = Schema({
+        name: { type: String, required: true },
+        age: { type: Number, required: true },
+        rank: String
+      });
+
+      const User = db.model('User', userSchema);
+      return User;
+    }
+  });
+
 });

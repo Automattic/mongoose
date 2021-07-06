@@ -20,7 +20,7 @@ interface Movie {
   genre?: string,
   actionIntensity?: number,
   status?: string,
-  actors?: Actor[]
+  actors: Actor[]
 }
 
 const movieSchema = new Schema<Document<Movie>, Model<Document<Movie>>, Movie>({
@@ -145,5 +145,22 @@ function gh10287() {
     subProp: {
       type: subSchema
     }
+  });
+}
+
+function gh10370() {
+  const movieSchema = new Schema<Document & Movie, Model<Document & Movie>, Movie>({
+    actors: {
+      type: [actorSchema]
+    }
+  });
+}
+
+function gh10409() {
+  interface Something {
+    field: Date;
+  }
+  const someSchema = new Schema<Something, Model<Something>, Something>({
+    field: { type: Date }
   });
 }

@@ -16,7 +16,12 @@ To create a transaction, you first need to create a session using or [`Mongoose#
 or [`Connection#startSession()`](/docs/api/connection.html#connection_Connection-startSession).
 
 ```javascript
+// Using Mongoose's default connection
 const session = await mongoose.startSession();
+
+// Using custom connection
+const db = await mongoose.createConnection(mongodbUri, { useUnifiedTopology: true, useNewUrlParser: true });
+const session = await db.startSession();
 ```
 
 In practice, you should use either the [`session.withTransaction()` helper](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html#withTransaction)

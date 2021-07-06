@@ -4,14 +4,50 @@ const assert = require('assert');
 const typescript = require('typescript');
 const tsconfig = require('./tsconfig.json');
 
+function printTSErrors(errors) {
+  if (!process.env.D) {
+    return;
+  }
+  if (!errors.length) {
+    return;
+  }
+  errors.forEach(e => {
+    if (typeof e.messageText === 'string') {
+      let lineStart = e.file.text.slice(0, e.start).lastIndexOf('\n');
+      if (lineStart === -1) {
+        lineStart = 0;
+      }
+      let lineEnd = e.file.text.slice(e.start).indexOf('\n');
+      if (lineEnd === -1) {
+        lineEnd = e.file.text.length;
+      } else {
+        lineEnd += e.start;
+      }
+      console.log(`-----\n\nERROR: ${e.messageText}\n\n${e.file.text.slice(lineStart, lineEnd - 1)}\n${' '.repeat(e.start - lineStart - 1)}^`);
+    } else if (e.messageText.messageText) {
+      let lineStart = e.file.text.slice(0, e.start).lastIndexOf('\n');
+      if (lineStart === -1) {
+        lineStart = 0;
+      }
+      let lineEnd = e.file.text.slice(e.start).indexOf('\n');
+      if (lineEnd === -1) {
+        lineEnd = e.file.text.length;
+      } else {
+        lineEnd += e.start;
+      }
+      console.log(`-----\n\nERROR: ${e.messageText.messageText}\n\n${e.file.text.slice(lineStart, lineEnd - 1)}\n${' '.repeat(e.start - lineStart - 1)}^`);
+    } else {
+      console.log(e);
+    }
+  });
+}
+
 describe('typescript syntax', function() {
   this.timeout(60000);
 
   it('base', function() {
     const errors = runTest('base.ts');
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
+    printTSErrors(errors);
     assert.equal(errors.length, 0);
   });
 
@@ -49,9 +85,7 @@ describe('typescript syntax', function() {
 
   it('queries', function() {
     const errors = runTest('queries.ts', { strict: true });
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
+    printTSErrors(errors);
     assert.equal(errors.length, 0);
   });
 
@@ -118,10 +152,12 @@ describe('typescript syntax', function() {
     if (process.env.D && errors.length) {
       console.log(errors);
     }
-    assert.equal(errors.length, 3);
+    assert.equal(errors.length, 5);
     assert.ok(errors[0].messageText.includes('Property \'save\' does not exist'), errors[0].messageText);
     assert.ok(errors[1].messageText.includes('Property \'save\' does not exist'), errors[1].messageText);
     assert.ok(errors[2].messageText.includes('Property \'testMethod\' does not exist'), errors[2].messageText);
+    assert.ok(errors[3].messageText.includes('Property \'id\' does not exist'), errors[3].messageText);
+    assert.ok(errors[4].messageText.includes('Property \'id\' does not exist'), errors[4].messageText);
   });
 
   it('doc array', function() {
@@ -201,6 +237,14 @@ describe('typescript syntax', function() {
 
   it('generics', function() {
     const errors = runTest('generics.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
+
+  it('virtuals', function() {
+    const errors = runTest('virtuals.ts');
     if (process.env.D && errors.length) {
       console.log(errors);
     }

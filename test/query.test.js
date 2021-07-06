@@ -3870,4 +3870,18 @@ describe('Query', function() {
       yield entry.save();
     });
   });
+
+  it('sanitizeProjection option (gh-10243)', function() {
+    const MySchema = Schema({ name: String, email: String });
+    const Test = db.model('Test', MySchema);
+
+    let q = Test.find().select({ email: '$name' });
+    assert.deepEqual(q._fields, { email: '$name' });
+
+    q = Test.find().setOptions({ sanitizeProjection: true }).select({ email: '$name' });
+    assert.deepEqual(q._fields, { email: 1 });
+
+    q = Test.find().select({ email: '$name' }).setOptions({ sanitizeProjection: true });
+    assert.deepEqual(q._fields, { email: 1 });
+  });
 });

@@ -10349,4 +10349,80 @@ describe('document', function() {
       assert.equal(fromDb.observers.length, 1);
     });
   });
+  it('gets rid of recursive merging when using set on nested paths (gh-9121) & (gh-9046)', function() {
+    const LocationSchema = new mongoose.Schema({
+      type: {
+        type: String,
+        default: 'Point',
+      },
+      coordinates: [Number],
+      properties: {
+        name: String,
+      },
+    }, {
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
+      _id: false,
+      id: false,
+    });
+    
+    const UserSchema = new mongoose.Schema({
+      location1: {
+        type: LocationSchema,
+      },
+      location2: {
+        type: {
+          type: String,
+          default: 'Point',
+        },
+        coordinates: [Number],
+        properties: {
+          name: String,
+        },
+      },
+    });
+    const User = db.model('User', UserSchema);
+
+    return co(function*() {
+      let user = yield User.create({
+        location1: {
+          coordinates: [ 2.3522219, 48.856614 ],
+          properties: {
+            name: 'Paris, France',
+          }
+        },
+        location2: {
+          coordinates: [ 2.3522219, 48.856614 ],
+          properties: {
+            name: 'Paris, France',
+          }
+        }
+      });
+
+      Object.assign(user, {
+        location1: { coordinates: [0,0] },
+        location2: { coordinates: [0,0] }
+      });
+
+      let user2 = new User({
+        location1: {
+          coordinates: [ 2.3522219, 48.856614 ],
+          properties: {
+            name: 'Paris, France',
+          }
+        },
+        location2: {
+          coordinates: [ 2.3522219, 48.856614 ],
+          properties: {
+            name: 'Paris, France',
+          }
+        }
+      });
+      user2.set(user.toObject());
+      assert.ok(!user.location1.properties.name);
+      assert.ok(!user.location2.properties.name);
+      assert.ok(!user2.location1.properties.name);
+      assert.ok(!user2.location2.properties.name);
+    });
+  });
 });

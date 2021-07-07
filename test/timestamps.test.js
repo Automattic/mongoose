@@ -875,4 +875,14 @@ describe('timestamps', function() {
       assert.ok(fromDb.content.a.updatedAt.valueOf() > ts.valueOf());
     });
   });
+  it('makes createdAt immutable by default (gh-10139)', function() {
+    const schema = Schema({ name: String }, { timestamps: true });
+    const Model = db.model('Time', schema);
+    return co(function*() {
+      const doc = yield Model.create({ name: 'test' });
+      const test = doc.createdAt;
+      doc.createdAt = new Date();
+      assert.equal(test, doc.createdAt);
+    });
+  });
 });

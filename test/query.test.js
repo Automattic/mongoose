@@ -3884,4 +3884,20 @@ describe('Query', function() {
     q = Test.find().select({ email: '$name' }).setOptions({ sanitizeProjection: true });
     assert.deepEqual(q._fields, { email: 1 });
   });
+
+  it('can avoid query selector injections using `Query#eq()` (gh-3944)', function() {
+    const MySchema = Schema({ username: String, pwd: String });
+    const Test = db.model('Test', MySchema);
+
+    return co(function*() {
+      yield Test.create({ username: 'val', pwd: 'taco' });
+
+      const q = Test.find().eq({ username: 'val', pwd: { $ne: null } });
+      assert.deepEqual(q.getFilter(), { username: { $eq: 'val' }, pwd: { $eq: { $ne: null } } });
+
+      const err = yield q.then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'CastError');
+    });
+  });
 });

@@ -10353,78 +10353,85 @@ describe('document', function() {
     const LocationSchema = new mongoose.Schema({
       type: {
         type: String,
-        default: 'Point',
+        default: 'Point'
       },
       coordinates: [Number],
       properties: {
-        name: String,
-      },
+        name: String
+      }
     }, {
       toJSON: { virtuals: true },
-      toObject: { virtuals: true },
+      toObject: { virtuals: true},
       _id: false,
-      id: false,
+      id: false
     });
-    
+
     const UserSchema = new mongoose.Schema({
       location1: {
-        type: LocationSchema,
+        type: LocationSchema
       },
       location2: {
         type: {
           type: String,
-          default: 'Point',
+          default: 'Point'
         },
         coordinates: [Number],
         properties: {
-          name: String,
-        },
-      },
+          name: String
+        }
+      }
     });
     const User = db.model('User', UserSchema);
 
     return co(function*() {
       let user = yield User.create({
         location1: {
-          coordinates: [ 2.3522219, 48.856614 ],
+          coordinates: [2.3522219, 48.856614],
           properties: {
-            name: 'Paris, France',
+            name: 'Paris, France'
           }
         },
         location2: {
-          coordinates: [ 2.3522219, 48.856614 ],
+          coordinates: [2.3522219, 48.856614],
           properties: {
-            name: 'Paris, France',
+            name: 'Paris, France'
           }
         }
       });
-      console.log('no name');
+
       Object.assign(user, {
-        location1: { coordinates: [0,0] },
-        location2: { coordinates: [0,0] }
+        location1: { coordinates: [0, 0] },
+        location2: { coordinates: [0, 0] }
       });
-      console.log('no name')
-      let user2 = new User({
+
+      let user2 = yield User.create({
         location1: {
-          coordinates: [ 2.3522219, 48.856614 ],
+          coordinates: [2.3522219, 48.856614],
           properties: {
-            name: 'Paris, France',
+            name: 'Paris, France'
           }
         },
         location2: {
-          coordinates: [ 2.3522219, 48.856614 ],
+          coordinates: [2.3522219, 48.856614],
           properties: {
-            name: 'Paris, France',
+            name: 'Paris, France'
           }
         }
       });
-      console.log('ye')
+      console.log('from test', user2.location1.properties.name);
+      console.log('from test', user2.location2.properties.name);
+      console.log('from test', user.toObject());
       user2.set(user.toObject());
-      console.log('yo');
+      console.log(user2.location1.properties.name);
+      console.log(user2.location2.properties.name);
       assert.ok(!user.location1.properties.name);
       assert.ok(!user.location2.properties.name);
+      assert.ok(user.location1.coordinates);
+      assert.ok(user.location2.coordinates);
       assert.ok(!user2.location1.properties.name);
       assert.ok(!user2.location2.properties.name);
+      assert.ok(user2.location1.coordinates);
+      assert.ok(user2.location2.coordinates);
     });
   });
 

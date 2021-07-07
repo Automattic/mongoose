@@ -18,7 +18,7 @@ const ValidatorError = mongoose.Error.ValidatorError;
 const ValidationError = mongoose.Error.ValidationError;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
-const EmbeddedDocument = mongoose.Types.Embedded;
+const EmbeddedDocument = mongoose.Types.Subdocument;
 const MongooseError = mongoose.Error;
 
 describe('Model', function() {

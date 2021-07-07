@@ -1798,7 +1798,7 @@ declare module 'mongoose' {
         auto(turnOn: boolean): this;
       }
 
-      class Embedded extends SchemaType {
+      class SubdocumentPath extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
@@ -1900,20 +1900,6 @@ declare module 'mongoose' {
 
       /** Searches array items for the first document with a matching _id. */
       id(id: any): T | null;
-    }
-
-    class EmbeddedDocument extends Document {
-      /** Returns the top level document of this sub-document. */
-      ownerDocument(): Document;
-
-      /** Returns this sub-documents parent document. */
-      parent(): Document;
-
-      /** Returns this sub-documents parent document. */
-      $parent(): Document;
-
-      /** Returns this sub-documents parent array. */
-      parentArray(): DocumentArray<Document>;
     }
 
     class Map<V> extends global.Map<string, V> {

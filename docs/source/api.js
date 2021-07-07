@@ -26,7 +26,7 @@ const files = [
   'lib/types/core_array.js',
   'lib/schema/array.js',
   'lib/schema/documentarray.js',
-  'lib/schema/SingleNestedPath.js',
+  'lib/schema/SubdocumentPath.js',
   'lib/options/SchemaTypeOptions.js',
   'lib/options/SchemaArrayOptions.js',
   'lib/options/SchemaBufferOptions.js',

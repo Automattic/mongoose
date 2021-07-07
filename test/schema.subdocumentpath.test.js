@@ -10,7 +10,7 @@ const assert = require('assert');
 
 const Schema = mongoose.Schema;
 
-describe('SingleNestedPath', function() {
+describe('SubdocumentPath', function() {
   describe('discriminator()', function() {
     describe('recursive nested discriminators', function() {
       it('allow multiple levels of data in the schema', function() {
@@ -165,7 +165,7 @@ describe('SingleNestedPath', function() {
 
   it('supports `set()` (gh-8883)', function() {
     mongoose.deleteModel(/Test/);
-    mongoose.Schema.Types.Embedded.set('required', true);
+    mongoose.Schema.Types.Subdocument.set('required', true);
 
     const Model = mongoose.model('Test', mongoose.Schema({
       nested: mongoose.Schema({
@@ -179,6 +179,6 @@ describe('SingleNestedPath', function() {
     assert.ok(err);
     assert.ok(err.errors['nested']);
 
-    mongoose.Schema.Types.Embedded.set('required', false);
+    mongoose.Schema.Types.Subdocument.set('required', false);
   });
 });

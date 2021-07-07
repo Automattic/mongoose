@@ -18,7 +18,6 @@ const DocumentObjectId = mongoose.Types.ObjectId;
 const ReadPref = mongoose.mongo.ReadPreference;
 const vm = require('vm');
 const co = require('co');
-const Buffer = require('safe-buffer').Buffer;
 const applyPlugins = require('../lib/helpers/schema/applyPlugins');
 
 /**

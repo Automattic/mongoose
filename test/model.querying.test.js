@@ -11,7 +11,6 @@ const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
 const util = require('./util');
-const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

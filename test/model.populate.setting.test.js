@@ -8,7 +8,6 @@
 
 const start = require('./common');
 
-const Buffer = require('safe-buffer').Buffer;
 const assert = require('assert');
 const utils = require('../lib/utils');
 

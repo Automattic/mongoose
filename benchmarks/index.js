@@ -1,7 +1,5 @@
 'use strict';
 
-const Buffer = require('safe-buffer').Buffer;
-
 Error.stackTraceLimit = Infinity;
 const out = process.argv.length < 3;
 function log() {

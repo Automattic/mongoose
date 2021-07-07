@@ -6,7 +6,6 @@
 
 const start = require('./common');
 
-const Buffer = require('safe-buffer').Buffer;
 const assert = require('assert');
 const mongoose = require('./common').mongoose;
 
@@ -55,7 +54,7 @@ describe('types.buffer', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it('test that a mongoose buffer behaves and quacks like a buffer', function(done) {
+  it('test that a mongoose buffer behaves and quacks like a buffer', function() {
     let a = new MongooseBuffer;
 
     assert.ok(a instanceof Buffer);
@@ -71,7 +70,6 @@ describe('types.buffer', function() {
     assert.equal(b.toString('utf8'), 'buffer shtuffs are neat');
     assert.equal(c.toString('utf8'), 'hello world');
     assert.equal(d.toString('utf8'), '');
-    done();
   });
 
   it('buffer validation', function(done) {
@@ -403,35 +401,31 @@ describe('types.buffer', function() {
   });
 
   describe('#toObject', function() {
-    it('retains custom subtypes', function(done) {
+    it('retains custom subtypes', function() {
       const buf = new MongooseBuffer(0);
       const out = buf.toObject(2);
       // validate the drivers Binary type output retains the option
       assert.equal(out.sub_type, 2);
-      done();
     });
   });
 
   describe('subtype', function() {
     let bufferSchema, B;
 
-    beforeEach(function(done) {
+    beforeEach(function() {
       bufferSchema = new Schema({ buf: Buffer });
       B = db.model('Test', bufferSchema);
-      done();
     });
 
-    it('default value', function(done) {
+    it('default value', function() {
       const b = new B({ buf: Buffer.from('hi') });
       assert.strictEqual(0, b.buf._subtype);
-      done();
     });
 
-    it('method works', function(done) {
+    it('method works', function() {
       const b = new B({ buf: Buffer.from('hi') });
       b.buf.subtype(128);
       assert.strictEqual(128, b.buf._subtype);
-      done();
     });
 
     it('is stored', function(done) {
@@ -486,17 +480,16 @@ describe('types.buffer', function() {
       });
     });
 
-    it('cast from number (gh-3764)', function(done) {
+    it('cast from number (gh-3764)', function() {
       const schema = new Schema({ buf: Buffer });
       mongoose.deleteModel(/Test/);
       const MyModel = mongoose.model('Test', schema);
 
       const doc = new MyModel({ buf: 9001 });
       assert.equal(doc.buf.length, 1);
-      done();
     });
 
-    it('cast from string', function(done) {
+    it('cast from string', function() {
       const schema = new Schema({ buf: Buffer });
       mongoose.deleteModel(/Test/);
       const MyModel = mongoose.model('Test', schema);
@@ -504,10 +497,9 @@ describe('types.buffer', function() {
       const doc = new MyModel({ buf: 'hi' });
       assert.ok(doc.buf instanceof Buffer);
       assert.equal(doc.buf.toString('utf8'), 'hi');
-      done();
     });
 
-    it('cast from array', function(done) {
+    it('cast from array', function() {
       const schema = new Schema({ buf: Buffer });
       mongoose.deleteModel(/Test/);
       const MyModel = mongoose.model('Test', schema);
@@ -515,10 +507,9 @@ describe('types.buffer', function() {
       const doc = new MyModel({ buf: [195, 188, 98, 101, 114] });
       assert.ok(doc.buf instanceof Buffer);
       assert.equal(doc.buf.toString('utf8'), 'über');
-      done();
     });
 
-    it('cast from Binary', function(done) {
+    it('cast from Binary', function() {
       const schema = new Schema({ buf: Buffer });
       mongoose.deleteModel(/Test/);
       const MyModel = mongoose.model('Test', schema);
@@ -526,10 +517,9 @@ describe('types.buffer', function() {
       const doc = new MyModel({ buf: new MongooseBuffer.Binary([228, 189, 160, 229, 165, 189], 0) });
       assert.ok(doc.buf instanceof Buffer);
       assert.equal(doc.buf.toString('utf8'), '你好');
-      done();
     });
 
-    it('cast from json (gh-6863)', function(done) {
+    it('cast from json (gh-6863)', function() {
       const schema = new Schema({ buf: Buffer });
       mongoose.deleteModel(/Test/);
       const MyModel = mongoose.model('Test', schema);
@@ -537,7 +527,15 @@ describe('types.buffer', function() {
       const doc = new MyModel({ buf: { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } });
       assert.ok(doc.buf instanceof Buffer);
       assert.equal(doc.buf.toString('utf8'), 'gh-6863');
-      done();
+    });
+
+    it('is an `instanceof Buffer`', () => {
+      const schema = new Schema({ buf: Buffer });
+      mongoose.deleteModel(/Test/);
+      const MyModel = mongoose.model('Test', schema);
+
+      const doc = new MyModel({ buf: { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } });
+      assert.ok(doc.buf instanceof Buffer);
     });
   });
 });

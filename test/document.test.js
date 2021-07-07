@@ -16,7 +16,6 @@ const idGetter = require('../lib/plugins/idGetter');
 const util = require('./util');
 const utils = require('../lib/utils');
 const validator = require('validator');
-const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

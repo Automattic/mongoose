@@ -3,8 +3,6 @@
 const mongoose = require('../');
 const Schema = mongoose.Schema;
 
-const Buffer = require('safe-buffer').Buffer;
-
 const DocSchema = new Schema({
   title: String
 });

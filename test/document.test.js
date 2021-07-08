@@ -10418,12 +10418,10 @@ describe('document', function() {
           }
         }
       });
-      console.log('from test', user2.location1.properties.name);
-      console.log('from test', user2.location2.properties.name);
-      console.log('from test', user.toObject());
+      console.log('user2', user2);
+      console.log('user.toObject', user.toObject());
       user2.set(user.toObject());
-      console.log(user2.location1.properties.name);
-      console.log(user2.location2.properties.name);
+      console.log('after toObject', user2);
       assert.ok(!user.location1.properties.name);
       assert.ok(!user.location2.properties.name);
       assert.ok(user.location1.coordinates);

@@ -32,7 +32,7 @@ userSchema.methods.genAuthToken = function() {
 // password hasing
 userPasswordSchema.pre('save', async function(next) {
   try {
-    if (this.isModified('password')) {
+    if (this.$isModified('password')) {
       this.password = await bcrypt.hashSync(this.password, 8);
       return next();
     }

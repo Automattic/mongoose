@@ -103,7 +103,7 @@ describe('Tutorial: findOneAndUpdate()', function() {
 
     // This will update `doc` age to `59`, even though the doc changed.
     doc.age = 59;
-    await doc.$save();
+    await doc.save();
 
     doc = await Character.findOne();
     doc.name; // Will Riker

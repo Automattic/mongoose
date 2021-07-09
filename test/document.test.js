@@ -10478,6 +10478,26 @@ describe('document', function() {
         assert.equal(user.populated, 'yep');
       });
     });
+    describe('Document#toObject(...)', () => {
+      it('is available as `$toObject`', async() => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const user = await User.create({ name: 'Sam' });
+
+        assert.equal(user.$toObject().name, 'Sam');
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          toObject: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', toObject: 'yep' });
+        assert.equal(user.toObject, 'yep');
+      });
+    });
   });
 
   describe('virtuals `pathsToSkip` (gh-10120)', () => {

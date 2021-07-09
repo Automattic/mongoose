@@ -13,10 +13,26 @@ const co = require('co');
 const mongodb = require('mongodb');
 const MongooseError = require('../lib/error/index');
 
+const Server = require('./connection_server');
+const server = new Server('mongod', {
+  bind_ip: '127.0.0.1',
+  port: 27000,
+  dbpath: './data/db/27000'
+});
+
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
 const uri = 'mongodb://localhost:27017/mongoose_test';
+
+before(function() {
+  return server.purge();
+});
+
+after(function() {
+  this.timeout(15000);
+  return server.stop();
+});
 
 /**
  * Test.
@@ -972,6 +988,7 @@ describe('connections:', function() {
       const disconnect = m.disconnect;
 
       yield disconnect();
+      yield cb => setTimeout(cb, 0);
 
       const errorOnConnect = yield connect('mongodb://localhost:27017/test_gh9597').then(() => null, err => err);
       assert.ifError(errorOnConnect);

@@ -11,7 +11,6 @@ const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
 const util = require('./util');
-const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -2547,7 +2546,7 @@ describe('model: querying:', function() {
             if (mongo26) {
               assert.ifError(err);
             } else {
-              assert.ok(err.toString().indexOf('MongoError') !== -1);
+              assert.ok(err.toString().indexOf('MongoServerError') !== -1);
             }
 
             assert.ok(!doc);

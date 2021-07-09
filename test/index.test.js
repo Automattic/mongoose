@@ -51,7 +51,7 @@ describe('mongoose module:', function() {
   });
 
   it('returns legacy pluralize function by default', function() {
-    const legacyPluralize = require('mongoose-legacy-pluralize');
+    const legacyPluralize = require('../lib/helpers/pluralize');
     const mongoose = new Mongoose();
 
     const pluralize = mongoose.pluralize();

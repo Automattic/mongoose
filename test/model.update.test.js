@@ -9,7 +9,6 @@ const start = require('./common');
 const assert = require('assert');
 const co = require('co');
 const util = require('./util');
-const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -3278,12 +3277,9 @@ describe('model: updateOne: ', function() {
 
       yield cb => setTimeout(cb, 10);
       yield Test.updateOne({ _id: doc._id }, { nested: { test: 'bar' } });
-
       const fromDb = yield Test.findOne({ _id: doc._id });
       assert.ok(fromDb.nested.updatedAt);
       assert.ok(fromDb.nested.updatedAt > doc.nested.updatedAt);
-      assert.ok(fromDb.nested.createdAt);
-      assert.ok(fromDb.nested.createdAt > doc.nested.createdAt);
     });
   });
 

@@ -121,6 +121,25 @@ function gh10074() {
   });
 }
 
+async function gh10359() {
+  interface Group {
+    groupId: string;
+  }
+
+  interface User extends Group {
+    firstName: string;
+    lastName: string;
+  }
+
+  async function foo<T extends Group>(model: Model<any>): Promise<T | null> {
+    const doc: T | null = await model.findOne({ groupId: 'test' }).lean().exec();
+    return doc;
+  }
+
+  const UserModel = model<User>('gh10359', new Schema({ firstName: String, lastName: String, groupId: String }));
+  const u: User | null = await foo<User>(UserModel);
+}
+
 const ExpiresSchema = new Schema({
   ttl: {
     type: Date,

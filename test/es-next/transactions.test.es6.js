@@ -439,4 +439,20 @@ describe('transactions', function() {
       { readPreference: 'primary' }
     );
   });
+
+  it('does not throw an error if using document after session has ended (gh-10306)', async function () {
+    const schema = Schema({ arr: [String] });
+
+    const Test = db.model('new_doc_array3', schema);
+
+    await Test.createCollection();
+
+    const session = await db.startSession();
+
+    const doc = new Test({ arr: ['foo'] });
+    doc.$session(session);
+    await session.endSession();
+
+    await doc.save();
+  });
 });

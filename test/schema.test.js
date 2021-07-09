@@ -2416,26 +2416,6 @@ describe('schema', function() {
     });
   });
 
-  describe('Schema.reserved (gh-8869)', function() {
-    it('throws errors on compiling schema with reserved key as a flat type', function() {
-      const buildInvalidSchema = () => new Schema({ save: String });
-
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-
-    it('throws errors on compiling schema with reserved key as a nested object', function() {
-      const buildInvalidSchema = () => new Schema({ save: { nested: String } });
-
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-
-    it('throws errors on compiling schema with reserved key as a nested array', function() {
-      const buildInvalidSchema = () => new Schema({ save: [{ nested: String }] });
-
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-  });
-
   it('disables `id` virtual if no `_id` path (gh-3936)', function() {
     const idGetter = require('../lib/plugins/idGetter');
 

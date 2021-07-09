@@ -10446,6 +10446,38 @@ describe('document', function() {
         assert.equal(user.isNew, 'yep');
       });
     });
+    describe('Document#populated(...)', () => {
+      it('is available as `$populated`', async() => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const postSchema = new Schema({
+          title: String,
+          userId: { type: Schema.ObjectId, ref: 'User' }
+        });
+        const Post = db.model('Post', postSchema);
+
+        const user = await User.create({ name: 'Sam' });
+
+        const postFromCreate = await Post.create({ title: 'I am a title', userId: user._id });
+
+        const post = await Post.findOne({ _id: postFromCreate }).populate({ path: 'userId' });
+
+        assert.ok(post.$populated('userId'));
+        post.depopulate('userId');
+        assert.ok(!post.$populated('userId'));
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          populated: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', populated: 'yep' });
+        assert.equal(user.populated, 'yep');
+      });
+    });
   });
 
   describe('virtuals `pathsToSkip` (gh-10120)', () => {

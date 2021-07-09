@@ -27,7 +27,7 @@ Router.get('/all', auth, async function({ userId }, res) {
 Router.post('/create', auth, clearCache, async function({ userId, body }, res) {
   try {
     const todo = new Todo({ ...body, userId });
-    await todo.$save();
+    await todo.save();
     res.status(201).json({ todo });
   } catch (err) {
     res.status(501).send('Server Error: ' + err);
@@ -46,7 +46,7 @@ Router.post('/update', auth, async function({ userId, body }, res) {
     );
     if (!updatedTodo) return res.status(404).send({ msg: 'Todo not found' });
 
-    await updatedTodo.$save();
+    await updatedTodo.save();
     res.status(200).json({ todo: updatedTodo });
   } catch (err) {
     res.status(501).send('Server Error: ' + err);

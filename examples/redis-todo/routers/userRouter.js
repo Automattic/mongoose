@@ -21,8 +21,8 @@ Router.post('/create', async function({ body }, res) {
     const token = await user.genAuthToken();
 
     // hashing password
-    await password.$save();
-    await user.$save();
+    await password.save();
+    await user.save();
     res.status(201).json({ token });
   } catch (err) {
     console.log(err);
@@ -68,7 +68,7 @@ Router.post('/update', auth, async function({ userId, body }, res) {
     if (body.password) {
       const password = await Password.findById({ _id: updatedUser.passwordId });
       password.password = body.password;
-      password.$save(); // hashing password
+      password.save(); // hashing password
     }
 
     res.status(200).json({ user: updatedUser });

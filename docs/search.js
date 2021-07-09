@@ -118,7 +118,7 @@ async function run() {
 
   await Content.deleteMany({});
   for (const content of contents) {
-    await content.$save();
+    await content.save();
   }
 
   const results = await Content.

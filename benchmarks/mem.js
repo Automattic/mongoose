@@ -138,7 +138,7 @@ function cycle() {
     docs: [{title: 'yo'}, {title: 'nowafasdi0fas asjkdfla fa'}]
   });
 
-  a.$save(function() {
+  a.save(function() {
     methods[Math.random() * methods.length | 0](a, function() {
       a = null;
       process.nextTick(cycle);

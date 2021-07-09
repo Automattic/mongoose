@@ -10422,6 +10422,30 @@ describe('document', function() {
         assert.equal(user.isModified, 'nope');
       });
     });
+    xdescribe('Document#isNew', () => {
+      it('is available as `$isNew`', async() => {
+        const userSchema = new Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam' });
+
+        assert.ok(user.$isNew === true);
+        await user.save();
+        assert.ok(user.$isNew === false);
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          isNew: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', isNew: 'yep' });
+        assert.equal(user.isNew, 'yep');
+      });
+    });
   });
 
   describe('virtuals `pathsToSkip` (gh-10120)', () => {

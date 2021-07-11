@@ -97,7 +97,7 @@ describe('clone', () => {
           return obj;
         },
         $toObject() {
-          return this.$toObject(...arguments);
+          return this.toObject(...arguments);
         }
       };
       const cloned = clone(base, baseOpts);

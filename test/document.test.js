@@ -10349,6 +10349,178 @@ describe('document', function() {
     });
   });
 
+  describe('reserved keywords can be used optionally (gh-9010)', () => {
+    describe('Document#validate(...)', () => {
+      it('is available as `$validate`', async() => {
+        const userSchema = new Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam' });
+        const err = await user.$validate();
+        assert.ok(err == null);
+        assert.equal(user.$validate, user.validate);
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          validate: Boolean
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', validate: true });
+        assert.equal(user.validate, true);
+      });
+    });
+    describe('Document#save(...)', () => {
+      it('is available as `$save`', async() => {
+        const userSchema = new Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam' });
+        const userFromSave = await user.$save();
+        assert.ok(userFromSave === user);
+        assert.equal(user.$save, user.save);
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          save: Boolean
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', save: true });
+        assert.equal(user.save, true);
+      });
+    });
+    describe('Document#isModified(...)', () => {
+      it('is available as `$isModified`', async() => {
+        const userSchema = new Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam' });
+        await user.save();
+
+        assert.ok(user.$isModified() === false);
+
+        user.name = 'John';
+        assert.ok(user.$isModified() === true);
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          isModified: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', isModified: 'nope' });
+        assert.equal(user.isModified, 'nope');
+      });
+    });
+    xdescribe('Document#isNew', () => {
+      it('is available as `$isNew`', async() => {
+        const userSchema = new Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam' });
+
+        assert.ok(user.$isNew === true);
+        await user.save();
+        assert.ok(user.$isNew === false);
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          isNew: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', isNew: 'yep' });
+        assert.equal(user.isNew, 'yep');
+      });
+    });
+    describe('Document#populated(...)', () => {
+      it('is available as `$populated`', async() => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const postSchema = new Schema({
+          title: String,
+          userId: { type: Schema.ObjectId, ref: 'User' }
+        });
+        const Post = db.model('Post', postSchema);
+
+        const user = await User.create({ name: 'Sam' });
+
+        const postFromCreate = await Post.create({ title: 'I am a title', userId: user._id });
+
+        const post = await Post.findOne({ _id: postFromCreate }).populate({ path: 'userId' });
+
+        assert.ok(post.$populated('userId'));
+        post.depopulate('userId');
+        assert.ok(!post.$populated('userId'));
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          populated: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', populated: 'yep' });
+        assert.equal(user.populated, 'yep');
+      });
+    });
+    describe('Document#toObject(...)', () => {
+      it('is available as `$toObject`', async() => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const user = await User.create({ name: 'Sam' });
+
+        assert.deepEqual(user.$toObject(), user.toObject());
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          toObject: String
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', toObject: 'yep' });
+        assert.equal(user.toObject, 'yep');
+      });
+    });
+    describe('Document#init(...)', () => {
+      it('is available as `$init`', async() => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const user = new User();
+        const sam = new User({ name: 'Sam' });
+
+        assert.equal(user.$init(sam).name, 'Sam');
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          init: Number
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', init: 12 });
+        assert.equal(user.init, 12);
+      });
+    });
+  });
+
   describe('virtuals `pathsToSkip` (gh-10120)', () => {
     it('adds support for `pathsToSkip` for virtuals feat-10120', function() {
       const schema = new mongoose.Schema({

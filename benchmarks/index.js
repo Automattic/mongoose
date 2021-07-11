@@ -149,7 +149,4 @@ run('array of docs', function() {
   });
 });
 
-// console.error(a.toObject({depopulate:true}));
 console.error('completed %d docs in %d seconds (%d dps)', numdocs, totaltime, numdocs / totaltime);
-
-// --trace-opt --trace-deopt --trace-bailout

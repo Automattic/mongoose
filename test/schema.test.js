@@ -1433,7 +1433,7 @@ describe('schema', function() {
   });
 
   describe('property names', function() {
-    it('that conflict throw', function(done) {
+    it('that conflict throw', function() {
       const child = new Schema({ name: String });
 
       assert.throws(function() {
@@ -1461,13 +1461,11 @@ describe('schema', function() {
         });
       }, /`errors` may not be used as a schema pathname/);
 
-      assert.throws(function() {
-        new Schema({
-          init: String
-        });
-      }, /`init` may not be used as a schema pathname/);
-
-      done();
+      // TODO: assert that a warning is being logged that those keys are reserved (gh-9010)
+      // https://github.com/Automattic/mongoose/pull/10414#issuecomment-876863778
+      new Schema({
+        init: String
+      });
     });
 
     it('that do not conflict do not throw', function(done) {
@@ -2415,26 +2413,6 @@ describe('schema', function() {
     });
   });
 
-  describe('Schema.reserved (gh-8869)', function() {
-    it('throws errors on compiling schema with reserved key as a flat type', function() {
-      const buildInvalidSchema = () => new Schema({ save: String });
-
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-
-    it('throws errors on compiling schema with reserved key as a nested object', function() {
-      const buildInvalidSchema = () => new Schema({ save: { nested: String } });
-
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-
-    it('throws errors on compiling schema with reserved key as a nested array', function() {
-      const buildInvalidSchema = () => new Schema({ save: [{ nested: String }] });
-
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-  });
-
   it('disables `id` virtual if no `_id` path (gh-3936)', function() {
     const idGetter = require('../lib/plugins/idGetter');
 
@@ -2570,13 +2548,10 @@ describe('schema', function() {
     const C1Schema = new mongoose.Schema({});
     C1Schema.loadClass(C1);
     const C1Model = db.model('C1', C1Schema);
-    console.log('C1Model', ((new C1Model())).hello); // expected: "1", result: "1"
 
     const C2Schema = new mongoose.Schema({});
     C2Schema.loadClass(C2);
     const C2Model = db.model('C2', C2Schema);
-    console.log('C2Model', ((new C2Model())).hello); // expected: "2", result: "1"
-
 
     assert.equal((new C1Model()).hello, 1);
     assert.equal((new C2Model()).hello, 2);

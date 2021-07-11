@@ -10485,7 +10485,7 @@ describe('document', function() {
 
         const user = await User.create({ name: 'Sam' });
 
-        assert.equal(user.$toObject().name, 'Sam');
+        assert.deepEqual(user.$toObject(), user.toObject());
       });
       it('can be used as a property in documents', () => {
         const userSchema = new Schema({
@@ -10496,6 +10496,27 @@ describe('document', function() {
         const User = db.model('User', userSchema);
         const user = new User({ name: 'Sam', toObject: 'yep' });
         assert.equal(user.toObject, 'yep');
+      });
+    });
+    describe('Document#init(...)', () => {
+      it('is available as `$init`', async() => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const user = new User();
+        const sam = new User({ name: 'Sam' });
+
+        assert.equal(user.$init(sam).name, 'Sam');
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: String,
+          init: Number
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ name: 'Sam', init: 12 });
+        assert.equal(user.init, 12);
       });
     });
   });

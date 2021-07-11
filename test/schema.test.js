@@ -1435,25 +1435,34 @@ describe('schema', function() {
   describe('property names', function() {
     it('that conflict throw', function() {
       const child = new Schema({ name: String });
+
+      assert.throws(function() {
+        new Schema({
+          on: String,
+          child: [child]
+        });
+      }, /`on` may not be used as a schema pathname/);
+
+      assert.throws(function() {
+        new Schema({
+          collection: String
+        });
+      }, /`collection` may not be used as a schema pathname/);
+
+      assert.throws(function() {
+        new Schema({
+          isNew: String
+        });
+      }, /`isNew` may not be used as a schema pathname/);
+
+      assert.throws(function() {
+        new Schema({
+          errors: String
+        });
+      }, /`errors` may not be used as a schema pathname/);
+
       // TODO: assert that a warning is being logged that those keys are reserved (gh-9010)
       // https://github.com/Automattic/mongoose/pull/10414#issuecomment-876863778
-      new Schema({
-        on: String,
-        child: [child]
-      });
-
-      new Schema({
-        collection: String
-      });
-
-      new Schema({
-        isNew: String
-      });
-
-      new Schema({
-        errors: String
-      });
-
       new Schema({
         init: String
       });

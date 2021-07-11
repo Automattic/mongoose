@@ -92,9 +92,6 @@ describe('clone', () => {
           const obj = JSON.parse(JSON.stringify(base));
           obj.toObject = base.toObject;
           return obj;
-        },
-        $toObject() {
-          return this.toObject(...arguments);
         }
       };
       const cloned = clone(base, baseOpts);

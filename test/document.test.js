@@ -8318,6 +8318,32 @@ describe('document', function() {
     require('util').inspect(doc.subdocs);
   });
 
+  it('always passes unpopulated paths to validators (gh-8042)', function() {
+    const schema = Schema({ test: String });
+    const schema2 = Schema({
+      keyToPopulate: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'gh8018_child',
+        required: true
+      }
+    });
+
+    const Child = db.model('gh8018_child', schema);
+    const Parent = db.model('gh8018_parent', schema2);
+
+    return co(function*() {
+      const child = yield Child.create({ test: 'test' });
+      yield Parent.create({ keyToPopulate: child._id });
+
+      yield child.deleteOne();
+
+      const doc = yield Parent.findOne();
+
+      // Should not throw
+      yield doc.save();
+    });
+  });
+
   it('set() merge option with single nested (gh-8201)', function() {
     const AddressSchema = Schema({
       street: { type: String, required: true },

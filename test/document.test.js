@@ -10427,6 +10427,7 @@ describe('document', function() {
       assert.ok(!user2.location2.properties.name);
       assert.deepStrictEqual(user2.location1.coordinates, [0,0]);
       assert.deepStrictEqual(user2.location2.coordinates, [0,0]);
+      assert.deepStrictEqual(user1, user2);
     });
   });
 

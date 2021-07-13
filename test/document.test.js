@@ -10419,15 +10419,15 @@ describe('document', function() {
         }
       });
       user2.set(user.toObject());
-      assert.ok(!user.location1.properties.name);
-      assert.ok(!user.location2.properties.name);
+      assert.ok(!user.location1.properties);
+      assert.ok(!user.location2.properties);
       assert.deepStrictEqual(user.location1.coordinates, [0,0]);
       assert.deepStrictEqual(user.location2.coordinates, [0,0]);
-      assert.ok(!user2.location1.properties.name);
-      assert.ok(!user2.location2.properties.name);
+      assert.ok(!user2.location1.properties);
+      assert.ok(!user2.location2.properties);
       assert.deepStrictEqual(user2.location1.coordinates, [0,0]);
       assert.deepStrictEqual(user2.location2.coordinates, [0,0]);
-      assert.deepStrictEqual(user1, user2);
+      assert.deepStrictEqual(user, user2);
     });
   });
 

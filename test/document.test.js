@@ -10418,10 +10418,7 @@ describe('document', function() {
           }
         }
       });
-      console.log('user2', user2);
-      console.log('user.toObject', user.toObject());
       user2.set(user.toObject());
-      console.log('after toObject', user2);
       assert.ok(!user.location1.properties.name);
       assert.ok(!user.location2.properties.name);
       assert.ok(user.location1.coordinates);

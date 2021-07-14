@@ -10403,7 +10403,7 @@ describe('document', function() {
         location1: { coordinates: [0, 0] },
         location2: { coordinates: [0, 0] }
       });
-
+      console.log('first done', user);
       let user2 = yield User.create({
         location1: {
           coordinates: [2.3522219, 48.856614],
@@ -10419,12 +10419,17 @@ describe('document', function() {
         }
       });
       user2.set(user.toObject());
+      console.log('Second done', user2);
       assert.ok(!user.location1.properties);
       assert.ok(!user.location2.properties);
+      assert.ok(!user.location1.properties.name);
+      assert.ok(!user.location2.properties.name);
       assert.deepStrictEqual(user.location1.coordinates, [0,0]);
       assert.deepStrictEqual(user.location2.coordinates, [0,0]);
       assert.ok(!user2.location1.properties);
       assert.ok(!user2.location2.properties);
+      assert.ok(!user2.location1.properties.name);
+      assert.ok(!user2.location2.properties.name);
       assert.deepStrictEqual(user2.location1.coordinates, [0,0]);
       assert.deepStrictEqual(user2.location2.coordinates, [0,0]);
       assert.deepStrictEqual(user, user2);

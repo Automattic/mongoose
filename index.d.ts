@@ -618,8 +618,8 @@ declare module 'mongoose' {
 
   interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
-    discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<D>;
-    discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
+    discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<D>;
+    discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
   interface AnyObject { [k: string]: any }
@@ -1703,8 +1703,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
-        discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -1760,8 +1760,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
-        discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
         schema: Schema;

@@ -120,7 +120,7 @@ declare module 'mongoose' {
    * [timestamps](/docs/guide.html#timestamps). You may stub out this function
    * using a tool like [Sinon](https://www.npmjs.com/package/sinon) for testing.
    */
-  export function now(): Date;
+  export function now(): NativeDate;
 
   /** Declares a global plugin executed on all Schemas. */
   export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): typeof mongoose;
@@ -1432,7 +1432,7 @@ declare module 'mongoose' {
   interface SchemaTimestampsConfig {
     createdAt?: boolean | string;
     updatedAt?: boolean | string;
-    currentTime?: () => (Date | number);
+    currentTime?: () => (NativeDate | number);
   }
 
   type Unpacked<T> = T extends (infer U)[] ? U : T;
@@ -1533,13 +1533,13 @@ declare module 'mongoose' {
     subtype?: number
 
     /** The minimum value allowed for this path. Only allowed for numbers and dates. */
-    min?: number | Date | [number, string] | [Date, string] | readonly [number, string] | readonly [Date, string];
+    min?: number | NativeDate | [number, string] | [NativeDate, string] | readonly [number, string] | readonly [NativeDate, string];
 
     /** The maximum value allowed for this path. Only allowed for numbers and dates. */
-    max?: number | Date | [number, string] | [Date, string] | readonly [number, string] | readonly [Date, string];
+    max?: number | NativeDate | [number, string] | [NativeDate, string] | readonly [number, string] | readonly [NativeDate, string];
 
     /** Defines a TTL index on this path. Only allowed for dates. */
-    expires?: number | Date;
+    expires?: number | NativeDate;
 
     /** If `true`, Mongoose will skip gathering indexes on subpaths. Only allowed for subdocuments and subdocument arrays. */
     excludeIndexes?: boolean;
@@ -1743,10 +1743,10 @@ declare module 'mongoose' {
         expires(when: number | string): this;
 
         /** Sets a maximum date validator. */
-        max(value: Date, message: string): this;
+        max(value: NativeDate, message: string): this;
 
         /** Sets a minimum date validator. */
-        min(value: Date, message: string): this;
+        min(value: NativeDate, message: string): this;
       }
 
       class Decimal128 extends SchemaType {
@@ -2441,7 +2441,7 @@ declare module 'mongoose' {
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   type TreatAsPrimitives = actualPrimitives |
       // eslint-disable-next-line no-undef
-    Date | RegExp | symbol | Error | BigInt | Types.ObjectId;
+    NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
 
   type LeanType<T> =
     0 extends (1 & T) ? T : // any

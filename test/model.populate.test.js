@@ -10523,4 +10523,57 @@ describe('model: populate:', function() {
       assert.equal(populatedBooks[0].author.name, 'Author1');
     });
   });
+
+  it('calls subdocument ref functions with subdocument as context (gh-8469)', function() {
+    const ImageSchema = Schema({ imageName: String });
+    const Image = db.model('Image', ImageSchema);
+
+    const TextSchema = Schema({ textName: String });
+    const Text = db.model('Text', TextSchema);
+
+    const opts = { _id: false };
+    let contexts = [];
+    const ItemSchema = Schema({
+      data: {
+        type: 'ObjectId',
+        ref: function() {
+          contexts.push(this);
+          return this.objectType;
+        }
+      },
+      objectType: String
+    }, opts);
+
+    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+    const Example = db.model('Test', ExampleSchema);
+
+    return co(function*() {
+      const text = yield Text.create({ textName: 'test' });
+      const image = yield Image.create({ imageName: 'test' });
+      yield Example.create({
+        list: [{ data: text._id, objectType: 'Text' }, { data: image._id, objectType: 'Image' }]
+      });
+
+      assert.equal(contexts.length, 0);
+      let res = yield Example.findOne().populate('list.data');
+
+      assert.equal(contexts.length, 2);
+      assert.equal(contexts[0].objectType, 'Text');
+      assert.equal(contexts[1].objectType, 'Image');
+
+      assert.equal(res.list[0].data.textName, 'test');
+      assert.equal(res.list[1].data.imageName, 'test');
+
+      contexts = [];
+      res = yield Example.findOne();
+      yield res.populate('list.data');
+
+      assert.equal(contexts.length, 2);
+      assert.equal(contexts[0].objectType, 'Text');
+      assert.equal(contexts[1].objectType, 'Image');
+
+      assert.equal(res.list[0].data.textName, 'test');
+      assert.equal(res.list[1].data.imageName, 'test');
+    });
+  });
 });

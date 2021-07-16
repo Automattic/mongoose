@@ -1799,12 +1799,15 @@ declare module 'mongoose' {
         auto(turnOn: boolean): this;
       }
 
-      class Embedded extends SchemaType {
+      class Embedded extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
         /** The document's schema */
         schema: Schema;
+
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
       }
 
       class String extends SchemaType {

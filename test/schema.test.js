@@ -2604,6 +2604,27 @@ describe('schema', function() {
     assert.equal(schema.virtuals.displayAs.applyGetters(null, { name: 'test' }), 'test');
   });
 
+  it('loadClass with static getter (gh-10436)', function() {
+    const schema = new mongoose.Schema({
+      firstName: String,
+      lastName: String
+    });
+
+    class UserClass extends mongoose.Model {
+      get fullName() {
+        return `${this.firstName} ${this.lastName}`;
+      }
+
+      static get greeting() {
+        return 'Hello World';
+      }
+    }
+
+    const User = mongoose.model(UserClass, schema);
+
+    assert.equal(User.greeting, 'Hello World');
+  });
+
   it('supports setting `ref` on array SchemaType (gh-10029)', function() {
     const testSchema = new mongoose.Schema({
       doesntpopulate: {

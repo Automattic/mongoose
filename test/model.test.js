@@ -3826,6 +3826,57 @@ describe('Model', function() {
         });
       });
     });
+    it('is saved object with proper defaults', function(done) {
+      const DefaultTestObject = db.model('Test',
+        new Schema({
+          foo: {
+            x: { type: String },
+            y: { type: String }
+          },
+          boo: {
+            x: { type: Boolean, default: false }
+          },
+          bee: {
+            x: { type: Boolean, default: false },
+            y: { type: Boolean, default: false }
+          }
+        })
+      );
+      const myTest = new DefaultTestObject({
+        foo: { x: 'a', y: 'b' },
+        bee: {},
+        boo: {}
+      });
+
+      myTest.save(function(err, doc) {
+        assert.ifError(err);
+        assert.equal(doc.bee.x, false);
+        assert.equal(doc.bee.y, false);
+        assert.equal(doc.boo.x, false);
+
+        DefaultTestObject.findById(doc._id, function(err, doc) {
+          assert.ifError(err);
+
+          doc.bee = undefined; // unset
+          doc.boo = undefined; // unset
+          doc.save(function(err) {
+            assert.ifError(err);
+
+            DefaultTestObject.findById(doc._id, function(err, doc) {
+              assert.ifError(err);
+
+              doc.save(function(err, doc) {
+                assert.ifError(err);
+                assert.equal(doc.bee.x, false);
+                assert.equal(doc.bee.y, false);
+                assert.equal(doc.boo.x, false);
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
   });
 
   it('path is cast to correct value when retreived from db', function(done) {
@@ -7323,7 +7374,8 @@ describe('Model', function() {
 
         yield User.insertMany([
           new User({ name: 'Hafez1_gh-9673-2' }),
-          new User({ name: 'Hafez2_gh-9673-2' })
+          new User({ name: 'Hafez2_gh-9673-2' }),
+          new User({ name: 'Hafez3_gh-9673-2' })
         ]);
 
         const users = yield User.find().sort('name');
@@ -7339,7 +7391,8 @@ describe('Model', function() {
           usersAfterUpdate.map(user => user.name),
           [
             'Hafez1_gh-9673-2-updated',
-            'Hafez2_gh-9673-2-updated'
+            'Hafez2_gh-9673-2-updated',
+            'Hafez3_gh-9673-2'
           ]
         );
       });
@@ -7412,7 +7465,7 @@ describe('Model', function() {
         assert.equal(user2.isNew, false);
       });
     });
-    it('sets `isNew` to false when a document succeds and `isNew` does not change when some fail', () => {
+    it('sets `isNew` to false when a document succeeds and `isNew` does not change when some fail', () => {
       return co(function* () {
         const userSchema = new Schema({
           name: { type: String, unique: true }

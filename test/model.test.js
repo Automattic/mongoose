@@ -7323,7 +7323,8 @@ describe('Model', function() {
 
         yield User.insertMany([
           new User({ name: 'Hafez1_gh-9673-2' }),
-          new User({ name: 'Hafez2_gh-9673-2' })
+          new User({ name: 'Hafez2_gh-9673-2' }),
+          new User({ name: 'Hafez3_gh-9673-2' })
         ]);
 
         const users = yield User.find().sort('name');
@@ -7339,7 +7340,8 @@ describe('Model', function() {
           usersAfterUpdate.map(user => user.name),
           [
             'Hafez1_gh-9673-2-updated',
-            'Hafez2_gh-9673-2-updated'
+            'Hafez2_gh-9673-2-updated',
+            'Hafez3_gh-9673-2'
           ]
         );
       });
@@ -7412,7 +7414,7 @@ describe('Model', function() {
         assert.equal(user2.isNew, false);
       });
     });
-    it('sets `isNew` to false when a document succeds and `isNew` does not change when some fail', () => {
+    it('sets `isNew` to false when a document succeeds and `isNew` does not change when some fail', () => {
       return co(function* () {
         const userSchema = new Schema({
           name: { type: String, unique: true }

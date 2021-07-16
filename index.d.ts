@@ -1167,7 +1167,7 @@ declare module 'mongoose' {
     obj: any;
 
     /** Gets/sets schema paths. */
-    path(path: string): SchemaType;
+    path<ResultType extends SchemaType = SchemaType>(path: string): ResultType;
     path(path: string, constructor: any): this;
 
     /** Lists all paths and their type in the schema. */

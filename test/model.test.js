@@ -7557,6 +7557,20 @@ describe('Model', function() {
         assert.equal(usersFromDatabase[1].name, 'name from pre-save');
       });
     });
+    it('works if some document is not modified (gh-10437)', () => {
+      const userSchema = new Schema({
+        name: String
+      });
+
+      const User = db.model('User', userSchema);
+
+      return co(function*() {
+        const user = yield User.create({ name: 'Hafez' });
+
+        const res = yield User.bulkSave([user]);
+        assert.ok(res.result.ok);
+      });
+    });
   });
 
   describe('Setting the explain flag', function() {

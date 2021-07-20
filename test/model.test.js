@@ -7567,8 +7567,8 @@ describe('Model', function() {
       return co(function*() {
         const user = yield User.create({ name: 'Hafez' });
 
-        const res = yield User.bulkSave([user]);
-        assert.ok(res.result.ok);
+        const err = yield User.bulkSave([user]).then(() => null, err => err);
+        assert.ok(err == null);
       });
     });
   });

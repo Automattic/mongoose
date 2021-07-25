@@ -18,6 +18,8 @@ var DocObjectId = mongoose.Types.ObjectId;
  */
 
 describe('model: populate:', function() {
+  this.timeout(process.env.TRAVIS ? 8000 : 4500);
+
   var User;
   var Comment;
   var BlogPost;
@@ -3271,16 +3273,57 @@ describe('model: populate:', function() {
             slice('fans', [0, 5]).
             populate('fans').
             exec(function(err, blogposts) {
+              assert.ifError(err);
+
+              assert.ok(blogposts.length === 2);
+
+              var test1, test2;
+              if (blogposts[0].title === 'Test 1') {
+                test1 = blogposts[0];
+                test2 = blogposts[1];
+              } else {
+                test1 = blogposts[1];
+                test2 = blogposts[0];
+              }
+
+              assert.ok(test1.title === 'Test 1');
+              assert.ok(test2.title === 'Test 2');
+
+              assert.equal(test1.fans[0].name, 'Fan 1');
+              assert.equal(test1.fans[1].name, 'Fan 2');
+
+              assert.equal(test2.fans[0].name, 'Fan 2');
+              assert.equal(test2.fans[1].name, 'Fan 1');
+              done();
+            });
+        });
+      });
+    });
+
+    it('populate + slice (gh-5737a)', function(done) {
+      var BlogPost = db.model('gh5737b', new Schema({
+        title: String,
+        user: { type: ObjectId, ref: 'gh5737a' },
+        fans: [{ type: ObjectId}]
+      }));
+      var User = db.model('gh5737a', new Schema({ name: String }));
+
+      User.create([{ name: 'Fan 1' }], function(error, fans) {
+        assert.ifError(error);
+        var posts = [
+          { title: 'Test 1', user: fans[0]._id, fans: [fans[0]._id] }
+        ];
+        BlogPost.create(posts, function(error) {
+          assert.ifError(error);
+          BlogPost.
+            find({}).
+            slice('fans', [0, 2]).
+            populate('user').
+            exec(function(err, blogposts) {
               assert.ifError(error);
 
+              assert.equal(blogposts[0].user.name, 'Fan 1');
               assert.equal(blogposts[0].title, 'Test 1');
-              assert.equal(blogposts[1].title, 'Test 2');
-
-              assert.equal(blogposts[0].fans[0].name, 'Fan 1');
-              assert.equal(blogposts[0].fans[1].name, 'Fan 2');
-
-              assert.equal(blogposts[1].fans[0].name, 'Fan 2');
-              assert.equal(blogposts[1].fans[1].name, 'Fan 1');
               done();
             });
         });
@@ -4575,8 +4618,8 @@ describe('model: populate:', function() {
           }).
           then(function(bs) {
             assert.equal(bs.length, 2);
-            assert.equal(bs[0].a.name, 'a1');
-            assert.equal(bs[1].a.name, 'a2');
+            var names = bs.map(function(b) { return b.a.name; }).sort();
+            assert.deepEqual(names, ['a1', 'a2']);
             done();
           }).
           catch(done);
@@ -5827,6 +5870,145 @@ describe('model: populate:', function() {
             done();
           }).
           catch(done);
+      });
+
+      it('subPopulate under discriminators race condition (gh-5858)', function() {
+        var options = { discriminatorKey: 'kind' };
+        var activitySchema = new Schema({ title: { type: String } }, options);
+
+        var dateActivitySchema = new Schema({
+          postedBy: {
+            type: Schema.Types.ObjectId,
+            ref: 'gh5858',
+            required: true
+          }
+        }, options);
+
+        var eventActivitySchema = new Schema({ test: String }, options);
+
+        var logSchema = new Schema({
+          seq: Number,
+          activity: {
+            type: Schema.Types.ObjectId,
+            refPath: 'kind',
+            required: true
+          },
+          kind: String
+        }, options);
+
+        var User = db.model('gh5858', { name: String });
+        var Activity = db.model('gh5858_0', activitySchema);
+        var DateActivity = Activity.discriminator('gh5858_1', dateActivitySchema);
+        var EventActivity = Activity.discriminator('gh5858_2', eventActivitySchema);
+        var Log = db.model('gh5858_3', logSchema);
+
+        var dateActivity;
+        var eventActivity;
+        return User.create({ name: 'val' }).
+          then(function(user) {
+            return DateActivity.create({ title: 'test', postedBy: user._id });
+          }).
+          then(function(_dateActivity) {
+            dateActivity = _dateActivity;
+            return EventActivity.create({ title: 'test' });
+          }).
+          then(function(_eventActivity) {
+            eventActivity = _eventActivity;
+            return Log.create([
+              { seq: 1, activity: eventActivity._id, kind: 'gh5858_2' },
+              { seq: 2, activity: dateActivity._id, kind: 'gh5858_1' }
+            ]);
+          }).
+          then(function() {
+            return Log.find({}).
+              populate({
+                path: 'activity',
+                populate: { path: 'postedBy' }
+              }).
+              sort({ seq:-1 });
+          }).
+          then(function(results) {
+            assert.equal(results.length, 2);
+            assert.equal(results[0].activity.kind, 'gh5858_1' );
+            assert.equal(results[0].activity.postedBy.name, 'val');
+            assert.equal(results[1].activity.kind, 'gh5858_2' );
+            assert.equal(results[1].activity.postedBy, null);
+          });
+      });
+
+      it('populating nested discriminator path (gh-5970)', function() {
+        var Author = db.model('gh5970', new mongoose.Schema({
+          firstName: {
+            type: String,
+            required: true
+          },
+          lastName: {
+            type: String,
+            required: true
+          }
+        }));
+
+        var ItemSchema = new mongoose.Schema({
+          title: {
+            type: String,
+            required: true
+          }
+        }, {discriminatorKey: 'type'});
+
+        var ItemBookSchema = new mongoose.Schema({
+          author: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'gh5970'
+          }
+        });
+
+        var ItemEBookSchema = new mongoose.Schema({
+          author: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'gh5970'
+          },
+          url: {
+            type: String
+          }
+        });
+
+        var BundleSchema = new mongoose.Schema({
+          name: {
+            type: String,
+            required: true
+          },
+          items: [{
+            type: ItemSchema,
+            required: false
+          }]
+        });
+
+        BundleSchema.path('items').discriminator('Book', ItemBookSchema);
+        BundleSchema.path('items').discriminator('EBook', ItemEBookSchema);
+
+        var Bundle = db.model('gh5970_0', BundleSchema);
+
+        return Author.create({firstName: 'David', lastName: 'Flanagan'}).
+          then(function(author) {
+            return Bundle.create({
+              name: 'Javascript Book Collection', items: [
+                {type: 'Book', title: 'JavaScript: The Definitive Guide', author: author},
+                {
+                  type: 'EBook',
+                  title: 'JavaScript: The Definitive Guide Ebook',
+                  url: 'https://google.com',
+                  author: author
+                }
+              ]
+            });
+          }).
+          then(function(bundle) {
+            return Bundle.findById(bundle._id).populate('items.author').lean();
+          }).
+          then(function(bundle) {
+            assert.equal(bundle.items[0].author.firstName, 'David');
+            assert.equal(bundle.items[1].author.firstName, 'David');
+          });
       });
 
       it('specify model in populate (gh-4264)', function(done) {

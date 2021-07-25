@@ -34,3 +34,7 @@ tools/31*
 *.key
 
 docs/*.html
+
+test/files/main.js
+
+.config.js

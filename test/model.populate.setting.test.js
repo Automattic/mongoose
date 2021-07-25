@@ -24,6 +24,8 @@ var posts = 'blogposts_' + random(),
  */
 
 describe('model: populate:', function() {
+  this.timeout(process.env.TRAVIS ? 8000 : 4500);
+
   describe('setting populated paths (gh-570)', function() {
     var types = {
       ObjectId: DocObjectId,

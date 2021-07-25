@@ -2230,26 +2230,6 @@ describe('model: update:', function() {
       });
     });
 
-    it('update handles casting with mongoose-long (gh-4283)', function(done) {
-      require('mongoose-long')(mongoose);
-
-      var Model = db.model('gh4283', {
-        number: { type: mongoose.Types.Long }
-      });
-
-      Model.create({ number: mongoose.mongo.Long.fromString('0') }, function(error) {
-        assert.ifError(error);
-        Model.update({}, { $inc: { number: mongoose.mongo.Long.fromString('2147483648') } }, function(error) {
-          assert.ifError(error);
-          Model.findOne({ number: { $type: 18 } }, function(error, doc) {
-            assert.ifError(error);
-            assert.ok(doc);
-            done();
-          });
-        });
-      });
-    });
-
     it('single nested with runValidators (gh-4420)', function(done) {
       var FileSchema = new Schema({
         name: String
@@ -2832,6 +2812,24 @@ describe('model: update:', function() {
         var expected = 'Parameter "filter" to updateMany() must be an object';
         assert.ok(error.message.indexOf(expected) !== -1, error.message);
         done();
+      });
+    });
+
+    it('upsert: 1 (gh-5839)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      var Model = db.model('gh5839', schema);
+
+      var opts = { upsert: 1 };
+      Model.update({ name: 'Test' }, { name: 'Test2' }, opts, function(error) {
+        assert.ifError(error);
+        Model.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.name, 'Test2');
+          done();
+        });
       });
     });
 

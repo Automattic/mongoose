@@ -49,7 +49,7 @@ block content
     }, 60000);
 
   :markdown
-    To disable buffering, turn off the [`bufferCommands` option on your schema](http://mongoosejs.com/docs/guide.html#bufferCommands).
+    To disable buffering, turn off the [`bufferCommands` option on your schema](./guide.html#bufferCommands).
     If you have `bufferCommands` on and your connection is hanging, try turning
     `bufferCommands` off to see if you haven't opened a connection properly.
 
@@ -92,7 +92,7 @@ block content
 
   h3#callback Callback
   :markdown
-    The `connect()` function also accepts a callback parameter and returns a [promise](http://mongoosejs.com/docs/promises.html).
+    The `connect()` function also accepts a callback parameter and returns a [promise](./promises.html).
   :js
     mongoose.connect(uri, options, function(error) {
       // Check error in initial connection. There is no 2nd param to the callback.
@@ -106,26 +106,24 @@ block content
 
   h4#connection-string-options Connection String Options
   :markdown
-    Mongoose supports the following options in the connection string.
+    You can also specify options in your connection string as [parameters in the query string](https://en.wikipedia.org/wiki/Query_string) portion of the URI.
+  :js
+    mongoose.connect('mongodb://localhost:27017/test?connectTimeoutMS=1000', { useMongoClient: true });
+    // The above is equivalent to:
+    mongoose.connect('mongodb://localhost:27017/test', {
+      useMongoClient: true,
+      connectTimeoutMS: 1000
+    });
+  :markdown
+    The disadvantage of putting options in the query string is that query
+    string options are harder to read. The advantage is that you only need a
+    single configuration option, the URI, rather than separate options for
+    `socketTimeoutMS`, `connectTimeoutMS`, etc. Best practice is to put options
+    that likely differ between development and production, like `replicaSet`
+    or `ssl`, in the connection string, and options that should remain constant,
+    like `connectTimeoutMS` or `poolSize`, in the options object.
 
-    * [ssl](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [poolSize](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [autoReconnect](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [socketTimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [connectTimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [authSource](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [retries](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [authMechanism](http://mongodb.github.io/node-mongodb-native/2.2/tutorials/connect/authenticating/)
-    * [reconnectWait](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [rs_name](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
-    * [replicaSet](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
-    * [nativeParser](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [w](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [journal](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [wtimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [readPreference](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [readPreferenceTags](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [sslValidate](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    The MongoDB docs have a full list of [supported connection string options](https://docs.mongodb.com/manual/reference/connection-string/)
 
   h4#keepAlive A note about keepAlive
   .important
@@ -157,9 +155,16 @@ block content
 
   h3#mongos_connections Multi-mongos support
   :markdown
-    High availability over multiple `mongos` instances is also supported. Pass a connection string for your `mongos` instances and set the `mongos` option to true:
+    High availability over multiple `mongos` instances is also supported.
+    Pass a connection string for your `mongos` instances. If you are not using
+    the `useMongoClient` option, you must also set the `mongos` option:
   :js
     mongoose.connect('mongodb://mongosA:27501,mongosB:27501', { mongos: true }, cb);
+  :markdown
+    With `useMongoClient`, you do not need to set the `mongos` option. You also
+    do **not** need to use `mongos` or `useMongoClient` in mongoose 5.x.
+  :js
+    mongoose.connect('mongodb://mongosA:27501,mongosB:27501', { useMongoClient: true }, cb);
 
   h3#multiple_connections Multiple connections
   :markdown

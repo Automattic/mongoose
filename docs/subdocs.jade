@@ -20,7 +20,7 @@ block content
 
   :markdown
     Subdocuments are similar to normal documents. Nested schemas can have
-    [middleware](http://mongoosejs.com/docs/middleware.html), [custom validation logic](http://mongoosejs.com/docs/middleware.html),
+    [middleware](./middleware.html), [custom validation logic](./validation.html),
     virtuals, and any other feature top-level schemas can use. The major
     difference is that subdocuments are
     not saved individually, they are saved whenever their top-level parent
@@ -29,14 +29,14 @@ block content
     var Parent = mongoose.model('Parent', parentSchema);
     var parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
     parent.children[0].name = 'Matthew';
-    
+
     // `parent.children[0].save()` is a no-op, it triggers middleware but
     // does **not** actually save the subdocument. You need to save the parent
     // doc.
     parent.save(callback);
 
   :markdown
-    Subdocuments have `save` and `validate` [middleware](http://mongoosejs.com/docs/middleware.html)
+    Subdocuments have `save` and `validate` [middleware](./middleware.html)
     just like top-level documents. Calling `save()` on the parent document triggers
     the `save()` middleware for all its subdocuments, and the same for `validate()`
     middleware.
@@ -53,13 +53,13 @@ block content
     parent.save(function (err) {
       console.log(err.message) // #sadpanda
     });
-  
+
   :markdown
     Subdocuments' `pre('save')` and `pre('validate')` middleware execute
     **before** the top-level document's `pre('save')` but **after** the
     top-level document's `pre('validate')` middleware. This is because validating
     before `save()` is actually a piece of built-in middleware.
-  
+
   :js
     // Below code will print out 1-4 in order
     var childSchema = new mongoose.Schema({ name: 'string' });
@@ -154,8 +154,8 @@ block content
     var parentSchema = new Schema({
       children: [new Schema({ name: 'string' })]
     });
-  
+
   h3#next Next Up
   :markdown
     Now that we've covered `Sub-documents`, let's take a look at
-    [querying](/docs/queries.html).
+    [querying](./queries.html).

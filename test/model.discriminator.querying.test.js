@@ -1010,6 +1010,29 @@ describe('model', function() {
             catch(done);
         });
 
+        it('doesnt exclude field if slice (gh-4991)', function(done) {
+          var baseSchema = new mongoose.Schema({
+            propA: { type: String, default: 'default value' },
+            array: [{type: String}]
+          });
+
+          var Base = db.model('gh4991_A', baseSchema);
+          var discriminatorSchema = new mongoose.Schema({
+            propB: { type: String}
+          });
+          var Discriminator = Base.discriminator('gh4991_A1', discriminatorSchema);
+
+          var obj = { propA: 'Hi', propB: 'test', array: ['a', 'b'] };
+          Discriminator.create(obj, function(error) {
+            assert.ifError(error);
+            Base.find().slice('array', 1).exec(function(error, docs) {
+              assert.equal(docs.length, 1);
+              assert.equal(docs[0].propA, 'Hi');
+              done();
+            });
+          });
+        });
+
         it('merges the first pipeline stages if applicable', function(done) {
           var aggregate = ImpressionEvent.aggregate([
             {$match: {name: 'Test Event'}}

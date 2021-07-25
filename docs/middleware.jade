@@ -28,9 +28,9 @@ block content
 
     Aggregate middleware is for `MyModel.aggregate()`. Aggregate middleware
     executes when you call `exec()` on an aggregate object.
-    In aggregate middleware, `this` refers to the [aggregation object](http://mongoosejs.com/docs/api.html#model_Model.aggregate).
+    In aggregate middleware, `this` refers to the [aggregation object](./api.html#model_Model.aggregate).
 
-    * [aggregate](http://mongoosejs.com/docs/api.html#model_Model.aggregate)
+    * [aggregate](./api.html#model_Model.aggregate)
 
     Model middleware is supported for the following model functions.
     In model middleware functions, `this` refers to the model.
@@ -50,12 +50,28 @@ block content
     There are two types of `pre` hooks, serial and parallel.
   h4#serial Serial
   :markdown
-    Serial middleware are executed one after another, when each middleware calls `next`.
+    Serial middleware functions are executed one after another, when each
+    middleware calls `next`.
   :js
     var schema = new Schema(..);
     schema.pre('save', function(next) {
       // do stuff
       next();
+    });
+  :markdown
+    The `next()` call does **not** stop the rest of the code in your middleware function from executing. Use
+    [the early `return` pattern](https://www.bennadel.com/blog/2323-use-a-return-statement-when-invoking-callbacks-especially-in-a-guard-statement.htm)
+    to prevent the rest of your middleware function from running when you call `next()`.
+  :js
+    var schema = new Schema(..);
+    schema.pre('save', function(next) {
+      if (foo()) {
+        console.log('calling next!');
+        // `return next();` will make sure the rest of this function doesn't run
+        /*return*/ next();
+      }
+      // Unless you comment out the `return` above, 'after next' will print
+      console.log('after next');
     });
   h4#parallel Parallel
   p

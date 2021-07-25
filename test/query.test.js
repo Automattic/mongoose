@@ -547,6 +547,7 @@ describe('Query', function() {
       assert.ok(!threw);
       done();
     });
+
     it('works with overwriting previous object args (1176)', function(done) {
       var q = new Query({}, {}, null, p1.collection);
       assert.doesNotThrow(function() {
@@ -915,6 +916,50 @@ describe('Query', function() {
       assert.ok(params.numbers.$ne instanceof Array);
       assert.equal(params.numbers.$ne[0], 10000);
       done();
+    });
+
+    it('doesn\'t wipe out $in (gh-6439)', function(done) {
+      var embeddedSchema = new Schema({
+        name: String
+      }, { _id: false });
+
+      var catSchema = new Schema({
+        name: String,
+        props: [embeddedSchema]
+      });
+
+      var Cat = db.model('gh6439', catSchema);
+      var kitty = new Cat({
+        name: 'Zildjian',
+        props: [
+          { name: 'invalid' },
+          { name: 'abc' },
+          { name: 'def' }
+        ]
+      });
+
+      kitty.save(function(err) {
+        assert.ifError(err);
+        var cond = { _id: kitty._id };
+        var update = {
+          $pull: {
+            props: {
+              $in: [
+                { name: 'invalid' },
+                { name: 'def' }
+              ]
+            }
+          }
+        };
+        Cat.update(cond, update, function(err) {
+          assert.ifError(err);
+          Cat.findOne(cond, function(err, found) {
+            assert.ifError(err);
+            assert.strictEqual(found.props[0].name, 'abc');
+            done();
+          });
+        });
+      });
     });
 
     it('subdocument array with $ne: null should not throw', function(done) {
@@ -1862,11 +1907,11 @@ describe('Query', function() {
 
       var MyModel = db.model('gh4378', schema);
 
-      assert.throws(function() {
-        MyModel.findOne('');
-      }, /Invalid argument to findOne()/);
-
-      done();
+      MyModel.findOne('', function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'ObjectParameterError');
+        done();
+      });
     });
 
     it('handles geoWithin with $center and mongoose object (gh-4419)', function(done) {
@@ -2251,6 +2296,44 @@ describe('Query', function() {
       });
     });
 
+    it('with non-object args (gh-1698)', function(done) {
+      var schema = new mongoose.Schema({
+        email: String
+      });
+      var M = db.model('gh1698', schema);
+
+      M.find(42, function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'ObjectParameterError');
+        done();
+      });
+    });
+
+    it('queries with BSON overflow (gh-5812)', function(done) {
+      this.timeout(10000);
+
+      var schema = new mongoose.Schema({
+        email: String
+      });
+
+      var model = db.model('gh5812', schema);
+      var bigData = new Array(800000);
+
+      for (var i = 0; i < bigData.length; ++i) {
+        bigData[i] = 'test1234567890';
+      }
+
+      model.find({email: {$in: bigData}}).lean().
+        then(function() {
+          done(new Error('Expected an error'));
+        }).
+        catch(function(error) {
+          assert.ok(error);
+          assert.ok(error.message !== 'Expected error');
+          done();
+        });
+    });
+
     it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
       var areaSchema = new Schema({
         name: {type: String},
@@ -2373,8 +2456,7 @@ describe('Query', function() {
     });
 
     it('slice projection', function(done) {
-      MyModel.findOne({name: 'John'}, {dependents: {$slice: 1}}).
-      exec(function(error, person) {
+      MyModel.findOne({name: 'John'}, {dependents: {$slice: 1}}).exec(function(error, person) {
         assert.ifError(error);
         assert.equal(person.salary, 25000);
         done();

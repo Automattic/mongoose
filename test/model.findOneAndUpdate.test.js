@@ -1811,6 +1811,23 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('honors retainKeyOrder (gh-6484)', function() {
+      var modelSchema = new Schema({
+        nested: { field1: Number, field2: Number }
+      }, { retainKeyOrder: true });
+
+      var Model = db.model('gh6484', modelSchema);
+      var opts = { upsert: true, new: true };
+      return Model.findOneAndUpdate({}, { nested: { field1: 1, field2: 2 } }, opts).exec().
+        then(function() {
+          return Model.collection.findOne();
+        }).
+        then(function(doc) {
+          // Make sure order is correct
+          assert.deepEqual(Object.keys(doc.nested), ['field1', 'field2']);
+        });
+    });
+
     it('should not apply schema transforms (gh-4574)', function(done) {
       var options = {
         toObject: {

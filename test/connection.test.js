@@ -18,6 +18,7 @@ var Schema = mongoose.Schema;
  */
 
 describe('connections:', function() {
+  this.timeout(10000);
   describe('useMongoClient/openUri (gh-5304)', function() {
     it('with mongoose.connect()', function(done) {
       var conn = mongoose.connect('mongodb://localhost:27017/mongoosetest', {
@@ -143,7 +144,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 50);
+              setTimeout(function() { resolve(); }, 100);
             });
           }).
           then(function() {
@@ -157,7 +158,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 2000);
+              setTimeout(function() { resolve(); }, 4000);
             });
           }).
           then(function() {
@@ -217,7 +218,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 400);
+              setTimeout(function() { resolve(); }, 4000);
             });
           }).
           then(function() {
@@ -1082,7 +1083,7 @@ describe('connections:', function() {
 
   describe('errors', function() {
     it('event fires with one listener', function(done) {
-      this.timeout(1000);
+      this.timeout(1500);
       var db = start({uri: 'mongodb://whatever23939.localhost/fakeeee?connectTimeoutMS=500', noErrorListener: 1});
       db.on('error', function() {
         // this callback has no params which triggered the bug #759

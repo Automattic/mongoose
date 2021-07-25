@@ -22,6 +22,8 @@ describe('model', function() {
   });
 
   describe('geoSearch', function() {
+    this.timeout(process.env.TRAVIS ? 8000 : 4500);
+
     it('works', function(done) {
       var db = start();
       var Geo = getModel(db);

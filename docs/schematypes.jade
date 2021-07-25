@@ -17,7 +17,7 @@ block content
     a(href="./api.html#query-js") queries
     |  and other general characteristics for&nbsp;
     a(href="./api.html#schema-string-js") Strings
-    |  and 
+    |  and
     a(href="./api.html#schema-number-js") Numbers
     |. Check out their respective API documentation for more detail.
   p
@@ -51,8 +51,8 @@ block content
       ofBoolean:  [Boolean],
       ofMixed:    [Schema.Types.Mixed],
       ofObjectId: [Schema.Types.ObjectId],
-      ofArrays:   [[]]
-      ofArrayOfNumbers: [[Number]]
+      ofArrays:   [[]],
+      ofArrayOfNumbers: [[Number]],
       nested: {
         stuff: { type: String, lowercase: true, trim: true }
       }
@@ -88,7 +88,7 @@ block content
     var schema1 = new Schema({
       test: String // `test` is a path of type String
     });
-    
+
     var schema2 = new Schema({
       test: { type: String } // `test` is a path of type string
     });
@@ -108,14 +108,14 @@ block content
     types.
   h5 All Schema Types
   :markdown
-    * `required`: boolean or function, if true adds a [required validator](http://mongoosejs.com/docs/validation.html#built-in-validators) for this property
+    * `required`: boolean or function, if true adds a [required validator](./validation.html#built-in-validators) for this property
     * `default`: Any or function, sets a default value for the path. If the value is a function, the return value of the function is used as the default.
     * `select`: boolean, specifies default [projections](https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/) for queries
-    * `validate`: function, adds a [validator function](http://mongoosejs.com/docs/validation.html#built-in-validators) for this property
+    * `validate`: function, adds a [validator function](./validation.html#built-in-validators) for this property
     * `get`: function, defines a custom getter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
     * `set`: function, defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
-    * `alias`: string, mongoose >= 4.10.0 only. Defines a [virtual](http://mongoosejs.com/docs/guide.html#virtuals) with the given name that gets/sets this path.
-    
+    * `alias`: string, mongoose >= 4.10.0 only. Defines a [virtual](./guide.html#virtuals) with the given name that gets/sets this path.
+
   :js
     var numberSchema = new Schema({
       integerOnly: {
@@ -125,9 +125,9 @@ block content
         alias: 'i'
       }
     });
-    
+
     var Number = mongoose.model('Number', numberSchema);
-    
+
     var doc = new Number();
     doc.integerOnly = 2.001;
     doc.integerOnly; // 2
@@ -135,13 +135,13 @@ block content
     doc.i = 3.001;
     doc.integerOnly; // 3
     doc.i; // 3
-  
+
   h5 Indexes
   p
   :markdown
     You can also define [MongoDB indexes](https://docs.mongodb.com/manual/indexes/)
     using schema type options.
-   
+
   :markdown
     * `index`: boolean, whether to define an [index](https://docs.mongodb.com/manual/indexes/) on this property.
     * `unique`: boolean, whether to define a [unique index](https://docs.mongodb.com/manual/core/index-unique/) on this property.
@@ -160,14 +160,14 @@ block content
     * `lowercase`: boolean, whether to always call `.toLowerCase()` on the value
     * `uppercase`: boolean, whether to always call `.toUpperCase()` on the value
     * `trim`: boolean, whether to always call `.trim()` on the value
-    * `match`: RegExp, creates a [validator](http://mongoosejs.com/docs/validation.html) that checks if the value matches the given regular expression
-    * `enum`: Array, creates a [validator](http://mongoosejs.com/docs/validation.html) that checks if the value is in the given array.
+    * `match`: RegExp, creates a [validator](./validation.html) that checks if the value matches the given regular expression
+    * `enum`: Array, creates a [validator](./validation.html) that checks if the value is in the given array.
 
   h5 Number
   :markdown
-    * `min`: Number, creates a [validator](http://mongoosejs.com/docs/validation.html) that checks if the value is greater than or equal to the given minimum.
-    * `max`: Number, creates a [validator](http://mongoosejs.com/docs/validation.html) that checks if the value is less than or equal to the given maximum.
-  
+    * `min`: Number, creates a [validator](./validation.html) that checks if the value is greater than or equal to the given minimum.
+    * `max`: Number, creates a [validator](./validation.html) that checks if the value is less than or equal to the given maximum.
+
   h5 Date
   :markdown
     * `min`: Date
@@ -195,7 +195,7 @@ block content
     var Any = new Schema({ any: Object });
     var Any = new Schema({ any: Schema.Types.Mixed });
   p
-    | Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect and save those changes. To "tell" Mongoose that the value of a Mixed type has changed, call the 
+    | Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect and save those changes. To "tell" Mongoose that the value of a Mixed type has changed, call the
     code .markModified(path)
     |  method of the document passing the path to the Mixed type you just changed.
   :js
@@ -204,7 +204,7 @@ block content
     person.save(); // anything will now get saved
   h4#objectids ObjectIds
   p
-    | To specify a type of ObjectId, use 
+    | To specify a type of ObjectId, use
     code Schema.Types.ObjectId
     |  in your declaration.
   :js
@@ -214,9 +214,9 @@ block content
     // or just Schema.ObjectId for backwards compatibility with v2
   h4#arrays Arrays
   p
-    | Provide creation of arrays of 
+    | Provide creation of arrays of
     a(href="./api.html#schema_Schema.Types") SchemaTypes
-    |  or 
+    |  or
     a(href="./subdocs.html") Sub-Documents
     |.
   :js
@@ -229,9 +229,9 @@ block content
       // ... etc
     });
   p
-    | Note: specifying an empty array is equivalent to 
+    | Note: specifying an empty array is equivalent to
     code Mixed
-    |. The following all create arrays of 
+    |. The following all create arrays of
     code Mixed
     |:
   :js
@@ -268,18 +268,18 @@ block content
     });
   h3#customtypes Creating Custom Types
   p
-    | Mongoose can also be extended with custom SchemaTypes. Search the 
+    | Mongoose can also be extended with custom SchemaTypes. Search the
     a(href="http://plugins.mongoosejs.com") plugins
-    |  site for compatible types like 
+    |  site for compatible types like
     a(href="https://github.com/aheckmann/mongoose-long") mongoose-long
     | ,&nbsp;
     a(href="https://github.com/vkarpov15/mongoose-int32") mongoose-int32
-    |  and 
+    |  and
     a(href="https://github.com/aheckmann/mongoose-function") other
-    | 
+    |
     a(href="https://github.com/OpenifyIt/mongoose-types") types
     |.
-    
+
   h3#path The `schema.path()` Function
   :markdown
     The `schema.path()` function returns the instantiated schema type for a

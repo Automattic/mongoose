@@ -28,7 +28,7 @@ block content
     })
   :markdown
     Here we see that the query was executed immediately and the results passed to our callback. All callbacks in Mongoose use the pattern:
-    `callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result` 
+    `callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result`
     will be null. If the query is successful, the `error` parameter will be null, and the `result` will be populated with the results of the query.
   .important
     :markdown
@@ -77,12 +77,12 @@ block content
       exec(callback);
 
   :markdown
-    A full list of [Query helper functions can be found in the API docs](http://mongoosejs.com/docs/api.html#query-js).
+    A full list of [Query helper functions can be found in the API docs](./api.html#query-js).
 
   h3#setters
   :markdown
     Setters are not executed by default in 4.x. For example, if you lowercase emails in your schema:
-  
+
   :js
     var personSchema = new Schema({
       email: {
@@ -90,11 +90,11 @@ block content
         lowercase: true
       }
     });
-  
+
   :markdown
     Mongoose will **not** automatically lowercase the email in your queries, so `Person.find({ email: 'Val@karpov.io' })` would return no results.
     Use the `runSettersOnQuery` option to turn on this behavior:
-  
+
   :js
     var personSchema = new Schema({
       email: {

@@ -1,3 +1,150 @@
+4.13.21 / 2020-07-12
+====================
+ * fix(query): delete top-level `_bsontype` property in queries to prevent silent empty queries #8222
+
+4.13.20 / 2020-01-07
+====================
+ * fix(schema): make aliases handle mongoose-lean-virtuals #6069
+
+4.13.19 / 2019-07-02
+====================
+ * fix(aggregate): make `setOptions()` work as advertised #7950 #6011 [cdimitroulas](https://github.com/cdimitroulas)
+
+4.13.18 / 2019-01-21
+====================
+ * fix(model): handle setting populated path set via `Document#populate()` #7302
+ * fix(cast): backport fix from #7290 to 4.x
+
+4.13.17 / 2018-08-30
+====================
+ * fix(document): disallow setting `constructor` and `prototype` if strict mode false
+
+4.13.16 / 2018-08-30
+====================
+ * fix(document): disallow setting __proto__ if strict mode false
+ * feat(error): backport adding modified paths to VersionError #6928 [freewil](https://github.com/freewil)
+
+4.13.15 / 2018-08-14
+====================
+ * fix(mongoose): add global `usePushEach` option for easier Mongoose 4.x + MongoDB 3.6 #6858
+ * chore: fix flakey tests for 4.x #6853 [Fonger](https://github.com/Fonger)
+ * feat(error): add version number to VersionError #6852 [freewil](https://github.com/freewil)
+
+4.13.14 / 2018-05-25
+====================
+ * fix(model): handle retainKeyOrder option in findOneAndUpdate() #6484
+
+4.13.13 / 2018-05-17
+====================
+ * fix(update): stop clobbering $in when casting update #6441 #6339
+ * fix: upgrade async -> 2.6.0 re: security warning
+
+4.13.12 / 2018-03-13
+====================
+ * fix(document): make virtual get() return undefined instead of null if no getters #6223
+ * docs: fix url in useMongoClient error message #6219 #6217 [lineus](https://github.com/lineus)
+ * fix(discriminator): don't copy `discriminators` property from base schema #6122 #6064
+
+4.13.11 / 2018-02-07
+====================
+ * docs: fix links in 4.x docs #6081
+ * chore: add release script that uses --tag for npm publish for 4.x releases #6063
+
+4.13.10 / 2018-01-28
+====================
+ * docs(model+query): add lean() option to Model helpers #5996 [aguyinmontreal](https://github.com/aguyinmontreal)
+ * fix: use lazy loading so we can build mongoose with webpack #5993 #5842
+ * docs(connections): clarify multi-mongos with useMongoClient for 4.x docs #5984
+ * fix(populate): handle populating embedded discriminator paths #5970
+ * docs(query+aggregate): add more detail re: maxTimeMS #4066
+
+4.13.9 / 2018-01-07
+===================
+ * chore: update marked (dev dependency) re: security vulnerability #5951 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix: upgrade mongodb -> 2.2.34 for ipv6 and autoReconnect fixes #5794 #5760
+ * docs: use useMongooseAggCursor for aggregate docs #2955
+
+4.13.8 / 2017-12-27
+===================
+ * docs(guide): use more up-to-date syntax for autoIndex example #5933
+ * docs: fix grammar #5927 [abagh0703](https://github.com/abagh0703)
+ * fix: propagate lean options to child schemas #5914
+ * fix(populate): use correct model with discriminators + nested populate #5858
+
+4.13.7 / 2017-12-11
+===================
+ * docs(schematypes): fix typo #5889 [gokaygurcan](https://github.com/gokaygurcan)
+ * fix(cursor): handle `reject(null)` with eachAsync callback #5875 #5874 [ZacharyRSmith](https://github.com/ZacharyRSmith)
+ * fix: disallow setting `mongoose.connection` to invalid values #5871 [jinasonlin](https://github.com/jinasonlin)
+ * docs(middleware): suggest using `return next()` to stop middleware execution #5866
+ * docs(connection): improve connection string query param docs #5864
+ * fix(document): run validate hooks on array subdocs even if not directly modified #5861
+ * fix(discriminator): don't treat $meta as defining projection when querying #5859
+ * fix(types): handle Decimal128 when using bson-ext on server side #5850
+ * fix(document): ensure projection with only $slice isn't treated as inclusive for discriminators #4991
+ * fix(model): throw error when passing non-object to create() #2037
+
+4.13.6 / 2017-12-02
+===================
+ * fix(schema): support strictBool option in schema #5856 [ekulabuhov](https://github.com/ekulabuhov)
+ * fix(update): make upsert option consistently handle truthy values, not just booleans, for updateOne() #5839
+ * refactor: remove unnecessary constructor check #2057
+ * docs(query): correct function signature for .mod() helper #1806
+ * fix(query): report ObjectParameterError when passing non-object as filter to find() and findOne() #1698
+
+4.13.5 / 2017-11-24
+===================
+ * fix(model): handle update cast errors correctly with bulkWrite #5845 [Michael77](https://github.com/Michael77)
+ * docs: add link to bufferCommands option #5844 [ralphite](https://github.com/ralphite)
+ * fix(model): allow virtual ref function to return arrays #5834 [brunohcastro](https://github.com/brunohcastro)
+ * fix(query): don't throw uncaught error if query filter too big #5812
+ * fix(document): if setting unselected nested path, don't overwrite nested path #5800
+ * fix(document): support calling `populate()` on nested document props #5703
+ * fix: add `strictBool` option for schema type boolean #5344 #5211 #4245
+ * docs(faq): add faq re: typeKey #1886
+ * docs(query): add more detailed docs re: options #1702
+
+4.13.4 / 2017-11-17
+===================
+ * fix(aggregate): add chainable .option() helper for setting arbitrary options #5829
+ * fix(aggregate): add `.pipeline()` helper to get the current pipeline #5825
+ * docs: grammar fixes for `unique` FAQ #5823 [mfluehr](https://github.com/mfluehr)
+ * chore: add node 9 to travis #5822 [superheri](https://github.com/superheri)
+ * fix(model): fix infinite recursion with recursive embedded discriminators #5821 [Faibk](https://github.com/Faibk)
+
+4.13.3 / 2017-11-15
+===================
+ * chore: add node 8 to travis #5818 [superheri](https://github.com/superheri)
+ * fix(document): don't apply transforms to nested docs when updating already saved doc #5807
+
+4.13.2 / 2017-11-11
+===================
+ * feat(buffer): add support for subtype prop #5530
+
+4.13.1 / 2017-11-08
+===================
+ * fix: accept multiple paths or array of paths to depopulate #5798 #5797 [adamreisnz](https://github.com/adamreisnz)
+ * fix(document): pass default array as actual array rather than taking first element #5780
+ * fix(model): increment version when $set-ing it in a save() that requires a version bump #5779
+ * fix(query): don't explicitly project in discriminator key if user projected in parent path #5775 #5754
+ * fix(model): cast query option to geoNear() #5765
+ * fix(query): don't treat projection with just $slice as inclusive #5737
+ * fix(discriminator): defer applying embedded discriminator hooks until top-level model is compiled #5706
+ * docs(discriminator): add warning to always attach hooks before calling discriminator() #5706
+
+4.13.0 / 2017-11-02
+===================
+ * feat(aggregate): add $addFields helper #5740 [AyushG3112](https://github.com/AyushG3112)
+ * feat(connection): add connection-level bufferCommands #5720
+ * feat(connection): add createCollection() helper #5712
+ * feat(populate): support setting localField and foreignField to functions #5704 #5602
+ * feat(query): add multipleCastError option for aggregating cast errors when casting update #5609
+ * feat(populate): allow passing a function to virtual ref #5602
+ * feat(schema): add excludeIndexes option to optionally prevent collecting indexes from nested schemas #5575
+ * feat(model): report validation errors from `insertMany()` if using `ordered: false` and `rawResult: true` #5337
+ * feat(aggregate): add pre/post aggregate middleware #5251
+ * feat(schema): allow using `set` as a schema path #1939
+
 4.12.6 / 2017-11-01
 ===================
  * fix(schema): make clone() copy query helpers correctly #5752

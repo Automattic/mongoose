@@ -10,6 +10,8 @@ var start = require('./common'),
 
 describe('documents should not be converted to _id (gh-1408)', function() {
   it('if an embedded doc', function(done) {
+    this.timeout(process.env.TRAVIS ? 8000 : 4500);
+
     var db = start();
 
     var PreferenceSchema = new Schema({

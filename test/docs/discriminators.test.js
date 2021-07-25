@@ -283,6 +283,10 @@ describe('discriminator docs', function () {
    * types are stored in the same document array (within a document) rather
    * than the same collection. In other words, embedded discriminators let
    * you store subdocuments matching different schemas in the same array.
+   *
+   * As a general best practice, make sure you declare any hooks on your
+   * schemas **before** you use them. You should **not** call `pre()` or
+   * `post()` after calling `discriminator()`
    */
   it('Embedded discriminators in arrays', function(done) {
     var eventSchema = new Schema({ message: String },
@@ -295,12 +299,15 @@ describe('discriminator docs', function () {
 
     // The `events` array can contain 2 different types of events, a
     // 'clicked' event that requires an element id that was clicked...
-    var Clicked = docArray.discriminator('Clicked', new Schema({
+    var clickedSchema = new Schema({
       element: {
         type: String,
         required: true
       }
-    }, { _id: false }));
+    }, { _id: false });
+    // Make sure to attach any hooks to `eventSchema` and `clickedSchema`
+    // **before** calling `discriminator()`.
+    var Clicked = docArray.discriminator('Clicked', clickedSchema);
 
     // ... and a 'purchased' event that requires the product that was purchased.
     var Purchased = docArray.discriminator('Purchased', new Schema({
@@ -340,6 +347,58 @@ describe('discriminator docs', function () {
 
         assert.equal(doc.events[2].product, 'action-figure-2');
         assert.ok(doc.events[2] instanceof Purchased);
+
+        done();
+      }).
+      catch(done);
+  });
+
+  /**
+   * Recursive embedded discriminators
+   */
+  it('Recursive embedded discriminators in arrays', function(done) {
+    var singleEventSchema = new Schema({ message: String },
+      { discriminatorKey: 'kind', _id: false });
+
+    var eventListSchema = new Schema({ events: [singleEventSchema] });
+
+    var subEventSchema = new Schema({
+       sub_events: [singleEventSchema]
+    }, { _id: false });
+
+    var SubEvent = subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema)
+    eventListSchema.path('events').discriminator('SubEvent', subEventSchema);
+
+    var Eventlist = db.model('EventList', eventListSchema);
+
+    // Create a new batch of events with different kinds
+    var list = {
+      events: [
+        { kind: 'SubEvent', sub_events: [{kind:'SubEvent', sub_events:[], message:'test1'}], message: 'hello' },
+        { kind: 'SubEvent', sub_events: [{kind:'SubEvent', sub_events:[{kind:'SubEvent', sub_events:[], message:'test3'}], message:'test2'}], message: 'world' }
+      ]
+    };
+
+    Eventlist.create(list).
+      then(function(doc) {
+        assert.equal(doc.events.length, 2);
+
+        assert.equal(doc.events[0].sub_events[0].message, 'test1');
+        assert.equal(doc.events[0].message, 'hello');
+        assert.ok(doc.events[0].sub_events[0] instanceof SubEvent);
+
+        assert.equal(doc.events[1].sub_events[0].sub_events[0].message, 'test3');
+        assert.equal(doc.events[1].message, 'world');
+        assert.ok(doc.events[1].sub_events[0].sub_events[0] instanceof SubEvent);
+
+        doc.events.push({kind:'SubEvent', sub_events:[{kind:'SubEvent', sub_events:[], message:'test4'}], message:'pushed'});
+        return doc.save();
+      }).
+      then(function(doc) {
+        assert.equal(doc.events.length, 3);
+
+        assert.equal(doc.events[2].message, 'pushed');
+        assert.ok(doc.events[2].sub_events[0] instanceof SubEvent);
 
         done();
       }).

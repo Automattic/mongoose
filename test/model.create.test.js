@@ -99,8 +99,6 @@ describe('model', function() {
     });
 
     it('creates in parallel', function(done) {
-      // we set the time out to be double that of the validator - 1 (so that running in serial will be greater than that)
-      this.timeout(1000);
       var db = start(),
           countPre = 0,
           countPost = 0;
@@ -108,12 +106,16 @@ describe('model', function() {
       var SchemaWithPreSaveHook = new Schema({
         preference: String
       });
+
+      var startTime, endTime;
       SchemaWithPreSaveHook.pre('save', true, function hook(next, done) {
         setTimeout(function() {
           countPre++;
+          if (countPre === 1) startTime = Date.now();
+          else if (countPre === 4) endTime = Date.now();
           next();
           done();
-        }, 500);
+        }, 100);
       });
       SchemaWithPreSaveHook.post('save', function() {
         countPost++;
@@ -139,7 +141,8 @@ describe('model', function() {
         assert.ok(doc4);
         assert.equal(countPre, 4);
         assert.equal(countPost, 4);
-        done();
+        assert.ok(endTime - startTime < 4 * 100); // serial: >= 4 * 100 parallel: < 4 * 100
+        db.close(done);
       });
     });
 

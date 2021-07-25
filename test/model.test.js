@@ -5718,6 +5718,18 @@ describe('Model', function() {
       });
     });
 
+    it('.create() with non-object (gh-2037)', function(done) {
+      var schema = new mongoose.Schema({ name: String });
+
+      var Model = db.model('gh2037', schema);
+
+      Model.create(1, function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'ObjectParameterError');
+        done();
+      });
+    });
+
     it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', function(done) {
       var schema = new Schema({
         str: String,

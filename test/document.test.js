@@ -913,6 +913,35 @@ describe('document', function() {
         });
       });
     });
+
+    it('populate on nested path (gh-5703)', function() {
+      var toySchema = new mongoose.Schema({ color: String });
+      var Toy = db.model('gh5703', toySchema);
+
+      var childSchema = new mongoose.Schema({
+        name: String,
+        values: {
+          toy: { type: mongoose.Schema.Types.ObjectId, ref: 'gh5703' }
+        }
+      });
+      var Child = db.model('gh5703_0', childSchema);
+
+      return Toy.create({ color: 'blue' }).
+        then(function(toy) {
+          return Child.create({ values: { toy: toy._id } });
+        }).
+        then(function(child) {
+          return Child.findById(child._id);
+        }).
+        then(function(child) {
+          return child.values.populate('toy').execPopulate().then(function() {
+            return child;
+          });
+        }).
+        then(function(child) {
+          assert.equal(child.values.toy.color, 'blue');
+        });
+    });
   });
 
   describe('#update', function() {
@@ -1347,6 +1376,8 @@ describe('document', function() {
     });
 
     it('validator should run only once per sub-doc gh-1743', function(done) {
+      this.timeout(process.env.TRAVIS ? 8000 : 4500);
+
       var count = 0;
       var db = start();
 
@@ -1381,18 +1412,21 @@ describe('document', function() {
 
 
     it('validator should run in parallel', function(done) {
-      // we set the time out to be double that of the validator - 1 (so that running in serial will be greater than that)
-      this.timeout(1000);
       var db = start();
       var count = 0;
+      var startTime, endTime;
 
       var SchemaWithValidator = new Schema({
         preference: {
           type: String,
           required: true,
-          validate: function validator(value, done) {
-            count++;
-            setTimeout(done.bind(null, true), 500);
+          validate: {
+            validator: function validator(value, done) {
+              count++;
+              if (count === 1) startTime = Date.now();
+              else if (count === 4) endTime = Date.now();
+              setTimeout(done.bind(null, true), 150);
+            }
           }
         }
       });
@@ -1413,6 +1447,7 @@ describe('document', function() {
       m.save(function(err) {
         assert.ifError(err);
         assert.equal(count, 4);
+        assert(endTime - startTime < 150 * 4); // serial >= 150 * 4, parallel < 150 * 4
         db.close(done);
       });
     });
@@ -1906,6 +1941,38 @@ describe('document', function() {
           });
         });
       });
+    });
+
+    it('single nested schema transform with save() (gh-5807)', function() {
+      var embeddedSchema = new Schema({
+        test: String
+      });
+
+      var called = false;
+      embeddedSchema.options.toObject = {
+        transform: function(doc, ret) {
+          called = true;
+          delete ret.test;
+          return ret;
+        }
+      };
+      var topLevelSchema = new Schema({
+        embedded: embeddedSchema
+      });
+      var MyModel = db.model('gh5807', topLevelSchema);
+
+      return MyModel.create({}).
+        then(function(doc) {
+          doc.embedded = { test: '123' };
+          return doc.save();
+        }).
+        then(function(doc) {
+          return MyModel.findById(doc._id);
+        }).
+        then(function(doc) {
+          assert.equal(doc.embedded.test, '123');
+          assert.ok(!called);
+        });
     });
 
     it('setters firing with objects on real paths (gh-2943)', function(done) {
@@ -2799,12 +2866,16 @@ describe('document', function() {
 
       var MyModel = db.model('gh4014', schema);
 
-      MyModel.
-        where('geo').near({ center: [50, 50] }).
-        exec(function(error) {
-          assert.ifError(error);
-          done();
-        });
+      MyModel.on('index', function(err) {
+        assert.ifError(err);
+
+        MyModel.
+          where('geo').near({ center: [50, 50], spherical: true }).
+          exec(function(err) {
+            assert.ifError(err);
+            done();
+          });
+      });
     });
 
     it('skip validation if required returns false (gh-4094)', function(done) {
@@ -3740,7 +3811,7 @@ describe('document', function() {
     });
 
     it('timestamps with nested paths (gh-5051)', function(done) {
-      var schema = new Schema({ props: Object }, {
+      var schema = new Schema({ props: {} }, {
         timestamps: {
           createdAt: 'props.createdAt',
           updatedAt: 'props.updatedAt'
@@ -3758,6 +3829,23 @@ describe('document', function() {
         assert.ok(doc.props.updatedAt.valueOf() >= now);
         done();
       });
+    });
+
+    it('Declaring defaults in your schema with timestamps defined (gh-6024)', function(done) {
+      var schemaDefinition = {
+        name: String,
+        misc: {
+          hometown: String,
+          isAlive: { type: Boolean, default: true }
+        }
+      };
+
+      var schemaWithTimestamps = new Schema(schemaDefinition, {timestamps: {createdAt: 'misc.createdAt'}});
+      var PersonWithTimestamps = db.model('Person_timestamps', schemaWithTimestamps);
+      var dude = new PersonWithTimestamps({ name: 'Keanu', misc: {hometown: 'Beirut'} });
+      assert.equal(dude.misc.isAlive, true);
+
+      done();
     });
 
     it('supports $where in pre save hook (gh-4004)', function(done) {
@@ -3830,6 +3918,21 @@ describe('document', function() {
         catch(done);
     });
 
+    it('buffer subtype prop (gh-5530)', function(done) {
+      var TestSchema = new mongoose.Schema({
+        uuid: {
+          type: Buffer,
+          subtype: 4
+        }
+      });
+
+      var Test = db.model('gh5530', TestSchema);
+
+      var doc = new Test({ uuid: 'test1' });
+      assert.equal(doc.uuid._subtype, 4);
+      done();
+    });
+
     it('runs validate hooks on single nested subdocs if not directly modified (gh-3884)', function(done) {
       var childSchema = new Schema({
         name: { type: String },
@@ -3861,6 +3964,46 @@ describe('document', function() {
         then(function(p) {
           assert.equal(count, 1);
           p.child.friends.push('Rafiki');
+          return p.save();
+        }).
+        then(function() {
+          assert.equal(count, 2);
+          done();
+        }).
+        catch(done);
+    });
+
+    it('runs validate hooks on arrays subdocs if not directly modified (gh-5861)', function(done) {
+      var childSchema = new Schema({
+        name: { type: String },
+        friends: [{ type: String }]
+      });
+      var count = 0;
+
+      childSchema.pre('validate', function(next) {
+        ++count;
+        next();
+      });
+
+      var parentSchema = new Schema({
+        name: { type: String },
+        children: [childSchema]
+      });
+
+      var Parent = db.model('gh5861', parentSchema);
+
+      var p = new Parent({
+        name: 'Mufasa',
+        children: [{
+          name: 'Simba',
+          friends: ['Pumbaa', 'Timon', 'Nala']
+        }]
+      });
+
+      p.save().
+        then(function(p) {
+          assert.equal(count, 1);
+          p.children[0].friends.push('Rafiki');
           return p.save();
         }).
         then(function() {
@@ -4768,6 +4911,100 @@ describe('document', function() {
       });
     });
 
+    it('handles array defaults correctly (gh-5780)', function(done) {
+      var testSchema = new Schema({
+        nestedArr: {
+          type: [[Number]],
+          default: [[0, 1]]
+        }
+      });
+
+      var Test = db.model('gh5780', testSchema);
+
+      var t = new Test({});
+      assert.deepEqual(t.toObject().nestedArr, [[0, 1]]);
+
+      t.nestedArr.push([1, 2]);
+      var t2 = new Test({});
+      assert.deepEqual(t2.toObject().nestedArr, [[0, 1]]);
+
+      done();
+    });
+
+    it('virtuals with no getters return undefined (gh-6223)', function(done) {
+      var personSchema = new mongoose.Schema({
+        name: { type: String },
+        children: [{
+          name: { type: String }
+        }]
+      }, {
+        toObject: { getters: true, virtuals: true },
+        toJSON: { getters: true, virtuals: true },
+        id: false
+      });
+
+      personSchema.virtual('favoriteChild').set(function(v) {
+        return this.set('children.0', v);
+      });
+
+      personSchema.virtual('heir').get(function() {
+        return this.get('children.0');
+      });
+
+      var Person = db.model('gh6223', personSchema);
+
+      var person = new Person({
+        name: 'Anakin'
+      });
+
+      assert.strictEqual(person.favoriteChild, void 0);
+      assert.ok(!('favoriteChild' in person.toJSON()));
+      assert.ok(!('favoriteChild' in person.toObject()));
+
+      done();
+    });
+
+    it('Disallows writing to __proto__ and other special properties', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      }, { strict: false });
+
+      var Model = db.model('prototest', schema);
+      var doc = new Model({ '__proto__.x': 'foo' });
+
+      assert.strictEqual(Model.x, void 0);
+      doc.set('__proto__.y', 'bar');
+
+      assert.strictEqual(Model.y, void 0);
+
+      doc.set('constructor.prototype.z', 'baz');
+
+      assert.strictEqual(Model.z, void 0);
+
+      done();
+    });
+
+    it('Handles setting populated path set via `Document#populate()` (gh-7302)', function() {
+      var authorSchema = new Schema({ name: String });
+      var bookSchema = new Schema({
+        author: { type: mongoose.Schema.Types.ObjectId, ref: 'gh7302_Author' }
+      });
+
+      var Author = db.model('gh7302_Author', authorSchema);
+      var Book = db.model('gh7302_Book', bookSchema);
+
+      return Author.create({ name: 'Victor Hugo' }).
+        then(function(author) { return Book.create({ author: author._id }); }).
+        then(function() { return Book.findOne(); }).
+        then(function(doc) { return doc.populate('author').execPopulate(); }).
+        then(function(doc) {
+          doc.author = {};
+          assert.ok(!doc.author.name);
+          assert.ifError(doc.validateSync());
+        });
+    });
+
+
     it('Single nested subdocs using discriminator can be modified (gh-5693)', function(done) {
       var eventSchema = new Schema({ message: String }, {
         discriminatorKey: 'kind',
@@ -4857,6 +5094,45 @@ describe('document', function() {
       });
     });
 
+    it('modifying unselected nested object (gh-5800)', function() {
+      var MainSchema = new mongoose.Schema({
+        a: {
+          b: {type: String, default: 'some default'},
+          c: {type: Number, default: 0},
+          d: {type: String}
+        },
+        e: {type: String}
+      });
+
+      MainSchema.pre('save', function(next) {
+        if (this.isModified()) {
+          this.set('a.c', 100, Number);
+        }
+        next();
+      });
+
+      var Main = db.model('gh5800', MainSchema);
+
+      var doc = { a: { b: 'not the default', d: 'some value' }, e: 'e' };
+      return Main.create(doc).
+        then(function(doc) {
+          assert.equal(doc.a.b, 'not the default');
+          assert.equal(doc.a.d, 'some value');
+          return Main.findOne().select('e');
+        }).
+        then(function(doc) {
+          doc.e = 'e modified';
+          return doc.save();
+        }).
+        then(function() {
+          return Main.findOne();
+        }).
+        then(function(doc) {
+          assert.equal(doc.a.b, 'not the default');
+          assert.equal(doc.a.d, 'some value');
+        });
+    });
+
     it('consistent context for nested docs (gh-5347)', function(done) {
       var contexts = [];
       var childSchema = new mongoose.Schema({
@@ -4893,6 +5169,7 @@ describe('document', function() {
         assert.ifError(error);
         var child = doc.children.id(doc.children[0]._id);
         child.phoneNumber = '345';
+        assert.equal(contexts.length, 1);
         doc.save(function(error) {
           assert.ifError(error);
           assert.equal(contexts.length, 2);

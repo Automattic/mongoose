@@ -214,7 +214,7 @@ block content
     populate them using the [Model.populate()](./api.html#model_Model.populate)
     method available in **mongoose >= 3.6**. This is what `document#populate()`
     and `query#populate()` use to populate documents.
-  
+
   h3#deep-populate Populating across multiple levels
   :markdown
     Say you have a user schema which keeps track of the user's friends.
@@ -235,7 +235,7 @@ block content
         // Get friends of friends - populate the 'friends' array for every friend
         populate: { path: 'friends' }
       });
-  
+
   h3#cross-db-populate Populating across Databases
   :markdown
     Let's say you have a schema representing events, and a schema representing
@@ -256,14 +256,14 @@ block content
   :js
     var db1 = mongoose.createConnection('localhost:27000/db1');
     var db2 = mongoose.createConnection('localhost:27001/db2');
-    
+
     var Event = db1.model('Event', eventSchema);
     var Conversation = db2.model('Conversation', conversationSchema);
   :markdown
     In this situation, you will **not** be able to `populate()` normally.
     The `conversation` field will always be null, because `populate()` doesn't
     know which model to use. However,
-    [you can specify the model explicitly](http://mongoosejs.com/docs/api.html#model_Model.populate).
+    [you can specify the model explicitly](./api.html#model_Model.populate).
   :js
     Event.
       find().
@@ -286,9 +286,9 @@ block content
         item: { type: ObjectId, refPath: 'connections.kind' }
       }]
     });
-    
+
     var organizationSchema = new Schema({ name: String, kind: String });
-    
+
     var User = mongoose.model('User', userSchema);
     var Organization = mongoose.model('Organization', organizationSchema);
   :markdown
@@ -320,17 +320,17 @@ block content
         // doc.connections[0].item is a User doc
         // doc.connections[1].item is an Organization doc
       });
-    
+
   h3#populate-virtuals Populate Virtuals
   :markdown
     _New in 4.5.0_
-    
+
     So far you've only populated based on the `_id` field. However, that's
     sometimes not the right choice.
     In particular, [arrays that grow without bound are a MongoDB anti-pattern](https://docs.mongodb.com/manual/tutorial/model-referenced-one-to-many-relationships-between-documents/).
     Using mongoose virtuals, you can define more sophisticated relationships
     between documents.
-  
+
   :js
     var PersonSchema = new Schema({
       name: String,
@@ -348,10 +348,10 @@ block content
       // an array. `justOne` is false by default.
       justOne: false
     });
-    
-    var Person = mongoose.model('Person', personSchema);
-    var Band = mongoose.model('Band', bandSchema);
-    
+
+    var Person = mongoose.model('Person', PersonSchema);
+    var Band = mongoose.model('Band', BandSchema);
+
     /**
      * Suppose you have 2 bands: "Guns N' Roses" and "Motley Crue"
      * And 4 people: "Axl Rose" and "Slash" with "Guns N' Roses", and
@@ -360,24 +360,24 @@ block content
     Band.find({}).populate('members').exec(function(error, bands) {
       /* `bands.members` is now an array of instances of `Person` */
     });
-  
+
   :markdown
     Keep in mind that virtuals are _not_ included in `toJSON()` output by
     default. If you want populate virtuals to show up when using functions
     that rely on `JSON.stringify()`, like Express'
     [`res.json()` function](http://expressjs.com/en/4x/api.html#res.json),
     set the `virtuals: true` option on your schema's `toJSON` options.
-  
+
   :js
     // Set `virtuals: true` so `res.json()` works
     var BandSchema = new Schema({
       name: String
     }, { toJSON: { virtuals: true } });
-  
+
   :markdown
     If you're using populate projections, make sure `foreignField` is included
     in the projection.
-    
+
   :js
     Band.
       find({}).

@@ -22,7 +22,7 @@ block content
       });
     });
   :markdown
-    You can also use [`.set()`](http://mongoosejs.com/docs/api.html#document_Document-set)
+    You can also use [`.set()`](./api.html#document_Document-set)
     to modify documents. Under the hood, `tank.size = 'large';` becomes `tank.set({ size: 'large' })`.
   :js
     Tank.findById(id, function (err, tank) {
@@ -51,7 +51,7 @@ block content
     });
   :markdown
     The `findAndUpdate/Remove` static methods all make a change to at most one document, and return it with just one call to the database. There [are](./api.html#model_Model.findByIdAndRemove) [several](./api.html#model_Model.findOneAndUpdate) [variations](./api.html#model_Model.findOneAndRemove) on the [findAndModify](http://www.mongodb.org/display/DOCS/findAndModify+Command) theme. Read the [API](./api.html) docs for more detail.
-    
+
     _Note that `findAndUpdate/Remove` do *not* execute any hooks or validation before making the change in the database. You can use the [`runValidators` option](/docs/validation.html#update-validators) to access a limited subset of document validation. However, if you need hooks and full document validation, first query for the document and then `save()` it._
 
   h3 Validating
@@ -61,7 +61,7 @@ block content
   h3 Overwriting
   :markdown
     You can overwrite an entire document using `.set()`. This is handy if you
-    want to change what document is being saved in [middleware](http://mongoosejs.com/docs/middleware.html).
+    want to change what document is being saved in [middleware](./docs/middleware.html).
   :js
     Tank.findById(id, function (err, tank) {
       if (err) return handleError(err);

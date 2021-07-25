@@ -265,6 +265,8 @@ describe('versioning', function() {
     function test4(err, a, b) {
       assert.ok(/No matching document/.test(err), err);
       assert.equal(a._doc.__v, 5);
+      assert.equal(err.version, b._doc.__v - 1);
+      assert.deepEqual(err.modifiedPaths, ['numbers', 'numbers.2']);
       a.set('arr.0.0', 'updated');
       var d = a.$__delta();
       assert.equal(a._doc.__v, d[0].__v, 'version should be added to where clause');
@@ -525,5 +527,32 @@ describe('versioning', function() {
       assert.equal(obj.__v, undefined);
       done();
     });
+  });
+
+  it('copying doc works (gh-5779)', function(done) {
+    var schema = new Schema({ subdocs: [{ a: Number }] });
+    var M = db.model('gh5779', schema, 'gh5779');
+    var m = new M({ subdocs: [] });
+    var m2;
+
+    m.save().
+      then(function() {
+        m2 = new M(m);
+        m2.subdocs.push({ a: 2 });
+        return m2.save();
+      }).
+      then(function() {
+        m2.subdocs[0].a = 3;
+        return m2.save();
+      }).
+      then(function() {
+        assert.equal(m2.subdocs[0].a, 3);
+        return M.findById(m._id);
+      }).
+      then(function(doc) {
+        assert.equal(doc.subdocs[0].a, 3);
+        done();
+      }).
+      catch(done);
   });
 });

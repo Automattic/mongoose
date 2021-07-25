@@ -20,7 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "async": "2.1.4",
-    "bson": "~1.0.4",
+    "bson": "~1.1.6",
     "hooks-fixed": "2.0.2",
     "kareem": "1.5.0",
     "lodash.get": "4.4.2",

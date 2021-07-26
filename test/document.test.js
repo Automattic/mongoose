@@ -1724,73 +1724,6 @@ describe('document', function() {
           assert.equal(Object.keys(doc._doc.nested).length, 1);
           assert.equal(doc.nested.path, 'overwrite the entire nested object');
           assert.ok(doc.isModified('nested'));
-
-          // vs merging using doc.set(object)
-          doc.set({ test: 'Test', nested: { age: 4 } });
-          assert.equal(doc.nested.path, '4overwrite the entire nested object');
-          assert.equal(doc.nested.age, 4);
-          assert.equal(Object.keys(doc._doc.nested).length, 2);
-          assert.ok(doc.isModified('nested'));
-
-          doc = new TestDocument();
-          doc.init({
-            test: 'Test',
-            nested: {
-              age: 5
-            }
-          });
-
-          // vs merging using doc.set(path, object, {merge: true})
-          doc.set('nested', { path: 'did not overwrite the nested object' }, {
-            merge: true
-          });
-          assert.equal(doc.nested.path, '5did not overwrite the nested object');
-          assert.equal(doc.nested.age, 5);
-          assert.equal(Object.keys(doc._doc.nested).length, 3);
-          assert.ok(doc.isModified('nested'));
-
-          doc = new TestDocument();
-          doc.init({
-            test: 'Test',
-            nested: {
-              age: 5
-            }
-          });
-
-          doc.set({ test: 'Test', nested: { age: 5 } });
-          assert.ok(!doc.isModified());
-          assert.ok(!doc.isModified('test'));
-          assert.ok(!doc.isModified('nested'));
-          assert.ok(!doc.isModified('nested.age'));
-
-          doc.nested = { path: 'overwrite the entire nested object', age: 5 };
-          assert.equal(doc.nested.age, 5);
-          assert.equal(Object.keys(doc._doc.nested).length, 2);
-          assert.equal(doc.nested.path, '5overwrite the entire nested object');
-          assert.ok(doc.isModified('nested'));
-
-          doc.nested.deep = { x: 'Hank and Marie' };
-          assert.equal(Object.keys(doc._doc.nested).length, 3);
-          assert.equal(doc.nested.path, '5overwrite the entire nested object');
-          assert.ok(doc.isModified('nested'));
-          assert.equal(doc.nested.deep.x, 'Hank and Marie');
-
-          doc = new TestDocument();
-          doc.init({
-            test: 'Test',
-            nested: {
-              age: 5
-            }
-          });
-
-          doc.set('nested.deep', { x: 'Hank and Marie' });
-          assert.equal(Object.keys(doc._doc.nested).length, 2);
-          assert.equal(Object.keys(doc._doc.nested.deep).length, 1);
-          assert.ok(doc.isModified('nested'));
-          assert.ok(!doc.isModified('nested.path'));
-          assert.ok(!doc.isModified('nested.age'));
-          assert.ok(doc.isModified('nested.deep'));
-          assert.equal(doc.nested.deep.x, 'Hank and Marie');
         });
 
         it('allows positional syntax on mixed nested paths (gh-6738)', function() {
@@ -3648,7 +3581,7 @@ describe('document', function() {
             primary: 'blue'
           }
         });
-        assert.deepEqual(luke.modifiedPaths(), ['name', 'colors', 'colors.primary']);
+        assert.deepEqual(luke.modifiedPaths(), ['name', 'colors']);
 
         const obiwan = new Person({ name: 'Obi-Wan' });
         obiwan.colors.primary = 'blue';
@@ -3719,10 +3652,12 @@ describe('document', function() {
           }
         });
 
-        assert.ok(doc.modifiedPaths().indexOf('name.first') !== -1);
-        assert.ok(doc.modifiedPaths().indexOf('name.last') !== -1);
-        assert.ok(doc.modifiedPaths().indexOf('relatives.aunt') !== -1);
-        assert.ok(doc.modifiedPaths().indexOf('relatives.uncle') !== -1);
+        assert.ok(doc.modifiedPaths().indexOf('name') !== -1);
+        assert.ok(doc.modifiedPaths().indexOf('relatives') !== -1);
+        assert.ok(doc.modifiedPaths({ includeChildren: true }).indexOf('name.first') !== -1);
+        assert.ok(doc.modifiedPaths({ includeChildren: true }).indexOf('name.last') !== -1);
+        assert.ok(doc.modifiedPaths({ includeChildren: true }).indexOf('relatives.aunt') !== -1);
+        assert.ok(doc.modifiedPaths({ includeChildren: true }).indexOf('relatives.uncle') !== -1);
 
         return Promise.resolve();
       });
@@ -10521,4 +10456,25 @@ describe('document', function() {
     }
   });
 
+  it('skips recursive merging (gh-9121)', function() {
+    // Subdocument
+    const subdocumentSchema = new mongoose.Schema({
+      child: new mongoose.Schema({ name: String, age: Number }, { _id: false })
+    });
+    const Subdoc = mongoose.model('Subdoc', subdocumentSchema);
+
+    // Nested path
+    const nestedSchema = new mongoose.Schema({
+      child: { name: String, age: Number }
+    });
+    const Nested = mongoose.model('Nested', nestedSchema);
+
+    const doc1 = new Subdoc({ child: { name: 'Luke', age: 19 } });
+    doc1.set({ child: { age: 21 } });
+    assert.deepEqual(doc1.toObject().child, { age: 21 });
+    
+    const doc2 = new Nested({ child: { name: 'Luke', age: 19 } });
+    doc2.set({ child: { age: 21 } });
+    assert.deepEqual(doc2.toObject().child, { age: 21 });
+  });
 });

@@ -3826,57 +3826,47 @@ describe('Model', function() {
         });
       });
     });
-    it('is saved object with proper defaults', function(done) {
-      const DefaultTestObject = db.model('Test',
-        new Schema({
-          foo: {
-            x: { type: String },
-            y: { type: String }
-          },
-          boo: {
-            x: { type: Boolean, default: false }
-          },
-          bee: {
-            x: { type: Boolean, default: false },
-            y: { type: Boolean, default: false }
-          }
-        })
-      );
-      const myTest = new DefaultTestObject({
+    it('is saved object with proper defaults', function() {
+      const schema = new Schema({
+        foo: {
+          x: { type: String },
+          y: { type: String }
+        },
+        boo: {
+          x: { type: Boolean, default: false }
+        },
+        bee: {
+          x: { type: Boolean, default: false },
+          y: { type: Boolean, default: false }
+        }
+      });
+      const Test = db.model('Test', schema);
+
+      const doc = new Test({
         foo: { x: 'a', y: 'b' },
         bee: {},
         boo: {}
       });
 
-      myTest.save(function(err, doc) {
-        assert.ifError(err);
+      return co(function*() {
+        yield doc.save();
         assert.equal(doc.bee.x, false);
         assert.equal(doc.bee.y, false);
         assert.equal(doc.boo.x, false);
 
-        DefaultTestObject.findById(doc._id, function(err, doc) {
-          assert.ifError(err);
+        doc.bee = undefined;
+        doc.boo = undefined;
 
-          doc.bee = undefined; // unset
-          doc.boo = undefined; // unset
-          doc.save(function(err) {
-            assert.ifError(err);
+        yield doc.save();
 
-            DefaultTestObject.findById(doc._id, function(err, doc) {
-              assert.ifError(err);
+        const docAfterUnsetting = yield Test.findById(doc._id);
 
-              doc.save(function(err, doc) {
-                assert.ifError(err);
-                assert.equal(doc.bee.x, false);
-                assert.equal(doc.bee.y, false);
-                assert.equal(doc.boo.x, false);
-                done();
-              });
-            });
-          });
-        });
+        assert.equal(docAfterUnsetting.bee.x, false);
+        assert.equal(docAfterUnsetting.bee.y, false);
+        assert.equal(docAfterUnsetting.boo.x, false);
       });
     });
+
   });
 
   it('path is cast to correct value when retreived from db', function(done) {

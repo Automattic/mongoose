@@ -1710,7 +1710,7 @@ describe('document', function() {
     describe('on nested paths', function() {
       describe('using set(path, object)', function() {
         it('overwrites the entire object', function() {
-          let doc = new TestDocument();
+          const doc = new TestDocument();
 
           doc.init({
             test: 'Test',
@@ -10472,7 +10472,7 @@ describe('document', function() {
     const doc1 = new Subdoc({ child: { name: 'Luke', age: 19 } });
     doc1.set({ child: { age: 21 } });
     assert.deepEqual(doc1.toObject().child, { age: 21 });
-    
+
     const doc2 = new Nested({ child: { name: 'Luke', age: 19 } });
     doc2.set({ child: { age: 21 } });
     assert.deepEqual(doc2.toObject().child, { age: 21 });

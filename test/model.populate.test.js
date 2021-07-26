@@ -9422,18 +9422,22 @@ describe('model: populate:', function() {
       const nested = Schema({}, { discriminatorKey: 'type' });
       const mainSchema = Schema({ items: [nested] });
 
+      const docs = [];
       mainSchema.path('items').discriminator('TestDiscriminator', Schema({
         childModel: { type: String },
         child: {
           type: mongoose.Schema.Types.ObjectId,
-          refPath: (doc, path) => path.replace('.child', '.childModel')
+          refPath: (doc, path) => {
+            docs.push(doc);
+            return path.replace('.child', '.childModel');
+          }
         }
       }));
       const Parent = db.model('Parent', mainSchema);
       const Child = db.model('Child', Schema({ name: String }));
 
       const child = yield Child.create({ name: 'test' });
-      yield Parent.create({
+      const parent = yield Parent.create({
         items: [{
           type: 'TestDiscriminator',
           childModel: 'Child',
@@ -9441,9 +9445,14 @@ describe('model: populate:', function() {
         }]
       });
 
+      assert.equal(docs.length, 0);
       const doc = yield Parent.findOne().populate('items.child').exec();
+
       assert.equal(doc.items[0].child.name, 'test');
       assert.ok(doc.items[0].populated('child'));
+
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0]._id.toHexString(), parent.items[0]._id.toHexString());
     });
   });
 

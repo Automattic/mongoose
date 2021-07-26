@@ -12,4 +12,6 @@
 
 * `await Model.create([])` in v6.0 returns an empty array when provided an empty array, in v5.0 it used to return `undefined`. If any of your code is checking whether the output is `undefined` or not, you need to modify it with the assumption that `await Model.create(...)` will always return an array if provided an array.
 
+* `doc.set({ child: { age: 21 } })` now works the same whether `child` is a nested path or a subdocument: Mongoose will overwrite the value of `child`. In Mongoose 5, this operation would merge `child` if `child` was a nested path.
+
 * Mongoose now adds a `valueOf()` function to ObjectIds. This means you can now use `==` to compare two ObjectId instances.

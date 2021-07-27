@@ -10480,6 +10480,27 @@ describe('document', function() {
         assert.equal(user.init, 12);
       });
     });
+    xdescribe('Document#collection', () => {
+      it('is available as `$collection`', async() => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const user = await User.create({ name: 'Hafez' });
+        const userFromCollection = await user.$collection.findOne({ _id: user._id });
+        assert.ok(userFromCollection);
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          collection: Number
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ collection: 12 });
+        assert.equal(user.collection, 12);
+        assert.ok(user.$collection !== user.collection);
+        assert.ok(user.$collection);
+      });
+    });
     describe('Document#errors', () => {
       it('is available as `$errors`', async() => {
         const userSchema = new Schema({ name: { type: String, required: true } });

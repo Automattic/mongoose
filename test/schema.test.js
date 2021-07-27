@@ -1449,11 +1449,6 @@ describe('schema', function() {
         });
       }, /`collection` may not be used as a schema pathname/);
 
-      assert.throws(function() {
-        new Schema({
-          isNew: String
-        });
-      }, /`isNew` may not be used as a schema pathname/);
 
       assert.throws(function() {
         new Schema({
@@ -1465,6 +1460,10 @@ describe('schema', function() {
       // https://github.com/Automattic/mongoose/pull/10414#issuecomment-876863778
       new Schema({
         init: String
+      });
+
+      new Schema({
+        isNew: String
       });
     });
 

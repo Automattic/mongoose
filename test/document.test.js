@@ -4903,7 +4903,7 @@ describe('document', function() {
       });
 
       schema.virtual('tests').get(function() {
-        return Object.keys(this.nested).map(key => this.nested[key]);
+        return Object.values(this.nested);
       });
 
       const M = db.model('Test', schema);

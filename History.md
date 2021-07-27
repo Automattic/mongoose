@@ -1,3 +1,14 @@
+5.13.3 / 2021-07-16
+===================
+ * fix(model): avoid throwing error when bulkSave() called on a document with no changes #10437
+ * fix(timestamps): apply timestamps when creating new subdocs with `$addToSet` and with positional operator #10447
+ * fix(schema): allow calling Schema#loadClass() with class that has a static getter with no setter #10436
+ * fix(model): handle re-applying object defaults after explicitly unsetting #10442 [semirturgay](https://github.com/semirturgay)
+ * fix: bump mongodb driver -> 3.6.10 #10440 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(index.d.ts): consistently use NativeDate instead of Date for Date validators and timestamps functions #10426
+ * fix(index.d.ts): allow calling `discriminator()` with non-document #10452 #10421 [DouglasGabr](https://github.com/DouglasGabr)
+ * fix(index.d.ts): allow passing ResultType generic to Schema#path() #10435
+
 5.13.2 / 2021-07-03
 ===================
  * fix: hardcode @types/node version for now to avoid breaking changes from DefinitelyTyped/DefinitelyTyped#53669 #10415

@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.13.2",
+  "version": "5.13.3",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -22,7 +22,7 @@
     "@types/node": "14.x || 15.x",
     "bson": "^4.2.2",
     "kareem": "2.3.2",
-    "mongodb": "4.0.0-beta.6",
+    "mongodb": "4.0.1",
     "mpath": "0.8.3",
     "mquery": "3.2.5",
     "ms": "2.1.2",
@@ -82,7 +82,7 @@
   },
   "main": "./index.js",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=12.0.0"
   },
   "bugs": {
     "url": "https://github.com/Automattic/mongoose/issues/new"

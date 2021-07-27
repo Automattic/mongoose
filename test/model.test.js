@@ -3826,6 +3826,47 @@ describe('Model', function() {
         });
       });
     });
+    it('is saved object with proper defaults', function() {
+      const schema = new Schema({
+        foo: {
+          x: { type: String },
+          y: { type: String }
+        },
+        boo: {
+          x: { type: Boolean, default: false }
+        },
+        bee: {
+          x: { type: Boolean, default: false },
+          y: { type: Boolean, default: false }
+        }
+      });
+      const Test = db.model('Test', schema);
+
+      const doc = new Test({
+        foo: { x: 'a', y: 'b' },
+        bee: {},
+        boo: {}
+      });
+
+      return co(function*() {
+        yield doc.save();
+        assert.equal(doc.bee.x, false);
+        assert.equal(doc.bee.y, false);
+        assert.equal(doc.boo.x, false);
+
+        doc.bee = undefined;
+        doc.boo = undefined;
+
+        yield doc.save();
+
+        const docAfterUnsetting = yield Test.findById(doc._id);
+
+        assert.equal(docAfterUnsetting.bee.x, false);
+        assert.equal(docAfterUnsetting.bee.y, false);
+        assert.equal(docAfterUnsetting.boo.x, false);
+      });
+    });
+
   });
 
   it('path is cast to correct value when retreived from db', function(done) {
@@ -7323,7 +7364,8 @@ describe('Model', function() {
 
         yield User.insertMany([
           new User({ name: 'Hafez1_gh-9673-2' }),
-          new User({ name: 'Hafez2_gh-9673-2' })
+          new User({ name: 'Hafez2_gh-9673-2' }),
+          new User({ name: 'Hafez3_gh-9673-2' })
         ]);
 
         const users = yield User.find().sort('name');
@@ -7339,7 +7381,8 @@ describe('Model', function() {
           usersAfterUpdate.map(user => user.name),
           [
             'Hafez1_gh-9673-2-updated',
-            'Hafez2_gh-9673-2-updated'
+            'Hafez2_gh-9673-2-updated',
+            'Hafez3_gh-9673-2'
           ]
         );
       });
@@ -7412,7 +7455,7 @@ describe('Model', function() {
         assert.equal(user2.isNew, false);
       });
     });
-    it('sets `isNew` to false when a document succeds and `isNew` does not change when some fail', () => {
+    it('sets `isNew` to false when a document succeeds and `isNew` does not change when some fail', () => {
       return co(function* () {
         const userSchema = new Schema({
           name: { type: String, unique: true }

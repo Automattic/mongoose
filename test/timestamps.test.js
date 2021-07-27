@@ -875,6 +875,7 @@ describe('timestamps', function() {
       assert.ok(fromDb.content.a.updatedAt.valueOf() > ts.valueOf());
     });
   });
+
   it('makes createdAt immutable by default (gh-10139)', function() {
     const schema = Schema({ name: String }, { timestamps: true });
     const Model = db.model('Time', schema);
@@ -883,6 +884,50 @@ describe('timestamps', function() {
       const test = doc.createdAt;
       doc.createdAt = new Date();
       assert.equal(test, doc.createdAt);
+    });
+  });
+
+  it('sets createdAt when using $push/$addToSet on path with positional operator (gh-10447)', function() {
+    const userSchema = new Schema({
+      email: String
+    }, { timestamps: true });
+    const eventSchema = new Schema({
+      users: [userSchema],
+      message: String
+    }, { timestamps: true });
+
+    const churchSchema = new Schema({
+      events: [eventSchema]
+    }, { timestamps: true });
+
+    const Church = db.model('Test', churchSchema);
+
+    return co(function*() {
+      yield Church.create({
+        events: [{
+          churchId: 1,
+          message: 'test',
+          users: [{
+            churchId: 1,
+            email: 'test@google.com'
+          }]
+        }]
+      });
+
+      const church = yield Church.findOneAndUpdate({
+        events: { $elemMatch: { users: { $not: { $elemMatch: { email: 'test2@google.com' } } } } }
+      }, {
+        $addToSet: {
+          'events.$.users': { churchId: 1, email: 'test2@google.com' }
+        }
+      }, {
+        new: true
+      });
+
+      assert.equal(church.events.length, 1);
+      assert.equal(church.events[0].users.length, 2);
+      assert.equal(church.events[0].users[1].email, 'test2@google.com');
+      assert.ok(church.events[0].users[1].createdAt);
     });
   });
 });

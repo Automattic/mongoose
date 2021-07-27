@@ -10422,7 +10422,7 @@ describe('document', function() {
         assert.equal(user.isModified, 'nope');
       });
     });
-    xdescribe('Document#isNew', () => {
+    describe('Document#isNew', () => {
       it('is available as `$isNew`', async() => {
         const userSchema = new Schema({
           name: String

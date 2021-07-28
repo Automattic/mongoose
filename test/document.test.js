@@ -10478,11 +10478,9 @@ describe('document', function() {
     });
     const Test = db.model('Test', schema);
 
-    return co(function*() {
-      const doc = new Test({});
-      doc.otherProp = 'test';
+    const doc = new Test({});
+    doc.otherProp = 'test';
 
-      assert.ok(!doc.nested.otherProp);
-    });
+    assert.ok(!doc.nested.otherProp);
   });
 });

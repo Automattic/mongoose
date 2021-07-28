@@ -10469,4 +10469,20 @@ describe('document', function() {
     }
   });
 
+  it('does not pull non-schema paths from parent documents into nested paths (gh-10449)', function() {
+    const schema = new Schema({
+      name: String,
+      nested: {
+        data: String
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = new Test({});
+      doc.otherProp = 'test';
+
+      assert.ok(!doc.nested.otherProp);
+    });
+  });
 });

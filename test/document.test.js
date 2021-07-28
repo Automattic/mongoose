@@ -7083,11 +7083,13 @@ describe('document', function() {
     return event.validate();
   });
 
-  it('flattenMaps option for toObject() (gh-7274)', function() {
+  it('flattenMaps option for toObject() (gh-7274) (gh-10486)', function() {
+    const subSchema = new Schema({ name: String });
+
     let schema = new Schema({
       test: {
         type: Map,
-        of: String,
+        of: subSchema,
         default: new Map()
       }
     }, { versionKey: false });
@@ -7095,13 +7097,14 @@ describe('document', function() {
     let Test = db.model('Test', schema);
 
     let mapTest = new Test({});
-    mapTest.test.set('key1', 'value1');
-    assert.equal(mapTest.toObject({ flattenMaps: true }).test.key1, 'value1');
+    mapTest.test.set('key1', { name: 'value1' });
+    // getters: true for gh-10486
+    assert.equal(mapTest.toObject({ getters: true, flattenMaps: true }).test.key1.name, 'value1');
 
     schema = new Schema({
       test: {
         type: Map,
-        of: String,
+        of: subSchema,
         default: new Map()
       }
     }, { versionKey: false });
@@ -7111,10 +7114,8 @@ describe('document', function() {
     Test = db.model('Test', schema);
 
     mapTest = new Test({});
-    mapTest.test.set('key1', 'value1');
-    assert.equal(mapTest.toObject({}).test.key1, 'value1');
-
-    return Promise.resolve();
+    mapTest.test.set('key1', { name: 'value1' });
+    assert.equal(mapTest.toObject({}).test.key1.name, 'value1');
   });
 
   it('`collection` property with strict: false (gh-7276)', function() {
@@ -10476,5 +10477,20 @@ describe('document', function() {
     const doc2 = new Nested({ child: { name: 'Luke', age: 19 } });
     doc2.set({ child: { age: 21 } });
     assert.deepEqual(doc2.toObject().child, { age: 21 });
+  });
+
+  it('does not pull non-schema paths from parent documents into nested paths (gh-10449)', function() {
+    const schema = new Schema({
+      name: String,
+      nested: {
+        data: String
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({});
+    doc.otherProp = 'test';
+
+    assert.ok(!doc.nested.otherProp);
   });
 });

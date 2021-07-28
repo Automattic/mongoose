@@ -226,7 +226,8 @@ describe('typescript syntax', function() {
   it('populate', function() {
     const errors = runTest('populate.ts', { strict: true });
     printTSErrors(errors);
-    assert.equal(errors.length, 0);
+    assert.equal(errors.length, 1);
+    assert.ok(errors[0].messageText.includes('Property \'save\' does not exist'), errors[0].messageText);
   });
 
   it('generics', function() {

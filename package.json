@@ -20,7 +20,6 @@
   "license": "MIT",
   "dependencies": {
     "@types/mongodb": "^3.5.27",
-    "@types/node": "14.x || 15.x",
     "bson": "^1.1.4",
     "kareem": "2.3.2",
     "mongodb": "3.6.10",

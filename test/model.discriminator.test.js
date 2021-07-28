@@ -1723,7 +1723,8 @@ describe('model', function() {
       'container',
       new mongoose.Schema({
         body: { children: childrenArraySchema }
-      })
+      }),
+      { clone: false }
     );
     const Nested = mongoose.model('nested', nestedSchema);
 

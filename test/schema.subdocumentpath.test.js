@@ -22,7 +22,7 @@ describe('SubdocumentPath', function() {
           sub_events: [singleEventSchema]
         }, { _id: false });
 
-        subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema);
+        subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema, { clone: false });
 
         let currentEventLevel = subEventSchema;
         for (let i = 0; i < 5; i++) {
@@ -42,7 +42,7 @@ describe('SubdocumentPath', function() {
           sub_events: [singleEventSchema]
         }, { _id: false });
 
-        subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema);
+        subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema, { clone: false });
 
         const SubEvent = mongoose.model('MultiLevelDataDoc', subEventSchema);
         const multiLevel = {
@@ -82,7 +82,7 @@ describe('SubdocumentPath', function() {
           sub_events: [singleEventSchema]
         });
 
-        subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema);
+        subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema, { clone: false });
 
         // To create a recursive document, the schema was modified, so the _id property is now a number
         assert.equal(subEventSchema.path('_id').instance, 'Number');
@@ -107,7 +107,7 @@ describe('SubdocumentPath', function() {
           sub_events: [singleEventSchema]
         });
 
-        subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema);
+        subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema, { clone: false });
 
         const SubEvent = mongoose.model('MultiLevelDataWithIdDoc', subEventSchema);
         const multiLevel = {

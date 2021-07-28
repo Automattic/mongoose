@@ -388,7 +388,7 @@ describe('mongoose module:', function() {
       }
     });
 
-    schema.path('events').discriminator('test-event', testEventSchema);
+    schema.path('events').discriminator('test-event', testEventSchema, { clone: false });
 
     m.model('gh7435', schema);
     assert.equal(called.length, 4);

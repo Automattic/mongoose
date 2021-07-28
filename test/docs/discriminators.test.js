@@ -349,9 +349,12 @@ describe('discriminator docs', function() {
       sub_events: [singleEventSchema]
     }, { _id: false });
 
+    // Make sure to pass `clone: false` as an option to `discriminator()`.
+    // Otherwise Mongoose will clone `subEventSchema` and the schema won't
+    // be recursive.
     const SubEvent = subEventSchema.path('sub_events').
-      discriminator('SubEvent', subEventSchema);
-    eventListSchema.path('events').discriminator('SubEvent', subEventSchema);
+      discriminator('SubEvent', subEventSchema, { clone: false });
+    eventListSchema.path('events').discriminator('SubEvent', subEventSchema, { clone: false });
 
     const Eventlist = db.model('EventList', eventListSchema);
 

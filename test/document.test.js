@@ -1522,48 +1522,6 @@ describe('document', function() {
         db.close(done);
       });
     });
-
-
-    it('validator should run in parallel', function(done) {
-      let count = 0;
-      let startTime, endTime;
-
-      const SchemaWithValidator = new Schema({
-        preference: {
-          type: String,
-          required: true,
-          validate: {
-            validator: function validator(value, done) {
-              count++;
-              if (count === 1) startTime = Date.now();
-              else if (count === 4) endTime = Date.now();
-              setTimeout(done.bind(null, true), 150);
-            },
-            isAsync: true
-          }
-        }
-      });
-
-      const MWSV = db.model('Test', new Schema({ subs: [SchemaWithValidator] }));
-      const m = new MWSV({
-        subs: [{
-          preference: 'xx'
-        }, {
-          preference: 'yy'
-        }, {
-          preference: '1'
-        }, {
-          preference: '2'
-        }]
-      });
-
-      m.save(function(err) {
-        assert.ifError(err);
-        assert.equal(count, 4);
-        assert(endTime - startTime < 150 * 4); // serial >= 150 * 4, parallel < 150 * 4
-        done();
-      });
-    });
   });
 
   it('#invalidate', function(done) {

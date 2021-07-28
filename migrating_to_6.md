@@ -19,3 +19,5 @@
 * `doc.set({ child: { age: 21 } })` now works the same whether `child` is a nested path or a subdocument: Mongoose will overwrite the value of `child`. In Mongoose 5, this operation would merge `child` if `child` was a nested path.
 
 * Mongoose now adds a `valueOf()` function to ObjectIds. This means you can now use `==` to compare two ObjectId instances.
+
+* `isAsync` is no longer an option for `validate`. Use an `async function` instead.

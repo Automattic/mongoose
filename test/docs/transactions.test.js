@@ -10,15 +10,17 @@ const Schema = mongoose.Schema;
 describe('transactions', function() {
   let db;
   let _skipped = false;
+  this.timeout(10000);
 
   before(function() {
+
     if (!process.env.REPLICA_SET) {
       _skipped = true;
       this.skip();
     }
     db = start({ replicaSet: process.env.REPLICA_SET });
 
-    return db.
+    return db.asPromise().
       then(() => {
         // Skip if not a repl set
         if (db.client.topology.constructor.name !== 'ReplSet' &&
@@ -240,12 +242,12 @@ describe('transactions', function() {
         then(() => db.startSession()).
         then(_session => {
           session = _session;
-          session.startTransaction();
+          return session.startTransaction();
         });
     });
 
-    afterEach(function() {
-      session.commitTransaction();
+    afterEach(async function() {
+      await session.commitTransaction();
       return session.endSession();
     });
 

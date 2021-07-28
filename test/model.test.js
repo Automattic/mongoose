@@ -4120,8 +4120,7 @@ describe('Model', function() {
 
       return co(function*() {
         yield Location.collection.drop().catch(() => {});
-        yield Location.createCollection();
-        yield Location.createIndexes();
+        yield Location.init();
 
         yield Location.create({
           name: 'Undefined location'
@@ -5235,7 +5234,7 @@ describe('Model', function() {
             const db = yield start();
             const MyModel = db.model('Test', new Schema({ name: String }));
 
-            yield MyModel.createCollection();
+            yield MyModel.init();
 
             const changeStream = MyModel.watch();
             const closed = new global.Promise(resolve => {

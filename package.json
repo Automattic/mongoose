@@ -26,7 +26,6 @@
     "mpath": "0.8.3",
     "mquery": "3.2.5",
     "ms": "2.1.2",
-    "optional-require": "1.0.x",
     "regexp-clone": "1.0.0",
     "sift": "13.5.2",
     "sliced": "1.0.1"

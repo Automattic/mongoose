@@ -1,3 +1,16 @@
+5.13.4 / 2021-07-28
+===================
+ * fix: avoid pulling non-schema paths from documents into nested paths #10449
+ * fix(update): support overwriting nested map paths #10485
+ * fix(update): apply timestamps to subdocs that would be newly created by `$setOnInsert` #10460
+ * fix(map): correctly clone subdocs when calling toObject() on a map #10486
+ * fix(cursor): cap parallel batchSize for populate at 5000 #10449
+ * fix(index.d.ts): improve autocomplete for new Model() by making `doc` an object with correct keys #10475
+ * fix(index.d.ts): add MongooseOptions interface #10471 [thiagokisaki](https://github.com/thiagokisaki)
+ * fix(index.d.ts): make LeanDocument work with PopulatedDoc #10494
+ * docs(mongoose+connection): correct default value for bufferTimeoutMS #10476
+ * chore: remove unnecessary 'eslint-disable' comments #10466 [thiagokisaki](https://github.com/thiagokisaki)
+
 5.13.3 / 2021-07-16
 ===================
  * fix(model): avoid throwing error when bulkSave() called on a document with no changes #10437

@@ -2438,12 +2438,17 @@ declare module 'mongoose' {
   type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
   export type _LeanDocument<T> = {
-    [K in keyof T]:
-    0 extends (1 & T[K]) ? T[K] : // any
-    T[K] extends unknown[] ? LeanArray<T[K]> : // Array
-    T[K] extends Document ? LeanDocument<T[K]> : // Subdocument
-    T[K];
+    [K in keyof T]: LeanDocumentElement<T[K]>;
   };
+
+  // Keep this a separate type, to ensure that T is a naked type.
+  // This way, the conditional type is distributive over union types.
+  // This is required for PopulatedDoc.
+  type LeanDocumentElement<T> =
+    0 extends (1 & T) ? T : // any
+    T extends unknown[] ? LeanArray<T> : // Array
+    T extends Document ? LeanDocument<T> : // Subdocument
+    T;
 
   export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 

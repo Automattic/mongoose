@@ -1,6 +1,6 @@
 import { Schema, model, Document, PopulatedDoc } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
 
 interface Child {
   name: string;

@@ -1926,7 +1926,7 @@ declare module 'mongoose' {
         auto(turnOn: boolean): this;
       }
 
-      class SubdocumentPath extends SchemaType implements AcceptsDiscriminator {
+      class Subdocument extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 

@@ -562,8 +562,7 @@ describe('QueryCursor', function() {
       yield User.create([{ order: 1 }, { order: 2 }, { order: 3 }]);
 
       const cursor = User.aggregate([{ $sort: { order: 1 } }]).
-        cursor().
-        exec();
+        cursor();
 
       const docs = [];
 
@@ -581,7 +580,6 @@ describe('QueryCursor', function() {
 
     let closeEventTriggeredCount = 0;
     cursor.on('close', () => closeEventTriggeredCount++);
-
     setTimeout(() => {
       assert.equal(closeEventTriggeredCount, 1);
       done();
@@ -591,7 +589,7 @@ describe('QueryCursor', function() {
   it('closing aggregation cursor emits `close` event only once (gh-8835)', function(done) {
     const User = db.model('User', new Schema({ name: String }));
 
-    const cursor = User.aggregate([{ $match: {} }]).cursor().exec();
+    const cursor = User.aggregate([{ $match: {} }]).cursor();
     cursor.on('data', () => {});
 
     let closeEventTriggeredCount = 0;
@@ -635,7 +633,7 @@ describe('QueryCursor', function() {
 
       const docsWithIndexes = [];
 
-      yield User.aggregate([{ $sort: { order: 1 } }]).cursor().exec().eachAsync((doc, i) => {
+      yield User.aggregate([{ $sort: { order: 1 } }]).cursor().eachAsync((doc, i) => {
         docsWithIndexes.push({ order: doc.order, i: i });
       });
 

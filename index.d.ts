@@ -252,9 +252,6 @@ declare module 'mongoose' {
     /** `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to `toObject()` */
     toObject?: ToObjectOptions;
 
-    /** true by default, may be `false` or `true`. Sets the default typePojoToMixed for schemas. */
-    typePojoToMixed?: boolean;
-
     /**
      * true by default. Set to `false` to make `findOneAndUpdate()` and `findOneAndRemove()`
      * use native `findOneAndUpdate()` rather than `findAndModify()`.
@@ -1535,11 +1532,6 @@ declare module 'mongoose' {
      * field names by setting timestamps.createdAt and timestamps.updatedAt.
      */
     timestamps?: boolean | SchemaTimestampsConfig;
-    /**
-     * Determines whether a type set to a POJO becomes
-     * a Mixed path or a Subdocument (defaults to true).
-     */
-    typePojoToMixed?: boolean;
   }
 
   interface SchemaTimestampsConfig {

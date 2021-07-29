@@ -387,20 +387,6 @@ const Any = new Schema({ any: {} });
 const Any = new Schema({ any: Object });
 const Any = new Schema({ any: Schema.Types.Mixed });
 const Any = new Schema({ any: mongoose.Mixed });
-// Note that by default, if you're using `type`, putting _any_ POJO as the `type` will
-// make the path mixed.
-const Any = new Schema({
-  any: {
-    type: { foo: String }
-  } // "any" will be Mixed - everything inside is ignored.
-});
-// However, as of Mongoose 5.8.0, this behavior can be overridden with typePojoToMixed.
-// In that case, it will create a single nested subdocument type instead.
-const Any = new Schema({
-  any: {
-    type: { foo: String }
-  } // "any" will be a single nested subdocument.
-}, {typePojoToMixed: false});
 ```
 
 Since Mixed is a schema-less type, you can change the value to anything else you

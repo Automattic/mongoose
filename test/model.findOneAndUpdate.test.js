@@ -2383,4 +2383,30 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(doc.a, 2);
     });
   });
+
+  it('supports overwriting nested map paths (gh-10485)', function() {
+    const child = new mongoose.Schema({
+      vals: {
+        type: mongoose.Schema.Types.Map,
+        of: String
+      }
+    });
+
+    const parent = new mongoose.Schema({
+      children: {
+        type: [child]
+      }
+    });
+    const Parent = db.model('Parent', parent);
+
+    return co(function*() {
+      const parent = yield Parent.create({
+        children: [{ vals: { github: 'hello', twitter: 'world' } }]
+      });
+
+      const res = yield Parent.findOneAndUpdate({ _id: parent._id, 'children.vals.github': { $exists: true } },
+        { $set: { 'children.$.vals': { telegram: 'hello' } } }, { new: true });
+      assert.deepEqual(res.toObject().children[0].vals, new Map([['telegram', 'hello']]));
+    });
+  });
 });

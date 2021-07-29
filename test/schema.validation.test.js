@@ -508,42 +508,6 @@ describe('schema', function() {
         });
       });
 
-      it('multiple sequence', function(done) {
-        let validator1Executed = false;
-        let validator2Executed = false;
-
-        function validator1(value, fn) {
-          setTimeout(function() {
-            validator1Executed = true;
-            assert.ok(!validator2Executed);
-            fn(value === true);
-          }, 5);
-        }
-
-        function validator2(value, fn) {
-          setTimeout(function() {
-            validator2Executed = true;
-            assert.ok(validator1Executed);
-            fn(value === true);
-            done();
-          }, 5);
-        }
-
-        const Animal = new Schema({
-          ferret: {
-            type: Boolean,
-            validate: [
-              { validator: validator1, msg: 'validator1' },
-              { validator: validator2, msg: 'validator2' }
-            ].map(function(v) { return Object.assign(v, { isAsync: true }); })
-          }
-        });
-
-        Animal.path('ferret').doValidate(true, function(err) {
-          assert.ifError(err);
-        });
-      });
-
       it('scope', function(done) {
         let called = false;
 
@@ -640,61 +604,8 @@ describe('schema', function() {
           });
         });
 
-        it('custom validators with isAsync = false', function(done) {
-          const validate = function(v, opts) {
-            // Make eslint not complain about unused vars
-            return !!(v && opts && false);
-          };
-
-          const schema = new Schema({
-            x: {
-              type: String,
-              validate: {
-                isAsync: false,
-                validator: validate
-              }
-            }
-          });
-          const M = mongoose.model('custom-validator-async-' + random(), schema);
-
-          const m = new M({ x: 'test' });
-
-          m.validate(function(err) {
-            assert.ok(err.errors['x']);
-            done();
-          });
-        });
-
-        it('custom validators with isAsync and .validate() (gh-5125)', function(done) {
-          const validate = function(v, opts) {
-            // Make eslint not complain about unused vars
-            return !!(v && opts && false);
-          };
-
-          const schema = new Schema({
-            x: {
-              type: String
-            }
-          });
-
-          schema.path('x').validate({
-            isAsync: false,
-            validator: validate,
-            message: 'Custom error message!'
-          });
-          const M = mongoose.model('gh5125', schema);
-
-          const m = new M({ x: 'test' });
-
-          m.validate(function(err) {
-            assert.ok(err.errors['x']);
-            assert.equal(err.errors['x'].message, 'Custom error message!');
-            done();
-          });
-        });
-
-        it('custom validators with isAsync and promise (gh-5171)', function(done) {
-          const validate = function(v) {
+        it('custom validators with promise (gh-5171)', function(done) {
+          const validate = async function(v) {
             return Promise.resolve(v === 'test');
           };
 
@@ -705,7 +616,6 @@ describe('schema', function() {
           });
 
           schema.path('x').validate({
-            isAsync: true,
             validator: validate
           });
           const M = mongoose.model('gh5171', schema);

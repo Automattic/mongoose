@@ -145,20 +145,6 @@ console.log(doc2.child); // Prints 'MongooseDocument { undefined }'
 doc2.child.name = 'test'; // Works
 ```
 
-Secondly, in Mongoose 5, [`Document#set()`](/docs/api/document.html#document_Document-set)
-merges when you call it on a nested path, but overwrites when you call
-it on a subdocument.
-
-```javascript
-const doc1 = new Subdoc({ child: { name: 'Luke', age: 19 } });
-doc1.set({ child: { age: 21 } });
-doc1.child; // { age: 21 }
-
-const doc2 = new Nested({ child: { name: 'Luke', age: 19 } });
-doc2.set({ child: { age: 21 } });
-doc2.child; // { name: Luke, age: 21 }
-```
-
 ### Subdocument Defaults
 
 Subdocument paths are undefined by default, and Mongoose does

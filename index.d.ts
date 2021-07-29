@@ -37,8 +37,7 @@ declare module 'mongoose' {
    * Mongoose constructor. The exports object of the `mongoose` module is an instance of this
    * class. Most apps will only use this one instance.
    */
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  export const Mongoose: new (options?: object | null) => typeof mongoose;
+  export const Mongoose: new (options?: MongooseOptions | null) => typeof mongoose;
 
   /**
    * The Mongoose Number [SchemaType](/docs/schematypes.html). Used for
@@ -93,7 +92,7 @@ declare module 'mongoose' {
   export function disconnect(cb: (err: CallbackError) => void): void;
 
   /** Gets mongoose options */
-  export function get(key: string): any;
+  export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
   /**
    * Returns true if Mongoose can cast the given value to an ObjectId, or
@@ -120,7 +119,7 @@ declare module 'mongoose' {
    * [timestamps](/docs/guide.html#timestamps). You may stub out this function
    * using a tool like [Sinon](https://www.npmjs.com/package/sinon) for testing.
    */
-  export function now(): Date;
+  export function now(): NativeDate;
 
   /** Declares a global plugin executed on all Schemas. */
   export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): typeof mongoose;
@@ -129,7 +128,7 @@ declare module 'mongoose' {
   export function pluralize(fn?: ((str: string) => string) | null): ((str: string) => string) | null;
 
   /** Sets mongoose options */
-  export function set(key: string, value: any): void;
+  export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): typeof mongoose;
 
   /**
    * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
@@ -145,6 +144,135 @@ declare module 'mongoose' {
   export type CastError = Error.CastError;
 
   type Mongoose = typeof mongoose;
+
+  interface MongooseOptions {
+    /** true by default. Set to false to skip applying global plugins to child schemas */
+    applyPluginsToChildSchemas?: boolean;
+
+    /**
+     * false by default. Set to true to apply global plugins to discriminator schemas.
+     * This typically isn't necessary because plugins are applied to the base schema and
+     * discriminators copy all middleware, methods, statics, and properties from the base schema.
+     */
+    applyPluginsToDiscriminators?: boolean;
+
+    /**
+     * Set to `true` to make Mongoose call` Model.createCollection()` automatically when you
+     * create a model with `mongoose.model()` or `conn.model()`. This is useful for testing
+     * transactions, change streams, and other features that require the collection to exist.
+     */
+    autoCreate?: boolean;
+
+    /**
+     * true by default. Set to false to disable automatic index creation
+     * for all models associated with this Mongoose instance.
+     */
+    autoIndex?: boolean;
+
+    /** enable/disable mongoose's buffering mechanism for all connections and models */
+    bufferCommands?: boolean;
+
+    bufferTimeoutMS?: number;
+
+    /** false by default. Set to `true` to `clone()` all schemas before compiling into a model. */
+    cloneSchemas?: boolean;
+
+    /**
+     * If `true`, prints the operations mongoose sends to MongoDB to the console.
+     * If a writable stream is passed, it will log to that stream, without colorization.
+     * If a callback function is passed, it will receive the collection name, the method
+     * name, then all arguments passed to the method. For example, if you wanted to
+     * replicate the default logging, you could output from the callback
+     * `Mongoose: ${collectionName}.${methodName}(${methodArgs.join(', ')})`.
+     */
+    debug?:
+      | boolean
+      | { color?: boolean; shell?: boolean }
+      | WritableStream
+      | ((collectionName: string, methodName: string, ...methodArgs: any[]) => void);
+
+    /** If set, attaches [maxTimeMS](https://docs.mongodb.com/manual/reference/operator/meta/maxTimeMS/) to every query */
+    maxTimeMS?: number;
+
+    /**
+     * true by default. Mongoose adds a getter to MongoDB ObjectId's called `_id` that
+     * returns `this` for convenience with populate. Set this to false to remove the getter.
+     */
+    objectIdGetter?: boolean;
+
+    /**
+     * Set to `true` to default to overwriting models with the same name when calling
+     * `mongoose.model()`, as opposed to throwing an `OverwriteModelError`.
+     */
+    overwriteModels?: boolean;
+
+    /**
+     * If `false`, changes the default `returnOriginal` option to `findOneAndUpdate()`,
+     * `findByIdAndUpdate`, and `findOneAndReplace()` to false. This is equivalent to
+     * setting the `new` option to `true` for `findOneAndX()` calls by default. Read our
+     * `findOneAndUpdate()` [tutorial](https://mongoosejs.com/docs/tutorials/findoneandupdate.html)
+     * for more information.
+     */
+    returnOriginal?: boolean;
+
+    /**
+     * false by default. Set to true to enable [update validators](
+     * https://mongoosejs.com/docs/validation.html#update-validators
+     * ) for all validators by default.
+     */
+    runValidators?: boolean;
+
+    sanitizeProjection?: boolean;
+
+    /**
+     * true by default. Set to false to opt out of Mongoose adding all fields that you `populate()`
+     * to your `select()`. The schema-level option `selectPopulatedPaths` overwrites this one.
+     */
+    selectPopulatedPaths?: boolean;
+
+    setDefaultsOnInsert?: boolean;
+
+    /** true by default, may be `false`, `true`, or `'throw'`. Sets the default strict mode for schemas. */
+    strict?: boolean | 'throw';
+
+    /**
+     * false by default, may be `false`, `true`, or `'throw'`. Sets the default
+     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
+     */
+    strictQuery?: boolean | 'throw';
+
+    /**
+     * `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to
+     * `toJSON()`, for determining how Mongoose documents get serialized by `JSON.stringify()`
+     */
+    toJSON?: ToObjectOptions;
+
+    /** `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to `toObject()` */
+    toObject?: ToObjectOptions;
+
+    /** true by default, may be `false` or `true`. Sets the default typePojoToMixed for schemas. */
+    typePojoToMixed?: boolean;
+
+    /**
+     * false by default. Set to `true` to make Mongoose's default index build use `createIndex()`
+     * instead of `ensureIndex()` to avoid deprecation warnings from the MongoDB driver.
+     */
+    useCreateIndex?: boolean;
+
+    /**
+     * true by default. Set to `false` to make `findOneAndUpdate()` and `findOneAndRemove()`
+     * use native `findOneAndUpdate()` rather than `findAndModify()`.
+     */
+    useFindAndModify?: boolean;
+
+    /** false by default. Set to `true` to make all connections set the `useNewUrlParser` option by default */
+    useNewUrlParser?: boolean;
+
+    usePushEach?: boolean;
+
+    /** false by default. Set to `true` to make all connections set the `useUnifiedTopology` option by default */
+    useUnifiedTopology?: boolean;
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface ClientSession extends mongodb.ClientSession { }
@@ -618,20 +746,19 @@ declare module 'mongoose' {
 
   interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
-    discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<D>;
-    discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
+    discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<D>;
+    discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
+  type AnyKeys<T> = Partial<{ [P in keyof T]: T[P] | any }>;
   interface AnyObject { [k: string]: any }
   type EnforceDocument<T, TMethods> = T extends Document ? T : T & Document<any, any, T> & TMethods;
 
   export const Model: Model<any>;
-  // eslint-disable-next-line no-undef
   interface Model<T, TQueryHelpers = {}, TMethods = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
-    new(doc?: T | any): EnforceDocument<T, TMethods>;
+    new(doc?: AnyKeys<T> & AnyObject): EnforceDocument<T, TMethods>;
 
     aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
-    // eslint-disable-next-line @typescript-eslint/ban-types
     aggregate<R = any>(pipeline: any[], cb: Function): Promise<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
@@ -722,7 +849,6 @@ declare module 'mongoose' {
      * Event emitter that reports any errors that occurred. Useful for global error
      * handling.
      */
-    // eslint-disable-next-line no-undef
     events: NodeJS.EventEmitter;
 
     /**
@@ -802,7 +928,6 @@ declare module 'mongoose' {
     watch<ResultType = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
 
     /** Adds a `$where` clause to this query */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     $where(argument: string | Function): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
 
     /** Registered discriminators for this model. */
@@ -995,7 +1120,6 @@ declare module 'mongoose' {
   }
 
   interface MapReduceOptions<T, Key, Val> {
-    // eslint-disable-next-line @typescript-eslint/ban-types
     map: Function | string;
     reduce: (key: Key, vals: T[]) => Val;
     /** query filter object. */
@@ -1149,11 +1273,9 @@ declare module 'mongoose' {
      * [statics](http://mongoosejs.com/docs/guide.html#statics), and
      * [methods](http://mongoosejs.com/docs/guide.html#methods).
      */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     loadClass(model: Function, onlyVirtuals?: boolean): this;
 
     /** Adds an instance method to documents constructed from Models compiled from this schema. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     method(name: string, fn: (this: EnforceDocument<DocType, TInstanceMethods>, ...args: any[]) => any, opts?: any): this;
     method(obj: { [name: string]: (this: EnforceDocument<DocType, TInstanceMethods>, ...args: any[]) => any }): this;
 
@@ -1164,7 +1286,7 @@ declare module 'mongoose' {
     obj: any;
 
     /** Gets/sets schema paths. */
-    path(path: string): SchemaType;
+    path<ResultType extends SchemaType = SchemaType>(path: string): ResultType;
     path(path: string, constructor: any): this;
 
     /** Lists all paths and their type in the schema. */
@@ -1224,9 +1346,7 @@ declare module 'mongoose' {
     set(path: string, value: any, _tags?: any): this;
 
     /** Adds static "class" methods to Models compiled from this schema. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     static(name: string, fn: (this: M, ...args: any[]) => any): this;
-    // eslint-disable-next-line @typescript-eslint/ban-types
     static(obj: { [name: string]: (this: M, ...args: any[]) => any }): this;
 
     /** Object of currently defined statics on this schema. */
@@ -1429,7 +1549,7 @@ declare module 'mongoose' {
   interface SchemaTimestampsConfig {
     createdAt?: boolean | string;
     updatedAt?: boolean | string;
-    currentTime?: () => (Date | number);
+    currentTime?: () => (NativeDate | number);
   }
 
   type Unpacked<T> = T extends (infer U)[] ?
@@ -1451,7 +1571,6 @@ declare module 'mongoose' {
     alias?: string;
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     validate?: RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T> | ValidateOpts<T>[];
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
@@ -1532,13 +1651,13 @@ declare module 'mongoose' {
     subtype?: number
 
     /** The minimum value allowed for this path. Only allowed for numbers and dates. */
-    min?: number | Date | [number, string] | [Date, string] | readonly [number, string] | readonly [Date, string];
+    min?: number | NativeDate | [number, string] | [NativeDate, string] | readonly [number, string] | readonly [NativeDate, string];
 
     /** The maximum value allowed for this path. Only allowed for numbers and dates. */
-    max?: number | Date | [number, string] | [Date, string] | readonly [number, string] | readonly [Date, string];
+    max?: number | NativeDate | [number, string] | [NativeDate, string] | readonly [number, string] | readonly [NativeDate, string];
 
     /** Defines a TTL index on this path. Only allowed for dates. */
-    expires?: number | Date;
+    expires?: number | NativeDate;
 
     /** If `true`, Mongoose will skip gathering indexes on subpaths. Only allowed for subdocuments and subdocument arrays. */
     excludeIndexes?: boolean;
@@ -1547,7 +1666,6 @@ declare module 'mongoose' {
     _id?: boolean;
 
     /** If set, specifies the type of this map's values. Mongoose will cast this map's values to the given type. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     of?: Function | SchemaDefinitionProperty<any>;
 
     /** If true, uses Mongoose's default `_id` settings. Only allowed for ObjectIds */
@@ -1702,8 +1820,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
-        discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -1742,10 +1860,10 @@ declare module 'mongoose' {
         expires(when: number | string): this;
 
         /** Sets a maximum date validator. */
-        max(value: Date, message: string): this;
+        max(value: NativeDate, message: string): this;
 
         /** Sets a minimum date validator. */
-        min(value: Date, message: string): this;
+        min(value: NativeDate, message: string): this;
       }
 
       class Decimal128 extends SchemaType {
@@ -1759,8 +1877,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D extends Document>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
-        discriminator<T extends Document, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
         schema: Schema;
@@ -1798,12 +1916,15 @@ declare module 'mongoose' {
         auto(turnOn: boolean): this;
       }
 
-      class SubdocumentPath extends SchemaType {
+      class SubdocumentPath extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
         /** The document's schema */
         schema: Schema;
+
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
       }
 
       class String extends SchemaType {
@@ -1945,7 +2066,6 @@ declare module 'mongoose' {
     // @todo: this doesn't seem right
     exec(callback?: (err: CallbackError, result: ResultType) => void): Promise<ResultType> | any;
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
     $where(argument: string | Function): QueryWithHelpers<DocType[], DocType, THelpers, RawDocType>;
 
     /** Specifies an `$all` query condition. When called with one argument, the most recent path passed to `where()` is used. */
@@ -2024,9 +2144,7 @@ declare module 'mongoose' {
     distinct(field: string, filter?: FilterQuery<DocType>, callback?: (err: CallbackError, count: number) => void): QueryWithHelpers<Array<any>, DocType, THelpers, RawDocType>;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     elemMatch(val: Function | any): this;
-    // eslint-disable-next-line @typescript-eslint/ban-types
     elemMatch(path: string, val: Function | any): this;
 
     /**
@@ -2553,8 +2671,7 @@ declare module 'mongoose' {
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   type TreatAsPrimitives = actualPrimitives |
-      // eslint-disable-next-line no-undef
-    Date | RegExp | symbol | Error | BigInt | Types.ObjectId;
+    NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
 
   type LeanType<T> =
     0 extends (1 & T) ? T : // any
@@ -2564,12 +2681,17 @@ declare module 'mongoose' {
   type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
   export type _LeanDocument<T> = {
-    [K in keyof T]:
-    0 extends (1 & T[K]) ? T[K] : // any
-    T[K] extends unknown[] ? LeanArray<T[K]> : // Array
-    T[K] extends Document ? LeanDocument<T[K]> : // Subdocument
-    T[K];
+    [K in keyof T]: LeanDocumentElement<T[K]>;
   };
+
+  // Keep this a separate type, to ensure that T is a naked type.
+  // This way, the conditional type is distributive over union types.
+  // This is required for PopulatedDoc.
+  type LeanDocumentElement<T> =
+    0 extends (1 & T) ? T : // any
+    T extends unknown[] ? LeanArray<T> : // Array
+    T extends Document ? LeanDocument<T> : // Subdocument
+    T;
 
   export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
@@ -2804,7 +2926,6 @@ declare module 'mongoose' {
     constructor(path: string, options?: any, instance?: string);
 
     /** Get/set the function used to cast arbitrary values to this type. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     static cast(caster?: Function | boolean): Function;
 
     static checkRequired(checkRequired?: (v: any) => boolean): (v: any) => boolean;
@@ -2825,7 +2946,6 @@ declare module 'mongoose' {
     default(val: any): any;
 
     /** Adds a getter to this schematype. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     get(fn: Function): this;
 
     /**
@@ -2853,7 +2973,6 @@ declare module 'mongoose' {
     select(val: boolean): this;
 
     /** Adds a setter to this schematype. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     set(fn: Function): this;
 
     /** Declares a sparse index. */
@@ -2869,7 +2988,6 @@ declare module 'mongoose' {
     unique(bool: boolean): this;
 
     /** Adds validator(s) for this document path. */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     validate(obj: RegExp | Function | any, errorMsg?: string,
       type?: string): this;
   }

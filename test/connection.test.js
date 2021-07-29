@@ -79,7 +79,7 @@ describe('connections:', function() {
     it('with autoCreate (gh-6489)', function() {
       return co(function*() {
         const conn = yield mongoose.createConnection(uri, {
-          autoCreate: true
+          // autoCreate: true
         }).asPromise();
 
         const Model = conn.model('gh6489_Conn', new Schema({ name: String }, {
@@ -89,7 +89,8 @@ describe('connections:', function() {
         yield Model.init();
 
         // Will throw if collection was not created
-        yield conn.collection('gh6489_Conn').stats();
+        const collections = yield conn.db.listCollections().toArray();
+        assert.ok(collections.map(c => c.name).includes('gh6489_Conn'));
 
         yield Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
 
@@ -98,6 +99,23 @@ describe('connections:', function() {
         const res = yield conn.collection('gh6489_Conn').
           find({}).sort({ name: 1 }).toArray();
         assert.deepEqual(res.map(v => v.name), ['alpha', 'Zeta']);
+      });
+    });
+
+    it('with autoCreate = false (gh-8814)', function() {
+      return co(function*() {
+        const conn = yield mongoose.createConnection(uri, {
+          autoCreate: false
+        }).asPromise();
+
+        const Model = conn.model('gh8814_Conn', new Schema({ name: String }, {
+          collation: { locale: 'en_US', strength: 1 },
+          collection: 'gh8814_Conn'
+        }));
+        yield Model.init();
+
+        const res = yield conn.db.listCollections().toArray();
+        assert.ok(!res.map(c => c.name).includes('gh8814_Conn'));
       });
     });
 

@@ -77,7 +77,7 @@ declare module 'mongoose' {
   /** An array containing all models associated with this Mongoose instance. */
   export const models: { [index: string]: Model<any> };
   /** Creates a Connection instance. */
-  export function createConnection(uri: string, options?: ConnectOptions): Connection & Promise<Connection>;
+  export function createConnection(uri: string, options?: ConnectOptions): Connection;
   export function createConnection(): Connection;
   export function createConnection(uri: string, options: ConnectOptions, callback: (err: CallbackError, conn: Connection) => void): void;
 
@@ -299,6 +299,9 @@ declare module 'mongoose' {
   }
 
   class Connection extends events.EventEmitter {
+    /** Returns a promise that resolves when this connection successfully connects to MongoDB */
+    asPromise(): Promise<this>;
+
     /** Closes the connection */
     close(callback: (err: CallbackError) => void): void;
     close(force: boolean, callback: (err: CallbackError) => void): void;

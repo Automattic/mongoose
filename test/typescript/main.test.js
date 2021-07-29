@@ -100,9 +100,7 @@ describe('typescript syntax', function() {
 
   it('aggregate', function() {
     const errors = runTest('aggregate.ts');
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
+    printTSErrors(errors);
     assert.equal(errors.length, 0);
   });
 

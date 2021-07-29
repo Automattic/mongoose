@@ -1089,7 +1089,7 @@ declare module 'mongoose' {
     writeConcern?: any;
   }
 
-  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'omitUndefined' | 'strict' | 'useFindAndModify' | 'sanitizeProjection' | 'sanitizeFilter'>;
+  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'omitUndefined' | 'strict' | 'sanitizeProjection' | 'sanitizeFilter'>;
 
   interface SaveOptions {
     checkKeys?: boolean;
@@ -2789,10 +2789,10 @@ declare module 'mongoose' {
     /**
      * Sets the cursor option for the aggregation query (ignored for < 2.6.0).
      */
-    cursor(options?: Record<string, unknown>): this;
+    cursor(options?: Record<string, unknown>): AggregationCursor;
 
-    /** Executes the aggregate pipeline on the currently bound Model. If cursor option is set, returns a cursor */
-    exec(callback?: (err: CallbackError, result: R) => void): Promise<R> | any;
+    /** Executes the aggregate pipeline on the currently bound Model. */
+    exec(callback?: (err: CallbackError, result: R) => void): Promise<R>;
 
     /** Execute the aggregation with explain */
     explain(callback?: (err: CallbackError, result: any) => void): Promise<any>;

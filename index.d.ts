@@ -222,6 +222,8 @@ declare module 'mongoose' {
      */
     runValidators?: boolean;
 
+    sanitizeFilter?: boolean;
+
     sanitizeProjection?: boolean;
 
     /**
@@ -1061,7 +1063,13 @@ declare module 'mongoose' {
      */
     returnDocument?: string;
     runValidators?: boolean;
+    /* Set to `true` to automatically sanitize potentially unsafe user-generated query projections */
     sanitizeProjection?: boolean;
+    /**
+     * Set to `true` to automatically sanitize potentially unsafe query filters by stripping out query selectors that
+     * aren't explicitly allowed using `mongoose.trusted()`.
+     */
+    sanitizeFilter?: boolean;
     /** The session associated with this query. */
     session?: mongodb.ClientSession;
     setDefaultsOnInsert?: boolean;
@@ -1078,11 +1086,10 @@ declare module 'mongoose' {
      */
     timestamps?: boolean;
     upsert?: boolean;
-    useFindAndModify?: boolean;
     writeConcern?: any;
   }
 
-  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'omitUndefined' | 'strict' | 'useFindAndModify' | 'sanitizeProjection'>;
+  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'omitUndefined' | 'strict' | 'useFindAndModify' | 'sanitizeProjection' | 'sanitizeFilter'>;
 
   interface SaveOptions {
     checkKeys?: boolean;

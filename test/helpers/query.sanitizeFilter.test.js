@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const { querySelector } = require('../../lib/helpers/query/querySelector');
+const { trusted } = require('../../lib/helpers/query/trusted');
 const sanitizeFilter = require('../../lib/helpers/query/sanitizeFilter');
 
 describe('sanitizeFilter', function() {
@@ -20,7 +20,7 @@ describe('sanitizeFilter', function() {
     sanitizeFilter(obj);
     assert.deepEqual(obj, { username: 'val', pwd: 'my secret' });
 
-    obj = { username: 'val', pwd: querySelector({ $type: 'string', $eq: 'my secret' }) };
+    obj = { username: 'val', pwd: trusted({ $type: 'string', $eq: 'my secret' }) };
     sanitizeFilter(obj);
     assert.deepEqual(obj, { username: 'val', pwd: { $type: 'string', $eq: 'my secret' } });
   });

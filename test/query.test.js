@@ -2930,7 +2930,7 @@ describe('Query', function() {
           docs.push(doc);
           next();
         });
-        const Model = db.model('Test', schema);
+        const Model = db.model('Test2', schema);
 
         yield Model.create({ name: 'Test' });
 
@@ -2952,7 +2952,7 @@ describe('Query', function() {
       });
     });
 
-    it('throws DocumentNotFoundError by default (gh-7409)', function() {
+    it('throws DocumentNotFoundError by default execute (gh-7409)', function() {
       return co(function*() {
         const err = yield Model.findOne({ name: 'na' }).
           orFail().

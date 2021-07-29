@@ -188,30 +188,6 @@ describe('mongoose module:', function() {
       then(() => mongoose.disconnect());
   });
 
-  it('useCreateIndex option (gh-6880)', function() {
-    const mongoose = new Mongoose();
-
-    const M = mongoose.model('Test', new Schema({
-      name: { type: String, index: true }
-    }));
-
-    M.collection.ensureIndex = function() {
-      throw new Error('Fail');
-    };
-
-    mongoose.set('useCreateIndex', true);
-
-    return mongoose.connect(uri, options).
-      then(() => {
-        return M.init();
-      }).
-      then(() => {
-        const M = mongoose.model('Test');
-        delete M.$init;
-        return M.init();
-      });
-  });
-
   it('toJSON options (gh-6815)', function() {
     const mongoose = new Mongoose();
 

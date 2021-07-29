@@ -256,12 +256,6 @@ declare module 'mongoose' {
     typePojoToMixed?: boolean;
 
     /**
-     * false by default. Set to `true` to make Mongoose's default index build use `createIndex()`
-     * instead of `ensureIndex()` to avoid deprecation warnings from the MongoDB driver.
-     */
-    useCreateIndex?: boolean;
-
-    /**
      * true by default. Set to `false` to make `findOneAndUpdate()` and `findOneAndRemove()`
      * use native `findOneAndUpdate()` rather than `findAndModify()`.
      */
@@ -269,8 +263,6 @@ declare module 'mongoose' {
 
     /** false by default. Set to `true` to make all connections set the `useNewUrlParser` option by default */
     useNewUrlParser?: boolean;
-
-    usePushEach?: boolean;
 
     /** false by default. Set to `true` to make all connections set the `useUnifiedTopology` option by default */
     useUnifiedTopology?: boolean;
@@ -294,8 +286,6 @@ declare module 'mongoose' {
     useFindAndModify?: boolean;
     /** Set to `true` to make Mongoose automatically call `createCollection()` on every model created on this connection. */
     autoCreate?: boolean;
-    /** False by default. If `true`, this connection will use `createIndex()` instead of `ensureIndex()` for automatic index builds via `Model.init()`. */
-    useCreateIndex?: boolean;
   }
 
   class Connection extends events.EventEmitter {
@@ -1509,8 +1499,7 @@ declare module 'mongoose' {
      * schema's strict mode setting. Set to `true` to use the child schema's `strict` mode setting.
      */
     useNestedStrict?: boolean;
-    /** defaults to false */
-    usePushEach?: boolean;
+
     /**
      * By default, documents are automatically validated before they are saved to the database. This is to
      * prevent saving an invalid document. If you want to handle validation manually, and be able to save

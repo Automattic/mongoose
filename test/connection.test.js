@@ -134,22 +134,6 @@ describe('connections:', function() {
       });
     });
 
-    it('useCreateIndex (gh-6922)', function(done) {
-      const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
-        useCreateIndex: true
-      });
-
-      const M = conn.model('Test', new Schema({
-        name: { type: String, index: true }
-      }));
-
-      M.collection.ensureIndex = function() {
-        throw new Error('Fail');
-      };
-
-      conn.asPromise().then(() => done(), err => done(err));
-    });
-
     it('throws helpful error with legacy syntax (gh-6756)', function() {
       assert.throws(function() {
         mongoose.createConnection('localhost', 'dbname', 27017);
@@ -928,10 +912,10 @@ describe('connections:', function() {
 
   it('useDB inherits config from default connection (gh-8267)', function() {
     return co(function*() {
-      yield mongoose.connect('mongodb://localhost:27017/gh8267-0', { useCreateIndex: true });
+      yield mongoose.connect('mongodb://localhost:27017/gh8267-0', { sanitizeFilter: true });
 
       const db2 = mongoose.connection.useDb('gh8267-1');
-      assert.equal(db2.config.useCreateIndex, true);
+      assert.equal(db2.config.sanitizeFilter, true);
     });
   });
 
@@ -1028,17 +1012,9 @@ describe('connections:', function() {
 
           assert.strictEqual(m.connection.get('autoIndex'), false);
           assert.strictEqual(m.connection.get('autoCreate'), false);
-          assert.strictEqual(
-            m.connection.get('useCreateIndex'),
-            false
-          );
 
           assert.strictEqual(m.connection.get('autoIndex'), false);
           assert.strictEqual(m.connection.get('autoCreate'), false);
-          assert.strictEqual(
-            m.connection.get('useCreateIndex'),
-            false
-          );
 
           yield m.disconnect();
         });
@@ -1055,7 +1031,7 @@ describe('connections:', function() {
           'MongoDB prohibits index creation on connections that read from ' +
                         'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
                         '"secondaryPreferred" may not opt-in to the following connection options: ' +
-                        'autoCreate, autoIndex, useCreateIndex'
+                        'autoCreate, autoIndex'
         );
         const m = new mongoose.Mongoose();
 
@@ -1075,7 +1051,7 @@ describe('connections:', function() {
           'MongoDB prohibits index creation on connections that read from ' +
                         'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
                         '"secondaryPreferred" may not opt-in to the following connection options: ' +
-                        'autoCreate, autoIndex, useCreateIndex'
+                        'autoCreate, autoIndex'
         );
         const m = new mongoose.Mongoose();
         assert.rejects(m.connect(secondaryURI, opts), err);
@@ -1093,13 +1069,11 @@ describe('connections:', function() {
 
         assert.equal(conn.get('autoIndex'), false);
         assert.equal(conn.get('autoCreate'), false);
-        assert.equal(conn.get('useCreateIndex'), false);
 
         const conn2 = new mongoose.createConnection(secondaryPrefURI);
 
         assert.equal(conn2.get('autoIndex'), false);
         assert.equal(conn2.get('autoCreate'), false);
-        assert.equal(conn2.get('useCreateIndex'), false);
       });
 
       it('throws if options try to set autoIndex to true', function() {
@@ -1112,7 +1086,7 @@ describe('connections:', function() {
           'MongoDB prohibits index creation on connections that read from ' +
                         'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
                         '"secondaryPreferred" may not opt-in to the following connection options: ' +
-                        'autoCreate, autoIndex, useCreateIndex'
+                        'autoCreate, autoIndex'
         );
         const m = new mongoose.Mongoose();
         return assert.throws(
@@ -1134,7 +1108,7 @@ describe('connections:', function() {
           'MongoDB prohibits index creation on connections that read from ' +
                         'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
                         '"secondaryPreferred" may not opt-in to the following connection options: ' +
-                        'autoCreate, autoIndex, useCreateIndex'
+                        'autoCreate, autoIndex'
         );
 
         assert.throws(

@@ -16,7 +16,7 @@
 
 * `Aggregate#cursor()` now returns an AggregationCursor instance to be consistent with `Query#cursor()`. You no longer need to do `Model.aggregate(pipeline).cursor().exec()` to get an aggregation cursor, just `Model.aggregate(pipeline).cursor()`.
 
-* `autoCreate` is `true` by default, which means Mongoose will attempt to create every model's underlying collection before creating indexes.
+* `autoCreate` is `true` by default **unless** readPreference is secondary or secondaryPreferred, which means Mongoose will attempt to create every model's underlying collection before creating indexes. If readPreference is secondary or secondaryPreferred, Mongoose will default to `false` for both `autoCreate` and `autoIndex` because both `createCollection()` and `createIndex()` will fail when connected to a secondary.
 
 * The `context` option for queries has been removed. Now Mongoose always uses `context = 'query'`.
 

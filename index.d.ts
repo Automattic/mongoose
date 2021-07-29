@@ -607,10 +607,6 @@ declare module 'mongoose' {
     /** Hash containing current validation errors. */
     errors?: Error.ValidationError;
 
-    /** Explicitly executes population and returns a promise. Useful for promises integration. */
-    execPopulate(): Promise<this>;
-    execPopulate(callback: (err: CallbackError, res: this) => void): void;
-
     /** Returns the value of a path. */
     get(path: string, type?: any, options?: any): any;
 
@@ -683,13 +679,14 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /**
-     * Populates document references, executing the `callback` when complete.
-     * If you want to use promises instead, use this function with
-     * [`execPopulate()`](#document_Document-execPopulate).
+     * Populates document references.
      */
-    populate(path: string, callback?: (err: CallbackError, res: this) => void): this;
-    populate(path: string, names: string, callback?: (err: CallbackError, res: this) => void): this;
-    populate(opts: PopulateOptions | Array<PopulateOptions>, callback?: (err: CallbackError, res: this) => void): this;
+    populate(path: string | string[]): Promise<this>;
+    populate(path: string | string[], callback: (err: CallbackError, res: this) => void): void;
+    populate(path: string, names: string): Promise<this>;
+    populate(path: string, names: string, callback: (err: CallbackError, res: this) => void): void;
+    populate(opts: PopulateOptions | Array<PopulateOptions>): Promise<this>;
+    populate(opts: PopulateOptions | Array<PopulateOptions>, callback: (err: CallbackError, res: this) => void): void;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;

@@ -2799,36 +2799,6 @@ describe('document', function() {
       });
     });
 
-    it('execPopulate (gh-3753)', function(done) {
-      const childSchema = new Schema({
-        name: String
-      });
-
-      const parentSchema = new Schema({
-        name: String,
-        children: [{ type: ObjectId, ref: 'Child' }]
-      });
-
-      const Child = db.model('Child', childSchema);
-      const Parent = db.model('Parent', parentSchema);
-
-      Child.create({ name: 'Luke Skywalker' }, function(error, child) {
-        assert.ifError(error);
-        const doc = { name: 'Darth Vader', children: [child._id] };
-        Parent.create(doc, function(error, doc) {
-          Parent.findOne({ _id: doc._id }, function(error, doc) {
-            assert.ifError(error);
-            assert.ok(doc);
-            doc.populate('children').then(function(doc) {
-              assert.equal(doc.children.length, 1);
-              assert.equal(doc.children[0].name, 'Luke Skywalker');
-              done();
-            });
-          });
-        });
-      });
-    });
-
     it('handles 0 for numeric subdoc ids (gh-3776)', function(done) {
       const personSchema = new Schema({
         _id: Number,

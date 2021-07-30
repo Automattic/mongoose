@@ -1,3 +1,9 @@
+5.13.5 / 2021-07-30
+===================
+ * perf(index.d.ts): improve typescript type checking performance #10515 [andreialecu](https://github.com/andreialecu)
+ * fix(index.d.ts): fix debug type in MongooseOptions #10510 [thiagokisaki](https://github.com/thiagokisaki)
+ * docs(api): clarify that `depopulate()` with no args depopulates all #10501 [gfrancz](https://github.com/gfrancz)
+
 5.13.4 / 2021-07-28
 ===================
  * fix: avoid pulling non-schema paths from documents into nested paths #10449

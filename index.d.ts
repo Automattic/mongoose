@@ -188,7 +188,7 @@ declare module 'mongoose' {
     debug?:
       | boolean
       | { color?: boolean; shell?: boolean }
-      | WritableStream
+      | stream.Writable
       | ((collectionName: string, methodName: string, ...methodArgs: any[]) => void);
 
     /** If set, attaches [maxTimeMS](https://docs.mongodb.com/manual/reference/operator/meta/maxTimeMS/) to every query */

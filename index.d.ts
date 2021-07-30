@@ -2494,9 +2494,9 @@ declare module 'mongoose' {
     ? mongodb.Condition<T[P]>
     : mongodb.Condition<T[P] | string>;
   } &
-    mongodb.RootQuerySelector<T>;
+    mongodb.RootQuerySelector<DocumentDefinition<T>>;
 
-  export type FilterQuery<T> = _FilterQuery<DocumentDefinition<T>>;
+  export type FilterQuery<T> = _FilterQuery<T>;
 
   type NumericTypes = number | mongodb.Decimal128 | mongodb.Double | mongodb.Int32 | mongodb.Long;
 

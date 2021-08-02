@@ -251,18 +251,6 @@ declare module 'mongoose' {
 
     /** `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to `toObject()` */
     toObject?: ToObjectOptions;
-
-    /**
-     * true by default. Set to `false` to make `findOneAndUpdate()` and `findOneAndRemove()`
-     * use native `findOneAndUpdate()` rather than `findAndModify()`.
-     */
-    useFindAndModify?: boolean;
-
-    /** false by default. Set to `true` to make all connections set the `useNewUrlParser` option by default */
-    useNewUrlParser?: boolean;
-
-    /** false by default. Set to `true` to make all connections set the `useUnifiedTopology` option by default */
-    useUnifiedTopology?: boolean;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -279,8 +267,6 @@ declare module 'mongoose' {
     pass?: string;
     /** Set to false to disable automatic index creation for all models associated with this connection. */
     autoIndex?: boolean;
-    /** True by default. Set to `false` to make `findOneAndUpdate()` and `findOneAndRemove()` use native `findOneAndUpdate()` rather than `findAndModify()`. */
-    useFindAndModify?: boolean;
     /** Set to `true` to make Mongoose automatically call `createCollection()` on every model created on this connection. */
     autoCreate?: boolean;
   }
@@ -1031,7 +1017,6 @@ declare module 'mongoose' {
      * instead give you the object after `update` was applied.
      */
     new?: boolean;
-    omitUndefined?: boolean;
     overwrite?: boolean;
     overwriteDiscriminatorKey?: boolean;
     populate?: string;
@@ -1076,7 +1061,7 @@ declare module 'mongoose' {
     writeConcern?: any;
   }
 
-  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'omitUndefined' | 'strict' | 'sanitizeProjection' | 'sanitizeFilter'>;
+  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'strict' | 'sanitizeProjection' | 'sanitizeFilter'>;
 
   interface SaveOptions {
     checkKeys?: boolean;
@@ -1491,11 +1476,6 @@ declare module 'mongoose' {
      * control which key mongoose uses to find type declarations, set the 'typeKey' schema option.
      */
     typeKey?: string;
-    /**
-     * Write operations like update(), updateOne(), updateMany(), and findOneAndUpdate() only check the top-level
-     * schema's strict mode setting. Set to `true` to use the child schema's `strict` mode setting.
-     */
-    useNestedStrict?: boolean;
 
     /**
      * By default, documents are automatically validated before they are saved to the database. This is to

@@ -1232,7 +1232,7 @@ declare module 'mongoose' {
   type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
   type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
 
-  class Schema<DocType = Document, M extends Model<DocType, any, any> = Model<any, any, any>, SchemaDefinitionType = undefined, TInstanceMethods = ExtractMethods<M>> extends events.EventEmitter {
+ class Schema<DocType = Document, M = Model<any, any, any>, SchemaDefinitionType = undefined, TInstanceMethods = any> extends events.EventEmitter {
     /**
      * Create a new schema
      */

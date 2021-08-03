@@ -75,6 +75,7 @@
     "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
+    "release-next": "git pull origin 6.0 && git push origin 6.0 --tags && npm publish --tag next",
     "test": "mocha --exit ./test/*.test.js ./test/typescript/main.test.js",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --watch --recursive --watch-files ./**/*.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"

@@ -1,3 +1,56 @@
+6.0.0-rc0 / 2021-08-03
+======================
+ * BREAKING CHANGE: upgrade to MongoDB Node.js driver 4.x. This adds support for MongoDB 5.0, drops support for Node.js < 12.0.0 #10338 #9840 #8759
+ * BREAKING CHANGE(connection): make connections not thenable, add `Connection#asPromise()` to use a connection as a promise #8810
+ * BREAKING CHANGE: throw an error if the same query object is executed multiple times #7398
+ * BREAKING CHANGE: Mongoose arrays are now proxies, which means directly setting an array index `doc.arr[0] = 'test'` triggers change tracking #8884
+ * BREAKING CHANGE: make Document#populate() return a promise if a callback isn't passed, remove `execPopulate()` #3834
+ * BREAKING CHANGE: virtual getters and setters are now executed in forward order, rather than reverse order. This means you can add getters/setters to populated virtuals #8897 [ggurkal](https://github.com/ggurkal)
+ * BREAKING CHANGE: make setDefaultsOnInsert true by default. Set to `false` to disable it. #8410
+ * BREAKING CHANGE: throw error by default if populating a path that isn't in the schema #5124
+ * BREAKING CHANGE: make schema paths declared with `type: { name: String }` create a single nested subdoc, remove `typePojoToMixed` because it is now always false #7181
+ * BREAKING CHANGE: remove context option for queries, always use `context: 'query'` #8395
+ * BREAKING CHANGE: array subdocument class now inherits from single subdocument class #8554
+ * BREAKING CHANGE: if model is registered on a non-default connection, don't register it on mongoose global #5758
+ * BREAKING CHANGE: `Aggregate#cursor()` now returns aggregation cursor, rather than aggregate instance #10410 [IslandRhythms](https://github.com/IslandRhythms)
+ * BREAKING CHANGE: `useStrictQuery` is removed, `strict` applies for both #9015
+ * BREAKING CHANGE: overwrite instead of merging when setting nested paths #9121
+ * BREAKING CHANGE: call ref and refPath functions with subdoc being populated, not top-level doc #8469
+ * BREAKING CHANGE: remove useFindAndModify option, always use MongoDB's native `findOneAndReplace()` rather than legacy `findAndModify()` #8737
+ * BREAKING CHANGE: always pass unpopulated value to validators #8042 [IslandRhythms](https://github.com/IslandRhythms)
+ * BREAKING CHANGE: rename Embedded/SingleNestedPath -> Subdocument/SubdocumentPath #10419
+ * BREAKING CHANGE: call setters with priorVal as 2nd parameter, and with new subdocument as context if creating new document #8629
+ * BREAKING CHANGE: pass document as first parameter to `default` functions #9633 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * BREAKING CHANGE: make filter, flat, flatMap, map, and slice return vanilla JS arrays #8356
+ * BREAKING CHANGE: make autoCreate true by default #8814
+ * BREAKING CHANGE: clone schema passed to discriminator() #8552
+ * BREAKING CHANGE: make autoIndex and autoCreate default to false if connection's read preference is 'secondary' or 'secondaryPreferred' #9374 [chumager](https://github.com/chumager)
+ * BREAKING CHANGE: make deepEqual treat objects with different order of keys as different #9571 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * BREAKING CHANGE: Make Model.exists() return a query rather than a promise, and resolve to doc or null, rather than true/false #8097
+ * BREAKING CHANGE: `Model.create([])` now returns an empty array rather than undefined #8792 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * BREAKING CHANGE: `createdAt` schema path is now `immutable` by default #10139 [IslandRhythms](https://github.com/IslandRhythms)
+ * BREAKING CHANGE: dont start buffering when database is disconnected #8702
+ * BREAKING CHANGE: emit 'disconnected' when losing connectivity to replica set primary #9262
+ * BREAKING CHANGE: Make Aggregate#model() always return a model rather than an aggregate instance #7702
+ * BREAKING CHANGE: remove omitUndefined option for updates - Mongoose now always removes `undefined` keys in updates #7680
+ * BREAKING CHANGE: remove Aggregate#addCursorFlag(), use `Aggregate#options()` instead #8701
+ * BREAKING CHANGE: rename Query#map() -> Query#transform() to avoid conflating with Array#map() and chaining #7951
+ * BREAKING CHANGE: remove storeSubdocumentValidationError schema option, never store subdocument ValidationErrors #5226
+ * BREAKING CHANGE(query): make find() with explain() return object instead of an array #8551
+ * BREAKING CHANGE: allow undefined in number arrays unlles `required` #8738
+ * BREAKING CHANGE: remove isAsync option for validators in favor of checking if a function is an async function #10502
+ * BREAKING CHANGE: drop support for Model#model #8958 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * BREAKING CHANGE: remove useNestedStrict, use nested schema strict mode when casting updates unless `strict` is explicitly specified in query options #8961
+ * BREAKING CHANGE: remove `safe-buffer`, make MongooseBuffer extend from native Buffer #9199 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * BREAKING CHANGE(schema): skip adding id virtual if schema doesn't have an `_id` path #3936
+ * BREAKING CHANGE: remove skipInit parameter to mongoose.model() #4625
+ * BREAKING CHANGE: make pluralize convert "goose" to "geese" #9278
+ * BREAKING CHANGE: the `Schema#noId` option is now removed, please use `_id` instead #9398
+ * BREAKING CHANGE: remove MONGOOSE_DRIVER_PATH, use a setDriver() function on Mongoose instance instead #9604
+ * feat(mongoose+query): add `sanitizeFilter` option and `mongoose.trusted()` to defend against query selector injection attacks #3944
+ * feat(query): add Query#clone() so you can more easily re-execute a query #8708
+ * feat(virtual+populate): allow `foreignField` to be a function #8568 [BJvdA](https://github.com/BJvdA)
+
 5.13.4 / 2021-07-28
 ===================
  * fix: avoid pulling non-schema paths from documents into nested paths #10449

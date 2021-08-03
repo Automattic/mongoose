@@ -1,0 +1,226 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.0.0-rc0: Using GeoJSON</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.0.0-rc0</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/v6">Version 6.0.0-rc0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/geojson.md" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h1 id="using-geojson">Using GeoJSON</h1>
+<script>
+  _native.init("CK7DT53U",{
+    targetClass: 'native-inline'
+  });
+</script>
+
+<div class="native-inline">
+  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+</div>
+
+<script>
+  _native.init("CK7DT53U",{
+    targetClass: 'native-inline'
+  });
+</script>
+
+<div class="native-inline">
+  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+</div>
+
+<p><a href="http://geojson.org/">GeoJSON</a> is a format for storing geographic points and
+polygons. <a href="http://thecodebarbarian.com/80-20-guide-to-mongodb-geospatial-queries">MongoDB has excellent support for geospatial queries</a>
+on GeoJSON objects. Let&#39;s take a look at how you can use Mongoose to store
+and query GeoJSON objects.</p>
+<h2 id="points">Point Schema</h2>
+
+<p>The most simple structure in GeoJSON is a point. Below is an example point
+representing the approximate location of <a href="https://www.google.com/maps/@37.7,-122.5,9z">San Francisco</a>.
+Note that longitude comes first in a GeoJSON coordinate array, <strong>not</strong> latitude.</p>
+<pre><code>{
+  <span class="hljs-string">"type"</span> : <span class="hljs-string">"Point"</span>,
+  <span class="hljs-string">"coordinates"</span> : [
+    <span class="hljs-number">-122.5</span>,
+    <span class="hljs-number">37.7</span>
+  ]
+}</code></pre>
+<p>Below is an example of a Mongoose schema where <code>location</code> is a point.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> citySchema = <span class="hljs-keyword">new</span> mongoose.Schema({
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
+  <span class="hljs-attr">location</span>: {
+    <span class="hljs-attr">type</span>: {
+      <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-comment">// Don't do `{ location: { type: String } }`</span>
+      <span class="hljs-attr">enum</span>: [<span class="hljs-string">'Point'</span>], <span class="hljs-comment">// 'location.type' must be 'Point'</span>
+      <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
+    },
+    <span class="hljs-attr">coordinates</span>: {
+      <span class="hljs-attr">type</span>: [<span class="hljs-built_in">Number</span>],
+      <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
+    }
+  }
+});</code></pre>
+<p>Using <a href="/docs/subdocs.html">subdocuments</a>, you can define a common <code>pointSchema</code> and reuse it everywhere you want to store a GeoJSON point.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> pointSchema = <span class="hljs-keyword">new</span> mongoose.Schema({
+  <span class="hljs-attr">type</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>,
+    <span class="hljs-attr">enum</span>: [<span class="hljs-string">'Point'</span>],
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
+  },
+  <span class="hljs-attr">coordinates</span>: {
+    <span class="hljs-attr">type</span>: [<span class="hljs-built_in">Number</span>],
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
+  }
+});
+
+<span class="hljs-keyword">const</span> citySchema = <span class="hljs-keyword">new</span> mongoose.Schema({
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
+  <span class="hljs-attr">location</span>: {
+    <span class="hljs-attr">type</span>: pointSchema,
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
+  }
+});</code></pre>
+<h2 id="polygons">Polygon Schema</h2>
+
+<p>GeoJSON polygons let you define an arbitrary shape on a map. For example,
+the below polygon is a GeoJSON rectangle that approximates the border
+of the state of Colorado.</p>
+<pre><code>{
+  <span class="hljs-string">"type"</span>: <span class="hljs-string">"Polygon"</span>,
+  <span class="hljs-string">"coordinates"</span>: [[
+    [<span class="hljs-number">-109</span>, <span class="hljs-number">41</span>],
+    [<span class="hljs-number">-102</span>, <span class="hljs-number">41</span>],
+    [<span class="hljs-number">-102</span>, <span class="hljs-number">37</span>],
+    [<span class="hljs-number">-109</span>, <span class="hljs-number">37</span>],
+    [<span class="hljs-number">-109</span>, <span class="hljs-number">41</span>]
+  ]]
+}</code></pre>
+<p>Polygons are tricky because they use triple nested arrays. Below is
+how you create a Mongoose schema where <code>coordinates</code> is a triple nested
+array of numbers.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> polygonSchema = <span class="hljs-keyword">new</span> mongoose.Schema({
+  <span class="hljs-attr">type</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>,
+    <span class="hljs-attr">enum</span>: [<span class="hljs-string">'Polygon'</span>],
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
+  },
+  <span class="hljs-attr">coordinates</span>: {
+    <span class="hljs-attr">type</span>: [[[<span class="hljs-built_in">Number</span>]]], <span class="hljs-comment">// Array of arrays of arrays of numbers</span>
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
+  }
+});
+
+<span class="hljs-keyword">const</span> citySchema = <span class="hljs-keyword">new</span> mongoose.Schema({
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
+  <span class="hljs-attr">location</span>: polygonSchema
+});</code></pre>
+<h2 id="querying">Geospatial Queries with Mongoose</h2>
+
+<p>Mongoose queries support the same <a href="http://thecodebarbarian.com/80-20-guide-to-mongodb-geospatial-queries">geospatial query operators</a>
+that the MongoDB driver does. For example, the below script saves a
+<code>city</code> document those <code>location</code> property is a GeoJSON point representing
+the city of Denver, Colorado. It then queries for all documents within
+a polygon representing the state of Colorado using
+<a href="https://docs.mongodb.com/manual/reference/operator/query/geoWithin/">the MongoDB <code>$geoWithin</code> operator</a>.</p>
+<img src="https://i.imgur.com/i32pWnC.png">
+
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> City = db.model(<span class="hljs-string">'City'</span>, <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
+  <span class="hljs-attr">location</span>: pointSchema
+}));
+
+<span class="hljs-keyword">const</span> colorado = {
+  <span class="hljs-attr">type</span>: <span class="hljs-string">'Polygon'</span>,
+  <span class="hljs-attr">coordinates</span>: [[
+    [<span class="hljs-number">-109</span>, <span class="hljs-number">41</span>],
+    [<span class="hljs-number">-102</span>, <span class="hljs-number">41</span>],
+    [<span class="hljs-number">-102</span>, <span class="hljs-number">37</span>],
+    [<span class="hljs-number">-109</span>, <span class="hljs-number">37</span>],
+    [<span class="hljs-number">-109</span>, <span class="hljs-number">41</span>]
+  ]]
+};
+<span class="hljs-keyword">const</span> denver = { <span class="hljs-attr">type</span>: <span class="hljs-string">'Point'</span>, <span class="hljs-attr">coordinates</span>: [<span class="hljs-number">-104.9903</span>, <span class="hljs-number">39.7392</span>] };
+<span class="hljs-keyword">return</span> City.create({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Denver'</span>, <span class="hljs-attr">location</span>: denver }).
+  then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> City.findOne({
+    <span class="hljs-attr">location</span>: {
+      <span class="hljs-attr">$geoWithin</span>: {
+        <span class="hljs-attr">$geometry</span>: colorado
+      }
+    }
+  })).
+  then(<span class="hljs-function"><span class="hljs-params">doc</span> =&gt;</span> assert.equal(doc.name, <span class="hljs-string">'Denver'</span>));</code></pre>
+<p>Mongoose also has a <a href="/docs/api.html#query_Query-within"><code>within()</code> helper</a>
+that&#39;s a shorthand for <code>$geoWithin</code>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> denver = { <span class="hljs-attr">type</span>: <span class="hljs-string">'Point'</span>, <span class="hljs-attr">coordinates</span>: [<span class="hljs-number">-104.9903</span>, <span class="hljs-number">39.7392</span>] };
+<span class="hljs-keyword">return</span> City.create({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Denver'</span>, <span class="hljs-attr">location</span>: denver }).
+  then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> City.findOne().where(<span class="hljs-string">'location'</span>).within(colorado)).
+  then(<span class="hljs-function"><span class="hljs-params">doc</span> =&gt;</span> assert.equal(doc.name, <span class="hljs-string">'Denver'</span>));</code></pre>
+<h2 id="geospatial-indexes">Geospatial Indexes</h2>
+
+<p>MongoDB supports <a href="https://docs.mongodb.com/manual/core/2dsphere/">2dsphere indexes</a>
+for speeding up geospatial queries. Here&#39;s how you can define
+a 2dsphere index on a GeoJSON point:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> denver = { <span class="hljs-attr">type</span>: <span class="hljs-string">'Point'</span>, <span class="hljs-attr">coordinates</span>: [<span class="hljs-number">-104.9903</span>, <span class="hljs-number">39.7392</span>] };
+<span class="hljs-keyword">const</span> City = db.model(<span class="hljs-string">'City'</span>, <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
+  <span class="hljs-attr">location</span>: {
+    <span class="hljs-attr">type</span>: pointSchema,
+    <span class="hljs-attr">index</span>: <span class="hljs-string">'2dsphere'</span> <span class="hljs-comment">// Create a special 2dsphere index on `City.location`</span>
+  }
+}));
+
+<span class="hljs-keyword">return</span> City.create({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Denver'</span>, <span class="hljs-attr">location</span>: denver }).
+  then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> City.findOne().where(<span class="hljs-string">'location'</span>).within(colorado)).
+  then(<span class="hljs-function"><span class="hljs-params">doc</span> =&gt;</span> assert.equal(doc.name, <span class="hljs-string">'Denver'</span>));</code></pre>
+<p>You can also define a geospatial index using the <a href="/docs/api/schema.html#schema_Schema-index"><code>Schema#index()</code> function</a>
+as shown below.</p>
+<pre><code class="language-javascript">citySchema.index({ <span class="hljs-attr">location</span>: <span class="hljs-string">'2dsphere'</span> });</code></pre>
+<p>MongoDB&#39;s <a href="https://docs.mongodb.com/v4.0/reference/operator/query/near/#op._S_near"><code>$near</code> query operator</a>
+and <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/#pipe._S_geoNear"><code>$geoNear</code> aggregation stage</a>
+<em>require</em> a 2dsphere index. </p>
+</div></div><script type="text/javascript">var xhr = new XMLHttpRequest();
+xhr.open('POST', 'https://g0a3nbw0xa.execute-api.us-east-1.amazonaws.com/prod/track', true);
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.onreadystatechange = function() {};
+xhr.send(JSON.stringify({
+  path: window.location.pathname,
+  hostname: window.location.hostname,
+  hash: window.location.hash
+}));</script><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript">(function (window, document) {
+  var layout   = document.getElementById('layout'),
+      menu     = document.getElementById('menu'),
+      menuLink = document.getElementById('menuLink'),
+      content  = document.getElementById('content');
+
+  function toggleClass(element, className) {
+      var classes = element.className.split(/\s+/),
+          length = classes.length,
+          i = 0;
+
+      for(; i < length; i++) {
+        if (classes[i] === className) {
+          classes.splice(i, 1);
+          break;
+        }
+      }
+      // The className is not found
+      if (length === classes.length) {
+          classes.push(className);
+      }
+
+      element.className = classes.join(' ');
+  }
+
+  function toggleAll(e) {
+      var active = 'active';
+
+      e.preventDefault();
+      toggleClass(layout, active);
+      toggleClass(menu, active);
+      toggleClass(menuLink, active);
+  }
+
+  menuLink.onclick = function (e) {
+      toggleAll(e);
+  };
+
+  content.onclick = function(e) {
+      if (menu.className.indexOf('active') !== -1) {
+          toggleAll(e);
+      }
+  };
+
+}(this, this.document));</script></div></body></html>

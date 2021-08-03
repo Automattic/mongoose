@@ -1,0 +1,307 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose ODM v6.0.0-rc0</title><link href="//fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="docs/css/default.css" rel="stylesheet"><link href="docs/css/style.css" rel="stylesheet"><link href="/docs/css/github.css" rel="stylesheet"><link rel="apple-touch-icon" sizes="57x57" href="docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="docs/images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><style>code {
+  font-size: 1em;
+}
+
+.sponsor {
+  margin-bottom: 40px;
+  font-size: 0.66em;
+  color: #666;
+  text-decoration: none;
+}
+
+.sponsors {
+  margin-bottom: 40px;
+}
+
+.sponsors a {
+  text-decoration: none;
+}
+
+.carbonad{
+  margin-top:0!important;
+  margin-bottom:-3rem!important
+}
+
+#carbonads {
+  position:fixed;
+  right: 0px;
+  bottom: 0px;
+  display:block;
+  width:200px;
+  padding:15px 15px 15px 160px;
+  overflow:hidden;
+  font-size:13px;
+  line-height:1.4;
+  text-align:left;
+  background-color: #fafafa;
+}
+
+@media (max-width: 1160px) {
+  #carbonads {
+    display: none !important;
+  }
+}
+
+#carbonads a{color:#333;text-decoration:none}
+
+.carbon-img{float:left;margin-left:-145px}
+
+.carbon-poweredby{display:block;color:#777!important}
+
+img.sponsor {
+  margin-right: 10px;
+  border: 1px dotted #dfdfdf;
+  height: 100px;
+}
+</style></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div class="homepage" id="wrap"><div id="header"><h1><a href="https://github.com/Automattic/mongoose" target="blank"><div class="mongoose">Mongoose</div></a></h1></div><div class="tagline"><p>Elegant <a href="https://www.mongodb.com/">MongoDB</a> object modeling for
+<a href="https://nodejs.org/en/">Node.js</a></p>
+</div><div id="links"><ul><li><a href="docs/guide.html">Read the Docs</a></li><li><a href="https://plugins.mongoosejs.io">Discover Plugins</a></li></ul></div><div id="follow"><ul><li><iframe class="github-btn" src="//ghbtns.com/github-btn.html?user=Automattic&amp;repo=mongoose&amp;type=watch&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px"></iframe></li><li id="version"><span>Version 6.0.0-rc0</span></li><li><iframe class="github-btn" src="//ghbtns.com/github-btn.html?user=Automattic&amp;repo=mongoose&amp;type=fork&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px"></iframe></li></ul></div><div id="inner"><div id="what"><p class="what">Let's face it,&nbsp;<strong>writing MongoDB validation, casting and business logic boilerplate is a drag</strong>. That's why we wrote Mongoose.</p></div><pre><code class="language-javascript"><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/test'</span>);
+
+<span class="hljs-keyword">const</span> Cat = mongoose.model(<span class="hljs-string">'Cat'</span>, { <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> });
+
+<span class="hljs-keyword">const</span> kitty = <span class="hljs-keyword">new</span> Cat({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Zildjian'</span> });
+kitty.save().then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'meow'</span>));</code></pre>
+<p>Mongoose provides a straight-forward, schema-based solution to model
+your application data. It includes built-in type casting, validation,
+query building, business logic hooks and more, out of the box.</p>
+<div id="tidelift"><a id="tidelift-button" href="https://tidelift.com/subscription/pkg/npm-mongoose?utm_source=npm-mongoose&utm_medium=website">
+  <img src="/docs/images/tidelift.svg" />
+  <span>Get Professionally Supported Mongoose</span>
+</a>
+</div><div class="carbon-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div><h2 id="getting-started">Getting Started</h2>
+<ul>
+<li><a href="/docs/index.html">quick start guide</a></li>
+</ul>
+<h2 id="support">Support</h2>
+<ul>
+<li><a href="http://stackoverflow.com/questions/tagged/mongoose">Stack Overflow</a></li>
+<li><a href="https://github.com/Automattic/mongoose/issues">GitHub Issues</a></li>
+<li><a href="https://gitter.im/Automattic/mongoose">Gitter Chat</a></li>
+<li><a href="http://www.mongodb.org/about/support/">MongoDB Support</a></li>
+</ul>
+<h2 id="news">News</h2>
+<ul>
+<li><a href="https://twitter.com/mongoosejs">Twitter</a></li>
+</ul>
+<h2 id="changelog">Changelog</h2>
+<ul>
+<li><a href="https://github.com/Automattic/mongoose/blob/master/History.md">Changelog</a></li>
+</ul>
+<h2 id="sponsors">Sponsors</h2>
+<div class="sponsors">
+  <div>
+    <a rel="sponsored" href="https://localizejs.com/">
+      <img class="sponsor" src="https://images.opencollective.com/localize/bb2cd4d/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.dontpayfull.com/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Fopencollective-production.s3-us-west-1.amazonaws.com%2F84c4ba80-1955-11e8-8343-278614155b3e.png&height=100" style="height:100px">
+    </a>
+    <a rel="sponsored" href="https://frontendmasters.com/">
+      <img class="sponsor" src="https://images.opencollective.com/frontendmasters/0b9cda4/logo/256.png" style="height:100px">
+    </a>
+    <a rel="sponsored" href="https://www.vpsserver.com/">
+      <img class="sponsor" src="https://pbs.twimg.com/profile_images/750300526538027008/jo7cFmU9_400x400.jpg" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://icons8.com/">
+      <img class="sponsor" src="https://s3.amazonaws.com/codebarbarian-images/Icons8+Logo+500px.png" style="height:100px">
+    </a>
+    <a rel="sponsored" href="https://www.embedgooglemap.net/blog/best-wordpress-themes/">
+      <img class="sponsor" title=" Best WordPress Themes " src="https://www.embedgooglemap.net/ultimate-wp-logo.png" style="height:100px">
+    </a>
+    <a rel="sponsored" href="https://loanscouter.com/">
+      <img class="sponsor" src="https://images.opencollective.com/lead-supply/7400b71/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://fair-laan.se/">
+      <img class="sponsor" src="https://images.opencollective.com/fair-laan-se/939304b/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://craftresumes.com/professional-resume-writer/">
+      <img class="sponsor" alt="Professional resume writer" src="https://s3.amazonaws.com/codebarbarian-images/craftresumes.png">
+    </a>
+    <a rel="sponsored" href="https://uiuxagencies.top/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Fopencollective-production.s3-us-west-1.amazonaws.com%2F62223ab0-f4f7-11e8-919f-53f2ea21a967.png&height=100" style="height:100px">
+    </a>
+    <a rel="sponsored" href="https://blokt.com/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Flogo.clearbit.com%2Fblokt.com&height=100" style="height:100px">
+    </a>
+    <a rel="sponsored" href="http://clay.global/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Fopencollective-production.s3-us-west-1.amazonaws.com%2F09d57c90-637c-11e7-9ed2-bfa12b0351e8.jpg&height=100" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://tekhattan.com/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Fopencollective-production.s3-us-west-1.amazonaws.com%2F31835450-5a98-11e9-adb1-e17fccd4c65e.png&height=80" style="height:80px">
+    </a>
+    <a rel="sponsored" href="https://www.rabathelten.dk/">
+      <img class="sponsor" src="/docs/images/dk.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://lemonlaw.site/">
+      <img class="sponsor" src="https://images.opencollective.com/lemon-law/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://uxplanet.org/top-ui-ux-design-agencies-user-experience-firms-8c54697e290">
+      <img class="sponsor" src="https://miro.medium.com/fit/c/160/160/1*A0FnBy5FBoVQC02SZXLXPg.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://proxybaylist.org/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy-bay/e176fe4/avatar.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://ghostinspector.com/">
+      <img class="sponsor" src="https://images.opencollective.com/ghostinspector/51b7be8/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://fortunegames.com/">
+      <img class="sponsor" src="/docs/images/fortunegames.jpg" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://medium.com/@niksundin/best-web-design-companies-1872e445775f">
+      <img class="sponsor" src="https://images.opencollective.com/top-web-design-agencies/d92d747/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.casinotop.com">
+      <img class="sponsor" src="https://images.opencollective.com/casinotop-com/10fd95b/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.casinotopp.net">
+      <img class="sponsor" src="https://images.opencollective.com/casino-topp/1dd399a/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.bonus.ca/">
+      <img class="sponsor" src="https://images.opencollective.com/bonus-finder/4b3394e/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.bonus.net.nz/free-spins">
+      <img class="sponsor" src="https://images.opencollective.com/bonusfinder-new-zealand/a5becb5/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.bonusfinder.com/casino">
+      <img class="sponsor" src="https://images.opencollective.com/bonusfinder-com-us/8a47a19/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.bonus.com.de/freispiele">
+      <img class="sponsor" src="https://images.opencollective.com/bonusfinder-deutschland/646169e/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.minitool.com/">
+      <img class="sponsor" src="https://images.opencollective.com/minitool-solution-ltd/1519aa6/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://maaltidskasser.net/">
+      <img class="sponsor" src="https://codebarbarian-images.s3.amazonaws.com/maaltidskasser-logo.png" style="height: 100px" alt="Måltidskasser">
+    </a>
+    <a rel="sponsored" href="https://taxfreesnus.com/">
+      <img class="sponsor" src="https://images.opencollective.com/taxfreesnus-com/ebf869a/logo.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.pelisivut.com/">
+      <img class="sponsor" src="https://images.opencollective.com/pelisivut/04f08f2/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.kasinot.fi/">
+      <img class="sponsor" src="https://images.opencollective.com/kasinot-fi/e09aa2e/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://mobilunity.com/">
+      <img class="sponsor" src="https://images.opencollective.com/mobilunity/e4ca372/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.paraskasino.fi/">
+      <img class="sponsor" src="https://images.opencollective.com/paraskasino/a39c3d6/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://casinoonline.casino/">
+      <img class="sponsor" src="https://images.opencollective.com/casino-online/4c8371c/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.casinot.net/">
+      <img class="sponsor" src="https://images.opencollective.com/casinot-net/242597a/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://420couponcodes.com/">
+      <img class="sponsor" src="https://images.opencollective.com/420couponcodes/8965926/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.kasinohai.com/nettikasinot">
+      <img class="sponsor" src="https://images.opencollective.com/kasinohai-com/41d4f51/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://onlinecasinoinformatie.com/">
+      <img class="sponsor" src="https://images.opencollective.com/ricardo-goncalves/3275f75/avatar/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.turtlebet.com/fi/kaikki-nettikasinot.html">
+      <img class="sponsor" src="https://images.opencollective.com/turtlebet-nettikasinot/4799a27/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.casinofever.ca/">
+      <img class="sponsor" src="https://images.opencollective.com/casinofever-ca1/4ad150e/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.parhaatnettikasinot.com/">
+      <img class="sponsor" src="https://images.opencollective.com/parhaatnettikasinot-com/fc53017/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://kasynohex.com/kasyna-online/">
+      <img class="sponsor" src="https://images.opencollective.com/kasynohex-com/b25daf6/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.japanesecasino.com/">
+      <img class="sponsor" src="https://images.opencollective.com/japanesecasino/b0ffe3c/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.parhaatkasinot.com/">
+      <img class="sponsor" src="https://images.opencollective.com/parhaatkasinot/e7fda21/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.polskiekasyno.com/">
+      <img class="sponsor" src="https://images.opencollective.com/polskiekasyno-com/a8975c6/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.baocasino.com/">
+      <img class="sponsor" src="https://images.opencollective.com/baocasino/b5a71c4/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://casino-academia.jp/">
+      <img class="sponsor" src="https://images.opencollective.com/casinoacademia/90fc970/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://nettikasinolista.com/">
+      <img class="sponsor" src="https://images.opencollective.com/nettikasinolista/fd361ee/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://casinopro.ca/">
+      <img class="sponsor" src="https://images.opencollective.com/casinopro/4729b46/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://twojtyp.pl/">
+      <img class="sponsor" src="https://images.opencollective.com/twojtyp/cd0b486/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://nettikasinot247.fi/">
+      <img class="sponsor" src="https://images.opencollective.com/nettikasinot-24-7/c51fe6a/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://goread.io/buy-instagram-likes">
+      <img class="sponsor" src="https://goread.io/assets/images/Goreadlogo.png" style="height: 100px" alt="Buy Instagram Likes">
+    </a>
+    <a rel="sponsored" href="https://nflthursday.com/">
+      <img class="sponsor" src="https://images.opencollective.com/nfl-thursday/ac3e3cc/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://njsportsjournal.com/">
+      <img class="sponsor" src="https://images.opencollective.com/njsj1/9bf603f/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.nettikasinot.media/">
+      <img class="sponsor" src="https://images.opencollective.com/nettikasinot-media/2dba7da/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://poprey.com/">
+      <img class="sponsor" src="/docs/images/logo-poprey-com-white-100.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://casinomartini.com/nz/new-online-casinos/">
+      <img class="sponsor" src="https://images.opencollective.com/casino-martini/8efce1c/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://slot-xo888.com/">
+      <img class="sponsor" src="https://images.opencollective.com/slotxo/694a96c/avatar/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.slotbar888.com/">
+      <img class="sponsor" src="https://images.opencollective.com/slotbar/2843cec/avatar/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://writersperhour.com/write-my-paper">
+      <img class="sponsor" src="https://images.opencollective.com/write-my-paper/5787d4b/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.gambledex.com/">
+      <img class="sponsor" src="https://codebarbarian-images.s3.amazonaws.com/gambedex.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.uudetkasinot.com/">
+      <img class="sponsor" src="https://images.opencollective.com/uudetkasinot-com/01a3658/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.vedonlyontibonukset.com/">
+      <img class="sponsor" src="https://images.opencollective.com/vedonlyontibonukset/69bffdc/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://list.casino/">
+      <img class="sponsor" src="https://images.opencollective.com/list-casino/5d33a45/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://www.bonusfinder.co.uk/">
+      <img class="sponsor" src="https://images.opencollective.com/bonusfinder-uk/ecdd3af/logo/256.png" style="height: 100px">
+    </a>
+    <a rel="sponsored" href="https://onlinecasinohex.nl/">
+      <img class="sponsor" src="https://images.opencollective.com/onlinecasinohex-nl/ed24082/logo/256.png" style="height: 100px">
+    </a>
+  </div>
+</div>
+
+<div class="sponsor">
+  Sponsor <a href="https://opencollective.com/mongoose">Mongoose on OpenCollective</a>
+  to get your company's logo above!
+</div>
+</div></div><p id="footer">Licensed under MIT.</p><script>document.body.className = 'load';</script><script type="text/javascript">var xhr = new XMLHttpRequest();
+xhr.open('POST', 'https://g0a3nbw0xa.execute-api.us-east-1.amazonaws.com/prod/track', true);
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.onreadystatechange = function() {};
+xhr.send(JSON.stringify({
+  path: window.location.pathname,
+  hostname: window.location.hostname,
+  hash: window.location.hash
+}));</script></body></html>

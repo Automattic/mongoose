@@ -1,0 +1,649 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.0.0-rc0: SchemaTypes</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.0.0-rc0</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/v6">Version 6.0.0-rc0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/schematypes.md" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h2 id="schematypes"><a href="#schematypes">SchemaTypes</a></h2>
+
+
+<script>
+  _native.init("CK7DT53U",{
+    targetClass: 'native-inline'
+  });
+</script>
+
+<div class="native-inline">
+  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+</div>
+
+<p>SchemaTypes handle definition of path
+<a href="./api.html#schematype_SchemaType-default">defaults</a>,
+<a href="./api.html#schematype_SchemaType-validate">validation</a>,
+<a href="#getters">getters</a>,
+<a href="./api.html#schematype_SchemaType-set">setters</a>,
+<a href="./api.html#schematype_SchemaType-select">field selection defaults</a> for
+<a href="./api.html#query-js">queries</a>,
+and other general characteristics for Mongoose document properties.</p>
+<ul class="toc">
+  <li><a href="#what-is-a-schema-type">What is a SchemaType?</a></li>
+  <li><a href="#schematype-options">SchemaType Options</a></li>
+  <li><a href="#customtypes">Creating Custom Types</a></li>
+  <li><a href="#path">The `schema.path()` Function</a></li>
+  <li><a href="#further-reading">Further Reading</a></li>
+</ul>
+
+<ul>
+<li><a href="#what-is-a-schematype">What is a SchemaType?</a></li>
+<li><a href="#type-key">The <code>type</code> Key</a></li>
+<li><a href="#schematype-options">SchemaType Options</a></li>
+<li><a href="#usage-notes">Usage Notes</a></li>
+<li><a href="#getters">Getters</a></li>
+<li><a href="#customtypes">Custom Types</a></li>
+<li><a href="#path">The <code>schema.path()</code> Function</a></li>
+</ul>
+<h3 id="what-is-a-schematype"><a href="#what-is-a-schematype">What is a SchemaType?</a></h3>
+
+<p>You can think of a Mongoose schema as the configuration object for a
+Mongoose model. A SchemaType is then a configuration object for an individual
+property. A SchemaType says what type a given
+path should have, whether it has any getters/setters, and what values are
+valid for that path.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> });
+schema.path(<span class="hljs-string">'name'</span>) <span class="hljs-keyword">instanceof</span> mongoose.SchemaType; <span class="hljs-comment">// true</span>
+schema.path(<span class="hljs-string">'name'</span>) <span class="hljs-keyword">instanceof</span> mongoose.Schema.Types.String; <span class="hljs-comment">// true</span>
+schema.path(<span class="hljs-string">'name'</span>).instance; <span class="hljs-comment">// 'String'</span></code></pre>
+<p>A SchemaType is different from a type. In other words, <code>mongoose.ObjectId !== mongoose.Types.ObjectId</code>.
+A SchemaType is just a configuration object for Mongoose. An instance of
+the <code>mongoose.ObjectId</code> SchemaType doesn&#39;t actually create MongoDB ObjectIds,
+it is just a configuration for a path in a schema.</p>
+<p>The following are all the valid SchemaTypes in Mongoose. Mongoose plugins
+can also add custom SchemaTypes like <a href="http://plugins.mongoosejs.io/plugins/int32">int32</a>.
+Check out <a href="http://plugins.mongoosejs.io">Mongoose&#39;s plugins search</a> to find plugins.</p>
+<ul>
+<li><a href="#strings">String</a></li>
+<li><a href="#numbers">Number</a></li>
+<li><a href="#dates">Date</a></li>
+<li><a href="#buffers">Buffer</a></li>
+<li><a href="#booleans">Boolean</a></li>
+<li><a href="#mixed">Mixed</a></li>
+<li><a href="#objectids">ObjectId</a></li>
+<li><a href="#arrays">Array</a></li>
+<li><a href="./api.html#mongoose_Mongoose-Decimal128">Decimal128</a></li>
+<li><a href="#maps">Map</a></li>
+<li><a href="#schemas">Schema</a></li>
+</ul>
+<h4>Example</h4>
+
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">name</span>:    <span class="hljs-built_in">String</span>,
+  <span class="hljs-attr">binary</span>:  Buffer,
+  <span class="hljs-attr">living</span>:  <span class="hljs-built_in">Boolean</span>,
+  <span class="hljs-attr">updated</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">Date</span>, <span class="hljs-attr">default</span>: <span class="hljs-built_in">Date</span>.now },
+  <span class="hljs-attr">age</span>:     { <span class="hljs-attr">type</span>: <span class="hljs-built_in">Number</span>, <span class="hljs-attr">min</span>: <span class="hljs-number">18</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">65</span> },
+  <span class="hljs-attr">mixed</span>:   Schema.Types.Mixed,
+  <span class="hljs-attr">_someId</span>: Schema.Types.ObjectId,
+  <span class="hljs-attr">decimal</span>: Schema.Types.Decimal128,
+  <span class="hljs-attr">array</span>: [],
+  <span class="hljs-attr">ofString</span>: [<span class="hljs-built_in">String</span>],
+  <span class="hljs-attr">ofNumber</span>: [<span class="hljs-built_in">Number</span>],
+  <span class="hljs-attr">ofDates</span>: [<span class="hljs-built_in">Date</span>],
+  <span class="hljs-attr">ofBuffer</span>: [Buffer],
+  <span class="hljs-attr">ofBoolean</span>: [<span class="hljs-built_in">Boolean</span>],
+  <span class="hljs-attr">ofMixed</span>: [Schema.Types.Mixed],
+  <span class="hljs-attr">ofObjectId</span>: [Schema.Types.ObjectId],
+  <span class="hljs-attr">ofArrays</span>: [[]],
+  <span class="hljs-attr">ofArrayOfNumbers</span>: [[<span class="hljs-built_in">Number</span>]],
+  <span class="hljs-attr">nested</span>: {
+    <span class="hljs-attr">stuff</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">lowercase</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span> }
+  },
+  <span class="hljs-attr">map</span>: <span class="hljs-built_in">Map</span>,
+  <span class="hljs-attr">mapOfString</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-built_in">Map</span>,
+    <span class="hljs-attr">of</span>: <span class="hljs-built_in">String</span>
+  }
+})
+
+<span class="hljs-comment">// example use</span>
+
+<span class="hljs-keyword">const</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, schema);
+
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> Thing;
+m.name = <span class="hljs-string">'Statue of Liberty'</span>;
+m.age = <span class="hljs-number">125</span>;
+m.updated = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>;
+m.binary = Buffer.alloc(<span class="hljs-number">0</span>);
+m.living = <span class="hljs-literal">false</span>;
+m.mixed = { <span class="hljs-attr">any</span>: { <span class="hljs-attr">thing</span>: <span class="hljs-string">'i want'</span> } };
+m.markModified(<span class="hljs-string">'mixed'</span>);
+m._someId = <span class="hljs-keyword">new</span> mongoose.Types.ObjectId;
+m.array.push(<span class="hljs-number">1</span>);
+m.ofString.push(<span class="hljs-string">"strings!"</span>);
+m.ofNumber.unshift(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>);
+m.ofDates.addToSet(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>);
+m.ofBuffer.pop();
+m.ofMixed = [<span class="hljs-number">1</span>, [], <span class="hljs-string">'three'</span>, { <span class="hljs-attr">four</span>: <span class="hljs-number">5</span> }];
+m.nested.stuff = <span class="hljs-string">'good'</span>;
+m.map = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>([[<span class="hljs-string">'key'</span>, <span class="hljs-string">'value'</span>]]);
+m.save(callback);</code></pre>
+<h3 id="type-key"><a href="#type-key">The `type` Key</a></h3>
+
+<p><code>type</code> is a special property in Mongoose schemas. When Mongoose finds
+a nested property named <code>type</code> in your schema, Mongoose assumes that
+it needs to define a SchemaType with the given type.</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// 3 string SchemaTypes: 'name', 'nested.firstName', 'nested.lastName'</span>
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span> },
+  <span class="hljs-attr">nested</span>: {
+    <span class="hljs-attr">firstName</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span> },
+    <span class="hljs-attr">lastName</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span> }
+  }
+});</code></pre>
+<p>As a consequence, <a href="/docs/faq.html#type-key">you need a little extra work to define a property named <code>type</code> in your schema</a>.
+For example, suppose you&#39;re building a stock portfolio app, and you
+want to store the asset&#39;s <code>type</code> (stock, bond, ETF, etc.). Naively,
+you might define your schema as shown below:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> holdingSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-comment">// You might expect `asset` to be an object that has 2 properties,</span>
+  <span class="hljs-comment">// but unfortunately `type` is special in Mongoose so mongoose</span>
+  <span class="hljs-comment">// interprets this schema to mean that `asset` is a string</span>
+  <span class="hljs-attr">asset</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>,
+    <span class="hljs-attr">ticker</span>: <span class="hljs-built_in">String</span>
+  }
+});</code></pre>
+<p>However, when Mongoose sees <code>type: String</code>, it assumes that you mean
+<code>asset</code> should be a string, not an object with a property <code>type</code>.
+The correct way to define an object with a property <code>type</code> is shown
+below.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> holdingSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">asset</span>: {
+    <span class="hljs-comment">// Workaround to make sure Mongoose knows `asset` is an object</span>
+    <span class="hljs-comment">// and `asset.type` is a string, rather than thinking `asset`</span>
+    <span class="hljs-comment">// is a string.</span>
+    <span class="hljs-attr">type</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span> },
+    <span class="hljs-attr">ticker</span>: <span class="hljs-built_in">String</span>
+  }
+});</code></pre>
+<h3 id="schematype-options"><a href="#schematype-options">SchemaType Options</a></h3>
+
+<p>You can declare a schema type using the type directly, or an object with
+a <code>type</code> property.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema1 = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">test</span>: <span class="hljs-built_in">String</span> <span class="hljs-comment">// `test` is a path of type String</span>
+});
+
+<span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-comment">// The `test` object contains the "SchemaType options"</span>
+  <span class="hljs-attr">test</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span> } <span class="hljs-comment">// `test` is a path of type string</span>
+});</code></pre>
+<p>In addition to the type property, you can specify additional properties
+for a path. For example, if you want to lowercase a string before saving:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">test</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>,
+    <span class="hljs-attr">lowercase</span>: <span class="hljs-literal">true</span> <span class="hljs-comment">// Always convert `test` to lowercase</span>
+  }
+});</code></pre>
+<p>You can add any property you want to your SchemaType options. Many plugins
+rely on custom SchemaType options. For example, the <a href="http://plugins.mongoosejs.io/plugins/autopopulate">mongoose-autopopulate</a>
+plugin automatically populates paths if you set <code>autopopulate: true</code> in your
+SchemaType options. Mongoose comes with support for several built-in
+SchemaType options, like <code>lowercase</code> in the above example.</p>
+<p>The <code>lowercase</code> option only works for strings. There are certain options
+which apply for all schema types, and some that apply for specific schema
+types.</p>
+<h5>All Schema Types</h5>
+
+<ul>
+<li><code>required</code>: boolean or function, if true adds a <a href="./validation.html#built-in-validators">required validator</a> for this property</li>
+<li><code>default</code>: Any or function, sets a default value for the path. If the value is a function, the return value of the function is used as the default.</li>
+<li><code>select</code>: boolean, specifies default <a href="https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/">projections</a> for queries</li>
+<li><code>validate</code>: function, adds a <a href="./validation.html#built-in-validators">validator function</a> for this property</li>
+<li><code>get</code>: function, defines a custom getter for this property using <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a>.</li>
+<li><code>set</code>: function, defines a custom setter for this property using <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a>.</li>
+<li><code>alias</code>: string, mongoose &gt;= 4.10.0 only. Defines a <a href="./guide.html#virtuals">virtual</a> with the given name that gets/sets this path.</li>
+<li><code>immutable</code>: boolean, defines path as immutable. Mongoose prevents you from changing immutable paths unless the parent document has <code>isNew: true</code>.</li>
+<li><code>transform</code>: function, Mongoose calls this function when you call <a href="/docs/api/document.html#document_Document-toJSON"><code>Document#toJSON()</code></a> function, including when you <a href="https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript"><code>JSON.stringify()</code></a> a document.</li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> numberSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">integerOnly</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-built_in">Number</span>,
+    <span class="hljs-attr">get</span>: <span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> <span class="hljs-built_in">Math</span>.round(v),
+    <span class="hljs-attr">set</span>: <span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> <span class="hljs-built_in">Math</span>.round(v),
+    <span class="hljs-attr">alias</span>: <span class="hljs-string">'i'</span>
+  }
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-built_in">Number</span> = mongoose.model(<span class="hljs-string">'Number'</span>, numberSchema);
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Number</span>();
+doc.integerOnly = <span class="hljs-number">2.001</span>;
+doc.integerOnly; <span class="hljs-comment">// 2</span>
+doc.i; <span class="hljs-comment">// 2</span>
+doc.i = <span class="hljs-number">3.001</span>;
+doc.integerOnly; <span class="hljs-comment">// 3</span>
+doc.i; <span class="hljs-comment">// 3</span></code></pre>
+<h5>Indexes</h5>
+
+<p>You can also define <a href="https://docs.mongodb.com/manual/indexes/">MongoDB indexes</a>
+using schema type options.</p>
+<ul>
+<li><code>index</code>: boolean, whether to define an <a href="https://docs.mongodb.com/manual/indexes/">index</a> on this property.</li>
+<li><code>unique</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-unique/">unique index</a> on this property.</li>
+<li><code>sparse</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-sparse/">sparse index</a> on this property.</li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">test</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>,
+    <span class="hljs-attr">index</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> <span class="hljs-comment">// Unique index. If you specify `unique: true`</span>
+    <span class="hljs-comment">// specifying `index: true` is optional if you do `unique: true`</span>
+  }
+});</code></pre>
+<h5 id="string-validators">String</h5>
+
+<ul>
+<li><code>lowercase</code>: boolean, whether to always call <code>.toLowerCase()</code> on the value</li>
+<li><code>uppercase</code>: boolean, whether to always call <code>.toUpperCase()</code> on the value</li>
+<li><code>trim</code>: boolean, whether to always call <code>.trim()</code> on the value</li>
+<li><code>match</code>: RegExp, creates a <a href="./validation.html">validator</a> that checks if the value matches the given regular expression</li>
+<li><code>enum</code>: Array, creates a <a href="./validation.html">validator</a> that checks if the value is in the given array.</li>
+<li><code>minLength</code>: Number, creates a <a href="./validation.html">validator</a> that checks if the value length is not less than the given number</li>
+<li><code>maxLength</code>: Number, creates a <a href="./validation.html">validator</a> that checks if the value length is not greater than the given number</li>
+<li><code>populate</code>: Object, sets default <a href="/docs/populate.html#query-conditions">populate options</a></li>
+</ul>
+<h5 id="number-validators">Number</h5>
+
+<ul>
+<li><code>min</code>: Number, creates a <a href="./validation.html">validator</a> that checks if the value is greater than or equal to the given minimum.</li>
+<li><code>max</code>: Number, creates a <a href="./validation.html">validator</a> that checks if the value is less than or equal to the given maximum.</li>
+<li><code>enum</code>: Array, creates a <a href="./validation.html">validator</a> that checks if the value is strictly equal to one of the values in the given array.</li>
+<li><code>populate</code>: Object, sets default <a href="/docs/populate.html#query-conditions">populate options</a></li>
+</ul>
+<h5>Date</h5>
+
+<ul>
+<li><code>min</code>: Date</li>
+<li><code>max</code>: Date</li>
+</ul>
+<h5>ObjectId</h5>
+
+<ul>
+<li><code>populate</code>: Object, sets default <a href="/docs/populate.html#query-conditions">populate options</a></li>
+</ul>
+<h3 id="usage-notes"><a href="#usage-notes">Usage Notes</a></h3>
+
+<h4 id="strings">String</h4>
+
+<p>To declare a path as a string, you may use either the <code>String</code> global
+constructor or the string <code>&#39;String&#39;</code>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema1 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> }); <span class="hljs-comment">// name will be cast to string</span>
+<span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-string">'String'</span> }); <span class="hljs-comment">// Equivalent</span>
+
+<span class="hljs-keyword">const</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, schema2);</code></pre>
+<p>If you pass an element that has a <code>toString()</code> function, Mongoose will call it,
+unless the element is an array or the <code>toString()</code> function is strictly equal to
+<code>Object.prototype.toString()</code>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: <span class="hljs-number">42</span> }).name; <span class="hljs-comment">// "42" as a string</span>
+<span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">toString</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-number">42</span> } }).name; <span class="hljs-comment">// "42" as a string</span>
+
+<span class="hljs-comment">// "undefined", will get a cast error if you `save()` this document</span>
+<span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">foo</span>: <span class="hljs-number">42</span> } }).name;</code></pre>
+<h4 id="numbers">Number</h4>
+
+<p>To declare a path as a number, you may use either the <code>Number</code> global
+constructor or the string <code>&#39;Number&#39;</code>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema1 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">age</span>: <span class="hljs-built_in">Number</span> }); <span class="hljs-comment">// age will be cast to a Number</span>
+<span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">age</span>: <span class="hljs-string">'Number'</span> }); <span class="hljs-comment">// Equivalent</span>
+
+<span class="hljs-keyword">const</span> Car = mongoose.model(<span class="hljs-string">'Car'</span>, schema2);</code></pre>
+<p>There are several types of values that will be successfully cast to a Number.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">new</span> Car({ <span class="hljs-attr">age</span>: <span class="hljs-string">'15'</span> }).age; <span class="hljs-comment">// 15 as a Number</span>
+<span class="hljs-keyword">new</span> Car({ <span class="hljs-attr">age</span>: <span class="hljs-literal">true</span> }).age; <span class="hljs-comment">// 1 as a Number</span>
+<span class="hljs-keyword">new</span> Car({ <span class="hljs-attr">age</span>: <span class="hljs-literal">false</span> }).age; <span class="hljs-comment">// 0 as a Number</span>
+<span class="hljs-keyword">new</span> Car({ <span class="hljs-attr">age</span>: { <span class="hljs-attr">valueOf</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-number">83</span> } }).age; <span class="hljs-comment">// 83 as a Number</span></code></pre>
+<p>If you pass an object with a <code>valueOf()</code> function that returns a Number, Mongoose will
+call it and assign the returned value to the path.</p>
+<p>The values <code>null</code> and <code>undefined</code> are not cast.</p>
+<p>NaN, strings that cast to NaN, arrays, and objects that don&#39;t have a <code>valueOf()</code> function
+will all result in a <a href="/docs/validation.html#cast-errors">CastError</a> once validated, meaning that it will not throw on initialization, only when validated.</p>
+<h4 id="dates">Dates</h4>
+
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Built-in <code>Date</code> methods</a> are <a href="https://github.com/Automattic/mongoose/issues/1598"><strong>not</strong> hooked into</a> the mongoose change tracking logic which in English means that if you use a <code>Date</code> in your document and modify it with a method like <code>setMonth()</code>, mongoose will be unaware of this change and <code>doc.save()</code> will not persist this modification. If you must modify <code>Date</code> types using built-in methods, tell mongoose about the change with <code>doc.markModified(&#39;pathToYourDate&#39;)</code> before saving.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> Assignment = mongoose.model(<span class="hljs-string">'Assignment'</span>, { <span class="hljs-attr">dueDate</span>: <span class="hljs-built_in">Date</span> });
+Assignment.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, doc</span>) </span>{
+  doc.dueDate.setMonth(<span class="hljs-number">3</span>);
+  doc.save(callback); <span class="hljs-comment">// THIS DOES NOT SAVE YOUR CHANGE</span>
+
+  doc.markModified(<span class="hljs-string">'dueDate'</span>);
+  doc.save(callback); <span class="hljs-comment">// works</span>
+})</code></pre>
+<h4 id="buffers">Buffer</h4>
+
+<p>To declare a path as a Buffer, you may use either the <code>Buffer</code> global
+constructor or the string <code>&#39;Buffer&#39;</code>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema1 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">binData</span>: Buffer }); <span class="hljs-comment">// binData will be cast to a Buffer</span>
+<span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">binData</span>: <span class="hljs-string">'Buffer'</span> }); <span class="hljs-comment">// Equivalent</span>
+
+<span class="hljs-keyword">const</span> Data = mongoose.model(<span class="hljs-string">'Data'</span>, schema2);</code></pre>
+<p>Mongoose will successfully cast the below values to buffers.</p>
+<pre><code><span class="hljs-keyword">const</span> file1 = <span class="hljs-keyword">new</span> Data({ <span class="hljs-attr">binData</span>: <span class="hljs-string">'test'</span>}); <span class="hljs-comment">// {"type":"Buffer","data":[116,101,115,116]}</span>
+<span class="hljs-keyword">const</span> file2 = <span class="hljs-keyword">new</span> Data({ <span class="hljs-attr">binData</span>: <span class="hljs-number">72987</span> }); <span class="hljs-comment">// {"type":"Buffer","data":[27]}</span>
+<span class="hljs-keyword">const</span> file4 = <span class="hljs-keyword">new</span> Data({ <span class="hljs-attr">binData</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">'Buffer'</span>, <span class="hljs-attr">data</span>: [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]}}); <span class="hljs-comment">// {"type":"Buffer","data":[1,2,3]}</span></code></pre>
+<h4 id="mixed">Mixed</h4>
+
+<p>An &quot;anything goes&quot; SchemaType. Mongoose will not do any casting on mixed paths.
+You can define a mixed path using <code>Schema.Types.Mixed</code> or by passing an empty
+object literal. The following are equivalent.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> Any = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: {} });
+<span class="hljs-keyword">const</span> Any = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: <span class="hljs-built_in">Object</span> });
+<span class="hljs-keyword">const</span> Any = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: Schema.Types.Mixed });
+<span class="hljs-keyword">const</span> Any = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: mongoose.Mixed });</code></pre>
+<p>Since Mixed is a schema-less type, you can change the value to anything else you
+like, but Mongoose loses the ability to auto detect and save those changes.
+To tell Mongoose that the value of a Mixed type has changed, you need to
+call <code>doc.markModified(path)</code>, passing the path to the Mixed type you just changed.</p>
+<p>To avoid these side-effects, a <a href="./subdocs.html">Subdocument</a> path may be used
+instead.</p>
+<pre><code class="language-javascript">person.anything = { <span class="hljs-attr">x</span>: [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>, { <span class="hljs-attr">y</span>: <span class="hljs-string">"changed"</span> }] };
+person.markModified(<span class="hljs-string">'anything'</span>);
+person.save(); <span class="hljs-comment">// Mongoose will save changes to `anything`.</span></code></pre>
+<h4 id="objectids">ObjectIds</h4>
+
+<p>An <a href="https://docs.mongodb.com/manual/reference/method/ObjectId/">ObjectId</a>
+is a special type typically used for unique identifiers. Here&#39;s how
+you declare a schema with a path <code>driver</code> that is an ObjectId:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> carSchema = <span class="hljs-keyword">new</span> mongoose.Schema({ <span class="hljs-attr">driver</span>: mongoose.ObjectId });</code></pre>
+<p><code>ObjectId</code> is a class, and ObjectIds are objects. However, they are
+often represented as strings. When you convert an ObjectId to a string
+using <code>toString()</code>, you get a 24-character hexadecimal string:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> Car = mongoose.model(<span class="hljs-string">'Car'</span>, carSchema);
+
+<span class="hljs-keyword">const</span> car = <span class="hljs-keyword">new</span> Car();
+car.driver = <span class="hljs-keyword">new</span> mongoose.Types.ObjectId();
+
+<span class="hljs-keyword">typeof</span> car.driver; <span class="hljs-comment">// 'object'</span>
+car.driver <span class="hljs-keyword">instanceof</span> mongoose.Types.ObjectId; <span class="hljs-comment">// true</span>
+
+car.driver.toString(); <span class="hljs-comment">// Something like "5e1a0651741b255ddda996c4"</span></code></pre>
+<h4 id="booleans">Boolean</h4>
+
+<p>Booleans in Mongoose are <a href="https://www.w3schools.com/js/js_booleans.asp">plain JavaScript booleans</a>.
+By default, Mongoose casts the below values to <code>true</code>:</p>
+<ul>
+<li><code>true</code></li>
+<li><code>&#39;true&#39;</code></li>
+<li><code>1</code></li>
+<li><code>&#39;1&#39;</code></li>
+<li><code>&#39;yes&#39;</code></li>
+</ul>
+<p>Mongoose casts the below values to <code>false</code>:</p>
+<ul>
+<li><code>false</code></li>
+<li><code>&#39;false&#39;</code></li>
+<li><code>0</code></li>
+<li><code>&#39;0&#39;</code></li>
+<li><code>&#39;no&#39;</code></li>
+</ul>
+<p>Any other value causes a <a href="/docs/validation.html#cast-errors">CastError</a>.
+You can modify what values Mongoose converts to true or false using the
+<code>convertToTrue</code> and <code>convertToFalse</code> properties, which are <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set">JavaScript sets</a>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> M = mongoose.model(<span class="hljs-string">'Test'</span>, <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">b</span>: <span class="hljs-built_in">Boolean</span> }));
+<span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">new</span> M({ <span class="hljs-attr">b</span>: <span class="hljs-string">'nay'</span> }).b); <span class="hljs-comment">// undefined</span>
+
+<span class="hljs-comment">// Set { false, 'false', 0, '0', 'no' }</span>
+<span class="hljs-built_in">console</span>.log(mongoose.Schema.Types.Boolean.convertToFalse);
+
+mongoose.Schema.Types.Boolean.convertToFalse.add(<span class="hljs-string">'nay'</span>);
+<span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">new</span> M({ <span class="hljs-attr">b</span>: <span class="hljs-string">'nay'</span> }).b); <span class="hljs-comment">// false</span></code></pre>
+<h4 id="arrays">Arrays</h4>
+
+<p>Mongoose supports arrays of <a href="./api.html#schema_Schema.Types">SchemaTypes</a>
+and arrays of <a href="./subdocs.html">subdocuments</a>. Arrays of SchemaTypes are
+also called <em>primitive arrays</em>, and arrays of subdocuments are also called
+<em>document arrays</em>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> ToySchema = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">const</span> ToyBoxSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">toys</span>: [ToySchema],
+  <span class="hljs-attr">buffers</span>: [Buffer],
+  <span class="hljs-attr">strings</span>: [<span class="hljs-built_in">String</span>],
+  <span class="hljs-attr">numbers</span>: [<span class="hljs-built_in">Number</span>]
+  <span class="hljs-comment">// ... etc</span>
+});</code></pre>
+<p>Arrays are special because they implicitly have a default value of <code>[]</code> (empty array).</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> ToyBox = mongoose.model(<span class="hljs-string">'ToyBox'</span>, ToyBoxSchema);
+<span class="hljs-built_in">console</span>.log((<span class="hljs-keyword">new</span> ToyBox()).toys); <span class="hljs-comment">// []</span></code></pre>
+<p>To overwrite this default, you need to set the default value to <code>undefined</code></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> ToyBoxSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">toys</span>: {
+    <span class="hljs-attr">type</span>: [ToySchema],
+    <span class="hljs-attr">default</span>: <span class="hljs-literal">undefined</span>
+  }
+});</code></pre>
+<p>Note: specifying an empty array is equivalent to <code>Mixed</code>. The following all create arrays of
+<code>Mixed</code>:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> Empty1 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: [] });
+<span class="hljs-keyword">const</span> Empty2 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: <span class="hljs-built_in">Array</span> });
+<span class="hljs-keyword">const</span> Empty3 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: [Schema.Types.Mixed] });
+<span class="hljs-keyword">const</span> Empty4 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: [{}] });</code></pre>
+<h4 id="maps">Maps</h4>
+
+<p><em>New in Mongoose 5.1.0</em></p>
+<p>A <code>MongooseMap</code> is a subclass of <a href="http://thecodebarbarian.com/the-80-20-guide-to-maps-in-javascript.html">JavaScript&#39;s <code>Map</code> class</a>.
+In these docs, we&#39;ll use the terms &#39;map&#39; and <code>MongooseMap</code> interchangeably.
+In Mongoose, maps are how you create a nested document with arbitrary keys.</p>
+<p><strong>Note</strong>: In Mongoose Maps, keys must be strings in order to store the document in MongoDB.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-comment">// `socialMediaHandles` is a map whose values are strings. A map's</span>
+  <span class="hljs-comment">// keys are always strings. You specify the type of values using `of`.</span>
+  <span class="hljs-attr">socialMediaHandles</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-built_in">Map</span>,
+    <span class="hljs-attr">of</span>: <span class="hljs-built_in">String</span>
+  }
+});
+
+<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema);
+<span class="hljs-comment">// Map { 'github' =&gt; 'vkarpov15', 'twitter' =&gt; '@code_barbarian' }</span>
+<span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">new</span> User({
+  <span class="hljs-attr">socialMediaHandles</span>: {
+    <span class="hljs-attr">github</span>: <span class="hljs-string">'vkarpov15'</span>,
+    <span class="hljs-attr">twitter</span>: <span class="hljs-string">'@code_barbarian'</span>
+  }
+}).socialMediaHandles);</code></pre>
+<p>The above example doesn&#39;t explicitly declare <code>github</code> or <code>twitter</code> as paths,
+but, since <code>socialMediaHandles</code> is a map, you can store arbitrary key/value
+pairs. However, since <code>socialMediaHandles</code> is a map, you <strong>must</strong> use
+<code>.get()</code> to get the value of a key and <code>.set()</code> to set the value of a key.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> User({
+  <span class="hljs-attr">socialMediaHandles</span>: {}
+});
+
+<span class="hljs-comment">// Good</span>
+user.socialMediaHandles.set(<span class="hljs-string">'github'</span>, <span class="hljs-string">'vkarpov15'</span>);
+<span class="hljs-comment">// Works too</span>
+user.set(<span class="hljs-string">'socialMediaHandles.twitter'</span>, <span class="hljs-string">'@code_barbarian'</span>);
+<span class="hljs-comment">// Bad, the `myspace` property will **not** get saved</span>
+user.socialMediaHandles.myspace = <span class="hljs-string">'fail'</span>;
+
+<span class="hljs-comment">// 'vkarpov15'</span>
+<span class="hljs-built_in">console</span>.log(user.socialMediaHandles.get(<span class="hljs-string">'github'</span>));
+<span class="hljs-comment">// '@code_barbarian'</span>
+<span class="hljs-built_in">console</span>.log(user.get(<span class="hljs-string">'socialMediaHandles.twitter'</span>));
+<span class="hljs-comment">// undefined</span>
+user.socialMediaHandles.github;
+
+<span class="hljs-comment">// Will only save the 'github' and 'twitter' properties</span>
+user.save();</code></pre>
+<p>Map types are stored as <a href="https://en.wikipedia.org/wiki/BSON#Data_types_and_syntax">BSON objects in MongoDB</a>.
+Keys in a BSON object are ordered, so this means the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#Description">insertion order</a>
+property of maps is maintained.</p>
+<p>Mongoose supports a special <code>$*</code> syntax to <a href="/docs/populate.html">populate</a> all elements in a map.
+For example, suppose your <code>socialMediaHandles</code> map contains a <code>ref</code>:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">socialMediaHandles</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-built_in">Map</span>,
+    <span class="hljs-attr">of</span>: <span class="hljs-keyword">new</span> Schema({
+      <span class="hljs-attr">handle</span>: <span class="hljs-built_in">String</span>,
+      <span class="hljs-attr">oauth</span>: {
+        <span class="hljs-attr">type</span>: ObjectId,
+        <span class="hljs-attr">ref</span>: <span class="hljs-string">'OAuth'</span>
+      }
+    })
+  }
+});
+<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema);</code></pre>
+<p>To populate every <code>socialMediaHandles</code> entry&#39;s <code>oauth</code> property, you should populate
+on <code>socialMediaHandles.$*.oauth</code>:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> User.findOne().populate(<span class="hljs-string">'socialMediaHandles.$*.oauth'</span>);</code></pre>
+<h3 id="getters"><a href="#getters">Getters</a></h3>
+
+<p>Getters are like virtuals for paths defined in your schema. For example,
+let&#39;s say you wanted to store user profile pictures as relative paths and
+then add the hostname in your application. Below is how you would structure
+your <code>userSchema</code>:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> root = <span class="hljs-string">'https://s3.amazonaws.com/mybucket'</span>;
+
+<span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
+  <span class="hljs-attr">picture</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>,
+    <span class="hljs-attr">get</span>: <span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> <span class="hljs-string">`<span class="hljs-subst">${root}</span><span class="hljs-subst">${v}</span>`</span>
+  }
+});
+
+<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema);
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> User({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Val'</span>, <span class="hljs-attr">picture</span>: <span class="hljs-string">'/123.png'</span> });
+doc.picture; <span class="hljs-comment">// 'https://s3.amazonaws.com/mybucket/123.png'</span>
+doc.toObject({ <span class="hljs-attr">getters</span>: <span class="hljs-literal">false</span> }).picture; <span class="hljs-comment">// '/123.png'</span></code></pre>
+<p>Generally, you only use getters on primitive paths as opposed to arrays
+or subdocuments. Because getters override what accessing a Mongoose path returns,
+declaring a getter on an object may remove Mongoose change tracking for
+that path.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">arr</span>: [{ <span class="hljs-attr">url</span>: <span class="hljs-built_in">String</span> }]
+});
+
+<span class="hljs-keyword">const</span> root = <span class="hljs-string">'https://s3.amazonaws.com/mybucket'</span>;
+
+<span class="hljs-comment">// Bad, don't do this!</span>
+schema.path(<span class="hljs-string">'arr'</span>).get(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> {
+  <span class="hljs-keyword">return</span> v.map(<span class="hljs-function"><span class="hljs-params">el</span> =&gt;</span> <span class="hljs-built_in">Object</span>.assign(el, { <span class="hljs-attr">url</span>: root + el.url }));
+});
+
+<span class="hljs-comment">// Later</span>
+doc.arr.push({ <span class="hljs-attr">key</span>: <span class="hljs-built_in">String</span> });
+doc.arr[<span class="hljs-number">0</span>]; <span class="hljs-comment">// 'undefined' because every `doc.arr` creates a new array!</span></code></pre>
+<p>Instead of declaring a getter on the array as shown above, you should
+declare a getter on the <code>url</code> string as shown below. If you need to declare
+a getter on a nested document or array, be very careful!</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-attr">arr</span>: [{ <span class="hljs-attr">url</span>: <span class="hljs-built_in">String</span> }]
+});
+
+<span class="hljs-keyword">const</span> root = <span class="hljs-string">'https://s3.amazonaws.com/mybucket'</span>;
+
+<span class="hljs-comment">// Good, do this instead of declaring a getter on `arr`</span>
+schema.path(<span class="hljs-string">'arr.0.url'</span>).get(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> <span class="hljs-string">`<span class="hljs-subst">${root}</span><span class="hljs-subst">${v}</span>`</span>);</code></pre>
+<h3 id="schemas"><a href="#schemas">Schemas</a></h3>
+
+<p>To declare a path as another <a href="./guide.html#definition">schema</a>,
+set <code>type</code> to the sub-schema&#39;s instance.</p>
+<p>To set a default value based on the sub-schema&#39;s shape, simply set a default value,
+and the value will be cast based on the sub-schema&#39;s definition before being set
+during document creation.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> subSchema = <span class="hljs-keyword">new</span> mongoose.Schema({
+  <span class="hljs-comment">// some schema definition here</span>
+});
+
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
+  <span class="hljs-attr">data</span>: {
+    <span class="hljs-attr">type</span>: subSchema
+    <span class="hljs-attr">default</span>: {}
+  }
+});</code></pre>
+<h3 id="customtypes"><a href="#customtypes">Creating Custom Types</a></h3>
+
+<p>Mongoose can also be extended with <a href="customschematypes.html">custom SchemaTypes</a>. Search the
+<a href="http://plugins.mongoosejs.io">plugins</a>
+site for compatible types like
+<a href="https://github.com/aheckmann/mongoose-long">mongoose-long</a>,
+<a href="https://github.com/vkarpov15/mongoose-int32">mongoose-int32</a>,
+and
+<a href="https://github.com/aheckmann/mongoose-function">other</a>
+<a href="https://github.com/OpenifyIt/mongoose-types">types</a>.</p>
+<p>Read more about creating <a href="customschematypes.html">custom SchemaTypes here</a>.</p>
+<h3 id="path"><a href="#path">The `schema.path()` Function</a></h3>
+
+<p>The <code>schema.path()</code> function returns the instantiated schema type for a
+given path.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> sampleSchema = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> } });
+<span class="hljs-built_in">console</span>.log(sampleSchema.path(<span class="hljs-string">'name'</span>));
+<span class="hljs-comment">// Output looks like:</span>
+<span class="hljs-comment">/**
+ * SchemaString {
+ *   enumValues: [],
+  *   regExp: null,
+  *   path: 'name',
+  *   instance: 'String',
+  *   validators: ...
+  */</span></code></pre>
+<p>You can use this function to inspect the schema type for a given path,
+including what validators it has and what the type is.</p>
+<h3 id="further-reading"><a href="#further-reading">Further Reading</a></h3>
+
+<ul>
+  <li><a href="https://masteringjs.io/tutorials/mongoose/schematype">An Introduction to Mongoose SchemaTypes</a></li>
+  <li><a href="https://kb.objectrocket.com/mongo-db/mongoose-schema-types-1418">Mongoose Schema Types</a></li>
+</ul></div></div><script type="text/javascript">var xhr = new XMLHttpRequest();
+xhr.open('POST', 'https://g0a3nbw0xa.execute-api.us-east-1.amazonaws.com/prod/track', true);
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.onreadystatechange = function() {};
+xhr.send(JSON.stringify({
+  path: window.location.pathname,
+  hostname: window.location.hostname,
+  hash: window.location.hash
+}));</script><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript">(function (window, document) {
+  var layout   = document.getElementById('layout'),
+      menu     = document.getElementById('menu'),
+      menuLink = document.getElementById('menuLink'),
+      content  = document.getElementById('content');
+
+  function toggleClass(element, className) {
+      var classes = element.className.split(/\s+/),
+          length = classes.length,
+          i = 0;
+
+      for(; i < length; i++) {
+        if (classes[i] === className) {
+          classes.splice(i, 1);
+          break;
+        }
+      }
+      // The className is not found
+      if (length === classes.length) {
+          classes.push(className);
+      }
+
+      element.className = classes.join(' ');
+  }
+
+  function toggleAll(e) {
+      var active = 'active';
+
+      e.preventDefault();
+      toggleClass(layout, active);
+      toggleClass(menu, active);
+      toggleClass(menuLink, active);
+  }
+
+  menuLink.onclick = function (e) {
+      toggleAll(e);
+  };
+
+  content.onclick = function(e) {
+      if (menu.className.indexOf('active') !== -1) {
+          toggleAll(e);
+      }
+  };
+
+}(this, this.document));</script></div></body></html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.0.0-rc0: Using TypeScript with Mongoose</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.0.0-rc0</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/v6">Version 6.0.0-rc0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item tertiary-item"><a class="pure-menu-link" href="/docs/typescript/schemas.html">Schemas</a></li><li class="pure-menu-item tertiary-item"><a class="pure-menu-link" href="/docs/typescript/statics.html">Statics</a></li><li class="pure-menu-item tertiary-item"><a class="pure-menu-link" href="/docs/typescript/query-helpers.html">Query Helpers</a></li><li class="pure-menu-item tertiary-item"><a class="pure-menu-link" href="/docs/typescript/populate.html">Populate</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/typescript.md" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h1 id="typescript-support">TypeScript Support</h1>
+<script>
+  _native.init("CK7DT53U",{
+    targetClass: 'native-inline'
+  });
+</script>
+
+<div class="native-inline">
+  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+</div>
+
+<p>Mongoose introduced <a href="https://thecodebarbarian.com/working-with-mongoose-in-typescript.html">officially supported TypeScript bindings in v5.11.0</a>.
+Mongoose&#39;s <code>index.d.ts</code> file supports a wide variety of syntaxes and strives to be compatible with <code>@types/mongoose</code> where possible.
+This guide describes Mongoose&#39;s recommended approach to working with Mongoose in TypeScript.</p>
+<h3 id="creating-your-first-document">Creating Your First Document</h3>
+<p>To get started with Mongoose in TypeScript, you need to: </p>
+<ol>
+<li>Create an interface representing a document in MongoDB.</li>
+<li>Create a <a href="/docs/guide.html">Schema</a> corresponding to the document interface.</li>
+<li>Create a Model.</li>
+<li><a href="/docs/connections.html">Connect to MongoDB</a>.</li>
+</ol>
+<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { Schema, model, connect } <span class="hljs-keyword">from</span> <span class="hljs-string">'mongoose'</span>;
+
+<span class="hljs-comment">// 1. Create an interface representing a document in MongoDB.</span>
+interface User {
+  <span class="hljs-attr">name</span>: string;
+  email: string;
+  avatar?: string;
+}
+
+<span class="hljs-comment">// 2. Create a Schema corresponding to the document interface.</span>
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema&lt;User&gt;({
+  <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">email</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">avatar</span>: <span class="hljs-built_in">String</span>
+});
+
+<span class="hljs-comment">// 3. Create a Model.</span>
+<span class="hljs-keyword">const</span> UserModel = model&lt;User&gt;(<span class="hljs-string">'User'</span>, schema);
+
+run().catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(err));
+
+<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">run</span>(<span class="hljs-params"></span>): <span class="hljs-title">Promise</span>&lt;<span class="hljs-title">void</span>&gt; </span>{
+  <span class="hljs-comment">// 4. Connect to MongoDB</span>
+  <span class="hljs-keyword">await</span> connect(<span class="hljs-string">'mongodb://localhost:27017/test'</span>, {
+    <span class="hljs-attr">useNewUrlParser</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">useUnifiedTopology</span>: <span class="hljs-literal">true</span>
+  });
+
+  <span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> UserModel({
+    <span class="hljs-attr">name</span>: <span class="hljs-string">'Bill'</span>,
+    <span class="hljs-attr">email</span>: <span class="hljs-string">'bill@initech.com'</span>,
+    <span class="hljs-attr">avatar</span>: <span class="hljs-string">'https://i.imgur.com/dM7Thhn.png'</span>
+  });
+  <span class="hljs-keyword">await</span> doc.save();
+
+  <span class="hljs-built_in">console</span>.log(doc.email); <span class="hljs-comment">// 'bill@initech.com'</span>
+}</code></pre>
+<p>You as the developer are responsible for ensuring that your document interface lines up with your Mongoose schema.
+For example, Mongoose won&#39;t report an error if <code>email</code> is <code>required</code> in your Mongoose schema but optional in your document interface.</p>
+<h3 id="using-extends-document">Using <code>extends Document</code></h3>
+<p>Alternatively, your document interface can extend Mongoose&#39;s <code>Document</code> class.
+Many Mongoose TypeScript codebases use the below approach.</p>
+<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { Document, Schema, model, connect } <span class="hljs-keyword">from</span> <span class="hljs-string">'mongoose'</span>;
+
+interface User extends Document {
+  <span class="hljs-attr">name</span>: string;
+  email: string;
+  avatar?: string;
+}</code></pre>
+<p>This approach works, but we recommend your document interface <em>not</em> extend <code>Document</code>.
+Using <code>extends Document</code> makes it difficult for Mongoose to infer which properties are present on <a href="/docs/queries.html">query filters</a>, <a href="/docs/tutorials/lean.html">lean documents</a>, and other cases.</p>
+<p>We recommend your document interface contain the properties defined in your schema and line up with what your documents look like in MongoDB.
+Although you can add <a href="/docs/guide.html#methods">instance methods</a> to your document interface, we do not recommend doing so.</p>
+<h3 id="using-custom-bindings">Using Custom Bindings</h3>
+<p>If Mongoose&#39;s built-in <code>index.d.ts</code> file does not work for you, you can remove it in a postinstall script in your <code>package.json</code> as shown below.
+However, before you do, please <a href="https://github.com/Automattic/mongoose/issues/new">open an issue on Mongoose&#39;s GitHub page</a> and describe the issue you&#39;re experiencing.</p>
+<pre><code>{
+  <span class="hljs-string">"postinstall"</span>: <span class="hljs-string">"rm ./node_modules/mongoose/index.d.ts"</span>
+}</code></pre>
+<h3 id="next-up">Next Up</h3>
+<p>Now that you&#39;ve seen the basics of how to use Mongoose in TypeScript, let&#39;s take a look at <a href="/docs/typescript/statics.html">statics in TypeScript</a>.</p>
+</div></div><script type="text/javascript">var xhr = new XMLHttpRequest();
+xhr.open('POST', 'https://g0a3nbw0xa.execute-api.us-east-1.amazonaws.com/prod/track', true);
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.onreadystatechange = function() {};
+xhr.send(JSON.stringify({
+  path: window.location.pathname,
+  hostname: window.location.hostname,
+  hash: window.location.hash
+}));</script><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript">(function (window, document) {
+  var layout   = document.getElementById('layout'),
+      menu     = document.getElementById('menu'),
+      menuLink = document.getElementById('menuLink'),
+      content  = document.getElementById('content');
+
+  function toggleClass(element, className) {
+      var classes = element.className.split(/\s+/),
+          length = classes.length,
+          i = 0;
+
+      for(; i < length; i++) {
+        if (classes[i] === className) {
+          classes.splice(i, 1);
+          break;
+        }
+      }
+      // The className is not found
+      if (length === classes.length) {
+          classes.push(className);
+      }
+
+      element.className = classes.join(' ');
+  }
+
+  function toggleAll(e) {
+      var active = 'active';
+
+      e.preventDefault();
+      toggleClass(layout, active);
+      toggleClass(menu, active);
+      toggleClass(menuLink, active);
+  }
+
+  menuLink.onclick = function (e) {
+      toggleAll(e);
+  };
+
+  content.onclick = function(e) {
+      if (menu.className.indexOf('active') !== -1) {
+          toggleAll(e);
+      }
+  };
+
+}(this, this.document));</script></div></body></html>

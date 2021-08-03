@@ -10,7 +10,7 @@ test:
 	./node_modules/.bin/mocha $(T) --async-only test/*.test.js
 
 docs: ghpages merge_stable docclean gendocs search
-docs_next: next docclean_next gendocs copytmp gitreset ghpages copynext
+docs_next: next docclean_next gendocs copytmp ghpages copynext
 docs_legacy: legacy docclean_legacy gendocs copytmp gitreset ghpages copylegacy
 
 search:
@@ -39,7 +39,7 @@ docclean:
 	rm -f ./docs/source/_docs
 
 docclean_legacy:
-	rm -rf ./docs/$(LEGACY_BRANCH)/*
+	rm -rf ./docs/v6/*
 	rm -f ./docs/source/_docs
 
 docclean_next:

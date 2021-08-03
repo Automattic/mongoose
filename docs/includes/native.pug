@@ -1,0 +1,21 @@
+append style
+  script(type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js")
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
+
+#native-direct
+script.
+  (function() {
+  if (typeof _bsa !== 'undefined' && _bsa) {
+  _bsa.init('custom', 'CK7DT53U', 'placement:mongoosejscom',
+  {
+  target: '#native-direct',
+  template: `
+  <div class="native-inline">
+  <a rel="sponsored noopener" target="_blank" href="##statlink##" title="##company## — ##tagline##"><span class="sponsor">Sponsor</span> ##company## — ##description##</a>
+  </div>
+  </a>
+  `
+  }
+  );
+  }
+  })();

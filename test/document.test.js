@@ -1021,7 +1021,8 @@ describe('document', function() {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'User'
         }
-      }, {
+      },
+      {
         toObject: {
           transform: function(doc, ret) {
             delete ret._id;
@@ -1510,11 +1511,10 @@ describe('document', function() {
       const Post = db.model('BlogPost', PostSchema);
 
       const post = new Post({
-        controls: [{
-          test: 'xx'
-        }, {
-          test: 'yy'
-        }]
+        controls: [
+          { test: 'xx' },
+          { test: 'yy' }
+        ]
       });
 
       post.save(function() {
@@ -1546,15 +1546,12 @@ describe('document', function() {
 
       const MWSV = db.model('Test', new Schema({ subs: [SchemaWithValidator] }));
       const m = new MWSV({
-        subs: [{
-          preference: 'xx'
-        }, {
-          preference: 'yy'
-        }, {
-          preference: '1'
-        }, {
-          preference: '2'
-        }]
+        subs: [
+          { preference: 'xx' },
+          { preference: 'yy' },
+          { preference: '1' },
+          { preference: '2' }
+        ]
       });
 
       m.save(function(err) {
@@ -2407,9 +2404,11 @@ describe('document', function() {
         const fakeDoc = new Model({});
         yield Model.create({});
 
-        const res = yield Model.findOneAndUpdate({ _id: fakeDoc._id }, {
-          test: 'test'
-        }, { upsert: true, new: true });
+        const res = yield Model.findOneAndUpdate(
+          { _id: fakeDoc._id },
+          { test: 'test' },
+          { upsert: true, new: true }
+        );
 
         assert.equal(res.test, 'test');
         assert.ok(!res.subDoc);
@@ -3515,9 +3514,10 @@ describe('document', function() {
     });
 
     it('minimize + empty object (gh-4337)', function() {
-      const SomeModelSchema = new mongoose.Schema({}, {
-        minimize: false
-      });
+      const SomeModelSchema = new mongoose.Schema(
+        {},
+        { minimize: false }
+      );
 
       const SomeModel = db.model('Test', SomeModelSchema);
 

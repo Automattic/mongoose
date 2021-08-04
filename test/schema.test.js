@@ -1433,29 +1433,7 @@ describe('schema', function() {
   });
 
   describe('property names', function() {
-    it('that conflict throw', function() {
-      const child = new Schema({ name: String });
-
-      assert.throws(function() {
-        new Schema({
-          on: String,
-          child: [child]
-        });
-      }, /`on` may not be used as a schema pathname/);
-
-      assert.throws(function() {
-        new Schema({
-          collection: String
-        });
-      }, /`collection` may not be used as a schema pathname/);
-
-
-      assert.throws(function() {
-        new Schema({
-          errors: String
-        });
-      }, /`errors` may not be used as a schema pathname/);
-
+    xit('that conflict log a warning', function() {
       // TODO: assert that a warning is being logged that those keys are reserved (gh-9010)
       // https://github.com/Automattic/mongoose/pull/10414#issuecomment-876863778
       new Schema({
@@ -1465,9 +1443,19 @@ describe('schema', function() {
       new Schema({
         isNew: String
       });
+      new Schema({
+        errors: String
+      });
+      new Schema({
+        collection: String
+      });
+      new Schema({
+        on: String,
+        child: [{ name: String }]
+      });
     });
 
-    it('that do not conflict do not throw', function(done) {
+    it('that do not conflict do not throw', function() {
       assert.doesNotThrow(function() {
         new Schema({
           model: String
@@ -1493,8 +1481,6 @@ describe('schema', function() {
         const M = mongoose.model('setMaxListeners-as-property-name', s);
         new M({ setMaxListeners: 'works' });
       });
-
-      done();
     });
 
     it('permit _scope to be used (gh-1184)', function(done) {

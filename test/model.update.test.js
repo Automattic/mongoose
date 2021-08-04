@@ -1246,7 +1246,7 @@ describe('model: update:', function() {
         });
       });
 
-      it('handles document array validation (gh-2733)', function(done) {
+      it('handles document array validation (gh-2733)', async function() {
         const member = new Schema({
           name: String,
           role: { type: String, required: true, enum: ['singer', 'guitar', 'drums', 'bass'] }
@@ -1259,14 +1259,13 @@ describe('model: update:', function() {
           { name: 'Christopher Walken', role: 'cowbell' }
         ];
 
-        Band.findOneAndUpdate(
+        const err = await Band.findOneAndUpdate(
           { name: 'Guns N\' Roses' },
           { $set: { members: members } },
-          { runValidators: true },
-          function(err) {
-            assert.ok(err);
-            done();
-          });
+          { runValidators: true })
+          .then(() => null, err => err);
+
+        assert.ok(err);
       });
 
       it('validators on arrays (gh-3724)', function(done) {

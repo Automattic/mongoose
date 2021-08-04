@@ -10458,6 +10458,28 @@ describe('document', function() {
         assert.ok(user.$errors.name.kind === 'required');
       });
     });
+    describe('Document#removeListener', () => {
+      it('is available as `$removeListener`', async() => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const user = new User({ name: 'Hafez' });
+
+        assert.ok(user.$removeListener('save', () => {}));
+        assert.ok(user.$removeListener === user.removeListener);
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: { type: String, required: true },
+          removeListener: Number
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ removeListener: 12 });
+
+        assert.equal(user.removeListener, 12);
+      });
+    });
   });
 
   describe('virtuals `pathsToSkip` (gh-10120)', () => {

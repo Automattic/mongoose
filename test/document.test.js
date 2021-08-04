@@ -10564,6 +10564,36 @@ describe('document', function() {
         assert.equal(user.get, 12);
       });
     });
+    describe('Document#remove', () => {
+      it('is available as `$remove`', async() => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const user = new User({ name: 'Hafez' });
+        await user.save();
+        await user.$remove();
+        const userFromDB = await User.findOne({ _id: user._id });
+
+        assert.ok(userFromDB == null);
+      });
+      it('can be used as a property in documents', async() => {
+        const userSchema = new Schema({
+          name: { type: String, required: true },
+          remove: Number
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ remove: 12 });
+
+        assert.equal(user.remove, 12);
+
+        await user.save();
+        await user.$remove();
+        const userFromDB = await User.findOne({ _id: user._id });
+
+        assert.ok(userFromDB == null);
+      });
+    });
   });
 
   describe('virtuals `pathsToSkip` (gh-10120)', () => {

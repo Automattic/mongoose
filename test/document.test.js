@@ -10543,6 +10543,27 @@ describe('document', function() {
         assert.equal(user.emit, 12);
       });
     });
+    describe('Document#get', () => {
+      it('is available as `$get`', async() => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const user = new User({ name: 'Hafez' });
+
+        assert.ok(user.$get === user.get);
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: { type: String, required: true },
+          get: Number
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ get: 12 });
+
+        assert.equal(user.get, 12);
+      });
+    });
   });
 
   describe('virtuals `pathsToSkip` (gh-10120)', () => {

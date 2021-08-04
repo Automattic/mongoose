@@ -10480,6 +10480,27 @@ describe('document', function() {
         assert.equal(user.removeListener, 12);
       });
     });
+    describe('Document#listeners', () => {
+      it('is available as `$listeners`', async() => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const user = new User({ name: 'Hafez' });
+
+        assert.ok(user.$listeners === user.listeners);
+      });
+      it('can be used as a property in documents', () => {
+        const userSchema = new Schema({
+          name: { type: String, required: true },
+          listeners: Number
+        });
+
+        const User = db.model('User', userSchema);
+        const user = new User({ listeners: 12 });
+
+        assert.equal(user.listeners, 12);
+      });
+    });
   });
 
   describe('virtuals `pathsToSkip` (gh-10120)', () => {

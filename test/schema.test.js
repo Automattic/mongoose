@@ -1433,27 +1433,43 @@ describe('schema', function() {
   });
 
   describe('property names', function() {
-    xit('that conflict log a warning', function() {
-      // TODO: assert that a warning is being logged that those keys are reserved (gh-9010)
-      // https://github.com/Automattic/mongoose/pull/10414#issuecomment-876863778
-      new Schema({
-        init: String
+    describe('reserved keys are log a warning (gh-9010)', () => {
+      const originalWarn = console.warn;
+      let lastWarnMessage;
+      beforeEach(() => {
+        console.warn = (message) => lastWarnMessage = message;
       });
 
-      new Schema({
-        isNew: String
+      afterEach(() => {
+        console.warn = originalWarn;
+        lastWarnMessage = null;
       });
-      new Schema({
-        errors: String
-      });
-      new Schema({
-        collection: String
-      });
-      new Schema({
-        on: String,
-        child: [{ name: String }]
+
+      [
+        'emit', 'listeners', 'on', 'removeListener', /* 'collection', */ // TODO: add `collection`
+        'errors', 'get', 'init', 'isModified', 'isNew', 'populated',
+        'remove', 'save', 'toObject', 'validate'
+      ];
+
+      ['emit'].forEach((reservedProperty) => {
+        it(`\`${reservedProperty}\` when used as a schema path logs a warning`, () => {
+          new Schema({ [reservedProperty]: String });
+
+          assert.ok(lastWarnMessage.includes(`\`${reservedProperty}\` is a reserved schema pathname`));
+        });
+
+        it(`\`${reservedProperty}\` when used as a schema path doesn't log a warning if \`supressReservedKeysWarning\` is true`, () => {
+          new Schema(
+            { [reservedProperty]: String },
+            { supressReservedKeysWarning: true }
+          );
+
+          assert.deepEqual(lastWarnMessage, null);
+        });
+
       });
     });
+
 
     it('that do not conflict do not throw', function() {
       assert.doesNotThrow(function() {

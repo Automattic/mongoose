@@ -3413,7 +3413,7 @@ describe('Query', function() {
     });
   });
 
-  describe.only('Query#validate() (gh-7984)', function() {
+  describe('Query#validate() (gh-7984)', function() {
     it('middleware', function() {
       const schema = new Schema({
         password: {

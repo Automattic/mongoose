@@ -9,6 +9,7 @@ const Schema = mongoose.Schema;
 describe('transactions', function() {
   let db;
   let _skipped = false;
+  this.timeout(10000);
 
   before(function() {
     if (!process.env.REPLICA_SET) {
@@ -17,7 +18,7 @@ describe('transactions', function() {
     }
     db = start({ replicaSet: process.env.REPLICA_SET });
 
-    return db.
+    return db.asPromise().
       then(() => {
         // Skip if not a repl set
         if (db.client.topology.constructor.name !== 'ReplSet' &&
@@ -52,7 +53,7 @@ describe('transactions', function() {
     const Customer = db.model('Customer', new Schema({ name: String }));
 
     // acquit:ignore:start
-    await Customer.createCollection();
+    await Customer.init();
     // acquit:ignore:end
     
     const session = await db.startSession();
@@ -85,7 +86,7 @@ describe('transactions', function() {
   it('withTransaction', async function() {
     // acquit:ignore:start
     const Customer = db.model('Customer_withTrans', new Schema({ name: String }));
-    await Customer.createCollection();
+    await Customer.init();
     // acquit:ignore:end
 
     const session = await Customer.startSession();
@@ -105,7 +106,7 @@ describe('transactions', function() {
   it('abort', async function() {
     // acquit:ignore:start
     const Customer = db.model('Customer0', new Schema({ name: String }));
-    await Customer.createCollection();
+    await Customer.init();
     // acquit:ignore:end
     const session = await Customer.startSession();
     session.startTransaction();
@@ -124,7 +125,7 @@ describe('transactions', function() {
   it('save', async function() {
     const User = db.model('User', new Schema({ name: String }));
     // acquit:ignore:start
-    await User.createCollection();
+    await User.init();
     // acquit:ignore:end
     const session = await db.startSession();
 
@@ -152,7 +153,7 @@ describe('transactions', function() {
   it('create (gh-6909)', async function() {
     // acquit:ignore:start
     const User = db.model('gh6909_User', new Schema({ name: String }));
-    await User.createCollection();
+    await User.init();
     // acquit:ignore:end
     const session = await db.startSession();
     session.startTransaction();
@@ -171,7 +172,7 @@ describe('transactions', function() {
   it('aggregate', async function() {
     const Event = db.model('Event', new Schema({ createdAt: Date }), 'Event');
     // acquit:ignore:start
-    await Event.createCollection();
+    await Event.init();
     // acquit:ignore:end
     const session = await db.startSession();
     
@@ -266,7 +267,7 @@ describe('transactions', function() {
       assert.equal(article.author.name, 'Val');
     });
 
-    it('`execPopulate()` uses the documents `$session()` by default', async function() {
+    it('`populate()` uses the documents `$session()` by default', async function() {
       const authors = await Author.create([{ name: 'Val' }], { session: session });
       const articles = await Article.create([{ author: authors[0]._id }], { session: session });
 
@@ -274,20 +275,19 @@ describe('transactions', function() {
       const article = await Article.findById(articles[0]._id).session(session);
 
       assert.ok(article.$session());
-      await article.populate('author').execPopulate();
+      await article.populate('author');
 
       assert.equal(article.author.name, 'Val');
     });
 
-    it('`execPopulate()` supports overwriting the session', async function() {
+    it('`populate()` supports overwriting the session', async function() {
       const authors = await Author.create([{ name: 'Val' }], { session: session });
       await Article.create([{ author: authors[0]._id }], { session: session });
 
       const article = await Article.findOne().session(session);
 
       await article.
-        populate({ path: 'author', options: { session: null } }).
-        execPopulate();
+        populate({ path: 'author', options: { session: null } });
       assert.ok(!article.author);
     });
   });

@@ -15,8 +15,6 @@ markdown.setOptions({
   }
 });
 
-mongoose.set('useCreateIndex', true);
-
 const contentSchema = new mongoose.Schema({
   title: { type: String, required: true },
   body: { type: String, required: true },

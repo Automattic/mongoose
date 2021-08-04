@@ -679,7 +679,8 @@ describe('model', function() {
           collation: {
             locale: 'en',
             strength: 2
-          }
+          },
+          autoCreate: false
         });
         userSchema.index({ username: 'text' }, { unique: true });
         const User = db.model('User', userSchema, 'User');

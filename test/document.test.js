@@ -1522,45 +1522,6 @@ describe('document', function() {
         db.close(done);
       });
     });
-
-
-    it('validator should run in parallel', function(done) {
-      let count = 0;
-      let startTime, endTime;
-
-      const SchemaWithValidator = new Schema({
-        preference: {
-          type: String,
-          required: true,
-          validate: {
-            validator: function validator(value, done) {
-              count++;
-              if (count === 1) startTime = Date.now();
-              else if (count === 4) endTime = Date.now();
-              setTimeout(done.bind(null, true), 150);
-            },
-            isAsync: true
-          }
-        }
-      });
-
-      const MWSV = db.model('Test', new Schema({ subs: [SchemaWithValidator] }));
-      const m = new MWSV({
-        subs: [
-          { preference: 'xx' },
-          { preference: 'yy' },
-          { preference: '1' },
-          { preference: '2' }
-        ]
-      });
-
-      m.save(function(err) {
-        assert.ifError(err);
-        assert.equal(count, 4);
-        assert(endTime - startTime < 150 * 4); // serial >= 150 * 4, parallel < 150 * 4
-        done();
-      });
-    });
   });
 
   it('#invalidate', function(done) {
@@ -2835,36 +2796,6 @@ describe('document', function() {
           doc.save(function(error) {
             assert.ifError(error);
             done();
-          });
-        });
-      });
-    });
-
-    it('execPopulate (gh-3753)', function(done) {
-      const childSchema = new Schema({
-        name: String
-      });
-
-      const parentSchema = new Schema({
-        name: String,
-        children: [{ type: ObjectId, ref: 'Child' }]
-      });
-
-      const Child = db.model('Child', childSchema);
-      const Parent = db.model('Parent', parentSchema);
-
-      Child.create({ name: 'Luke Skywalker' }, function(error, child) {
-        assert.ifError(error);
-        const doc = { name: 'Darth Vader', children: [child._id] };
-        Parent.create(doc, function(error, doc) {
-          Parent.findOne({ _id: doc._id }, function(error, doc) {
-            assert.ifError(error);
-            assert.ok(doc);
-            doc.populate('children').then(function(doc) {
-              assert.equal(doc.children.length, 1);
-              assert.equal(doc.children[0].name, 'Luke Skywalker');
-              done();
-            });
           });
         });
       });
@@ -7083,11 +7014,13 @@ describe('document', function() {
     return event.validate();
   });
 
-  it('flattenMaps option for toObject() (gh-7274)', function() {
+  it('flattenMaps option for toObject() (gh-7274) (gh-10486)', function() {
+    const subSchema = new Schema({ name: String });
+
     let schema = new Schema({
       test: {
         type: Map,
-        of: String,
+        of: subSchema,
         default: new Map()
       }
     }, { versionKey: false });
@@ -7095,13 +7028,14 @@ describe('document', function() {
     let Test = db.model('Test', schema);
 
     let mapTest = new Test({});
-    mapTest.test.set('key1', 'value1');
-    assert.equal(mapTest.toObject({ flattenMaps: true }).test.key1, 'value1');
+    mapTest.test.set('key1', { name: 'value1' });
+    // getters: true for gh-10486
+    assert.equal(mapTest.toObject({ getters: true, flattenMaps: true }).test.key1.name, 'value1');
 
     schema = new Schema({
       test: {
         type: Map,
-        of: String,
+        of: subSchema,
         default: new Map()
       }
     }, { versionKey: false });
@@ -7111,10 +7045,8 @@ describe('document', function() {
     Test = db.model('Test', schema);
 
     mapTest = new Test({});
-    mapTest.test.set('key1', 'value1');
-    assert.equal(mapTest.toObject({}).test.key1, 'value1');
-
-    return Promise.resolve();
+    mapTest.test.set('key1', { name: 'value1' });
+    assert.equal(mapTest.toObject({}).test.key1.name, 'value1');
   });
 
   it('`collection` property with strict: false (gh-7276)', function() {
@@ -10694,5 +10626,20 @@ describe('document', function() {
     const doc2 = new Nested({ child: { name: 'Luke', age: 19 } });
     doc2.set({ child: { age: 21 } });
     assert.deepEqual(doc2.toObject().child, { age: 21 });
+  });
+
+  it('does not pull non-schema paths from parent documents into nested paths (gh-10449)', function() {
+    const schema = new Schema({
+      name: String,
+      nested: {
+        data: String
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({});
+    doc.otherProp = 'test';
+
+    assert.ok(!doc.nested.otherProp);
   });
 });

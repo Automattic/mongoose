@@ -70,10 +70,7 @@ First, we need to define a connection. If your app uses only one database, you s
 Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters `host, database, port, options`.
 
 ```js
-await mongoose.connect('mongodb://localhost/my_database', {
-  useFindAndModify: false,
-  useCreateIndex: true
-});
+await mongoose.connect('mongodb://localhost/my_database');
 ```
 
 Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`.

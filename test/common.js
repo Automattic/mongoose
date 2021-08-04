@@ -19,16 +19,12 @@ if (process.env.PRINT_COLLECTIONS) {
   });
 }
 
-// For 3.1.3 deprecations
-mongoose.set('useCreateIndex', true);
-
 /**
  * Override all Collection related queries to keep count
  */
 
 [
   'createIndex',
-  'ensureIndex',
   'findAndModify',
   'findOne',
   'find',
@@ -116,23 +112,6 @@ module.exports = function(options) {
 
   return conn;
 };
-
-/*!
- * ignore
- */
-
-before(function(done) {
-  module.exports.mongodVersion(function(err, version) {
-    if (err) {
-      return done(err);
-    }
-    const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
-    if (mongo36) {
-      mongoose.set('usePushEach', true);
-    }
-    done();
-  });
-});
 
 /*!
  * testing uri

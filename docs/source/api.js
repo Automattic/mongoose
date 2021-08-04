@@ -23,7 +23,6 @@ const files = [
   'lib/schematype.js',
   'lib/virtualtype.js',
   'lib/error/index.js',
-  'lib/types/core_array.js',
   'lib/schema/array.js',
   'lib/schema/documentarray.js',
   'lib/schema/SubdocumentPath.js',

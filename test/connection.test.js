@@ -79,7 +79,7 @@ describe('connections:', function() {
     it('with autoCreate (gh-6489)', function() {
       return co(function*() {
         const conn = yield mongoose.createConnection(uri, {
-          autoCreate: true
+          // autoCreate: true
         }).asPromise();
 
         const Model = conn.model('gh6489_Conn', new Schema({ name: String }, {
@@ -89,7 +89,8 @@ describe('connections:', function() {
         yield Model.init();
 
         // Will throw if collection was not created
-        yield conn.collection('gh6489_Conn').stats();
+        const collections = yield conn.db.listCollections().toArray();
+        assert.ok(collections.map(c => c.name).includes('gh6489_Conn'));
 
         yield Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
 
@@ -98,6 +99,23 @@ describe('connections:', function() {
         const res = yield conn.collection('gh6489_Conn').
           find({}).sort({ name: 1 }).toArray();
         assert.deepEqual(res.map(v => v.name), ['alpha', 'Zeta']);
+      });
+    });
+
+    it('with autoCreate = false (gh-8814)', function() {
+      return co(function*() {
+        const conn = yield mongoose.createConnection(uri, {
+          autoCreate: false
+        }).asPromise();
+
+        const Model = conn.model('gh8814_Conn', new Schema({ name: String }, {
+          collation: { locale: 'en_US', strength: 1 },
+          collection: 'gh8814_Conn'
+        }));
+        yield Model.init();
+
+        const res = yield conn.db.listCollections().toArray();
+        assert.ok(!res.map(c => c.name).includes('gh8814_Conn'));
       });
     });
 
@@ -114,22 +132,6 @@ describe('connections:', function() {
 
         yield conn.model('Actor', schema).init();
       });
-    });
-
-    it('useCreateIndex (gh-6922)', function(done) {
-      const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
-        useCreateIndex: true
-      });
-
-      const M = conn.model('Test', new Schema({
-        name: { type: String, index: true }
-      }));
-
-      M.collection.ensureIndex = function() {
-        throw new Error('Fail');
-      };
-
-      conn.asPromise().then(() => done(), err => done(err));
     });
 
     it('throws helpful error with legacy syntax (gh-6756)', function() {
@@ -910,10 +912,10 @@ describe('connections:', function() {
 
   it('useDB inherits config from default connection (gh-8267)', function() {
     return co(function*() {
-      yield mongoose.connect('mongodb://localhost:27017/gh8267-0', { useCreateIndex: true });
+      yield mongoose.connect('mongodb://localhost:27017/gh8267-0', { sanitizeFilter: true });
 
       const db2 = mongoose.connection.useDb('gh8267-1');
-      assert.equal(db2.config.useCreateIndex, true);
+      assert.equal(db2.config.sanitizeFilter, true);
     });
   });
 
@@ -1010,17 +1012,9 @@ describe('connections:', function() {
 
           assert.strictEqual(m.connection.get('autoIndex'), false);
           assert.strictEqual(m.connection.get('autoCreate'), false);
-          assert.strictEqual(
-            m.connection.get('useCreateIndex'),
-            false
-          );
 
           assert.strictEqual(m.connection.get('autoIndex'), false);
           assert.strictEqual(m.connection.get('autoCreate'), false);
-          assert.strictEqual(
-            m.connection.get('useCreateIndex'),
-            false
-          );
 
           yield m.disconnect();
         });
@@ -1037,7 +1031,7 @@ describe('connections:', function() {
           'MongoDB prohibits index creation on connections that read from ' +
                         'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
                         '"secondaryPreferred" may not opt-in to the following connection options: ' +
-                        'autoCreate, autoIndex, useCreateIndex'
+                        'autoCreate, autoIndex'
         );
         const m = new mongoose.Mongoose();
 
@@ -1057,7 +1051,7 @@ describe('connections:', function() {
           'MongoDB prohibits index creation on connections that read from ' +
                         'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
                         '"secondaryPreferred" may not opt-in to the following connection options: ' +
-                        'autoCreate, autoIndex, useCreateIndex'
+                        'autoCreate, autoIndex'
         );
         const m = new mongoose.Mongoose();
         assert.rejects(m.connect(secondaryURI, opts), err);
@@ -1075,13 +1069,11 @@ describe('connections:', function() {
 
         assert.equal(conn.get('autoIndex'), false);
         assert.equal(conn.get('autoCreate'), false);
-        assert.equal(conn.get('useCreateIndex'), false);
 
         const conn2 = new mongoose.createConnection(secondaryPrefURI);
 
         assert.equal(conn2.get('autoIndex'), false);
         assert.equal(conn2.get('autoCreate'), false);
-        assert.equal(conn2.get('useCreateIndex'), false);
       });
 
       it('throws if options try to set autoIndex to true', function() {
@@ -1094,7 +1086,7 @@ describe('connections:', function() {
           'MongoDB prohibits index creation on connections that read from ' +
                         'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
                         '"secondaryPreferred" may not opt-in to the following connection options: ' +
-                        'autoCreate, autoIndex, useCreateIndex'
+                        'autoCreate, autoIndex'
         );
         const m = new mongoose.Mongoose();
         return assert.throws(
@@ -1116,7 +1108,7 @@ describe('connections:', function() {
           'MongoDB prohibits index creation on connections that read from ' +
                         'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
                         '"secondaryPreferred" may not opt-in to the following connection options: ' +
-                        'autoCreate, autoIndex, useCreateIndex'
+                        'autoCreate, autoIndex'
         );
 
         assert.throws(

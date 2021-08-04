@@ -37,7 +37,7 @@ declare module 'mongoose' {
    * Mongoose constructor. The exports object of the `mongoose` module is an instance of this
    * class. Most apps will only use this one instance.
    */
-  export const Mongoose: new (options?: object | null) => typeof mongoose;
+  export const Mongoose: new (options?: MongooseOptions | null) => typeof mongoose;
 
   /**
    * The Mongoose Number [SchemaType](/docs/schematypes.html). Used for
@@ -77,7 +77,7 @@ declare module 'mongoose' {
   /** An array containing all models associated with this Mongoose instance. */
   export const models: { [index: string]: Model<any> };
   /** Creates a Connection instance. */
-  export function createConnection(uri: string, options?: ConnectOptions): Connection & Promise<Connection>;
+  export function createConnection(uri: string, options?: ConnectOptions): Connection;
   export function createConnection(): Connection;
   export function createConnection(uri: string, options: ConnectOptions, callback: (err: CallbackError, conn: Connection) => void): void;
 
@@ -92,7 +92,7 @@ declare module 'mongoose' {
   export function disconnect(cb: (err: CallbackError) => void): void;
 
   /** Gets mongoose options */
-  export function get(key: string): any;
+  export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
   /**
    * Returns true if Mongoose can cast the given value to an ObjectId, or
@@ -128,7 +128,7 @@ declare module 'mongoose' {
   export function pluralize(fn?: ((str: string) => string) | null): ((str: string) => string) | null;
 
   /** Sets mongoose options */
-  export function set(key: string, value: any): void;
+  export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): typeof mongoose;
 
   /**
    * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
@@ -145,6 +145,114 @@ declare module 'mongoose' {
 
   type Mongoose = typeof mongoose;
 
+  interface MongooseOptions {
+    /** true by default. Set to false to skip applying global plugins to child schemas */
+    applyPluginsToChildSchemas?: boolean;
+
+    /**
+     * false by default. Set to true to apply global plugins to discriminator schemas.
+     * This typically isn't necessary because plugins are applied to the base schema and
+     * discriminators copy all middleware, methods, statics, and properties from the base schema.
+     */
+    applyPluginsToDiscriminators?: boolean;
+
+    /**
+     * Set to `true` to make Mongoose call` Model.createCollection()` automatically when you
+     * create a model with `mongoose.model()` or `conn.model()`. This is useful for testing
+     * transactions, change streams, and other features that require the collection to exist.
+     */
+    autoCreate?: boolean;
+
+    /**
+     * true by default. Set to false to disable automatic index creation
+     * for all models associated with this Mongoose instance.
+     */
+    autoIndex?: boolean;
+
+    /** enable/disable mongoose's buffering mechanism for all connections and models */
+    bufferCommands?: boolean;
+
+    bufferTimeoutMS?: number;
+
+    /** false by default. Set to `true` to `clone()` all schemas before compiling into a model. */
+    cloneSchemas?: boolean;
+
+    /**
+     * If `true`, prints the operations mongoose sends to MongoDB to the console.
+     * If a writable stream is passed, it will log to that stream, without colorization.
+     * If a callback function is passed, it will receive the collection name, the method
+     * name, then all arguments passed to the method. For example, if you wanted to
+     * replicate the default logging, you could output from the callback
+     * `Mongoose: ${collectionName}.${methodName}(${methodArgs.join(', ')})`.
+     */
+    debug?:
+      | boolean
+      | { color?: boolean; shell?: boolean }
+      | WritableStream
+      | ((collectionName: string, methodName: string, ...methodArgs: any[]) => void);
+
+    /** If set, attaches [maxTimeMS](https://docs.mongodb.com/manual/reference/operator/meta/maxTimeMS/) to every query */
+    maxTimeMS?: number;
+
+    /**
+     * true by default. Mongoose adds a getter to MongoDB ObjectId's called `_id` that
+     * returns `this` for convenience with populate. Set this to false to remove the getter.
+     */
+    objectIdGetter?: boolean;
+
+    /**
+     * Set to `true` to default to overwriting models with the same name when calling
+     * `mongoose.model()`, as opposed to throwing an `OverwriteModelError`.
+     */
+    overwriteModels?: boolean;
+
+    /**
+     * If `false`, changes the default `returnOriginal` option to `findOneAndUpdate()`,
+     * `findByIdAndUpdate`, and `findOneAndReplace()` to false. This is equivalent to
+     * setting the `new` option to `true` for `findOneAndX()` calls by default. Read our
+     * `findOneAndUpdate()` [tutorial](https://mongoosejs.com/docs/tutorials/findoneandupdate.html)
+     * for more information.
+     */
+    returnOriginal?: boolean;
+
+    /**
+     * false by default. Set to true to enable [update validators](
+     * https://mongoosejs.com/docs/validation.html#update-validators
+     * ) for all validators by default.
+     */
+    runValidators?: boolean;
+
+    sanitizeFilter?: boolean;
+
+    sanitizeProjection?: boolean;
+
+    /**
+     * true by default. Set to false to opt out of Mongoose adding all fields that you `populate()`
+     * to your `select()`. The schema-level option `selectPopulatedPaths` overwrites this one.
+     */
+    selectPopulatedPaths?: boolean;
+
+    setDefaultsOnInsert?: boolean;
+
+    /** true by default, may be `false`, `true`, or `'throw'`. Sets the default strict mode for schemas. */
+    strict?: boolean | 'throw';
+
+    /**
+     * false by default, may be `false`, `true`, or `'throw'`. Sets the default
+     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
+     */
+    strictQuery?: boolean | 'throw';
+
+    /**
+     * `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to
+     * `toJSON()`, for determining how Mongoose documents get serialized by `JSON.stringify()`
+     */
+    toJSON?: ToObjectOptions;
+
+    /** `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to `toObject()` */
+    toObject?: ToObjectOptions;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface ClientSession extends mongodb.ClientSession { }
 
@@ -159,15 +267,14 @@ declare module 'mongoose' {
     pass?: string;
     /** Set to false to disable automatic index creation for all models associated with this connection. */
     autoIndex?: boolean;
-    /** True by default. Set to `false` to make `findOneAndUpdate()` and `findOneAndRemove()` use native `findOneAndUpdate()` rather than `findAndModify()`. */
-    useFindAndModify?: boolean;
     /** Set to `true` to make Mongoose automatically call `createCollection()` on every model created on this connection. */
     autoCreate?: boolean;
-    /** False by default. If `true`, this connection will use `createIndex()` instead of `ensureIndex()` for automatic index builds via `Model.init()`. */
-    useCreateIndex?: boolean;
   }
 
   class Connection extends events.EventEmitter {
+    /** Returns a promise that resolves when this connection successfully connects to MongoDB */
+    asPromise(): Promise<this>;
+
     /** Closes the connection */
     close(callback: (err: CallbackError) => void): void;
     close(force: boolean, callback: (err: CallbackError) => void): void;
@@ -473,10 +580,6 @@ declare module 'mongoose' {
     /** Hash containing current validation errors. */
     errors?: Error.ValidationError;
 
-    /** Explicitly executes population and returns a promise. Useful for promises integration. */
-    execPopulate(): Promise<this>;
-    execPopulate(callback: (err: CallbackError, res: this) => void): void;
-
     /** Returns the value of a path. */
     get(path: string, type?: any, options?: any): any;
 
@@ -549,13 +652,14 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /**
-     * Populates document references, executing the `callback` when complete.
-     * If you want to use promises instead, use this function with
-     * [`execPopulate()`](#document_Document-execPopulate).
+     * Populates document references.
      */
-    populate(path: string, callback?: (err: CallbackError, res: this) => void): this;
-    populate(path: string, names: string, callback?: (err: CallbackError, res: this) => void): this;
-    populate(opts: PopulateOptions | Array<PopulateOptions>, callback?: (err: CallbackError, res: this) => void): this;
+    populate(path: string | string[]): Promise<this>;
+    populate(path: string | string[], callback: (err: CallbackError, res: this) => void): void;
+    populate(path: string, names: string): Promise<this>;
+    populate(path: string, names: string, callback: (err: CallbackError, res: this) => void): void;
+    populate(opts: PopulateOptions | Array<PopulateOptions>): Promise<this>;
+    populate(opts: PopulateOptions | Array<PopulateOptions>, callback: (err: CallbackError, res: this) => void): void;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
@@ -621,12 +725,13 @@ declare module 'mongoose' {
     discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
+  type AnyKeys<T> = Partial<{ [P in keyof T]: T[P] | any }>;
   interface AnyObject { [k: string]: any }
   type EnforceDocument<T, TMethods> = T extends Document ? T : T & Document<any, any, T> & TMethods;
 
   export const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethods = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
-    new(doc?: T | any): EnforceDocument<T, TMethods>;
+    new(doc?: AnyKeys<T> & AnyObject): EnforceDocument<T, TMethods>;
 
     aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: any[], cb: Function): Promise<Array<R>>;
@@ -912,7 +1017,6 @@ declare module 'mongoose' {
      * instead give you the object after `update` was applied.
      */
     new?: boolean;
-    omitUndefined?: boolean;
     overwrite?: boolean;
     overwriteDiscriminatorKey?: boolean;
     populate?: string;
@@ -931,7 +1035,13 @@ declare module 'mongoose' {
      */
     returnDocument?: string;
     runValidators?: boolean;
+    /* Set to `true` to automatically sanitize potentially unsafe user-generated query projections */
     sanitizeProjection?: boolean;
+    /**
+     * Set to `true` to automatically sanitize potentially unsafe query filters by stripping out query selectors that
+     * aren't explicitly allowed using `mongoose.trusted()`.
+     */
+    sanitizeFilter?: boolean;
     /** The session associated with this query. */
     session?: mongodb.ClientSession;
     setDefaultsOnInsert?: boolean;
@@ -948,11 +1058,10 @@ declare module 'mongoose' {
      */
     timestamps?: boolean;
     upsert?: boolean;
-    useFindAndModify?: boolean;
     writeConcern?: any;
   }
 
-  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'omitUndefined' | 'strict' | 'useFindAndModify' | 'sanitizeProjection'>;
+  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'strict' | 'sanitizeProjection' | 'sanitizeFilter'>;
 
   interface SaveOptions {
     checkKeys?: boolean;
@@ -1367,13 +1476,7 @@ declare module 'mongoose' {
      * control which key mongoose uses to find type declarations, set the 'typeKey' schema option.
      */
     typeKey?: string;
-    /**
-     * Write operations like update(), updateOne(), updateMany(), and findOneAndUpdate() only check the top-level
-     * schema's strict mode setting. Set to `true` to use the child schema's `strict` mode setting.
-     */
-    useNestedStrict?: boolean;
-    /** defaults to false */
-    usePushEach?: boolean;
+
     /**
      * By default, documents are automatically validated before they are saved to the database. This is to
      * prevent saving an invalid document. If you want to handle validation manually, and be able to save
@@ -1409,11 +1512,6 @@ declare module 'mongoose' {
      * field names by setting timestamps.createdAt and timestamps.updatedAt.
      */
     timestamps?: boolean | SchemaTimestampsConfig;
-    /**
-     * Determines whether a type set to a POJO becomes
-     * a Mixed path or a Subdocument (defaults to true).
-     */
-    typePojoToMixed?: boolean;
   }
 
   interface SchemaTimestampsConfig {
@@ -1786,7 +1884,7 @@ declare module 'mongoose' {
         auto(turnOn: boolean): this;
       }
 
-      class SubdocumentPath extends SchemaType implements AcceptsDiscriminator {
+      class Subdocument extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
@@ -2551,12 +2649,17 @@ declare module 'mongoose' {
   type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
   export type _LeanDocument<T> = {
-    [K in keyof T]:
-    0 extends (1 & T[K]) ? T[K] : // any
-    T[K] extends unknown[] ? LeanArray<T[K]> : // Array
-    T[K] extends Document ? LeanDocument<T[K]> : // Subdocument
-    T[K];
+    [K in keyof T]: LeanDocumentElement<T[K]>;
   };
+
+  // Keep this a separate type, to ensure that T is a naked type.
+  // This way, the conditional type is distributive over union types.
+  // This is required for PopulatedDoc.
+  type LeanDocumentElement<T> =
+    0 extends (1 & T) ? T : // any
+    T extends unknown[] ? LeanArray<T> : // Array
+    T extends Document ? LeanDocument<T> : // Subdocument
+    T;
 
   export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
@@ -2647,10 +2750,10 @@ declare module 'mongoose' {
     /**
      * Sets the cursor option for the aggregation query (ignored for < 2.6.0).
      */
-    cursor(options?: Record<string, unknown>): this;
+    cursor(options?: Record<string, unknown>): AggregationCursor;
 
-    /** Executes the aggregate pipeline on the currently bound Model. If cursor option is set, returns a cursor */
-    exec(callback?: (err: CallbackError, result: R) => void): Promise<R> | any;
+    /** Executes the aggregate pipeline on the currently bound Model. */
+    exec(callback?: (err: CallbackError, result: R) => void): Promise<R>;
 
     /** Execute the aggregation with explain */
     explain(callback?: (err: CallbackError, result: any) => void): Promise<any>;

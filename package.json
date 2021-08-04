@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.13.3",
+  "version": "6.0.0-rc0",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -19,7 +19,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@types/node": "14.x || 15.x",
     "bson": "^4.2.2",
     "kareem": "2.3.2",
     "mongodb": "4.0.1",
@@ -76,6 +75,7 @@
     "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
+    "release-next": "git pull origin 6.0 && git push origin 6.0 --tags && npm publish --tag next",
     "test": "mocha --exit ./test/*.test.js ./test/typescript/main.test.js",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
@@ -127,7 +127,7 @@
       "mocha-no-only"
     ],
     "parserOptions": {
-      "ecmaVersion": 2018
+      "ecmaVersion": 2020
     },
     "env": {
       "node": true,

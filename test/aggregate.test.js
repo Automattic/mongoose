@@ -1054,7 +1054,6 @@ describe('aggregate: ', function() {
         M.
           aggregate([{ $match: { name: 'test' } }]).
           cursor({ useMongooseAggCursor: true }).
-          exec().
           eachAsync(function() {
             ++numDocs;
           }).
@@ -1112,8 +1111,7 @@ describe('aggregate: ', function() {
       const cursor = MyModel.
         aggregate([{ $match: { name: 'test' } }, { $project: { name: '$name' } }]).
         allowDiskUse(true).
-        cursor({ batchSize: 2500 }).
-        exec();
+        cursor({ batchSize: 2500 });
 
       assert.ok(cursor.eachAsync);
     });
@@ -1138,8 +1136,7 @@ describe('aggregate: ', function() {
     db.on('open', function() {
       const cursor = MyModel.
         aggregate([{ $match: { name: 'test' } }]).
-        cursor().
-        exec();
+        cursor();
       assert.ok(cursor instanceof require('stream').Readable);
       done();
     });
@@ -1150,8 +1147,7 @@ describe('aggregate: ', function() {
 
     const cursor = MyModel.
       aggregate([{ $match: { name: 'test' } }]).
-      cursor({ useMongooseAggCursor: true }).
-      exec();
+      cursor({ useMongooseAggCursor: true });
     assert.ok(cursor instanceof require('stream').Readable);
   });
 
@@ -1165,7 +1161,6 @@ describe('aggregate: ', function() {
       MyModel.
         aggregate([{ $match: { name: 'test' } }]).
         cursor({ useMongooseAggCursor: true }).
-        exec().
         eachAsync(function(doc) {
           docs.push(doc);
         }).
@@ -1186,7 +1181,6 @@ describe('aggregate: ', function() {
       then(function() {
         return MyModel.aggregate([{ $sort: { name: 1 } }]).
           cursor().
-          exec().
           eachAsync(function(doc) {
             const _cur = cur;
             assert.equal(doc.name, expectedNames[cur]);
@@ -1227,7 +1221,6 @@ describe('aggregate: ', function() {
       then(function() {
         return MyModel.aggregate([{ $sort: { name: 1 } }]).
           cursor().
-          exec().
           eachAsync(checkDoc, { parallel: 2 }).then(function() {
             assert.ok(Date.now() - startedAt[1] >= 100);
             assert.equal(startedAt.length, 2);
@@ -1237,6 +1230,14 @@ describe('aggregate: ', function() {
           });
       }).
       catch(done);
+  });
+
+  it('is now a proper aggregate cursor vs what it was before gh-10410', function(done) {
+    const MyModel = db.model('Test', { name: String });
+    assert.throws(() => {
+      MyModel.aggregate([]).cursor({ batchSize: 1000 }).exec();
+    });
+    done();
   });
 
   it('query by document (gh-4866)', function(done) {

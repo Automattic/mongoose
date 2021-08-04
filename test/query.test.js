@@ -2930,7 +2930,7 @@ describe('Query', function() {
           docs.push(doc);
           next();
         });
-        const Model = db.model('Test', schema);
+        const Model = db.model('Test2', schema);
 
         yield Model.create({ name: 'Test' });
 
@@ -2952,7 +2952,7 @@ describe('Query', function() {
       });
     });
 
-    it('throws DocumentNotFoundError by default (gh-7409)', function() {
+    it('throws DocumentNotFoundError by default execute (gh-7409)', function() {
       return co(function*() {
         const err = yield Model.findOne({ name: 'na' }).
           orFail().
@@ -3884,5 +3884,26 @@ describe('Query', function() {
 
     q = Test.find().select({ email: '$name' }).setOptions({ sanitizeProjection: true });
     assert.deepEqual(q._fields, { email: 1 });
+  });
+
+  it('sanitizeFilter option (gh-3944)', function() {
+    const MySchema = Schema({ username: String, pwd: String });
+    const Test = db.model('Test', MySchema);
+
+    let q = Test.find({ username: 'val', pwd: 'my secret' }).setOptions({ sanitizeFilter: true });
+    q._castConditions();
+    assert.ifError(q.error());
+    assert.deepEqual(q._conditions, { username: 'val', pwd: 'my secret' });
+
+    q = Test.find({ username: 'val', pwd: { $ne: null } }).setOptions({ sanitizeFilter: true });
+    q._castConditions();
+    assert.ok(q.error());
+    assert.equal(q.error().name, 'CastError');
+
+    q = Test.find({ username: 'val', pwd: mongoose.trusted({ $gt: null }) }).
+      setOptions({ sanitizeFilter: true });
+    q._castConditions();
+    assert.ifError(q.error());
+    assert.deepEqual(q._conditions, { username: 'val', pwd: { $gt: null } });
   });
 });

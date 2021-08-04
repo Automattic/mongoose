@@ -355,23 +355,6 @@ const schema = new Schema({
 });
 ```
 
-Surprisingly, declaring `nested` with an object `type` makes `nested`
-into a path of type [Mixed](/docs/schematypes.html#mixed). To instead
-make Mongoose automatically convert `type: { prop: String }` into
-`type: new Schema({ prop: String })`, set the `typePojoToMixed` option
-to `false`.
-
-```javascript
-const schema = new Schema({
-  nested: {
-    // Because of `typePojoToMixed`, Mongoose knows to
-    // wrap `{ prop: String }` in a `new Schema()`.
-    type: { prop: String },
-    required: true
-  }
-}, { typePojoToMixed: false });
-```
-
 ### Next Up
 
 Now that we've covered Subdocuments, let's take a look at

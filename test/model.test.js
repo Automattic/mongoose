@@ -4120,8 +4120,7 @@ describe('Model', function() {
 
       return co(function*() {
         yield Location.collection.drop().catch(() => {});
-        yield Location.createCollection();
-        yield Location.createIndexes();
+        yield Location.init();
 
         yield Location.create({
           name: 'Undefined location'
@@ -5235,7 +5234,7 @@ describe('Model', function() {
             const db = yield start();
             const MyModel = db.model('Test', new Schema({ name: String }));
 
-            yield MyModel.createCollection();
+            yield MyModel.init();
 
             const changeStream = MyModel.watch();
             const closed = new global.Promise(resolve => {
@@ -7545,6 +7544,20 @@ describe('Model', function() {
         const usersFromDatabase = yield User.find({ _id: { $in: [user1._id, user2._id] } }).sort('_id');
         assert.equal(usersFromDatabase[0].name, 'name from pre-save');
         assert.equal(usersFromDatabase[1].name, 'name from pre-save');
+      });
+    });
+    it('works if some document is not modified (gh-10437)', () => {
+      const userSchema = new Schema({
+        name: String
+      });
+
+      const User = db.model('User', userSchema);
+
+      return co(function*() {
+        const user = yield User.create({ name: 'Hafez' });
+
+        const err = yield User.bulkSave([user]).then(() => null, err => err);
+        assert.ok(err == null);
       });
     });
   });

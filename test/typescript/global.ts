@@ -1,9 +1,5 @@
 import mongoose from 'mongoose';
 
-mongoose.set('useCreateIndex', true);
-
-mongoose.get('useCreateIndex');
-
 const m: mongoose.Mongoose = new mongoose.Mongoose();
 
 m.STATES.connected;

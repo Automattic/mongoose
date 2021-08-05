@@ -1449,9 +1449,7 @@ describe('schema', function() {
         'emit', 'listeners', 'on', 'removeListener', /* 'collection', */ // TODO: add `collection`
         'errors', 'get', 'init', 'isModified', 'isNew', 'populated',
         'remove', 'save', 'toObject', 'validate'
-      ];
-
-      ['emit'].forEach((reservedProperty) => {
+      ].forEach((reservedProperty) => {
         it(`\`${reservedProperty}\` when used as a schema path logs a warning`, () => {
           new Schema({ [reservedProperty]: String });
 

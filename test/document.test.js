@@ -10578,7 +10578,6 @@ describe('document', function() {
       });
       it('can be used as a property in documents', async() => {
         const userSchema = new Schema({
-          name: { type: String, required: true },
           remove: Number
         });
 

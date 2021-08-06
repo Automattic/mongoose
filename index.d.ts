@@ -1957,6 +1957,7 @@ declare module 'mongoose' {
   }
 
   namespace Types {
+	type OmitDocumentTypes<T> = T extends Document ? Omit<T, keyof Document> : T
     class Array<T> extends global.Array<T> {
       /** Pops the array atomically at most one time per document `save()`. */
       $pop(): T;
@@ -2023,7 +2024,7 @@ declare module 'mongoose' {
       /** Searches array items for the first document with a matching _id. */
       id(id: any): T | null;
 
-      push(...args: any[]): number;
+      push(...args: Omit<T, keyof Document>[]): number;
     }
 
     class EmbeddedDocument extends Document {

@@ -2022,6 +2022,8 @@ declare module 'mongoose' {
 
       /** Searches array items for the first document with a matching _id. */
       id(id: any): T | null;
+
+      push(...args: any[]): number;
     }
 
     class EmbeddedDocument extends Document {

@@ -1970,10 +1970,10 @@ declare module 'mongoose' {
       isMongooseArray: true;
 
       /** Pushes items to the array non-atomically. */
-      nonAtomicPush(...args: any[]): number;
+      nonAtomicPush(...args: T[]): number;
 
       /** Wraps [`Array#push`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push) with proper change tracking. */
-      push(...args: any[]): number;
+      push(...args: T[]): number;
 
       /**
        * Pulls items from the array atomically. Equality is determined by casting

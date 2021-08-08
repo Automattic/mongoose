@@ -754,6 +754,13 @@ declare module 'mongoose' {
   interface AnyObject { [k: string]: any }
   type EnforceDocument<T, TMethods> = T extends Document ? T : T & Document<any, any, T> & TMethods;
 
+  interface IndexesDiff {
+    /** Indexes that would be created in mongodb. */
+    toCreate: Array<any>
+    /** Indexes that would be dropped in mongodb. */
+    toDrop: Array<any>
+  }
+
   export const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethods = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
     new(doc?: AnyKeys<T> & AnyObject): EnforceDocument<T, TMethods>;
@@ -911,6 +918,14 @@ declare module 'mongoose' {
      */
     syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
     syncIndexes(options: Record<string, unknown> | null, callback: (err: CallbackError, dropped: Array<string>) => void): void;
+
+    /**
+     * Does a dry-run of Model.syncIndexes(), meaning that
+     * the result of this function would be the result of
+     * Model.syncIndexes().
+     */
+    diffIndexes(options?: Record<string, unknown>): Promise<IndexesDiff>
+    diffIndexes(options: Record<string, unknown> | null, callback: (err: CallbackError, diff: IndexesDiff) => void): void
 
     /**
      * Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)

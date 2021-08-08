@@ -1267,7 +1267,7 @@ declare module 'mongoose' {
     indexes(): Array<any>;
 
     /** Gets a schema option. */
-    get(path: string): any;
+    get<K extends keyof SchemaOptions>(key: K): SchemaOptions[K];
 
     /**
      * Loads an ES6 class into a schema. Maps [setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) + [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get), [static methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static),
@@ -1346,7 +1346,7 @@ declare module 'mongoose' {
     requiredPaths(invalidate?: boolean): string[];
 
     /** Sets a schema option. */
-    set(path: string, value: any, _tags?: any): this;
+    set<K extends keyof SchemaOptions>(key: K, value: SchemaOptions[K], _tags?: any): this;
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static(name: string, fn: (this: M, ...args: any[]) => any): this;

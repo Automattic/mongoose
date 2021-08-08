@@ -188,7 +188,7 @@ declare module 'mongoose' {
     debug?:
       | boolean
       | { color?: boolean; shell?: boolean }
-      | WritableStream
+      | stream.Writable
       | ((collectionName: string, methodName: string, ...methodArgs: any[]) => void);
 
     /** If set, attaches [maxTimeMS](https://docs.mongodb.com/manual/reference/operator/meta/maxTimeMS/) to every query */
@@ -729,6 +729,13 @@ declare module 'mongoose' {
   interface AnyObject { [k: string]: any }
   type EnforceDocument<T, TMethods> = T extends Document ? T : T & Document<any, any, T> & TMethods;
 
+  interface IndexesDiff {
+    /** Indexes that would be created in mongodb. */
+    toCreate: Array<any>
+    /** Indexes that would be dropped in mongodb. */
+    toDrop: Array<any>
+  }
+
   export const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethods = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
     new(doc?: AnyKeys<T> & AnyObject): EnforceDocument<T, TMethods>;
@@ -886,6 +893,14 @@ declare module 'mongoose' {
      */
     syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
     syncIndexes(options: Record<string, unknown> | null, callback: (err: CallbackError, dropped: Array<string>) => void): void;
+
+    /**
+     * Does a dry-run of Model.syncIndexes(), meaning that
+     * the result of this function would be the result of
+     * Model.syncIndexes().
+     */
+    diffIndexes(options?: Record<string, unknown>): Promise<IndexesDiff>
+    diffIndexes(options: Record<string, unknown> | null, callback: (err: CallbackError, diff: IndexesDiff) => void): void
 
     /**
      * Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
@@ -1243,7 +1258,7 @@ declare module 'mongoose' {
     indexes(): Array<any>;
 
     /** Gets a schema option. */
-    get(path: string): any;
+    get<K extends keyof SchemaOptions>(key: K): SchemaOptions[K];
 
     /**
      * Loads an ES6 class into a schema. Maps [setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) + [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get), [static methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static),
@@ -1322,7 +1337,7 @@ declare module 'mongoose' {
     requiredPaths(invalidate?: boolean): string[];
 
     /** Sets a schema option. */
-    set(path: string, value: any, _tags?: any): this;
+    set<K extends keyof SchemaOptions>(key: K, value: SchemaOptions[K], _tags?: any): this;
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static(name: string, fn: (this: M, ...args: any[]) => any): this;
@@ -2232,7 +2247,7 @@ declare module 'mongoose' {
      * Runs a function `fn` and treats the return value of `fn` as the new value
      * for the query to resolve to.
      */
-    map<MappedType>(fn: (doc: DocType) => MappedType): QueryWithHelpers<ResultType extends unknown[] ? MappedType[] : MappedType, DocType, THelpers, RawDocType>;
+    map<MappedType>(fn: (doc: ResultType) => MappedType): QueryWithHelpers<MappedType, DocType, THelpers, RawDocType>;
 
     /** Specifies an `$maxDistance` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     maxDistance(val: number): this;
@@ -2519,7 +2534,7 @@ declare module 'mongoose' {
   } &
     RootQuerySelector<T>;
 
-  export type FilterQuery<T> = _FilterQuery<DocumentDefinition<T>>;
+  export type FilterQuery<T> = _FilterQuery<T>;
 
   type AddToSetOperators<Type> = {
     $each: Type;

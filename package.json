@@ -84,6 +84,7 @@
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
+  "types": "./index.d.ts",
   "engines": {
     "node": ">=4.0.0"
   },

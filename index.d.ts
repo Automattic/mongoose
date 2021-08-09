@@ -1277,7 +1277,7 @@ declare module 'mongoose' {
     eachPath(fn: (path: string, type: SchemaType) => void): this;
 
     /** Defines an index (most likely compound) for this schema. */
-    index(fields: any, options?: any): this;
+    index(fields: mongodb.IndexSpecification, options?: IndexOptions): this;
 
     /**
      * Returns a list of indexes that this schema declares, via `schema.index()`

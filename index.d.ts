@@ -754,7 +754,7 @@ declare module 'mongoose' {
     discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
-  type AnyKeys<T> = Partial<{ [P in keyof T]: T[P] | any }>;
+  type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
   interface AnyObject { [k: string]: any }
   type EnforceDocument<T, TMethods> = T extends Document ? T : T & Document<any, any, T> & TMethods;
 

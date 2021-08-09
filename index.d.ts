@@ -1257,7 +1257,6 @@ declare module 'mongoose' {
     /** Iterates the schemas paths similar to Array#forEach. */
     eachPath(fn: (path: string, type: SchemaType) => void): this;
 
-    
     /** Defines an index (most likely compound) for this schema. */
     index(fields: mongodb.IndexSpecification, options?: IndexOptions): this;
 

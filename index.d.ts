@@ -1732,12 +1732,8 @@ declare module 'mongoose' {
     RawId extends RefType = (PopulatedType extends { _id?: RefType; } ? NonNullable<PopulatedType['_id']> : mongoose.Types.ObjectId) | undefined
     > = PopulatedType | RawId;
 
-  interface IndexOptions {
-    background?: boolean,
+  interface IndexOptions extends mongodb.IndexOptions {
     expires?: number | string
-    sparse?: boolean,
-    type?: string,
-    unique?: boolean
   }
 
   interface ValidatorProps {

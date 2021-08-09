@@ -64,8 +64,8 @@ declare module 'mongoose' {
   export const STATES: typeof ConnectionStates;
 
   /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
-  export function connect(uri: string, options: ConnectOptions, callback: Callback): void;
-  export function connect(uri: string, callback: Callback): void;
+  export function connect(uri: string, options: ConnectOptions, callback: CallbackWithoutResult): void;
+  export function connect(uri: string, callback: CallbackWithoutResult): void;
   export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
 
   /** The Mongoose module's default connection. Equivalent to `mongoose.connections[0]`, see [`connections`](#mongoose_Mongoose-connections). */
@@ -89,7 +89,7 @@ declare module 'mongoose' {
   export function deleteModel(name: string | RegExp): typeof mongoose;
 
   export function disconnect(): Promise<void>;
-  export function disconnect(cb: Callback): void;
+  export function disconnect(cb: CallbackWithoutResult): void;
 
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
@@ -298,8 +298,8 @@ declare module 'mongoose' {
 
   class Connection extends events.EventEmitter {
     /** Closes the connection */
-    close(callback: Callback): void;
-    close(force: boolean, callback: Callback): void;
+    close(callback: CallbackWithoutResult): void;
+    close(force: boolean, callback: CallbackWithoutResult): void;
     close(force?: boolean): Promise<void>;
 
     /** Retrieves a collection, creating it if not cached. */
@@ -335,14 +335,14 @@ declare module 'mongoose' {
      * all documents and indexes.
      */
     dropCollection(collection: string): Promise<void>;
-    dropCollection(collection: string, cb: Callback): void;
+    dropCollection(collection: string, cb: CallbackWithoutResult): void;
 
     /**
      * Helper for `dropDatabase()`. Deletes the given database, including all
      * collections, documents, and indexes.
      */
     dropDatabase(): Promise<void>;
-    dropDatabase(cb: Callback): void;
+    dropDatabase(cb: CallbackWithoutResult): void;
 
     /** Gets the value of the option `key`. Equivalent to `conn.options[key]` */
     get(key: string): any;
@@ -389,8 +389,8 @@ declare module 'mongoose' {
 
     /** Opens the connection with a URI using `MongoClient.connect()`. */
     openUri(uri: string, options?: ConnectOptions): Promise<Connection>;
-    openUri(uri: string, callback: Callback<Connection>): Connection;
-    openUri(uri: string, options: ConnectOptions, callback: Callback<Connection>): Connection;
+    openUri(uri: string, callback: (err: CallbackError, conn?: Connection) => void): Connection;
+    openUri(uri: string, options: ConnectOptions, callback: (err: CallbackError, conn?: Connection) => void): Connection;
 
     /** The password specified in the URI */
     pass: string;
@@ -730,9 +730,9 @@ declare module 'mongoose' {
     /** Executes registered validation rules for this document. */
     validate(options:{ pathsToSkip?: pathsToSkip }): Promise<void>;
     validate(pathsToValidate?: pathsToValidate, options?: any): Promise<void>;
-    validate(callback: Callback): void;
-    validate(pathsToValidate: pathsToValidate, callback: Callback): void;
-    validate(pathsToValidate: pathsToValidate, options: any, callback: Callback): void;
+    validate(callback: CallbackWithoutResult): void;
+    validate(pathsToValidate: pathsToValidate, callback: CallbackWithoutResult): void;
+    validate(pathsToValidate: pathsToValidate, options: any, callback: CallbackWithoutResult): void;
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
     validateSync(options:{pathsToSkip?: pathsToSkip, [k:string]: any }): Error.ValidationError | null;
@@ -814,8 +814,8 @@ declare module 'mongoose' {
      * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
      * function.
      */
-    createIndexes(callback?: Callback): Promise<void>;
-    createIndexes(options?: any, callback?: Callback): Promise<void>;
+    createIndexes(callback?: CallbackWithoutResult): Promise<void>;
+    createIndexes(options?: any, callback?: CallbackWithoutResult): Promise<void>;
 
     /** Connection the model uses. */
     db: Connection;
@@ -825,25 +825,25 @@ declare module 'mongoose' {
      * Behaves like `remove()`, but deletes all documents that match `conditions`
      * regardless of the `single` option.
      */
-    deleteMany(filter?: FilterQuery<T>, options?: QueryOptions, callback?: Callback): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
-    deleteMany(filter: FilterQuery<T>, callback: Callback): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
-    deleteMany(callback: Callback): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    deleteMany(filter?: FilterQuery<T>, options?: QueryOptions, callback?: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    deleteMany(filter: FilterQuery<T>, callback: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    deleteMany(callback: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
 
     /**
      * Deletes the first document that matches `conditions` from the collection.
      * Behaves like `remove()`, but deletes at most one document regardless of the
      * `single` option.
      */
-    deleteOne(filter?: FilterQuery<T>, options?: QueryOptions, callback?: Callback): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
-    deleteOne(filter: FilterQuery<T>, callback: Callback): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
-    deleteOne(callback: Callback): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    deleteOne(filter?: FilterQuery<T>, options?: QueryOptions, callback?: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    deleteOne(filter: FilterQuery<T>, callback: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    deleteOne(callback: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
 
     /**
      * Sends `createIndex` commands to mongo for each index declared in the schema.
      * The `createIndex` commands are sent in series.
      */
-    ensureIndexes(callback?: Callback): Promise<void>;
-    ensureIndexes(options?: any, callback?: Callback): Promise<void>;
+    ensureIndexes(callback?: CallbackWithoutResult): Promise<void>;
+    ensureIndexes(options?: any, callback?: CallbackWithoutResult): Promise<void>;
 
     /**
      * Event emitter that reports any errors that occurred. Useful for global error
@@ -875,7 +875,7 @@ declare module 'mongoose' {
      * [`connection.model()`](/docs/api.html#connection_Connection-model), so you
      * don't need to call it.
      */
-    init(callback?: Callback): Promise<EnforceDocument<T, TMethods>>;
+    init(callback?: CallbackWithoutResult): Promise<EnforceDocument<T, TMethods>>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
     insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
@@ -920,9 +920,9 @@ declare module 'mongoose' {
     startSession(options?: mongodb.SessionOptions, cb?: Callback<mongodb.ClientSession>): Promise<mongodb.ClientSession>;
 
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
-    validate(callback?: Callback): Promise<void>;
-    validate(optional: any, callback?: Callback): Promise<void>;
-    validate(optional: any, pathsToValidate: string[], callback?: Callback): Promise<void>;
+    validate(callback?: CallbackWithoutResult): Promise<void>;
+    validate(optional: any, callback?: CallbackWithoutResult): Promise<void>;
+    validate(optional: any, pathsToValidate: string[], callback?: CallbackWithoutResult): Promise<void>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://docs.mongodb.com/manual/changeStreams/). */
     watch(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;
@@ -989,7 +989,7 @@ declare module 'mongoose' {
       callback?: Callback
     ): Promise<any>;
 
-    remove(filter?: any, callback?: Callback): QueryWithHelpers<any, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    remove(filter?: any, callback?: CallbackWithoutResult): QueryWithHelpers<any, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
 
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
     replaceOne(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
@@ -2606,7 +2606,7 @@ declare module 'mongoose' {
      * `next()` will error.
      */
     close(): Promise<void>;
-    close(callback: Callback): void;
+    close(callback: CallbackWithoutResult): void;
 
     /**
      * Execute `fn` for every document(s) in the cursor. If batchSize is provided
@@ -2616,8 +2616,8 @@ declare module 'mongoose' {
      */
     eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }): Promise<void>;
     eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number, batchSize?: number }, cb?: Callback): void;
-    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }, cb?: Callback): void;
+    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number, batchSize?: number }, cb?: CallbackWithoutResult): void;
+    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }, cb?: CallbackWithoutResult): void;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved
@@ -2783,7 +2783,7 @@ declare module 'mongoose' {
      * `next()` will error.
      */
     close(): Promise<void>;
-    close(callback: Callback): void;
+    close(callback: CallbackWithoutResult): void;
 
     /**
      * Execute `fn` for every document(s) in the cursor. If batchSize is provided
@@ -2792,7 +2792,7 @@ declare module 'mongoose' {
      * Returns a promise that resolves when done.
      */
     eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }): Promise<void>;
-    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }, cb?: Callback): void;
+    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }, cb?: CallbackWithoutResult): void;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved
@@ -2880,6 +2880,8 @@ declare module 'mongoose' {
   }
 
   type Callback<T = any> = (error: CallbackError, result: T) => void;
+
+  type CallbackWithoutResult = (error: CallbackError) => void;
 
   class NativeError extends global.Error { }
   type CallbackError = NativeError | null;

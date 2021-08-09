@@ -1971,7 +1971,7 @@ declare module 'mongoose' {
       isMongooseArray: true;
 
       /** Pushes items to the array non-atomically. */
-      nonAtomicPush(...args: T[]): number;
+      nonAtomicPush(...args: Array<AnyKeys<T> & AnyObject>): number;
 
       /** Wraps [`Array#push`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push) with proper change tracking. */
       push(...args: T[]): number;

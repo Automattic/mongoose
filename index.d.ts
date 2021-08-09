@@ -1231,8 +1231,6 @@ declare module 'mongoose' {
   type PreSaveMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void, opts: SaveOptions) => void | Promise<void>;
   type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
   type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
-  
-  type Index = { [key: string]: boolean | number | string | Index }
 
   class Schema<DocType = Document, M extends Model<DocType, any, any> = Model<any, any, any>, SchemaDefinitionType = undefined, TInstanceMethods = ExtractMethods<M>> extends events.EventEmitter {
     /**
@@ -1261,13 +1259,13 @@ declare module 'mongoose' {
 
     
     /** Defines an index (most likely compound) for this schema. */
-    index(fields: Index, options?: IndexOptions): this;
+    index(fields: mongodb.IndexSpecification, options?: IndexOptions): this;
 
     /**
      * Returns a list of indexes that this schema declares, via `schema.index()`
      * or by `index: true` in a path's options.
      */
-    indexes(): Array<Index>;
+    indexes(): Array<any>;
 
     /** Gets a schema option. */
     get(path: string): any;

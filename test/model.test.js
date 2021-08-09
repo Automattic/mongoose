@@ -5876,6 +5876,21 @@ describe('Model', function() {
           }
         });
       });
+
+      it('casts objects with null prototype (gh-10512)', function() {
+        const schema = Schema({
+          _id: String,
+          someArray: [{ message: String }]
+        });
+        const Test = db.model('Test', schema);
+    
+        return Test.bulkWrite([{
+          updateOne: {
+            filter: {},
+            update: { $set: { 'someArray.1': { __proto__: null, message: 'test' } } }
+          }
+        }])
+      });
     });
 
     it('insertMany with Decimal (gh-5190)', function(done) {

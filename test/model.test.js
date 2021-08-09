@@ -5883,13 +5883,13 @@ describe('Model', function() {
           someArray: [{ message: String }]
         });
         const Test = db.model('Test', schema);
-    
+
         return Test.bulkWrite([{
           updateOne: {
             filter: {},
             update: { $set: { 'someArray.1': { __proto__: null, message: 'test' } } }
           }
-        }])
+        }]);
       });
     });
 

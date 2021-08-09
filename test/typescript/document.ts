@@ -1,4 +1,4 @@
-import { Schema, model, Document, Error } from 'mongoose';
+import { Schema, model, Model, Document, Error } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String', required: true }, address: new Schema({ city: { type: String, required: true } }) });
 
@@ -33,3 +33,7 @@ void async function run() {
   test.validateSync({ pathsToSkip: ['name', 'age'] });
   test.validateSync({ pathsToSkip: 'name age' });
 })();
+
+function gh10526<U extends ITest>(arg1: Model<U>) {
+  const t = new arg1({ name: 'hello' });
+}

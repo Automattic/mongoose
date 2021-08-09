@@ -1,3 +1,17 @@
+5.13.6 / 2021-08-09
+===================
+ * fix: upgrade mongodb driver -> 3.6.11 #10543 [maon-fp](https://github.com/maon-fp)
+ * fix(schema): throw more helpful error when defining a document array using a schema from a different copy of the Mongoose module #10453
+ * fix: add explicit check on constructor property to avoid throwing an error when checking objects with null prototypes #10512
+ * fix(cursor): make sure to clear stack every 1000 docs when calling `next()` to avoid stack overflow with large batch size #10449
+ * fix(index.d.ts): allow calling new Model(...) with generic Model param #10526
+ * fix(index.d.ts): update type declarations of Schema.index method #10538 #10530 [Raader](https://github.com/Raader)
+ * fix(index.d.ts): add useNewUrlParser and useUnifiedTopology to ConnectOptions #10500
+ * fix(index.d.ts): add missing type for diffIndexes #10547 [bvgusak](https://github.com/bvgusak)
+ * fix(index.d.ts): fixed incorrect type definition for Query's .map function #10544 [GCastilho](https://github.com/GCastilho)
+ * docs(schema): add more info and examples to Schema#indexes() docs #10446
+ * chore: add types property to package.json #10557 [thiagokisaki](https://github.com/thiagokisaki)
+
 5.13.5 / 2021-07-30
 ===================
  * perf(index.d.ts): improve typescript type checking performance #10515 [andreialecu](https://github.com/andreialecu)

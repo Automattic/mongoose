@@ -294,6 +294,10 @@ declare module 'mongoose' {
     autoCreate?: boolean;
     /** False by default. If `true`, this connection will use `createIndex()` instead of `ensureIndex()` for automatic index builds via `Model.init()`. */
     useCreateIndex?: boolean;
+    /** false by default. Set to `true` to make all connections set the `useNewUrlParser` option by default */
+    useNewUrlParser?: boolean;
+    /** false by default. Set to `true` to make all connections set the `useUnifiedTopology` option by default */
+    useUnifiedTopology?: boolean;
   }
 
   class Connection extends events.EventEmitter {
@@ -750,9 +754,16 @@ declare module 'mongoose' {
     discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
-  type AnyKeys<T> = Partial<{ [P in keyof T]: T[P] | any }>;
+  type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
   interface AnyObject { [k: string]: any }
   type EnforceDocument<T, TMethods> = T extends Document ? T : T & Document<any, any, T> & TMethods;
+
+  interface IndexesDiff {
+    /** Indexes that would be created in mongodb. */
+    toCreate: Array<any>
+    /** Indexes that would be dropped in mongodb. */
+    toDrop: Array<any>
+  }
 
   export const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethods = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
@@ -911,6 +922,14 @@ declare module 'mongoose' {
      */
     syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
     syncIndexes(options: Record<string, unknown> | null, callback: (err: CallbackError, dropped: Array<string>) => void): void;
+
+    /**
+     * Does a dry-run of Model.syncIndexes(), meaning that
+     * the result of this function would be the result of
+     * Model.syncIndexes().
+     */
+    diffIndexes(options?: Record<string, unknown>): Promise<IndexesDiff>
+    diffIndexes(options: Record<string, unknown> | null, callback: (err: CallbackError, diff: IndexesDiff) => void): void
 
     /**
      * Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
@@ -1258,7 +1277,7 @@ declare module 'mongoose' {
     eachPath(fn: (path: string, type: SchemaType) => void): this;
 
     /** Defines an index (most likely compound) for this schema. */
-    index(fields: any, options?: any): this;
+    index(fields: mongodb.IndexSpecification, options?: IndexOptions): this;
 
     /**
      * Returns a list of indexes that this schema declares, via `schema.index()`
@@ -1267,7 +1286,7 @@ declare module 'mongoose' {
     indexes(): Array<any>;
 
     /** Gets a schema option. */
-    get(path: string): any;
+    get<K extends keyof SchemaOptions>(key: K): SchemaOptions[K];
 
     /**
      * Loads an ES6 class into a schema. Maps [setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) + [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get), [static methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static),
@@ -1346,7 +1365,7 @@ declare module 'mongoose' {
     requiredPaths(invalidate?: boolean): string[];
 
     /** Sets a schema option. */
-    set(path: string, value: any, _tags?: any): this;
+    set<K extends keyof SchemaOptions>(key: K, value: SchemaOptions[K], _tags?: any): this;
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static(name: string, fn: (this: M, ...args: any[]) => any): this;
@@ -2290,7 +2309,7 @@ declare module 'mongoose' {
      * Runs a function `fn` and treats the return value of `fn` as the new value
      * for the query to resolve to.
      */
-    map<MappedType>(fn: (doc: DocType) => MappedType): QueryWithHelpers<ResultType extends unknown[] ? MappedType[] : MappedType, DocType, THelpers, RawDocType>;
+    map<MappedType>(fn: (doc: ResultType) => MappedType): QueryWithHelpers<MappedType, DocType, THelpers, RawDocType>;
 
     /** Specifies an `$maxDistance` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     maxDistance(val: number): this;

@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.13.5",
+  "version": "5.13.6",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -22,7 +22,7 @@
     "@types/mongodb": "^3.5.27",
     "bson": "^1.1.4",
     "kareem": "2.3.2",
-    "mongodb": "3.6.10",
+    "mongodb": "3.6.11",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.8.3",
     "mquery": "3.2.5",
@@ -84,6 +84,7 @@
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
+  "types": "./index.d.ts",
   "engines": {
     "node": ">=4.0.0"
   },

@@ -36,4 +36,4 @@ void async function run() {
 
 function gh10526<U extends ITest>(arg1: Model<U>) {
   const t = new arg1({ name: 'hello' });
-};
+}

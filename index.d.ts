@@ -1677,7 +1677,7 @@ declare module 'mongoose' {
     max?: number | NativeDate | [number, string] | [NativeDate, string] | readonly [number, string] | readonly [NativeDate, string];
 
     /** Defines a TTL index on this path. Only allowed for dates. */
-    expires?: number | NativeDate;
+    expires?: string | number;
 
     /** If `true`, Mongoose will skip gathering indexes on subpaths. Only allowed for subdocuments and subdocument arrays. */
     excludeIndexes?: boolean;

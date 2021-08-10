@@ -1246,7 +1246,8 @@ declare module 'mongoose' {
   type ExtractQueryHelpers<M> = M extends Model<any, infer TQueryHelpers> ? TQueryHelpers : {};
   type ExtractMethods<M> = M extends Model<any, any, infer TMethods> ? TMethods : {};
 
-  type IndexDefinition<T> = { [K in keyof T]: 1 | -1; };
+  type IndexDirection = 1 | -1;
+  type IndexDefinition<T> = { [K in keyof T]: IndexDirection; };
 
   type PreMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void) => void | Promise<void>;
   type PreSaveMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void, opts: SaveOptions) => void | Promise<void>;

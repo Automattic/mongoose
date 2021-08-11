@@ -1904,7 +1904,7 @@ declare module 'mongoose' {
 
         /** Sets a maximum number validator. */
         max(value: number, message: string): this;
-\
+
         /** Sets a minimum number validator. */
         min(value: number, message: string): this;
       }

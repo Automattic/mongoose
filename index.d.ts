@@ -2023,7 +2023,7 @@ declare module 'mongoose' {
       /** Searches array items for the first document with a matching _id. */
       id(id: any): T | null;
 
-      push(...args: Array<AnyKeys<T> & AnyObject>): number;
+      push(...args: (AnyKeys<T> & AnyObject)[]): number;
     }
 
     class EmbeddedDocument extends Document {

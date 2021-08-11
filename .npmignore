@@ -24,7 +24,8 @@ examples/
 .vscode
 .eslintignore
 CONTRIBUTING.md
-History.*
+History.md
+CHANGELOG.md
 format_deps.js
 release-items.md
 static.js

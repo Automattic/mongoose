@@ -2343,6 +2343,9 @@ declare module 'mongoose' {
     mod(val: Array<number>): this;
     mod(path: string, val: Array<number>): this;
 
+    /** The model this query was created from */
+    model: typeof Model;
+
     /**
      * Getter/setter around the current mongoose-specific options for this query
      * Below are the current Mongoose-specific options.

@@ -1257,6 +1257,9 @@ declare module 'mongoose' {
 
   type ExtractMethods<M> = M extends Model<any, any, infer TMethods> ? TMethods : {};
 
+  type IndexDirection = 1 | -1 | '2d' | '2dsphere' | 'geoHaystack' | 'hashed' | 'text';
+  type IndexDefinition = Record<string, IndexDirection>;
+  
   type PreMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void) => void | Promise<void>;
   type PreSaveMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void, opts: SaveOptions) => void | Promise<void>;
   type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
@@ -1288,13 +1291,13 @@ declare module 'mongoose' {
     eachPath(fn: (path: string, type: SchemaType) => void): this;
 
     /** Defines an index (most likely compound) for this schema. */
-    index(fields: mongodb.IndexSpecification, options?: IndexOptions): this;
+    index(fields: IndexDefinition, options?: IndexOptions): this;
 
     /**
      * Returns a list of indexes that this schema declares, via `schema.index()`
      * or by `index: true` in a path's options.
      */
-    indexes(): Array<any>;
+    indexes(): Array<IndexDefinition>;
 
     /** Gets a schema option. */
     get<K extends keyof SchemaOptions>(key: K): SchemaOptions[K];

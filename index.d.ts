@@ -1970,10 +1970,10 @@ declare module 'mongoose' {
       isMongooseArray: true;
 
       /** Pushes items to the array non-atomically. */
-      nonAtomicPush(...args: Array<AnyKeys<T> & AnyObject>): number;
+      nonAtomicPush(...args: any[]): number;
 
       /** Wraps [`Array#push`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push) with proper change tracking. */
-      push(...args: Array<AnyKeys<T> & AnyObject>): number;
+      push(...args: any[]): number;
 
       /**
        * Pulls items from the array atomically. Equality is determined by casting
@@ -2023,7 +2023,7 @@ declare module 'mongoose' {
       /** Searches array items for the first document with a matching _id. */
       id(id: any): T | null;
 
-      push(...args: Omit<T, keyof Document>[]): number;
+      push(...args: Array<AnyKeys<T> & AnyObject>): number;
     }
 
     class EmbeddedDocument extends Document {

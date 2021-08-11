@@ -66,6 +66,10 @@ const movieSchema = new Schema<Document<Movie>, Model<Document<Movie>>, Movie>({
   }
 });
 
+movieSchema.index({ status: 1, 'actors.name': 1 });
+movieSchema.index({ title: 'text' });
+movieSchema.index({ rating: -1 });
+
 // Using `SchemaDefinition`
 interface IProfile { age: number; }
 interface ProfileDoc extends Document, IProfile {}

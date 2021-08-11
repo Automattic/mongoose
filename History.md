@@ -1,3 +1,14 @@
+5.13.7 / 2021-08-11
+===================
+ * perf(index.d.ts): loosen up restrictions on ModelType generic for Schema for a ~50% perf improvement when compiling TypeScript and using intellisense #10536 #10515 #10349
+ * fix(index.d.ts): fix broken `Schema#index()` types #10562 [JaredReisinger](https://github.com/JaredReisinger)
+ * fix(index.d.ts): allow using SchemaTypeOptions with array of raw document interfaces #10537
+ * fix(index.d.ts): define IndexOptions in terms of mongodb.IndexOptions #10563 [JaredReisinger](https://github.com/JaredReisinger)
+ * fix(index.d.ts): improve intellisense for DocumentArray `push()` #10546
+ * fix(index.d.ts): correct type for expires #10529
+ * fix(index.d.ts): add Query#model property to ts bindings #10531
+ * refactor(index.d.ts): make callbacks use the new Callback and CallbackWithoutResult types #10550 [thiagokisaki](https://github.com/thiagokisaki)
+
 5.13.6 / 2021-08-09
 ===================
  * fix: upgrade mongodb driver -> 3.6.11 #10543 [maon-fp](https://github.com/maon-fp)

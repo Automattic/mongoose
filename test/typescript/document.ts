@@ -1,4 +1,4 @@
-import { Schema, model, Document, Error } from 'mongoose';
+import { Schema, model, Model, Document, Error } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String', required: true }, address: new Schema({ city: { type: String, required: true } }) });
 
@@ -33,3 +33,29 @@ void async function run() {
   test.validateSync({ pathsToSkip: ['name', 'age'] });
   test.validateSync({ pathsToSkip: 'name age' });
 })();
+
+function gh10526<U extends ITest>(arg1: Model<U>) {
+  const t = new arg1({ name: 'hello' });
+}
+
+function testMethods(): void {
+  interface IUser {
+    first: string;
+    last: string;
+  }
+
+  interface IUserMethods {
+    fullName(): string;
+  }
+
+  type User = Model<IUser, {}, IUserMethods>
+
+  const schema = new Schema<IUser, User>({ first: String, last: String });
+  schema.methods.fullName = function(): string {
+    return this.first + ' ' + this.last;
+  };
+  const UserModel = model<IUser, User>('User', schema);
+
+  const doc = new UserModel({ first: 'test', last: 'test' });
+  doc.fullName().toUpperCase();
+}

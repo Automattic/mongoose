@@ -1,3 +1,28 @@
+5.13.7 / 2021-08-11
+===================
+ * perf(index.d.ts): loosen up restrictions on ModelType generic for Schema for a ~50% perf improvement when compiling TypeScript and using intellisense #10536 #10515 #10349
+ * fix(index.d.ts): fix broken `Schema#index()` types #10562 [JaredReisinger](https://github.com/JaredReisinger)
+ * fix(index.d.ts): allow using SchemaTypeOptions with array of raw document interfaces #10537
+ * fix(index.d.ts): define IndexOptions in terms of mongodb.IndexOptions #10563 [JaredReisinger](https://github.com/JaredReisinger)
+ * fix(index.d.ts): improve intellisense for DocumentArray `push()` #10546
+ * fix(index.d.ts): correct type for expires #10529
+ * fix(index.d.ts): add Query#model property to ts bindings #10531
+ * refactor(index.d.ts): make callbacks use the new Callback and CallbackWithoutResult types #10550 [thiagokisaki](https://github.com/thiagokisaki)
+
+5.13.6 / 2021-08-09
+===================
+ * fix: upgrade mongodb driver -> 3.6.11 #10543 [maon-fp](https://github.com/maon-fp)
+ * fix(schema): throw more helpful error when defining a document array using a schema from a different copy of the Mongoose module #10453
+ * fix: add explicit check on constructor property to avoid throwing an error when checking objects with null prototypes #10512
+ * fix(cursor): make sure to clear stack every 1000 docs when calling `next()` to avoid stack overflow with large batch size #10449
+ * fix(index.d.ts): allow calling new Model(...) with generic Model param #10526
+ * fix(index.d.ts): update type declarations of Schema.index method #10538 #10530 [Raader](https://github.com/Raader)
+ * fix(index.d.ts): add useNewUrlParser and useUnifiedTopology to ConnectOptions #10500
+ * fix(index.d.ts): add missing type for diffIndexes #10547 [bvgusak](https://github.com/bvgusak)
+ * fix(index.d.ts): fixed incorrect type definition for Query's .map function #10544 [GCastilho](https://github.com/GCastilho)
+ * docs(schema): add more info and examples to Schema#indexes() docs #10446
+ * chore: add types property to package.json #10557 [thiagokisaki](https://github.com/thiagokisaki)
+
 6.0.0-rc0 / 2021-08-03
 ======================
  * BREAKING CHANGE: upgrade to MongoDB Node.js driver 4.x. This adds support for MongoDB 5.0, drops support for Node.js < 12.0.0 #10338 #9840 #8759

@@ -37,3 +37,25 @@ void async function run() {
 function gh10526<U extends ITest>(arg1: Model<U>) {
   const t = new arg1({ name: 'hello' });
 }
+
+function testMethods(): void {
+  interface IUser {
+    first: string;
+    last: string;
+  }
+
+  interface IUserMethods {
+    fullName(): string;
+  }
+
+  type User = Model<IUser, {}, IUserMethods>
+
+  const schema = new Schema<IUser, User>({ first: String, last: String });
+  schema.methods.fullName = function(): string {
+    return this.first + ' ' + this.last;
+  };
+  const UserModel = model<IUser, User>('User', schema);
+
+  const doc = new UserModel({ first: 'test', last: 'test' });
+  doc.fullName().toUpperCase();
+}

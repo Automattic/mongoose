@@ -103,7 +103,13 @@ declare module 'mongoose' {
   export function model<T>(name: string, schema?: Schema<any>, collection?: string, skipInit?: boolean): Model<T>;
   export function model<T, U extends Model<T, TQueryHelpers, any>, TQueryHelpers = {}>(
     name: string,
-    schema?: Schema<T, U>,
+    schema?: Schema<T, U, TQueryHelpers>,
+    collection?: string,
+    skipInit?: boolean
+  ): U;
+  export function model<T, U extends Model<T, TQueryHelpers, any>, TQueryHelpers = {}>(
+    name: string,
+    schema?: Schema<any>,
     collection?: string,
     skipInit?: boolean
   ): U;
@@ -377,10 +383,16 @@ declare module 'mongoose' {
     models: { [index: string]: Model<any> };
 
     /** Defines or retrieves a model. */
-    model<T>(name: string, schema?: Schema<T>, collection?: string): Model<T>;
+    model<T>(name: string, schema?: Schema<any>, collection?: string): Model<T>;
     model<T, U extends Model<T, TQueryHelpers, any>, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<T, U, TQueryHelpers>,
+      collection?: string,
+      skipInit?: boolean
+    ): U;
+    model<T, U extends Model<T, TQueryHelpers, any>, TQueryHelpers = {}>(
+      name: string,
+      schema?: Schema<any>,
       collection?: string,
       skipInit?: boolean
     ): U;
@@ -750,8 +762,8 @@ declare module 'mongoose' {
 
   interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
-    discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<D>;
-    discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
+    discriminator<D>(name: string | number, schema: Schema, value?: string | number | ObjectId): Model<D>;
+    discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
   type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
@@ -1243,7 +1255,6 @@ declare module 'mongoose' {
   type SchemaPreOptions = { document?: boolean, query?: boolean };
   type SchemaPostOptions = { document?: boolean, query?: boolean };
 
-  type ExtractQueryHelpers<M> = M extends Model<any, infer TQueryHelpers> ? TQueryHelpers : {};
   type ExtractMethods<M> = M extends Model<any, any, infer TMethods> ? TMethods : {};
 
   type PreMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void) => void | Promise<void>;
@@ -1251,7 +1262,7 @@ declare module 'mongoose' {
   type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
   type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
 
-  class Schema<DocType = Document, M extends Model<DocType, any, any> = Model<any, any, any>, SchemaDefinitionType = undefined, TInstanceMethods = ExtractMethods<M>> extends events.EventEmitter {
+  class Schema<DocType = Document, M = Model<DocType, any, any>, SchemaDefinitionType = undefined, TInstanceMethods = {}> extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -1329,8 +1340,8 @@ declare module 'mongoose' {
     post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: PostMiddlewareFunction<T, Array<any>>): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, Array<any>>): this;
-    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<T>): this;
-    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
+    post<T = M>(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<T>): this;
+    post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
 
     post<T = EnforceDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T = EnforceDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
@@ -1338,8 +1349,8 @@ declare module 'mongoose' {
     post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
-    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
-    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = M>(method: 'insertMany' | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
 
     /** Defines a pre hook for the model. */
     pre<T = EnforceDocument<DocType, TInstanceMethods>>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
@@ -1349,11 +1360,11 @@ declare module 'mongoose' {
     pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
-    pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
-    pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
+    pre<T = M>(method: 'insertMany' | RegExp, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
+    pre<T = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
 
     /** Object of currently defined query helpers on this schema. */
-    query: { [name: string]: <T extends QueryWithHelpers<any, EnforceDocument<DocType, TInstanceMethods>, ExtractQueryHelpers<M>> = QueryWithHelpers<any, EnforceDocument<DocType, ExtractMethods<M>>, ExtractQueryHelpers<M>>>(this: T, ...args: any[]) => any };
+    query: { [name: string]: Function };
 
     /** Adds a method call to the queue. */
     queue(name: string, args: any[]): this;
@@ -1840,8 +1851,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
-        discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -1897,8 +1908,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
-        discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
         schema: Schema;
@@ -1943,8 +1954,8 @@ declare module 'mongoose' {
         /** The document's schema */
         schema: Schema;
 
-        discriminator<D>(name: string | number, schema: Schema<D>, value?: string): Model<D>;
-        discriminator<T, U extends Model<T>>(name: string | number, schema: Schema<T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
       }
 
       class String extends SchemaType {

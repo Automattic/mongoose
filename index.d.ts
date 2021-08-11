@@ -1904,7 +1904,7 @@ declare module 'mongoose' {
 
         /** Sets a maximum number validator. */
         max(value: number, message: string): this;
-
+\
         /** Sets a minimum number validator. */
         min(value: number, message: string): this;
       }
@@ -1957,7 +1957,6 @@ declare module 'mongoose' {
   }
 
   namespace Types {
-	type OmitDocumentTypes<T> = T extends Document ? Omit<T, keyof Document> : T
     class Array<T> extends global.Array<T> {
       /** Pops the array atomically at most one time per document `save()`. */
       $pop(): T;
@@ -1974,7 +1973,7 @@ declare module 'mongoose' {
       nonAtomicPush(...args: Array<AnyKeys<T> & AnyObject>): number;
 
       /** Wraps [`Array#push`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push) with proper change tracking. */
-      push(...args: T[]): number;
+      push(...args: (AnyKeys<T> & AnyObject)[]): number;
 
       /**
        * Pulls items from the array atomically. Equality is determined by casting

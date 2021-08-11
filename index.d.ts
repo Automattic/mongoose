@@ -1973,7 +1973,7 @@ declare module 'mongoose' {
       nonAtomicPush(...args: Array<AnyKeys<T> & AnyObject>): number;
 
       /** Wraps [`Array#push`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push) with proper change tracking. */
-      push(...args: (AnyKeys<T> & AnyObject)[]): number;
+      push(...args: Array<AnyKeys<T> & AnyObject>): number;
 
       /**
        * Pulls items from the array atomically. Equality is determined by casting

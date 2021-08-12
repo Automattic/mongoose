@@ -47,7 +47,7 @@ function getVersion() {
 }
 
 function getLatestLegacyVersion(startsWith) {
-  const hist = fs.readFileSync('./History.md', 'utf8').replace(/\r/g, '\n').split('\n');
+  const hist = fs.readFileSync('./CHANGELOG.md', 'utf8').replace(/\r/g, '\n').split('\n');
 
   for (const rawLine of hist) {
     const line = (rawLine || '').trim();

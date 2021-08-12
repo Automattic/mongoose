@@ -1,3 +1,9 @@
+6.0.0-rc1 / 2021-08-12
+======================
+ * feat: upgrade to MongoDB driver 4.1.0 #10567 #10560
+ * feat: add `valueOf()` to ObjectId prototype #7299
+ * BREAKING CHANGE: rename History.md -> CHANGELOG.md #10542
+
 5.13.7 / 2021-08-11
 ===================
  * perf(index.d.ts): loosen up restrictions on ModelType generic for Schema for a ~50% perf improvement when compiling TypeScript and using intellisense #10536 #10515 #10349

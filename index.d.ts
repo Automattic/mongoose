@@ -1716,16 +1716,16 @@ declare module 'mongoose' {
      * @example
      * ```js
      * const schema = new Schema({ prop1: Date });
-     * 
+     *
      * // expire in 24 hours
      * schema.index({ prop1: 1 }, { expires: 60*60*24 })
-     * 
+     *
      * // expire in 24 hours
      * schema.index({ prop1: 1 }, { expires: '24h' })
-     * 
+     *
      * // expire in 1.5 hours
      * schema.index({ prop1: 1 }, { expires: '1.5h' })
-     * 
+     *
      * // expire in 7 days
      * schema.index({ prop1: 1 }, { expires: '7d' })
      * ```

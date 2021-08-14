@@ -33,6 +33,7 @@ website.js
 
 .config*
 
+migrating_to_6.md
 migrating_to_5.md
 renovate.json
 .travis.yml

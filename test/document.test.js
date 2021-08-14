@@ -10421,4 +10421,37 @@ describe('document', function() {
 
     assert.ok(!doc.nested.otherProp);
   });
+
+  it('sets properties in the order they are defined in the schema (gh-4665)', function() {
+    const schema = new Schema({
+      test: String,
+      internal: {
+        status: String,
+        createdAt: Date
+      },
+      profile: {
+        name: {
+          first: String,
+          last: String
+        }
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = new Test({
+        profile: { name: { last: 'Musashi', first: 'Miyamoto' } },
+        internal: { createdAt: new Date('1603-06-01'), status: 'approved' },
+        test: 'test'
+      });
+
+      assert.deepEqual(Object.keys(doc.toObject()), ['test', 'internal', 'profile', '_id']);
+      assert.deepEqual(Object.keys(doc.toObject().profile.name), ['first', 'last']);
+      assert.deepEqual(Object.keys(doc.toObject().internal), ['status', 'createdAt']);
+
+      yield doc.save();
+      const res = yield Test.findOne({ _id: doc._id, 'profile.name': { first: 'Miyamoto', last: 'Musashi' } });
+      assert.ok(res);
+    });
+  });
 });

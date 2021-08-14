@@ -9817,7 +9817,9 @@ describe('document', function() {
         child: c._id
       });
 
-      const p = yield Parent.findOne().populate('children child');
+      const p = yield Parent.findOne();
+      yield p.populate('children');
+      yield p.populate('child');
 
       p.children; // [{ _id: '...', name: 'test' }]
 

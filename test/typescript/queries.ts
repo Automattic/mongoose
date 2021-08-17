@@ -1,6 +1,7 @@
 import { Schema, model, Document, Types, Query, Model, QueryWithHelpers } from 'mongoose';
 
 interface QueryHelpers {
+  _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
   byName(name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
 }
 
@@ -11,8 +12,13 @@ const schema: Schema<ITest, Model<ITest, QueryHelpers>> = new Schema({
   endDate: Date
 });
 
-schema.query.byName = function(name: string): Query<any, ITest, QueryHelpers> & QueryHelpers {
+schema.query._byName = function(name: string): QueryWithHelpers<any, ITest> {
   return this.find({ name });
+};
+
+schema.query.byName = function(name: string): QueryWithHelpers<any, ITest> {
+  this.notAQueryHelper();
+  return this._byName(name);
 };
 
 interface ISubdoc extends Document {

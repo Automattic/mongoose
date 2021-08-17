@@ -4538,7 +4538,7 @@ describe('model: populate:', function() {
             { title: 'Save', moduleId: 1 },
             { title: 'Save As', moduleId: 1 },
             { title: 'Undo', moduleId: 2 },
-            { title: 'Redo', moduleId: 2 },
+            { title: 'Redo', moduleId: 2 }
           ]);
 
           app = yield App.findById(app).populate('modules.menu');

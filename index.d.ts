@@ -1237,14 +1237,14 @@ declare module 'mongoose' {
   type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
   type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
 
-  class Schema<DocType = Document, M = Model<DocType, any, any>, SchemaDefinitionType = undefined, TInstanceMethods = {}> extends events.EventEmitter {
+  class Schema<DocType = any, M = Model<DocType, any, any>, TInstanceMethods = {}> extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<DocumentDefinition<SchemaDefinitionType>>, options?: SchemaOptions);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<DocType>>, options?: SchemaOptions);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<DocumentDefinition<SchemaDefinitionType>> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<SchemaDefinitionType<DocType>> | Schema, prefix?: string): this;
 
     /**
      * Array of child schemas (from document arrays and single nested subdocs)
@@ -1306,7 +1306,7 @@ declare module 'mongoose' {
     pathType(path: string): string;
 
     /** Registers a plugin for this schema. */
-    plugin(fn: (schema: Schema<DocType, Model<DocType>, SchemaDefinitionType>, opts?: any) => void, opts?: any): this;
+    plugin(fn: (schema: Schema<DocType, Model<DocType>>, opts?: any) => void, opts?: any): this;
 
     /** Defines a post hook for the model. */
     post<T = EnforceDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T>): this;
@@ -1384,9 +1384,9 @@ declare module 'mongoose' {
     ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
     SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
-    Schema<any, any, any, any> |
-    Schema<any, any, any, any>[] |
-    ReadonlyArray<Schema<any, any, any, any>> |
+    Schema<any, any, any> |
+    Schema<any, any, any>[] |
+    ReadonlyArray<Schema<any, any, any>> |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
     ReadonlyArray<SchemaTypeOptions<T extends undefined ? any : T>> |
     Function[] |
@@ -2711,6 +2711,7 @@ declare module 'mongoose' {
     T extends Document ? LeanDocument<T> : // Subdocument
     T;
 
+  export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
   export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :

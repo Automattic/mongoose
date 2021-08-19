@@ -53,9 +53,7 @@ describe('typescript syntax', function() {
 
   it('create schema and model', function() {
     const errors = runTest('createBasicSchemaDefinition.ts');
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
+    printTSErrors(errors);
     assert.equal(errors.length, 0);
   });
 
@@ -207,9 +205,7 @@ describe('typescript syntax', function() {
 
   it('schema', function() {
     const errors = runTest('schema.ts', { strict: true });
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
+    printTSErrors(errors);
     assert.equal(errors.length, 1);
     const messageText = errors[0].messageText.messageText;
     assert.ok(/Type '.*StringConstructor.*' is not assignable to type.*number/.test(messageText), messageText);

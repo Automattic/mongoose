@@ -1468,7 +1468,7 @@ describe('Query', function() {
         });
 
         it('and sends it though the driver', function(done) {
-          const options = { read: 'secondary', safe: { w: 'majority' } };
+          const options = { read: 'secondary', w: 'majority' };
           const schema = new Schema({ name: String }, options);
           const M = db.model('Test', schema);
           const q = M.find();

@@ -1598,7 +1598,7 @@ describe('model: update:', function() {
         assert.ifError(err);
 
         const update = { $push: { followers: 200 } };
-        const opts = { overwrite: true, new: true, safe: true, upsert: false, multi: false };
+        const opts = { overwrite: true, new: true, upsert: false, multi: false };
 
         M.update({ topicId: doc.topicId }, update, opts, function(err) {
           assert.ifError(err);

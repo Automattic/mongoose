@@ -5120,10 +5120,8 @@ describe('document', function() {
       const schema = new mongoose.Schema({
         name: String
       }, {
-        safe: {
-          w: 'majority',
-          wtimeout: 1e4
-        }
+        w: 'majority',
+        wtimeout: 1e4
       });
 
       const M = db.model('Test', schema);

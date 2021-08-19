@@ -184,7 +184,7 @@ describe('model field selection', function() {
     const id = new DocumentObjectId;
 
     BlogPostB.collection.insertOne(
-      { _id: id, title: 'issue 870' }, { safe: true }, function(err) {
+      { _id: id, title: 'issue 870' }, function(err) {
         assert.ifError(err);
 
         BlogPostB.findById(id, 'def comments', function(err, found) {

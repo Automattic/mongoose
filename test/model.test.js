@@ -3738,7 +3738,7 @@ describe('Model', function() {
           }
         };
 
-        M.collection.insertOne(o, { safe: true }, function(err) {
+        M.collection.insertOne(o, function(err) {
           assert.ifError(err);
           M.findById(o._id, function(err, doc) {
             db.close();
@@ -3872,7 +3872,7 @@ describe('Model', function() {
   it('path is cast to correct value when retreived from db', function(done) {
     const schema = new Schema({ title: { type: 'string', index: true } });
     const T = db.model('Test', schema);
-    T.collection.insertOne({ title: 234 }, { safe: true }, function(err) {
+    T.collection.insertOne({ title: 234 }, function(err) {
       assert.ifError(err);
       T.findOne(function(err, doc) {
         assert.ifError(err);
@@ -3952,7 +3952,7 @@ describe('Model', function() {
   describe('unsetting a default value', function() {
     it('should be ignored (gh-758)', function(done) {
       const M = db.model('Test', new Schema({ s: String, n: Number, a: Array }));
-      M.collection.insertOne({}, { safe: true }, function(err) {
+      M.collection.insertOne({}, function(err) {
         assert.ifError(err);
         M.findOne(function(err, m) {
           assert.ifError(err);
@@ -5955,23 +5955,6 @@ describe('Model', function() {
         assert.equal(error.name, 'ObjectParameterError');
         done();
       });
-    });
-
-    it('save() with unacknowledged writes (gh-6012)', function() {
-      const schema = new mongoose.Schema({ name: String }, { safe: false });
-
-      const Model = db.model('Test', schema);
-
-      return Model.create({});
-    });
-
-    it('save() with unacknowledged writes in options (gh-6012)', function() {
-      const schema = new mongoose.Schema({ name: String });
-
-      const Model = db.model('Test', schema);
-      const doc = new Model();
-
-      return doc.save({ safe: { w: 0 } });
     });
 
     it.skip('save() with wtimeout defined in schema (gh-6862)', function(done) {

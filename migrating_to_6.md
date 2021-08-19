@@ -43,3 +43,5 @@
 ## TypeScript changes
 
 * The `Schema` class now takes 3 generic params instead of 4. The 3rd generic param, `SchemaDefinitionType`, is now the same as the 1st generic param `DocType`. Replace `new Schema<UserDocument, UserModel, User>(schemaDefinition)` with `new Schema<UserDocument, UserModel>(schemaDefinition)`
+
+* The following legacy types have been removed: `ModelUpdateOptions`, `DocumentQuery`, `HookSyncCallback`, `HookAsyncCallback`, `HookErrorCallback`, `HookNextFunction`, `HookDoneFunction`, `SchemaTypeOpts`, `ConnectionOptions`.

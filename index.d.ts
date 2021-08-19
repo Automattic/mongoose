@@ -3104,37 +3104,6 @@ declare module 'mongoose' {
     }
   }
 
-  /** Deprecated types for backwards compatibility. */
-
-  /** Alias for QueryOptions for backwards compatibility. */
-  type ModelUpdateOptions = QueryOptions;
-
-  type DocumentQuery<ResultType, DocType, THelpers = {}> = Query<ResultType, DocType, THelpers>;
-
-  /** Backwards support for DefinitelyTyped */
-  interface HookSyncCallback<T> {
-    (this: T, next: HookNextFunction, docs: any[]): Promise<any> | void;
-  }
-
-  interface HookAsyncCallback<T> {
-    (this: T, next: HookNextFunction, done: HookDoneFunction, docs: any[]): Promise<any> | void;
-  }
-
-  interface HookErrorCallback {
-    (error?: Error): any;
-  }
-
-  interface HookNextFunction {
-    (error?: Error): any;
-  }
-
-  interface HookDoneFunction {
-    (error?: Error): any;
-  }
-
-  export type SchemaTypeOpts<T> = SchemaTypeOptions<T>;
-  export type ConnectionOptions = ConnectOptions;
-
   /* for ts-mongoose */
   class mquery {}
 }

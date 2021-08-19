@@ -101,15 +101,9 @@ declare module 'mongoose' {
   export function isValidObjectId(v: any): boolean;
 
   export function model<T>(name: string, schema?: Schema<any>, collection?: string, skipInit?: boolean): Model<T>;
-  export function model<T, U extends Model<T, TQueryHelpers, any>, TQueryHelpers = {}>(
+  export function model<T, U, TQueryHelpers = {}>(
     name: string,
     schema?: Schema<T, U, TQueryHelpers>,
-    collection?: string,
-    skipInit?: boolean
-  ): U;
-  export function model<T, U extends Model<T, TQueryHelpers, any>, TQueryHelpers = {}>(
-    name: string,
-    schema?: Schema<any>,
     collection?: string,
     skipInit?: boolean
   ): U;
@@ -358,15 +352,9 @@ declare module 'mongoose' {
 
     /** Defines or retrieves a model. */
     model<T>(name: string, schema?: Schema<any>, collection?: string): Model<T>;
-    model<T, U extends Model<T, TQueryHelpers, any>, TQueryHelpers = {}>(
+    model<T, U, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<T, U, TQueryHelpers>,
-      collection?: string,
-      skipInit?: boolean
-    ): U;
-    model<T, U extends Model<T, TQueryHelpers, any>, TQueryHelpers = {}>(
-      name: string,
-      schema?: Schema<any>,
       collection?: string,
       skipInit?: boolean
     ): U;
@@ -644,9 +632,6 @@ declare module 'mongoose' {
     /** Returns the list of paths that have been modified. */
     modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;
 
-    /** Returns another Model instance. */
-    model<T extends Model<any>>(name: string): T;
-
     /** The name of the model */
     modelName: string;
 
@@ -739,7 +724,7 @@ declare module 'mongoose' {
 
   type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
   interface AnyObject { [k: string]: any }
-  type EnforceDocument<T, TMethods> = T extends Document ? T : T & Document<any, any, T> & TMethods;
+  type EnforceDocument<T, TMethods> = T extends Document ? T : (Document<any, any, T> & T & TMethods);
 
   interface IndexesDiff {
     /** Indexes that would be created in mongodb. */
@@ -1227,8 +1212,6 @@ declare module 'mongoose' {
   type SchemaPreOptions = { document?: boolean, query?: boolean };
   type SchemaPostOptions = { document?: boolean, query?: boolean };
 
-  type ExtractMethods<M> = M extends Model<any, any, infer TMethods> ? TMethods : {};
-
   type IndexDirection = 1 | -1 | '2d' | '2dsphere' | 'geoHaystack' | 'hashed' | 'text';
   type IndexDefinition = Record<string, IndexDirection>;
 
@@ -1306,7 +1289,7 @@ declare module 'mongoose' {
     pathType(path: string): string;
 
     /** Registers a plugin for this schema. */
-    plugin(fn: (schema: Schema<DocType, Model<DocType>>, opts?: any) => void, opts?: any): this;
+    plugin(fn: (schema: Schema<DocType>, opts?: any) => void, opts?: any): this;
 
     /** Defines a post hook for the model. */
     post<T = EnforceDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T>): this;
@@ -3126,7 +3109,7 @@ declare module 'mongoose' {
   /** Alias for QueryOptions for backwards compatibility. */
   type ModelUpdateOptions = QueryOptions;
 
-  type DocumentQuery<ResultType, DocType extends Document, THelpers = {}> = Query<ResultType, DocType, THelpers>;
+  type DocumentQuery<ResultType, DocType, THelpers = {}> = Query<ResultType, DocType, THelpers>;
 
   /** Backwards support for DefinitelyTyped */
   interface HookSyncCallback<T> {

@@ -1468,7 +1468,7 @@ describe('Query', function() {
         });
 
         it('and sends it though the driver', function(done) {
-          const options = { read: 'secondary', w: 'majority' };
+          const options = { read: 'secondary', writeConcern: { w: 'majority' } };
           const schema = new Schema({ name: String }, options);
           const M = db.model('Test', schema);
           const q = M.find();
@@ -1482,7 +1482,7 @@ describe('Query', function() {
 
             assert.ok(ret.readPreference);
             assert.equal(ret.readPreference.mode, 'secondary');
-            assert.deepEqual({ w: 'majority' }, ret.safe);
+            assert.deepEqual({ w: 'majority' }, ret.writeConcern);
             called = true;
 
             return ret;

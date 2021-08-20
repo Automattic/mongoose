@@ -3445,7 +3445,7 @@ describe('Query', function() {
       });
     });
 
-    it('pre("validate") errors (gh-7187)', function() {
+    it('pre("validate") errors (gh-7187)', async function() {
       const addressSchema = Schema({ countryId: String });
       addressSchema.pre('validate', { query: true }, function() {
         throw new Error('Oops!');
@@ -3454,13 +3454,14 @@ describe('Query', function() {
       const Contact = db.model('Test', contactSchema);
 
       const update = { addresses: [{ countryId: 'foo' }] };
-      return Contact.updateOne({}, update, { runValidators: true }).then(
-        () => assert.ok(false),
-        err => {
-          assert.ok(err.errors['addresses.0']);
-          assert.equal(err.errors['addresses.0'].message, 'Oops!');
-        }
-      );
+      const err = await Contact.updateOne(
+        {},
+        update,
+        { runValidators: true }
+      ).then(() => null, err => err);
+
+      assert.ok(err.errors['addresses.0']);
+      assert.equal(err.errors['addresses.0'].message, 'Oops!');
     });
   });
 

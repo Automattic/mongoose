@@ -1433,44 +1433,43 @@ describe('schema', function() {
   });
 
   describe('property names', function() {
-    it('that conflict throw', function(done) {
-      const child = new Schema({ name: String });
+    describe('reserved keys are log a warning (gh-9010)', () => {
+      const originalWarn = console.warn;
+      let lastWarnMessage;
+      beforeEach(() => {
+        console.warn = (message) => lastWarnMessage = message;
+      });
 
-      assert.throws(function() {
-        new Schema({
-          on: String,
-          child: [child]
+      afterEach(() => {
+        console.warn = originalWarn;
+        lastWarnMessage = null;
+      });
+
+      [
+        'emit', 'listeners', 'on', 'removeListener', /* 'collection', */ // TODO: add `collection`
+        'errors', 'get', 'init', 'isModified', 'isNew', 'populated',
+        'remove', 'save', 'toObject', 'validate'
+      ].forEach((reservedProperty) => {
+        it(`\`${reservedProperty}\` when used as a schema path logs a warning`, () => {
+          new Schema({ [reservedProperty]: String });
+
+          assert.ok(lastWarnMessage.includes(`\`${reservedProperty}\` is a reserved schema pathname`));
         });
-      }, /`on` may not be used as a schema pathname/);
 
-      assert.throws(function() {
-        new Schema({
-          collection: String
+        it(`\`${reservedProperty}\` when used as a schema path doesn't log a warning if \`supressReservedKeysWarning\` is true`, () => {
+          new Schema(
+            { [reservedProperty]: String },
+            { supressReservedKeysWarning: true }
+          );
+
+          assert.deepEqual(lastWarnMessage, null);
         });
-      }, /`collection` may not be used as a schema pathname/);
 
-      assert.throws(function() {
-        new Schema({
-          isNew: String
-        });
-      }, /`isNew` may not be used as a schema pathname/);
-
-      assert.throws(function() {
-        new Schema({
-          errors: String
-        });
-      }, /`errors` may not be used as a schema pathname/);
-
-      assert.throws(function() {
-        new Schema({
-          init: String
-        });
-      }, /`init` may not be used as a schema pathname/);
-
-      done();
+      });
     });
 
-    it('that do not conflict do not throw', function(done) {
+
+    it('that do not conflict do not throw', function() {
       assert.doesNotThrow(function() {
         new Schema({
           model: String
@@ -1496,8 +1495,6 @@ describe('schema', function() {
         const M = mongoose.model('setMaxListeners-as-property-name', s);
         new M({ setMaxListeners: 'works' });
       });
-
-      done();
     });
 
     it('permit _scope to be used (gh-1184)', function(done) {
@@ -2415,26 +2412,6 @@ describe('schema', function() {
     });
   });
 
-  describe('Schema.reserved (gh-8869)', function() {
-    it('throws errors on compiling schema with reserved key as a flat type', function() {
-      const buildInvalidSchema = () => new Schema({ save: String });
-
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-
-    it('throws errors on compiling schema with reserved key as a nested object', function() {
-      const buildInvalidSchema = () => new Schema({ save: { nested: String } });
-
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-
-    it('throws errors on compiling schema with reserved key as a nested array', function() {
-      const buildInvalidSchema = () => new Schema({ save: [{ nested: String }] });
-
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-  });
-
   it('disables `id` virtual if no `_id` path (gh-3936)', function() {
     const idGetter = require('../lib/plugins/idGetter');
 
@@ -2570,13 +2547,10 @@ describe('schema', function() {
     const C1Schema = new mongoose.Schema({});
     C1Schema.loadClass(C1);
     const C1Model = db.model('C1', C1Schema);
-    console.log('C1Model', ((new C1Model())).hello); // expected: "1", result: "1"
 
     const C2Schema = new mongoose.Schema({});
     C2Schema.loadClass(C2);
     const C2Model = db.model('C2', C2Schema);
-    console.log('C2Model', ((new C2Model())).hello); // expected: "2", result: "1"
-
 
     assert.equal((new C1Model()).hello, 1);
     assert.equal((new C2Model()).hello, 2);

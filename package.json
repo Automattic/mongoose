@@ -77,7 +77,7 @@
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
     "release-next": "git pull origin 6.0 && git push origin 6.0 --tags && npm publish --tag next",
     "test": "mocha --exit ./test/*.test.js ./test/typescript/main.test.js",
-    "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --watch --recursive --watch-files ./**/*.js",
+    "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
@@ -106,26 +106,24 @@
     "extends": [
       "eslint:recommended"
     ],
-    "overrides": [
-      {
-        "files": [
-          "**/*.{ts,tsx}"
-        ],
-        "extends": [
-          "plugin:@typescript-eslint/eslint-recommended",
-          "plugin:@typescript-eslint/recommended"
-        ],
-        "plugins": [
-          "@typescript-eslint"
-        ],
-        "rules": {
-          "@typescript-eslint/no-explicit-any": "off",
-          "@typescript-eslint/ban-types": "off",
-          "@typescript-eslint/no-unused-vars": "off",
-          "@typescript-eslint/explicit-module-boundary-types": "off"
-        }
+    "overrides": [{
+      "files": [
+        "**/*.{ts,tsx}"
+      ],
+      "extends": [
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+      ],
+      "plugins": [
+        "@typescript-eslint"
+      ],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/ban-types": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off"
       }
-    ],
+    }],
     "plugins": [
       "mocha-no-only"
     ],

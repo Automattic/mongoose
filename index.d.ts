@@ -1270,10 +1270,10 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<DocumentDefinition<SchemaDefinitionType>>, options?: SchemaOptions);
+    constructor(definition?: SchemaDefinition<LeanDocument<SchemaDefinitionType>>, options?: SchemaOptions);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<DocumentDefinition<SchemaDefinitionType>> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<LeanDocument<SchemaDefinitionType>> | Schema, prefix?: string): this;
 
     /**
      * Array of child schemas (from document arrays and single nested subdocs)
@@ -2587,8 +2587,12 @@ declare module 'mongoose' {
   export type UpdateQuery<T> = (_UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>);
 
   type _AllowStringsForIds<T> = {
-    [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;
-  };
+    [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never]
+      ? T[K] extends TreatAsPrimitives
+        ? T[K]
+        : _AllowStringsForIds<T[K]>
+      : T[K] | string;
+    };
   export type DocumentDefinition<T> = _AllowStringsForIds<LeanDocument<T>>;
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;

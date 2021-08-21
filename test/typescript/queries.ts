@@ -8,7 +8,7 @@ interface QueryHelpers {
 const schema: Schema<ITest, Model<ITest, QueryHelpers>> = new Schema({
   name: { type: 'String' },
   tags: [String],
-  docs: [{ nested: { id: Number, tags: [String] } }],
+  docs: [{ _id: 'ObjectId', id: Number, tags: [String] }],
   endDate: Date
 });
 
@@ -22,6 +22,7 @@ schema.query.byName = function(name: string): QueryWithHelpers<any, ITest> {
 };
 
 interface ISubdoc extends Document {
+  myId?: Types.ObjectId;
   id?: number;
   tags?: string[];
 }
@@ -88,6 +89,8 @@ Test.findOneAndUpdate({ name: 'test' }, { $currentDate: { endDate: true } });
 Test.findOneAndUpdate({ name: 'test' }, [{ $set: { endDate: true } }]);
 
 Test.findByIdAndUpdate({ name: 'test' }, { name: 'test2' }, (err, doc) => console.log(doc));
+
+Test.findOneAndUpdate({ name: 'test' }, { 'docs.0.myId': '0'.repeat(24) });
 
 const query: Query<ITest | null, ITest> = Test.findOne();
 query instanceof Query;

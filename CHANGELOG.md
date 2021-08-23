@@ -1,3 +1,11 @@
+6.0.0-rc2 / 2021-08-23
+======================
+ * BREAKING CHANGE: make document set() set keys in the order they're defined in the schema, not in the user specified object #4665
+ * BREAKING CHANGE: remove most schema reserved words - can now opt in to using `save`, `isNew`, etc. as schema paths #9010 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * BREAKING CHANGE: upgrade mquery -> 4.x #10579
+ * BREAKING CHANGE: remove some legacy type aliases for TypeScript
+ * fix(document): pass depopulated value to array element validators for consistency #10585 #8042
+
 5.13.8 / 2021-08-23
 ===================
  * fix(populate): handle populating subdoc array virtual with sort #10552

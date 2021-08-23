@@ -1079,7 +1079,7 @@ declare module 'mongoose' {
     omitUndefined?: boolean;
     overwrite?: boolean;
     overwriteDiscriminatorKey?: boolean;
-    populate?: string;
+    populate?: string | string[] | PopulateOptions | PopulateOptions[];
     projection?: any;
     /**
      * if true, returns the raw result from the MongoDB driver

@@ -1748,7 +1748,8 @@ declare module 'mongoose' {
     > = PopulatedType | RawId;
 
   interface IndexOptions extends mongodb.IndexOptions {
-    expires?: number | string
+    expires?: number | string;
+    weights?: AnyObject;
   }
 
   interface ValidatorProps {

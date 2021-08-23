@@ -67,7 +67,9 @@ const movieSchema = new Schema<Document<Movie>, Model<Document<Movie>>, Movie>({
 });
 
 movieSchema.index({ status: 1, 'actors.name': 1 });
-movieSchema.index({ title: 'text' });
+movieSchema.index({ title: 'text' }, {
+  weights: { title: 10 }
+});
 movieSchema.index({ rating: -1 });
 
 // Using `SchemaDefinition`

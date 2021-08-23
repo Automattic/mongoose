@@ -47,7 +47,7 @@ interface ITest extends Document {
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
-Test.find({}, {}, {populate:{path:"child", model:ChildModel, match:true}}).exec().then((res: Array<ITest>) => console.log(res))
+Test.find({}, {}, { populate: { path: 'child', model: ChildModel, match: true } }).exec().then((res: Array<ITest>) => console.log(res));
 
 Test.find().byName('test').byName('test2').orFail().exec().then(console.log);
 

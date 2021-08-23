@@ -71,6 +71,7 @@ movieSchema.index({ title: 'text' }, {
   weights: { title: 10 }
 });
 movieSchema.index({ rating: -1 });
+movieSchema.index({ title: 1 }, { unique: true });
 
 // Using `SchemaDefinition`
 interface IProfile { age: number; }

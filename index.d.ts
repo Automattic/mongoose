@@ -1547,7 +1547,7 @@ declare module 'mongoose' {
       T extends number[] ? (SchemaDefinitionWithBuiltInClass<number>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<number>>) :
       T extends boolean[] ? (SchemaDefinitionWithBuiltInClass<boolean>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<boolean>>) :
       T extends Function[] ? (SchemaDefinitionWithBuiltInClass<Function>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<Function>>) :
-      T | typeof SchemaType | Schema<any, any, any, any>;
+      T | typeof SchemaType | Schema<any, any, any>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;

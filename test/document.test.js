@@ -8185,12 +8185,33 @@ describe('document', function() {
 
   it('always passes unpopulated paths to validators (gh-8042)', function() {
     const schema = Schema({ test: String });
+
+    const calledWith = [];
+    function validate(v) {
+      calledWith.push(v);
+      return true;
+    }
     const schema2 = Schema({
       keyToPopulate: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'gh8018_child',
-        required: true
-      }
+        required: true,
+        validate: validate
+      },
+      array: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'gh8018_child',
+        required: true,
+        validate: validate
+      }],
+      subdoc: Schema({
+        keyToPopulate: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'gh8018_child',
+          required: true,
+          validate: validate
+        }
+      })
     });
 
     const Child = db.model('gh8018_child', schema);
@@ -8198,11 +8219,17 @@ describe('document', function() {
 
     return co(function*() {
       const child = yield Child.create({ test: 'test' });
-      yield Parent.create({ keyToPopulate: child._id });
+      yield Parent.create({ keyToPopulate: child, array: [child], subdoc: { keyToPopulate: child } });
+      assert.equal(calledWith.length, 3);
+      console.log(calledWith);
+      assert.ok(calledWith[0] instanceof mongoose.Types.ObjectId);
+      assert.ok(calledWith[1] instanceof mongoose.Types.ObjectId);
+      assert.ok(calledWith[2] instanceof mongoose.Types.ObjectId);
 
       yield child.deleteOne();
 
-      const doc = yield Parent.findOne();
+      const doc = yield Parent.findOne().populate(['keyToPopulate', 'array', 'subdoc']);
+      assert.equal(doc.keyToPopulate, null);
 
       // Should not throw
       yield doc.save();

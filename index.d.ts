@@ -574,7 +574,7 @@ declare module 'mongoose' {
     $set(path: string, val: any, type: any, options?: any): this;
     $set(value: any): this;
 
-    /** Additional properties to attach to the query when calling `save()` and `isNew` is false. */
+    /** Set this property to add additional query filters when Mongoose saves this document and `isNew` is false. */
     $where: Record<string, unknown>;
 
     /** If this is a discriminator model, `baseModelName` is the name of the base model. */

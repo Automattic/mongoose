@@ -1,3 +1,13 @@
+5.13.8 / 2021-08-23
+===================
+ * fix(populate): handle populating subdoc array virtual with sort #10552
+ * fix(model): check for code instead of codeName when checking for existing collections for backwards compat with MongoDB 3.2 #10420
+ * fix(index.d.ts): correct value of this for custom query helper methods #10545
+ * fix(index.d.ts): allow strings for ObjectIds in nested properties #10573
+ * fix(index.d.ts): add match to VirtualTypeOptions.options #8749
+ * fix(index.d.ts): allow QueryOptions populate parameter type PopulateOptions #10587 [osmanakol](https://github.com/osmanakol)
+ * docs(api): add Document#$where to API docs #10583
+
 5.13.7 / 2021-08-11
 ===================
  * perf(index.d.ts): loosen up restrictions on ModelType generic for Schema for a ~50% perf improvement when compiling TypeScript and using intellisense #10536 #10515 #10349
@@ -15,6 +25,7 @@
  * fix(schema): throw more helpful error when defining a document array using a schema from a different copy of the Mongoose module #10453
  * fix: add explicit check on constructor property to avoid throwing an error when checking objects with null prototypes #10512
  * fix(cursor): make sure to clear stack every 1000 docs when calling `next()` to avoid stack overflow with large batch size #10449
+ * fix(index.d.ts): improve types of Schema#(g|s)et #10555 [thiagokisaki](https://github.com/thiagokisaki)
  * fix(index.d.ts): allow calling new Model(...) with generic Model param #10526
  * fix(index.d.ts): update type declarations of Schema.index method #10538 #10530 [Raader](https://github.com/Raader)
  * fix(index.d.ts): add useNewUrlParser and useUnifiedTopology to ConnectOptions #10500

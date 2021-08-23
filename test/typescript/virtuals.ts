@@ -10,6 +10,7 @@ interface IPerson {
 
 interface IPet {
   name: string;
+  isDeleted: boolean;
   ownerId: number;
 
   owner: IPerson;
@@ -23,7 +24,8 @@ const personSchema = new Schema<IPerson & Document, Model<IPerson & Document>, I
 
 const petSchema = new Schema<IPet & Document, Model<IPet & Document>, IPet>({
   name: { type: String, required: true },
-  ownerId: { type: Number, required: true }
+  ownerId: { type: Number, required: true },
+  isDeleted: { type: Boolean, default: false }
 });
 
 // Virtual getters and setters
@@ -43,7 +45,10 @@ petSchema.virtual('owner', {
   localField: 'ownerId',
   foreignField: '_id',
   justOne: true,
-  autopopulate: true
+  autopopulate: true,
+  options: {
+    match: { isDeleted: false }
+  }
 });
 
 const Person = model('Person', personSchema);

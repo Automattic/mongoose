@@ -52,7 +52,8 @@ describe('typescript syntax', function() {
     if (process.env.D && errors.length) {
       console.log(errors);
     }
-    assert.equal(errors.length, 0);
+    assert.equal(errors.length, 1);
+    assert.ok(errors[0].messageText.includes('notAQueryHelper'), errors[0].messageText);
   });
 
   it('create', function() {

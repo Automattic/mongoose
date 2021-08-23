@@ -1823,7 +1823,7 @@ declare module 'mongoose' {
     perDocumentLimit?: number;
 
     /** Additional options like `limit` and `lean`. */
-    options?: QueryOptions;
+    options?: QueryOptions & { match?: AnyObject };
 
     /** Additional options for plugins */
     [extra: string]: any;

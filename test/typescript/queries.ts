@@ -1,21 +1,36 @@
-import { Schema, model, Document, Types, Query, Model, QueryWithHelpers } from 'mongoose';
+import { Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 interface QueryHelpers {
+  _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
   byName(name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
 }
+
+const childSchema: Schema = new Schema({ name: String });
+const ChildModel = model<Child>('Child', childSchema);
 
 const schema: Schema<ITest, Model<ITest, QueryHelpers>> = new Schema({
   name: { type: 'String' },
   tags: [String],
-  docs: [{ nested: { id: Number, tags: [String] } }],
+  child: { type: 'ObjectId', ref: 'Child' },
+  docs: [{ _id: 'ObjectId', id: Number, tags: [String] }],
   endDate: Date
 });
 
-schema.query.byName = function(name: string): Query<any, ITest, QueryHelpers> & QueryHelpers {
+schema.query._byName = function(name: string): QueryWithHelpers<any, ITest> {
   return this.find({ name });
 };
 
+schema.query.byName = function(name: string): QueryWithHelpers<any, ITest> {
+  this.notAQueryHelper();
+  return this._byName(name);
+};
+
+interface Child {
+  name: string;
+}
 interface ISubdoc extends Document {
+  myId?: Types.ObjectId;
   id?: number;
   tags?: string[];
 }
@@ -24,12 +39,15 @@ interface ITest extends Document {
   name?: string;
   age?: number;
   parent?: Types.ObjectId;
+  child?: PopulatedDoc<Child & Document<ObjectId>>,
   tags?: string[];
   docs?: ISubdoc[];
   endDate?: Date;
 }
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
+
+Test.find({}, {}, { populate: { path: 'child', model: ChildModel, match: true } }).exec().then((res: Array<ITest>) => console.log(res));
 
 Test.find().byName('test').byName('test2').orFail().exec().then(console.log);
 
@@ -82,6 +100,8 @@ Test.findOneAndUpdate({ name: 'test' }, { $currentDate: { endDate: true } });
 Test.findOneAndUpdate({ name: 'test' }, [{ $set: { endDate: true } }]);
 
 Test.findByIdAndUpdate({ name: 'test' }, { name: 'test2' }, (err: any, doc) => console.log(doc));
+
+Test.findOneAndUpdate({ name: 'test' }, { 'docs.0.myId': '0'.repeat(24) });
 
 const query: Query<ITest | null, ITest> = Test.findOne();
 query instanceof Query;

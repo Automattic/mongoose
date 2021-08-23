@@ -1,3 +1,13 @@
+5.13.8 / 2021-08-23
+===================
+ * fix(populate): handle populating subdoc array virtual with sort #10552
+ * fix(model): check for code instead of codeName when checking for existing collections for backwards compat with MongoDB 3.2 #10420
+ * fix(index.d.ts): correct value of this for custom query helper methods #10545
+ * fix(index.d.ts): allow strings for ObjectIds in nested properties #10573
+ * fix(index.d.ts): add match to VirtualTypeOptions.options #8749
+ * fix(index.d.ts): allow QueryOptions populate parameter type PopulateOptions #10587 [osmanakol](https://github.com/osmanakol)
+ * docs(api): add Document#$where to API docs #10583
+
 6.0.0-rc1 / 2021-08-12
 ======================
  * feat: upgrade to MongoDB driver 4.1.0 #10567 #10560

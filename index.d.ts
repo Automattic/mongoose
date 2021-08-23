@@ -536,7 +536,7 @@ declare module 'mongoose' {
     $set(path: string, val: any, type: any, options?: any): this;
     $set(value: any): this;
 
-    /** Additional properties to attach to the query when calling `save()` and `isNew` is false. */
+    /** Set this property to add additional query filters when Mongoose saves this document and `isNew` is false. */
     $where: Record<string, unknown>;
 
     /** If this is a discriminator model, `baseModelName` is the name of the base model. */
@@ -1031,7 +1031,7 @@ declare module 'mongoose' {
     new?: boolean;
     overwrite?: boolean;
     overwriteDiscriminatorKey?: boolean;
-    populate?: string;
+    populate?: string | string[] | PopulateOptions | PopulateOptions[];
     projection?: any;
     /**
      * if true, returns the raw result from the MongoDB driver
@@ -1212,6 +1212,8 @@ declare module 'mongoose' {
   type SchemaPreOptions = { document?: boolean, query?: boolean };
   type SchemaPostOptions = { document?: boolean, query?: boolean };
 
+  type ExtractQueryHelpers<M> = M extends Model<any, infer TQueryHelpers> ? TQueryHelpers : {};
+
   type IndexDirection = 1 | -1 | '2d' | '2dsphere' | 'geoHaystack' | 'hashed' | 'text';
   type IndexDefinition = Record<string, IndexDirection>;
 
@@ -1322,7 +1324,7 @@ declare module 'mongoose' {
     pre<T = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
 
     /** Object of currently defined query helpers on this schema. */
-    query: { [name: string]: Function };
+    query: { [name: string]: (this: QueryWithHelpers<any, DocType, ExtractQueryHelpers<M>>, ...args: any[]) => any };
 
     /** Adds a method call to the queue. */
     queue(name: string, args: any[]): this;
@@ -1545,7 +1547,7 @@ declare module 'mongoose' {
       T extends number[] ? (SchemaDefinitionWithBuiltInClass<number>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<number>>) :
       T extends boolean[] ? (SchemaDefinitionWithBuiltInClass<boolean>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<boolean>>) :
       T extends Function[] ? (SchemaDefinitionWithBuiltInClass<Function>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<Function>>) :
-      T | typeof SchemaType | Schema<any, any>;
+      T | typeof SchemaType | Schema<any, any, any, any>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;
@@ -1788,7 +1790,7 @@ declare module 'mongoose' {
     perDocumentLimit?: number;
 
     /** Additional options like `limit` and `lean`. */
-    options?: QueryOptions;
+    options?: QueryOptions & { match?: AnyObject };
 
     /** Additional options for plugins */
     [extra: string]: any;
@@ -2666,8 +2668,12 @@ declare module 'mongoose' {
   export type UpdateQuery<T> = _UpdateQuery<DocumentDefinition<T>> & MatchKeysAndValues<DocumentDefinition<T>>;
 
   type _AllowStringsForIds<T> = {
-    [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;
-  };
+    [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never]
+      ? T[K] extends TreatAsPrimitives
+        ? T[K]
+        : _AllowStringsForIds<T[K]>
+      : T[K] | string;
+    };
   export type DocumentDefinition<T> = _AllowStringsForIds<LeanDocument<T>>;
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;

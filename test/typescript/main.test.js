@@ -84,7 +84,8 @@ describe('typescript syntax', function() {
   it('queries', function() {
     const errors = runTest('queries.ts', { strict: true });
     printTSErrors(errors);
-    assert.equal(errors.length, 0);
+    assert.equal(errors.length, 1);
+    assert.ok(errors[0].messageText.includes('notAQueryHelper'), errors[0].messageText);
   });
 
   it('create', function() {

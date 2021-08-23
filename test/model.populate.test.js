@@ -4512,6 +4512,57 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('in embedded array with sort (gh-10552)', function() {
+        const AppMenuItemSchema = new Schema({
+          appId: 'ObjectId',
+          moduleId: Number,
+          title: String,
+          parent: {
+            type: mongoose.ObjectId,
+            ref: 'AppMenuItem'
+          },
+          order: Number
+        });
+
+        const moduleSchema = new Schema({
+          _id: Number,
+          title: { type: String },
+          hidden: { type: Boolean }
+        });
+
+        moduleSchema.virtual('menu', {
+          ref: 'Test1',
+          localField: '_id',
+          foreignField: 'moduleId',
+          options: { sort: { title: 1 } }
+        });
+
+        const appSchema = new Schema({
+          modules: [moduleSchema]
+        });
+
+        const App = db.model('Test', appSchema);
+        const AppMenuItem = db.model('Test1', AppMenuItemSchema);
+
+        return co(function*() {
+          let app = yield App.create({ modules: [{ _id: 1, title: 'File' }, { _id: 2, title: 'Preferences' }] });
+          yield AppMenuItem.create([
+            { title: 'Save', moduleId: 1 },
+            { title: 'Save As', moduleId: 1 },
+            { title: 'Undo', moduleId: 2 },
+            { title: 'Redo', moduleId: 2 }
+          ]);
+
+          app = yield App.findById(app).populate('modules.menu');
+          app = app.toObject({ virtuals: true });
+
+          assert.equal(app.modules.length, 2);
+          assert.equal(app.modules[0].menu.length, 2);
+          assert.deepEqual(app.modules[0].menu.map(i => i.title), ['Save', 'Save As']);
+          assert.deepEqual(app.modules[1].menu.map(i => i.title), ['Redo', 'Undo']);
+        });
+      });
+
       it('justOne option (gh-4263)', function(done) {
         const PersonSchema = new Schema({
           name: String,

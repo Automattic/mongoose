@@ -238,12 +238,6 @@ declare module 'mongoose' {
     strict?: boolean | 'throw';
 
     /**
-     * false by default, may be `false`, `true`, or `'throw'`. Sets the default
-     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
-     */
-    strictQuery?: boolean | 'throw';
-
-    /**
      * `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to
      * `toJSON()`, for determining how Mongoose documents get serialized by `JSON.stringify()`
      */
@@ -1465,11 +1459,6 @@ declare module 'mongoose' {
      * schema option to the same shard key and we'll be all set.
      */
     shardKey?: Record<string, unknown>;
-    /**
-     * For backwards compatibility, the strict option does not apply to the filter parameter for queries.
-     * Mongoose has a separate strictQuery option to toggle strict mode for the filter parameter to queries.
-     */
-    strictQuery?: boolean | 'throw';
     /**
      * The strict option, (enabled by default), ensures that values passed to our model constructor that were not
      * specified in our schema do not get saved to the db.

@@ -10,6 +10,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [The `asPromise()` Method for Connections](#the-aspromise-method-for-connections)
 * [`mongoose.connect()` Returns a Promise](#mongoose-connect-returns-a-promise)
 * [Duplicate Query Execution](#duplicate-query-execution)
+* [`strictQuery` is removed and replaced by `strict`](#strictquery-is-removed-and-replaced-by-strict)
 * [MongoError is now MongoServerError](#mongoerror-is-now-mongoservererror)
 * [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)
 * [Schema Defined Document Key Order](#schema-defined-document-key-order)
@@ -79,6 +80,21 @@ await Model.find({}, function(err, result) {});
 const q = Model.find();
 await q;
 await q.clone(); // Can `clone()` the query to allow executing the query again
+```
+
+<h3 id="strictquery-is-removed-and-replaced-by-strict"><a href="#strictquery-is-removed-and-replaced-by-strict">`strictQuery` is removed and replaced by `strict`</a></h3>
+
+Mongoose no longer supports a `strictQuery` option. You must now use `strict`. This means that, by default, Mongoose will filter out filter properties that are not in the schema.
+
+```javascript
+const userSchema = new Schema({ name: String });
+const User = mongoose.model('User', userSchema);
+
+// By default, this is equivalent to `User.find()` because Mongoose filters out `notInSchema`
+await User.find({ notInSchema: 1 });
+
+// Set `strict: false` to opt in to filtering by properties that aren't in the schema
+await User.find({ notInSchema: 1 }, { strict: false });
 ```
 
 <h3 id="mongoerror-is-now-mongoservererror"><a href="#mongoerror-is-now-mongoservererror">MongoError is now MongoServerError</a></h3>

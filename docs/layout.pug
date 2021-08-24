@@ -52,11 +52,9 @@ html(lang='en')
                 a(href="#").pure-menu-link Version #{package.version}
                 ul.pure-menu-children
                   li.pure-menu-item
-                    a.pure-menu-link(href="/docs/v6") Version 6.0.0-rc0
+                    a.pure-menu-link(href="/docs/5.x") Version #{package.latest5x}
                   li.pure-menu-item
                     a.pure-menu-link(href="/docs/4.x") Version #{package.latest4x}
-                  li.pure-menu-item
-                    a.pure-menu-link(href="/docs/3.8.x") Version #{package.latest38x}
               li.pure-menu-item.search
                 input#search-input-nav(type="text", placeholder="Search")
                 button#search-button-nav
@@ -143,7 +141,7 @@ html(lang='en')
               li.pure-menu-item
                 a.pure-menu-link(href="/docs/built-with-mongoose.html", , class=outputUrl === '/docs/built-with-mongoose.html' ? 'selected' : '') Built with Mongoose
             div.cpc-ad
-              <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script>
+              <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script>
         .container
           #content
             block content

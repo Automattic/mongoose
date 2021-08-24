@@ -65,6 +65,7 @@ function getLatestLegacyVersion(startsWith) {
 
 // use last release
 pkg.version = getVersion();
+pkg.latest5x = getLatestLegacyVersion('5.');
 pkg.latest4x = getLatestLegacyVersion('4.');
 pkg.latest38x = getLatestLegacyVersion('3.8');
 

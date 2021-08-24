@@ -14,6 +14,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [MongoError is now MongoServerError](#mongoerror-is-now-mongoservererror)
 * [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)
 * [Schema Defined Document Key Order](#schema-defined-document-key-order)
+* [`sanitizeFilter` and `trusted()`](#sanitizefilter-and-trusted)
 * [Document Parameter to Default Functions](#document-parameter-to-default-functions)
 * [Arrays are Proxies](#arrays-are-proxies)
 * [`typePojoToMixed`](#typepojotomixed)
@@ -136,6 +137,23 @@ const doc = new Test({
 // Note that 'first' comes before 'last', even though the argument to `new Test()` flips the key order.
 // Mongoose uses the schema's key order, not the provided objects' key order.
 assert.deepEqual(Object.keys(doc.toObject().profile.name), ['first', 'last']);
+```
+
+<h3 id="sanitizefilter-and-trusted"><a href="#sanitizefilter-and-trusted">`sanitizeFilter` and `trusted()`</a></h3>
+
+Mongoose 6 introduces a new `sanitizeFilter` option to globals and queries that defends against [query selector injection attacks](https://thecodebarbarian.com/2014/09/04/defending-against-query-selector-injection-attacks.html). If you enable `sanitizeFilter`, Mongoose will wrap any object in the query filter in a `$eq`:
+
+```javascript
+// Mongoose will convert this filter into `{ username: 'val', pwd: { $eq: { $ne: null } } }`, preventing
+// a query selector injection.
+await Test.find({ username: 'val', pwd: { $ne: null } }).setOptions({ sanitizeFilter: true });
+```
+
+To explicitly allow a query selector, use `mongoose.trusted()`:
+
+```javascript
+// `mongoose.trusted()` allows query selectors through
+await Test.find({ username: 'val', pwd: mongoose.trusted({ $ne: null }) }).setOptions({ sanitizeFilter: true });
 ```
 
 <h3 id="document-parameter-to-default-functions"><a href="#document-parameter-to-default-functions">Document Parameter to Default Functions</a></h3>

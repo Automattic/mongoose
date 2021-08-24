@@ -3,14 +3,12 @@ DOCS_ = $(shell find lib/ -name '*.js')
 DOCS = $(DOCS_:.js=.json)
 DOCFILE = docs/source/_docs
 STABLE_BRANCH = master
-NEXT_BRANCH = 6.0
 LEGACY_BRANCH = 4.x
 
 test:
 	./node_modules/.bin/mocha $(T) --async-only test/*.test.js
 
 docs: ghpages merge_stable docclean gendocs search
-docs_next: next docclean_next gendocs copytmp ghpages copynext
 docs_legacy: legacy docclean_legacy gendocs copytmp gitreset ghpages copylegacy
 
 search:

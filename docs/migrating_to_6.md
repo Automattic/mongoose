@@ -31,6 +31,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [ObjectId `valueOf()`](#objectid-valueof)
 * [Immutable `createdAt`](#immutable-createdat)
 * [Removed Validator `isAsync`](#removed-validator-isasync)
+* [Removed `safe`](#removed-safe)
 * [TypeScript changes](#typescript-changes)
 
 <h3 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h3>
@@ -237,6 +238,10 @@ If you set `timestamps: true`, Mongoose will now make the `createdAt` property `
 <h3 id="removed-validator-isasync"><a href="#removed-validator-isasync">Removed Validator `isAsync`</a></h3>
 
 `isAsync` is no longer an option for `validate`. Use an `async function` instead.
+
+<h3 id="removed-safe"><a href="#removed-safe">Removed `safe`</a></h3>
+
+`safe` is no longer an option for schemas, queries, or `save()`. Use `writeConcern` instead.
 
 ## TypeScript changes
 

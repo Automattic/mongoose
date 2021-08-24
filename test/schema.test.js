@@ -943,11 +943,11 @@ describe('schema', function() {
       let Tobi = new Schema({}, { collection: 'users' });
 
       Tobi.set('a', 'b');
-      Tobi.set('safe', false);
+      Tobi.set('writeConcern', { w: 0 });
       assert.equal(Tobi.options.collection, 'users');
 
       assert.equal(Tobi.options.a, 'b');
-      assert.deepEqual(Tobi.options.safe, { w: 0 });
+      assert.deepEqual(Tobi.options.writeConcern, { w: 0 });
       assert.equal(Tobi.options.read, null);
 
       const tags = [{ x: 1 }];

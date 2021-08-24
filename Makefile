@@ -11,6 +11,9 @@ test:
 docs: ghpages merge_stable docclean gendocs search
 docs_legacy: legacy docclean_legacy gendocs copytmp gitreset ghpages copylegacy
 
+ghpages:
+	git checkout gh-pages
+
 search:
 	node docs/search.js
 

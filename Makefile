@@ -3,7 +3,7 @@ DOCS_ = $(shell find lib/ -name '*.js')
 DOCS = $(DOCS_:.js=.json)
 DOCFILE = docs/source/_docs
 STABLE_BRANCH = master
-LEGACY_BRANCH = 4.x
+LEGACY_BRANCH = 5.x
 
 test:
 	./node_modules/.bin/mocha $(T) --async-only test/*.test.js
@@ -23,25 +23,15 @@ site:
 merge_stable:
 	git merge $(STABLE_BRANCH)
 
-ghpages:
-	git checkout gh-pages
-
 legacy:
 	git checkout $(LEGACY_BRANCH)
-
-next:
-	git checkout $(NEXT_BRANCH)
 
 docclean:
 	rm -f ./docs/*.{1,html,json}
 	rm -f ./docs/source/_docs
 
 docclean_legacy:
-	rm -rf ./docs/v6/*
-	rm -f ./docs/source/_docs
-
-docclean_next:
-	rm -rf ./docs/$(NEXT_BRANCH)/*
+	rm -rf ./docs/$(LEGACY_BRANCH)/*
 	rm -f ./docs/source/_docs
 
 copytmp:
@@ -63,9 +53,4 @@ gitreset:
 copylegacy:
 	mkdir -p ./docs/$(LEGACY_BRANCH)
 	cp -R ./tmp/* ./docs/$(LEGACY_BRANCH)/
-	rm -rf ./tmp
-
-copynext:
-	mkdir -p ./docs/v6
-	cp -R ./tmp/* ./docs/v6/
 	rm -rf ./tmp

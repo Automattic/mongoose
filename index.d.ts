@@ -1715,7 +1715,8 @@ declare module 'mongoose' {
      * schema.index({ prop1: 1 }, { expires: '7d' })
      * ```
      */
-    expires?: number | string
+    expires?: number | string;
+    weights?: AnyObject;
   }
 
   interface ValidatorProps {

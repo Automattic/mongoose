@@ -84,19 +84,12 @@ describe('defaults docs', function() {
   });
 
   /**
-   * By default, mongoose only applies defaults when you create a new document.
-   * It will **not** set defaults if you use `update()` and
-   * `findOneAndUpdate()`. However, mongoose 4.x lets you opt-in to this
-   * behavior using the `setDefaultsOnInsert` option.
+   * Mongoose also applies defaults when you upsert a document.
+   * Mongoose only applies defaults on upsert if a new document is
+   * inserted, not if the upsert updated an existing document.
    *
-   * ## Important
-   *
-   * The `setDefaultsOnInsert` option relies on the
-   * [MongoDB `$setOnInsert` operator](https://docs.mongodb.org/manual/reference/operator/update/setOnInsert/).
-   * The `$setOnInsert` operator was introduced in MongoDB 2.4. If you're
-   * using MongoDB server < 2.4.0, do **not** use `setDefaultsOnInsert`.
    */
-  it('The `setDefaultsOnInsert` option', function(done) {
+  it('The `setDefaultsOnInsert` option', function() {
     const schema = new Schema({
       title: String,
       genre: { type: String, default: 'Action' }
@@ -109,21 +102,18 @@ describe('defaults docs', function() {
     const options = {
       // Return the document after updates are applied
       new: true,
-      // Create a document if one isn't found. Required
-      // for `setDefaultsOnInsert`
-      upsert: true,
-      setDefaultsOnInsert: true
+      // Create a document if one isn't found.
+      upsert: true
     };
 
-    Movie.
-      findOneAndUpdate(query, update, options, function(error, doc) {
-        assert.ifError(error);
-        assert.equal(doc.title, 'The Terminator');
-        assert.equal(doc.genre, 'Action');
-        // acquit:ignore:start
-        done();
-        // acquit:ignore:end
-      });
+    return Movie.findOneAndUpdate(query, update, options).then(doc => {
+      doc.genre; // 'Action', Mongoose set a default value.
+      // acquit:ignore:start
+      assert.equal(doc.title, 'The Terminator');
+      assert.equal(doc.genre, 'Action');
+      // acquit:ignore:end
+      return doc;
+    });
   });
 
   /**

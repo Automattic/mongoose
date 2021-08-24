@@ -6,7 +6,6 @@
 
 const start = require('./common');
 
-const Buffer = require('safe-buffer').Buffer;
 const MongooseBuffer = require('../lib/types/buffer');
 const ObjectId = require('../lib/types/objectid');
 const StateMachine = require('../lib/statemachine');
@@ -222,6 +221,19 @@ describe('utils', function() {
     assert.ok(!utils.deepEqual(a, []));
     assert.ok(!utils.deepEqual([], a));
     done();
+  });
+
+  it('`deepEqual` treats objects with different order of keys as different (gh-9571)', function() {
+    const user1 = {
+      name: 'Hafez',
+      age: 26
+    };
+    const user2 = {
+      age: 26,
+      name: 'Hafez'
+    };
+
+    assert.equal(utils.deepEqual(user1, user2), false);
   });
 
   describe('clone', function() {

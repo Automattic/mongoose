@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

@@ -183,9 +183,7 @@ describe('model middleware', function() {
       next();
     });
 
-    mongoose.model('TestMiddleware', schema);
-
-    const TestMiddleware = db.model('TestMiddleware');
+    const TestMiddleware = db.model('TestMiddleware', schema);
 
     const test = new TestMiddleware();
 

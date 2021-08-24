@@ -186,7 +186,7 @@ for await (const doc of Person.find()) {
 
 Cursors are subject to [cursor timeouts](https://stackoverflow.com/questions/21853178/when-a-mongodb-cursor-will-expire).
 By default, MongoDB will close your cursor after 10 minutes and subsequent
-`next()` calls will result in a `MongoError: cursor id 123 not found` error.
+`next()` calls will result in a `MongoServerError: cursor id 123 not found` error.
 To override this, set the `noCursorTimeout` option on your cursor.
 
 ```javascript

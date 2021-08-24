@@ -843,11 +843,11 @@ describe('model: findOneAndUpdate:', function() {
       let fruit = yield Fruit.create({ name: 'Apple' });
 
       fruit = yield Fruit.findOneAndUpdate({}, { $set: { name: 'Banana' } },
-        { new: true, useFindAndModify: false });
+        { new: true });
       assert.ok(fruit instanceof mongoose.Document);
 
       fruit = yield Fruit.findOneAndUpdate({}, { $set: { name: 'Cherry' } },
-        { new: true, useFindAndModify: true });
+        { new: true });
       assert.ok(fruit instanceof mongoose.Document);
     });
   });
@@ -1159,7 +1159,7 @@ describe('model: findOneAndUpdate:', function() {
       });
       const Breakfast = db.model('Test', s);
 
-      const updateOptions = { upsert: true, setDefaultsOnInsert: true, new: true };
+      const updateOptions = { upsert: true, new: true };
       Breakfast.findOneAndUpdate(
         {},
         { base: 'eggs' },
@@ -1184,7 +1184,7 @@ describe('model: findOneAndUpdate:', function() {
       }, { versionKey: null });
       const Breakfast = db.model('Test', s);
 
-      const updateOptions = { upsert: true, setDefaultsOnInsert: true, new: true };
+      const updateOptions = { upsert: true, new: true };
       Breakfast.findOneAndUpdate(
         { topping: 'sausage', numEggs: 4 },
         { base: 'eggs' },
@@ -1205,7 +1205,7 @@ describe('model: findOneAndUpdate:', function() {
       });
       const Breakfast = db.model('Test', s);
 
-      const updateOptions = { upsert: true, setDefaultsOnInsert: true, new: true };
+      const updateOptions = { upsert: true, new: true };
       Breakfast.findOneAndUpdate(
         { topping: { $ne: 'sausage' } },
         { base: 'eggs' },
@@ -1236,7 +1236,7 @@ describe('model: findOneAndUpdate:', function() {
 
       return co(function*() {
         const update = { $setOnInsert: { username: 'test' } };
-        const opts = { upsert: true, setDefaultsOnInsert: true, new: true };
+        const opts = { upsert: true, new: true };
         const doc = yield Profile.findOneAndUpdate({}, update, opts);
         assert.equal(doc.socialMediaHandles, undefined);
       });
@@ -1261,7 +1261,6 @@ describe('model: findOneAndUpdate:', function() {
 
       const updateOptions = {
         upsert: true,
-        setDefaultsOnInsert: true,
         runValidators: true,
         new: true
       };
@@ -1426,7 +1425,7 @@ describe('model: findOneAndUpdate:', function() {
       const TestModel = db.model('Test', testSchema);
       TestModel.create({ id: '1' }, function(error) {
         assert.ifError(error);
-        TestModel.findOneAndUpdate({ id: '1' }, { $set: { name: 'Joe' } }, { upsert: true, setDefaultsOnInsert: true },
+        TestModel.findOneAndUpdate({ id: '1' }, { $set: { name: 'Joe' } }, { upsert: true },
           function(error) {
             assert.ifError(error);
             done();
@@ -1444,7 +1443,7 @@ describe('model: findOneAndUpdate:', function() {
       const TestModel = db.model('Test', testSchema);
       TestModel.create({ blob: null, status: 'active' }, function(error) {
         assert.ifError(error);
-        TestModel.findOneAndUpdate({ id: '1', blob: null }, { $set: { status: 'inactive' } }, { upsert: true, setDefaultsOnInsert: true },
+        TestModel.findOneAndUpdate({ id: '1', blob: null }, { $set: { status: 'inactive' } }, { upsert: true },
           function(error) {
             assert.ifError(error);
             done();
@@ -1468,7 +1467,7 @@ describe('model: findOneAndUpdate:', function() {
       const TestModel = db.model('Test', testSchema);
       TestModel.create({ id: '1' }, function(error) {
         assert.ifError(error);
-        TestModel.findOneAndUpdate({ id: '1' }, { $set: { name: 'Joe' } }, { upsert: true, setDefaultsOnInsert: true },
+        TestModel.findOneAndUpdate({ id: '1' }, { $set: { name: 'Joe' } }, { upsert: true },
           function(error) {
             assert.ifError(error);
             done();
@@ -1487,7 +1486,7 @@ describe('model: findOneAndUpdate:', function() {
 
       const TestModel = db.model('Test', testSchema);
       const update = { $setOnInsert: { a: [{ foo: 'bar' }], b: [2] } };
-      const opts = { upsert: true, new: true, setDefaultsOnInsert: true };
+      const opts = { upsert: true, new: true };
       TestModel
         .findOneAndUpdate({ name: 'abc' }, update, opts,
           function(error, doc) {
@@ -1662,8 +1661,7 @@ describe('model: findOneAndUpdate:', function() {
         upsert: false,
         passRawResult: false,
         overwrite: false,
-        runValidators: true,
-        setDefaultsOnInsert: true
+        runValidators: true
       };
       Board.
         findOneAndUpdate({}, update, opts).
@@ -1718,7 +1716,6 @@ describe('model: findOneAndUpdate:', function() {
       const Model = db.model('Test', modelSchema);
       Model.findOneAndUpdate({ nonexistingField: 1 }, { field: 2 }, {
         upsert: true,
-        setDefaultsOnInsert: true,
         new: true
       }).exec(function(error) {
         assert.ok(error);
@@ -1915,7 +1912,7 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
-    it('only calls setters once with useFindAndModify (gh-6203)', function() {
+    it('only calls setters once (gh-6203)', function() {
       return co(function*() {
         const calls = [];
         const userSchema = new mongoose.Schema({
@@ -1930,129 +1927,9 @@ describe('model: findOneAndUpdate:', function() {
         });
         const Model = db.model('User', userSchema);
 
-        yield Model.findOneAndUpdate({ foo: '123' }, { name: 'bar' }, {
-          useFindAndModify: false
-        });
+        yield Model.findOneAndUpdate({ foo: '123' }, { name: 'bar' });
 
         assert.deepEqual(calls, ['123']);
-      });
-    });
-
-    it('useFindAndModify in opts (gh-5616)', function(done) {
-      const m = new mongoose.constructor();
-
-      m.connect(start.uri, { useNewUrlParser: true });
-
-      const calls = [];
-      m.set('debug', function(collection, fnName) {
-        calls.push({ collection: collection, fnName: fnName });
-      });
-
-      const schema = new m.Schema({
-        arr: [String]
-      });
-
-      const Model = m.model('Test', schema);
-
-      const update = { $push: { arr: 'test' } };
-      const options = { useFindAndModify: false };
-      Model.findOneAndUpdate({}, update, options, function() {
-        assert.equal(calls.length, 1);
-        assert.equal(calls[0].collection, 'tests');
-        assert.equal(calls[0].fnName, 'findOneAndUpdate');
-        m.disconnect();
-        done();
-      });
-    });
-
-    it('useFindAndModify in set (gh-5616)', function(done) {
-      const m = new mongoose.constructor();
-
-      m.connect(start.uri, { useNewUrlParser: true });
-
-      const calls = [];
-      m.set('debug', function(collection, fnName) {
-        calls.push({ collection: collection, fnName: fnName });
-      });
-
-      m.set('useFindAndModify', false);
-      const schema = new m.Schema({
-        arr: [String]
-      });
-
-      const Model = m.model('Test', schema);
-
-      const update = { $push: { arr: 'test' } };
-      const options = {};
-      Model.findOneAndUpdate({}, update, options, function() {
-        assert.equal(calls.length, 1);
-        assert.equal(calls[0].collection, 'tests');
-        assert.equal(calls[0].fnName, 'findOneAndUpdate');
-        m.disconnect();
-        done();
-      });
-    });
-
-    it('useFindAndModify in connection options (gh-7108)', function(done) {
-      const m = new mongoose.constructor();
-      m.connect(start.uri, { useNewUrlParser: true, useFindAndModify: false });
-
-      const calls = [];
-      m.set('debug', function(collection, fnName) {
-        calls.push({ collection: collection, fnName: fnName });
-      });
-
-      const Model = m.model('Test', { name: String });
-      const update = { name: 'test' };
-      Model.findOneAndUpdate({}, update, {}, function() {
-        assert.equal(calls.length, 1);
-        assert.equal(calls[0].collection, 'tests');
-        assert.equal(calls[0].fnName, 'findOneAndUpdate');
-        m.disconnect();
-        done();
-      });
-    });
-
-    it('useFindAndModify with overwrite (gh-6887)', function() {
-      return co(function*() {
-        const m = new mongoose.constructor();
-        yield m.connect(start.uri, { useNewUrlParser: true });
-
-        const calls = [];
-        m.set('debug', function(collection, fnName) {
-          calls.push({ collection: collection, fnName: fnName });
-        });
-
-        m.set('useFindAndModify', false);
-
-        const schema = new m.Schema({
-          name: String,
-          age: Number,
-          location: String
-        });
-
-        const Model = m.model('Test', schema);
-
-        const options = { overwrite: true, new: true };
-        const doc = yield Model.create({ name: 'Jennifer', location: 'Taipei' });
-        const newDoc1 = yield Model.findOneAndUpdate({ name: 'Jennifer' }, { age: 24 }, options);
-        const newDoc2 = yield Model.findByIdAndUpdate(doc._id, { name: 'Fonger', location: 'Hsinchu' }, options);
-
-        assert.strictEqual(newDoc1.name, undefined);
-        assert.strictEqual(newDoc1.age, 24);
-        assert.strictEqual(newDoc1.location, undefined);
-
-        assert.strictEqual(newDoc2.name, 'Fonger');
-        assert.strictEqual(newDoc2.age, undefined);
-        assert.strictEqual(newDoc2.location, 'Hsinchu');
-
-        assert.equal(calls.length, 3);
-        assert.equal(calls[1].collection, 'tests');
-        assert.equal(calls[1].collection, 'tests');
-        assert.equal(calls[2].fnName, 'findOneAndReplace');
-        assert.equal(calls[2].fnName, 'findOneAndReplace');
-
-        m.disconnect();
       });
     });
 
@@ -2203,7 +2080,6 @@ describe('model: findOneAndUpdate:', function() {
       const user = { name: 'upsert', foo: uuid.v4() };
       const opts = {
         upsert: true,
-        setDefaultsOnInsert: true,
         new: true
       };
       User.findOneAndUpdate({}, user, opts).exec(function(error, doc) {
@@ -2408,7 +2284,7 @@ describe('model: findOneAndUpdate:', function() {
       yield Cat.create({ name: 'test' });
       const res = yield Cat.findOneAndUpdate({}, {
         name: 'test2'
-      }, { returnOriginal: false, useFindAndModify: false });
+      }, { returnOriginal: false });
       assert.equal(res.name, 'test2');
     });
   });
@@ -2457,7 +2333,7 @@ describe('model: findOneAndUpdate:', function() {
       prop: String
     }));
 
-    const opts = { upsert: true, setDefaultsOnInsert: true, new: true };
+    const opts = { upsert: true, new: true };
     return Model.findOneAndUpdate({}, { prop: 'foo', L1: {} }, opts).lean().
       then(doc => assert.equal(doc.L1.L2.name, 'foo'));
   });

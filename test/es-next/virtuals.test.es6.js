@@ -10,7 +10,7 @@ const Schema = mongoose.Schema;
 
 describe('Virtuals', function() {
   before(async function() {
-    await mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true });
+    await mongoose.connect('mongodb://localhost:27017/test');
   });
 
   beforeEach(function() {
@@ -133,7 +133,7 @@ describe('Virtuals', function() {
     // acquit:ignore:end
     // Will **not** find any results, because `domain` is not stored in
     // MongoDB.
-    const doc = await User.findOne({ domain: 'gmail.com' });
+    const doc = await User.findOne({ domain: 'gmail.com' }, null, { strict: false });
     doc; // undefined
     // acquit:ignore:start
     assert.equal(doc, null);

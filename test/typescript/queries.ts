@@ -99,7 +99,7 @@ Test.findOneAndUpdate({ name: 'test' }, update);
 Test.findOneAndUpdate({ name: 'test' }, { $currentDate: { endDate: true } });
 Test.findOneAndUpdate({ name: 'test' }, [{ $set: { endDate: true } }]);
 
-Test.findByIdAndUpdate({ name: 'test' }, { name: 'test2' }, (err, doc) => console.log(doc));
+Test.findByIdAndUpdate({ name: 'test' }, { name: 'test2' }, (err: any, doc) => console.log(doc));
 
 Test.findOneAndUpdate({ name: 'test' }, { 'docs.0.myId': '0'.repeat(24) });
 

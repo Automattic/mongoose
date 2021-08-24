@@ -15,8 +15,6 @@ markdown.setOptions({
   }
 });
 
-mongoose.set('useCreateIndex', true);
-
 const contentSchema = new mongoose.Schema({
   title: { type: String, required: true },
   body: { type: String, required: true },
@@ -114,7 +112,7 @@ for (const filename of files) {
 run().catch(error => console.error(error.stack));
 
 async function run() {
-  await mongoose.connect(config.uri, { useNewUrlParser: true, dbName: 'mongoose' });
+  await mongoose.connect(config.uri, { dbName: 'mongoose' });
 
   await Content.deleteMany({});
   for (const content of contents) {

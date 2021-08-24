@@ -47,7 +47,7 @@ function getVersion() {
 }
 
 function getLatestLegacyVersion(startsWith) {
-  const hist = fs.readFileSync('./History.md', 'utf8').replace(/\r/g, '\n').split('\n');
+  const hist = fs.readFileSync('./CHANGELOG.md', 'utf8').replace(/\r/g, '\n').split('\n');
 
   for (const rawLine of hist) {
     const line = (rawLine || '').trim();
@@ -65,6 +65,7 @@ function getLatestLegacyVersion(startsWith) {
 
 // use last release
 pkg.version = getVersion();
+pkg.latest5x = getLatestLegacyVersion('5.');
 pkg.latest4x = getLatestLegacyVersion('4.');
 pkg.latest38x = getLatestLegacyVersion('3.8');
 

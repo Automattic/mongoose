@@ -132,7 +132,7 @@ describe('versioning', function() {
   it('version works with existing unversioned docs', function(done) {
     const V = BlogPost;
 
-    V.collection.insertOne({ title: 'unversioned', numbers: [1, 2, 3] }, { safe: true }, function(err) {
+    V.collection.insertOne({ title: 'unversioned', numbers: [1, 2, 3] }, function(err) {
       assert.ifError(err);
       V.findOne({ title: 'unversioned' }, function(err, d) {
         assert.ifError(err);
@@ -270,7 +270,8 @@ describe('versioning', function() {
       a.meta.numbers.pull(2);
       b.meta.numbers.push(10);
 
-      yield [a.save(), b.save()];
+      yield a.save();
+      yield b.save();
 
       a = yield BlogPost.findById(a);
       assert.deepEqual(a.toObject().meta.numbers, [4, 6, 8, 10]);
@@ -555,19 +556,6 @@ describe('versioning', function() {
       thing_2.set({ price: 1 });
       const err = yield thing_2.save().then(() => null, err => err);
       assert.equal(err.name, 'DocumentNotFoundError');
-    });
-  });
-
-  describe('versioning is off', function() {
-    it('when { safe: false } is set (gh-1520)', function(done) {
-      const schema1 = new Schema({ title: String }, { safe: false });
-      assert.equal(schema1.options.versionKey, false);
-      done();
-    });
-    it('when { safe: { w: 0 }} is set (gh-1520)', function(done) {
-      const schema1 = new Schema({ title: String }, { safe: { w: 0 } });
-      assert.equal(schema1.options.versionKey, false);
-      done();
     });
   });
 

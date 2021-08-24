@@ -43,25 +43,25 @@ function test(): void {
 
   const cardDbSchema: Schema = new Schema(
     cardDbBaseSchemaDefinition,
-    cardDbSchemaOptions,
+    cardDbSchemaOptions
   );
 
   const cardDbModel: Model<CardDb> = mongoose.model<CardDb>(
     'Card',
     cardDbSchema,
-    'card',
+    'card'
   );
 
   const landDbAdditionalPropertiesSchemaDefinition: SchemaDefinition = {};
 
   const landDbSchema: Schema = new Schema(
-    landDbAdditionalPropertiesSchemaDefinition,
+    landDbAdditionalPropertiesSchemaDefinition
   );
 
   const landDbModel: Model<LandDb> = cardDbModel.discriminator<LandDb>(
     'Land',
     landDbSchema,
-    CardType.Land,
+    CardType.Land
   );
 
   const sampleLandDb: LandDb = new landDbModel({

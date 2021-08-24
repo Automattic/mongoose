@@ -203,7 +203,7 @@ describe('Map', function() {
       assert.ok(doc.m instanceof Map);
       assert.deepEqual(Array.from(doc.toObject().m.keys()), ['bacon', 'eggs']);
 
-      yield Test.updateOne({}, { n: 1 }, { upsert: true, setDefaultsOnInsert: true });
+      yield Test.updateOne({}, { n: 1 }, { upsert: true });
 
       const saved = yield Test.findOne({ n: 1 });
       assert.ok(saved);
@@ -372,7 +372,7 @@ describe('Map', function() {
         const doc = yield User.create({ apiKeys: { github: key._id, twitter: key2._id } });
 
         const _doc = yield User.findById(doc);
-        yield _doc.populate('apiKeys').execPopulate();
+        yield _doc.populate('apiKeys');
 
         assert.equal(_doc.apiKeys.get('github').key, 'abc123');
         assert.equal(_doc.apiKeys.get('twitter').key, 'key');
@@ -1034,5 +1034,42 @@ describe('Map', function() {
       const res = yield Budget.findOne();
       assert.deepEqual(res.toObject().budgeted.get('2020'), [100, 200, 10]);
     });
+  });
+
+  it('can populate map of subdocs with doc array using ref function (gh-10584)', async function() {
+    const Person = db.model('Person', Schema({ name: String }));
+    const Book = db.model('Book', Schema({ title: String }));
+
+    const schema = new Schema({
+      myMap: {
+        type: Map,
+        of: {
+          modelId: String,
+          data: [{
+            _id: {
+              type: mongoose.ObjectId,
+              ref: doc => doc.$parent().modelId
+            }
+          }]
+        }
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const people = await Person.create({ name: 'John' });
+    const book = await Book.create({ title: 'Intro to CS' });
+
+    await Test.create({
+      myMap: {
+        key1: { modelId: 'Person', data: [{ _id: people._id }] },
+        key2: { modelId: 'Book', data: [{ _id: book._id }] }
+      }
+    });
+
+    const res = await Test.findOne().populate('myMap.$*.data._id');
+    assert.equal(res.myMap.get('key1').data.length, 1);
+    assert.equal(res.myMap.get('key1').data[0]._id.name, 'John');
+    assert.equal(res.myMap.get('key2').data.length, 1);
+    assert.equal(res.myMap.get('key2').data[0]._id.title, 'Intro to CS');
   });
 });

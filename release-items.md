@@ -2,7 +2,7 @@
 
 1.  tests must pass
 2.  update `package.json` and `package-lock.json` version
-3.  update History.md using `git changelog` or similar. Add #<TICKET_NUMBER> as well as a link to the github user who fixed it if applicable.
+3.  update `CHANGELOG.md`. Add #<TICKET_NUMBER> as well as a link to the github user who fixed it if applicable.
 4.  git commit -a -m 'release x.x.x'
 5.  git tag x.x.x
 6.  `npm run release`, or `npm run release-legacy` for 4.x

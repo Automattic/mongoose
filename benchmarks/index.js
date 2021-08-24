@@ -1,7 +1,5 @@
 'use strict';
 
-const Buffer = require('safe-buffer').Buffer;
-
 Error.stackTraceLimit = Infinity;
 const out = process.argv.length < 3;
 function log() {
@@ -151,7 +149,4 @@ run('array of docs', function() {
   });
 });
 
-// console.error(a.toObject({depopulate:true}));
 console.error('completed %d docs in %d seconds (%d dps)', numdocs, totaltime, numdocs / totaltime);
-
-// --trace-opt --trace-deopt --trace-bailout

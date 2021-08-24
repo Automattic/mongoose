@@ -171,6 +171,7 @@ describe('model field selection', function() {
         assert.strictEqual(true, Array.isArray(found[0].comments));
         assert.equal(found[0].comments.length, 1);
         assert.equal(found[0].comments[0].title, ':)');
+
         assert.strictEqual(undefined, found[0].comments[0]._id);
         // gh-590
         assert.ok(!found[0].comments[0].id);
@@ -183,7 +184,7 @@ describe('model field selection', function() {
     const id = new DocumentObjectId;
 
     BlogPostB.collection.insertOne(
-      { _id: id, title: 'issue 870' }, { safe: true }, function(err) {
+      { _id: id, title: 'issue 870' }, function(err) {
         assert.ifError(err);
 
         BlogPostB.findById(id, 'def comments', function(err, found) {

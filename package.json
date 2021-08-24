@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.13.8",
+  "version": "6.0.0",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -19,17 +19,13 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@types/mongodb": "^3.5.27",
-    "bson": "^1.1.4",
+    "bson": "^4.2.2",
     "kareem": "2.3.2",
-    "mongodb": "3.6.11",
-    "mongoose-legacy-pluralize": "1.0.2",
+    "mongodb": "4.1.1",
     "mpath": "0.8.3",
-    "mquery": "3.2.5",
+    "mquery": "4.0.0",
     "ms": "2.1.2",
-    "optional-require": "1.0.x",
     "regexp-clone": "1.0.0",
-    "safe-buffer": "5.2.1",
     "sift": "13.5.2",
     "sliced": "1.0.1"
   },
@@ -80,13 +76,13 @@
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
     "test": "mocha --exit ./test/*.test.js ./test/typescript/main.test.js",
-    "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --watch --recursive --watch-files ./**/*.js",
+    "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
   "types": "./index.d.ts",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=12.0.0"
   },
   "bugs": {
     "url": "https://github.com/Automattic/mongoose/issues/new"
@@ -109,31 +105,29 @@
     "extends": [
       "eslint:recommended"
     ],
-    "overrides": [
-      {
-        "files": [
-          "**/*.{ts,tsx}"
-        ],
-        "extends": [
-          "plugin:@typescript-eslint/eslint-recommended",
-          "plugin:@typescript-eslint/recommended"
-        ],
-        "plugins": [
-          "@typescript-eslint"
-        ],
-        "rules": {
-          "@typescript-eslint/no-explicit-any": "off",
-          "@typescript-eslint/ban-types": "off",
-          "@typescript-eslint/no-unused-vars": "off",
-          "@typescript-eslint/explicit-module-boundary-types": "off"
-        }
+    "overrides": [{
+      "files": [
+        "**/*.{ts,tsx}"
+      ],
+      "extends": [
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+      ],
+      "plugins": [
+        "@typescript-eslint"
+      ],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/ban-types": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off"
       }
-    ],
+    }],
     "plugins": [
       "mocha-no-only"
     ],
     "parserOptions": {
-      "ecmaVersion": 2015
+      "ecmaVersion": 2020
     },
     "env": {
       "node": true,

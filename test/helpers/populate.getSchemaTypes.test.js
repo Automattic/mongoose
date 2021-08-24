@@ -49,7 +49,7 @@ describe('getSchemaTypes', function() {
       ]
     };
 
-    const schemaTypes = getSchemaTypes(BundleSchema, doc, 'items.author');
+    const schemaTypes = getSchemaTypes(null, BundleSchema, doc, 'items.author');
 
     assert.ok(Array.isArray(schemaTypes));
     // Make sure we only got the schema paths for Book and EBook, and none
@@ -124,7 +124,7 @@ describe('getSchemaTypes', function() {
         ]
       }
     };
-    const schemaTypes = getSchemaTypes(BundleSchema, doc, 'level2.items.author');
+    const schemaTypes = getSchemaTypes(null, BundleSchema, doc, 'level2.items.author');
 
     assert.ok(Array.isArray(schemaTypes));
     // Make sure we only got the schema paths for Book and EBook, and none
@@ -161,7 +161,7 @@ describe('getSchemaTypes', function() {
     assert.equal(driver.cars[0].name, '1970 Dodge Charger');
     assert.ok(driver.populated('cars'));
 
-    const schematype = getSchemaTypes(DriverSchema, driver, 'cars.producer');
+    const schematype = getSchemaTypes(null, DriverSchema, driver, 'cars.producer');
     assert.equal(schematype.options.ref, 'gh6798_Producer');
 
     done();
@@ -179,7 +179,7 @@ describe('getSchemaTypes', function() {
     }));
     contentPath.discriminator('Wall', new Schema({ color: String }));
 
-    const schemaTypes = getSchemaTypes(mapSchema, null, 'tiles.enemy');
+    const schemaTypes = getSchemaTypes(null, mapSchema, null, 'tiles.enemy');
     assert.ok(Array.isArray(schemaTypes));
     assert.equal(schemaTypes.length, 1);
     assert.equal(schemaTypes[0].options.ref, 'Enemy');

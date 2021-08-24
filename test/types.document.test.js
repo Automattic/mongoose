@@ -9,9 +9,9 @@ const start = require('./common');
 
 const assert = require('assert');
 const mongoose = start.mongoose;
-const EmbeddedDocument = require('../lib/types/embedded');
+const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const EventEmitter = require('events').EventEmitter;
-const DocumentArray = require('../lib/types/documentarray');
+const DocumentArray = require('../lib/types/DocumentArray');
 const Schema = mongoose.Schema;
 const ValidationError = mongoose.Document.ValidationError;
 
@@ -37,15 +37,13 @@ describe('types.document', function() {
     Dummy.prototype.$__setSchema(new Schema);
 
     function _Subdocument() {
-      const arr = new DocumentArray;
-      arr.$path = () => 'jsconf.ar';
-      arr.$parent = () => new Dummy;
+      const arr = new DocumentArray([], 'jsconf.ar', new Dummy);
       arr[0] = this;
-      EmbeddedDocument.call(this, {}, arr);
+      ArraySubdocument.call(this, {}, arr);
     }
     Subdocument = _Subdocument;
 
-    Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
+    Subdocument.prototype.__proto__ = ArraySubdocument.prototype;
 
     for (const i in EventEmitter.prototype) {
       Subdocument[i] = EventEmitter.prototype[i];
@@ -66,12 +64,15 @@ describe('types.document', function() {
       ratings: [RatingSchema]
     });
 
-    mongoose.model('Movie', MovieSchema);
     db = start();
   });
 
   after(function(done) {
     db.close(done);
+  });
+
+  beforeEach(function() {
+    db.deleteModel(/.*/);
   });
 
   it('test that validate sets errors', function(done) {
@@ -108,7 +109,7 @@ describe('types.document', function() {
   });
 
   it('cached _ids', function(done) {
-    const Movie = db.model('Movie');
+    const Movie = db.model('Movie', MovieSchema);
     const m = new Movie;
 
     assert.equal(m.id, m.$__._id);
@@ -128,7 +129,7 @@ describe('types.document', function() {
   });
 
   it('Subdocument#remove (gh-531)', function(done) {
-    const Movie = db.model('Movie');
+    const Movie = db.model('Movie', MovieSchema);
 
     const super8 = new Movie({ title: 'Super 8' });
 
@@ -200,7 +201,7 @@ describe('types.document', function() {
 
   describe('setting nested objects', function() {
     it('works (gh-1394)', function(done) {
-      const Movie = db.model('Movie');
+      const Movie = db.model('Movie', MovieSchema);
 
       Movie.create({
         title: 'Life of Pi',

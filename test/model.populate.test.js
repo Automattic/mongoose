@@ -10,7 +10,6 @@ const assert = require('assert');
 const co = require('co');
 const utils = require('../lib/utils');
 const util = require('./util');
-const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -560,8 +559,12 @@ describe('model: populate:', function() {
     function next(_id) {
       Sample.findOne({ _id }, function(error, sample) {
         assert.ifError(error);
-        const opts = { path: 'items.company', options: { lean: true } };
-        Company.populate(sample, opts, function(error) {
+        const opts = {
+          path: 'items.company',
+          options: { lean: true },
+          model: Company
+        };
+        Sample.populate(sample, opts, function(error) {
           assert.ifError(error);
           assert.strictEqual(sample.items[1].company, void 0);
           done();
@@ -1386,7 +1389,11 @@ describe('model: populate:', function() {
           // non-existant subprop
           BlogPost
             .findById(post._id)
-            .populate('comments._idontexist', 'email')
+            .populate({
+              path: 'comments._idontexist',
+              select: 'email',
+              strictPopulate: false
+            })
             .exec(function(err) {
               assert.ifError(err);
 
@@ -1400,7 +1407,12 @@ describe('model: populate:', function() {
                   // helpful when populating mapReduce results too.
                   BlogPost
                     .findById(post._id)
-                    .populate('comments._idontexist', 'email', 'User')
+                    .populate({
+                      path: 'comments._idontexist',
+                      select: 'email',
+                      model: 'User',
+                      strictPopulate: false
+                    })
                     .exec(function(err, post) {
                       assert.ifError(err);
                       assert.ok(post);
@@ -2967,7 +2979,7 @@ describe('model: populate:', function() {
           }).save();
         }).
         then(function(basket) {
-          return basket.populate('balls.ball').execPopulate();
+          return basket.populate('balls.ball');
         }).
         then(function(basket) {
           assert.equal(basket.balls[0].ball.seam, 'yarn');
@@ -3037,7 +3049,7 @@ describe('model: populate:', function() {
       function test(id) {
         Parent.findById(id, function(error, doc) {
           assert.ifError(error);
-          doc.populate('children.toy.value').execPopulate().then(function(doc) {
+          doc.populate('children.toy.value').then(function(doc) {
             assert.equal(doc.children[0].toy.value.name, 'model-A');
             assert.equal(doc.children[1].toy.value, null);
             assert.equal(doc.children[2].toy.value.name, 'model-B');
@@ -3220,12 +3232,12 @@ describe('model: populate:', function() {
       const User = db.model('User', UserSchema);
 
       const user = {
-        _id: mongoose.Types.ObjectId(),
+        _id: new mongoose.Types.ObjectId(),
         name: 'Arnold'
       };
 
       const post = {
-        _id: mongoose.Types.ObjectId(),
+        _id: new mongoose.Types.ObjectId(),
         comments: [
           {},
           {
@@ -3321,7 +3333,7 @@ describe('model: populate:', function() {
       ]);
 
       let agent = yield Agent.findOne({});
-      yield agent.populate('coopBrands.products').execPopulate();
+      yield agent.populate('coopBrands.products');
       agent = agent.toObject({ virtuals: true });
       assert.equal(agent.coopBrands[0].products.length, 2);
       assert.deepEqual(agent.coopBrands[1].products, []);
@@ -4119,7 +4131,7 @@ describe('model: populate:', function() {
       Demo.create({ name: 'test' }).
         then(function(demo) { return DemoWrapper.create({ demo: [demo._id] }); }).
         then(function(wrapper) { return DemoWrapper.findById(wrapper._id); }).
-        then(function(doc) { return doc.populate('demo').execPopulate(); }).
+        then(function(doc) { return doc.populate('demo'); }).
         then(function(res) {
           assert.equal(res.demo.toObject()[0].name, 'test');
           done();
@@ -5728,7 +5740,7 @@ describe('model: populate:', function() {
               populate: {
                 path: 'value'
               }
-            });
+            }).exec();
           }).
           then(function(obj) {
             assert.equal(obj.fields.length, 2);
@@ -6006,7 +6018,7 @@ describe('model: populate:', function() {
             return Team.findById(team._id);
           }).
           then(function(team) {
-            return team.populate('people.parent').execPopulate();
+            return team.populate('people.parent');
           }).
           then(function(team) {
             team = team.toObject({ virtuals: true });
@@ -6105,7 +6117,7 @@ describe('model: populate:', function() {
             return Child.findById(c._id);
           }).
           then(function(c) {
-            return c.populate('parent').execPopulate();
+            return c.populate('parent');
           }).
           then(function(c) {
             c = c.toObject({ virtuals: true });
@@ -6304,7 +6316,7 @@ describe('model: populate:', function() {
             return person.populate({
               path: 'bandDetails',
               match: { active: { $eq: true } }
-            }).execPopulate();
+            });
           }).
           then(function(person) {
             person = person.toObject({ virtuals: true });
@@ -6350,7 +6362,7 @@ describe('model: populate:', function() {
             return person.populate({
               path: 'bandDetails',
               match: { active: { $eq: true } }
-            }).execPopulate();
+            });
           }).
           then(function(person) {
             person = person.toObject({ virtuals: true });
@@ -6414,7 +6426,7 @@ describe('model: populate:', function() {
             return Test.create({ users: [user._id] });
           }).
           then(function(test) {
-            const promise = test.populate('users').execPopulate();
+            const promise = test.populate('users');
             assert.ok(!test.populated('users'));
             return promise;
           }).
@@ -7628,7 +7640,7 @@ describe('model: populate:', function() {
       p.children.push({ child: child });
       yield p.save();
 
-      p = yield p.populate(parentFieldsToPopulate).execPopulate();
+      p = yield p.populate(parentFieldsToPopulate);
       assert.ok(p.children[0].child);
       assert.equal(p.children[0].child.name, 'test');
     });
@@ -8148,7 +8160,7 @@ describe('model: populate:', function() {
       assert.equal(doc.children, null);
 
       doc = yield Parent.findOne();
-      yield doc.populate('childCount').execPopulate();
+      yield doc.populate('childCount');
       assert.equal(doc.childCount, 2);
       assert.equal(doc.children, null);
     });
@@ -8362,15 +8374,13 @@ describe('model: populate:', function() {
       assert.ok(!doc.arr1[0].arr2[1].item.name);
 
       doc = yield Model.findOne();
-      doc.populate('arr1.0.arr2.1.item');
-      yield doc.execPopulate();
+      yield doc.populate('arr1.0.arr2.1.item');
       assert.ok(!doc.arr1[0].arr2[0].item.name);
       assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
 
       doc = yield Model.findOne();
-      doc.populate('arr1.0.arr2.0.item');
-      doc.populate('arr1.0.arr2.1.item');
-      yield doc.execPopulate();
+      yield doc.populate('arr1.0.arr2.0.item');
+      yield doc.populate('arr1.0.arr2.1.item');
       assert.equal(doc.arr1[0].arr2[0].item.name, 'item1');
       assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
     });
@@ -8506,7 +8516,7 @@ describe('model: populate:', function() {
 
   it('supports cross-db populate with refPath (gh-6520)', function() {
     return co(function*() {
-      const db2 = yield mongoose.createConnection(start.uri2);
+      const db2 = yield mongoose.createConnection(start.uri2).asPromise();
 
       const bookSchema = new Schema({ title: String });
       const movieSchema = new Schema({ title: String });
@@ -9384,7 +9394,6 @@ describe('model: populate:', function() {
     }, noId);
 
     const externalSchema = Schema({ data: { sourceId: Number } }, noId);
-
     const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
     ExampleSchema.path('list').discriminator('Image', InternalItemSchemaGen());
     ExampleSchema.path('list').discriminator('Video', InternalItemSchemaGen());
@@ -9464,18 +9473,22 @@ describe('model: populate:', function() {
       const nested = Schema({}, { discriminatorKey: 'type' });
       const mainSchema = Schema({ items: [nested] });
 
+      const docs = [];
       mainSchema.path('items').discriminator('TestDiscriminator', Schema({
         childModel: { type: String },
         child: {
           type: mongoose.Schema.Types.ObjectId,
-          refPath: (doc, path) => path.replace('.child', '.childModel')
+          refPath: (doc, path) => {
+            docs.push(doc);
+            return path.replace('.child', '.childModel');
+          }
         }
       }));
       const Parent = db.model('Parent', mainSchema);
       const Child = db.model('Child', Schema({ name: String }));
 
       const child = yield Child.create({ name: 'test' });
-      yield Parent.create({
+      const parent = yield Parent.create({
         items: [{
           type: 'TestDiscriminator',
           childModel: 'Child',
@@ -9483,9 +9496,14 @@ describe('model: populate:', function() {
         }]
       });
 
+      assert.equal(docs.length, 0);
       const doc = yield Parent.findOne().populate('items.child').exec();
+
       assert.equal(doc.items[0].child.name, 'test');
       assert.ok(doc.items[0].populated('child'));
+
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0]._id.toHexString(), parent.items[0]._id.toHexString());
     });
   });
 
@@ -9801,7 +9819,7 @@ describe('model: populate:', function() {
       assert.ok(doc.myVirtual.$parent() === doc);
 
       doc = yield Parent.findOne();
-      yield doc.populate('single').execPopulate();
+      yield doc.populate('single');
       assert.ok(doc.single.parent() === doc);
       assert.ok(doc.single.$parent() === doc);
     });
@@ -10277,8 +10295,8 @@ describe('model: populate:', function() {
       yield Promise.all([rootModel.save(), modelB.save(), modelA.save()]);
 
       const modelA1 = yield ModelA.findById(modelA._id);
-      yield modelA1.populate('_modelB _rootModel').execPopulate();
-      yield modelA1.populate('_modelB._rootModel').execPopulate();
+      yield modelA1.populate('_modelB _rootModel');
+      yield modelA1.populate('_modelB._rootModel');
 
       assert.equal(modelA1._modelB._rootModel.name, 'my name');
     });
@@ -10426,7 +10444,7 @@ describe('model: populate:', function() {
       const friend = yield Cat.create({ name: 'Zildjian' });
       const myCat = yield Cat.create({ name: 'Lord Fluffles', friends: [friend.id] });
 
-      yield myCat.populate('friends').execPopulate();
+      yield myCat.populate('friends');
 
       assert.equal(myCat.friends[0].name, 'Zildjian');
     });
@@ -10505,7 +10523,7 @@ describe('model: populate:', function() {
       });
 
       const event = yield ProgrammeModel.findOne({ _id: programme1._id }).orFail().exec();
-      yield event.populate({ path: 'activities.speakers' }).execPopulate();
+      yield event.populate({ path: 'activities.speakers' });
       assert.equal(event.activities.length, 1);
       assert.equal(event.activities[0].speakers.length, 2);
       assert.equal(event.activities[0].speakers[0].dummy, '1');
@@ -10531,7 +10549,7 @@ describe('model: populate:', function() {
       const myCat = new Cat({ _id: 'arlene', name: 'Arlene', friends: [friend.id] });
       yield myCat.save();
 
-      yield myCat.populate('friends').execPopulate();
+      yield myCat.populate('friends');
       assert.equal(myCat.friends[0].name, 'Garfield');
     });
   });
@@ -10563,6 +10581,59 @@ describe('model: populate:', function() {
 
       assert.equal(populatedBooks.length, 1);
       assert.equal(populatedBooks[0].author.name, 'Author1');
+    });
+  });
+
+  it('calls subdocument ref functions with subdocument as context (gh-8469)', function() {
+    const ImageSchema = Schema({ imageName: String });
+    const Image = db.model('Image', ImageSchema);
+
+    const TextSchema = Schema({ textName: String });
+    const Text = db.model('Text', TextSchema);
+
+    const opts = { _id: false };
+    let contexts = [];
+    const ItemSchema = Schema({
+      data: {
+        type: 'ObjectId',
+        ref: function() {
+          contexts.push(this);
+          return this.objectType;
+        }
+      },
+      objectType: String
+    }, opts);
+
+    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+    const Example = db.model('Test', ExampleSchema);
+
+    return co(function*() {
+      const text = yield Text.create({ textName: 'test' });
+      const image = yield Image.create({ imageName: 'test' });
+      yield Example.create({
+        list: [{ data: text._id, objectType: 'Text' }, { data: image._id, objectType: 'Image' }]
+      });
+
+      assert.equal(contexts.length, 0);
+      let res = yield Example.findOne().populate('list.data');
+
+      assert.equal(contexts.length, 2);
+      assert.equal(contexts[0].objectType, 'Text');
+      assert.equal(contexts[1].objectType, 'Image');
+
+      assert.equal(res.list[0].data.textName, 'test');
+      assert.equal(res.list[1].data.imageName, 'test');
+
+      contexts = [];
+      res = yield Example.findOne();
+      yield res.populate('list.data');
+
+      assert.equal(contexts.length, 2);
+      assert.equal(contexts[0].objectType, 'Text');
+      assert.equal(contexts[1].objectType, 'Image');
+
+      assert.equal(res.list[0].data.textName, 'test');
+      assert.equal(res.list[1].data.imageName, 'test');
     });
   });
 });

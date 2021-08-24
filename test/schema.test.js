@@ -18,7 +18,7 @@ const DocumentObjectId = mongoose.Types.ObjectId;
 const ReadPref = mongoose.mongo.ReadPreference;
 const vm = require('vm');
 const co = require('co');
-const Buffer = require('safe-buffer').Buffer;
+const applyPlugins = require('../lib/helpers/schema/applyPlugins');
 
 /**
  * Test Document constructor.
@@ -440,8 +440,7 @@ describe('schema', function() {
       } catch (error) {
         threw = true;
         assert.equal(error.name, 'CastError');
-        assert.equal(error.message,
-          'Cast to [[Number]] failed for value "[["abcd"]]" (type string) at path "nums.0"');
+        assert.ok(error.message.includes('Cast to [[Number]] failed'), error.message);
       }
       assert.ok(threw);
 
@@ -543,7 +542,7 @@ describe('schema', function() {
     });
 
     it('scope', function(done) {
-      function lowercase(v, self) {
+      function lowercase(v, cur, self) {
         assert.equal(this.a, 'b');
         assert.equal(self.path, 'name');
         return v.toLowerCase();
@@ -749,17 +748,6 @@ describe('schema', function() {
 
       schema.set('_id', true);
       assert.ok(schema.path('_id') instanceof Schema.ObjectId);
-
-      // old options
-      schema = new Schema({
-        name: String
-      }, { noId: false });
-      assert.ok(schema.path('_id') instanceof Schema.ObjectId);
-
-      schema = new Schema({
-        name: String
-      }, { noId: true });
-      assert.equal(schema.path('_id'), undefined);
       done();
     });
   });
@@ -955,11 +943,11 @@ describe('schema', function() {
       let Tobi = new Schema({}, { collection: 'users' });
 
       Tobi.set('a', 'b');
-      Tobi.set('safe', false);
+      Tobi.set('writeConcern', { w: 0 });
       assert.equal(Tobi.options.collection, 'users');
 
       assert.equal(Tobi.options.a, 'b');
-      assert.deepEqual(Tobi.options.safe, { w: 0 });
+      assert.deepEqual(Tobi.options.writeConcern, { w: 0 });
       assert.equal(Tobi.options.read, null);
 
       const tags = [{ x: 1 }];
@@ -1136,7 +1124,7 @@ describe('schema', function() {
         done();
       });
       it('disabling', function(done) {
-        const schema = new Schema({ name: String }, { noVirtualId: true });
+        const schema = new Schema({ name: String });
         assert.strictEqual(undefined, schema.virtuals.id);
         done();
       });
@@ -1445,44 +1433,43 @@ describe('schema', function() {
   });
 
   describe('property names', function() {
-    it('that conflict throw', function(done) {
-      const child = new Schema({ name: String });
+    describe('reserved keys are log a warning (gh-9010)', () => {
+      const originalWarn = console.warn;
+      let lastWarnMessage;
+      beforeEach(() => {
+        console.warn = (message) => lastWarnMessage = message;
+      });
 
-      assert.throws(function() {
-        new Schema({
-          on: String,
-          child: [child]
+      afterEach(() => {
+        console.warn = originalWarn;
+        lastWarnMessage = null;
+      });
+
+      [
+        'emit', 'listeners', 'on', 'removeListener', /* 'collection', */ // TODO: add `collection`
+        'errors', 'get', 'init', 'isModified', 'isNew', 'populated',
+        'remove', 'save', 'toObject', 'validate'
+      ].forEach((reservedProperty) => {
+        it(`\`${reservedProperty}\` when used as a schema path logs a warning`, () => {
+          new Schema({ [reservedProperty]: String });
+
+          assert.ok(lastWarnMessage.includes(`\`${reservedProperty}\` is a reserved schema pathname`));
         });
-      }, /`on` may not be used as a schema pathname/);
 
-      assert.throws(function() {
-        new Schema({
-          collection: String
+        it(`\`${reservedProperty}\` when used as a schema path doesn't log a warning if \`supressReservedKeysWarning\` is true`, () => {
+          new Schema(
+            { [reservedProperty]: String },
+            { supressReservedKeysWarning: true }
+          );
+
+          assert.deepEqual(lastWarnMessage, null);
         });
-      }, /`collection` may not be used as a schema pathname/);
 
-      assert.throws(function() {
-        new Schema({
-          isNew: String
-        });
-      }, /`isNew` may not be used as a schema pathname/);
-
-      assert.throws(function() {
-        new Schema({
-          errors: String
-        });
-      }, /`errors` may not be used as a schema pathname/);
-
-      assert.throws(function() {
-        new Schema({
-          init: String
-        });
-      }, /`init` may not be used as a schema pathname/);
-
-      done();
+      });
     });
 
-    it('that do not conflict do not throw', function(done) {
+
+    it('that do not conflict do not throw', function() {
       assert.doesNotThrow(function() {
         new Schema({
           model: String
@@ -1508,8 +1495,6 @@ describe('schema', function() {
         const M = mongoose.model('setMaxListeners-as-property-name', s);
         new M({ setMaxListeners: 'works' });
       });
-
-      done();
     });
 
     it('permit _scope to be used (gh-1184)', function(done) {
@@ -2427,53 +2412,13 @@ describe('schema', function() {
     });
   });
 
-  describe('Schema.reserved (gh-8869)', function() {
-    it('throws errors on compiling schema with reserved key as a flat type', function() {
-      const buildInvalidSchema = () => new Schema({ save: String });
+  it('disables `id` virtual if no `_id` path (gh-3936)', function() {
+    const idGetter = require('../lib/plugins/idGetter');
 
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-
-    it('throws errors on compiling schema with reserved key as a nested object', function() {
-      const buildInvalidSchema = () => new Schema({ save: { nested: String } });
-
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-
-    it('throws errors on compiling schema with reserved key as a nested array', function() {
-      const buildInvalidSchema = () => new Schema({ save: [{ nested: String }] });
-
-      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
-    });
-  });
-
-  describe('mongoose.set(`strictQuery`, value); (gh-6658)', function() {
-    let strictQueryOriginalValue;
-
-    this.beforeEach(() => strictQueryOriginalValue = mongoose.get('strictQuery'));
-    this.afterEach(() => mongoose.set('strictQuery', strictQueryOriginalValue));
-
-    it('setting `strictQuery` on base sets strictQuery to schema (gh-6658)', function() {
-      // Arrange
-      mongoose.set('strictQuery', 'some value');
-
-      // Act
-      const schema = new Schema();
-
-      // Assert
-      assert.equal(schema.get('strictQuery'), 'some value');
-    });
-
-    it('`strictQuery` set on base gets overwritten by option set on schema (gh-6658)', function() {
-      // Arrange
-      mongoose.set('strictQuery', 'base option');
-
-      // Act
-      const schema = new Schema({}, { strictQuery: 'schema option' });
-
-      // Assert
-      assert.equal(schema.get('strictQuery'), 'schema option');
-    });
+    const schema = Schema({ name: String }, { _id: false });
+    applyPlugins(schema, [[idGetter]]);
+    assert.ok(!schema.paths._id);
+    assert.ok(!schema.virtuals.id);
   });
 
   it('treats dotted paths with no parent as a nested path (gh-9020)', function() {
@@ -2584,6 +2529,31 @@ describe('schema', function() {
     assert.equal(schema.path('nums').caster.instance, 'Number');
     assert.equal(schema.path('tags').caster.instance, 'String');
     assert.equal(schema.path('subdocs').casterConstructor.schema.path('name').instance, 'String');
+  });
+
+  it('should use the top-most class\'s getter/setter gh-8892', function() {
+    class C1 {
+      get hello() {
+        return 1;
+      }
+    }
+
+    class C2 extends C1 {
+      get hello() {
+        return 2;
+      }
+    }
+
+    const C1Schema = new mongoose.Schema({});
+    C1Schema.loadClass(C1);
+    const C1Model = db.model('C1', C1Schema);
+
+    const C2Schema = new mongoose.Schema({});
+    C2Schema.loadClass(C2);
+    const C2Model = db.model('C2', C2Schema);
+
+    assert.equal((new C1Model()).hello, 1);
+    assert.equal((new C2Model()).hello, 2);
   });
 
   it('handles loadClass with inheritted getters (gh-9975)', function() {

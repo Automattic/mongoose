@@ -24,7 +24,8 @@ examples/
 .vscode
 .eslintignore
 CONTRIBUTING.md
-History.*
+History.md
+CHANGELOG.md
 format_deps.js
 release-items.md
 static.js
@@ -32,6 +33,7 @@ website.js
 
 .config*
 
+migrating_to_6.md
 migrating_to_5.md
 renovate.json
 .travis.yml

@@ -18,9 +18,7 @@ describe('Date Tutorial', function() {
     });
     User = mongoose.model('User', userSchema);
 
-    return mongoose.connect('mongodb://localhost:27017/mongoose', {
-      useNewUrlParser: true
-    });
+    return mongoose.connect('mongodb://localhost:27017/mongoose');
   });
 
   it('Example 1.2: casts strings to dates', function() {
@@ -100,7 +98,7 @@ describe('Date Tutorial', function() {
             max: '1994-05-23'
           }
         });
-        db = yield start();
+        db = yield start().asPromise();
         Episode = db.model('Episode', episodeSchema);
 
         yield Episode.create([

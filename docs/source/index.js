@@ -24,6 +24,7 @@ exports['docs/queries.md'] = { guide: true, title: 'Queries', markdown: true };
 exports['docs/populate.md'] = { guide: true, title: 'Query Population', markdown: true };
 exports['docs/migration.md'] = { guide: true, title: 'Migration Guide', markdown: true };
 exports['docs/migrating_to_5.md'] = { guide: true, title: 'Migrating to Mongoose 5', markdown: true };
+exports['docs/migrating_to_6.md'] = { guide: true, title: 'Migrating to Mongoose 6', markdown: true };
 exports['docs/contributing.md'] = { guide: true, title: 'Contributing', markdown: true };
 exports['docs/connections.md'] = { guide: true, title: 'Connecting to MongoDB', markdown: true };
 exports['docs/lambda.md'] = { guide: true, title: 'Using Mongoose With AWS Lambda', markdown: true };

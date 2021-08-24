@@ -277,7 +277,8 @@ describe('model', function() {
 
       it('inherits validators', function() {
         assert.strictEqual(Employee.schema.path('gender').validators, PersonSchema.path('gender').validators);
-        assert.strictEqual(Employee.schema.path('department').validators, EmployeeSchema.path('department').validators);
+        assert.deepEqual(Employee.schema.path('department').validators,
+          EmployeeSchema.path('department').validators);
       });
 
       it('does not inherit and override fields that exist', function() {
@@ -1722,7 +1723,8 @@ describe('model', function() {
       'container',
       new mongoose.Schema({
         body: { children: childrenArraySchema }
-      })
+      }),
+      { clone: false }
     );
     const Nested = mongoose.model('nested', nestedSchema);
 
@@ -1748,6 +1750,45 @@ describe('model', function() {
     });
 
     assert.deepEqual(nestedDocument.body.children[1].body.children[0].body.children[0].body.children, []);
+  });
+
+  describe('Discriminator Key test', function() {
+    it('gh-9015', function() {
+      return co(function*() {
+        const baseSchema = new Schema({}, { discriminatorKey: 'type' });
+        const baseModel = db.model('thing', baseSchema);
+        const aSchema = new Schema(
+          {
+            aThing: { type: Number }
+          },
+          { _id: false, id: false }
+        );
+        baseModel.discriminator('A', aSchema);
+        const bSchema = new Schema(
+          {
+            bThing: { type: String }
+          },
+          { _id: false, id: false }
+        );
+        baseModel.discriminator('B', bSchema);
+        // Model is created as a type A
+        let doc = yield baseModel.create({ type: 'A', aThing: 1 });
+        let res = yield baseModel.findByIdAndUpdate(
+          doc._id,
+          { type: 'B', bThing: 'one', aThing: '2' },
+          { runValidators: true, /* overwriteDiscriminatorKey: true, */ new: true }
+        );
+        assert.equal(res.type, 'A');
+
+        doc = yield baseModel.create({ type: 'A', aThing: 1 });
+        res = yield baseModel.findByIdAndUpdate(
+          doc._id,
+          { type: 'B', bThing: 'one', aThing: '2' },
+          { runValidators: true, overwriteDiscriminatorKey: true, new: true }
+        );
+        assert.equal(res.type, 'B');
+      });
+    });
   });
 
   it('takes discriminator schema\'s single nested over base schema\'s (gh-10157)', function() {

@@ -6,7 +6,6 @@
 
 const start = require('./common');
 
-const Buffer = require('safe-buffer').Buffer;
 const assert = require('assert');
 const co = require('co');
 const mongodb = require('mongodb');
@@ -45,7 +44,7 @@ describe('types array', function() {
   afterEach(() => require('./util').stopRemainingOps(db));
 
   it('behaves and quacks like an Array', function(done) {
-    const a = new MongooseArray;
+    const a = new MongooseArray([]);
 
     assert.ok(a instanceof Array);
     assert.ok(a.isMongooseArray);
@@ -60,6 +59,7 @@ describe('types array', function() {
     const doc = new Test({ arr: ['test'] });
 
     assert.deepEqual(doc.arr, new MongooseArray(['test']));
+    assert.deepEqual(doc.arr, ['test']);
 
     done();
   });
@@ -1420,7 +1420,7 @@ describe('types array', function() {
       save(m, function(err, doc) {
         assert.ifError(err);
         assert.equal(doc.arr.length, '4');
-        doc.arr.set(2, 10);
+        doc.arr[2] = 10;
         assert.equal(doc.arr.length, 4);
         assert.equal(doc.arr[2], '10');
         doc.arr.set(doc.arr.length, '11');
@@ -1556,7 +1556,7 @@ describe('types array', function() {
       save(m, function(err, doc) {
         assert.ifError(err);
         assert.equal(doc.arr.length, 2);
-        doc.arr.set(0, { name: 'vdrums' });
+        doc.arr[0] = { name: 'vdrums' };
         assert.equal(doc.arr.length, 2);
         assert.equal(doc.arr[0].name, 'vdrums');
         doc.arr.set(doc.arr.length, { name: 'Restrepo' });
@@ -1628,7 +1628,7 @@ describe('types array', function() {
         doc.arr.set(0, 'THREE');
         assert.strictEqual('three', doc.arr[0]);
         assert.strictEqual('two', doc.arr[1]);
-        doc.arr.set(doc.arr.length, 'FOUR');
+        doc.arr[doc.arr.length] = 'FOUR';
         assert.strictEqual('three', doc.arr[0]);
         assert.strictEqual('two', doc.arr[1]);
         assert.strictEqual('four', doc.arr[2]);
@@ -1768,7 +1768,7 @@ describe('types array', function() {
   });
 
   describe('of number', function() {
-    it('allows nulls', function(done) {
+    it('allows null and undefined', function(done) {
       const schema = new Schema({ x: [Number] });
       const M = db.model('Test', schema);
       let m;
@@ -1777,11 +1777,21 @@ describe('types array', function() {
       m.save(function(err) {
         assert.ifError(err);
 
-        // undefined is not allowed
         m = new M({ x: [1, undefined, 3] });
         m.save(function(err) {
-          assert.ok(err);
-          done();
+          assert.ifError(err);
+
+          m.x = [1,, 3]; // eslint-disable-line no-sparse-arrays
+          m.save(function(err) {
+            assert.ifError(err);
+            assert.strictEqual(m.x[1], void 0);
+            m.x.set(1, 2);
+            m.save(function(err) {
+              assert.ifError(err);
+              assert.deepEqual(m.toObject().x, [1, 2, 3]);
+              done();
+            });
+          });
         });
       });
     });
@@ -2073,6 +2083,65 @@ describe('types array', function() {
           });
         });
       });
+    });
+  });
+
+  describe('built-in array methods that modify element structure return vanilla arrays (gh-8356)', function() {
+    beforeEach(function() {
+      mongoose.deleteModel(/Test/);
+    });
+
+    it('filter', function() {
+      const Model = mongoose.model('Test', Schema({ arr: [String] }));
+      const doc = new Model({ arr: ['foo', 'bar', 'baz'] });
+
+      const arr = doc.arr.filter(str => str.startsWith('b'));
+      assert.deepEqual(arr, ['bar', 'baz']);
+      assert.ok(!arr.isMongooseArray);
+    });
+
+    it('flat', function() {
+      if (Array.prototype.flat == null) {
+        return this.skip();
+      }
+
+      const Model = mongoose.model('Test', Schema({ arr: [[String]] }));
+      const doc = new Model({ arr: [['foo']] });
+
+      const arr = doc.arr.flat();
+      assert.deepEqual(arr, ['foo']);
+      assert.ok(!arr.isMongooseArray);
+    });
+
+    it('flatMap', function() {
+      if (Array.prototype.flatMap == null) {
+        return this.skip();
+      }
+
+      const Model = mongoose.model('Test', Schema({ arr: [Number] }));
+      const doc = new Model({ arr: [1, 3, 5, 7] });
+
+      const arr = doc.arr.flatMap(v => [v, v + 1]);
+      assert.deepEqual(arr, [1, 2, 3, 4, 5, 6, 7, 8]);
+      assert.ok(!arr.isMongooseArray);
+    });
+
+    it('map', function() {
+      const Model = mongoose.model('Test', Schema({ arr: [Number] }));
+      const doc = new Model({ arr: [2, 4, 6, 8] });
+
+      const arr = doc.arr.map(v => v / 2);
+      assert.deepEqual(arr, [1, 2, 3, 4]);
+      assert.ok(!arr.isMongooseArray);
+    });
+
+    it('slice', function() {
+      const Model = mongoose.model('Test', Schema({ arr: [Number] }));
+      const doc = new Model({ arr: [2, 4, 6, 8] });
+
+      const arr = doc.arr.slice(1, 3);
+      assert.deepEqual(arr, [4, 6]);
+      assert.ok(!arr.isMongooseArray);
     });
   });
 });

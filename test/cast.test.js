@@ -10,7 +10,6 @@ const Schema = require('../lib/schema');
 const assert = require('assert');
 const cast = require('../lib/cast');
 const ObjectId = require('bson').ObjectId;
-const Buffer = require('safe-buffer').Buffer;
 
 describe('cast: ', function() {
   describe('when casting an array', function() {

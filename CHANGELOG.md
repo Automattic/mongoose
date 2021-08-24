@@ -1,3 +1,10 @@
+6.0.0 / 2021-08-24
+==================
+ * BREAKING CHANGE: remove the deprecated safe option in favor of write concerns
+ * fix: upgrade to mongodb driver 4.1.1
+ * fix: consistently use $__parent to store subdoc parent as a property, and `$parent()` as a getter function #10584 #10414
+ * fix: allow calling `countDocuments()` with options
+
 6.0.0-rc2 / 2021-08-23
 ======================
  * BREAKING CHANGE: make document set() set keys in the order they're defined in the schema, not in the user specified object #4665

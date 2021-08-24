@@ -17,7 +17,6 @@ const ObjectId = Schema.Types.ObjectId;
 describe('model: mapreduce:', function() {
   let Comments;
   let BlogPost;
-  let collection;
   let db;
 
   before(function() {
@@ -46,8 +45,6 @@ describe('model: mapreduce:', function() {
       comments: [Comments]
     });
 
-    collection = 'mapreduce_' + random();
-    mongoose.model('MapReduce', BlogPost);
     db = start();
   });
 
@@ -55,8 +52,12 @@ describe('model: mapreduce:', function() {
     db.close(done);
   });
 
+  beforeEach(function() {
+    db.deleteModel(/.*/);
+  });
+
   it('works', function(done) {
-    const MR = db.model('MapReduce', collection);
+    const MR = db.model('MapReduce', BlogPost);
 
     let magicID;
     const id = new mongoose.Types.ObjectId;
@@ -163,7 +164,7 @@ describe('model: mapreduce:', function() {
               // ad-hoc population works
               model
                 .findOne({ _id: 'aaron' })
-                .populate({ path: 'value.own', model: 'MapReduce' })
+                .populate({ path: 'value.own', model: 'MapReduce', strictPopulate: false })
                 .exec(function(err, doc) {
                   assert.ifError(err);
                   assert.equal(doc.value.own.author, 'guillermo');
@@ -177,7 +178,7 @@ describe('model: mapreduce:', function() {
   });
 
   it('withholds stats with false verbosity', function(done) {
-    const MR = db.model('MapReduce', collection);
+    const MR = db.model('MapReduce', BlogPost);
 
     const o = {
       map: function() {
@@ -196,7 +197,7 @@ describe('model: mapreduce:', function() {
 
   describe('promises (gh-1628)', function() {
     it('are returned', function(done) {
-      const MR = db.model('MapReduce', collection);
+      const MR = db.model('MapReduce', BlogPost);
 
       const o = {
         map: function() {
@@ -222,7 +223,7 @@ describe('model: mapreduce:', function() {
 
     before(function(done) {
       db = start();
-      MR = db.model('MapReduce', collection);
+      MR = db.model('MapReduce', BlogPost);
 
       id = new mongoose.Types.ObjectId;
       const authors = 'aaron guillermo brian nathan'.split(' ');
@@ -307,7 +308,7 @@ describe('model: mapreduce:', function() {
   });
 
   it('withholds stats with false verbosity using then', function(done) {
-    const MR = db.model('MapReduce', collection);
+    const MR = db.model('MapReduce', BlogPost);
 
     const o = {
       map: function() {

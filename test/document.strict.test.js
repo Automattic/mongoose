@@ -425,7 +425,7 @@ describe('document: strict mode:', function() {
       const Foo = db.model('Test', FooSchema);
 
       assert.doesNotThrow(function() {
-        new Foo({ name: mongoose.Types.ObjectId(), father: { name: { full: 'bacon' } } });
+        new Foo({ name: new mongoose.Types.ObjectId(), father: { name: { full: 'bacon' } } });
       });
     });
 
@@ -455,7 +455,6 @@ describe('document: strict mode:', function() {
     });
 
     nestedSchema.options.strict = 'throw';
-    nestedSchema.options.strictQuery = 'throw';
 
     const schema = new mongoose.Schema({
       nested: {

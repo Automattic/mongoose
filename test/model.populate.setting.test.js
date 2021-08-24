@@ -8,7 +8,6 @@
 
 const start = require('./common');
 
-const Buffer = require('safe-buffer').Buffer;
 const assert = require('assert');
 const utils = require('../lib/utils');
 
@@ -34,7 +33,7 @@ describe('model: populate:', function() {
 
     const construct = {};
     construct.String = random;
-    construct.ObjectId = DocObjectId;
+    construct.ObjectId = () => new DocObjectId();
     construct.Number = random;
     construct.Buffer = function() {
       return Buffer.from(random());

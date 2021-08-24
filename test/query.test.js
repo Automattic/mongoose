@@ -1189,57 +1189,6 @@ describe('Query', function() {
         });
       }, done);
     });
-
-    it('single option, default', function(done) {
-      const Test = db.model('Person', new Schema({ name: String }));
-
-      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        Test.deleteMany({ name: /Stark/ }).exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.n, 2);
-          Test.countDocuments({}, function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 0);
-            done();
-          });
-        });
-      });
-    });
-
-    it.skip('single option, false', function(done) {
-      const Test = db.model('Person', new Schema({ name: String }));
-
-      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        Test.remove({ name: /Stark/ }).setOptions({ single: false }).exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.n, 2);
-          Test.countDocuments({}, function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 0);
-            done();
-          });
-        });
-      });
-    });
-
-    it.skip('single option, true', function(done) {
-      const Test = db.model('Person', new Schema({ name: String }));
-
-      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        Test.remove({ name: /Stark/ }).setOptions({ single: true }).exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.n, 1);
-          Test.countDocuments({}, function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 1);
-            done();
-          });
-        });
-      });
-    });
   });
 
   describe('querying/updating with model instance containing embedded docs should work (#454)', function() {
@@ -1519,7 +1468,7 @@ describe('Query', function() {
         });
 
         it('and sends it though the driver', function(done) {
-          const options = { read: 'secondary', safe: { w: 'majority' } };
+          const options = { read: 'secondary', writeConcern: { w: 'majority' } };
           const schema = new Schema({ name: String }, options);
           const M = db.model('Test', schema);
           const q = M.find();
@@ -1533,7 +1482,7 @@ describe('Query', function() {
 
             assert.ok(ret.readPreference);
             assert.equal(ret.readPreference.mode, 'secondary');
-            assert.deepEqual({ w: 'majority' }, ret.safe);
+            assert.deepEqual({ w: 'majority' }, ret.writeConcern);
             called = true;
 
             return ret;
@@ -1545,47 +1494,6 @@ describe('Query', function() {
             }
             assert.ok(called);
             done();
-          });
-        });
-      });
-
-      describe('useNestedStrict', function() {
-        it('overrides schema useNestedStrict: false (gh-5144)', function() {
-          const subSchema = new Schema({}, { strict: false });
-          const schema = new Schema({
-            name: String,
-            nested: subSchema
-          }, { strict: 'throw' });
-
-          const Test = db.model('Test', schema);
-          const test = new Test({ name: 'Test1' });
-          return co(function*() {
-            yield test.save();
-            const cond = { _id: test._id };
-            const update = { 'nested.v': 'xyz' };
-            const opts = { new: true, useNestedStrict: true };
-            const doc = yield Test.findOneAndUpdate(cond, update, opts);
-            assert.strictEqual(doc.toObject().nested.v, 'xyz');
-          });
-        });
-
-        it('overrides schema useNestedStrict: true (gh-5144)', function() {
-          const subSchema = new Schema({}, { strict: false });
-          const schema = new Schema({
-            name: String,
-            nested: subSchema
-          }, { strict: 'throw', useNestedStrict: true });
-
-          const Test = db.model('Test', schema);
-          const test = new Test({ name: 'Test1' });
-          return co(function* () {
-            yield test.save();
-            const cond = { _id: test._id };
-            const update = { 'nested.v': 'xyz' };
-            const opts = { useNestedStrict: false };
-            let error;
-            yield Test.findOneAndUpdate(cond, update, opts).catch(e => error = e);
-            assert.strictEqual(error.name, 'StrictModeError');
           });
         });
       });
@@ -1756,7 +1664,7 @@ describe('Query', function() {
         _id: {
           select: false,
           type: Schema.Types.ObjectId,
-          default: mongoose.Types.ObjectId
+          default: () => new mongoose.Types.ObjectId()
         },
         username: String
       });
@@ -1894,7 +1802,7 @@ describe('Query', function() {
 
       const MyModel = db.model('Test', schema);
 
-      const opts = { setDefaultsOnInsert: true, upsert: true };
+      const opts = { upsert: true };
       MyModel.updateOne({}, {}, opts, function(error) {
         assert.ifError(error);
         MyModel.findOne({}, function(error, doc) {
@@ -2486,10 +2394,10 @@ describe('Query', function() {
         yield Model.create({ n: 42 });
 
         let res = yield Model.find().explain('queryPlanner');
-        assert.ok(res[0].queryPlanner);
+        assert.ok(res.queryPlanner);
 
         res = yield Model.find().explain();
-        assert.ok(res[0].queryPlanner);
+        assert.ok(res.queryPlanner);
 
         res = yield Model.find().explain().explain(false);
         assert.equal(res[0].n, 42);
@@ -2808,7 +2716,7 @@ describe('Query', function() {
     return co(function*() {
       yield Model.create({ name: 'test' });
       const now = new Date();
-      const res = yield Model.findOne().map(res => {
+      const res = yield Model.findOne().transform(res => {
         res.loadedAt = now;
         return res;
       });
@@ -2879,7 +2787,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.deleteMany({ name: 'Test' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.deletedCount, 1);
       });
     });
 
@@ -2897,7 +2805,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.deleteOne({ name: 'Test' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.deletedCount, 1);
       });
     });
 
@@ -2915,7 +2823,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.remove({ name: 'Test' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.deletedCount, 1);
       });
     });
 
@@ -2934,7 +2842,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.update({}, { name: 'Test2' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.modifiedCount, 1);
       });
     });
 
@@ -2953,7 +2861,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.updateMany({}, { name: 'Test2' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.modifiedCount, 1);
       });
     });
 
@@ -2972,7 +2880,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.updateOne({}, { name: 'Test2' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.modifiedCount, 1);
       });
     });
 
@@ -3022,7 +2930,7 @@ describe('Query', function() {
           docs.push(doc);
           next();
         });
-        const Model = db.model('Test', schema);
+        const Model = db.model('Test2', schema);
 
         yield Model.create({ name: 'Test' });
 
@@ -3044,7 +2952,7 @@ describe('Query', function() {
       });
     });
 
-    it('throws DocumentNotFoundError by default (gh-7409)', function() {
+    it('throws DocumentNotFoundError by default execute (gh-7409)', function() {
       return co(function*() {
         const err = yield Model.findOne({ name: 'na' }).
           orFail().
@@ -3341,11 +3249,11 @@ describe('Query', function() {
     });
   });
 
-  it('strictQuery option (gh-4136) (gh-7178)', function() {
+  it('strict option (gh-4136) (gh-7178)', function() {
     const modelSchema = new Schema({
       field: Number,
       nested: { path: String }
-    }, { strictQuery: 'throw' });
+    }, { strict: 'throw' });
 
     const Model = db.model('Test', modelSchema);
 
@@ -3353,7 +3261,7 @@ describe('Query', function() {
       // `find()` on a top-level path not in the schema
       let err = yield Model.find({ notInschema: 1 }).then(() => null, e => e);
       assert.ok(err);
-      assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
+      assert.ok(err.message.indexOf('strict') !== -1, err.message);
 
       // Shouldn't throw on nested path re: gh-7178
       yield Model.create({ nested: { path: 'a' } });
@@ -3363,12 +3271,12 @@ describe('Query', function() {
       // `find()` on a nested path not in the schema
       err = yield Model.find({ 'nested.bad': 'foo' }).then(() => null, e => e);
       assert.ok(err);
-      assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
+      assert.ok(err.message.indexOf('strict') !== -1, err.message);
     });
   });
 
-  it('strictQuery = true (gh-6032)', function() {
-    const modelSchema = new Schema({ field: Number }, { strictQuery: true });
+  it('strict = true (gh-6032)', function() {
+    const modelSchema = new Schema({ field: Number }, { strict: true });
 
     return co(function*() {
       const Model = db.model('Test', modelSchema);
@@ -3537,7 +3445,7 @@ describe('Query', function() {
       });
     });
 
-    it('pre("validate") errors (gh-7187)', function() {
+    it('pre("validate") errors (gh-7187)', async function() {
       const addressSchema = Schema({ countryId: String });
       addressSchema.pre('validate', { query: true }, function() {
         throw new Error('Oops!');
@@ -3546,13 +3454,14 @@ describe('Query', function() {
       const Contact = db.model('Test', contactSchema);
 
       const update = { addresses: [{ countryId: 'foo' }] };
-      return Contact.updateOne({}, update, { runValidators: true }).then(
-        () => assert.ok(false),
-        err => {
-          assert.ok(err.errors['addresses.0']);
-          assert.equal(err.errors['addresses.0'].message, 'Oops!');
-        }
-      );
+      const err = await Contact.updateOne(
+        {},
+        update,
+        { runValidators: true }
+      ).then(() => null, err => err);
+
+      assert.ok(err.errors['addresses.0']);
+      assert.equal(err.errors['addresses.0'].message, 'Oops!');
     });
   });
 
@@ -3593,6 +3502,32 @@ describe('Query', function() {
     });
   });
 
+  it('throws an error if executed multiple times (gh-7398)', function() {
+    const Test = db.model('Test', Schema({ name: String }));
+
+    return co(function*() {
+      const q = Test.findOne();
+
+      yield q;
+
+      let err = yield q.then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'MongooseError');
+      assert.equal(err.message, 'Query was already executed: Test.findOne({})');
+      assert.ok(err.originalStack);
+
+      const cb = () => {};
+      err = yield Test.find(cb).then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'MongooseError');
+      assert.equal(err.message, 'Query was already executed: Test.find({})');
+      assert.ok(err.originalStack);
+
+      err = yield q.clone().then(() => null, err => err);
+      assert.ifError(err);
+    });
+  });
+
   describe('stack traces', function() {
     it('includes calling file for filter cast errors (gh-8691)', function() {
       const toCheck = ['find', 'findOne', 'deleteOne'];
@@ -3604,6 +3539,100 @@ describe('Query', function() {
           assert.ok(err);
           assert.ok(err.stack.includes(__filename), err.stack);
         }
+      });
+    });
+  });
+
+  it('setter priorVal (gh-8629)', function() {
+    const priorVals = [];
+    const schema = Schema({
+      name: {
+        type: String,
+        set: (v, priorVal) => {
+          priorVals.push(priorVal);
+          return v;
+        }
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    return Model.updateOne({}, { name: 'bar' }).exec().
+      then(() => assert.deepEqual(priorVals, [null]));
+  });
+
+  describe('clone', function() {
+    let Model;
+
+    beforeEach(function() {
+      Model = db.model('Test', Schema({ name: String, age: Number }));
+
+      return Model.create([
+        { name: 'Jean-Luc Picard', age: 59 },
+        { name: 'Will Riker', age: 29 }
+      ]);
+    });
+
+    it('with findOne', function() {
+      return co(function*() {
+        const q = Model.findOne({ age: 29 });
+        const q2 = q.clone();
+
+        let doc = yield q;
+        assert.equal(doc.name, 'Will Riker');
+
+        assert.deepEqual(q2._conditions, { age: 29 });
+        doc = yield q2;
+        assert.equal(doc.name, 'Will Riker');
+
+        const q3 = q.clone();
+        assert.deepEqual(q3._conditions, { age: 29 });
+        doc = yield q3;
+        assert.equal(doc.name, 'Will Riker');
+      });
+    });
+
+    it('with deleteOne', function() {
+      return co(function*() {
+        const q = Model.deleteOne({ age: 29 });
+
+        yield q;
+        assert.equal(yield Model.findOne({ name: 'Will Riker' }), null);
+        yield Model.create({ name: 'Will Riker', age: 29 });
+
+        const q2 = q.clone();
+        assert.deepEqual(q2._conditions, { age: 29 });
+        yield q2;
+        assert.equal(yield Model.findOne({ name: 'Will Riker' }), null);
+      });
+    });
+
+    it('with updateOne', function() {
+      return co(function*() {
+        const q = Model.updateOne({ name: 'Will Riker' }, { name: 'Thomas Riker' });
+
+        yield q;
+        assert.equal(yield Model.findOne({ name: 'Will Riker' }), null);
+        yield Model.updateOne({ name: 'Thomas Riker' }, { name: 'Will Riker' });
+
+        const q2 = q.clone();
+        assert.deepEqual(q2._conditions, { name: 'Will Riker' });
+        assert.deepEqual(q2._update, { $set: { name: 'Thomas Riker' } });
+        yield q2;
+        assert.equal(yield Model.findOne({ name: 'Will Riker' }), null);
+      });
+    });
+
+    it('with distinct', function() {
+      return co(function*() {
+        const q = Model.distinct('name');
+
+        const res = yield q;
+        assert.deepEqual(res.sort(), ['Jean-Luc Picard', 'Will Riker']);
+
+        const q2 = q.clone();
+        assert.deepEqual(q2._distinct, 'name');
+        yield q2;
+        assert.deepEqual(res.sort(), ['Jean-Luc Picard', 'Will Riker']);
       });
     });
   });
@@ -3641,6 +3670,30 @@ describe('Query', function() {
     });
   });
 
+  it('allows disabling `setDefaultsOnInsert` (gh-8410)', function() {
+    const schema = new Schema({
+      title: String,
+      genre: { type: String, default: 'Action' }
+    });
+
+    const Movie = db.model('Movie', schema);
+
+    const query = {};
+    const update = { title: 'The Terminator' };
+    const options = {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: false,
+      lean: true
+    };
+
+    return Movie.deleteMany({}).
+      then(() => Movie.findOneAndUpdate(query, update, options)).
+      then(doc => {
+        assert.strictEqual(doc.genre, void 0);
+      });
+  });
+
   it('throws readable error if `$and` and `$or` contain non-objects (gh-8948)', function() {
     const userSchema = new Schema({ name: String });
     const Person = db.model('Person', userSchema);
@@ -3657,6 +3710,24 @@ describe('Query', function() {
       err = yield Person.find({ $nor: ['not an object'] }).catch(err => err);
       assert.equal(err.name, 'CastError');
       assert.equal(err.path, '$nor.0');
+    });
+  });
+
+  it('includes `undefined` in filters (gh-3944)', function() {
+    const userSchema = new Schema({ name: String, pwd: String });
+    const Person = db.model('Person', userSchema);
+
+    return co(function*() {
+      yield Person.create([
+        { name: 'test1', pwd: 'my secret' },
+        { name: 'test2', pwd: null }
+      ]);
+
+      let res = yield Person.findOne({ name: 'test1', pwd: void 0 });
+      assert.equal(res, null);
+
+      res = yield Person.findOne({ name: 'test2', pwd: { $eq: void 0 } });
+      assert.equal(res.name, 'test2');
     });
   });
 
@@ -3813,5 +3884,26 @@ describe('Query', function() {
 
     q = Test.find().select({ email: '$name' }).setOptions({ sanitizeProjection: true });
     assert.deepEqual(q._fields, { email: 1 });
+  });
+
+  it('sanitizeFilter option (gh-3944)', function() {
+    const MySchema = Schema({ username: String, pwd: String });
+    const Test = db.model('Test', MySchema);
+
+    let q = Test.find({ username: 'val', pwd: 'my secret' }).setOptions({ sanitizeFilter: true });
+    q._castConditions();
+    assert.ifError(q.error());
+    assert.deepEqual(q._conditions, { username: 'val', pwd: 'my secret' });
+
+    q = Test.find({ username: 'val', pwd: { $ne: null } }).setOptions({ sanitizeFilter: true });
+    q._castConditions();
+    assert.ok(q.error());
+    assert.equal(q.error().name, 'CastError');
+
+    q = Test.find({ username: 'val', pwd: mongoose.trusted({ $gt: null }) }).
+      setOptions({ sanitizeFilter: true });
+    q._castConditions();
+    assert.ifError(q.error());
+    assert.deepEqual(q._conditions, { username: 'val', pwd: { $gt: null } });
   });
 });

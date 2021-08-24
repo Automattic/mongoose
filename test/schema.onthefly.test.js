@@ -129,7 +129,7 @@ describe('schema.onthefly', function() {
     assert.equal(typeof d.get('title', Number), 'number');
 
     d.title = '000000000000000000000001';
-    assert.equal(d.get('title', ObjectId).constructor.name, 'ObjectID');
+    assert.equal(d.get('title', ObjectId).constructor.name, 'ObjectId');
 
     d.set('title', 1, Number);
     assert.equal(typeof d.get('title'), 'number');

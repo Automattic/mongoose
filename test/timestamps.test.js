@@ -819,21 +819,21 @@ describe('timestamps', function() {
     return co(function*() {
       yield Parent.deleteMany({});
 
-      yield Parent.create({
+      const _id = yield Parent.create({
         content: {
           a: { nestedA: 'a' },
           b: { nestedB: 'b' }
         }
-      });
+      }).then(doc => doc._id);
 
-      const doc = yield Parent.findOne();
+      const doc = yield Parent.findById(_id);
 
       const ts = doc.content.b.updatedAt;
       doc.content.a.nestedA = 'b';
       yield cb => setTimeout(cb, 10);
       yield doc.save();
 
-      const fromDb = yield Parent.findById(doc);
+      const fromDb = yield Parent.findById(_id);
       assert.strictEqual(fromDb.content.b.updatedAt.valueOf(), ts.valueOf());
     });
   });
@@ -873,6 +873,17 @@ describe('timestamps', function() {
       }, { new: true });
 
       assert.ok(fromDb.content.a.updatedAt.valueOf() > ts.valueOf());
+    });
+  });
+
+  it('makes createdAt immutable by default (gh-10139)', function() {
+    const schema = Schema({ name: String }, { timestamps: true });
+    const Model = db.model('Time', schema);
+    return co(function*() {
+      const doc = yield Model.create({ name: 'test' });
+      const test = doc.createdAt;
+      doc.createdAt = new Date();
+      assert.equal(test, doc.createdAt);
     });
   });
 

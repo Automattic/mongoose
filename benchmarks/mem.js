@@ -4,8 +4,6 @@ const mongoose = require('../');
 
 const Schema = mongoose.Schema;
 
-const Buffer = require('safe-buffer').Buffer;
-
 mongoose.connect('localhost', 'testing_bench');
 
 const DocSchema = new Schema({

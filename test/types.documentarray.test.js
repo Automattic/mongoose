@@ -6,11 +6,11 @@
 
 const start = require('./common');
 
-const DocumentArray = require('../lib/types/documentarray');
-const EmbeddedDocument = require('../lib/types/embedded');
+const DocumentArray = require('../lib/types/DocumentArray');
+const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const assert = require('assert');
 const co = require('co');
-const random = require('../lib/utils').random;
+const idGetter = require('../lib/plugins/idGetter');
 const setValue = require('../lib/utils').setValue;
 
 const mongoose = require('./common').mongoose;
@@ -23,14 +23,14 @@ const MongooseDocumentArray = mongoose.Types.DocumentArray;
 
 function TestDoc(schema) {
   const Subdocument = function() {
-    EmbeddedDocument.call(this, {}, new DocumentArray);
+    ArraySubdocument.call(this, {}, new DocumentArray);
   };
 
   /**
-   * Inherits from EmbeddedDocument.
+   * Inherits from ArraySubdocument.
    */
 
-  Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
+  Subdocument.prototype.__proto__ = ArraySubdocument.prototype;
 
   /**
    * Set schema.
@@ -40,7 +40,7 @@ function TestDoc(schema) {
     title: { type: String }
   });
 
-  Subdocument.prototype.$__setSchema(schema || SubSchema);
+  Subdocument.prototype.$__setSchema(idGetter(schema || SubSchema));
 
   return Subdocument;
 }
@@ -142,13 +142,6 @@ describe('types.documentarray', function() {
     assert.notEqual(a.id({ one: 'rolling', two: 'rock' }).title, 'rock-n-roll');
     assert.equal(a.id({ one: 'rock', two: 'roll' }).title, 'rock-n-roll');
 
-    // test with no _id
-    let NoId = new Schema({
-      title: { type: String }
-    }, { noId: true });
-
-    Subdocument = TestDoc(NoId);
-
     let sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
 
@@ -160,13 +153,6 @@ describe('types.documentarray', function() {
       threw = err;
     }
     assert.equal(threw, false);
-
-    // test the _id option, noId is deprecated
-    NoId = new Schema({
-      title: { type: String }
-    }, { _id: false });
-
-    Subdocument = TestDoc(NoId);
 
     sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
@@ -308,7 +294,7 @@ describe('types.documentarray', function() {
       const subdoc = t.docs.create({ name: 100 });
       assert.ok(subdoc._id);
       assert.equal(subdoc.name, '100');
-      assert.ok(subdoc instanceof EmbeddedDocument);
+      assert.ok(subdoc instanceof ArraySubdocument);
       done();
     });
   });
@@ -321,7 +307,7 @@ describe('types.documentarray', function() {
         next();
       });
       const schema = new Schema({ children: [child] });
-      const M = db.model('Test', schema, 'edarecast-' + random());
+      const M = db.model('Test', schema);
       const m = new M;
       m.save(function(err) {
         assert.ifError(err);
@@ -411,7 +397,7 @@ describe('types.documentarray', function() {
     });
   });
 
-  it('#push should work on EmbeddedDocuments more than 2 levels deep', function(done) {
+  it('#push should work on ArraySubdocument more than 2 levels deep', function(done) {
     const Comments = new Schema;
     Comments.add({
       title: String,
@@ -576,7 +562,7 @@ describe('types.documentarray', function() {
       assert.equal(doc.docs.length, 2);
     });
 
-    it('map() works', function() {
+    it('map() works (gh-8317)', function() {
       const personSchema = new Schema({ friends: [{ name: { type: String } }] });
       mongoose.deleteModel(/Test/);
       const Person = mongoose.model('Test', personSchema);
@@ -688,6 +674,23 @@ describe('types.documentarray', function() {
 
     assert.equal(doc2.subDocArray[0].ownerDocument().name, 'doc2');
     assert.equal(doc1.subDocArray[0].ownerDocument().name, 'doc1');
+  });
+
+  it('modifying subdoc path after `slice()` (gh-8356)', function() {
+    mongoose.deleteModel(/Test/);
+    const nestedArraySchema = Schema({
+      name: String,
+      subDocArray: [{ name: String }]
+    });
+
+    const Model = db.model('Test', nestedArraySchema);
+    const doc = new Model().init({
+      name: 'test',
+      subDocArray: [{ name: 'foo' }, { name: 'bar' }]
+    });
+
+    doc.subDocArray.slice(1, 2)[0].name = 'baz';
+    assert.ok(doc.isModified('subDocArray.1.name'));
   });
 
   it('supports setting to newly constructed array with no path or parent (gh-8108)', function() {

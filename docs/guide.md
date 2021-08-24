@@ -412,7 +412,6 @@ Valid options:
 - [toJSON](#toJSON)
 - [toObject](#toObject)
 - [typeKey](#typeKey)
-- [typePojoToMixed](/docs/schematypes.html#mixed)
 - [useNestedStrict](#useNestedStrict)
 - [validateBeforeSave](#validateBeforeSave)
 - [versionKey](#versionKey)

@@ -23,7 +23,7 @@ interface Movie {
   actors: Actor[]
 }
 
-const movieSchema = new Schema<Document<Movie>, Model<Document<Movie>>, Movie>({
+const movieSchema = new Schema<Document & Movie, Model<Document & Movie>>({
   title: {
     type: String,
     index: 'text'
@@ -113,8 +113,6 @@ async function gh9857() {
     active: { type: Boolean },
     points: Number
   };
-
-  const schema = new Schema<UserDocument, UserModel, User>(schemaDefinition);
 }
 
 function gh10261() {

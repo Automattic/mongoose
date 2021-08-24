@@ -35,7 +35,7 @@ describe('collections:', function() {
     });
 
     const uri = 'mongodb://localhost:27017/mongoose_test';
-    db.openUri(process.env.MONGOOSE_TEST_URI || uri, { useNewUrlParser: true }, function(err) {
+    db.openUri(process.env.MONGOOSE_TEST_URI || uri, function(err) {
       connected = !err;
       finish();
     });
@@ -53,7 +53,7 @@ describe('collections:', function() {
       });
 
     const uri = 'mongodb://localhost:27017/mongoose_test';
-    db.openUri(process.env.MONGOOSE_TEST_URI || uri, { useNewUrlParser: true }, function(err) {
+    db.openUri(process.env.MONGOOSE_TEST_URI || uri, function(err) {
       assert.ifError(err);
       promise.then(() => done(), done);
     });

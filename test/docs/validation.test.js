@@ -10,7 +10,8 @@ describe('validation docs', function() {
 
   before(function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test', {
-      poolSize: 1
+      minPoolSize: 1,
+      maxPoolSize: 1
     });
   });
 
@@ -516,8 +517,7 @@ describe('validation docs', function() {
     });
     // acquit:ignore:end
     toySchema.path('color').validate(function(value) {
-      // When running update validators with the `context` option set to
-      // 'query', `this` refers to the query object.
+      // When running update validators, `this` refers to the query object.
       if (this.getUpdate().$set.name.toLowerCase().indexOf('red') !== -1) {
         return value === 'red';
       }

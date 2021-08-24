@@ -379,8 +379,6 @@ the array.
 If you have an existing mongoose document and want to populate some of its
 paths, you can use the
 [Document#populate()](./api.html#document_Document-populate) method.
-Just make sure you call [`Document#execPopulate()`](/docs/api/document.html#document_Document-execPopulate)
-to execute the `populate()`.
 
 ```javascript
 const person = await Person.findOne({ name: 'Ian Fleming' });
@@ -388,18 +386,17 @@ const person = await Person.findOne({ name: 'Ian Fleming' });
 person.populated('stories'); // null
 
 // Call the `populate()` method on a document to populate a path.
-// Need to call `execPopulate()` to actually execute the `populate()`.
-await person.populate('stories').execPopulate();
+await person.populate('stories');
 
 person.populated('stories'); // Array of ObjectIds
 person.stories[0].name; // 'Casino Royale'
 ```
 
-The `Document#populate()` method supports chaining, so you can chain
-multiple `populate()` calls together.
+The `Document#populate()` method does not support chaining.
+You need to call `populate()` multiple times, or with an array of paths, to populate multiple paths
 
 ```javascript
-await person.populate('stories').populate('fans').execPopulate();
+await person.populate(['stories', 'fans']);
 person.populated('fans'); // Array of ObjectIds
 ```
 
@@ -795,7 +792,7 @@ MySchema.pre('find', function() {
 MySchema.post('find', async function(docs) {
   for (let doc of docs) {
     if (doc.isPublic) {
-      await doc.populate('user').execPopulate();
+      await doc.populate('user');
     }
   }
 });
@@ -805,7 +802,7 @@ MySchema.post('find', async function(docs) {
 // `populate()` after saving. Useful for sending populated data back to the client in an
 // update API endpoint
 MySchema.post('save', function(doc, next) {
-  doc.populate('user').execPopulate().then(function() {
+  doc.populate('user').then(function() {
     next();
   });
 });

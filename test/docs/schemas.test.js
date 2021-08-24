@@ -25,10 +25,16 @@ describe('Advanced Schemas', function() {
   it('Creating from ES6 Classes Using `loadClass()`', function(done) {
     const schema = new Schema({ firstName: String, lastName: String });
 
-    class PersonClass {
+    class HumanClass {
+      get fullName() {
+        return 'My name';
+      }
+    }
+
+    class PersonClass extends HumanClass {
       // `fullName` becomes a virtual
       get fullName() {
-        return `${this.firstName} ${this.lastName}`;
+        return `${super.fullName} is ${this.firstName} ${this.lastName}`;
       }
 
       set fullName(v) {
@@ -56,14 +62,14 @@ describe('Advanced Schemas', function() {
 
     Person.create({ firstName: 'Jon', lastName: 'Snow' }).
       then(doc => {
-        assert.equal(doc.fullName, 'Jon Snow');
+        assert.equal(doc.fullName, 'My name is Jon Snow');
         doc.fullName = 'Jon Stark';
         assert.equal(doc.firstName, 'Jon');
         assert.equal(doc.lastName, 'Stark');
         return Person.findByFullName('Jon Snow');
       }).
       then(doc => {
-        assert.equal(doc.fullName, 'Jon Snow');
+        assert.equal(doc.fullName, 'My name is Jon Snow');
         // acquit:ignore:start
         done();
         // acquit:ignore:end

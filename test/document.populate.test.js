@@ -10,7 +10,6 @@ const start = require('./common');
 const Document = require('../lib/document');
 const assert = require('assert');
 const co = require('co');
-const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -148,65 +147,6 @@ describe('document.populate', function() {
     db.close(done);
   });
 
-  describe('argument processing', function() {
-    describe('duplicates', function() {
-      it('are removed', function(done) {
-        B.findById(post, function(err, post) {
-          assert.ifError(err);
-          post.populate('_creator');
-          assert.equal(Object.keys(post.$__.populate).length, 1);
-          assert.ok('_creator' in post.$__.populate);
-          post.populate('_creator');
-          assert.equal(Object.keys(post.$__.populate).length, 1);
-          assert.ok('_creator' in post.$__.populate);
-          post.populate('_creator fans');
-          assert.equal(Object.keys(post.$__.populate).length, 2);
-          assert.ok('_creator' in post.$__.populate);
-          assert.ok('fans' in post.$__.populate);
-          post.populate({ path: '_creator' });
-          assert.equal(Object.keys(post.$__.populate).length, 2);
-          assert.ok('_creator' in post.$__.populate);
-          assert.ok('fans' in post.$__.populate);
-          done();
-        });
-      });
-      it('overwrite previous', function(done) {
-        B.findById(post, function(err, post) {
-          assert.ifError(err);
-          post.populate('_creator');
-          assert.equal(Object.keys(post.$__.populate).length, 1);
-          assert.equal(post.$__.populate._creator.select, undefined);
-          post.populate({ path: '_creator', select: 'name' });
-          assert.equal(Object.keys(post.$__.populate).length, 1);
-          assert.ok('_creator' in post.$__.populate);
-          assert.equal(post.$__.populate._creator.select, 'name');
-          done();
-        });
-      });
-    });
-  });
-
-  describe('options', function() {
-    it('resets populate options after execution', function(done) {
-      B.findById(post, function(err, post) {
-        const creator_id = post._creator;
-        post.populate('_creator', function(err) {
-          assert.ifError(err);
-          assert.ok(!post.$__.populate);
-          assert.ok(post._creator);
-          assert.equal(String(post._creator._id), String(creator_id));
-          done();
-        });
-      });
-    });
-
-    it('are not modified when no arguments are passed', function() {
-      const d = new TestDocument();
-      const o = utils.clone(d.options);
-      assert.deepEqual(o, d.populate().options);
-    });
-  });
-
   describe('populating two paths', function() {
     it('with space delmited string works', function(done) {
       B.findById(post, function(err, post) {
@@ -228,7 +168,7 @@ describe('document.populate', function() {
     B.findById(post, function(err, post) {
       const creator_id = post._creator;
       const alt_id = post.fans[1];
-      post.populate('_creator').populate(function(err) {
+      post.populate('_creator', function(err) {
         assert.ifError(err);
         assert.ok(post._creator);
         assert.equal(String(post._creator._id), String(creator_id));
@@ -315,17 +255,36 @@ describe('document.populate', function() {
     });
   });
 
+  it('multiple paths, multiple options', function() {
+    return co(function*() {
+      const b = yield B.findById(post);
+
+      yield b.populate([
+        { path: '_creator', select: '-email' },
+        { path: 'fans', sort: 'name', select: { age: 0 } }
+      ]);
+
+      assert.ok(b.populated('_creator'));
+      assert.ok(!b._creator.email);
+      assert.ok(b._creator.age);
+
+      assert.ok(b.populated('fans'));
+      assert.ok(!b.fans[0].age);
+      assert.ok(b.fans[0].email);
+    });
+  });
+
   it('a property not in schema', function(done) {
     B.findById(post, function(err, post) {
       assert.ifError(err);
       post.populate('idontexist', function(err) {
-        assert.ifError(err);
+        assert.ok(err);
 
         // stuff an ad-hoc value in
         post.$__setValue('idontexist', user1._id);
 
         // populate the non-schema value by passing an explicit model
-        post.populate({ path: 'idontexist', model: 'User' }, function(err, post) {
+        post.populate({ path: 'idontexist', model: 'User', strictPopulate: false }, function(err, post) {
           assert.ifError(err);
           assert.ok(post);
           assert.equal(user1._id.toString(), post.get('idontexist')._id);
@@ -457,7 +416,7 @@ describe('document.populate', function() {
       assert.ifError(err);
 
       const note = new Note({ author: 2359, body: 'Buy Milk' });
-      note.populate('author').populate(function(err, note) {
+      note.populate('author', function(err, note) {
         assert.ifError(err);
         assert.ok(note.author);
         assert.equal(note.author._id, 2359);
@@ -488,7 +447,7 @@ describe('document.populate', function() {
     it('should save just the populated _id (gh-1442)', function() {
       const b = new B({ _creator: user1 });
       return co(function*() {
-        yield b.populate('_creator').execPopulate();
+        yield b.populate('_creator');
         assert.equal(b._creator.name, 'Phoenix');
         yield b.save();
 
@@ -585,12 +544,12 @@ describe('document.populate', function() {
         return Person.findOne({});
       }).then(p => {
         person = p;
-        return person.populate('cars').execPopulate();
+        return person.populate('cars');
       }).then(() => {
         return Car.create({ model: 1 });
       }).then(car => {
         person.cars.push(car);
-        return person.populate('cars').execPopulate();
+        return person.populate('cars');
       }).then(() => {
         return Car.create({ model: 2 });
       }).then(car => {
@@ -747,7 +706,7 @@ describe('document.populate', function() {
           return test.save();
         }).
         then((saved) => {
-          return saved.populate('$others $single').execPopulate();
+          return saved.populate('$others $single');
         }).
         then((populated) => {
           assert.strictEqual(populated.$others.length, 3);
@@ -755,7 +714,7 @@ describe('document.populate', function() {
           populated.depopulate();
           assert.equal(populated.$others, null);
           assert.equal(populated.$single, null);
-          return populated.populate('$last').execPopulate();
+          return populated.populate('$last');
         }).
         then((populatedAgain) => {
           assert.strictEqual(populatedAgain.$last.prop, 'xyzb');
@@ -787,7 +746,7 @@ describe('document.populate', function() {
           books: []
         });
         yield author.save();
-        yield author.populate('books').execPopulate();
+        yield author.populate('books');
         assert.ok(author.books);
         assert.strictEqual(author.books.length, 0);
         author.depopulate('books');
@@ -875,7 +834,7 @@ describe('document.populate', function() {
         const player = yield Player.create({ name: 'Derek Jeter', _id: 'test1' });
         yield Team.create({ name: 'Yankees', captain: 'test1' });
 
-        yield player.populate('teams').execPopulate();
+        yield player.populate('teams');
         assert.deepEqual(player.populated('teams'), ['test1']);
       });
     });
@@ -897,7 +856,7 @@ describe('document.populate', function() {
         const player = yield Player.create({ name: 'Derek Jeter', _id: 'test1' });
         yield Team.create({ name: 'Yankees', captain: 'test1' });
 
-        yield player.populate('team').execPopulate();
+        yield player.populate('team');
         assert.deepEqual(player.populated('team'), 'test1');
       });
     });
@@ -990,34 +949,10 @@ describe('document.populate', function() {
       const o = yield O.create({ i: n._id });
 
       const doc = yield O.findOne({ _id: o._id }).populate('i').exec();
-      const finalDoc = yield doc.populate('i.g').execPopulate();
+      const finalDoc = yield doc.populate('i.g');
 
       assert.ok(finalDoc.populated('i.g'));
       assert.ok(finalDoc.i.populated('g'));
-    });
-  });
-
-  it('doc.execPopulate(options) is a shorthand for doc.populate(options).execPopulate(...) (gh-8839)', function() {
-    const userSchema = new Schema({ name: String });
-    const User = db.model('Test1', userSchema);
-
-    const postSchema = new Schema({
-      user: { type: mongoose.ObjectId, ref: 'Test1' },
-      title: String
-    });
-
-    const Post = db.model('Test2', postSchema);
-
-    return co(function*() {
-      const user = yield User.create({ name: 'val' });
-
-      yield Post.create({ title: 'test1', user: user });
-
-      const post = yield Post.findOne();
-
-      yield post.execPopulate({ path: 'user' });
-
-      assert.equal(post.user.name, 'val');
     });
   });
 });

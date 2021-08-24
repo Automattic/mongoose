@@ -135,7 +135,7 @@ describe('Query:', function() {
     });
 
     it('creates subclasses of mquery', function(done) {
-      const opts = { safe: { w: 'majority' }, readPreference: 'p' };
+      const opts = { w: 'majority', readPreference: 'p' };
       const match = { title: 'test', count: { $gt: 101 } };
       const select = { name: 1, count: 0 };
       const update = { $set: { title: 'thing' } };

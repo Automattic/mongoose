@@ -10,7 +10,6 @@ const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
 const util = require('./util');
-const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -18,7 +17,7 @@ const ValidatorError = mongoose.Error.ValidatorError;
 const ValidationError = mongoose.Error.ValidationError;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
-const EmbeddedDocument = mongoose.Types.Embedded;
+const EmbeddedDocument = mongoose.Types.Subdocument;
 const MongooseError = mongoose.Error;
 
 describe('Model', function() {
@@ -1053,9 +1052,10 @@ describe('Model', function() {
         a: String
       }));
 
-      TestP.collection.insertOne({ a: null, previous: null }, {}, function(err, f) {
+      const doc = { a: null, previous: null };
+      TestP.collection.insertOne(doc, {}, function(err) {
         assert.ifError(err);
-        TestP.findOne({ _id: f.ops[0]._id }, function(err, found) {
+        TestP.findOne({ _id: doc._id }, function(err, found) {
           assert.ifError(err);
           assert.equal(found.isNew, false);
           assert.strictEqual(found.get('previous'), null);
@@ -3198,8 +3198,8 @@ describe('Model', function() {
         const query = BlogPost.update({ title: 'interoperable update as promise' }, { title: 'interoperable update as promise delta' });
         query.exec(function(err, res) {
           assert.ifError(err);
-          assert.equal(res.n, 1);
-          assert.equal(res.nModified, 1);
+          assert.equal(res.matchedCount, 1);
+          assert.equal(res.modifiedCount, 1);
           BlogPost.count({ title: 'interoperable update as promise delta' }, function(err, count) {
             assert.ifError(err);
             assert.equal(count, 1);
@@ -3738,7 +3738,7 @@ describe('Model', function() {
           }
         };
 
-        M.collection.insertOne(o, { safe: true }, function(err) {
+        M.collection.insertOne(o, function(err) {
           assert.ifError(err);
           M.findById(o._id, function(err, doc) {
             db.close();
@@ -3872,7 +3872,7 @@ describe('Model', function() {
   it('path is cast to correct value when retreived from db', function(done) {
     const schema = new Schema({ title: { type: 'string', index: true } });
     const T = db.model('Test', schema);
-    T.collection.insertOne({ title: 234 }, { safe: true }, function(err) {
+    T.collection.insertOne({ title: 234 }, function(err) {
       assert.ifError(err);
       T.findOne(function(err, doc) {
         assert.ifError(err);
@@ -3952,7 +3952,7 @@ describe('Model', function() {
   describe('unsetting a default value', function() {
     it('should be ignored (gh-758)', function(done) {
       const M = db.model('Test', new Schema({ s: String, n: Number, a: Array }));
-      M.collection.insertOne({}, { safe: true }, function(err) {
+      M.collection.insertOne({}, function(err) {
         assert.ifError(err);
         M.findOne(function(err, m) {
           assert.ifError(err);
@@ -4120,8 +4120,7 @@ describe('Model', function() {
 
       return co(function*() {
         yield Location.collection.drop().catch(() => {});
-        yield Location.createCollection();
-        yield Location.createIndexes();
+        yield Location.init();
 
         yield Location.create({
           name: 'Undefined location'
@@ -4327,7 +4326,7 @@ describe('Model', function() {
 
     test.save(function(error) {
       assert.ok(error);
-      assert.equal(error.name, 'MongoError');
+      assert.equal(error.name, 'MongoServerError');
       db.close(done);
     });
   });
@@ -4346,7 +4345,7 @@ describe('Model', function() {
     db.on('connected', function() {
       test.save(function(error) {
         assert.ok(error);
-        assert.equal(error.name, 'MongoError');
+        assert.equal(error.name, 'MongoServerError');
         db.close(done);
       });
     });
@@ -5235,7 +5234,7 @@ describe('Model', function() {
             const db = yield start();
             const MyModel = db.model('Test', new Schema({ name: String }));
 
-            yield MyModel.createCollection();
+            yield MyModel.init();
 
             const changeStream = MyModel.watch();
             const closed = new global.Promise(resolve => {
@@ -5297,7 +5296,7 @@ describe('Model', function() {
             // Don't wait for promise
             const sessionPromise = MyModel.startSession({ causalConsistency: true });
 
-            yield db;
+            yield db.asPromise();
 
             const session = yield sessionPromise;
 
@@ -5622,8 +5621,7 @@ describe('Model', function() {
               update: {
                 $inc: { num: 1 }
               },
-              upsert: true,
-              setDefaultsOnInsert: true
+              upsert: true
             }
           }
         ];
@@ -5957,23 +5955,6 @@ describe('Model', function() {
         assert.equal(error.name, 'ObjectParameterError');
         done();
       });
-    });
-
-    it('save() with unacknowledged writes (gh-6012)', function() {
-      const schema = new mongoose.Schema({ name: String }, { safe: false });
-
-      const Model = db.model('Test', schema);
-
-      return Model.create({});
-    });
-
-    it('save() with unacknowledged writes in options (gh-6012)', function() {
-      const schema = new mongoose.Schema({ name: String });
-
-      const Model = db.model('Test', schema);
-      const doc = new Model();
-
-      return doc.save({ safe: { w: 0 } });
     });
 
     it.skip('save() with wtimeout defined in schema (gh-6862)', function(done) {
@@ -6425,7 +6406,7 @@ describe('Model', function() {
         const collectionName = Model.collection.name;
 
         // If the collection is not created, the following will throw
-        // MongoError: Collection [mongoose_test.User] not found.
+        // MongoServerError: Collection [mongoose_test.User] not found.
         yield db.collection(collectionName).stats();
 
         yield Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
@@ -6538,7 +6519,7 @@ describe('Model', function() {
 
       yield Model.aggregate([{ $group: { fail: true } }]).exec().catch(() => {});
       assert.equal(called.length, 1);
-      assert.equal(called[0].name, 'MongoError');
+      assert.equal(called[0].name, 'MongoServerError');
     });
   });
 
@@ -6700,11 +6681,11 @@ describe('Model', function() {
 
       return Model.create({ name: 'foo' }).
         then(() => Model.exists({ name: 'foo' })).
-        then(res => assert.strictEqual(res, true)).
+        then(res => assert.ok(res)).
         then(() => Model.exists({})).
-        then(res => assert.strictEqual(res, true)).
+        then(res => assert.ok(res)).
         then(() => Model.exists()).
-        then(res => assert.strictEqual(res, true));
+        then(res => assert.ok(res));
     });
 
     it('returns false if no doc exists', function() {
@@ -6712,9 +6693,9 @@ describe('Model', function() {
 
       return Model.create({ name: 'foo' }).
         then(() => Model.exists({ name: 'bar' })).
-        then(res => assert.strictEqual(res, false)).
-        then(() => Model.exists({ otherProp: 'foo' })).
-        then(res => assert.strictEqual(res, false));
+        then(res => assert.ok(!res)).
+        then(() => Model.exists({ otherProp: 'foo' }, { strict: false })).
+        then(res => assert.ok(!res));
     });
 
     it('options (gh-8075)', function() {
@@ -6967,11 +6948,12 @@ describe('Model', function() {
     const User = db.model('User', userSchema);
 
     return co(function*() {
-      const users = yield User.collection.insertMany([
+      const users = [
         { notInSchema: 1 },
         { notInSchema: 2 },
         { notInSchema: 3 }
-      ]).then(res => res.ops);
+      ];
+      yield User.collection.insertMany(users);
 
       // Act
       yield User.bulkWrite([

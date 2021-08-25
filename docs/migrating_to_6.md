@@ -95,7 +95,9 @@ const User = mongoose.model('User', userSchema);
 await User.find({ notInSchema: 1 });
 
 // Set `strict: false` to opt in to filtering by properties that aren't in the schema
-await User.find({ notInSchema: 1 }, { strict: false });
+await User.find({ notInSchema: 1 }, null, { strict: false });
+// equivalent:
+await User.find({ notInSchema: 1 }).setOptions({ strict: false });
 ```
 
 <h3 id="mongoerror-is-now-mongoservererror"><a href="#mongoerror-is-now-mongoservererror">MongoError is now MongoServerError</a></h3>

@@ -408,7 +408,6 @@ Valid options:
 - [writeConcern](#writeConcern)
 - [shardKey](#shardKey)
 - [strict](#strict)
-- [strictQuery](#strictQuery)
 - [toJSON](#toJSON)
 - [toObject](#toObject)
 - [typeKey](#typeKey)
@@ -754,41 +753,6 @@ const Thing = mongoose.model('Thing', thingSchema);
 const thing = new Thing;
 thing.iAmNotInTheSchema = true;
 thing.save(); // iAmNotInTheSchema is never saved to the db
-```
-
-<h3 id="strictQuery"><a href="#strictQuery">option: strictQuery</a></h3>
-
-For backwards compatibility, the `strict` option does **not** apply to
-the `filter` parameter for queries.
-
-```javascript
-const mySchema = new Schema({ field: Number }, { strict: true });
-const MyModel = mongoose.model('Test', mySchema);
-
-// Mongoose will **not** filter out `notInSchema: 1`, despite `strict: true`
-MyModel.find({ notInSchema: 1 });
-```
-
-The `strict` option does apply to updates.
-
-```javascript
-// Mongoose will strip out `notInSchema` from the update if `strict` is
-// not `false`
-MyModel.updateMany({}, { $set: { notInSchema: 1 } });
-```
-
-Mongoose has a separate `strictQuery` option to toggle strict mode for
-the `filter` parameter to queries.
-
-```javascript
-const mySchema = new Schema({ field: Number }, {
-  strict: true,
-  strictQuery: true // Turn on strict mode for query filters
-});
-const MyModel = mongoose.model('Test', mySchema);
-
-// Mongoose will strip out `notInSchema: 1` because `strictQuery` is `true`
-MyModel.find({ notInSchema: 1 });
 ```
 
 <h3 id="toJSON"><a href="#toJSON">option: toJSON</a></h3>

@@ -60,6 +60,7 @@ Test.find({ parent: '0'.repeat(24) });
 
 // Operators
 Test.find({ name: { $in: ['Test'] } }).exec().then((res: Array<ITest>) => console.log(res));
+Test.find({ tags: 'test' }).exec();
 
 Test.find({ name: 'test' }, (err: Error, docs: ITest[]) => {
   console.log(!!err, docs[0].age);

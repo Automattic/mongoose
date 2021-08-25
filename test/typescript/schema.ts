@@ -169,3 +169,22 @@ function gh10409() {
     field: { type: Date }
   });
 }
+
+function gh10605() {
+  interface ITest {
+    arrayField?: string[];
+    object: {
+      value: number
+    };
+  }
+  const schema = new Schema<ITest>({
+    arrayField: [String],
+    object: {
+      type: {
+        value: {
+          type: Number
+        }
+      }
+    }
+  });
+}

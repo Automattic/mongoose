@@ -1,0 +1,454 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.13.8: </title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>.api-nav .nav-item-sub {
+  display: block !important;
+}
+
+.api-content {
+  margin-top: 3em;
+}
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.13.8</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs">Version 6.x</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/5.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/aggregate.js" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h1>Aggregate</h1><div><div class="native-inline">
+  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+</div>
+</div><div class="api-nav"><div class="api-nav-content"><div class="nav-item" id="nav-Mongoose"><div class="nav-item-title"><a href="mongoose.html">Mongoose</a></div></div><div class="nav-item" id="nav-Schema"><div class="nav-item-title"><a href="schema.html">Schema</a></div></div><div class="nav-item" id="nav-Connection"><div class="nav-item-title"><a href="connection.html">Connection</a></div></div><div class="nav-item" id="nav-Document"><div class="nav-item-title"><a href="document.html">Document</a></div></div><div class="nav-item" id="nav-Model"><div class="nav-item-title"><a href="model.html">Model</a></div></div><div class="nav-item" id="nav-Query"><div class="nav-item-title"><a href="query.html">Query</a></div></div><div class="nav-item" id="nav-QueryCursor"><div class="nav-item-title"><a href="querycursor.html">QueryCursor</a></div></div><div class="nav-item" id="nav-Aggregate"><div class="nav-item-title" style="font-weight: bold"><a href="aggregate.html">Aggregate</a></div><ul class="nav-item-sub"><li><a href="#aggregate_Aggregate">Aggregate()</a></li><li><a href="#aggregate_Aggregate-Symbol.asyncIterator">Aggregate.prototype.Symbol.asyncIterator()</a></li><li><a href="#aggregate_Aggregate-addCursorFlag">Aggregate.prototype.addCursorFlag</a></li><li><a href="#aggregate_Aggregate-addFields">Aggregate.prototype.addFields()</a></li><li><a href="#aggregate_Aggregate-allowDiskUse">Aggregate.prototype.allowDiskUse()</a></li><li><a href="#aggregate_Aggregate-append">Aggregate.prototype.append()</a></li><li><a href="#aggregate_Aggregate-catch">Aggregate.prototype.catch()</a></li><li><a href="#aggregate_Aggregate-collation">Aggregate.prototype.collation()</a></li><li><a href="#aggregate_Aggregate-count">Aggregate.prototype.count()</a></li><li><a href="#aggregate_Aggregate-cursor">Aggregate.prototype.cursor()</a></li><li><a href="#aggregate_Aggregate-exec">Aggregate.prototype.exec()</a></li><li><a href="#aggregate_Aggregate-explain">Aggregate.prototype.explain()</a></li><li><a href="#aggregate_Aggregate-facet">Aggregate.prototype.facet()</a></li><li><a href="#aggregate_Aggregate-graphLookup">Aggregate.prototype.graphLookup()</a></li><li><a href="#aggregate_Aggregate-group">Aggregate.prototype.group()</a></li><li><a href="#aggregate_Aggregate-hint">Aggregate.prototype.hint()</a></li><li><a href="#aggregate_Aggregate-limit">Aggregate.prototype.limit()</a></li><li><a href="#aggregate_Aggregate-lookup">Aggregate.prototype.lookup()</a></li><li><a href="#aggregate_Aggregate-match">Aggregate.prototype.match()</a></li><li><a href="#aggregate_Aggregate-model">Aggregate.prototype.model()</a></li><li><a href="#aggregate_Aggregate-near">Aggregate.prototype.near()</a></li><li><a href="#aggregate_Aggregate-option">Aggregate.prototype.option()</a></li><li><a href="#aggregate_Aggregate-options">Aggregate.prototype.options</a></li><li><a href="#aggregate_Aggregate-pipeline">Aggregate.prototype.pipeline()</a></li><li><a href="#aggregate_Aggregate-project">Aggregate.prototype.project()</a></li><li><a href="#aggregate_Aggregate-read">Aggregate.prototype.read()</a></li><li><a href="#aggregate_Aggregate-readConcern">Aggregate.prototype.readConcern()</a></li><li><a href="#aggregate_Aggregate-redact">Aggregate.prototype.redact()</a></li><li><a href="#aggregate_Aggregate-replaceRoot">Aggregate.prototype.replaceRoot()</a></li><li><a href="#aggregate_Aggregate-sample">Aggregate.prototype.sample()</a></li><li><a href="#aggregate_Aggregate-search">Aggregate.prototype.search()</a></li><li><a href="#aggregate_Aggregate-session">Aggregate.prototype.session()</a></li><li><a href="#aggregate_Aggregate-skip">Aggregate.prototype.skip()</a></li><li><a href="#aggregate_Aggregate-sort">Aggregate.prototype.sort()</a></li><li><a href="#aggregate_Aggregate-sortByCount">Aggregate.prototype.sortByCount()</a></li><li><a href="#aggregate_Aggregate-then">Aggregate.prototype.then()</a></li><li><a href="#aggregate_Aggregate-unwind">Aggregate.prototype.unwind()</a></li></ul></div><div class="nav-item" id="nav-AggregationCursor"><div class="nav-item-title"><a href="aggregationcursor.html">AggregationCursor</a></div></div><div class="nav-item" id="nav-Schematype"><div class="nav-item-title"><a href="schematype.html">Schematype</a></div></div><div class="nav-item" id="nav-Virtualtype"><div class="nav-item-title"><a href="virtualtype.html">Virtualtype</a></div></div><div class="nav-item" id="nav-Error"><div class="nav-item-title"><a href="error.html">Error</a></div></div><div class="nav-item" id="nav-Array"><div class="nav-item-title"><a href="array.html">Array</a></div></div><div class="nav-item" id="nav-SchemaArray"><div class="nav-item-title"><a href="schemaarray.html">SchemaArray</a></div></div><div class="nav-item" id="nav-DocumentArrayPath"><div class="nav-item-title"><a href="documentarraypath.html">DocumentArrayPath</a></div></div><div class="nav-item" id="nav-SingleNestedPath"><div class="nav-item-title"><a href="singlenestedpath.html">SingleNestedPath</a></div></div></div></div><div class="api-content"><ul><li><a href="#aggregate_Aggregate">Aggregate()</a></li><li><a href="#aggregate_Aggregate-Symbol.asyncIterator">Aggregate.prototype.Symbol.asyncIterator()</a></li><li><a href="#aggregate_Aggregate-addCursorFlag">Aggregate.prototype.addCursorFlag</a></li><li><a href="#aggregate_Aggregate-addFields">Aggregate.prototype.addFields()</a></li><li><a href="#aggregate_Aggregate-allowDiskUse">Aggregate.prototype.allowDiskUse()</a></li><li><a href="#aggregate_Aggregate-append">Aggregate.prototype.append()</a></li><li><a href="#aggregate_Aggregate-catch">Aggregate.prototype.catch()</a></li><li><a href="#aggregate_Aggregate-collation">Aggregate.prototype.collation()</a></li><li><a href="#aggregate_Aggregate-count">Aggregate.prototype.count()</a></li><li><a href="#aggregate_Aggregate-cursor">Aggregate.prototype.cursor()</a></li><li><a href="#aggregate_Aggregate-exec">Aggregate.prototype.exec()</a></li><li><a href="#aggregate_Aggregate-explain">Aggregate.prototype.explain()</a></li><li><a href="#aggregate_Aggregate-facet">Aggregate.prototype.facet()</a></li><li><a href="#aggregate_Aggregate-graphLookup">Aggregate.prototype.graphLookup()</a></li><li><a href="#aggregate_Aggregate-group">Aggregate.prototype.group()</a></li><li><a href="#aggregate_Aggregate-hint">Aggregate.prototype.hint()</a></li><li><a href="#aggregate_Aggregate-limit">Aggregate.prototype.limit()</a></li><li><a href="#aggregate_Aggregate-lookup">Aggregate.prototype.lookup()</a></li><li><a href="#aggregate_Aggregate-match">Aggregate.prototype.match()</a></li><li><a href="#aggregate_Aggregate-model">Aggregate.prototype.model()</a></li><li><a href="#aggregate_Aggregate-near">Aggregate.prototype.near()</a></li><li><a href="#aggregate_Aggregate-option">Aggregate.prototype.option()</a></li><li><a href="#aggregate_Aggregate-options">Aggregate.prototype.options</a></li><li><a href="#aggregate_Aggregate-pipeline">Aggregate.prototype.pipeline()</a></li><li><a href="#aggregate_Aggregate-project">Aggregate.prototype.project()</a></li><li><a href="#aggregate_Aggregate-read">Aggregate.prototype.read()</a></li><li><a href="#aggregate_Aggregate-readConcern">Aggregate.prototype.readConcern()</a></li><li><a href="#aggregate_Aggregate-redact">Aggregate.prototype.redact()</a></li><li><a href="#aggregate_Aggregate-replaceRoot">Aggregate.prototype.replaceRoot()</a></li><li><a href="#aggregate_Aggregate-sample">Aggregate.prototype.sample()</a></li><li><a href="#aggregate_Aggregate-search">Aggregate.prototype.search()</a></li><li><a href="#aggregate_Aggregate-session">Aggregate.prototype.session()</a></li><li><a href="#aggregate_Aggregate-skip">Aggregate.prototype.skip()</a></li><li><a href="#aggregate_Aggregate-sort">Aggregate.prototype.sort()</a></li><li><a href="#aggregate_Aggregate-sortByCount">Aggregate.prototype.sortByCount()</a></li><li><a href="#aggregate_Aggregate-then">Aggregate.prototype.then()</a></li><li><a href="#aggregate_Aggregate-unwind">Aggregate.prototype.unwind()</a></li></ul><hr class="separate-api-elements"><h3 id="aggregate_Aggregate"><a href="#aggregate_Aggregate">Aggregate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[pipeline]
+<span class="method-type">&laquo;Array&raquo;</span> aggregation pipeline as an array of objects</p>
+</li></ul><div><p>Aggregate constructor used for building aggregation pipelines. Do not instantiate this class directly, use <a href="/docs/api.html#model_Model.aggregate">Model.aggregate()</a> instead.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">const</span> aggregate = Model.aggregate([
+  { <span class="hljs-attr">$project</span>: { <span class="hljs-attr">a</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">b</span>: <span class="hljs-number">1</span> } },
+  { <span class="hljs-attr">$skip</span>: <span class="hljs-number">5</span> }
+]);
+
+Model.
+  aggregate([{ <span class="hljs-attr">$match</span>: { <span class="hljs-attr">age</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">21</span> }}}]).
+  unwind(<span class="hljs-string">'tags'</span>).
+  exec(callback);</code></pre>
+
+<h4>Note:</h4>
+
+<ul>
+<li>The documents returned are plain javascript objects, not mongoose documents (since any shape of document can be returned).</li>
+<li>Mongoose does <strong>not</strong> cast pipeline stages. The below will <strong>not</strong> work unless <code>_id</code> is a string in the database</li>
+</ul>
+
+<div class="highlight"><pre lang="javascript">  new Aggregate([{ $match: { _id: '00000000000000000000000a' } }]);
+  // Do this instead to cast to an ObjectId
+  new Aggregate([{ $match: { _id: mongoose.Types.ObjectId('00000000000000000000000a') } }]);
+</pre></div>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-Symbol.asyncIterator"><a href="#aggregate_Aggregate-Symbol.asyncIterator">Aggregate.prototype.Symbol.asyncIterator()</a></h3><div><p>Returns an asyncIterator for use with [<code>for/await/of</code> loops](<a href='https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js'>https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js</a> You do not need to call this function explicitly, the JavaScript runtime will call it for you.</p>
+
+<h4>Example</h4>
+
+<pre><code><span class="hljs-keyword">const</span> agg = Model.aggregate([{ <span class="hljs-attr">$match</span>: { <span class="hljs-attr">age</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">25</span> } } }]);
+<span class="hljs-keyword">for</span> <span class="hljs-keyword">await</span> (<span class="hljs-keyword">const</span> doc <span class="hljs-keyword">of</span> agg) {
+  <span class="hljs-built_in">console</span>.log(doc.name);
+}</code></pre>
+
+<p>Node.js 10.x supports async iterators natively without any flags. You can enable async iterators in Node.js 8.x using the <a href="https://github.com/tc39/proposal-async-iteration/issues/117#issuecomment-346695187"><code>--harmony_async_iteration</code> flag</a>.</p>
+
+<p><strong>Note:</strong> This function is not set if <code>Symbol.asyncIterator</code> is undefined. If <code>Symbol.asyncIterator</code> is undefined, that means your Node.js version does not support async iterators.</p>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-addCursorFlag"><a href="#aggregate_Aggregate-addCursorFlag">Aggregate.prototype.addCursorFlag</a></h3><h5>Parameters</h5><ul class="params"><li class="param">flag
+<span class="method-type">&laquo;String&raquo;</span> </li><li class="param">value
+<span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</p>
+</li></ul><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Sets an option on this aggregation. This function will be deprecated in a future release. Use the <a href="./api.html#aggregate_Aggregate-cursor"><code>cursor()</code></a>, <a href="./api.html#aggregate_Aggregate-collation"><code>collation()</code></a>, etc. helpers to set individual options, or access <code>agg.options</code> directly.</p>
+
+<p>Note that MongoDB aggregations <a href="https://jira.mongodb.org/browse/SERVER-6036">do <strong>not</strong> support the <code>noCursorTimeout</code> flag</a>, if you try setting that flag with this function you will get a "unrecognized field 'noCursorTimeout'" error.</p>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-addFields"><a href="#aggregate_Aggregate-addFields">Aggregate.prototype.addFields()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
+<span class="method-type">&laquo;Object&raquo;</span> field specification</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $addFields operator to this aggregate pipeline. Requires MongoDB v3.4+ to work</p>
+
+<h4>Examples:</h4>
+
+<pre><code><span class="hljs-comment">// adding new fields based on existing fields</span>
+aggregate.addFields({
+    <span class="hljs-attr">newField</span>: <span class="hljs-string">'$b.nested'</span>
+  , <span class="hljs-attr">plusTen</span>: { <span class="hljs-attr">$add</span>: [<span class="hljs-string">'$val'</span>, <span class="hljs-number">10</span>]}
+  , <span class="hljs-attr">sub</span>: {
+       <span class="hljs-attr">name</span>: <span class="hljs-string">'$a'</span>
+    }
+})
+
+<span class="hljs-comment">// etc</span>
+aggregate.addFields({ <span class="hljs-attr">salary_k</span>: { <span class="hljs-attr">$divide</span>: [ <span class="hljs-string">"$salary"</span>, <span class="hljs-number">1000</span> ] } });</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-allowDiskUse"><a href="#aggregate_Aggregate-allowDiskUse">Aggregate.prototype.allowDiskUse()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">value
+<span class="method-type">&laquo;Boolean&raquo;</span> Should tell server it can use hard drive to store data during aggregation.</p>
+</li><li class="param">[tags]
+<span class="method-type">&laquo;Array&raquo;</span> optional tags for this query</p>
+</li></ul><div><p>Sets the allowDiskUse option for the aggregation query (ignored for &lt; 2.6.0)</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">await</span> Model.aggregate([{ <span class="hljs-attr">$match</span>: { <span class="hljs-attr">foo</span>: <span class="hljs-string">'bar'</span> } }]).allowDiskUse(<span class="hljs-literal">true</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-append"><a href="#aggregate_Aggregate-append">Aggregate.prototype.append()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">ops
+<span class="method-type">&laquo;Object&raquo;</span> operator(s) to append</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new operators to this aggregate pipeline</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.append({ <span class="hljs-attr">$project</span>: { <span class="hljs-attr">field</span>: <span class="hljs-number">1</span> }}, { <span class="hljs-attr">$limit</span>: <span class="hljs-number">2</span> });
+
+<span class="hljs-comment">// or pass an array</span>
+<span class="hljs-keyword">const</span> pipeline = [{ <span class="hljs-attr">$match</span>: { <span class="hljs-attr">daw</span>: <span class="hljs-string">'Logic Audio X'</span> }} ];
+aggregate.append(pipeline);</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-catch"><a href="#aggregate_Aggregate-catch">Aggregate.prototype.catch()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[reject]
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query returning a <code>Promise</code> which will be resolved with either the doc(s) or rejected with the error. Like <a href="#query_Query-then"><code>.then()</code></a>, but only takes a rejection handler.</p>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-collation"><a href="#aggregate_Aggregate-collation">Aggregate.prototype.collation()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">collation
+<span class="method-type">&laquo;Object&raquo;</span> options</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</p>
+</li></ul><div><p>Adds a collation</p>
+
+<h4>Example:</h4>
+
+<pre><code>Model.aggregate(..).collation({ <span class="hljs-attr">locale</span>: <span class="hljs-string">'en_US'</span>, <span class="hljs-attr">strength</span>: <span class="hljs-number">1</span> }).exec();</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-count"><a href="#aggregate_Aggregate-count">Aggregate.prototype.count()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">the
+<span class="method-type">&laquo;String&raquo;</span> name of the count field</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $count operator to this aggregate pipeline.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.count(<span class="hljs-string">"userCount"</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-cursor"><a href="#aggregate_Aggregate-cursor">Aggregate.prototype.cursor()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
+<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">options.batchSize
+<span class="method-type">&laquo;Number&raquo;</span> set the cursor batch size</p>
+</li><ul style="margin-top: 0.5em"><li>[options.useMongooseAggCursor]
+<span class="method-type">&laquo;Boolean&raquo;</span> use experimental mongoose-specific aggregation cursor (for <code>eachAsync()</code> and other query cursor semantics)</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</p>
+</li></ul><div><p>Sets the cursor option option for the aggregation query (ignored for &lt; 2.6.0). Note the different syntax below: .exec() returns a cursor object, and no callback is necessary.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">const</span> cursor = Model.aggregate(..).cursor({ <span class="hljs-attr">batchSize</span>: <span class="hljs-number">1000</span> }).exec();
+cursor.eachAsync(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc, i</span>) </span>{
+  <span class="hljs-comment">// use doc</span>
+});</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-exec"><a href="#aggregate_Aggregate-exec">Aggregate.prototype.exec()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[callback]
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the aggregate pipeline on the currently bound Model.</p>
+
+<h4>Example:</h4>
+
+<pre><code>aggregate.exec(callback);
+
+<span class="hljs-comment">// Because a promise is returned, the `callback` is optional.</span>
+<span class="hljs-keyword">const</span> promise = aggregate.exec();
+promise.then(..);</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-explain"><a href="#aggregate_Aggregate-explain">Aggregate.prototype.explain()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">callback
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Execute the aggregation with explain</p>
+
+<h4>Example:</h4>
+
+<pre><code>Model.aggregate(..).explain(callback)</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-facet"><a href="#aggregate_Aggregate-facet">Aggregate.prototype.facet()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">facet
+<span class="method-type">&laquo;Object&raquo;</span> options</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</p>
+</li></ul><div><p>Combines multiple aggregation pipelines.</p>
+
+<h4>Example:</h4>
+
+<pre><code>Model.aggregate(...)
+ .facet({
+   <span class="hljs-attr">books</span>: [{ <span class="hljs-attr">groupBy</span>: <span class="hljs-string">'$author'</span> }],
+   <span class="hljs-attr">price</span>: [{ <span class="hljs-attr">$bucketAuto</span>: { <span class="hljs-attr">groupBy</span>: <span class="hljs-string">'$price'</span>, <span class="hljs-attr">buckets</span>: <span class="hljs-number">2</span> } }]
+ })
+ .exec();
+
+<span class="hljs-comment">// Output: { books: [...], price: [{...}, {...}] }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-graphLookup"><a href="#aggregate_Aggregate-graphLookup">Aggregate.prototype.graphLookup()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
+<span class="method-type">&laquo;Object&raquo;</span> to $graphLookup as described in the above link</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new custom $graphLookup operator(s) to this aggregate pipeline, performing a recursive search on a collection.</p>
+
+<p>Note that graphLookup can only consume at most 100MB of memory, and does not allow disk use even if <code>{ allowDiskUse: true }</code> is specified.</p>
+
+<h4>Examples:</h4>
+
+<pre><code><span class="hljs-comment">// Suppose we have a collection of courses, where a document might look like `{ _id: 0, name: 'Calculus', prerequisite: 'Trigonometry'}` and `{ _id: 0, name: 'Trigonometry', prerequisite: 'Algebra' }`</span>
+ aggregate.graphLookup({ <span class="hljs-attr">from</span>: <span class="hljs-string">'courses'</span>, <span class="hljs-attr">startWith</span>: <span class="hljs-string">'$prerequisite'</span>, <span class="hljs-attr">connectFromField</span>: <span class="hljs-string">'prerequisite'</span>, <span class="hljs-attr">connectToField</span>: <span class="hljs-string">'name'</span>, <span class="hljs-attr">as</span>: <span class="hljs-string">'prerequisites'</span>, <span class="hljs-attr">maxDepth</span>: <span class="hljs-number">3</span> }) <span class="hljs-comment">// this will recursively search the 'courses' collection up to 3 prerequisites</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-group"><a href="#aggregate_Aggregate-group">Aggregate.prototype.group()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
+<span class="method-type">&laquo;Object&raquo;</span> $group operator contents</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new custom $group operator to this aggregate pipeline.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.group({ <span class="hljs-attr">_id</span>: <span class="hljs-string">"$department"</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-hint"><a href="#aggregate_Aggregate-hint">Aggregate.prototype.hint()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">value
+<span class="method-type">&laquo;Object|String&raquo;</span> a hint object or the index name</p>
+</li></ul><div><p>Sets the hint option for the aggregation query (ignored for &lt; 3.6.0)</p>
+
+<h4>Example:</h4>
+
+<pre><code>Model.aggregate(..).hint({ <span class="hljs-attr">qty</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">category</span>: <span class="hljs-number">1</span> }).exec(callback)</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-limit"><a href="#aggregate_Aggregate-limit">Aggregate.prototype.limit()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">num
+<span class="method-type">&laquo;Number&raquo;</span> maximum number of records to pass to the next stage</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $limit operator to this aggregate pipeline.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.limit(<span class="hljs-number">10</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-lookup"><a href="#aggregate_Aggregate-lookup">Aggregate.prototype.lookup()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
+<span class="method-type">&laquo;Object&raquo;</span> to $lookup as described in the above link</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate*&raquo;</span> @api public</p>
+</li></ul><div><p>Appends new custom $lookup operator to this aggregate pipeline.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.lookup({ <span class="hljs-attr">from</span>: <span class="hljs-string">'users'</span>, <span class="hljs-attr">localField</span>: <span class="hljs-string">'userId'</span>, <span class="hljs-attr">foreignField</span>: <span class="hljs-string">'_id'</span>, <span class="hljs-attr">as</span>: <span class="hljs-string">'users'</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-match"><a href="#aggregate_Aggregate-match">Aggregate.prototype.match()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
+<span class="method-type">&laquo;Object&raquo;</span> $match operator contents</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new custom $match operator to this aggregate pipeline.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.match({ <span class="hljs-attr">department</span>: { <span class="hljs-attr">$in</span>: [ <span class="hljs-string">"sales"</span>, <span class="hljs-string">"engineering"</span> ] } });</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-model"><a href="#aggregate_Aggregate-model">Aggregate.prototype.model()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[model]
+<span class="method-type">&laquo;Model&raquo;</span> the model to which the aggregate is to be bound</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate,Model&raquo;</span> if model is passed, will return <code>this</code>, otherwise will return the model</p>
+</li></ul><div><p>Get/set the model that this aggregation will execute on.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">const</span> aggregate = MyModel.aggregate([{ <span class="hljs-attr">$match</span>: { <span class="hljs-attr">answer</span>: <span class="hljs-number">42</span> } }]);
+aggregate.model() === MyModel; <span class="hljs-comment">// true</span>
+
+<span class="hljs-comment">// Change the model. There's rarely any reason to do this.</span>
+aggregate.model(SomeOtherModel);
+aggregate.model() === SomeOtherModel; <span class="hljs-comment">// true</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-near"><a href="#aggregate_Aggregate-near">Aggregate.prototype.near()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $geoNear operator to this aggregate pipeline.</p>
+
+<h4>NOTE:</h4>
+
+<p><strong>MUST</strong> be used as the first operator in the pipeline.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.near({
+  <span class="hljs-attr">near</span>: [<span class="hljs-number">40.724</span>, <span class="hljs-number">-73.997</span>],
+  <span class="hljs-attr">distanceField</span>: <span class="hljs-string">"dist.calculated"</span>, <span class="hljs-comment">// required</span>
+  <span class="hljs-attr">maxDistance</span>: <span class="hljs-number">0.008</span>,
+  <span class="hljs-attr">query</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">"public"</span> },
+  <span class="hljs-attr">includeLocs</span>: <span class="hljs-string">"dist.location"</span>,
+  <span class="hljs-attr">uniqueDocs</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">num</span>: <span class="hljs-number">5</span>
+});</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-option"><a href="#aggregate_Aggregate-option">Aggregate.prototype.option()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
+<span class="method-type">&laquo;Object&raquo;</span> keys to merge into current options</p>
+</li><li class="param">number
+<span class="method-type">&laquo;[options.maxTimeMS]&raquo;</span> limits the time this aggregation will run, see <a href="https://docs.mongodb.com/manual/reference/operator/meta/maxTimeMS/">MongoDB docs on <code>maxTimeMS</code></a></p>
+</li><li class="param">boolean
+<span class="method-type">&laquo;[options.allowDiskUse]&raquo;</span> if true, the MongoDB server will use the hard drive to store data during this aggregation</p>
+</li><li class="param">object
+<span class="method-type">&laquo;[options.collation]&raquo;</span> see <a href="./docs/api.html#aggregate_Aggregate-collation"><code>Aggregate.prototype.collation()</code></a></p>
+</li><li class="param">ClientSession
+<span class="method-type">&laquo;[options.session]&raquo;</span> see <a href="./docs/api.html#aggregate_Aggregate-session"><code>Aggregate.prototype.session()</code></a></p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</p>
+</li></ul><div><p>Lets you set arbitrary options, for middleware or plugins.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">const</span> agg = Model.aggregate(..).option({ <span class="hljs-attr">allowDiskUse</span>: <span class="hljs-literal">true</span> }); <span class="hljs-comment">// Set the `allowDiskUse` option</span>
+agg.options; <span class="hljs-comment">// `{ allowDiskUse: true }`</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-options"><a href="#aggregate_Aggregate-options">Aggregate.prototype.options</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Contains options passed down to the <a href="https://docs.mongodb.com/manual/reference/command/aggregate/">aggregate command</a>.</p>
+
+<h2>Supported options are</h2>
+
+<ul>
+<li><code>readPreference</code></li>
+<li><a href="./api.html#aggregate_Aggregate-cursor"><code>cursor</code></a></li>
+<li><a href="./api.html#aggregate_Aggregate-explain"><code>explain</code></a></li>
+<li><a href="./api.html#aggregate_Aggregate-allowDiskUse"><code>allowDiskUse</code></a></li>
+<li><code>maxTimeMS</code></li>
+<li><code>bypassDocumentValidation</code></li>
+<li><code>raw</code></li>
+<li><code>promoteLongs</code></li>
+<li><code>promoteValues</code></li>
+<li><code>promoteBuffers</code></li>
+<li><a href="./api.html#aggregate_Aggregate-collation"><code>collation</code></a></li>
+<li><code>comment</code></li>
+<li><a href="./api.html#aggregate_Aggregate-session"><code>session</code></a></li>
+</ul>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-pipeline"><a href="#aggregate_Aggregate-pipeline">Aggregate.prototype.pipeline()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns the current pipeline</p>
+
+<h4>Example:</h4>
+
+<pre><code>MyModel.aggregate().match({ <span class="hljs-attr">test</span>: <span class="hljs-number">1</span> }).pipeline(); <span class="hljs-comment">// [{ $match: { test: 1 } }]</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-project"><a href="#aggregate_Aggregate-project">Aggregate.prototype.project()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
+<span class="method-type">&laquo;Object|String&raquo;</span> field specification</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $project operator to this aggregate pipeline.</p>
+
+<p>Mongoose query <a href="#query_Query-select">selection syntax</a> is also supported.</p>
+
+<h4>Examples:</h4>
+
+<pre><code><span class="hljs-comment">// include a, include b, exclude _id</span>
+aggregate.project(<span class="hljs-string">"a b -_id"</span>);
+
+<span class="hljs-comment">// or you may use object notation, useful when</span>
+<span class="hljs-comment">// you have keys already prefixed with a "-"</span>
+aggregate.project({<span class="hljs-attr">a</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">b</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">_id</span>: <span class="hljs-number">0</span>});
+
+<span class="hljs-comment">// reshaping documents</span>
+aggregate.project({
+    <span class="hljs-attr">newField</span>: <span class="hljs-string">'$b.nested'</span>
+  , <span class="hljs-attr">plusTen</span>: { <span class="hljs-attr">$add</span>: [<span class="hljs-string">'$val'</span>, <span class="hljs-number">10</span>]}
+  , <span class="hljs-attr">sub</span>: {
+       <span class="hljs-attr">name</span>: <span class="hljs-string">'$a'</span>
+    }
+})
+
+<span class="hljs-comment">// etc</span>
+aggregate.project({ <span class="hljs-attr">salary_k</span>: { <span class="hljs-attr">$divide</span>: [ <span class="hljs-string">"$salary"</span>, <span class="hljs-number">1000</span> ] } });</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-read"><a href="#aggregate_Aggregate-read">Aggregate.prototype.read()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">pref
+<span class="method-type">&laquo;String&raquo;</span> one of the listed preference options or their aliases</p>
+</li><li class="param">[tags]
+<span class="method-type">&laquo;Array&raquo;</span> optional tags for this query</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</p>
+</li></ul><div><p>Sets the readPreference option for the aggregation query.</p>
+
+<h4>Example:</h4>
+
+<pre><code>Model.aggregate(..).read(<span class="hljs-string">'primaryPreferred'</span>).exec(callback)</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-readConcern"><a href="#aggregate_Aggregate-readConcern">Aggregate.prototype.readConcern()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">level
+<span class="method-type">&laquo;String&raquo;</span> one of the listed read concern level or their aliases</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</p>
+</li></ul><div><p>Sets the readConcern level for the aggregation query.</p>
+
+<h4>Example:</h4>
+
+<pre><code>Model.aggregate(..).readConcern(<span class="hljs-string">'majority'</span>).exec(callback)</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-redact"><a href="#aggregate_Aggregate-redact">Aggregate.prototype.redact()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">expression
+<span class="method-type">&laquo;Object&raquo;</span> redact options or conditional expression</p>
+</li><li class="param">[thenExpr]
+<span class="method-type">&laquo;String|Object&raquo;</span> true case for the condition</p>
+</li><li class="param">[elseExpr]
+<span class="method-type">&laquo;String|Object&raquo;</span> false case for the condition</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</p>
+</li></ul><div><p>Appends a new $redact operator to this aggregate pipeline.</p>
+
+<p>If 3 arguments are supplied, Mongoose will wrap them with if-then-else of $cond operator respectively If <code>thenExpr</code> or <code>elseExpr</code> is string, make sure it starts with $$, like <code>$$DESCEND</code>, <code>$$PRUNE</code> or <code>$$KEEP</code>.</p>
+
+<h4>Example:</h4>
+
+<pre><code>Model.aggregate(...)
+ .redact({
+   <span class="hljs-attr">$cond</span>: {
+     <span class="hljs-attr">if</span>: { <span class="hljs-attr">$eq</span>: [ <span class="hljs-string">'$level'</span>, <span class="hljs-number">5</span> ] },
+     <span class="hljs-attr">then</span>: <span class="hljs-string">'$$PRUNE'</span>,
+     <span class="hljs-attr">else</span>: <span class="hljs-string">'$$DESCEND'</span>
+   }
+ })
+ .exec();
+
+<span class="hljs-comment">// $redact often comes with $cond operator, you can also use the following syntax provided by mongoose</span>
+Model.aggregate(...)
+ .redact({ <span class="hljs-attr">$eq</span>: [ <span class="hljs-string">'$level'</span>, <span class="hljs-number">5</span> ] }, <span class="hljs-string">'$$PRUNE'</span>, <span class="hljs-string">'$$DESCEND'</span>)
+ .exec();</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-replaceRoot"><a href="#aggregate_Aggregate-replaceRoot">Aggregate.prototype.replaceRoot()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">the
+<span class="method-type">&laquo;String|Object&raquo;</span> field or document which will become the new root document</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $replaceRoot operator to this aggregate pipeline.</p>
+
+<p>Note that the <code>$replaceRoot</code> operator requires field strings to start with '$'. If you are passing in a string Mongoose will prepend '$' if the specified field doesn't start '$'. If you are passing in an object the strings in your expression will not be altered.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.replaceRoot(<span class="hljs-string">"user"</span>);
+
+aggregate.replaceRoot({ <span class="hljs-attr">x</span>: { <span class="hljs-attr">$concat</span>: [<span class="hljs-string">'$this'</span>, <span class="hljs-string">'$that'</span>] } });</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-sample"><a href="#aggregate_Aggregate-sample">Aggregate.prototype.sample()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">size
+<span class="method-type">&laquo;Number&raquo;</span> number of random documents to pick</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new custom $sample operator to this aggregate pipeline.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.sample(<span class="hljs-number">3</span>); <span class="hljs-comment">// Add a pipeline that picks 3 random documents</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-search"><a href="#aggregate_Aggregate-search">Aggregate.prototype.search()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">$search
+<span class="method-type">&laquo;Object&raquo;</span> options</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</p>
+</li></ul><div><p>Helper for <a href="https://docs.atlas.mongodb.com/reference/atlas-search/tutorial/">Atlas Text Search</a>'s <code>$search</code> stage.</p>
+
+<h4>Example:</h4>
+
+<pre><code>Model.aggregate().
+ search({
+   <span class="hljs-attr">text</span>: {
+     <span class="hljs-attr">query</span>: <span class="hljs-string">'baseball'</span>,
+     <span class="hljs-attr">path</span>: <span class="hljs-string">'plot'</span>
+   }
+ });
+
+<span class="hljs-comment">// Output: [{ plot: '...', title: '...' }]</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-session"><a href="#aggregate_Aggregate-session">Aggregate.prototype.session()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">session
+<span class="method-type">&laquo;ClientSession&raquo;</span> </li></ul><div><p>Sets the session for this aggregation. Useful for <a href="/docs/transactions.html">transactions</a>.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">const</span> session = <span class="hljs-keyword">await</span> Model.startSession();
+<span class="hljs-keyword">await</span> Model.aggregate(..).session(session);</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-skip"><a href="#aggregate_Aggregate-skip">Aggregate.prototype.skip()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">num
+<span class="method-type">&laquo;Number&raquo;</span> number of records to skip before next stage</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $skip operator to this aggregate pipeline.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.skip(<span class="hljs-number">10</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-sort"><a href="#aggregate_Aggregate-sort">Aggregate.prototype.sort()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
+<span class="method-type">&laquo;Object|String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</p>
+</li></ul><div><p>Appends a new $sort operator to this aggregate pipeline.</p>
+
+<p>If an object is passed, values allowed are <code>asc</code>, <code>desc</code>, <code>ascending</code>, <code>descending</code>, <code>1</code>, and <code>-1</code>.</p>
+
+<p>If a string is passed, it must be a space delimited list of path names. The sort order of each path is ascending unless the path name is prefixed with <code>-</code> which will be treated as descending.</p>
+
+<h4>Examples:</h4>
+
+<pre><code><span class="hljs-comment">// these are equivalent</span>
+aggregate.sort({ <span class="hljs-attr">field</span>: <span class="hljs-string">'asc'</span>, <span class="hljs-attr">test</span>: <span class="hljs-number">-1</span> });
+aggregate.sort(<span class="hljs-string">'field -test'</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-sortByCount"><a href="#aggregate_Aggregate-sortByCount">Aggregate.prototype.sortByCount()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
+<span class="method-type">&laquo;Object|String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</p>
+</li></ul><div><p>Appends a new $sortByCount operator to this aggregate pipeline. Accepts either a string field name or a pipeline object.</p>
+
+<p>Note that the <code>$sortByCount</code> operator requires the new root to start with '$'. Mongoose will prepend '$' if the specified field name doesn't start with '$'.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.sortByCount(<span class="hljs-string">'users'</span>);
+aggregate.sortByCount({ <span class="hljs-attr">$mergeObjects</span>: [ <span class="hljs-string">"$employee"</span>, <span class="hljs-string">"$business"</span> ] })</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-then"><a href="#aggregate_Aggregate-then">Aggregate.prototype.then()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[resolve]
+<span class="method-type">&laquo;Function&raquo;</span> successCallback</p>
+</li><li class="param">[reject]
+<span class="method-type">&laquo;Function&raquo;</span> errorCallback</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Provides promise for aggregate.</p>
+
+<h4>Example:</h4>
+
+<pre><code>Model.aggregate(..).then(successCallback, errorCallback);</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-unwind"><a href="#aggregate_Aggregate-unwind">Aggregate.prototype.unwind()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fields
+<span class="method-type">&laquo;String|Object&raquo;</span> the field(s) to unwind, either as field names or as <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/#document-operand-with-options">objects with options</a>. If passing a string, prefixing the field name with &#39;$&#39; is optional. If passing an object, <code>path</code> must start with &#39;$&#39;.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new custom $unwind operator(s) to this aggregate pipeline.</p>
+
+<p>Note that the <code>$unwind</code> operator requires the path name to start with '$'. Mongoose will prepend '$' if the specified field doesn't start '$'.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.unwind(<span class="hljs-string">"tags"</span>);
+aggregate.unwind(<span class="hljs-string">"a"</span>, <span class="hljs-string">"b"</span>, <span class="hljs-string">"c"</span>);
+aggregate.unwind({ <span class="hljs-attr">path</span>: <span class="hljs-string">'$tags'</span>, <span class="hljs-attr">preserveNullAndEmptyArrays</span>: <span class="hljs-literal">true</span> });</code></pre>  </div></div><script>_native.init("CK7DT53U",{
+  targetClass: 'native-inline'
+});</script></div></div><script type="text/javascript">var xhr = new XMLHttpRequest();
+xhr.open('POST', 'https://g0a3nbw0xa.execute-api.us-east-1.amazonaws.com/prod/track', true);
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.onreadystatechange = function() {};
+xhr.send(JSON.stringify({
+  path: window.location.pathname,
+  hostname: window.location.hostname,
+  hash: window.location.hash
+}));</script><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript">(function (window, document) {
+  var layout   = document.getElementById('layout'),
+      menu     = document.getElementById('menu'),
+      menuLink = document.getElementById('menuLink'),
+      content  = document.getElementById('content');
+
+  function toggleClass(element, className) {
+      var classes = element.className.split(/\s+/),
+          length = classes.length,
+          i = 0;
+
+      for(; i < length; i++) {
+        if (classes[i] === className) {
+          classes.splice(i, 1);
+          break;
+        }
+      }
+      // The className is not found
+      if (length === classes.length) {
+          classes.push(className);
+      }
+
+      element.className = classes.join(' ');
+  }
+
+  function toggleAll(e) {
+      var active = 'active';
+
+      e.preventDefault();
+      toggleClass(layout, active);
+      toggleClass(menu, active);
+      toggleClass(menuLink, active);
+  }
+
+  menuLink.onclick = function (e) {
+      toggleAll(e);
+  };
+
+  content.onclick = function(e) {
+      if (menu.className.indexOf('active') !== -1) {
+          toggleAll(e);
+      }
+  };
+
+}(this, this.document));</script></div></body></html>

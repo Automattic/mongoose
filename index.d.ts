@@ -2923,7 +2923,7 @@ declare module 'mongoose' {
 
   class SchemaType {
     /** SchemaType constructor */
-    constructor(path: string, options?: any, instance?: string);
+    constructor(path: string, options?: AnyObject, instance?: string);
 
     /** Get/set the function used to cast arbitrary values to this type. */
     static cast(caster?: Function | boolean): Function;
@@ -2957,6 +2957,12 @@ declare module 'mongoose' {
     /** Declares the index options for this schematype. */
     index(options: any): this;
 
+    /** String representation of what type this is, like 'ObjectID' or 'Number' */
+    instance: string;
+
+    /** The options this SchemaType was instantiated with */
+    options: AnyObject;
+
     /**
      * Set the model that this path refers to. This is the option that [populate](https://mongoosejs.com/docs/populate.html)
      * looks at to determine the foreign collection it should query.
@@ -2968,6 +2974,9 @@ declare module 'mongoose' {
      * to the front of this SchemaType's validators array using unshift().
      */
     required(required: boolean, message?: string): this;
+
+    /** The schema this SchemaType instance is part of */
+    schema: Schema<any>;
 
     /** Sets default select() behavior for this path. */
     select(val: boolean): this;

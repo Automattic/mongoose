@@ -6,6 +6,7 @@ you should be aware of when migrating from Mongoose 5.x to Mongoose 6.x.
 If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration guide](/docs/migrating_to_5.html) and upgrade to Mongoose 5.x first.
 
 * [Version Requirements](#version-requirements)
+* [MongoDB Driver 4.0](#mongodb-driver-40)
 * [No More Deprecation Warning Options](#no-more-deprecation-warning-options)
 * [The `asPromise()` Method for Connections](#the-aspromise-method-for-connections)
 * [`mongoose.connect()` Returns a Promise](#mongoose-connect-returns-a-promise)
@@ -39,6 +40,23 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 <h3 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h3>
 
 Mongoose now requires Node.js >= 12.0.0. Mongoose still supports MongoDB server versions back to 3.0.0.
+
+<h3 id="mongodb-driver-40"><a href="#mongodb-driver-40">MongoDB Driver 4.0</a></h3>
+
+Mongoose now uses v4.x of the [MongoDB Node driver](https://www.npmjs.com/package/mongodb).
+See [the MongoDB Node drivers' migration guide](https://github.com/mongodb/node-mongodb-native/blob/4.0/docs/CHANGES_4.0.0.md) for detailed info.
+Below are some of the most noteworthy changes:
+
+* MongoDB Driver 4.x is written in TypeScript and has its own TypeScript type definitions. These may conflict with `@types/mongodb`, so if you have TypeScript compiler errors please make sure you upgrade to the [latest version of `@types/mongodb`](https://www.npmjs.com/package/@types/mongodb), which is an empty stub.
+* The result of `updateOne()` and `updateMany()` is now different.
+
+```javascript
+let res = await TestModel.updateMany({}, { someProperty: 'someValue' });
+
+res.matchedCount; // Number of documents that were found that match the filter. Replaces `res.n`
+res.modifiedCount; // Number of documents modified. Replaces `res.nModified`
+res.upsertedCount; // Number of documents upserted. Replaces `res.upserted`
+```
 
 <h3 id="no-more-deprecation-warning-options"><a href="#no-more-deprecation-warning-options">No More Deprecation Warning Options</a></h3>
 

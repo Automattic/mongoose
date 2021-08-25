@@ -5112,7 +5112,7 @@ describe('model: populate:', function() {
         });
       });
 
-      it('with no results XYZ (gh-4284)', function(done) {
+      it('with no results (gh-4284)', function(done) {
         const PersonSchema = new Schema({
           name: String,
           authored: [Number]

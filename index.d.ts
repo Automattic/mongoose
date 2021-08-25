@@ -2530,8 +2530,9 @@ declare module 'mongoose' {
   type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & DotAndArrayNotation<any>;
 
   type AllowRegexpForStrings<T> = T extends string ? T | RegExp : T;
+  type AllowArrayElementQuery<T> = T extends (infer U)[] ? T | U : T;
 
-  type Condition<T> = AllowRegexpForStrings<T> | QuerySelector<T>;
+  type Condition<T> = AllowRegexpForStrings<T> | AllowArrayElementQuery<T> | QuerySelector<T>;
 
   type _FilterQuery<T> = {
     [P in keyof T]?: P extends '_id'

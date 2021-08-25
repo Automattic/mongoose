@@ -41,6 +41,9 @@ copytmp:
 	mkdir -p ./tmp/docs/css
 	mkdir -p ./tmp/docs/js
 	mkdir -p ./tmp/docs/images
+	mkdir -p ./tmp/docs/api
+	mkdir -p ./tmp/docs/tutorials
+	mkdir -p ./tmp/docs/typescript
 	cp -R ./docs/*.html ./tmp/docs
 	cp -R ./docs/css/*.css ./tmp/docs/css
 	cp -R ./docs/js/*.js ./tmp/docs/js

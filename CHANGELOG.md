@@ -1,5 +1,6 @@
 6.0.0 / 2021-08-24
 ==================
+ * Follow the [migration guide](https://mongoosejs.com/docs/migrating_to_6.html) to get a list of all breaking changes in v6.0.
  * BREAKING CHANGE: remove the deprecated safe option in favor of write concerns
  * fix: upgrade to mongodb driver 4.1.1
  * fix: consistently use $__parent to store subdoc parent as a property, and `$parent()` as a getter function #10584 #10414

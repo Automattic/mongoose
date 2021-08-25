@@ -1,3 +1,14 @@
+6.0.1 / 2021-08-25
+==================
+ * fix(aggregate): allow calling Model.aggregate() with options #10604 [amitbeck](https://github.com/amitbeck)
+ * fix(index.d.ts): add instance, options, schema properties to SchemaType class #10609
+ * fix(index.d.ts): allow querying array of strings by string #10605
+ * fix(index.d.ts): allow using type: SchemaDefinitionProperty in schema definitions #10605
+ * fix(index.d.ts): remove strictQuery option #10598 [thiagokisaki](https://github.com/thiagokisaki)
+ * docs: add link to migration guide in changelog #10600 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: fix docs build for v5.x docs #10607
+ * docs(query): add note about strict option to setOptions() #10602
+
 6.0.0 / 2021-08-24
 ==================
  * Follow the [migration guide](https://mongoosejs.com/docs/migrating_to_6.html) to get a list of all breaking changes in v6.0.

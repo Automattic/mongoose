@@ -45,6 +45,9 @@ copytmp:
 	cp -R ./docs/css/*.css ./tmp/docs/css
 	cp -R ./docs/js/*.js ./tmp/docs/js
 	cp -R ./docs/images/* ./tmp/docs/images
+	cp -R ./docs/api/* ./tmp/docs/api
+	cp -R ./docs/tutorials/* ./tmp/docs/tutorials
+	cp -R ./docs/typescript/* ./tmp/docs/typescript
 	cp index.html ./tmp
 
 copylegacy:

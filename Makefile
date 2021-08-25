@@ -9,7 +9,7 @@ test:
 	./node_modules/.bin/mocha $(T) --async-only test/*.test.js
 
 docs: ghpages merge_stable docclean gendocs search
-docs_legacy: legacy docclean_legacy gendocs copytmp gitreset ghpages copylegacy
+docs_legacy: legacy docclean_legacy gendocs copytmp ghpages copylegacy
 
 ghpages:
 	git checkout gh-pages
@@ -41,17 +41,17 @@ copytmp:
 	mkdir -p ./tmp/docs/css
 	mkdir -p ./tmp/docs/js
 	mkdir -p ./tmp/docs/images
+	mkdir -p ./tmp/docs/api
+	mkdir -p ./tmp/docs/tutorials
+	mkdir -p ./tmp/docs/typescript
 	cp -R ./docs/*.html ./tmp/docs
 	cp -R ./docs/css/*.css ./tmp/docs/css
 	cp -R ./docs/js/*.js ./tmp/docs/js
 	cp -R ./docs/images/* ./tmp/docs/images
+	cp -R ./docs/api/* ./tmp/docs/api
+	cp -R ./docs/tutorials/* ./tmp/docs/tutorials
+	cp -R ./docs/typescript/* ./tmp/docs/typescript
 	cp index.html ./tmp
-
-gitreset:
-	git checkout docs/*.html
-	git checkout docs/tutorials/*.html
-	git checkout docs/api/*.html
-	git checkout index.html
 
 copylegacy:
 	mkdir -p ./docs/$(LEGACY_BRANCH)

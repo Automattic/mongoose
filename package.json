@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -105,24 +105,26 @@
     "extends": [
       "eslint:recommended"
     ],
-    "overrides": [{
-      "files": [
-        "**/*.{ts,tsx}"
-      ],
-      "extends": [
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended"
-      ],
-      "plugins": [
-        "@typescript-eslint"
-      ],
-      "rules": {
-        "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/ban-types": "off",
-        "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/explicit-module-boundary-types": "off"
+    "overrides": [
+      {
+        "files": [
+          "**/*.{ts,tsx}"
+        ],
+        "extends": [
+          "plugin:@typescript-eslint/eslint-recommended",
+          "plugin:@typescript-eslint/recommended"
+        ],
+        "plugins": [
+          "@typescript-eslint"
+        ],
+        "rules": {
+          "@typescript-eslint/no-explicit-any": "off",
+          "@typescript-eslint/ban-types": "off",
+          "@typescript-eslint/no-unused-vars": "off",
+          "@typescript-eslint/explicit-module-boundary-types": "off"
+        }
       }
-    }],
+    ],
     "plugins": [
       "mocha-no-only"
     ],

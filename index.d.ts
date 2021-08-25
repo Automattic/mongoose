@@ -238,12 +238,6 @@ declare module 'mongoose' {
     strict?: boolean | 'throw';
 
     /**
-     * false by default, may be `false`, `true`, or `'throw'`. Sets the default
-     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
-     */
-    strictQuery?: boolean | 'throw';
-
-    /**
      * `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to
      * `toJSON()`, for determining how Mongoose documents get serialized by `JSON.stringify()`
      */
@@ -737,8 +731,9 @@ declare module 'mongoose' {
   interface Model<T, TQueryHelpers = {}, TMethods = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
     new(doc?: AnyKeys<T> & AnyObject): EnforceDocument<T, TMethods>;
 
-    aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline?: any[], options?: Record<string, unknown>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: any[], cb: Function): Promise<Array<R>>;
+    aggregate<R = any>(pipeline: any[], options: Record<string, unknown>, cb: Function): Promise<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
     base: typeof mongoose;
@@ -1466,11 +1461,6 @@ declare module 'mongoose' {
      */
     shardKey?: Record<string, unknown>;
     /**
-     * For backwards compatibility, the strict option does not apply to the filter parameter for queries.
-     * Mongoose has a separate strictQuery option to toggle strict mode for the filter parameter to queries.
-     */
-    strictQuery?: boolean | 'throw';
-    /**
      * The strict option, (enabled by default), ensures that values passed to our model constructor that were not
      * specified in our schema do not get saved to the db.
      */
@@ -1547,7 +1537,7 @@ declare module 'mongoose' {
       T extends number[] ? (SchemaDefinitionWithBuiltInClass<number>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<number>>) :
       T extends boolean[] ? (SchemaDefinitionWithBuiltInClass<boolean>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<boolean>>) :
       T extends Function[] ? (SchemaDefinitionWithBuiltInClass<Function>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<Function>>) :
-      T | typeof SchemaType | Schema<any, any, any>;
+      T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;
@@ -2541,8 +2531,9 @@ declare module 'mongoose' {
   type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & DotAndArrayNotation<any>;
 
   type AllowRegexpForStrings<T> = T extends string ? T | RegExp : T;
+  type AllowArrayElementQuery<T> = T extends (infer U)[] ? T | U : T;
 
-  type Condition<T> = AllowRegexpForStrings<T> | QuerySelector<T>;
+  type Condition<T> = AllowRegexpForStrings<T> | AllowArrayElementQuery<T> | QuerySelector<T>;
 
   type _FilterQuery<T> = {
     [P in keyof T]?: P extends '_id'
@@ -2932,7 +2923,7 @@ declare module 'mongoose' {
 
   class SchemaType {
     /** SchemaType constructor */
-    constructor(path: string, options?: any, instance?: string);
+    constructor(path: string, options?: AnyObject, instance?: string);
 
     /** Get/set the function used to cast arbitrary values to this type. */
     static cast(caster?: Function | boolean): Function;
@@ -2966,6 +2957,12 @@ declare module 'mongoose' {
     /** Declares the index options for this schematype. */
     index(options: any): this;
 
+    /** String representation of what type this is, like 'ObjectID' or 'Number' */
+    instance: string;
+
+    /** The options this SchemaType was instantiated with */
+    options: AnyObject;
+
     /**
      * Set the model that this path refers to. This is the option that [populate](https://mongoosejs.com/docs/populate.html)
      * looks at to determine the foreign collection it should query.
@@ -2977,6 +2974,9 @@ declare module 'mongoose' {
      * to the front of this SchemaType's validators array using unshift().
      */
     required(required: boolean, message?: string): this;
+
+    /** The schema this SchemaType instance is part of */
+    schema: Schema<any>;
 
     /** Sets default select() behavior for this path. */
     select(val: boolean): this;

@@ -49,6 +49,7 @@ Below are some of the most noteworthy changes:
 
 * MongoDB Driver 4.x is written in TypeScript and has its own TypeScript type definitions. These may conflict with `@types/mongodb`, so if you have TypeScript compiler errors please make sure you upgrade to the [latest version of `@types/mongodb`](https://www.npmjs.com/package/@types/mongodb), which is an empty stub.
 * The result of `updateOne()` and `updateMany()` is now different.
+* The result of `deleteOne()` and `deleteMany()` no longer has an `n` property.
 
 ```javascript
 let res = await TestModel.updateMany({}, { someProperty: 'someValue' });
@@ -56,6 +57,16 @@ let res = await TestModel.updateMany({}, { someProperty: 'someValue' });
 res.matchedCount; // Number of documents that were found that match the filter. Replaces `res.n`
 res.modifiedCount; // Number of documents modified. Replaces `res.nModified`
 res.upsertedCount; // Number of documents upserted. Replaces `res.upserted`
+```
+
+```javascript
+let res = await TestModel.deleteMany({});
+
+// In Mongoose 6: `{ acknowledged: true, deletedCount: 2 }`
+// In Mongoose 5: `{ n: 2, ok: 1, deletedCount: 2 }`
+res;
+
+res.deletedCount; // Number of documents that were deleted. Replaces `res.n`
 ```
 
 <h3 id="no-more-deprecation-warning-options"><a href="#no-more-deprecation-warning-options">No More Deprecation Warning Options</a></h3>

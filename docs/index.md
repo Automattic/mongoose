@@ -28,23 +28,15 @@ connection to the `test` database on our locally running instance of MongoDB.
 ```javascript
 // getting-started.js
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/test', {useNewUrlParser: true, useUnifiedTopology: true});
+
+main().catch(err => console.log(err));
+
+async function main() {
+  await mongoose.connect('mongodb://localhost:27017/test');
+}
 ```
 
-We have a pending connection to the test database running on localhost.
-We now need to get notified if we connect successfully or if a connection
-error occurs:
-
-```javascript
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  // we're connected!
-});
-```
-
-Once our connection opens, our callback will be called. For brevity,
-let's assume that all following code is within this callback.
+For brevity, let's assume that all following code is within the `main()` function.
 
 With Mongoose, everything is derived from a [Schema](/docs/guide.html).
 Let's get a reference to it and define our kittens.
@@ -75,12 +67,12 @@ to our documents:
 
 ```javascript
 // NOTE: methods must be added to the schema before compiling it with mongoose.model()
-kittySchema.methods.speak = function () {
+kittySchema.methods.speak = function speak() {
   const greeting = this.name
     ? "Meow name is " + this.name
     : "I don't have a name";
   console.log(greeting);
-}
+};
 
 const Kitten = mongoose.model('Kitten', kittySchema);
 ```
@@ -97,27 +89,23 @@ We have talking kittens! But we still haven't saved anything to MongoDB.
 Each document can be saved to the database by calling its [save](/docs/api.html#model_Model-save) method. The first argument to the callback will be an error if any occurred.
 
 ```javascript
-  fluffy.save(function (err, fluffy) {
-    if (err) return console.error(err);
-    fluffy.speak();
-  });
+await fluffy.save();
+fluffy.speak();
 ```
 
 Say time goes by and we want to display all the kittens we've seen.
 We can access all of the kitten documents through our Kitten [model](/docs/models.html).
 
 ```javascript
-Kitten.find(function (err, kittens) {
-  if (err) return console.error(err);
-  console.log(kittens);
-})
+const kittens = await Kitten.find();
+console.log(kittens);
 ```
 
 We just logged all of the kittens in our db to the console.
 If we want to filter our kittens by name, Mongoose supports MongoDBs rich [querying](/docs/queries.html) syntax.
 
 ```javascript
-Kitten.find({ name: /^fluff/ }, callback);
+await Kitten.find({ name: /^fluff/ });
 ```
 
 This performs a search for all documents with a name property that begins

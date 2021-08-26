@@ -1,3 +1,13 @@
+6.0.2 / 2021-08-26
+==================
+ * fix(query): handle find() when buffering on initial connection #10610
+ * fix(populate): get doc schema using $__schema to avoid paths named `schema` #10619
+ * docs: use async/await in the quickstart #10610
+ * docs: fix links to guide, schematypes, connections in v5.x docs #10607
+ * docs: add link to 6.x migration guide to schemas guide #10616
+ * docs: add migration to 6.x in Migration Guides section #10618 [HunterKohler](https://github.com/HunterKohler)
+ * docs: fix missing URL part on layout.pug #10622 [ItsLhun](https://github.com/ItsLhun)
+
 6.0.1 / 2021-08-25
 ==================
  * fix(aggregate): allow calling Model.aggregate() with options #10604 [amitbeck](https://github.com/amitbeck)

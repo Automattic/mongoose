@@ -42,6 +42,7 @@ integrating Mongoose with external tools and frameworks.
 
 ### Migration Guides
 
+* [Mongoose 5.x to 6.x](/docs/migrating_to_6.html)
 * [Mongoose 4.x to 5.x](/docs/migrating_to_5.html)
 * [Mongoose 3.x to 4.x](/docs/migration.html)
 

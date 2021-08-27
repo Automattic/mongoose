@@ -29,14 +29,8 @@ connection to the `test` database on our locally running instance of MongoDB.
 // getting-started.js
 const mongoose = require('mongoose');
 
-main().catch(err => console.log(err));
-
-async function main() {
-  await mongoose.connect('mongodb://localhost:27017/test');
-}
+mongoose.connect('mongodb://localhost:27017/test');
 ```
-
-For brevity, let's assume that all following code is within the `main()` function.
 
 With Mongoose, everything is derived from a [Schema](/docs/guide.html).
 Let's get a reference to it and define our kittens.

@@ -89,10 +89,40 @@ describe('Query', function() {
       assert.deepEqual(query._fields, { a: 1 });
       query.select('b');
       assert.deepEqual(query._fields, { a: 1, b: 1 });
-      query.select({ c: 0 });
-      assert.deepEqual(query._fields, { a: 1, b: 1, c: 0 });
-      query.select('-d');
-      assert.deepEqual(query._fields, { a: 1, b: 1, c: 0, d: 0 });
+      query.select({ c: 1 });
+      assert.deepEqual(query._fields, { a: 1, b: 1, c: 1 });
+      query.select('d');
+      assert.deepEqual(query._fields, { a: 1, b: 1, c: 1, d: 1 });
+      done();
+    });
+
+    it('should remove existing fields from inclusive projection', function(done) {
+      const query = new Query({});
+      query.select({
+        a: 1,
+        b: 1,
+        c: 1,
+        'parent1.child1': 1,
+        'parent1.child2': 1,
+        'parent2.child1': 1,
+        'parent2.child2': 1
+      }).select({ b: 0, d: 1, 'c.child': 0, parent1: 0, 'parent2.child1': 0 });
+      assert.deepEqual(query._fields, { a: 1, c: 1, d: 1, 'parent2.child2': 1 });
+      done();
+    });
+
+    it('should remove existing fields from exclusive projection', function(done) {
+      const query = new Query({});
+      query.select({
+        a: 0,
+        b: 0,
+        c: 0,
+        'parent1.child1': 0,
+        'parent1.child2': 0,
+        'parent2.child1': 0,
+        'parent2.child2': 0
+      }).select({ b: 1, d: 0, 'c.child': 1, parent1: 1, 'parent2.child1': 1 });
+      assert.deepEqual(query._fields, { a: 0, c: 0, d: 0, 'parent2.child2': 0 });
       done();
     });
   });

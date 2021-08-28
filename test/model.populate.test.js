@@ -3507,15 +3507,14 @@ describe('model: populate:', function() {
       const Movie = db.model('Movie', movieSchema);
       const Category = db.model('Category', categorySchema);
 
-      await Movie.create({}, {}, {});
+      await Movie.create([{}, {}, {}]);
 
-      const docs = await Movie.find({});
-      assert.equal(docs.length, 3);
+      const movies = await Movie.find({});
+      assert.equal(movies.length, 3);
 
-      await Category.create({ movies: [docs[0]._id, docs[1]._id, docs[2]._id] });
+      await Category.create({ movies: movies });
 
       const category = await Category.findOne({}).populate({ path: 'movies', options: { limit: 2, skip: 1 } }).exec();
-
       assert.equal(category.movies.length, 2);
     });
 

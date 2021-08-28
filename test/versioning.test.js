@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
@@ -231,332 +230,317 @@ describe('versioning', function() {
     });
   });
 
-  it('allows concurrent push', function() {
-    return co(function*() {
-      let a = new BlogPost({
-        meta: {
-          numbers: []
-        }
-      });
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('allows concurrent push', async function() {
 
-      assert.equal(a._doc.__v, 0);
-
-      a.meta.numbers.push(2);
-      b.meta.numbers.push(4);
-
-      yield a.save();
-      yield b.save();
-
-      a = yield BlogPost.findById(a);
-      assert.deepEqual(a.toObject().meta.numbers, [2, 4]);
-      assert.equal(a._doc.__v, 2);
+    let a = new BlogPost({
+      meta: {
+        numbers: []
+      }
     });
+    await a.save();
+    const b = await BlogPost.findById(a);
+
+    assert.equal(a._doc.__v, 0);
+
+    a.meta.numbers.push(2);
+    b.meta.numbers.push(4);
+
+    await a.save();
+    await b.save();
+
+    a = await BlogPost.findById(a);
+    assert.deepEqual(a.toObject().meta.numbers, [2, 4]);
+    assert.equal(a._doc.__v, 2);
   });
 
-  it('allows concurrent push and pull', function() {
-    return co(function*() {
-      let a = new BlogPost({
-        meta: {
-          numbers: [2, 4, 6, 8]
-        }
-      });
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('allows concurrent push and pull', async function() {
 
-      assert.equal(a._doc.__v, 0);
-
-      a.meta.numbers.pull(2);
-      b.meta.numbers.push(10);
-
-      yield a.save();
-      yield b.save();
-
-      a = yield BlogPost.findById(a);
-      assert.deepEqual(a.toObject().meta.numbers, [4, 6, 8, 10]);
-      assert.equal(a._doc.__v, 2);
+    let a = new BlogPost({
+      meta: {
+        numbers: [2, 4, 6, 8]
+      }
     });
+    await a.save();
+    const b = await BlogPost.findById(a);
+
+    assert.equal(a._doc.__v, 0);
+
+    a.meta.numbers.pull(2);
+    b.meta.numbers.push(10);
+
+    await a.save();
+    await b.save();
+
+    a = await BlogPost.findById(a);
+    assert.deepEqual(a.toObject().meta.numbers, [4, 6, 8, 10]);
+    assert.equal(a._doc.__v, 2);
   });
 
-  it('throws if you set a positional path after pulling', function() {
-    return co(function*() {
-      let a = new BlogPost({
-        meta: {
-          numbers: [2, 4, 6, 8]
-        }
-      });
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('throws if you set a positional path after pulling', async function() {
 
-      assert.equal(a._doc.__v, 0);
-
-      a.meta.numbers.pull(4, 6);
-      b.set('meta.numbers.2', 7);
-
-      yield a.save();
-      const err = yield b.save().then(() => null, err => err);
-
-      assert.ok(/No matching document/.test(err.message), err.message);
-      a = yield BlogPost.findById(a);
-      assert.equal(a._doc.__v, 1);
+    let a = new BlogPost({
+      meta: {
+        numbers: [2, 4, 6, 8]
+      }
     });
+    await a.save();
+    const b = await BlogPost.findById(a);
+
+    assert.equal(a._doc.__v, 0);
+
+    a.meta.numbers.pull(4, 6);
+    b.set('meta.numbers.2', 7);
+
+    await a.save();
+    const err = await b.save().then(() => null, err => err);
+
+    assert.ok(/No matching document/.test(err.message), err.message);
+    a = await BlogPost.findById(a);
+    assert.equal(a._doc.__v, 1);
   });
 
-  it('allows pull/push after $set', function() {
-    return co(function*() {
-      let a = new BlogPost({
-        arr: ['test1', 10]
-      });
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('allows pull/push after $set', async function() {
 
-      assert.equal(a._doc.__v, 0);
-
-      a.set('arr.0', 'not an array');
-      // should overwrite a's changes, last write wins
-      b.arr.pull(10);
-      b.arr.addToSet('using set');
-
-      yield a.save();
-      yield b.save();
-
-      a = yield BlogPost.findById(a);
-      assert.deepEqual(a.toObject().arr, ['test1', 'using set']);
+    let a = new BlogPost({
+      arr: ['test1', 10]
     });
+    await a.save();
+    const b = await BlogPost.findById(a);
+
+    assert.equal(a._doc.__v, 0);
+
+    a.set('arr.0', 'not an array');
+    // should overwrite a's changes, last write wins
+    b.arr.pull(10);
+    b.arr.addToSet('using set');
+
+    await a.save();
+    await b.save();
+
+    a = await BlogPost.findById(a);
+    assert.deepEqual(a.toObject().arr, ['test1', 'using set']);
   });
 
-  it('should add version to where clause', function() {
-    return co(function*() {
-      let a = new BlogPost({
-        arr: [['before update']]
-      });
-      yield a.save();
+  it('should add version to where clause', async function() {
 
-      assert.equal(a._doc.__v, 0);
-
-      a.set('arr.0.0', 'updated');
-      const d = a.$__delta();
-      assert.equal(a._doc.__v, d[0].__v, 'version should be added to where clause');
-      assert.ok(!('$inc' in d[1]));
-
-      yield a.save();
-
-      a = yield BlogPost.findById(a);
-      assert.equal(a.arr[0][0], 'updated');
-      assert.equal(a._doc.__v, 0);
+    let a = new BlogPost({
+      arr: [['before update']]
     });
+    await a.save();
+
+    assert.equal(a._doc.__v, 0);
+
+    a.set('arr.0.0', 'updated');
+    const d = a.$__delta();
+    assert.equal(a._doc.__v, d[0].__v, 'version should be added to where clause');
+    assert.ok(!('$inc' in d[1]));
+
+    await a.save();
+
+    a = await BlogPost.findById(a);
+    assert.equal(a.arr[0][0], 'updated');
+    assert.equal(a._doc.__v, 0);
   });
 
-  it('$set after pull/push throws', function() {
-    return co(function*() {
-      const a = new BlogPost({
-        arr: ['test1', 'using set']
-      });
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('$set after pull/push throws', async function() {
 
-      assert.equal(a._doc.__v, 0);
-
-      b.set('arr.0', 'not an array');
-      // force a $set
-      a.arr.pull('using set');
-      a.arr.push('woot', 'woot2');
-      a.arr.$pop();
-
-      yield a.save();
-      const err = yield b.save().then(() => null, err => err);
-
-      assert.ok(/No matching document/.test(err.message), err.message);
+    const a = new BlogPost({
+      arr: ['test1', 'using set']
     });
+    await a.save();
+    const b = await BlogPost.findById(a);
+
+    assert.equal(a._doc.__v, 0);
+
+    b.set('arr.0', 'not an array');
+    // force a $set
+    a.arr.pull('using set');
+    a.arr.push('woot', 'woot2');
+    a.arr.$pop();
+
+    await a.save();
+    const err = await b.save().then(() => null, err => err);
+
+    assert.ok(/No matching document/.test(err.message), err.message);
   });
 
-  it('doesnt persist conflicting changes', function() {
-    return co(function*() {
-      const a = new BlogPost({
-        meta: { nested: [{ title: 'test1' }, { title: 'test2' }] }
-      });
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('doesnt persist conflicting changes', async function() {
 
-      assert.equal(a._doc.__v, 0);
-
-      a.meta.nested.$pop();
-      b.meta.nested.$pop();
-      yield a.save();
-      const err = yield b.save().then(() => null, err => err);
-
-      assert.ok(/No matching document/.test(err.message), err.message);
+    const a = new BlogPost({
+      meta: { nested: [{ title: 'test1' }, { title: 'test2' }] }
     });
+    await a.save();
+    const b = await BlogPost.findById(a);
+
+    assert.equal(a._doc.__v, 0);
+
+    a.meta.nested.$pop();
+    b.meta.nested.$pop();
+    await a.save();
+    const err = await b.save().then(() => null, err => err);
+
+    assert.ok(/No matching document/.test(err.message), err.message);
   });
 
-  it('increments version on push', function() {
-    return co(function*() {
-      let a = new BlogPost({
-        meta: { nested: [] }
-      });
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('increments version on push', async function() {
 
-      assert.equal(a._doc.__v, 0);
-
-      a.meta.nested.push({ title: 'test1' });
-      a.meta.nested.push({ title: 'test2' });
-      b.meta.nested.push({ title: 'test3' });
-      yield a.save();
-      yield b.save();
-
-      a = yield BlogPost.findById(a);
-      assert.equal(a._doc.__v, 2);
-      assert.deepEqual(a.meta.nested.map(v => v.title), ['test1', 'test2', 'test3']);
+    let a = new BlogPost({
+      meta: { nested: [] }
     });
+    await a.save();
+    const b = await BlogPost.findById(a);
+
+    assert.equal(a._doc.__v, 0);
+
+    a.meta.nested.push({ title: 'test1' });
+    a.meta.nested.push({ title: 'test2' });
+    b.meta.nested.push({ title: 'test3' });
+    await a.save();
+    await b.save();
+
+    a = await BlogPost.findById(a);
+    assert.equal(a._doc.__v, 2);
+    assert.deepEqual(a.meta.nested.map(v => v.title), ['test1', 'test2', 'test3']);
   });
 
-  it('does not increment version when setting nested paths', function() {
-    return co(function*() {
-      let a = new BlogPost({
-        meta: {
-          nested: [{ title: 'test1' }, { title: 'test2' }, { title: 'test3' }]
-        }
-      });
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('does not increment version when setting nested paths', async function() {
 
-      assert.equal(a._doc.__v, 0);
-
-      a.meta.nested[2].title = 'two';
-      b.meta.nested[0].title = 'zero';
-      b.meta.nested[1].title = 'sub one';
-
-      yield [a.save(), b.save()];
-      assert.equal(a._doc.__v, 0);
-
-      a = yield BlogPost.findById(a);
-      assert.equal(a.meta.nested[2].title, 'two');
-      assert.equal(a.meta.nested[0].title, 'zero');
+    let a = new BlogPost({
+      meta: {
+        nested: [{ title: 'test1' }, { title: 'test2' }, { title: 'test3' }]
+      }
     });
+    await a.save();
+    const b = await BlogPost.findById(a);
+
+    assert.equal(a._doc.__v, 0);
+
+    a.meta.nested[2].title = 'two';
+    b.meta.nested[0].title = 'zero';
+    b.meta.nested[1].title = 'sub one';
+
+    await Promise.all([a.save(), b.save()]);
+    assert.equal(a._doc.__v, 0);
+
+    a = await BlogPost.findById(a);
+    assert.equal(a.meta.nested[2].title, 'two');
+    assert.equal(a.meta.nested[0].title, 'zero');
   });
 
-  it('increments version when modifying mixed array', function() {
-    return co(function*() {
-      const a = new BlogPost({ mixed: { arr: [] } });
-      yield a.save();
+  it('increments version when modifying mixed array', async function() {
 
-      assert.equal(a._doc.__v, 0);
+    const a = new BlogPost({ mixed: { arr: [] } });
+    await a.save();
 
-      a.mixed.arr.push([10], { x: 1 }, 'test');
-      a.markModified('mixed.arr');
+    assert.equal(a._doc.__v, 0);
 
-      yield a.save();
+    a.mixed.arr.push([10], { x: 1 }, 'test');
+    a.markModified('mixed.arr');
 
-      assert.equal(a._doc.__v, 1);
-      assert.equal(a.mixed.arr.length, 3);
-      assert.equal(a.mixed.arr[1].x, 1);
-      assert.equal(a.mixed.arr[2], 'test');
-      assert.equal(a.mixed.arr[0][0], 10);
-    });
+    await a.save();
+
+    assert.equal(a._doc.__v, 1);
+    assert.equal(a.mixed.arr.length, 3);
+    assert.equal(a.mixed.arr[1].x, 1);
+    assert.equal(a.mixed.arr[2], 'test');
+    assert.equal(a.mixed.arr[0][0], 10);
   });
 
-  it('increments version when $set-ing an array', function() {
-    return co(function*() {
-      const a = new BlogPost({});
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('increments version when $set-ing an array', async function() {
 
-      assert.equal(a._doc.__v, 0);
+    const a = new BlogPost({});
+    await a.save();
+    const b = await BlogPost.findById(a);
 
-      a.comments.addToSet({ title: 'monkey' });
-      b.markModified('comments');
+    assert.equal(a._doc.__v, 0);
 
-      const d = b.$__delta();
-      assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
+    a.comments.addToSet({ title: 'monkey' });
+    b.markModified('comments');
 
-      yield a.save();
-      const err = yield b.save().then(() => null, err => err);
+    const d = b.$__delta();
+    assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
 
-      assert.ok(err instanceof VersionError);
-      assert.ok(err.stack.indexOf('versioning.test.js') !== -1);
-      assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
-      assert.equal(a.comments.length, 1);
-    });
+    await a.save();
+    const err = await b.save().then(() => null, err => err);
+
+    assert.ok(err instanceof VersionError);
+    assert.ok(err.stack.indexOf('versioning.test.js') !== -1);
+    assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
+    assert.equal(a.comments.length, 1);
   });
 
-  it('increments version and converts to $set when mixing $shift and $addToSet', function() {
-    return co(function*() {
-      const a = new BlogPost({});
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('increments version and converts to $set when mixing $shift and $addToSet', async function() {
 
-      assert.equal(a._doc.__v, 0);
+    const a = new BlogPost({});
+    await a.save();
+    const b = await BlogPost.findById(a);
 
-      a.comments.addToSet({ title: 'aven' });
-      a.comments.addToSet({ title: 'avengers' });
-      let d = a.$__delta();
+    assert.equal(a._doc.__v, 0);
 
-      assert.equal(d[0].__v, undefined, 'version should not be included in where clause');
-      assert.ok(!d[1].$set);
-      assert.ok(d[1].$addToSet);
-      assert.ok(d[1].$addToSet.comments);
+    a.comments.addToSet({ title: 'aven' });
+    a.comments.addToSet({ title: 'avengers' });
+    let d = a.$__delta();
 
-      a.comments.$shift();
-      d = a.$__delta();
-      assert.equal(d[0].__v, 0, 'version should be included in where clause');
-      assert.ok(d[1].$set, 'two differing atomic ops on same path should create a $set');
-      assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
-      assert.ok(!d[1].$addToSet);
+    assert.equal(d[0].__v, undefined, 'version should not be included in where clause');
+    assert.ok(!d[1].$set);
+    assert.ok(d[1].$addToSet);
+    assert.ok(d[1].$addToSet.comments);
 
-      yield [a.save(), b.save()];
-    });
+    a.comments.$shift();
+    d = a.$__delta();
+    assert.equal(d[0].__v, 0, 'version should be included in where clause');
+    assert.ok(d[1].$set, 'two differing atomic ops on same path should create a $set');
+    assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
+    assert.ok(!d[1].$addToSet);
+
+    await Promise.all([a.save(), b.save()]);
   });
 
-  it('should not increment version for non-versioned fields', function() {
-    return co(function*() {
-      const a = new BlogPost({});
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('should not increment version for non-versioned fields', async function() {
 
-      assert.equal(a._doc.__v, 0);
+    const a = new BlogPost({});
+    await a.save();
+    const b = await BlogPost.findById(a);
 
-      a.dontVersionMe.push('value1');
-      b.dontVersionMe.push('value2');
-      yield [a.save(), b.save()];
+    assert.equal(a._doc.__v, 0);
 
-      assert.equal(a._doc.__v, 0);
-    });
+    a.dontVersionMe.push('value1');
+    b.dontVersionMe.push('value2');
+    await Promise.all([a.save(), b.save()]);
+
+    assert.equal(a._doc.__v, 0);
   });
 
-  it('should not increment version for non-versioned sub-document fields', function() {
-    return co(function*() {
-      const a = new BlogPost({ comments: [{ title: 'test' }] });
-      yield a.save();
-      const b = yield BlogPost.findById(a);
+  it('should not increment version for non-versioned sub-document fields', async function() {
 
-      assert.equal(a._doc.__v, 0);
+    const a = new BlogPost({ comments: [{ title: 'test' }] });
+    await a.save();
+    const b = await BlogPost.findById(a);
 
-      a.comments[0].dontVersionMeEither.push('value1');
-      b.comments[0].dontVersionMeEither.push('value2');
-      yield [a.save(), b.save()];
+    assert.equal(a._doc.__v, 0);
 
-      assert.equal(a._doc.__v, 0);
-    });
+    a.comments[0].dontVersionMeEither.push('value1');
+    b.comments[0].dontVersionMeEither.push('value2');
+    await Promise.all([a.save(), b.save()]);
+
+    assert.equal(a._doc.__v, 0);
   });
 
-  it('should persist correctly when optimisticConcurrency is true gh-10128', function() {
+  it('should persist correctly when optimisticConcurrency is true gh-10128', async function() {
     const thingSchema = new Schema({ price: Number }, { optimisticConcurrency: true });
     const Thing = db.model('Thing', thingSchema);
-    return co(function*() {
-      const thing = yield Thing.create({ price: 1 });
-      yield thing.save();
-      assert.equal(thing.__v, 0);
-      const thing_1 = yield Thing.findById(thing.id);
-      const thing_2 = yield Thing.findById(thing.id);
-      thing_1.set({ price: 2 });
-      yield thing_1.save();
-      assert.equal(thing_1.__v, 1);
-      thing_2.set({ price: 1 });
-      const err = yield thing_2.save().then(() => null, err => err);
-      assert.equal(err.name, 'DocumentNotFoundError');
-    });
+
+    const thing = await Thing.create({ price: 1 });
+    await thing.save();
+    assert.equal(thing.__v, 0);
+    const thing_1 = await Thing.findById(thing.id);
+    const thing_2 = await Thing.findById(thing.id);
+    thing_1.set({ price: 2 });
+    await thing_1.save();
+    assert.equal(thing_1.__v, 1);
+    thing_2.set({ price: 1 });
+    const err = await thing_2.save().then(() => null, err => err);
+    assert.equal(err.name, 'DocumentNotFoundError');
   });
 
   it('gh-1898', function(done) {
@@ -595,30 +579,29 @@ describe('versioning', function() {
     });
   });
 
-  it('pull doesnt add version where clause (gh-6190)', function() {
+  it('pull doesnt add version where clause (gh-6190)', async function() {
     const User = db.model('User', new mongoose.Schema({
       unreadPosts: [{ type: mongoose.Schema.Types.ObjectId }]
     }));
 
-    return co(function*() {
-      const id1 = new mongoose.Types.ObjectId();
-      const id2 = new mongoose.Types.ObjectId();
-      const doc = yield User.create({
-        unreadPosts: [id1, id2]
-      });
 
-      const doc1 = yield User.findById(doc._id);
-      const doc2 = yield User.findById(doc._id);
-
-      doc1.unreadPosts.pull(id1);
-      yield doc1.save();
-
-      doc2.unreadPosts.pull(id2);
-      yield doc2.save();
-
-      const doc3 = yield User.findById(doc._id);
-      assert.equal(doc3.unreadPosts.length, 0);
+    const id1 = new mongoose.Types.ObjectId();
+    const id2 = new mongoose.Types.ObjectId();
+    const doc = await User.create({
+      unreadPosts: [id1, id2]
     });
+
+    const doc1 = await User.findById(doc._id);
+    const doc2 = await User.findById(doc._id);
+
+    doc1.unreadPosts.pull(id1);
+    await doc1.save();
+
+    doc2.unreadPosts.pull(id2);
+    await doc2.save();
+
+    const doc3 = await User.findById(doc._id);
+    assert.equal(doc3.unreadPosts.length, 0);
   });
 
   it('copying doc works (gh-5779)', function(done) {
@@ -648,25 +631,24 @@ describe('versioning', function() {
       catch(done);
   });
 
-  it('optimistic concurrency (gh-9001) (gh-5424)', function() {
+  it('optimistic concurrency (gh-9001) (gh-5424)', async function() {
     const schema = new Schema({ name: String }, { optimisticConcurrency: true });
     const M = db.model('Test', schema);
 
     const doc = new M({ name: 'foo' });
 
-    return co(function*() {
-      yield doc.save();
 
-      const d1 = yield M.findOne();
-      const d2 = yield M.findOne();
+    await doc.save();
 
-      d1.name = 'bar';
-      yield d1.save();
+    const d1 = await M.findOne();
+    const d2 = await M.findOne();
 
-      d2.name = 'qux';
-      const err = yield d2.save().then(() => null, err => err);
-      assert.ok(err);
-      assert.equal(err.name, 'VersionError');
-    });
+    d1.name = 'bar';
+    await d1.save();
+
+    d2.name = 'qux';
+    const err = await d2.save().then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'VersionError');
   });
 });

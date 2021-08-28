@@ -34,7 +34,7 @@ describe('browser', function() {
     });
   });
 
-  it('document validation with arrays (gh-6175)', function() {
+  it('document validation with arrays (gh-6175)', async function() {
     const Point = new Schema({
       latitude: {
         type: Number,
@@ -61,38 +61,29 @@ describe('browser', function() {
       }
     });
 
-    return co(function*() {
-      let test = new Document({
-        name: 'Test Polygon',
-        vertices: [
-          {
-            latitude: -37.81902680201739,
-            longitude: 144.9821037054062
-          }
-        ]
-      }, schema);
+    let test = new Document({
+      name: 'Test Polygon',
+      vertices: [
+        {
+          latitude: -37.81902680201739,
+          longitude: 144.9821037054062
+        }
+      ]
+    }, schema);
 
-      // Should not throw
-      yield test.validate();
+    // Should not throw
+    await test.validate();
 
-      test = new Document({
-        name: 'Test Polygon',
-        vertices: [
-          {
-            latitude: -37.81902680201739
-          }
-        ]
-      }, schema);
+    test = new Document({
+      name: 'Test Polygon',
+      vertices: [
+        {
+          latitude: -37.81902680201739
+        }
+      ]
+    }, schema);
 
-      let threw = false;
-      try {
-        yield test.validate();
-      } catch (error) {
-        threw = true;
-        assert.ok(error.errors['vertices.0.longitude']);
-      }
-
-      assert.ok(threw);
-    });
+    const error = await test.validate().then(() => null, err => err);
+    assert.ok(error.errors['vertices.0.longitude']);
   });
 });

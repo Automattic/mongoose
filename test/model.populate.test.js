@@ -69,34 +69,25 @@ describe('model: populate:', function() {
   afterEach(() => util.clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it('populating array of object', function(done) {
+  it('populating array of object', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db.model('User', userSchema);
 
-    User.create({ name: 'User 1' }, function(err, user1) {
-      assert.ifError(err);
+    const user1 = await User.create({ name: 'User 1' });
+    const user2 = await User.create({ name: 'User 2' });
 
-      User.create({ name: 'User 2' }, function(err, user2) {
-        assert.ifError(err);
 
-        BlogPost.create({
-          title: 'Woot',
-          _creator: user1._id,
-          comments: [
-            { _creator: user1._id, content: 'Woot woot' },
-            { _creator: user2._id, content: 'Wha wha' }
-          ]
-        }, function(err, post) {
-          assert.ifError(err);
-
-          assert.doesNotThrow(function() {
-            post.populate('comments', function() {
-            });
-          });
-          done();
-        });
-      });
+    const post = await BlogPost.create({
+      title: 'Woot',
+      _creator: user1._id,
+      comments: [
+        { _creator: user1._id, content: 'Woot woot' },
+        { _creator: user2._id, content: 'Wha wha' }
+      ]
     });
+
+    // Does not throw
+    await post.populate('comments');
   });
 
   it('deep population (gh-3103)', function(done) {
@@ -302,26 +293,21 @@ describe('model: populate:', function() {
     });
   });
 
-  it('not failing on null as ref', function(done) {
+  it('not failing on null as ref', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     db.model('User', userSchema);
 
-    BlogPost.create({
+    const createdPost = await BlogPost.create({
       title: 'woot',
       _creator: null
-    }, function(err, post) {
-      assert.ifError(err);
-
-      BlogPost
-        .findById(post._id)
-        .populate('_creator')
-        .exec(function(err, post) {
-          assert.ifError(err);
-
-          assert.equal(post._creator, null);
-          done();
-        });
     });
+
+
+    const foundPost = await BlogPost
+      .findById(createdPost._id)
+      .populate('_creator');
+
+    assert.equal(foundPost._creator, null);
   });
 
   it('not failing on empty object as ref', function(done) {
@@ -2578,37 +2564,30 @@ describe('model: populate:', function() {
   });
 
   describe('populating combined with lean (gh-1260)', function() {
-    it('with findOne', function(done) {
+    it('with findOne', async function() {
       const BlogPost = db.model('BlogPost', blogPostSchema);
       const User = db.model('User', userSchema);
 
-      User.create({
+      const creator = await User.create({
         name: 'Guillermo',
         email: 'rauchg@gmail.com'
-      }, function(err, creator) {
-        assert.ifError(err);
-
-        BlogPost.create({
-          title: 'woot',
-          _creator: creator
-        }, function(err, post) {
-          assert.ifError(err);
-
-          BlogPost
-            .findById(post._id)
-            .lean()
-            .populate('_creator')
-            .exec(function(err, post) {
-              assert.ifError(err);
-
-              assert.ok(utils.isObject(post._creator));
-              assert.equal(post._creator.name, 'Guillermo');
-              assert.equal(post._creator.email, 'rauchg@gmail.com');
-              assert.equal(typeof post._creator.update, 'undefined');
-              done();
-            });
-        });
       });
+
+      const createdPost = await BlogPost.create({
+        title: 'woot',
+        _creator: creator
+      });
+
+
+      const post = await BlogPost
+        .findById(createdPost._id)
+        .lean()
+        .populate('_creator');
+
+      assert.ok(utils.isObject(post._creator));
+      assert.equal(post._creator.name, 'Guillermo');
+      assert.equal(post._creator.email, 'rauchg@gmail.com');
+      assert.equal(typeof post._creator.update, 'undefined');
     });
 
     it('with find', function(done) {
@@ -2666,77 +2645,71 @@ describe('model: populate:', function() {
     let u1, u2;
     let b1;
 
-    beforeEach(function(done) {
+    beforeEach(async function() {
       B = db.model('BlogPost', blogPostSchema);
       U = db.model('User', userSchema);
 
-      U.create({
-        name: 'Fan 1',
-        email: 'fan1@learnboost.com'
+      const [fan1, fan2] = await U.create([
+        { name: 'Fan 1', email: 'fan1@learnboost.com' },
+        {
+          name: 'Fan 2',
+          email: 'fan2@learnboost.com'
+        }
+      ]);
+
+      u1 = fan1;
+      u2 = fan2;
+
+      const post = await B.create({
+        title: 'Woot',
+        fans: [fan1, fan2],
+        _creator: fan1
       }, {
-        name: 'Fan 2',
-        email: 'fan2@learnboost.com'
-      }, function(err, fan1, fan2) {
-        assert.ifError(err);
-        u1 = fan1;
-        u2 = fan2;
-
-        B.create({
-          title: 'Woot',
-          fans: [fan1, fan2],
-          _creator: fan1
-        }, {
-          title: 'Woot2',
-          fans: [fan2, fan1],
-          _creator: fan2
-        }, function(err, post) {
-          assert.ifError(err);
-          b1 = post;
-          done();
-        });
+        title: 'Woot2',
+        fans: [fan2, fan1],
+        _creator: fan2
       });
+
+      b1 = post;
     });
 
-    it('with findOne', function(done) {
-      B.findById(b1).populate('fans _creator').exec(function(err, doc) {
-        assert.ifError(err);
-        assert.ok(Array.isArray(doc.populated('fans')));
-        assert.equal(doc.populated('fans').length, 2);
-        assert.equal(doc.populated('fans')[0], String(u1._id));
-        assert.equal(doc.populated('fans')[1], String(u2._id));
-        assert.equal(doc.populated('_creator'), String(u1._id));
-        done();
-      });
+    it('with findOne', async function() {
+      const doc = await B.findById(b1).populate('fans _creator').exec();
+
+      assert.ok(Array.isArray(doc.populated('fans')));
+      assert.equal(doc.populated('fans').length, 2);
+      assert.equal(doc.populated('fans')[0], String(u1._id));
+      assert.equal(doc.populated('fans')[1], String(u2._id));
+      assert.equal(doc.populated('_creator'), String(u1._id));
     });
 
-    it('with find', function(done) {
-      B.find().sort('title').populate('fans _creator').exec(function(err, docs) {
-        assert.ifError(err);
-        assert.equal(docs.length, 2);
+    it('with find', async function() {
+      const docs = await B.find().sort('title').populate('fans _creator').exec();
 
-        const doc1 = docs[0];
-        const doc2 = docs[1];
+      assert.equal(docs.length, 2);
 
-        assert.ok(Array.isArray(doc1.populated('fans')));
-        assert.equal(doc1.populated('fans').length, 2);
+      const doc1 = docs[0];
+      const doc2 = docs[1];
 
-        assert.equal(doc1.populated('fans')[0], String(u1._id));
-        assert.equal(doc1.populated('fans')[1], String(u2._id));
-        assert.equal(doc1.populated('_creator'), String(u1._id));
+      assert.ok(Array.isArray(doc1.populated('fans')));
+      assert.equal(doc1.populated('fans').length, 2);
 
-        assert.ok(Array.isArray(doc2.populated('fans')));
-        assert.equal(doc2.populated('fans').length, 2);
-        assert.equal(doc2.populated('fans')[0], String(u2._id));
-        assert.equal(doc2.populated('fans')[1], String(u1._id));
-        assert.equal(doc2.populated('_creator'), String(u2._id));
-        done();
-      });
+      assert.equal(doc1.populated('fans')[0], String(u1._id));
+      assert.equal(doc1.populated('fans')[1], String(u2._id));
+      assert.equal(doc1.populated('_creator'), String(u1._id));
+
+      assert.ok(Array.isArray(doc2.populated('fans')));
+      assert.equal(doc2.populated('fans').length, 2);
+      assert.equal(doc2.populated('fans')[0], String(u2._id));
+      assert.equal(doc2.populated('fans')[1], String(u1._id));
+      assert.equal(doc2.populated('_creator'), String(u2._id));
     });
   });
 
   describe('deselecting _id', function() {
     let C, U, c1, c2;
-    beforeEach(function(done) {
+
+    beforeEach(async function() {
       C = db.model('Comment', Schema({
         body: 'string', title: String
       }));
@@ -2748,19 +2721,15 @@ describe('model: populate:', function() {
         comment: { type: Schema.ObjectId, ref: 'Comment' }
       }));
 
-      C.create({ body: 'comment 1', title: '1' }, { body: 'comment 2', title: 2 }, function(err, c1_, c2_) {
-        assert.ifError(err);
-        c1 = c1_;
-        c2 = c2_;
+      const [c1_, c2_] = await C.create([{ body: 'comment 1', title: '1' }, { body: 'comment 2', title: 2 }]);
 
-        U.create(
-          { name: 'u1', comments: [c1, c2], comment: c1 }
-          , { name: 'u2', comment: c2 }
-          , function(err) {
-            assert.ifError(err);
-            done();
-          });
-      });
+      c1 = c1_;
+      c2 = c2_;
+
+      await U.create([
+        { name: 'u1', comments: [c1, c2], comment: c1 },
+        { name: 'u2', comment: c2 }
+      ]);
     });
 
     describe('in a subdocument', function() {
@@ -3462,7 +3431,7 @@ describe('model: populate:', function() {
       });
     });
 
-    it('maps results back to correct document (gh-1444)', function(done) {
+    it('maps results back to correct document (gh-1444)', async function() {
       const articleSchema = new Schema({
         body: String,
         mediaAttach: { type: Schema.ObjectId, ref: 'Test' },
@@ -3475,29 +3444,21 @@ describe('model: populate:', function() {
       });
       const Media = db.model('Test', mediaSchema);
 
-      Media.create({ filename: 'one' }, function(err, media) {
-        assert.ifError(err);
+      const media = await Media.create({ filename: 'one' });
 
-        Article.create(
-          { body: 'body1', author: 'a' }
-          , { body: 'body2', author: 'a', mediaAttach: media._id }
-          , { body: 'body3', author: 'a' }, function(err) {
-            if (err) {
-              return done(err);
-            }
+      await Article.create(
+        { body: 'body1', author: 'a' },
+        { body: 'body2', author: 'a', mediaAttach: media._id },
+        { body: 'body3', author: 'a' }
+      );
 
-            Article.find().populate('mediaAttach').exec(function(err, docs) {
-              assert.ifError(err);
 
-              const a2 = docs.filter(function(d) {
-                return d.body === 'body2';
-              })[0];
-              assert.equal(a2.mediaAttach.id, media.id);
+      const docs = await Article.find().populate('mediaAttach');
 
-              done();
-            });
-          });
-      });
+      const a2 = docs.filter(function(d) {
+        return d.body === 'body2';
+      })[0];
+      assert.equal(a2.mediaAttach.id, media.id);
     });
 
     it('handles skip', async function() {
@@ -3518,34 +3479,30 @@ describe('model: populate:', function() {
       assert.equal(category.movies.length, 2);
     });
 
-    it('handles slice (gh-1934)', function(done) {
+    it('handles slice (gh-1934)', async function() {
       const movieSchema = new Schema({ title: String, actors: [String] });
       const categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'Movie' }] });
 
       const Movie = db.model('Movie', movieSchema);
       const Category = db.model('Category', categorySchema);
-      const movies = [
+
+      const movies = await Movie.create([
         { title: 'Rush', actors: ['Chris Hemsworth', 'Daniel Bruhl'] },
         { title: 'Pacific Rim', actors: ['Charlie Hunnam', 'Idris Elba'] },
         { title: 'Man of Steel', actors: ['Henry Cavill', 'Amy Adams'] }
-      ];
-      Movie.create(movies[0], movies[1], movies[2], function(error, m1, m2, m3) {
-        assert.ifError(error);
-        Category.create({ movies: [m1._id, m2._id, m3._id] }, function(error) {
-          assert.ifError(error);
-          Category.findOne({}).populate({ path: 'movies', options: { slice: { actors: 1 } } }).exec(function(error, category) {
-            assert.ifError(error);
-            assert.equal(category.movies.length, 3);
-            assert.equal(category.movies[0].actors.length, 1);
-            assert.equal(category.movies[1].actors.length, 1);
-            assert.equal(category.movies[2].actors.length, 1);
-            done();
-          });
-        });
-      });
+      ]);
+
+      await Category.create({ movies: movies });
+
+      const category = await Category.findOne({}).populate({ path: 'movies', options: { slice: { actors: 1 } } });
+
+      assert.equal(category.movies.length, 3);
+      assert.equal(category.movies[0].actors.length, 1);
+      assert.equal(category.movies[1].actors.length, 1);
+      assert.equal(category.movies[2].actors.length, 1);
     });
 
-    it('fails if sorting with a doc array subprop (gh-2202)', function(done) {
+    it('fails if sorting with a doc array subprop (gh-2202)', async function() {
       const childSchema = new Schema({ name: String });
       const Child = db.model('Child', childSchema);
 
@@ -3564,30 +3521,23 @@ describe('model: populate:', function() {
       });
       const Parent = db.model('Parent', parentSchema);
 
-      Child.create([{ name: 'test1' }, { name: 'test2' }], function(error, c) {
-        assert.ifError(error);
-        const doc = {
-          children1: [
-            { child: c[0]._id, test: 1 },
-            { child: c[1]._id, test: 2 }
-          ],
-          children2: [c[0]._id, c[1]._id]
-        };
-        Parent.create(doc, function(error, doc) {
-          assert.ifError(error);
-          Parent.findById(doc).populate('children2').exec(function(error, doc) {
-            assert.ifError(error);
-            assert.equal(doc.children2[0].name, 'test1');
-            Parent.findById(doc).
-              populate({ path: 'children1.child', options: { sort: '-name' } }).
-              exec(function(error) {
-                assert.notEqual(error.message.indexOf('subproperty of a document array'),
-                  -1);
-                done();
-              });
-          });
-        });
+      const c = await Child.create([{ name: 'test1' }, { name: 'test2' }]);
+
+      const createdParent = await Parent.create({
+        children1: [
+          { child: c[0]._id, test: 1 },
+          { child: c[1]._id, test: 2 }
+        ],
+        children2: [c[0]._id, c[1]._id]
       });
+
+      const foundParent = await Parent.findById(createdParent).populate('children2');
+      assert.equal(foundParent.children2[0].name, 'test1');
+
+      const err = await Parent.findById(foundParent).
+        populate({ path: 'children1.child', options: { sort: '-name' } }).then(() => null, err => err);
+
+      assert.notEqual(err.message.indexOf('subproperty of a document array'), -1);
     });
 
     it('handles toObject() (gh-3279)', function(done) {
@@ -3638,32 +3588,26 @@ describe('model: populate:', function() {
       });
     });
 
-    it('populate option (gh-2321)', function(done) {
+    it('populate option (gh-2321)', async function() {
       const User = db.model('User', { name: String });
       const Group = db.model('Group', {
         users: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         name: String
       });
 
-      User.create({ name: 'Val' }, function(error, user) {
-        assert.ifError(error);
-        Group.create({ users: [user._id], name: 'test' }, function(error, group) {
-          assert.ifError(error);
-          test(group._id);
-        });
-      });
+      const user = await User.create({ name: 'Val' });
 
-      const test = function(id) {
-        const options = { populate: { path: 'users', model: 'User' } };
-        Group.find({ _id: id }, '-name', options, function(error, group) {
-          assert.ifError(error);
-          assert.ok(group[0].users[0]._id);
-          done();
-        });
-      };
+      const group = await Group.create({ users: [user._id], name: 'test' });
+
+      const group2 = await Group.find(
+        { _id: group._id },
+        '-name',
+        { populate: { path: 'users', model: 'User' } }
+      );
+      assert.ok(group2[0].users[0]._id);
     });
 
-    it('discriminator child schemas (gh-3878)', function(done) {
+    it('discriminator child schemas (gh-3878)', async function() {
       const options = { discriminatorKey: 'kind' };
       const activitySchema = new Schema({ title: { type: String } }, options);
 
@@ -3678,33 +3622,21 @@ describe('model: populate:', function() {
       const DateActivity = Activity.discriminator('Date', dateActivitySchema);
       const EventActivity = Activity.discriminator('Event', eventActivitySchema);
 
-      User.create({ name: 'val' }, function(error, user) {
-        assert.ifError(error);
-        const dateActivity = { title: 'test', postedBy: user._id };
-        DateActivity.create(dateActivity, function(error) {
-          assert.ifError(error);
-          const eventActivity = {
-            title: 'test2',
-            test: 'test'
-          };
-          EventActivity.create(eventActivity, function(error) {
-            assert.ifError(error);
-            test();
-          });
-        });
+      const user = await User.create({ name: 'val' });
+      const dateActivity = { title: 'test', postedBy: user._id };
+      await DateActivity.create(dateActivity);
+
+      await EventActivity.create({
+        title: 'test2',
+        test: 'test'
       });
 
-      function test() {
-        Activity.find({}).populate('postedBy').exec(function(error, results) {
-          assert.ifError(error);
-          assert.equal(results.length, 2);
-          assert.equal(results[0].postedBy.name, 'val');
-          done();
-        });
-      }
+      const results = await Activity.find({}).populate('postedBy');
+      assert.equal(results.length, 2);
+      assert.equal(results[0].postedBy.name, 'val');
     });
 
-    it('set to obj w/ same id doesnt mark modified (gh-3992)', function(done) {
+    it('set to obj w/ same id doesnt mark modified (gh-3992)', async function() {
       const personSchema = new Schema({
         name: { type: String }
       });
@@ -3716,22 +3648,18 @@ describe('model: populate:', function() {
       const Person = db.model('Person', personSchema);
       const Job = db.model('Job', jobSchema);
 
-      Person.create({ name: 'Val' }, function(error, person) {
-        assert.ifError(error);
-        const job = { title: 'Engineer', person: person._id };
-        Job.create(job, function(error, job) {
-          assert.ifError(error);
-          Job.findById(job._id, function(error, job) {
-            assert.ifError(error);
-            job.person = person;
-            assert.ok(!job.isModified('person'));
-            done();
-          });
-        });
-      });
+      const person = await Person.create({ name: 'Val' });
+
+      const createdJob = await Job.create({ title: 'Engineer', person: person._id });
+
+
+      const foundJob = await Job.findById(createdJob._id);
+      foundJob.person = person;
+
+      assert.ok(!foundJob.isModified('person'));
     });
 
-    it('deep populate single -> array (gh-3904)', function(done) {
+    it('deep populate single -> array (gh-3904)', async function() {
       const personSchema = new Schema({
         name: { type: String }
       });
@@ -3750,51 +3678,41 @@ describe('model: populate:', function() {
       const Team = db.model('Team', teamSchema);
       const Game = db.model('Test', gameSchema);
 
-      const people = [
+
+      const people = await Person.create([
         { name: 'Shaq' },
         { name: 'Kobe' },
         { name: 'Horry' },
         { name: 'Duncan' },
         { name: 'Robinson' },
         { name: 'Johnson' }
-      ];
+      ]);
 
-      Person.create(people, function(error, people) {
-        assert.ifError(error);
-        const lakers = {
-          name: 'Lakers',
-          members: [people[0]._id, people[1]._id, people[2]._id]
-        };
-        const spurs = {
-          name: 'Spurs',
-          members: [people[3]._id, people[4]._id, people[5]._id]
-        };
-        const teams = [lakers, spurs];
-        Team.create(teams, function(error, teams) {
-          assert.ifError(error);
-          const game = { team: teams[0]._id, opponent: teams[1]._id };
-          Game.create(game, function(error, game) {
-            assert.ifError(error);
-            test(game._id);
-          });
-        });
+      const lakers = {
+        name: 'Lakers',
+        members: [people[0]._id, people[1]._id, people[2]._id]
+      };
+      const spurs = {
+        name: 'Spurs',
+        members: [people[3]._id, people[4]._id, people[5]._id]
+      };
+
+      const teams = await Team.create([lakers, spurs]);
+
+      const game = await Game.create({ team: teams[0]._id, opponent: teams[1]._id });
+
+
+      const doc = await Game.findById(game._id).populate({
+        path: 'team',
+        select: 'name members',
+        populate: { path: 'members', select: 'name' }
       });
 
-      function test(id) {
-        const query = Game.findById(id).populate({
-          path: 'team',
-          select: 'name members',
-          populate: { path: 'members', select: 'name' }
-        });
-        query.exec(function(error, doc) {
-          assert.ifError(error);
-          const arr = doc.toObject().team.members.map(function(v) {
-            return v.name;
-          });
-          assert.deepEqual(arr, ['Shaq', 'Kobe', 'Horry']);
-          done();
-        });
-      }
+      const arr = doc.toObject().team.members.map(function(v) {
+        return v.name;
+      });
+
+      assert.deepEqual(arr, ['Shaq', 'Kobe', 'Horry']);
     });
 
     it('deep populate array -> array (gh-3954)', function(done) {
@@ -4061,7 +3979,7 @@ describe('model: populate:', function() {
         });
     });
 
-    it('dynref bug (gh-4104)', function(done) {
+    it('dynref bug (gh-4104)', async function() {
       const PersonSchema = new Schema({
         name: { type: String }
       });
@@ -4081,23 +3999,17 @@ describe('model: populate:', function() {
       const Person = db.model('Person', PersonSchema);
       const Animal = db.model('Test', AnimalSchema);
 
-      Person.create({ name: 'Val' }, function(error, person) {
-        assert.ifError(error);
-        Animal.create({ name: 'Air Bud' }, function(error, animal) {
-          assert.ifError(error);
-          const obj1 = { createdByModel: 'Person', createdBy: person._id };
-          const obj2 = { createdByModel: 'Test', createdBy: animal._id };
-          Thing.create(obj1, obj2, function(error) {
-            assert.ifError(error);
-            Thing.find({}).populate('createdBy').exec(function(error, things) {
-              assert.ifError(error);
-              assert.ok(things[0].createdBy.name);
-              assert.ok(things[1].createdBy.name);
-              done();
-            });
-          });
-        });
-      });
+      const person = await Person.create({ name: 'Val' });
+      const animal = await Animal.create({ name: 'Air Bud' });
+
+      const obj1 = { createdByModel: 'Person', createdBy: person._id };
+      const obj2 = { createdByModel: 'Test', createdBy: animal._id };
+      await Thing.create(obj1, obj2);
+
+      const things = await Thing.find({}).populate('createdBy').exec();
+
+      assert.ok(things[0].createdBy.name);
+      assert.ok(things[1].createdBy.name);
     });
 
     it('returned array has toObject() (gh-4656)', function(done) {

@@ -9,34 +9,25 @@ require('./person.js')();
 const Person = mongoose.model('Person');
 
 // connect to a server to do a quick write / read example
+run().catch(console.error);
 
-mongoose.connect('mongodb://localhost/persons', function(err) {
-  if (err) {
-    throw err;
-  }
-
-  Person.create({ name: 'bill', age: 25, birthday: new Date().setFullYear((new Date().getFullYear() - 25)) },
-    function(err, bill) {
-      if (err) {
-        throw err;
-      }
-      console.log('People added to db: %s', bill.toString());
-
-      // using the static
-      Person.findPersonByName('bill', function(err, result) {
-        if (err) {
-          throw err;
-        }
-
-        console.log(result);
-        cleanup();
-      });
-    }
-  );
-});
-
-function cleanup() {
-  Person.remove(function() {
-    mongoose.disconnect();
+async function run() {
+  await mongoose.connect('mongodb://localhost/persons');
+  const bill = await Person.create({
+    name: 'bill',
+    age: 25,
+    birthday: new Date().setFullYear((new Date().getFullYear() - 25))
   });
+  console.log('People added to db: %s', bill.toString());
+
+  // using the static
+  const result = await Person.findPersonByName('bill');
+
+  console.log(result);
+  cleanup();
+}
+
+async function cleanup() {
+  await Person.remove();
+  mongoose.disconnect();
 }

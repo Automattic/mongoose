@@ -3500,28 +3500,23 @@ describe('model: populate:', function() {
       });
     });
 
-    it('handles skip', function(done) {
+    it('handles skip', async function() {
       const movieSchema = new Schema({});
       const categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'Movie' }] });
 
       const Movie = db.model('Movie', movieSchema);
       const Category = db.model('Category', categorySchema);
 
-      Movie.create({}, {}, {}, function(error) {
-        assert.ifError(error);
-        Movie.find({}, function(error, docs) {
-          assert.ifError(error);
-          assert.equal(docs.length, 3);
-          Category.create({ movies: [docs[0]._id, docs[1]._id, docs[2]._id] }, function(error) {
-            assert.ifError(error);
-            Category.findOne({}).populate({ path: 'movies', options: { limit: 2, skip: 1 } }).exec(function(error, category) {
-              assert.ifError(error);
-              assert.equal(category.movies.length, 2);
-              done();
-            });
-          });
-        });
-      });
+      await Movie.create({}, {}, {});
+
+      const docs = await Movie.find({});
+      assert.equal(docs.length, 3);
+
+      await Category.create({ movies: [docs[0]._id, docs[1]._id, docs[2]._id] });
+
+      const category = await Category.findOne({}).populate({ path: 'movies', options: { limit: 2, skip: 1 } }).exec();
+
+      assert.equal(category.movies.length, 2);
     });
 
     it('handles slice (gh-1934)', function(done) {

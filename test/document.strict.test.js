@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -444,7 +443,7 @@ describe('document: strict mode:', function() {
     });
   });
 
-  it('handles setting `schema.options.strict` (gh-7103)', function() {
+  it('handles setting `schema.options.strict` (gh-7103)', async function() {
     const nestedSchema = new mongoose.Schema({
       _id: false,
       someProp: {
@@ -465,18 +464,16 @@ describe('document: strict mode:', function() {
 
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      const doc1 = new Model();
-      doc1.nested = { someProp: true, somethingElse: false };
+    const doc1 = new Model();
+    doc1.nested = { someProp: true, somethingElse: false };
 
-      let err = doc1.validateSync();
-      assert.ok(err);
-      assert.ok(err.errors['nested']);
+    let err = doc1.validateSync();
+    assert.ok(err);
+    assert.ok(err.errors['nested']);
 
-      err = yield doc1.validate().then(() => null, err => err);
-      assert.ok(err);
+    err = await doc1.validate().then(() => null, err => err);
+    assert.ok(err);
 
-      assert.ok(err.errors['nested']);
-    });
+    assert.ok(err.errors['nested']);
   });
 });

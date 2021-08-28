@@ -4535,7 +4535,8 @@ describe('document', function() {
       assert.equal(preFoo, 0);
       assert.equal(postFoo, 0);
 
-      assert.equal(await new Promise((resolve) => doc.foo(resolve)), 'test');
+      const fooResult = await doc.foo();
+      assert.equal(fooResult, 'test');
       assert.equal(preFoo, 1);
       assert.equal(postFoo, 1);
 
@@ -7604,7 +7605,7 @@ describe('document', function() {
       name: {
         type: String,
         validate: async function() {
-          await new Promise.resolve((resolve) => setImmediate(resolve));
+          await Promise.resolve((resolve) => setImmediate(resolve));
           throw new Error('Oops!');
         }
       }

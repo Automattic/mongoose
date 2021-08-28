@@ -7,7 +7,6 @@
 const Document = require('../lib/browserDocument');
 const Schema = require('../lib/schema');
 const assert = require('assert');
-const co = require('co');
 const exec = require('child_process').exec;
 
 /**

@@ -3463,9 +3463,9 @@ describe('model: populate:', function() {
 
     it('handles skip', async function() {
       const movieSchema = new Schema({});
-      const categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'Movie' }] });
+      const categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'Movie_Skip' }] });
 
-      const Movie = db.model('Movie', movieSchema);
+      const Movie = db.model('Movie_Skip', movieSchema);
       const Category = db.model('Category', categorySchema);
 
       await Movie.create([{}, {}, {}]);
@@ -3481,9 +3481,9 @@ describe('model: populate:', function() {
 
     it('handles slice (gh-1934)', async function() {
       const movieSchema = new Schema({ title: String, actors: [String] });
-      const categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'Movie' }] });
+      const categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'Movie_Slice' }] });
 
-      const Movie = db.model('Movie', movieSchema);
+      const Movie = db.model('Movie_Slice', movieSchema);
       const Category = db.model('Category', categorySchema);
 
       const movies = await Movie.create([
@@ -7210,7 +7210,7 @@ describe('model: populate:', function() {
     describe('lean + deep populate (gh-6498)', function() {
       const isLean = v => v != null && !(v instanceof mongoose.Document);
 
-      beforeEach(function() {
+      beforeEach(async function() {
         const userSchema = new Schema({
           name: String,
           roomId: { type: Schema.ObjectId, ref: 'Test1' }
@@ -7231,8 +7231,8 @@ describe('model: populate:', function() {
         user.roomId = room._id;
         room.officeId = office._id;
 
-        return User.deleteMany({}).
-          then(() => Promise.all([user.save(), office.save(), room.save()]));
+        await User.deleteMany({});
+        await Promise.all([user.save(), office.save(), room.save()]);
       });
 
       it('document, and subdocuments are not lean by default', async function() {

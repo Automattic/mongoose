@@ -8136,8 +8136,9 @@ describe('document', function() {
 
     const child = await Child.create({ test: 'test' });
     await Parent.create({ keyToPopulate: child, array: [child], subdoc: { keyToPopulate: child } });
+
     assert.equal(calledWith.length, 3);
-    console.log(calledWith);
+
     assert.ok(calledWith[0] instanceof mongoose.Types.ObjectId);
     assert.ok(calledWith[1] instanceof mongoose.Types.ObjectId);
     assert.ok(calledWith[2] instanceof mongoose.Types.ObjectId);

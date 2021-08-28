@@ -143,4 +143,18 @@ describe('collections:', function() {
     assert.ok(thrown);
     thrown = false;
   });
+
+  it('buffers for sync methods (gh-10610)', function(done) {
+    const db = mongoose.createConnection();
+    const collection = db.collection('gh10610');
+
+    collection.find({}, {}, function(err, res) {
+      assert.ifError(err);
+      assert.equal(typeof res.toArray, 'function');
+      done();
+    });
+
+    const uri = 'mongodb://localhost:27017/mongoose_test';
+    db.openUri(process.env.MONGOOSE_TEST_URI || uri);
+  });
 });

@@ -4,7 +4,6 @@ const start = require('./common');
 
 const Query = require('../lib/query');
 const assert = require('assert');
-const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -174,7 +173,7 @@ describe('Query:', function() {
       });
     });
 
-    it('gets middleware from model (gh-6455)', function() {
+    it('gets middleware from model (gh-6455)', async function() {
       let called = 0;
       const schema = new Schema({
         name: String
@@ -188,12 +187,11 @@ describe('Query:', function() {
       const test = new Test({ name: 'Romero' });
       const Q = Test.findOne({}).toConstructor();
 
-      return co(function*() {
-        yield test.save();
-        const doc = yield Q();
-        assert.strictEqual(doc.name, 'Romero');
-        assert.strictEqual(called, 1);
-      });
+
+      await test.save();
+      const doc = await Q();
+      assert.strictEqual(doc.name, 'Romero');
+      assert.strictEqual(called, 1);
     });
 
     it('works with entries-style sort() syntax (gh-8159)', function() {

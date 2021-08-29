@@ -86,27 +86,25 @@ describe('Date Tutorial', function() {
     let Episode;
     let db;
 
-    before(function() {
-      return co(function*() {
-        const episodeSchema = new mongoose.Schema({
-          title: String,
-          airedAt: {
-            type: Date,
-            // The dates of the first and last episodes of
-            // Star Trek: The Next Generation
-            min: '1987-09-28',
-            max: '1994-05-23'
-          }
-        });
-        db = yield start().asPromise();
-        Episode = db.model('Episode', episodeSchema);
-
-        yield Episode.create([
-          { title: 'Encounter at Farpoint', airedAt: '1987-09-28' },
-          { title: 'The Last Outpost', airedAt: '1987-10-19' },
-          { title: 'Where No One Has Gone Before', airedAt: '1987-10-26' }
-        ]);
+    before(async function() {
+      const episodeSchema = new mongoose.Schema({
+        title: String,
+        airedAt: {
+          type: Date,
+          // The dates of the first and last episodes of
+          // Star Trek: The Next Generation
+          min: '1987-09-28',
+          max: '1994-05-23'
+        }
       });
+      db = await start().asPromise();
+      Episode = db.model('Episode', episodeSchema);
+
+      await Episode.create([
+        { title: 'Encounter at Farpoint', airedAt: '1987-09-28' },
+        { title: 'The Last Outpost', airedAt: '1987-10-19' },
+        { title: 'Where No One Has Gone Before', airedAt: '1987-10-26' }
+      ]);
     });
 
     it('date queries', function() {

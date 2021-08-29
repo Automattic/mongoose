@@ -3,7 +3,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -340,7 +339,7 @@ describe('timestamps', function() {
       then(doc => assert.ok(doc.createdAt.valueOf() >= startTime));
   });
 
-  it('timestamps handle reusing child schemas (gh-7712)', function() {
+  it('timestamps handle reusing child schemas (gh-7712)', async function() {
     const childSchema = new mongoose.Schema({ name: String }, {
       timestamps: true
     });
@@ -349,71 +348,65 @@ describe('timestamps', function() {
       children: [childSchema]
     }));
 
-    return co(function*() {
-      let startTime = null;
-      let doc = yield M1.create({ child: { name: 'foo' } });
-      assert.ok(doc.child.updatedAt);
-      yield new Promise(resolve => setTimeout(resolve, 25));
-      startTime = Date.now();
+    let startTime = null;
+    let doc = await M1.create({ child: { name: 'foo' } });
+    assert.ok(doc.child.updatedAt);
+    await new Promise(resolve => setTimeout(resolve, 25));
+    startTime = Date.now();
 
-      doc = yield M1.findOneAndUpdate({}, { $set: { 'child.name': 'bar' } },
-        { new: true });
-      assert.ok(doc.child.updatedAt.valueOf() >= startTime,
-        `Timestamp not updated: ${doc.child.updatedAt}`);
+    doc = await M1.findOneAndUpdate({}, { $set: { 'child.name': 'bar' } },
+      { new: true });
+    assert.ok(doc.child.updatedAt.valueOf() >= startTime,
+      `Timestamp not updated: ${doc.child.updatedAt}`);
 
-      doc = yield M2.create({ children: [{ name: 'foo' }] });
-      assert.ok(doc.children[0].updatedAt);
-      yield new Promise(resolve => setTimeout(resolve, 25));
-      startTime = Date.now();
+    doc = await M2.create({ children: [{ name: 'foo' }] });
+    assert.ok(doc.children[0].updatedAt);
+    await new Promise(resolve => setTimeout(resolve, 25));
+    startTime = Date.now();
 
-      doc = yield M2.findOneAndUpdate({ 'children.name': 'foo' },
-        { $set: { 'children.$.name': 'bar' } }, { new: true });
-      assert.ok(doc.children[0].updatedAt.valueOf() >= startTime,
-        `Timestamp not updated: ${doc.children[0].updatedAt}`);
-    });
+    doc = await M2.findOneAndUpdate({ 'children.name': 'foo' },
+      { $set: { 'children.$.name': 'bar' } }, { new: true });
+    assert.ok(doc.children[0].updatedAt.valueOf() >= startTime,
+      `Timestamp not updated: ${doc.children[0].updatedAt}`);
   });
 
-  it('respects timestamps: false in child schema (gh-8007)', function() {
+  it('respects timestamps: false in child schema (gh-8007)', async function() {
     const sub = Schema({ name: String }, { timestamps: false, _id: false });
     const schema = Schema({ data: sub });
 
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      let res = yield Model.create({ data: {} });
+    let res = await Model.create({ data: {} });
 
-      yield Model.bulkWrite([
-        {
-          updateOne: {
-            filter: {
-              _id: res._id
-            },
-            update: {
-              'data.name': 'foo'
-            }
+    await Model.bulkWrite([
+      {
+        updateOne: {
+          filter: {
+            _id: res._id
+          },
+          update: {
+            'data.name': 'foo'
           }
         }
-      ]);
+      }
+    ]);
 
-      res = yield Model.findOne({}).lean();
-      assert.deepEqual(res.data, { name: 'foo' });
-    });
+    res = await Model.findOne({}).lean();
+    assert.deepEqual(res.data, { name: 'foo' });
   });
 
-  it('updates updatedAt when calling update without $set (gh-4768)', function() {
+  it('updates updatedAt when calling update without $set (gh-4768)', async function() {
     const Model = db.model('Test', Schema({ name: String }, { timestamps: true }));
 
-    return co(function*() {
-      let doc = yield Model.create({ name: 'test1' });
-      const start = doc.updatedAt;
+    let doc = await Model.create({ name: 'test1' });
+    const start = doc.updatedAt;
 
-      yield cb => setTimeout(cb, 50);
-      doc = yield Model.findOneAndUpdate({}, doc.toObject(), { new: true });
-      assert.ok(doc.updatedAt > start, `${doc.updatedAt} >= ${start}`);
-    });
+    await delay(50);
+    doc = await Model.findOneAndUpdate({}, doc.toObject(), { new: true });
+    assert.ok(doc.updatedAt > start, `${doc.updatedAt} >= ${start}`);
   });
 
-  it('updates updatedAt when calling update on subchild', function() {
+  it('updates updatedAt when calling update on subchild', async function() {
     const subchildschema = new mongoose.Schema({
       name: String
     }, { timestamps: true });
@@ -427,28 +420,26 @@ describe('timestamps', function() {
 
     const Model = db.model('Test', parentSchema);
 
-    return co(function*() {
-      let doc = yield Model.create({ name: 'test', child: {
-        name: 'child',
-        subchild: {
-          name: 'subchild'
-        }
-      } });
-      assert.ok(doc.child.updatedAt);
-      const startTime = doc.createdAt;
-      yield new Promise(resolve => setTimeout(resolve), 25);
+    let doc = await Model.create({ name: 'test', child: {
+      name: 'child',
+      subchild: {
+        name: 'subchild'
+      }
+    } });
+    assert.ok(doc.child.updatedAt);
+    const startTime = doc.createdAt;
+    await new Promise(resolve => setTimeout(resolve), 25);
 
-      doc = yield Model.findOneAndUpdate({}, { $set: {
-        'child.subchild.name': 'subChildUpdated'
-      } }, { new: true });
+    doc = await Model.findOneAndUpdate({}, { $set: {
+      'child.subchild.name': 'subChildUpdated'
+    } }, { new: true });
 
-      assert.ok(doc.updatedAt.valueOf() > startTime,
-        `Parent Timestamp not updated: ${doc.updatedAt}`);
-      assert.ok(doc.child.updatedAt.valueOf() > startTime,
-        `Child Timestamp not updated: ${doc.updatedAt}`);
-      assert.ok(doc.child.subchild.updatedAt.valueOf() > startTime,
-        `SubChild Timestamp not updated: ${doc.updatedAt}`);
-    });
+    assert.ok(doc.updatedAt.valueOf() > startTime,
+      `Parent Timestamp not updated: ${doc.updatedAt}`);
+    assert.ok(doc.child.updatedAt.valueOf() > startTime,
+      `Child Timestamp not updated: ${doc.updatedAt}`);
+    assert.ok(doc.child.subchild.updatedAt.valueOf() > startTime,
+      `SubChild Timestamp not updated: ${doc.updatedAt}`);
   });
 
   it('sets timestamps on deeply nested docs on upsert (gh-8894)', function() {
@@ -479,7 +470,7 @@ describe('timestamps', function() {
       });
   });
 
-  it('sets timestamps on bulk write without `$set` (gh-9268)', function() {
+  it('sets timestamps on bulk write without `$set` (gh-9268)', async function() {
     const NestedSchema = new Schema({ name: String }, {
       timestamps: true,
       _id: false
@@ -489,25 +480,23 @@ describe('timestamps', function() {
     });
     const Test = db.model('Test', TestSchema);
 
-    return co(function*() {
-      yield Test.create({ nestedDoc: { name: 'test' } });
-      const doc = yield Test.findOne().lean();
+    await Test.create({ nestedDoc: { name: 'test' } });
+    const doc = await Test.findOne().lean();
 
-      yield cb => setTimeout(cb, 10);
-      yield Test.bulkWrite([
-        {
-          updateOne: {
-            filter: {},
-            update: {
-              'nestedDoc.name': 'test2'
-            }
+    await delay(10);
+    await Test.bulkWrite([
+      {
+        updateOne: {
+          filter: {},
+          update: {
+            'nestedDoc.name': 'test2'
           }
         }
-      ]);
+      }
+    ]);
 
-      const newDoc = yield Test.findById(doc).lean();
-      assert.ok(newDoc.nestedDoc.updatedAt > doc.nestedDoc.updatedAt);
-    });
+    const newDoc = await Test.findById(doc).lean();
+    assert.ok(newDoc.nestedDoc.updatedAt > doc.nestedDoc.updatedAt);
   });
 
   it('works with property named "set" (gh-9428)', function() {
@@ -623,20 +612,18 @@ describe('timestamps', function() {
       });
     });
 
-    it('can skip with timestamps: false (gh-7357)', function() {
-      return co(function*() {
-        const cat = yield Cat.findOne();
+    it('can skip with timestamps: false (gh-7357)', async function() {
+      const cat = await Cat.findOne();
 
-        const old = cat.updatedAt;
+      const old = cat.updatedAt;
 
-        yield cb => setTimeout(() => cb(), 10);
+      await delay(10);
 
-        cat.hobby = 'fishing';
+      cat.hobby = 'fishing';
 
-        yield cat.save({ timestamps: false });
+      await cat.save({ timestamps: false });
 
-        assert.strictEqual(cat.updatedAt, old);
-      });
+      assert.strictEqual(cat.updatedAt, old);
     });
 
     it('should change updatedAt when findOneAndUpdate', function(done) {
@@ -652,7 +639,7 @@ describe('timestamps', function() {
       });
     });
 
-    it('insertMany with createdAt off (gh-6381)', function() {
+    it('insertMany with createdAt off (gh-6381)', async function() {
       const CatSchema = new Schema({
         name: String,
         createdAt: {
@@ -673,15 +660,13 @@ describe('timestamps', function() {
 
       const d = new Date('2011-06-01');
 
-      return co(function*() {
-        yield Cat.deleteMany({});
-        yield Cat.insertMany([{ name: 'a' }, { name: 'b', createdAt: d }]);
+      await Cat.deleteMany({});
+      await Cat.insertMany([{ name: 'a' }, { name: 'b', createdAt: d }]);
 
-        const cats = yield Cat.find().sort('name');
+      const cats = await Cat.find().sort('name');
 
-        assert.equal(cats[0].createdAt.valueOf(), new Date('2013-06-01').valueOf());
-        assert.equal(cats[1].createdAt.valueOf(), new Date('2011-06-01').valueOf());
-      });
+      assert.equal(cats[0].createdAt.valueOf(), new Date('2013-06-01').valueOf());
+      assert.equal(cats[1].createdAt.valueOf(), new Date('2011-06-01').valueOf());
     });
 
     it('should have fields when update', function(done) {
@@ -762,7 +747,7 @@ describe('timestamps', function() {
     });
   });
 
-  it('timestamps with number types (gh-3957)', function() {
+  it('timestamps with number types (gh-3957)', async function() {
     const schema = Schema({
       createdAt: Number,
       updatedAt: Number,
@@ -771,17 +756,15 @@ describe('timestamps', function() {
     const Model = db.model('Test', schema);
     const start = Date.now();
 
-    return co(function*() {
-      const doc = yield Model.create({ name: 'test' });
+    const doc = await Model.create({ name: 'test' });
 
-      assert.equal(typeof doc.createdAt, 'number');
-      assert.equal(typeof doc.updatedAt, 'number');
-      assert.ok(doc.createdAt >= start);
-      assert.ok(doc.updatedAt >= start);
-    });
+    assert.equal(typeof doc.createdAt, 'number');
+    assert.equal(typeof doc.updatedAt, 'number');
+    assert.ok(doc.createdAt >= start);
+    assert.ok(doc.updatedAt >= start);
   });
 
-  it('timestamps with custom timestamp (gh-3957)', function() {
+  it('timestamps with custom timestamp (gh-3957)', async function() {
     const schema = Schema({
       createdAt: Number,
       updatedAt: Number,
@@ -791,17 +774,15 @@ describe('timestamps', function() {
     });
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      const doc = yield Model.create({ name: 'test' });
+    const doc = await Model.create({ name: 'test' });
 
-      assert.equal(typeof doc.createdAt, 'number');
-      assert.equal(typeof doc.updatedAt, 'number');
-      assert.equal(doc.createdAt, 42);
-      assert.equal(doc.updatedAt, 42);
-    });
+    assert.equal(typeof doc.createdAt, 'number');
+    assert.equal(typeof doc.updatedAt, 'number');
+    assert.equal(doc.createdAt, 42);
+    assert.equal(doc.updatedAt, 42);
   });
 
-  it('shouldnt bump updatedAt in single nested subdocs that are not modified (gh-9357)', function() {
+  it('shouldnt bump updatedAt in single nested subdocs that are not modified (gh-9357)', async function() {
     const nestedSchema = Schema({
       nestedA: { type: String },
       nestedB: { type: String }
@@ -816,29 +797,27 @@ describe('timestamps', function() {
 
     const Parent = db.model('Test', parentSchema);
 
-    return co(function*() {
-      yield Parent.deleteMany({});
+    await Parent.deleteMany({});
 
-      const _id = yield Parent.create({
-        content: {
-          a: { nestedA: 'a' },
-          b: { nestedB: 'b' }
-        }
-      }).then(doc => doc._id);
+    const _id = await Parent.create({
+      content: {
+        a: { nestedA: 'a' },
+        b: { nestedB: 'b' }
+      }
+    }).then(doc => doc._id);
 
-      const doc = yield Parent.findById(_id);
+    const doc = await Parent.findById(_id);
 
-      const ts = doc.content.b.updatedAt;
-      doc.content.a.nestedA = 'b';
-      yield cb => setTimeout(cb, 10);
-      yield doc.save();
+    const ts = doc.content.b.updatedAt;
+    doc.content.a.nestedA = 'b';
+    await delay(10);
+    await doc.save();
 
-      const fromDb = yield Parent.findById(_id);
-      assert.strictEqual(fromDb.content.b.updatedAt.valueOf(), ts.valueOf());
-    });
+    const fromDb = await Parent.findById(_id);
+    assert.strictEqual(fromDb.content.b.updatedAt.valueOf(), ts.valueOf());
   });
 
-  it('bumps updatedAt with mixed $set (gh-9357)', function() {
+  it('bumps updatedAt with mixed $set (gh-9357)', async function() {
     const nestedSchema = Schema({
       nestedA: { type: String },
       nestedB: { type: String }
@@ -853,41 +832,37 @@ describe('timestamps', function() {
 
     const Parent = db.model('Test', parentSchema);
 
-    return co(function*() {
-      yield Parent.deleteMany({});
+    await Parent.deleteMany({});
 
-      const doc = yield Parent.create({
-        content: {
-          a: { nestedA: 'a' },
-          b: { nestedB: 'b' }
-        }
-      });
-      const ts = doc.content.b.updatedAt;
-
-      yield cb => setTimeout(cb, 10);
-      const fromDb = yield Parent.findOneAndUpdate({}, {
-        'content.c': 'value',
-        $set: {
-          'content.a.nestedA': 'value'
-        }
-      }, { new: true });
-
-      assert.ok(fromDb.content.a.updatedAt.valueOf() > ts.valueOf());
+    const doc = await Parent.create({
+      content: {
+        a: { nestedA: 'a' },
+        b: { nestedB: 'b' }
+      }
     });
+    const ts = doc.content.b.updatedAt;
+
+    await delay(10);
+    const fromDb = await Parent.findOneAndUpdate({}, {
+      'content.c': 'value',
+      $set: {
+        'content.a.nestedA': 'value'
+      }
+    }, { new: true });
+
+    assert.ok(fromDb.content.a.updatedAt.valueOf() > ts.valueOf());
   });
 
-  it('makes createdAt immutable by default (gh-10139)', function() {
+  it('makes createdAt immutable by default (gh-10139)', async function() {
     const schema = Schema({ name: String }, { timestamps: true });
     const Model = db.model('Time', schema);
-    return co(function*() {
-      const doc = yield Model.create({ name: 'test' });
-      const test = doc.createdAt;
-      doc.createdAt = new Date();
-      assert.equal(test, doc.createdAt);
-    });
+    const doc = await Model.create({ name: 'test' });
+    const test = doc.createdAt;
+    doc.createdAt = new Date();
+    assert.equal(test, doc.createdAt);
   });
 
-  it('sets createdAt when using $push/$addToSet on path with positional operator (gh-10447)', function() {
+  it('sets createdAt when using $push/$addToSet on path with positional operator (gh-10447)', async function() {
     const userSchema = new Schema({
       email: String
     }, { timestamps: true });
@@ -902,32 +877,35 @@ describe('timestamps', function() {
 
     const Church = db.model('Test', churchSchema);
 
-    return co(function*() {
-      yield Church.create({
-        events: [{
+    await Church.create({
+      events: [{
+        churchId: 1,
+        message: 'test',
+        users: [{
           churchId: 1,
-          message: 'test',
-          users: [{
-            churchId: 1,
-            email: 'test@google.com'
-          }]
+          email: 'test@google.com'
         }]
-      });
-
-      const church = yield Church.findOneAndUpdate({
-        events: { $elemMatch: { users: { $not: { $elemMatch: { email: 'test2@google.com' } } } } }
-      }, {
-        $addToSet: {
-          'events.$.users': { churchId: 1, email: 'test2@google.com' }
-        }
-      }, {
-        new: true
-      });
-
-      assert.equal(church.events.length, 1);
-      assert.equal(church.events[0].users.length, 2);
-      assert.equal(church.events[0].users[1].email, 'test2@google.com');
-      assert.ok(church.events[0].users[1].createdAt);
+      }]
     });
+
+    const church = await Church.findOneAndUpdate({
+      events: { $elemMatch: { users: { $not: { $elemMatch: { email: 'test2@google.com' } } } } }
+    }, {
+      $addToSet: {
+        'events.$.users': { churchId: 1, email: 'test2@google.com' }
+      }
+    }, {
+      new: true
+    });
+
+    assert.equal(church.events.length, 1);
+    assert.equal(church.events[0].users.length, 2);
+    assert.equal(church.events[0].users[1].email, 'test2@google.com');
+    assert.ok(church.events[0].users[1].createdAt);
   });
 });
+
+
+async function delay(ms) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}

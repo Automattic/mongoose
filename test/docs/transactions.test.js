@@ -323,45 +323,41 @@ describe('transactions', function() {
       then(() => session.endSession());
   });
 
-  it('remove, update, updateOne (gh-7455)', function() {
+  it('remove, update, updateOne (gh-7455)', async function() {
     const Character = db.model('gh7455_Character', new Schema({ name: String, title: String }, { versionKey: false }));
 
-    return co(function*() {
-      yield Character.create({ name: 'Tyrion Lannister' });
-      const session = yield db.startSession();
+      await Character.create({ name: 'Tyrion Lannister' });
+      const session = await db.startSession();
 
       session.startTransaction();
 
-      const tyrion = yield Character.findOne().session(session);
+      const tyrion = await Character.findOne().session(session);
 
-      yield tyrion.updateOne({ title: 'Hand of the King' });
+      await tyrion.updateOne({ title: 'Hand of the King' });
 
       // Session isn't committed
-      assert.equal(yield Character.countDocuments({ title: /hand/i }), 0);
+      assert.equal(await Character.countDocuments({ title: /hand/i }), 0);
 
-      yield tyrion.remove();
+      await tyrion.remove();
 
       // Undo both update and delete since doc should pull from `$session()`
-      yield session.abortTransaction();
+      await session.abortTransaction();
       session.endSession();
 
-      const fromDb = yield Character.findOne().then(doc => doc.toObject());
+      const fromDb = await Character.findOne().then(doc => doc.toObject());
       delete fromDb._id;
       assert.deepEqual(fromDb, { name: 'Tyrion Lannister' });
-    });
   });
 
-  it('save() with no changes (gh-8571)', function() {
-    return co(function*() {
+  it('save() with no changes (gh-8571)', async function() {
       const Test = db.model('Test', Schema({ name: String }));
 
-      yield Test.createCollection();
-      const session = yield db.startSession();
-      yield session.withTransaction(() => co(function*() {
-        const test = yield Test.create([{}], { session }).then(res => res[0]);
-        yield test.save(); // throws DocumentNotFoundError
-      }));
-      yield session.endSession();
-    });
+      await Test.createCollection();
+      const session = await db.startSession();
+      await session.withTransaction(async () => {
+        const test = await Test.create([{}], { session }).then(res => res[0]);
+        await test.save(); // throws DocumentNotFoundError
+      });
+      await session.endSession();
   });
 });

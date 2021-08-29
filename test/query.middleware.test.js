@@ -3,7 +3,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -381,7 +380,7 @@ describe('query middleware', function() {
     });
   });
 
-  it('deleteOne() (gh-7195)', function() {
+  it('deleteOne() (gh-7195)', async function() {
     let preCount = 0;
     let postCount = 0;
 
@@ -393,22 +392,21 @@ describe('query middleware', function() {
       ++postCount;
     });
 
-    return co(function*() {
-      const Model = db.model('Test', schema);
-      yield Model.create([{ title: 'foo' }, { title: 'bar' }]);
 
-      const res = yield Model.deleteOne();
-      assert.equal(res.deletedCount, 1);
+    const Model = db.model('Test', schema);
+    await Model.create([{ title: 'foo' }, { title: 'bar' }]);
 
-      assert.equal(preCount, 1);
-      assert.equal(postCount, 1);
+    const res = await Model.deleteOne();
+    assert.equal(res.deletedCount, 1);
 
-      const count = yield Model.countDocuments();
-      assert.equal(count, 1);
-    });
+    assert.equal(preCount, 1);
+    assert.equal(postCount, 1);
+
+    const count = await Model.countDocuments();
+    assert.equal(count, 1);
   });
 
-  it('deleteMany() (gh-7195)', function() {
+  it('deleteMany() (gh-7195)', async function() {
     let preCount = 0;
     let postCount = 0;
 
@@ -420,21 +418,20 @@ describe('query middleware', function() {
       ++postCount;
     });
 
-    return co(function*() {
-      const Model = db.model('Test', schema);
-      yield Model.create([{ title: 'foo' }, { title: 'bar' }]);
 
-      yield Model.deleteMany();
+    const Model = db.model('Test', schema);
+    await Model.create([{ title: 'foo' }, { title: 'bar' }]);
 
-      assert.equal(preCount, 1);
-      assert.equal(postCount, 1);
+    await Model.deleteMany();
 
-      const count = yield Model.countDocuments();
-      assert.equal(count, 0);
-    });
+    assert.equal(preCount, 1);
+    assert.equal(postCount, 1);
+
+    const count = await Model.countDocuments();
+    assert.equal(count, 0);
   });
 
-  it('distinct (gh-5938)', function() {
+  it('distinct (gh-5938)', async function() {
     let preCount = 0;
     let postCount = 0;
 
@@ -447,16 +444,15 @@ describe('query middleware', function() {
       ++postCount;
     });
 
-    return co(function*() {
-      const Model = db.model('Test', schema);
-      yield Model.create([{ title: 'foo' }, { title: 'bar' }, { title: 'bar' }]);
 
-      const res = yield Model.distinct('title');
-      assert.deepEqual(res.sort(), ['bar', 'foo']);
+    const Model = db.model('Test', schema);
+    await Model.create([{ title: 'foo' }, { title: 'bar' }, { title: 'bar' }]);
 
-      assert.equal(preCount, 1);
-      assert.equal(postCount, 1);
-    });
+    const res = await Model.distinct('title');
+    assert.deepEqual(res.sort(), ['bar', 'foo']);
+
+    assert.equal(preCount, 1);
+    assert.equal(postCount, 1);
   });
 
   it('error handlers (gh-2284)', function(done) {
@@ -617,7 +613,7 @@ describe('query middleware', function() {
       then(() => assert.equal(calledPost, 1));
   });
 
-  it('deleteOne with `document: true` but no `query` (gh-8555)', function() {
+  it('deleteOne with `document: true` but no `query` (gh-8555)', async function() {
     const mySchema = Schema({ name: String });
 
     const docs = [];
@@ -627,18 +623,17 @@ describe('query middleware', function() {
 
     const Model = db.model('Test', mySchema);
 
-    return co(function*() {
-      const doc = yield Model.create({ name: 'test' });
-      yield doc.deleteOne();
-      assert.equal(docs.length, 1);
-      assert.strictEqual(docs[0], doc);
 
-      yield Model.deleteOne();
-      assert.equal(docs.length, 1);
-    });
+    const doc = await Model.create({ name: 'test' });
+    await doc.deleteOne();
+    assert.equal(docs.length, 1);
+    assert.strictEqual(docs[0], doc);
+
+    await Model.deleteOne();
+    assert.equal(docs.length, 1);
   });
 
-  it('allows registering middleware for all queries with regexp (gh-9190)', function() {
+  it('allows registering middleware for all queries with regexp (gh-9190)', async function() {
     const schema = Schema({ name: String });
 
     let called = 0;
@@ -647,24 +642,23 @@ describe('query middleware', function() {
     });
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      yield Model.find();
-      assert.equal(called, 1);
 
-      yield Model.findOne();
-      assert.equal(called, 2);
+    await Model.find();
+    assert.equal(called, 1);
 
-      yield Model.countDocuments();
-      assert.equal(called, 3);
+    await Model.findOne();
+    assert.equal(called, 2);
 
-      yield Model.create({ name: 'test' });
-      assert.equal(called, 3);
+    await Model.countDocuments();
+    assert.equal(called, 3);
 
-      yield Model.insertMany([{ name: 'test' }]);
-      assert.equal(called, 3);
+    await Model.create({ name: 'test' });
+    assert.equal(called, 3);
 
-      yield Model.aggregate([{ $match: { name: 'test' } }]);
-      assert.equal(called, 3);
-    });
+    await Model.insertMany([{ name: 'test' }]);
+    assert.equal(called, 3);
+
+    await Model.aggregate([{ $match: { name: 'test' } }]);
+    assert.equal(called, 3);
   });
 });

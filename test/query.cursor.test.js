@@ -537,10 +537,10 @@ describe('QueryCursor', function() {
 
     let numDone = 0;
 
-    await delay(100);
-    ++numDone;
-
-    await Movie.find().cursor().eachAsync(test, { parallel: 4 });
+    await Movie.find().cursor().eachAsync(async function() {
+      await delay(100);
+      ++numDone;
+    }, { parallel: 4 });
     assert.equal(numDone, 3);
   });
 

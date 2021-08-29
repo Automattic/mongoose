@@ -5249,6 +5249,7 @@ describe('Model', function() {
 
       describe('sessions (gh-6362)', function() {
         let MyModel;
+
         const delay = ms => done => setTimeout(done, ms);
 
         beforeEach(function(done) {
@@ -5304,6 +5305,9 @@ describe('Model', function() {
         });
 
         it('sets session when pulling a document from db', async function() {
+          async function delay(ms) {
+            await new Promise((resolve) => setTimeout(resolve, ms));
+          }
           let doc = await MyModel.create({ name: 'test', nested: { foo: 'bar' } });
 
           const session = await MyModel.startSession();
@@ -5343,7 +5347,6 @@ describe('Model', function() {
         });
 
         it('sets session on child doc when creating new doc (gh-7104)', async function() {
-
           let doc = await MyModel.create({ name: 'test', arr: [{ foo: 'bar' }] });
 
           const session = await MyModel.startSession();
@@ -5380,6 +5383,9 @@ describe('Model', function() {
         });
 
         it('sets session when pulling multiple docs from db', async function() {
+          async function delay(ms) {
+            await new Promise((resolve) => setTimeout(resolve, ms));
+          }
 
           const doc = await MyModel.create({ name: 'test' });
 
@@ -5411,6 +5417,9 @@ describe('Model', function() {
         });
 
         it('supports overwriting `session` in save()', async function() {
+          async function delay(ms) {
+            await new Promise((resolve) => setTimeout(resolve, ms));
+          }
           let doc = await MyModel.create({ name: 'test' });
 
           const session = await MyModel.startSession();
@@ -7612,5 +7621,7 @@ describe('Model', function() {
 
   });
 });
+
+
 
 

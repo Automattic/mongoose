@@ -8,7 +8,6 @@ const start = require('./common');
 
 const SchemaMapOptions = require('../lib/options/SchemaMapOptions');
 const assert = require('assert');
-const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -32,7 +31,7 @@ describe('Map', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it('validation', function() {
+  it('validation', async function() {
     const nestedValidateCalls = [];
     const validateCalls = [];
     const TestSchema = new mongoose.Schema({
@@ -56,37 +55,35 @@ describe('Map', function() {
 
     const Test = db.model('MapTest', TestSchema);
 
-    return co(function*() {
-      const doc = yield Test.create({ v: { x: 1 } });
-      assert.deepEqual(nestedValidateCalls, [1]);
-      assert.equal(validateCalls.length, 1);
-      assert.equal(validateCalls[0].get('x'), 1);
+    const doc = await Test.create({ v: { x: 1 } });
+    assert.deepEqual(nestedValidateCalls, [1]);
+    assert.equal(validateCalls.length, 1);
+    assert.equal(validateCalls[0].get('x'), 1);
 
-      assert.ok(doc.v instanceof Map);
+    assert.ok(doc.v instanceof Map);
 
-      let threw = false;
+    let threw = false;
 
-      try {
-        yield Test.create({ v: { notA: 'number' } });
-      } catch (error) {
-        threw = true;
-        assert.ok(!error.errors['v']);
-        assert.ok(error.errors['v.notA']);
-      }
-      assert.ok(threw);
+    try {
+      await Test.create({ v: { notA: 'number' } });
+    } catch (error) {
+      threw = true;
+      assert.ok(!error.errors['v']);
+      assert.ok(error.errors['v.notA']);
+    }
+    assert.ok(threw);
 
-      doc.v.set('y', 5);
+    doc.v.set('y', 5);
 
-      threw = false;
-      try {
-        yield doc.save();
-      } catch (error) {
-        threw = true;
-        assert.ok(!error.errors['v']);
-        assert.ok(error.errors['v.y']);
-      }
-      assert.ok(threw);
-    });
+    threw = false;
+    try {
+      await doc.save();
+    } catch (error) {
+      threw = true;
+      assert.ok(!error.errors['v']);
+      assert.ok(error.errors['v.y']);
+    }
+    assert.ok(threw);
   });
 
   it('deep set', function(done) {
@@ -109,7 +106,7 @@ describe('Map', function() {
     done();
   });
 
-  it('supports delete() (gh-7743)', function() {
+  it('supports delete() (gh-7743)', async function() {
     const Person = db.model('gh7743', new mongoose.Schema({
       name: String,
       fact: {
@@ -119,34 +116,32 @@ describe('Map', function() {
       }
     }));
 
-    return co(function*() {
-      const person = new Person({
-        name: 'Arya Stark',
-        fact: {
-          cool: true,
-          girl: true,
-          killer: true
-        }
-      });
-
-      yield person.save();
-
-      assert.strictEqual(person.fact.get('killer'), true);
-
-      person.fact.delete('killer');
-
-      assert.deepStrictEqual(person.$__delta()[1], { $unset: { 'fact.killer': 1 } });
-      assert.deepStrictEqual(Array.from(person.fact.keys()).sort(), ['cool', 'girl']);
-      assert.strictEqual(person.fact.get('killer'), undefined);
-
-      yield person.save();
-
-      const queryPerson = yield Person.findOne({ name: 'Arya Stark' });
-      assert.strictEqual(queryPerson.fact.get('killer'), undefined);
+    const person = new Person({
+      name: 'Arya Stark',
+      fact: {
+        cool: true,
+        girl: true,
+        killer: true
+      }
     });
+
+    await person.save();
+
+    assert.strictEqual(person.fact.get('killer'), true);
+
+    person.fact.delete('killer');
+
+    assert.deepStrictEqual(person.$__delta()[1], { $unset: { 'fact.killer': 1 } });
+    assert.deepStrictEqual(Array.from(person.fact.keys()).sort(), ['cool', 'girl']);
+    assert.strictEqual(person.fact.get('killer'), undefined);
+
+    await person.save();
+
+    const queryPerson = await Person.findOne({ name: 'Arya Stark' });
+    assert.strictEqual(queryPerson.fact.get('killer'), undefined);
   });
 
-  it('query casting', function() {
+  it('query casting', async function() {
     const TestSchema = new mongoose.Schema({
       v: {
         type: Map,
@@ -156,37 +151,35 @@ describe('Map', function() {
 
     const Test = db.model('MapQueryTest', TestSchema);
 
-    return co(function*() {
-      const docs = yield Test.create([
-        { v: { n: 1 } },
-        { v: { n: 2 } }
-      ]);
+    const docs = await Test.create([
+      { v: { n: 1 } },
+      { v: { n: 2 } }
+    ]);
 
-      let res = yield Test.find({ 'v.n': 1 });
-      assert.equal(res.length, 1);
+    let res = await Test.find({ 'v.n': 1 });
+    assert.equal(res.length, 1);
 
-      res = yield Test.find({ v: { n: 2 } });
-      assert.equal(res.length, 1);
+    res = await Test.find({ v: { n: 2 } });
+    assert.equal(res.length, 1);
 
-      yield Test.updateOne({ _id: docs[1]._id }, { 'v.n': 3 });
+    await Test.updateOne({ _id: docs[1]._id }, { 'v.n': 3 });
 
-      res = yield Test.find({ v: { n: 3 } });
-      assert.equal(res.length, 1);
+    res = await Test.find({ v: { n: 3 } });
+    assert.equal(res.length, 1);
 
-      let threw = false;
-      try {
-        yield Test.updateOne({ _id: docs[1]._id }, { 'v.n': 'not a number' });
-      } catch (error) {
-        threw = true;
-        assert.equal(error.name, 'CastError');
-      }
-      assert.ok(threw);
-      res = yield Test.find({ v: { n: 3 } });
-      assert.equal(res.length, 1);
-    });
+    let threw = false;
+    try {
+      await Test.updateOne({ _id: docs[1]._id }, { 'v.n': 'not a number' });
+    } catch (error) {
+      threw = true;
+      assert.equal(error.name, 'CastError');
+    }
+    assert.ok(threw);
+    res = await Test.find({ v: { n: 3 } });
+    assert.equal(res.length, 1);
   });
 
-  it('defaults', function() {
+  it('defaults', async function() {
     const TestSchema = new mongoose.Schema({
       n: Number,
       m: {
@@ -198,21 +191,19 @@ describe('Map', function() {
 
     const Test = db.model('MapDefaultsTest', TestSchema);
 
-    return co(function*() {
-      const doc = new Test({});
-      assert.ok(doc.m instanceof Map);
-      assert.deepEqual(Array.from(doc.toObject().m.keys()), ['bacon', 'eggs']);
+    const doc = new Test({});
+    assert.ok(doc.m instanceof Map);
+    assert.deepEqual(Array.from(doc.toObject().m.keys()), ['bacon', 'eggs']);
 
-      yield Test.updateOne({}, { n: 1 }, { upsert: true });
+    await Test.updateOne({}, { n: 1 }, { upsert: true });
 
-      const saved = yield Test.findOne({ n: 1 });
-      assert.ok(saved);
-      assert.deepEqual(Array.from(saved.toObject().m.keys()),
-        ['bacon', 'eggs']);
-    });
+    const saved = await Test.findOne({ n: 1 });
+    assert.ok(saved);
+    assert.deepEqual(Array.from(saved.toObject().m.keys()),
+      ['bacon', 'eggs']);
   });
 
-  it('validation', function() {
+  it('validation', async function() {
     const TestSchema = new mongoose.Schema({
       ratings: {
         type: Map,
@@ -226,37 +217,35 @@ describe('Map', function() {
 
     const Test = db.model('MapValidationTest', TestSchema);
 
-    return co(function*() {
-      const doc = new Test({ ratings: { github: 11 } });
-      assert.ok(doc.ratings instanceof Map);
+    const doc = new Test({ ratings: { github: 11 } });
+    assert.ok(doc.ratings instanceof Map);
 
-      let threw = false;
-      try {
-        yield doc.save();
-      } catch (err) {
-        threw = true;
-        assert.ok(err.errors['ratings.github']);
-      }
-      assert.ok(threw);
+    let threw = false;
+    try {
+      await doc.save();
+    } catch (err) {
+      threw = true;
+      assert.ok(err.errors['ratings.github']);
+    }
+    assert.ok(threw);
 
-      doc.ratings.set('github', 8);
-      // Shouldn't throw
-      yield doc.save();
+    doc.ratings.set('github', 8);
+    // Shouldn't throw
+    await doc.save();
 
-      threw = false;
-      try {
-        yield Test.updateOne({}, { $set: { 'ratings.github': 11 } }, {
-          runValidators: true
-        });
-      } catch (err) {
-        threw = true;
-        assert.ok(err.errors['ratings.github']);
-      }
-      assert.ok(threw);
-    });
+    threw = false;
+    try {
+      await Test.updateOne({}, { $set: { 'ratings.github': 11 } }, {
+        runValidators: true
+      });
+    } catch (err) {
+      threw = true;
+      assert.ok(err.errors['ratings.github']);
+    }
+    assert.ok(threw);
   });
 
-  it('with single nested subdocs', function() {
+  it('with single nested subdocs', async function() {
     const TestSchema = new mongoose.Schema({
       m: {
         type: Map,
@@ -266,26 +255,24 @@ describe('Map', function() {
 
     const Test = db.model('MapEmbeddedTest', TestSchema);
 
-    return co(function*() {
-      let doc = new Test({ m: { bacon: { n: 2 } } });
+    let doc = new Test({ m: { bacon: { n: 2 } } });
 
-      yield doc.save();
+    await doc.save();
 
-      assert.ok(doc.m instanceof Map);
-      assert.deepEqual(doc.toObject().m.get('bacon').toObject(), { n: 2 });
+    assert.ok(doc.m instanceof Map);
+    assert.deepEqual(doc.toObject().m.get('bacon').toObject(), { n: 2 });
 
-      doc.m.get('bacon').n = 4;
-      yield doc.save();
-      assert.deepEqual(doc.toObject().m.get('bacon').toObject(), { n: 4 });
+    doc.m.get('bacon').n = 4;
+    await doc.save();
+    assert.deepEqual(doc.toObject().m.get('bacon').toObject(), { n: 4 });
 
-      doc = yield Test.findById(doc._id);
+    doc = await Test.findById(doc._id);
 
-      assert.deepEqual(doc.toObject().m.get('bacon').toObject(), { n: 4 });
-    });
+    assert.deepEqual(doc.toObject().m.get('bacon').toObject(), { n: 4 });
   });
 
   describe('populate', function() {
-    it('populate individual path', function() {
+    it('populate individual path', async function() {
       const UserSchema = new mongoose.Schema({
         keys: {
           type: Map,
@@ -301,26 +288,24 @@ describe('Map', function() {
       const User = db.model('User', UserSchema);
       const Key = db.model('Test', KeySchema);
 
-      return co(function*() {
-        const key = yield Key.create({ key: 'abc123' });
-        const key2 = yield Key.create({ key: 'key' });
+      const key = await Key.create({ key: 'abc123' });
+      const key2 = await Key.create({ key: 'key' });
 
-        const doc = yield User.create({ keys: { github: key._id } });
+      const doc = await User.create({ keys: { github: key._id } });
 
-        const populated = yield User.findById(doc).populate('keys.github');
+      const populated = await User.findById(doc).populate('keys.github');
 
-        assert.equal(populated.keys.get('github').key, 'abc123');
+      assert.equal(populated.keys.get('github').key, 'abc123');
 
-        populated.keys.set('twitter', key2._id);
+      populated.keys.set('twitter', key2._id);
 
-        yield populated.save();
+      await populated.save();
 
-        const rawDoc = yield User.collection.findOne({ _id: doc._id });
-        assert.deepEqual(rawDoc.keys, { github: key._id, twitter: key2._id });
-      });
+      const rawDoc = await User.collection.findOne({ _id: doc._id });
+      assert.deepEqual(rawDoc.keys, { github: key._id, twitter: key2._id });
     });
 
-    it('populate entire map', function() {
+    it('populate entire map', async function() {
       const UserSchema = new mongoose.Schema({
         apiKeys: {
           type: Map,
@@ -336,20 +321,18 @@ describe('Map', function() {
       const User = db.model('User', UserSchema);
       const Key = db.model('Test', KeySchema);
 
-      return co(function*() {
-        const key = yield Key.create({ key: 'abc123' });
-        const key2 = yield Key.create({ key: 'key' });
+      const key = await Key.create({ key: 'abc123' });
+      const key2 = await Key.create({ key: 'key' });
 
-        const doc = yield User.create({ apiKeys: { github: key._id, twitter: key2._id } });
+      const doc = await User.create({ apiKeys: { github: key._id, twitter: key2._id } });
 
-        const populated = yield User.findById(doc).populate('apiKeys');
+      const populated = await User.findById(doc).populate('apiKeys');
 
-        assert.equal(populated.apiKeys.get('github').key, 'abc123');
-        assert.equal(populated.apiKeys.get('twitter').key, 'key');
-      });
+      assert.equal(populated.apiKeys.get('github').key, 'abc123');
+      assert.equal(populated.apiKeys.get('twitter').key, 'key');
     });
 
-    it('populate entire map in doc', function() {
+    it('populate entire map in doc', async function() {
       const UserSchema = new mongoose.Schema({
         apiKeys: {
           type: Map,
@@ -365,21 +348,19 @@ describe('Map', function() {
       const User = db.model('User', UserSchema);
       const Key = db.model('Test', KeySchema);
 
-      return co(function*() {
-        const key = yield Key.create({ key: 'abc123' });
-        const key2 = yield Key.create({ key: 'key' });
+      const key = await Key.create({ key: 'abc123' });
+      const key2 = await Key.create({ key: 'key' });
 
-        const doc = yield User.create({ apiKeys: { github: key._id, twitter: key2._id } });
+      const doc = await User.create({ apiKeys: { github: key._id, twitter: key2._id } });
 
-        const _doc = yield User.findById(doc);
-        yield _doc.populate('apiKeys');
+      const _doc = await User.findById(doc);
+      await _doc.populate('apiKeys');
 
-        assert.equal(_doc.apiKeys.get('github').key, 'abc123');
-        assert.equal(_doc.apiKeys.get('twitter').key, 'key');
-      });
+      assert.equal(_doc.apiKeys.get('github').key, 'abc123');
+      assert.equal(_doc.apiKeys.get('twitter').key, 'key');
     });
 
-    it('avoid populating as map if populate on obj (gh-6460) (gh-8157)', function() {
+    it('avoid populating as map if populate on obj (gh-6460) (gh-8157)', async function() {
       const UserSchema = new mongoose.Schema({
         apiKeys: {}
       });
@@ -389,22 +370,20 @@ describe('Map', function() {
       const User = db.model('User', UserSchema);
       const Key = db.model('Test', KeySchema);
 
-      return co(function*() {
-        const key = yield Key.create({ key: 'abc123' });
-        const key2 = yield Key.create({ key: 'key' });
+      const key = await Key.create({ key: 'abc123' });
+      const key2 = await Key.create({ key: 'key' });
 
-        const doc = yield User.create({ apiKeys: { github: key._id, twitter: key2._id } });
+      const doc = await User.create({ apiKeys: { github: key._id, twitter: key2._id } });
 
-        const populated = yield User.findById(doc).populate({
-          path: 'apiKeys',
-          skipInvalidIds: true
-        });
-        assert.ok(!(populated.apiKeys instanceof Map));
-        assert.ok(!Array.isArray(populated.apiKeys));
+      const populated = await User.findById(doc).populate({
+        path: 'apiKeys',
+        skipInvalidIds: true
       });
+      assert.ok(!(populated.apiKeys instanceof Map));
+      assert.ok(!Array.isArray(populated.apiKeys));
     });
 
-    it('handles setting populated path to doc and then saving (gh-7745)', function() {
+    it('handles setting populated path to doc and then saving (gh-7745)', async function() {
       const Scene = db.model('Test', new mongoose.Schema({
         name: String
       }));
@@ -420,22 +399,20 @@ describe('Map', function() {
         }
       }));
 
-      return co(function*() {
-        const foo = yield Scene.create({ name: 'foo' });
-        let event = yield Event.create({ scenes: { foo: foo._id } });
+      const foo = await Scene.create({ name: 'foo' });
+      let event = await Event.create({ scenes: { foo: foo._id } });
 
-        event = yield Event.findOne().populate('scenes.$*');
-        const bar = yield Scene.create({ name: 'bar' });
-        event.scenes.set('bar', bar);
-        yield event.save();
+      event = await Event.findOne().populate('scenes.$*');
+      const bar = await Scene.create({ name: 'bar' });
+      event.scenes.set('bar', bar);
+      await event.save();
 
-        event = yield Event.findOne().populate('scenes.$*');
-        assert.ok(event.scenes.has('bar'));
-        assert.equal(event.scenes.get('bar').name, 'bar');
-      });
+      event = await Event.findOne().populate('scenes.$*');
+      assert.ok(event.scenes.has('bar'));
+      assert.equal(event.scenes.get('bar').name, 'bar');
     });
 
-    it('handles populating path of subdoc (gh-9359)', function() {
+    it('handles populating path of subdoc (gh-9359)', async function() {
       const bookSchema = Schema({
         author: {
           type: 'ObjectId',
@@ -454,32 +431,30 @@ describe('Map', function() {
       const Person = db.model('Person', Schema({ name: String }));
       const Test = db.model('Test', schema);
 
-      return co(function*() {
-        const person = yield Person.create({ name: 'Ian Fleming' });
-        yield Test.create({
-          books: {
-            key1: {
-              title: 'Casino Royale',
-              author: person._id
-            }
+      const person = await Person.create({ name: 'Ian Fleming' });
+      await Test.create({
+        books: {
+          key1: {
+            title: 'Casino Royale',
+            author: person._id
           }
-        });
-
-        let doc = yield Test.findOne().populate('books.$*.author');
-
-        assert.equal(doc.books.get('key1').author.name, 'Ian Fleming');
-
-        doc.books.set('key2', { title: 'Live and Let Die', author: person._id });
-        yield doc.save();
-
-        doc = yield Test.findOne().populate('books.$*.author');
-
-        assert.equal(doc.books.get('key2').author.name, 'Ian Fleming');
+        }
       });
+
+      let doc = await Test.findOne().populate('books.$*.author');
+
+      assert.equal(doc.books.get('key1').author.name, 'Ian Fleming');
+
+      doc.books.set('key2', { title: 'Live and Let Die', author: person._id });
+      await doc.save();
+
+      doc = await Test.findOne().populate('books.$*.author');
+
+      assert.equal(doc.books.get('key2').author.name, 'Ian Fleming');
     });
   });
 
-  it('discriminators', function() {
+  it('discriminators', async function() {
     const TestSchema = new mongoose.Schema({
       n: Number
     });
@@ -493,19 +468,17 @@ describe('Map', function() {
       }
     }));
 
-    return co(function*() {
-      const doc = new Disc({ m: { test: 1 } });
-      assert.ok(doc.m instanceof Map);
-      assert.deepEqual(Array.from(doc.toObject().m.keys()), ['test']);
-      yield doc.save();
+    const doc = new Disc({ m: { test: 1 } });
+    assert.ok(doc.m instanceof Map);
+    assert.deepEqual(Array.from(doc.toObject().m.keys()), ['test']);
+    await doc.save();
 
-      const fromDb = yield Disc.findOne({ 'm.test': 1 });
-      assert.ok(fromDb);
-      assert.equal(fromDb._id.toHexString(), doc._id.toHexString());
-    });
+    const fromDb = await Disc.findOne({ 'm.test': 1 });
+    assert.ok(fromDb);
+    assert.equal(fromDb._id.toHexString(), doc._id.toHexString());
   });
 
-  it('embedded discriminators', function() {
+  it('embedded discriminators', async function() {
     const EmployeeSchema = new mongoose.Schema({
       name: String
     }, { _id: false, id: false });
@@ -527,34 +500,32 @@ describe('Map', function() {
 
     const Department = db.model('Test', DepartmentSchema);
 
-    return co(function*() {
-      const dept = new Department({
-        employees: [
-          { __t: 'Sales', name: 'E1', clients: ['test1', 'test2'] },
-          { __t: 'Engineering', name: 'E2', apiKeys: { github: 'test3' } }
-        ]
-      });
-
-      assert.deepEqual(dept.toObject().employees[0],
-        { __t: 'Sales', name: 'E1', clients: ['test1', 'test2'] });
-
-      assert.deepEqual(Array.from(dept.toObject().employees[1].apiKeys.values()),
-        ['test3']);
-
-      yield dept.save();
-
-      let fromDb = yield Department.findOne({ 'employees.apiKeys.github': 'test3' });
-      assert.ok(fromDb);
-
-      dept.employees[1].apiKeys.set('github', 'test4');
-      yield dept.save();
-
-      fromDb = yield Department.findOne({ 'employees.apiKeys.github': 'test4' });
-      assert.ok(fromDb);
+    const dept = new Department({
+      employees: [
+        { __t: 'Sales', name: 'E1', clients: ['test1', 'test2'] },
+        { __t: 'Engineering', name: 'E2', apiKeys: { github: 'test3' } }
+      ]
     });
+
+    assert.deepEqual(dept.toObject().employees[0],
+      { __t: 'Sales', name: 'E1', clients: ['test1', 'test2'] });
+
+    assert.deepEqual(Array.from(dept.toObject().employees[1].apiKeys.values()),
+      ['test3']);
+
+    await dept.save();
+
+    let fromDb = await Department.findOne({ 'employees.apiKeys.github': 'test3' });
+    assert.ok(fromDb);
+
+    dept.employees[1].apiKeys.set('github', 'test4');
+    await dept.save();
+
+    fromDb = await Department.findOne({ 'employees.apiKeys.github': 'test4' });
+    assert.ok(fromDb);
   });
 
-  it('toJSON seralizes map paths (gh-6478)', function() {
+  it('toJSON seralizes map paths (gh-6478)', async function() {
     const schema = new mongoose.Schema({
       str: {
         type: Map,
@@ -579,67 +550,61 @@ describe('Map', function() {
     assert.deepEqual(test.str.toJSON(), { testing: '123' });
     assert.deepEqual(test.num.toJSON(), { testing: 456 });
 
-    return co(function*() {
-      yield test.save();
+    await test.save();
 
-      const found = yield Test.findOne();
-      assert.deepEqual(found.str.toJSON(), { testing: '123' });
-      assert.deepEqual(found.num.toJSON(), { testing: 456 });
-    });
+    const found = await Test.findOne();
+    assert.deepEqual(found.str.toJSON(), { testing: '123' });
+    assert.deepEqual(found.num.toJSON(), { testing: 456 });
   });
 
-  it('updating map doesnt crash (gh-6750)', function() {
-    return co(function*() {
-      const Schema = mongoose.Schema;
-      const User = db.model('User', {
-        maps: { type: Map, of: String, default: {} }
-      });
-
-      const Post = db.model('BlogPost', {
-        user: { type: Schema.Types.ObjectId, ref: 'User' }
-      });
-
-      const user = yield User.create({});
-      const doc = yield Post.
-        findOneAndUpdate({}, { user: user }, { upsert: true, new: true });
-      assert.ok(doc);
-      assert.equal(doc.user.toHexString(), user._id.toHexString());
+  it('updating map doesnt crash (gh-6750)', async function() {
+    const Schema = mongoose.Schema;
+    const User = db.model('User', {
+      maps: { type: Map, of: String, default: {} }
     });
+
+    const Post = db.model('BlogPost', {
+      user: { type: Schema.Types.ObjectId, ref: 'User' }
+    });
+
+    const user = await User.create({});
+    const doc = await Post.
+      findOneAndUpdate({}, { user: user }, { upsert: true, new: true });
+    assert.ok(doc);
+    assert.equal(doc.user.toHexString(), user._id.toHexString());
   });
 
-  it('works with sub doc hooks (gh-6938)', function() {
-    return co(function*() {
-      const Schema = mongoose.Schema;
-      let subDocHooksCalledTimes = 0;
-      let mapChildHooksCalledTimes = 0;
-      const mapChildSchema = new Schema({
-        y: Number
-      });
-      mapChildSchema.pre('save', function() {
-        mapChildHooksCalledTimes++;
-      });
-      const mapSchema = new Schema({
-        x: String,
-        child: mapChildSchema
-      });
-      mapSchema.pre('save', function() {
-        subDocHooksCalledTimes++;
-      });
-      const schema = new Schema({
-        widgets: {
-          type: Map,
-          of: mapSchema
-        }
-      });
-
-      const Test = db.model('Test', schema);
-      const test = new Test({ widgets: { one: { x: 'a' } } });
-      test.widgets.set('two', { x: 'b' });
-      test.widgets.set('three', { x: 'c', child: { y: 2018 } });
-      yield test.save();
-      assert.strictEqual(subDocHooksCalledTimes, 3);
-      assert.strictEqual(mapChildHooksCalledTimes, 1);
+  it('works with sub doc hooks (gh-6938)', async function() {
+    const Schema = mongoose.Schema;
+    let subDocHooksCalledTimes = 0;
+    let mapChildHooksCalledTimes = 0;
+    const mapChildSchema = new Schema({
+      y: Number
     });
+    mapChildSchema.pre('save', function() {
+      mapChildHooksCalledTimes++;
+    });
+    const mapSchema = new Schema({
+      x: String,
+      child: mapChildSchema
+    });
+    mapSchema.pre('save', function() {
+      subDocHooksCalledTimes++;
+    });
+    const schema = new Schema({
+      widgets: {
+        type: Map,
+        of: mapSchema
+      }
+    });
+
+    const Test = db.model('Test', schema);
+    const test = new Test({ widgets: { one: { x: 'a' } } });
+    test.widgets.set('two', { x: 'b' });
+    test.widgets.set('three', { x: 'c', child: { y: 2018 } });
+    await test.save();
+    assert.strictEqual(subDocHooksCalledTimes, 3);
+    assert.strictEqual(mapChildHooksCalledTimes, 1);
   });
 
   it('array of mixed maps (gh-6995)', function() {
@@ -651,7 +616,7 @@ describe('Map', function() {
       });
   });
 
-  it('only runs setters once on init (gh-7272)', function() {
+  it('only runs setters once on init (gh-7272)', async function() {
     let setterContext = [];
     function set(v) {
       setterContext.push(this);
@@ -675,19 +640,17 @@ describe('Map', function() {
 
     const Parent = db.model('Parent', ParentSchema);
 
-    return co(function*() {
-      yield Parent.create({ children: { luke: { age: 30 } } });
+    await Parent.create({ children: { luke: { age: 30 } } });
 
-      setterContext = [];
+    setterContext = [];
 
-      yield Parent.findOne({ 'children.luke.age': 30 });
+    await Parent.findOne({ 'children.luke.age': 30 });
 
-      assert.equal(setterContext.length, 1);
-      assert.ok(setterContext[0] instanceof mongoose.Query);
-    });
+    assert.equal(setterContext.length, 1);
+    assert.ok(setterContext[0] instanceof mongoose.Query);
   });
 
-  it('init then set marks correct path as modified (gh-7321)', function() {
+  it('init then set marks correct path as modified (gh-7321)', async function() {
     const childSchema = new mongoose.Schema({ name: String });
 
     const parentSchema = new mongoose.Schema({
@@ -699,26 +662,24 @@ describe('Map', function() {
 
     const Parent = db.model('Parent', parentSchema);
 
-    return co(function*() {
-      const first = yield Parent.create({
-        children: {
-          one: { name: 'foo' }
-        }
-      });
-
-      let loaded = yield Parent.findById(first.id);
-      assert.equal(loaded.get('children.one.name'), 'foo');
-
-      loaded.children.get('one').set('name', 'bar');
-
-      yield loaded.save();
-
-      loaded = yield Parent.findById(first.id);
-      assert.equal(loaded.get('children.one.name'), 'bar');
+    const first = await Parent.create({
+      children: {
+        one: { name: 'foo' }
+      }
     });
+
+    let loaded = await Parent.findById(first.id);
+    assert.equal(loaded.get('children.one.name'), 'foo');
+
+    loaded.children.get('one').set('name', 'bar');
+
+    await loaded.save();
+
+    loaded = await Parent.findById(first.id);
+    assert.equal(loaded.get('children.one.name'), 'bar');
   });
 
-  it('nested maps (gh-7630)', function() {
+  it('nested maps (gh-7630)', async function() {
     const schema = new mongoose.Schema({
       describe: {
         type: Map,
@@ -733,12 +694,10 @@ describe('Map', function() {
     goodsInfo.describe = new Map();
     goodsInfo.describe.set('brand', new Map([['en', 'Hermes']]));
 
-    return co(function*() {
-      yield goodsInfo.save();
+    await goodsInfo.save();
 
-      goodsInfo = yield GoodsInfo.findById(goodsInfo);
-      assert.equal(goodsInfo.get('describe.brand.en'), 'Hermes');
-    });
+    goodsInfo = await GoodsInfo.findById(goodsInfo);
+    assert.equal(goodsInfo.get('describe.brand.en'), 'Hermes');
   });
 
   it('get full path in validator with `propsParameter` (gh-7447)', function() {
@@ -826,7 +785,7 @@ describe('Map', function() {
     assert.ok(!doc.myMap.get('foo')._id);
   });
 
-  it('avoids marking path as modified if setting to same value (gh-8652)', function() {
+  it('avoids marking path as modified if setting to same value (gh-8652)', async function() {
     const childSchema = mongoose.Schema({ name: String }, { _id: false });
     const schema = mongoose.Schema({
       numMap: {
@@ -840,29 +799,27 @@ describe('Map', function() {
     });
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      yield Model.create({
-        numMap: {
-          answer: 42,
-          powerLevel: 9001
-        },
-        docMap: {
-          captain: { name: 'Jean-Luc Picard' },
-          firstOfficer: { name: 'Will Riker' }
-        }
-      });
-      const doc = yield Model.findOne();
-
-      doc.numMap.set('answer', 42);
-      doc.numMap.set('powerLevel', 9001);
-      doc.docMap.set('captain', { name: 'Jean-Luc Picard' });
-      doc.docMap.set('firstOfficer', { name: 'Will Riker' });
-
-      assert.deepEqual(doc.modifiedPaths(), []);
+    await Model.create({
+      numMap: {
+        answer: 42,
+        powerLevel: 9001
+      },
+      docMap: {
+        captain: { name: 'Jean-Luc Picard' },
+        firstOfficer: { name: 'Will Riker' }
+      }
     });
+    const doc = await Model.findOne();
+
+    doc.numMap.set('answer', 42);
+    doc.numMap.set('powerLevel', 9001);
+    doc.docMap.set('captain', { name: 'Jean-Luc Picard' });
+    doc.docMap.set('firstOfficer', { name: 'Will Riker' });
+
+    assert.deepEqual(doc.modifiedPaths(), []);
   });
 
-  it('handles setting map value to spread document (gh-8652)', function() {
+  it('handles setting map value to spread document (gh-8652)', async function() {
     const childSchema = mongoose.Schema({ name: String }, { _id: false });
     const schema = mongoose.Schema({
       docMap: {
@@ -872,21 +829,19 @@ describe('Map', function() {
     });
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      yield Model.create({
-        docMap: {
-          captain: { name: 'Jean-Luc Picard' },
-          firstOfficer: { name: 'Will Riker' }
-        }
-      });
-      const doc = yield Model.findOne();
-
-      doc.docMap.set('captain', Object.assign({}, doc.docMap.get('firstOfficer')));
-      yield doc.save();
-
-      const fromDb = yield Model.findOne();
-      assert.equal(fromDb.docMap.get('firstOfficer').name, 'Will Riker');
+    await Model.create({
+      docMap: {
+        captain: { name: 'Jean-Luc Picard' },
+        firstOfficer: { name: 'Will Riker' }
+      }
     });
+    const doc = await Model.findOne();
+
+    doc.docMap.set('captain', Object.assign({}, doc.docMap.get('firstOfficer')));
+    await doc.save();
+
+    const fromDb = await Model.findOne();
+    assert.equal(fromDb.docMap.get('firstOfficer').name, 'Will Riker');
   });
 
   it('runs getters on map values (gh-8730)', function() {
@@ -942,7 +897,7 @@ describe('Map', function() {
     return doc.validate();
   });
 
-  it('persists `.clear()` (gh-9493)', function() {
+  it('persists `.clear()` (gh-9493)', async function() {
     const BoardSchema = new Schema({
       _id: { type: String },
       elements: { type: Map, default: new Map() }
@@ -950,41 +905,37 @@ describe('Map', function() {
 
     const BoardModel = db.model('Test', BoardSchema);
 
-    return co(function*() {
-      let board = new BoardModel({ _id: 'test' });
-      board.elements.set('a', 1);
-      yield board.save();
+    let board = new BoardModel({ _id: 'test' });
+    board.elements.set('a', 1);
+    await board.save();
 
-      board = yield BoardModel.findById('test').exec();
-      board.elements.clear();
-      yield board.save();
+    board = await BoardModel.findById('test').exec();
+    board.elements.clear();
+    await board.save();
 
-      board = yield BoardModel.findById('test').exec();
-      assert.equal(board.elements.size, 0);
-    });
+    board = await BoardModel.findById('test').exec();
+    assert.equal(board.elements.size, 0);
   });
 
-  it('supports `null` in map of subdocuments (gh-9628)', function() {
+  it('supports `null` in map of subdocuments (gh-9628)', async function() {
     const testSchema = new Schema({
       messages: { type: Map, of: new Schema({ _id: false, text: String }) }
     });
 
     const Test = db.model('Test', testSchema);
 
-    return co(function*() {
-      let doc = yield Test.create({
-        messages: { prop1: { text: 'test' }, prop2: null }
-      });
-
-      doc = yield Test.findById(doc);
-
-      assert.deepEqual(doc.messages.get('prop1').toObject(), { text: 'test' });
-      assert.strictEqual(doc.messages.get('prop2'), null);
-      assert.ifError(doc.validateSync());
+    let doc = await Test.create({
+      messages: { prop1: { text: 'test' }, prop2: null }
     });
+
+    doc = await Test.findById(doc);
+
+    assert.deepEqual(doc.messages.get('prop1').toObject(), { text: 'test' });
+    assert.strictEqual(doc.messages.get('prop2'), null);
+    assert.ifError(doc.validateSync());
   });
 
-  it('tracks changes correctly (gh-9811)', function() {
+  it('tracks changes correctly (gh-9811)', async function() {
     const SubSchema = Schema({
       myValue: {
         type: String
@@ -1000,18 +951,16 @@ describe('Map', function() {
       }
     }, { minimize: false, collection: 'test' });
     const Model = db.model('Test', schema);
-    return co(function*() {
-      const doc = yield Model.create({
-        myMap: new Map()
-      });
-      doc.myMap.set('abc', { myValue: 'some value' });
-      const changes = doc.getChanges();
-      assert.ok(!changes.$unset);
-      assert.deepEqual(changes, { $set: { 'myMap.abc': { myValue: 'some value' } } });
+    const doc = await Model.create({
+      myMap: new Map()
     });
+    doc.myMap.set('abc', { myValue: 'some value' });
+    const changes = doc.getChanges();
+    assert.ok(!changes.$unset);
+    assert.deepEqual(changes, { $set: { 'myMap.abc': { myValue: 'some value' } } });
   });
 
-  it('handles map of arrays (gh-9813)', function() {
+  it('handles map of arrays (gh-9813)', async function() {
     const BudgetSchema = new mongoose.Schema({
       budgeted: {
         type: Map,
@@ -1021,19 +970,17 @@ describe('Map', function() {
 
     const Budget = db.model('Test', BudgetSchema);
 
-    return co(function*() {
-      const _id = yield Budget.create({
-        budgeted: new Map([['2020', [100, 200, 300]]])
-      }).then(doc => doc._id);
+    const _id = await Budget.create({
+      budgeted: new Map([['2020', [100, 200, 300]]])
+    }).then(doc => doc._id);
 
-      const doc = yield Budget.findById(_id);
-      doc.budgeted.get('2020').set(2, 10);
-      assert.deepEqual(doc.getChanges(), { $set: { 'budgeted.2020.2': 10 } });
-      yield doc.save();
+    const doc = await Budget.findById(_id);
+    doc.budgeted.get('2020').set(2, 10);
+    assert.deepEqual(doc.getChanges(), { $set: { 'budgeted.2020.2': 10 } });
+    await doc.save();
 
-      const res = yield Budget.findOne();
-      assert.deepEqual(res.toObject().budgeted.get('2020'), [100, 200, 10]);
-    });
+    const res = await Budget.findOne();
+    assert.deepEqual(res.toObject().budgeted.get('2020'), [100, 200, 10]);
   });
 
   it('can populate map of subdocs with doc array using ref function (gh-10584)', async function() {

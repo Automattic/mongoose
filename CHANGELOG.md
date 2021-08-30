@@ -1,3 +1,7 @@
+6.0.3 / 2021-08-30
+==================
+ * fix: handle buffering with find() now that find() no longer accepts a callback #10639 #10634 #10610
+
 6.0.2 / 2021-08-26
 ==================
  * fix(query): handle find() when buffering on initial connection #10610

@@ -18,10 +18,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Upgrade Node 5 npm
-        run: npm install -g npm@3
-        if: ${{ matrix.node == 5 }}
-
       - run: npm install
 
       - name: Setup

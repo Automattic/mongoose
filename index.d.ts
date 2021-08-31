@@ -1066,6 +1066,11 @@ declare module 'mongoose' {
     timestamps?: boolean;
     upsert?: boolean;
     writeConcern?: any;
+    /**
+    * If set to `true` this will delete any properties whose value is undefined when casting an update. 
+    * In other words, if this is set, Mongoose will delete baz from the update in Model.updateOne({}, { foo: 'bar', baz: undefined }) before sending the update to the server.
+    */
+    omitUndefined?: boolean
   }
 
   type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'strict' | 'sanitizeProjection' | 'sanitizeFilter'>;

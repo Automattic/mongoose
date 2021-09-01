@@ -37,10 +37,7 @@ run().catch(err => console.log(err));
 
 async function run(): Promise<void> {
   // 4. Connect to MongoDB
-  await connect('mongodb://localhost:27017/test', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  });
+  await connect('mongodb://localhost:27017/test');
 
   const doc = new UserModel({
     name: 'Bill',

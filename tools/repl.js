@@ -1,8 +1,12 @@
 'use strict';
 
 const co = require('co');
+run().catch(error => {
+  console.error(error);
+  process.exit(-1);
+});
 
-co(function*() {
+async function run () {
   const ReplSet = require('mongodb-topology-manager').ReplSet;
 
   // Create new instance
@@ -27,10 +31,7 @@ co(function*() {
     replSet: 'rs'
   });
 
-  yield topology.start();
+  await topology.start();
 
   console.log('done');
-}).catch(error => {
-  console.error(error);
-  process.exit(-1);
-});
+}

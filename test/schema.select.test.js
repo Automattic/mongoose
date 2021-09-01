@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
@@ -424,43 +423,39 @@ describe('schema select option', function() {
       });
     });
 
-    it('ignores if path does not have select in schema (gh-6785)', function() {
+    it('ignores if path does not have select in schema (gh-6785)', async function() {
       const M = db.model('Test', new Schema({
         a: String,
         b: String
       }));
 
-      return co(function*() {
-        yield M.create({ a: 'foo', b: 'bar' });
+      await M.create({ a: 'foo', b: 'bar' });
 
-        const doc = yield M.findOne().select('+a');
-        assert.equal(doc.a, 'foo');
-        assert.equal(doc.b, 'bar');
-      });
+      const doc = await M.findOne().select('+a');
+      assert.equal(doc.a, 'foo');
+      assert.equal(doc.b, 'bar');
     });
 
-    it('omits if not in schema (gh-7017)', function() {
+    it('omits if not in schema (gh-7017)', async function() {
       const M = db.model('Test', new Schema({
         a: { type: String, select: false },
         b: { type: String, select: false }
       }), 'Test');
 
-      return co(function*() {
-        yield db.$initialConnection;
-        yield db.collection('Test').insertOne({
-          a: 'foo',
-          b: 'bar',
-          c: 'baz'
-        });
-
-        const q = M.find({}).select('+c');
-        const doc = yield q.then(res => res[0]);
-        assert.deepEqual(q._fields, { a: 0, b: 0 });
-
-        assert.strictEqual(doc.a, void 0);
-        assert.strictEqual(doc.b, void 0);
-        assert.equal(doc.toObject().c, 'baz');
+      await db.$initialConnection;
+      await db.collection('Test').insertOne({
+        a: 'foo',
+        b: 'bar',
+        c: 'baz'
       });
+
+      const q = M.find({}).select('+c');
+      const doc = await q.then(res => res[0]);
+      assert.deepEqual(q._fields, { a: 0, b: 0 });
+
+      assert.strictEqual(doc.a, void 0);
+      assert.strictEqual(doc.b, void 0);
+      assert.equal(doc.toObject().c, 'baz');
     });
   });
 

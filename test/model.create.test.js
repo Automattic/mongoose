@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -189,14 +188,12 @@ describe('model', function() {
           catch(done);
       });
 
-      it('when passed an empty array, returns an empty array', function() {
-        return co(function*() {
-          const userSchema = new Schema({ name: String });
-          const User = db.model('User', userSchema);
+      it('when passed an empty array, returns an empty array', async function() {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
 
-          const users = yield User.create([]);
-          assert.deepEqual(users, []);
-        });
+        const users = await User.create([]);
+        assert.deepEqual(users, []);
       });
 
       it('treats undefined first arg as doc rather than callback (gh-9765)', function() {

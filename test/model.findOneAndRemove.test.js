@@ -7,14 +7,13 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
 
-describe('model: findOneAndRemove:', function() {
+describe('model: findOneAndRemove:', async function() {
   let Comments;
   let BlogPost;
   let db;
@@ -78,22 +77,20 @@ describe('model: findOneAndRemove:', function() {
     BlogPost = db.model('BlogPost', BlogPost);
   });
 
-  it('returns the original document', function() {
+  it('returns the original document', async function() {
     const M = BlogPost;
     const title = 'remove muah';
 
     const post = new M({ title: title });
 
-    return co(function*() {
-      yield post.save();
+    await post.save();
 
-      const doc = yield M.findOneAndRemove({ title: title });
+    const doc = await M.findOneAndRemove({ title: title });
 
-      assert.equal(post.id, doc.id);
+    assert.equal(post.id, doc.id);
 
-      const gone = yield M.findById(post.id);
-      assert.equal(gone, null);
-    });
+    const gone = await M.findById(post.id);
+    assert.equal(gone, null);
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
@@ -326,25 +323,24 @@ describe('model: findOneAndRemove:', function() {
     });
   });
 
-  it('only calls setters once (gh-6203)', function() {
-    return co(function*() {
-      const calls = [];
-      const userSchema = new mongoose.Schema({
-        name: String,
-        foo: {
-          type: String,
-          set: function(val) {
-            calls.push(val);
-            return val + val;
-          }
+  it('only calls setters once (gh-6203)', async function() {
+
+    const calls = [];
+    const userSchema = new mongoose.Schema({
+      name: String,
+      foo: {
+        type: String,
+        set: function(val) {
+          calls.push(val);
+          return val + val;
         }
-      });
-      const Model = db.model('Test', userSchema);
-
-      yield Model.findOneAndRemove({ foo: '123' }, { name: 'bar' });
-
-      assert.deepEqual(calls, ['123']);
+      }
     });
+    const Model = db.model('Test', userSchema);
+
+    await Model.findOneAndRemove({ foo: '123' }, { name: 'bar' });
+
+    assert.deepEqual(calls, ['123']);
   });
 
   it('with orFail() (gh-9381)', function() {

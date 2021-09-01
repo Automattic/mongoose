@@ -8,7 +8,6 @@ const start = require('./common');
 
 const Query = require('../lib/query');
 const assert = require('assert');
-const co = require('co');
 const random = require('../lib/utils').random;
 const util = require('./util');
 
@@ -944,31 +943,29 @@ describe('model: querying:', function() {
       });
     });
 
-    it('where $exists', function() {
+    it('where $exists', async function() {
       const ExistsSchema = new Schema({ a: Number, b: String });
       const Exists = db.model('Test', ExistsSchema);
 
-      return co(function*() {
-        yield Exists.create({ a: 1 }, { b: 'hi' });
-        let docs = yield Exists.find({ b: { $exists: true } });
-        assert.equal(docs.length, 1);
-        assert.equal(docs[0].b, 'hi');
+      await Exists.create({ a: 1 }, { b: 'hi' });
+      let docs = await Exists.find({ b: { $exists: true } });
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].b, 'hi');
 
-        docs = yield Exists.find({ b: { $exists: 'true' } });
-        assert.equal(docs.length, 1);
-        assert.equal(docs[0].b, 'hi');
+      docs = await Exists.find({ b: { $exists: 'true' } });
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].b, 'hi');
 
-        let threw = false;
-        try {
-          yield Exists.find({ b: { $exists: 'foo' } });
-        } catch (error) {
-          threw = true;
-          assert.equal(error.path, 'b');
-          assert.equal(error.value, 'foo');
-          assert.equal(error.name, 'CastError');
-        }
-        assert.ok(threw);
-      });
+      let threw = false;
+      try {
+        await Exists.find({ b: { $exists: 'foo' } });
+      } catch (error) {
+        threw = true;
+        assert.equal(error.path, 'b');
+        assert.equal(error.value, 'foo');
+        assert.equal(error.name, 'CastError');
+      }
+      assert.ok(threw);
     });
 
     it('works with $elemMatch (gh-1100)', function(done) {
@@ -1435,7 +1432,7 @@ describe('model: querying:', function() {
         });
       });
 
-      it('works when text search is called by a schema (gh-3824) (gh-6851)', function() {
+      it('works when text search is called by a schema (gh-3824) (gh-6851)', async function() {
         if (!mongo26_or_greater) {
           return this.skip();
         }
@@ -1448,29 +1445,27 @@ describe('model: querying:', function() {
 
         const Example = db.model('Test', exampleSchema);
 
-        return co(function*() {
-          yield Example.init(); // Wait for index build
-          // Should not error
-          yield Example.findOne({ $text: { $search: 'text search' } });
+        await Example.init(); // Wait for index build
+        // Should not error
+        await Example.findOne({ $text: { $search: 'text search' } });
 
-          yield Example.create({ name: '1234 ABCD', tag: 'test1' });
-          let doc = yield Example.findOne({
-            $text: {
-              $search: 1234 // Will be casted to a string
-            }
-          });
-          assert.ok(doc);
-          assert.equal(doc.tag, 'test1');
-
-          doc = yield Example.findOne({
-            $text: {
-              $search: 'abcd',
-              $caseSensitive: 'no' // Casted to boolean
-            }
-          });
-          assert.ok(doc);
-          assert.equal(doc.tag, 'test1');
+        await Example.create({ name: '1234 ABCD', tag: 'test1' });
+        let doc = await Example.findOne({
+          $text: {
+            $search: 1234 // Will be casted to a string
+          }
         });
+        assert.ok(doc);
+        assert.equal(doc.tag, 'test1');
+
+        doc = await Example.findOne({
+          $text: {
+            $search: 'abcd',
+            $caseSensitive: 'no' // Casted to boolean
+          }
+        });
+        assert.ok(doc);
+        assert.equal(doc.tag, 'test1');
       });
     });
   });
@@ -1838,7 +1833,7 @@ describe('model: querying:', function() {
     });
   });
 
-  it('with conditionals', function(done) {
+  it('with conditionals', async function() {
     // $in $nin etc
     const BufSchema = new Schema({ name: String, block: Buffer });
     const Test = db.model('Test', BufSchema);
@@ -1848,79 +1843,72 @@ describe('model: querying:', function() {
     const docC = { name: 'C', block: new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64') };
     const docD = { name: 'D', block: new MongooseBuffer({ type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] }) };
 
-    Test.create(docA, docB, docC, docD, function(err, a, b, c, d) {
-      if (err) return done(err);
+    const [a, b, c, d] = await Test.create([docA, docB, docC, docD]);
 
-      co(function*() {
-        assert.equal(a.block.toString('utf8'), 'über');
-        assert.equal(b.block.toString('utf8'), 'buffer shtuffs are neat');
-        assert.equal(c.block.toString('utf8'), 'hello world');
-        assert.equal(d.block.toString('utf8'), 'gh-6863');
 
-        const testPromises = [
-          Test.find({ block: {
-            $in: [
-              [195, 188, 98, 101, 114],
-              'buffer shtuffs are neat',
-              Buffer.from('aGVsbG8gd29ybGQ=', 'base64'),
-              { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } // gh-6863
-            ] } }).exec().then(tests => {
-            assert.ifError(err);
-            assert.equal(tests.length, 4);
-          }),
-          Test.find({ block: { $in: ['über', 'hello world'] } }).exec().then(tests => {
-            assert.equal(tests.length, 2);
-          }),
-          Test.find({ block: { $in: ['über'] } }).exec().then(tests => {
-            assert.equal(tests.length, 1);
-            assert.equal(tests[0].block.toString('utf8'), 'über');
-          }),
-          Test.find({ block: { $nin: ['über'] } }).exec().then(tests => {
-            assert.equal(tests.length, 3);
-          }),
-          Test.find({ block: {
-            $nin: [
-              [195, 188, 98, 101, 114],
-              Buffer.from('aGVsbG8gd29ybGQ=', 'base64'),
-              { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } // gh-6863
-            ] } }).exec().then(tests => {
-            assert.ifError(err);
-            assert.equal(tests.length, 1);
-            assert.equal(tests[0].block.toString('utf8'), 'buffer shtuffs are neat');
-          }),
-          Test.find({ block: { $ne: 'über' } }).exec().then(tests => {
-            assert.equal(tests.length, 3);
-          }),
-          Test.find({ block: { $gt: 'über' } }).exec().then(tests => {
-            assert.equal(tests.length, 3);
-          }),
-          Test.find({ block: { $gte: 'über' } }).exec().then(tests => {
-            assert.equal(tests.length, 4);
-          }),
-          Test.find({ block: { $lt: Buffer.from('buffer shtuffs are neat') } }).exec().then(tests => {
-            assert.ifError(err);
-            assert.equal(tests.length, 3);
-            const ret = {};
-            ret[tests[0].block.toString('utf8')] = 1;
-            ret[tests[1].block.toString('utf8')] = 1;
-            ret[tests[2].block.toString('utf8')] = 1;
 
-            assert.ok(ret['über'] !== undefined);
-          }),
-          Test.find({ block: { $lte: 'buffer shtuffs are neat' } }).exec().then(tests => {
-            assert.equal(tests.length, 4);
-          }),
-          Test.find({ block: { $gt: { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } } }).exec().then(tests => {
-            assert.equal(tests.length, 2);
-          })
-        ];
+    assert.equal(a.block.toString('utf8'), 'über');
+    assert.equal(b.block.toString('utf8'), 'buffer shtuffs are neat');
+    assert.equal(c.block.toString('utf8'), 'hello world');
+    assert.equal(d.block.toString('utf8'), 'gh-6863');
 
-        // run all of the tests in parallel
-        yield testPromises;
-        yield Test.deleteOne({});
-        done();
-      }).catch(done);
-    });
+
+    // run all of the tests in parallel
+    await Promise.all([
+      Test.find({ block: {
+        $in: [
+          [195, 188, 98, 101, 114],
+          'buffer shtuffs are neat',
+          Buffer.from('aGVsbG8gd29ybGQ=', 'base64'),
+          { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } // gh-6863
+        ] } }).exec().then(tests => {
+        assert.equal(tests.length, 4);
+      }),
+      Test.find({ block: { $in: ['über', 'hello world'] } }).exec().then(tests => {
+        assert.equal(tests.length, 2);
+      }),
+      Test.find({ block: { $in: ['über'] } }).exec().then(tests => {
+        assert.equal(tests.length, 1);
+        assert.equal(tests[0].block.toString('utf8'), 'über');
+      }),
+      Test.find({ block: { $nin: ['über'] } }).exec().then(tests => {
+        assert.equal(tests.length, 3);
+      }),
+      Test.find({ block: {
+        $nin: [
+          [195, 188, 98, 101, 114],
+          Buffer.from('aGVsbG8gd29ybGQ=', 'base64'),
+          { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } // gh-6863
+        ] } }).exec().then(tests => {
+        assert.equal(tests.length, 1);
+        assert.equal(tests[0].block.toString('utf8'), 'buffer shtuffs are neat');
+      }),
+      Test.find({ block: { $ne: 'über' } }).exec().then(tests => {
+        assert.equal(tests.length, 3);
+      }),
+      Test.find({ block: { $gt: 'über' } }).exec().then(tests => {
+        assert.equal(tests.length, 3);
+      }),
+      Test.find({ block: { $gte: 'über' } }).exec().then(tests => {
+        assert.equal(tests.length, 4);
+      }),
+      Test.find({ block: { $lt: Buffer.from('buffer shtuffs are neat') } }).exec().then(tests => {
+        assert.equal(tests.length, 3);
+        const ret = {};
+        ret[tests[0].block.toString('utf8')] = 1;
+        ret[tests[1].block.toString('utf8')] = 1;
+        ret[tests[2].block.toString('utf8')] = 1;
+
+        assert.ok(ret['über'] !== undefined);
+      }),
+      Test.find({ block: { $lte: 'buffer shtuffs are neat' } }).exec().then(tests => {
+        assert.equal(tests.length, 4);
+      }),
+      Test.find({ block: { $gt: { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } } }).exec().then(tests => {
+        assert.equal(tests.length, 2);
+      })
+    ]);
+    await Test.deleteOne({});
   });
 
   it('with previously existing null values in the db', function(done) {
@@ -2358,20 +2346,18 @@ describe('model: querying:', function() {
           });
         }
       });
-      it('works with legacy 2dsphere pair in schema (gh-6937)', function() {
+      it('works with legacy 2dsphere pair in schema (gh-6937)', async function() {
         if (!mongo24_or_greater) {
           return it.skip();
         }
 
-        return co(function*() {
-          const Model = db.model('Test', schema2dsphere);
-          yield Model.init();
-          const model = new Model();
-          model.loc = [1, 2];
-          yield model.save();
-          const result = yield Model.where('loc').near({ center: { type: 'Point', coordinates: [1, 2] }, maxDistance: 10 });
-          assert.equal(result.length, 1);
-        });
+        const Model = db.model('Test', schema2dsphere);
+        await Model.init();
+        const model = new Model();
+        model.loc = [1, 2];
+        await model.save();
+        const result = await Model.where('loc').near({ center: { type: 'Point', coordinates: [1, 2] }, maxDistance: 10 });
+        assert.equal(result.length, 1);
       });
     });
   });

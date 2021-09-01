@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 const random = require('../lib/utils').random;
 const util = require('./util');
 
@@ -1598,7 +1597,7 @@ describe('Model', function() {
       });
     });
 
-    it('handles query vs document middleware (gh-3054)', function() {
+    it('handles query vs document middleware (gh-3054)', async function() {
       const schema = new Schema({ name: String });
 
       let docMiddleware = 0;
@@ -1616,20 +1615,19 @@ describe('Model', function() {
 
       const Model = db.model('Test', schema);
 
-      return co(function*() {
-        const doc = yield Model.create({ name: String });
 
-        assert.equal(docMiddleware, 0);
-        assert.equal(queryMiddleware, 0);
-        yield doc.remove();
+      const doc = await Model.create({ name: String });
 
-        assert.equal(docMiddleware, 1);
-        assert.equal(queryMiddleware, 0);
+      assert.equal(docMiddleware, 0);
+      assert.equal(queryMiddleware, 0);
+      await doc.remove();
 
-        yield Model.remove({});
-        assert.equal(docMiddleware, 1);
-        assert.equal(queryMiddleware, 1);
-      });
+      assert.equal(docMiddleware, 1);
+      assert.equal(queryMiddleware, 0);
+
+      await Model.remove({});
+      assert.equal(docMiddleware, 1);
+      assert.equal(queryMiddleware, 1);
     });
 
     describe('when called multiple times', function() {
@@ -3826,7 +3824,7 @@ describe('Model', function() {
         });
       });
     });
-    it('is saved object with proper defaults', function() {
+    it('is saved object with proper defaults', async function() {
       const schema = new Schema({
         foo: {
           x: { type: String },
@@ -3848,23 +3846,23 @@ describe('Model', function() {
         boo: {}
       });
 
-      return co(function*() {
-        yield doc.save();
-        assert.equal(doc.bee.x, false);
-        assert.equal(doc.bee.y, false);
-        assert.equal(doc.boo.x, false);
 
-        doc.bee = undefined;
-        doc.boo = undefined;
+      await doc.save();
+      assert.equal(doc.bee.x, false);
+      assert.equal(doc.bee.y, false);
+      assert.equal(doc.boo.x, false);
 
-        yield doc.save();
+      doc.bee = undefined;
+      doc.boo = undefined;
 
-        const docAfterUnsetting = yield Test.findById(doc._id);
+      await doc.save();
 
-        assert.equal(docAfterUnsetting.bee.x, false);
-        assert.equal(docAfterUnsetting.bee.y, false);
-        assert.equal(docAfterUnsetting.boo.x, false);
-      });
+      const docAfterUnsetting = await Test.findById(doc._id);
+
+      assert.equal(docAfterUnsetting.bee.x, false);
+      assert.equal(docAfterUnsetting.bee.y, false);
+      assert.equal(docAfterUnsetting.boo.x, false);
+
     });
 
   });
@@ -4017,7 +4015,7 @@ describe('Model', function() {
 
     this.timeout(5000);
 
-    it('2dsphere indexed field with value is saved', function() {
+    it('2dsphere indexed field with value is saved', async function() {
       const PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4033,19 +4031,19 @@ describe('Model', function() {
         loc: loc
       });
 
-      return co(function*() {
-        yield Person.createIndexes();
 
-        yield p.save();
+      await Person.createIndexes();
 
-        const personDoc = yield Person.findById(p._id);
+      await p.save();
 
-        assert.equal(personDoc.loc[0], loc[0]);
-        assert.equal(personDoc.loc[1], loc[1]);
-      });
+      const personDoc = await Person.findById(p._id);
+
+      assert.equal(personDoc.loc[0], loc[0]);
+      assert.equal(personDoc.loc[1], loc[1]);
+
     });
 
-    it('2dsphere indexed field without value is saved (gh-1668)', function() {
+    it('2dsphere indexed field without value is saved (gh-1668)', async function() {
       const PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4059,19 +4057,18 @@ describe('Model', function() {
         name: 'Jimmy Page'
       });
 
-      return co(function*() {
-        yield Person.createIndexes();
 
-        yield p.save();
+      await Person.createIndexes();
 
-        const personDoc = yield Person.findById(p._id);
+      await p.save();
 
-        assert.equal(personDoc.name, 'Jimmy Page');
-        assert.equal(personDoc.loc, undefined);
-      });
+      const personDoc = await Person.findById(p._id);
+
+      assert.equal(personDoc.name, 'Jimmy Page');
+      assert.equal(personDoc.loc, undefined);
     });
 
-    it('2dsphere indexed field in subdoc without value is saved', function() {
+    it('2dsphere indexed field in subdoc without value is saved', async function() {
       const PersonSchema = new Schema({
         name: { type: String, required: true },
         nested: {
@@ -4091,21 +4088,21 @@ describe('Model', function() {
 
       p.nested.tag = 'guitarist';
 
-      return co(function*() {
-        yield Person.collection.drop();
-        yield Person.createIndexes();
 
-        yield p.save();
+      await Person.collection.drop();
+      await Person.createIndexes();
 
-        const personDoc = yield Person.findById(p._id);
+      await p.save();
 
-        assert.equal(personDoc.name, 'Jimmy Page');
-        assert.equal(personDoc.nested.tag, 'guitarist');
-        assert.equal(personDoc.nested.loc, undefined);
-      });
+      const personDoc = await Person.findById(p._id);
+
+      assert.equal(personDoc.name, 'Jimmy Page');
+      assert.equal(personDoc.nested.tag, 'guitarist');
+      assert.equal(personDoc.nested.loc, undefined);
+
     });
 
-    it('2dsphere indexed field with geojson without value is saved (gh-3233)', function() {
+    it('2dsphere indexed field with geojson without value is saved (gh-3233)', async function() {
       const LocationSchema = new Schema({
         name: { type: String, required: true },
         location: {
@@ -4118,17 +4115,17 @@ describe('Model', function() {
 
       const Location = db.model('Test', LocationSchema);
 
-      return co(function*() {
-        yield Location.collection.drop().catch(() => {});
-        yield Location.init();
 
-        yield Location.create({
-          name: 'Undefined location'
-        });
+      await Location.collection.drop().catch(() => {});
+      await Location.init();
+
+      await Location.create({
+        name: 'Undefined location'
       });
+
     });
 
-    it('Doc with 2dsphere indexed field without initial value can be updated', function() {
+    it('Doc with 2dsphere indexed field without initial value can be updated', async function() {
       const PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4142,26 +4139,26 @@ describe('Model', function() {
         name: 'Jimmy Page'
       });
 
-      return co(function*() {
-        yield Person.collection.drop();
-        yield Person.createIndexes();
 
-        yield p.save();
+      await Person.collection.drop();
+      await Person.createIndexes();
 
-        const updates = {
-          $set: {
-            loc: [0.3, 51.4]
-          }
-        };
+      await p.save();
 
-        const personDoc = yield Person.findByIdAndUpdate(p._id, updates, { new: true });
+      const updates = {
+        $set: {
+          loc: [0.3, 51.4]
+        }
+      };
 
-        assert.equal(personDoc.loc[0], updates.$set.loc[0]);
-        assert.equal(personDoc.loc[1], updates.$set.loc[1]);
-      });
+      const personDoc = await Person.findByIdAndUpdate(p._id, updates, { new: true });
+
+      assert.equal(personDoc.loc[0], updates.$set.loc[0]);
+      assert.equal(personDoc.loc[1], updates.$set.loc[1]);
+
     });
 
-    it('2dsphere indexed required field without value is rejected', function() {
+    it('2dsphere indexed required field without value is rejected', async function() {
       const PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4176,19 +4173,19 @@ describe('Model', function() {
         name: 'Jimmy Page'
       });
 
-      return co(function*() {
-        yield Person.collection.drop();
-        yield Person.createIndexes();
 
-        let err;
-        yield p.save().catch(_err => { err = _err; });
+      await Person.collection.drop();
+      await Person.createIndexes();
 
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-      });
+      let err;
+      await p.save().catch(_err => { err = _err; });
+
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
+
     });
 
-    it('2dsphere field without value but with schema default is saved', function() {
+    it('2dsphere field without value but with schema default is saved', async function() {
       const loc = [0, 1];
       const PersonSchema = new Schema({
         name: String,
@@ -4204,20 +4201,20 @@ describe('Model', function() {
         name: 'Jimmy Page'
       });
 
-      return co(function*() {
-        yield Person.collection.drop();
-        yield Person.createIndexes();
 
-        yield p.save();
+      await Person.collection.drop();
+      await Person.createIndexes();
 
-        const personDoc = yield Person.findById(p._id);
+      await p.save();
 
-        assert.equal(loc[0], personDoc.loc[0]);
-        assert.equal(loc[1], personDoc.loc[1]);
-      });
+      const personDoc = await Person.findById(p._id);
+
+      assert.equal(loc[0], personDoc.loc[0]);
+      assert.equal(loc[1], personDoc.loc[1]);
+
     });
 
-    it('2d indexed field without value is saved', function() {
+    it('2d indexed field without value is saved', async function() {
       const PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4231,19 +4228,19 @@ describe('Model', function() {
         name: 'Jimmy Page'
       });
 
-      return co(function*() {
-        yield Person.collection.drop();
-        yield Person.createIndexes();
 
-        yield p.save();
+      await Person.collection.drop();
+      await Person.createIndexes();
 
-        const personDoc = yield Person.findById(p._id);
+      await p.save();
 
-        assert.equal(personDoc.loc, undefined);
-      });
+      const personDoc = await Person.findById(p._id);
+
+      assert.equal(personDoc.loc, undefined);
+
     });
 
-    it.skip('Compound index with 2dsphere field without value is saved', function() {
+    it.skip('Compound index with 2dsphere field without value is saved', async function() {
       const PersonSchema = new Schema({
         name: String,
         type: String,
@@ -4262,22 +4259,22 @@ describe('Model', function() {
         tags: ['guitarist']
       });
 
-      return co(function*() {
-        yield Person.collection.drop();
-        yield Person.createIndexes();
 
-        yield p.save();
+      await Person.collection.drop();
+      await Person.createIndexes();
 
-        const personDoc = yield Person.findById(p._id);
+      await p.save();
 
-        assert.equal(personDoc.name, 'Jimmy Page');
-        assert.equal(personDoc.loc, undefined);
+      const personDoc = await Person.findById(p._id);
 
-        yield Person.collection.drop();
-      });
+      assert.equal(personDoc.name, 'Jimmy Page');
+      assert.equal(personDoc.loc, undefined);
+
+      await Person.collection.drop();
+
     });
 
-    it.skip('Compound index on field earlier declared with 2dsphere index is saved', function() {
+    it.skip('Compound index on field earlier declared with 2dsphere index is saved', async function() {
       const PersonSchema = new Schema({
         name: String,
         type: String,
@@ -4297,19 +4294,19 @@ describe('Model', function() {
         tags: ['guitarist']
       });
 
-      return co(function*() {
-        yield Person.collection.drop();
-        yield Person.createIndexes();
 
-        yield p.save();
+      await Person.collection.drop();
+      await Person.createIndexes();
 
-        const personDoc = yield Person.findById(p._id);
+      await p.save();
 
-        assert.equal(personDoc.name, 'Jimmy Page');
-        assert.equal(personDoc.loc, undefined);
+      const personDoc = await Person.findById(p._id);
 
-        yield Person.collection.drop();
-      });
+      assert.equal(personDoc.name, 'Jimmy Page');
+      assert.equal(personDoc.loc, undefined);
+
+      await Person.collection.drop();
+
     });
   });
 
@@ -4570,40 +4567,40 @@ describe('Model', function() {
       }
     });
 
-    it('insertMany() `writeErrors` if only one error (gh-8938)', function() {
+    it('insertMany() `writeErrors` if only one error (gh-8938)', async function() {
       const QuestionType = new mongoose.Schema({
         code: { type: String, required: true, unique: true },
         text: String
       });
       const Question = db.model('Test', QuestionType);
 
-      return co(function*() {
-        yield Question.init();
 
-        yield Question.create({ code: 'MEDIUM', text: '123' });
-        const data = [
-          { code: 'MEDIUM', text: '1111' },
-          { code: 'test', text: '222' },
-          { code: 'HARD', text: '2222' }
-        ];
-        const opts = { ordered: false, rawResult: true };
-        let err = yield Question.insertMany(data, opts).catch(err => err);
-        assert.ok(Array.isArray(err.writeErrors));
-        assert.equal(err.writeErrors.length, 1);
-        assert.equal(err.insertedDocs.length, 2);
-        assert.equal(err.insertedDocs[0].code, 'test');
-        assert.equal(err.insertedDocs[1].code, 'HARD');
+      await Question.init();
 
-        yield Question.deleteMany({});
-        yield Question.create({ code: 'MEDIUM', text: '123' });
-        yield Question.create({ code: 'HARD', text: '123' });
+      await Question.create({ code: 'MEDIUM', text: '123' });
+      const data = [
+        { code: 'MEDIUM', text: '1111' },
+        { code: 'test', text: '222' },
+        { code: 'HARD', text: '2222' }
+      ];
+      const opts = { ordered: false, rawResult: true };
+      let err = await Question.insertMany(data, opts).catch(err => err);
+      assert.ok(Array.isArray(err.writeErrors));
+      assert.equal(err.writeErrors.length, 1);
+      assert.equal(err.insertedDocs.length, 2);
+      assert.equal(err.insertedDocs[0].code, 'test');
+      assert.equal(err.insertedDocs[1].code, 'HARD');
 
-        err = yield Question.insertMany(data, opts).catch(err => err);
-        assert.ok(Array.isArray(err.writeErrors));
-        assert.equal(err.writeErrors.length, 2);
-        assert.equal(err.insertedDocs.length, 1);
-        assert.equal(err.insertedDocs[0].code, 'test');
-      });
+      await Question.deleteMany({});
+      await Question.create({ code: 'MEDIUM', text: '123' });
+      await Question.create({ code: 'HARD', text: '123' });
+
+      err = await Question.insertMany(data, opts).catch(err => err);
+      assert.ok(Array.isArray(err.writeErrors));
+      assert.equal(err.writeErrors.length, 2);
+      assert.equal(err.insertedDocs.length, 1);
+      assert.equal(err.insertedDocs[0].code, 'test');
+
     });
 
     it('insertMany() ordered option for single validation error', function(done) {
@@ -4767,7 +4764,7 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany() populate option (gh-9720)', function() {
+    it('insertMany() populate option (gh-9720)', async function() {
       const schema = new Schema({
         name: { type: String, required: true }
       });
@@ -4780,23 +4777,23 @@ describe('Model', function() {
         }
       }));
 
-      return co(function*() {
-        const movies = yield Movie.create([
-          { name: 'The Empire Strikes Back' },
-          { name: 'Jingle All The Way' }
-        ]);
-        const people = yield Person.insertMany([
-          { name: 'Test1', favoriteMovie: movies[1]._id },
-          { name: 'Test2', favoriteMovie: movies[0]._id }
-        ], { populate: 'favoriteMovie' });
 
-        assert.equal(people.length, 2);
-        assert.equal(people[0].favoriteMovie.name, 'Jingle All The Way');
-        assert.equal(people[1].favoriteMovie.name, 'The Empire Strikes Back');
-      });
+      const movies = await Movie.create([
+        { name: 'The Empire Strikes Back' },
+        { name: 'Jingle All The Way' }
+      ]);
+      const people = await Person.insertMany([
+        { name: 'Test1', favoriteMovie: movies[1]._id },
+        { name: 'Test2', favoriteMovie: movies[0]._id }
+      ], { populate: 'favoriteMovie' });
+
+      assert.equal(people.length, 2);
+      assert.equal(people[0].favoriteMovie.name, 'Jingle All The Way');
+      assert.equal(people[1].favoriteMovie.name, 'The Empire Strikes Back');
+
     });
 
-    it('insertMany() sets `isNew` for inserted documents with `ordered = false` (gh-9677)', function() {
+    it('insertMany() sets `isNew` for inserted documents with `ordered = false` (gh-9677)', async function() {
       const schema = new Schema({
         title: { type: String, required: true, unique: true }
       });
@@ -4804,18 +4801,18 @@ describe('Model', function() {
 
       const arr = [{ title: 'The Phantom Menace' }, { title: 'The Phantom Menace' }];
       const opts = { ordered: false };
-      return co(function*() {
-        yield Movie.init();
-        const err = yield Movie.insertMany(arr, opts).then(() => err, err => err);
-        assert.ok(err);
-        assert.ok(err.insertedDocs);
 
-        assert.equal(err.insertedDocs.length, 1);
-        assert.strictEqual(err.insertedDocs[0].isNew, false);
-      });
+      await Movie.init();
+      const err = await Movie.insertMany(arr, opts).then(() => err, err => err);
+      assert.ok(err);
+      assert.ok(err.insertedDocs);
+
+      assert.equal(err.insertedDocs.length, 1);
+      assert.strictEqual(err.insertedDocs[0].isNew, false);
+
     });
 
-    it('insertMany() returns only inserted docs with `ordered = true`', function() {
+    it('insertMany() returns only inserted docs with `ordered = true`', async function() {
       const schema = new Schema({
         name: { type: String, required: true, unique: true }
       });
@@ -4828,16 +4825,16 @@ describe('Model', function() {
         { name: 'Jingle All The Way' }
       ];
       const opts = { ordered: true };
-      return co(function*() {
-        yield Movie.init();
-        const err = yield Movie.insertMany(arr, opts).then(() => err, err => err);
-        assert.ok(err);
-        assert.ok(err.insertedDocs);
 
-        assert.equal(err.insertedDocs.length, 2);
-        assert.strictEqual(err.insertedDocs[0].name, 'The Phantom Menace');
-        assert.strictEqual(err.insertedDocs[1].name, 'The Empire Strikes Back');
-      });
+      await Movie.init();
+      const err = await Movie.insertMany(arr, opts).then(() => err, err => err);
+      assert.ok(err);
+      assert.ok(err.insertedDocs);
+
+      assert.equal(err.insertedDocs.length, 2);
+      assert.strictEqual(err.insertedDocs[0].name, 'The Phantom Menace');
+      assert.strictEqual(err.insertedDocs[1].name, 'The Empire Strikes Back');
+
     });
 
     it('insertMany() validation error with ordered true and rawResult true when all documents are invalid', function(done) {
@@ -4926,7 +4923,7 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany() with error handlers (gh-6228)', function() {
+    it('insertMany() with error handlers (gh-6228)', async function() {
       const schema = new Schema({
         name: { type: String, unique: true }
       }, { autoIndex: false });
@@ -4945,26 +4942,26 @@ describe('Model', function() {
 
       const Movie = db.model('Movie', schema);
 
-      return co(function*() {
-        yield Movie.createIndexes();
 
-        let threw = false;
-        try {
-          yield Movie.insertMany([
-            { name: 'Star Wars' },
-            { name: 'Star Wars' }
-          ]);
-        } catch (error) {
-          assert.ok(error);
-          threw = true;
-        }
+      await Movie.createIndexes();
 
-        assert.ok(threw);
-        assert.equal(postCalled, 0);
-        assert.equal(postErrorCalled, 1);
+      let threw = false;
+      try {
+        await Movie.insertMany([
+          { name: 'Star Wars' },
+          { name: 'Star Wars' }
+        ]);
+      } catch (error) {
+        assert.ok(error);
+        threw = true;
+      }
 
-        yield Movie.collection.drop();
-      });
+      assert.ok(threw);
+      assert.equal(postCalled, 0);
+      assert.equal(postErrorCalled, 1);
+
+      await Movie.collection.drop();
+
     });
 
     it('insertMany() with non object array error can be catched (gh-8363)', function(done) {
@@ -4979,21 +4976,21 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany() return docs with empty modifiedPaths (gh-7852)', function() {
+    it('insertMany() return docs with empty modifiedPaths (gh-7852)', async function() {
       const schema = new Schema({
         name: { type: String }
       });
 
       const Food = db.model('Test', schema);
 
-      return co(function*() {
-        const foods = yield Food.insertMany([
-          { name: 'Rice dumplings' },
-          { name: 'Beef noodle' }
-        ]);
-        assert.equal(foods[0].modifiedPaths().length, 0);
-        assert.equal(foods[1].modifiedPaths().length, 0);
-      });
+
+      const foods = await Food.insertMany([
+        { name: 'Rice dumplings' },
+        { name: 'Beef noodle' }
+      ]);
+      assert.equal(foods[0].modifiedPaths().length, 0);
+      assert.equal(foods[1].modifiedPaths().length, 0);
+
     });
 
     it('deleteOne() with options (gh-7857)', function(done) {
@@ -5087,80 +5084,80 @@ describe('Model', function() {
         });
       });
 
-      it('arrayFilter (gh-5965)', function() {
-        return co(function*() {
-          const MyModel = db.model('Test', new Schema({
-            _id: Number,
-            grades: [Number]
-          }));
+      it('arrayFilter (gh-5965)', async function() {
 
-          yield MyModel.create([
-            { _id: 1, grades: [95, 92, 90] },
-            { _id: 2, grades: [98, 100, 102] },
-            { _id: 3, grades: [95, 110, 100] }
-          ]);
+        const MyModel = db.model('Test', new Schema({
+          _id: Number,
+          grades: [Number]
+        }));
 
-          yield MyModel.updateMany({}, { $set: { 'grades.$[element]': 100 } }, {
-            arrayFilters: [{ element: { $gte: 100 } }]
-          });
+        await MyModel.create([
+          { _id: 1, grades: [95, 92, 90] },
+          { _id: 2, grades: [98, 100, 102] },
+          { _id: 3, grades: [95, 110, 100] }
+        ]);
 
-          const docs = yield MyModel.find().sort({ _id: 1 });
-          assert.deepEqual(docs[0].toObject().grades, [95, 92, 90]);
-          assert.deepEqual(docs[1].toObject().grades, [98, 100, 100]);
-          assert.deepEqual(docs[2].toObject().grades, [95, 100, 100]);
+        await MyModel.updateMany({}, { $set: { 'grades.$[element]': 100 } }, {
+          arrayFilters: [{ element: { $gte: 100 } }]
         });
+
+        const docs = await MyModel.find().sort({ _id: 1 });
+        assert.deepEqual(docs[0].toObject().grades, [95, 92, 90]);
+        assert.deepEqual(docs[1].toObject().grades, [98, 100, 100]);
+        assert.deepEqual(docs[2].toObject().grades, [95, 100, 100]);
+
       });
 
-      it('arrayFilter casting (gh-5965) (gh-7079)', function() {
-        return co(function*() {
-          const MyModel = db.model('Test', new Schema({
-            _id: Number,
-            grades: [Number]
-          }));
+      it('arrayFilter casting (gh-5965) (gh-7079)', async function() {
 
-          yield MyModel.create([
-            { _id: 1, grades: [95, 92, 90] },
-            { _id: 2, grades: [98, 100, 102] },
-            { _id: 3, grades: [95, 110, 100] }
-          ]);
+        const MyModel = db.model('Test', new Schema({
+          _id: Number,
+          grades: [Number]
+        }));
 
-          yield MyModel.updateMany({}, { $set: { 'grades.$[element]': 100 } }, {
-            arrayFilters: [{
-              element: { $gte: '100', $lte: { valueOf: () => 109 } }
-            }]
-          });
+        await MyModel.create([
+          { _id: 1, grades: [95, 92, 90] },
+          { _id: 2, grades: [98, 100, 102] },
+          { _id: 3, grades: [95, 110, 100] }
+        ]);
 
-          const docs = yield MyModel.find().sort({ _id: 1 });
-          assert.deepEqual(docs[0].toObject().grades, [95, 92, 90]);
-          assert.deepEqual(docs[1].toObject().grades, [98, 100, 100]);
-          assert.deepEqual(docs[2].toObject().grades, [95, 110, 100]);
+        await MyModel.updateMany({}, { $set: { 'grades.$[element]': 100 } }, {
+          arrayFilters: [{
+            element: { $gte: '100', $lte: { valueOf: () => 109 } }
+          }]
         });
+
+        const docs = await MyModel.find().sort({ _id: 1 });
+        assert.deepEqual(docs[0].toObject().grades, [95, 92, 90]);
+        assert.deepEqual(docs[1].toObject().grades, [98, 100, 100]);
+        assert.deepEqual(docs[2].toObject().grades, [95, 110, 100]);
+
       });
 
-      it('avoids unused array filter error (gh-9468)', function() {
-        return co(function*() {
-          const MyModel = db.model('Test', new Schema({
-            _id: Number,
-            grades: [Number]
-          }));
+      it('avoids unused array filter error (gh-9468)', async function() {
 
-          yield MyModel.create([
-            { _id: 1, grades: [95, 92, 90] },
-            { _id: 2, grades: [98, 100, 102] },
-            { _id: 3, grades: [95, 110, 100] }
-          ]);
+        const MyModel = db.model('Test', new Schema({
+          _id: Number,
+          grades: [Number]
+        }));
 
-          yield MyModel.updateMany({}, { $set: { 'grades.0': 100 } }, {
-            arrayFilters: [{
-              element: { $gte: 95 }
-            }]
-          });
+        await MyModel.create([
+          { _id: 1, grades: [95, 92, 90] },
+          { _id: 2, grades: [98, 100, 102] },
+          { _id: 3, grades: [95, 110, 100] }
+        ]);
 
-          const docs = yield MyModel.find().sort({ _id: 1 });
-          assert.deepEqual(docs[0].toObject().grades, [100, 92, 90]);
-          assert.deepEqual(docs[1].toObject().grades, [100, 100, 102]);
-          assert.deepEqual(docs[2].toObject().grades, [100, 110, 100]);
+        await MyModel.updateMany({}, { $set: { 'grades.0': 100 } }, {
+          arrayFilters: [{
+            element: { $gte: 95 }
+          }]
         });
+
+        const docs = await MyModel.find().sort({ _id: 1 });
+        assert.deepEqual(docs[0].toObject().grades, [100, 92, 90]);
+        assert.deepEqual(docs[1].toObject().grades, [100, 100, 102]);
+        assert.deepEqual(docs[2].toObject().grades, [100, 110, 100]);
+
       });
 
       describe('watch()', function() {
@@ -5170,89 +5167,88 @@ describe('Model', function() {
           }
         });
 
-        it('watch() (gh-5964)', function() {
-          return co(function*() {
-            const MyModel = db.model('Test', new Schema({ name: String }));
+        it('watch() (gh-5964)', async function() {
 
-            const doc = yield MyModel.create({ name: 'Ned Stark' });
+          const MyModel = db.model('Test', new Schema({ name: String }));
 
-            const changed = new global.Promise(resolve => {
-              MyModel.watch().once('change', data => resolve(data));
-            });
+          const doc = await MyModel.create({ name: 'Ned Stark' });
 
-            yield doc.remove();
-
-            const changeData = yield changed;
-            assert.equal(changeData.operationType, 'delete');
-            assert.equal(changeData.documentKey._id.toHexString(),
-              doc._id.toHexString());
+          const changed = new global.Promise(resolve => {
+            MyModel.watch().once('change', data => resolve(data));
           });
+
+          await doc.remove();
+
+          const changeData = await changed;
+          assert.equal(changeData.operationType, 'delete');
+          assert.equal(changeData.documentKey._id.toHexString(),
+            doc._id.toHexString());
+
         });
 
-        it('watch() before connecting (gh-5964)', function() {
-          return co(function*() {
-            const db = start();
+        it('watch() before connecting (gh-5964)', async function() {
 
-            const MyModel = db.model('Test', new Schema({ name: String }));
+          const db = start();
 
-            // Synchronous, before connection happens
-            const changeStream = MyModel.watch();
-            const changed = new global.Promise(resolve => {
-              changeStream.once('change', data => resolve(data));
-            });
+          const MyModel = db.model('Test', new Schema({ name: String }));
 
-            yield db;
-            yield MyModel.create({ name: 'Ned Stark' });
-
-            const changeData = yield changed;
-            assert.equal(changeData.operationType, 'insert');
-            assert.equal(changeData.fullDocument.name, 'Ned Stark');
+          // Synchronous, before connection happens
+          const changeStream = MyModel.watch();
+          const changed = new global.Promise(resolve => {
+            changeStream.once('change', data => resolve(data));
           });
+
+          await db;
+          await MyModel.create({ name: 'Ned Stark' });
+
+          const changeData = await changed;
+          assert.equal(changeData.operationType, 'insert');
+          assert.equal(changeData.fullDocument.name, 'Ned Stark');
+
         });
 
-        it('watch() close() prevents buffered watch op from running (gh-7022)', function() {
-          return co(function*() {
-            const db = start();
-            const MyModel = db.model('Test', new Schema({}));
-            const changeStream = MyModel.watch();
-            const ready = new global.Promise(resolve => {
-              changeStream.once('ready', () => {
-                resolve(true);
-              });
-              setTimeout(resolve, 500, false);
-            });
+        it('watch() close() prevents buffered watch op from running (gh-7022)', async function() {
 
-            changeStream.close();
-            yield db;
-            const readyCalled = yield ready;
-            assert.strictEqual(readyCalled, false);
+          const db = start();
+          const MyModel = db.model('Test', new Schema({}));
+          const changeStream = MyModel.watch();
+          const ready = new global.Promise(resolve => {
+            changeStream.once('ready', () => {
+              resolve(true);
+            });
+            setTimeout(resolve, 500, false);
           });
+
+          changeStream.close();
+          await db;
+          const readyCalled = await ready;
+          assert.strictEqual(readyCalled, false);
+
         });
 
-        it('watch() close() closes the stream (gh-7022)', function() {
-          return co(function*() {
-            const db = yield start();
-            const MyModel = db.model('Test', new Schema({ name: String }));
+        it('watch() close() closes the stream (gh-7022)', async function() {
 
-            yield MyModel.init();
+          const db = await start();
+          const MyModel = db.model('Test', new Schema({ name: String }));
 
-            const changeStream = MyModel.watch();
-            const closed = new global.Promise(resolve => {
-              changeStream.once('close', () => resolve(true));
-            });
+          await MyModel.init();
 
-            yield MyModel.create({ name: 'Hodor' });
-
-            changeStream.close();
-            const closedData = yield closed;
-            assert.strictEqual(closedData, true);
+          const changeStream = MyModel.watch();
+          const closed = new global.Promise(resolve => {
+            changeStream.once('close', () => resolve(true));
           });
+
+          await MyModel.create({ name: 'Hodor' });
+
+          changeStream.close();
+          const closedData = await closed;
+          assert.strictEqual(closedData, true);
+
         });
       });
 
       describe('sessions (gh-6362)', function() {
         let MyModel;
-        const delay = ms => done => setTimeout(done, ms);
 
         beforeEach(function(done) {
           const nestedSchema = new Schema({ foo: String });
@@ -5277,169 +5273,163 @@ describe('Model', function() {
           });
         });
 
-        it('startSession()', function() {
-          return co(function*() {
-            const session = yield MyModel.startSession({ causalConsistency: true });
+        it('startSession()', async function() {
 
-            assert.equal(session.supports.causalConsistency, true);
+          const session = await MyModel.startSession({ causalConsistency: true });
 
-            session.endSession();
-          });
+          assert.equal(session.supports.causalConsistency, true);
+
+          session.endSession();
+
         });
 
-        it('startSession() before connecting', function() {
-          return co(function*() {
-            const db = start();
+        it('startSession() before connecting', async function() {
 
-            const MyModel = db.model('Test', new Schema({ name: String }));
+          const db = start();
 
-            // Don't wait for promise
-            const sessionPromise = MyModel.startSession({ causalConsistency: true });
+          const MyModel = db.model('Test', new Schema({ name: String }));
 
-            yield db.asPromise();
+          // Don't wait for promise
+          const sessionPromise = MyModel.startSession({ causalConsistency: true });
 
-            const session = yield sessionPromise;
+          await db.asPromise();
 
-            assert.equal(session.supports.causalConsistency, true);
+          const session = await sessionPromise;
 
-            session.endSession();
-          });
+          assert.equal(session.supports.causalConsistency, true);
+
+          session.endSession();
+
         });
 
-        it('sets session when pulling a document from db', function() {
-          return co(function*() {
-            let doc = yield MyModel.create({ name: 'test', nested: { foo: 'bar' } });
+        it('sets session when pulling a document from db', async function() {
+          let doc = await MyModel.create({ name: 'test', nested: { foo: 'bar' } });
 
-            const session = yield MyModel.startSession();
+          const session = await MyModel.startSession();
 
-            let lastUse = session.serverSession.lastUse;
+          let lastUse = session.serverSession.lastUse;
 
-            yield delay(1);
+          await delay(1);
 
-            doc = yield MyModel.findOne({ _id: doc._id }, null, { session });
-            assert.strictEqual(doc.$__.session, session);
-            assert.strictEqual(doc.$session(), session);
-            assert.strictEqual(doc.nested.$session(), session);
+          doc = await MyModel.findOne({ _id: doc._id }, null, { session });
+          assert.strictEqual(doc.$__.session, session);
+          assert.strictEqual(doc.$session(), session);
+          assert.strictEqual(doc.nested.$session(), session);
 
-            assert.ok(session.serverSession.lastUse > lastUse);
-            lastUse = session.serverSession.lastUse;
+          assert.ok(session.serverSession.lastUse > lastUse);
+          lastUse = session.serverSession.lastUse;
 
-            yield delay(1);
+          await delay(1);
 
-            doc = yield MyModel.findOneAndUpdate({}, { name: 'test2' },
-              { session: session });
-            assert.strictEqual(doc.$__.session, session);
-            assert.strictEqual(doc.$session(), session);
-            assert.strictEqual(doc.nested.$session(), session);
+          doc = await MyModel.findOneAndUpdate({}, { name: 'test2' },
+            { session: session });
+          assert.strictEqual(doc.$__.session, session);
+          assert.strictEqual(doc.$session(), session);
+          assert.strictEqual(doc.nested.$session(), session);
 
-            assert.ok(session.serverSession.lastUse > lastUse);
-            lastUse = session.serverSession.lastUse;
+          assert.ok(session.serverSession.lastUse > lastUse);
+          lastUse = session.serverSession.lastUse;
 
-            yield delay(1);
+          await delay(1);
 
-            doc.name = 'test3';
+          doc.name = 'test3';
 
-            yield doc.save();
+          await doc.save();
 
-            assert.ok(session.serverSession.lastUse > lastUse);
+          assert.ok(session.serverSession.lastUse > lastUse);
 
-            session.endSession();
-          });
+          session.endSession();
         });
 
-        it('sets session on child doc when creating new doc (gh-7104)', function() {
-          return co(function*() {
-            let doc = yield MyModel.create({ name: 'test', arr: [{ foo: 'bar' }] });
+        it('sets session on child doc when creating new doc (gh-7104)', async function() {
+          let doc = await MyModel.create({ name: 'test', arr: [{ foo: 'bar' }] });
 
-            const session = yield MyModel.startSession();
+          const session = await MyModel.startSession();
 
-            const lastUse = session.serverSession.lastUse;
+          const lastUse = session.serverSession.lastUse;
 
-            yield delay(1);
+          await delay(1);
 
-            doc = yield MyModel.findOne({ _id: doc._id }, null, { session });
-            assert.strictEqual(doc.$__.session, session);
-            assert.strictEqual(doc.$session(), session);
-            assert.strictEqual(doc.arr[0].$session(), session);
+          doc = await MyModel.findOne({ _id: doc._id }, null, { session });
+          assert.strictEqual(doc.$__.session, session);
+          assert.strictEqual(doc.$session(), session);
+          assert.strictEqual(doc.arr[0].$session(), session);
 
-            assert.ok(session.serverSession.lastUse > lastUse);
+          assert.ok(session.serverSession.lastUse > lastUse);
 
-            doc.arr.push({ foo: 'baz' });
+          doc.arr.push({ foo: 'baz' });
 
-            assert.strictEqual(doc.arr[0].$session(), session);
-            assert.strictEqual(doc.arr[1].$session(), session);
+          assert.strictEqual(doc.arr[0].$session(), session);
+          assert.strictEqual(doc.arr[1].$session(), session);
 
-            doc.nested = { foo: 'foo' };
-            assert.strictEqual(doc.nested.$session(), session);
+          doc.nested = { foo: 'foo' };
+          assert.strictEqual(doc.nested.$session(), session);
 
-            yield doc.save();
+          await doc.save();
 
-            assert.strictEqual(doc.arr[0].$session(), session);
-            assert.strictEqual(doc.arr[1].$session(), session);
+          assert.strictEqual(doc.arr[0].$session(), session);
+          assert.strictEqual(doc.arr[1].$session(), session);
 
-            doc.$session(null);
+          doc.$session(null);
 
-            assert.equal(doc.arr[0].$session(), null);
-            assert.equal(doc.arr[1].$session(), null);
-          });
+          assert.equal(doc.arr[0].$session(), null);
+          assert.equal(doc.arr[1].$session(), null);
+
         });
 
-        it('sets session when pulling multiple docs from db', function() {
-          return co(function*() {
-            const doc = yield MyModel.create({ name: 'test' });
+        it('sets session when pulling multiple docs from db', async function() {
+          const doc = await MyModel.create({ name: 'test' });
 
-            const session = yield MyModel.startSession();
+          const session = await MyModel.startSession();
 
-            let lastUse = session.serverSession.lastUse;
+          let lastUse = session.serverSession.lastUse;
 
-            yield delay(1);
+          await delay(1);
 
-            const docs = yield MyModel.find({ _id: doc._id }, null,
-              { session: session });
-            assert.equal(docs.length, 1);
-            assert.strictEqual(docs[0].$__.session, session);
-            assert.strictEqual(docs[0].$session(), session);
+          const docs = await MyModel.find({ _id: doc._id }, null,
+            { session: session });
+          assert.equal(docs.length, 1);
+          assert.strictEqual(docs[0].$__.session, session);
+          assert.strictEqual(docs[0].$session(), session);
 
-            assert.ok(session.serverSession.lastUse > lastUse);
-            lastUse = session.serverSession.lastUse;
+          assert.ok(session.serverSession.lastUse > lastUse);
+          lastUse = session.serverSession.lastUse;
 
-            yield delay(1);
+          await delay(1);
 
-            docs[0].name = 'test3';
+          docs[0].name = 'test3';
 
-            yield docs[0].save();
+          await docs[0].save();
 
-            assert.ok(session.serverSession.lastUse > lastUse);
+          assert.ok(session.serverSession.lastUse > lastUse);
 
-            session.endSession();
-          });
+          session.endSession();
+
         });
 
-        it('supports overwriting `session` in save()', function() {
-          return co(function*() {
-            let doc = yield MyModel.create({ name: 'test' });
+        it('supports overwriting `session` in save()', async function() {
+          let doc = await MyModel.create({ name: 'test' });
 
-            const session = yield MyModel.startSession();
+          const session = await MyModel.startSession();
 
-            let lastUse = session.serverSession.lastUse;
+          let lastUse = session.serverSession.lastUse;
 
-            yield delay(1);
+          await delay(1);
 
-            doc = yield MyModel.findOne({ _id: doc._id }, null, { session });
+          doc = await MyModel.findOne({ _id: doc._id }, null, { session });
 
-            assert.ok(session.serverSession.lastUse > lastUse);
-            lastUse = session.serverSession.lastUse;
+          assert.ok(session.serverSession.lastUse > lastUse);
+          lastUse = session.serverSession.lastUse;
 
-            yield delay(1);
+          await delay(1);
 
-            doc.name = 'test3';
+          doc.name = 'test3';
 
-            yield doc.save({ session: null });
+          await doc.save({ session: null });
 
-            assert.ok(session.serverSession.lastUse <= lastUse);
+          assert.ok(session.serverSession.lastUse <= lastUse);
 
-            session.endSession();
-          });
+          session.endSession();
         });
       });
     });
@@ -5636,7 +5626,7 @@ describe('Model', function() {
         });
       });
 
-      it('timestamps (gh-5708)', function() {
+      it('timestamps (gh-5708)', async function() {
         const schema = new Schema({
           str: { type: String, default: 'test' },
           num: Number
@@ -5665,24 +5655,24 @@ describe('Model', function() {
 
         const now = Date.now();
 
-        return co(function*() {
-          yield M.bulkWrite(ops);
 
-          let doc = yield M.findOne({ num: 42 });
-          assert.ok(doc.createdAt);
-          assert.ok(doc.createdAt.valueOf() >= now.valueOf());
-          assert.ok(doc.updatedAt);
-          assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+        await M.bulkWrite(ops);
 
-          doc = yield M.findOne({ num: 1 });
-          assert.ok(doc.createdAt);
-          assert.ok(doc.createdAt.valueOf() >= now.valueOf());
-          assert.ok(doc.updatedAt);
-          assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
-        });
+        let doc = await M.findOne({ num: 42 });
+        assert.ok(doc.createdAt);
+        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.updatedAt);
+        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+
+        doc = await M.findOne({ num: 1 });
+        assert.ok(doc.createdAt);
+        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.updatedAt);
+        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+
       });
 
-      it('with child timestamps and array filters (gh-7032)', function() {
+      it('with child timestamps and array filters (gh-7032)', async function() {
         const childSchema = new Schema({ name: String }, { timestamps: true });
 
         const parentSchema = new Schema({ children: [childSchema] }, {
@@ -5691,77 +5681,77 @@ describe('Model', function() {
 
         const Parent = db.model('Parent', parentSchema);
 
-        return co(function*() {
-          yield Parent.create({ children: [{ name: 'foo' }] });
 
-          const end = Date.now();
-          yield new Promise(resolve => setTimeout(resolve, 100));
+        await Parent.create({ children: [{ name: 'foo' }] });
 
-          yield Parent.bulkWrite([
-            {
-              updateOne: {
-                filter: {},
-                update: { $set: { 'children.$[].name': 'bar' } }
-              }
+        const end = Date.now();
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        await Parent.bulkWrite([
+          {
+            updateOne: {
+              filter: {},
+              update: { $set: { 'children.$[].name': 'bar' } }
             }
-          ]);
+          }
+        ]);
 
-          const doc = yield Parent.findOne();
-          assert.ok(doc.children[0].updatedAt.valueOf() > end);
-        });
+        const doc = await Parent.findOne();
+        assert.ok(doc.children[0].updatedAt.valueOf() > end);
+
       });
 
-      it('with timestamps and replaceOne (gh-5708)', function() {
+      it('with timestamps and replaceOne (gh-5708)', async function() {
         const schema = new Schema({ num: Number }, { timestamps: true });
 
         const M = db.model('Test', schema);
 
-        return co(function*() {
-          yield M.create({ num: 42 });
 
-          yield cb => setTimeout(cb, 10);
-          const now = Date.now();
+        await M.create({ num: 42 });
 
-          yield M.bulkWrite([{
-            replaceOne: {
-              filter: { num: 42 },
-              replacement: { num: 100 }
-            }
-          }]);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        const now = Date.now();
 
-          const doc = yield M.findOne({ num: 100 });
-          assert.ok(doc.createdAt);
-          assert.ok(doc.createdAt.valueOf() >= now.valueOf());
-          assert.ok(doc.updatedAt);
-          assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
-        });
+        await M.bulkWrite([{
+          replaceOne: {
+            filter: { num: 42 },
+            replacement: { num: 100 }
+          }
+        }]);
+
+        const doc = await M.findOne({ num: 100 });
+        assert.ok(doc.createdAt);
+        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.updatedAt);
+        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+
       });
 
-      it('with child timestamps (gh-7032)', function() {
+      it('with child timestamps (gh-7032)', async function() {
         const nested = new Schema({ name: String }, { timestamps: true });
         const schema = new Schema({ nested: [nested] }, { timestamps: true });
 
         const M = db.model('Test', schema);
 
-        return co(function*() {
-          yield M.create({ nested: [] });
 
-          yield cb => setTimeout(cb, 10);
-          const now = Date.now();
+        await M.create({ nested: [] });
 
-          yield M.bulkWrite([{
-            updateOne: {
-              filter: {},
-              update: { $push: { nested: { name: 'test' } } }
-            }
-          }]);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        const now = Date.now();
 
-          const doc = yield M.findOne({});
-          assert.ok(doc.nested[0].createdAt);
-          assert.ok(doc.nested[0].createdAt.valueOf() >= now.valueOf());
-          assert.ok(doc.nested[0].updatedAt);
-          assert.ok(doc.nested[0].updatedAt.valueOf() >= now.valueOf());
-        });
+        await M.bulkWrite([{
+          updateOne: {
+            filter: {},
+            update: { $push: { nested: { name: 'test' } } }
+          }
+        }]);
+
+        const doc = await M.findOne({});
+        assert.ok(doc.nested[0].createdAt);
+        assert.ok(doc.nested[0].createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.nested[0].updatedAt);
+        assert.ok(doc.nested[0].updatedAt.valueOf() >= now.valueOf());
+
       });
 
       it('with single nested and setOnInsert (gh-7534)', function() {
@@ -5788,91 +5778,91 @@ describe('Model', function() {
           then(doc => assert.equal(doc.nested.name, 'foo'));
       });
 
-      it('throws an error if no update object is provided (gh-8331)', function() {
+      it('throws an error if no update object is provided (gh-8331)', async function() {
         const userSchema = new Schema({ name: { type: String, required: true } });
         const User = db.model('User', userSchema);
 
-        return co(function*() {
-          const createdUser = yield User.create({ name: 'Hafez' });
 
-          const err = yield User.bulkWrite([{
-            updateOne: {
-              filter: { _id: createdUser._id }
-            }
-          }])
-            .then(() => null)
-            .catch(err => err);
+        const createdUser = await User.create({ name: 'Hafez' });
+
+        const err = await User.bulkWrite([{
+          updateOne: {
+            filter: { _id: createdUser._id }
+          }
+        }])
+          .then(() => null)
+          .catch(err => err);
 
 
-          assert.ok(err);
-          assert.equal(err.message, 'Must provide an update object.');
+        assert.ok(err);
+        assert.equal(err.message, 'Must provide an update object.');
 
-          const userAfterUpdate = yield User.findOne({ _id: createdUser._id });
+        const userAfterUpdate = await User.findOne({ _id: createdUser._id });
 
-          assert.equal(userAfterUpdate.name, 'Hafez', 'Document data is not wiped if no update object is provided.');
-        });
+        assert.equal(userAfterUpdate.name, 'Hafez', 'Document data is not wiped if no update object is provided.');
+
       });
 
-      it('casts according to child discriminator if `discriminatorKey` is present (gh-8982)', function() {
-        return co(function*() {
-          const Person = db.model('Person', { name: String });
-          Person.discriminator('Worker', new Schema({ age: Number }));
+      it('casts according to child discriminator if `discriminatorKey` is present (gh-8982)', async function() {
+
+        const Person = db.model('Person', { name: String });
+        Person.discriminator('Worker', new Schema({ age: Number }));
 
 
-          yield Person.create([
-            { __t: 'Worker', name: 'Hafez1', age: '5' },
-            { __t: 'Worker', name: 'Hafez2', age: '10' },
-            { __t: 'Worker', name: 'Hafez3', age: '15' },
-            { __t: 'Worker', name: 'Hafez4', age: '20' },
-            { __t: 'Worker', name: 'Hafez5', age: '25' }
-          ]);
+        await Person.create([
+          { __t: 'Worker', name: 'Hafez1', age: '5' },
+          { __t: 'Worker', name: 'Hafez2', age: '10' },
+          { __t: 'Worker', name: 'Hafez3', age: '15' },
+          { __t: 'Worker', name: 'Hafez4', age: '20' },
+          { __t: 'Worker', name: 'Hafez5', age: '25' }
+        ]);
 
-          yield Person.bulkWrite([
-            { updateOne: { filter: { __t: 'Worker', age: '5' }, update: { age: '6' } } },
-            { updateMany: { filter: { __t: 'Worker', age: '10' }, update: { age: '11' } } },
-            { replaceOne: { filter: { __t: 'Worker', age: '15' }, replacement: { name: 'Hafez3', age: '16' } } },
-            { deleteOne: { filter: { __t: 'Worker', age: '20' } } },
-            { deleteMany: { filter: { __t: 'Worker', age: '25' } } },
-            { insertOne: { document: { __t: 'Worker', name: 'Hafez6', age: '30' } } }
-          ]);
+        await Person.bulkWrite([
+          { updateOne: { filter: { __t: 'Worker', age: '5' }, update: { age: '6' } } },
+          { updateMany: { filter: { __t: 'Worker', age: '10' }, update: { age: '11' } } },
+          { replaceOne: { filter: { __t: 'Worker', age: '15' }, replacement: { name: 'Hafez3', age: '16' } } },
+          { deleteOne: { filter: { __t: 'Worker', age: '20' } } },
+          { deleteMany: { filter: { __t: 'Worker', age: '25' } } },
+          { insertOne: { document: { __t: 'Worker', name: 'Hafez6', age: '30' } } }
+        ]);
 
-          const people = yield Person.find().sort('name');
+        const people = await Person.find().sort('name');
 
-          assert.equal(people.length, 4);
-          assert.equal(people[0].age, 6);
-          assert.equal(people[1].age, 11);
-          assert.equal(people[2].age, 16);
-          assert.equal(people[3].age, 30);
-        });
+        assert.equal(people.length, 4);
+        assert.equal(people[0].age, 6);
+        assert.equal(people[1].age, 11);
+        assert.equal(people[2].age, 16);
+        assert.equal(people[3].age, 30);
+
       });
 
-      it('insertOne and replaceOne should not throw an error when set `timestamps: false` in schmea (gh-10048)', function() {
+      it('insertOne and replaceOne should not throw an error when set `timestamps: false` in schmea (gh-10048)', async function() {
         const schema = new Schema({ name: String }, { timestamps: false });
         const Model = db.model('Test', schema);
 
-        return co(function*() {
-          yield Model.create({ name: 'test' });
 
-          yield Model.bulkWrite([
-            {
-              insertOne: {
-                document: { name: 'insertOne-test' }
-              }
-            },
-            {
-              replaceOne: {
-                filter: { name: 'test' },
-                replacement: { name: 'replaceOne-test' }
-              }
+        await Model.create({ name: 'test' });
+
+        await Model.bulkWrite([
+          {
+            insertOne: {
+              document: { name: 'insertOne-test' }
             }
-          ]);
-
-          for (const name of ['insertOne-test', 'replaceOne-test']) {
-            const doc = yield Model.findOne({ name });
-            assert.strictEqual(doc.createdAt, undefined);
-            assert.strictEqual(doc.updatedAt, undefined);
+          },
+          {
+            replaceOne: {
+              filter: { name: 'test' },
+              replacement: { name: 'replaceOne-test' }
+            }
           }
-        });
+        ]);
+
+        for (const name of ['insertOne-test', 'replaceOne-test']) {
+          const doc = await Model.findOne({ name });
+          assert.strictEqual(doc.createdAt, undefined);
+          assert.strictEqual(doc.updatedAt, undefined);
+        }
+
       });
 
       it('casts objects with null prototype (gh-10512)', function() {
@@ -6079,7 +6069,7 @@ describe('Model', function() {
       });
     });
 
-    it('alias with lean virtual (gh-6069)', function() {
+    it('alias with lean virtual (gh-6069)', async function() {
       const schema = new mongoose.Schema({
         name: {
           type: String,
@@ -6089,13 +6079,13 @@ describe('Model', function() {
 
       const Model = db.model('Test', schema);
 
-      return co(function*() {
-        const doc = yield Model.create({ name: 'Val' });
 
-        const res = yield Model.findById(doc._id).lean();
+      const doc = await Model.create({ name: 'Val' });
 
-        assert.equal(schema.virtual('nameAlias').getters[0].call(res), 'Val');
-      });
+      const res = await Model.findById(doc._id).lean();
+
+      assert.equal(schema.virtual('nameAlias').getters[0].call(res), 'Val');
+
     });
 
     it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
@@ -6177,133 +6167,131 @@ describe('Model', function() {
       });
     });
 
-    it('syncIndexes() (gh-6281)', function() {
+    it('syncIndexes() (gh-6281)', async function() {
       this.timeout(10000);
 
-      return co(function*() {
-        const coll = 'tests' + random();
-        let M = db.model('Test', new Schema({
-          name: { type: String, index: true }
-        }, { autoIndex: false }), coll);
-        let dropped = yield M.syncIndexes();
-        assert.deepEqual(dropped, []);
 
-        let indexes = yield M.listIndexes();
-        assert.deepEqual(indexes.map(i => i.key), [
-          { _id: 1 },
-          { name: 1 }
-        ]);
+      const coll = 'tests' + random();
+      let M = db.model('Test', new Schema({
+        name: { type: String, index: true }
+      }, { autoIndex: false }), coll);
+      let dropped = await M.syncIndexes();
+      assert.deepEqual(dropped, []);
 
-        // New model, same collection, index on different property
-        db.deleteModel(/Test/);
-        M = db.model('Test', new Schema({
-          otherName: { type: String, index: true }
-        }, { autoIndex: false }), coll);
+      let indexes = await M.listIndexes();
+      assert.deepEqual(indexes.map(i => i.key), [
+        { _id: 1 },
+        { name: 1 }
+      ]);
 
-        dropped = yield M.syncIndexes();
-        assert.deepEqual(dropped, ['name_1']);
+      // New model, same collection, index on different property
+      db.deleteModel(/Test/);
+      M = db.model('Test', new Schema({
+        otherName: { type: String, index: true }
+      }, { autoIndex: false }), coll);
 
-        indexes = yield M.listIndexes();
-        assert.deepEqual(indexes.map(i => i.key), [
-          { _id: 1 },
-          { otherName: 1 }
-        ]);
+      dropped = await M.syncIndexes();
+      assert.deepEqual(dropped, ['name_1']);
 
-        // New model, same collection, different options
-        db.deleteModel(/Test/);
-        M = db.model('Test', new Schema({
-          otherName: { type: String, unique: true }
-        }, { autoIndex: false }), coll);
+      indexes = await M.listIndexes();
+      assert.deepEqual(indexes.map(i => i.key), [
+        { _id: 1 },
+        { otherName: 1 }
+      ]);
 
-        dropped = yield M.syncIndexes();
-        assert.deepEqual(dropped, ['otherName_1']);
+      // New model, same collection, different options
+      db.deleteModel(/Test/);
+      M = db.model('Test', new Schema({
+        otherName: { type: String, unique: true }
+      }, { autoIndex: false }), coll);
 
-        indexes = yield M.listIndexes();
-        assert.deepEqual(indexes.map(i => i.key), [
-          { _id: 1 },
-          { otherName: 1 }
-        ]);
+      dropped = await M.syncIndexes();
+      assert.deepEqual(dropped, ['otherName_1']);
 
-        // Re-run syncIndexes(), shouldn't change anything
-        dropped = yield M.syncIndexes();
-        assert.deepEqual(dropped, []);
+      indexes = await M.listIndexes();
+      assert.deepEqual(indexes.map(i => i.key), [
+        { _id: 1 },
+        { otherName: 1 }
+      ]);
 
-        yield M.collection.drop();
-      });
+      // Re-run syncIndexes(), shouldn't change anything
+      dropped = await M.syncIndexes();
+      assert.deepEqual(dropped, []);
+
+      await M.collection.drop();
+
     });
 
-    it('syncIndexes() with different key order (gh-8135)', function() {
+    it('syncIndexes() with different key order (gh-8135)', async function() {
       this.timeout(10000);
 
-      return co(function*() {
-        const opts = { autoIndex: false };
-        let schema = new Schema({ name: String, age: Number }, opts);
-        schema.index({ name: 1, age: -1 });
 
-        const coll = 'tests' + random();
-        let M = db.model('Test', schema, coll);
+      const opts = { autoIndex: false };
+      let schema = new Schema({ name: String, age: Number }, opts);
+      schema.index({ name: 1, age: -1 });
 
-        let dropped = yield M.syncIndexes();
-        assert.deepEqual(dropped, []);
+      const coll = 'tests' + random();
+      let M = db.model('Test', schema, coll);
 
-        const indexes = yield M.listIndexes();
-        assert.deepEqual(indexes.map(i => i.key), [
-          { _id: 1 },
-          { name: 1, age: -1 }
-        ]);
+      let dropped = await M.syncIndexes();
+      assert.deepEqual(dropped, []);
 
-        // New model, same collection, different key order
-        schema = new Schema({ name: String, age: Number }, opts);
-        schema.index({ age: -1, name: 1 });
-        db.deleteModel(/Test/);
-        M = db.model('Test', schema, coll);
+      const indexes = await M.listIndexes();
+      assert.deepEqual(indexes.map(i => i.key), [
+        { _id: 1 },
+        { name: 1, age: -1 }
+      ]);
 
-        dropped = yield M.syncIndexes();
-        assert.deepEqual(dropped, ['name_1_age_-1']);
-      });
+      // New model, same collection, different key order
+      schema = new Schema({ name: String, age: Number }, opts);
+      schema.index({ age: -1, name: 1 });
+      db.deleteModel(/Test/);
+      M = db.model('Test', schema, coll);
+
+      dropped = await M.syncIndexes();
+      assert.deepEqual(dropped, ['name_1_age_-1']);
+
     });
 
-    it('syncIndexes() with different key order (gh-8559)', function() {
+    it('syncIndexes() with different key order (gh-8559)', async function() {
       this.timeout(5000);
 
-      return co(function*() {
-        yield db.dropDatabase();
 
-        const opts = { autoIndex: false };
-        let schema = new Schema({ name: String, age: Number }, opts);
-        schema.index({ name: 1, _id: 1 });
+      await db.dropDatabase();
 
-        let M = db.model('Test', schema);
+      const opts = { autoIndex: false };
+      let schema = new Schema({ name: String, age: Number }, opts);
+      schema.index({ name: 1, _id: 1 });
 
-        let dropped = yield M.syncIndexes();
-        assert.deepEqual(dropped, []);
+      let M = db.model('Test', schema);
 
-        // New model, same collection, different key order
-        schema = new Schema({ name: String, age: Number }, opts);
-        schema.index({ name: 1 });
-        db.deleteModel(/Test/);
-        M = db.model('Test', schema);
+      let dropped = await M.syncIndexes();
+      assert.deepEqual(dropped, []);
 
-        dropped = yield M.syncIndexes();
-        assert.deepEqual(dropped, ['name_1__id_1']);
-      });
+      // New model, same collection, different key order
+      schema = new Schema({ name: String, age: Number }, opts);
+      schema.index({ name: 1 });
+      db.deleteModel(/Test/);
+      M = db.model('Test', schema);
+
+      dropped = await M.syncIndexes();
+      assert.deepEqual(dropped, ['name_1__id_1']);
+
     });
 
-    it('syncIndexes() allows overwriting `background` option (gh-8645)', function() {
-      return co(function*() {
-        yield db.dropDatabase();
+    it('syncIndexes() allows overwriting `background` option (gh-8645)', async function() {
+      await db.dropDatabase();
 
-        const opts = { autoIndex: false };
-        const schema = new Schema({ name: String }, opts);
-        schema.index({ name: 1 }, { background: true });
+      const opts = { autoIndex: false };
+      const schema = new Schema({ name: String }, opts);
+      schema.index({ name: 1 }, { background: true });
 
-        const M = db.model('Test', schema);
-        yield M.syncIndexes({ background: false });
+      const M = db.model('Test', schema);
+      await M.syncIndexes({ background: false });
 
-        const indexes = yield M.listIndexes();
-        assert.deepEqual(indexes[1].key, { name: 1 });
-        assert.strictEqual(indexes[1].background, false);
-      });
+      const indexes = await M.listIndexes();
+      assert.deepEqual(indexes[1].key, { name: 1 });
+      assert.strictEqual(indexes[1].background, false);
     });
 
     it('using `new db.model()()` (gh-6698)', function(done) {
@@ -6371,7 +6359,7 @@ describe('Model', function() {
       test.save().catch(error);
     });
 
-    it('allows calling save in a post save hook (gh-6611)', function() {
+    it('allows calling save in a post save hook (gh-6611)', async function() {
       let called = 0;
       const noteSchema = new Schema({
         body: String
@@ -6387,86 +6375,86 @@ describe('Model', function() {
 
 
       const Note = db.model('Test', noteSchema);
-      return co(function*() {
-        yield Note.create({ body: 'a note.' });
-        const doc = yield Note.findOne({});
-        assert.strictEqual(doc.body, 'a note, part deux.');
-      });
+
+      await Note.create({ body: 'a note.' });
+      const doc = await Note.findOne({});
+      assert.strictEqual(doc.body, 'a note, part deux.');
+
     });
 
-    it('createCollection() respects schema collation (gh-6489)', function() {
+    it('createCollection() respects schema collation (gh-6489)', async function() {
       const userSchema = new Schema({
         name: String
       }, { collation: { locale: 'en_US', strength: 1 } });
       const Model = db.model('User', userSchema);
 
-      return co(function*() {
-        yield Model.collection.drop().catch(() => {});
-        yield Model.createCollection();
-        const collectionName = Model.collection.name;
 
-        // If the collection is not created, the following will throw
-        // MongoServerError: Collection [mongoose_test.User] not found.
-        yield db.collection(collectionName).stats();
+      await Model.collection.drop().catch(() => {});
+      await Model.createCollection();
+      const collectionName = Model.collection.name;
 
-        yield Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
+      // If the collection is not created, the following will throw
+      // MongoServerError: Collection [mongoose_test.User] not found.
+      await db.collection(collectionName).stats();
 
-        // Ensure that the default collation is set. Mongoose will set the
-        // collation on the query itself (see gh-4839).
-        const res = yield db.collection(collectionName).
-          find({}).sort({ name: 1 }).toArray();
-        assert.deepEqual(res.map(v => v.name), ['alpha', 'Zeta']);
-      });
+      await Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
+
+      // Ensure that the default collation is set. Mongoose will set the
+      // collation on the query itself (see gh-4839).
+      const res = await db.collection(collectionName).
+        find({}).sort({ name: 1 }).toArray();
+      assert.deepEqual(res.map(v => v.name), ['alpha', 'Zeta']);
+
     });
 
-    it('createCollection() handles NamespaceExists errors (gh-9447)', function() {
+    it('createCollection() handles NamespaceExists errors (gh-9447)', async function() {
       const userSchema = new Schema({ name: String });
       const Model = db.model('User', userSchema);
 
-      return co(function*() {
-        yield Model.collection.drop().catch(() => {});
 
-        yield Model.createCollection();
-        yield Model.createCollection();
-      });
+      await Model.collection.drop().catch(() => {});
+
+      await Model.createCollection();
+      await Model.createCollection();
+
     });
   });
 
-  it('dropDatabase() after init allows re-init (gh-6967)', function() {
+  it('dropDatabase() after init allows re-init (gh-6967)', async function() {
     this.timeout(10000);
 
     const Model = db.model('Test', new Schema({
       name: { type: String, index: true }
     }));
 
-    return co(function*() {
-      yield Model.init();
 
-      yield db.dropDatabase();
+    await Model.init();
 
-      assert.ok(!Model.$init);
+    await db.dropDatabase();
 
-      let threw = false;
+    assert.ok(!Model.$init);
 
-      try {
-        yield Model.listIndexes();
-      } catch (err) {
-        assert.ok(err.message.indexOf('test') !== -1,
-          err.message);
-        threw = true;
-      }
-      assert.ok(threw);
+    let threw = false;
 
-      yield Model.init();
+    try {
+      await Model.listIndexes();
+    } catch (err) {
+      assert.ok(err.message.indexOf('test') !== -1,
+        err.message);
+      threw = true;
+    }
+    assert.ok(threw);
 
-      const indexes = yield Model.listIndexes();
+    await Model.init();
 
-      assert.equal(indexes.length, 2);
-      assert.deepEqual(indexes[1].key, { name: 1 });
-    });
+    const indexes = await Model.listIndexes();
+
+    assert.equal(indexes.length, 2);
+    assert.deepEqual(indexes[1].key, { name: 1 });
+
   });
 
-  it('replaceOne always sets version key in top-level (gh-7138)', function() {
+  it('replaceOne always sets version key in top-level (gh-7138)', async function() {
     const key = 'A';
 
     const schema = new mongoose.Schema({
@@ -6478,13 +6466,13 @@ describe('Model', function() {
 
     const record = { key: key, items: ['A', 'B', 'C'] };
 
-    return co(function*() {
-      yield Record.replaceOne({ key: key }, record, { upsert: true });
 
-      const fetchedRecord = yield Record.findOne({ key: key });
+    await Record.replaceOne({ key: key }, record, { upsert: true });
 
-      assert.deepEqual(fetchedRecord.toObject().items, ['A', 'B', 'C']);
-    });
+    const fetchedRecord = await Record.findOne({ key: key });
+
+    assert.deepEqual(fetchedRecord.toObject().items, ['A', 'B', 'C']);
+
   });
 
   it('can JSON.stringify(Model.schema) with nested (gh-7220)', function() {
@@ -6495,7 +6483,7 @@ describe('Model', function() {
     assert.ok(_schema.obj.nested);
   });
 
-  it('Model.events() (gh-7125)', function() {
+  it('Model.events() (gh-7125)', async function() {
     const Model = db.model('Test', Schema({
       name: { type: String, validate: () => false }
     }));
@@ -6503,27 +6491,27 @@ describe('Model', function() {
     let called = [];
     Model.events.on('error', err => { called.push(err); });
 
-    return co(function*() {
-      yield Model.findOne({ _id: 'notanid' }).catch(() => {});
-      assert.equal(called.length, 1);
-      assert.equal(called[0].name, 'CastError');
 
-      called = [];
+    await Model.findOne({ _id: 'notanid' }).catch(() => {});
+    assert.equal(called.length, 1);
+    assert.equal(called[0].name, 'CastError');
 
-      const doc = new Model({ name: 'fail' });
-      yield doc.save().catch(() => {});
-      assert.equal(called.length, 1);
-      assert.equal(called[0].name, 'ValidationError');
+    called = [];
 
-      called = [];
+    const doc = new Model({ name: 'fail' });
+    await doc.save().catch(() => {});
+    assert.equal(called.length, 1);
+    assert.equal(called[0].name, 'ValidationError');
 
-      yield Model.aggregate([{ $group: { fail: true } }]).exec().catch(() => {});
-      assert.equal(called.length, 1);
-      assert.equal(called[0].name, 'MongoServerError');
-    });
+    called = [];
+
+    await Model.aggregate([{ $group: { fail: true } }]).exec().catch(() => {});
+    assert.equal(called.length, 1);
+    assert.equal(called[0].name, 'MongoServerError');
+
   });
 
-  it('sets $session() before pre save hooks run (gh-7742)', function() {
+  it('sets $session() before pre save hooks run (gh-7742)', async function() {
     const schema = new Schema({ name: String });
     let sessions = [];
     schema.pre('save', function() {
@@ -6532,28 +6520,28 @@ describe('Model', function() {
 
     const SampleModel = db.model('Test', schema);
 
-    return co(function*() {
-      yield SampleModel.create({ name: 'foo' });
-      // start session
-      const session = yield db.startSession();
 
-      // get doc
-      const doc = yield SampleModel.findOne();
-      doc.foo = 'bar';
+    await SampleModel.create({ name: 'foo' });
+    // start session
+    const session = await db.startSession();
 
-      sessions = [];
-      yield doc.save({ session });
-      assert.equal(sessions.length, 1);
-      assert.strictEqual(sessions[0], session);
+    // get doc
+    const doc = await SampleModel.findOne();
+    doc.foo = 'bar';
 
-      sessions = [];
-      yield doc.save({ session: null });
-      assert.equal(sessions.length, 1);
-      assert.strictEqual(sessions[0], null);
-    });
+    sessions = [];
+    await doc.save({ session });
+    assert.equal(sessions.length, 1);
+    assert.strictEqual(sessions[0], session);
+
+    sessions = [];
+    await doc.save({ session: null });
+    assert.equal(sessions.length, 1);
+    assert.strictEqual(sessions[0], null);
+
   });
 
-  it('sets $session() before pre remove hooks run (gh-7742)', function() {
+  it('sets $session() before pre remove hooks run (gh-7742)', async function() {
     const schema = new Schema({ name: String });
     let sessions = [];
     schema.pre('remove', function() {
@@ -6562,23 +6550,23 @@ describe('Model', function() {
 
     const SampleModel = db.model('Test', schema);
 
-    return co(function*() {
-      yield SampleModel.create({ name: 'foo' });
-      // start session
-      const session = yield db.startSession();
 
-      // get doc
-      const doc = yield SampleModel.findOne();
-      doc.foo = 'bar';
+    await SampleModel.create({ name: 'foo' });
+    // start session
+    const session = await db.startSession();
 
-      sessions = [];
-      yield doc.remove({ session });
-      assert.equal(sessions.length, 1);
-      assert.strictEqual(sessions[0], session);
-    });
+    // get doc
+    const doc = await SampleModel.findOne();
+    doc.foo = 'bar';
+
+    sessions = [];
+    await doc.remove({ session });
+    assert.equal(sessions.length, 1);
+    assert.strictEqual(sessions[0], session);
+
   });
 
-  it('set $session() before pre validate hooks run on bulkWrite and insertMany (gh-7769)', function() {
+  it('set $session() before pre validate hooks run on bulkWrite and insertMany (gh-7769)', async function() {
     const schema = new Schema({ name: String });
     const sessions = [];
     schema.pre('validate', function() {
@@ -6587,53 +6575,53 @@ describe('Model', function() {
 
     const SampleModel = db.model('Test', schema);
 
-    return co(function*() {
-      // start session
-      const session = yield db.startSession();
 
-      yield SampleModel.insertMany([{ name: 'foo' }, { name: 'bar' }], { session });
-      assert.strictEqual(sessions[0], session);
-      assert.strictEqual(sessions[1], session);
+    // start session
+    const session = await db.startSession();
 
-      yield SampleModel.bulkWrite([{
-        insertOne: {
-          doc: { name: 'Samwell Tarly' }
-        }
-      }, {
-        replaceOne: {
-          filter: { name: 'bar' },
-          replacement: { name: 'Gilly' }
-        }
-      }], { session });
+    await SampleModel.insertMany([{ name: 'foo' }, { name: 'bar' }], { session });
+    assert.strictEqual(sessions[0], session);
+    assert.strictEqual(sessions[1], session);
 
-      assert.strictEqual(sessions[2], session);
-      assert.strictEqual(sessions[3], session);
-    });
+    await SampleModel.bulkWrite([{
+      insertOne: {
+        doc: { name: 'Samwell Tarly' }
+      }
+    }, {
+      replaceOne: {
+        filter: { name: 'bar' },
+        replacement: { name: 'Gilly' }
+      }
+    }], { session });
+
+    assert.strictEqual(sessions[2], session);
+    assert.strictEqual(sessions[3], session);
+
   });
 
-  it('custom statics that overwrite query functions dont get hooks by default (gh-7790)', function() {
-    return co(function*() {
-      const schema = new Schema({ name: String, loadedAt: Date });
+  it('custom statics that overwrite query functions dont get hooks by default (gh-7790)', async function() {
 
-      schema.statics.findOne = function() {
-        return this.findOneAndUpdate({}, { loadedAt: new Date() }, { new: true });
-      };
+    const schema = new Schema({ name: String, loadedAt: Date });
 
-      let called = 0;
-      schema.pre('findOne', function() {
-        ++called;
-      });
-      const Model = db.model('Test', schema);
+    schema.statics.findOne = function() {
+      return this.findOneAndUpdate({}, { loadedAt: new Date() }, { new: true });
+    };
 
-      yield Model.create({ name: 'foo' });
-
-      const res = yield Model.findOne();
-      assert.ok(res.loadedAt);
-      assert.equal(called, 0);
+    let called = 0;
+    schema.pre('findOne', function() {
+      ++called;
     });
+    const Model = db.model('Test', schema);
+
+    await Model.create({ name: 'foo' });
+
+    const res = await Model.findOne();
+    assert.ok(res.loadedAt);
+    assert.equal(called, 0);
+
   });
 
-  it('error handling middleware passes saved doc (gh-7832)', function() {
+  it('error handling middleware passes saved doc (gh-7832)', async function() {
     const schema = new Schema({ _id: Number });
 
     const errs = [];
@@ -6645,20 +6633,20 @@ describe('Model', function() {
     });
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      yield Model.create({ _id: 1 });
 
-      const doc = new Model({ _id: 1 });
-      const err = yield doc.save().then(() => null, err => err);
-      assert.ok(err);
-      assert.equal(err.code, 11000);
+    await Model.create({ _id: 1 });
 
-      assert.equal(errs.length, 1);
-      assert.equal(errs[0].code, 11000);
+    const doc = new Model({ _id: 1 });
+    const err = await doc.save().then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.code, 11000);
 
-      assert.equal(docs.length, 1);
-      assert.strictEqual(docs[0], doc);
-    });
+    assert.equal(errs.length, 1);
+    assert.equal(errs[0].code, 11000);
+
+    assert.equal(docs.length, 1);
+    assert.strictEqual(docs[0], doc);
+
   });
 
   it('throws readable error if calling Model function with bad context (gh-7957)', function() {
@@ -6708,7 +6696,7 @@ describe('Model', function() {
     });
   });
 
-  it('Model.validate() (gh-7587)', function() {
+  it('Model.validate() (gh-7587)', async function() {
     const Model = db.model('Test', new Schema({
       name: {
         first: {
@@ -6727,53 +6715,53 @@ describe('Model', function() {
       comments: [{ name: { type: String, required: true } }]
     }));
 
-    return co(function*() {
-      let err = null;
-      let obj = null;
 
-      err = yield Model.validate({ age: null }, ['age']).
-        then(() => null, err => err);
-      assert.ok(err);
-      assert.deepEqual(Object.keys(err.errors), ['age']);
+    let err = null;
+    let obj = null;
 
-      err = yield Model.validate({ name: {} }, ['name']).
-        then(() => null, err => err);
-      assert.ok(err);
-      assert.deepEqual(Object.keys(err.errors), ['name.first', 'name.last']);
+    err = await Model.validate({ age: null }, ['age']).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.deepEqual(Object.keys(err.errors), ['age']);
 
-      obj = { name: { first: 'foo' } };
-      err = yield Model.validate(obj, ['name']).
-        then(() => null, err => err);
-      assert.ok(err);
-      assert.deepEqual(Object.keys(err.errors), ['name.last']);
+    err = await Model.validate({ name: {} }, ['name']).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.deepEqual(Object.keys(err.errors), ['name.first', 'name.last']);
 
-      obj = { comments: [{ name: 'test' }, {}] };
-      err = yield Model.validate(obj, ['comments']).
-        then(() => null, err => err);
-      assert.ok(err);
-      assert.deepEqual(Object.keys(err.errors), ['comments.name']);
+    obj = { name: { first: 'foo' } };
+    err = await Model.validate(obj, ['name']).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.deepEqual(Object.keys(err.errors), ['name.last']);
 
-      obj = { age: '42' };
-      yield Model.validate(obj, ['age']);
-      assert.strictEqual(obj.age, 42);
-    });
+    obj = { comments: [{ name: 'test' }, {}] };
+    err = await Model.validate(obj, ['comments']).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.deepEqual(Object.keys(err.errors), ['comments.name']);
+
+    obj = { age: '42' };
+    await Model.validate(obj, ['age']);
+    assert.strictEqual(obj.age, 42);
+
   });
 
-  it('Model.validate(...) validates paths in arrays (gh-8821)', function() {
+  it('Model.validate(...) validates paths in arrays (gh-8821)', async function() {
     const userSchema = new Schema({
       friends: [{ type: String, required: true, minlength: 3 }]
     });
 
     const User = db.model('User', userSchema);
-    return co(function*() {
-      const err = yield User.validate({ friends: [null, 'A'] }).catch(err => err);
 
-      assert.ok(err.errors['friends.0']);
-      assert.ok(err.errors['friends.1']);
-    });
+    const err = await User.validate({ friends: [null, 'A'] }).catch(err => err);
+
+    assert.ok(err.errors['friends.0']);
+    assert.ok(err.errors['friends.1']);
+
   });
 
-  it('Model.validate(...) uses document instance as context by default (gh-10132)', function() {
+  it('Model.validate(...) uses document instance as context by default (gh-10132)', async function() {
     const userSchema = new Schema({
       name: {
         type: String,
@@ -6785,28 +6773,28 @@ describe('Model', function() {
     });
 
     const User = db.model('User', userSchema);
-    return co(function*() {
-      const user = new User({ name: 'test', nameRequired: false });
-      const err = yield User.validate(user).catch(err => err);
 
-      assert.ifError(err);
-    });
+    const user = new User({ name: 'test', nameRequired: false });
+    const err = await User.validate(user).catch(err => err);
+
+    assert.ifError(err);
+
   });
-  it('Model.validate(...) uses object as context by default (gh-10346)', () => {
-    return co(function* () {
-      const userSchema = new mongoose.Schema({
-        name: { type: String, required: true },
-        age: { type: Number, required() {return this && this.name === 'John';} }
-      });
+  it('Model.validate(...) uses object as context by default (gh-10346)', async() => {
 
-      const User = db.model('User', userSchema);
-
-      const err1 = yield User.validate({ name: 'John' }).then(() => null, err => err);
-      assert.ok(err1);
-
-      const err2 = yield User.validate({ name: 'Sam' }).then(() => null, err => err);
-      assert.ok(err2 === null);
+    const userSchema = new mongoose.Schema({
+      name: { type: String, required: true },
+      age: { type: Number, required() {return this && this.name === 'John';} }
     });
+
+    const User = db.model('User', userSchema);
+
+    const err1 = await User.validate({ name: 'John' }).then(() => null, err => err);
+    assert.ok(err1);
+
+    const err2 = await User.validate({ name: 'Sam' }).then(() => null, err => err);
+    assert.ok(err2 === null);
+
   });
 
   it('sets correct `Document#op` with `save()` (gh-8439)', function() {
@@ -6833,113 +6821,113 @@ describe('Model', function() {
     });
   });
 
-  it('bulkWrite sets discriminator filters (gh-8590)', function() {
+  it('bulkWrite sets discriminator filters (gh-8590)', async function() {
     const Animal = db.model('Test', Schema({ name: String }));
     const Dog = Animal.discriminator('Dog', Schema({ breed: String }));
 
-    return co(function*() {
-      yield Dog.bulkWrite([{
-        updateOne: {
-          filter: { name: 'Pooka' },
-          update: { $set: { breed: 'Chorkie' } },
-          upsert: true
-        }
-      }]);
-      const res = yield Animal.findOne();
-      assert.ok(res instanceof Dog);
-      assert.strictEqual(res.breed, 'Chorkie');
-    });
+
+    await Dog.bulkWrite([{
+      updateOne: {
+        filter: { name: 'Pooka' },
+        update: { $set: { breed: 'Chorkie' } },
+        upsert: true
+      }
+    }]);
+    const res = await Animal.findOne();
+    assert.ok(res instanceof Dog);
+    assert.strictEqual(res.breed, 'Chorkie');
+
   });
 
-  it('bulkWrite upsert works when update casts to empty (gh-8698)', function() {
+  it('bulkWrite upsert works when update casts to empty (gh-8698)', async function() {
     const userSchema = new Schema({
       name: String
     });
     const User = db.model('User', userSchema);
 
-    return co(function*() {
-      yield User.bulkWrite([{
-        updateOne: {
-          filter: { name: 'test' },
-          update: { notInSchema: true },
-          upsert: true
-        }
-      }]);
 
-      const doc = yield User.findOne();
-      assert.ok(doc);
-      assert.strictEqual(doc.notInSchema, undefined);
-    });
+    await User.bulkWrite([{
+      updateOne: {
+        filter: { name: 'test' },
+        update: { notInSchema: true },
+        upsert: true
+      }
+    }]);
+
+    const doc = await User.findOne();
+    assert.ok(doc);
+    assert.strictEqual(doc.notInSchema, undefined);
+
   });
 
-  it('bulkWrite upsert with non-schema path in filter (gh-8698)', function() {
+  it('bulkWrite upsert with non-schema path in filter (gh-8698)', async function() {
     const userSchema = new Schema({
       name: String
     });
     const User = db.model('User', userSchema);
 
-    return co(function*() {
-      let err = yield User.bulkWrite([{
-        updateOne: {
-          filter: { notInSchema: 'foo' },
-          update: { name: 'test' },
-          upsert: true
-        }
-      }]).then(() => null, err => err);
-      assert.ok(err);
-      assert.equal(err.name, 'StrictModeError');
-      assert.ok(err.message.indexOf('notInSchema') !== -1, err.message);
 
-      err = yield User.bulkWrite([{
-        updateMany: {
-          filter: { notInSchema: 'foo' },
-          update: { name: 'test' },
-          upsert: true
-        }
-      }]).then(() => null, err => err);
-      assert.ok(err);
-      assert.equal(err.name, 'StrictModeError');
-      assert.ok(err.message.indexOf('notInSchema') !== -1, err.message);
+    let err = await User.bulkWrite([{
+      updateOne: {
+        filter: { notInSchema: 'foo' },
+        update: { name: 'test' },
+        upsert: true
+      }
+    }]).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'StrictModeError');
+    assert.ok(err.message.indexOf('notInSchema') !== -1, err.message);
 
-      err = yield User.bulkWrite([{
-        replaceOne: {
-          filter: { notInSchema: 'foo' },
-          update: { name: 'test' },
-          upsert: true
-        }
-      }]).then(() => null, err => err);
-      assert.ok(err);
-      assert.equal(err.name, 'StrictModeError');
-      assert.ok(err.message.indexOf('notInSchema') !== -1, err.message);
-    });
+    err = await User.bulkWrite([{
+      updateMany: {
+        filter: { notInSchema: 'foo' },
+        update: { name: 'test' },
+        upsert: true
+      }
+    }]).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'StrictModeError');
+    assert.ok(err.message.indexOf('notInSchema') !== -1, err.message);
+
+    err = await User.bulkWrite([{
+      replaceOne: {
+        filter: { notInSchema: 'foo' },
+        update: { name: 'test' },
+        upsert: true
+      }
+    }]).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'StrictModeError');
+    assert.ok(err.message.indexOf('notInSchema') !== -1, err.message);
+
   });
 
-  it('bulkWrite can disable timestamps with updateOne, and updateMany', function() {
+  it('bulkWrite can disable timestamps with updateOne, and updateMany', async function() {
     const userSchema = new Schema({
       name: String
     }, { timestamps: true });
 
     const User = db.model('User', userSchema);
 
-    return co(function*() {
-      const users = yield User.create([{ name: 'Hafez1' }, { name: 'Hafez2' }]);
 
-      yield User.bulkWrite([
-        { updateOne: { filter: { _id: users[0]._id }, update: { name: 'John1' }, timestamps: false } },
-        { updateMany: { filter: { _id: users[1]._id }, update: { name: 'John2' }, timestamps: false } }
-      ]);
+    const users = await User.create([{ name: 'Hafez1' }, { name: 'Hafez2' }]);
 
-      const usersAfterUpdate = yield Promise.all([
-        User.findOne({ _id: users[0]._id }),
-        User.findOne({ _id: users[1]._id })
-      ]);
+    await User.bulkWrite([
+      { updateOne: { filter: { _id: users[0]._id }, update: { name: 'John1' }, timestamps: false } },
+      { updateMany: { filter: { _id: users[1]._id }, update: { name: 'John2' }, timestamps: false } }
+    ]);
 
-      assert.deepEqual(users[0].updatedAt, usersAfterUpdate[0].updatedAt);
-      assert.deepEqual(users[1].updatedAt, usersAfterUpdate[1].updatedAt);
-    });
+    const usersAfterUpdate = await Promise.all([
+      User.findOne({ _id: users[0]._id }),
+      User.findOne({ _id: users[1]._id })
+    ]);
+
+    assert.deepEqual(users[0].updatedAt, usersAfterUpdate[0].updatedAt);
+    assert.deepEqual(users[1].updatedAt, usersAfterUpdate[1].updatedAt);
+
   });
 
-  it('bulkWrite can overwrite schema `strict` option for filters and updates (gh-8778)', function() {
+  it('bulkWrite can overwrite schema `strict` option for filters and updates (gh-8778)', async function() {
     // Arrange
     const userSchema = new Schema({
       name: String
@@ -6947,159 +6935,158 @@ describe('Model', function() {
 
     const User = db.model('User', userSchema);
 
-    return co(function*() {
-      const users = [
-        { notInSchema: 1 },
-        { notInSchema: 2 },
-        { notInSchema: 3 }
-      ];
-      yield User.collection.insertMany(users);
 
-      // Act
-      yield User.bulkWrite([
-        { updateOne: { filter: { notInSchema: 1 }, update: { notInSchema: 'first' } } },
-        { updateMany: { filter: { notInSchema: 2 }, update: { notInSchema: 'second' } } },
-        { replaceOne: { filter: { notInSchema: 3 }, replacement: { notInSchema: 'third' } } }
-      ],
-      { strict: false });
+    const users = [
+      { notInSchema: 1 },
+      { notInSchema: 2 },
+      { notInSchema: 3 }
+    ];
+    await User.collection.insertMany(users);
 
-      // Assert
-      const usersAfterUpdate = yield Promise.all([
-        User.collection.findOne({ _id: users[0]._id }),
-        User.collection.findOne({ _id: users[1]._id }),
-        User.collection.findOne({ _id: users[2]._id })
-      ]);
+    // Act
+    await User.bulkWrite([
+      { updateOne: { filter: { notInSchema: 1 }, update: { notInSchema: 'first' } } },
+      { updateMany: { filter: { notInSchema: 2 }, update: { notInSchema: 'second' } } },
+      { replaceOne: { filter: { notInSchema: 3 }, replacement: { notInSchema: 'third' } } }
+    ],
+    { strict: false });
 
-      assert.equal(usersAfterUpdate[0].notInSchema, 'first');
-      assert.equal(usersAfterUpdate[1].notInSchema, 'second');
-      assert.equal(usersAfterUpdate[2].notInSchema, 'third');
-    });
+    // Assert
+    const usersAfterUpdate = await Promise.all([
+      User.collection.findOne({ _id: users[0]._id }),
+      User.collection.findOne({ _id: users[1]._id }),
+      User.collection.findOne({ _id: users[2]._id })
+    ]);
+
+    assert.equal(usersAfterUpdate[0].notInSchema, 'first');
+    assert.equal(usersAfterUpdate[1].notInSchema, 'second');
+    assert.equal(usersAfterUpdate[2].notInSchema, 'third');
+
   });
 
-  it('cast errors have `kind` field (gh-8953)', function() {
-    return co(function*() {
-      const User = db.model('User', {});
-      const err = yield User.findOne({ _id: 'invalid' }).then(() => null, err => err);
+  it('cast errors have `kind` field (gh-8953)', async function() {
 
-      assert.deepEqual(err.kind, 'ObjectId');
-    });
+    const User = db.model('User', {});
+    const err = await User.findOne({ _id: 'invalid' }).then(() => null, err => err);
+
+    assert.deepEqual(err.kind, 'ObjectId');
+
   });
 
-  it('casts bulkwrite timestamps to `Number` when specified (gh-9030)', function() {
-    return co(function* () {
-      const userSchema = new Schema({
-        name: String,
-        updatedAt: Number
-      }, { timestamps: true });
+  it('casts bulkwrite timestamps to `Number` when specified (gh-9030)', async function() {
 
-      const User = db.model('User', userSchema);
+    const userSchema = new Schema({
+      name: String,
+      updatedAt: Number
+    }, { timestamps: true });
 
-      yield User.create([{ name: 'user1' }, { name: 'user2' }]);
+    const User = db.model('User', userSchema);
 
-      yield User.bulkWrite([
-        {
-          updateOne: {
-            filter: { name: 'user1' },
-            update: { name: 'new name' }
-          }
+    await User.create([{ name: 'user1' }, { name: 'user2' }]);
+
+    await User.bulkWrite([
+      {
+        updateOne: {
+          filter: { name: 'user1' },
+          update: { name: 'new name' }
+        }
+      },
+      {
+        updateMany: {
+          filter: { name: 'user2' },
+          update: { name: 'new name' }
+        }
+      }
+    ]);
+
+    const users = await User.find().lean();
+    assert.equal(typeof users[0].updatedAt, 'number');
+    assert.equal(typeof users[1].updatedAt, 'number');
+
+    // not-lean queries cast to number even if stored on DB as a date
+    assert.equal(users[0] instanceof User, false);
+    assert.equal(users[1] instanceof User, false);
+
+  });
+
+  it('Model.bulkWrite(...) does not throw an error when provided an empty array (gh-9131)', async function() {
+    const userSchema = new Schema();
+    const User = db.model('User', userSchema);
+
+    const res = await User.bulkWrite([]);
+
+    assert.deepEqual(
+      res,
+      {
+        result: {
+          ok: 1,
+          writeErrors: [],
+          writeConcernErrors: [],
+          insertedIds: [],
+          nInserted: 0,
+          nUpserted: 0,
+          nMatched: 0,
+          nModified: 0,
+          nRemoved: 0,
+          upserted: []
         },
-        {
-          updateMany: {
-            filter: { name: 'user2' },
-            update: { name: 'new name' }
-          }
-        }
-      ]);
+        insertedCount: 0,
+        matchedCount: 0,
+        modifiedCount: 0,
+        deletedCount: 0,
+        upsertedCount: 0,
+        upsertedIds: {},
+        insertedIds: {},
+        n: 0
+      }
+    );
 
-      const users = yield User.find().lean();
-      assert.equal(typeof users[0].updatedAt, 'number');
-      assert.equal(typeof users[1].updatedAt, 'number');
-
-      // not-lean queries cast to number even if stored on DB as a date
-      assert.equal(users[0] instanceof User, false);
-      assert.equal(users[1] instanceof User, false);
-    });
   });
 
-  it('Model.bulkWrite(...) does not throw an error when provided an empty array (gh-9131)', function() {
-    return co(function*() {
-      const userSchema = new Schema();
-      const User = db.model('User', userSchema);
+  it('Model.bulkWrite(...) does not throw an error with upsert:true, setDefaultsOnInsert: true (gh-9157)', async function() {
 
-      const res = yield User.bulkWrite([]);
+    const userSchema = new Schema(
+      {
+        friends: [String],
+        age: { type: Number, default: 25 }
+      },
+      { timestamps: true }
+    );
+    const User = db.model('User', userSchema);
 
-      assert.deepEqual(
-        res,
-        {
-          result: {
-            ok: 1,
-            writeErrors: [],
-            writeConcernErrors: [],
-            insertedIds: [],
-            nInserted: 0,
-            nUpserted: 0,
-            nMatched: 0,
-            nModified: 0,
-            nRemoved: 0,
-            upserted: []
-          },
-          insertedCount: 0,
-          matchedCount: 0,
-          modifiedCount: 0,
-          deletedCount: 0,
-          upsertedCount: 0,
-          upsertedIds: {},
-          insertedIds: {},
-          n: 0
+    await User.bulkWrite([
+      {
+        updateOne: {
+          filter: { },
+          update: { friends: ['Sam'] },
+          upsert: true,
+          setDefaultsOnInsert: true
         }
-      );
-    });
+      }
+    ]);
+
+    const user = await User.findOne().sort({ _id: -1 });
+
+    assert.equal(user.age, 25);
+    assert.deepEqual(user.friends, ['Sam']);
+
   });
 
-  it('Model.bulkWrite(...) does not throw an error with upsert:true, setDefaultsOnInsert: true (gh-9157)', function() {
-    return co(function*() {
-      const userSchema = new Schema(
-        {
-          friends: [String],
-          age: { type: Number, default: 25 }
-        },
-        { timestamps: true }
-      );
-      const User = db.model('User', userSchema);
-
-      yield User.bulkWrite([
-        {
-          updateOne: {
-            filter: { },
-            update: { friends: ['Sam'] },
-            upsert: true,
-            setDefaultsOnInsert: true
-          }
-        }
-      ]);
-
-      const user = yield User.findOne().sort({ _id: -1 });
-
-      assert.equal(user.age, 25);
-      assert.deepEqual(user.friends, ['Sam']);
-    });
-  });
-
-  it('allows calling `create()` after `bulkWrite()` (gh-9350)', function() {
+  it('allows calling `create()` after `bulkWrite()` (gh-9350)', async function() {
     const schema = Schema({ foo: Boolean });
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      yield Model.bulkWrite([
-        { insertOne: { document: { foo: undefined } } },
-        { updateOne: { filter: {}, update: { $set: { foo: true } } } }
-      ]);
 
-      yield Model.create({ foo: undefined });
+    await Model.bulkWrite([
+      { insertOne: { document: { foo: undefined } } },
+      { updateOne: { filter: {}, update: { $set: { foo: true } } } }
+    ]);
 
-      const docs = yield Model.find();
-      assert.equal(docs.length, 2);
-    });
+    await Model.create({ foo: undefined });
+
+    const docs = await Model.find();
+    assert.equal(docs.length, 2);
+
   });
 
   it('skips applying init hooks if `document` option set to `false` (gh-9316)', function() {
@@ -7116,48 +7103,48 @@ describe('Model', function() {
     assert.equal(called, 0);
   });
 
-  it('retains atomics after failed `save()` (gh-9327)', function() {
+  it('retains atomics after failed `save()` (gh-9327)', async function() {
     const schema = new Schema({ arr: [String] });
     const Test = db.model('Test', schema);
 
-    return co(function*() {
-      const doc = yield Test.create({ arr: [] });
 
-      yield Test.deleteMany({});
+    const doc = await Test.create({ arr: [] });
 
-      doc.arr.push('test');
-      const err = yield doc.save().then(() => null, err => err);
-      assert.ok(err);
+    await Test.deleteMany({});
 
-      const delta = doc.getChanges();
-      assert.ok(delta.$push);
-      assert.ok(delta.$push.arr);
-    });
+    doc.arr.push('test');
+    const err = await doc.save().then(() => null, err => err);
+    assert.ok(err);
+
+    const delta = doc.getChanges();
+    assert.ok(delta.$push);
+    assert.ok(delta.$push.arr);
+
   });
 
-  it('doesnt wipe out changes made while `save()` is in flight (gh-9327)', function() {
+  it('doesnt wipe out changes made while `save()` is in flight (gh-9327)', async function() {
     const schema = new Schema({ num1: Number, num2: Number });
     const Test = db.model('Test', schema);
 
-    return co(function*() {
-      const doc = yield Test.create({});
 
-      doc.num1 = 1;
-      doc.num2 = 1;
-      const p = doc.save();
+    const doc = await Test.create({});
 
-      yield cb => setTimeout(cb, 0);
+    doc.num1 = 1;
+    doc.num2 = 1;
+    const p = doc.save();
 
-      doc.num1 = 2;
-      doc.num2 = 2;
-      yield p;
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
-      yield doc.save();
+    doc.num1 = 2;
+    doc.num2 = 2;
+    await p;
 
-      const fromDb = yield Test.findById(doc._id);
-      assert.equal(fromDb.num1, 2);
-      assert.equal(fromDb.num2, 2);
-    });
+    await doc.save();
+
+    const fromDb = await Test.findById(doc._id);
+    assert.equal(fromDb.num1, 2);
+    assert.equal(fromDb.num2, 2);
+
   });
 
   describe('returnOriginal (gh-9183)', function() {
@@ -7170,81 +7157,81 @@ describe('Model', function() {
       mongoose.set('returnOriginal', originalValue);
     });
 
-    it('Setting `returnOriginal` works', function() {
-      return co(function*() {
-        const userSchema = new Schema({
-          name: { type: String }
-        });
+    it('Setting `returnOriginal` works', async function() {
 
-        const User = db.model('User', userSchema);
-
-        const createdUser = yield User.create({ name: 'Hafez' });
-
-        const user1 = yield User.findOneAndUpdate({ _id: createdUser._id }, { name: 'Hafez1' });
-        assert.equal(user1.name, 'Hafez1');
-
-        const user2 = yield User.findByIdAndUpdate(createdUser._id, { name: 'Hafez2' });
-        assert.equal(user2.name, 'Hafez2');
-
-        const user3 = yield User.findOneAndReplace({ _id: createdUser._id }, { name: 'Hafez3' });
-        assert.equal(user3.name, 'Hafez3');
+      const userSchema = new Schema({
+        name: { type: String }
       });
+
+      const User = db.model('User', userSchema);
+
+      const createdUser = await User.create({ name: 'Hafez' });
+
+      const user1 = await User.findOneAndUpdate({ _id: createdUser._id }, { name: 'Hafez1' });
+      assert.equal(user1.name, 'Hafez1');
+
+      const user2 = await User.findByIdAndUpdate(createdUser._id, { name: 'Hafez2' });
+      assert.equal(user2.name, 'Hafez2');
+
+      const user3 = await User.findOneAndReplace({ _id: createdUser._id }, { name: 'Hafez3' });
+      assert.equal(user3.name, 'Hafez3');
+
     });
 
-    it('`returnOriginal` can be overwritten', function() {
-      return co(function*() {
-        const userSchema = new Schema({
-          name: { type: String }
-        });
+    it('`returnOriginal` can be overwritten', async function() {
 
-        const User = db.model('User', userSchema);
-
-        const createdUser = yield User.create({ name: 'Hafez' });
-
-        const user1 = yield User.findOneAndUpdate({ _id: createdUser._id }, { name: 'Hafez1' }, { new: false });
-        assert.equal(user1.name, 'Hafez');
-
-        const user2 = yield User.findByIdAndUpdate(createdUser._id, { name: 'Hafez2' }, { new: false });
-        assert.equal(user2.name, 'Hafez1');
-
-        const user3 = yield User.findOneAndReplace({ _id: createdUser._id }, { name: 'Hafez3' }, { new: false });
-        assert.equal(user3.name, 'Hafez2');
+      const userSchema = new Schema({
+        name: { type: String }
       });
+
+      const User = db.model('User', userSchema);
+
+      const createdUser = await User.create({ name: 'Hafez' });
+
+      const user1 = await User.findOneAndUpdate({ _id: createdUser._id }, { name: 'Hafez1' }, { new: false });
+      assert.equal(user1.name, 'Hafez');
+
+      const user2 = await User.findByIdAndUpdate(createdUser._id, { name: 'Hafez2' }, { new: false });
+      assert.equal(user2.name, 'Hafez1');
+
+      const user3 = await User.findOneAndReplace({ _id: createdUser._id }, { name: 'Hafez3' }, { new: false });
+      assert.equal(user3.name, 'Hafez2');
+
     });
   });
 
   describe('buildBulkWriteOperations() (gh-9673)', () => {
-    it('builds write operations', () => {
-      return co(function*() {
+    it('builds write operations', async() => {
 
-        const userSchema = new Schema({
-          name: { type: String }
-        });
 
-        const User = db.model('User', userSchema);
-
-        const users = [
-          new User({ name: 'Hafez1_gh-9673-1' }),
-          new User({ name: 'Hafez2_gh-9673-1' }),
-          new User({ name: 'I am the third name' })
-        ];
-
-        yield users[2].save();
-        users[2].name = 'I am the updated third name';
-
-        const writeOperations = User.buildBulkWriteOperations(users);
-
-        const desiredWriteOperations = [
-          { insertOne: { document: users[0] } },
-          { insertOne: { document: users[1] } },
-          { updateOne: { filter: { _id: users[2]._id }, update: { $set: { name: 'I am the updated third name' } } } }
-        ];
-
-        assert.deepEqual(
-          writeOperations,
-          desiredWriteOperations
-        );
+      const userSchema = new Schema({
+        name: { type: String }
       });
+
+      const User = db.model('User', userSchema);
+
+      const users = [
+        new User({ name: 'Hafez1_gh-9673-1' }),
+        new User({ name: 'Hafez2_gh-9673-1' }),
+        new User({ name: 'I am the third name' })
+      ];
+
+      await users[2].save();
+      users[2].name = 'I am the updated third name';
+
+      const writeOperations = User.buildBulkWriteOperations(users);
+
+      const desiredWriteOperations = [
+        { insertOne: { document: users[0] } },
+        { insertOne: { document: users[1] } },
+        { updateOne: { filter: { _id: users[2]._id }, update: { $set: { name: 'I am the updated third name' } } } }
+      ];
+
+      assert.deepEqual(
+        writeOperations,
+        desiredWriteOperations
+      );
+
     });
 
     it('throws an error when one document is invalid', () => {
@@ -7324,290 +7311,290 @@ describe('Model', function() {
   });
 
   describe('bulkSave() (gh-9673)', function() {
-    it('saves new documents', function() {
-      return co(function* () {
-        const userSchema = new Schema({
-          name: { type: String }
-        });
+    it('saves new documents', async function() {
 
-        const User = db.model('User', userSchema);
-
-
-        yield User.bulkSave([
-          new User({ name: 'Hafez1_gh-9673-1' }),
-          new User({ name: 'Hafez2_gh-9673-1' })
-        ]);
-
-        const users = yield User.find().sort('name');
-
-        assert.deepEqual(
-          users.map(user => user.name),
-          [
-            'Hafez1_gh-9673-1',
-            'Hafez2_gh-9673-1'
-          ]
-        );
+      const userSchema = new Schema({
+        name: { type: String }
       });
+
+      const User = db.model('User', userSchema);
+
+
+      await User.bulkSave([
+        new User({ name: 'Hafez1_gh-9673-1' }),
+        new User({ name: 'Hafez2_gh-9673-1' })
+      ]);
+
+      const users = await User.find().sort('name');
+
+      assert.deepEqual(
+        users.map(user => user.name),
+        [
+          'Hafez1_gh-9673-1',
+          'Hafez2_gh-9673-1'
+        ]
+      );
+
     });
 
-    it('updates documents', function() {
-      return co(function* () {
-        const userSchema = new Schema({
-          name: { type: String }
-        });
+    it('updates documents', async function() {
 
-        const User = db.model('User', userSchema);
-
-
-        yield User.insertMany([
-          new User({ name: 'Hafez1_gh-9673-2' }),
-          new User({ name: 'Hafez2_gh-9673-2' }),
-          new User({ name: 'Hafez3_gh-9673-2' })
-        ]);
-
-        const users = yield User.find().sort('name');
-
-        users[0].name = 'Hafez1_gh-9673-2-updated';
-        users[1].name = 'Hafez2_gh-9673-2-updated';
-
-        yield User.bulkSave(users);
-
-        const usersAfterUpdate = yield User.find().sort('name');
-
-        assert.deepEqual(
-          usersAfterUpdate.map(user => user.name),
-          [
-            'Hafez1_gh-9673-2-updated',
-            'Hafez2_gh-9673-2-updated',
-            'Hafez3_gh-9673-2'
-          ]
-        );
+      const userSchema = new Schema({
+        name: { type: String }
       });
+
+      const User = db.model('User', userSchema);
+
+
+      await User.insertMany([
+        new User({ name: 'Hafez1_gh-9673-2' }),
+        new User({ name: 'Hafez2_gh-9673-2' }),
+        new User({ name: 'Hafez3_gh-9673-2' })
+      ]);
+
+      const users = await User.find().sort('name');
+
+      users[0].name = 'Hafez1_gh-9673-2-updated';
+      users[1].name = 'Hafez2_gh-9673-2-updated';
+
+      await User.bulkSave(users);
+
+      const usersAfterUpdate = await User.find().sort('name');
+
+      assert.deepEqual(
+        usersAfterUpdate.map(user => user.name),
+        [
+          'Hafez1_gh-9673-2-updated',
+          'Hafez2_gh-9673-2-updated',
+          'Hafez3_gh-9673-2'
+        ]
+      );
+
     });
 
-    it('returns writeResult on success', () => {
-      return co(function* () {
-        const userSchema = new Schema({
-          name: { type: String }
-        });
+    it('returns writeResult on success', async() => {
 
-        const User = db.model('User', userSchema);
-
-
-        yield User.insertMany([
-          new User({ name: 'Hafez1_gh-9673-2' }),
-          new User({ name: 'Hafez2_gh-9673-2' })
-        ]);
-
-        const users = yield User.find().sort('name');
-
-        users[0].name = 'Hafez1_gh-9673-2-updated';
-        users[1].name = 'Hafez2_gh-9673-2-updated';
-
-        const writeResult = yield User.bulkSave(users);
-        assert.ok(writeResult.result.ok);
+      const userSchema = new Schema({
+        name: { type: String }
       });
+
+      const User = db.model('User', userSchema);
+
+
+      await User.insertMany([
+        new User({ name: 'Hafez1_gh-9673-2' }),
+        new User({ name: 'Hafez2_gh-9673-2' })
+      ]);
+
+      const users = await User.find().sort('name');
+
+      users[0].name = 'Hafez1_gh-9673-2-updated';
+      users[1].name = 'Hafez2_gh-9673-2-updated';
+
+      const writeResult = await User.bulkSave(users);
+      assert.ok(writeResult.result.ok);
+
     });
-    it('throws an error on failure', () => {
-      return co(function* () {
-        const userSchema = new Schema({
-          name: { type: String, unique: true }
-        });
+    it('throws an error on failure', async() => {
 
-        const User = db.model('User', userSchema);
-        yield User.init();
-
-        yield User.insertMany([
-          new User({ name: 'Hafez1_gh-9673-2' }),
-          new User({ name: 'Hafez2_gh-9673-2' })
-        ]);
-
-        const users = yield User.find().sort('name');
-
-        users[0].name = 'duplicate-name';
-        users[1].name = 'duplicate-name';
-
-        const err = yield User.bulkSave(users).then(() => null, err => err);
-        assert.ok(err);
+      const userSchema = new Schema({
+        name: { type: String, unique: true }
       });
+
+      const User = db.model('User', userSchema);
+      await User.init();
+
+      await User.insertMany([
+        new User({ name: 'Hafez1_gh-9673-2' }),
+        new User({ name: 'Hafez2_gh-9673-2' })
+      ]);
+
+      const users = await User.find().sort('name');
+
+      users[0].name = 'duplicate-name';
+      users[1].name = 'duplicate-name';
+
+      const err = await User.bulkSave(users).then(() => null, err => err);
+      assert.ok(err);
+
     });
-    it('changes document state from `isNew` `false` to `true`', () => {
-      return co(function* () {
-        const userSchema = new Schema({
-          name: { type: String }
-        });
+    it('changes document state from `isNew` `false` to `true`', async() => {
 
-        const User = db.model('User', userSchema);
-        yield User.init();
-
-        const user1 = new User({ name: 'Hafez1_gh-9673-3' });
-        const user2 = new User({ name: 'Hafez1_gh-9673-3' });
-
-        assert.equal(user1.isNew, true);
-        assert.equal(user2.isNew, true);
-
-        yield User.bulkSave([user1, user2]);
-
-        assert.equal(user1.isNew, false);
-        assert.equal(user2.isNew, false);
+      const userSchema = new Schema({
+        name: { type: String }
       });
+
+      const User = db.model('User', userSchema);
+      await User.init();
+
+      const user1 = new User({ name: 'Hafez1_gh-9673-3' });
+      const user2 = new User({ name: 'Hafez1_gh-9673-3' });
+
+      assert.equal(user1.isNew, true);
+      assert.equal(user2.isNew, true);
+
+      await User.bulkSave([user1, user2]);
+
+      assert.equal(user1.isNew, false);
+      assert.equal(user2.isNew, false);
+
     });
-    it('sets `isNew` to false when a document succeeds and `isNew` does not change when some fail', () => {
-      return co(function* () {
-        const userSchema = new Schema({
-          name: { type: String, unique: true }
-        });
+    it('sets `isNew` to false when a document succeeds and `isNew` does not change when some fail', async() => {
 
-        const User = db.model('User', userSchema);
-        yield User.init();
-
-        const user1 = new User({ name: 'Hafez1_gh-9673-4' });
-        const user2 = new User({ name: 'Hafez1_gh-9673-4' });
-
-        const err = yield User.bulkSave([user1, user2]).then(() => null, err => err);
-
-        assert.ok(err);
-        assert.equal(user1.isNew, false);
-        assert.equal(user2.isNew, true);
+      const userSchema = new Schema({
+        name: { type: String, unique: true }
       });
+
+      const User = db.model('User', userSchema);
+      await User.init();
+
+      const user1 = new User({ name: 'Hafez1_gh-9673-4' });
+      const user2 = new User({ name: 'Hafez1_gh-9673-4' });
+
+      const err = await User.bulkSave([user1, user2]).then(() => null, err => err);
+
+      assert.ok(err);
+      assert.equal(user1.isNew, false);
+      assert.equal(user2.isNew, true);
+
     });
-    it('changes documents state for successful writes', () => {
-      return co(function* () {
-        const userSchema = new Schema({
-          name: { type: String, unique: true },
-          age: Number
-        });
+    it('changes documents state for successful writes', async() => {
 
-        const User = db.model('User', userSchema);
-        yield User.init();
-
-        const user1 = new User({ name: 'Sam', age: 26 });
-        const user2 = new User({ name: 'Sam', age: 27 });
-
-        assert.equal(user1.isNew, true);
-        assert.equal(user2.isNew, true);
-
-        const err = yield User.bulkSave([user1, user2]).then(() => null, err => err);
-
-        assert.ok(err);
-        assert.deepEqual(user1.getChanges(), {});
-        assert.deepEqual(user2.getChanges(), { $set: { age: 27, name: 'Sam' } });
+      const userSchema = new Schema({
+        name: { type: String, unique: true },
+        age: Number
       });
+
+      const User = db.model('User', userSchema);
+      await User.init();
+
+      const user1 = new User({ name: 'Sam', age: 26 });
+      const user2 = new User({ name: 'Sam', age: 27 });
+
+      assert.equal(user1.isNew, true);
+      assert.equal(user2.isNew, true);
+
+      const err = await User.bulkSave([user1, user2]).then(() => null, err => err);
+
+      assert.ok(err);
+      assert.deepEqual(user1.getChanges(), {});
+      assert.deepEqual(user2.getChanges(), { $set: { age: 27, name: 'Sam' } });
+
     });
-    it('triggers pre/post-save hooks', () => {
-      return co(function* () {
-        const userSchema = new Schema({
-          name: String,
-          age: Number
-        });
+    it('triggers pre/post-save hooks', async() => {
 
-        let preSaveCallCount = 0;
-        let postSaveCallCount = 0;
-
-        userSchema.pre('save', function() {
-          preSaveCallCount++;
-        });
-        userSchema.post('save', function() {
-          postSaveCallCount++;
-        });
-
-        const User = db.model('User', userSchema);
-
-        const user1 = new User({ name: 'Sam1' });
-        const user2 = new User({ name: 'Sam2' });
-
-
-        yield User.bulkSave([user1, user2]);
-        assert.equal(preSaveCallCount, 2);
-        assert.equal(postSaveCallCount, 2);
+      const userSchema = new Schema({
+        name: String,
+        age: Number
       });
-    });
-    it('calls pre-save before actually saving', () => {
-      return co(function* () {
-        const userSchema = new Schema({ name: String });
 
+      let preSaveCallCount = 0;
+      let postSaveCallCount = 0;
 
-        userSchema.pre('save', function() {
-          this.name = 'name from pre-save';
-        });
-
-        const User = db.model('User', userSchema);
-
-        const user1 = new User({ name: 'Sam1' });
-        const user2 = new User({ name: 'Sam2' });
-
-
-        yield User.bulkSave([user1, user2]);
-
-        const usersFromDatabase = yield User.find({ _id: { $in: [user1._id, user2._id] } }).sort('_id');
-        assert.equal(usersFromDatabase[0].name, 'name from pre-save');
-        assert.equal(usersFromDatabase[1].name, 'name from pre-save');
+      userSchema.pre('save', function() {
+        preSaveCallCount++;
       });
+      userSchema.post('save', function() {
+        postSaveCallCount++;
+      });
+
+      const User = db.model('User', userSchema);
+
+      const user1 = new User({ name: 'Sam1' });
+      const user2 = new User({ name: 'Sam2' });
+
+
+      await User.bulkSave([user1, user2]);
+      assert.equal(preSaveCallCount, 2);
+      assert.equal(postSaveCallCount, 2);
+
     });
-    it('works if some document is not modified (gh-10437)', () => {
+    it('calls pre-save before actually saving', async() => {
+
+      const userSchema = new Schema({ name: String });
+
+
+      userSchema.pre('save', function() {
+        this.name = 'name from pre-save';
+      });
+
+      const User = db.model('User', userSchema);
+
+      const user1 = new User({ name: 'Sam1' });
+      const user2 = new User({ name: 'Sam2' });
+
+
+      await User.bulkSave([user1, user2]);
+
+      const usersFromDatabase = await User.find({ _id: { $in: [user1._id, user2._id] } }).sort('_id');
+      assert.equal(usersFromDatabase[0].name, 'name from pre-save');
+      assert.equal(usersFromDatabase[1].name, 'name from pre-save');
+
+    });
+    it('works if some document is not modified (gh-10437)', async() => {
       const userSchema = new Schema({
         name: String
       });
 
       const User = db.model('User', userSchema);
 
-      return co(function*() {
-        const user = yield User.create({ name: 'Hafez' });
 
-        const err = yield User.bulkSave([user]).then(() => null, err => err);
-        assert.ok(err == null);
-      });
+      const user = await User.create({ name: 'Hafez' });
+
+      const err = await User.bulkSave([user]).then(() => null, err => err);
+      assert.ok(err == null);
+
     });
   });
 
   describe('Setting the explain flag', function() {
-    it('should give an object back rather than a boolean (gh-8275)', function() {
-      return co(function*() {
-        const MyModel = db.model('Character', mongoose.Schema({
-          name: String,
-          age: Number,
-          rank: String
-        }));
+    it('should give an object back rather than a boolean (gh-8275)', async function() {
 
-        yield MyModel.create([
-          { name: 'Jean-Luc Picard', age: 59, rank: 'Captain' },
-          { name: 'William Riker', age: 29, rank: 'Commander' },
-          { name: 'Deanna Troi', age: 28, rank: 'Lieutenant Commander' },
-          { name: 'Geordi La Forge', age: 29, rank: 'Lieutenant' },
-          { name: 'Worf', age: 24, rank: 'Lieutenant' }
-        ]);
-        const res = yield MyModel.exists({}, { explain: true });
+      const MyModel = db.model('Character', mongoose.Schema({
+        name: String,
+        age: Number,
+        rank: String
+      }));
 
-        assert.equal(typeof res, 'object');
-      });
+      await MyModel.create([
+        { name: 'Jean-Luc Picard', age: 59, rank: 'Captain' },
+        { name: 'William Riker', age: 29, rank: 'Commander' },
+        { name: 'Deanna Troi', age: 28, rank: 'Lieutenant Commander' },
+        { name: 'Geordi La Forge', age: 29, rank: 'Lieutenant' },
+        { name: 'Worf', age: 24, rank: 'Lieutenant' }
+      ]);
+      const res = await MyModel.exists({}, { explain: true });
+
+      assert.equal(typeof res, 'object');
+
     });
   });
 
-  it('saves all error object properties to paths with type `Mixed` (gh-10126)', () => {
-    return co(function*() {
-      const userSchema = new Schema({ err: Schema.Types.Mixed });
+  it('saves all error object properties to paths with type `Mixed` (gh-10126)', async() => {
 
-      const User = db.model('User', userSchema);
+    const userSchema = new Schema({ err: Schema.Types.Mixed });
 
-      const err = new Error('I am a bad error');
-      err.metadata = { reasons: ['Cloudflare is down', 'DNS'] };
+    const User = db.model('User', userSchema);
 
-      const user = yield User.create({ err });
-      const userFromDB = yield User.findOne({ _id: user._id });
+    const err = new Error('I am a bad error');
+    err.metadata = { reasons: ['Cloudflare is down', 'DNS'] };
 
-      assertErrorProperties(user);
-      assertErrorProperties(userFromDB);
+    const user = await User.create({ err });
+    const userFromDB = await User.findOne({ _id: user._id });
+
+    assertErrorProperties(user);
+    assertErrorProperties(userFromDB);
 
 
-      function assertErrorProperties(user) {
-        assert.equal(user.err.message, 'I am a bad error');
-        assert.ok(user.err.stack);
-        assert.deepEqual(user.err.metadata, { reasons: ['Cloudflare is down', 'DNS'] });
-      }
-    });
+    function assertErrorProperties(user) {
+      assert.equal(user.err.message, 'I am a bad error');
+      assert.ok(user.err.stack);
+      assert.deepEqual(user.err.metadata, { reasons: ['Cloudflare is down', 'DNS'] });
+    }
+
   });
 
-  it('supports skipping defaults on a find operation gh-7287', function() {
+  it('supports skipping defaults on a find operation gh-7287', async function() {
     const betaSchema = new Schema({
       name: { type: String, default: 'foo' },
       age: { type: Number },
@@ -7615,12 +7602,17 @@ describe('Model', function() {
     });
 
     const Beta = db.model('Beta', betaSchema);
-    return co(function*() {
-      yield Beta.collection.insertOne({ age: 21, _id: 1 });
-      const test = yield Beta.findOne({ _id: 1 }).setOptions({ defaults: false });
-      assert.ok(!test.name);
-    });
+
+    await Beta.collection.insertOne({ age: 21, _id: 1 });
+    const test = await Beta.findOne({ _id: 1 }).setOptions({ defaults: false });
+    assert.ok(!test.name);
+
   });
 });
 
 
+
+
+async function delay(ms) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}

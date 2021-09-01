@@ -9,7 +9,6 @@ const start = require('./common');
 const DocumentArray = require('../lib/types/DocumentArray');
 const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const assert = require('assert');
-const co = require('co');
 const idGetter = require('../lib/plugins/idGetter');
 const setValue = require('../lib/utils').setValue;
 
@@ -620,7 +619,7 @@ describe('types.documentarray', function() {
     });
   });
 
-  it('cleans modified subpaths on splice() (gh-7249)', function() {
+  it('cleans modified subpaths on splice() (gh-7249)', async function() {
     const childSchema = mongoose.Schema({
       name: { type: String, required: true }
     }, { _id: false });
@@ -631,22 +630,21 @@ describe('types.documentarray', function() {
 
     const Parent = db.model('Test', parentSchema);
 
-    return co(function*() {
-      let parent = yield Parent.create({
-        children: [{ name: '1' }, { name: '2' }]
-      });
 
-      parent = yield Parent.findOne();
-
-      parent.children[1].name = '3';
-      parent.children.splice(0, 1);
-
-      yield parent.save();
-
-      parent = yield Parent.findOne();
-
-      assert.deepEqual(parent.toObject().children, [{ name: '3' }]);
+    let parent = await Parent.create({
+      children: [{ name: '1' }, { name: '2' }]
     });
+
+    parent = await Parent.findOne();
+
+    parent.children[1].name = '3';
+    parent.children.splice(0, 1);
+
+    await parent.save();
+
+    parent = await Parent.findOne();
+
+    assert.deepEqual(parent.toObject().children, [{ name: '3' }]);
   });
 
   it('modifies ownerDocument() on set (gh-8479)', function() {

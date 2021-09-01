@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 const util = require('util');
 
 const mongoose = start.mongoose;
@@ -180,26 +179,24 @@ describe('model', function() {
         checkHydratesCorrectModels({ name: 1 }, done);
       });
 
-      it('casts underneath $or if discriminator key in filter (gh-9018)', function() {
-        return co(function*() {
-          yield ImpressionEvent.create({ name: 'Impression event', element: '42' });
-          yield ConversionEvent.create({ name: 'Conversion event', revenue: 1.337 });
+      it('casts underneath $or if discriminator key in filter (gh-9018)', async function() {
+        await ImpressionEvent.create({ name: 'Impression event', element: '42' });
+        await ConversionEvent.create({ name: 'Conversion event', revenue: 1.337 });
 
-          let docs = yield BaseEvent.find({ __t: 'Impression', element: 42 });
-          assert.equal(docs.length, 1);
-          assert.equal(docs[0].name, 'Impression event');
+        let docs = await BaseEvent.find({ __t: 'Impression', element: 42 });
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].name, 'Impression event');
 
-          docs = yield BaseEvent.find({ $or: [{ __t: 'Impression', element: 42 }] });
-          assert.equal(docs.length, 1);
-          assert.equal(docs[0].name, 'Impression event');
+        docs = await BaseEvent.find({ $or: [{ __t: 'Impression', element: 42 }] });
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].name, 'Impression event');
 
-          docs = yield BaseEvent.find({
-            $or: [{ __t: 'Impression', element: 42 }, { __t: 'Conversion', revenue: '1.337' }]
-          }).sort({ __t: 1 });
-          assert.equal(docs.length, 2);
-          assert.equal(docs[0].name, 'Conversion event');
-          assert.equal(docs[1].name, 'Impression event');
-        });
+        docs = await BaseEvent.find({
+          $or: [{ __t: 'Impression', element: 42 }, { __t: 'Conversion', revenue: '1.337' }]
+        }).sort({ __t: 1 });
+        assert.equal(docs.length, 2);
+        assert.equal(docs[0].name, 'Conversion event');
+        assert.equal(docs[1].name, 'Impression event');
       });
 
       describe('discriminator model only finds documents of its type', function() {
@@ -822,7 +819,7 @@ describe('model', function() {
         });
       });
 
-      it('reference in child schemas (gh-2719-2)', function() {
+      it('reference in child schemas (gh-2719-2)', async function() {
         function BaseSchema() {
           Schema.apply(this, arguments);
 
@@ -856,27 +853,25 @@ describe('model', function() {
           date: Date
         }));
 
-        return co(function*() {
-          const survey = yield Survey.create({
-            name: 'That you see?',
-            date: Date.now()
-          });
-
-          yield Talk.create({
-            name: 'Meetup rails',
-            date: new Date('2015-04-01T00:00:00Z'),
-            pin: '0004',
-            period: { start: '11:00', end: '12:00' },
-            surveys: [survey]
-          });
-
-          const events = yield Event.find({}).populate('surveys').exec();
-
-          assert.ok(events[0].surveys[0] instanceof Survey);
+        const survey = await Survey.create({
+          name: 'That you see?',
+          date: Date.now()
         });
+
+        await Talk.create({
+          name: 'Meetup rails',
+          date: new Date('2015-04-01T00:00:00Z'),
+          pin: '0004',
+          period: { start: '11:00', end: '12:00' },
+          surveys: [survey]
+        });
+
+        const events = await Event.find({}).populate('surveys').exec();
+
+        assert.ok(events[0].surveys[0] instanceof Survey);
       });
 
-      it('correctly populates doc with nonexistent discriminator key (gh-10082)', function() {
+      it('correctly populates doc with nonexistent discriminator key (gh-10082)', async function() {
         const foodSchema = Schema({ name: String, animal: String });
         const Food = db.model('Food', foodSchema);
 
@@ -894,28 +889,26 @@ describe('model', function() {
         });
         const Animal = db.model('Animal', animalSchema);
         Animal.discriminator('cat', catSchema);
-        // const Rabbit = Animal.discriminator('rabbit', rabbitSchema);
 
-        return co(function*() {
-          yield Promise.all([
-            new Food({ name: 'Cat Food', animal: 'cat' }).save(),
-            new Food({ name: 'Rabbit Food', animal: 'rabbit' }).save()
-          ]);
-          yield Animal.collection.insertOne({ type: 'cat', catYears: 4 });
-          yield Animal.collection.insertOne({ type: 'rabbit' }); // <-- "rabbit" has no discriminator
+        await Promise.all([
+          Food.create({ name: 'Cat Food', animal: 'cat' }),
+          Food.create({ name: 'Rabbit Food', animal: 'rabbit' })
+        ]);
+        await Animal.collection.insertOne({ type: 'cat', catYears: 4 });
+        await Animal.collection.insertOne({ type: 'rabbit' }); // <-- "rabbit" has no discriminator
 
-          const cat = yield Animal.findOne({ type: 'cat' }).populate('foods');
-          const rabbit = yield Animal.findOne({ type: 'rabbit' }).populate('foods');
-          assert.equal(cat.foods.length, 1);
-          assert.equal(cat.foods[0].name, 'Cat Food');
-          assert.equal(rabbit.foods.length, 1);
-          assert.equal(rabbit.foods[0].name, 'Rabbit Food');
-        });
+        const cat = await Animal.findOne({ type: 'cat' }).populate('foods');
+        const rabbit = await Animal.findOne({ type: 'rabbit' }).populate('foods');
+        assert.equal(cat.foods.length, 1);
+        assert.equal(cat.foods[0].name, 'Cat Food');
+        assert.equal(rabbit.foods.length, 1);
+        assert.equal(rabbit.foods[0].name, 'Rabbit Food');
+
       });
     });
 
     describe('deleteOne and deleteMany (gh-8471)', function() {
-      it('adds discriminator filter if no conditions passed', () => {
+      it('adds discriminator filter if no conditions passed', async() => {
         const PeopleSchema = Schema({ job: String, name: String },
           { discriminatorKey: 'job' });
 
@@ -927,50 +920,48 @@ describe('model', function() {
         const DeveloperSchema = Schema({ coffeeAmount: Number });
         const Developer = People.discriminator('Developer', DeveloperSchema, 'Developer');
 
-        return co(function*() {
-          yield Designer.create({
-            name: 'John',
-            job: 'Designer',
-            badge: 'green'
-          });
-
-          let numDesigners = yield Designer.countDocuments();
-          let numDevelopers = yield Developer.countDocuments();
-          let total = yield People.countDocuments();
-          assert.equal(numDesigners, 1);
-          assert.equal(numDevelopers, 0);
-          assert.equal(total, 1);
-
-          yield Developer.deleteOne();
-
-          numDesigners = yield Designer.countDocuments();
-          numDevelopers = yield Developer.countDocuments();
-          total = yield People.countDocuments();
-          assert.equal(numDesigners, 1);
-          assert.equal(numDevelopers, 0);
-          assert.equal(total, 1);
-
-          yield Developer.create([
-            { name: 'Mike', job: 'Developer', coffeeAmount: 25 },
-            { name: 'Joe', job: 'Developer', coffeeAmount: 14 }
-          ]);
-
-          numDesigners = yield Designer.countDocuments();
-          numDevelopers = yield Developer.countDocuments();
-          total = yield People.countDocuments();
-          assert.equal(numDesigners, 1);
-          assert.equal(numDevelopers, 2);
-          assert.equal(total, 3);
-
-          yield Developer.deleteMany();
-
-          numDesigners = yield Designer.countDocuments();
-          numDevelopers = yield Developer.countDocuments();
-          total = yield People.countDocuments();
-          assert.equal(numDesigners, 1);
-          assert.equal(numDevelopers, 0);
-          assert.equal(total, 1);
+        await Designer.create({
+          name: 'John',
+          job: 'Designer',
+          badge: 'green'
         });
+
+        let numDesigners = await Designer.countDocuments();
+        let numDevelopers = await Developer.countDocuments();
+        let total = await People.countDocuments();
+        assert.equal(numDesigners, 1);
+        assert.equal(numDevelopers, 0);
+        assert.equal(total, 1);
+
+        await Developer.deleteOne();
+
+        numDesigners = await Designer.countDocuments();
+        numDevelopers = await Developer.countDocuments();
+        total = await People.countDocuments();
+        assert.equal(numDesigners, 1);
+        assert.equal(numDevelopers, 0);
+        assert.equal(total, 1);
+
+        await Developer.create([
+          { name: 'Mike', job: 'Developer', coffeeAmount: 25 },
+          { name: 'Joe', job: 'Developer', coffeeAmount: 14 }
+        ]);
+
+        numDesigners = await Designer.countDocuments();
+        numDevelopers = await Developer.countDocuments();
+        total = await People.countDocuments();
+        assert.equal(numDesigners, 1);
+        assert.equal(numDevelopers, 2);
+        assert.equal(total, 3);
+
+        await Developer.deleteMany();
+
+        numDesigners = await Designer.countDocuments();
+        numDevelopers = await Developer.countDocuments();
+        total = await People.countDocuments();
+        assert.equal(numDesigners, 1);
+        assert.equal(numDevelopers, 0);
+        assert.equal(total, 1);
       });
     });
 

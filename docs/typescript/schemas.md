@@ -24,7 +24,7 @@ const schema = new Schema<User>({
 By default, Mongoose does **not** check if your document interface lines up with your schema.
 For example, the above code won't throw an error if `email` is optional in the document interface, but `required` in `schema`.
 
-## Defining Middleware
+## [Defining Middleware](#defining-middleware)
 
 The Mongoose `Schema` class in TypeScript has 3 generic parameters:
 
@@ -43,7 +43,7 @@ schema.pre('save', function(): void {
 });
 ```
 
-## Checking Field Names
+## [Checking Field Names](#checking-field-names)
 
 The 3rd generic param, `SchemaDefinitionType`, checks to make sure that every path in your schema is defined in your document interface.
 For example, the below code will fail to compile because `emaill` is a path in the schema, but not in the `SchemaDefinitionType`.

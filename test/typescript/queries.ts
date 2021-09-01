@@ -128,3 +128,18 @@ function eachAsync(): void {
 
   Test.find().cursor().eachAsync((docs: ITest[]) => console.log(docs[0].name), { batchSize: 2 });
 }
+
+async function gh10617(): Promise<void> {
+  interface IDBModel extends Document {
+    date: Date; // date created
+    _tags: any[];
+  }
+
+  const schema = new Schema({
+    date: { type: Date, default: Date.now }, // date created
+    _tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }]
+  });
+
+  const DBModel: Model<IDBModel> = model<IDBModel>('Meep', schema);
+  await DBModel.findOne({});
+}

@@ -51,8 +51,8 @@ petSchema.virtual('owner', {
   }
 });
 
-const Person = model('Person', personSchema);
-const Pet = model('Pet', petSchema);
+const Person = model<IPerson>('Person', personSchema);
+const Pet = model<IPet>('Pet', petSchema);
 
 (async() => {
   const person = await Person.create({ _id: 1, firstName: 'John', lastName: 'Wick' });

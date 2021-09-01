@@ -15,7 +15,7 @@ Before we get into the specifics of validation syntax, please keep the following
 [require:Validation$]
 ```
 
-### Built-in Validators
+### [Built-in Validators](#built-in-validators)
 
 Mongoose has several built-in validators.
 
@@ -29,7 +29,7 @@ Each of the validator links above provide more information about how to enable t
 [require:Built-in Validators]
 ```
 
-### Custom Error Messages
+### [Custom Error Messages](#custom-error-messages)
 
 You can configure the error message for individual validators in your schema. There are two equivalent
 ways to set the validator error message:
@@ -44,7 +44,7 @@ Mongoose replaces `{VALUE}` with the value being validated.
 [require:Custom Error Messages]
 ```
 
-### The `unique` Option is Not a Validator
+### [The `unique` Option is Not a Validator](#the-unique-option-is-not-a-validator)
 
 A common gotcha for beginners is that the `unique` option for schemas
 is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://docs.mongodb.com/manual/core/index-unique/).
@@ -54,7 +54,7 @@ See the [FAQ](/docs/faq.html) for more information.
 [require:The `unique` Option is Not a Validator]
 ```
 
-### Custom Validators
+### [Custom Validators](#custom-validators)
 
 If the built-in validators aren't enough, you can define custom validators
 to suit your needs.
@@ -67,7 +67,7 @@ You can find detailed instructions on how to do this in the
 [require:Custom Validators]
 ```
 
-### Async Custom Validators
+### [Async Custom Validators](#async-custom-validators)
 
 Custom validators can also be asynchronous. If your validator function
 returns a promise (like an `async` function), mongoose will wait for that
@@ -78,7 +78,7 @@ the value `false`, Mongoose will consider that a validation error.
 [require:Async Custom Validators]
 ```
 
-### Validation Errors
+### [Validation Errors](#validation-errors)
 
 Errors returned after failed validation contain an `errors` object
 whose values are `ValidatorError` objects. Each
@@ -92,7 +92,7 @@ thrown.
 [require:Validation Errors]
 ```
 
-### Cast Errors
+### [Cast Errors](#cast-errors)
 
 Before running validators, Mongoose attempts to coerce values to the
 correct type. This process is called _casting_ the document. If
@@ -107,7 +107,7 @@ fails. That means your custom validators may assume `v` is `null`,
 [require:Cast Errors]
 ```
 
-### Required Validators On Nested Objects
+### [Required Validators On Nested Objects](#required-validators-on-nested-objects)
 
 Defining validators on nested objects in mongoose is tricky, because
 nested objects are not fully fledged paths.
@@ -116,7 +116,7 @@ nested objects are not fully fledged paths.
 [require:Required Validators On Nested Objects]
 ```
 
-### Update Validators
+### [Update Validators](#update-validators)
 
 In the above examples, you learned about document validation. Mongoose also
 supports validation for [`update()`](/docs/api.html#query_Query-update),
@@ -135,7 +135,7 @@ caveats.
 [require:Update Validators$]
 ```
 
-### Update Validators and `this`
+### [Update Validators and `this`](#update-validators-and-this)
 
 There are a couple of key differences between update validators and
 document validators. In the color validation function above, `this` refers
@@ -148,7 +148,7 @@ not defined.
 [require:Update Validators and `this`]
 ```
 
-### The `context` option
+### [The `context` option](#the-context-option)
 
 The `context` option lets you set the value of `this` in update validators
 to the underlying query.
@@ -157,7 +157,7 @@ to the underlying query.
 [require:The `context` option]
 ```
 
-### Update Validators Only Run On Updated Paths
+### [Update Validators Only Run On Updated Paths](#update-validators-only-run-on-updated-paths)
 
 The other key difference is that update validators only run on the paths
 specified in the update. For instance, in the below example, because
@@ -171,7 +171,7 @@ you try to explicitly `$unset` the key.
 [require:Update Validators Only Run On Updated Paths]
 ```
 
-### Update Validators Only Run For Some Operations
+### [Update Validators Only Run For Some Operations](#update-validators-only-run-for-some-operations)
 
 One final detail worth noting: update validators **only** run on the
 following update operators:

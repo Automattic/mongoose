@@ -115,7 +115,7 @@ describe('defaults docs', function() {
 
     await Movie.deleteMany({});
 
-    doc = await Movie.findOneAndUpdate(query, update, { ...options, setDefaultsOnInsert: false }).lean();
+    doc = await Movie.findOneAndUpdate(query, update, { new: true, upsert: true, setDefaultsOnInsert: false }).lean();
     doc.genre; // undefined, Mongoose did not set a default value
     // acquit:ignore:start
     assert.equal(doc.title, 'The Terminator');

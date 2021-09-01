@@ -1,3 +1,13 @@
+6.0.4 / 2021-09-01
+==================
+ * fix(schema): handle maps of maps #10644
+ * fix: avoid setting defaults on insert on a path whose subpath is referenced in the update #10624
+ * fix(index.d.ts): simplify UpdateQuery to avoid "excessively deep and possibly infinite" errors with `extends Document` and `any` #10617
+ * fix(index.d.ts): allow using type: [documentDefinition] when defining a doc array in a schema #10605
+ * docs: remove useNewUrlParser, useUnifiedTopology, some other legacy options from docs #10631 #10632
+ * docs(defaults): clarify that setDefaultsOnInsert is true by default in 6.x #10643
+ * test: use async/await instead of co #10633 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 6.0.3 / 2021-08-30
 ==================
  * fix: handle buffering with find() now that find() no longer accepts a callback #10639 #10634 #10610

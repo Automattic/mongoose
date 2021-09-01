@@ -1,10 +1,14 @@
 'use strict';
 
 const Server = require('mongodb-topology-manager').Server;
-const co = require('co');
 const mongodb = require('mongodb');
 
-co(function*() {
+run().catch(error => {
+  console.error(error);
+  process.exit(-1);
+});
+
+async function run() {
   // Create new instance
   const server = new Server('mongod', {
     auth: null,
@@ -12,19 +16,16 @@ co(function*() {
   });
 
   // Purge the directory
-  yield server.purge();
+  await server.purge();
 
   // Start process
-  yield server.start();
+  await server.start();
 
-  const db = yield mongodb.MongoClient.connect('mongodb://localhost:27017/admin');
+  const db = await mongodb.MongoClient.connect('mongodb://localhost:27017/admin');
 
-  yield db.addUser('passwordIsTaco', 'taco', {
+  await db.addUser('passwordIsTaco', 'taco', {
     roles: ['dbOwner']
   });
 
   console.log('done');
-}).catch(error => {
-  console.error(error);
-  process.exit(-1);
-});
+}

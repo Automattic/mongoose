@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "6.0.3",
+  "version": "6.0.4",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -22,7 +22,7 @@
     "bson": "^4.2.2",
     "kareem": "2.3.2",
     "mongodb": "4.1.1",
-    "mpath": "0.8.3",
+    "mpath": "0.8.4",
     "mquery": "4.0.0",
     "ms": "2.1.2",
     "regexp-clone": "1.0.0",
@@ -42,7 +42,6 @@
     "bluebird": "3.5.5",
     "chalk": "2.4.2",
     "cheerio": "1.0.0-rc.2",
-    "co": "4.6.0",
     "dox": "0.3.1",
     "eslint": "7.1.0",
     "eslint-plugin-mocha-no-only": "1.1.0",
@@ -105,26 +104,24 @@
     "extends": [
       "eslint:recommended"
     ],
-    "overrides": [
-      {
-        "files": [
-          "**/*.{ts,tsx}"
-        ],
-        "extends": [
-          "plugin:@typescript-eslint/eslint-recommended",
-          "plugin:@typescript-eslint/recommended"
-        ],
-        "plugins": [
-          "@typescript-eslint"
-        ],
-        "rules": {
-          "@typescript-eslint/no-explicit-any": "off",
-          "@typescript-eslint/ban-types": "off",
-          "@typescript-eslint/no-unused-vars": "off",
-          "@typescript-eslint/explicit-module-boundary-types": "off"
-        }
+    "overrides": [{
+      "files": [
+        "**/*.{ts,tsx}"
+      ],
+      "extends": [
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+      ],
+      "plugins": [
+        "@typescript-eslint"
+      ],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/ban-types": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off"
       }
-    ],
+    }],
     "plugins": [
       "mocha-no-only"
     ],

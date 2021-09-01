@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
@@ -34,7 +33,7 @@ describe('model', function() {
   describe('indexes', function() {
     this.timeout(5000);
 
-    it('are created when model is compiled', function() {
+    it('are created when model is compiled', async function() {
       const Indexed = new Schema({
         name: { type: String, index: true },
         last: String,
@@ -48,26 +47,25 @@ describe('model', function() {
       const IndexedModel = db.model('Test', Indexed);
       let assertions = 0;
 
-      return co(function*() {
-        yield cb => IndexedModel.on('index', () => cb());
-        const indexes = yield IndexedModel.collection.getIndexes({ full: true });
+      await new Promise((resolve) => IndexedModel.on('index', () => resolve()));
 
-        indexes.forEach(function(index) {
-          switch (index.name) {
-            case '_id_':
-            case 'name_1':
-            case 'last_1_email_1':
-              assertions++;
-              break;
-            case 'date_1':
-              assertions++;
-              assert.equal(index.expireAfterSeconds, 10);
-              break;
-          }
-        });
+      const indexes = await IndexedModel.collection.getIndexes({ full: true });
 
-        assert.equal(assertions, 4);
+      indexes.forEach(function(index) {
+        switch (index.name) {
+          case '_id_':
+          case 'name_1':
+          case 'last_1_email_1':
+            assertions++;
+            break;
+          case 'date_1':
+            assertions++;
+            assert.equal(index.expireAfterSeconds, 10);
+            break;
+        }
       });
+
+      assert.equal(assertions, 4);
     });
 
     it('of embedded documents', function(done) {
@@ -336,22 +334,21 @@ describe('model', function() {
       });
     });
 
-    it('creates descending indexes from schema definition(gh-8895)', function() {
-      return co(function*() {
-        const userSchema = new Schema({
-          name: { type: String, index: -1 },
-          address: { type: String, index: '-1' }
-        });
+    it('creates descending indexes from schema definition(gh-8895)', async function() {
 
-        const User = db.model('User', userSchema);
-
-        yield User.init();
-
-        const indexes = yield User.collection.getIndexes();
-
-        assert.ok(indexes['name_-1']);
-        assert.ok(indexes['address_-1']);
+      const userSchema = new Schema({
+        name: { type: String, index: -1 },
+        address: { type: String, index: '-1' }
       });
+
+      const User = db.model('User', userSchema);
+
+      await User.init();
+
+      const indexes = await User.collection.getIndexes();
+
+      assert.ok(indexes['name_-1']);
+      assert.ok(indexes['address_-1']);
     });
 
     describe('auto creation', function() {
@@ -459,23 +456,22 @@ describe('model', function() {
     });
   });
 
-  it('sets correct partialFilterExpression for document array (gh-9091)', function() {
+  it('sets correct partialFilterExpression for document array (gh-9091)', async function() {
     const childSchema = new Schema({ name: String });
     childSchema.index({ name: 1 }, { partialFilterExpression: { name: { $exists: true } } });
     const schema = new Schema({ arr: [childSchema] });
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      yield Model.init();
 
-      yield Model.syncIndexes();
-      const indexes = yield Model.listIndexes();
+    await Model.init();
 
-      assert.equal(indexes.length, 2);
-      assert.ok(indexes[1].partialFilterExpression);
-      assert.deepEqual(indexes[1].partialFilterExpression, {
-        'arr.name': { $exists: true }
-      });
+    await Model.syncIndexes();
+    const indexes = await Model.listIndexes();
+
+    assert.equal(indexes.length, 2);
+    assert.ok(indexes[1].partialFilterExpression);
+    assert.deepEqual(indexes[1].partialFilterExpression, {
+      'arr.name': { $exists: true }
     });
   });
 
@@ -559,151 +555,145 @@ describe('model', function() {
         then(dropped => assert.equal(dropped.length, 0));
     });
 
-    it('uses schema-level collation by default (gh-9912)', function() {
-      return co(function*() {
-        yield db.db.collection('User').drop().catch(() => {});
+    it('uses schema-level collation by default (gh-9912)', async function() {
 
-        const userSchema = new mongoose.Schema({ username: String }, {
-          collation: {
-            locale: 'en',
-            strength: 2
-          }
-        });
-        userSchema.index({ username: 1 }, { unique: true });
-        const User = db.model('User', userSchema, 'User');
+      await db.db.collection('User').drop().catch(() => {});
 
-        yield User.init();
-        const indexes = yield User.listIndexes();
-        assert.equal(indexes.length, 2);
-        assert.deepEqual(indexes[1].key, { username: 1 });
-        assert.ok(indexes[1].collation);
-        assert.equal(indexes[1].collation.strength, 2);
-
-        yield User.collection.drop();
+      const userSchema = new mongoose.Schema({ username: String }, {
+        collation: {
+          locale: 'en',
+          strength: 2
+        }
       });
+      userSchema.index({ username: 1 }, { unique: true });
+      const User = db.model('User', userSchema, 'User');
+
+      await User.init();
+      const indexes = await User.listIndexes();
+      assert.equal(indexes.length, 2);
+      assert.deepEqual(indexes[1].key, { username: 1 });
+      assert.ok(indexes[1].collation);
+      assert.equal(indexes[1].collation.strength, 2);
+
+      await User.collection.drop();
     });
 
-    it('different collation with syncIndexes() (gh-8521)', function() {
-      return co(function*() {
-        yield db.db.collection('User').drop().catch(() => {});
+    it('different collation with syncIndexes() (gh-8521)', async function() {
 
-        let userSchema = new mongoose.Schema({ username: String });
-        userSchema.index({ username: 1 }, { unique: true });
-        let User = db.model('User', userSchema, 'User');
+      await db.db.collection('User').drop().catch(() => {});
 
-        yield User.init();
-        let indexes = yield User.listIndexes();
-        assert.equal(indexes.length, 2);
-        assert.deepEqual(indexes[1].key, { username: 1 });
-        assert.ok(!indexes[1].collation);
+      let userSchema = new mongoose.Schema({ username: String });
+      userSchema.index({ username: 1 }, { unique: true });
+      let User = db.model('User', userSchema, 'User');
 
-        userSchema = new mongoose.Schema({ username: String }, { autoIndex: false });
-        userSchema.index({ username: 1 }, {
-          unique: true,
-          collation: {
-            locale: 'en',
-            strength: 2
-          }
-        });
-        db.deleteModel('User');
-        User = db.model('User', userSchema, 'User');
+      await User.init();
+      let indexes = await User.listIndexes();
+      assert.equal(indexes.length, 2);
+      assert.deepEqual(indexes[1].key, { username: 1 });
+      assert.ok(!indexes[1].collation);
 
-        yield User.syncIndexes();
-
-        indexes = yield User.listIndexes();
-        assert.equal(indexes.length, 2);
-        assert.deepEqual(indexes[1].key, { username: 1 });
-        assert.ok(!!indexes[1].collation);
-
-        yield User.collection.drop();
+      userSchema = new mongoose.Schema({ username: String }, { autoIndex: false });
+      userSchema.index({ username: 1 }, {
+        unique: true,
+        collation: {
+          locale: 'en',
+          strength: 2
+        }
       });
+      db.deleteModel('User');
+      User = db.model('User', userSchema, 'User');
+
+      await User.syncIndexes();
+
+      indexes = await User.listIndexes();
+      assert.equal(indexes.length, 2);
+      assert.deepEqual(indexes[1].key, { username: 1 });
+      assert.ok(!!indexes[1].collation);
+
+      await User.collection.drop();
     });
 
-    it('reports syncIndexes() error (gh-9303)', function() {
-      return co(function*() {
-        let userSchema = new mongoose.Schema({ username: String, email: String });
-        let User = db.model('User', userSchema);
+    it('reports syncIndexes() error (gh-9303)', async function() {
 
-        yield User.createCollection().catch(() => {});
-        let indexes = yield User.listIndexes();
-        assert.equal(indexes.length, 1);
+      let userSchema = new mongoose.Schema({ username: String, email: String });
+      let User = db.model('User', userSchema);
 
-        yield User.create([{ username: 'test', email: 'foo@bar' }, { username: 'test', email: 'foo@bar' }]);
+      await User.createCollection().catch(() => {});
+      let indexes = await User.listIndexes();
+      assert.equal(indexes.length, 1);
 
-        userSchema = new mongoose.Schema({ username: String, email: String }, { autoIndex: false });
-        userSchema.index({ username: 1 }, { unique: true });
-        userSchema.index({ email: 1 });
-        db.deleteModel('User');
-        User = db.model('User', userSchema, 'User');
+      await User.create([{ username: 'test', email: 'foo@bar' }, { username: 'test', email: 'foo@bar' }]);
 
-        const err = yield User.syncIndexes().then(() => null, err => err);
-        assert.ok(err);
-        assert.equal(err.code, 11000);
+      userSchema = new mongoose.Schema({ username: String, email: String }, { autoIndex: false });
+      userSchema.index({ username: 1 }, { unique: true });
+      userSchema.index({ email: 1 });
+      db.deleteModel('User');
+      User = db.model('User', userSchema, 'User');
 
-        indexes = yield User.listIndexes();
-        assert.equal(indexes.length, 2);
-        assert.deepEqual(indexes[1].key, { email: 1 });
+      const err = await User.syncIndexes().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.code, 11000);
 
-        yield User.collection.drop();
-      });
+      indexes = await User.listIndexes();
+      assert.equal(indexes.length, 2);
+      assert.deepEqual(indexes[1].key, { email: 1 });
+
+      await User.collection.drop();
     });
 
-    it('cleanIndexes (gh-6676)', function() {
-      return co(function*() {
-        let M = db.model('Test', new Schema({
-          name: { type: String, index: true }
-        }, { autoIndex: false }), 'Test');
+    it('cleanIndexes (gh-6676)', async function() {
 
-        yield M.createIndexes();
+      let M = db.model('Test', new Schema({
+        name: { type: String, index: true }
+      }, { autoIndex: false }), 'Test');
 
-        let indexes = yield M.listIndexes();
-        assert.deepEqual(indexes.map(i => i.key), [
-          { _id: 1 },
-          { name: 1 }
-        ]);
+      await M.createIndexes();
 
-        M = db.model('Test', new Schema({
-          name: String
-        }, { autoIndex: false }), 'Test');
+      let indexes = await M.listIndexes();
+      assert.deepEqual(indexes.map(i => i.key), [
+        { _id: 1 },
+        { name: 1 }
+      ]);
 
-        yield M.cleanIndexes();
-        indexes = yield M.listIndexes();
-        assert.deepEqual(indexes.map(i => i.key), [
-          { _id: 1 }
-        ]);
-      });
+      M = db.model('Test', new Schema({
+        name: String
+      }, { autoIndex: false }), 'Test');
+
+      await M.cleanIndexes();
+      indexes = await M.listIndexes();
+      assert.deepEqual(indexes.map(i => i.key), [
+        { _id: 1 }
+      ]);
     });
-    it('should prevent collation on text indexes (gh-10044)', function() {
-      return co(function*() {
-        const userSchema = new mongoose.Schema({ username: String }, {
-          collation: {
-            locale: 'en',
-            strength: 2
-          },
-          autoCreate: false
-        });
-        userSchema.index({ username: 'text' }, { unique: true });
-        const User = db.model('User', userSchema, 'User');
+    it('should prevent collation on text indexes (gh-10044)', async function() {
 
-        yield User.init();
-        const indexes = yield User.listIndexes();
-        assert.ok(!indexes[1].collation);
-        yield User.collection.drop();
+      const userSchema = new mongoose.Schema({ username: String }, {
+        collation: {
+          locale: 'en',
+          strength: 2
+        },
+        autoCreate: false
       });
+      userSchema.index({ username: 'text' }, { unique: true });
+      const User = db.model('User', userSchema, 'User');
+
+      await User.init();
+      const indexes = await User.listIndexes();
+      assert.ok(!indexes[1].collation);
+      await User.collection.drop();
     });
-    it('should do a dryRun feat-10316', function() {
-      return co(function*() {
-        const userSchema = new mongoose.Schema({ username: String }, { password: String }, { email: String });
-        const User = db.model('Upson', userSchema);
-        yield User.collection.createIndex({ age: 1 });
-        yield User.collection.createIndex({ weight: 1 });
-        yield User.init();
-        userSchema.index({ password: 1 });
-        userSchema.index({ email: 1 });
-        const result = yield User.diffIndexes();
-        assert.deepStrictEqual(result.toDrop, ['age_1', 'weight_1']);
-        assert.deepStrictEqual(result.toCreate, [{ password: 1 }, { email: 1 }]);
-      });
+    it('should do a dryRun feat-10316', async function() {
+
+      const userSchema = new mongoose.Schema({ username: String }, { password: String }, { email: String });
+      const User = db.model('Upson', userSchema);
+      await User.collection.createIndex({ age: 1 });
+      await User.collection.createIndex({ weight: 1 });
+      await User.init();
+      userSchema.index({ password: 1 });
+      userSchema.index({ email: 1 });
+      const result = await User.diffIndexes();
+      assert.deepStrictEqual(result.toDrop, ['age_1', 'weight_1']);
+      assert.deepStrictEqual(result.toCreate, [{ password: 1 }, { email: 1 }]);
     });
   });
 });

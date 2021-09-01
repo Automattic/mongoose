@@ -188,3 +188,13 @@ function gh10605() {
     }
   });
 }
+
+function gh10605_2() {
+  interface ITestSchema extends Document {
+    someObject: Array<{id: string}>
+  }
+
+  const testSchema = new Schema<ITestSchema>({
+    someObject: { type: [{ id: String }] }
+  });
+}

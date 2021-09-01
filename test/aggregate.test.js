@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 
 const Aggregate = require('../lib/aggregate');
 
@@ -928,7 +927,7 @@ describe('aggregate: ', function() {
         });
       });
 
-      it('setting option in pre (gh-7606)', function() {
+      it('setting option in pre (gh-7606)', async function() {
         const s = new Schema({ name: String });
 
         s.pre('aggregate', function(next) {
@@ -938,17 +937,15 @@ describe('aggregate: ', function() {
 
         const M = db.model('Test', s);
 
-        return co(function*() {
-          yield M.create([{ name: 'alpha' }, { name: 'Zeta' }]);
+        await M.create([{ name: 'alpha' }, { name: 'Zeta' }]);
 
-          const docs = yield M.aggregate([{ $sort: { name: 1 } }]);
+        const docs = await M.aggregate([{ $sort: { name: 1 } }]);
 
-          assert.equal(docs[0].name, 'alpha');
-          assert.equal(docs[1].name, 'Zeta');
-        });
+        assert.equal(docs[0].name, 'alpha');
+        assert.equal(docs[1].name, 'Zeta');
       });
 
-      it('adding to pipeline in pre (gh-8017)', function() {
+      it('adding to pipeline in pre (gh-8017)', async function() {
         const s = new Schema({ name: String });
 
         s.pre('aggregate', function(next) {
@@ -958,14 +955,12 @@ describe('aggregate: ', function() {
 
         const M = db.model('Test', s);
 
-        return co(function*() {
-          yield M.create([{ name: 'alpha' }, { name: 'Zeta' }]);
+        await M.create([{ name: 'alpha' }, { name: 'Zeta' }]);
 
-          const docs = yield M.aggregate([{ $sort: { name: 1 } }]);
+        const docs = await M.aggregate([{ $sort: { name: 1 } }]);
 
-          assert.equal(docs.length, 1);
-          assert.equal(docs[0].name, 'Zeta');
-        });
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].name, 'Zeta');
       });
 
       it('post', function(done) {
@@ -1102,30 +1097,26 @@ describe('aggregate: ', function() {
     });
   });
 
-  it('cursor (gh-3160)', function() {
+  it('cursor (gh-3160)', async function() {
     const MyModel = db.model('Test', { name: String });
 
-    return co(function * () {
-      yield MyModel.create({ name: 'test' });
+    await MyModel.create({ name: 'test' });
 
-      const cursor = MyModel.
-        aggregate([{ $match: { name: 'test' } }, { $project: { name: '$name' } }]).
-        allowDiskUse(true).
-        cursor({ batchSize: 2500 });
+    const cursor = MyModel.
+      aggregate([{ $match: { name: 'test' } }, { $project: { name: '$name' } }]).
+      allowDiskUse(true).
+      cursor({ batchSize: 2500 });
 
-      assert.ok(cursor.eachAsync);
-    });
+    assert.ok(cursor.eachAsync);
   });
 
-  it('catch() (gh-7267)', function() {
+  it('catch() (gh-7267)', async function() {
     const MyModel = db.model('Test', {});
 
-    return co(function * () {
-      const err = yield MyModel.aggregate([{ $group: { foo: 'bar' } }]).
-        catch(err => err);
-      assert.ok(err instanceof Error);
-      assert.equal(err.name, 'MongoServerError');
-    });
+    const err = await MyModel.aggregate([{ $group: { foo: 'bar' } }])
+      .then(() => null, err => err);
+    assert.ok(err instanceof Error);
+    assert.equal(err.name, 'MongoServerError');
   });
 
   it('cursor() without options (gh-3855)', function(done) {

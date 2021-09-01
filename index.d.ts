@@ -1528,15 +1528,17 @@ declare module 'mongoose' {
     U :
     T extends ReadonlyArray<infer U> ? U : T;
 
+  type AnyArray<T> = T[] | ReadonlyArray<T>;
+
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends Schema<any, any> ? T :
-      T extends object[] ? (Schema<Unpacked<T>>[] | ReadonlyArray<Schema<Unpacked<T>>> | Schema<Document & Unpacked<T>>[] | ReadonlyArray<Schema<Document & Unpacked<T>>>) :
-      T extends string[] ? (SchemaDefinitionWithBuiltInClass<string>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<string>>) :
-      T extends number[] ? (SchemaDefinitionWithBuiltInClass<number>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<number>>) :
-      T extends boolean[] ? (SchemaDefinitionWithBuiltInClass<boolean>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<boolean>>) :
-      T extends Function[] ? (SchemaDefinitionWithBuiltInClass<Function>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<Function>>) :
+      T extends object[] ? (AnyArray<Schema<Unpacked<T>>> | AnyArray<Schema<Document & Unpacked<T>>> | AnyArray<SchemaDefinition<Unpacked<T>>>) :
+      T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> :
+      T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> :
+      T extends boolean[] ? AnyArray<SchemaDefinitionWithBuiltInClass<boolean>> :
+      T extends Function[] ? AnyArray<SchemaDefinitionWithBuiltInClass<Function>> :
       T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
@@ -2561,87 +2563,32 @@ declare module 'mongoose' {
     $sort?: SortValues | Record<string, SortValues>;
   };
 
-  type SetFields<TSchema> = ({
-    readonly [key in KeysOfAType<TSchema, ReadonlyArray<any> | undefined>]?:
-      | Unpacked<TSchema[key]>
-      | AddToSetOperators<Unpacked<TSchema[key]>[]>;
-  } &
-    NotAcceptedFields<TSchema, ReadonlyArray<any> | undefined>) & {
-      readonly [key: string]: AddToSetOperators<any> | any;
-    };
-
-  type PushOperator<TSchema> = ({
-    readonly [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
-      | Unpacked<TSchema[key]>
-      | ArrayOperator<Unpacked<TSchema[key]>[]>;
-  } &
-      NotAcceptedFields<TSchema, ReadonlyArray<any>>) & {
-      readonly [key: string]: ArrayOperator<any> | any;
-  };
-
   type ObjectQuerySelector<T> = T extends object ? { [key in keyof T]?: QuerySelector<T[key]> } : QuerySelector<T>;
 
-  type PullOperator<TSchema> = {
-    [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
-        | Partial<Unpacked<TSchema[key]>>
-        | ObjectQuerySelector<Unpacked<TSchema[key]>>
-        // Doesn't look like TypeScript has good support for creating an
-        // object containing dotted keys:
-        // https://stackoverflow.com/questions/58434389/typescript-deep-keyof-of-a-nested-object
-        | any;
-  } | any; // Because TS doesn't have good support for creating an object with dotted keys, including `.$.` re: #10075
-
-  type PullAllOperator<TSchema> = ({
-      readonly [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?: TSchema[key];
-  } &
-      NotAcceptedFields<TSchema, ReadonlyArray<any>>) & {
-      readonly [key: string]: any[];
+  type OnlyFieldsOfType<TSchema, FieldType = any, AssignableType = FieldType> = {
+    [key in keyof TSchema]?: [Extract<TSchema[key], FieldType>] extends [never] ? never : AssignableType;
   };
-
-  type KeysOfAType<TSchema, Type> = {
-    [key in keyof TSchema]: NonNullable<TSchema[key]> extends Type ? key : never;
-  }[keyof TSchema];
-  type KeysOfOtherType<TSchema, Type> = {
-    [key in keyof TSchema]: NonNullable<TSchema[key]> extends Type ? never : key;
-  }[keyof TSchema];
-
-  type AcceptedFields<TSchema, FieldType, AssignableType> = {
-    readonly [key in KeysOfAType<TSchema, FieldType>]?: AssignableType;
-  };
-
-  /** It avoid uses fields of non Type */
-  type NotAcceptedFields<TSchema, FieldType> = {
-    readonly [key in KeysOfOtherType<TSchema, FieldType>]?: never;
-  };
-
-  type OnlyFieldsOfType<TSchema, FieldType = any, AssignableType = FieldType> = AcceptedFields<
-      TSchema,
-      FieldType,
-      AssignableType
-  > &
-      NotAcceptedFields<TSchema, FieldType> &
-      DotAndArrayNotation<AssignableType>;
 
   type NumericTypes = number | Decimal128 | mongodb.Double | mongodb.Int32 | mongodb.Long;
 
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: OnlyFieldsOfType<TSchema, NativeDate, true | { $type: 'date' | 'timestamp' }>;
-    $inc?: OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
-    $min?: MatchKeysAndValues<TSchema>;
-    $max?: MatchKeysAndValues<TSchema>;
-    $mul?: OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
+    $currentDate?: OnlyFieldsOfType<TSchema, NativeDate, true | { $type: 'date' | 'timestamp' }> & AnyObject;
+    $inc?: OnlyFieldsOfType<TSchema, NumericTypes | undefined> & AnyObject;
+    $min?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
+    $max?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
+    $mul?: OnlyFieldsOfType<TSchema, NumericTypes | undefined> & AnyObject;
     $rename?: { [key: string]: string };
-    $set?: MatchKeysAndValues<TSchema>;
-    $setOnInsert?: MatchKeysAndValues<TSchema>;
-    $unset?: OnlyFieldsOfType<TSchema, any, any>;
+    $set?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
+    $setOnInsert?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
+    $unset?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: SetFields<TSchema>;
-    $pop?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1>;
-    $pull?: PullOperator<TSchema>;
-    $push?: PushOperator<TSchema>;
-    $pullAll?: PullAllOperator<TSchema>;
+    $addToSet?: OnlyFieldsOfType<TSchema, any[], any> & AnyObject;
+    $pop?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1> & AnyObject;
+    $pull?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
+    $push?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
+    $pullAll?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: {

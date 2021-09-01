@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -78,19 +77,17 @@ describe('model: findOneAndReplace:', function() {
     BlogPost = db.model('BlogPost', BlogPost);
   });
 
-  it('returns the original document', function() {
+  it('returns the original document', async function() {
     const M = BlogPost;
     const title = 'remove muah';
 
     const post = new M({ title: title });
 
-    return co(function*() {
-      yield post.save();
+    await post.save();
 
-      const doc = yield M.findOneAndReplace({ title: title });
+    const doc = await M.findOneAndReplace({ title: title });
 
-      assert.equal(post.id, doc.id);
-    });
+    assert.equal(post.id, doc.id);
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
@@ -292,25 +289,24 @@ describe('model: findOneAndReplace:', function() {
     });
   });
 
-  it('only calls setters once (gh-6203)', function() {
-    return co(function*() {
-      const calls = [];
-      const userSchema = new mongoose.Schema({
-        name: String,
-        foo: {
-          type: String,
-          set: function(val) {
-            calls.push(val);
-            return val + val;
-          }
+  it('only calls setters once (gh-6203)', async function() {
+
+    const calls = [];
+    const userSchema = new mongoose.Schema({
+      name: String,
+      foo: {
+        type: String,
+        set: function(val) {
+          calls.push(val);
+          return val + val;
         }
-      });
-      const Model = db.model('Test', userSchema);
-
-      yield Model.findOneAndReplace({ foo: '123' }, { name: 'bar' });
-
-      assert.deepEqual(calls, ['123']);
+      }
     });
+    const Model = db.model('Test', userSchema);
+
+    await Model.findOneAndReplace({ foo: '123' }, { name: 'bar' });
+
+    assert.deepEqual(calls, ['123']);
   });
 
   describe('middleware', function() {
@@ -388,69 +384,65 @@ describe('model: findOneAndReplace:', function() {
     });
   });
 
-  it('works (gh-7654)', function() {
+  it('works (gh-7654)', async function() {
     const schema = new Schema({ name: String, age: Number });
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      yield Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, { upsert: true });
 
-      const doc = yield Model.findOne();
-      assert.equal(doc.name, 'Jean-Luc Picard');
+    await Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, { upsert: true });
 
-      const err = yield Model.findOneAndReplace({}, { age: 'not a number' }, {}).
-        then(() => null, err => err);
-      assert.ok(err);
-      assert.ok(err.errors['age'].message.indexOf('not a number') !== -1,
-        err.errors['age'].message);
-    });
+    const doc = await Model.findOne();
+    assert.equal(doc.name, 'Jean-Luc Picard');
+
+    const err = await Model.findOneAndReplace({}, { age: 'not a number' }, {}).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['age'].message.indexOf('not a number') !== -1,
+      err.errors['age'].message);
   });
 
-  it('schema-level projection (gh-7654)', function() {
+  it('schema-level projection (gh-7654)', async function() {
     const schema = new Schema({ name: String, age: { type: Number, select: false } });
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      const doc = yield Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, {
-        upsert: true,
-        returnOriginal: false
-      });
 
-      assert.ok(!doc.age);
+    const doc = await Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, {
+      upsert: true,
+      returnOriginal: false
     });
+
+    assert.ok(!doc.age);
   });
 
-  it('supports `new` in addition to `returnOriginal` (gh-7846)', function() {
+  it('supports `new` in addition to `returnOriginal` (gh-7846)', async function() {
     const schema = new Schema({ name: String, age: Number });
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      const doc = yield Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, {
-        upsert: true,
-        new: true
-      });
 
-      assert.equal(doc.age, 59);
+    const doc = await Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, {
+      upsert: true,
+      new: true
     });
+
+    assert.equal(doc.age, 59);
   });
 
-  it('orFail() (gh-8030)', function() {
+  it('orFail() (gh-8030)', async function() {
     const schema = Schema({ name: String, age: Number });
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      let err = yield Model.findOneAndReplace({}, { name: 'test' }).orFail().
-        then(() => assert.ok(false), err => err);
 
-      assert.ok(err);
-      assert.equal(err.name, 'DocumentNotFoundError');
+    let err = await Model.findOneAndReplace({}, { name: 'test' }).orFail().
+      then(() => assert.ok(false), err => err);
 
-      yield Model.create({ name: 'test' });
-      err = yield Model.findOneAndReplace({ name: 'test' }, { name: 'test2' }).
-        orFail().
-        then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'DocumentNotFoundError');
 
-      assert.ifError(err);
-    });
+    await Model.create({ name: 'test' });
+    err = await Model.findOneAndReplace({ name: 'test' }, { name: 'test2' }).
+      orFail().
+      then(() => null, err => err);
+
+    assert.ifError(err);
   });
 });

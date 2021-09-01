@@ -8,7 +8,6 @@ const start = require('./common');
 
 const assert = require('assert');
 const clone = require('../lib/utils').clone;
-const co = require('co');
 const random = require('../lib/utils').random;
 const util = require('util');
 
@@ -498,7 +497,7 @@ describe('model', function() {
           });
       });
 
-      it('embedded discriminator with numeric type (gh-7808)', function() {
+      it('embedded discriminator with numeric type (gh-7808)', async function() {
         const typesSchema = Schema({
           type: { type: Number }
         }, { discriminatorKey: 'type', _id: false });
@@ -514,15 +513,13 @@ describe('model', function() {
 
         const Model = db.model('Test1', mainSchema);
 
-        return co(function*() {
-          yield Model.create({
-            types: [{ type: 1 }, { type: 2 }]
-          });
-          const fromDb = yield Model.collection.findOne();
-          assert.equal(fromDb.types.length, 2);
-          assert.equal(fromDb.types[0].foo, 'bar');
-          assert.equal(fromDb.types[1].hello, 'world');
+        await Model.create({
+          types: [{ type: 1 }, { type: 2 }]
         });
+        const fromDb = await Model.collection.findOne();
+        assert.equal(fromDb.types.length, 2);
+        assert.equal(fromDb.types[0].foo, 'bar');
+        assert.equal(fromDb.types[1].hello, 'world');
       });
 
       it('supports clone() (gh-4983)', function(done) {
@@ -615,34 +612,32 @@ describe('model', function() {
         });
       });
 
-      it('incorrect discriminator key throws readable error with create (gh-6434)', function() {
-        return co(function*() {
-          const settingSchema = new Schema({ name: String }, {
-            discriminatorKey: 'kind'
-          });
-
-          const defaultAdvisorSchema = new Schema({
-            _advisor: String
-          });
-
-          const Setting = db.model('Test', settingSchema);
-          Setting.discriminator('DefaultAdvisor',
-            defaultAdvisorSchema);
-
-          let threw = false;
-          try {
-            yield Setting.create({
-              kind: 'defaultAdvisor',
-              name: 'xyz'
-            });
-          } catch (error) {
-            threw = true;
-            assert.equal(error.name, 'MongooseError');
-            assert.equal(error.message, 'Discriminator "defaultAdvisor" not ' +
-              'found for model "Test"');
-          }
-          assert.ok(threw);
+      it('incorrect discriminator key throws readable error with create (gh-6434)', async function() {
+        const settingSchema = new Schema({ name: String }, {
+          discriminatorKey: 'kind'
         });
+
+        const defaultAdvisorSchema = new Schema({
+          _advisor: String
+        });
+
+        const Setting = db.model('Test', settingSchema);
+        Setting.discriminator('DefaultAdvisor',
+          defaultAdvisorSchema);
+
+        let threw = false;
+        try {
+          await Setting.create({
+            kind: 'defaultAdvisor',
+            name: 'xyz'
+          });
+        } catch (error) {
+          threw = true;
+          assert.equal(error.name, 'MongooseError');
+          assert.equal(error.message, 'Discriminator "defaultAdvisor" not ' +
+            'found for model "Test"');
+        }
+        assert.ok(threw);
       });
 
       it('copies query hooks (gh-5147)', function(done) {
@@ -1095,7 +1090,7 @@ describe('model', function() {
         });
     });
 
-    it('supports ObjectId as tied value (gh-10130)', function() {
+    it('supports ObjectId as tied value (gh-10130)', async function() {
       const eventSchema = new Schema({ message: String, kind: 'ObjectId' },
         { discriminatorKey: 'kind' });
 
@@ -1109,19 +1104,17 @@ describe('model', function() {
         product: String
       }), purchasedId);
 
-      return co(function*() {
-        yield Event.create([
-          { message: 'test', element: '#buy', kind: clickedId },
-          { message: 'test2', product: 'Turbo Man', kind: purchasedId }
-        ]);
+      await Event.create([
+        { message: 'test', element: '#buy', kind: clickedId },
+        { message: 'test2', product: 'Turbo Man', kind: purchasedId }
+      ]);
 
-        const docs = yield Event.find().sort({ message: 1 });
-        assert.equal(docs.length, 2);
-        assert.equal(docs[0].kind.toHexString(), clickedId.toHexString());
-        assert.equal(docs[0].element, '#buy');
-        assert.equal(docs[1].kind.toHexString(), purchasedId.toHexString());
-        assert.equal(docs[1].product, 'Turbo Man');
-      });
+      const docs = await Event.find().sort({ message: 1 });
+      assert.equal(docs.length, 2);
+      assert.equal(docs[0].kind.toHexString(), clickedId.toHexString());
+      assert.equal(docs[0].element, '#buy');
+      assert.equal(docs[1].kind.toHexString(), purchasedId.toHexString());
+      assert.equal(docs[1].product, 'Turbo Man');
     });
 
     it('Embedded discriminators in nested doc arrays (gh-6202)', function() {
@@ -1452,7 +1445,7 @@ describe('model', function() {
       });
     });
 
-    it('does not project in embedded discriminator key if it is the only selected field (gh-7574)', function() {
+    it('does not project in embedded discriminator key if it is the only selected field (gh-7574)', async function() {
       const sectionSchema = Schema({ title: String }, { discriminatorKey: 'kind' });
       const imageSectionSchema = Schema({ href: String });
       const textSectionSchema = Schema({ text: String });
@@ -1468,23 +1461,21 @@ describe('model', function() {
 
       const Model = db.model('Test', documentSchema);
 
-      return co(function*() {
-        yield Model.create({
-          title: 'example',
-          sections: [
-            { kind: 'image', title: 'image', href: 'foo' },
-            { kind: 'text', title: 'text', text: 'bar' }
-          ]
-        });
-
-        let doc = yield Model.findOne({}).select('title');
-        assert.ok(!doc.sections);
-
-        doc = yield Model.findOne({}).select('title sections.title');
-        assert.ok(doc.sections);
-        assert.equal(doc.sections[0].kind, 'image');
-        assert.equal(doc.sections[1].kind, 'text');
+      await Model.create({
+        title: 'example',
+        sections: [
+          { kind: 'image', title: 'image', href: 'foo' },
+          { kind: 'text', title: 'text', text: 'bar' }
+        ]
       });
+
+      let doc = await Model.findOne({}).select('title');
+      assert.ok(!doc.sections);
+
+      doc = await Model.findOne({}).select('title sections.title');
+      assert.ok(doc.sections);
+      assert.equal(doc.sections[0].kind, 'image');
+      assert.equal(doc.sections[1].kind, 'text');
     });
 
     it('merges schemas instead of overwriting (gh-7884)', function() {
@@ -1567,25 +1558,23 @@ describe('model', function() {
     });
   });
 
-  it('attempting to populate on base model a virtual path defined on discriminator does not throw an error (gh-8924)', function() {
-    return co(function* () {
-      const User = db.model('User', {});
-      const Post = db.model('Post', {});
+  it('attempting to populate on base model a virtual path defined on discriminator does not throw an error (gh-8924)', async function() {
+    const User = db.model('User', {});
+    const Post = db.model('Post', {});
 
-      const userWithPostSchema = new Schema({ postId: Schema.ObjectId });
+    const userWithPostSchema = new Schema({ postId: Schema.ObjectId });
 
-      userWithPostSchema.virtual('post', { ref: 'Post', localField: 'postId', foreignField: '_id' });
+    userWithPostSchema.virtual('post', { ref: 'Post', localField: 'postId', foreignField: '_id' });
 
-      const UserWithPost = User.discriminator('UserWithPost', userWithPostSchema);
+    const UserWithPost = User.discriminator('UserWithPost', userWithPostSchema);
 
-      const post = yield Post.create({});
+    const post = await Post.create({});
 
-      yield UserWithPost.create({ postId: post._id });
+    await UserWithPost.create({ postId: post._id });
 
-      const user = yield User.findOne().populate({ path: 'post' });
+    const user = await User.findOne().populate({ path: 'post' });
 
-      assert.ok(user.postId);
-    });
+    assert.ok(user.postId);
   });
 
   it('accepts a POJO as a schema for discriminators (gh-8984)', function() {
@@ -1676,7 +1665,7 @@ describe('model', function() {
     assert.ok(actions.schema.discriminators['message']);
   });
 
-  it('embedded discriminator array of arrays (gh-9984)', function() {
+  it('embedded discriminator array of arrays (gh-9984)', async function() {
     const enemySchema = new Schema({
       name: String,
       level: Number
@@ -1696,19 +1685,18 @@ describe('model', function() {
 
     const Map = db.model('Map', mapSchema);
 
-    return co(function*() {
-      const e = yield Enemy.create({
-        name: 'Bowser',
-        level: 10
-      });
 
-      let map = yield Map.create({
-        tiles: [[{ kind: 'Enemy', enemy: e._id }, { kind: 'Wall', color: 'Blue' }]]
-      });
-
-      map = yield Map.findById(map).populate({ path: 'tiles.enemy' });
-      assert.equal(map.tiles[0][0].enemy.name, 'Bowser');
+    const e = await Enemy.create({
+      name: 'Bowser',
+      level: 10
     });
+
+    let map = await Map.create({
+      tiles: [[{ kind: 'Enemy', enemy: e._id }, { kind: 'Wall', color: 'Blue' }]]
+    });
+
+    map = await Map.findById(map).populate({ path: 'tiles.enemy' });
+    assert.equal(map.tiles[0][0].enemy.name, 'Bowser');
   });
 
   it('recursive embedded discriminator using schematype (gh-9600)', function() {
@@ -1753,41 +1741,39 @@ describe('model', function() {
   });
 
   describe('Discriminator Key test', function() {
-    it('gh-9015', function() {
-      return co(function*() {
-        const baseSchema = new Schema({}, { discriminatorKey: 'type' });
-        const baseModel = db.model('thing', baseSchema);
-        const aSchema = new Schema(
-          {
-            aThing: { type: Number }
-          },
-          { _id: false, id: false }
-        );
-        baseModel.discriminator('A', aSchema);
-        const bSchema = new Schema(
-          {
-            bThing: { type: String }
-          },
-          { _id: false, id: false }
-        );
-        baseModel.discriminator('B', bSchema);
-        // Model is created as a type A
-        let doc = yield baseModel.create({ type: 'A', aThing: 1 });
-        let res = yield baseModel.findByIdAndUpdate(
-          doc._id,
-          { type: 'B', bThing: 'one', aThing: '2' },
-          { runValidators: true, /* overwriteDiscriminatorKey: true, */ new: true }
-        );
-        assert.equal(res.type, 'A');
+    it('gh-9015', async function() {
+      const baseSchema = new Schema({}, { discriminatorKey: 'type' });
+      const baseModel = db.model('thing', baseSchema);
+      const aSchema = new Schema(
+        {
+          aThing: { type: Number }
+        },
+        { _id: false, id: false }
+      );
+      baseModel.discriminator('A', aSchema);
+      const bSchema = new Schema(
+        {
+          bThing: { type: String }
+        },
+        { _id: false, id: false }
+      );
+      baseModel.discriminator('B', bSchema);
+      // Model is created as a type A
+      let doc = await baseModel.create({ type: 'A', aThing: 1 });
+      let res = await baseModel.findByIdAndUpdate(
+        doc._id,
+        { type: 'B', bThing: 'one', aThing: '2' },
+        { runValidators: true, /* overwriteDiscriminatorKey: true, */ new: true }
+      );
+      assert.equal(res.type, 'A');
 
-        doc = yield baseModel.create({ type: 'A', aThing: 1 });
-        res = yield baseModel.findByIdAndUpdate(
-          doc._id,
-          { type: 'B', bThing: 'one', aThing: '2' },
-          { runValidators: true, overwriteDiscriminatorKey: true, new: true }
-        );
-        assert.equal(res.type, 'B');
-      });
+      doc = await baseModel.create({ type: 'A', aThing: 1 });
+      res = await baseModel.findByIdAndUpdate(
+        doc._id,
+        { type: 'B', bThing: 'one', aThing: '2' },
+        { runValidators: true, overwriteDiscriminatorKey: true, new: true }
+      );
+      assert.equal(res.type, 'B');
     });
   });
 

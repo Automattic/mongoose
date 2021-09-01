@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 const utils = require('../lib/utils');
 const util = require('./util');
 
@@ -70,34 +69,25 @@ describe('model: populate:', function() {
   afterEach(() => util.clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it('populating array of object', function(done) {
+  it('populating array of object', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db.model('User', userSchema);
 
-    User.create({ name: 'User 1' }, function(err, user1) {
-      assert.ifError(err);
+    const user1 = await User.create({ name: 'User 1' });
+    const user2 = await User.create({ name: 'User 2' });
 
-      User.create({ name: 'User 2' }, function(err, user2) {
-        assert.ifError(err);
 
-        BlogPost.create({
-          title: 'Woot',
-          _creator: user1._id,
-          comments: [
-            { _creator: user1._id, content: 'Woot woot' },
-            { _creator: user2._id, content: 'Wha wha' }
-          ]
-        }, function(err, post) {
-          assert.ifError(err);
-
-          assert.doesNotThrow(function() {
-            post.populate('comments', function() {
-            });
-          });
-          done();
-        });
-      });
+    const post = await BlogPost.create({
+      title: 'Woot',
+      _creator: user1._id,
+      comments: [
+        { _creator: user1._id, content: 'Woot woot' },
+        { _creator: user2._id, content: 'Wha wha' }
+      ]
     });
+
+    // Does not throw
+    await post.populate('comments');
   });
 
   it('deep population (gh-3103)', function(done) {
@@ -303,26 +293,21 @@ describe('model: populate:', function() {
     });
   });
 
-  it('not failing on null as ref', function(done) {
+  it('not failing on null as ref', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     db.model('User', userSchema);
 
-    BlogPost.create({
+    const createdPost = await BlogPost.create({
       title: 'woot',
       _creator: null
-    }, function(err, post) {
-      assert.ifError(err);
-
-      BlogPost
-        .findById(post._id)
-        .populate('_creator')
-        .exec(function(err, post) {
-          assert.ifError(err);
-
-          assert.equal(post._creator, null);
-          done();
-        });
     });
+
+
+    const foundPost = await BlogPost
+      .findById(createdPost._id)
+      .populate('_creator');
+
+    assert.equal(foundPost._creator, null);
   });
 
   it('not failing on empty object as ref', function(done) {
@@ -1585,87 +1570,84 @@ describe('model: populate:', function() {
     });
   });
 
-  it('populating subdocuments with array including nulls', function() {
+  it('populating subdocuments with array including nulls', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db.model('User', userSchema);
 
-    return co(function*() {
-      const user = new User({ name: 'hans zimmer' });
-      yield user.save();
 
-      const post = yield BlogPost.create({
-        title: 'Woot',
-        fans: []
-      });
+    const user = new User({ name: 'hans zimmer' });
+    await user.save();
 
-      yield BlogPost.collection.updateOne({ _id: post._id }, {
-        $set: { fans: [null, undefined, user.id, null] }
-      });
-
-      const returned = yield BlogPost.
-        findById(post._id).
-        populate('fans', 'name');
-
-      assert.equal(returned.id, post.id);
-      assert.equal(returned.fans.length, 1);
+    const post = await BlogPost.create({
+      title: 'Woot',
+      fans: []
     });
+
+    await BlogPost.collection.updateOne({ _id: post._id }, {
+      $set: { fans: [null, undefined, user.id, null] }
+    });
+
+    const returned = await BlogPost.
+      findById(post._id).
+      populate('fans', 'name');
+
+    assert.equal(returned.id, post.id);
+    assert.equal(returned.fans.length, 1);
   });
 
-  it('supports `retainNullValues` to override filtering out null docs (gh-6432)', function() {
+  it('supports `retainNullValues` to override filtering out null docs (gh-6432)', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db.model('User', userSchema);
 
-    return co(function*() {
-      const user = new User({ name: 'Victor Hugo' });
-      yield user.save();
 
-      const post = yield BlogPost.create({
-        title: 'Notre-Dame de Paris',
-        fans: []
-      });
+    const user = new User({ name: 'Victor Hugo' });
+    await user.save();
 
-      yield BlogPost.collection.updateOne({ _id: post._id }, {
-        $set: { fans: [null, user.id, null, undefined] }
-      });
-
-      const returned = yield BlogPost.
-        findById(post._id).
-        populate({ path: 'fans', options: { retainNullValues: true } });
-
-      assert.equal(returned.id, post.id);
-      assert.equal(returned.fans.length, 4);
-      assert.strictEqual(returned.fans[0], null);
-      assert.equal(returned.fans[1].name, 'Victor Hugo');
-      assert.strictEqual(returned.fans[2], null);
-      assert.strictEqual(returned.fans[3], null);
+    const post = await BlogPost.create({
+      title: 'Notre-Dame de Paris',
+      fans: []
     });
+
+    await BlogPost.collection.updateOne({ _id: post._id }, {
+      $set: { fans: [null, user.id, null, undefined] }
+    });
+
+    const returned = await BlogPost.
+      findById(post._id).
+      populate({ path: 'fans', options: { retainNullValues: true } });
+
+    assert.equal(returned.id, post.id);
+    assert.equal(returned.fans.length, 4);
+    assert.strictEqual(returned.fans[0], null);
+    assert.equal(returned.fans[1].name, 'Victor Hugo');
+    assert.strictEqual(returned.fans[2], null);
+    assert.strictEqual(returned.fans[3], null);
   });
 
-  it('supports `retainNullValues` while supressing _id of subdocument', function() {
+  it('supports `retainNullValues` while supressing _id of subdocument', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db.model('User', userSchema);
 
-    return co(function*() {
-      const user = new User({ name: 'Victor Hugo' });
-      yield user.save();
-      const post = yield BlogPost.create({
-        title: 'Notre-Dame de Paris',
-        fans: []
-      });
 
-      yield BlogPost.collection.updateOne({ _id: post._id }, {
-        $set: { fans: [user.id] }
-      });
-
-      yield user.delete();
-
-      const returned = yield BlogPost.
-        findById(post._id).
-        populate({ path: 'fans', select: 'name -_id', options: { retainNullValues: true } });
-
-      assert.equal(returned.fans.length, 1);
-      assert.strictEqual(returned.fans[0], null);
+    const user = new User({ name: 'Victor Hugo' });
+    await user.save();
+    const post = await BlogPost.create({
+      title: 'Notre-Dame de Paris',
+      fans: []
     });
+
+    await BlogPost.collection.updateOne({ _id: post._id }, {
+      $set: { fans: [user.id] }
+    });
+
+    await user.delete();
+
+    const returned = await BlogPost.
+      findById(post._id).
+      populate({ path: 'fans', select: 'name -_id', options: { retainNullValues: true } });
+
+    assert.equal(returned.fans.length, 1);
+    assert.strictEqual(returned.fans[0], null);
   });
 
   it('populating more than one array at a time', function(done) {
@@ -2582,37 +2564,30 @@ describe('model: populate:', function() {
   });
 
   describe('populating combined with lean (gh-1260)', function() {
-    it('with findOne', function(done) {
+    it('with findOne', async function() {
       const BlogPost = db.model('BlogPost', blogPostSchema);
       const User = db.model('User', userSchema);
 
-      User.create({
+      const creator = await User.create({
         name: 'Guillermo',
         email: 'rauchg@gmail.com'
-      }, function(err, creator) {
-        assert.ifError(err);
-
-        BlogPost.create({
-          title: 'woot',
-          _creator: creator
-        }, function(err, post) {
-          assert.ifError(err);
-
-          BlogPost
-            .findById(post._id)
-            .lean()
-            .populate('_creator')
-            .exec(function(err, post) {
-              assert.ifError(err);
-
-              assert.ok(utils.isObject(post._creator));
-              assert.equal(post._creator.name, 'Guillermo');
-              assert.equal(post._creator.email, 'rauchg@gmail.com');
-              assert.equal(typeof post._creator.update, 'undefined');
-              done();
-            });
-        });
       });
+
+      const createdPost = await BlogPost.create({
+        title: 'woot',
+        _creator: creator
+      });
+
+
+      const post = await BlogPost
+        .findById(createdPost._id)
+        .lean()
+        .populate('_creator');
+
+      assert.ok(utils.isObject(post._creator));
+      assert.equal(post._creator.name, 'Guillermo');
+      assert.equal(post._creator.email, 'rauchg@gmail.com');
+      assert.equal(typeof post._creator.update, 'undefined');
     });
 
     it('with find', function(done) {
@@ -2670,77 +2645,71 @@ describe('model: populate:', function() {
     let u1, u2;
     let b1;
 
-    beforeEach(function(done) {
+    beforeEach(async function() {
       B = db.model('BlogPost', blogPostSchema);
       U = db.model('User', userSchema);
 
-      U.create({
-        name: 'Fan 1',
-        email: 'fan1@learnboost.com'
+      const [fan1, fan2] = await U.create([
+        { name: 'Fan 1', email: 'fan1@learnboost.com' },
+        {
+          name: 'Fan 2',
+          email: 'fan2@learnboost.com'
+        }
+      ]);
+
+      u1 = fan1;
+      u2 = fan2;
+
+      const post = await B.create({
+        title: 'Woot',
+        fans: [fan1, fan2],
+        _creator: fan1
       }, {
-        name: 'Fan 2',
-        email: 'fan2@learnboost.com'
-      }, function(err, fan1, fan2) {
-        assert.ifError(err);
-        u1 = fan1;
-        u2 = fan2;
-
-        B.create({
-          title: 'Woot',
-          fans: [fan1, fan2],
-          _creator: fan1
-        }, {
-          title: 'Woot2',
-          fans: [fan2, fan1],
-          _creator: fan2
-        }, function(err, post) {
-          assert.ifError(err);
-          b1 = post;
-          done();
-        });
+        title: 'Woot2',
+        fans: [fan2, fan1],
+        _creator: fan2
       });
+
+      b1 = post;
     });
 
-    it('with findOne', function(done) {
-      B.findById(b1).populate('fans _creator').exec(function(err, doc) {
-        assert.ifError(err);
-        assert.ok(Array.isArray(doc.populated('fans')));
-        assert.equal(doc.populated('fans').length, 2);
-        assert.equal(doc.populated('fans')[0], String(u1._id));
-        assert.equal(doc.populated('fans')[1], String(u2._id));
-        assert.equal(doc.populated('_creator'), String(u1._id));
-        done();
-      });
+    it('with findOne', async function() {
+      const doc = await B.findById(b1).populate('fans _creator').exec();
+
+      assert.ok(Array.isArray(doc.populated('fans')));
+      assert.equal(doc.populated('fans').length, 2);
+      assert.equal(doc.populated('fans')[0], String(u1._id));
+      assert.equal(doc.populated('fans')[1], String(u2._id));
+      assert.equal(doc.populated('_creator'), String(u1._id));
     });
 
-    it('with find', function(done) {
-      B.find().sort('title').populate('fans _creator').exec(function(err, docs) {
-        assert.ifError(err);
-        assert.equal(docs.length, 2);
+    it('with find', async function() {
+      const docs = await B.find().sort('title').populate('fans _creator').exec();
 
-        const doc1 = docs[0];
-        const doc2 = docs[1];
+      assert.equal(docs.length, 2);
 
-        assert.ok(Array.isArray(doc1.populated('fans')));
-        assert.equal(doc1.populated('fans').length, 2);
+      const doc1 = docs[0];
+      const doc2 = docs[1];
 
-        assert.equal(doc1.populated('fans')[0], String(u1._id));
-        assert.equal(doc1.populated('fans')[1], String(u2._id));
-        assert.equal(doc1.populated('_creator'), String(u1._id));
+      assert.ok(Array.isArray(doc1.populated('fans')));
+      assert.equal(doc1.populated('fans').length, 2);
 
-        assert.ok(Array.isArray(doc2.populated('fans')));
-        assert.equal(doc2.populated('fans').length, 2);
-        assert.equal(doc2.populated('fans')[0], String(u2._id));
-        assert.equal(doc2.populated('fans')[1], String(u1._id));
-        assert.equal(doc2.populated('_creator'), String(u2._id));
-        done();
-      });
+      assert.equal(doc1.populated('fans')[0], String(u1._id));
+      assert.equal(doc1.populated('fans')[1], String(u2._id));
+      assert.equal(doc1.populated('_creator'), String(u1._id));
+
+      assert.ok(Array.isArray(doc2.populated('fans')));
+      assert.equal(doc2.populated('fans').length, 2);
+      assert.equal(doc2.populated('fans')[0], String(u2._id));
+      assert.equal(doc2.populated('fans')[1], String(u1._id));
+      assert.equal(doc2.populated('_creator'), String(u2._id));
     });
   });
 
   describe('deselecting _id', function() {
     let C, U, c1, c2;
-    beforeEach(function(done) {
+
+    beforeEach(async function() {
       C = db.model('Comment', Schema({
         body: 'string', title: String
       }));
@@ -2752,19 +2721,15 @@ describe('model: populate:', function() {
         comment: { type: Schema.ObjectId, ref: 'Comment' }
       }));
 
-      C.create({ body: 'comment 1', title: '1' }, { body: 'comment 2', title: 2 }, function(err, c1_, c2_) {
-        assert.ifError(err);
-        c1 = c1_;
-        c2 = c2_;
+      const [c1_, c2_] = await C.create([{ body: 'comment 1', title: '1' }, { body: 'comment 2', title: 2 }]);
 
-        U.create(
-          { name: 'u1', comments: [c1, c2], comment: c1 }
-          , { name: 'u2', comment: c2 }
-          , function(err) {
-            assert.ifError(err);
-            done();
-          });
-      });
+      c1 = c1_;
+      c2 = c2_;
+
+      await U.create([
+        { name: 'u1', comments: [c1, c2], comment: c1 },
+        { name: 'u2', comment: c2 }
+      ]);
     });
 
     describe('in a subdocument', function() {
@@ -2862,7 +2827,7 @@ describe('model: populate:', function() {
     let Item1;
     let Item2;
 
-    beforeEach(function() {
+    beforeEach(async function() {
       const reviewSchema = new Schema({
         _id: Number,
         text: String,
@@ -2909,14 +2874,13 @@ describe('model: populate:', function() {
         items: [{ id: 1, type: 'Test1' }, { id: 2, type: 'Test2' }]
       };
 
-      return co(function*() {
-        yield Item1.deleteMany({});
-        yield Item2.deleteMany({});
 
-        yield Item1.create({ _id: 1, name: 'Val' });
-        yield Item2.create({ _id: 2, otherName: 'Val' });
-        yield Review.create(review);
-      });
+      await Item1.deleteMany({});
+      await Item2.deleteMany({});
+
+      await Item1.create({ _id: 1, name: 'Val' });
+      await Item2.create({ _id: 2, otherName: 'Val' });
+      await Review.create(review);
     });
 
     it('Simple populate', function(done) {
@@ -3114,7 +3078,7 @@ describe('model: populate:', function() {
         catch(done);
     });
 
-    it('with different schema types for local fields (gh-6870)', function() {
+    it('with different schema types for local fields (gh-6870)', async function() {
       const TestSchema = new mongoose.Schema({
         _id: Number,
         exercises: [String]
@@ -3168,16 +3132,15 @@ describe('model: populate:', function() {
         ]
       });
 
-      return co(function*() {
-        yield [test.save(), lesson.save(), list.save()];
-        const doc = yield List.findOne({}).populate('parts.contents.item');
 
-        assert.strictEqual(doc.parts[0].contents[0].item.exercises[0], 't1');
-        assert.strictEqual(doc.parts[0].contents[1].item.url, 'https://youtube.com');
-      });
+      await Promise.all([test.save(), lesson.save(), list.save()]);
+      const doc = await List.findOne({}).populate('parts.contents.item');
+
+      assert.strictEqual(doc.parts[0].contents[0].item.exercises[0], 't1');
+      assert.strictEqual(doc.parts[0].contents[1].item.url, 'https://youtube.com');
     });
 
-    it('with nested nonexistant refPath (gh-6457)', function() {
+    it('with nested nonexistant refPath (gh-6457)', async function() {
       const CommentSchema = new Schema({
         text: String,
         references: {
@@ -3198,22 +3161,21 @@ describe('model: populate:', function() {
 
       const Post = db.model('Test', PostSchema);
 
-      return co(function*() {
-        yield Post.create({
-          text: 'Post 2',
-          comments: [{
-            text: 'Comment'
-            // No `references`
-          }]
-        });
 
-        const post = yield Post.findOne().populate('comments.references.item');
-
-        assert.deepEqual(post.toObject().comments[0].references, []);
+      await Post.create({
+        text: 'Post 2',
+        comments: [{
+          text: 'Comment'
+          // No `references`
+        }]
       });
+
+      const post = await Post.findOne().populate('comments.references.item');
+
+      assert.deepEqual(post.toObject().comments[0].references, []);
     });
 
-    it('where first doc doesnt have a refPath (gh-6913', function() {
+    it('where first doc doesnt have a refPath (gh-6913', async function() {
       const UserSchema = new Schema({ name: String });
 
       const PostSchema = new Schema({
@@ -3249,18 +3211,17 @@ describe('model: populate:', function() {
         ]
       };
 
-      return co(function*() {
-        yield User.create(user);
-        yield Post.create(post);
 
-        const _post = yield Post.findOne().populate('comments.references.item');
-        assert.equal(_post.comments.length, 2);
-        assert.equal(_post.comments[1].references.length, 1);
-        assert.equal(_post.comments[1].references[0].item.name, 'Arnold');
-      });
+      await User.create(user);
+      await Post.create(post);
+
+      const _post = await Post.findOne().populate('comments.references.item');
+      assert.equal(_post.comments.length, 2);
+      assert.equal(_post.comments[1].references.length, 1);
+      assert.equal(_post.comments[1].references[0].item.name, 'Arnold');
     });
 
-    it('readable error with deselected refPath (gh-6834)', function() {
+    it('readable error with deselected refPath (gh-6834)', async function() {
       const offerSchema = new Schema({
         text: String,
         city: String,
@@ -3272,27 +3233,26 @@ describe('model: populate:', function() {
 
       const Offer = db.model('Test', offerSchema);
 
-      return co(function*() {
-        yield Offer.create({
-          text: 'special discount',
-          city: 'New York',
-          formData: new mongoose.Types.ObjectId()
-        });
 
-        let threw = false;
-        try {
-          yield Offer.findOne().populate('formData').select('-city');
-        } catch (error) {
-          assert.ok(error);
-          assert.ok(error.message.indexOf('refPath') !== -1, error.message);
-          threw = true;
-        }
-        assert.ok(threw);
+      await Offer.create({
+        text: 'special discount',
+        city: 'New York',
+        formData: new mongoose.Types.ObjectId()
       });
+
+      let threw = false;
+      try {
+        await Offer.findOne().populate('formData').select('-city');
+      } catch (error) {
+        assert.ok(error);
+        assert.ok(error.message.indexOf('refPath') !== -1, error.message);
+        threw = true;
+      }
+      assert.ok(threw);
     });
   });
 
-  it('strips out not-matched ids when populating a hydrated doc (gh-6435)', function() {
+  it('strips out not-matched ids when populating a hydrated doc (gh-6435)', async function() {
     const coopBrandSchema = new Schema({
       name: String
     });
@@ -3317,27 +3277,26 @@ describe('model: populate:', function() {
     const Agent = db.model('Test', agentSchema);
     const Product = db.model('Product', productSchema);
 
-    return co(function*() {
-      const billy = yield Agent.create({
-        name: 'Billy',
-        coopBrands: [
-          { name: 'Has product' },
-          { name: 'Has no product' }
-        ]
-      });
 
-      const coopBrandId = billy.coopBrands[0]._id;
-      yield Product.create([
-        { coopBrandId: coopBrandId, name: 'Product 1' },
-        { coopBrandId: coopBrandId, name: 'Product 2' }
-      ]);
-
-      let agent = yield Agent.findOne({});
-      yield agent.populate('coopBrands.products');
-      agent = agent.toObject({ virtuals: true });
-      assert.equal(agent.coopBrands[0].products.length, 2);
-      assert.deepEqual(agent.coopBrands[1].products, []);
+    const billy = await Agent.create({
+      name: 'Billy',
+      coopBrands: [
+        { name: 'Has product' },
+        { name: 'Has no product' }
+      ]
     });
+
+    const coopBrandId = billy.coopBrands[0]._id;
+    await Product.create([
+      { coopBrandId: coopBrandId, name: 'Product 1' },
+      { coopBrandId: coopBrandId, name: 'Product 2' }
+    ]);
+
+    let agent = await Agent.findOne({});
+    await agent.populate('coopBrands.products');
+    agent = agent.toObject({ virtuals: true });
+    assert.equal(agent.coopBrands[0].products.length, 2);
+    assert.deepEqual(agent.coopBrands[1].products, []);
   });
 
   describe('leaves Documents within Mixed properties alone (gh-1471)', function() {
@@ -3472,7 +3431,7 @@ describe('model: populate:', function() {
       });
     });
 
-    it('maps results back to correct document (gh-1444)', function(done) {
+    it('maps results back to correct document (gh-1444)', async function() {
       const articleSchema = new Schema({
         body: String,
         mediaAttach: { type: Schema.ObjectId, ref: 'Test' },
@@ -3485,83 +3444,65 @@ describe('model: populate:', function() {
       });
       const Media = db.model('Test', mediaSchema);
 
-      Media.create({ filename: 'one' }, function(err, media) {
-        assert.ifError(err);
+      const media = await Media.create({ filename: 'one' });
 
-        Article.create(
-          { body: 'body1', author: 'a' }
-          , { body: 'body2', author: 'a', mediaAttach: media._id }
-          , { body: 'body3', author: 'a' }, function(err) {
-            if (err) {
-              return done(err);
-            }
+      await Article.create(
+        { body: 'body1', author: 'a' },
+        { body: 'body2', author: 'a', mediaAttach: media._id },
+        { body: 'body3', author: 'a' }
+      );
 
-            Article.find().populate('mediaAttach').exec(function(err, docs) {
-              assert.ifError(err);
 
-              const a2 = docs.filter(function(d) {
-                return d.body === 'body2';
-              })[0];
-              assert.equal(a2.mediaAttach.id, media.id);
+      const docs = await Article.find().populate('mediaAttach');
 
-              done();
-            });
-          });
-      });
+      const a2 = docs.filter(function(d) {
+        return d.body === 'body2';
+      })[0];
+      assert.equal(a2.mediaAttach.id, media.id);
     });
 
-    it('handles skip', function(done) {
+    it('handles skip', async function() {
       const movieSchema = new Schema({});
-      const categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'Movie' }] });
+      const categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'Movie_Skip' }] });
 
-      const Movie = db.model('Movie', movieSchema);
+      const Movie = db.model('Movie_Skip', movieSchema);
       const Category = db.model('Category', categorySchema);
 
-      Movie.create({}, {}, {}, function(error) {
-        assert.ifError(error);
-        Movie.find({}, function(error, docs) {
-          assert.ifError(error);
-          assert.equal(docs.length, 3);
-          Category.create({ movies: [docs[0]._id, docs[1]._id, docs[2]._id] }, function(error) {
-            assert.ifError(error);
-            Category.findOne({}).populate({ path: 'movies', options: { limit: 2, skip: 1 } }).exec(function(error, category) {
-              assert.ifError(error);
-              assert.equal(category.movies.length, 2);
-              done();
-            });
-          });
-        });
-      });
+      await Movie.create([{}, {}, {}]);
+
+      const movies = await Movie.find({});
+      assert.equal(movies.length, 3);
+
+      await Category.create({ movies: movies });
+
+      const category = await Category.findOne({}).populate({ path: 'movies', options: { limit: 2, skip: 1 } }).exec();
+      assert.equal(category.movies.length, 2);
     });
 
-    it('handles slice (gh-1934)', function(done) {
+    it('handles slice (gh-1934)', async function() {
       const movieSchema = new Schema({ title: String, actors: [String] });
-      const categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'Movie' }] });
+      const categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'Movie_Slice' }] });
 
-      const Movie = db.model('Movie', movieSchema);
+      const Movie = db.model('Movie_Slice', movieSchema);
       const Category = db.model('Category', categorySchema);
-      const movies = [
+
+      const movies = await Movie.create([
         { title: 'Rush', actors: ['Chris Hemsworth', 'Daniel Bruhl'] },
         { title: 'Pacific Rim', actors: ['Charlie Hunnam', 'Idris Elba'] },
         { title: 'Man of Steel', actors: ['Henry Cavill', 'Amy Adams'] }
-      ];
-      Movie.create(movies[0], movies[1], movies[2], function(error, m1, m2, m3) {
-        assert.ifError(error);
-        Category.create({ movies: [m1._id, m2._id, m3._id] }, function(error) {
-          assert.ifError(error);
-          Category.findOne({}).populate({ path: 'movies', options: { slice: { actors: 1 } } }).exec(function(error, category) {
-            assert.ifError(error);
-            assert.equal(category.movies.length, 3);
-            assert.equal(category.movies[0].actors.length, 1);
-            assert.equal(category.movies[1].actors.length, 1);
-            assert.equal(category.movies[2].actors.length, 1);
-            done();
-          });
-        });
-      });
+      ]);
+
+      await Category.create({ movies: movies });
+
+      const category = await Category.findOne({}).populate({ path: 'movies', options: { slice: { actors: 1 } } });
+
+      assert.equal(category.movies.length, 3);
+      assert.equal(category.movies[0].actors.length, 1);
+      assert.equal(category.movies[1].actors.length, 1);
+      assert.equal(category.movies[2].actors.length, 1);
     });
 
-    it('fails if sorting with a doc array subprop (gh-2202)', function(done) {
+    it('fails if sorting with a doc array subprop (gh-2202)', async function() {
       const childSchema = new Schema({ name: String });
       const Child = db.model('Child', childSchema);
 
@@ -3580,30 +3521,23 @@ describe('model: populate:', function() {
       });
       const Parent = db.model('Parent', parentSchema);
 
-      Child.create([{ name: 'test1' }, { name: 'test2' }], function(error, c) {
-        assert.ifError(error);
-        const doc = {
-          children1: [
-            { child: c[0]._id, test: 1 },
-            { child: c[1]._id, test: 2 }
-          ],
-          children2: [c[0]._id, c[1]._id]
-        };
-        Parent.create(doc, function(error, doc) {
-          assert.ifError(error);
-          Parent.findById(doc).populate('children2').exec(function(error, doc) {
-            assert.ifError(error);
-            assert.equal(doc.children2[0].name, 'test1');
-            Parent.findById(doc).
-              populate({ path: 'children1.child', options: { sort: '-name' } }).
-              exec(function(error) {
-                assert.notEqual(error.message.indexOf('subproperty of a document array'),
-                  -1);
-                done();
-              });
-          });
-        });
+      const c = await Child.create([{ name: 'test1' }, { name: 'test2' }]);
+
+      const createdParent = await Parent.create({
+        children1: [
+          { child: c[0]._id, test: 1 },
+          { child: c[1]._id, test: 2 }
+        ],
+        children2: [c[0]._id, c[1]._id]
       });
+
+      const foundParent = await Parent.findById(createdParent).populate('children2');
+      assert.equal(foundParent.children2[0].name, 'test1');
+
+      const err = await Parent.findById(foundParent).
+        populate({ path: 'children1.child', options: { sort: '-name' } }).then(() => null, err => err);
+
+      assert.notEqual(err.message.indexOf('subproperty of a document array'), -1);
     });
 
     it('handles toObject() (gh-3279)', function(done) {
@@ -3654,32 +3588,26 @@ describe('model: populate:', function() {
       });
     });
 
-    it('populate option (gh-2321)', function(done) {
+    it('populate option (gh-2321)', async function() {
       const User = db.model('User', { name: String });
       const Group = db.model('Group', {
         users: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         name: String
       });
 
-      User.create({ name: 'Val' }, function(error, user) {
-        assert.ifError(error);
-        Group.create({ users: [user._id], name: 'test' }, function(error, group) {
-          assert.ifError(error);
-          test(group._id);
-        });
-      });
+      const user = await User.create({ name: 'Val' });
 
-      const test = function(id) {
-        const options = { populate: { path: 'users', model: 'User' } };
-        Group.find({ _id: id }, '-name', options, function(error, group) {
-          assert.ifError(error);
-          assert.ok(group[0].users[0]._id);
-          done();
-        });
-      };
+      const group = await Group.create({ users: [user._id], name: 'test' });
+
+      const group2 = await Group.find(
+        { _id: group._id },
+        '-name',
+        { populate: { path: 'users', model: 'User' } }
+      );
+      assert.ok(group2[0].users[0]._id);
     });
 
-    it('discriminator child schemas (gh-3878)', function(done) {
+    it('discriminator child schemas (gh-3878)', async function() {
       const options = { discriminatorKey: 'kind' };
       const activitySchema = new Schema({ title: { type: String } }, options);
 
@@ -3694,33 +3622,21 @@ describe('model: populate:', function() {
       const DateActivity = Activity.discriminator('Date', dateActivitySchema);
       const EventActivity = Activity.discriminator('Event', eventActivitySchema);
 
-      User.create({ name: 'val' }, function(error, user) {
-        assert.ifError(error);
-        const dateActivity = { title: 'test', postedBy: user._id };
-        DateActivity.create(dateActivity, function(error) {
-          assert.ifError(error);
-          const eventActivity = {
-            title: 'test2',
-            test: 'test'
-          };
-          EventActivity.create(eventActivity, function(error) {
-            assert.ifError(error);
-            test();
-          });
-        });
+      const user = await User.create({ name: 'val' });
+      const dateActivity = { title: 'test', postedBy: user._id };
+      await DateActivity.create(dateActivity);
+
+      await EventActivity.create({
+        title: 'test2',
+        test: 'test'
       });
 
-      function test() {
-        Activity.find({}).populate('postedBy').exec(function(error, results) {
-          assert.ifError(error);
-          assert.equal(results.length, 2);
-          assert.equal(results[0].postedBy.name, 'val');
-          done();
-        });
-      }
+      const results = await Activity.find({}).populate('postedBy');
+      assert.equal(results.length, 2);
+      assert.equal(results[0].postedBy.name, 'val');
     });
 
-    it('set to obj w/ same id doesnt mark modified (gh-3992)', function(done) {
+    it('set to obj w/ same id doesnt mark modified (gh-3992)', async function() {
       const personSchema = new Schema({
         name: { type: String }
       });
@@ -3732,22 +3648,18 @@ describe('model: populate:', function() {
       const Person = db.model('Person', personSchema);
       const Job = db.model('Job', jobSchema);
 
-      Person.create({ name: 'Val' }, function(error, person) {
-        assert.ifError(error);
-        const job = { title: 'Engineer', person: person._id };
-        Job.create(job, function(error, job) {
-          assert.ifError(error);
-          Job.findById(job._id, function(error, job) {
-            assert.ifError(error);
-            job.person = person;
-            assert.ok(!job.isModified('person'));
-            done();
-          });
-        });
-      });
+      const person = await Person.create({ name: 'Val' });
+
+      const createdJob = await Job.create({ title: 'Engineer', person: person._id });
+
+
+      const foundJob = await Job.findById(createdJob._id);
+      foundJob.person = person;
+
+      assert.ok(!foundJob.isModified('person'));
     });
 
-    it('deep populate single -> array (gh-3904)', function(done) {
+    it('deep populate single -> array (gh-3904)', async function() {
       const personSchema = new Schema({
         name: { type: String }
       });
@@ -3766,51 +3678,41 @@ describe('model: populate:', function() {
       const Team = db.model('Team', teamSchema);
       const Game = db.model('Test', gameSchema);
 
-      const people = [
+
+      const people = await Person.create([
         { name: 'Shaq' },
         { name: 'Kobe' },
         { name: 'Horry' },
         { name: 'Duncan' },
         { name: 'Robinson' },
         { name: 'Johnson' }
-      ];
+      ]);
 
-      Person.create(people, function(error, people) {
-        assert.ifError(error);
-        const lakers = {
-          name: 'Lakers',
-          members: [people[0]._id, people[1]._id, people[2]._id]
-        };
-        const spurs = {
-          name: 'Spurs',
-          members: [people[3]._id, people[4]._id, people[5]._id]
-        };
-        const teams = [lakers, spurs];
-        Team.create(teams, function(error, teams) {
-          assert.ifError(error);
-          const game = { team: teams[0]._id, opponent: teams[1]._id };
-          Game.create(game, function(error, game) {
-            assert.ifError(error);
-            test(game._id);
-          });
-        });
+      const lakers = {
+        name: 'Lakers',
+        members: [people[0]._id, people[1]._id, people[2]._id]
+      };
+      const spurs = {
+        name: 'Spurs',
+        members: [people[3]._id, people[4]._id, people[5]._id]
+      };
+
+      const teams = await Team.create([lakers, spurs]);
+
+      const game = await Game.create({ team: teams[0]._id, opponent: teams[1]._id });
+
+
+      const doc = await Game.findById(game._id).populate({
+        path: 'team',
+        select: 'name members',
+        populate: { path: 'members', select: 'name' }
       });
 
-      function test(id) {
-        const query = Game.findById(id).populate({
-          path: 'team',
-          select: 'name members',
-          populate: { path: 'members', select: 'name' }
-        });
-        query.exec(function(error, doc) {
-          assert.ifError(error);
-          const arr = doc.toObject().team.members.map(function(v) {
-            return v.name;
-          });
-          assert.deepEqual(arr, ['Shaq', 'Kobe', 'Horry']);
-          done();
-        });
-      }
+      const arr = doc.toObject().team.members.map(function(v) {
+        return v.name;
+      });
+
+      assert.deepEqual(arr, ['Shaq', 'Kobe', 'Horry']);
     });
 
     it('deep populate array -> array (gh-3954)', function(done) {
@@ -4077,7 +3979,7 @@ describe('model: populate:', function() {
         });
     });
 
-    it('dynref bug (gh-4104)', function(done) {
+    it('dynref bug (gh-4104)', async function() {
       const PersonSchema = new Schema({
         name: { type: String }
       });
@@ -4097,23 +3999,17 @@ describe('model: populate:', function() {
       const Person = db.model('Person', PersonSchema);
       const Animal = db.model('Test', AnimalSchema);
 
-      Person.create({ name: 'Val' }, function(error, person) {
-        assert.ifError(error);
-        Animal.create({ name: 'Air Bud' }, function(error, animal) {
-          assert.ifError(error);
-          const obj1 = { createdByModel: 'Person', createdBy: person._id };
-          const obj2 = { createdByModel: 'Test', createdBy: animal._id };
-          Thing.create(obj1, obj2, function(error) {
-            assert.ifError(error);
-            Thing.find({}).populate('createdBy').exec(function(error, things) {
-              assert.ifError(error);
-              assert.ok(things[0].createdBy.name);
-              assert.ok(things[1].createdBy.name);
-              done();
-            });
-          });
-        });
-      });
+      const person = await Person.create({ name: 'Val' });
+      const animal = await Animal.create({ name: 'Air Bud' });
+
+      const obj1 = { createdByModel: 'Person', createdBy: person._id };
+      const obj2 = { createdByModel: 'Test', createdBy: animal._id };
+      await Thing.create(obj1, obj2);
+
+      const things = await Thing.find({}).populate('createdBy').exec();
+
+      assert.ok(things[0].createdBy.name);
+      assert.ok(things[1].createdBy.name);
     });
 
     it('returned array has toObject() (gh-4656)', function(done) {
@@ -4270,7 +4166,7 @@ describe('model: populate:', function() {
         });
       });
 
-      it('match (gh-6787)', function() {
+      it('match (gh-6787)', async function() {
         const PersonSchema = new Schema({ name: String, band: String });
         const BandSchema = new Schema({ name: String });
         BandSchema.virtual('members', {
@@ -4289,13 +4185,12 @@ describe('model: populate:', function() {
           return { name: v, band: 'Test' };
         });
 
-        return co(function*() {
-          yield Person.create(people);
-          yield Band.create({ name: 'Test' });
 
-          const band = yield Band.findOne().populate('members');
-          assert.deepEqual(band.members.map(b => b.name).sort(), ['AA', 'AB']);
-        });
+        await Person.create(people);
+        await Band.create({ name: 'Test' });
+
+        const band = await Band.findOne().populate('members');
+        assert.deepEqual(band.members.map(b => b.name).sort(), ['AA', 'AB']);
       });
 
       it('multiple source docs', function(done) {
@@ -4512,7 +4407,7 @@ describe('model: populate:', function() {
           catch(done);
       });
 
-      it('in embedded array with sort (gh-10552)', function() {
+      it('in embedded array with sort (gh-10552)', async function() {
         const AppMenuItemSchema = new Schema({
           appId: 'ObjectId',
           moduleId: Number,
@@ -4544,23 +4439,22 @@ describe('model: populate:', function() {
         const App = db.model('Test', appSchema);
         const AppMenuItem = db.model('Test1', AppMenuItemSchema);
 
-        return co(function*() {
-          let app = yield App.create({ modules: [{ _id: 1, title: 'File' }, { _id: 2, title: 'Preferences' }] });
-          yield AppMenuItem.create([
-            { title: 'Save', moduleId: 1 },
-            { title: 'Save As', moduleId: 1 },
-            { title: 'Undo', moduleId: 2 },
-            { title: 'Redo', moduleId: 2 }
-          ]);
 
-          app = yield App.findById(app).populate('modules.menu');
-          app = app.toObject({ virtuals: true });
+        let app = await App.create({ modules: [{ _id: 1, title: 'File' }, { _id: 2, title: 'Preferences' }] });
+        await AppMenuItem.create([
+          { title: 'Save', moduleId: 1 },
+          { title: 'Save As', moduleId: 1 },
+          { title: 'Undo', moduleId: 2 },
+          { title: 'Redo', moduleId: 2 }
+        ]);
 
-          assert.equal(app.modules.length, 2);
-          assert.equal(app.modules[0].menu.length, 2);
-          assert.deepEqual(app.modules[0].menu.map(i => i.title), ['Save', 'Save As']);
-          assert.deepEqual(app.modules[1].menu.map(i => i.title), ['Redo', 'Undo']);
-        });
+        app = await App.findById(app).populate('modules.menu');
+        app = app.toObject({ virtuals: true });
+
+        assert.equal(app.modules.length, 2);
+        assert.equal(app.modules[0].menu.length, 2);
+        assert.deepEqual(app.modules[0].menu.map(i => i.title), ['Save', 'Save As']);
+        assert.deepEqual(app.modules[1].menu.map(i => i.title), ['Redo', 'Undo']);
       });
 
       it('justOne option (gh-4263)', function(done) {
@@ -4606,82 +4500,80 @@ describe('model: populate:', function() {
         });
       });
 
-      it('justOne + lean (gh-6234)', function() {
-        return co(function*() {
-          const PersonSchema = new mongoose.Schema({
-            name: String,
-            band: String
-          });
+      it('justOne + lean (gh-6234)', async function() {
 
-          const BandSchema = new mongoose.Schema({
-            name: String
-          });
-
-          BandSchema.virtual('member', {
-            ref: 'Person',
-            localField: 'name',
-            foreignField: 'band',
-            justOne: true
-          });
-
-          const Person = db.model('Person', PersonSchema);
-          const Band = db.model('Test', BandSchema);
-
-          yield Band.create({ name: 'Guns N\' Roses' });
-          yield Band.create({ name: 'Motley Crue' });
-          yield Person.create({ name: 'Axl Rose', band: 'Guns N\' Roses' });
-          yield Person.create({ name: 'Slash', band: 'Guns N\' Roses' });
-          yield Person.create({ name: 'Vince Neil', band: 'Motley Crue' });
-          yield Person.create({ name: 'Nikki Sixx', band: 'Motley Crue' });
-
-          const res = yield Band.find().
-            sort({ name: 1 }).
-            populate('member').
-            lean();
-
-          assert.equal(res.length, 2);
-          assert.equal(res[0].name, 'Guns N\' Roses');
-          assert.equal(res[0].member.name, 'Axl Rose');
-          assert.equal(res[1].name, 'Motley Crue');
-          assert.equal(res[1].member.name, 'Vince Neil');
+        const PersonSchema = new mongoose.Schema({
+          name: String,
+          band: String
         });
+
+        const BandSchema = new mongoose.Schema({
+          name: String
+        });
+
+        BandSchema.virtual('member', {
+          ref: 'Person',
+          localField: 'name',
+          foreignField: 'band',
+          justOne: true
+        });
+
+        const Person = db.model('Person', PersonSchema);
+        const Band = db.model('Test', BandSchema);
+
+        await Band.create({ name: 'Guns N\' Roses' });
+        await Band.create({ name: 'Motley Crue' });
+        await Person.create({ name: 'Axl Rose', band: 'Guns N\' Roses' });
+        await Person.create({ name: 'Slash', band: 'Guns N\' Roses' });
+        await Person.create({ name: 'Vince Neil', band: 'Motley Crue' });
+        await Person.create({ name: 'Nikki Sixx', band: 'Motley Crue' });
+
+        const res = await Band.find().
+          sort({ name: 1 }).
+          populate('member').
+          lean();
+
+        assert.equal(res.length, 2);
+        assert.equal(res[0].name, 'Guns N\' Roses');
+        assert.equal(res[0].member.name, 'Axl Rose');
+        assert.equal(res[1].name, 'Motley Crue');
+        assert.equal(res[1].member.name, 'Vince Neil');
       });
 
-      it('justOne underneath array (gh-6867)', function() {
-        return co(function*() {
-          const ReportItemSchema = new Schema({
-            idItem: String
-          });
+      it('justOne underneath array (gh-6867)', async function() {
 
-          const ReportSchema = new Schema({
-            items: [ReportItemSchema]
-          });
-
-          ReportItemSchema.virtual('itemDetail', {
-            ref: 'Child',
-            localField: 'idItem',
-            foreignField: '_id',
-            justOne: true // here is the problem
-          });
-
-          const ItemSchema = new Schema({
-            _id: String
-          });
-
-          const ReportModel = db.model('Parent', ReportSchema);
-          const ItemModel = db.model('Child', ItemSchema);
-
-          yield ItemModel.create({ _id: 'foo' });
-
-          yield ReportModel.create({
-            items: [{ idItem: 'foo' }, { idItem: 'bar' }]
-          });
-
-          let doc = yield ReportModel.findOne({}).populate('items.itemDetail');
-          doc = doc.toObject({ virtuals: true });
-          assert.equal(doc.items[0].itemDetail._id, 'foo');
-          assert.ok(!doc.items[1].itemDetail);
+        const ReportItemSchema = new Schema({
+          idItem: String
         });
+
+        const ReportSchema = new Schema({
+          items: [ReportItemSchema]
+        });
+
+        ReportItemSchema.virtual('itemDetail', {
+          ref: 'Child',
+          localField: 'idItem',
+          foreignField: '_id',
+          justOne: true // here is the problem
+        });
+
+        const ItemSchema = new Schema({
+          _id: String
+        });
+
+        const ReportModel = db.model('Parent', ReportSchema);
+        const ItemModel = db.model('Child', ItemSchema);
+
+        await ItemModel.create({ _id: 'foo' });
+
+        await ReportModel.create({
+          items: [{ idItem: 'foo' }, { idItem: 'bar' }]
+        });
+
+        let doc = await ReportModel.findOne({}).populate('items.itemDetail');
+        doc = doc.toObject({ virtuals: true });
+        assert.equal(doc.items[0].itemDetail._id, 'foo');
+        assert.ok(!doc.items[1].itemDetail);
       });
 
       it('with no results and justOne (gh-4284)', function(done) {
@@ -4771,7 +4663,7 @@ describe('model: populate:', function() {
         });
       });
 
-      it('virtuals with getters (gh-9343)', function() {
+      it('virtuals with getters (gh-9343)', async function() {
         const UserSchema = new Schema({
           openId: String,
           test: String
@@ -4790,16 +4682,15 @@ describe('model: populate:', function() {
         const User = db.model('User', UserSchema);
         const Comment = db.model('Comment', CommentSchema);
 
-        return co(function*() {
-          yield Comment.create({ openId: 'test' });
-          yield User.create({ openId: 'test', test: 'my string' });
 
-          const comment = yield Comment.findOne({ openId: 'test' }).populate('user');
-          assert.equal(comment.user, 'my string');
-        });
+        await Comment.create({ openId: 'test' });
+        await User.create({ openId: 'test', test: 'my string' });
+
+        const comment = await Comment.findOne({ openId: 'test' }).populate('user');
+        assert.equal(comment.user, 'my string');
       });
 
-      it('virtuals with `get` option (gh-9343)', function() {
+      it('virtuals with `get` option (gh-9343)', async function() {
         const UserSchema = new Schema({
           openId: String,
           test: String
@@ -4819,13 +4710,12 @@ describe('model: populate:', function() {
         const User = db.model('User', UserSchema);
         const Comment = db.model('Comment', CommentSchema);
 
-        return co(function*() {
-          yield Comment.create({ openId: 'test' });
-          yield User.create({ openId: 'test', test: 'my string' });
 
-          const comment = yield Comment.findOne({ openId: 'test' }).populate('user');
-          assert.equal(comment.user, 'my string');
-        });
+        await Comment.create({ openId: 'test' });
+        await User.create({ openId: 'test', test: 'my string' });
+
+        const comment = await Comment.findOne({ openId: 'test' }).populate('user');
+        assert.equal(comment.user, 'my string');
       });
 
       it('hydrates properly (gh-4618)', function(done) {
@@ -4959,7 +4849,7 @@ describe('model: populate:', function() {
           catch(done);
       });
 
-      it('with functions for match (gh-7397)', function() {
+      it('with functions for match (gh-7397)', async function() {
         const ASchema = new Schema({
           name: String,
           createdAt: Date
@@ -4973,36 +4863,35 @@ describe('model: populate:', function() {
         const A = db.model('Test', ASchema);
         const B = db.model('Test1', BSchema);
 
-        return co(function*() {
-          const as = yield A.create([
-            { name: 'old', createdAt: '2015-06-01' },
-            { name: 'newer', createdAt: '2017-06-01' },
-            { name: 'newest', createdAt: '2019-06-01' }
-          ]);
 
-          yield B.create({ as: as.map(a => a._id), minDate: '2016-01-01' });
-          const b = yield B.findOne().populate({
-            path: 'as',
-            match: doc => ({ createdAt: { $gte: doc.minDate } })
-          });
-          assert.equal(b.as.length, 2);
-          assert.deepEqual(b.as.map(a => a.name), ['newer', 'newest']);
+        const as = await A.create([
+          { name: 'old', createdAt: '2015-06-01' },
+          { name: 'newer', createdAt: '2017-06-01' },
+          { name: 'newest', createdAt: '2019-06-01' }
+        ]);
 
-          yield B.create({ as: as.map(a => a._id), minDate: '2018-01-01' });
-          const bs = yield B.find().sort({ minDate: 1 }).populate({
-            path: 'as',
-            match: doc => ({ createdAt: { $gte: doc.minDate } })
-          });
-          assert.equal(bs[0].minDate.toString(), new Date('2016-01-01').toString());
-          assert.equal(bs[1].minDate.toString(), new Date('2018-01-01').toString());
-          assert.equal(bs[0].as.length, 2);
-          assert.deepEqual(bs[0].as.map(a => a.name), ['newer', 'newest']);
-          assert.equal(bs[1].as.length, 1);
-          assert.deepEqual(bs[1].as.map(a => a.name), ['newest']);
+        await B.create({ as: as.map(a => a._id), minDate: '2016-01-01' });
+        const b = await B.findOne().populate({
+          path: 'as',
+          match: doc => ({ createdAt: { $gte: doc.minDate } })
         });
+        assert.equal(b.as.length, 2);
+        assert.deepEqual(b.as.map(a => a.name), ['newer', 'newest']);
+
+        await B.create({ as: as.map(a => a._id), minDate: '2018-01-01' });
+        const bs = await B.find().sort({ minDate: 1 }).populate({
+          path: 'as',
+          match: doc => ({ createdAt: { $gte: doc.minDate } })
+        });
+        assert.equal(bs[0].minDate.toString(), new Date('2016-01-01').toString());
+        assert.equal(bs[1].minDate.toString(), new Date('2018-01-01').toString());
+        assert.equal(bs[0].as.length, 2);
+        assert.deepEqual(bs[0].as.map(a => a.name), ['newer', 'newest']);
+        assert.equal(bs[1].as.length, 1);
+        assert.deepEqual(bs[1].as.map(a => a.name), ['newest']);
       });
 
-      it('with functions for match and foreignField (gh-7397)', function() {
+      it('with functions for match and foreignField (gh-7397)', async function() {
         const ASchema = new Schema({
           name: String,
           createdAt: Date,
@@ -5025,30 +4914,29 @@ describe('model: populate:', function() {
         const A = db.model('Test1', ASchema);
         const B = db.model('Test2', BSchema);
 
-        return co(function*() {
-          let bs = yield B.create([
-            { minDate: '2016-01-01' },
-            { minDate: '2016-01-01', alternateProperty: true }
-          ]);
-          yield A.create([
-            { name: 'old', createdAt: '2015-06-01', b: bs[0]._id, b2: bs[1]._id },
-            { name: 'newer', createdAt: '2017-06-01', b: bs[0]._id, b2: bs[1]._id },
-            { name: 'newest', createdAt: '2019-06-01', b: bs[0]._id, b2: bs[1]._id }
-          ]);
 
-          bs = yield B.find().sort({ minDate: 1 }).populate('as');
+        let bs = await B.create([
+          { minDate: '2016-01-01' },
+          { minDate: '2016-01-01', alternateProperty: true }
+        ]);
+        await A.create([
+          { name: 'old', createdAt: '2015-06-01', b: bs[0]._id, b2: bs[1]._id },
+          { name: 'newer', createdAt: '2017-06-01', b: bs[0]._id, b2: bs[1]._id },
+          { name: 'newest', createdAt: '2019-06-01', b: bs[0]._id, b2: bs[1]._id }
+        ]);
 
-          let b = bs[0];
-          assert.equal(b.as.length, 2);
-          assert.deepEqual(b.as.map(a => a.name).sort(), ['newer', 'newest']);
+        bs = await B.find().sort({ minDate: 1 }).populate('as');
 
-          b = bs[1];
-          assert.equal(b.as.length, 2);
-          assert.deepEqual(b.as.map(a => a.name).sort(), ['newer', 'newest']);
-        });
+        let b = bs[0];
+        assert.equal(b.as.length, 2);
+        assert.deepEqual(b.as.map(a => a.name).sort(), ['newer', 'newest']);
+
+        b = bs[1];
+        assert.equal(b.as.length, 2);
+        assert.deepEqual(b.as.map(a => a.name).sort(), ['newer', 'newest']);
       });
 
-      it('with function for refPath (gh-6669)', function() {
+      it('with function for refPath (gh-6669)', async function() {
         const connectionSchema = new Schema({
           destination: String
         });
@@ -5097,19 +4985,18 @@ describe('model: populate:', function() {
           agents: [{ kind: 'Test3', item: agent._id }]
         });
 
-        return co(function*() {
-          yield connection.save();
-          yield user.save();
-          yield agent.save();
-          yield record.save();
-          const doc = yield Record.findOne({})
-            .populate('connections.item')
-            .populate('users.item')
-            .populate('agents.item');
-          assert.strictEqual(doc.connections[0].item.destination, '192.168.1.15');
-          assert.strictEqual(doc.users[0].item.name, 'Kev');
-          assert.strictEqual(doc.agents[0].item.vendor, 'chrome');
-        });
+
+        await connection.save();
+        await user.save();
+        await agent.save();
+        await record.save();
+        const doc = await Record.findOne({})
+          .populate('connections.item')
+          .populate('users.item')
+          .populate('agents.item');
+        assert.strictEqual(doc.connections[0].item.destination, '192.168.1.15');
+        assert.strictEqual(doc.users[0].item.name, 'Kev');
+        assert.strictEqual(doc.agents[0].item.vendor, 'chrome');
       });
 
       it('with no results (gh-4284)', function(done) {
@@ -5166,7 +5053,7 @@ describe('model: populate:', function() {
         });
       });
 
-      it('virtual is undefined when not populated (gh-7795)', function() {
+      it('virtual is undefined when not populated (gh-7795)', async function() {
         const BlogPostSchema = new Schema({
           _id: Number,
           title: String
@@ -5179,12 +5066,11 @@ describe('model: populate:', function() {
 
         const BlogPost = db.model('BlogPost', BlogPostSchema);
 
-        return co(function*() {
-          yield BlogPost.create({ _id: 1, title: 'test' });
 
-          const doc = yield BlogPost.findOne();
-          assert.strictEqual(doc.authors, void 0);
-        });
+        await BlogPost.create({ _id: 1, title: 'test' });
+
+        const doc = await BlogPost.findOne();
+        assert.strictEqual(doc.authors, void 0);
       });
 
       it('deep populate virtual -> conventional (gh-4261)', function(done) {
@@ -5606,7 +5492,7 @@ describe('model: populate:', function() {
           });
         });
 
-        it('disabling at schema level (gh-6546)', function() {
+        it('disabling at schema level (gh-6546)', async function() {
           const Person = db.model('Person', new Schema({ name: String }));
 
           const bookSchema = new Schema({
@@ -5615,19 +5501,18 @@ describe('model: populate:', function() {
           }, { selectPopulatedPaths: false });
           const Book = db.model('Product', bookSchema);
 
-          return co(function*() {
-            const author = yield Person.create({ name: 'Val' });
-            yield Book.create({
-              title: 'Mastering Async/Await',
-              author: author._id
-            });
 
-            const res = yield Book.findOne().select('title').populate('author');
-            assert.ok(!res.author);
+          const author = await Person.create({ name: 'Val' });
+          await Book.create({
+            title: 'Mastering Async/Await',
+            author: author._id
           });
+
+          const res = await Book.findOne().select('title').populate('author');
+          assert.ok(!res.author);
         });
 
-        it('disabling at global level (gh-6546)', function() {
+        it('disabling at global level (gh-6546)', async function() {
           const Person = db.model('Person', new Schema({ name: String }));
 
           const bookSchema = new Schema({
@@ -5638,19 +5523,18 @@ describe('model: populate:', function() {
 
           mongoose.set('selectPopulatedPaths', false);
 
-          return co(function*() {
-            const author = yield Person.create({ name: 'Val' });
-            yield Book.create({
-              title: 'Mastering Async/Await',
-              author: author._id
-            });
 
-            const res = yield Book.findOne().select('title').populate('author');
-            assert.ok(!res.author);
+          const author = await Person.create({ name: 'Val' });
+          await Book.create({
+            title: 'Mastering Async/Await',
+            author: author._id
           });
+
+          const res = await Book.findOne().select('title').populate('author');
+          assert.ok(!res.author);
         });
 
-        it('schema overwrites global (gh-6546)', function() {
+        it('schema overwrites global (gh-6546)', async function() {
           const Person = db.model('Person', new Schema({ name: String }));
 
           const bookSchema = new Schema({
@@ -5661,16 +5545,15 @@ describe('model: populate:', function() {
 
           mongoose.set('selectPopulatedPaths', false);
 
-          return co(function*() {
-            const author = yield Person.create({ name: 'Val' });
-            yield Book.create({
-              title: 'Mastering Async/Await',
-              author: author._id
-            });
 
-            const res = yield Book.findOne().select('title').populate('author');
-            assert.equal(res.author.name, 'Val');
+          const author = await Person.create({ name: 'Val' });
+          await Book.create({
+            title: 'Mastering Async/Await',
+            author: author._id
           });
+
+          const res = await Book.findOne().select('title').populate('author');
+          assert.equal(res.author.name, 'Val');
         });
       });
 
@@ -6233,51 +6116,50 @@ describe('model: populate:', function() {
         done();
       });
 
-      it('array underneath non-existent array (gh-6245)', function() {
-        return co(function*() {
-          let DepartmentSchema = new Schema({ name: String });
-          let CompanySchema = new Schema({
-            name: String,
-            departments: [DepartmentSchema]
-          });
+      it('array underneath non-existent array (gh-6245)', async function() {
 
-          let Company = db.model('Company', CompanySchema);
-          const company = new Company({
-            name: 'Uber',
-            departments: [{ name: 'Security' }, { name: 'Engineering' }]
-          });
-
-          yield company.save();
-
-          const EmployeeSchema = new Schema({ name: String });
-          DepartmentSchema = new Schema({
-            name: String,
-            employees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Company' }]
-          });
-          CompanySchema = new Schema({
-            name: String,
-            departments: [DepartmentSchema]
-          });
-
-          delete db.models['Company'];
-          const Employee = db.model('Person', EmployeeSchema);
-          Company = db.model('Company', CompanySchema);
-
-          let uber = yield Company.findOne({ name: 'Uber' });
-          const kurt = yield Employee.create({ name: 'Kurt' });
-
-          const engineering = uber.departments.
-            find(d => d.name === 'Engineering');
-          engineering.employees.addToSet(kurt);
-          yield uber.save();
-
-          uber = yield Company.findOne({ name: 'Uber' }).
-            populate('departments.employees');
-          assert.equal(uber.departments[0].name, 'Security');
-          // Take extra care to make sure this isn't `null`
-          assert.ok(Array.isArray(uber.departments[0].employees));
-          assert.equal(uber.departments[0].employees.length, 0);
+        let DepartmentSchema = new Schema({ name: String });
+        let CompanySchema = new Schema({
+          name: String,
+          departments: [DepartmentSchema]
         });
+
+        let Company = db.model('Company', CompanySchema);
+        const company = new Company({
+          name: 'Uber',
+          departments: [{ name: 'Security' }, { name: 'Engineering' }]
+        });
+
+        await company.save();
+
+        const EmployeeSchema = new Schema({ name: String });
+        DepartmentSchema = new Schema({
+          name: String,
+          employees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Company' }]
+        });
+        CompanySchema = new Schema({
+          name: String,
+          departments: [DepartmentSchema]
+        });
+
+        delete db.models['Company'];
+        const Employee = db.model('Person', EmployeeSchema);
+        Company = db.model('Company', CompanySchema);
+
+        let uber = await Company.findOne({ name: 'Uber' });
+        const kurt = await Employee.create({ name: 'Kurt' });
+
+        const engineering = uber.departments.
+          find(d => d.name === 'Engineering');
+        engineering.employees.addToSet(kurt);
+        await uber.save();
+
+        uber = await Company.findOne({ name: 'Uber' }).
+          populate('departments.employees');
+        assert.equal(uber.departments[0].name, 'Security');
+        // Take extra care to make sure this isn't `null`
+        assert.ok(Array.isArray(uber.departments[0].employees));
+        assert.equal(uber.departments[0].employees.length, 0);
       });
 
       it('virtuals with justOne false and foreign field not found (gh-5336)', function(done) {
@@ -6712,196 +6594,193 @@ describe('model: populate:', function() {
       });
     });
 
-    it('virtual populate with embedded discriminators (gh-6273)', function() {
-      return co(function*() {
-        // Generate Users Model
-        const userSchema = new Schema({ employeeId: Number, name: String });
-        const UserModel = db.model('User', userSchema);
+    it('virtual populate with embedded discriminators (gh-6273)', async function() {
 
-        // Generate Embedded Discriminators
-        const eventSchema = new Schema(
-          { message: String },
-          { discriminatorKey: 'kind' }
-        );
+      // Generate Users Model
+      const userSchema = new Schema({ employeeId: Number, name: String });
+      const UserModel = db.model('User', userSchema);
 
-        const batchSchema = new Schema({ events: [eventSchema] });
-        const docArray = batchSchema.path('events');
+      // Generate Embedded Discriminators
+      const eventSchema = new Schema(
+        { message: String },
+        { discriminatorKey: 'kind' }
+      );
 
-        // First embedded discriminator schema
-        const clickedSchema = new Schema(
-          {
-            element: { type: String },
-            users: [Number]
-          },
-          {
-            toJSON: { virtuals: true },
-            toObject: { virtuals: true }
-          }
-        );
+      const batchSchema = new Schema({ events: [eventSchema] });
+      const docArray = batchSchema.path('events');
 
-        // Add virtual to first embedded discriminator schema for virtual population
-        clickedSchema.virtual('users_$', {
-          ref: 'User',
-          localField: 'users',
-          foreignField: 'employeeId'
-        });
+      // First embedded discriminator schema
+      const clickedSchema = new Schema(
+        {
+          element: { type: String },
+          users: [Number]
+        },
+        {
+          toJSON: { virtuals: true },
+          toObject: { virtuals: true }
+        }
+      );
 
-        docArray.discriminator('gh6273_Clicked', clickedSchema);
-
-        // Second embedded discriminator
-        docArray.discriminator('gh6273_Purchased', new Schema({
-          product: { type: String }
-        }));
-
-        const Batch = db.model('Test', batchSchema);
-
-        // Generate Items
-        const user = { employeeId: 1, name: 'Test name' };
-        const batch = {
-          events: [
-            { kind: 'gh6273_Clicked', element: '#hero', message: 'hello', users: [1] },
-            { kind: 'gh6273_Purchased', product: 'action-figure-1', message: 'world' }
-          ]
-        };
-
-        yield UserModel.create(user);
-        yield Batch.create(batch);
-
-        const doc = yield Batch.findOne().populate('events.users_$');
-
-        assert.equal(doc.events[0].users_$.length, 1);
-        assert.equal(doc.events[0].users_$[0].name, 'Test name');
-        assert.deepEqual(doc.toObject().events[0].users, [1]);
-        assert.ok(!doc.events[1].users_$);
+      // Add virtual to first embedded discriminator schema for virtual population
+      clickedSchema.virtual('users_$', {
+        ref: 'User',
+        localField: 'users',
+        foreignField: 'employeeId'
       });
+
+      docArray.discriminator('gh6273_Clicked', clickedSchema);
+
+      // Second embedded discriminator
+      docArray.discriminator('gh6273_Purchased', new Schema({
+        product: { type: String }
+      }));
+
+      const Batch = db.model('Test', batchSchema);
+
+      // Generate Items
+      const user = { employeeId: 1, name: 'Test name' };
+      const batch = {
+        events: [
+          { kind: 'gh6273_Clicked', element: '#hero', message: 'hello', users: [1] },
+          { kind: 'gh6273_Purchased', product: 'action-figure-1', message: 'world' }
+        ]
+      };
+
+      await UserModel.create(user);
+      await Batch.create(batch);
+
+      const doc = await Batch.findOne().populate('events.users_$');
+
+      assert.equal(doc.events[0].users_$.length, 1);
+      assert.equal(doc.events[0].users_$[0].name, 'Test name');
+      assert.deepEqual(doc.toObject().events[0].users, [1]);
+      assert.ok(!doc.events[1].users_$);
     });
 
     describe('populates an array of objects', function() {
-      it('subpopulates array w/ space separated path (gh-6284)', function() {
-        return co(function* () {
-          const db = start();
-          const houseSchema = new Schema({ location: String });
-          const citySchema = new Schema({ name: String });
-          const districtSchema = new Schema({ name: String });
+      it('subpopulates array w/ space separated path (gh-6284)', async function() {
+        const db = start();
+        const houseSchema = new Schema({ location: String });
+        const citySchema = new Schema({ name: String });
+        const districtSchema = new Schema({ name: String });
 
-          const userSchema = new Schema({
-            name: String,
-            houseId: {
-              type: Schema.Types.ObjectId,
-              ref: 'Test'
-            },
-            cityId: {
-              type: Schema.Types.ObjectId,
-              ref: 'Test2'
-            },
-            districtId: {
-              type: Schema.Types.ObjectId,
-              ref: 'Test3'
-            }
-          });
-
-          const postSchema = new Schema({
-            content: String,
-            userId: {
-              type: Schema.Types.ObjectId,
-              ref: 'Test1'
-            }
-          });
-
-          const House = db.model('Test', houseSchema);
-          const User = db.model('Test1', userSchema);
-          const City = db.model('Test2', citySchema);
-          const District = db.model('Test3', districtSchema);
-          const Post = db.model('BlogPost', postSchema);
-
-          const house = new House({ location: '123 abc st.' });
-          const city = new City({ name: 'Some City' });
-          const district = new District({ name: 'That District' });
-
-          const user = new User({
-            name: 'Billy',
-            houseId: house._id,
-            districtId: district._id,
-            cityId: city._id
-          });
-
-          const post = new Post({
-            content: 'Some meaningful insight.',
-            userId: user._id
-          });
-
-          yield House.create(house);
-          yield City.create(city);
-          yield District.create(district);
-          yield User.create(user);
-          yield Post.create(post);
-          const doc = yield Post.findOne({}).
-            populate({
-              path: 'userId',
-              populate: [{
-                path: 'houseId',
-                select: 'location'
-              }, {
-                path: 'cityId districtId',
-                select: 'name'
-              }]
-            });
-          assert.equal(doc.userId.houseId.location, '123 abc st.');
-          assert.equal(doc.userId.cityId.name, 'Some City');
-          assert.equal(doc.userId.districtId.name, 'That District');
+        const userSchema = new Schema({
+          name: String,
+          houseId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Test'
+          },
+          cityId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Test2'
+          },
+          districtId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Test3'
+          }
         });
+
+        const postSchema = new Schema({
+          content: String,
+          userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Test1'
+          }
+        });
+
+        const House = db.model('Test', houseSchema);
+        const User = db.model('Test1', userSchema);
+        const City = db.model('Test2', citySchema);
+        const District = db.model('Test3', districtSchema);
+        const Post = db.model('BlogPost', postSchema);
+
+        const house = new House({ location: '123 abc st.' });
+        const city = new City({ name: 'Some City' });
+        const district = new District({ name: 'That District' });
+
+        const user = new User({
+          name: 'Billy',
+          houseId: house._id,
+          districtId: district._id,
+          cityId: city._id
+        });
+
+        const post = new Post({
+          content: 'Some meaningful insight.',
+          userId: user._id
+        });
+
+        await House.create(house);
+        await City.create(city);
+        await District.create(district);
+        await User.create(user);
+        await Post.create(post);
+        const doc = await Post.findOne({}).
+          populate({
+            path: 'userId',
+            populate: [{
+              path: 'houseId',
+              select: 'location'
+            }, {
+              path: 'cityId districtId',
+              select: 'name'
+            }]
+          });
+        assert.equal(doc.userId.houseId.location, '123 abc st.');
+        assert.equal(doc.userId.cityId.name, 'Some City');
+        assert.equal(doc.userId.districtId.name, 'That District');
+
       });
-      it('populates array of space separated path objs (gh-6414)', function() {
-        return co(function* () {
-          const userSchema = new Schema({
-            name: String
-          });
-
-          const User = db.model('User', userSchema);
-
-          const officeSchema = new Schema({
-            managerId: { type: Schema.ObjectId, ref: 'User' },
-            supervisorId: { type: Schema.ObjectId, ref: 'User' },
-            janitorId: { type: Schema.ObjectId, ref: 'User' },
-            associatesIds: [{ type: Schema.ObjectId, ref: 'User' }]
-          });
-
-          const Office = db.model('Test', officeSchema);
-
-          const manager = new User({ name: 'John' });
-          const billy = new User({ name: 'Billy' });
-          const tom = new User({ name: 'Tom' });
-          const kevin = new User({ name: 'Kevin' });
-          const hafez = new User({ name: 'Hafez' });
-          const office = new Office({
-            managerId: manager._id,
-            supervisorId: hafez._id,
-            janitorId: kevin._id,
-            associatesIds: [billy._id, tom._id]
-          });
-
-          yield manager.save();
-          yield hafez.save();
-          yield billy.save();
-          yield tom.save();
-          yield kevin.save();
-          yield office.save();
-
-          const doc = yield Office.findOne({ _id: office._id })
-            .populate([
-              { path: 'managerId supervisorId associatesIds', select: 'name -_id' },
-              { path: 'janitorId', select: 'name -_id' }
-            ]);
-
-          assert.strictEqual(doc.managerId.name, 'John');
-          assert.strictEqual(doc.supervisorId.name, 'Hafez');
-          assert.strictEqual(doc.associatesIds[0].name, 'Billy');
-          assert.strictEqual(doc.associatesIds[1].name, 'Tom');
-          assert.strictEqual(doc.janitorId.name, 'Kevin');
+      it('populates array of space separated path objs (gh-6414)', async function() {
+        const userSchema = new Schema({
+          name: String
         });
+
+        const User = db.model('User', userSchema);
+
+        const officeSchema = new Schema({
+          managerId: { type: Schema.ObjectId, ref: 'User' },
+          supervisorId: { type: Schema.ObjectId, ref: 'User' },
+          janitorId: { type: Schema.ObjectId, ref: 'User' },
+          associatesIds: [{ type: Schema.ObjectId, ref: 'User' }]
+        });
+
+        const Office = db.model('Test', officeSchema);
+
+        const manager = new User({ name: 'John' });
+        const billy = new User({ name: 'Billy' });
+        const tom = new User({ name: 'Tom' });
+        const kevin = new User({ name: 'Kevin' });
+        const hafez = new User({ name: 'Hafez' });
+        const office = new Office({
+          managerId: manager._id,
+          supervisorId: hafez._id,
+          janitorId: kevin._id,
+          associatesIds: [billy._id, tom._id]
+        });
+
+        await manager.save();
+        await hafez.save();
+        await billy.save();
+        await tom.save();
+        await kevin.save();
+        await office.save();
+
+        const doc = await Office.findOne({ _id: office._id })
+          .populate([
+            { path: 'managerId supervisorId associatesIds', select: 'name -_id' },
+            { path: 'janitorId', select: 'name -_id' }
+          ]);
+
+        assert.strictEqual(doc.managerId.name, 'John');
+        assert.strictEqual(doc.supervisorId.name, 'Hafez');
+        assert.strictEqual(doc.associatesIds[0].name, 'Billy');
+        assert.strictEqual(doc.associatesIds[1].name, 'Tom');
+        assert.strictEqual(doc.janitorId.name, 'Kevin');
+
       });
 
-      it('handles subpopulation with options (gh-6528)', function() {
+      it('handles subpopulation with options (gh-6528)', async function() {
         const userSchema = new Schema({
           name: String
         });
@@ -6994,24 +6873,23 @@ describe('model: populate:', function() {
           return Post.find(cond, null, opts).populate(pop).exec();
         }
 
-        return co(function* () {
-          yield User.create(users);
-          yield Teacher.create(teachers);
-          yield Post.create(posts);
-          yield Comment.create(comments);
-          const t = yield Teacher.findOne({ name: 'teacher1' });
-          const found = yield getTeacherPosts(t._id, 1);
-          // skipped 1 posts, sorted backwards from title1 should equal title0
-          assert.strictEqual(found[0].title, 'title0');
-          assert.strictEqual(found[0].teacher.toHexString(), t.id);
-          // skipped 1 comment
-          assert.strictEqual(found[0].comments.length, 1);
-          // skipped 1 comment, sorted backwards from comment1 should equal comment0
-          assert.strictEqual(found[0].comments[0].content, 'comment0 on title0');
-        });
+        await User.create(users);
+        await Teacher.create(teachers);
+        await Post.create(posts);
+        await Comment.create(comments);
+        const t = await Teacher.findOne({ name: 'teacher1' });
+        const found = await getTeacherPosts(t._id, 1);
+        // skipped 1 posts, sorted backwards from title1 should equal title0
+        assert.strictEqual(found[0].title, 'title0');
+        assert.strictEqual(found[0].teacher.toHexString(), t.id);
+        // skipped 1 comment
+        assert.strictEqual(found[0].comments.length, 1);
+        // skipped 1 comment, sorted backwards from comment1 should equal comment0
+        assert.strictEqual(found[0].comments[0].content, 'comment0 on title0');
+
       });
 
-      it('honors top-level match with subPopulation (gh-6451)', function() {
+      it('honors top-level match with subPopulation (gh-6451)', async function() {
         const anotherSchema = new Schema({
           name: String
         });
@@ -7062,29 +6940,28 @@ describe('model: populate:', function() {
           o: [other._id, other2._id]
         });
 
-        return co(function* () {
-          yield another.save();
-          yield Other.create([other, other2]);
-          yield test.save();
+        await another.save();
+        await Other.create([other, other2]);
+        await test.save();
 
-          const popObj = {
-            path: 'o',
-            select: '-_id',
-            match: { online: true },
-            populate: {
-              path: 'a',
-              select: '-_id name'
-            }
-          };
-          const doc = yield Test.findOne({ visible: true }).populate(popObj);
-          assert.strictEqual(doc.o.length, 1);
-          assert.strictEqual(doc.o[0].value, 'yippie');
-          assert.strictEqual(doc.o[0].online, true);
-          assert.strictEqual(doc.o[0].a.name, 'testing');
-        });
+        const popObj = {
+          path: 'o',
+          select: '-_id',
+          match: { online: true },
+          populate: {
+            path: 'a',
+            select: '-_id name'
+          }
+        };
+        const doc = await Test.findOne({ visible: true }).populate(popObj);
+        assert.strictEqual(doc.o.length, 1);
+        assert.strictEqual(doc.o[0].value, 'yippie');
+        assert.strictEqual(doc.o[0].online, true);
+        assert.strictEqual(doc.o[0].a.name, 'testing');
+
       });
 
-      it('handles embedded discriminator (gh-6487)', function() {
+      it('handles embedded discriminator (gh-6487)', async function() {
         const userSchema = new Schema({ employeeId: Number, name: String });
         const UserModel = db.model('User', userSchema);
 
@@ -7133,18 +7010,17 @@ describe('model: populate:', function() {
           }
         };
 
-        return co(function*() {
-          yield UserModel.create(user);
-          yield Batch.create(batch);
-          const docs = yield Batch.find({})
-            .populate('nested.events.users_$')
-            .lean();
-          const name = docs[0].nested.events[0].users_$[0].name;
-          assert.strictEqual(name, 'Test name');
-        });
+
+        await UserModel.create(user);
+        await Batch.create(batch);
+        const docs = await Batch.find({})
+          .populate('nested.events.users_$')
+          .lean();
+        const name = docs[0].nested.events[0].users_$[0].name;
+        assert.strictEqual(name, 'Test name');
       });
 
-      it('handles virtual embedded discriminator underneath single nested (gh-6571)', co.wrap(function*() {
+      it('handles virtual embedded discriminator underneath single nested (gh-6571)', async function() {
         // Generate Users Model
         const userSchema = new Schema({ id: Number, name: String });
         db.deleteModel(/.*/);
@@ -7190,9 +7066,9 @@ describe('model: populate:', function() {
         const FlexibleItem = db.model('Test', flexibleItemSchema);
 
         // Generate items
-        yield User.create({ id: 111, name: 'John Doe' });
-        yield Product.create({ id: 222, name: 'Notebook' });
-        yield FlexibleItem.create({
+        await User.create({ id: 111, name: 'John Doe' });
+        await Product.create({ id: 222, name: 'Notebook' });
+        await FlexibleItem.create({
           outer: {
             inner: {
               flexible: [
@@ -7203,7 +7079,7 @@ describe('model: populate:', function() {
           }
         });
 
-        const doc = yield FlexibleItem.findOne().
+        const doc = await FlexibleItem.findOne().
           populate('outer.inner.flexible.users_$').
           populate('outer.inner.flexible.products_$').
           then(doc => doc.toObject({ virtuals: true }));
@@ -7212,112 +7088,110 @@ describe('model: populate:', function() {
         assert.equal(doc.outer.inner.flexible[0].users_$[0].name, 'John Doe');
         assert.equal(doc.outer.inner.flexible[1].products_$.length, 1);
         assert.equal(doc.outer.inner.flexible[1].products_$[0].name, 'Notebook');
-      }));
-    });
-
-    it('populates undefined nested fields without error (gh-6845)', co.wrap(function*() {
-      const metaDataSchema = new Schema({
-        type: String
       });
 
-      const commentSchema = new Schema({
-        metadata: {
-          type: Schema.Types.ObjectId,
-          ref: 'Test'
-        }
+      it('populates undefined nested fields without error (gh-6845)', async function() {
+        const metaDataSchema = new Schema({
+          type: String
+        });
+
+        const commentSchema = new Schema({
+          metadata: {
+            type: Schema.Types.ObjectId,
+            ref: 'Test'
+          }
+        });
+
+        const postSchema = new Schema({
+          comments: [commentSchema]
+        });
+
+        const userSchema = new Schema({
+          username: String,
+          password: String,
+          posts: [postSchema]
+        });
+
+        db.model('Test', metaDataSchema);
+        const User = db.model('User', userSchema);
+
+        const user = await User.findOneAndUpdate(
+          { username: 'Jennifer' }, /* upsert username but missing posts */
+          { },
+          {
+            upsert: true,
+            new: true
+          })
+          .populate(['posts.comments.metadata'])
+          .exec();
+
+        assert.ok(user && user.username === 'Jennifer');
       });
 
-      const postSchema = new Schema({
-        comments: [commentSchema]
-      });
+      it('populates refPath from array element (gh-6509)', async function() {
+        const jobSchema = new Schema({
+          kind: String,
+          title: String,
+          company: String
+        });
 
-      const userSchema = new Schema({
-        username: String,
-        password: String,
-        posts: [postSchema]
-      });
+        const Job = db.model('Job', jobSchema);
 
-      db.model('Test', metaDataSchema);
-      const User = db.model('User', userSchema);
+        const volunteerSchema = new Schema({
+          kind: String,
+          resp: String,
+          org: String
+        });
 
-      const user = yield User.findOneAndUpdate(
-        { username: 'Jennifer' }, /* upsert username but missing posts */
-        { },
-        {
-          upsert: true,
-          new: true
-        })
-        .populate(['posts.comments.metadata'])
-        .exec();
+        const Volunteer = db.model('Test1', volunteerSchema);
 
-      assert.ok(user && user.username === 'Jennifer');
-    }));
-
-    it('populates refPath from array element (gh-6509)', function() {
-      const jobSchema = new Schema({
-        kind: String,
-        title: String,
-        company: String
-      });
-
-      const Job = db.model('Job', jobSchema);
-
-      const volunteerSchema = new Schema({
-        kind: String,
-        resp: String,
-        org: String
-      });
-
-      const Volunteer = db.model('Test1', volunteerSchema);
-
-      const cvSchema = new Schema({
-        title: String,
-        date: { type: Date, default: Date.now },
-        sections: [{
-          name: String,
-          active: Boolean,
-          list: [{
-            kind: String,
+        const cvSchema = new Schema({
+          title: String,
+          date: { type: Date, default: Date.now },
+          sections: [{
+            name: String,
             active: Boolean,
-            item: {
-              type: Schema.Types.ObjectId,
-              refPath: 'sections.list.kind'
-            }
+            list: [{
+              kind: String,
+              active: Boolean,
+              item: {
+                type: Schema.Types.ObjectId,
+                refPath: 'sections.list.kind'
+              }
+            }]
           }]
-        }]
-      });
+        });
 
-      const CV = db.model('Test2', cvSchema);
+        const CV = db.model('Test2', cvSchema);
 
-      const job = new Job({
-        kind: 'Job',
-        title: 'janitor',
-        company: 'Bait & Tackle'
-      });
+        const job = new Job({
+          kind: 'Job',
+          title: 'janitor',
+          company: 'Bait & Tackle'
+        });
 
-      const volunteer = new Volunteer({
-        kind: 'Test1',
-        resp: 'construction',
-        org: 'Habitat for Humanity'
-      });
+        const volunteer = new Volunteer({
+          kind: 'Test1',
+          resp: 'construction',
+          org: 'Habitat for Humanity'
+        });
 
-      const test = new CV({
-        title: 'Billy',
-        sections: [{
-          name: 'Experience',
-          active: true,
-          list: [
-            { kind: 'Job', active: true, item: job._id },
-            { kind: 'Test1', active: true, item: volunteer._id }
-          ]
-        }]
-      });
+        const test = new CV({
+          title: 'Billy',
+          sections: [{
+            name: 'Experience',
+            active: true,
+            list: [
+              { kind: 'Job', active: true, item: job._id },
+              { kind: 'Test1', active: true, item: volunteer._id }
+            ]
+          }]
+        });
 
-      return co(function* () {
-        yield job.save();
-        yield volunteer.save();
-        yield test.save();
-        const found = yield CV.findOne({}).populate('sections.list.item');
+        await job.save();
+        await volunteer.save();
+        await test.save();
+        const found = await CV.findOne({}).populate('sections.list.item');
 
         assert.ok(found.sections[0].list[0].item);
         assert.strictEqual(
@@ -7329,598 +7203,582 @@ describe('model: populate:', function() {
           found.sections[0].list[1].item.org,
           'Habitat for Humanity'
         );
+
       });
     });
-  });
 
-  describe('lean + deep populate (gh-6498)', function() {
-    const isLean = v => v != null && !(v instanceof mongoose.Document);
+    describe('lean + deep populate (gh-6498)', function() {
+      const isLean = v => v != null && !(v instanceof mongoose.Document);
 
-    beforeEach(function() {
+      beforeEach(async function() {
+        const userSchema = new Schema({
+          name: String,
+          roomId: { type: Schema.ObjectId, ref: 'Test1' }
+        });
+        const officeSchema = new Schema();
+        const roomSchema = new Schema({
+          officeId: { type: Schema.ObjectId, ref: 'Test2' }
+        });
+
+        const User = db.model('User', userSchema);
+        const Office = db.model('Test2', officeSchema);
+        const Room = db.model('Test1', roomSchema);
+
+        const user = new User();
+        const office = new Office();
+        const room = new Room();
+
+        user.roomId = room._id;
+        room.officeId = office._id;
+
+        await User.deleteMany({});
+        await Promise.all([user.save(), office.save(), room.save()]);
+      });
+
+      it('document, and subdocuments are not lean by default', async function() {
+
+        const user = await db.model('User').findOne().populate({
+          path: 'roomId',
+          populate: {
+            path: 'officeId'
+          }
+        });
+
+        assert.equal(isLean(user), false);
+        assert.equal(isLean(user.roomId), false);
+        assert.equal(isLean(user.roomId.officeId), false);
+      });
+
+      it('.lean() makes query result, and all populated fields lean', async function() {
+
+        const user = await db.model('User').findOne().
+          populate({
+            path: 'roomId',
+            populate: {
+              path: 'officeId'
+            }
+          }).
+          lean();
+
+        assert.equal(isLean(user), true);
+        assert.equal(isLean(user.roomId), true);
+        assert.equal(isLean(user.roomId.officeId), true);
+      });
+
+      it('disabling lean at some populating level reflects on it, and descendants', async function() {
+
+        const user = await db.model('User').findOne().
+          populate({
+            path: 'roomId',
+            options: { lean: false },
+            populate: {
+              path: 'officeId'
+            }
+          }).
+          lean();
+
+        assert.equal(isLean(user), true);
+        assert.equal(isLean(user.roomId), false);
+        assert.equal(isLean(user.roomId.officeId), false);
+      });
+
+      it('enabling lean at some populating level reflects on it, and descendants', async function() {
+
+        const user = await db.model('User').findOne().populate({
+          path: 'roomId',
+          options: { lean: true },
+          populate: {
+            path: 'officeId'
+          }
+        });
+
+        assert.equal(isLean(user), false);
+        assert.equal(isLean(user.roomId), true);
+        assert.equal(isLean(user.roomId.officeId), true);
+      });
+
+      it('disabling lean on nested population overwrites parent lean', async function() {
+
+        const user = await db.model('User').findOne().populate({
+          path: 'roomId',
+          options: { lean: true },
+          populate: {
+            options: { lean: false },
+            path: 'officeId'
+          }
+        });
+
+        assert.equal(isLean(user), false);
+        assert.equal(isLean(user.roomId), true);
+        assert.equal(isLean(user.roomId.officeId), false);
+      });
+    });
+
+    it('populates virtual of embedded discriminator with dynamic ref (gh-6554)', async function() {
       const userSchema = new Schema({
-        name: String,
-        roomId: { type: Schema.ObjectId, ref: 'Test1' }
-      });
-      const officeSchema = new Schema();
-      const roomSchema = new Schema({
-        officeId: { type: Schema.ObjectId, ref: 'Test2' }
+        employeeId: Number,
+        name: String
       });
 
-      const User = db.model('User', userSchema);
-      const Office = db.model('Test2', officeSchema);
-      const Room = db.model('Test1', roomSchema);
+      const UserModel = db.model('User', userSchema);
 
-      const user = new User();
-      const office = new Office();
-      const room = new Room();
+      const eventSchema = new Schema({
+        message: String
+      }, { discriminatorKey: 'kind' });
 
-      user.roomId = room._id;
-      room.officeId = office._id;
-
-      return User.deleteMany({}).
-        then(() => Promise.all([user.save(), office.save(), room.save()]));
-    });
-
-    it('document, and subdocuments are not lean by default', function() {
-      return co(function*() {
-        const user = yield db.model('User').findOne().populate({
-          path: 'roomId',
-          populate: {
-            path: 'officeId'
-          }
-        });
-
-        assert.equal(isLean(user), false);
-        assert.equal(isLean(user.roomId), false);
-        assert.equal(isLean(user.roomId.officeId), false);
+      const batchSchema = new Schema({
+        events: [eventSchema]
       });
-    });
 
-    it('.lean() makes query result, and all populated fields lean', function() {
-      return co(function*() {
-        const user = yield db.model('User').findOne().
-          populate({
-            path: 'roomId',
-            populate: {
-              path: 'officeId'
-            }
-          }).
-          lean();
+      const docArray = batchSchema.path('events');
 
-        assert.equal(isLean(user), true);
-        assert.equal(isLean(user.roomId), true);
-        assert.equal(isLean(user.roomId.officeId), true);
-      });
-    });
-
-    it('disabling lean at some populating level reflects on it, and descendants', function() {
-      return co(function*() {
-        const user = yield db.model('User').findOne().
-          populate({
-            path: 'roomId',
-            options: { lean: false },
-            populate: {
-              path: 'officeId'
-            }
-          }).
-          lean();
-
-        assert.equal(isLean(user), true);
-        assert.equal(isLean(user.roomId), false);
-        assert.equal(isLean(user.roomId.officeId), false);
-      });
-    });
-
-    it('enabling lean at some populating level reflects on it, and descendants', function() {
-      return co(function*() {
-        const user = yield db.model('User').findOne().populate({
-          path: 'roomId',
-          options: { lean: true },
-          populate: {
-            path: 'officeId'
-          }
-        });
-
-        assert.equal(isLean(user), false);
-        assert.equal(isLean(user.roomId), true);
-        assert.equal(isLean(user.roomId.officeId), true);
-      });
-    });
-
-    it('disabling lean on nested population overwrites parent lean', function() {
-      return co(function*() {
-        const user = yield db.model('User').findOne().populate({
-          path: 'roomId',
-          options: { lean: true },
-          populate: {
-            options: { lean: false },
-            path: 'officeId'
-          }
-        });
-
-        assert.equal(isLean(user), false);
-        assert.equal(isLean(user.roomId), true);
-        assert.equal(isLean(user.roomId.officeId), false);
-      });
-    });
-  });
-
-  it('populates virtual of embedded discriminator with dynamic ref (gh-6554)', function() {
-    const userSchema = new Schema({
-      employeeId: Number,
-      name: String
-    });
-
-    const UserModel = db.model('User', userSchema);
-
-    const eventSchema = new Schema({
-      message: String
-    }, { discriminatorKey: 'kind' });
-
-    const batchSchema = new Schema({
-      events: [eventSchema]
-    });
-
-    const docArray = batchSchema.path('events');
-
-    const clickedSchema = new Schema({
-      element: { type: String },
-      users: [{}]
-    },
-    {
-      toJSON: { virtuals: true },
-      toObject: { virtuals: true }
-    });
-
-    clickedSchema.virtual('users_$', {
-      ref: function(doc) {
-        return doc.events[0].users[0].refKey;
+      const clickedSchema = new Schema({
+        element: { type: String },
+        users: [{}]
       },
-      localField: 'users.ID',
-      foreignField: 'employeeId'
-    });
+      {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+      });
 
-    docArray.discriminator('Clicked', clickedSchema);
-    const Batch = db.model('Test', batchSchema);
+      clickedSchema.virtual('users_$', {
+        ref: function(doc) {
+          return doc.events[0].users[0].refKey;
+        },
+        localField: 'users.ID',
+        foreignField: 'employeeId'
+      });
 
-    const user = { employeeId: 1, name: 'Test name' };
-    const batch = {
-      events: [
-        {
-          kind: 'Clicked',
-          element: '#hero',
-          message: 'hello',
-          users: [{ ID: 1, refKey: 'User' }]
-        }
-      ]
-    };
+      docArray.discriminator('Clicked', clickedSchema);
+      const Batch = db.model('Test', batchSchema);
 
-    return co(function*() {
-      yield UserModel.create(user);
-      yield Batch.create(batch);
-      const doc = yield Batch.findOne({}).populate('events.users_$');
+      const user = { employeeId: 1, name: 'Test name' };
+      const batch = {
+        events: [
+          {
+            kind: 'Clicked',
+            element: '#hero',
+            message: 'hello',
+            users: [{ ID: 1, refKey: 'User' }]
+          }
+        ]
+      };
+
+
+      await UserModel.create(user);
+      await Batch.create(batch);
+      const doc = await Batch.findOne({}).populate('events.users_$');
       assert.strictEqual(doc.events[0].users_$[0].name, 'Test name');
     });
-  });
 
-  it('populates virtual of embedded discriminator with dynamic ref when more than one model name is returned (gh-6612)', function() {
-    const userSchema = new Schema({
-      employeeId: Number,
-      name: String
-    });
+    it('populates virtual of embedded discriminator with dynamic ref when more than one model name is returned (gh-6612)', async function() {
+      const userSchema = new Schema({
+        employeeId: Number,
+        name: String
+      });
 
-    const UserModel = db.model('User', userSchema);
+      const UserModel = db.model('User', userSchema);
 
-    const authorSchema = new Schema({
-      employeeId: Number,
-      name: String
-    });
+      const authorSchema = new Schema({
+        employeeId: Number,
+        name: String
+      });
 
-    const AuthorModel = db.model('Author', authorSchema);
+      const AuthorModel = db.model('Author', authorSchema);
 
-    const eventSchema = new Schema({
-      message: String
-    }, { discriminatorKey: 'kind' });
+      const eventSchema = new Schema({
+        message: String
+      }, { discriminatorKey: 'kind' });
 
-    const batchSchema = new Schema({
-      events: [eventSchema]
-    });
+      const batchSchema = new Schema({
+        events: [eventSchema]
+      });
 
-    const docArray = batchSchema.path('events');
+      const docArray = batchSchema.path('events');
 
-    const clickedSchema = new Schema({
-      element: { type: String },
-      users: [{}]
-    },
-    {
-      toJSON: { virtuals: true },
-      toObject: { virtuals: true }
-    });
-
-    clickedSchema.virtual('users_$', {
-      ref: function(doc) {
-        const refKeys = doc.events[0].users.map(user => user.refKey);
-        return refKeys;
+      const clickedSchema = new Schema({
+        element: { type: String },
+        users: [{}]
       },
-      localField: 'users.ID',
-      foreignField: 'employeeId'
-    });
+      {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+      });
 
-    docArray.discriminator('Clicked', clickedSchema);
-    const Batch = db.model('Test', batchSchema);
+      clickedSchema.virtual('users_$', {
+        ref: function(doc) {
+          const refKeys = doc.events[0].users.map(user => user.refKey);
+          return refKeys;
+        },
+        localField: 'users.ID',
+        foreignField: 'employeeId'
+      });
 
-    const user = { employeeId: 1, name: 'Test name' };
-    const author = { employeeId: 2, name: 'Author Name' };
-    const batch = {
-      events: [
-        {
-          kind: 'Clicked',
-          element: '#hero',
-          message: 'hello',
-          users: [
-            { ID: 1, refKey: 'User' },
-            { ID: 2, refKey: 'Author' }
-          ]
-        }
-      ]
-    };
+      docArray.discriminator('Clicked', clickedSchema);
+      const Batch = db.model('Test', batchSchema);
 
-    return co(function*() {
-      yield UserModel.create(user);
-      yield AuthorModel.create(author);
-      yield Batch.create(batch);
-      const doc = yield Batch.findOne({}).populate('events.users_$');
+      const user = { employeeId: 1, name: 'Test name' };
+      const author = { employeeId: 2, name: 'Author Name' };
+      const batch = {
+        events: [
+          {
+            kind: 'Clicked',
+            element: '#hero',
+            message: 'hello',
+            users: [
+              { ID: 1, refKey: 'User' },
+              { ID: 2, refKey: 'Author' }
+            ]
+          }
+        ]
+      };
+
+
+      await UserModel.create(user);
+      await AuthorModel.create(author);
+      await Batch.create(batch);
+      const doc = await Batch.findOne({}).populate('events.users_$');
       assert.strictEqual(doc.events[0].users_$[0].name, 'Test name');
       assert.strictEqual(doc.events[0].users_$[1].name, 'Author Name');
     });
-  });
 
-  it('uses getter if one is defined on the localField (gh-6618)', function() {
-    const userSchema = new Schema({
-      name: String
-    });
+    it('uses getter if one is defined on the localField (gh-6618)', async function() {
+      const userSchema = new Schema({
+        name: String
+      });
 
-    const schema = new Schema({
-      referrer: {
-        type: String,
-        get: function(val) {
-          return val.slice(6);
+      const schema = new Schema({
+        referrer: {
+          type: String,
+          get: function(val) {
+            return val.slice(6);
+          }
         }
-      }
-    }, { toObject: { virtuals: true } });
+      }, { toObject: { virtuals: true } });
 
-    schema.virtual('referrerUser', {
-      ref: 'User',
-      localField: 'referrer',
-      foreignField: 'name',
-      justOne: false,
-      getters: true
-    });
+      schema.virtual('referrerUser', {
+        ref: 'User',
+        localField: 'referrer',
+        foreignField: 'name',
+        justOne: false,
+        getters: true
+      });
 
-    const User = db.model('User', userSchema);
-    const Test = db.model('Test', schema);
+      const User = db.model('User', userSchema);
+      const Test = db.model('Test', schema);
 
-    const user = new User({ name: 'billy' });
-    const test = new Test({ referrer: 'Model$' + user.name });
+      const user = new User({ name: 'billy' });
+      const test = new Test({ referrer: 'Model$' + user.name });
 
-    return co(function*() {
-      yield user.save();
-      yield test.save();
-      const pop = yield Test.findOne().populate('referrerUser');
+
+      await user.save();
+      await test.save();
+      const pop = await Test.findOne().populate('referrerUser');
       assert.strictEqual(pop.referrerUser[0].name, 'billy');
 
-      const pop2 = yield Test.findOne().populate({ path: 'referrerUser', options: { getters: false } });
+      const pop2 = await Test.findOne().populate({ path: 'referrerUser', options: { getters: false } });
       assert.strictEqual(pop2.referrerUser.length, 0);
     });
-  });
 
-  it('populate child with same name as parent (gh-6839) (gh-6908)', function() {
-    const parentFieldsToPopulate = [
-      { path: 'children.child' },
-      { path: 'child' }
-    ];
+    it('populate child with same name as parent (gh-6839) (gh-6908)', async function() {
+      const parentFieldsToPopulate = [
+        { path: 'children.child' },
+        { path: 'child' }
+      ];
 
-    const childSchema = new mongoose.Schema({ name: String });
-    const Child = db.model('Child', childSchema);
+      const childSchema = new mongoose.Schema({ name: String });
+      const Child = db.model('Child', childSchema);
 
-    const parentSchema = new mongoose.Schema({
-      child: { type: mongoose.Schema.Types.ObjectId, ref: 'Child' },
-      children: [{
-        child: { type: mongoose.Schema.Types.ObjectId, ref: 'Child' }
-      }]
-    });
-    const Parent = db.model('Parent', parentSchema);
+      const parentSchema = new mongoose.Schema({
+        child: { type: mongoose.Schema.Types.ObjectId, ref: 'Child' },
+        children: [{
+          child: { type: mongoose.Schema.Types.ObjectId, ref: 'Child' }
+        }]
+      });
+      const Parent = db.model('Parent', parentSchema);
 
-    return co(function*() {
-      let child = yield Child.create({ name: 'test' });
-      let p = yield Parent.create({ child: child });
 
-      child = yield Child.findById(child._id);
-      p = yield Parent.findById(p._id).populate(parentFieldsToPopulate);
+      let child = await Child.create({ name: 'test' });
+      let p = await Parent.create({ child: child });
+
+      child = await Child.findById(child._id);
+      p = await Parent.findById(p._id).populate(parentFieldsToPopulate);
       p.children.push({ child: child });
-      yield p.save();
+      await p.save();
 
-      p = yield p.populate(parentFieldsToPopulate);
+      p = await p.populate(parentFieldsToPopulate);
       assert.ok(p.children[0].child);
       assert.equal(p.children[0].child.name, 'test');
     });
-  });
 
-  it('passes scope as Model instance (gh-6726)', function() {
-    const otherSchema = new Schema({ name: String });
-    const Other = db.model('Test1', otherSchema);
-    const schema = new Schema({
-      x: {
-        type: Schema.Types.ObjectId,
-        ref: 'Test1',
-        get: function(v) {
-          assert.strictEqual(this.constructor.name, 'model');
-          return v;
+    it('passes scope as Model instance (gh-6726)', async function() {
+      const otherSchema = new Schema({ name: String });
+      const Other = db.model('Test1', otherSchema);
+      const schema = new Schema({
+        x: {
+          type: Schema.Types.ObjectId,
+          ref: 'Test1',
+          get: function(v) {
+            assert.strictEqual(this.constructor.name, 'model');
+            return v;
+          }
         }
-      }
-    });
-    const Test = db.model('Test', schema);
-    const other = new Other({ name: 'Max' });
-    const test = new Test({ x: other._id });
-    return co(function*() {
-      yield other.save();
-      yield test.save();
-      const doc = yield Test.findOne({}).populate('x');
+      });
+      const Test = db.model('Test', schema);
+      const other = new Other({ name: 'Max' });
+      const test = new Test({ x: other._id });
+
+      await other.save();
+      await test.save();
+      const doc = await Test.findOne({}).populate('x');
       assert.strictEqual(doc.x.name, 'Max');
     });
-  });
 
-  it('respects schema array even if underlying doc doesnt use array (gh-6908)', function() {
-    const jobSchema = new Schema({
-      company: [{ type: Schema.Types.ObjectId, ref: 'Company' }]
-    });
-    const Job = db.model('Test', jobSchema);
+    it('respects schema array even if underlying doc doesnt use array (gh-6908)', async function() {
+      const jobSchema = new Schema({
+        company: [{ type: Schema.Types.ObjectId, ref: 'Company' }]
+      });
+      const Job = db.model('Test', jobSchema);
 
-    const companySchema = new Schema({ name: String });
-    const Company = db.model('Company', companySchema);
+      const companySchema = new Schema({ name: String });
+      const Company = db.model('Company', companySchema);
 
-    return co(function*() {
-      const mdb = yield Company.create({ name: 'MongoDB' });
 
-      yield Job.collection.insertOne({ company: mdb._id });
+      const mdb = await Company.create({ name: 'MongoDB' });
 
-      const res = yield Job.findOne().populate('company');
+      await Job.collection.insertOne({ company: mdb._id });
+
+      const res = await Job.findOne().populate('company');
 
       assert.ok(Array.isArray(res.company));
       assert.equal(res.company[0].name, 'MongoDB');
     });
-  });
 
-  it('save objectid with populated refPath (gh-6714)', function() {
-    const parentSchema = new Schema({
-      kind: {
-        type: String
-      },
-      item: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        refPath: 'parent.kind'
-      }
-    });
-    const schema = new Schema({
-      parent: parentSchema,
-      lockingVersion: mongoose.Schema.Types.ObjectId,
-      lastUpdate: {
-        alias: String,
-        date: Date
-      },
-      test: String
-    });
+    it('save objectid with populated refPath (gh-6714)', async function() {
+      const parentSchema = new Schema({
+        kind: {
+          type: String
+        },
+        item: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+          refPath: 'parent.kind'
+        }
+      });
+      const schema = new Schema({
+        parent: parentSchema,
+        lockingVersion: mongoose.Schema.Types.ObjectId,
+        lastUpdate: {
+          alias: String,
+          date: Date
+        },
+        test: String
+      });
 
-    const Role = db.model('Test', schema);
+      const Role = db.model('Test', schema);
 
-    return co(function*() {
-      const role = yield Role.create({ });
-      const role2 = yield Role.create({
+
+      const role = await Role.create({ });
+      const role2 = await Role.create({
         parent: { kind: 'Test', item: role._id }
       });
 
-      const toUpdate = yield Role.find({ _id: role2._id }).
+      const toUpdate = await Role.find({ _id: role2._id }).
         populate('parent.item').
         then(res => res[0]);
 
       toUpdate.test = 'foo';
-      yield toUpdate.save();
-    });
-  });
-
-  it('correct model and justOne when double populating (gh-6978)', function() {
-    const authorSchema = new Schema({
-      name: String
+      await toUpdate.save();
     });
 
-    const commentSchema = new Schema({
-      text: String,
-      author: {
-        type: Schema.Types.ObjectId,
-        ref: 'Author'
-      }
-    });
+    it('correct model and justOne when double populating (gh-6978)', async function() {
+      const authorSchema = new Schema({
+        name: String
+      });
 
-    const postSchema = new Schema({
-      content: String,
-      comments: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Comment'
-      }]
-    });
+      const commentSchema = new Schema({
+        text: String,
+        author: {
+          type: Schema.Types.ObjectId,
+          ref: 'Author'
+        }
+      });
 
-    const Author = db.model('Author', authorSchema);
-    const Comment = db.model('Comment', commentSchema);
-    const Post = db.model('BlogPost', postSchema);
+      const postSchema = new Schema({
+        content: String,
+        comments: [{
+          type: Schema.Types.ObjectId,
+          ref: 'Comment'
+        }]
+      });
 
-    const authors = '123'.split('').map(n => {
-      return new Author({ name: `author${n}` });
-    });
+      const Author = db.model('Author', authorSchema);
+      const Comment = db.model('Comment', commentSchema);
+      const Post = db.model('BlogPost', postSchema);
 
-    const comments = 'abc'.split('').map((l, i) => {
-      const id = authors[i]._id;
-      return new Comment({ text: `comment_${l}`, author: id });
-    });
+      const authors = '123'.split('').map(n => {
+        return new Author({ name: `author${n}` });
+      });
 
-    return co(function*() {
-      yield Post.create({
+      const comments = 'abc'.split('').map((l, i) => {
+        const id = authors[i]._id;
+        return new Comment({ text: `comment_${l}`, author: id });
+      });
+
+
+      await Post.create({
         content: 'foobar',
         comments: comments
       });
 
-      yield Author.create(authors);
-      yield Comment.create(comments);
+      await Author.create(authors);
+      await Comment.create(comments);
 
-      let post = yield Post.findOne({});
-      post = yield Post.populate(post, { path: 'comments' });
-      post = yield Post.populate(post, { path: 'comments.author' });
+      let post = await Post.findOne({});
+      post = await Post.populate(post, { path: 'comments' });
+      post = await Post.populate(post, { path: 'comments.author' });
 
       post.comments.forEach((c, i) => {
         assert.ok(!Array.isArray(c.author), `author ${i} is an array`);
       });
     });
-  });
 
-  it('correctly finds justOne when double-populating underneath an array (gh-6798)', function() {
-    const FileSchema = new Schema({ filename: 'String' });
-    const EditionOptionsSchema = new Schema({
-      price: 'Number',
-      image: {
-        type: 'ObjectId',
-        ref: 'Test'
-      }
-    });
-    const EditionSchema = new Schema({ editionOptions: EditionOptionsSchema });
-    const CarVersionSchema = new Schema({
-      type: {
-        type: 'String'
-      },
-      editions: [{
-        type: 'ObjectId',
-        ref: 'Test1'
-      }]
-    });
-    const CarSchema = new mongoose.Schema({
-      make: 'String',
-      versions: [CarVersionSchema]
-    });
+    it('correctly finds justOne when double-populating underneath an array (gh-6798)', async function() {
+      const FileSchema = new Schema({ filename: 'String' });
+      const EditionOptionsSchema = new Schema({
+        price: 'Number',
+        image: {
+          type: 'ObjectId',
+          ref: 'Test'
+        }
+      });
+      const EditionSchema = new Schema({ editionOptions: EditionOptionsSchema });
+      const CarVersionSchema = new Schema({
+        type: {
+          type: 'String'
+        },
+        editions: [{
+          type: 'ObjectId',
+          ref: 'Test1'
+        }]
+      });
+      const CarSchema = new mongoose.Schema({
+        make: 'String',
+        versions: [CarVersionSchema]
+      });
 
-    const File = db.model('Test', FileSchema);
-    const Edition = db.model('Test1', EditionSchema);
-    const Car = db.model('Car', CarSchema);
+      const File = db.model('Test', FileSchema);
+      const Edition = db.model('Test1', EditionSchema);
+      const Car = db.model('Car', CarSchema);
 
-    return co(function*() {
-      const file = yield File.create({ filename: 'file1.png' });
 
-      const editions = yield Edition.create([
+      const file = await File.create({ filename: 'file1.png' });
+
+      const editions = await Edition.create([
         { editionOptions: { price: 15000, image: file._id } },
         { editionOptions: { price: 150000 } }
       ]);
 
-      let cars = yield Car.create([
+      let cars = await Car.create([
         { make: 'Ford', versions: [{ type: 'F150', editions: [editions[0]] }] },
         { make: 'BMW', versions: [{ type: 'i8', editions: [editions[1]] }] }
       ]);
 
-      cars = yield Car.find().sort({ make: 1 });
-      cars = yield Car.populate(cars, 'versions.editions');
-      cars = yield Car.populate(cars, 'versions.editions.editionOptions.image');
+      cars = await Car.find().sort({ make: 1 });
+      cars = await Car.populate(cars, 'versions.editions');
+      cars = await Car.populate(cars, 'versions.editions.editionOptions.image');
 
       assert.strictEqual(cars[0].versions[0].editions[0].editionOptions.image,
         void 0);
       assert.equal(cars[1].versions[0].editions[0].editionOptions.image.filename,
         'file1.png');
     });
-  });
 
-  it('handles virtual justOne if it is not set (gh-6988)', function() {
-    const postSchema = new Schema({
-      name: String
-    });
+    it('handles virtual justOne if it is not set (gh-6988)', async function() {
+      const postSchema = new Schema({
+        name: String
+      });
 
-    postSchema.virtual('comments', {
-      ref: 'Comment',
-      localField: '_id',
-      foreignField: 'postId'
-    });
+      postSchema.virtual('comments', {
+        ref: 'Comment',
+        localField: '_id',
+        foreignField: 'postId'
+      });
 
-    const commentSchema = new Schema({
-      postId: { type: Schema.Types.ObjectId }
-    });
+      const commentSchema = new Schema({
+        postId: { type: Schema.Types.ObjectId }
+      });
 
-    const Post = db.model('BlogPost', postSchema);
-    const Comment = db.model('Comment', commentSchema);
+      const Post = db.model('BlogPost', postSchema);
+      const Comment = db.model('Comment', commentSchema);
 
-    return co(function*() {
-      const post = yield Post.create({ name: 'n1' });
-      const comment = yield Comment.create({ postId: post._id });
 
-      const doc = yield Post.findOne({}).populate('comments').lean();
+      const post = await Post.create({ name: 'n1' });
+      const comment = await Comment.create({ postId: post._id });
+
+      const doc = await Post.findOne({}).populate('comments').lean();
       assert.ok(Array.isArray(doc.comments));
       assert.equal(doc.comments.length, 1);
       assert.equal(doc.comments[0]._id.toHexString(),
         comment._id.toHexString());
     });
-  });
 
-  it('handles virtual justOne if it is not set, is lean, and subfields are selected', function() {
-    const postSchema = new Schema({
-      name: String
-    });
+    it('handles virtual justOne if it is not set, is lean, and subfields are selected', async function() {
+      const postSchema = new Schema({
+        name: String
+      });
 
-    postSchema.virtual('comments', {
-      ref: 'Comment',
-      localField: '_id',
-      foreignField: 'postId'
-    });
+      postSchema.virtual('comments', {
+        ref: 'Comment',
+        localField: '_id',
+        foreignField: 'postId'
+      });
 
-    const commentSchema = new Schema({
-      postId: { type: Schema.Types.ObjectId },
-      text: String
-    });
+      const commentSchema = new Schema({
+        postId: { type: Schema.Types.ObjectId },
+        text: String
+      });
 
-    const Post = db.model('BlogPost', postSchema);
-    const Comment = db.model('Comment', commentSchema);
+      const Post = db.model('BlogPost', postSchema);
+      const Comment = db.model('Comment', commentSchema);
 
-    return co(function*() {
-      const post = yield Post.create({ name: 'n1' });
-      const comment = yield Comment.create({ postId: post._id, text: 'a comment' });
 
-      const doc = yield Post.find({}).populate('comments', 'text').lean();
+      const post = await Post.create({ name: 'n1' });
+      const comment = await Comment.create({ postId: post._id, text: 'a comment' });
+
+      const doc = await Post.find({}).populate('comments', 'text').lean();
       assert.ok(Array.isArray(doc[0].comments));
       assert.equal(doc[0].comments.length, 1);
       assert.equal(doc[0].comments[0]._id.toHexString(),
         comment._id.toHexString());
     });
-  });
 
-  it('does not set `justOne` if underneath Mixed (gh-6985)', function() {
-    const articleSchema = new Schema({
-      title: String,
-      content: String
-    });
+    it('does not set `justOne` if underneath Mixed (gh-6985)', async function() {
+      const articleSchema = new Schema({
+        title: String,
+        content: String
+      });
 
-    const schema = new Schema({
-      name: String,
-      data: Schema.Types.Mixed
-    });
+      const schema = new Schema({
+        name: String,
+        data: Schema.Types.Mixed
+      });
 
-    const Article = db.model('Article', articleSchema);
-    const Test = db.model('User', schema);
+      const Article = db.model('Article', articleSchema);
+      const Test = db.model('User', schema);
 
-    return co(function*() {
-      const articles = yield Article.create([
+
+      const articles = await Article.create([
         { title: 'An Overview of BigInt in Node.js', content: '' },
         { title: 'Building a Serverless App with MongoDB Stitch', content: '' }
       ]);
 
-      yield Test.create({
+      await Test.create({
         name: 'Val',
         data: { articles: articles.map(a => a._id) }
       });
 
-      let res = yield Test.findOne();
+      let res = await Test.findOne();
       const popObj = {
         path: 'data.articles',
         select: 'title',
@@ -7928,7 +7786,7 @@ describe('model: populate:', function() {
         options: { lean: true }
       };
 
-      res = yield Test.populate(res, popObj);
+      res = await Test.populate(res, popObj);
 
       assert.ok(Array.isArray(res.data.articles));
       assert.deepEqual(res.data.articles.map(a => a.title), [
@@ -7936,34 +7794,33 @@ describe('model: populate:', function() {
         'Building a Serverless App with MongoDB Stitch'
       ]);
     });
-  });
 
-  it('supports setting `justOne` as an option (gh-6985)', function() {
-    const articleSchema = new Schema({
-      title: String,
-      content: String
-    });
+    it('supports setting `justOne` as an option (gh-6985)', async function() {
+      const articleSchema = new Schema({
+        title: String,
+        content: String
+      });
 
-    const schema = new Schema({
-      title: String,
-      data: Schema.Types.Mixed
-    });
+      const schema = new Schema({
+        title: String,
+        data: Schema.Types.Mixed
+      });
 
-    const Article = db.model('Article', articleSchema);
-    const Test = db.model('Test', schema);
+      const Article = db.model('Article', articleSchema);
+      const Test = db.model('Test', schema);
 
-    return co(function*() {
-      const articles = yield Article.create([
+
+      const articles = await Article.create([
         { title: 'An Overview of BigInt in Node.js', content: '' },
         { title: 'Building a Serverless App with MongoDB Stitch', content: '' }
       ]);
 
-      yield Test.create({
+      await Test.create({
         title: 'test',
         data: { articles: articles.map(a => a._id) }
       });
 
-      let res = yield Test.findOne();
+      let res = await Test.findOne();
       const popObj = {
         path: 'data.articles',
         select: 'title',
@@ -7972,48 +7829,47 @@ describe('model: populate:', function() {
         options: { lean: true }
       };
 
-      res = yield Test.populate(res, popObj);
+      res = await Test.populate(res, popObj);
 
       assert.ok(!Array.isArray(res.data.articles));
       assert.equal(res.data.articles.title, 'An Overview of BigInt in Node.js');
     });
-  });
 
-  it('multiple localFields and foreignFields (gh-5704)', function() {
-    const childSchema = new Schema({
-      _id: Number,
-      sourceId: Number
-    });
-    const parentSchema = new Schema({
-      _id: Number,
-      internalChildId: Number,
-      sourceChildId: Number
-    });
-    parentSchema.virtual('children', {
-      ref: 'Child',
-      localField: function() {
-        return this.internalChildId ? 'internalChildId' : 'sourceChildId';
-      },
-      foreignField: function() {
-        return this.internalChildId ? '_id' : 'sourceId';
-      }
-    });
+    it('multiple localFields and foreignFields (gh-5704)', async function() {
+      const childSchema = new Schema({
+        _id: Number,
+        sourceId: Number
+      });
+      const parentSchema = new Schema({
+        _id: Number,
+        internalChildId: Number,
+        sourceChildId: Number
+      });
+      parentSchema.virtual('children', {
+        ref: 'Child',
+        localField: function() {
+          return this.internalChildId ? 'internalChildId' : 'sourceChildId';
+        },
+        foreignField: function() {
+          return this.internalChildId ? '_id' : 'sourceId';
+        }
+      });
 
-    const Child = db.model('Child', childSchema);
-    const Parent = db.model('Parent', parentSchema);
+      const Child = db.model('Child', childSchema);
+      const Parent = db.model('Parent', parentSchema);
 
-    return co(function*() {
-      yield Child.create([
+
+      await Child.create([
         { _id: 1 },
         { _id: 99, sourceId: 2 }
       ]);
 
-      yield Parent.create([
+      await Parent.create([
         { _id: 10, internalChildId: 1 },
         { _id: 11, sourceChildId: 2 }
       ]);
 
-      let res = yield Parent.find().sort({ _id: 1 }).populate('children');
+      let res = await Parent.find().sort({ _id: 1 }).populate('children');
 
       res = res.map(doc => doc.toObject({ virtuals: true }));
       assert.equal(res[0].children.length, 1);
@@ -8022,209 +7878,203 @@ describe('model: populate:', function() {
       assert.equal(res[1].children.length, 1);
       assert.strictEqual(res[1].children[0]._id, 99);
     });
-  });
 
-  it('lean populate underneath array (gh-7052)', function() {
-    const ownerSchema = new Schema({
-      name: String,
-      age: Number,
-      dogs: [Schema.Types.ObjectId]
-    });
+    it('lean populate underneath array (gh-7052)', async function() {
+      const ownerSchema = new Schema({
+        name: String,
+        age: Number,
+        dogs: [Schema.Types.ObjectId]
+      });
 
-    const dogSchema = new Schema({
-      name: String,
-      trick: Schema.Types.ObjectId
-    });
+      const dogSchema = new Schema({
+        name: String,
+        trick: Schema.Types.ObjectId
+      });
 
-    const trickSchema = new Schema({ description: String });
+      const trickSchema = new Schema({ description: String });
 
-    const Owner = db.model('Person', ownerSchema);
-    const Dog = db.model('Test', dogSchema);
-    const Trick = db.model('Test1', trickSchema);
+      const Owner = db.model('Person', ownerSchema);
+      const Dog = db.model('Test', dogSchema);
+      const Trick = db.model('Test1', trickSchema);
 
-    const t = new Trick({ description: 'roll over' });
-    const d = new Dog({ name: 'Fido', trick: t._id });
-    const o = new Owner({ name: 'Bill', age: 10, dogs: [d._id] });
+      const t = new Trick({ description: 'roll over' });
+      const d = new Dog({ name: 'Fido', trick: t._id });
+      const o = new Owner({ name: 'Bill', age: 10, dogs: [d._id] });
 
-    return co(function*() {
-      yield [t.save(), d.save(), o.save()];
 
-      const owner = yield Owner.findOne({}).lean();
-      let populated = yield Owner.populate(owner,
+      await Promise.all([t.save(), d.save(), o.save()]);
+
+      const owner = await Owner.findOne({}).lean();
+      let populated = await Owner.populate(owner,
         [{ path: 'dogs', model: 'Test', options: { lean: true } }]);
-      populated = yield Owner.populate(owner,
+      populated = await Owner.populate(owner,
         [{ path: 'dogs.trick', model: 'Test1', options: { lean: true } }]);
 
       assert.ok(!Array.isArray(populated.dogs[0].trick));
     });
-  });
 
-  it('handles plus path projections with virtual populate (gh-7050)', function() {
-    const CatSchema = mongoose.Schema({ name: String }, { toObject: { virtuals: true } });
+    it('handles plus path projections with virtual populate (gh-7050)', async function() {
+      const CatSchema = mongoose.Schema({ name: String }, { toObject: { virtuals: true } });
 
-    CatSchema.virtual('friends', {
-      ref: 'Test',
-      localField: '_id',
-      foreignField: 'cat'
-    });
+      CatSchema.virtual('friends', {
+        ref: 'Test',
+        localField: '_id',
+        foreignField: 'cat'
+      });
 
-    const Cat = db.model('Cat', CatSchema);
+      const Cat = db.model('Cat', CatSchema);
 
-    const DogSchema = mongoose.Schema({
-      name: String,
-      cat: mongoose.ObjectId,
-      secret: { type: String, select: false }
-    });
+      const DogSchema = mongoose.Schema({
+        name: String,
+        cat: mongoose.ObjectId,
+        secret: { type: String, select: false }
+      });
 
-    const Dog = db.model('Test', DogSchema);
+      const Dog = db.model('Test', DogSchema);
 
-    return co(function*() {
-      const kitty = yield Cat.create({ name: 'foo' });
 
-      yield Dog.create({
+      const kitty = await Cat.create({ name: 'foo' });
+
+      await Dog.create({
         name: 'Scooby',
         cat: kitty,
         secret: 'I ate all the scooby snacks!'
       });
 
-      const res = yield Cat.findOne().select().populate({
+      const res = await Cat.findOne().select().populate({
         path: 'friends',
         select: '+secret'
       });
       assert.equal(res.friends[0].name, 'Scooby');
       assert.equal(res.friends[0].secret, 'I ate all the scooby snacks!');
     });
-  });
 
-  it('set model as ref in schema (gh-7253)', function() {
-    const userSchema = new Schema({ name: String });
-    const User = db.model('User', userSchema);
+    it('set model as ref in schema (gh-7253)', async function() {
+      const userSchema = new Schema({ name: String });
+      const User = db.model('User', userSchema);
 
-    const postSchema = new Schema({
-      user: {
-        type: mongoose.ObjectId,
-        ref: User
-      },
-      user2: mongoose.ObjectId
-    });
-    postSchema.path('user2').ref(User);
-    const Post = db.model('BlogPost', postSchema);
+      const postSchema = new Schema({
+        user: {
+          type: mongoose.ObjectId,
+          ref: User
+        },
+        user2: mongoose.ObjectId
+      });
+      postSchema.path('user2').ref(User);
+      const Post = db.model('BlogPost', postSchema);
 
-    return co(function*() {
-      const user = yield User.create({ name: 'val' });
-      yield Post.create({ user: user._id, user2: user._id });
 
-      const post = yield Post.findOne().populate('user user2');
+      const user = await User.create({ name: 'val' });
+      await Post.create({ user: user._id, user2: user._id });
+
+      const post = await Post.findOne().populate('user user2');
 
       assert.equal(post.user.name, 'val');
       assert.equal(post.user2.name, 'val');
     });
-  });
 
-  it('count option (gh-4469) (gh-7380)', function() {
-    const childSchema = new Schema({ parentId: mongoose.ObjectId });
+    it('count option (gh-4469) (gh-7380)', async function() {
+      const childSchema = new Schema({ parentId: mongoose.ObjectId });
 
-    const parentSchema = new Schema({ name: String });
-    parentSchema.virtual('childCount', {
-      ref: 'Child',
-      localField: '_id',
-      foreignField: 'parentId',
-      count: true
-    });
+      const parentSchema = new Schema({ name: String });
+      parentSchema.virtual('childCount', {
+        ref: 'Child',
+        localField: '_id',
+        foreignField: 'parentId',
+        count: true
+      });
 
-    parentSchema.virtual('children', {
-      ref: 'Child',
-      localField: '_id',
-      foreignField: 'parentId',
-      count: false
-    });
+      parentSchema.virtual('children', {
+        ref: 'Child',
+        localField: '_id',
+        foreignField: 'parentId',
+        count: false
+      });
 
-    const Child = db.model('Child', childSchema);
-    const Parent = db.model('Parent', parentSchema);
+      const Child = db.model('Child', childSchema);
+      const Parent = db.model('Parent', parentSchema);
 
-    return co(function*() {
-      const p = yield Parent.create({ name: 'test' });
 
-      yield Child.create([{ parentId: p._id }, { parentId: p._id }, {}]);
+      const p = await Parent.create({ name: 'test' });
 
-      let doc = yield Parent.findOne().populate('children childCount');
+      await Child.create([{ parentId: p._id }, { parentId: p._id }, {}]);
+
+      let doc = await Parent.findOne().populate('children childCount');
       assert.equal(doc.childCount, 2);
       assert.equal(doc.children.length, 2);
 
-      doc = yield Parent.find().populate('children childCount').then(res => res[0]);
+      doc = await Parent.find().populate('children childCount').then(res => res[0]);
       assert.equal(doc.childCount, 2);
       assert.equal(doc.children.length, 2);
 
-      doc = yield Parent.find().populate('childCount').then(res => res[0]);
+      doc = await Parent.find().populate('childCount').then(res => res[0]);
       assert.equal(doc.childCount, 2);
       assert.equal(doc.children, null);
 
-      doc = yield Parent.findOne();
-      yield doc.populate('childCount');
+      doc = await Parent.findOne();
+      await doc.populate('childCount');
       assert.equal(doc.childCount, 2);
       assert.equal(doc.children, null);
     });
-  });
 
-  it('count option ignores skip (gh-4469) (gh-8476)', function() {
-    const childSchema = new Schema({ parentId: mongoose.ObjectId });
+    it('count option ignores skip (gh-4469) (gh-8476)', async function() {
+      const childSchema = new Schema({ parentId: mongoose.ObjectId });
 
-    const parentSchema = new Schema({ name: String });
-    parentSchema.virtual('childCount', {
-      ref: 'Child',
-      localField: '_id',
-      foreignField: 'parentId',
-      count: true,
-      options: { skip: 2 }
-    });
+      const parentSchema = new Schema({ name: String });
+      parentSchema.virtual('childCount', {
+        ref: 'Child',
+        localField: '_id',
+        foreignField: 'parentId',
+        count: true,
+        options: { skip: 2 }
+      });
 
-    const Child = db.model('Child', childSchema);
-    const Parent = db.model('Parent', parentSchema);
+      const Child = db.model('Child', childSchema);
+      const Parent = db.model('Parent', parentSchema);
 
-    return co(function*() {
-      const p = yield Parent.create({ name: 'test' });
 
-      yield Child.create([{ parentId: p._id }, { parentId: p._id }, {}]);
+      const p = await Parent.create({ name: 'test' });
 
-      const doc = yield Parent.findOne().populate('childCount');
+      await Child.create([{ parentId: p._id }, { parentId: p._id }, {}]);
+
+      const doc = await Parent.findOne().populate('childCount');
       assert.equal(doc.childCount, 2);
     });
-  });
 
-  it('count with deeply nested (gh-7573)', function() {
-    const s1 = new mongoose.Schema({});
+    it('count with deeply nested (gh-7573)', async function() {
+      const s1 = new mongoose.Schema({});
 
-    s1.virtual('s2', {
-      ref: 'Test2',
-      localField: '_id',
-      foreignField: 's1'
-    });
+      s1.virtual('s2', {
+        ref: 'Test2',
+        localField: '_id',
+        foreignField: 's1'
+      });
 
-    const s2 = new mongoose.Schema({
-      s1: { type: mongoose.Schema.Types.ObjectId, ref: 'schema1' }
-    });
+      const s2 = new mongoose.Schema({
+        s1: { type: mongoose.Schema.Types.ObjectId, ref: 'schema1' }
+      });
 
-    s2.virtual('numS3', {
-      ref: 'Test3',
-      localField: '_id',
-      foreignField: 's2',
-      count: true
-    });
+      s2.virtual('numS3', {
+        ref: 'Test3',
+        localField: '_id',
+        foreignField: 's2',
+        count: true
+      });
 
-    const s3 = new mongoose.Schema({
-      s2: { type: mongoose.Schema.Types.ObjectId, ref: 'schema2' }
-    });
+      const s3 = new mongoose.Schema({
+        s2: { type: mongoose.Schema.Types.ObjectId, ref: 'schema2' }
+      });
 
-    return co(function*() {
+
       const S1 = db.model('Test1', s1);
       const S2 = db.model('Test2', s2);
       const S3 = db.model('Test3', s3);
 
-      const s1doc = yield S1.create({});
-      const s2docs = yield S2.create([{ s1: s1doc }, { s1: s1doc }]);
-      yield S3.create([{ s2: s2docs[0] }, { s2: s2docs[0] }, { s2: s2docs[1] }]);
+      const s1doc = await S1.create({});
+      const s2docs = await S2.create([{ s1: s1doc }, { s1: s1doc }]);
+      await S3.create([{ s2: s2docs[0] }, { s2: s2docs[0] }, { s2: s2docs[1] }]);
 
-      const doc = yield S1.findOne({}).populate({
+      const doc = await S1.findOne({}).populate({
         path: 's2',
         populate: {
           path: 'numS3'
@@ -8233,57 +8083,55 @@ describe('model: populate:', function() {
 
       assert.deepEqual(doc.s2.map(s => s.numS3).sort(), [1, 2]);
     });
-  });
 
-  it('explicit model option overrides refPath (gh-7273)', function() {
-    const userSchema = new Schema({ name: String });
-    const User1 = db.model('User', userSchema);
-    db.model('Test', userSchema);
+    it('explicit model option overrides refPath (gh-7273)', async function() {
+      const userSchema = new Schema({ name: String });
+      const User1 = db.model('User', userSchema);
+      db.model('Test', userSchema);
 
-    const postSchema = new Schema({
-      user: {
-        type: mongoose.ObjectId,
-        refPath: 'm'
-      },
-      m: String
-    });
-    const Post = db.model('BlogPost', postSchema);
+      const postSchema = new Schema({
+        user: {
+          type: mongoose.ObjectId,
+          refPath: 'm'
+        },
+        m: String
+      });
+      const Post = db.model('BlogPost', postSchema);
 
-    return co(function*() {
-      const user = yield User1.create({ name: 'val' });
-      yield Post.create({ user: user._id, m: 'Test' });
 
-      let post = yield Post.findOne().populate('user');
+      const user = await User1.create({ name: 'val' });
+      await Post.create({ user: user._id, m: 'Test' });
+
+      let post = await Post.findOne().populate('user');
       assert.ok(!post.user);
 
-      post = yield Post.findOne().populate({ path: 'user', model: 'User' });
+      post = await Post.findOne().populate({ path: 'user', model: 'User' });
 
       assert.equal(post.user.name, 'val');
     });
-  });
 
-  it('clone option means identical ids get separate copies of doc (gh-3258)', function() {
-    const userSchema = new Schema({ name: String });
-    const User = db.model('User', userSchema);
+    it('clone option means identical ids get separate copies of doc (gh-3258)', async function() {
+      const userSchema = new Schema({ name: String });
+      const User = db.model('User', userSchema);
 
-    const postSchema = new Schema({
-      user: {
-        type: mongoose.ObjectId,
-        ref: User
-      },
-      title: String
-    });
+      const postSchema = new Schema({
+        user: {
+          type: mongoose.ObjectId,
+          ref: User
+        },
+        title: String
+      });
 
-    const Post = db.model('BlogPost', postSchema);
+      const Post = db.model('BlogPost', postSchema);
 
-    return co(function*() {
-      const user = yield User.create({ name: 'val' });
-      yield Post.create([
+
+      const user = await User.create({ name: 'val' });
+      await Post.create([
         { title: 'test1', user: user },
         { title: 'test2', user: user }
       ]);
 
-      const posts = yield Post.find().populate({
+      const posts = await Post.find().populate({
         path: 'user',
         options: { clone: true }
       });
@@ -8291,68 +8139,66 @@ describe('model: populate:', function() {
       posts[0].user.name = 'val2';
       assert.equal(posts[1].user.name, 'val');
     });
-  });
 
-  it('handles double nested array `foreignField` (gh-7374)', function() {
-    const songSchema = Schema({
-      title: { type: String },
-      identifiers: [{
-        _id: false,
-        artists: [{
+    it('handles double nested array `foreignField` (gh-7374)', async function() {
+      const songSchema = Schema({
+        title: { type: String },
+        identifiers: [{
           _id: false,
-          artist: { type: Number }
+          artists: [{
+            _id: false,
+            artist: { type: Number }
+          }]
         }]
-      }]
-    });
+      });
 
-    const artistSchema = new Schema({ _id: Number, name: String });
-    artistSchema.virtual('songs', {
-      ref: 'Test',
-      localField: '_id',
-      foreignField: 'identifiers.artists.artist'
-    });
+      const artistSchema = new Schema({ _id: Number, name: String });
+      artistSchema.virtual('songs', {
+        ref: 'Test',
+        localField: '_id',
+        foreignField: 'identifiers.artists.artist'
+      });
 
-    const Song = db.model('Test', songSchema);
-    const Artist = db.model('Person', artistSchema);
+      const Song = db.model('Test', songSchema);
+      const Artist = db.model('Person', artistSchema);
 
-    return co(function*() {
-      yield Artist.create([
+
+      await Artist.create([
         { _id: 1, name: 'Axl Rose' },
         { _id: 2, name: 'Slash' }
       ]);
 
-      yield Song.create({
+      await Song.create({
         title: 'November Rain',
         identifiers: [{ artists: [{ artist: 1 }, { artist: 2 }] }]
       });
 
-      const axl = yield Artist.findById(1).populate('songs');
+      const axl = await Artist.findById(1).populate('songs');
       assert.equal(axl.songs.length, 1);
       assert.equal(axl.songs[0].title, 'November Rain');
     });
-  });
 
-  it('populate single path with numeric path underneath doc array (gh-7273)', function() {
-    const schema = new Schema({
-      arr1: [{
-        arr2: [{
-          item: { type: Schema.Types.ObjectId, refPath: 'arr1.arr2.kind' },
-          kind: String
+    it('populate single path with numeric path underneath doc array (gh-7273)', async function() {
+      const schema = new Schema({
+        arr1: [{
+          arr2: [{
+            item: { type: Schema.Types.ObjectId, refPath: 'arr1.arr2.kind' },
+            kind: String
+          }]
         }]
-      }]
-    });
+      });
 
-    const Model = db.model('Test', schema);
+      const Model = db.model('Test', schema);
 
-    const itemSchema = new Schema({ name: String });
-    const Item1 = db.model('Test1', itemSchema);
-    const Item2 = db.model('Test2', itemSchema);
+      const itemSchema = new Schema({ name: String });
+      const Item1 = db.model('Test1', itemSchema);
+      const Item2 = db.model('Test2', itemSchema);
 
-    return co(function*() {
-      const item1 = yield Item1.create({ name: 'item1' });
-      const item2 = yield Item2.create({ name: 'item2' });
 
-      yield Model.create({
+      const item1 = await Item1.create({ name: 'item1' });
+      const item2 = await Item2.create({ name: 'item2' });
+
+      await Model.create({
         arr1: [{
           arr2: [
             { item: item1._id, kind: 'Test1' },
@@ -8361,76 +8207,74 @@ describe('model: populate:', function() {
         }]
       });
 
-      let doc = yield Model.findOne().populate('arr1.arr2.item');
+      let doc = await Model.findOne().populate('arr1.arr2.item');
       assert.equal(doc.arr1[0].arr2[0].item.name, 'item1');
       assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
 
-      doc = yield Model.findOne().populate('arr1.0.arr2.item');
+      doc = await Model.findOne().populate('arr1.0.arr2.item');
       assert.equal(doc.arr1[0].arr2[0].item.name, 'item1');
       assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
 
-      doc = yield Model.findOne().populate('arr1.0.arr2.0.item');
+      doc = await Model.findOne().populate('arr1.0.arr2.0.item');
       assert.equal(doc.arr1[0].arr2[0].item.name, 'item1');
       assert.ok(!doc.arr1[0].arr2[1].item.name);
 
-      doc = yield Model.findOne();
-      yield doc.populate('arr1.0.arr2.1.item');
+      doc = await Model.findOne();
+      await doc.populate('arr1.0.arr2.1.item');
       assert.ok(!doc.arr1[0].arr2[0].item.name);
       assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
 
-      doc = yield Model.findOne();
-      yield doc.populate('arr1.0.arr2.0.item');
-      yield doc.populate('arr1.0.arr2.1.item');
+      doc = await Model.findOne();
+      await doc.populate('arr1.0.arr2.0.item');
+      await doc.populate('arr1.0.arr2.1.item');
       assert.equal(doc.arr1[0].arr2[0].item.name, 'item1');
       assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
     });
-  });
 
-  it('supports populating a path in a document array embedded in an array (gh-7647)', function() {
-    const schema = new Schema({
-      recordings: [[{
-        file: { type: Schema.ObjectId, ref: 'Test' }
-      }]]
-    });
-    const Song = db.model('Test1', schema);
-    const Asset = db.model('Test', Schema({ name: String }));
+    it('supports populating a path in a document array embedded in an array (gh-7647)', async function() {
+      const schema = new Schema({
+        recordings: [[{
+          file: { type: Schema.ObjectId, ref: 'Test' }
+        }]]
+      });
+      const Song = db.model('Test1', schema);
+      const Asset = db.model('Test', Schema({ name: String }));
 
-    return co(function*() {
-      const a = yield Asset.create({ name: 'foo' });
-      yield Song.create({ recordings: [[{ file: a._id }]] });
 
-      const doc = yield Song.findOne().populate('recordings.file');
+      const a = await Asset.create({ name: 'foo' });
+      await Song.create({ recordings: [[{ file: a._id }]] });
+
+      const doc = await Song.findOne().populate('recordings.file');
 
       assert.equal(doc.recordings.length, 1);
       assert.equal(doc.recordings[0].length, 1);
       assert.equal(doc.recordings[0][0].file.name, 'foo');
       assert.ok(doc.populated('recordings.file'));
     });
-  });
 
-  it('handles populating deeply nested path if value in db is a primitive (gh-7545)', function() {
-    const personSchema = new Schema({ _id: Number, name: String });
-    const PersonModel = db.model('Person', personSchema);
+    it('handles populating deeply nested path if value in db is a primitive (gh-7545)', async function() {
+      const personSchema = new Schema({ _id: Number, name: String });
+      const PersonModel = db.model('Person', personSchema);
 
-    // Create Event Model
-    const teamSchema = new Schema({
-      nested: { members: [{ type: Number, ref: 'Person' }] }
-    });
-    const eventSchema = new Schema({
-      _id: Number,
-      title: String,
-      teams: [teamSchema]
-    });
-    const EventModel = db.model('Test', eventSchema);
+      // Create Event Model
+      const teamSchema = new Schema({
+        nested: { members: [{ type: Number, ref: 'Person' }] }
+      });
+      const eventSchema = new Schema({
+        _id: Number,
+        title: String,
+        teams: [teamSchema]
+      });
+      const EventModel = db.model('Test', eventSchema);
 
-    return co(function*() {
-      yield PersonModel.create({ _id: 1, name: 'foo' });
-      yield EventModel.collection.insertMany([
+
+      await PersonModel.create({ _id: 1, name: 'foo' });
+      await EventModel.collection.insertMany([
         { _id: 2, title: 'Event 1', teams: false },
         { _id: 3, title: 'Event 2', teams: [{ nested: { members: [1] } }] }
       ]);
 
-      const docs = yield EventModel.find().
+      const docs = await EventModel.find().
         sort({ _id: 1 }).
         lean().
         populate('teams.nested.members');
@@ -8439,84 +8283,80 @@ describe('model: populate:', function() {
       assert.equal(docs[1].teams.length, 1);
       assert.deepEqual(docs[1].teams[0].nested.members.map(m => m.name), ['foo']);
     });
-  });
 
-  it('sets populate virtual to empty array if local field empty (gh-8230)', function() {
-    const GroupSchema = new Schema({
-      roles: [{
-        roleId: String
-      }]
-    });
-    GroupSchema.virtual('roles$', {
-      ref: 'Test',
-      localField: 'roles.roleId',
-      foreignField: '_id'
-    });
+    it('sets populate virtual to empty array if local field empty (gh-8230)', async function() {
+      const GroupSchema = new Schema({
+        roles: [{
+          roleId: String
+        }]
+      });
+      GroupSchema.virtual('roles$', {
+        ref: 'Test',
+        localField: 'roles.roleId',
+        foreignField: '_id'
+      });
 
-    const RoleSchema = new Schema({});
+      const RoleSchema = new Schema({});
 
-    const GroupModel = db.model('Group', GroupSchema);
-    db.model('Test', RoleSchema);
+      const GroupModel = db.model('Group', GroupSchema);
+      db.model('Test', RoleSchema);
 
-    return co(function*() {
-      yield GroupModel.create({ roles: [] });
 
-      const res = yield GroupModel.findOne({}).populate('roles$');
+      await GroupModel.create({ roles: [] });
+
+      const res = await GroupModel.findOne({}).populate('roles$');
       assert.deepEqual(res.roles$, []);
     });
-  });
 
-  it('sets populate virtual with count to 0 if local field empty (gh-7731)', function() {
-    const GroupSchema = new Schema({
-      roles: [{
-        roleId: String
-      }]
-    });
-    GroupSchema.virtual('rolesCount', {
-      ref: 'Test',
-      localField: 'roles.roleId',
-      foreignField: '_id',
-      count: true
-    });
+    it('sets populate virtual with count to 0 if local field empty (gh-7731)', async function() {
+      const GroupSchema = new Schema({
+        roles: [{
+          roleId: String
+        }]
+      });
+      GroupSchema.virtual('rolesCount', {
+        ref: 'Test',
+        localField: 'roles.roleId',
+        foreignField: '_id',
+        count: true
+      });
 
-    const RoleSchema = new Schema({});
+      const RoleSchema = new Schema({});
 
-    const GroupModel = db.model('Group', GroupSchema);
-    db.model('Test', RoleSchema);
+      const GroupModel = db.model('Group', GroupSchema);
+      db.model('Test', RoleSchema);
 
-    return co(function*() {
-      yield GroupModel.create({ roles: [] });
 
-      const res = yield GroupModel.findOne({}).populate('rolesCount');
+      await GroupModel.create({ roles: [] });
+
+      const res = await GroupModel.findOne({}).populate('rolesCount');
       assert.strictEqual(res.rolesCount, 0);
     });
-  });
 
-  it('can populate an array property whose name conflicts with array method (gh-7782)', function() {
-    const Child = db.model('Child', Schema({ name: String }));
+    it('can populate an array property whose name conflicts with array method (gh-7782)', async function() {
+      const Child = db.model('Child', Schema({ name: String }));
 
-    const Parent = db.model('Parent', Schema({
-      list: [{
-        fill: {
-          child: { type: ObjectId, ref: 'Child' }
-        }
-      }]
-    }));
+      const Parent = db.model('Parent', Schema({
+        list: [{
+          fill: {
+            child: { type: ObjectId, ref: 'Child' }
+          }
+        }]
+      }));
 
-    return co(function*() {
-      const c = yield Child.create({ name: 'test' });
-      const p = yield Parent.create({ list: [{ fill: { child: c._id } }] });
 
-      const doc = yield Parent.findById(p).populate('list.fill.child');
+      const c = await Child.create({ name: 'test' });
+      const p = await Parent.create({ list: [{ fill: { child: c._id } }] });
+
+      const doc = await Parent.findById(p).populate('list.fill.child');
 
       assert.equal(doc.list.length, 1);
       assert.strictEqual(doc.list[0].fill.child.name, 'test');
     });
-  });
 
-  it('supports cross-db populate with refPath (gh-6520)', function() {
-    return co(function*() {
-      const db2 = yield mongoose.createConnection(start.uri2).asPromise();
+    it('supports cross-db populate with refPath (gh-6520)', async function() {
+
+      const db2 = await mongoose.createConnection(start.uri2).asPromise();
 
       const bookSchema = new Schema({ title: String });
       const movieSchema = new Schema({ title: String });
@@ -8534,106 +8374,103 @@ describe('model: populate:', function() {
       const Book = db2.model('Book', bookSchema);
       const Movie = db2.model('Movie', movieSchema);
 
-      const book = yield Book.create({ title: 'Legacy of the Force: Revelation' });
-      const movie = yield Movie.create({ title: 'A New Hope' });
+      const book = await Book.create({ title: 'Legacy of the Force: Revelation' });
+      const movie = await Movie.create({ title: 'A New Hope' });
 
-      yield User.create([
+      await User.create([
         { name: 'test1', kind: 'Book', hobby: book._id },
         { name: 'test2', kind: 'Movie', hobby: movie._id }
       ]);
 
-      const docs = yield User.find().sort({ name: 1 }).populate({
+      const docs = await User.find().sort({ name: 1 }).populate({
         path: 'hobby',
         connection: db2
       });
       assert.equal(docs[0].hobby.title, 'Legacy of the Force: Revelation');
       assert.equal(docs[1].hobby.title, 'A New Hope');
     });
-  });
 
-  it('ref function for conventional populate (gh-7669)', function() {
-    const schema = new mongoose.Schema({
-      kind: String,
-      media: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: doc => doc.kind
-      }
-    });
-    const Model = db.model('Test', schema);
-    const Movie = db.model('Movie', new Schema({ name: String }));
-    const Book = db.model('Book', new Schema({ title: String }));
+    it('ref function for conventional populate (gh-7669)', async function() {
+      const schema = new mongoose.Schema({
+        kind: String,
+        media: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: doc => doc.kind
+        }
+      });
+      const Model = db.model('Test', schema);
+      const Movie = db.model('Movie', new Schema({ name: String }));
+      const Book = db.model('Book', new Schema({ title: String }));
 
-    return co(function*() {
-      const docs = yield [
+
+      const docs = await Promise.all([
         Movie.create({ name: 'The Empire Strikes Back' }),
         Book.create({ title: 'New Jedi Order' })
-      ];
+      ]);
 
-      yield Model.create([
+      await Model.create([
         { kind: 'Movie', media: docs[0]._id },
         { kind: 'Book', media: docs[1]._id }
       ]);
 
-      const res = yield Model.find().sort({ kind: -1 }).populate('media');
+      const res = await Model.find().sort({ kind: -1 }).populate('media');
 
       assert.equal(res[0].kind, 'Movie');
       assert.equal(res[0].media.name, 'The Empire Strikes Back');
       assert.equal(res[1].kind, 'Book');
       assert.equal(res[1].media.title, 'New Jedi Order');
     });
-  });
 
-  it('virtual refPath (gh-7848)', function() {
-    const Child = db.model('Child', Schema({
-      name: String,
-      parentId: Number
-    }));
+    it('virtual refPath (gh-7848)', async function() {
+      const Child = db.model('Child', Schema({
+        name: String,
+        parentId: Number
+      }));
 
-    const parentSchema = Schema({
-      _id: Number,
-      kind: String
-    });
-    parentSchema.virtual('childDocs', {
-      refPath: 'kind',
-      localField: '_id',
-      foreignField: 'parentId',
-      justOne: false
-    });
-    const Parent = db.model('Parent', parentSchema);
+      const parentSchema = Schema({
+        _id: Number,
+        kind: String
+      });
+      parentSchema.virtual('childDocs', {
+        refPath: 'kind',
+        localField: '_id',
+        foreignField: 'parentId',
+        justOne: false
+      });
+      const Parent = db.model('Parent', parentSchema);
 
-    return co(function*() {
-      yield Parent.create({ _id: 1, kind: 'Child' });
-      yield Child.create({ name: 'test', parentId: 1 });
 
-      const doc = yield Parent.findOne().populate('childDocs');
+      await Parent.create({ _id: 1, kind: 'Child' });
+      await Child.create({ name: 'test', parentId: 1 });
+
+      const doc = await Parent.findOne().populate('childDocs');
       assert.equal(doc.childDocs.length, 1);
       assert.equal(doc.childDocs[0].name, 'test');
     });
-  });
 
-  it('handles refPath on discriminator when populating top-level model (gh-5109)', function() {
-    const options = { discriminatorKey: 'kind' };
-    const Post = db.model('BlogPost', new Schema({ time: Date, text: String }, options));
+    it('handles refPath on discriminator when populating top-level model (gh-5109)', async function() {
+      const options = { discriminatorKey: 'kind' };
+      const Post = db.model('BlogPost', new Schema({ time: Date, text: String }, options));
 
-    const MediaPost = Post.discriminator('Test', new Schema({
-      media: { type: Schema.Types.ObjectId, refPath: 'mediaType' },
-      mediaType: String // either 'Image' or 'Video'
-    }, options));
-    const Image = db.model('Image',
-      new Schema({ url: String }));
-    const Video = db.model('Video',
-      new Schema({ url: String, duration: Number }));
+      const MediaPost = Post.discriminator('Test', new Schema({
+        media: { type: Schema.Types.ObjectId, refPath: 'mediaType' },
+        mediaType: String // either 'Image' or 'Video'
+      }, options));
+      const Image = db.model('Image',
+        new Schema({ url: String }));
+      const Video = db.model('Video',
+        new Schema({ url: String, duration: Number }));
 
-    return co(function*() {
-      const image = yield Image.create({ url: 'test' });
-      const video = yield Video.create({ url: 'foo', duration: 42 });
 
-      yield MediaPost.create([
+      const image = await Image.create({ url: 'test' });
+      const video = await Video.create({ url: 'foo', duration: 42 });
+
+      await MediaPost.create([
         { media: image._id, mediaType: 'Image' },
         { media: video._id, mediaType: 'Video' }
       ]);
 
-      const docs = yield Post.find().populate('media').sort({ mediaType: 1 });
+      const docs = await Post.find().populate('media').sort({ mediaType: 1 });
 
       assert.equal(docs.length, 2);
       assert.ok(docs[0].populated('media'));
@@ -8643,31 +8480,30 @@ describe('model: populate:', function() {
       assert.equal(docs[1].media.url, 'foo');
       assert.equal(docs[1].media.duration, 42);
     });
-  });
 
-  it('refPath with virtual (gh-7341)', function() {
-    const options = { discriminatorKey: 'kind' };
-    const postSchema = new Schema({
-      media: { type: Schema.Types.ObjectId, refPath: 'mediaType' },
-      _mediaType: String // either 'Image' or 'Video'
-    }, options);
+    it('refPath with virtual (gh-7341)', async function() {
+      const options = { discriminatorKey: 'kind' };
+      const postSchema = new Schema({
+        media: { type: Schema.Types.ObjectId, refPath: 'mediaType' },
+        _mediaType: String // either 'Image' or 'Video'
+      }, options);
 
-    postSchema.virtual('mediaType').get(function() { return this._mediaType; });
+      postSchema.virtual('mediaType').get(function() { return this._mediaType; });
 
-    const Post = db.model('BlogPost', postSchema);
-    const Image = db.model('Image', new Schema({ url: String }));
-    const Video = db.model('Video', new Schema({ url: String, duration: Number }));
+      const Post = db.model('BlogPost', postSchema);
+      const Image = db.model('Image', new Schema({ url: String }));
+      const Video = db.model('Video', new Schema({ url: String, duration: Number }));
 
-    return co(function*() {
-      const image = yield Image.create({ url: 'test' });
-      const video = yield Video.create({ url: 'foo', duration: 42 });
 
-      yield Post.create([
+      const image = await Image.create({ url: 'test' });
+      const video = await Video.create({ url: 'foo', duration: 42 });
+
+      await Post.create([
         { media: image._id, _mediaType: 'Image' },
         { media: video._id, _mediaType: 'Video' }
       ]);
 
-      const docs = yield Post.find().populate('media').sort({ _mediaType: 1 });
+      const docs = await Post.find().populate('media').sort({ _mediaType: 1 });
 
       assert.ok(docs[0].populated('media'));
       assert.ok(docs[1].populated('media'));
@@ -8676,49 +8512,47 @@ describe('model: populate:', function() {
       assert.equal(docs[1].media.url, 'foo');
       assert.equal(docs[1].media.duration, 42);
     });
-  });
 
-  it('count with subdocs (gh-7573)', function() {
-    const DeveloperSchema = Schema({ name: String });
-    const TeamSchema = Schema({
-      name: String,
-      developers: [DeveloperSchema]
-    });
-    const TicketSchema = Schema({
-      assigned: String,
-      description: String
-    });
+    it('count with subdocs (gh-7573)', async function() {
+      const DeveloperSchema = Schema({ name: String });
+      const TeamSchema = Schema({
+        name: String,
+        developers: [DeveloperSchema]
+      });
+      const TicketSchema = Schema({
+        assigned: String,
+        description: String
+      });
 
-    DeveloperSchema.virtual('ticketCount', {
-      ref: 'Test',
-      localField: 'name',
-      foreignField: 'assigned',
-      count: true
-    });
+      DeveloperSchema.virtual('ticketCount', {
+        ref: 'Test',
+        localField: 'name',
+        foreignField: 'assigned',
+        count: true
+      });
 
-    const Ticket = db.model('Test', TicketSchema);
-    const Team = db.model('Team', TeamSchema);
+      const Ticket = db.model('Test', TicketSchema);
+      const Team = db.model('Team', TeamSchema);
 
-    return co(function*() {
-      yield Team.create({
+
+      await Team.create({
         name: 'Rocket',
         developers: [{ name: 'Jessie' }, { name: 'James' }, { name: 'Meowth' }]
       });
-      yield Ticket.create([
+      await Ticket.create([
         { assigned: 'Jessie', description: 'test1' },
         { assigned: 'James', description: 'test2' },
         { assigned: 'Jessie', description: 'test3' }
       ]);
 
-      const team = yield Team.findOne().populate('developers.ticketCount');
+      const team = await Team.findOne().populate('developers.ticketCount');
       assert.equal(team.developers[0].ticketCount, 2);
       assert.equal(team.developers[1].ticketCount, 1);
       assert.equal(team.developers[2].ticketCount, 0);
     });
-  });
 
-  it('handles virtual populate of an embedded discriminator nested path (gh-6488) (gh-8173)', function() {
-    return co(function*() {
+    it('handles virtual populate of an embedded discriminator nested path (gh-6488) (gh-8173)', async function() {
+
       const UserModel = db.model('User', Schema({
         employeeId: Number,
         name: String
@@ -8740,8 +8574,8 @@ describe('model: populate:', function() {
 
       const Batch = db.model('Test', batchSchema);
 
-      yield UserModel.create({ employeeId: 1, name: 'test' });
-      yield Batch.create({
+      await UserModel.create({ employeeId: 1, name: 'test' });
+      await Batch.create({
         nested: {
           events: [
             { kind: 'Clicked', nestedLayer: { users: [1] } },
@@ -8750,7 +8584,7 @@ describe('model: populate:', function() {
         }
       });
 
-      let res = yield Batch.findOne().
+      let res = await Batch.findOne().
         populate('nested.events.nestedLayer.users_$');
       assert.equal(res.nested.events[0].nestedLayer.users_$.length, 1);
       assert.equal(res.nested.events[0].nestedLayer.users_$[0].name, 'test');
@@ -8759,80 +8593,77 @@ describe('model: populate:', function() {
       assert.equal(res.nested.events[0].nestedLayer.users_$.length, 1);
       assert.equal(res.nested.events[0].nestedLayer.users_$[0].name, 'test');
     });
-  });
 
-  it('accessing populate virtual prop (gh-8198)', function() {
-    const FooSchema = new Schema({
-      name: String,
-      children: [{
-        barId: { type: Schema.Types.ObjectId, ref: 'Test' },
-        quantity: Number
-      }]
-    });
-    FooSchema.virtual('children.bar', {
-      ref: 'Test',
-      localField: 'children.barId',
-      foreignField: '_id',
-      justOne: true
-    });
-    const BarSchema = Schema({ name: String });
-    const Foo = db.model('Test1', FooSchema);
-    const Bar = db.model('Test', BarSchema);
-    return co(function*() {
-      const bar = yield Bar.create({ name: 'bar' });
-      const foo = yield Foo.create({
+    it('accessing populate virtual prop (gh-8198)', async function() {
+      const FooSchema = new Schema({
+        name: String,
+        children: [{
+          barId: { type: Schema.Types.ObjectId, ref: 'Test' },
+          quantity: Number
+        }]
+      });
+      FooSchema.virtual('children.bar', {
+        ref: 'Test',
+        localField: 'children.barId',
+        foreignField: '_id',
+        justOne: true
+      });
+      const BarSchema = Schema({ name: String });
+      const Foo = db.model('Test1', FooSchema);
+      const Bar = db.model('Test', BarSchema);
+
+      const bar = await Bar.create({ name: 'bar' });
+      const foo = await Foo.create({
         name: 'foo',
         children: [{ barId: bar._id, quantity: 1 }]
       });
-      const foo2 = yield Foo.findById(foo._id).populate('children.bar');
+      const foo2 = await Foo.findById(foo._id).populate('children.bar');
       assert.equal(foo2.children[0].bar.name, 'bar');
     });
-  });
 
-  describe('gh-8247', function() {
-    let Author;
-    let Page;
+    describe('gh-8247', function() {
+      let Author;
+      let Page;
 
-    beforeEach(function() {
-      const authorSchema = Schema({ name: String });
-      const subSchema = Schema({
-        author: { type: Schema.Types.ObjectId, ref: 'Author' },
-        comment: String
+      beforeEach(function() {
+        const authorSchema = Schema({ name: String });
+        const subSchema = Schema({
+          author: { type: Schema.Types.ObjectId, ref: 'Author' },
+          comment: String
+        });
+        const pageSchema = Schema({ title: String, comments: [subSchema] });
+        Author = db.model('Author', authorSchema);
+        Page = db.model('Test', pageSchema);
       });
-      const pageSchema = Schema({ title: String, comments: [subSchema] });
-      Author = db.model('Author', authorSchema);
-      Page = db.model('Test', pageSchema);
-    });
 
-    beforeEach(() => co(function*() {
-      yield Author.deleteMany({});
-      yield Page.deleteMany({});
-    }));
+      beforeEach(async() => {
+        await Author.deleteMany({});
+        await Page.deleteMany({});
+      });
 
-    it('checking `populated()` on a document array element (gh-8247)', function() {
-      return co(function*() {
-        const doc = yield Author.create({ name: 'test author' });
-        yield Page.create({ comments: [{ author: doc._id }] });
+      it('checking `populated()` on a document array element (gh-8247)', async function() {
 
-        const fromDb = yield Page.findOne().populate('comments.author');
+        const doc = await Author.create({ name: 'test author' });
+        await Page.create({ comments: [{ author: doc._id }] });
+
+        const fromDb = await Page.findOne().populate('comments.author');
         assert.ok(Array.isArray(fromDb.populated('comments.author')));
         assert.equal(fromDb.populated('comments.author').length, 1);
         assert.equal(fromDb.comments[0].author.name, 'test author');
 
         assert.ok(fromDb.comments[0].populated('author'));
       });
-    });
 
-    it('updates top-level populated() when pushing elements onto a document array with single populated path (gh-8247) (gh-8265)', function() {
-      return co(function*() {
-        const docs = yield Author.create([
+      it('updates top-level populated() when pushing elements onto a document array with single populated path (gh-8247) (gh-8265)', async function() {
+
+        const docs = await Author.create([
           { name: 'test1' },
           { name: 'test2' }
         ]);
-        yield Page.create({ comments: [{ author: docs[0]._id }] });
+        await Page.create({ comments: [{ author: docs[0]._id }] });
 
         // Try setting to non-manually populated path...
-        let fromDb = yield Page.findOne().populate('comments.author');
+        let fromDb = await Page.findOne().populate('comments.author');
         assert.ok(Array.isArray(fromDb.populated('comments.author')));
         assert.equal(fromDb.populated('comments.author').length, 1);
         assert.equal(fromDb.comments[0].author.name, 'test1');
@@ -8852,7 +8683,7 @@ describe('model: populate:', function() {
         assert.equal(pop.length, 0);
 
         // And try setting to populated path
-        fromDb = yield Page.findOne().populate('comments.author');
+        fromDb = await Page.findOne().populate('comments.author');
         assert.ok(Array.isArray(fromDb.populated('comments.author')));
         assert.equal(fromDb.populated('comments.author').length, 1);
         assert.equal(fromDb.comments[0].author.name, 'test1');
@@ -8865,27 +8696,26 @@ describe('model: populate:', function() {
         pop = fromDb.populated('comments.author');
         assert.equal(pop.length, 1);
       });
-    });
 
-    it('retainNullValues stores `null` in array if foreign doc not found (gh-8293)', function() {
-      db.deleteModel(/Test/);
-      const schema = Schema({ troops: [{ type: Number, ref: 'Test' }] });
-      const Team = db.model('Team', schema);
-      const Card = db.model('Test', Schema({
-        _id: { type: Number },
-        name: String,
-        entityType: { type: String }
-      }));
+      it('retainNullValues stores `null` in array if foreign doc not found (gh-8293)', async function() {
+        db.deleteModel(/Test/);
+        const schema = Schema({ troops: [{ type: Number, ref: 'Test' }] });
+        const Team = db.model('Team', schema);
+        const Card = db.model('Test', Schema({
+          _id: { type: Number },
+          name: String,
+          entityType: { type: String }
+        }));
 
-      return co(function*() {
-        yield Card.create([
+
+        await Card.create([
           { _id: 2, name: 'Card 2' },
           { _id: 3, name: 'Card 3' },
           { _id: 4, name: 'Card 4' }
         ]);
-        yield Team.create({ troops: [1, 2, 3, 4] });
+        await Team.create({ troops: [1, 2, 3, 4] });
 
-        const doc = yield Team.findOne().populate({
+        const doc = await Team.findOne().populate({
           path: 'troops',
           options: { retainNullValues: true }
         });
@@ -8895,81 +8725,79 @@ describe('model: populate:', function() {
         assert.equal(doc.troops[2].name, 'Card 3');
         assert.equal(doc.troops[3].name, 'Card 4');
       });
-    });
 
-    it('virtual populate with discriminator that has a custom discriminator value (gh-8324)', function() {
-      db.deleteModel(/Test/);
-      const mainSchema = new Schema({ title: { type: String } },
-        { discriminatorKey: 'type' });
+      it('virtual populate with discriminator that has a custom discriminator value (gh-8324)', async function() {
+        db.deleteModel(/Test/);
+        const mainSchema = new Schema({ title: { type: String } },
+          { discriminatorKey: 'type' });
 
-      mainSchema.virtual('virtualField', {
-        ref: 'Test1',
-        localField: '_id',
-        foreignField: 'main'
-      });
+        mainSchema.virtual('virtualField', {
+          ref: 'Test1',
+          localField: '_id',
+          foreignField: 'main'
+        });
 
-      const discriminatedSchema = new Schema({ description: String });
-      const Main = db.model('Test', mainSchema);
-      const Discriminator = Main.discriminator('gh8324_Discriminator',
-        discriminatedSchema, 'customValue');
-      const Model = db.model('Test1', Schema({
-        main: 'ObjectId'
-      }));
+        const discriminatedSchema = new Schema({ description: String });
+        const Main = db.model('Test', mainSchema);
+        const Discriminator = Main.discriminator('gh8324_Discriminator',
+          discriminatedSchema, 'customValue');
+        const Model = db.model('Test1', Schema({
+          main: 'ObjectId'
+        }));
 
-      return co(function*() {
-        const d = yield Discriminator.create({ title: 'test', description: 'test' });
-        yield Model.create({ main: d._id });
 
-        const docs = yield Main.find().populate('virtualField').exec();
+        const d = await Discriminator.create({ title: 'test', description: 'test' });
+        await Model.create({ main: d._id });
+
+        const docs = await Main.find().populate('virtualField').exec();
         assert.ok(docs[0].virtualField[0].main);
       });
-    });
 
-    it('virtual populate with multiple `localField` and `foreignField` (gh-6608)', function() {
-      const employeeSchema = Schema({
-        locationId: String,
-        departmentId: String,
-        name: String
-      });
+      it('virtual populate with multiple `localField` and `foreignField` (gh-6608)', async function() {
+        const employeeSchema = Schema({
+          locationId: String,
+          departmentId: String,
+          name: String
+        });
 
-      employeeSchema.virtual('department', {
-        ref: 'Test',
-        localField: ['locationId', 'departmentId'],
-        foreignField: ['locationId', 'name'],
-        justOne: true
-      });
+        employeeSchema.virtual('department', {
+          ref: 'Test',
+          localField: ['locationId', 'departmentId'],
+          foreignField: ['locationId', 'name'],
+          justOne: true
+        });
 
-      employeeSchema.virtual('departments', {
-        ref: 'Test',
-        localField: ['locationId', 'departmentId'],
-        foreignField: ['locationId', 'name'],
-        justOne: false
-      });
+        employeeSchema.virtual('departments', {
+          ref: 'Test',
+          localField: ['locationId', 'departmentId'],
+          foreignField: ['locationId', 'name'],
+          justOne: false
+        });
 
-      const departmentSchema = Schema({
-        locationId: String,
-        name: String
-      });
+        const departmentSchema = Schema({
+          locationId: String,
+          name: String
+        });
 
-      return co(function*() {
+
         db.deleteModel(/Test/);
         const Employee = db.model('Person', employeeSchema);
         const Department = db.model('Test', departmentSchema);
 
-        yield Employee.create([
+        await Employee.create([
           { locationId: 'Miami', departmentId: 'Engineering', name: 'Valeri Karpov' },
           { locationId: 'Miami', departmentId: 'Accounting', name: 'Test 1' },
           { locationId: 'New York', departmentId: 'Engineering', name: 'Test 2' }
         ]);
 
-        const depts = yield Department.create([
+        const depts = await Department.create([
           { locationId: 'Miami', name: 'Engineering' },
           { locationId: 'Miami', name: 'Accounting' },
           { locationId: 'New York', name: 'Engineering' }
         ]);
         const dept = depts[0];
 
-        const doc = yield Employee.findOne({ name: 'Valeri Karpov' }).
+        const doc = await Employee.findOne({ name: 'Valeri Karpov' }).
           populate('department departments');
         assert.equal(doc.department._id.toHexString(), dept._id.toHexString());
         assert.equal(doc.department.name, 'Engineering');
@@ -8978,7 +8806,7 @@ describe('model: populate:', function() {
         assert.equal(doc.departments[0]._id.toHexString(), dept._id.toHexString());
         assert.equal(doc.departments[0].name, 'Engineering');
 
-        const docs = yield Employee.find().
+        const docs = await Employee.find().
           sort({ name: 1 }).
           populate('department');
 
@@ -8991,56 +8819,55 @@ describe('model: populate:', function() {
         assert.equal(docs[2].department.locationId, 'Miami');
       });
     });
-  });
 
-  it('doesnt insert empty document when populating a path within a non-existent document array (gh-8432)', function() {
-    const companySchema = new mongoose.Schema({
-      name: String
-    });
-    const Company = db.model('Test', companySchema);
+    it('doesnt insert empty document when populating a path within a non-existent document array (gh-8432)', async function() {
+      const companySchema = new mongoose.Schema({
+        name: String
+      });
+      const Company = db.model('Test', companySchema);
 
-    const userSchema = new mongoose.Schema({
-      fullName: String,
-      companyId: {
-        type: mongoose.ObjectId,
-        ref: 'Test'
-      }
-    });
-    const User = db.model('User', userSchema);
+      const userSchema = new mongoose.Schema({
+        fullName: String,
+        companyId: {
+          type: mongoose.ObjectId,
+          ref: 'Test'
+        }
+      });
+      const User = db.model('User', userSchema);
 
-    const fileSchema = new mongoose.Schema({
-      _id: String,
-      uploaderId: {
-        type: mongoose.ObjectId,
-        ref: 'User'
-      }
-    }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
-    fileSchema.virtual('uploadedBy', {
-      ref: 'User',
-      localField: 'uploaderId',
-      foreignField: '_id',
-      justOne: true
-    });
+      const fileSchema = new mongoose.Schema({
+        _id: String,
+        uploaderId: {
+          type: mongoose.ObjectId,
+          ref: 'User'
+        }
+      }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+      fileSchema.virtual('uploadedBy', {
+        ref: 'User',
+        localField: 'uploaderId',
+        foreignField: '_id',
+        justOne: true
+      });
 
-    const rideSchema = new mongoose.Schema({
-      title: String,
-      files: { type: [fileSchema], default: [] }
-    }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
-    const Ride = db.model('Test1', rideSchema);
+      const rideSchema = new mongoose.Schema({
+        title: String,
+        files: { type: [fileSchema], default: [] }
+      }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+      const Ride = db.model('Test1', rideSchema);
 
-    return co(function*() {
-      const company = yield Company.create({ name: 'Apple' });
-      const user = yield User.create({ fullName: 'John Doe', companyId: company._id });
-      yield Ride.create([
+
+      const company = await Company.create({ name: 'Apple' });
+      const user = await User.create({ fullName: 'John Doe', companyId: company._id });
+      await Ride.create([
         { title: 'London-Paris' },
         {
           title: 'Berlin-Moscow',
           files: [{ _id: '123', uploaderId: user._id }]
         }
       ]);
-      yield Ride.updateMany({}, { $unset: { files: 1 } });
+      await Ride.updateMany({}, { $unset: { files: 1 } });
 
-      const populatedRides = yield Ride.find({}).populate({
+      const populatedRides = await Ride.find({}).populate({
         path: 'files.uploadedBy',
         justOne: true,
         populate: {
@@ -9051,61 +8878,59 @@ describe('model: populate:', function() {
       assert.deepEqual(populatedRides[0].files, []);
       assert.deepEqual(populatedRides[1].files, []);
     });
-  });
 
-  it('sets empty array if populating undefined path (gh-8455)', function() {
-    const TestSchema = new Schema({
-      thingIds: [mongoose.ObjectId]
-    });
+    it('sets empty array if populating undefined path (gh-8455)', async function() {
+      const TestSchema = new Schema({
+        thingIds: [mongoose.ObjectId]
+      });
 
-    TestSchema.virtual('things', {
-      ref: 'Test1',
-      localField: 'thingIds',
-      foreignField: '_id',
-      justOne: false
-    });
+      TestSchema.virtual('things', {
+        ref: 'Test1',
+        localField: 'thingIds',
+        foreignField: '_id',
+        justOne: false
+      });
 
-    const Test = db.model('Test', TestSchema);
-    db.model('Test1', mongoose.Schema({ name: String }));
+      const Test = db.model('Test', TestSchema);
+      db.model('Test1', mongoose.Schema({ name: String }));
 
-    return co(function*() {
-      yield Test.collection.insertOne({});
 
-      const doc = yield Test.findOne().populate('things');
+      await Test.collection.insertOne({});
+
+      const doc = await Test.findOne().populate('things');
       assert.deepEqual(doc.toObject({ virtuals: true }).things, []);
     });
-  });
 
-  it('succeeds with refPath if embedded discriminator has path with same name but no refPath (gh-8452) (gh-8499)', function() {
-    const ImageSchema = Schema({ imageName: String });
-    const Image = db.model('Image', ImageSchema);
+    it('succeeds with refPath if embedded discriminator has path with same name but no refPath (gh-8452) (gh-8499)', async function() {
+      const ImageSchema = Schema({ imageName: String });
+      const Image = db.model('Image', ImageSchema);
 
-    const TextSchema = Schema({ textName: String });
-    const Text = db.model('BlogPost', TextSchema);
+      const TextSchema = Schema({ textName: String });
+      const Text = db.model('BlogPost', TextSchema);
 
-    const opts = { _id: false };
-    const ItemSchema = Schema({ objectType: String }, opts);
-    const ItemSchemaA = Schema({
-      data: {
-        type: ObjectId,
-        refPath: 'list.objectType'
-      },
-      objectType: String
-    }, opts);
-    const ItemSchemaB = Schema({
-      data: { sourceId: Number },
-      objectType: String
-    }, opts);
+      const opts = { _id: false };
+      const ItemSchema = Schema({ objectType: String }, opts);
+      const ItemSchemaA = Schema({
+        data: {
+          type: ObjectId,
+          refPath: 'list.objectType'
+        },
+        objectType: String
+      }, opts);
+      const ItemSchemaB = Schema({
+        data: { sourceId: Number },
+        objectType: String
+      }, opts);
 
-    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
-    ExampleSchema.path('list').discriminator('gh8452_ExtendA', ItemSchemaA);
-    ExampleSchema.path('list').discriminator('gh8452_ExtendB', ItemSchemaB);
-    const Example = db.model('Test', ExampleSchema);
+      const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+      ExampleSchema.path('list').discriminator('gh8452_ExtendA', ItemSchemaA);
+      ExampleSchema.path('list').discriminator('gh8452_ExtendB', ItemSchemaB);
+      const Example = db.model('Test', ExampleSchema);
 
-    return co(function*() {
-      const images = yield Image.create([{ imageName: 'image' }, { imageName: 'image2' }]);
-      const text = yield Text.create({ textName: 'text' });
-      yield Example.create({
+
+      const images = await Image.create([{ imageName: 'image' }, { imageName: 'image2' }]);
+      const text = await Text.create({ textName: 'text' });
+      await Example.create({
         test: '02',
         list: [
           { __t: 'gh8452_ExtendA', data: images[0]._id, objectType: 'Image' },
@@ -9116,296 +8941,289 @@ describe('model: populate:', function() {
         ]
       });
 
-      const res = yield Example.findOne().populate('list.data').lean();
+      const res = await Example.findOne().populate('list.data').lean();
       assert.equal(res.list[0].data.imageName, 'image');
       assert.equal(res.list[1].data.textName, 'text');
       assert.equal(res.list[2].data.sourceId, 123);
       assert.equal(res.list[3].data.imageName, 'image2');
       assert.equal(res.list[4].data.sourceId, 456);
     });
-  });
 
-  it('excluding foreignField using minus path deselects foreignField (gh-8460)', function() {
-    const schema = Schema({ specialId: String });
+    it('excluding foreignField using minus path deselects foreignField (gh-8460)', async function() {
+      const schema = Schema({ specialId: String });
 
-    schema.virtual('searchResult', {
-      ref: 'Test',
-      localField: 'specialId',
-      foreignField: 'specialId',
-      options: { select: 'name -_id -specialId' },
-      justOne: true
-    });
-    const Model = db.model('Test1', schema);
-    const Result = db.model('Test', Schema({
-      name: String,
-      specialId: String,
-      other: String
-    }));
+      schema.virtual('searchResult', {
+        ref: 'Test',
+        localField: 'specialId',
+        foreignField: 'specialId',
+        options: { select: 'name -_id -specialId' },
+        justOne: true
+      });
+      const Model = db.model('Test1', schema);
+      const Result = db.model('Test', Schema({
+        name: String,
+        specialId: String,
+        other: String
+      }));
 
-    return co(function*() {
-      yield Result.create({ name: 'foo', specialId: 'secret', other: 'test' });
-      yield Model.create({ specialId: 'secret' });
 
-      let doc = yield Model.findOne().populate('searchResult');
+      await Result.create({ name: 'foo', specialId: 'secret', other: 'test' });
+      await Model.create({ specialId: 'secret' });
+
+      let doc = await Model.findOne().populate('searchResult');
       assert.strictEqual(doc.searchResult.specialId, void 0);
 
-      doc = yield Model.findOne().populate({
+      doc = await Model.findOne().populate({
         path: 'searchResult',
         select: 'name -_id'
       });
       assert.strictEqual(doc.searchResult.specialId, 'secret');
     });
-  });
 
-  it('supports top-level match option (gh-8475)', function() {
-    const childSchema = Schema({ parentId: 'ObjectId', deleted: Boolean });
+    it('supports top-level match option (gh-8475)', async function() {
+      const childSchema = Schema({ parentId: 'ObjectId', deleted: Boolean });
 
-    const parentSchema = Schema({ name: String });
-    parentSchema.virtual('childCount', {
-      ref: 'Child',
-      localField: '_id',
-      foreignField: 'parentId',
-      count: true,
-      match: { deleted: { $ne: true } }
-    });
+      const parentSchema = Schema({ name: String });
+      parentSchema.virtual('childCount', {
+        ref: 'Child',
+        localField: '_id',
+        foreignField: 'parentId',
+        count: true,
+        match: { deleted: { $ne: true } }
+      });
 
-    const Child = db.model('Child', childSchema);
-    const Parent = db.model('Parent', parentSchema);
+      const Child = db.model('Child', childSchema);
+      const Parent = db.model('Parent', parentSchema);
 
-    return co(function*() {
-      const p = yield Parent.create({ name: 'test' });
 
-      yield Child.create([
+      const p = await Parent.create({ name: 'test' });
+
+      await Child.create([
         { parentId: p._id },
         { parentId: p._id, deleted: true },
         { parentId: p._id, deleted: false }
       ]);
 
-      let doc = yield Parent.findOne().populate('childCount');
+      let doc = await Parent.findOne().populate('childCount');
       assert.equal(doc.childCount, 2);
 
-      doc = yield Parent.findOne().
+      doc = await Parent.findOne().
         populate({ path: 'childCount', match: { deleted: true } });
       assert.equal(doc.childCount, 1);
     });
-  });
 
-  it('supports top-level skip and limit options (gh-8445)', function() {
-    const childSchema = Schema({ _id: Number, parentId: 'ObjectId' });
+    it('supports top-level skip and limit options (gh-8445)', async function() {
+      const childSchema = Schema({ _id: Number, parentId: 'ObjectId' });
 
-    const parentSchema = Schema({ name: String });
-    parentSchema.virtual('children', {
-      ref: 'Child',
-      localField: '_id',
-      foreignField: 'parentId',
-      justOne: false,
-      skip: 1,
-      limit: 2,
-      options: { sort: { _id: 1 } }
-    });
+      const parentSchema = Schema({ name: String });
+      parentSchema.virtual('children', {
+        ref: 'Child',
+        localField: '_id',
+        foreignField: 'parentId',
+        justOne: false,
+        skip: 1,
+        limit: 2,
+        options: { sort: { _id: 1 } }
+      });
 
-    const Child = db.model('Child', childSchema);
-    const Parent = db.model('Parent', parentSchema);
+      const Child = db.model('Child', childSchema);
+      const Parent = db.model('Parent', parentSchema);
 
-    return co(function*() {
-      const p = yield Parent.create({ name: 'test' });
 
-      yield Child.create([
+      const p = await Parent.create({ name: 'test' });
+
+      await Child.create([
         { _id: 1, parentId: p._id },
         { _id: 2, parentId: p._id },
         { _id: 3, parentId: p._id }
       ]);
 
-      let doc = yield Parent.findOne().populate('children');
+      let doc = await Parent.findOne().populate('children');
       assert.deepEqual(doc.children.map(c => c._id), [2, 3]);
 
-      doc = yield Parent.findOne().populate({ path: 'children', skip: 2 });
+      doc = await Parent.findOne().populate({ path: 'children', skip: 2 });
       assert.deepEqual(doc.children.map(c => c._id), [3]);
 
-      doc = yield Parent.findOne().populate({
+      doc = await Parent.findOne().populate({
         path: 'children',
         skip: 2,
         options: { skip: 1 }
       });
       assert.deepEqual(doc.children.map(c => c._id), [2, 3]);
 
-      doc = yield Parent.findOne().populate({ path: 'children', skip: 0 });
+      doc = await Parent.findOne().populate({ path: 'children', skip: 0 });
       assert.deepEqual(doc.children.map(c => c._id), [1, 2]);
 
-      doc = yield Parent.findOne().populate({ path: 'children', skip: 0, limit: 1 });
+      doc = await Parent.findOne().populate({ path: 'children', skip: 0, limit: 1 });
       assert.deepEqual(doc.children.map(c => c._id), [1]);
 
-      const p2 = yield Parent.create({ name: 'test2' });
-      yield Child.create([
+      const p2 = await Parent.create({ name: 'test2' });
+      await Child.create([
         { _id: 4, parentId: p2._id },
         { _id: 5, parentId: p2._id }
       ]);
 
-      const docs = yield Parent.find().sort({ _id: 1 }).
+      const docs = await Parent.find().sort({ _id: 1 }).
         populate({ path: 'children', skip: 0, limit: 2 });
       assert.equal(docs[0]._id.toString(), p._id.toString());
       assert.equal(docs[1]._id.toString(), p2._id.toString());
       assert.deepEqual(docs[0].children.map(c => c._id), [1, 2]);
       assert.deepEqual(docs[1].children.map(c => c._id), [4]);
     });
-  });
 
-  it('top-level limit properly applies limit per document (gh-8657)', function() {
-    const Article = db.model('Article', mongoose.Schema({
-      authors: [{ type: Number, ref: 'User' }]
-    }));
-    const User = db.model('User', mongoose.Schema({ _id: Number }));
+    it('top-level limit properly applies limit per document (gh-8657)', async function() {
+      const Article = db.model('Article', mongoose.Schema({
+        authors: [{ type: Number, ref: 'User' }]
+      }));
+      const User = db.model('User', mongoose.Schema({ _id: Number }));
 
-    return co(function*() {
-      yield Article.create([
+
+      await Article.create([
         { authors: [1, 2] },
         { authors: [3, 4] }
       ]);
-      yield User.create({ _id: 1 }, { _id: 2 }, { _id: 3 }, { _id: 4 });
+      await User.create({ _id: 1 }, { _id: 2 }, { _id: 3 }, { _id: 4 });
 
-      const res = yield Article.find().
+      const res = await Article.find().
         sort({ _id: 1 }).
         populate({ path: 'authors', limit: 1, sort: { _id: 1 } });
       assert.equal(res.length, 2);
       assert.deepEqual(res[0].authors.map(a => a._id), [1]);
       assert.deepEqual(res[1].toObject().authors, []);
     });
-  });
 
-  it('correct limit with populate (gh-7318)', function() {
-    const childSchema = Schema({ _id: Number, parentId: 'ObjectId' });
+    it('correct limit with populate (gh-7318)', async function() {
+      const childSchema = Schema({ _id: Number, parentId: 'ObjectId' });
 
-    const parentSchema = Schema({ name: String });
-    parentSchema.virtual('children', {
-      ref: 'Child',
-      localField: '_id',
-      foreignField: 'parentId',
-      justOne: false,
-      options: { sort: { _id: 1 } },
-      perDocumentLimit: 2
-    });
+      const parentSchema = Schema({ name: String });
+      parentSchema.virtual('children', {
+        ref: 'Child',
+        localField: '_id',
+        foreignField: 'parentId',
+        justOne: false,
+        options: { sort: { _id: 1 } },
+        perDocumentLimit: 2
+      });
 
-    const Child = db.model('Child', childSchema);
-    const Parent = db.model('Parent', parentSchema);
+      const Child = db.model('Child', childSchema);
+      const Parent = db.model('Parent', parentSchema);
 
-    return co(function*() {
-      const p = yield Parent.create({ name: 'test' });
 
-      yield Child.create([
+      const p = await Parent.create({ name: 'test' });
+
+      await Child.create([
         { _id: 1, parentId: p._id },
         { _id: 2, parentId: p._id },
         { _id: 3, parentId: p._id }
       ]);
 
-      const p2 = yield Parent.create({ name: 'test2' });
-      yield Child.create([
+      const p2 = await Parent.create({ name: 'test2' });
+      await Child.create([
         { _id: 4, parentId: p2._id },
         { _id: 5, parentId: p2._id }
       ]);
 
-      let docs = yield Parent.find().sort({ _id: 1 }).
+      let docs = await Parent.find().sort({ _id: 1 }).
         populate({ path: 'children' });
       assert.equal(docs[0]._id.toString(), p._id.toString());
       assert.equal(docs[1]._id.toString(), p2._id.toString());
       assert.deepEqual(docs[0].children.map(c => c._id), [1, 2]);
       assert.deepEqual(docs[1].children.map(c => c._id), [4, 5]);
 
-      docs = yield Parent.find().sort({ _id: 1 }).
+      docs = await Parent.find().sort({ _id: 1 }).
         populate({ path: 'children', perDocumentLimit: 1 });
       assert.equal(docs[0]._id.toString(), p._id.toString());
       assert.equal(docs[1]._id.toString(), p2._id.toString());
       assert.deepEqual(docs[0].children.map(c => c._id), [1]);
       assert.deepEqual(docs[1].children.map(c => c._id), [4]);
 
-      docs = yield Parent.find().sort({ _id: 1 }).
+      docs = await Parent.find().sort({ _id: 1 }).
         populate({ path: 'children', options: { perDocumentLimit: 1 } });
       assert.equal(docs[0]._id.toString(), p._id.toString());
       assert.equal(docs[1]._id.toString(), p2._id.toString());
       assert.deepEqual(docs[0].children.map(c => c._id), [1]);
       assert.deepEqual(docs[1].children.map(c => c._id), [4]);
     });
-  });
 
-  it('perDocumentLimit as option to `populate()` method (gh-7318) (gh-9418)', function() {
-    const childSchema = Schema({ _id: Number, parentId: 'ObjectId' });
+    it('perDocumentLimit as option to `populate()` method (gh-7318) (gh-9418)', async function() {
+      const childSchema = Schema({ _id: Number, parentId: 'ObjectId' });
 
-    const parentSchema = Schema({ name: String });
-    parentSchema.virtual('children', {
-      ref: 'Child',
-      localField: '_id',
-      foreignField: 'parentId',
-      justOne: false,
-      options: { sort: { _id: 1 } }
-    });
+      const parentSchema = Schema({ name: String });
+      parentSchema.virtual('children', {
+        ref: 'Child',
+        localField: '_id',
+        foreignField: 'parentId',
+        justOne: false,
+        options: { sort: { _id: 1 } }
+      });
 
-    const Child = db.model('Child', childSchema);
-    const Parent = db.model('Parent', parentSchema);
+      const Child = db.model('Child', childSchema);
+      const Parent = db.model('Parent', parentSchema);
 
-    return co(function*() {
-      const p = yield Parent.create({ name: 'test' });
 
-      yield Child.create([
+      const p = await Parent.create({ name: 'test' });
+
+      await Child.create([
         { _id: 1, parentId: p._id },
         { _id: 2, parentId: p._id },
         { _id: 3, parentId: p._id }
       ]);
 
-      const p2 = yield Parent.create({ name: 'test2' });
-      yield Child.create([
+      const p2 = await Parent.create({ name: 'test2' });
+      await Child.create([
         { _id: 4, parentId: p2._id },
         { _id: 5, parentId: p2._id }
       ]);
 
-      let docs = yield Parent.find().sort({ _id: 1 }).
+      let docs = await Parent.find().sort({ _id: 1 }).
         populate({ path: 'children', perDocumentLimit: 1 });
       assert.equal(docs[0]._id.toString(), p._id.toString());
       assert.equal(docs[1]._id.toString(), p2._id.toString());
       assert.deepEqual(docs[0].children.map(c => c._id), [1]);
       assert.deepEqual(docs[1].children.map(c => c._id), [4]);
 
-      docs = yield Parent.find().sort({ _id: 1 }).
+      docs = await Parent.find().sort({ _id: 1 }).
         populate({ path: 'children', options: { perDocumentLimit: 1 } });
       assert.equal(docs[0]._id.toString(), p._id.toString());
       assert.equal(docs[1]._id.toString(), p2._id.toString());
       assert.deepEqual(docs[0].children.map(c => c._id), [1]);
       assert.deepEqual(docs[1].children.map(c => c._id), [4]);
     });
-  });
 
-  it('works when embedded discriminator array has populated path but not refPath (gh-8527)', function() {
-    const Image = db.model('Image', Schema({ imageName: String }));
-    const Video = db.model('Video', Schema({ videoName: String }));
-    const ItemSchema = Schema({ objectType: String }, {
-      discriminatorKey: 'objectType',
-      _id: false
-    });
+    it('works when embedded discriminator array has populated path but not refPath (gh-8527)', async function() {
+      const Image = db.model('Image', Schema({ imageName: String }));
+      const Video = db.model('Video', Schema({ videoName: String }));
+      const ItemSchema = Schema({ objectType: String }, {
+        discriminatorKey: 'objectType',
+        _id: false
+      });
 
-    const noId = { _id: false };
+      const noId = { _id: false };
 
-    const NestedDataSchema = Schema({
-      data: Schema({ title: String, description: String }, noId)
-    }, noId);
+      const NestedDataSchema = Schema({
+        data: Schema({ title: String, description: String }, noId)
+      }, noId);
 
-    const InternalItemSchemaGen = () => Schema({
-      data: {
-        type: ObjectId,
-        refPath: 'list.objectType'
-      }
-    }, noId);
+      const InternalItemSchemaGen = () => Schema({
+        data: {
+          type: ObjectId,
+          refPath: 'list.objectType'
+        }
+      }, noId);
 
-    const externalSchema = Schema({ data: { sourceId: Number } }, noId);
-    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
-    ExampleSchema.path('list').discriminator('Image', InternalItemSchemaGen());
-    ExampleSchema.path('list').discriminator('Video', InternalItemSchemaGen());
-    ExampleSchema.path('list').discriminator('ExternalSource', externalSchema);
-    ExampleSchema.path('list').discriminator('NestedData', NestedDataSchema);
-    const Example = db.model('Test', ExampleSchema);
+      const externalSchema = Schema({ data: { sourceId: Number } }, noId);
+      const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+      ExampleSchema.path('list').discriminator('Image', InternalItemSchemaGen());
+      ExampleSchema.path('list').discriminator('Video', InternalItemSchemaGen());
+      ExampleSchema.path('list').discriminator('ExternalSource', externalSchema);
+      ExampleSchema.path('list').discriminator('NestedData', NestedDataSchema);
+      const Example = db.model('Test', ExampleSchema);
 
-    return co(function*() {
-      const image1 = yield Image.create({ imageName: '01image' });
-      const video1 = yield Video.create({ videoName: '01video' });
 
-      const example = yield Example.create({
+      const image1 = await Image.create({ imageName: '01image' });
+      const video1 = await Video.create({ videoName: '01video' });
+
+      const example = await Example.create({
         test: 'example',
         list: [
           { data: image1._id, objectType: 'Image' },
@@ -9415,50 +9233,47 @@ describe('model: populate:', function() {
         ]
       });
 
-      const res = yield Example.findById(example).populate('list.data').lean();
+      const res = await Example.findById(example).populate('list.data').lean();
       assert.deepEqual(res.list[3].data, { title: 'test' });
     });
-  });
 
-  it('handles populating embedded discriminators with `refPath` when none of the subdocs have `refPath` (gh-8553)', function() {
-    const ItemSchema = new Schema({ objectType: String },
-      { discriminatorKey: 'objectType', _id: false });
-    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+    it('handles populating embedded discriminators with `refPath` when none of the subdocs have `refPath` (gh-8553)', async function() {
+      const ItemSchema = new Schema({ objectType: String },
+        { discriminatorKey: 'objectType', _id: false });
+      const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
 
-    ExampleSchema.path('list').discriminator('Text', Schema({
-      data: { type: ObjectId, refPath: 'list.objectType' }
-    }, { _id: false }));
-    ExampleSchema.path('list').discriminator('ExternalSource', Schema({
-      data: { sourceId: Number }
-    }));
+      ExampleSchema.path('list').discriminator('Text', Schema({
+        data: { type: ObjectId, refPath: 'list.objectType' }
+      }, { _id: false }));
+      ExampleSchema.path('list').discriminator('ExternalSource', Schema({
+        data: { sourceId: Number }
+      }));
 
-    const Example = db.model('Test', ExampleSchema);
+      const Example = db.model('Test', ExampleSchema);
 
-    return co(function*() {
-      yield Example.create({
+
+      await Example.create({
         test: 'example',
         list: [
           { data: { sourceId: 123 }, objectType: 'ExternalSource' }
         ]
       });
 
-      const res = yield Example.find().populate('list.data');
+      const res = await Example.find().populate('list.data');
       assert.deepEqual(res[0].toObject().list[0].data, { sourceId: 123 });
     });
-  });
 
-  it('throws an error when using limit with perDocumentLimit', function() {
-    return co(function *() {
+    it('throws an error when using limit with perDocumentLimit', async function() {
       const User = db.model('User', userSchema);
       const BlogPost = db.model('BlogPost', blogPostSchema);
 
-      const blogPosts = yield BlogPost.create([{ title: 'JS 101' }, { title: 'Mocha 101' }]);
-      const user = yield User.create({ blogposts: blogPosts });
+      const blogPosts = await BlogPost.create([{ title: 'JS 101' }, { title: 'Mocha 101' }]);
+      const user = await User.create({ blogposts: blogPosts });
 
 
       let err;
       try {
-        yield User.find({ _id: user._id }).populate({ path: 'blogposts', perDocumentLimit: 2, limit: 1 });
+        await User.find({ _id: user._id }).populate({ path: 'blogposts', perDocumentLimit: 2, limit: 1 });
       } catch (error) {
         err = error;
       }
@@ -9466,10 +9281,8 @@ describe('model: populate:', function() {
       assert(err);
       assert.equal(err.message, 'Can not use `limit` and `perDocumentLimit` at the same time. Path: `blogposts`.');
     });
-  });
 
-  it('handles function refPath with discriminators (gh-8731)', function() {
-    return co(function *() {
+    it('handles function refPath with discriminators (gh-8731)', async function() {
       const nested = Schema({}, { discriminatorKey: 'type' });
       const mainSchema = Schema({ items: [nested] });
 
@@ -9487,8 +9300,8 @@ describe('model: populate:', function() {
       const Parent = db.model('Parent', mainSchema);
       const Child = db.model('Child', Schema({ name: String }));
 
-      const child = yield Child.create({ name: 'test' });
-      const parent = yield Parent.create({
+      const child = await Child.create({ name: 'test' });
+      const parent = await Parent.create({
         items: [{
           type: 'TestDiscriminator',
           childModel: 'Child',
@@ -9497,7 +9310,7 @@ describe('model: populate:', function() {
       });
 
       assert.equal(docs.length, 0);
-      const doc = yield Parent.findOne().populate('items.child').exec();
+      const doc = await Parent.findOne().populate('items.child').exec();
 
       assert.equal(doc.items[0].child.name, 'test');
       assert.ok(doc.items[0].populated('child'));
@@ -9505,62 +9318,59 @@ describe('model: populate:', function() {
       assert.equal(docs.length, 1);
       assert.equal(docs[0]._id.toHexString(), parent.items[0]._id.toHexString());
     });
-  });
 
-  describe('gh-8760', function() {
-    it('clone with lean creates identical copies from the same document', function() {
-      const userSchema = new Schema({ name: String });
-      const User = db.model('User', userSchema);
+    describe('gh-8760', function() {
+      it('clone with lean creates identical copies from the same document', async function() {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
 
-      const postSchema = new Schema({
-        user: { type: mongoose.ObjectId, ref: 'User' },
-        title: String
-      });
+        const postSchema = new Schema({
+          user: { type: mongoose.ObjectId, ref: 'User' },
+          title: String
+        });
 
-      const Post = db.model('BlogPost', postSchema);
+        const Post = db.model('BlogPost', postSchema);
 
-      return co(function*() {
-        const user = yield User.create({ name: 'val' });
-        yield Post.create([
+
+        const user = await User.create({ name: 'val' });
+        await Post.create([
           { title: 'test1', user: user },
           { title: 'test2', user: user },
           { title: 'test3', user: new mongoose.Types.ObjectId() }
         ]);
 
-        const posts = yield Post.find().populate({ path: 'user', options: { clone: true } }).sort('title').lean();
+        const posts = await Post.find().populate({ path: 'user', options: { clone: true } }).sort('title').lean();
 
         posts[0].user.name = 'val2';
         assert.equal(posts[1].user.name, 'val');
         assert.equal(posts[2].user, null);
       });
-    });
 
-    it('clone with populate and lean makes child lean', function() {
-      const isLean = v => v != null && !(v instanceof mongoose.Document);
+      it('clone with populate and lean makes child lean', async function() {
+        const isLean = v => v != null && !(v instanceof mongoose.Document);
 
-      const userSchema = new Schema({ name: String });
-      const User = db.model('User', userSchema);
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
 
-      const postSchema = new Schema({
-        user: { type: mongoose.ObjectId, ref: 'User' },
-        title: String
-      });
+        const postSchema = new Schema({
+          user: { type: mongoose.ObjectId, ref: 'User' },
+          title: String
+        });
 
-      const Post = db.model('BlogPost', postSchema);
+        const Post = db.model('BlogPost', postSchema);
 
-      return co(function*() {
-        const user = yield User.create({ name: 'val' });
 
-        yield Post.create({ title: 'test1', user: user });
+        const user = await User.create({ name: 'val' });
 
-        const post = yield Post.findOne().populate({ path: 'user', options: { clone: true } }).lean();
+        await Post.create({ title: 'test1', user: user });
+
+        const post = await Post.findOne().populate({ path: 'user', options: { clone: true } }).lean();
 
         assert.ok(isLean(post.user));
       });
-    });
 
-    it('can populate subdocs where one is discriminator and the other is not (gh-8837)', function() {
-      return co(function*() {
+      it('can populate subdocs where one is discriminator and the other is not (gh-8837)', async function() {
+
         const eventSchema = new Schema({ }, { discriminatorKey: 'type' });
         const eventsListSchema = new Schema({ events: [eventSchema] });
 
@@ -9575,22 +9385,21 @@ describe('model: populate:', function() {
         const EventsList = db.model('EventsList', eventsListSchema);
         const Product = db.model('Product', new Schema({ name: String }));
 
-        const product = yield Product.create({ name: 'GTX 1050 Ti' });
+        const product = await Product.create({ name: 'GTX 1050 Ti' });
 
-        yield EventsList.create({
+        await EventsList.create({
           events: [
             { },
             { type: 'ClickEvent', modelName: 'Product', productId: product._id }
           ]
         });
 
-        const result = yield EventsList.findOne().populate('events.productId');
+        const result = await EventsList.findOne().populate('events.productId');
         assert.equal(result.events[1].productId.name, 'GTX 1050 Ti');
       });
-    });
 
-    it('can populate virtuals defined on child discriminators (gh-8924)', function() {
-      return co(function*() {
+      it('can populate virtuals defined on child discriminators (gh-8924)', async function() {
+
         const User = db.model('User', {});
         const Post = db.model('Post', { name: String });
 
@@ -9600,37 +9409,36 @@ describe('model: populate:', function() {
 
         const UserWithPost = User.discriminator('UserWithPost', userWithPostSchema);
 
-        const post = yield Post.create({ name: 'Clean Code' });
+        const post = await Post.create({ name: 'Clean Code' });
 
-        yield UserWithPost.create({ postId: post._id });
+        await UserWithPost.create({ postId: post._id });
 
-        const user = yield User.findOne().populate({ path: 'post' });
+        const user = await User.findOne().populate({ path: 'post' });
 
 
         assert.equal(user.post.name, 'Clean Code');
       });
     });
-  });
 
-  it('no-op if populating on a document array with no ref (gh-8946)', function() {
-    const teamSchema = Schema({
-      members: [{ user: { type: ObjectId, ref: 'User' } }]
-    });
-    const userSchema = Schema({ name: { type: String } });
-    userSchema.virtual('teams', {
-      ref: 'Team',
-      localField: '_id',
-      foreignField: 'members.user',
-      justOne: false
-    });
-    const User = db.model('User', userSchema);
-    const Team = db.model('Team', teamSchema);
+    it('no-op if populating on a document array with no ref (gh-8946)', async function() {
+      const teamSchema = Schema({
+        members: [{ user: { type: ObjectId, ref: 'User' } }]
+      });
+      const userSchema = Schema({ name: { type: String } });
+      userSchema.virtual('teams', {
+        ref: 'Team',
+        localField: '_id',
+        foreignField: 'members.user',
+        justOne: false
+      });
+      const User = db.model('User', userSchema);
+      const Team = db.model('Team', teamSchema);
 
-    return co(function*() {
-      const user = yield User.create({ name: 'User' });
-      yield Team.create({ members: [{ user: user._id }] });
 
-      const res = yield User.findOne().populate({
+      const user = await User.create({ name: 'User' });
+      await Team.create({ members: [{ user: user._id }] });
+
+      const res = await User.findOne().populate({
         path: 'teams',
         populate: {
           path: 'members', // No ref
@@ -9640,55 +9448,53 @@ describe('model: populate:', function() {
 
       assert.equal(res.teams[0].members[0].user.name, 'User');
     });
-  });
 
-  it('no-op if populating a nested path (gh-9073)', function() {
-    const buildingSchema = Schema({ owner: String });
-    const Building = db.model('Building', buildingSchema);
+    it('no-op if populating a nested path (gh-9073)', async function() {
+      const buildingSchema = Schema({ owner: String });
+      const Building = db.model('Building', buildingSchema);
 
-    const officeSchema = new Schema({
-      title: String,
-      place: { building: { type: Schema.ObjectId, ref: 'Building' } }
-    });
-    const Office = db.model('Office', officeSchema);
+      const officeSchema = new Schema({
+        title: String,
+        place: { building: { type: Schema.ObjectId, ref: 'Building' } }
+      });
+      const Office = db.model('Office', officeSchema);
 
-    return co(function*() {
+
       const building = new Building({ owner: 'test' });
-      yield building.save();
-      yield Office.create({ place: { building: building._id } });
+      await building.save();
+      await Office.create({ place: { building: building._id } });
 
-      const foundOffice = yield Office.findOne({}).
+      const foundOffice = await Office.findOne({}).
         populate({ path: 'place', populate: 'building' });
       assert.equal(foundOffice.place.building.owner, 'test');
     });
-  });
 
-  it('handles populating primitive array under document array with discriminator (gh-9148)', function() {
-    const ContentSchema = new Schema({ name: String });
-    const Content = db.model('Test1', ContentSchema);
+    it('handles populating primitive array under document array with discriminator (gh-9148)', async function() {
+      const ContentSchema = new Schema({ name: String });
+      const Content = db.model('Test1', ContentSchema);
 
-    const DataSchema = new Schema({ alias: String }, {
-      discriminatorKey: 'type',
-      _id: false
-    });
-    const ContentRelationSchema = new Schema({
-      content: [{ type: Schema.Types.ObjectId, ref: 'Test1' }]
-    }, { _id: false });
-    const PageSchema = new Schema({
-      name: String,
-      data: [DataSchema]
-    });
+      const DataSchema = new Schema({ alias: String }, {
+        discriminatorKey: 'type',
+        _id: false
+      });
+      const ContentRelationSchema = new Schema({
+        content: [{ type: Schema.Types.ObjectId, ref: 'Test1' }]
+      }, { _id: false });
+      const PageSchema = new Schema({
+        name: String,
+        data: [DataSchema]
+      });
 
-    PageSchema.path('data').discriminator('content', ContentRelationSchema);
-    const Page = db.model('Test', PageSchema);
+      PageSchema.path('data').discriminator('content', ContentRelationSchema);
+      const Page = db.model('Test', PageSchema);
 
-    return co(function*() {
-      const content = yield Promise.all([
+
+      const content = await Promise.all([
         Content.create({ name: 'A' }),
         Content.create({ name: 'B' })
       ]);
 
-      const doc = yield Page.create({
+      const doc = await Page.create({
         name: 'Index',
         data: [{
           alias: 'my_content',
@@ -9697,7 +9503,7 @@ describe('model: populate:', function() {
         }]
       });
 
-      const page = yield Page.findById(doc._id).populate({
+      const page = await Page.findById(doc._id).populate({
         path: 'data.content',
         select: { name: 1, _id: 0 }
       });
@@ -9708,65 +9514,63 @@ describe('model: populate:', function() {
         content: [{ name: 'A' }, { name: 'B' }]
       }]);
     });
-  });
 
-  it('handles deselecting _id with `perDocumentLimit` (gh-8460) (gh-9175)', function() {
-    const postSchema = new Schema({
-      title: String,
-      commentsIds: [{ type: Schema.ObjectId, ref: 'Comment' }]
-    });
-    const Post = db.model('Post', postSchema);
+    it('handles deselecting _id with `perDocumentLimit` (gh-8460) (gh-9175)', async function() {
+      const postSchema = new Schema({
+        title: String,
+        commentsIds: [{ type: Schema.ObjectId, ref: 'Comment' }]
+      });
+      const Post = db.model('Post', postSchema);
 
-    const commentSchema = new Schema({ content: String });
-    const Comment = db.model('Comment', commentSchema);
+      const commentSchema = new Schema({ content: String });
+      const Comment = db.model('Comment', commentSchema);
 
-    return co(function*() {
+
       const post1 = new Post({ title: 'I have 3 comments' });
-      let comments = yield Comment.create([
+      let comments = await Comment.create([
         { content: 'Cool first post' },
         { content: 'Very cool first post' },
         { content: 'Super cool first post' }
       ]);
 
       post1.commentsIds = comments;
-      yield post1.save();
+      await post1.save();
 
       const post2 = new Post({ title: 'I have 4 comments' });
-      comments = yield Comment.create([
+      comments = await Comment.create([
         { content: 'Cool second post' },
         { content: 'Very cool second post' },
         { content: 'Super cool second post' },
         { content: 'Absolutely cool second post' }
       ]);
       post2.commentsIds = comments;
-      yield post2.save();
+      await post2.save();
 
-      const posts = yield Post.find().populate({ path: 'commentsIds', select: 'content -_id', perDocumentLimit: 2 });
+      const posts = await Post.find().populate({ path: 'commentsIds', select: 'content -_id', perDocumentLimit: 2 });
 
       assert.equal(posts[0].commentsIds.length, 2);
       assert.equal(posts[1].commentsIds.length, 2);
     });
-  });
 
-  it('handles embedded discriminator `refPath` with multiple documents (gh-8731) (gh-9153)', function() {
-    const nested = Schema({}, { discriminatorKey: 'type' });
-    const mySchema = Schema({ title: { type: String }, items: [nested] });
+    it('handles embedded discriminator `refPath` with multiple documents (gh-8731) (gh-9153)', async function() {
+      const nested = Schema({}, { discriminatorKey: 'type' });
+      const mySchema = Schema({ title: { type: String }, items: [nested] });
 
-    const itemType = mySchema.path('items');
+      const itemType = mySchema.path('items');
 
-    itemType.discriminator('link', Schema({
-      fooType: { type: String },
-      foo: {
-        type: mongoose.Schema.Types.ObjectId,
-        refPath: 'items.fooType'
-      }
-    }));
+      itemType.discriminator('link', Schema({
+        fooType: { type: String },
+        foo: {
+          type: mongoose.Schema.Types.ObjectId,
+          refPath: 'items.fooType'
+        }
+      }));
 
-    const Model = db.model('Test', mySchema);
+      const Model = db.model('Test', mySchema);
 
-    return co(function*() {
-      const doc1 = yield Model.create({ title: 'doc1' });
-      yield Model.create({
+
+      const doc1 = await Model.create({ title: 'doc1' });
+      await Model.create({
         title: 'doc2',
         items: [{
           type: 'link',
@@ -9775,111 +9579,108 @@ describe('model: populate:', function() {
         }]
       });
 
-      const docs = yield Model.find({ }).sort({ title: 1 }).populate('items.foo').exec();
+      const docs = await Model.find({ }).sort({ title: 1 }).populate('items.foo').exec();
       assert.equal(docs[1].items[0].foo.title, 'doc1');
     });
-  });
 
-  it('Sets the populated document\'s parent() (gh-8092)', function() {
-    const schema = new Schema({
-      single: { type: Number, ref: 'Child' },
-      arr: [{ type: Number, ref: 'Child' }],
-      docArr: [{ ref: { type: Number, ref: 'Child' } }]
-    });
+    it('Sets the populated document\'s parent() (gh-8092)', async function() {
+      const schema = new Schema({
+        single: { type: Number, ref: 'Child' },
+        arr: [{ type: Number, ref: 'Child' }],
+        docArr: [{ ref: { type: Number, ref: 'Child' } }]
+      });
 
-    schema.virtual('myVirtual', {
-      ref: 'Child',
-      localField: 'single',
-      foreignField: '_id',
-      justOne: true
-    });
+      schema.virtual('myVirtual', {
+        ref: 'Child',
+        localField: 'single',
+        foreignField: '_id',
+        justOne: true
+      });
 
-    const Parent = db.model('Parent', schema);
-    const Child = db.model('Child', Schema({ _id: Number, name: String }));
+      const Parent = db.model('Parent', schema);
+      const Child = db.model('Child', Schema({ _id: Number, name: String }));
 
-    return co(function*() {
-      yield Child.create({ _id: 1, name: 'test' });
 
-      yield Parent.create({ single: 1, arr: [1], docArr: [{ ref: 1 }] });
+      await Child.create({ _id: 1, name: 'test' });
 
-      let doc = yield Parent.findOne().populate('single');
+      await Parent.create({ single: 1, arr: [1], docArr: [{ ref: 1 }] });
+
+      let doc = await Parent.findOne().populate('single');
       assert.ok(doc.single.parent() === doc);
       assert.ok(doc.single.$parent() === doc);
 
-      doc = yield Parent.findOne().populate('arr');
+      doc = await Parent.findOne().populate('arr');
       assert.ok(doc.arr[0].parent() === doc);
       assert.ok(doc.arr[0].$parent() === doc);
 
-      doc = yield Parent.findOne().populate('docArr.ref');
+      doc = await Parent.findOne().populate('docArr.ref');
       assert.ok(doc.docArr[0].ref.parent() === doc);
       assert.ok(doc.docArr[0].ref.$parent() === doc);
 
-      doc = yield Parent.findOne().populate('myVirtual');
+      doc = await Parent.findOne().populate('myVirtual');
       assert.ok(doc.myVirtual.parent() === doc);
       assert.ok(doc.myVirtual.$parent() === doc);
 
-      doc = yield Parent.findOne();
-      yield doc.populate('single');
+      doc = await Parent.findOne();
+      await doc.populate('single');
       assert.ok(doc.single.parent() === doc);
       assert.ok(doc.single.$parent() === doc);
     });
-  });
 
-  it('populates single nested discriminator underneath doc array when populated docs have different model but same id (gh-9244)', function() {
-    const catSchema = Schema({ _id: Number, name: String });
-    const dogSchema = Schema({ _id: Number, name: String });
+    it('populates single nested discriminator underneath doc array when populated docs have different model but same id (gh-9244)', async function() {
+      const catSchema = Schema({ _id: Number, name: String });
+      const dogSchema = Schema({ _id: Number, name: String });
 
-    const notificationSchema = Schema({ title: String }, { discriminatorKey: 'type' });
-    const notificationTypeASchema = Schema({
-      subject: {
-        type: Number,
-        ref: 'Cat'
-      }
-    }, { discriminatorKey: 'type' });
-    const notificationTypeBSchema = Schema({
-      subject: {
-        type: Number,
-        ref: 'Dog'
-      }
-    }, { discriminatorKey: 'type' });
+      const notificationSchema = Schema({ title: String }, { discriminatorKey: 'type' });
+      const notificationTypeASchema = Schema({
+        subject: {
+          type: Number,
+          ref: 'Cat'
+        }
+      }, { discriminatorKey: 'type' });
+      const notificationTypeBSchema = Schema({
+        subject: {
+          type: Number,
+          ref: 'Dog'
+        }
+      }, { discriminatorKey: 'type' });
 
-    const CatModel = db.model('Cat', catSchema);
-    const DogModel = db.model('Dog', dogSchema);
-    const NotificationModel = db.model('Notification', notificationSchema);
-    const NotificationTypeAModel = NotificationModel.discriminator('NotificationTypeA', notificationTypeASchema);
-    const NotificationTypeBModel = NotificationModel.discriminator('NotificationTypeB', notificationTypeBSchema);
+      const CatModel = db.model('Cat', catSchema);
+      const DogModel = db.model('Dog', dogSchema);
+      const NotificationModel = db.model('Notification', notificationSchema);
+      const NotificationTypeAModel = NotificationModel.discriminator('NotificationTypeA', notificationTypeASchema);
+      const NotificationTypeBModel = NotificationModel.discriminator('NotificationTypeB', notificationTypeBSchema);
 
-    return co(function*() {
-      const cat = yield CatModel.create({ _id: 1, name: 'Keanu' });
-      const dog = yield DogModel.create({ _id: 1, name: 'Bud' });
 
-      yield NotificationTypeAModel.create({ subject: cat._id, title: 'new cat' });
-      yield NotificationTypeBModel.create({ subject: dog._id, title: 'new dog' });
+      const cat = await CatModel.create({ _id: 1, name: 'Keanu' });
+      const dog = await DogModel.create({ _id: 1, name: 'Bud' });
 
-      const notifications = yield NotificationModel.find({}).populate('subject');
+      await NotificationTypeAModel.create({ subject: cat._id, title: 'new cat' });
+      await NotificationTypeBModel.create({ subject: dog._id, title: 'new dog' });
+
+      const notifications = await NotificationModel.find({}).populate('subject');
       assert.deepEqual(notifications.map(el => el.subject.name), ['Keanu', 'Bud']);
     });
-  });
 
-  it('skips checking `refPath` if the path to populate is undefined (gh-9340)', function() {
-    const firstSchema = Schema({
-      ref: String,
-      linkedId: {
-        type: Schema.ObjectId,
-        refPath: 'ref'
-      }
-    });
-    const Parent = db.model('Parent', firstSchema);
+    it('skips checking `refPath` if the path to populate is undefined (gh-9340)', async function() {
+      const firstSchema = Schema({
+        ref: String,
+        linkedId: {
+          type: Schema.ObjectId,
+          refPath: 'ref'
+        }
+      });
+      const Parent = db.model('Parent', firstSchema);
 
-    const secondSchema = new Schema({ name: String });
-    const Child = db.model('Child', secondSchema);
+      const secondSchema = new Schema({ name: String });
+      const Child = db.model('Child', secondSchema);
 
-    return co(function*() {
-      const child = yield Child.create({ name: 'child' });
-      yield Parent.create({ ref: 'Child', linkedId: child._id });
-      yield Parent.create({ ref: 'does not exist' });
 
-      const res = yield Parent.find().populate('linkedId').sort({ ref: 1 }).exec();
+      const child = await Child.create({ name: 'child' });
+      await Parent.create({ ref: 'Child', linkedId: child._id });
+      await Parent.create({ ref: 'does not exist' });
+
+      const res = await Parent.find().populate('linkedId').sort({ ref: 1 }).exec();
       assert.equal(res.length, 2);
 
       assert.equal(res[0].ref, 'Child');
@@ -9887,72 +9688,69 @@ describe('model: populate:', function() {
       assert.equal(res[1].ref, 'does not exist');
       assert.strictEqual(res[1].linkedId, undefined);
     });
-  });
 
-  it('supports default populate options (gh-6029)', function() {
-    const parentSchema = Schema({
-      child: {
-        type: 'ObjectId',
-        ref: 'Child',
-        populate: { select: 'name' }
-      }
-    });
-    const Parent = db.model('Parent', parentSchema);
+    it('supports default populate options (gh-6029)', async function() {
+      const parentSchema = Schema({
+        child: {
+          type: 'ObjectId',
+          ref: 'Child',
+          populate: { select: 'name' }
+        }
+      });
+      const Parent = db.model('Parent', parentSchema);
 
-    const childSchema = new Schema({ name: String, age: Number });
-    const Child = db.model('Child', childSchema);
+      const childSchema = new Schema({ name: String, age: Number });
+      const Child = db.model('Child', childSchema);
 
-    return co(function*() {
-      const child = yield Child.create({ name: 'my name', age: 30 });
-      yield Parent.create({ child: child._id });
 
-      const res = yield Parent.findOne().populate('child');
+      const child = await Child.create({ name: 'my name', age: 30 });
+      await Parent.create({ child: child._id });
+
+      const res = await Parent.findOne().populate('child');
       assert.equal(res.child.name, 'my name');
       assert.strictEqual(res.child.age, void 0);
     });
-  });
 
-  it('avoids propagating lean virtuals to children (gh-9592)', function() {
-    const parentSchema = Schema({
-      child: {
-        type: 'ObjectId',
-        ref: 'Child',
-        populate: { select: 'name' }
-      }
-    });
-    const Parent = db.model('Parent', parentSchema);
+    it('avoids propagating lean virtuals to children (gh-9592)', async function() {
+      const parentSchema = Schema({
+        child: {
+          type: 'ObjectId',
+          ref: 'Child',
+          populate: { select: 'name' }
+        }
+      });
+      const Parent = db.model('Parent', parentSchema);
 
-    const childSchema = new Schema({ name: String, age: Number });
-    const findCallOptions = [];
-    childSchema.pre('find', function() {
-      findCallOptions.push(this._mongooseOptions.lean);
-    });
-    const Child = db.model('Child', childSchema);
+      const childSchema = new Schema({ name: String, age: Number });
+      const findCallOptions = [];
+      childSchema.pre('find', function() {
+        findCallOptions.push(this._mongooseOptions.lean);
+      });
+      const Child = db.model('Child', childSchema);
 
-    return co(function*() {
-      const child = yield Child.create({ name: 'my name', age: 30 });
-      yield Parent.create({ child: child._id });
 
-      yield Parent.findOne().populate('child').lean({ virtuals: ['name', 'child.foo'] });
+      const child = await Child.create({ name: 'my name', age: 30 });
+      await Parent.create({ child: child._id });
+
+      await Parent.findOne().populate('child').lean({ virtuals: ['name', 'child.foo'] });
       assert.equal(findCallOptions.length, 1);
       assert.deepEqual(findCallOptions[0].virtuals, ['foo']);
     });
-  });
 
-  it('gh-9833', function() {
-    const Books = db.model('books', new Schema({ name: String, tags: [{ type: Schema.Types.ObjectId, ref: 'tags' }] }));
-    const Tags = db.model('tags', new Schema({ author: Schema.Types.ObjectId }));
-    const Authors = db.model('authors', new Schema({ name: String }));
+    it('gh-9833', async function() {
+      const Books = db.model('books', new Schema({ name: String, tags: [{ type: Schema.Types.ObjectId, ref: 'tags' }] }));
+      const Tags = db.model('tags', new Schema({ author: Schema.Types.ObjectId }));
+      const Authors = db.model('authors', new Schema({ name: String }));
 
-    return co(function*() {
+
       const anAuthor = new Authors({ name: 'Author1' });
-      yield anAuthor.save();
+      await anAuthor.save();
 
       const aTag = new Tags({ author: anAuthor.id });
-      yield aTag.save();
+      await aTag.save();
 
       const aBook = new Books({ name: 'Book1', tags: [aTag.id] });
-      yield aBook.save();
+      await aBook.save();
 
       const aggregateOptions = [
         { $match: {
@@ -9965,7 +9763,7 @@ describe('model: populate:', function() {
           as: 'tags'
         } }
       ];
-      const books = yield Books.aggregate(aggregateOptions).exec();
+      const books = await Books.aggregate(aggregateOptions).exec();
 
       const populateOptions = [{
         path: 'tags.author',
@@ -9973,25 +9771,24 @@ describe('model: populate:', function() {
         select: '_id name'
       }];
 
-      const populatedBooks = yield Books.populate(books, populateOptions);
+      const populatedBooks = await Books.populate(books, populateOptions);
       assert.ok(!Array.isArray(populatedBooks[0].tags[0].author));
     });
-  });
 
-  it('sets not-found values to null for paths that are not in the schema (gh-9913)', function() {
-    const Books = db.model('books', new Schema({ name: String, tags: [{ type: 'ObjectId', ref: 'tags' }] }));
-    const Tags = db.model('tags', new Schema({ authors: [{ author: 'ObjectId' }] }));
-    const Authors = db.model('authors', new Schema({ name: String }));
+    it('sets not-found values to null for paths that are not in the schema (gh-9913)', async function() {
+      const Books = db.model('books', new Schema({ name: String, tags: [{ type: 'ObjectId', ref: 'tags' }] }));
+      const Tags = db.model('tags', new Schema({ authors: [{ author: 'ObjectId' }] }));
+      const Authors = db.model('authors', new Schema({ name: String }));
 
-    return co(function*() {
+
       const anAuthor = new Authors({ name: 'Author1' });
-      yield anAuthor.save();
+      await anAuthor.save();
 
       const aTag = new Tags({ authors: [{ author: anAuthor.id }, { author: new mongoose.Types.ObjectId() }] });
-      yield aTag.save();
+      await aTag.save();
 
       const aBook = new Books({ name: 'Book1', tags: [aTag.id] });
-      yield aBook.save();
+      await aBook.save();
 
       const aggregateOptions = [
         { $match: {
@@ -10004,7 +9801,7 @@ describe('model: populate:', function() {
           as: 'tags'
         } }
       ];
-      const books = yield Books.aggregate(aggregateOptions).exec();
+      const books = await Books.aggregate(aggregateOptions).exec();
 
       const populateOptions = [{
         path: 'tags.authors.author',
@@ -10012,37 +9809,36 @@ describe('model: populate:', function() {
         select: '_id name'
       }];
 
-      const populatedBooks = yield Books.populate(books, populateOptions);
+      const populatedBooks = await Books.populate(books, populateOptions);
       assert.strictEqual(populatedBooks[0].tags[0].authors[0].author.name, 'Author1');
       assert.strictEqual(populatedBooks[0].tags[0].authors[1].author, null);
     });
-  });
 
-  it('handles perDocumentLimit where multiple documents reference the same populated doc (gh-9906)', function() {
-    const postSchema = new Schema({
-      title: String,
-      commentsIds: [{ type: Schema.ObjectId, ref: 'Comment' }]
-    });
-    const Post = db.model('Post', postSchema);
+    it('handles perDocumentLimit where multiple documents reference the same populated doc (gh-9906)', async function() {
+      const postSchema = new Schema({
+        title: String,
+        commentsIds: [{ type: Schema.ObjectId, ref: 'Comment' }]
+      });
+      const Post = db.model('Post', postSchema);
 
-    const commentSchema = new Schema({ content: String });
-    const Comment = db.model('Comment', commentSchema);
+      const commentSchema = new Schema({ content: String });
+      const Comment = db.model('Comment', commentSchema);
 
-    return co(function*() {
+
       const commonComment = new Comment({ content: 'Im used in two posts' });
-      yield commonComment.save();
+      await commonComment.save();
 
-      const comments = yield Comment.create([
+      const comments = await Comment.create([
         { content: 'Nice first post' },
         { content: 'Nice second post' }
       ]);
 
-      let posts = yield Post.create([
+      let posts = await Post.create([
         { title: 'First post', commentsIds: [commonComment, comments[0]] },
         { title: 'Second post', commentsIds: [commonComment, comments[1]] }
       ]);
 
-      posts = yield Post.find().
+      posts = await Post.find().
         sort({ title: 1 }).
         populate({ path: 'commentsIds', perDocumentLimit: 2, sort: { content: 1 } });
       assert.equal(posts.length, 2);
@@ -10051,21 +9847,20 @@ describe('model: populate:', function() {
       assert.deepEqual(posts[0].toObject().commentsIds.map(c => c.content), ['Im used in two posts', 'Nice first post']);
       assert.deepEqual(posts[1].toObject().commentsIds.map(c => c.content), ['Im used in two posts', 'Nice second post']);
     });
-  });
 
-  it('supports `transform` option (gh-3375)', function() {
-    const parentSchema = new Schema({
-      name: String,
-      children: [{ type: 'ObjectId', ref: 'Child' }],
-      child: { type: 'ObjectId', ref: 'Child' }
-    });
-    const Parent = db.model('Parent', parentSchema);
+    it('supports `transform` option (gh-3375)', async function() {
+      const parentSchema = new Schema({
+        name: String,
+        children: [{ type: 'ObjectId', ref: 'Child' }],
+        child: { type: 'ObjectId', ref: 'Child' }
+      });
+      const Parent = db.model('Parent', parentSchema);
 
-    const Child = db.model('Child', Schema({ name: String }));
+      const Child = db.model('Child', Schema({ name: String }));
 
-    return co(function*() {
-      const children = yield Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
-      let p = yield Parent.create({
+
+      const children = await Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
+      let p = await Parent.create({
         name: 'Anakin',
         children: children,
         child: children[0]._id
@@ -10082,7 +9877,7 @@ describe('model: populate:', function() {
       }
 
       // Populate array of ids
-      p = yield Parent.findById(p).populate({
+      p = await Parent.findById(p).populate({
         path: 'children',
         transform: transform
       });
@@ -10096,7 +9891,7 @@ describe('model: populate:', function() {
 
       // Populate single id
       called = [];
-      p = yield Parent.findById(p).populate({
+      p = await Parent.findById(p).populate({
         path: 'child',
         transform: transform
       });
@@ -10107,10 +9902,10 @@ describe('model: populate:', function() {
 
       // Push a nonexistent id
       const newId = new mongoose.Types.ObjectId();
-      yield Parent.updateOne({ _id: p._id }, { $push: { children: newId } });
+      await Parent.updateOne({ _id: p._id }, { $push: { children: newId } });
 
       called = [];
-      p = yield Parent.findById(p).populate({
+      p = await Parent.findById(p).populate({
         path: 'children',
         transform: transform
       });
@@ -10121,10 +9916,10 @@ describe('model: populate:', function() {
       assert.equal(p.children[2].toHexString(), newId.toHexString());
 
       // Populate 2 docs with same id
-      yield Parent.updateOne({ _id: p._id }, { $set: { children: [children[0], children[0]] } });
+      await Parent.updateOne({ _id: p._id }, { $set: { children: [children[0], children[0]] } });
       called = [];
 
-      p = yield Parent.findById(p).populate({
+      p = await Parent.findById(p).populate({
         path: 'children',
         transform: transform
       });
@@ -10133,9 +9928,9 @@ describe('model: populate:', function() {
       assert.equal(called[1].id.toHexString(), children[0]._id.toHexString());
 
       // Populate single id that points to nonexistent doc
-      yield Parent.updateOne({ _id: p._id }, { $set: { child: newId } });
+      await Parent.updateOne({ _id: p._id }, { $set: { child: newId } });
       called = [];
-      p = yield Parent.findById(p).populate({
+      p = await Parent.findById(p).populate({
         path: 'child',
         transform: transform
       });
@@ -10144,20 +9939,19 @@ describe('model: populate:', function() {
       assert.strictEqual(called[0].doc, null);
       assert.equal(called[0].id.toHexString(), newId.toHexString());
     });
-  });
 
-  it('transform to primitive (gh-10064)', function() {
-    const Child = db.model('Child', mongoose.Schema({ name: String }));
-    const Parent = db.model('Parent', mongoose.Schema({
-      child: { type: 'ObjectId', ref: 'Child' },
-      children: [{ type: 'ObjectId', ref: 'Child' }]
-    }));
+    it('transform to primitive (gh-10064)', async function() {
+      const Child = db.model('Child', mongoose.Schema({ name: String }));
+      const Parent = db.model('Parent', mongoose.Schema({
+        child: { type: 'ObjectId', ref: 'Child' },
+        children: [{ type: 'ObjectId', ref: 'Child' }]
+      }));
 
-    return co(function*() {
-      const children = yield Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
 
-      let doc = yield Parent.create({ children, child: children[0] });
-      doc = yield Parent.findById(doc).populate([
+      const children = await Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
+
+      let doc = await Parent.create({ children, child: children[0] });
+      doc = await Parent.findById(doc).populate([
         {
           path: 'child',
           transform: getName
@@ -10176,29 +9970,28 @@ describe('model: populate:', function() {
       assert.equal(doc.child, 'Luke');
       assert.deepEqual(doc.toObject().children.sort().reverse(), ['Luke', 'Leia']);
     });
-  });
 
-  it('transform with virtual populate, justOne = true (gh-3375)', function() {
-    const parentSchema = new Schema({
-      name: String
-    });
-    parentSchema.virtual('child', {
-      ref: 'Child',
-      localField: '_id',
-      foreignField: 'parentId',
-      justOne: true
-    });
-    const Parent = db.model('Parent', parentSchema);
+    it('transform with virtual populate, justOne = true (gh-3375)', async function() {
+      const parentSchema = new Schema({
+        name: String
+      });
+      parentSchema.virtual('child', {
+        ref: 'Child',
+        localField: '_id',
+        foreignField: 'parentId',
+        justOne: true
+      });
+      const Parent = db.model('Parent', parentSchema);
 
-    const Child = db.model('Child', Schema({ name: String, parentId: 'ObjectId' }));
+      const Child = db.model('Child', Schema({ name: String, parentId: 'ObjectId' }));
 
-    return co(function*() {
-      let p = yield Parent.create({ name: 'Anakin' });
-      yield Child.create({ name: 'Luke', parentId: p._id });
+
+      let p = await Parent.create({ name: 'Anakin' });
+      await Child.create({ name: 'Luke', parentId: p._id });
 
       const called = [];
 
-      p = yield Parent.findById(p).populate({
+      p = await Parent.findById(p).populate({
         path: 'child',
         transform: function(doc, id) {
           called.push({
@@ -10214,32 +10007,31 @@ describe('model: populate:', function() {
       assert.strictEqual(called[0].doc.parentId.toHexString(), p._id.toHexString());
       assert.equal(called[0].id.toHexString(), p._id.toHexString());
     });
-  });
 
-  it('transform with virtual populate, justOne = false (gh-3375)', function() {
-    const parentSchema = new Schema({
-      name: String
-    });
-    parentSchema.virtual('children', {
-      ref: 'Child',
-      localField: '_id',
-      foreignField: 'parentId',
-      justOne: false
-    });
-    const Parent = db.model('Parent', parentSchema);
+    it('transform with virtual populate, justOne = false (gh-3375)', async function() {
+      const parentSchema = new Schema({
+        name: String
+      });
+      parentSchema.virtual('children', {
+        ref: 'Child',
+        localField: '_id',
+        foreignField: 'parentId',
+        justOne: false
+      });
+      const Parent = db.model('Parent', parentSchema);
 
-    const Child = db.model('Child', Schema({ name: String, parentId: 'ObjectId' }));
+      const Child = db.model('Child', Schema({ name: String, parentId: 'ObjectId' }));
 
-    return co(function*() {
-      let p = yield Parent.create({ name: 'Anakin' });
-      yield Child.create([
+
+      let p = await Parent.create({ name: 'Anakin' });
+      await Child.create([
         { name: 'Luke', parentId: p._id },
         { name: 'Leia', parentId: p._id }
       ]);
 
       const called = [];
 
-      p = yield Parent.findById(p).populate({
+      p = await Parent.findById(p).populate({
         path: 'children',
         transform: function(doc, id) {
           called.push({
@@ -10260,30 +10052,29 @@ describe('model: populate:', function() {
       assert.strictEqual(called[1].doc.parentId.toHexString(), p._id.toHexString());
       assert.equal(called[1].id.toHexString(), p._id.toHexString());
     });
-  });
 
-  it('supports populating dotted subpath of a populated doc that has the same id as a populated doc (gh-10005)', function() {
-    const ModelASchema = new mongoose.Schema({
-      _modelB: {
-        type: mongoose.Types.ObjectId,
-        ref: 'Test1'
-      },
-      _rootModel: {
-        type: mongoose.Types.ObjectId,
-        ref: 'Test'
-      }
-    });
+    it('supports populating dotted subpath of a populated doc that has the same id as a populated doc (gh-10005)', async function() {
+      const ModelASchema = new mongoose.Schema({
+        _modelB: {
+          type: mongoose.Types.ObjectId,
+          ref: 'Test1'
+        },
+        _rootModel: {
+          type: mongoose.Types.ObjectId,
+          ref: 'Test'
+        }
+      });
 
-    const ModelBSchema = new mongoose.Schema({
-      _rootModel: {
-        type: mongoose.Types.ObjectId,
-        ref: 'Test'
-      }
-    });
+      const ModelBSchema = new mongoose.Schema({
+        _rootModel: {
+          type: mongoose.Types.ObjectId,
+          ref: 'Test'
+        }
+      });
 
-    const RootModelSchema = new mongoose.Schema({ name: String });
+      const RootModelSchema = new mongoose.Schema({ name: String });
 
-    return co(function*() {
+
       const ModelA = db.model('Test2', ModelASchema);
       const ModelB = db.model('Test1', ModelBSchema);
       const RootModel = db.model('Test', RootModelSchema);
@@ -10292,35 +10083,34 @@ describe('model: populate:', function() {
       const modelB = new ModelB({ _rootModel: rootModel });
       const modelA = new ModelA({ _rootModel: rootModel, _modelB: modelB });
 
-      yield Promise.all([rootModel.save(), modelB.save(), modelA.save()]);
+      await Promise.all([rootModel.save(), modelB.save(), modelA.save()]);
 
-      const modelA1 = yield ModelA.findById(modelA._id);
-      yield modelA1.populate('_modelB _rootModel');
-      yield modelA1.populate('_modelB._rootModel');
+      const modelA1 = await ModelA.findById(modelA._id);
+      await modelA1.populate('_modelB _rootModel');
+      await modelA1.populate('_modelB._rootModel');
 
       assert.equal(modelA1._modelB._rootModel.name, 'my name');
     });
-  });
 
-  it('prevents already populated fields from becoming null gh-10068', function() {
-    return co(function*() {
+    it('prevents already populated fields from becoming null gh-10068', async function() {
+
       const Books = db.model('books', new Schema({ name: String, contributors: [{ author: Schema.Types.ObjectId }] }));
       const Authors = db.model('authors', new Schema({ name: String }));
 
       const anAuthor = new Authors({ name: 'Author1' });
-      yield anAuthor.save();
+      await anAuthor.save();
 
       const aBook1 = new Books({ name: 'Book1', contributors: [{ author: anAuthor.id }] });
-      yield aBook1.save();
+      await aBook1.save();
       const aBook2 = new Books({ name: 'Book2', contributors: [{ author: anAuthor.id }] });
-      yield aBook2.save();
+      await aBook2.save();
 
       const populateOptions = [{
         path: 'contributors.author',
         model: 'authors',
         select: '_id name'
       }];
-      const populatedBooks = (yield Books.find().populate(populateOptions)).map(aBook => {
+      const populatedBooks = (await Books.find().populate(populateOptions)).map(aBook => {
         aBook = aBook.toObject();
         if (!aBook._id.equals(aBook1.id)) {
           aBook.contributors[0].author = aBook.contributors[0].author._id;
@@ -10328,83 +10118,80 @@ describe('model: populate:', function() {
         return aBook;
       });
 
-      const populatedBooksAgain = yield Books.populate(populatedBooks, populateOptions);
+      const populatedBooksAgain = await Books.populate(populatedBooks, populateOptions);
 
       assert.equal(populatedBooksAgain[0].contributors[0].author.name, 'Author1');
     });
-  });
 
-  it('populates lean subdoc with `_id` property (gh-10069)', function() {
-    const Books = db.model('Book', new Schema({ name: String, author: Schema.Types.ObjectId }));
-    const Authors = db.model('Person', new Schema({ name: String }));
+    it('populates lean subdoc with `_id` property (gh-10069)', async function() {
+      const Books = db.model('Book', new Schema({ name: String, author: Schema.Types.ObjectId }));
+      const Authors = db.model('Person', new Schema({ name: String }));
 
-    return co(function*() {
+
       const anAuthor = new Authors({ name: 'Author1' });
-      yield anAuthor.save();
+      await anAuthor.save();
 
       const aBook1 = new Books({ name: 'Book1', author: anAuthor.id });
-      yield aBook1.save();
+      await aBook1.save();
       const aBook2 = new Books({ name: 'Book2', author: anAuthor.id });
-      yield aBook2.save();
+      await aBook2.save();
 
       const populateOptions = [{
         path: 'author',
         model: 'Person'
       }];
 
-      const books = (yield Books.find().lean()).map(aBook => {
+      const books = (await Books.find().lean()).map(aBook => {
         if (!aBook._id.equals(aBook1.id)) {
           aBook.author = { _id: aBook.author };
         }
         return aBook;
       });
 
-      const populatedBooks = yield Books.populate(books, populateOptions);
+      const populatedBooks = await Books.populate(books, populateOptions);
       assert.equal(populatedBooks.length, 2);
       assert.equal(populatedBooks[0].author.name, 'Author1');
       assert.equal(populatedBooks[1].author.name, 'Author1');
     });
-  });
 
-  it('handles virtual populate when foreignField is an array with duplicates (gh-10117)', function() {
-    const bookSchema = new Schema({ name: String, author: String });
-    bookSchema.virtual('authors', {
-      ref: 'Person',
-      localField: 'author',
-      foreignField: 'aliases',
-      justOne: false
-    });
-    const Book = db.model('Book', bookSchema);
-    const Author = db.model('Person', new Schema({ aliases: [String] }));
+    it('handles virtual populate when foreignField is an array with duplicates (gh-10117)', async function() {
+      const bookSchema = new Schema({ name: String, author: String });
+      bookSchema.virtual('authors', {
+        ref: 'Person',
+        localField: 'author',
+        foreignField: 'aliases',
+        justOne: false
+      });
+      const Book = db.model('Book', bookSchema);
+      const Author = db.model('Person', new Schema({ aliases: [String] }));
 
-    return co(function*() {
-      yield Author.create({ aliases: ['author1', 'author2', 'author1'] });
 
-      const book = yield Book.create({ name: 'Book1', author: 'author1' });
+      await Author.create({ aliases: ['author1', 'author2', 'author1'] });
 
-      const fromDb = yield Book.findById(book).populate('authors');
+      const book = await Book.create({ name: 'Book1', author: 'author1' });
+
+      const fromDb = await Book.findById(book).populate('authors');
       assert.equal(fromDb.authors.length, 1);
       assert.deepEqual(fromDb.toObject({ virtuals: true }).authors[0].aliases, ['author1', 'author2', 'author1']);
     });
-  });
 
-  it('handles virtual populate with `$elemMatch` in custom match when `foreignField` is an array (gh-10117)', function() {
-    const User = db.model('User', mongoose.Schema({
-      name: String,
-      access: [{ role: String, deletedAt: Date, organization: 'ObjectId' }]
-    }));
+    it('handles virtual populate with `$elemMatch` in custom match when `foreignField` is an array (gh-10117)', async function() {
+      const User = db.model('User', mongoose.Schema({
+        name: String,
+        access: [{ role: String, deletedAt: Date, organization: 'ObjectId' }]
+      }));
 
-    const organizationSchema = mongoose.Schema({ name: String });
-    organizationSchema.virtual('administrators', {
-      ref: 'User',
-      localField: '_id',
-      foreignField: 'access.organization'
-    });
-    const Organization = db.model('Organization', organizationSchema);
+      const organizationSchema = mongoose.Schema({ name: String });
+      organizationSchema.virtual('administrators', {
+        ref: 'User',
+        localField: '_id',
+        foreignField: 'access.organization'
+      });
+      const Organization = db.model('Organization', organizationSchema);
 
-    return co(function*() {
-      const org = yield Organization.create({ name: 'test org' });
-      yield User.create([
+
+      const org = await Organization.create({ name: 'test org' });
+      await User.create([
         { name: 'user1', access: [{ role: 'admin', organization: org._id }] },
         { name: 'user2', access: [{ role: 'admin', organization: null }] },
         {
@@ -10419,7 +10206,7 @@ describe('model: populate:', function() {
         }
       ]);
 
-      const res = yield Organization.findById(org).populate({
+      const res = await Organization.findById(org).populate({
         path: 'administrators',
         match: {
           access: { $elemMatch: { role: 'admin', deletedAt: { $exists: false } } }
@@ -10428,48 +10215,46 @@ describe('model: populate:', function() {
       assert.equal(res.administrators.length, 1);
       assert.equal(res.administrators[0].name, 'user1');
     });
-  });
 
-  it('populates immutable array paths (gh-10159)', function() {
-    const Cat = db.model('Cat', {
-      name: String,
-      friends: [{
-        immutable: true,
-        type: mongoose.ObjectId,
-        ref: 'Cat'
-      }]
-    });
+    it('populates immutable array paths (gh-10159)', async function() {
+      const Cat = db.model('Cat', {
+        name: String,
+        friends: [{
+          immutable: true,
+          type: mongoose.ObjectId,
+          ref: 'Cat'
+        }]
+      });
 
-    return co(function*() {
-      const friend = yield Cat.create({ name: 'Zildjian' });
-      const myCat = yield Cat.create({ name: 'Lord Fluffles', friends: [friend.id] });
 
-      yield myCat.populate('friends');
+      const friend = await Cat.create({ name: 'Zildjian' });
+      const myCat = await Cat.create({ name: 'Lord Fluffles', friends: [friend.id] });
+
+      await myCat.populate('friends');
 
       assert.equal(myCat.friends[0].name, 'Zildjian');
     });
-  });
 
-  it('populates paths under mixed schematypes where some documents have non-object properties (gh-10191)', function() {
-    const schema = mongoose.Schema({
-      name: String,
-      params: [{
-        key: String,
-        value: 'Mixed'
-      }]
-    });
-    const Test = db.model('Test', schema);
-    const User = db.model('User', mongoose.Schema({ name: String }));
+    it('populates paths under mixed schematypes where some documents have non-object properties (gh-10191)', async function() {
+      const schema = mongoose.Schema({
+        name: String,
+        params: [{
+          key: String,
+          value: 'Mixed'
+        }]
+      });
+      const Test = db.model('Test', schema);
+      const User = db.model('User', mongoose.Schema({ name: String }));
 
-    return co(function*() {
-      const user = yield User.create({ name: 'test' });
 
-      yield Test.create([
+      const user = await User.create({ name: 'test' });
+
+      await Test.create([
         { name: 'test1', params: [{ key: 'textContext', value: 'asd' }] },
         { name: 'test2', params: [{ key: 'logic', value: { optionLabels: [user._id] } }] }
       ]);
 
-      const res = yield Test.find().sort({ name: 1 }).populate({
+      const res = await Test.find().sort({ name: 1 }).populate({
         path: 'params.value.optionLabels',
         model: User
       });
@@ -10483,97 +10268,94 @@ describe('model: populate:', function() {
       assert.equal(res[1].params[0].value.optionLabels.length, 1);
       assert.equal(res[1].params[0].value.optionLabels[0].name, 'test');
     });
-  });
 
-  it('populates embedded discriminator with tied value (gh-10231)', function() {
-    const GuestSchema = new Schema({
-      dummy: String
-    });
+    it('populates embedded discriminator with tied value (gh-10231)', async function() {
+      const GuestSchema = new Schema({
+        dummy: String
+      });
 
-    const ActivitySchema = new Schema({
-      title: String,
-      kind: { required: true, type: String, enum: ['TALK'] } },
-    { discriminatorKey: 'kind' });
+      const ActivitySchema = new Schema({
+        title: String,
+        kind: { required: true, type: String, enum: ['TALK'] } },
+      { discriminatorKey: 'kind' });
 
-    const ActivityTalkSchema = new Schema({
-      speakers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Guest' }]
-    });
+      const ActivityTalkSchema = new Schema({
+        speakers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Guest' }]
+      });
 
-    ActivityTalkSchema.add(ActivitySchema);
+      ActivityTalkSchema.add(ActivitySchema);
 
-    ActivityTalkSchema.paths.kind.options.$skipDiscriminatorCheck = true;
+      ActivityTalkSchema.paths.kind.options.$skipDiscriminatorCheck = true;
 
-    const ProgrammeSchema = new Schema({
-      activities: [{ required: true, type: ActivitySchema }]
-    });
+      const ProgrammeSchema = new Schema({
+        activities: [{ required: true, type: ActivitySchema }]
+      });
 
-    ProgrammeSchema.path('activities').discriminator('ActivityTalk', ActivityTalkSchema, 'TALK');
+      ProgrammeSchema.path('activities').discriminator('ActivityTalk', ActivityTalkSchema, 'TALK');
 
-    const GuestModel = db.model('Guest', GuestSchema);
-    const ProgrammeModel = db.model('Test', ProgrammeSchema);
+      const GuestModel = db.model('Guest', GuestSchema);
+      const ProgrammeModel = db.model('Test', ProgrammeSchema);
 
-    return co(function*() {
-      const guest1 = yield GuestModel.create({ dummy: '1' });
-      const guest2 = yield GuestModel.create({ dummy: '2' });
 
-      const programme1 = yield ProgrammeModel.create({
+      const guest1 = await GuestModel.create({ dummy: '1' });
+      const guest2 = await GuestModel.create({ dummy: '2' });
+
+      const programme1 = await ProgrammeModel.create({
         activities: [
           { title: 'hello', kind: 'TALK', speakers: [guest1, guest2] }
         ]
       });
 
-      const event = yield ProgrammeModel.findOne({ _id: programme1._id }).orFail().exec();
-      yield event.populate({ path: 'activities.speakers' });
+      const event = await ProgrammeModel.findOne({ _id: programme1._id }).orFail().exec();
+      await event.populate({ path: 'activities.speakers' });
       assert.equal(event.activities.length, 1);
       assert.equal(event.activities[0].speakers.length, 2);
       assert.equal(event.activities[0].speakers[0].dummy, '1');
       assert.equal(event.activities[0].speakers[1].dummy, '2');
     });
-  });
 
-  it('supports populating an array of immutable elements (gh-10264)', function() {
-    const Cat = db.model('Cat', {
-      _id: String,
-      name: String,
-      friends: [{
-        immutable: true,
-        ref: 'Cat',
-        type: String
-      }]
-    });
+    it('supports populating an array of immutable elements (gh-10264)', async function() {
+      const Cat = db.model('Cat', {
+        _id: String,
+        name: String,
+        friends: [{
+          immutable: true,
+          ref: 'Cat',
+          type: String
+        }]
+      });
 
-    return co(function*() {
+
       const friend = new Cat({ _id: 'garfield', name: 'Garfield' });
-      yield friend.save();
+      await friend.save();
 
       const myCat = new Cat({ _id: 'arlene', name: 'Arlene', friends: [friend.id] });
-      yield myCat.save();
+      await myCat.save();
 
-      yield myCat.populate('friends');
+      await myCat.populate('friends');
       assert.equal(myCat.friends[0].name, 'Garfield');
     });
-  });
 
-  it('populates nested path in schema using `Model.populate()` static (gh-10335)', function() {
-    const Books = db.model('Book', new Schema({
-      name: String,
-      author: { _id: Schema.Types.ObjectId, name: String }
-    }));
-    const Authors = db.model('Author', new Schema({ name: String }));
+    it('populates nested path in schema using `Model.populate()` static (gh-10335)', async function() {
+      const Books = db.model('Book', new Schema({
+        name: String,
+        author: { _id: Schema.Types.ObjectId, name: String }
+      }));
+      const Authors = db.model('Author', new Schema({ name: String }));
 
-    return co(function*() {
+
       const anAuthor = new Authors({ name: 'Author1' });
-      yield anAuthor.save();
+      await anAuthor.save();
 
       const aBook1 = new Books({ name: 'Book1', author: { _id: anAuthor.id } });
-      yield aBook1.save();
+      await aBook1.save();
 
-      const books = (yield Books.find().lean()).map(aBook => {
+      const books = (await Books.find().lean()).map(aBook => {
         aBook.author = aBook.author._id;
         return aBook;
       });
 
-      const populatedBooks = yield Books.populate(books, [{
+      const populatedBooks = await Books.populate(books, [{
         path: 'author',
         model: 'Author',
         select: '_id name'
@@ -10582,40 +10364,39 @@ describe('model: populate:', function() {
       assert.equal(populatedBooks.length, 1);
       assert.equal(populatedBooks[0].author.name, 'Author1');
     });
-  });
 
-  it('calls subdocument ref functions with subdocument as context (gh-8469)', function() {
-    const ImageSchema = Schema({ imageName: String });
-    const Image = db.model('Image', ImageSchema);
+    it('calls subdocument ref functions with subdocument as context (gh-8469)', async function() {
+      const ImageSchema = Schema({ imageName: String });
+      const Image = db.model('Image', ImageSchema);
 
-    const TextSchema = Schema({ textName: String });
-    const Text = db.model('Text', TextSchema);
+      const TextSchema = Schema({ textName: String });
+      const Text = db.model('Text', TextSchema);
 
-    const opts = { _id: false };
-    let contexts = [];
-    const ItemSchema = Schema({
-      data: {
-        type: 'ObjectId',
-        ref: function() {
-          contexts.push(this);
-          return this.objectType;
-        }
-      },
-      objectType: String
-    }, opts);
+      const opts = { _id: false };
+      let contexts = [];
+      const ItemSchema = Schema({
+        data: {
+          type: 'ObjectId',
+          ref: function() {
+            contexts.push(this);
+            return this.objectType;
+          }
+        },
+        objectType: String
+      }, opts);
 
-    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
-    const Example = db.model('Test', ExampleSchema);
+      const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+      const Example = db.model('Test', ExampleSchema);
 
-    return co(function*() {
-      const text = yield Text.create({ textName: 'test' });
-      const image = yield Image.create({ imageName: 'test' });
-      yield Example.create({
+
+      const text = await Text.create({ textName: 'test' });
+      const image = await Image.create({ imageName: 'test' });
+      await Example.create({
         list: [{ data: text._id, objectType: 'Text' }, { data: image._id, objectType: 'Image' }]
       });
 
       assert.equal(contexts.length, 0);
-      let res = yield Example.findOne().populate('list.data');
+      let res = await Example.findOne().populate('list.data');
 
       assert.equal(contexts.length, 2);
       assert.equal(contexts[0].objectType, 'Text');
@@ -10625,8 +10406,8 @@ describe('model: populate:', function() {
       assert.equal(res.list[1].data.imageName, 'test');
 
       contexts = [];
-      res = yield Example.findOne();
-      yield res.populate('list.data');
+      res = await Example.findOne();
+      await res.populate('list.data');
 
       assert.equal(contexts.length, 2);
       assert.equal(contexts[0].objectType, 'Text');

@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
@@ -204,25 +203,23 @@ describe('model query casting', function() {
     });
   });
 
-  it('works with $type matching', function() {
+  it('works with $type matching', async function() {
     const B = BlogPostB;
 
-    return co(function*() {
-      yield B.deleteMany({});
+    await B.deleteMany({});
 
-      yield B.collection.insertMany([{ title: 'test' }, { title: 1 }]);
+    await B.collection.insertMany([{ title: 'test' }, { title: 1 }]);
 
-      const err = yield B.find({ title: { $type: { x: 1 } } }).then(() => null, err => err);
-      assert.equal(err.message,
-        '$type parameter must be number, string, or array of numbers and strings');
+    const err = await B.find({ title: { $type: { x: 1 } } }).then(() => null, err => err);
+    assert.equal(err.message,
+      '$type parameter must be number, string, or array of numbers and strings');
 
-      let posts = yield B.find({ title: { $type: 2 } });
-      assert.equal(posts.length, 1);
-      assert.equal(posts[0].title, 'test');
+    let posts = await B.find({ title: { $type: 2 } });
+    assert.equal(posts.length, 1);
+    assert.equal(posts[0].title, 'test');
 
-      posts = yield B.find({ title: { $type: ['string', 'number'] } });
-      assert.equal(posts.length, 2);
-    });
+    posts = await B.find({ title: { $type: ['string', 'number'] } });
+    assert.equal(posts.length, 2);
   });
 
   it('works when finding Boolean with $in (gh-998)', function(done) {
@@ -909,20 +906,18 @@ describe('model query casting', function() {
       }
     });
 
-    it('casts $nor within $elemMatch (gh-9479)', function() {
+    it('casts $nor within $elemMatch (gh-9479)', async function() {
       const Test = db.model('Test', Schema({
         arr: [{ x: Number, y: Number }]
       }));
 
-      return co(function*() {
-        const _doc = yield Test.create({ arr: [{ x: 1 }, { y: 3 }, { x: 2 }] });
+      const _doc = await Test.create({ arr: [{ x: 1 }, { y: 3 }, { x: 2 }] });
 
-        const doc = yield Test.findOne({
-          arr: { $elemMatch: { $nor: [{ x: 1 }, { y: 3 }] } }
-        });
-
-        assert.equal(_doc._id.toString(), doc._id.toString());
+      const doc = await Test.findOne({
+        arr: { $elemMatch: { $nor: [{ x: 1 }, { y: 3 }] } }
       });
+
+      assert.equal(_doc._id.toString(), doc._id.toString());
     });
   });
 

@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -401,7 +400,7 @@ describe('model middleware', function() {
     });
   });
 
-  it('static hooks (gh-5982)', function() {
+  it('static hooks (gh-5982)', async function() {
     const schema = new Schema({
       name: String
     });
@@ -424,18 +423,16 @@ describe('model middleware', function() {
 
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      yield Model.create({ name: 'foo' });
+    await Model.create({ name: 'foo' });
 
-      const docs = yield Model.findByName('foo');
-      assert.equal(docs.length, 1);
-      assert.equal(docs[0].name, 'foo');
-      assert.equal(preCalled, 1);
-      assert.equal(postCalled, 1);
-    });
+    const docs = await Model.findByName('foo');
+    assert.equal(docs.length, 1);
+    assert.equal(docs[0].name, 'foo');
+    assert.equal(preCalled, 1);
+    assert.equal(postCalled, 1);
   });
 
-  it('deleteOne hooks (gh-7538)', function() {
+  it('deleteOne hooks (gh-7538)', async function() {
     const schema = new Schema({
       name: String
     });
@@ -457,25 +454,23 @@ describe('model middleware', function() {
 
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      yield Model.create({ name: 'foo' });
+    await Model.create({ name: 'foo' });
 
-      const doc = yield Model.findOne();
+    const doc = await Model.findOne();
 
-      assert.equal(preCalled, 0);
-      assert.equal(postCalled, 0);
+    assert.equal(preCalled, 0);
+    assert.equal(postCalled, 0);
 
-      yield doc.deleteOne();
+    await doc.deleteOne();
 
-      assert.equal(queryPreCalled, 0);
-      assert.equal(preCalled, 1);
-      assert.equal(postCalled, 1);
+    assert.equal(queryPreCalled, 0);
+    assert.equal(preCalled, 1);
+    assert.equal(postCalled, 1);
 
-      yield Model.deleteOne();
+    await Model.deleteOne();
 
-      assert.equal(queryPreCalled, 1);
-      assert.equal(preCalled, 1);
-      assert.equal(postCalled, 1);
-    });
+    assert.equal(queryPreCalled, 1);
+    assert.equal(preCalled, 1);
+    assert.equal(postCalled, 1);
   });
 });

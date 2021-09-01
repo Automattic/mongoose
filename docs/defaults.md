@@ -23,20 +23,17 @@ execute that function and use the return value as the default.
 
 ### The `setDefaultsOnInsert` Option
 
-By default, mongoose only applies defaults when you create a new document.
-It will **not** set defaults if you use `update()` and
-`findOneAndUpdate()`. However, mongoose 4.x lets you opt-in to this
-behavior using the `setDefaultsOnInsert` option.
-
-#### Important
-
-The `setDefaultsOnInsert` option relies on the
-[MongoDB `$setOnInsert` operator](https://docs.mongodb.org/manual/reference/operator/update/setOnInsert/).
-The `$setOnInsert` operator was introduced in MongoDB 2.4. If you're
-using MongoDB server < 2.4.0, do **not** use `setDefaultsOnInsert`.
+Mongoose also sets defaults on `update()` and `findOneAndUpdate()` when the `upsert` option is set by adding your schema's defaults to a [MongoDB `$setOnInsert` operator](https://docs.mongodb.org/manual/reference/operator/update/setOnInsert/).
+You can disable this behavior by setting the `setDefaultsOnInsert` option to `false`.
 
 ```javascript
 [require:The `setDefaultsOnInsert` option]
+```
+
+You can also set `setDefaultsOnInsert` to `false` globally:
+
+```javascript
+mongoose.set('setDefaultsOnInsert', false);`
 ```
 
 ### Default functions and `this`

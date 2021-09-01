@@ -17,7 +17,6 @@ const Mixed = SchemaTypes.Mixed;
 const DocumentObjectId = mongoose.Types.ObjectId;
 const ReadPref = mongoose.mongo.ReadPreference;
 const vm = require('vm');
-const co = require('co');
 const applyPlugins = require('../lib/helpers/schema/applyPlugins');
 
 /**
@@ -2387,28 +2386,26 @@ describe('schema', function() {
   });
 
   describe('gh-8849', function() {
-    it('treats `select: undefined` as not specifying `select` option', function() {
+    it('treats `select: undefined` as not specifying `select` option', async function() {
       const userSchema = new Schema({ name: { type: String, select: undefined } });
       const User = db.model('User', userSchema);
 
-      return co(function*() {
-        yield User.create({ name: 'Hafez' });
-        const user = yield User.findOne();
 
-        assert.equal(user.name, 'Hafez');
-      });
+      await User.create({ name: 'Hafez' });
+      const user = await User.findOne();
+
+      assert.equal(user.name, 'Hafez');
     });
 
-    it('treats `select: null` as not specifying `select` option', function() {
+    it('treats `select: null` as not specifying `select` option', async function() {
       const userSchema = new Schema({ name: { type: String, select: null } });
       const User = db.model('User', userSchema);
 
-      return co(function*() {
-        yield User.create({ name: 'Hafez' });
-        const user = yield User.findOne();
 
-        assert.equal(user.name, 'Hafez');
-      });
+      await User.create({ name: 'Hafez' });
+      const user = await User.findOne();
+
+      assert.equal(user.name, 'Hafez');
     });
   });
 
@@ -2651,5 +2648,18 @@ describe('schema', function() {
 
     assert.equal(TestSchema.path('testprop.$*').instance, 'Number');
     assert.equal(TestSchema.path('testprop.$*').options.ref, 'OtherModel');
+  });
+
+  it('handles maps of maps (gh-10644)', function() {
+    const schema = new mongoose.Schema({
+      myMap: {
+        type: Map,
+        of: {
+          type: Map,
+          of: String
+        }
+      }
+    });
+    assert.equal(schema.path('myMap').$__schemaType.$__schemaType.instance, 'String');
   });
 });

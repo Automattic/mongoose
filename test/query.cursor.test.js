@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -247,7 +246,7 @@ describe('QueryCursor', function() {
       });
     });
 
-    it('with pre-find hooks (gh-5096)', function() {
+    it('with pre-find hooks (gh-5096)', async function() {
       const schema = new Schema({ name: String });
       let called = 0;
       schema.pre('find', function(next) {
@@ -258,14 +257,12 @@ describe('QueryCursor', function() {
       db.deleteModel(/Test/);
       const Model = db.model('Test', schema);
 
-      return co(function*() {
-        yield Model.deleteMany({});
-        yield Model.create({ name: 'Test' });
+      await Model.deleteMany({});
+      await Model.create({ name: 'Test' });
 
-        const doc = yield Model.find().cursor().next();
-        assert.equal(called, 1);
-        assert.equal(doc.name, 'Test');
-      });
+      const doc = await Model.find().cursor().next();
+      assert.equal(called, 1);
+      assert.equal(doc.name, 'Test');
     });
   });
 
@@ -437,13 +434,11 @@ describe('QueryCursor', function() {
       });
     });
 
-    it('lean = false (gh-7197)', function() {
+    it('lean = false (gh-7197)', async function() {
       const cursor = Model.find().sort({ name: 1 }).lean(false).cursor();
 
-      return co(function*() {
-        const doc = yield cursor.next();
-        assert.ok(doc instanceof mongoose.Document);
-      });
+      const doc = await cursor.next();
+      assert.ok(doc instanceof mongoose.Document);
     });
   });
 
@@ -473,23 +468,21 @@ describe('QueryCursor', function() {
     });
   });
 
-  it('handles non-boolean lean option (gh-7137)', function() {
+  it('handles non-boolean lean option (gh-7137)', async function() {
     const schema = new Schema({ name: String });
     db.deleteModel(/Test/);
     const Model = db.model('Test', schema);
 
-    return co(function*() {
-      yield Model.deleteMany({});
-      yield Model.create({ name: 'test' });
+    await Model.deleteMany({});
+    await Model.create({ name: 'test' });
 
-      let doc;
-      yield Model.find().lean({ virtuals: true }).cursor().eachAsync(_doc => {
-        assert.ok(!doc);
-        doc = _doc;
-      });
-
-      assert.ok(!doc.$__);
+    let doc;
+    await Model.find().lean({ virtuals: true }).cursor().eachAsync(_doc => {
+      assert.ok(!doc);
+      doc = _doc;
     });
+
+    assert.ok(!doc.$__);
   });
 
   it('data before close (gh-4998)', function(done) {
@@ -531,45 +524,39 @@ describe('QueryCursor', function() {
     assert.equal(cursor.options.readPreference.mode, read);
   });
 
-  it('eachAsync() with parallel > numDocs (gh-8422)', function() {
+  it('eachAsync() with parallel > numDocs (gh-8422)', async function() {
     const schema = new mongoose.Schema({ name: String });
     const Movie = db.model('Movie', schema);
 
-    return co(function*() {
-      yield Movie.deleteMany({});
-      yield Movie.create([
-        { name: 'Kickboxer' },
-        { name: 'Ip Man' },
-        { name: 'Enter the Dragon' }
-      ]);
+    await Movie.deleteMany({});
+    await Movie.create([
+      { name: 'Kickboxer' },
+      { name: 'Ip Man' },
+      { name: 'Enter the Dragon' }
+    ]);
 
-      let numDone = 0;
+    let numDone = 0;
 
-      const test = co.wrap(function*() {
-        yield new Promise((resolve) => setTimeout(resolve, 100));
-        ++numDone;
-      });
-
-      yield Movie.find().cursor().eachAsync(test, { parallel: 4 });
-      assert.equal(numDone, 3);
-    });
+    await Movie.find().cursor().eachAsync(async function() {
+      await delay(100);
+      ++numDone;
+    }, { parallel: 4 });
+    assert.equal(numDone, 3);
   });
 
-  it('eachAsync() with sort, parallel, and sync function (gh-8557)', function() {
+  it('eachAsync() with sort, parallel, and sync function (gh-8557)', async function() {
     const User = db.model('User', Schema({ order: Number }));
 
-    return co(function*() {
-      yield User.create([{ order: 1 }, { order: 2 }, { order: 3 }]);
+    await User.create([{ order: 1 }, { order: 2 }, { order: 3 }]);
 
-      const cursor = User.aggregate([{ $sort: { order: 1 } }]).
-        cursor();
+    const cursor = User.aggregate([{ $sort: { order: 1 } }]).
+      cursor();
 
-      const docs = [];
+    const docs = [];
 
-      yield cursor.eachAsync((doc) => docs.push(doc), { parallel: 3 });
+    await cursor.eachAsync((doc) => docs.push(doc), { parallel: 3 });
 
-      assert.deepEqual(docs.map(d => d.order), [1, 2, 3]);
-    });
+    assert.deepEqual(docs.map(d => d.order), [1, 2, 3]);
   });
 
   it('closing query cursor emits `close` event only once (gh-8835)', function(done) {
@@ -602,92 +589,89 @@ describe('QueryCursor', function() {
     }, 20);
   });
 
-  it('passes document index as the second argument for query cursor (gh-8972)', function() {
-    return co(function *() {
-      const User = db.model('User', Schema({ order: Number }));
+  it('passes document index as the second argument for query cursor (gh-8972)', async function() {
+    const User = db.model('User', Schema({ order: Number }));
 
-      yield User.create([{ order: 1 }, { order: 2 }, { order: 3 }]);
+    await User.create([{ order: 1 }, { order: 2 }, { order: 3 }]);
 
-      const docsWithIndexes = [];
+    const docsWithIndexes = [];
 
-      yield User.find().sort('order').cursor().eachAsync((doc, i) => {
-        docsWithIndexes.push({ order: doc.order, i: i });
-      });
-
-      const expected = [
-        { order: 1, i: 0 },
-        { order: 2, i: 1 },
-        { order: 3, i: 2 }
-      ];
-
-      assert.deepEqual(docsWithIndexes, expected);
+    await User.find().sort('order').cursor().eachAsync((doc, i) => {
+      docsWithIndexes.push({ order: doc.order, i: i });
     });
+
+    const expected = [
+      { order: 1, i: 0 },
+      { order: 2, i: 1 },
+      { order: 3, i: 2 }
+    ];
+
+    assert.deepEqual(docsWithIndexes, expected);
   });
 
-  it('passes document index as the second argument for aggregation cursor (gh-8972)', function() {
-    return co(function *() {
-      const User = db.model('User', Schema({ order: Number }));
+  it('passes document index as the second argument for aggregation cursor (gh-8972)', async function() {
+    const User = db.model('User', Schema({ order: Number }));
 
-      yield User.create([{ order: 1 }, { order: 2 }, { order: 3 }]);
+    await User.create([{ order: 1 }, { order: 2 }, { order: 3 }]);
 
 
-      const docsWithIndexes = [];
+    const docsWithIndexes = [];
 
-      yield User.aggregate([{ $sort: { order: 1 } }]).cursor().eachAsync((doc, i) => {
-        docsWithIndexes.push({ order: doc.order, i: i });
-      });
-
-      const expected = [
-        { order: 1, i: 0 },
-        { order: 2, i: 1 },
-        { order: 3, i: 2 }
-      ];
-
-      assert.deepEqual(docsWithIndexes, expected);
+    await User.aggregate([{ $sort: { order: 1 } }]).cursor().eachAsync((doc, i) => {
+      docsWithIndexes.push({ order: doc.order, i: i });
     });
+
+    const expected = [
+      { order: 1, i: 0 },
+      { order: 2, i: 1 },
+      { order: 3, i: 2 }
+    ];
+
+    assert.deepEqual(docsWithIndexes, expected);
   });
 
-  it('post hooks (gh-9435)', function() {
+  it('post hooks (gh-9435)', async function() {
     const schema = new mongoose.Schema({ name: String });
     schema.post('find', function(docs) {
       docs.forEach(doc => { doc.name = doc.name.toUpperCase(); });
     });
     const Movie = db.model('Movie', schema);
 
-    return co(function*() {
-      yield Movie.deleteMany({});
-      yield Movie.create([
-        { name: 'Kickboxer' },
-        { name: 'Ip Man' },
-        { name: 'Enter the Dragon' }
-      ]);
+    await Movie.deleteMany({});
+    await Movie.create([
+      { name: 'Kickboxer' },
+      { name: 'Ip Man' },
+      { name: 'Enter the Dragon' }
+    ]);
 
-      const arr = [];
-      yield Movie.find().sort({ name: -1 }).cursor().
-        eachAsync(doc => arr.push(doc.name));
-      assert.deepEqual(arr, ['KICKBOXER', 'IP MAN', 'ENTER THE DRAGON']);
-    });
+    const arr = [];
+    await Movie.find().sort({ name: -1 }).cursor().
+      eachAsync(doc => arr.push(doc.name));
+    assert.deepEqual(arr, ['KICKBOXER', 'IP MAN', 'ENTER THE DRAGON']);
   });
 
-  it('reports CastError with noCursorTimeout set (gh-10150)', function() {
+  it('reports CastError with noCursorTimeout set (gh-10150)', async function() {
     const schema = new mongoose.Schema({ name: String });
     const Movie = db.model('Movie', schema);
 
-    return co(function*() {
-      yield Movie.deleteMany({});
-      yield Movie.create([
-        { name: 'Kickboxer' },
-        { name: 'Ip Man' },
-        { name: 'Enter the Dragon' }
-      ]);
+    await Movie.deleteMany({});
+    await Movie.create([
+      { name: 'Kickboxer' },
+      { name: 'Ip Man' },
+      { name: 'Enter the Dragon' }
+    ]);
 
-      const arr = [];
-      const err = yield Movie.find({ name: { lt: 'foo' } }).cursor().
-        addCursorFlag('noCursorTimeout', true).
-        eachAsync(doc => arr.push(doc.name)).
-        then(() => null, err => err);
-      assert.ok(err);
-      assert.equal(err.name, 'CastError');
-    });
+    const arr = [];
+    const err = await Movie.find({ name: { lt: 'foo' } }).cursor().
+      addCursorFlag('noCursorTimeout', true).
+      eachAsync(doc => arr.push(doc.name)).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'CastError');
   });
 });
+
+
+async function delay(ms) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}

@@ -3,7 +3,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 const random = require('../lib/utils').random;
 const stream = require('stream');
 
@@ -73,7 +72,7 @@ describe('mongoose module:', function() {
     assert.equal(mongoose.model('User').collection.name, 'User');
   });
 
-  it('debug to stream (gh-7018)', function() {
+  it('debug to stream (gh-7018)', async function() {
     const mongoose = new Mongoose();
 
     const written = [];
@@ -87,12 +86,11 @@ describe('mongoose module:', function() {
 
     const User = mongoose.model('User', new Schema({ name: String }));
 
-    return co(function*() {
-      yield mongoose.connect(uri);
-      yield User.findOne();
-      assert.equal(written.length, 1);
-      assert.ok(written[0].startsWith('users.findOne('));
-    });
+
+    await mongoose.connect(uri);
+    await User.findOne();
+    assert.equal(written.length, 1);
+    assert.ok(written[0].startsWith('users.findOne('));
   });
 
   it('{g,s}etting options', function() {
@@ -416,7 +414,7 @@ describe('mongoose module:', function() {
     assert.ok(doc.testNum instanceof mongoose.Types.Decimal128);
   });
 
-  it('stubbing now() for timestamps (gh-6728)', function() {
+  it('stubbing now() for timestamps (gh-6728)', async function() {
     const mongoose = new Mongoose();
 
     const date = new Date('2011-06-01');
@@ -427,16 +425,15 @@ describe('mongoose module:', function() {
 
     const M = mongoose.model('gh6728', schema);
 
-    return co(function*() {
-      yield mongoose.connect(uri);
 
-      const doc = new M({ name: 'foo' });
+    await mongoose.connect(uri);
 
-      yield doc.save();
+    const doc = new M({ name: 'foo' });
 
-      assert.equal(doc.createdAt.valueOf(), date.valueOf());
-      assert.equal(doc.updatedAt.valueOf(), date.valueOf());
-    });
+    await doc.save();
+
+    assert.equal(doc.createdAt.valueOf(), date.valueOf());
+    assert.equal(doc.updatedAt.valueOf(), date.valueOf());
   });
 
   it('isolates custom types between mongoose instances (gh-6933) (gh-7158)', function() {
@@ -740,56 +737,53 @@ describe('mongoose module:', function() {
       });
     });
 
-    it('can set `setDefaultsOnInsert` as a global option (gh-9032)', function() {
-      return co(function* () {
-        const m = new mongoose.Mongoose();
-        m.set('setDefaultsOnInsert', true);
-        const db = yield m.connect('mongodb://localhost:27017/mongoose_test_9032');
+    it('can set `setDefaultsOnInsert` as a global option (gh-9032)', async function() {
+      const m = new mongoose.Mongoose();
+      m.set('setDefaultsOnInsert', true);
+      const db = await m.connect('mongodb://localhost:27017/mongoose_test_9032');
 
-        const schema = new m.Schema({
-          title: String,
-          genre: { type: String, default: 'Action' }
-        }, { collection: 'movies_1' });
+      const schema = new m.Schema({
+        title: String,
+        genre: { type: String, default: 'Action' }
+      }, { collection: 'movies_1' });
 
-        const Movie = db.model('Movie', schema);
-        yield Movie.deleteMany({});
+      const Movie = db.model('Movie', schema);
+      await Movie.deleteMany({});
 
-        yield Movie.updateOne(
-          {},
-          { title: 'Cloud Atlas' },
-          { upsert: true }
-        );
+      await Movie.updateOne(
+        {},
+        { title: 'Cloud Atlas' },
+        { upsert: true }
+      );
 
-        // lean is necessary to avoid defaults by casting
-        const movie = yield Movie.findOne({ title: 'Cloud Atlas' }).lean();
-        assert.equal(movie.genre, 'Action');
-      });
+      // lean is necessary to avoid defaults by casting
+      const movie = await Movie.findOne({ title: 'Cloud Atlas' }).lean();
+      assert.equal(movie.genre, 'Action');
     });
 
-    it('setting `setDefaultOnInsert` on operation has priority over base option (gh-9032)', function() {
-      return co(function* () {
-        const m = new mongoose.Mongoose();
-        m.set('setDefaultsOnInsert', true);
-        const db = yield m.connect('mongodb://localhost:27017/mongoose_test_9032');
+    it('setting `setDefaultOnInsert` on operation has priority over base option (gh-9032)', async function() {
+      const m = new mongoose.Mongoose();
+      m.set('setDefaultsOnInsert', true);
 
-        const schema = new m.Schema({
-          title: String,
-          genre: { type: String, default: 'Action' }
-        }, { collection: 'movies_2' });
+      const db = await m.connect('mongodb://localhost:27017/mongoose_test_9032');
 
-        const Movie = db.model('Movie', schema);
+      const schema = new m.Schema({
+        title: String,
+        genre: { type: String, default: 'Action' }
+      }, { collection: 'movies_2' });
+
+      const Movie = db.model('Movie', schema);
 
 
-        yield Movie.updateOne(
-          {},
-          { title: 'The Man From Earth' },
-          { upsert: true, setDefaultsOnInsert: false }
-        );
+      await Movie.updateOne(
+        {},
+        { title: 'The Man From Earth' },
+        { upsert: true, setDefaultsOnInsert: false }
+      );
 
-        // lean is necessary to avoid defaults by casting
-        const movie = yield Movie.findOne({ title: 'The Man From Earth' }).lean();
-        assert.ok(!movie.genre);
-      });
+      // lean is necessary to avoid defaults by casting
+      const movie = await Movie.findOne({ title: 'The Man From Earth' }).lean();
+      assert.ok(!movie.genre);
     });
     it('should prevent non-hexadecimal strings (gh-9996)', function() {
       const badIdString = 'z'.repeat(24);

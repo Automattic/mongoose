@@ -50,10 +50,7 @@ const ProjectModel = model<Project, Model<Project, ProjectQueryHelpers>>('Projec
 run().catch(err => console.log(err));
 
 async function run(): Promise<void> {
-  await connect('mongodb://localhost:27017/test', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  });
+  await connect('mongodb://localhost:27017/test');
   
   // Equivalent to `ProjectModel.find({ stars: { $gt: 1000 }, name: 'mongoose' })`
   await ProjectModel.find().where('stars').gt(1000).byName('mongoose');

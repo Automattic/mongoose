@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 const mongodb = require('mongodb');
 const mongoose = require('./common').mongoose;
 
@@ -1196,27 +1195,25 @@ describe('types array', function() {
       return Promise.resolve();
     });
 
-    it('works with $addToSet and $push (gh-7479)', function() {
-      return co(function*() {
-        const schema = new Schema({
-          arr: [mongoose.Schema.Types.ObjectId]
-        });
-        const Model = db.model('Test', schema);
-        yield Model.create({ arr: [] });
-
-        const oid = new mongoose.Types.ObjectId();
-        yield Model.updateMany({}, {
-          $addToSet: { arr: oid }
-        });
-        let raw = yield Model.collection.findOne();
-        assert.equal(raw.arr[0].toHexString(), oid.toHexString());
-
-        yield Model.updateMany({}, {
-          $push: { arr: oid }
-        });
-        raw = yield Model.collection.findOne();
-        assert.equal(raw.arr[1].toHexString(), oid.toHexString());
+    it('works with $addToSet and $push (gh-7479)', async function() {
+      const schema = new Schema({
+        arr: [mongoose.Schema.Types.ObjectId]
       });
+      const Model = db.model('Test', schema);
+      await Model.create({ arr: [] });
+
+      const oid = new mongoose.Types.ObjectId();
+      await Model.updateMany({}, {
+        $addToSet: { arr: oid }
+      });
+      let raw = await Model.collection.findOne();
+      assert.equal(raw.arr[0].toHexString(), oid.toHexString());
+
+      await Model.updateMany({}, {
+        $push: { arr: oid }
+      });
+      raw = await Model.collection.findOne();
+      assert.equal(raw.arr[1].toHexString(), oid.toHexString());
     });
   });
 

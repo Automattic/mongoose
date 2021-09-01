@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -446,7 +445,7 @@ describe('model field selection', function() {
     });
   });
 
-  it('sets defaults correctly in child docs with projection (gh-7159)', function() {
+  it('sets defaults correctly in child docs with projection (gh-7159)', async function() {
     const CalendarSchema = new Schema({
       dateFormat: {
         type: String,
@@ -476,85 +475,81 @@ describe('model field selection', function() {
     db.deleteModel(/BlogPost/);
     const BlogPost = db.model('BlogPost', BlogPostSchema);
 
-    return co(function*() {
-      yield BlogPost.create({
-        author: 'me',
-        settings: {
-          calendar: {
-            dateFormat: '1234'
-          }
+
+    await BlogPost.create({
+      author: 'me',
+      settings: {
+        calendar: {
+          dateFormat: '1234'
         }
-      });
-
-      yield BlogPost.updateOne({}, { $unset: { 'settings.calendar.locale': 1 } });
-
-      let doc = yield BlogPost.findOne();
-      assert.strictEqual(doc.settings.calendar.locale, 'en-gb');
-      assert.strictEqual(doc.settings.calendar.dateFormat, '1234');
-
-      doc = yield BlogPost.findOne().select('settings author');
-      assert.strictEqual(doc.settings.calendar.locale, 'en-gb');
-      assert.strictEqual(doc.settings.calendar.dateFormat, '1234');
+      }
     });
+
+    await BlogPost.updateOne({}, { $unset: { 'settings.calendar.locale': 1 } });
+
+    let doc = await BlogPost.findOne();
+    assert.strictEqual(doc.settings.calendar.locale, 'en-gb');
+    assert.strictEqual(doc.settings.calendar.dateFormat, '1234');
+
+    doc = await BlogPost.findOne().select('settings author');
+    assert.strictEqual(doc.settings.calendar.locale, 'en-gb');
+    assert.strictEqual(doc.settings.calendar.dateFormat, '1234');
   });
 
-  it('when `select: true` in schema, works with $elemMatch in projection', function() {
-    return co(function*() {
+  it('when `select: true` in schema, works with $elemMatch in projection', async function() {
 
-      const productSchema = new Schema({
-        attributes: {
-          select: true,
-          type: [{ name: String, group: String }]
-        }
-      });
 
-      const Product = db.model('Product', productSchema);
-
-      const attributes = [
-        { name: 'a', group: 'alpha' },
-        { name: 'b', group: 'beta' }
-      ];
-
-      yield Product.create({ name: 'test', attributes });
-
-      const product = yield Product.findOne()
-        .select({ attributes: { $elemMatch: { group: 'beta' } } });
-
-      assert.equal(product.attributes[0].name, 'b');
-      assert.equal(product.attributes[0].group, 'beta');
-      assert.equal(product.attributes.length, 1);
+    const productSchema = new Schema({
+      attributes: {
+        select: true,
+        type: [{ name: String, group: String }]
+      }
     });
+
+    const Product = db.model('Product', productSchema);
+
+    const attributes = [
+      { name: 'a', group: 'alpha' },
+      { name: 'b', group: 'beta' }
+    ];
+
+    await Product.create({ name: 'test', attributes });
+
+    const product = await Product.findOne()
+      .select({ attributes: { $elemMatch: { group: 'beta' } } });
+
+    assert.equal(product.attributes[0].name, 'b');
+    assert.equal(product.attributes[0].group, 'beta');
+    assert.equal(product.attributes.length, 1);
   });
 
-  it('selection specified in query overwrites option in schema', function() {
-    return co(function*() {
-      const productSchema = new Schema({ name: { type: String, select: false } });
+  it('selection specified in query overwrites option in schema', async function() {
 
-      const Product = db.model('Product', productSchema);
+    const productSchema = new Schema({ name: { type: String, select: false } });
+
+    const Product = db.model('Product', productSchema);
 
 
-      yield Product.create({ name: 'Computer' });
+    await Product.create({ name: 'Computer' });
 
-      const product = yield Product.findOne().select('name');
+    const product = await Product.findOne().select('name');
 
-      assert.equal(product.name, 'Computer');
-    });
+    assert.equal(product.name, 'Computer');
   });
 
-  it('selecting with `false` instead of `0` doesn\'t overwrite schema `select: false` (gh-8923)', function() {
-    return co(function*() {
-      const userSchema = new Schema({
-        name: { type: String, select: false },
-        age: { type: Number }
-      });
+  it('selecting with `false` instead of `0` doesn\'t overwrite schema `select: false` (gh-8923)', async function() {
 
-      const User = db.model('User', userSchema);
-
-      yield User.create({ name: 'Hafez', age: 25 });
-
-      const user = yield User.findOne().select({ age: false });
-
-      assert.ok(!user.name);
+    const userSchema = new Schema({
+      name: { type: String, select: false },
+      age: { type: Number }
     });
+
+    const User = db.model('User', userSchema);
+
+    await User.create({ name: 'Hafez', age: 25 });
+
+    const user = await User.findOne().select({ age: false });
+
+    assert.ok(!user.name);
   });
 });

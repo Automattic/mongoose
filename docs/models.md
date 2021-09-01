@@ -63,7 +63,7 @@ uses is open. Every model has an associated connection. When you use
 `mongoose.model()`, your model will use the default mongoose connection.
 
 ```javascript
-mongoose.connect('mongodb://localhost/gettingstarted', {useNewUrlParser: true});
+mongoose.connect('mongodb://localhost/gettingstarted');
 ```
 
 If you create a custom connection, use that connection's `model()` function

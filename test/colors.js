@@ -97,8 +97,6 @@ describe('debug: colors', function() {
             colors: false
           });
 
-          // console.log(colorfull, colorless);
-
           assert.notEqual(colorfull, colorless);
 
           done();
@@ -125,8 +123,6 @@ describe('debug: colors', function() {
       depth: null,
       colors: false
     });
-
-    // console.log(colorfull, colorless);
 
     assert.notEqual(colorfull, colorless);
   });

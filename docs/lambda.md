@@ -23,12 +23,6 @@ exports.handler = async function(event, context) {
   // potentially expensive process of connecting to MongoDB every time.
   if (conn == null) {
     conn = mongoose.createConnection(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      // Buffering means mongoose will queue up operations if it gets
-      // disconnected from MongoDB and send them when it reconnects.
-      // With serverless, better to fail fast if not connected.
-      bufferCommands: false, // Disable mongoose buffering
       // and tell the MongoDB driver to not wait more than 5 seconds
       // before erroring out if it isn't connected
       serverSelectionTimeoutMS: 5000
@@ -66,9 +60,6 @@ const uri = 'YOUR CONNECTION STRING HERE';
 exports.connect = async function() {
   if (conn == null) {
     conn = mongoose.createConnection(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      bufferCommands: false, // Disable mongoose buffering
       serverSelectionTimeoutMS: 5000
     });
     
@@ -97,9 +88,6 @@ const uri = 'YOUR CONNECTION STRING HERE';
 exports.connect = async function() {
   if (conn == null) {
     conn = mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      bufferCommands: false, // Disable mongoose buffering
       serverSelectionTimeoutMS: 5000
     }).then(() => mongoose);
     

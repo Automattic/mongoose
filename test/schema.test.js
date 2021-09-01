@@ -2652,4 +2652,17 @@ describe('schema', function() {
     assert.equal(TestSchema.path('testprop.$*').instance, 'Number');
     assert.equal(TestSchema.path('testprop.$*').options.ref, 'OtherModel');
   });
+
+  it('handles maps of maps (gh-10644)', function() {
+    const schema = new mongoose.Schema({
+      myMap: {
+        type: Map,
+        of: {
+          type: Map,
+          of: String
+        }
+      }
+    });
+    assert.equal(schema.path('myMap').$__schemaType.$__schemaType.instance, 'String');
+  });
 });

@@ -89,7 +89,7 @@ describe('defaults docs', function() {
    * inserted, not if the upsert updated an existing document.
    *
    */
-  it('The `setDefaultsOnInsert` option', function() {
+  it('The `setDefaultsOnInsert` option', async function() {
     const schema = new Schema({
       title: String,
       genre: { type: String, default: 'Action' }
@@ -106,14 +106,21 @@ describe('defaults docs', function() {
       upsert: true
     };
 
-    return Movie.findOneAndUpdate(query, update, options).then(doc => {
-      doc.genre; // 'Action', Mongoose set a default value.
-      // acquit:ignore:start
-      assert.equal(doc.title, 'The Terminator');
-      assert.equal(doc.genre, 'Action');
-      // acquit:ignore:end
-      return doc;
-    });
+    let doc = await Movie.findOneAndUpdate(query, update, options).lean();
+    doc.genre; // 'Action', Mongoose set a default value.
+    // acquit:ignore:start
+    assert.equal(doc.title, 'The Terminator');
+    assert.equal(doc.genre, 'Action');
+    // acquit:ignore:end
+
+    await Movie.deleteMany({});
+
+    doc = await Movie.findOneAndUpdate(query, update, { ...options, setDefaultsOnInsert: false }).lean();
+    doc.genre; // undefined, Mongoose did not set a default value
+    // acquit:ignore:start
+    assert.equal(doc.title, 'The Terminator');
+    assert.equal(doc.genre, void 0);
+    // acquit:ignore:end
   });
 
   /**

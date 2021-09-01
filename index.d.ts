@@ -1528,15 +1528,17 @@ declare module 'mongoose' {
     U :
     T extends ReadonlyArray<infer U> ? U : T;
 
+  type AnyArray<T> = T[] | ReadonlyArray<T>;
+
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends Schema<any, any> ? T :
-      T extends object[] ? (Schema<Unpacked<T>>[] | ReadonlyArray<Schema<Unpacked<T>>> | Schema<Document & Unpacked<T>>[] | ReadonlyArray<Schema<Document & Unpacked<T>>>) :
-      T extends string[] ? (SchemaDefinitionWithBuiltInClass<string>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<string>>) :
-      T extends number[] ? (SchemaDefinitionWithBuiltInClass<number>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<number>>) :
-      T extends boolean[] ? (SchemaDefinitionWithBuiltInClass<boolean>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<boolean>>) :
-      T extends Function[] ? (SchemaDefinitionWithBuiltInClass<Function>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<Function>>) :
+      T extends object[] ? (AnyArray<Schema<Unpacked<T>>> | AnyArray<Schema<Document & Unpacked<T>>> | AnyArray<SchemaDefinition<Unpacked<T>>>) :
+      T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> :
+      T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> :
+      T extends boolean[] ? AnyArray<SchemaDefinitionWithBuiltInClass<boolean>> :
+      T extends Function[] ? AnyArray<SchemaDefinitionWithBuiltInClass<Function>> :
       T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T>;
 
     /** Defines a virtual with the given name that gets/sets this path. */

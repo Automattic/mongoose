@@ -108,4 +108,13 @@ describe('cast: ', function() {
       }, /Cast to number failed/);
     });
   });
+
+  describe('$expr', function() {
+    it('does not get filtered out (gh-10662)', function() {
+      const schema = new Schema({ spent: Number, budget: Number });
+      const res = cast(schema, { $expr: { $gt: ['$spent', '$budget'] } }, { strict: true });
+      assert.ok(res.$expr);
+      assert.deepEqual(res.$expr.$gt, ['$spent', '$budget']);
+    });
+  });
 });

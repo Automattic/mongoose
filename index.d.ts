@@ -2536,40 +2536,29 @@ declare module 'mongoose' {
 
   type NumericTypes = number | mongodb.Decimal128 | mongodb.Double | mongodb.Int32 | mongodb.Long;
 
-  type KeysOfAType<TSchema, Type> = {
-    [key in keyof TSchema]: NonNullable<TSchema[key]> extends Type ? key : never;
-  }[keyof TSchema];
-
-  type PullOperator<TSchema> = {
-    [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
-        | Partial<Unpacked<TSchema[key]>>
-        | mongodb.ObjectQuerySelector<Unpacked<TSchema[key]>>
-        // Doesn't look like TypeScript has good support for creating an
-        // object containing dotted keys:
-        // https://stackoverflow.com/questions/58434389/typescript-deep-keyof-of-a-nested-object
-        | mongodb.QuerySelector<any>
-        | any;
-  } | any; // Because TS doesn't have good support for creating an object with dotted keys, including `.$.` re: #10075
+  type OnlyFieldsOfType<TSchema, FieldType = any, AssignableType = FieldType> = {
+    [key in keyof TSchema]?: [Extract<TSchema[key], FieldType>] extends [never] ? never : AssignableType;
+  };
 
   /** @see https://docs.mongodb.com/manual/reference/operator/update */
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, NativeDate | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }> | any;
-    $inc?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined> | any;
-    $min?: mongodb.MatchKeysAndValues<TSchema>;
-    $max?: mongodb.MatchKeysAndValues<TSchema>;
-    $mul?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined> | any;
+    $currentDate?: OnlyFieldsOfType<TSchema, NativeDate, true | { $type: 'date' | 'timestamp' }> & AnyObject;
+    $inc?: OnlyFieldsOfType<TSchema, NumericTypes | undefined> & AnyObject;
+    $min?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
+    $max?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
+    $mul?: OnlyFieldsOfType<TSchema, NumericTypes | undefined> & AnyObject;
     $rename?: { [key: string]: string };
-    $set?: mongodb.MatchKeysAndValues<TSchema>;
-    $setOnInsert?: mongodb.MatchKeysAndValues<TSchema>;
-    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, any> | any;
+    $set?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
+    $setOnInsert?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
+    $unset?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: mongodb.SetFields<TSchema> | any;
-    $pop?: mongodb.OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1> | any;
-    $pull?: PullOperator<TSchema>;
-    $push?: mongodb.PushOperator<TSchema> | any;
-    $pullAll?: mongodb.PullAllOperator<TSchema> | any;
+    $addToSet?: OnlyFieldsOfType<TSchema, any[], any> & AnyObject;
+    $pop?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1> & AnyObject;
+    $pull?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
+    $push?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
+    $pullAll?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: {
@@ -2585,7 +2574,18 @@ declare module 'mongoose' {
     { $replaceRoot: any } |
     { $replaceWith: any };
 
-  export type UpdateQuery<T> = (_UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>);
+  type __UpdateDefProperty<T> =
+    0 extends (1 & T) ? T : // any
+    T extends unknown[] ? LeanArray<T> : // Array
+    T extends Document ? LeanDocument<T> : // Subdocument
+    [Extract<T, mongodb.ObjectId>] extends [never] ? T :
+    T | string;
+  type __UpdateQueryDef<T> = {
+    [K in keyof T]: __UpdateDefProperty<T[K]>;
+  };
+  type _UpdateQueryDef<T> = __UpdateQueryDef<T>;
+
+  export type UpdateQuery<T> = (_UpdateQuery<_UpdateQueryDef<T>> & mongodb.MatchKeysAndValues<_UpdateQueryDef<LeanDocument<T>>>);
 
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never]

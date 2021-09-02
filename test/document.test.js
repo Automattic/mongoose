@@ -10726,4 +10726,45 @@ describe('document', function() {
     const res = await Test.findOne({ _id: doc._id, 'profile.name': { first: 'Miyamoto', last: 'Musashi' } });
     assert.ok(res);
   });
+
+  it('depopulate all should depopulate nested array population (gh-10592)', async function() {
+    const Person = db.model('Person', {
+      name: String
+    });
+
+    const Band = db.model('Band', {
+      name: String,
+      members: [{ type: Schema.Types.ObjectId, ref: 'Person' }],
+      lead: { type: Schema.Types.ObjectId, ref: 'Person' },
+      embeddedMembers: [{
+        active: Boolean,
+        member: {
+          type: Schema.Types.ObjectId, ref: 'Person'
+        }
+      }]
+    });
+
+    const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
+
+    const docs = await Person.create(people);
+    let band = {
+      name: 'Guns N\' Roses',
+      members: [docs[0]._id, docs[1]],
+      lead: docs[0]._id,
+      embeddedMembers: [{ active: true, member: docs[0]._id }, { active: false, member: docs[1]._id }]
+    };
+    band = await Band.create(band);
+    await band.populate('members lead').populate('embeddedMembers.member').execPopulate();
+    assert.ok(band.populated('members'));
+    assert.ok(band.populated('lead'));
+    assert.ok(band.populated('embeddedMembers.member'));
+    assert.equal(band.members[0].name, 'Axl Rose');
+    assert.equal(band.embeddedMembers[0].member.name, 'Axl Rose');
+    band.depopulate();
+
+    assert.ok(!band.populated('members'));
+    assert.ok(!band.populated('lead'));
+    assert.ok(!band.populated('embeddedMembers.member'));
+    assert.ok(!band.embeddedMembers[0].member.name);
+  });
 });

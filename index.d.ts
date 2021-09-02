@@ -2604,7 +2604,18 @@ declare module 'mongoose' {
     { $replaceRoot: any } |
     { $replaceWith: any };
 
-  export type UpdateQuery<T> = _UpdateQuery<DocumentDefinition<T>> & MatchKeysAndValues<DocumentDefinition<T>>;
+  type __UpdateDefProperty<T> =
+    0 extends (1 & T) ? T : // any
+    T extends unknown[] ? LeanArray<T> : // Array
+    T extends Document ? LeanDocument<T> : // Subdocument
+    [Extract<T, mongodb.ObjectId>] extends [never] ? T :
+    T | string;
+  type __UpdateQueryDef<T> = {
+    [K in keyof T]: __UpdateDefProperty<T[K]>;
+  };
+  type _UpdateQueryDef<T> = __UpdateQueryDef<T>;
+
+  export type UpdateQuery<T> = (_UpdateQuery<_UpdateQueryDef<T>> & MatchKeysAndValues<_UpdateQueryDef<LeanDocument<T>>>);
 
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never]

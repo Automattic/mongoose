@@ -8262,6 +8262,33 @@ describe('document', function() {
     assert.ifError(err);
   });
 
+  it('enum object syntax for number (gh-10648) (gh-8139)', function() {
+    const schema = Schema({
+      num: {
+        type: Number,
+        enum: {
+          values: [1, 2, 3],
+          message: 'Invalid number'
+        }
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    let doc = new Model({});
+    let err = doc.validateSync();
+    assert.ifError(err);
+
+    doc = new Model({ num: 4 });
+    err = doc.validateSync();
+    assert.ok(err);
+    assert.equal(err.errors['num'].name, 'ValidatorError');
+    assert.equal(err.errors['num'].message, 'Invalid number');
+
+    doc = new Model({ num: 2 });
+    err = doc.validateSync();
+    assert.ifError(err);
+  });
+
   it('support `pathsToValidate()` option for `validate()` (gh-7587)', async function() {
     const schema = Schema({
       name: {

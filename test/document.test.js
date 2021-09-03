@@ -972,7 +972,7 @@ describe('document', function() {
   });
 
   describe('inspect', function() {
-    it('inspect inherits schema options (gh-4001)', function(done) {
+    it('inspect inherits schema options (gh-4001)', async function() {
       const opts = {
         toObject: { virtuals: true },
         toJSON: { virtuals: true }
@@ -994,18 +994,14 @@ describe('document', function() {
 
       const Task = db.model('Test', taskSchema);
 
-      const doc = { name: 'task1', title: 'task999' };
-      Task.collection.insertOne(doc, function(error) {
-        assert.ifError(error);
-        Task.findById(doc._id, function(error, doc) {
-          assert.ifError(error);
-          assert.equal(doc.inspect().title, 'task1');
-          done();
-        });
-      });
+      const doc = await Task.collection.insertOne({ name: 'task1', title: 'task999' });
+
+      const foundDoc = await Task.findById(doc._id);
+
+      assert.equal(foundDoc.inspect().title, 'task1');
     });
 
-    it('does not apply transform to populated docs (gh-4213)', function(done) {
+    it('does not apply transform to populated docs (gh-4213)', async function() {
       const UserSchema = new Schema({
         name: String
       });
@@ -1036,20 +1032,16 @@ describe('document', function() {
       const val = new User({ name: 'Val' });
       const post = new Post({ title: 'Test', postedBy: val._id });
 
-      Post.create(post, function(error) {
-        assert.ifError(error);
-        User.create(val, function(error) {
-          assert.ifError(error);
-          Post.find({}).
-            populate('postedBy').
-            exec(function(error, posts) {
-              assert.ifError(error);
-              assert.equal(posts.length, 1);
-              assert.ok(posts[0].postedBy._id);
-              done();
-            });
-        });
-      });
+      await Post.create(post);
+
+      await User.create(val);
+
+      const posts = await Post.find({}).
+        populate('postedBy').
+        exec();
+
+      assert.equal(posts.length, 1);
+      assert.ok(posts[0].postedBy._id);
     });
 
     it('populate on nested path (gh-5703)', function() {
@@ -1787,49 +1779,38 @@ describe('document', function() {
   });
 
   describe('gh-2082', function() {
-    it('works', function(done) {
+    it('works', async function() {
       const Parent = db.model('Test', parentSchema);
 
       const parent = new Parent({ name: 'Hello' });
-      parent.save(function(err, parent) {
-        assert.ifError(err);
-        parent.children.push({ counter: 0 });
-        parent.save(function(err, parent) {
-          assert.ifError(err);
-          parent.children[0].counter += 1;
-          parent.save(function(err, parent) {
-            assert.ifError(err);
-            parent.children[0].counter += 1;
-            parent.save(function(err) {
-              assert.ifError(err);
-              Parent.findOne({}, function(error, parent) {
-                assert.ifError(error);
-                assert.equal(parent.children[0].counter, 2);
-                done();
-              });
-            });
-          });
-        });
-      });
+      await parent.save();
+
+      parent.children.push({ counter: 0 });
+      await parent.save();
+
+      parent.children[0].counter += 1;
+      await parent.save();
+
+      parent.children[0].counter += 1;
+      await parent.save();
+
+      await Parent.findOne({});
+
+      assert.equal(parent.children[0].counter, 2);
     });
   });
 
   describe('gh-1933', function() {
-    it('works', function(done) {
+    it('works', async function() {
       const M = db.model('Test', new Schema({ id: String, field: Number }));
 
-      M.create({}, function(error) {
-        assert.ifError(error);
-        M.findOne({}, function(error, doc) {
-          assert.ifError(error);
-          doc.__v = 123;
-          doc.field = 5; // .push({ _id: '123', type: '456' });
-          doc.save(function(error) {
-            assert.ifError(error);
-            done();
-          });
-        });
-      });
+      const doc = await M.create({});
+
+      doc.__v = 123;
+      doc.field = 5;
+
+      // Does not throw
+      await doc.save();
     });
   });
 

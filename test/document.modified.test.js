@@ -272,7 +272,7 @@ describe('document modified', function() {
       });
     });
 
-    it('should let you set ref paths (gh-1530)', function(done) {
+    it('should let you set ref paths (gh-1530)', async function() {
       const parentSchema = new Schema({
         child: { type: Schema.Types.ObjectId, ref: 'Child' }
       });
@@ -299,31 +299,27 @@ describe('document modified', function() {
       p.child = c;
       assert.equal(p.child.name, 'Luke');
 
-      p.save(function(error) {
-        assert.ifError(error);
-        assert.equal(p.child.name, 'Luke');
-        const originalParent = p;
-        Parent.findOne({}, function(error, p) {
-          assert.ifError(error);
-          assert.ok(p.child);
-          assert.ok(typeof p.child.name === 'undefined');
-          assert.equal(preCalls, 0);
-          assert.equal(postCalls, 0);
-          Child.findOne({ name: 'Luke' }, function(error, child) {
-            assert.ifError(error);
-            assert.ok(!child);
-            originalParent.child.save(function(error) {
-              assert.ifError(error);
-              Child.findOne({ name: 'Luke' }, function(error, child) {
-                assert.ifError(error);
-                assert.ok(child);
-                assert.equal(p.child.toString(), child._id.toString());
-                done();
-              });
-            });
-          });
-        });
-      });
+      await p.save();
+
+      assert.equal(p.child.name, 'Luke');
+      const originalParent = p;
+
+      const foundParent = await Parent.findOne({});
+
+      assert.ok(foundParent.child);
+      assert.ok(typeof foundParent.child.name === 'undefined');
+      assert.equal(preCalls, 0);
+      assert.equal(postCalls, 0);
+
+      const child = await Child.findOne({ name: 'Luke' });
+      assert.ok(!child);
+
+      await originalParent.child.save();
+
+      const child2 = await Child.findOne({ name: 'Luke' });
+
+      assert.ok(child2);
+      assert.equal(foundParent.child.toString(), child2._id.toString());
     });
 
     it('properly sets populated for gh-1530 (gh-2678)', function() {
@@ -483,7 +479,7 @@ describe('document modified', function() {
       });
     });
 
-    it('should mark multi-level nested schemas as modified (gh-1754)', function(done) {
+    it('should mark multi-level nested schemas as modified (gh-1754)', async function() {
       const grandChildSchema = new Schema({
         name: String
       });
@@ -499,21 +495,16 @@ describe('document modified', function() {
       });
 
       const Parent = db.model('Parent', parentSchema);
-      Parent.create(
-        { child: [{ name: 'Brian', grandChild: [{ name: 'Jake' }] }] },
-        function(error, p) {
-          assert.ifError(error);
-          assert.ok(p);
-          assert.equal(p.child.length, 1);
-          assert.equal(p.child[0].grandChild.length, 1);
-          p.child[0].grandChild[0].name = 'Jason';
-          assert.ok(p.isModified('child.0.grandChild.0.name'));
-          p.save(function(error1, inDb) {
-            assert.ifError(error1);
-            assert.equal(inDb.child[0].grandChild[0].name, 'Jason');
-            done();
-          });
-        });
+      const p = await Parent.create({ child: [{ name: 'Brian', grandChild: [{ name: 'Jake' }] }] });
+
+      assert.ok(p);
+      assert.equal(p.child.length, 1);
+      assert.equal(p.child[0].grandChild.length, 1);
+      p.child[0].grandChild[0].name = 'Jason';
+      assert.ok(p.isModified('child.0.grandChild.0.name'));
+      await p.save();
+
+      assert.equal(p.child[0].grandChild[0].name, 'Jason');
     });
 
     it('should reset the modified state after calling unmarkModified', function(done) {

@@ -476,7 +476,7 @@ describe('document.populate', function() {
   });
 
   describe('gh-2214', function() {
-    it('should return a real document array when populating', function(done) {
+    it('should return a real document array when populating', async function() {
       const Car = db.model('Car', {
         color: String,
         model: String
@@ -501,25 +501,18 @@ describe('document.populate', function() {
       });
       joe.cars.push(car);
 
-      joe.save(function(error) {
-        assert.ifError(error);
-        car.save(function(error) {
-          assert.ifError(error);
-          Person.findById(joe.id, function(error, joe) {
-            assert.ifError(error);
-            joe.populate('cars', function(error) {
-              assert.ifError(error);
-              car = new Car({
-                model: 'BMW',
-                color: 'black'
-              });
-              joe.cars.push(car);
-              assert.ok(joe.isModified('cars'));
-              done();
-            });
-          });
-        });
+      await joe.save();
+      await car.save();
+
+      const joe2 = await Person.findById(joe.id);
+      await joe2.populate('cars');
+
+      car = new Car({
+        model: 'BMW',
+        color: 'black'
       });
+      joe2.cars.push(car);
+      assert.ok(joe2.isModified('cars'));
     });
   });
 
@@ -562,7 +555,7 @@ describe('document.populate', function() {
   });
 
   describe('depopulate', function() {
-    it('can depopulate specific path (gh-2509)', function(done) {
+    it('can depopulate specific path (gh-2509)', async function() {
       const Person = db.model('Person', {
         name: String
       });
@@ -573,36 +566,32 @@ describe('document.populate', function() {
         lead: { type: Schema.Types.ObjectId, ref: 'Person' }
       });
 
-      const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
-      Person.create(people, function(error, docs) {
-        assert.ifError(error);
-        const band = {
-          name: 'Guns N\' Roses',
-          members: [docs[0]._id, docs[1]],
-          lead: docs[0]._id
-        };
-        Band.create(band, function(error, band) {
-          band.populate('members', function() {
-            assert.equal(band.members[0].name, 'Axl Rose');
-            band.depopulate('members');
-            assert.ok(!band.members[0].name);
-            assert.equal(band.members[0].toString(), docs[0]._id.toString());
-            assert.equal(band.members[1].toString(), docs[1]._id.toString());
-            assert.ok(!band.populated('members'));
-            assert.ok(!band.populated('lead'));
-            band.populate('lead', function() {
-              assert.equal(band.lead.name, 'Axl Rose');
-              band.depopulate('lead');
-              assert.ok(!band.lead.name);
-              assert.equal(band.lead.toString(), docs[0]._id.toString());
-              done();
-            });
-          });
-        });
+      const docs = await Person.create([{ name: 'Axl Rose' }, { name: 'Slash' }]);
+
+      const band = await Band.create({
+        name: 'Guns N\' Roses',
+        members: [docs[0]._id, docs[1]],
+        lead: docs[0]._id
       });
+
+      await band.populate('members');
+
+      assert.equal(band.members[0].name, 'Axl Rose');
+      band.depopulate('members');
+      assert.ok(!band.members[0].name);
+      assert.equal(band.members[0].toString(), docs[0]._id.toString());
+      assert.equal(band.members[1].toString(), docs[1]._id.toString());
+      assert.ok(!band.populated('members'));
+      assert.ok(!band.populated('lead'));
+      await band.populate('lead');
+
+      assert.equal(band.lead.name, 'Axl Rose');
+      band.depopulate('lead');
+      assert.ok(!band.lead.name);
+      assert.equal(band.lead.toString(), docs[0]._id.toString());
     });
 
-    it('depopulates all (gh-6073)', function(done) {
+    it('depopulates all (gh-6073)', async function() {
       const Person = db.model('Person', {
         name: String
       });
@@ -614,25 +603,22 @@ describe('document.populate', function() {
       });
 
       const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
-      Person.create(people, function(error, docs) {
-        assert.ifError(error);
-        const band = {
-          name: 'Guns N\' Roses',
-          members: [docs[0]._id, docs[1]],
-          lead: docs[0]._id
-        };
-        Band.create(band, function(error, band) {
-          band.populate('members lead', function() {
-            assert.ok(band.populated('members'));
-            assert.ok(band.populated('lead'));
-            assert.equal(band.members[0].name, 'Axl Rose');
-            band.depopulate();
-            assert.ok(!band.populated('members'));
-            assert.ok(!band.populated('lead'));
-            done();
-          });
-        });
+      const docs = await Person.create(people);
+
+      const band = await Band.create({
+        name: 'Guns N\' Roses',
+        members: [docs[0]._id, docs[1]],
+        lead: docs[0]._id
       });
+
+      await band.populate('members lead');
+
+      assert.ok(band.populated('members'));
+      assert.ok(band.populated('lead'));
+      assert.equal(band.members[0].name, 'Axl Rose');
+      band.depopulate();
+      assert.ok(!band.populated('members'));
+      assert.ok(!band.populated('lead'));
     });
 
     it('doesn\'t throw when called on a doc that is not populated (gh-6075)', function(done) {
@@ -773,7 +759,7 @@ describe('document.populate', function() {
     }, /on nested docs/);
   });
 
-  it('handles pulling from populated array (gh-3579)', function(done) {
+  it('handles pulling from populated array (gh-3579)', async function() {
     const barSchema = new Schema({ name: String });
 
     const Bar = db.model('Test', barSchema);
@@ -787,20 +773,16 @@ describe('document.populate', function() {
 
     const Foo = db.model('Test1', fooSchema);
 
-    Bar.create([{ name: 'bar1' }, { name: 'bar2' }], function(error, docs) {
-      assert.ifError(error);
-      const foo = new Foo({ bars: [docs[0], docs[1]] });
-      foo.bars.pull(docs[0]._id);
-      foo.save(function(error) {
-        assert.ifError(error);
-        Foo.findById(foo._id, function(error, foo) {
-          assert.ifError(error);
-          assert.equal(foo.bars.length, 1);
-          assert.equal(foo.bars[0].toString(), docs[1]._id.toString());
-          done();
-        });
-      });
-    });
+    const docs = await Bar.create([{ name: 'bar1' }, { name: 'bar2' }]);
+
+    const foo = new Foo({ bars: [docs[0], docs[1]] });
+    foo.bars.pull(docs[0]._id);
+    await foo.save();
+
+    const foo2 = await Foo.findById(foo._id);
+
+    assert.equal(foo2.bars.length, 1);
+    assert.equal(foo2.bars[0].toString(), docs[1]._id.toString());
   });
 
   describe('#populated() with virtuals (gh-7440)', function() {

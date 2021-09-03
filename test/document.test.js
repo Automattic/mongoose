@@ -10640,9 +10640,7 @@ describe('document', function() {
     };
 
     band = await Band.create(band);
-
-    await band.populate('members lead');
-    await band.populate('embeddedMembers.member');
+    await band.populate('members lead embeddedMembers.member');
     assert.ok(band.populated('members'));
     assert.ok(band.populated('lead'));
     assert.ok(band.populated('embeddedMembers.member'));

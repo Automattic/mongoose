@@ -10,9 +10,9 @@ cause any problems for your application. Please [report any issues on GitHub](ht
 To fix all deprecation warnings, follow the below steps:
 
 * `mongoose.set('useNewUrlParser', true);`
-* `mongoose.set('useFindAndModify', false);`
-* `mongoose.set('useCreateIndex', true);`
 * `mongoose.set('useUnifiedTopology', true);`
+* *Remove* `mongoose.set('useFindAndModify', false);`
+* *Remove* `mongoose.set('useCreateIndex', true);`
 * Replace `update()` with `updateOne()`, `updateMany()`, or `replaceOne()`
 * Replace `remove()` with `deleteOne()` or `deleteMany()`.
 * Replace `count()` with `countDocuments()`, unless you want to count how many documents are in the whole collection (no filter). In the latter case, use `estimatedDocumentCount()`.
@@ -56,80 +56,19 @@ with `{ useNewUrlParser: true }`, please [open an issue on GitHub](https://githu
 
 <h2 id="findandmodify"><a href="#findandmodify"><code>findAndModify()</code></a></h2>
 
-If you use [`Model.findOneAndUpdate()`](/docs/api.html#model_Model.findOneAndUpdate),
-by default you'll see one of the below deprecation warnings.
+As of Mongoose 6.0, this functionality has been removed and will produce an error if used.
 
-```
-DeprecationWarning: Mongoose: `findOneAndUpdate()` and `findOneAndDelete()` without the `useFindAndModify` option set to false are deprecated. See: https://mongoosejs.com/docs/deprecations.html#findandmodify
-DeprecationWarning: collection.findAndModify is deprecated. Use findOneAndUpdate, findOneAndReplace or findOneAndDelete instead.
-```
+<h2 id="findoneandupdate"><a href="#findoneandupdate"><code>findOneAndUpdate()</code></a></h2>
 
-Mongoose's `findOneAndUpdate()` long pre-dates the MongoDB driver's `findOneAndUpdate()`
-function, so it uses the MongoDB driver's [`findAndModify()` function](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findAndModify)
-instead. You can opt in to using the MongoDB driver's `findOneAndUpdate()`
-function using the [`useFindAndModify` global option](/docs/api.html#mongoose_Mongoose-set).
-
-```javascript
-// Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
-// by default, you need to set it to false.
-mongoose.set('useFindAndModify', false);
-```
-
-You can also configure `useFindAndModify` by passing it through the connection options.
-
-```javascript
-mongoose.connect(uri, { useFindAndModify: false });
-```
-
-This option affects the following model and query functions. There are
-no intentional backwards breaking changes, so you should be able to turn
-this option on without any code changes. If you discover any issues,
-please [open an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
-
-* [`Model.findByIdAndDelete()`](/docs/api.html#model_Model.findByIdAndDelete)
-* [`Model.findByIdAndRemove()`](/docs/api.html#model_Model.findByIdAndRemove)
-* [`Model.findByIdAndUpdate()`](/docs/api.html#model_Model.findByIdAndUpdate)
-* [`Model.findOneAndDelete()`](/docs/api.html#model_Model.findOneAndDelete)
-* [`Model.findOneAndRemove()`](/docs/api.html#model_Model.findOneAndRemove)
-* [`Model.findOneAndUpdate()`](/docs/api.html#model_Model.findOneAndUpdate)
-* [`Query.findOneAndDelete()`](/docs/api.html#query_Query-findOneAndDelete)
-* [`Query.findOneAndRemove()`](/docs/api.html#query_Query-findOneAndRemove)
-* [`Query.findOneAndUpdate()`](/docs/api.html#query_Query-findOneAndUpdate)
-
-You can also safely ignore this warning. Mongoose will not remove the legacy `useFindAndModify: true`
-behavior until Mongoose 6.0.
+As of Mongoose 6.0, this functionality has been removed and will produce an error if used.
 
 <h2 id="ensureindex"><a href="#ensureindex"><code>ensureIndex()</code></a></h2>
 
-If you define [indexes in your Mongoose schemas](https://mongoosejs.com/docs/guide.html#indexes), you'll see the below
-deprecation warning.
+As of Mongoose 6.0, this functionality has been removed and will produce an error if used.
 
-```
-DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes
-instead.
-```
+<h2 id="usecreateindex"><a href="#usecreateindex"><code>useCreateIndex()</code></a></h2>
 
-By default, Mongoose 5.x calls the [MongoDB driver's `ensureIndex()` function](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#ensureIndex).
-The MongoDB driver deprecated this function in favor of [`createIndex()`](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#createIndex).
-Set the [`useCreateIndex` global option](/docs/api.html#mongoose_Mongoose-set) to opt in to making Mongoose use `createIndex()` instead.
-
-```javascript
-mongoose.set('useCreateIndex', true);
-```
-
-You can also configure `useCreateIndex` by passing it through the connection options.
-
-```javascript
-mongoose.connect(uri, { useCreateIndex: true });
-```
-
-There are no intentional backwards breaking changes with the `useCreateIndex`
-option, so you should be able to turn
-this option on without any code changes. If you discover any issues,
-please [open an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
-
-You can also safely ignore this warning. Mongoose will not remove the legacy `useCreateIndex: false`
-behavior until Mongoose 6.0.
+As of Mongoose 6.0, this functionality has been removed and will produce an error if used.
 
 <h2 id="remove"><a href="#remove"><code>remove()</code></a></h2>
 

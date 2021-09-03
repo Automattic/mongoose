@@ -557,19 +557,15 @@ describe('aggregate: ', function() {
       setupData(db, done);
     });
 
-    it('project', function(done) {
+    it('project', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      aggregate.
-        project({ sal: 1, sal_k: { $divide: ['$sal', 1000] } }).
-        exec(function(err, docs) {
-          assert.ifError(err);
-          docs.forEach(function(doc) {
-            assert.equal(doc.sal / 1000, doc.sal_k);
-          });
+      const docs = await aggregate.project({ sal: 1, sal_k: { $divide: ['$sal', 1000] } }).exec();
 
-          done();
-        });
+      docs.forEach(function(doc) {
+        assert.equal(doc.sal / 1000, doc.sal_k);
+      });
+
     });
 
     it('group', function(done) {

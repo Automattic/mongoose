@@ -465,73 +465,63 @@ describe('model: findOneAndUpdate:', function() {
     });
   });
 
-  it('honors strict schemas', function(done) {
+  it('honors strict schemas', async function() {
     const S = db.model('Test', Schema({ name: String }, { strict: true }));
     const s = new S({ name: 'orange crush' });
 
-    s.save(function(err) {
-      assert.ifError(err);
-      const name = Date.now();
-      S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true, new: true }, function(err, doc) {
-        assert.ifError(err);
-        assert.ok(doc);
-        assert.ok(doc._id);
-        assert.equal(doc.ignore, undefined);
-        assert.equal(doc._doc.ignore, undefined);
-        assert.equal(doc.name, name);
-        S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, { upsert: true }, function(err, doc) {
-          assert.ifError(err);
-          assert.ok(!doc.ignore);
-          assert.ok(!doc._doc.ignore);
-          assert.equal(doc.name, 'orange crush');
-          S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, function(err, doc) {
-            assert.ifError(err);
-            assert.ok(!doc.ignore);
-            assert.ok(!doc._doc.ignore);
-            assert.equal(doc.name, 'orange crush');
-            done();
-          });
-        });
-      });
-    });
+    await s.save();
+
+    const name = Date.now();
+    const doc = await S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true, new: true });
+
+    assert.ok(doc);
+    assert.ok(doc._id);
+    assert.equal(doc.ignore, undefined);
+    assert.equal(doc._doc.ignore, undefined);
+    assert.equal(doc.name, name);
+    const doc2 = await S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, { upsert: true });
+
+    assert.ok(!doc2.ignore);
+    assert.ok(!doc2._doc.ignore);
+    assert.equal(doc2.name, 'orange crush');
+    const doc3 = await S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true });
+
+    assert.ok(!doc3.ignore);
+    assert.ok(!doc3._doc.ignore);
+    assert.equal(doc3.name, 'orange crush');
   });
 
-  it('returns errors with strict:throw schemas', function(done) {
+  it('returns errors with strict:throw schemas', async function() {
     const S = db.model('Test', Schema({ name: String }, { strict: 'throw' }));
     const s = new S({ name: 'orange crush' });
 
-    s.save(function(err) {
-      assert.ifError(err);
+    await s.save();
 
-      const name = Date.now();
-      S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true }, function(err, doc) {
-        assert.ok(err);
-        assert.ok(/not in schema/.test(err));
-        assert.ok(!doc);
 
-        S.findOneAndUpdate({ _id: s._id }, { ignore: true }, function(err, doc) {
-          assert.ok(err);
-          assert.ok(/not in schema/.test(err));
-          assert.ok(!doc);
-          done();
-        });
-      });
-    });
+    const name = Date.now();
+
+    const err = await S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true }).then(() => null, err => err);
+
+    assert.ok(err);
+    assert.ok(/not in schema/.test(err));
+
+    const err2 = await S.findOneAndUpdate({ _id: s._id }, { ignore: true }).then(() => null, err => err);
+
+    assert.ok(err2);
+    assert.ok(/not in schema/.test(err2));
   });
 
-  it('executing with just a callback throws', function(done) {
+  it('executing with just a callback throws', function() {
     const M = BlogPost;
     let err;
 
     try {
-      M.findByIdAndUpdate(function() {
-      });
+      M.findByIdAndUpdate(function() {});
     } catch (e) {
       err = e;
     }
 
     assert.ok(/First argument must not be a function/.test(err));
-    done();
   });
 
   it('executes when a callback is passed', function(done) {
@@ -570,7 +560,7 @@ describe('model: findOneAndUpdate:', function() {
     }
   });
 
-  it('returns the original document', function(done) {
+  it('returns the original document', async function() {
     const M = BlogPost;
     const title = 'Tobi ' + random();
     const author = 'Brian ' + random();
@@ -589,48 +579,43 @@ describe('model: findOneAndUpdate:', function() {
     post.owners = [id0, id1];
     post.comments = [{ body: 'been there' }, { body: 'done that' }];
 
-    post.save(function(err) {
-      assert.ifError(err);
-      M.findById(post._id, function(err) {
-        assert.ifError(err);
+    await post.save();
 
-        const update = {
-          title: newTitle, // becomes $set
-          $inc: { 'meta.visitors': 2 },
-          $set: { date: new Date },
-          published: false, // becomes $set
-          mixed: { x: 'ECKS', y: 'why' }, // $set
-          $pullAll: { numbers: [4, 6] },
-          $pull: { owners: id0 },
-          'comments.1.body': 8 // $set
-        };
+    await M.findById(post._id);
 
-        M.findByIdAndUpdate(post.id, update, { new: false }, function(err, up) {
-          assert.ifError(err);
+    const update = {
+      title: newTitle, // becomes $set
+      $inc: { 'meta.visitors': 2 },
+      $set: { date: new Date },
+      published: false, // becomes $set
+      mixed: { x: 'ECKS', y: 'why' }, // $set
+      $pullAll: { numbers: [4, 6] },
+      $pull: { owners: id0 },
+      'comments.1.body': 8 // $set
+    };
 
-          assert.equal(post.title, up.title);
-          assert.equal(post.author, up.author);
-          assert.equal(post.meta.visitors, up.meta.visitors.valueOf());
-          assert.equal(post.date.toString(), up.date.toString());
-          assert.equal(post.published, up.published);
-          assert.equal(post.mixed.x, up.mixed.x);
-          assert.strictEqual(up.mixed.y, post.mixed.y);
-          assert.deepEqual(up.numbers.toObject(), post.numbers.toObject());
-          assert.equal(post.owners.length, up.owners.length);
-          assert.equal(post.owners[0].toString(), up.owners[0].toString());
-          assert.equal(post.comments[0].body, up.comments[0].body);
-          assert.equal(post.comments[1].body, up.comments[1].body);
-          assert.ok(up.comments[0]._id);
-          assert.ok(up.comments[1]._id);
-          assert.ok(up.comments[0]._id instanceof DocumentObjectId);
-          assert.ok(up.comments[1]._id instanceof DocumentObjectId);
-          done();
-        });
-      });
-    });
+    const up = await M.findByIdAndUpdate(post.id, update, { new: false });
+
+
+    assert.equal(post.title, up.title);
+    assert.equal(post.author, up.author);
+    assert.equal(post.meta.visitors, up.meta.visitors.valueOf());
+    assert.equal(post.date.toString(), up.date.toString());
+    assert.equal(post.published, up.published);
+    assert.equal(post.mixed.x, up.mixed.x);
+    assert.strictEqual(up.mixed.y, post.mixed.y);
+    assert.deepEqual(up.numbers.toObject(), post.numbers.toObject());
+    assert.equal(post.owners.length, up.owners.length);
+    assert.equal(post.owners[0].toString(), up.owners[0].toString());
+    assert.equal(post.comments[0].body, up.comments[0].body);
+    assert.equal(post.comments[1].body, up.comments[1].body);
+    assert.ok(up.comments[0]._id);
+    assert.ok(up.comments[1]._id);
+    assert.ok(up.comments[0]._id instanceof DocumentObjectId);
+    assert.ok(up.comments[1]._id instanceof DocumentObjectId);
   });
 
-  it('options/conditions/doc are merged when no callback is passed', function(done) {
+  it('options/conditions/doc are merged when no callback is passed', function() {
     const M = BlogPost;
     const _id = new DocumentObjectId;
 
@@ -657,10 +642,9 @@ describe('model: findOneAndUpdate:', function() {
     assert.strictEqual(undefined, query.options.new);
     assert.equal(query._update, undefined);
     assert.strictEqual(undefined, query._conditions._id);
-    done();
   });
 
-  it('supports v3 select string syntax', function(done) {
+  it('supports v3 select string syntax', function() {
     const M = BlogPost;
     const _id = new DocumentObjectId;
 
@@ -674,10 +658,9 @@ describe('model: findOneAndUpdate:', function() {
     query = M.findOneAndUpdate({}, { $set: { date: now } }, { select: 'author -title' });
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
-    done();
   });
 
-  it('supports v3 select object syntax', function(done) {
+  it('supports v3 select object syntax', function() {
     const M = BlogPost;
     const _id = new DocumentObjectId;
 
@@ -691,10 +674,9 @@ describe('model: findOneAndUpdate:', function() {
     query = M.findOneAndUpdate({}, { $set: { date: now } }, { select: { author: 1, title: 0 } });
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
-    done();
   });
 
-  it('supports v3 sort string syntax', function(done) {
+  it('supports v3 sort string syntax', async function() {
     const M = BlogPost;
 
     const now = new Date;
@@ -712,25 +694,16 @@ describe('model: findOneAndUpdate:', function() {
     assert.equal(query.options.sort.title, -1);
 
     // gh-1887
-    M.create(
-      { title: 1, meta: { visitors: 0 } }
-      , { title: 2, meta: { visitors: 10 } }
-      , { title: 3, meta: { visitors: 5 } }
-      , function(err) {
-        if (err) {
-          return done(err);
-        }
+    await M.create(
+      { title: 1, meta: { visitors: 0 } },
+      { title: 2, meta: { visitors: 10 } },
+      { title: 3, meta: { visitors: 5 } }
+    );
 
-        M.findOneAndUpdate({}, { title: 'changed' })
-          .sort({ 'meta.visitors': -1 })
-          .exec(function(err, doc) {
-            if (err) {
-              return done(err);
-            }
-            assert.equal(doc.meta.visitors, 10);
-            done();
-          });
-      });
+    const doc = await M.findOneAndUpdate({}, { title: 'changed' })
+      .sort({ 'meta.visitors': -1 })
+      .exec();
+    assert.equal(doc.meta.visitors, 10);
   });
 
   it('supports v3 sort object syntax', function(done) {

@@ -1,6 +1,5 @@
 'use strict';
 
-const co = require('co');
 run().catch(error => {
   console.error(error);
   process.exit(-1);

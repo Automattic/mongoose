@@ -2015,7 +2015,7 @@ describe('document', function() {
   });
 
   describe('bug fixes', function() {
-    it('applies toJSON transform correctly for populated docs (gh-2910) (gh-2990)', function(done) {
+    it('applies toJSON transform correctly for populated docs (gh-2910) (gh-2990)', async function() {
       const parentSchema = mongoose.Schema({
         c: { type: mongoose.Schema.Types.ObjectId, ref: 'Child' }
       });
@@ -2043,32 +2043,30 @@ describe('document', function() {
       const Child = db.model('Child', childSchema);
       const Parent = db.model('Parent', parentSchema);
 
-      Child.create({ name: 'test' }, function(error, c) {
-        Parent.create({ c: c._id }, function(error, p) {
-          Parent.findOne({ _id: p._id }).populate('c').exec(function(error, p) {
-            let doc = p.toJSON();
-            assert.equal(called.length, 1);
-            assert.equal(called[0]._id.toString(), p._id.toString());
-            assert.equal(doc._id.toString(), p._id.toString());
-            assert.equal(childCalled.length, 1);
-            assert.equal(childCalled[0]._id.toString(), c._id.toString());
+      const c = await Child.create({ name: 'test' });
 
-            called = [];
-            childCalled = [];
+      const createdParent = await Parent.create({ c: c._id });
 
-            // JSON.stringify() passes field name, so make sure we don't treat
-            // that as a param to toJSON (gh-2990)
-            doc = JSON.parse(JSON.stringify({ parent: p })).parent;
-            assert.equal(called.length, 1);
-            assert.equal(called[0]._id.toString(), p._id.toString());
-            assert.equal(doc._id.toString(), p._id.toString());
-            assert.equal(childCalled.length, 1);
-            assert.equal(childCalled[0]._id.toString(), c._id.toString());
+      const p = await Parent.findOne({ _id: createdParent._id }).populate('c').exec();
 
-            done();
-          });
-        });
-      });
+      let doc = p.toJSON();
+      assert.equal(called.length, 1);
+      assert.equal(called[0]._id.toString(), p._id.toString());
+      assert.equal(doc._id.toString(), p._id.toString());
+      assert.equal(childCalled.length, 1);
+      assert.equal(childCalled[0]._id.toString(), c._id.toString());
+
+      called = [];
+      childCalled = [];
+
+      // JSON.stringify() passes field name, so make sure we don't treat
+      // that as a param to toJSON (gh-2990)
+      doc = JSON.parse(JSON.stringify({ parent: p })).parent;
+      assert.equal(called.length, 1);
+      assert.equal(called[0]._id.toString(), p._id.toString());
+      assert.equal(doc._id.toString(), p._id.toString());
+      assert.equal(childCalled.length, 1);
+      assert.equal(childCalled[0]._id.toString(), c._id.toString());
     });
 
     it('single nested schema transform with save() (gh-5807)', function() {

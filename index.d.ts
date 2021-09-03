@@ -642,15 +642,11 @@ declare module 'mongoose' {
      */
     $parent(): Document | undefined;
 
-    /**
-     * Populates document references.
-     */
-    populate(path: string | string[]): Promise<this>;
-    populate(path: string | string[], callback: Callback<this>): void;
+    /** Populates document references. */
+    populate(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this>;
+    populate(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this>): void;
     populate(path: string, names: string): Promise<this>;
     populate(path: string, names: string, callback: Callback<this>): void;
-    populate(opts: PopulateOptions | Array<PopulateOptions>): Promise<this>;
-    populate(opts: PopulateOptions | Array<PopulateOptions>, callback: Callback<this>): void;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;

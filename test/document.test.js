@@ -10754,7 +10754,7 @@ describe('document', function() {
       embeddedMembers: [{ active: true, member: docs[0]._id }, { active: false, member: docs[1]._id }]
     };
     band = await Band.create(band);
-    await band.populate('members lead').populate('embeddedMembers.member').execPopulate();
+    await band.populate('members lead embeddedMembers.member');
     assert.ok(band.populated('members'));
     assert.ok(band.populated('lead'));
     assert.ok(band.populated('embeddedMembers.member'));

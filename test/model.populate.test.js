@@ -10418,40 +10418,38 @@ describe('model: populate:', function() {
     });
   });
 
-  it('avoids setting empty array on lean document when populate result is undefined (gh-10599)', function() {
-    return co(function*() {
-      const ImageSchema = Schema({ imageName: String }, { _id: false });
-      const TextSchema = Schema({
-        textName: String,
-        attached: [{ type: 'ObjectId', ref: 'Test2' }]
-      }, { _id: false });
+  it('avoids setting empty array on lean document when populate result is undefined (gh-10599)', async function() {
+    const ImageSchema = Schema({ imageName: String }, { _id: false });
+    const TextSchema = Schema({
+      textName: String,
+      attached: [{ type: 'ObjectId', ref: 'Test2' }]
+    }, { _id: false });
 
-      const ItemSchema = Schema({ objectType: String }, {
-        discriminatorKey: 'objectType',
-        _id: false
-      });
-
-      const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
-
-      ExampleSchema.path('list').discriminator('Image', ImageSchema);
-      ExampleSchema.path('list').discriminator('Text', TextSchema);
-      const Example = db.model('Test', ExampleSchema);
-      const Another = db.model('Test2', Schema({ test: 'String' }));
-
-      yield Another.create({ _id: '61254490ea89de0004c8f2a0', test: 'test' });
-
-      const example = yield Example.create({
-        test: 'example',
-        list: [
-          { imageName: 'an image', objectType: 'Image' },
-          { textName: 'this is a text', attached: ['61254490ea89de0004c8f2a0'], objectType: 'Text' }
-        ]
-      });
-      const query = Example.findById(example._id).populate('list.attached').lean();
-
-      const result = yield query.exec();
-      assert.strictEqual(result.list[0].attached, void 0);
-      assert.equal(result.list[1].attached[0].test, 'test');
+    const ItemSchema = Schema({ objectType: String }, {
+      discriminatorKey: 'objectType',
+      _id: false
     });
+
+    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+
+    ExampleSchema.path('list').discriminator('Image', ImageSchema);
+    ExampleSchema.path('list').discriminator('Text', TextSchema);
+    const Example = db.model('Test', ExampleSchema);
+    const Another = db.model('Test2', Schema({ test: 'String' }));
+
+    await Another.create({ _id: '61254490ea89de0004c8f2a0', test: 'test' });
+
+    const example = await Example.create({
+      test: 'example',
+      list: [
+        { imageName: 'an image', objectType: 'Image' },
+        { textName: 'this is a text', attached: ['61254490ea89de0004c8f2a0'], objectType: 'Text' }
+      ]
+    });
+    const query = Example.findById(example._id).populate('list.attached').lean();
+
+    const result = await query.exec();
+    assert.strictEqual(result.list[0].attached, void 0);
+    assert.equal(result.list[1].attached[0].test, 'test');
   });
 });

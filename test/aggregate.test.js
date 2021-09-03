@@ -904,7 +904,7 @@ describe('aggregate: ', function() {
     });
 
     describe('middleware (gh-5251)', function() {
-      it('pre', function(done) {
+      it('pre', async function() {
         const s = new Schema({ name: String });
 
         let called = 0;
@@ -915,12 +915,10 @@ describe('aggregate: ', function() {
 
         const M = db.model('Test', s);
 
-        M.aggregate([{ $match: { name: 'test' } }], function(error, res) {
-          assert.ifError(error);
-          assert.deepEqual(res, []);
-          assert.equal(called, 1);
-          done();
-        });
+        const res = await M.aggregate([{ $match: { name: 'test' } }]);
+
+        assert.deepEqual(res, []);
+        assert.equal(called, 1);
       });
 
       it('setting option in pre (gh-7606)', async function() {
@@ -959,7 +957,7 @@ describe('aggregate: ', function() {
         assert.equal(docs[0].name, 'Zeta');
       });
 
-      it('post', function(done) {
+      it('post', async function() {
         const s = new Schema({ name: String });
 
         const calledWith = [];
@@ -970,16 +968,14 @@ describe('aggregate: ', function() {
 
         const M = db.model('Test', s);
 
-        M.aggregate([{ $match: { name: 'test' } }], function(error, res) {
-          assert.ifError(error);
-          assert.deepEqual(res, []);
-          assert.equal(calledWith.length, 1);
-          assert.deepEqual(calledWith[0], []);
-          done();
-        });
+        const res = await M.aggregate([{ $match: { name: 'test' } }]);
+
+        assert.deepEqual(res, []);
+        assert.equal(calledWith.length, 1);
+        assert.deepEqual(calledWith[0], []);
       });
 
-      it('error handler with agg error', function(done) {
+      it('error handler with agg error', async function() {
         const s = new Schema({ name: String });
 
         const calledWith = [];
@@ -990,18 +986,19 @@ describe('aggregate: ', function() {
 
         const M = db.model('Test', s);
 
-        M.aggregate([{ $fakeStage: { name: 'test' } }], function(error, res) {
-          assert.ok(error);
-          assert.ok(error.message.indexOf('Unrecognized pipeline stage') !== -1,
-            error.message);
-          assert.equal(res, null);
-          assert.equal(calledWith.length, 1);
-          assert.equal(calledWith[0], error);
-          done();
-        });
+        const error = await M.aggregate([{ $fakeStage: { name: 'test' } }]).then(() => null, err => err);
+
+        assert.ok(error);
+        assert.ok(
+          error.message.indexOf('Unrecognized pipeline stage') !== -1,
+          error.message
+        );
+
+        assert.equal(calledWith.length, 1);
+        assert.equal(calledWith[0], error);
       });
 
-      it('error handler with pre error', function(done) {
+      it('error handler with pre error', async function() {
         const s = new Schema({ name: String });
 
         const calledWith = [];
@@ -1015,17 +1012,15 @@ describe('aggregate: ', function() {
 
         const M = db.model('Test', s);
 
-        M.aggregate([{ $match: { name: 'test' } }], function(error, res) {
-          assert.ok(error);
-          assert.equal(error.message, 'woops');
-          assert.equal(res, null);
-          assert.equal(calledWith.length, 1);
-          assert.equal(calledWith[0], error);
-          done();
-        });
+        const error = await M.aggregate([{ $match: { name: 'test' } }]).then(() => null, err => err);
+
+        assert.ok(error);
+        assert.equal(error.message, 'woops');
+        assert.equal(calledWith.length, 1);
+        assert.equal(calledWith[0], error);
       });
 
-      it('with agg cursor', function(done) {
+      it('with agg cursor', async function() {
         const s = new Schema({ name: String });
 
         let calledPre = 0;
@@ -1042,18 +1037,14 @@ describe('aggregate: ', function() {
         const M = db.model('Test', s);
 
         let numDocs = 0;
-        M.
+        await M.
           aggregate([{ $match: { name: 'test' } }]).
           cursor({ useMongooseAggCursor: true }).
-          eachAsync(function() {
-            ++numDocs;
-          }).
-          then(function() {
-            assert.equal(numDocs, 0);
-            assert.equal(calledPre, 1);
-            assert.equal(calledPost, 0);
-            done();
-          });
+          eachAsync(function() { ++numDocs; });
+
+        assert.equal(numDocs, 0);
+        assert.equal(calledPre, 1);
+        assert.equal(calledPost, 0);
       });
 
       it('with explain() (gh-5887)', function() {
@@ -1273,25 +1264,23 @@ describe('aggregate: ', function() {
       const mySchema = new Schema({ name: String, qty: Number });
       mySchema.index({ qty: -1, name: -1 });
       const M = db.model('Test', mySchema);
-      M.on('index', function(error) {
+      M.on('index', async function(error) {
         assert.ifError(error);
         const docs = [
           { name: 'Andrew', qty: 4 },
           { name: 'Betty', qty: 5 },
           { name: 'Charlie', qty: 4 }
         ];
-        M.create(docs, function(error) {
-          assert.ifError(error);
-          const aggregate = M.aggregate();
-          aggregate.match({})
-            .hint({ qty: -1, name: -1 }).exec(function(error, docs) {
-              assert.ifError(error);
-              assert.equal(docs[0].name, 'Betty');
-              assert.equal(docs[1].name, 'Charlie');
-              assert.equal(docs[2].name, 'Andrew');
-              done();
-            });
-        });
+        await M.create(docs);
+
+        const aggregate = M.aggregate();
+        const foundDocs = await aggregate.match({})
+          .hint({ qty: -1, name: -1 }).exec();
+
+        assert.equal(foundDocs[0].name, 'Betty');
+        assert.equal(foundDocs[1].name, 'Charlie');
+        assert.equal(foundDocs[2].name, 'Andrew');
+        done();
       });
     });
   });

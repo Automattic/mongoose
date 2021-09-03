@@ -2150,67 +2150,52 @@ describe('model: querying:', function() {
     });
 
     describe('$geometry', function() {
-      it('Polygon', function(done) {
+      it('Polygon', async function() {
         if (!mongo24_or_greater) {
-          return done();
+          return;
         }
 
         const Test = db.model('Test', schema2dsphere);
+        await Test.init();
 
-        Test.on('index', function(err) {
-          assert.ifError(err);
+        const created = await Test.create({ loc: [0, 0] });
 
-          Test.create({ loc: [0, 0] }, function(err, created) {
-            assert.ifError(err);
+        const geojsonPoly = { type: 'Polygon', coordinates: [[[-5, -5], ['-5', 5], [5, 5], [5, -5], [-5, '-5']]] };
 
-            const geojsonPoly = { type: 'Polygon', coordinates: [[[-5, -5], ['-5', 5], [5, 5], [5, -5], [-5, '-5']]] };
+        const docs = await Test.find({ loc: { $within: { $geometry: geojsonPoly } } });
 
-            Test.find({ loc: { $within: { $geometry: geojsonPoly } } }, function(err, docs) {
-              assert.ifError(err);
-              assert.equal(docs.length, 1);
-              assert.equal(created.id, docs[0].id);
+        assert.equal(docs.length, 1);
+        assert.equal(created.id, docs[0].id);
 
-              Test.where('loc').within().geometry(geojsonPoly).exec(function(err, docs) {
-                assert.ifError(err);
-                assert.equal(docs.length, 1);
-                assert.equal(created.id, docs[0].id);
-                done();
-              });
-            });
-          });
-        });
+        const geoDocs = await Test.where('loc').within().geometry(geojsonPoly).exec();
+
+        assert.equal(geoDocs.length, 1);
+        assert.equal(created.id, geoDocs[0].id);
       });
     });
 
     describe('$geoIntersects', function() {
-      it('LineString', function(done) {
+      it('LineString', async function(done) {
         if (!mongo24_or_greater) {
           return done();
         }
 
         const Test = db.model('Test', geoSchema);
+        await Test.init();
 
-        Test.on('index', function(err) {
-          assert.ifError(err);
 
-          Test.create({ line: { type: 'LineString', coordinates: [[-178.0, 10.0], [178.0, 10.0]] } }, function(err, created) {
-            assert.ifError(err);
+        const created = await Test.create({ line: { type: 'LineString', coordinates: [[-178.0, 10.0], [178.0, 10.0]] } });
 
-            const geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] };
+        const geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] };
 
-            Test.find({ line: { $geoIntersects: { $geometry: geojsonLine } } }, function(err, docs) {
-              assert.ifError(err);
-              assert.equal(docs.length, 1);
-              assert.equal(created.id, docs[0].id);
+        const docs = await Test.find({ line: { $geoIntersects: { $geometry: geojsonLine } } });
 
-              Test.where('line').intersects().geometry(geojsonLine).findOne(function(err, doc) {
-                assert.ifError(err);
-                assert.equal(created.id, doc.id);
-                done();
-              });
-            });
-          });
-        });
+        assert.equal(docs.length, 1);
+        assert.equal(created.id, docs[0].id);
+
+        const doc = await Test.where('line').intersects().geometry(geojsonLine).findOne();
+
+        assert.equal(created.id, doc.id);
       });
 
       it('MultiLineString', function(done) {

@@ -4370,7 +4370,7 @@ describe('Model', function() {
       });
     });
 
-    it('doesnt reset "modified" status for fields', function(done) {
+    it('doesnt reset "modified" status for fields', async function() {
       const UniqueSchema = new Schema({
         changer: String,
         unique: {
@@ -4390,25 +4390,23 @@ describe('Model', function() {
         changer: 'a',
         unique: 6
       });
+      await Unique.init();
 
-      Unique.on('index', function() {
-        u1.save(function(err) {
-          assert.ifError(err);
-          assert.ok(!u1.isModified('changer'));
-          u2.save(function(err) {
-            assert.ifError(err);
-            assert.ok(!u2.isModified('changer'));
-            u2.changer = 'b';
-            u2.unique = 5;
-            assert.ok(u2.isModified('changer'));
-            u2.save(function(err) {
-              assert.ok(err);
-              assert.ok(u2.isModified('changer'));
-              Unique.collection.drop(done);
-            });
-          });
-        });
-      });
+
+      await u1.save();
+
+      assert.ok(!u1.isModified('changer'));
+      await u2.save();
+
+      assert.ok(!u2.isModified('changer'));
+      u2.changer = 'b';
+      u2.unique = 5;
+      assert.ok(u2.isModified('changer'));
+      const err = await u2.save().then(() => null, err => err);
+
+      assert.ok(err);
+      assert.ok(u2.isModified('changer'));
+      await Unique.collection.drop();
     });
 
     it('insertMany() (gh-723)', function(done) {
@@ -4449,10 +4447,10 @@ describe('Model', function() {
           return;
         }
 
-        test();
+        test().then(() => done(null), done);
       });
 
-      function test() {
+      async function test() {
         const schema = new Schema({
           name: { type: String, unique: true }
         });
@@ -4463,19 +4461,17 @@ describe('Model', function() {
           { name: 'Star Wars' },
           { name: 'The Empire Strikes Back' }
         ];
-        Movie.on('index', function(error) {
-          assert.ifError(error);
-          Movie.insertMany(arr, { ordered: false }, function(error) {
-            assert.equal(error.message.indexOf('E11000'), 0);
-            Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
-              assert.ifError(error);
-              assert.equal(docs.length, 2);
-              assert.equal(docs[0].name, 'Star Wars');
-              assert.equal(docs[1].name, 'The Empire Strikes Back');
-              Movie.collection.drop(done);
-            });
-          });
-        });
+        await Movie.init();
+
+        const error = await Movie.insertMany(arr, { ordered: false }).then(() => null, err => err);
+
+        assert.equal(error.message.indexOf('E11000'), 0);
+        const docs = await Movie.find({}).sort({ name: 1 }).exec();
+
+        assert.equal(docs.length, 2);
+        assert.equal(docs[0].name, 'Star Wars');
+        assert.equal(docs[1].name, 'The Empire Strikes Back');
+        await Movie.collection.drop(done);
       }
     });
 

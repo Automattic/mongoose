@@ -2522,7 +2522,7 @@ describe('Query', function() {
       assert.strictEqual(count, 0);
     });
 
-    it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
+    it('handles geoWithin with mongoose docs (gh-4392)', async function() {
       const areaSchema = new Schema({
         name: { type: String },
         loc: {
@@ -2553,44 +2553,39 @@ describe('Query', function() {
       observationSchema.index({ geometry: '2dsphere' });
 
       const Observation = db.model('Test1', observationSchema);
+      await Observation.init();
 
-      Observation.on('index', function(error) {
-        assert.ifError(error);
-        const tromso = new Area({
-          name: 'Tromso, Norway',
-          loc: {
-            type: 'Polygon',
-            coordinates: [[
-              [18.89, 69.62],
-              [18.89, 69.72],
-              [19.03, 69.72],
-              [19.03, 69.62],
-              [18.89, 69.62]
-            ]]
-          }
-        });
-        tromso.save(function(error) {
-          assert.ifError(error);
-          const observation = {
-            geometry: {
-              type: 'Point',
-              coordinates: [18.895, 69.67]
-            }
-          };
-          Observation.create(observation, function(error) {
-            assert.ifError(error);
 
-            Observation.
-              find().
-              where('geometry').within().geometry(tromso.loc).
-              exec(function(error, docs) {
-                assert.ifError(error);
-                assert.equal(docs.length, 1);
-                done();
-              });
-          });
-        });
+      const tromso = new Area({
+        name: 'Tromso, Norway',
+        loc: {
+          type: 'Polygon',
+          coordinates: [[
+            [18.89, 69.62],
+            [18.89, 69.72],
+            [19.03, 69.72],
+            [19.03, 69.62],
+            [18.89, 69.62]
+          ]]
+        }
       });
+      await tromso.save();
+
+      const observation = {
+        geometry: {
+          type: 'Point',
+          coordinates: [18.895, 69.67]
+        }
+      };
+      await Observation.create(observation);
+
+
+      const docs = await Observation.
+        find().
+        where('geometry').within().geometry(tromso.loc).
+        exec();
+
+      assert.equal(docs.length, 1);
     });
   });
 

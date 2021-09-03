@@ -138,7 +138,7 @@ describe('model', function() {
       assert.deepEqual(indexNames.sort(), ['_id_', 'name_1']);
     });
 
-    it('of multiple embedded documents with same schema', async function(done) {
+    it('of multiple embedded documents with same schema', async function() {
       const BlogPosts = new Schema({
         _id: { type: ObjectId, unique: true },
         title: { type: String, index: true },
@@ -273,7 +273,7 @@ describe('model', function() {
       });
     });
 
-    it('when one index creation errors', function(done) {
+    it('when one index creation errors', async function() {
       const userSchema = {
         name: { type: String },
         secondValue: { type: Boolean }
@@ -292,27 +292,24 @@ describe('model', function() {
       const UserModel2 = db.model('Test2', User2, 'Test');
       let assertions = 0;
 
-      UserModel2.on('index', function() {
-        UserModel2.collection.getIndexes(function(err, indexes) {
-          assert.ifError(err);
+      await UserModel2.init();
 
-          function iter(index) {
-            if (index[0] === 'name') {
-              assertions++;
-            }
-            if (index[0] === 'secondValue') {
-              assertions++;
-            }
-          }
+      const indexes = await UserModel2.collection.getIndexes();
 
-          for (const i in indexes) {
-            indexes[i].forEach(iter);
-          }
+      function iter(index) {
+        if (index[0] === 'name') {
+          assertions++;
+        }
+        if (index[0] === 'secondValue') {
+          assertions++;
+        }
+      }
 
-          assert.equal(assertions, 2);
-          done();
-        });
-      });
+      for (const i in indexes) {
+        indexes[i].forEach(iter);
+      }
+
+      assert.equal(assertions, 2);
     });
 
     it('creates descending indexes from schema definition(gh-8895)', async function() {

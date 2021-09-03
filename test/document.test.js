@@ -994,7 +994,8 @@ describe('document', function() {
 
       const Task = db.model('Test', taskSchema);
 
-      const doc = await Task.collection.insertOne({ name: 'task1', title: 'task999' });
+      const doc = { name: 'task1', title: 'task999' };
+      await Task.collection.insertOne(doc);
 
       const foundDoc = await Task.findById(doc._id);
 

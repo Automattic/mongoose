@@ -1231,28 +1231,24 @@ describe('aggregate: ', function() {
       catch(done);
   });
 
-  it('sort by text score (gh-5258)', function(done) {
+  it('sort by text score (gh-5258)', async function() {
     const mySchema = new Schema({ test: String });
     mySchema.index({ test: 'text' });
     const M = db.model('Test', mySchema);
 
-    M.on('index', function(error) {
-      assert.ifError(error);
-      M.create([{ test: 'test test' }, { test: 'a test' }], function(error) {
-        assert.ifError(error);
-        const aggregate = M.aggregate();
-        aggregate.match({ $text: { $search: 'test' } });
-        aggregate.sort({ score: { $meta: 'textScore' } });
+    await M.init();
 
-        aggregate.exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.length, 2);
-          assert.equal(res[0].test, 'test test');
-          assert.equal(res[1].test, 'a test');
-          done();
-        });
-      });
-    });
+    await M.create([{ test: 'test test' }, { test: 'a test' }]);
+
+    const aggregate = M.aggregate();
+    aggregate.match({ $text: { $search: 'test' } });
+    aggregate.sort({ score: { $meta: 'textScore' } });
+
+    const res = await aggregate.exec();
+
+    assert.equal(res.length, 2);
+    assert.equal(res[0].test, 'test test');
+    assert.equal(res[1].test, 'a test');
   });
 
   describe('Mongo 3.6 options', function() {
@@ -1260,28 +1256,25 @@ describe('aggregate: ', function() {
       onlyTestAtOrAbove('3.6', this, done);
     });
 
-    it('adds hint option', function(done) {
+    it('adds hint option', async function() {
       const mySchema = new Schema({ name: String, qty: Number });
       mySchema.index({ qty: -1, name: -1 });
       const M = db.model('Test', mySchema);
-      M.on('index', async function(error) {
-        assert.ifError(error);
-        const docs = [
-          { name: 'Andrew', qty: 4 },
-          { name: 'Betty', qty: 5 },
-          { name: 'Charlie', qty: 4 }
-        ];
-        await M.create(docs);
+      await M.init();
 
-        const aggregate = M.aggregate();
-        const foundDocs = await aggregate.match({})
-          .hint({ qty: -1, name: -1 }).exec();
+      const docs = [
+        { name: 'Andrew', qty: 4 },
+        { name: 'Betty', qty: 5 },
+        { name: 'Charlie', qty: 4 }
+      ];
+      await M.create(docs);
 
-        assert.equal(foundDocs[0].name, 'Betty');
-        assert.equal(foundDocs[1].name, 'Charlie');
-        assert.equal(foundDocs[2].name, 'Andrew');
-        done();
-      });
+      const foundDocs = await M.aggregate().match({})
+        .hint({ qty: -1, name: -1 }).exec();
+
+      assert.equal(foundDocs[0].name, 'Betty');
+      assert.equal(foundDocs[1].name, 'Charlie');
+      assert.equal(foundDocs[2].name, 'Andrew');
     });
   });
 });

@@ -2953,7 +2953,7 @@ describe('document', function() {
       assert.ok(foundDoc.child._id);
     });
 
-    it('single embedded docs with $near (gh-4014)', function(done) {
+    it('single embedded docs with $near (gh-4014)', async function() {
       const schema = new mongoose.Schema({
         placeName: String
       });
@@ -2974,17 +2974,11 @@ describe('document', function() {
       schema.index({ geo: '2dsphere' });
 
       const MyModel = db.model('Test', schema);
+      await MyModel.init();
 
-      MyModel.on('index', function(err) {
-        assert.ifError(err);
-
-        MyModel.
-          where('geo').near({ center: [50, 50], spherical: true }).
-          exec(function(err) {
-            assert.ifError(err);
-            done();
-          });
-      });
+      await MyModel.
+        where('geo').near({ center: [50, 50], spherical: true }).
+        exec();
     });
 
     it('skip validation if required returns false (gh-4094)', function() {

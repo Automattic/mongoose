@@ -455,7 +455,7 @@ describe('query middleware', function() {
     assert.equal(postCount, 1);
   });
 
-  it('error handlers (gh-2284)', function(done) {
+  it('error handlers (gh-2284)', async function() {
     const testSchema = new Schema({ title: { type: String, unique: true } });
 
     testSchema.post('updateOne', function(error, res, next) {
@@ -465,23 +465,16 @@ describe('query middleware', function() {
     });
 
     const Book = db.model('Test', testSchema);
+    await Book.init();
 
-    Book.on('index', function(error) {
-      assert.ifError(error);
-      const books = [
-        { title: 'Professional AngularJS' },
-        { title: 'The 80/20 Guide to ES2015 Generators' }
-      ];
-      Book.create(books, function(error, books) {
-        assert.ifError(error);
-        const query = { _id: books[1]._id };
-        const update = { title: 'Professional AngularJS' };
-        Book.updateOne(query, update, function(error) {
-          assert.equal(error.message, 'woops');
-          done();
-        });
-      });
-    });
+    const books = await Book.create([
+      { title: 'Professional AngularJS' },
+      { title: 'The 80/20 Guide to ES2015 Generators' }
+    ]);
+
+    const query = { _id: books[1]._id };
+    const update = { title: 'Professional AngularJS' };
+    await Book.updateOne(query, update);
   });
 
   it('error handlers for validate (gh-4885)', function(done) {

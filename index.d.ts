@@ -714,7 +714,9 @@ declare module 'mongoose' {
 
   type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
   interface AnyObject { [k: string]: any }
-  type EnforceDocument<T, TMethods> = T extends Document ? T : (Document<any, any, T> & T & TMethods);
+
+  type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
+  type EnforceDocument<T, TMethods> = T extends Document ? Require_id<T> : (Document<any, any, T> & Require_id<T> & TMethods);
 
   interface IndexesDiff {
     /** Indexes that would be created in mongodb. */

@@ -1,3 +1,12 @@
+5.13.9 / 2021-09-06
+===================
+ * fix(populate): avoid setting empty array on lean document when populate result is undefined #10599
+ * fix(document): make depopulate() handle populated paths underneath document arrays #10592
+ * fix: peg @types/bson version to 1.x || 4.0.x to avoid stubbed 4.2.x release #10678
+ * fix(index.d.ts): simplify UpdateQuery to avoid "excessively deep and possibly infinite" errors with `extends Document` and `any` #10647
+ * fix(index.d.ts): allow specifying weights as an IndexOption #10586
+ * fix: upgrade to mpath v0.8.4 re: security issue #10683
+
 6.0.4 / 2021-09-01
 ==================
  * fix(schema): handle maps of maps #10644

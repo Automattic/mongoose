@@ -6744,7 +6744,6 @@ describe('Model', function() {
     obj = { age: '42' };
     await Model.validate(obj, ['age']);
     assert.strictEqual(obj.age, 42);
-
   });
 
   it('Model.validate(...) validates paths in arrays (gh-8821)', async function() {
@@ -6759,6 +6758,19 @@ describe('Model', function() {
     assert.ok(err.errors['friends.0']);
     assert.ok(err.errors['friends.1']);
 
+  });
+
+  it('Model.validate() works with arrays (gh-10669)', async function() {
+    const testSchema = new Schema({
+      docs: [String]
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    const test = { docs: ['6132655f2cdb9d94eaebc09b'] };
+
+    const err = await Test.validate(test);
+    assert.ifError(err);
   });
 
   it('Model.validate(...) uses document instance as context by default (gh-10132)', async function() {

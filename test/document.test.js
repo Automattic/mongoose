@@ -8262,6 +8262,33 @@ describe('document', function() {
     assert.ifError(err);
   });
 
+  it('enum object syntax for number (gh-10648) (gh-8139)', function() {
+    const schema = Schema({
+      num: {
+        type: Number,
+        enum: {
+          values: [1, 2, 3],
+          message: 'Invalid number'
+        }
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    let doc = new Model({});
+    let err = doc.validateSync();
+    assert.ifError(err);
+
+    doc = new Model({ num: 4 });
+    err = doc.validateSync();
+    assert.ok(err);
+    assert.equal(err.errors['num'].name, 'ValidatorError');
+    assert.equal(err.errors['num'].message, 'Invalid number');
+
+    doc = new Model({ num: 2 });
+    err = doc.validateSync();
+    assert.ifError(err);
+  });
+
   it('support `pathsToValidate()` option for `validate()` (gh-7587)', async function() {
     const schema = Schema({
       name: {
@@ -10698,5 +10725,46 @@ describe('document', function() {
     await doc.save();
     const res = await Test.findOne({ _id: doc._id, 'profile.name': { first: 'Miyamoto', last: 'Musashi' } });
     assert.ok(res);
+  });
+
+  it('depopulate all should depopulate nested array population (gh-10592)', async function() {
+    const Person = db.model('Person', {
+      name: String
+    });
+
+    const Band = db.model('Band', {
+      name: String,
+      members: [{ type: Schema.Types.ObjectId, ref: 'Person' }],
+      lead: { type: Schema.Types.ObjectId, ref: 'Person' },
+      embeddedMembers: [{
+        active: Boolean,
+        member: {
+          type: Schema.Types.ObjectId, ref: 'Person'
+        }
+      }]
+    });
+
+    const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
+
+    const docs = await Person.create(people);
+    let band = {
+      name: 'Guns N\' Roses',
+      members: [docs[0]._id, docs[1]],
+      lead: docs[0]._id,
+      embeddedMembers: [{ active: true, member: docs[0]._id }, { active: false, member: docs[1]._id }]
+    };
+    band = await Band.create(band);
+    await band.populate('members lead embeddedMembers.member');
+    assert.ok(band.populated('members'));
+    assert.ok(band.populated('lead'));
+    assert.ok(band.populated('embeddedMembers.member'));
+    assert.equal(band.members[0].name, 'Axl Rose');
+    assert.equal(band.embeddedMembers[0].member.name, 'Axl Rose');
+    band.depopulate();
+
+    assert.ok(!band.populated('members'));
+    assert.ok(!band.populated('lead'));
+    assert.ok(!band.populated('embeddedMembers.member'));
+    assert.ok(!band.embeddedMembers[0].member.name);
   });
 });

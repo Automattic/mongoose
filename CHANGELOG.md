@@ -1,3 +1,27 @@
+6.0.5 / 2021-09-06
+==================
+ * fix(model): allow calling Model.validate() static with POJO array #10669
+ * fix(cast): let $expr through in query filters if strict mode enabled #10662
+ * fix(map): propagate flattenMaps option down to nested maps #10653
+ * fix(setDefaultsOnInsert): avoid adding unnecessary auto _id to $setOnInsert #10646
+ * fix(schema): support object with values and message syntax for Number enums #10648
+ * fix(index.d.ts): fix Document#populate() type #10651 [thiagokisaki](https://github.com/thiagokisaki)
+ * fix(index.d.ts): allow using $in and $nin on array paths #10605
+ * fix(index.d.ts): make _id required in query results and return value from `create()` #10657
+ * docs: update deprecations.md to reflect version 6 #10673 [multiwebinc](https://github.com/multiwebinc)
+ * docs: fix typo in queries.md #10681 [yogabonito](https://github.com/yogabonito)
+ * docs: fix typo in models.md #10680 [yogabonito](https://github.com/yogabonito)
+ * ci: add test for ubuntu-20.04 #10679 [YC](https://github.com/YC)
+
+5.13.9 / 2021-09-06
+===================
+ * fix(populate): avoid setting empty array on lean document when populate result is undefined #10599
+ * fix(document): make depopulate() handle populated paths underneath document arrays #10592
+ * fix: peg @types/bson version to 1.x || 4.0.x to avoid stubbed 4.2.x release #10678
+ * fix(index.d.ts): simplify UpdateQuery to avoid "excessively deep and possibly infinite" errors with `extends Document` and `any` #10647
+ * fix(index.d.ts): allow specifying weights as an IndexOption #10586
+ * fix: upgrade to mpath v0.8.4 re: security issue #10683
+
 6.0.4 / 2021-09-01
 ==================
  * fix(schema): handle maps of maps #10644

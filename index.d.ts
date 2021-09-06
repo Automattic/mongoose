@@ -642,15 +642,11 @@ declare module 'mongoose' {
      */
     $parent(): Document | undefined;
 
-    /**
-     * Populates document references.
-     */
-    populate(path: string | string[]): Promise<this>;
-    populate(path: string | string[], callback: Callback<this>): void;
+    /** Populates document references. */
+    populate(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this>;
+    populate(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this>): void;
     populate(path: string, names: string): Promise<this>;
     populate(path: string, names: string, callback: Callback<this>): void;
-    populate(opts: PopulateOptions | Array<PopulateOptions>): Promise<this>;
-    populate(opts: PopulateOptions | Array<PopulateOptions>, callback: Callback<this>): void;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
@@ -718,7 +714,9 @@ declare module 'mongoose' {
 
   type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
   interface AnyObject { [k: string]: any }
-  type EnforceDocument<T, TMethods> = T extends Document ? T : (Document<any, any, T> & T & TMethods);
+
+  type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
+  type EnforceDocument<T, TMethods> = T extends Document ? Require_id<T> : (Document<any, any, T> & Require_id<T> & TMethods);
 
   interface IndexesDiff {
     /** Indexes that would be created in mongodb. */
@@ -2460,11 +2458,11 @@ declare module 'mongoose' {
     $eq?: T;
     $gt?: T;
     $gte?: T;
-    $in?: T[];
+    $in?: T extends AnyArray<any> ? Unpacked<T>[] : T[];
     $lt?: T;
     $lte?: T;
     $ne?: T;
-    $nin?: T[];
+    $nin?: T extends AnyArray<any> ? Unpacked<T>[] : T[];
     // Logical
     $not?: T extends string ? QuerySelector<T> | RegExp : QuerySelector<T>;
     // Element
@@ -2604,7 +2602,18 @@ declare module 'mongoose' {
     { $replaceRoot: any } |
     { $replaceWith: any };
 
-  export type UpdateQuery<T> = _UpdateQuery<DocumentDefinition<T>> & MatchKeysAndValues<DocumentDefinition<T>>;
+  type __UpdateDefProperty<T> =
+    0 extends (1 & T) ? T : // any
+    T extends unknown[] ? LeanArray<T> : // Array
+    T extends Document ? LeanDocument<T> : // Subdocument
+    [Extract<T, mongodb.ObjectId>] extends [never] ? T :
+    T | string;
+  type __UpdateQueryDef<T> = {
+    [K in keyof T]: __UpdateDefProperty<T[K]>;
+  };
+  type _UpdateQueryDef<T> = __UpdateQueryDef<T>;
+
+  export type UpdateQuery<T> = (_UpdateQuery<_UpdateQueryDef<T>> & MatchKeysAndValues<_UpdateQueryDef<LeanDocument<T>>>);
 
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never]

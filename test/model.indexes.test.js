@@ -47,7 +47,7 @@ describe('model', function() {
       const IndexedModel = db.model('Test', Indexed);
       let assertions = 0;
 
-      await Indexed.init();
+      await IndexedModel.init();
 
       const indexes = await IndexedModel.collection.getIndexes({ full: true });
 
@@ -85,7 +85,7 @@ describe('model', function() {
 
       await UserModel.init();
 
-      const mongoIndexes = await UserModel.collection.getIndexes();
+      const mongoIndexes = Object.values(await UserModel.collection.getIndexes());
 
       for (const mongoIndex in mongoIndexes) {
         mongoIndexes[mongoIndex].forEach(function iter(mongoIndex) {

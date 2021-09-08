@@ -1348,7 +1348,7 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  type SchemaDefinitionWithBuiltInClass<T extends number | string | boolean | NativeDate | Function> = T extends number
+  type SchemaDefinitionWithBuiltInClass<T> = T extends number
     ? (typeof Number | 'number' | 'Number' | typeof Schema.Types.Number)
     : T extends string
     ? (typeof String | 'string' | 'String' | typeof Schema.Types.String)
@@ -1358,19 +1358,15 @@ declare module 'mongoose' {
     ? (typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date)
     : (Function | string);
 
-  type SchemaDefinitionProperty<T = undefined> = T extends string | number | boolean | NativeDate | Function
-    ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
+  type SchemaDefinitionProperty<T = undefined> = SchemaDefinitionWithBuiltInClass<T> |
     SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
     Schema<any, any, any> |
     Schema<any, any, any>[] |
-    ReadonlyArray<Schema<any, any, any>> |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
-    ReadonlyArray<SchemaTypeOptions<T extends undefined ? any : T>> |
     Function[] |
     SchemaDefinition<T> |
-    SchemaDefinition<T>[] |
-    ReadonlyArray<SchemaDefinition<T>>;
+    SchemaDefinition<T>[];
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
@@ -1531,8 +1527,7 @@ declare module 'mongoose' {
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends Schema<any, any> ? T :
-      T extends object[] ? (AnyArray<Schema<Unpacked<T>>> | AnyArray<Schema<Document & Unpacked<T>>> | AnyArray<SchemaDefinition<Unpacked<T>>>) :
+      T extends object[] ? (AnyArray<Schema<any>> | AnyArray<SchemaDefinition<Unpacked<T>>>) :
       T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> :
       T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> :
       T extends boolean[] ? AnyArray<SchemaDefinitionWithBuiltInClass<boolean>> :
@@ -2530,19 +2525,14 @@ declare module 'mongoose' {
 
   type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & DotAndArrayNotation<any>;
 
+  type AllowStringForObjectId<T> = T extends mongodb.ObjectId ? T | string : T;
   type AllowRegexpForStrings<T> = T extends string ? T | RegExp : T;
   type AllowArrayElementQuery<T> = T extends (infer U)[] ? T | U : T;
 
-  type Condition<T> = AllowRegexpForStrings<T> | AllowArrayElementQuery<T> | QuerySelector<T>;
+  type Condition<T> = AllowStringForObjectId<T> | AllowRegexpForStrings<T> | AllowArrayElementQuery<T> | QuerySelector<T>;
 
   type _FilterQuery<T> = {
-    [P in keyof T]?: P extends '_id'
-    ? [Extract<T[P], mongodb.ObjectId>] extends [never]
-    ? Condition<T[P]>
-    : Condition<T[P] | string | { _id: mongodb.ObjectId }>
-    : [Extract<T[P], mongodb.ObjectId>] extends [never]
-    ? Condition<T[P]>
-    : Condition<T[P] | string>;
+    [P in keyof T]?: Condition<T[P]>;
   } &
     RootQuerySelector<T>;
 

@@ -10782,7 +10782,7 @@ describe('document', function() {
        await saved.save();
        let document = await Model.findById({_id: saved._id});
        document.values.set('abc', {entries: 'a'});
-       document.values.set('abcd', {entries: 'b'});
+       document.values.set('abc-d', {entries: 'b'});
        console.log('======================================================================================')
        await document.save();
   });

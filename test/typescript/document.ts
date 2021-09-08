@@ -1,4 +1,4 @@
-import { Schema, model, Model, Document, Error } from 'mongoose';
+import { Schema, model, Model, Document, Error, Types } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String', required: true }, address: new Schema({ city: { type: String, required: true } }) });
 
@@ -58,4 +58,32 @@ function testMethods(): void {
 
   const doc = new UserModel({ first: 'test', last: 'test' });
   doc.fullName().toUpperCase();
+}
+
+function testRequiredId(): void {
+  // gh-10657
+  interface Foo {
+    _id: string;
+    label: string;
+  }
+
+  const FooSchema = new Schema<Foo, Model<Foo>, Foo>({
+    _id: String,
+    label: { type: String }
+  });
+
+  const Foo: Model<Foo> = model<Foo>('Foo', FooSchema);
+
+  type FooInput = {
+    label: string;
+  };
+
+  type FooOutput = {
+    _id: string;
+    label: string;
+  };
+
+  const createFoo = async(foo: FooInput): Promise<FooOutput> => {
+    return await Foo.create(foo);
+  };
 }

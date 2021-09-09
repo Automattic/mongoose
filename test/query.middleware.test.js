@@ -474,7 +474,8 @@ describe('query middleware', function() {
 
     const query = { _id: books[1]._id };
     const update = { title: 'Professional AngularJS' };
-    await Book.updateOne(query, update);
+    const err = await Book.updateOne(query, update).then(() => null, err => err);
+    assert.equal(err.message, 'woops');
   });
 
   it('error handlers for validate (gh-4885)', function(done) {

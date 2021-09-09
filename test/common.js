@@ -7,6 +7,7 @@
 const mongoose = require('../');
 const Collection = mongoose.Collection;
 const assert = require('assert');
+const { promisify } = require('util');
 
 const collectionNames = new Map();
 
@@ -137,6 +138,7 @@ module.exports.mongoose = mongoose;
 
 module.exports.mongodVersion = function(cb) {
   const db = module.exports();
+
   db.on('error', cb);
 
   db.on('open', function() {
@@ -154,6 +156,8 @@ module.exports.mongodVersion = function(cb) {
     });
   });
 };
+
+module.exports.promisifiedMongodVersion = promisify(module.exports.mongodVersion);
 
 function dropDBs(done) {
   const db = module.exports({ noErrorListener: true });

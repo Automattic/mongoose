@@ -4435,44 +4435,35 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany() ordered option for constraint errors (gh-3893)', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          done();
-          return;
-        }
+    it('insertMany() ordered option for constraint errors (gh-3893)', async function() {
+      const version = await start.promisifiedMongodVersion();
 
-        test().then(() => done(null), done);
-      });
-
-      async function test() {
-        const schema = new Schema({
-          name: { type: String, unique: true }
-        });
-        const Movie = db.model('Movie', schema);
-
-        const arr = [
-          { name: 'Star Wars' },
-          { name: 'Star Wars' },
-          { name: 'The Empire Strikes Back' }
-        ];
-        await Movie.init();
-
-        const error = await Movie.insertMany(arr, { ordered: false }).then(() => null, err => err);
-
-        assert.equal(error.message.indexOf('E11000'), 0);
-        const docs = await Movie.find({}).sort({ name: 1 }).exec();
-
-        assert.equal(docs.length, 2);
-        assert.equal(docs[0].name, 'Star Wars');
-        assert.equal(docs[1].name, 'The Empire Strikes Back');
-        await Movie.collection.drop(done);
+      const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+      if (!mongo34) {
+        return;
       }
+
+      const schema = new Schema({
+        name: { type: String, unique: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { name: 'Star Wars' },
+        { name: 'Star Wars' },
+        { name: 'The Empire Strikes Back' }
+      ];
+      await Movie.init();
+
+      const error = await Movie.insertMany(arr, { ordered: false }).then(() => null, err => err);
+
+      assert.equal(error.message.indexOf('E11000'), 0);
+      const docs = await Movie.find({}).sort({ name: 1 }).exec();
+
+      assert.equal(docs.length, 2);
+      assert.equal(docs[0].name, 'Star Wars');
+      assert.equal(docs[1].name, 'The Empire Strikes Back');
+      await Movie.collection.drop();
     });
 
     describe('insertMany() lean option to bypass validation (gh-8234)', () => {

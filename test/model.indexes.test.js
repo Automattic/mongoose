@@ -152,31 +152,35 @@ describe('model', function() {
       });
 
       const UserModel = db.model('Test', User);
-      let assertions = 0;
 
       await UserModel.init();
 
-      const mongoIndexes = await UserModel.collection.getIndexes();
+      const mongoIndexesNames = Object.values(await UserModel.collection.getIndexes()).map(indexArray => indexArray[0][0]);
 
-      for (const mongoIndex of mongoIndexes) {
-        if (mongoIndex[0] === 'name') {
-          ++assertions;
-        }
-        if (mongoIndex[0] === 'blogposts._id') {
-          ++assertions;
-        }
-        if (mongoIndex[0] === 'blogposts.title') {
-          ++assertions;
-        }
-        if (mongoIndex[0] === 'featured._id') {
-          ++assertions;
-        }
-        if (mongoIndex[0] === 'featured.title') {
-          ++assertions;
+      const existingIndexesMap = {
+        name: false,
+        'blogposts._id': false,
+        'blogposts.title': false,
+        'featured._id': false,
+        'featured.title': false
+      };
+
+      for (const mongoIndexName of mongoIndexesNames) {
+        if (existingIndexesMap[mongoIndexName] != null) {
+          existingIndexesMap[mongoIndexName] = true;
         }
       }
 
-      assert.equal(assertions, 5);
+      assert.deepEqual(
+        existingIndexesMap,
+        {
+          name: true,
+          'blogposts._id': true,
+          'blogposts.title': true,
+          'featured._id': true,
+          'featured.title': true
+        }
+      );
     });
 
     it('compound: on embedded docs', async function() {

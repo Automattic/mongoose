@@ -2123,18 +2123,14 @@ describe('model: querying:', function() {
 
     // mongodb 2.4
     let mongo24_or_greater = false;
-    before(function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          throw err;
-        }
+    before(async function() {
+      const version = await start.promisifiedMongodVersion();
 
-        mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
-        if (!mongo24_or_greater) {
-          console.log('not testing mongodb 2.4 features');
-        }
-        done();
-      });
+      mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
+
+      if (!mongo24_or_greater) {
+        console.log('not testing mongodb 2.4 features');
+      }
     });
 
     it('index is allowed in schema', function(done) {
@@ -2175,9 +2171,9 @@ describe('model: querying:', function() {
     });
 
     describe('$geoIntersects', function() {
-      it('LineString', async function(done) {
+      it('LineString', async function() {
         if (!mongo24_or_greater) {
-          return done();
+          return;
         }
 
         const Test = db.model('Test', geoSchema);

@@ -712,7 +712,15 @@ declare module 'mongoose' {
     discriminator<D>(name: string | number, schema: Schema, value?: string | number | ObjectId): Model<D>;
     discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
+  
+  type IfEquals<X, Y, A=X, B=never> =
+  (<T>() => T extends X ? 1 : 2) extends
+  (<T>() => T extends Y ? 1 : 2) ? A : B;
 
+  type ReadonlyKeys<T> = {
+    [P in keyof T]-?: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, never, P>
+  }[keyof T];
+  
   type AnyKeys<T> = { [P in keyof T]: T[P] | any };
   interface AnyObject { [k: string]: any }
 
@@ -728,7 +736,7 @@ declare module 'mongoose' {
 
   export const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethods = {}, TSchemaDefinitionType = T> extends NodeJS.EventEmitter, AcceptsDiscriminator {
-    new(doc?: AnyKeys<TSchemaDefinitionType> & AnyObject): EnforceDocument<T, TMethods>;
+    new(doc?: AnyKeys<Omit<TSchemaDefinitionType, ReadonlyKeys<TSchemaDefinitionType>>> & AnyObject): EnforceDocument<T, TMethods>;
 
     aggregate<R = any>(pipeline?: any[], options?: Record<string, unknown>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: any[], cb: Function): Promise<Array<R>>;

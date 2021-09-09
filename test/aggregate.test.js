@@ -676,50 +676,37 @@ describe('aggregate: ', function() {
         });
     });
 
-    it('graphLookup', function(done) {
+    it('graphLookup', async function() {
       const _this = this;
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          _this.skip();
-        }
-        test();
-      });
+      const version = await start.promisifiedMongodVersion();
 
-      function test() {
-        const aggregate = new Aggregate([], db.model('Employee'));
-
-        aggregate.
-          graphLookup({
-            from: 'Employee',
-            startWith: '$reportsTo',
-            connectFromField: 'reportsTo',
-            connectToField: 'name',
-            as: 'employeeHierarchy'
-          }).
-          sort({ name: 1 }).
-          exec(function(err, docs) {
-            if (err) {
-              return done(err);
-            }
-            const lowest = docs[3];
-            assert.equal(lowest.name, 'Dave');
-            assert.equal(lowest.employeeHierarchy.length, 3);
-
-            // First result in array is max depth result
-            const names = lowest.employeeHierarchy.map(function(doc) {
-              return doc.name;
-            }).sort();
-            assert.equal(names[0], 'Alice');
-            assert.equal(names[1], 'Bob');
-            assert.equal(names[2], 'Carol');
-            done();
-          });
+      const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+      if (!mongo34) {
+        _this.skip();
       }
+
+      const aggregate = new Aggregate([], db.model('Employee'));
+
+      const docs = await aggregate.
+        graphLookup({
+          from: 'Employee',
+          startWith: '$reportsTo',
+          connectFromField: 'reportsTo',
+          connectToField: 'name',
+          as: 'employeeHierarchy'
+        }).
+        sort({ name: 1 }).
+        exec();
+
+      const lowest = docs[3];
+      assert.equal(lowest.name, 'Dave');
+      assert.equal(lowest.employeeHierarchy.length, 3);
+
+      // First result in array is max depth result
+      const names = lowest.employeeHierarchy.map((doc) => doc.name).sort();
+      assert.equal(names[0], 'Alice');
+      assert.equal(names[1], 'Bob');
+      assert.equal(names[2], 'Carol');
     });
 
     it('facet', function(done) {

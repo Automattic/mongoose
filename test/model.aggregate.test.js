@@ -41,6 +41,7 @@ describe('model aggregate', function() {
     const docs = [];
     maxAge = 0;
 
+
     for (let i = 0; i < num; ++i) {
       const age = Math.random() * 100 | 0;
       maxAge = Math.max(maxAge, age);

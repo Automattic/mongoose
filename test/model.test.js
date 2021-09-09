@@ -4515,43 +4515,30 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany() ordered option for validation errors (gh-5068)', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          done();
-          return;
-        }
+    it('insertMany() ordered option for validation errors (gh-5068)', async function() {
+      const version = await start.promisifiedMongodVersion();
 
-        test();
-      });
-
-      function test() {
-        const schema = new Schema({
-          name: { type: String, required: true }
-        });
-        const Movie = db.model('Movie', schema);
-
-        const arr = [
-          { name: 'Star Wars' },
-          { foo: 'Star Wars' },
-          { name: 'The Empire Strikes Back' }
-        ];
-        Movie.insertMany(arr, { ordered: false }, function(error) {
-          assert.ifError(error);
-          Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
-            assert.ifError(error);
-            assert.equal(docs.length, 2);
-            assert.equal(docs[0].name, 'Star Wars');
-            assert.equal(docs[1].name, 'The Empire Strikes Back');
-            done();
-          });
-        });
+      const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+      if (!mongo34) {
+        return;
       }
+
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { name: 'Star Wars' },
+        { foo: 'Star Wars' },
+        { name: 'The Empire Strikes Back' }
+      ];
+      await Movie.insertMany(arr, { ordered: false });
+
+      const docs = await Movie.find({}).sort({ name: 1 }).exec();
+      assert.equal(docs.length, 2);
+      assert.equal(docs[0].name, 'Star Wars');
+      assert.equal(docs[1].name, 'The Empire Strikes Back');
     });
 
     it('insertMany() `writeErrors` if only one error (gh-8938)', async function() {
@@ -4590,39 +4577,28 @@ describe('Model', function() {
 
     });
 
-    it('insertMany() ordered option for single validation error', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          done();
-          return;
-        }
+    it('insertMany() ordered option for single validation error', async function() {
+      const version = start.promisifiedMongodVersion();
 
-        test();
-      });
-
-      function test() {
-        const schema = new Schema({
-          name: { type: String, required: true }
-        });
-        const Movie = db.model('Movie', schema);
-
-        const arr = [
-          { foo: 'Star Wars' },
-          { foo: 'The Fast and the Furious' }
-        ];
-        Movie.insertMany(arr, { ordered: false }, function(error) {
-          assert.ifError(error);
-          Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
-            assert.equal(docs.length, 0);
-            done();
-          });
-        });
+      const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+      if (!mongo34) {
+        return;
       }
+
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { foo: 'Star Wars' },
+        { foo: 'The Fast and the Furious' }
+      ];
+      await Movie.insertMany(arr, { ordered: false });
+
+      const docs = await Movie.find({}).sort({ name: 1 }).exec();
+
+      assert.equal(docs.length, 0);
     });
 
     it('insertMany() hooks (gh-3846)', function(done) {
@@ -5231,7 +5207,7 @@ describe('Model', function() {
       describe('sessions (gh-6362)', function() {
         let MyModel;
 
-        beforeEach(function(done) {
+        beforeEach(async function() {
           const nestedSchema = new Schema({ foo: String });
           db.deleteModel(/Test/);
           MyModel = db.model('Test', new Schema({
@@ -5240,18 +5216,12 @@ describe('Model', function() {
             arr: [nestedSchema]
           }));
 
-          start.mongodVersion((err, version) => {
-            if (err) {
-              done(err);
-              return;
-            }
-            const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
-            if (!mongo36) {
-              this.skip();
-            }
+          const version = await start.promisifiedMongodVersion();
 
-            done();
-          });
+          const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
+          if (!mongo36) {
+            this.skip();
+          }
         });
 
         it('startSession()', async function() {

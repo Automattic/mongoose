@@ -70,7 +70,7 @@ describe('model: querying:', function() {
 
   let mongo26_or_greater = false;
   before(async function() {
-    const version = await start.promisifiedMongodVersion();
+    const version = await start.mongodVersion();
 
     mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
     if (!mongo26_or_greater) {
@@ -1688,7 +1688,7 @@ describe('model: querying:', function() {
     });
 
     it('with $elemMatch (gh-3163)', async function() {
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
 
       const mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
       if (!mongo26_or_greater) {
@@ -2116,7 +2116,7 @@ describe('model: querying:', function() {
     // mongodb 2.4
     let mongo24_or_greater = false;
     before(async function() {
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
 
       mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
 
@@ -2339,7 +2339,7 @@ describe('model: querying:', function() {
     let mongo24_or_greater = false;
 
     before(async function() {
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
 
       mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
       if (!mongo24_or_greater) {
@@ -2485,7 +2485,7 @@ describe('model: querying:', function() {
       let mongo26 = false;
 
       before(async function() {
-        const version = await start.promisifiedMongodVersion();
+        const version = await start.mongodVersion();
 
         mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
       });

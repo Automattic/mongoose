@@ -7,7 +7,6 @@
 const mongoose = require('../');
 const Collection = mongoose.Collection;
 const assert = require('assert');
-const { promisify } = require('util');
 
 const collectionNames = new Map();
 
@@ -136,28 +135,29 @@ module.exports.mongoose = mongoose;
  * expose mongod version helper
  */
 
-module.exports.mongodVersion = function(cb) {
-  const db = module.exports();
+module.exports.mongodVersion = async function() {
+  return new Promise((resolve, reject) => {
+    const db = module.exports();
 
-  db.on('error', cb);
 
-  db.on('open', function() {
-    const admin = db.db.admin();
-    admin.serverStatus(function(err, info) {
-      if (err) {
-        return cb(err);
-      }
-      const version = info.version.split('.').map(function(n) {
-        return parseInt(n, 10);
-      });
-      db.close(function() {
-        cb(null, version);
+    db.on('error', reject);
+
+    db.on('open', function() {
+      const admin = db.db.admin();
+      admin.serverStatus(function(err, info) {
+        if (err) {
+          return reject(err);
+        }
+        const version = info.version.split('.').map(function(n) {
+          return parseInt(n, 10);
+        });
+        db.close(function() {
+          resolve(version);
+        });
       });
     });
   });
 };
-
-module.exports.promisifiedMongodVersion = promisify(module.exports.mongodVersion);
 
 function dropDBs(done) {
   const db = module.exports({ noErrorListener: true });

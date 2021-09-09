@@ -5714,7 +5714,7 @@ describe('model: populate:', function() {
       });
 
       it('populate with Decimal128 as ref (gh-4759)', async function() {
-        const version = await start.promisifiedMongodVersion();
+        const version = await start.mongodVersion();
 
         const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
         if (!mongo34) {

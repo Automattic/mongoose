@@ -29,7 +29,7 @@ describe('transactions', function() {
         throw new Error('skip');
       }
 
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
 
       if (version[0] < 4) {
         _skipped = true;

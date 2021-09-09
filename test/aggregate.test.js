@@ -53,27 +53,20 @@ function setupData(db, callback) {
  *
  * @param {String} semver, `3.4`, specify minimum compatible mongod version
  * @param {Object} ctx, `this`, so that mocha tests can be skipped
- * @param {Function} done
  * @return {Void}
  */
-function onlyTestAtOrAbove(semver, ctx, done) {
-  start.mongodVersion(function(err, version) {
-    if (err) {
-      done(err);
-      return;
-    }
+async function onlyTestAtOrAbove(semver, ctx) {
+  const version = await start.mongodVersion();
 
-    const desired = semver.split('.').map(function(s) {
-      return parseInt(s);
-    });
-
-    const meetsMinimum = version[0] > desired[0] || (version[0] === desired[0] && version[1] >= desired[1]);
-
-    if (!meetsMinimum) {
-      ctx.skip();
-    }
-    done();
+  const desired = semver.split('.').map(function(s) {
+    return parseInt(s);
   });
+
+  const meetsMinimum = version[0] > desired[0] || (version[0] === desired[0] && version[1] >= desired[1]);
+
+  if (!meetsMinimum) {
+    ctx.skip();
+  }
 }
 
 /**
@@ -395,8 +388,8 @@ describe('aggregate: ', function() {
   });
 
   describe('Mongo 3.4 operators', function() {
-    before(function(done) {
-      onlyTestAtOrAbove('3.4', this, done);
+    before(async function() {
+      await onlyTestAtOrAbove('3.4', this);
     });
 
     describe('graphLookup', function() {
@@ -678,7 +671,7 @@ describe('aggregate: ', function() {
 
     it('graphLookup', async function() {
       const _this = this;
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
 
       const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
       if (!mongo34) {
@@ -709,52 +702,42 @@ describe('aggregate: ', function() {
       assert.equal(names[2], 'Carol');
     });
 
-    it('facet', function(done) {
+    it('facet', async function() {
       const _this = this;
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          _this.skip();
-        }
-        test();
-      });
+      const version = await start.mongodVersion();
 
-      function test() {
-        const aggregate = new Aggregate([], db.model('Employee'));
-
-        aggregate.
-          facet({
-            departments: [
-              {
-                $group: { _id: '$dept', count: { $sum: 1 } }
-              }
-            ],
-            employeesPerCustomer: [
-              { $unwind: '$customers' },
-              { $sortByCount: '$customers' },
-              { $sort: { _id: 1 } }
-            ]
-          }).
-          exec(function(error, docs) {
-            if (error) {
-              return done(error);
-            }
-            assert.deepEqual(docs[0].departments.map(d => d.count), [2, 2]);
-
-            assert.deepEqual(docs[0].employeesPerCustomer, [
-              { _id: 'Eve', count: 1 },
-              { _id: 'Fred', count: 1 },
-              { _id: 'Gary', count: 1 },
-              { _id: 'Herbert', count: 1 },
-              { _id: 'Isaac', count: 1 }
-            ]);
-            done();
-          });
+      const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+      if (!mongo34) {
+        _this.skip();
       }
+
+
+      const aggregate = new Aggregate([], db.model('Employee'));
+
+      const docs = await aggregate.
+        facet({
+          departments: [
+            {
+              $group: { _id: '$dept', count: { $sum: 1 } }
+            }
+          ],
+          employeesPerCustomer: [
+            { $unwind: '$customers' },
+            { $sortByCount: '$customers' },
+            { $sort: { _id: 1 } }
+          ]
+        }).
+        exec();
+
+      assert.deepEqual(docs[0].departments.map(d => d.count), [2, 2]);
+
+      assert.deepEqual(docs[0].employeesPerCustomer, [
+        { _id: 'Eve', count: 1 },
+        { _id: 'Fred', count: 1 },
+        { _id: 'Gary', count: 1 },
+        { _id: 'Herbert', count: 1 },
+        { _id: 'Isaac', count: 1 }
+      ]);
     });
 
     it('complex pipeline', function(done) {
@@ -786,30 +769,22 @@ describe('aggregate: ', function() {
       assert.deepEqual(pipeline, [{ $match: { sal: { $lt: 16000 } } }]);
     });
 
-    it('explain()', function(done) {
+    it('explain()', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-        if (!mongo26) {
-          done();
-          return;
-        }
+      const version = await start.mongodVersion();
 
-        aggregate.
-          match({ sal: { $lt: 16000 } }).
-          explain(function(err1, output) {
-            assert.ifError(err1);
-            assert.ok(output);
-            // make sure we got explain output
-            assert.ok(output.stages || output.queryPlanner);
+      const mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
+      if (!mongo26) {
+        return;
+      }
 
-            done();
-          });
-      });
+      const output = await aggregate.
+        match({ sal: { $lt: 16000 } }).
+        explain();
+
+      assert.ok(output);
+      // make sure we got explain output
+      assert.ok(output.stages || output.queryPlanner);
     });
 
     describe('error when empty pipeline', function() {
@@ -855,7 +830,7 @@ describe('aggregate: ', function() {
     });
 
     it('handles aggregation options', async function() {
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
 
       const m = db.model('Employee');
       const match = { $match: { sal: { $gt: 15000 } } };
@@ -1232,8 +1207,8 @@ describe('aggregate: ', function() {
   });
 
   describe('Mongo 3.6 options', function() {
-    before(function(done) {
-      onlyTestAtOrAbove('3.6', this, done);
+    before(async function() {
+      await onlyTestAtOrAbove('3.6', this);
     });
 
     it('adds hint option', async function() {

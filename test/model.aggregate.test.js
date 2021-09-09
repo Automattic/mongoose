@@ -50,7 +50,7 @@ describe('model aggregate', function() {
 
     await A.create(docs);
 
-    const version = await start.promisifiedMongodVersion();
+    const version = await start.mongodVersion();
 
     mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
 

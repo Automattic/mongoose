@@ -4436,7 +4436,7 @@ describe('Model', function() {
     });
 
     it('insertMany() ordered option for constraint errors (gh-3893)', async function() {
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
 
       const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
       if (!mongo34) {
@@ -4516,7 +4516,7 @@ describe('Model', function() {
     });
 
     it('insertMany() ordered option for validation errors (gh-5068)', async function() {
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
 
       const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
       if (!mongo34) {
@@ -4578,7 +4578,7 @@ describe('Model', function() {
     });
 
     it('insertMany() ordered option for single validation error', async function() {
-      const version = start.promisifiedMongodVersion();
+      const version = start.mongodVersion();
 
       const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
       if (!mongo34) {
@@ -5033,7 +5033,7 @@ describe('Model', function() {
 
     describe('3.6 features', function() {
       before(async function() {
-        const version = await start.promisifiedMongodVersion();
+        const version = await start.mongodVersion();
         const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
 
         if (!mongo36) {
@@ -5216,7 +5216,7 @@ describe('Model', function() {
             arr: [nestedSchema]
           }));
 
-          const version = await start.promisifiedMongodVersion();
+          const version = await start.mongodVersion();
 
           const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
           if (!mongo36) {
@@ -5833,7 +5833,7 @@ describe('Model', function() {
     });
 
     it('insertMany with Decimal (gh-5190)', async function() {
-      const version = start.promisifiedMongodVersion();
+      const version = start.mongodVersion();
 
       const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
       if (!mongo34) {

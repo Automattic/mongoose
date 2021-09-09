@@ -633,7 +633,7 @@ describe('model: update:', function() {
     let mongo24_or_greater = false;
 
     before(async function() {
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
 
       mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
     });
@@ -727,7 +727,7 @@ describe('model: update:', function() {
     let mongo26_or_greater = false;
 
     before(async function() {
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
 
       mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
     });
@@ -2533,7 +2533,7 @@ describe('model: update:', function() {
     });
 
     it('update with Decimal type (gh-5361)', async function() {
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
       const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
       if (!mongo34) {
         return;
@@ -3227,7 +3227,7 @@ describe('model: updateOne: ', function() {
 
   describe('mongodb 42 features', function() {
     before(async function() {
-      const version = await start.promisifiedMongodVersion();
+      const version = await start.mongodVersion();
 
       if (version[0] < 4 || (version[0] === 4 && version[1] < 2)) {
         this.skip();

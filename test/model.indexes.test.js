@@ -283,34 +283,33 @@ describe('model', function() {
         secondValue: { type: Boolean }
       };
 
-      const User = new Schema(userSchema);
-      User.index({ name: 1 });
+      const userSchema1 = new Schema(userSchema);
+      userSchema1.index({ name: 1 });
 
-      const User2 = new Schema(userSchema);
-      User2.index({ name: 1 }, { unique: true });
-      User2.index({ secondValue: 1 });
+      const userSchema2 = new Schema(userSchema);
+      userSchema2.index({ name: 1 }, { unique: true });
+      userSchema2.index({ secondValue: 1 });
 
-      db.model('Test1', User, 'Test');
+      const collectionName = 'deepindexedmodel' + random();
+      // Create model with first schema to initialize indexes
+      db.model('SingleIndexedModel', userSchema1, collectionName);
 
       // Create model with second schema in same collection to add new indexes
-      const UserModel2 = db.model('Test2', User2, 'Test');
+      const UserModel2 = db.model('DuplicateIndexedModel', userSchema2, collectionName);
       let assertions = 0;
 
-      await UserModel2.init();
+      await UserModel2.init().catch(err => err);
 
-      const indexes = await UserModel2.collection.getIndexes();
+      const rawIndexesResponse = await UserModel2.collection.getIndexes();
+      const indexesNames = Object.values(rawIndexesResponse).map(indexArray => indexArray[0][0]);
 
-      function iter(index) {
-        if (index[0] === 'name') {
+      for (const indexName of indexesNames) {
+        if (indexName === 'name') {
           assertions++;
         }
-        if (index[0] === 'secondValue') {
+        if (indexName === 'secondValue') {
           assertions++;
         }
-      }
-
-      for (const i in indexes) {
-        indexes[i].forEach(iter);
       }
 
       assert.equal(assertions, 2);

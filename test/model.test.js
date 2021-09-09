@@ -5056,19 +5056,13 @@ describe('Model', function() {
     });
 
     describe('3.6 features', function() {
-      before(function(done) {
-        start.mongodVersion((err, version) => {
-          if (err) {
-            done(err);
-            return;
-          }
-          const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
-          if (!mongo36) {
-            this.skip();
-          }
+      before(async function() {
+        const version = await start.promisifiedMongodVersion();
+        const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
 
-          done();
-        });
+        if (!mongo36) {
+          this.skip();
+        }
       });
 
       it('arrayFilter (gh-5965)', async function() {
@@ -5868,32 +5862,20 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany with Decimal (gh-5190)', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          done();
-          return;
-        }
+    it('insertMany with Decimal (gh-5190)', async function() {
+      const version = start.promisifiedMongodVersion();
 
-        test();
-      });
-
-      function test() {
-        const schema = new mongoose.Schema({
-          amount: mongoose.Schema.Types.Decimal
-        });
-        const Money = db.model('Test', schema);
-
-        Money.insertMany([{ amount: '123.45' }], function(error) {
-          assert.ifError(error);
-          done();
-        });
+      const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+      if (!mongo34) {
+        return;
       }
+
+      const schema = new mongoose.Schema({
+        amount: mongoose.Schema.Types.Decimal
+      });
+      const Money = db.model('Test', schema);
+
+      await Money.insertMany([{ amount: '123.45' }]);
     });
 
     it('remove with cast error (gh-5323)', function(done) {

@@ -1558,19 +1558,14 @@ describe('Query', function() {
 
   describe('bug fixes', function() {
     describe('collations', function() {
-      before(function(done) {
+      before(async function() {
         const _this = this;
-        start.mongodVersion(function(err, version) {
-          if (err) {
-            return done(err);
-          }
-          const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-          if (!mongo34) {
-            return _this.skip();
-          }
+        const version = await start.promisifiedMongodVersion();
 
-          done();
-        });
+        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          return _this.skip();
+        }
       });
 
       it('collation support (gh-4839)', function(done) {

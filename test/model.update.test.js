@@ -632,12 +632,10 @@ describe('model: update:', function() {
   describe('mongodb 2.4 features', function() {
     let mongo24_or_greater = false;
 
-    before(function(done) {
-      start.mongodVersion(function(err, version) {
-        assert.ifError(err);
-        mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
-        done();
-      });
+    before(async function() {
+      const version = await start.promisifiedMongodVersion();
+
+      mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
     });
 
     it('$setOnInsert operator', function(done) {

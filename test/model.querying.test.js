@@ -69,17 +69,13 @@ describe('model: querying:', function() {
   });
 
   let mongo26_or_greater = false;
-  before(function(done) {
-    start.mongodVersion(function(err, version) {
-      if (err) {
-        throw err;
-      }
-      mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-      if (!mongo26_or_greater) {
-        console.log('not testing mongodb 2.6 features');
-      }
-      done();
-    });
+  before(async function() {
+    const version = await start.promisifiedMongodVersion();
+
+    mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
+    if (!mongo26_or_greater) {
+      console.log('not testing mongodb 2.6 features');
+    }
   });
 
   after(function(done) {
@@ -1691,33 +1687,29 @@ describe('model: querying:', function() {
       });
     });
 
-    it('with $elemMatch (gh-3163)', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          throw err;
-        }
-        const mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-        if (!mongo26_or_greater) {
-          return done();
-        }
+    it('with $elemMatch (gh-3163)', async function() {
+      const version = await start.promisifiedMongodVersion();
 
-        next();
+      const mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
+      if (!mongo26_or_greater) {
+        return;
+      }
+
+
+      const schema = new Schema({ test: [String] });
+      const MyModel = db.model('Test', schema);
+
+      await MyModel.create({ test: ['log1', 'log2'] });
+
+      const docs = await MyModel.find({
+        test: {
+          $all: [
+            { $elemMatch: { $regex: /log/g } }
+          ]
+        }
       });
 
-      const next = function() {
-        const schema = new Schema({ test: [String] });
-        const MyModel = db.model('Test', schema);
-
-        MyModel.create({ test: ['log1', 'log2'] }, function(error) {
-          assert.ifError(error);
-          const query = { test: { $all: [{ $elemMatch: { $regex: /log/g } }] } };
-          MyModel.find(query, function(error, docs) {
-            assert.ifError(error);
-            assert.equal(docs.length, 1);
-            done();
-          });
-        });
-      };
+      assert.equal(docs.length, 1);
     });
   });
 
@@ -2346,17 +2338,13 @@ describe('model: querying:', function() {
   describe('hashed indexes', function() {
     let mongo24_or_greater = false;
 
-    before(function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          return done(err);
-        }
-        mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
-        if (!mongo24_or_greater) {
-          console.log('not testing mongodb 2.4 features');
-        }
-        done();
-      });
+    before(async function() {
+      const version = await start.promisifiedMongodVersion();
+
+      mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
+      if (!mongo24_or_greater) {
+        console.log('not testing mongodb 2.4 features');
+      }
     });
 
     it('work', function(done) {
@@ -2496,14 +2484,10 @@ describe('model: querying:', function() {
     describe('$eq', function() {
       let mongo26 = false;
 
-      before(function(done) {
-        start.mongodVersion(function(err, version) {
-          if (err) {
-            return done(err);
-          }
-          mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-          done();
-        });
+      before(async function() {
+        const version = await start.promisifiedMongodVersion();
+
+        mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
       });
 
       it('casts $eq (gh-2752)', function(done) {

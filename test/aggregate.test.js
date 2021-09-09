@@ -867,40 +867,33 @@ describe('aggregate: ', function() {
       });
     });
 
-    it('handles aggregation options', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          throw err;
-        }
+    it('handles aggregation options', async function() {
+      const version = await start.promisifiedMongodVersion();
 
-        const m = db.model('Employee');
-        const match = { $match: { sal: { $gt: 15000 } } };
-        const pref = 'primaryPreferred';
-        const aggregate = m.aggregate([match]).read(pref);
-        const mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-        const mongo32_or_greater = version[0] > 3 || (version[0] === 3 && version[1] >= 2);
+      const m = db.model('Employee');
+      const match = { $match: { sal: { $gt: 15000 } } };
+      const pref = 'primaryPreferred';
+      const aggregate = m.aggregate([match]).read(pref);
+      const mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
+      const mongo32_or_greater = version[0] > 3 || (version[0] === 3 && version[1] >= 2);
 
-        assert.equal(aggregate.options.readPreference.mode, pref);
-        if (mongo26_or_greater) {
-          aggregate.allowDiskUse(true);
-          aggregate.option({ maxTimeMS: 1000 });
-          assert.equal(aggregate.options.allowDiskUse, true);
-          assert.equal(aggregate.options.maxTimeMS, 1000);
-        }
+      assert.equal(aggregate.options.readPreference.mode, pref);
+      if (mongo26_or_greater) {
+        aggregate.allowDiskUse(true);
+        aggregate.option({ maxTimeMS: 1000 });
+        assert.equal(aggregate.options.allowDiskUse, true);
+        assert.equal(aggregate.options.maxTimeMS, 1000);
+      }
 
-        if (mongo32_or_greater) {
-          aggregate.readConcern('m');
-          assert.deepEqual(aggregate.options.readConcern, { level: 'majority' });
-        }
+      if (mongo32_or_greater) {
+        aggregate.readConcern('m');
+        assert.deepEqual(aggregate.options.readConcern, { level: 'majority' });
+      }
 
-        aggregate.
-          exec(function(err, docs) {
-            assert.ifError(err);
-            assert.equal(1, docs.length);
-            assert.equal(docs[0].sal, 18000);
-            done();
-          });
-      });
+      const docs = await aggregate.exec();
+
+      assert.equal(1, docs.length);
+      assert.equal(docs[0].sal, 18000);
     });
 
     describe('middleware (gh-5251)', function() {

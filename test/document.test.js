@@ -10767,4 +10767,22 @@ describe('document', function() {
     assert.ok(!band.populated('embeddedMembers.member'));
     assert.ok(!band.embeddedMembers[0].member.name);
   });
+  it('should allow dashes in the path name (gh-10677)', async function() {
+    const schema = new mongoose.Schema({
+      values: {
+        type: Map,
+        of: { entries: String },
+        default: {}
+      }
+    });
+
+    const Model = db.model('test', schema, 'test');
+
+    const saved = new Model({});
+    await saved.save();
+    const document = await Model.findById({ _id: saved._id });
+    document.values.set('abc', { entries: 'a' });
+    document.values.set('abc-d', { entries: 'b' });
+    await document.save();
+  });
 });

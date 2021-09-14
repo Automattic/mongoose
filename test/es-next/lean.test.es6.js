@@ -34,7 +34,7 @@ describe('Lean Tutorial', function() {
     // To enable the `lean` option for a query, use the `lean()` function.
     const leanDoc = await MyModel.findOne().lean();
 
-    sizeof(normalDoc); // approximately 1000
+    sizeof(normalDoc); // approximately 600
     sizeof(leanDoc); // 36, more than 10x smaller!
 
     // In case you were wondering, the JSON form of a Mongoose doc is the same
@@ -42,7 +42,7 @@ describe('Lean Tutorial', function() {
     // Node.js process uses, not how much data is sent over the network.
     JSON.stringify(normalDoc).length === JSON.stringify(leanDoc.length); // true
     // acquit:ignore:start
-    assert.ok(sizeof(normalDoc) >= 750 && sizeof(normalDoc) <= 1250, sizeof(normalDoc));
+    assert.ok(sizeof(normalDoc) >= 400 && sizeof(normalDoc) <= 800, sizeof(normalDoc));
     assert.equal(sizeof(leanDoc), 36);
     assert.equal(JSON.stringify(normalDoc).length, JSON.stringify(leanDoc).length);
     // acquit:ignore:end

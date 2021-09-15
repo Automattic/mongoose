@@ -263,6 +263,10 @@ declare module 'mongoose' {
     autoIndex?: boolean;
     /** Set to `true` to make Mongoose automatically call `createCollection()` on every model created on this connection. */
     autoCreate?: boolean;
+    /** Set to `true` to use new [url parser behind the flag](https://mongoosejs.com/docs/deprecations.html#the-usenewurlparser-option). */
+    useNewUrlParser?: boolean;
+    /** Set to `true` to opt in to [using the new topology engine](https://mongoosejs.com/docs/deprecations.html#useunifiedtopology). */
+    useUnifiedTopology?: boolean;
   }
 
   class Connection extends events.EventEmitter {

@@ -3033,6 +3033,9 @@ declare module 'mongoose' {
       name: 'ValidationError';
 
       errors: { [path: string]: ValidatorError | CastError | ValidationError };
+      addError: (path: string, error: ValidatorError | CastError | ValidationError) => void;
+
+      constructor(instance?: Error);
     }
 
     export class ValidatorError extends Error {
@@ -3048,6 +3051,14 @@ declare module 'mongoose' {
       path: string;
       value: any;
       reason?: Error | null;
+
+      constructor(properties: {
+        message?: string,
+        type?: string,
+        path?: string,
+        value?: any,
+        reason?: any
+      });
     }
 
     export class VersionError extends Error {

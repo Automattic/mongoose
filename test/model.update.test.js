@@ -632,12 +632,10 @@ describe('model: update:', function() {
   describe('mongodb 2.4 features', function() {
     let mongo24_or_greater = false;
 
-    before(function(done) {
-      start.mongodVersion(function(err, version) {
-        assert.ifError(err);
-        mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
-        done();
-      });
+    before(async function() {
+      const version = await start.mongodVersion();
+
+      mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
     });
 
     it('$setOnInsert operator', function(done) {
@@ -728,12 +726,10 @@ describe('model: update:', function() {
   describe('mongodb 2.6 features', function() {
     let mongo26_or_greater = false;
 
-    before(function(done) {
-      start.mongodVersion(function(err, version) {
-        assert.ifError(err);
-        mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-        done();
-      });
+    before(async function() {
+      const version = await start.mongodVersion();
+
+      mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
     });
 
     it('supports $position', function(done) {
@@ -2536,54 +2532,42 @@ describe('model: update:', function() {
       return Item.findOneAndUpdate({}, update, opts);
     });
 
-    it('update with Decimal type (gh-5361)', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          done();
-          return;
-        }
+    it('update with Decimal type (gh-5361)', async function() {
+      const version = await start.mongodVersion();
+      const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+      if (!mongo34) {
+        return;
+      }
 
-        test();
+      const schema = new mongoose.Schema({
+        name: String,
+        pricing: [{
+          _id: false,
+          program: String,
+          money: mongoose.Schema.Types.Decimal
+        }]
       });
 
-      function test() {
-        const schema = new mongoose.Schema({
-          name: String,
-          pricing: [{
-            _id: false,
-            program: String,
-            money: mongoose.Schema.Types.Decimal
-          }]
-        });
+      const Person = db.model('Person', schema);
 
-        const Person = db.model('Person', schema);
+      const data = {
+        name: 'Jack',
+        pricing: [
+          { program: 'A', money: mongoose.Types.Decimal128.fromString('1.2') },
+          { program: 'B', money: mongoose.Types.Decimal128.fromString('3.4') }
+        ]
+      };
 
-        const data = {
-          name: 'Jack',
-          pricing: [
-            { program: 'A', money: mongoose.Types.Decimal128.fromString('1.2') },
-            { program: 'B', money: mongoose.Types.Decimal128.fromString('3.4') }
-          ]
-        };
+      await Person.create(data);
 
-        Person.create(data).
-          then(function() {
-            const newData = {
-              name: 'Jack',
-              pricing: [
-                { program: 'A', money: mongoose.Types.Decimal128.fromString('5.6') },
-                { program: 'B', money: mongoose.Types.Decimal128.fromString('7.8') }
-              ]
-            };
-            return Person.update({ name: 'Jack' }, newData);
-          }).
-          then(function() { done(); }, done);
-      }
+      const newData = {
+        name: 'Jack',
+        pricing: [
+          { program: 'A', money: mongoose.Types.Decimal128.fromString('5.6') },
+          { program: 'B', money: mongoose.Types.Decimal128.fromString('7.8') }
+        ]
+      };
+      await Person.update({ name: 'Jack' }, newData);
     });
 
     it('strict false in query (gh-5453)', function(done) {
@@ -3242,14 +3226,12 @@ describe('model: updateOne: ', function() {
   });
 
   describe('mongodb 42 features', function() {
-    before(function(done) {
-      start.mongodVersion((err, version) => {
-        assert.ifError(err);
-        if (version[0] < 4 || (version[0] === 4 && version[1] < 2)) {
-          this.skip();
-        }
-        done();
-      });
+    before(async function() {
+      const version = await start.mongodVersion();
+
+      if (version[0] < 4 || (version[0] === 4 && version[1] < 2)) {
+        this.skip();
+      }
     });
 
     it('update pipeline (gh-8225)', async function() {

@@ -1,3 +1,16 @@
+6.0.6 / 2021-09-15
+==================
+ * perf(index.d.ts): streamline SchemaDefinitionType and SchemaTypeOptions to reduce number of instantiations and speed up lib checking #10349
+ * perf(document): make $locals a getter/setter, avoid creating unnecessary `undefined` properties in Document constructor, remove unnecessary event listeners #10400
+ * fix(connection): use username parameter for MongoDB driver instead of user #10727 [saveman71](https://github.com/saveman71)
+ * fix(update): handle casting $or and $and in array filters #10696
+ * fix(connection): allow calling connection helpers before calling `mongoose.connect()` #10706
+ * fix(document): correctly handle subpaths of arrays that contain non-alphanumeric chars like `-` #10709
+ * fix(index.d.ts): correct return value for findOneAndUpdate(), `findByIdAndUpdate()` to support query helpers #10658
+ * fix(index.d.ts): add missing methods to ValidationError & ValidatorError classes #10725 [medfreeman](https://github.com/medfreeman)
+ * perf(subdocument): make internal $isSingleNested and `$isDocumentArrayElement` properties constants on the prototype rather than setting them on every instance #10400
+ * docs: improve Document#populate documentation, tests #10728 [saveman71](https://github.com/saveman71)
+
 6.0.5 / 2021-09-06
 ==================
  * fix(model): allow calling Model.validate() static with POJO array #10669

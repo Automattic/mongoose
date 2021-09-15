@@ -941,10 +941,10 @@ declare module 'mongoose' {
     findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): Query<any, EnforceDocument<T, TMethods>, T>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: T, res: any) => void): Query<T, EnforceDocument<T, TMethods>, T>;
-    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null, res: any) => void): Query<T | null, EnforceDocument<T, TMethods>, T>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, callback: (err: CallbackError, doc: T | null, res: any) => void): Query<T | null, EnforceDocument<T, TMethods>, T>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods>, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: T, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods>, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods>, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, callback: (err: CallbackError, doc: T | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods>, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
@@ -957,9 +957,9 @@ declare module 'mongoose' {
     findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods> | null, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): Query<any, EnforceDocument<T, TMethods>, T>;
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: T, res: any) => void): Query<T, EnforceDocument<T, TMethods>, T>;
-    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null, res: any) => void): Query<T | null, EnforceDocument<T, TMethods>, T>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods>, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: T, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods>, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
+    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods>, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
 
     geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: Callback<Array<EnforceDocument<T, TMethods>>>): QueryWithHelpers<Array<EnforceDocument<T, TMethods>>, EnforceDocument<T, TMethods>, TQueryHelpers, T>;
 
@@ -1348,7 +1348,7 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  type SchemaDefinitionWithBuiltInClass<T extends number | string | boolean | NativeDate | Function> = T extends number
+  type SchemaDefinitionWithBuiltInClass<T> = T extends number
     ? (typeof Number | 'number' | 'Number' | typeof Schema.Types.Number)
     : T extends string
     ? (typeof String | 'string' | 'String' | typeof Schema.Types.String)
@@ -1358,19 +1358,15 @@ declare module 'mongoose' {
     ? (typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date)
     : (Function | string);
 
-  type SchemaDefinitionProperty<T = undefined> = T extends string | number | boolean | NativeDate | Function
-    ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
+  type SchemaDefinitionProperty<T = undefined> = SchemaDefinitionWithBuiltInClass<T> |
     SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
     Schema<any, any, any> |
     Schema<any, any, any>[] |
-    ReadonlyArray<Schema<any, any, any>> |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
-    ReadonlyArray<SchemaTypeOptions<T extends undefined ? any : T>> |
     Function[] |
     SchemaDefinition<T> |
-    SchemaDefinition<T>[] |
-    ReadonlyArray<SchemaDefinition<T>>;
+    SchemaDefinition<T>[];
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
@@ -1531,8 +1527,7 @@ declare module 'mongoose' {
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends Schema<any, any> ? T :
-      T extends object[] ? (AnyArray<Schema<Unpacked<T>>> | AnyArray<Schema<Document & Unpacked<T>>> | AnyArray<SchemaDefinition<Unpacked<T>>>) :
+      T extends object[] ? (AnyArray<Schema<any>> | AnyArray<SchemaDefinition<Unpacked<T>>>) :
       T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> :
       T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> :
       T extends boolean[] ? AnyArray<SchemaDefinitionWithBuiltInClass<boolean>> :
@@ -2530,19 +2525,14 @@ declare module 'mongoose' {
 
   type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & DotAndArrayNotation<any>;
 
+  type AllowStringForObjectId<T> = T extends mongodb.ObjectId ? T | string : T;
   type AllowRegexpForStrings<T> = T extends string ? T | RegExp : T;
   type AllowArrayElementQuery<T> = T extends (infer U)[] ? T | U : T;
 
-  type Condition<T> = AllowRegexpForStrings<T> | AllowArrayElementQuery<T> | QuerySelector<T>;
+  type Condition<T> = AllowStringForObjectId<T> | AllowRegexpForStrings<T> | AllowArrayElementQuery<T> | QuerySelector<T>;
 
   type _FilterQuery<T> = {
-    [P in keyof T]?: P extends '_id'
-    ? [Extract<T[P], mongodb.ObjectId>] extends [never]
-    ? Condition<T[P]>
-    : Condition<T[P] | string | { _id: mongodb.ObjectId }>
-    : [Extract<T[P], mongodb.ObjectId>] extends [never]
-    ? Condition<T[P]>
-    : Condition<T[P] | string>;
+    [P in keyof T]?: Condition<T[P]>;
   } &
     RootQuerySelector<T>;
 
@@ -3043,6 +3033,9 @@ declare module 'mongoose' {
       name: 'ValidationError';
 
       errors: { [path: string]: ValidatorError | CastError | ValidationError };
+      addError: (path: string, error: ValidatorError | CastError | ValidationError) => void;
+
+      constructor(instance?: Error);
     }
 
     export class ValidatorError extends Error {
@@ -3058,6 +3051,14 @@ declare module 'mongoose' {
       path: string;
       value: any;
       reason?: Error | null;
+
+      constructor(properties: {
+        message?: string,
+        type?: string,
+        path?: string,
+        value?: any,
+        reason?: any
+      });
     }
 
     export class VersionError extends Error {

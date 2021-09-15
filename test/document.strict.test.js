@@ -45,31 +45,28 @@ describe('document: strict mode:', function() {
       Strict = db.model('Test2', strict);
     });
 
-    it('when creating models with non-strict schemas (gh-4274)', function(done) {
-      const l = new Lax({ content: 'sample', rouge: 'data', items: {} });
-      assert.equal(l.$__.strictMode, false);
+    it('when creating models with non-strict schemas (gh-4274)', async function() {
+      const lax = new Lax({ content: 'sample', rouge: 'data', items: {} });
+      assert.equal(lax.$__.strictMode, false);
 
-      const lo = l.toObject();
-      assert.ok('ts' in l);
+      const lo = lax.toObject();
+      assert.ok('ts' in lax);
       assert.ok('ts' in lo);
-      assert.equal(l.content, 'sample');
+      assert.equal(lax.content, 'sample');
       assert.equal(lo.content, 'sample');
-      assert.equal(l.rouge, 'data');
+      assert.equal(lax.rouge, 'data');
       assert.equal(lo.rouge, 'data');
-      assert.deepEqual(l.items, {});
+      assert.deepEqual(lax.items, {});
       assert.deepEqual(lo.items, {});
 
-      l.save(function(error) {
-        assert.ifError(error);
-        Lax.findById(l).exec(function(error, doc) {
-          assert.ifError(error);
-          const lo = doc.toObject();
-          assert.equal(lo.content, 'sample');
-          assert.equal(lo.rouge, 'data');
-          assert.deepEqual(lo.items, {});
-          done();
-        });
-      });
+      await lax.save();
+
+      const doc = await Lax.findById(lax);
+
+      const lo2 = doc.toObject();
+      assert.equal(lo2.content, 'sample');
+      assert.equal(lo2.rouge, 'data');
+      assert.deepEqual(lo2.items, {});
     });
 
     it('when creating models with strict schemas', function() {

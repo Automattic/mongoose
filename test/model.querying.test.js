@@ -69,17 +69,13 @@ describe('model: querying:', function() {
   });
 
   let mongo26_or_greater = false;
-  before(function(done) {
-    start.mongodVersion(function(err, version) {
-      if (err) {
-        throw err;
-      }
-      mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-      if (!mongo26_or_greater) {
-        console.log('not testing mongodb 2.6 features');
-      }
-      done();
-    });
+  before(async function() {
+    const version = await start.mongodVersion();
+
+    mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
+    if (!mongo26_or_greater) {
+      console.log('not testing mongodb 2.6 features');
+    }
   });
 
   after(function(done) {
@@ -1691,33 +1687,29 @@ describe('model: querying:', function() {
       });
     });
 
-    it('with $elemMatch (gh-3163)', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          throw err;
-        }
-        const mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-        if (!mongo26_or_greater) {
-          return done();
-        }
+    it('with $elemMatch (gh-3163)', async function() {
+      const version = await start.mongodVersion();
 
-        next();
+      const mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
+      if (!mongo26_or_greater) {
+        return;
+      }
+
+
+      const schema = new Schema({ test: [String] });
+      const MyModel = db.model('Test', schema);
+
+      await MyModel.create({ test: ['log1', 'log2'] });
+
+      const docs = await MyModel.find({
+        test: {
+          $all: [
+            { $elemMatch: { $regex: /log/g } }
+          ]
+        }
       });
 
-      const next = function() {
-        const schema = new Schema({ test: [String] });
-        const MyModel = db.model('Test', schema);
-
-        MyModel.create({ test: ['log1', 'log2'] }, function(error) {
-          assert.ifError(error);
-          const query = { test: { $all: [{ $elemMatch: { $regex: /log/g } }] } };
-          MyModel.find(query, function(error, docs) {
-            assert.ifError(error);
-            assert.equal(docs.length, 1);
-            done();
-          });
-        });
-      };
+      assert.equal(docs.length, 1);
     });
   });
 
@@ -2123,18 +2115,14 @@ describe('model: querying:', function() {
 
     // mongodb 2.4
     let mongo24_or_greater = false;
-    before(function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          throw err;
-        }
+    before(async function() {
+      const version = await start.mongodVersion();
 
-        mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
-        if (!mongo24_or_greater) {
-          console.log('not testing mongodb 2.4 features');
-        }
-        done();
-      });
+      mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
+
+      if (!mongo24_or_greater) {
+        console.log('not testing mongodb 2.4 features');
+      }
     });
 
     it('index is allowed in schema', function(done) {
@@ -2150,67 +2138,52 @@ describe('model: querying:', function() {
     });
 
     describe('$geometry', function() {
-      it('Polygon', function(done) {
+      it('Polygon', async function() {
         if (!mongo24_or_greater) {
-          return done();
+          return;
         }
 
         const Test = db.model('Test', schema2dsphere);
+        await Test.init();
 
-        Test.on('index', function(err) {
-          assert.ifError(err);
+        const created = await Test.create({ loc: [0, 0] });
 
-          Test.create({ loc: [0, 0] }, function(err, created) {
-            assert.ifError(err);
+        const geojsonPoly = { type: 'Polygon', coordinates: [[[-5, -5], ['-5', 5], [5, 5], [5, -5], [-5, '-5']]] };
 
-            const geojsonPoly = { type: 'Polygon', coordinates: [[[-5, -5], ['-5', 5], [5, 5], [5, -5], [-5, '-5']]] };
+        const docs = await Test.find({ loc: { $within: { $geometry: geojsonPoly } } });
 
-            Test.find({ loc: { $within: { $geometry: geojsonPoly } } }, function(err, docs) {
-              assert.ifError(err);
-              assert.equal(docs.length, 1);
-              assert.equal(created.id, docs[0].id);
+        assert.equal(docs.length, 1);
+        assert.equal(created.id, docs[0].id);
 
-              Test.where('loc').within().geometry(geojsonPoly).exec(function(err, docs) {
-                assert.ifError(err);
-                assert.equal(docs.length, 1);
-                assert.equal(created.id, docs[0].id);
-                done();
-              });
-            });
-          });
-        });
+        const geoDocs = await Test.where('loc').within().geometry(geojsonPoly).exec();
+
+        assert.equal(geoDocs.length, 1);
+        assert.equal(created.id, geoDocs[0].id);
       });
     });
 
     describe('$geoIntersects', function() {
-      it('LineString', function(done) {
+      it('LineString', async function() {
         if (!mongo24_or_greater) {
-          return done();
+          return;
         }
 
         const Test = db.model('Test', geoSchema);
+        await Test.init();
 
-        Test.on('index', function(err) {
-          assert.ifError(err);
 
-          Test.create({ line: { type: 'LineString', coordinates: [[-178.0, 10.0], [178.0, 10.0]] } }, function(err, created) {
-            assert.ifError(err);
+        const created = await Test.create({ line: { type: 'LineString', coordinates: [[-178.0, 10.0], [178.0, 10.0]] } });
 
-            const geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] };
+        const geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] };
 
-            Test.find({ line: { $geoIntersects: { $geometry: geojsonLine } } }, function(err, docs) {
-              assert.ifError(err);
-              assert.equal(docs.length, 1);
-              assert.equal(created.id, docs[0].id);
+        const docs = await Test.find({ line: { $geoIntersects: { $geometry: geojsonLine } } });
 
-              Test.where('line').intersects().geometry(geojsonLine).findOne(function(err, doc) {
-                assert.ifError(err);
-                assert.equal(created.id, doc.id);
-                done();
-              });
-            });
-          });
-        });
+        assert.equal(docs.length, 1);
+        assert.equal(created.id, docs[0].id);
+
+        const doc = await Test.where('line').intersects().geometry(geojsonLine).findOne();
+
+        assert.equal(created.id, doc.id);
       });
 
       it('MultiLineString', function(done) {
@@ -2365,17 +2338,13 @@ describe('model: querying:', function() {
   describe('hashed indexes', function() {
     let mongo24_or_greater = false;
 
-    before(function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          return done(err);
-        }
-        mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
-        if (!mongo24_or_greater) {
-          console.log('not testing mongodb 2.4 features');
-        }
-        done();
-      });
+    before(async function() {
+      const version = await start.mongodVersion();
+
+      mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
+      if (!mongo24_or_greater) {
+        console.log('not testing mongodb 2.4 features');
+      }
     });
 
     it('work', function(done) {
@@ -2515,14 +2484,10 @@ describe('model: querying:', function() {
     describe('$eq', function() {
       let mongo26 = false;
 
-      before(function(done) {
-        start.mongodVersion(function(err, version) {
-          if (err) {
-            return done(err);
-          }
-          mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-          done();
-        });
+      before(async function() {
+        const version = await start.mongodVersion();
+
+        mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
       });
 
       it('casts $eq (gh-2752)', function(done) {

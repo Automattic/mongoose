@@ -47,7 +47,7 @@ describe('model', function() {
       const IndexedModel = db.model('Test', Indexed);
       let assertions = 0;
 
-      await new Promise((resolve) => IndexedModel.on('index', () => resolve()));
+      await IndexedModel.init();
 
       const indexes = await IndexedModel.collection.getIndexes({ full: true });
 
@@ -68,7 +68,7 @@ describe('model', function() {
       assert.equal(assertions, 4);
     });
 
-    it('of embedded documents', function(done) {
+    it('of embedded documents', async function() {
       const BlogPosts = new Schema({
         _id: { type: ObjectId, index: true },
         title: { type: String, index: true },
@@ -83,33 +83,28 @@ describe('model', function() {
       const UserModel = db.model('Test', User);
       let assertions = 0;
 
-      UserModel.on('index', function() {
-        UserModel.collection.getIndexes(function(err, indexes) {
-          assert.ifError(err);
+      await UserModel.init();
 
-          function iter(index) {
-            if (index[0] === 'name') {
-              assertions++;
-            }
-            if (index[0] === 'blogposts._id') {
-              assertions++;
-            }
-            if (index[0] === 'blogposts.title') {
-              assertions++;
-            }
+      const mongoIndexes = Object.values(await UserModel.collection.getIndexes());
+
+      for (const mongoIndex in mongoIndexes) {
+        mongoIndexes[mongoIndex].forEach(function iter(mongoIndex) {
+          if (mongoIndex[0] === 'name') {
+            assertions++;
           }
-
-          for (const i in indexes) {
-            indexes[i].forEach(iter);
+          if (mongoIndex[0] === 'blogposts._id') {
+            assertions++;
           }
-
-          assert.equal(assertions, 3);
-          done();
+          if (mongoIndex[0] === 'blogposts.title') {
+            assertions++;
+          }
         });
-      });
+      }
+
+      assert.equal(assertions, 3);
     });
 
-    it('of embedded documents unless excludeIndexes (gh-5575) (gh-8343)', function(done) {
+    it('of embedded documents unless excludeIndexes (gh-5575) (gh-8343)', async function() {
       const BlogPost = Schema({
         _id: { type: ObjectId },
         title: { type: String, index: true },
@@ -134,20 +129,16 @@ describe('model', function() {
       });
 
       const UserModel = db.model('Test', User);
+      await UserModel.init();
 
-      UserModel.on('index', function() {
-        UserModel.collection.getIndexes(function(err, indexes) {
-          assert.ifError(err);
+      const indexes = await UserModel.collection.getIndexes();
 
-          // Should only have _id and name indexes
-          const indexNames = Object.keys(indexes);
-          assert.deepEqual(indexNames.sort(), ['_id_', 'name_1']);
-          done();
-        });
-      });
+      // Should only have _id and name indexes
+      const indexNames = Object.keys(indexes);
+      assert.deepEqual(indexNames.sort(), ['_id_', 'name_1']);
     });
 
-    it('of multiple embedded documents with same schema', function(done) {
+    it('of multiple embedded documents with same schema', async function() {
       const BlogPosts = new Schema({
         _id: { type: ObjectId, unique: true },
         title: { type: String, index: true },
@@ -161,41 +152,38 @@ describe('model', function() {
       });
 
       const UserModel = db.model('Test', User);
-      let assertions = 0;
 
-      UserModel.on('index', function() {
-        UserModel.collection.getIndexes(function(err, indexes) {
-          assert.ifError(err);
+      await UserModel.init();
 
-          function iter(index) {
-            if (index[0] === 'name') {
-              ++assertions;
-            }
-            if (index[0] === 'blogposts._id') {
-              ++assertions;
-            }
-            if (index[0] === 'blogposts.title') {
-              ++assertions;
-            }
-            if (index[0] === 'featured._id') {
-              ++assertions;
-            }
-            if (index[0] === 'featured.title') {
-              ++assertions;
-            }
-          }
+      const mongoIndexesNames = Object.values(await UserModel.collection.getIndexes()).map(indexArray => indexArray[0][0]);
 
-          for (const i in indexes) {
-            indexes[i].forEach(iter);
-          }
+      const existingIndexesMap = {
+        name: false,
+        'blogposts._id': false,
+        'blogposts.title': false,
+        'featured._id': false,
+        'featured.title': false
+      };
 
-          assert.equal(assertions, 5);
-          done();
-        });
-      });
+      for (const mongoIndexName of mongoIndexesNames) {
+        if (existingIndexesMap[mongoIndexName] != null) {
+          existingIndexesMap[mongoIndexName] = true;
+        }
+      }
+
+      assert.deepEqual(
+        existingIndexesMap,
+        {
+          name: true,
+          'blogposts._id': true,
+          'blogposts.title': true,
+          'featured._id': true,
+          'featured.title': true
+        }
+      );
     });
 
-    it('compound: on embedded docs', function(done) {
+    it('compound: on embedded docs', async function() {
       const BlogPosts = new Schema({
         title: String,
         desc: String
@@ -211,23 +199,20 @@ describe('model', function() {
       const UserModel = db.model('Test', User);
       let found = 0;
 
-      UserModel.on('index', function() {
-        UserModel.collection.getIndexes(function(err, indexes) {
-          assert.ifError(err);
+      await UserModel.init();
 
-          for (const index in indexes) {
-            switch (index) {
-              case 'name_1':
-              case 'blogposts.title_1_blogposts.desc_1':
-                ++found;
-                break;
-            }
-          }
+      const indexes = await UserModel.collection.getIndexes();
 
-          assert.equal(found, 2);
-          done();
-        });
-      });
+      for (const index in indexes) {
+        switch (index) {
+          case 'name_1':
+          case 'blogposts.title_1_blogposts.desc_1':
+            ++found;
+            break;
+        }
+      }
+
+      assert.equal(found, 2);
     });
 
     it('nested embedded docs (gh-5199)', function(done) {
@@ -292,46 +277,42 @@ describe('model', function() {
       });
     });
 
-    it('when one index creation errors', function(done) {
+    it('when one index creation errors', async function() {
       const userSchema = {
         name: { type: String },
         secondValue: { type: Boolean }
       };
 
-      const User = new Schema(userSchema);
-      User.index({ name: 1 });
+      const userSchema1 = new Schema(userSchema);
+      userSchema1.index({ name: 1 });
 
-      const User2 = new Schema(userSchema);
-      User2.index({ name: 1 }, { unique: true });
-      User2.index({ secondValue: 1 });
+      const userSchema2 = new Schema(userSchema);
+      userSchema2.index({ name: 1 }, { unique: true });
+      userSchema2.index({ secondValue: 1 });
 
-      db.model('Test1', User, 'Test');
+      const collectionName = 'deepindexedmodel' + random();
+      // Create model with first schema to initialize indexes
+      db.model('SingleIndexedModel', userSchema1, collectionName);
 
       // Create model with second schema in same collection to add new indexes
-      const UserModel2 = db.model('Test2', User2, 'Test');
+      const UserModel2 = db.model('DuplicateIndexedModel', userSchema2, collectionName);
       let assertions = 0;
 
-      UserModel2.on('index', function() {
-        UserModel2.collection.getIndexes(function(err, indexes) {
-          assert.ifError(err);
+      await UserModel2.init().catch(err => err);
 
-          function iter(index) {
-            if (index[0] === 'name') {
-              assertions++;
-            }
-            if (index[0] === 'secondValue') {
-              assertions++;
-            }
-          }
+      const rawIndexesResponse = await UserModel2.collection.getIndexes();
+      const indexesNames = Object.values(rawIndexesResponse).map(indexArray => indexArray[0][0]);
 
-          for (const i in indexes) {
-            indexes[i].forEach(iter);
-          }
+      for (const indexName of indexesNames) {
+        if (indexName === 'name') {
+          assertions++;
+        }
+        if (indexName === 'secondValue') {
+          assertions++;
+        }
+      }
 
-          assert.equal(assertions, 2);
-          done();
-        });
-      });
+      assert.equal(assertions, 2);
     });
 
     it('creates descending indexes from schema definition(gh-8895)', async function() {

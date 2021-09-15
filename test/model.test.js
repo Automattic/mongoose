@@ -4370,7 +4370,7 @@ describe('Model', function() {
       });
     });
 
-    it('doesnt reset "modified" status for fields', function(done) {
+    it('doesnt reset "modified" status for fields', async function() {
       const UniqueSchema = new Schema({
         changer: String,
         unique: {
@@ -4390,25 +4390,23 @@ describe('Model', function() {
         changer: 'a',
         unique: 6
       });
+      await Unique.init();
 
-      Unique.on('index', function() {
-        u1.save(function(err) {
-          assert.ifError(err);
-          assert.ok(!u1.isModified('changer'));
-          u2.save(function(err) {
-            assert.ifError(err);
-            assert.ok(!u2.isModified('changer'));
-            u2.changer = 'b';
-            u2.unique = 5;
-            assert.ok(u2.isModified('changer'));
-            u2.save(function(err) {
-              assert.ok(err);
-              assert.ok(u2.isModified('changer'));
-              Unique.collection.drop(done);
-            });
-          });
-        });
-      });
+
+      await u1.save();
+
+      assert.ok(!u1.isModified('changer'));
+      await u2.save();
+
+      assert.ok(!u2.isModified('changer'));
+      u2.changer = 'b';
+      u2.unique = 5;
+      assert.ok(u2.isModified('changer'));
+      const err = await u2.save().then(() => null, err => err);
+
+      assert.ok(err);
+      assert.ok(u2.isModified('changer'));
+      await Unique.collection.drop();
     });
 
     it('insertMany() (gh-723)', function(done) {
@@ -4437,46 +4435,35 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany() ordered option for constraint errors (gh-3893)', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          done();
-          return;
-        }
+    it('insertMany() ordered option for constraint errors (gh-3893)', async function() {
+      const version = await start.mongodVersion();
 
-        test();
-      });
-
-      function test() {
-        const schema = new Schema({
-          name: { type: String, unique: true }
-        });
-        const Movie = db.model('Movie', schema);
-
-        const arr = [
-          { name: 'Star Wars' },
-          { name: 'Star Wars' },
-          { name: 'The Empire Strikes Back' }
-        ];
-        Movie.on('index', function(error) {
-          assert.ifError(error);
-          Movie.insertMany(arr, { ordered: false }, function(error) {
-            assert.equal(error.message.indexOf('E11000'), 0);
-            Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
-              assert.ifError(error);
-              assert.equal(docs.length, 2);
-              assert.equal(docs[0].name, 'Star Wars');
-              assert.equal(docs[1].name, 'The Empire Strikes Back');
-              Movie.collection.drop(done);
-            });
-          });
-        });
+      const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+      if (!mongo34) {
+        return;
       }
+
+      const schema = new Schema({
+        name: { type: String, unique: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { name: 'Star Wars' },
+        { name: 'Star Wars' },
+        { name: 'The Empire Strikes Back' }
+      ];
+      await Movie.init();
+
+      const error = await Movie.insertMany(arr, { ordered: false }).then(() => null, err => err);
+
+      assert.equal(error.message.indexOf('E11000'), 0);
+      const docs = await Movie.find({}).sort({ name: 1 }).exec();
+
+      assert.equal(docs.length, 2);
+      assert.equal(docs[0].name, 'Star Wars');
+      assert.equal(docs[1].name, 'The Empire Strikes Back');
+      await Movie.collection.drop();
     });
 
     describe('insertMany() lean option to bypass validation (gh-8234)', () => {
@@ -4528,43 +4515,30 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany() ordered option for validation errors (gh-5068)', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          done();
-          return;
-        }
+    it('insertMany() ordered option for validation errors (gh-5068)', async function() {
+      const version = await start.mongodVersion();
 
-        test();
-      });
-
-      function test() {
-        const schema = new Schema({
-          name: { type: String, required: true }
-        });
-        const Movie = db.model('Movie', schema);
-
-        const arr = [
-          { name: 'Star Wars' },
-          { foo: 'Star Wars' },
-          { name: 'The Empire Strikes Back' }
-        ];
-        Movie.insertMany(arr, { ordered: false }, function(error) {
-          assert.ifError(error);
-          Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
-            assert.ifError(error);
-            assert.equal(docs.length, 2);
-            assert.equal(docs[0].name, 'Star Wars');
-            assert.equal(docs[1].name, 'The Empire Strikes Back');
-            done();
-          });
-        });
+      const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+      if (!mongo34) {
+        return;
       }
+
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { name: 'Star Wars' },
+        { foo: 'Star Wars' },
+        { name: 'The Empire Strikes Back' }
+      ];
+      await Movie.insertMany(arr, { ordered: false });
+
+      const docs = await Movie.find({}).sort({ name: 1 }).exec();
+      assert.equal(docs.length, 2);
+      assert.equal(docs[0].name, 'Star Wars');
+      assert.equal(docs[1].name, 'The Empire Strikes Back');
     });
 
     it('insertMany() `writeErrors` if only one error (gh-8938)', async function() {
@@ -4603,39 +4577,28 @@ describe('Model', function() {
 
     });
 
-    it('insertMany() ordered option for single validation error', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          done();
-          return;
-        }
+    it('insertMany() ordered option for single validation error', async function() {
+      const version = start.mongodVersion();
 
-        test();
-      });
-
-      function test() {
-        const schema = new Schema({
-          name: { type: String, required: true }
-        });
-        const Movie = db.model('Movie', schema);
-
-        const arr = [
-          { foo: 'Star Wars' },
-          { foo: 'The Fast and the Furious' }
-        ];
-        Movie.insertMany(arr, { ordered: false }, function(error) {
-          assert.ifError(error);
-          Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
-            assert.equal(docs.length, 0);
-            done();
-          });
-        });
+      const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+      if (!mongo34) {
+        return;
       }
+
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { foo: 'Star Wars' },
+        { foo: 'The Fast and the Furious' }
+      ];
+      await Movie.insertMany(arr, { ordered: false });
+
+      const docs = await Movie.find({}).sort({ name: 1 }).exec();
+
+      assert.equal(docs.length, 0);
     });
 
     it('insertMany() hooks (gh-3846)', function(done) {
@@ -5069,19 +5032,13 @@ describe('Model', function() {
     });
 
     describe('3.6 features', function() {
-      before(function(done) {
-        start.mongodVersion((err, version) => {
-          if (err) {
-            done(err);
-            return;
-          }
-          const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
-          if (!mongo36) {
-            this.skip();
-          }
+      before(async function() {
+        const version = await start.mongodVersion();
+        const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
 
-          done();
-        });
+        if (!mongo36) {
+          this.skip();
+        }
       });
 
       it('arrayFilter (gh-5965)', async function() {
@@ -5250,7 +5207,7 @@ describe('Model', function() {
       describe('sessions (gh-6362)', function() {
         let MyModel;
 
-        beforeEach(function(done) {
+        beforeEach(async function() {
           const nestedSchema = new Schema({ foo: String });
           db.deleteModel(/Test/);
           MyModel = db.model('Test', new Schema({
@@ -5259,18 +5216,12 @@ describe('Model', function() {
             arr: [nestedSchema]
           }));
 
-          start.mongodVersion((err, version) => {
-            if (err) {
-              done(err);
-              return;
-            }
-            const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
-            if (!mongo36) {
-              this.skip();
-            }
+          const version = await start.mongodVersion();
 
-            done();
-          });
+          const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
+          if (!mongo36) {
+            this.skip();
+          }
         });
 
         it('startSession()', async function() {
@@ -5881,32 +5832,20 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany with Decimal (gh-5190)', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          done();
-          return;
-        }
+    it('insertMany with Decimal (gh-5190)', async function() {
+      const version = start.mongodVersion();
 
-        test();
-      });
-
-      function test() {
-        const schema = new mongoose.Schema({
-          amount: mongoose.Schema.Types.Decimal
-        });
-        const Money = db.model('Test', schema);
-
-        Money.insertMany([{ amount: '123.45' }], function(error) {
-          assert.ifError(error);
-          done();
-        });
+      const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+      if (!mongo34) {
+        return;
       }
+
+      const schema = new mongoose.Schema({
+        amount: mongoose.Schema.Types.Decimal
+      });
+      const Money = db.model('Test', schema);
+
+      await Money.insertMany([{ amount: '123.45' }]);
     });
 
     it('remove with cast error (gh-5323)', function(done) {

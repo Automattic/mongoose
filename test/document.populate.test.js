@@ -254,6 +254,48 @@ describe('document.populate', function() {
     });
   });
 
+  it('one path, model selection as second argument', async function() {
+    const b = await B.findById(post);
+
+    const creator_id = b._creator;
+
+    await b.populate('_creator', '-email');
+
+    assert.equal(String(b._creator._id), String(creator_id));
+
+    assert.ok(b.populated('_creator'));
+    assert.ok(!b._creator.email);
+    assert.ok(b._creator.age);
+  });
+
+  it('multiple paths, model selection as second argument', async function() {
+    const b = await B.findById(post);
+
+    await b.populate('_creator fans', '-email');
+
+    assert.ok(b.populated('_creator'));
+    assert.ok(!b._creator.email);
+    assert.ok(b._creator.age);
+
+    assert.ok(b.populated('fans'));
+    assert.ok(!b.fans[0].email);
+    assert.ok(b.fans[0].age);
+  });
+
+  it('multiple paths, mixed argument types', async function() {
+    const b = await B.findById(post);
+
+    await b.populate([{ path: '_creator', select: '-email' }, 'fans']);
+
+    assert.ok(b.populated('_creator'));
+    assert.ok(!b._creator.email);
+    assert.ok(b._creator.age);
+
+    assert.ok(b.populated('fans'));
+    assert.ok(b.fans[0].email);
+    assert.ok(b.fans[0].age);
+  });
+
   it('multiple paths, multiple options', async function() {
     const b = await B.findById(post);
 

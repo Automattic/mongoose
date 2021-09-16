@@ -1183,7 +1183,7 @@ describe('document', function() {
     });
     const User = db.model('Test', userSchema);
 
-    const user = new User.create({ name: 'teeee', req: 'i am required' });
+    const user = await User.create({ name: 'teeee', req: 'i am required' });
 
     const user1 = await User.findById(user).select('name').exec();
     assert.equal(user1.req, void 0);
@@ -1257,12 +1257,6 @@ describe('document', function() {
 
       const err = await mBad.validate().then(() => null, err => err);
       assert.ok(err);
-      clearTimeout(timeout);
-
-      const timeout = setTimeout(function() {
-        db.close();
-        throw new Error('Promise not fulfilled!');
-      }, 500);
     });
 
     it('doesnt have stale cast errors (gh-2766)', async function() {
@@ -1442,9 +1436,8 @@ describe('document', function() {
       const Control = new Schema({
         test: {
           type: String,
-          validate: function(value, done) {
+          validate: function() {
             count++;
-            return done(true);
           }
         }
       });

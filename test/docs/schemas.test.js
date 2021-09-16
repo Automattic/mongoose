@@ -11,7 +11,7 @@ describe('Advanced Schemas', function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 

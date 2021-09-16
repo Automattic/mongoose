@@ -26,12 +26,12 @@ describe('discriminator docs', function() {
     done();
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 
-  beforeEach(function(done) {
-    Event.deleteMany({}, done);
+  beforeEach(async function() {
+    await Event.deleteMany({});
   });
 
   /**

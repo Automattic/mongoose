@@ -4328,9 +4328,9 @@ describe('Model', function() {
     await db.close();
   });
 
-  it.only('reports max bson size error in save (gh-3906)', async function() {
+  it('reports max bson size error in save (gh-3906)', async function() {
     this.timeout(10000);
-    const db = start({ noErrorListener: true });
+    const db = await start({ noErrorListener: true });
     const Test = db.model('Test', { name: Object });
 
     const test = new Test({
@@ -4338,7 +4338,7 @@ describe('Model', function() {
         data: (new Array(16 * 1024 * 1024)).join('x')
       }
     });
-    await db;
+
     const error = await test.save().then(() => null, err => err);
 
     assert.ok(error);

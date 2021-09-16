@@ -143,19 +143,16 @@ describe('discriminator docs', function() {
       clickedLinkSchema);
 
     const event1 = new ClickedLinkEvent();
-    event1.validate(function() {
-      assert.equal(eventSchemaCalls, 1);
-      assert.equal(clickedSchemaCalls, 1);
+    await event1.validate();
+    
+    assert.equal(eventSchemaCalls, 1);
+    assert.equal(clickedSchemaCalls, 1);
 
-      const generic = new Event();
-      generic.validate(function() {
-        assert.equal(eventSchemaCalls, 2);
-        assert.equal(clickedSchemaCalls, 1);
-        // acquit:ignore:start
-        done();
-        // acquit:ignore:end
-      });
-    });
+    const generic = new Event();
+    await generic.validate();
+    
+    assert.equal(eventSchemaCalls, 2);
+    assert.equal(clickedSchemaCalls, 1);
   });
 
   /**

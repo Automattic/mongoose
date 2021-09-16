@@ -409,7 +409,7 @@ describe('model', function() {
         assert.equal(foundImpressionEvent.name, 'Impression event');
 
         // finds & hydrates ConversionEvent
-        const foundConversionEvent = BaseEvent.findOne({ _id: conversionEvent._id });
+        const foundConversionEvent = await BaseEvent.findOne({ _id: conversionEvent._id });
 
         assert.ok(foundConversionEvent instanceof ConversionEvent);
         assert.deepEqual(foundConversionEvent.schema.$originalSchemaId, ConversionEventSchema.$id);

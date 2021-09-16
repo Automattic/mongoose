@@ -64,8 +64,8 @@ describe('connections:', function() {
         });
     });
 
-    it('with autoIndex (gh-5423)', function() {
-      const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
+    it('with autoIndex (gh-5423)', async function() {
+      const conn = await mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
         autoIndex: false
       }).asPromise();
 

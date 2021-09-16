@@ -4324,7 +4324,7 @@ describe('Model', function() {
     test.save(function(error) {
       assert.ok(error);
       assert.equal(error.name, 'MongoServerError');
-      db.close(done);
+      await db.close();
     });
   });
 
@@ -4343,7 +4343,7 @@ describe('Model', function() {
       test.save(function(error) {
         assert.ok(error);
         assert.equal(error.name, 'MongoServerError');
-        db.close(done);
+        await db.close();
       });
     });
   });

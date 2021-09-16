@@ -79,7 +79,7 @@ describe('model: querying:', function() {
   });
 
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   it('find returns a Query', function(done) {

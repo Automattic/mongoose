@@ -21,7 +21,7 @@ describe('document modified', function() {
     db = start();
   });
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   beforeEach(() => db.deleteModel(/.*/));
@@ -345,7 +345,7 @@ describe('document modified', function() {
       });
 
       after(function(done) {
-        db.close(done);
+        await db.close();
       });
 
       it('gh-1530 for arrays (gh-3575)', function() {

@@ -143,7 +143,7 @@ describe('document.populate', function() {
   });
 
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   describe('populating two paths', function() {

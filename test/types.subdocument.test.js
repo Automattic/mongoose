@@ -42,7 +42,7 @@ describe('types.subdocument', function() {
   });
 
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   it('returns a proper ownerDocument (gh-3589)', function(done) {

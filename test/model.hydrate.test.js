@@ -52,7 +52,7 @@ describe('model', function() {
     });
 
     after(function(done) {
-      db.close(done);
+      await db.close();
     });
 
     it('hydrates documents with no modified paths', function(done) {

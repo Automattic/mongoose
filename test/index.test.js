@@ -36,7 +36,7 @@ describe('mongoose module:', function() {
       const db = goose.connection;
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri, options).then(function() {
-        db.close(done);
+        await db.close();
       });
     });
   });

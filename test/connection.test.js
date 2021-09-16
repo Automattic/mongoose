@@ -276,8 +276,8 @@ describe('connections:', function() {
       db = start();
     });
 
-    after(function(done) {
-      db.close(done);
+    after(async function() {
+      await db.close();
     });
 
     beforeEach(function() {
@@ -469,7 +469,7 @@ describe('connections:', function() {
   });
 
   describe('modelNames()', function() {
-    it('returns names of all models registered on it', function(done) {
+    it('returns names of all models registered on it', async function() {
       const m = new mongoose.Mongoose;
       m.model('root', { x: String });
       const another = m.model('another', { x: String });
@@ -490,12 +490,12 @@ describe('connections:', function() {
       assert.equal(names[1], 'another');
       assert.equal(names[2], 'discriminated');
 
-      db.close(done);
+      await db.close();
     });
   });
 
   describe('connection pool sharing: ', function() {
-    it('works', function(done) {
+    it('works', async function() {
       const db = mongoose.createConnection('mongodb://localhost:27017/mongoose1');
 
       const db2 = db.useDb('mongoose2');
@@ -511,10 +511,10 @@ describe('connections:', function() {
       assert.equal(db2.pass, db.pass);
       assert.deepEqual(db.options, db2.options);
 
-      db2.close(done);
+      await db2.close();
     });
 
-    it('saves correctly', function(done) {
+    it('saves correctly', async function() {
       const db = start();
       const db2 = db.useDb('mongoose-test-2');
 
@@ -526,62 +526,52 @@ describe('connections:', function() {
       const m1 = db.model('Test', schema);
       const m2 = db2.model('Test', schema);
 
-      m1.create({ body: 'this is some text', thing: 1 }, function(err, i1) {
-        assert.ifError(err);
-        m2.create({ body: 'this is another body', thing: 2 }, function(err, i2) {
-          assert.ifError(err);
+      const i1 = await m1.create({ body: 'this is some text', thing: 1 });
 
-          m1.findById(i1.id, function(err, item1) {
-            assert.ifError(err);
-            assert.equal('this is some text', item1.body);
-            assert.equal(1, item1.thing);
+      const i2 = await m2.create({ body: 'this is another body', thing: 2 });
 
-            m2.findById(i2.id, function(err, item2) {
-              assert.ifError(err);
-              assert.equal('this is another body', item2.body);
-              assert.equal(2, item2.thing);
+      const item1 = await m1.findById(i1.id);
 
-              // validate the doc doesn't exist in the other db
-              m1.findById(i2.id, function(err, nothing) {
-                assert.ifError(err);
-                assert.strictEqual(null, nothing);
+      assert.equal('this is some text', item1.body);
+      assert.equal(1, item1.thing);
 
-                m2.findById(i1.id, function(err, nothing) {
-                  assert.ifError(err);
-                  assert.strictEqual(null, nothing);
+      const item2 = await m2.findById(i2.id);
+      assert.equal('this is another body', item2.body);
+      assert.equal(2, item2.thing);
 
-                  db2.close(done);
-                });
-              });
-            });
-          });
-        });
-      });
+      // validate the doc doesn't exist in the other db
+      const nothing = await m1.findById(i2.id);
+      assert.strictEqual(null, nothing);
+
+      const nothing2 = await m2.findById(i1.id);
+      assert.strictEqual(null, nothing2);
+
+      await db2.close();
     });
 
-    it('emits connecting events on both', function(done) {
+    it('emits connecting events on both', async function() {
       const db = mongoose.createConnection();
       const db2 = db.useDb('mongoose-test-2');
       let hit = false;
 
-      db2.on('connecting', function() {
-        hit && close();
+      db2.on('connecting', async function() {
+        hit && await close();
         hit = true;
       });
 
-      db.on('connecting', function() {
-        hit && close();
+      db.on('connecting', async function() {
+        hit && await close();
         hit = true;
       });
 
       db.openUri(start.uri);
 
-      function close() {
-        db.close(done);
+      async function close() {
+        await db.close();
       }
     });
 
-    it('emits connected events on both', function(done) {
+    it('emits connected events on both', function() {
       const db = mongoose.createConnection();
       const db2 = db.useDb('mongoose-test-2');
       let hit = false;
@@ -597,12 +587,12 @@ describe('connections:', function() {
 
       db.openUri(start.uri);
 
-      function close() {
-        db.close(done);
+      async function close() {
+        await db.close();
       }
     });
 
-    it('emits open events on both', function(done) {
+    it('emits open events on both', function() {
       const db = mongoose.createConnection();
       const db2 = db.useDb('mongoose-test-2');
       let hit = false;
@@ -617,8 +607,8 @@ describe('connections:', function() {
 
       db.openUri(start.uri);
 
-      function close() {
-        db.close(done);
+      async function close() {
+        await db.close();
       }
     });
 

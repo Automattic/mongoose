@@ -49,7 +49,7 @@ describe('model: mapreduce:', function() {
   });
 
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   beforeEach(function() {
@@ -242,7 +242,7 @@ describe('model: mapreduce:', function() {
     });
 
     after(function(done) {
-      db.close(done);
+      await db.close();
     });
 
     it('works', function() {

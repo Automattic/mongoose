@@ -35,7 +35,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
   });
 
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   it('during construction', function(done) {

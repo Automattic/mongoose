@@ -19,7 +19,7 @@ describe('schema alias option', function() {
   });
 
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   beforeEach(() => db.deleteModel(/.*/));

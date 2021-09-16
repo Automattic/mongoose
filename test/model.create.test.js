@@ -31,7 +31,7 @@ describe('model', function() {
     });
 
     after(function(done) {
-      db.close(done);
+      await db.close();
     });
 
     it('accepts an array and returns an array', function(done) {

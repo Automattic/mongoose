@@ -27,7 +27,7 @@ describe('discriminator docs', function() {
   });
 
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   beforeEach(function(done) {

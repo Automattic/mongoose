@@ -23,7 +23,7 @@ describe('model', function() {
   });
 
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   beforeEach(() => db.deleteModel(/.*/));
@@ -393,7 +393,7 @@ describe('model', function() {
               Test.collection.getIndexes(function(err, indexes) {
                 assert.ifError(err);
                 assert.deepEqual(['_id_'], Object.keys(indexes));
-                db.close(done);
+                await db.close();
               });
             }, 100);
           });

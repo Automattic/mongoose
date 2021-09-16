@@ -78,7 +78,7 @@ describe('model: update:', function() {
   });
 
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   beforeEach(function() {
@@ -2898,7 +2898,7 @@ describe('model: updateOne: ', function() {
   });
 
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   beforeEach(() => db.deleteModel(/.*/));

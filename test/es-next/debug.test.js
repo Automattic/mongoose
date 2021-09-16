@@ -54,7 +54,7 @@ describe('debug: shell', function() {
     // revert monkey patch
     console.info = originalConsole;
     mongoose.set('debug', originalDebugOption);
-    db.close(done);
+    await db.close();
   });
 
   it('no-shell', function() {

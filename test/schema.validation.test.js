@@ -165,7 +165,7 @@ describe('schema', function() {
         });
 
         after(function(done) {
-          db.close(done);
+          await db.close();
         });
 
         it('and can be set to "undefined" (gh-1594)', function(done) {

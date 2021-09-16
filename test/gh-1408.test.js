@@ -75,7 +75,7 @@ describe('documents should not be converted to _id (gh-1408)', function() {
               assert.equal(pref.value, newData.settings.preferences[i].value);
             });
 
-            db.close(done);
+            await db.close();
           });
         });
       });

@@ -22,7 +22,7 @@ describe('promises docs', function () {
   after(function (done) {
     mongoose.Promise = global.Promise;
 
-    db.close(done);
+    await db.close();
   });
 
   /**

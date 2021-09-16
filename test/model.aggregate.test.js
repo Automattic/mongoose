@@ -60,7 +60,7 @@ describe('model aggregate', function() {
   });
 
   after(function(done) {
-    db.close(done);
+    await db.close();
   });
 
   describe('works', function() {

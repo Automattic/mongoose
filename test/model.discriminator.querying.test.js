@@ -53,8 +53,8 @@ describe('model', function() {
     afterEach(() => require('./util').clearTestData(db));
     afterEach(() => require('./util').stopRemainingOps(db));
 
-    after(function(done) {
-      db.close(done);
+    after(async function() {
+      await db.close();
     });
 
     describe('pushing discriminated objects', function() {

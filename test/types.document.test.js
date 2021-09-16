@@ -75,28 +75,26 @@ describe('types.document', function() {
     db.deleteModel(/.*/);
   });
 
-  it('test that validate sets errors', function(done) {
+  it('test that validate sets errors', async function() {
     const a = new Subdocument();
     a.set('test', '');
     a.set('work', 'nope');
     a.__index = 0;
 
-    a.validate(function() {
-      assert.ok(a[documentArrayParent].$__.validationError instanceof ValidationError);
-      assert.equal(a[documentArrayParent].errors['jsconf.ar.0.work'].name, 'ValidatorError');
-      done();
-    });
+    await a.validate().catch(() => {});
+
+    assert.ok(a[documentArrayParent].$__.validationError instanceof ValidationError);
+    assert.equal(a[documentArrayParent].errors['jsconf.ar.0.work'].name, 'ValidatorError');
   });
 
-  it('objects can be passed to #set', function(done) {
+  it('objects can be passed to #set', function() {
     const a = new Subdocument();
     a.set({ test: 'paradiddle', work: 'good flam' });
     assert.equal(a.test, 'paradiddle');
     assert.equal(a.work, 'good flam');
-    done();
   });
 
-  it('Subdocuments can be passed to #set', function(done) {
+  it('Subdocuments can be passed to #set', function() {
     const a = new Subdocument();
     a.set({ test: 'paradiddle', work: 'good flam' });
     assert.equal(a.test, 'paradiddle');
@@ -105,10 +103,9 @@ describe('types.document', function() {
     b.set(a);
     assert.equal(b.test, 'paradiddle');
     assert.equal(b.work, 'good flam');
-    done();
   });
 
-  it('cached _ids', function(done) {
+  it('cached _ids', function() {
     const Movie = db.model('Movie', MovieSchema);
     const m = new Movie;
 
@@ -125,10 +122,9 @@ describe('types.document', function() {
     assert.strictEqual(true, m.$__._id !== m2.$__._id);
     assert.strictEqual(true, m.id !== m2.id);
     assert.strictEqual(true, m.$__._id !== m2.$__._id);
-    done();
   });
 
-  it('Subdocument#remove (gh-531)', function(done) {
+  it('Subdocument#remove (gh-531)', async function() {
     const Movie = db.model('Movie', MovieSchema);
 
     const super8 = new Movie({ title: 'Super 8' });
@@ -143,67 +139,57 @@ describe('types.document', function() {
     super8.ratings.push({ stars: 7, _id: id3 });
     super8.ratings.push({ stars: 6, _id: id4 });
 
-    super8.save(function(err) {
-      assert.ifError(err);
+    await super8.save();
 
-      assert.equal(super8.title, 'Super 8');
-      assert.equal(super8.ratings.id(id1).stars.valueOf(), 9);
-      assert.equal(super8.ratings.id(id2).stars.valueOf(), 8);
-      assert.equal(super8.ratings.id(id3).stars.valueOf(), 7);
-      assert.equal(super8.ratings.id(id4).stars.valueOf(), 6);
+    assert.equal(super8.title, 'Super 8');
+    assert.equal(super8.ratings.id(id1).stars.valueOf(), 9);
+    assert.equal(super8.ratings.id(id2).stars.valueOf(), 8);
+    assert.equal(super8.ratings.id(id3).stars.valueOf(), 7);
+    assert.equal(super8.ratings.id(id4).stars.valueOf(), 6);
 
-      super8.ratings.id(id1).stars = 5;
-      super8.ratings.id(id2).remove();
-      super8.ratings.id(id3).stars = 4;
-      super8.ratings.id(id4).stars = 3;
+    super8.ratings.id(id1).stars = 5;
+    super8.ratings.id(id2).remove();
+    super8.ratings.id(id3).stars = 4;
+    super8.ratings.id(id4).stars = 3;
 
-      super8.save(function(err) {
-        assert.ifError(err);
+    await super8.save();
 
-        Movie.findById(super8._id, function(err, movie) {
-          assert.ifError(err);
+    const movie = await Movie.findById(super8._id);
 
-          assert.equal(movie.title, 'Super 8');
-          assert.equal(movie.ratings.length, 3);
-          assert.equal(movie.ratings.id(id1).stars.valueOf(), 5);
-          assert.equal(movie.ratings.id(id3).stars.valueOf(), 4);
-          assert.equal(movie.ratings.id(id4).stars.valueOf(), 3);
+    assert.equal(movie.title, 'Super 8');
+    assert.equal(movie.ratings.length, 3);
+    assert.equal(movie.ratings.id(id1).stars.valueOf(), 5);
+    assert.equal(movie.ratings.id(id3).stars.valueOf(), 4);
+    assert.equal(movie.ratings.id(id4).stars.valueOf(), 3);
 
-          movie.ratings.id(id1).stars = 2;
-          movie.ratings.id(id3).remove();
-          movie.ratings.id(id4).stars = 1;
+    movie.ratings.id(id1).stars = 2;
+    movie.ratings.id(id3).remove();
+    movie.ratings.id(id4).stars = 1;
 
-          movie.save(function(err) {
-            assert.ifError(err);
+    await movie.save();
 
-            Movie.findById(super8._id, function(err, movie) {
-              assert.ifError(err);
-              assert.equal(movie.ratings.length, 2);
-              assert.equal(movie.ratings.id(id1).stars.valueOf(), 2);
-              assert.equal(movie.ratings.id(id4).stars.valueOf(), 1);
 
-              // gh-531
-              movie.ratings[0].remove();
-              movie.ratings[0].remove();
-              movie.save(function() {
-                Movie.findById(super8._id, function(err, movie) {
-                  assert.ifError(err);
-                  assert.equal(movie.ratings.length, 0);
-                  done();
-                });
-              });
-            });
-          });
-        });
-      });
-    });
+    const modifiedMovie = await Movie.findById(super8._id);
+
+    assert.equal(modifiedMovie.ratings.length, 2);
+    assert.equal(modifiedMovie.ratings.id(id1).stars.valueOf(), 2);
+    assert.equal(modifiedMovie.ratings.id(id4).stars.valueOf(), 1);
+
+    // gh-531
+    modifiedMovie.ratings[0].remove();
+    modifiedMovie.ratings[0].remove();
+    await modifiedMovie.save();
+
+    const finalMovie = Movie.findById(super8._id);
+
+    assert.equal(finalMovie.ratings.length, 0);
   });
 
   describe('setting nested objects', function() {
-    it('works (gh-1394)', function(done) {
+    it('works (gh-1394)', async function() {
       const Movie = db.model('Movie', MovieSchema);
 
-      Movie.create({
+      const movie = await Movie.create({
         title: 'Life of Pi',
         ratings: [{
           description: {
@@ -213,43 +199,32 @@ describe('types.document', function() {
             }
           }
         }]
-      }, function(err, movie) {
-        assert.ifError(err);
-
-        Movie.findById(movie, function(err, movie) {
-          assert.ifError(err);
-
-          assert.ok(movie.ratings[0].description.source.time instanceof Date);
-          movie.ratings[0].description.source = { url: 'http://www.lifeofpimovie.com/' };
-
-          movie.save(function(err) {
-            assert.ifError(err);
-
-            Movie.findById(movie, function(err, movie) {
-              assert.ifError(err);
-
-              assert.equal('http://www.lifeofpimovie.com/', movie.ratings[0].description.source.url);
-
-              // overwritten date
-              assert.equal(undefined, movie.ratings[0].description.source.time);
-
-              const newDate = new Date;
-              movie.ratings[0].set('description.source.time', newDate, { merge: true });
-              movie.save(function(err) {
-                assert.ifError(err);
-
-                Movie.findById(movie, function(err, movie) {
-                  assert.ifError(err);
-                  assert.equal(String(newDate), movie.ratings[0].description.source.time);
-                  // url not overwritten using merge
-                  assert.equal('http://www.lifeofpimovie.com/', movie.ratings[0].description.source.url);
-                  done();
-                });
-              });
-            });
-          });
-        });
       });
+
+      const movie2 = await Movie.findById(movie);
+
+      assert.ok(movie2.ratings[0].description.source.time instanceof Date);
+      movie2.ratings[0].description.source = { url: 'http://www.lifeofpimovie.com/' };
+
+      await movie2.save();
+
+      const movie3 = await Movie.findById(movie2);
+
+      assert.equal('http://www.lifeofpimovie.com/', movie3.ratings[0].description.source.url);
+
+      // overwritten date
+      assert.equal(undefined, movie3.ratings[0].description.source.time);
+
+      const newDate = new Date;
+      movie3.ratings[0].set('description.source.time', newDate, { merge: true });
+      await movie3.save();
+
+
+      const movie4 = await Movie.findById(movie3);
+
+      assert.equal(String(newDate), movie4.ratings[0].description.source.time);
+      // url not overwritten using merge
+      assert.equal('http://www.lifeofpimovie.com/', movie4.ratings[0].description.source.url);
     });
   });
 });

@@ -366,31 +366,25 @@ describe('types.buffer', function() {
     }
   });
 
-  it('can be set to null', function(done) {
+  it('can be set to null', async function() {
     const User = db.model('Test', UserBuffer);
     const user = new User({ array: [null], required: Buffer.alloc(1) });
-    user.save(function(err, doc) {
-      assert.ifError(err);
-      User.findById(doc, function(err, doc) {
-        assert.ifError(err);
-        assert.equal(doc.array.length, 1);
-        assert.equal(doc.array[0], null);
-        done();
-      });
-    });
+    await user.save();
+
+    const doc = await User.findById(user);
+
+    assert.equal(doc.array.length, 1);
+    assert.equal(doc.array[0], null);
   });
 
-  it('can be updated to null', function(done) {
+  it('can be updated to null', async function() {
     const User = db.model('Test', UserBuffer);
     const user = new User({ array: [null], required: Buffer.alloc(1), serial: Buffer.alloc(1) });
-    user.save(function(err, doc) {
-      assert.ifError(err);
-      User.findOneAndUpdate({ _id: doc.id }, { serial: null }, { new: true }, function(err, doc) {
-        assert.ifError(err);
-        assert.equal(doc.serial, null);
-        done();
-      });
-    });
+    await user.save();
+
+    const doc = await User.findOneAndUpdate({ _id: user.id }, { serial: null }, { new: true });
+
+    assert.equal(doc.serial, null);
   });
 
   describe('#toObject', function() {
@@ -421,56 +415,30 @@ describe('types.buffer', function() {
       assert.strictEqual(128, b.buf._subtype);
     });
 
-    it('is stored', function(done) {
+    it('is stored', async function() {
       const b = new B({ buf: Buffer.from('hi') });
       b.buf.subtype(128);
-      b.save(function(err) {
-        if (err) {
-          done(err);
-          return;
-        }
-        B.findById(b, function(err, doc) {
-          if (err) {
-            done(err);
-            return;
-          }
-          assert.equal(doc.buf._subtype, 128);
-          done();
-        });
-      });
+      await b.save();
+
+      const doc = await B.findById(b);
+
+      assert.equal(doc.buf._subtype, 128);
     });
 
-    it('changes are retained', function(done) {
+    it('changes are retained', async function() {
       const b = new B({ buf: Buffer.from('hi') });
       b.buf.subtype(128);
-      b.save(function(err) {
-        if (err) {
-          done(err);
-          return;
-        }
-        B.findById(b, function(err, doc) {
-          if (err) {
-            done(err);
-            return;
-          }
-          assert.equal(doc.buf._subtype, 128);
-          doc.buf.subtype(0);
-          doc.save(function(err) {
-            if (err) {
-              done(err);
-              return;
-            }
-            B.findById(b, function(err, doc) {
-              if (err) {
-                done(err);
-                return;
-              }
-              assert.strictEqual(0, doc.buf._subtype);
-              done();
-            });
-          });
-        });
-      });
+      await b.save();
+
+      const doc = await B.findById(b);
+
+      assert.equal(doc.buf._subtype, 128);
+      doc.buf.subtype(0);
+      await doc.save();
+
+      const doc2 = await B.findById(b);
+
+      assert.strictEqual(0, doc2.buf._subtype);
     });
 
     it('cast from number (gh-3764)', function() {

@@ -34,7 +34,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     M = db.model('Test', schema);
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 

@@ -30,7 +30,7 @@ describe('model', function() {
       B = db.model('Test', schema);
     });
 
-    after(function(done) {
+    after(async function() {
       await db.close();
     });
 
@@ -179,13 +179,10 @@ describe('model', function() {
         }, done);
       });
 
-      it('if callback is falsy, will ignore it (gh-5061)', function(done) {
-        B.create({ title: 'test' }, null).
-          then(function(doc) {
-            assert.equal(doc.title, 'test');
-            done();
-          }).
-          catch(done);
+      it('if callback is falsy, will ignore it (gh-5061)', async function() {
+        const doc = await B.create({ title: 'test' }, null);
+
+        assert.equal(doc.title, 'test');
       });
 
       it('when passed an empty array, returns an empty array', async function() {

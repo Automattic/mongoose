@@ -164,7 +164,7 @@ describe('schema', function() {
           Person = db.model('person-schema-validation-test', PersonSchema);
         });
 
-        after(function(done) {
+        after(async function() {
           await db.close();
         });
 

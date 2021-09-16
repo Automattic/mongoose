@@ -27,7 +27,7 @@ describe('model query casting', function() {
     db = start();
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 

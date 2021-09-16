@@ -45,7 +45,7 @@ describe('model: populate: divergent arrays', function() {
       });
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 

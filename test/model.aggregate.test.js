@@ -59,7 +59,7 @@ describe('model aggregate', function() {
     }
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 

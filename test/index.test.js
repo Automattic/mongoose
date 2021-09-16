@@ -31,13 +31,13 @@ describe('mongoose module:', function() {
       });
     });
 
-    it('with promise (gh-3790)', function(done) {
+    it('with promise (gh-3790)', async function() {
       const goose = new Mongoose;
       const db = goose.connection;
 
-      goose.connect(process.env.MONGOOSE_TEST_URI || uri, options).then(function() {
-        await db.close();
-      });
+      await goose.connect(process.env.MONGOOSE_TEST_URI || uri, options);
+
+      await db.close();
     });
   });
 

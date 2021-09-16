@@ -51,7 +51,7 @@ describe('model', function() {
       return db;
     });
 
-    after(function(done) {
+    after(async function() {
       await db.close();
     });
 

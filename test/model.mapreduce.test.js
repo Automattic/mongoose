@@ -48,7 +48,7 @@ describe('model: mapreduce:', function() {
     db = start();
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 
@@ -241,7 +241,7 @@ describe('model: mapreduce:', function() {
       });
     });
 
-    after(function(done) {
+    after(async function() {
       await db.close();
     });
 

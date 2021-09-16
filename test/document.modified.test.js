@@ -20,7 +20,7 @@ describe('document modified', function() {
   before(function() {
     db = start();
   });
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 
@@ -344,7 +344,7 @@ describe('document modified', function() {
         db = start();
       });
 
-      after(function(done) {
+      after(async function() {
         await db.close();
       });
 

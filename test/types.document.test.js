@@ -67,7 +67,7 @@ describe('types.document', function() {
     db = start();
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 

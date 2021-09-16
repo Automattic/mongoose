@@ -18,7 +18,7 @@ describe('id virtual getter', function() {
     db = start();
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 

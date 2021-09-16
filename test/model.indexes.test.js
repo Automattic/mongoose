@@ -22,7 +22,7 @@ describe('model', function() {
     return db.createCollection('Test').catch(() => {});
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 
@@ -379,7 +379,7 @@ describe('model', function() {
           });
         });
 
-        it('will not create indexes if the global auto index is false and schema option isnt set (gh-1875)', function(done) {
+        it('will not create indexes if the global auto index is false and schema option isnt set (gh-1875)', async function() {
           const db = start({ config: { autoIndex: false } });
           const schema = new Schema({ name: { type: String, index: true } });
           const Test = db.model('Test', schema);
@@ -387,16 +387,13 @@ describe('model', function() {
             assert.ok(false, 'Model.ensureIndexes() was called');
           });
 
-          Test.create({ name: 'Bacon' }, function(err) {
-            assert.ifError(err);
-            setTimeout(function() {
-              Test.collection.getIndexes(function(err, indexes) {
-                assert.ifError(err);
-                assert.deepEqual(['_id_'], Object.keys(indexes));
-                await db.close();
-              });
-            }, 100);
-          });
+          await Test.create({ name: 'Bacon' });
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          const indexes = await Test.collection.getIndexes();
+          assert.deepEqual(['_id_'], Object.keys(indexes));
+
+          await db.close();
         });
       });
     });

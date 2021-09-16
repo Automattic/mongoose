@@ -14,7 +14,7 @@ describe('timestamps', function() {
     db = start();
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 

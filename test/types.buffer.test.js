@@ -46,7 +46,7 @@ describe('types.buffer', function() {
     });
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 

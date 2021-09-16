@@ -77,7 +77,7 @@ describe('model: update:', function() {
     BlogPost = db.model('BlogPost', schema);
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 
@@ -2897,7 +2897,7 @@ describe('model: updateOne: ', function() {
     db = start();
   });
 
-  after(function(done) {
+  after(async function() {
     await db.close();
   });
 

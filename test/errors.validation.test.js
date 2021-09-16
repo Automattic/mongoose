@@ -20,10 +20,15 @@ describe('ValidationError', function() {
     it('does not cause RangeError (gh-1834)', async function() {
       const SubSchema = new Schema({
         name: { type: String, required: true },
-        contents: [new Schema({
-          key: { type: String, required: true },
-          value: { type: String, required: true }
-        }, { _id: false })]
+        contents: [
+          new Schema(
+            {
+              key: { type: String, required: true },
+              value: { type: String, required: true }
+            },
+            { _id: false }
+          )
+        ]
       });
 
       const M = mongoose.model('SubSchema', SubSchema);

@@ -107,35 +107,29 @@ describe('model', function() {
     });
 
     describe('find', function() {
-      it('hydrates correct models', function(done) {
+      it('hydrates correct models', async function() {
         const baseEvent = new BaseEvent({ name: 'Base event' });
         const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         const conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
-        baseEvent.save(function(err) {
-          assert.ifError(err);
-          impressionEvent.save(function(err) {
-            assert.ifError(err);
-            conversionEvent.save(function(err) {
-              assert.ifError(err);
-              BaseEvent.find({}).sort('name').exec(function(err, docs) {
-                assert.ifError(err);
-                assert.ok(docs[0] instanceof BaseEvent);
-                assert.equal(docs[0].name, 'Base event');
+        await baseEvent.save();
+        await impressionEvent.save();
+        await conversionEvent.save();
 
-                assert.ok(docs[1] instanceof ConversionEvent);
-                assert.equal(docs[1].schema.$originalSchemaId, ConversionEventSchema.$id);
-                assert.equal(docs[1].name, 'Conversion event');
-                assert.equal(docs[1].revenue, 1.337);
 
-                assert.ok(docs[2] instanceof ImpressionEvent);
-                assert.equal(docs[2].schema.$originalSchemaId, ImpressionEventSchema.$id);
-                assert.equal(docs[2].name, 'Impression event');
-                done();
-              });
-            });
-          });
-        });
+        const docs = await BaseEvent.find({}).sort('name').exec();
+
+        assert.ok(docs[0] instanceof BaseEvent);
+        assert.equal(docs[0].name, 'Base event');
+
+        assert.ok(docs[1] instanceof ConversionEvent);
+        assert.equal(docs[1].schema.$originalSchemaId, ConversionEventSchema.$id);
+        assert.equal(docs[1].name, 'Conversion event');
+        assert.equal(docs[1].revenue, 1.337);
+
+        assert.ok(docs[2] instanceof ImpressionEvent);
+        assert.equal(docs[2].schema.$originalSchemaId, ImpressionEventSchema.$id);
+        assert.equal(docs[2].name, 'Impression event');
       });
 
       const checkHydratesCorrectModels = function(fields, done) {

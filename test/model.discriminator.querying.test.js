@@ -354,7 +354,7 @@ describe('model', function() {
         });
       });
 
-      it('select: false in base schema (gh-5448)', function(done) {
+      it('select: false in base schema (gh-5448)', async function() {
         const schema = new mongoose.Schema({
           foo: String,
           hiddenColumn: {
@@ -373,123 +373,108 @@ describe('model', function() {
           hiddenColumn: 'Wanna see me?',
           bar: 'test2'
         };
-        Bar.create(obj).
-          then(function() { return Foo.find().select('+hiddenColumn'); }).
-          then(function(docs) {
-            assert.equal(docs.length, 1);
-            assert.equal(docs[0].hiddenColumn, 'Wanna see me?');
-            assert.equal(docs[0].foo, 'test');
-            assert.equal(docs[0].bar, 'test2');
-            done();
-          }).
-          catch(done);
+
+        await Bar.create(obj);
+
+        const docs = await Foo.find().select('+hiddenColumn');
+
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].hiddenColumn, 'Wanna see me?');
+        assert.equal(docs[0].foo, 'test');
+        assert.equal(docs[0].bar, 'test2');
       });
 
-      it('hydrates correct model', function(done) {
+      it('hydrates correct model', async function() {
+        const baseEvent = new BaseEvent({ name: 'Base event' });
+
+        const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
+        const conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
+
+        await baseEvent.save();
+
+        await impressionEvent.save();
+        await conversionEvent.save();
+
+        // finds & hydrates BaseEvent
+        const event = await BaseEvent.findOne({ _id: baseEvent._id });
+
+        assert.ok(event instanceof BaseEvent);
+        assert.equal(event.name, 'Base event');
+
+        // finds & hydrates ImpressionEvent
+        const foundImpressionEvent = await BaseEvent.findOne({ _id: impressionEvent._id });
+
+        assert.ok(foundImpressionEvent instanceof ImpressionEvent);
+        assert.equal(foundImpressionEvent.schema.$originalSchemaId, ImpressionEventSchema.$id);
+        assert.equal(foundImpressionEvent.name, 'Impression event');
+
+        // finds & hydrates ConversionEvent
+        const foundConversionEvent = BaseEvent.findOne({ _id: conversionEvent._id });
+
+        assert.ok(foundConversionEvent instanceof ConversionEvent);
+        assert.deepEqual(foundConversionEvent.schema.$originalSchemaId, ConversionEventSchema.$id);
+        assert.equal(foundConversionEvent.name, 'Conversion event');
+      });
+
+      async function checkHydratesCorrectModels(fields, checkUndefinedRevenue) {
         const baseEvent = new BaseEvent({ name: 'Base event' });
         const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         const conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
-        baseEvent.save(function(err) {
-          assert.ifError(err);
-          impressionEvent.save(function(err) {
-            assert.ifError(err);
-            conversionEvent.save(function(err) {
-              assert.ifError(err);
-              // finds & hydrates BaseEvent
-              BaseEvent.findOne({ _id: baseEvent._id }, function(err, event) {
-                assert.ifError(err);
-                assert.ok(event instanceof BaseEvent);
-                assert.equal(event.name, 'Base event');
+        await baseEvent.save();
 
-                // finds & hydrates ImpressionEvent
-                BaseEvent.findOne({ _id: impressionEvent._id }, function(err, event) {
-                  assert.ifError(err);
-                  assert.ok(event instanceof ImpressionEvent);
-                  assert.equal(event.schema.$originalSchemaId, ImpressionEventSchema.$id);
-                  assert.equal(event.name, 'Impression event');
+        await impressionEvent.save();
+        await conversionEvent.save();
 
-                  // finds & hydrates ConversionEvent
-                  BaseEvent.findOne({ _id: conversionEvent._id }, function(err, event) {
-                    assert.ifError(err);
-                    assert.ok(event instanceof ConversionEvent);
-                    assert.deepEqual(event.schema.$originalSchemaId, ConversionEventSchema.$id);
-                    assert.equal(event.name, 'Conversion event');
-                    done();
-                  });
-                });
-              });
-            });
-          });
-        });
+        // finds & hydrates BaseEvent
+        const foundBaseEvent = await BaseEvent.findOne({ _id: baseEvent._id }, fields);
+        assert.ok(foundBaseEvent instanceof BaseEvent);
+        assert.equal(foundBaseEvent.name, 'Base event');
+
+        // finds & hydrates ImpressionEvent
+        const foundImpressionEvent = await BaseEvent.findOne({ _id: impressionEvent._id }, fields);
+
+        assert.ok(foundImpressionEvent instanceof ImpressionEvent);
+        assert.equal(
+          foundImpressionEvent.schema.$originalSchemaId,
+          ImpressionEventSchema.$id
+        );
+        assert.equal(foundImpressionEvent.name, 'Impression event');
+
+        // finds & hydrates ConversionEvent
+        const foundConversionEvent = await BaseEvent.findOne({ _id: conversionEvent._id }, fields);
+
+        assert.ok(foundConversionEvent instanceof ConversionEvent);
+        assert.deepEqual(foundConversionEvent.schema.$originalSchemaId,
+          ConversionEventSchema.$id);
+        assert.equal(foundConversionEvent.name, 'Conversion event');
+        if (checkUndefinedRevenue === true) {
+          assert.equal(foundConversionEvent.revenue, undefined);
+        }
+      }
+
+      it('hydrates correct model when fields selection set as string inclusive', async function() {
+        await checkHydratesCorrectModels('name', true);
       });
 
-      const checkHydratesCorrectModels = function(fields, done, checkUndefinedRevenue) {
-        const baseEvent = new BaseEvent({ name: 'Base event' });
-        const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
-        const conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
-
-        baseEvent.save(function(err) {
-          assert.ifError(err);
-          impressionEvent.save(function(err) {
-            assert.ifError(err);
-            conversionEvent.save(function(err) {
-              assert.ifError(err);
-              // finds & hydrates BaseEvent
-              BaseEvent.findOne({ _id: baseEvent._id }, fields, function(err, event) {
-                assert.ifError(err);
-                assert.ok(event instanceof BaseEvent);
-                assert.equal(event.name, 'Base event');
-
-                // finds & hydrates ImpressionEvent
-                BaseEvent.findOne({ _id: impressionEvent._id }, fields, function(err, event) {
-                  assert.ifError(err);
-                  assert.ok(event instanceof ImpressionEvent);
-                  assert.equal(event.schema.$originalSchemaId,
-                    ImpressionEventSchema.$id);
-                  assert.equal(event.name, 'Impression event');
-
-                  // finds & hydrates ConversionEvent
-                  BaseEvent.findOne({ _id: conversionEvent._id }, fields, function(err, event) {
-                    assert.ifError(err);
-                    assert.ok(event instanceof ConversionEvent);
-                    assert.deepEqual(event.schema.$originalSchemaId,
-                      ConversionEventSchema.$id);
-                    assert.equal(event.name, 'Conversion event');
-                    if (checkUndefinedRevenue === true) {
-                      assert.equal(event.revenue, undefined);
-                    }
-                    done();
-                  });
-                });
-              });
-            });
-          });
-        });
-      };
-
-      it('hydrates correct model when fields selection set as string inclusive', function(done) {
-        checkHydratesCorrectModels('name', done, true);
+      it('hydrates correct model when fields selection set as string exclusive', async function() {
+        await checkHydratesCorrectModels('-revenue', true);
       });
 
-      it('hydrates correct model when fields selection set as string exclusive', function(done) {
-        checkHydratesCorrectModels('-revenue', done, true);
+      it('hydrates correct model when fields selection set as empty string', async function() {
+        await checkHydratesCorrectModels('');
       });
 
-      it('hydrates correct model when fields selection set as empty string', function(done) {
-        checkHydratesCorrectModels('', done);
+      it('hydrates correct model when fields selection set as object inclusive', async function() {
+        await checkHydratesCorrectModels({ name: 1 }, true);
       });
 
-      it('hydrates correct model when fields selection set as object inclusive', function(done) {
-        checkHydratesCorrectModels({ name: 1 }, done, true);
+      it('hydrates correct model when fields selection set as object exclusive', async function() {
+        await checkHydratesCorrectModels({ revenue: 0 }, true);
       });
 
-      it('hydrates correct model when fields selection set as object exclusive', function(done) {
-        checkHydratesCorrectModels({ revenue: 0 }, done, true);
-      });
-
-      it('hydrates correct model when fields selection set as empty object', function(done) {
-        checkHydratesCorrectModels({}, done);
+      it('hydrates correct model when fields selection set as empty object', async function() {
+        await checkHydratesCorrectModels({});
       });
 
       it('discriminator model only finds a document of its type', function(done) {

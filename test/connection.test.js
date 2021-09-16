@@ -64,15 +64,12 @@ describe('connections:', function() {
         });
     });
 
-    it('with autoIndex (gh-5423)', function(done) {
-      const promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
+    it('with autoIndex (gh-5423)', function() {
+      const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
         autoIndex: false
       }).asPromise();
 
-      promise.then(function(conn) {
-        assert.strictEqual(conn.config.autoIndex, false);
-        done();
-      }).catch(done);
+      assert.strictEqual(conn.config.autoIndex, false);
     });
 
     it('with autoCreate (gh-6489)', async function() {
@@ -139,7 +136,7 @@ describe('connections:', function() {
       }, /string.*createConnection/);
     });
 
-    it('resolving with q (gh-5714)', function(done) {
+    it('resolving with q (gh-5714)', async function() {
       const bootMongo = Q.defer();
 
       const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
@@ -148,10 +145,8 @@ describe('connections:', function() {
         bootMongo.resolve(this);
       });
 
-      bootMongo.promise.then(function(_conn) {
-        assert.equal(_conn, conn);
-        done();
-      }).catch(done);
+      const _conn = await bootMongo.promise;
+      assert.equal(_conn, conn);
     });
 
     it('connection plugins (gh-7378)', function() {
@@ -183,50 +178,34 @@ describe('connections:', function() {
       return conn.close();
     });
 
-    it('dropDatabase()', function(done) {
-      conn.dropDatabase(function(error) {
-        assert.ifError(error);
-        done();
+    it('dropDatabase()', async function() {
+      await conn.dropDatabase();
+    });
+
+    it('dropCollection()', async function() {
+      await conn.db.collection('test').insertOne({ x: 1 });
+      await conn.dropCollection('test');
+      const doc = await conn.db.collection('test').findOne();
+      assert.ok(!doc);
+    });
+
+    it('createCollection()', async function() {
+      await conn.dropDatabase();
+
+      await conn.createCollection('gh5712', {
+        capped: true,
+        size: 1024
       });
-    });
 
-    it('dropCollection()', function() {
-      return conn.db.collection('test').insertOne({ x: 1 }).
-        then(function() {
-          return conn.dropCollection('test');
-        }).
-        then(function() {
-          return conn.db.collection('test').findOne();
-        }).
-        then(function(doc) {
-          assert.ok(!doc);
-        });
-    });
+      const collections = await conn.db.listCollections().toArray();
 
-    it('createCollection()', function() {
-      return conn.dropDatabase().
-        then(function() {
-          return conn.createCollection('gh5712', {
-            capped: true,
-            size: 1024
-          });
-        }).
-        then(function() {
-          return conn.db.listCollections().toArray();
-        }).
-        then(function(collections) {
-          const names = collections.map(function(c) { return c.name; });
-          assert.ok(names.indexOf('gh5712') !== -1);
-          assert.ok(collections[names.indexOf('gh5712')].options.capped);
-          return conn.createCollection('gh5712_0');
-        }).
-        then(function() {
-          return conn.db.listCollections().toArray();
-        }).
-        then(function(collections) {
-          const names = collections.map(function(c) { return c.name; });
-          assert.ok(names.indexOf('gh5712') !== -1);
-        });
+      const names = collections.map(function(c) { return c.name; });
+      assert.ok(names.indexOf('gh5712') !== -1);
+      assert.ok(collections[names.indexOf('gh5712')].options.capped);
+      await conn.createCollection('gh5712_0');
+      const collectionsAfterCreation = await conn.db.listCollections().toArray();
+      const newCollectionsNames = collectionsAfterCreation.map(function(c) { return c.name; });
+      assert.ok(newCollectionsNames.indexOf('gh5712') !== -1);
     });
   });
 

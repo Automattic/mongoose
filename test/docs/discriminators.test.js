@@ -71,7 +71,7 @@ describe('discriminator docs', function() {
    * stored in the same collection as generic events and `ClickedLinkEvent`
    * instances.
    */
-  it('Discriminators save to the Event model\'s collection', function() {
+  it('Discriminators save to the Event model\'s collection', async function() {
     const event1 = new Event({ time: Date.now() });
     const event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
     const event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
@@ -104,7 +104,7 @@ describe('discriminator docs', function() {
    * to queries. In other words, `find()`, `count()`, `aggregate()`, etc.
    * are smart enough to account for discriminators.
    */
-  it('Discriminators add the discriminator key to queries', function() {
+  it('Discriminators add the discriminator key to queries', async function() {
     const event1 = new Event({ time: Date.now() });
     const event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
     const event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });

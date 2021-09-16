@@ -3664,7 +3664,7 @@ describe('document', function() {
       });
     });
 
-    it('setting a nested path retains nested modified paths (gh-5206)', function(done) {
+    it('setting a nested path retains nested modified paths (gh-5206)', async function() {
       const testSchema = new mongoose.Schema({
         name: String,
         surnames: {
@@ -3681,17 +3681,16 @@ describe('document', function() {
         }
       });
 
-      kitty.save(function(error) {
-        assert.ifError(error);
+      await kitty.save();
 
-        kitty.surnames = {
-          docarray: [{ name: 'test1' }, { name: 'test2' }, { name: 'test3' }]
-        };
+      kitty.surnames = {
+        docarray: [{ name: 'test1' }, { name: 'test2' }, { name: 'test3' }]
+      };
 
-        assert.deepEqual(kitty.modifiedPaths(),
-          ['surnames', 'surnames.docarray']);
-        done();
-      });
+      assert.deepEqual(
+        kitty.modifiedPaths(),
+        ['surnames', 'surnames.docarray']
+      );
     });
 
     it('toObject() does not depopulate top level (gh-3057)', function() {

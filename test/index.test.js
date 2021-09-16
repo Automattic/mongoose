@@ -18,17 +18,12 @@ const options = {};
 
 describe('mongoose module:', function() {
   describe('default connection works', function() {
-    it('without options', function(done) {
+    it('without options', async function() {
       const goose = new Mongoose;
       const db = goose.connection;
 
-      goose.connect(process.env.MONGOOSE_TEST_URI || uri, options);
-
-      db.on('open', function() {
-        db.close(function() {
-          done();
-        });
-      });
+      await goose.connect(process.env.MONGOOSE_TEST_URI || uri, options);
+      await db.close();
     });
 
     it('with promise (gh-3790)', async function() {
@@ -265,7 +260,7 @@ describe('mongoose module:', function() {
     assert.equal(doc.toObject().bar, 'baz');
   });
 
-  it('declaring global plugins (gh-5690)', function(done) {
+  it('declaring global plugins (gh-5690)', async function() {
     const mong = new Mongoose();
     const subSchema = new Schema({ name: String });
     const schema = new Schema({
@@ -299,15 +294,14 @@ describe('mongoose module:', function() {
     assert.deepEqual(calls[1].obj, subSchema.obj);
 
     assert.equal(preSaveCalls, 0);
-    mong.connect(start.uri, options);
-    M.create({ test: [{ name: 'Val' }] }, function(error, doc) {
-      assert.ifError(error);
-      assert.equal(preSaveCalls, 2);
-      assert.equal(doc.testMethod(), 42);
-      assert.equal(doc.test[0].testMethod(), 42);
-      mong.disconnect();
-      done();
-    });
+    await mong.connect(start.uri, options);
+
+    const doc = await M.create({ test: [{ name: 'Val' }] });
+
+    assert.equal(preSaveCalls, 2);
+    assert.equal(doc.testMethod(), 42);
+    assert.equal(doc.test[0].testMethod(), 42);
+    await mong.disconnect();
   });
 
   it('global plugins on nested schemas underneath embedded discriminators (gh-7370)', function() {

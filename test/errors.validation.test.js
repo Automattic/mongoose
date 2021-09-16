@@ -17,7 +17,7 @@ const ValidatorError = SchemaType.ValidatorError;
 
 describe('ValidationError', function() {
   describe('#infiniteRecursion', function() {
-    it('does not cause RangeError (gh-1834)', function(done) {
+    it('does not cause RangeError (gh-1834)', async function() {
       const SubSchema = new Schema({
         name: { type: String, required: true },
         contents: [new Schema({
@@ -35,17 +35,16 @@ describe('ValidationError', function() {
         ]
       });
 
-      model.validate(function(err) {
-        assert.doesNotThrow(function() {
-          JSON.stringify(err);
-        });
-        done();
+      const err = await model.validate().then(() => null, err => err);
+
+      assert.doesNotThrow(function() {
+        JSON.stringify(err);
       });
     });
   });
 
   describe('#minDate', function() {
-    it('causes a validation error', function(done) {
+    it('causes a validation error', async function() {
       const MinSchema = new Schema({
         appointmentDate: { type: Date, min: Date.now }
       });
@@ -57,22 +56,19 @@ describe('ValidationError', function() {
       });
 
       // should fail validation
-      model.validate(function(err) {
-        assert.notEqual(err, null, 'min Date validation failed.');
-        assert.ok(err.message.startsWith('MinSchema validation failed'));
-        model.appointmentDate = new Date(Date.now().valueOf() + 10000);
+      const err = await model.validate().then(() => null, err => err);
 
-        // should pass validation
-        model.validate(function(err) {
-          assert.equal(err, null);
-          done();
-        });
-      });
+      assert.notEqual(err, null, 'min Date validation failed.');
+      assert.ok(err.message.startsWith('MinSchema validation failed'));
+      model.appointmentDate = new Date(Date.now().valueOf() + 10000);
+
+      // should pass validation
+      await model.validate();
     });
   });
 
   describe('#maxDate', function() {
-    it('causes a validation error', function(done) {
+    it('causes a validation error', async function() {
       const MaxSchema = new Schema({
         birthdate: { type: Date, max: Date.now }
       });
@@ -84,22 +80,19 @@ describe('ValidationError', function() {
       });
 
       // should fail validation
-      model.validate(function(err) {
-        assert.notEqual(err, null, 'max Date validation failed');
-        assert.ok(err.message.startsWith('MaxSchema validation failed'));
-        model.birthdate = Date.now();
+      const err = await model.validate().then(() => null, err => err);
 
-        // should pass validation
-        model.validate(function(err) {
-          assert.equal(err, null, 'max Date validation failed');
-          done();
-        });
-      });
+      assert.notEqual(err, null, 'max Date validation failed');
+      assert.ok(err.message.startsWith('MaxSchema validation failed'));
+      model.birthdate = Date.now();
+
+      // should pass validation
+      await model.validate();
     });
   });
 
   describe('#minLength', function() {
-    it('causes a validation error', function(done) {
+    it('causes a validation error', async function() {
       const AddressSchema = new Schema({
         postalCode: { type: String, minlength: 5 },
         zipCode: { type: String, minLength: 5 }
@@ -113,21 +106,18 @@ describe('ValidationError', function() {
       });
 
       // should fail validation
-      model.validate(function(err) {
-        assert.notEqual(err, null, 'String minLength validation failed.');
-        assert.ok(err.message.startsWith('MinLengthAddress validation failed'));
-        model.postalCode = '95125';
-        model.zipCode = '95125';
+      const err = await model.validate().then(() => null, err => err);
 
-        // should pass validation
-        model.validate(function(err) {
-          assert.equal(err, null);
-          done();
-        });
-      });
+      assert.notEqual(err, null, 'String minLength validation failed.');
+      assert.ok(err.message.startsWith('MinLengthAddress validation failed'));
+      model.postalCode = '95125';
+      model.zipCode = '95125';
+
+      // should pass validation
+      await model.validate();
     });
 
-    it('with correct error message (gh-4207)', function(done) {
+    it('with correct error message (gh-4207)', async function() {
       const old = mongoose.Error.messages;
       mongoose.Error.messages = {
         String: {
@@ -148,17 +138,16 @@ describe('ValidationError', function() {
       });
 
       // should fail validation
-      model.validate(function(err) {
-        assert.equal(err.errors['postalCode'].message, 'woops!');
-        assert.ok(err.message.startsWith('gh4207 validation failed'));
-        mongoose.Error.messages = old;
-        done();
-      });
+      const err = await model.validate().then(() => null, err => err);
+
+      assert.equal(err.errors['postalCode'].message, 'woops!');
+      assert.ok(err.message.startsWith('gh4207 validation failed'));
+      mongoose.Error.messages = old;
     });
   });
 
   describe('#maxLength', function() {
-    it('causes a validation error', function(done) {
+    it('causes a validation error', async function() {
       const AddressSchema = new Schema({
         postalCode: { type: String, maxlength: 10 },
         zipCode: { type: String, maxLength: 10 }
@@ -172,23 +161,20 @@ describe('ValidationError', function() {
       });
 
       // should fail validation
-      model.validate(function(err) {
-        assert.notEqual(err, null, 'String maxLength validation failed.');
-        assert.ok(err.message.startsWith('MaxLengthAddress validation failed'));
-        model.postalCode = '95125';
-        model.zipCode = '95125';
+      const err = await model.validate().then(() => null, err => err);
 
-        // should pass validation
-        model.validate(function(err) {
-          assert.equal(err, null);
-          done();
-        });
-      });
+      assert.notEqual(err, null, 'String maxLength validation failed.');
+      assert.ok(err.message.startsWith('MaxLengthAddress validation failed'));
+      model.postalCode = '95125';
+      model.zipCode = '95125';
+
+      // should pass validation
+      await model.validate();
     });
   });
 
   describe('#toString', function() {
-    it('does not cause RangeError (gh-1296)', function(done) {
+    it('does not cause RangeError (gh-1296)', async function() {
       const ASchema = new Schema({
         key: { type: String, required: true },
         value: { type: String, required: true }
@@ -201,11 +187,10 @@ describe('ValidationError', function() {
       const M = mongoose.model('A', BSchema);
       const m = new M;
       m.contents.push({ key: 'asdf' });
-      m.validate(function(err) {
-        assert.doesNotThrow(function() {
-          String(err);
-        });
-        done();
+      const err = await m.validate().then(() => null, err => err);
+
+      assert.doesNotThrow(function() {
+        String(err);
       });
     });
   });
@@ -257,15 +242,17 @@ describe('ValidationError', function() {
       });
     });
   });
-  it('should have error name in Cast error gh-10166', function(done) {
-    const zetaSchema = new Schema({ text: { type: String, required: [true, 'Text is required'] }, number: {
-      type: Number, required: [true, 'Number is required'] } });
+  it('should have error name in Cast error gh-10166', async function() {
+    const zetaSchema = new Schema({
+      text: { type: String, required: [true, 'Text is required'] },
+      number: { type: Number, required: [true, 'Number is required'] }
+    });
     const Zeta = mongoose.model('Zeta', zetaSchema);
     const entry = new Zeta({ text: false, number: 'fsfsf' });
-    entry.validate(function(error) {
-      assert.ok(JSON.parse(JSON.stringify(error.errors.number.message)));
-      assert.ok(JSON.parse(JSON.stringify(error.errors.number.name)));
-    });
-    done();
+
+    const error = await entry.validate().then(() => null, err => err);
+
+    assert.ok(JSON.parse(JSON.stringify(error.errors.number.message)));
+    assert.ok(JSON.parse(JSON.stringify(error.errors.number.name)));
   });
 });

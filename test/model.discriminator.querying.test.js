@@ -132,45 +132,36 @@ describe('model', function() {
         assert.equal(docs[2].name, 'Impression event');
       });
 
-      const checkHydratesCorrectModels = function(fields, done) {
+      async function checkHydratesCorrectModels(fields) {
         const baseEvent = new BaseEvent({ name: 'Base event' });
         const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         const conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
-        baseEvent.save(function(err) {
-          assert.ifError(err);
-          impressionEvent.save(function(err) {
-            assert.ifError(err);
-            conversionEvent.save(function(err) {
-              assert.ifError(err);
-              BaseEvent.find({}, fields).sort('name').exec(function(err, docs) {
-                assert.ifError(err);
-                assert.ok(docs[0] instanceof BaseEvent);
-                assert.equal(docs[0].name, 'Base event');
+        await baseEvent.save();
+        await impressionEvent.save();
+        await conversionEvent.save();
 
-                assert.ok(docs[1] instanceof ConversionEvent);
-                assert.equal(docs[1].schema.$originalSchemaId,
-                  ConversionEventSchema.$id);
-                assert.equal(docs[1].name, 'Conversion event');
-                assert.equal(docs[1].revenue, undefined);
+        const docs = await BaseEvent.find({}, fields).sort('name').exec();
 
-                assert.ok(docs[2] instanceof ImpressionEvent);
-                assert.equal(docs[2].schema.$originalSchemaId,
-                  ImpressionEventSchema.$id);
-                assert.equal(docs[2].name, 'Impression event');
-                done();
-              });
-            });
-          });
-        });
-      };
+        assert.ok(docs[0] instanceof BaseEvent);
+        assert.equal(docs[0].name, 'Base event');
 
-      it('hydrates correct models when fields selection set as string', function(done) {
-        checkHydratesCorrectModels('name', done);
+        assert.ok(docs[1] instanceof ConversionEvent);
+        assert.equal(docs[1].schema.$originalSchemaId, ConversionEventSchema.$id);
+        assert.equal(docs[1].name, 'Conversion event');
+        assert.equal(docs[1].revenue, undefined);
+
+        assert.ok(docs[2] instanceof ImpressionEvent);
+        assert.equal(docs[2].schema.$originalSchemaId, ImpressionEventSchema.$id);
+        assert.equal(docs[2].name, 'Impression event');
+      }
+
+      it('hydrates correct models when fields selection set as string', async function() {
+        await checkHydratesCorrectModels('name');
       });
 
-      it('hydrates correct models when fields selection set as object', function(done) {
-        checkHydratesCorrectModels({ name: 1 }, done);
+      it('hydrates correct models when fields selection set as object', async function() {
+        await checkHydratesCorrectModels({ name: 1 });
       });
 
       it('casts underneath $or if discriminator key in filter (gh-9018)', async function() {

@@ -112,7 +112,7 @@ describe('model middleware', function() {
     });
   });
 
-  it('post hook promises (gh-3779)', function(done) {
+  it('post hook promises (gh-3779)', async function() {
     const schema = new Schema({
       title: String
     });
@@ -130,11 +130,9 @@ describe('model middleware', function() {
 
     const test = new TestMiddleware({ title: 'Test' });
 
-    test.save(function(err, doc) {
-      assert.ifError(err);
-      assert.equal(doc.title, 'From Post Save');
-      done();
-    });
+    const doc = await test.save();
+
+    assert.equal(doc.title, 'From Post Save');
   });
 
   it('validate middleware runs before save middleware (gh-2462)', function(done) {

@@ -187,33 +187,25 @@ describe('model', function() {
       describe('discriminator model only finds documents of its type', function() {
 
         describe('using "ModelDiscriminator#findById"', function() {
-          it('to find a document of the appropriate discriminator', function(done) {
+          it('to find a document of the appropriate discriminator', async function() {
             const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
-            impressionEvent.save(function(err) {
-              assert.ifError(err);
+            await impressionEvent.save();
 
-              // via BaseEvent model
-              BaseEvent.findById(impressionEvent._id, function(err, doc) {
-                assert.ifError(err);
-                assert.ok(doc);
-                assert.equal(impressionEvent.__t, doc.__t);
+            // via BaseEvent model
+            const doc = await BaseEvent.findById(impressionEvent._id);
 
-                // via ImpressionEvent model discriminator -- should be present
-                ImpressionEvent.findById(impressionEvent._id, function(err, doc) {
-                  assert.ifError(err);
-                  assert.ok(doc);
-                  assert.equal(impressionEvent.__t, doc.__t);
+            assert.ok(doc);
+            assert.equal(impressionEvent.__t, doc.__t);
 
-                  // via ConversionEvent model discriminator -- should not be present
-                  ConversionEvent.findById(impressionEvent._id, function(err, doc) {
-                    assert.ifError(err);
-                    assert.ok(!doc);
+            // via ImpressionEvent model discriminator -- should be present
+            const doc2 = await ImpressionEvent.findById(impressionEvent._id);
 
-                    done();
-                  });
-                });
-              });
-            });
+            assert.ok(doc2);
+            assert.equal(impressionEvent.__t, doc2.__t);
+
+            // via ConversionEvent model discriminator -- should not be present
+            const doc3 = await ConversionEvent.findById(impressionEvent._id);
+            assert.ok(!doc3);
           });
         });
 

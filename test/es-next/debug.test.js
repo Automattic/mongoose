@@ -55,16 +55,16 @@ describe('debug: shell', function() {
     await db.close();
   });
 
-  it('no-shell', function() {
+  it('no-shell', async function() {
     mongoose.set('debug', { shell: false });
-    return testModel.create({ dob: new Date() }).
-      then(() => assert.equal(true, lastLog.includes('new Date')));
+    await testModel.create({ dob: new Date() });
+    assert.equal(true, lastLog.includes('new Date'));
   });
 
-  it('shell', function() {
+  it('shell', async function() {
     mongoose.set('debug', { shell: true });
-    testModel.create({ dob: new Date() }).
-      then(() => assert.equal(true, lastLog.includes('ISODate')));
+    await testModel.create({ dob: new Date() })
+    assert.equal(true, lastLog.includes('ISODate'));
   });
 
 });

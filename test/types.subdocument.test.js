@@ -45,7 +45,7 @@ describe('types.subdocument', function() {
     await db.close();
   });
 
-  it('returns a proper ownerDocument (gh-3589)', function(done) {
+  it('returns a proper ownerDocument (gh-3589)', function() {
     const Parent = mongoose.model('Parent-3589-Sub');
     const p = new Parent({
       name: 'Parent Parentson',
@@ -60,7 +60,6 @@ describe('types.subdocument', function() {
     });
 
     assert.equal(p._id, p.children[0].child.ownerDocument()._id);
-    done();
   });
 
   it('not setting timestamps in subdocuments', function() {

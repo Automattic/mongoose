@@ -209,11 +209,11 @@ describe('connections:', function() {
     });
   });
 
-  it('should allow closing a closed connection', function(done) {
+  it('should allow closing a closed connection', async function() {
     const db = mongoose.createConnection();
 
     assert.equal(db.readyState, 0);
-    db.close(done);
+    await db.close();
   });
 
   describe('errors', function() {

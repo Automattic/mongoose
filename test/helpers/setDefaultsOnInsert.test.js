@@ -6,7 +6,7 @@ const setDefaultsOnInsert = require('../../lib/helpers/setDefaultsOnInsert');
 const utils = require('../../lib/utils');
 
 describe('setDefaultsOnInsert', function() {
-  it('properly ignores nested paths (gh-6665)', function(done) {
+  it('properly ignores nested paths (gh-6665)', function() {
     const schema = new Schema({
       nested1: {
         nested2: {
@@ -19,9 +19,9 @@ describe('setDefaultsOnInsert', function() {
     const opts = { upsert: true, setDefaultsOnInsert: true };
     let update = { $setOnInsert: { 'nested1.nested2': { name: 'foo' } } };
     update = setDefaultsOnInsert({}, schema, update, opts);
-    assert.deepEqual(utils.omit(update.$setOnInsert, ['_id']),
-      { 'nested1.nested2': { name: 'foo' } });
-
-    done();
+    assert.deepEqual(
+      utils.omit(update.$setOnInsert, ['_id']),
+      { 'nested1.nested2': { name: 'foo' } }
+    );
   });
 });

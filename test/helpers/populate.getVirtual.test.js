@@ -5,7 +5,7 @@ const assert = require('assert');
 const getVirtual = require('../../lib/helpers/populate/getVirtual');
 
 describe('getVirtual', function() {
-  it('handles embedded discriminators (gh-6411)', function(done) {
+  it('handles embedded discriminators (gh-6411)', function() {
     // Generate Embedded Discriminators
     const eventSchema = new Schema(
       { message: String },
@@ -39,13 +39,13 @@ describe('getVirtual', function() {
       product: { type: String }
     }));
 
-    assert.equal(getVirtual(batchSchema, 'nested.events.users_$').virtual.options.ref,
-      'Users');
-
-    done();
+    assert.equal(
+      getVirtual(batchSchema, 'nested.events.users_$').virtual.options.ref,
+      'Users'
+    );
   });
 
-  it('handles embedded discriminators under single nested (gh-6488)', function(done) {
+  it('handles embedded discriminators under single nested (gh-6488)', function() {
     // Generate Embedded Discriminators
     const eventSchema = new Schema({ message: String },
       { discriminatorKey: 'kind' });
@@ -82,11 +82,9 @@ describe('getVirtual', function() {
 
     const res = getVirtual(batchSchema, 'nested.events.nestedLayer.users_$');
     assert.equal(res.virtual.options.ref, 'Users');
-
-    done();
   });
 
-  it('handles multiple calls with discriminator under doc array (gh-6644)', function(done) {
+  it('handles multiple calls with discriminator under doc array (gh-6644)', function() {
     const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind' });
 
     const batchSchema = new Schema({ events: [eventSchema] });
@@ -113,7 +111,5 @@ describe('getVirtual', function() {
     res = getVirtual(batchSchema, 'events.users_$');
     assert.equal(res.virtual.options.ref, 'Users');
     assert.equal(res.nestedSchemaPath, 'events');
-
-    done();
   });
 });

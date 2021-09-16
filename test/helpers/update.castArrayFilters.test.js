@@ -6,7 +6,7 @@ const assert = require('assert');
 const castArrayFilters = require('../../lib/helpers/update/castArrayFilters');
 
 describe('castArrayFilters', function() {
-  it('works', function(done) {
+  it('works', function() {
     const schema = new Schema({ comments: [{ date: Date }] });
     const q = new Query();
     q.schema = schema;
@@ -17,11 +17,9 @@ describe('castArrayFilters', function() {
     castArrayFilters(q);
 
     assert.ok(q.options.arrayFilters[0]['x.date'].$gte instanceof Date);
-
-    done();
   });
 
-  it('casts multiple', function(done) {
+  it('casts multiple', function() {
     const schema = new Schema({
       comments: [{
         text: String,
@@ -37,11 +35,9 @@ describe('castArrayFilters', function() {
     castArrayFilters(q);
     assert.strictEqual(q.options.arrayFilters[0]['x.text'], '123');
     assert.ok(q.options.arrayFilters[1]['y.date'].$gte instanceof Date);
-
-    done();
   });
 
-  it('casts on multiple fields', function(done) {
+  it('casts on multiple fields', function() {
     const schema = new Schema({
       comments: [{
         text: String,
@@ -62,11 +58,9 @@ describe('castArrayFilters', function() {
     assert.strictEqual(q.options.arrayFilters[0]['x.text'], '123');
     assert.ok(q.options.arrayFilters[1]['y.beginAt'].$gte instanceof Date);
     assert.ok(q.options.arrayFilters[1]['y.endAt'].$lt instanceof Date);
-
-    done();
   });
 
-  it('sane error on same filter twice', function(done) {
+  it('sane error on same filter twice', function() {
     const schema = new Schema({
       comments: [{
         text: String,
@@ -83,11 +77,9 @@ describe('castArrayFilters', function() {
     assert.throws(() => {
       castArrayFilters(q);
     }, /same array filter/);
-
-    done();
   });
 
-  it('using $in (gh-7431)', function(done) {
+  it('using $in (gh-7431)', function() {
     const schema = new Schema({
       itemsInfo: {
         allUsers: { all: Number },
@@ -110,11 +102,9 @@ describe('castArrayFilters', function() {
     castArrayFilters(q);
 
     assert.deepEqual(q.options.arrayFilters[0]['element.userId'].$in, ['1', '2', '3']);
-
-    done();
   });
 
-  it('all positional operator works (gh-7540)', function(done) {
+  it('all positional operator works (gh-7540)', function() {
     const schema = new Schema({
       doctorsAppointment: {
         queries: [{
@@ -132,8 +122,6 @@ describe('castArrayFilters', function() {
     castArrayFilters(q);
 
     assert.strictEqual(q.options.arrayFilters[0]['u.key'], '123');
-
-    done();
   });
 
   it('handles deeply nested arrays (gh-7603)', function() {

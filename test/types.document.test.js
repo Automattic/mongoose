@@ -180,7 +180,7 @@ describe('types.document', function() {
     modifiedMovie.ratings[0].remove();
     await modifiedMovie.save();
 
-    const finalMovie = Movie.findById(super8._id);
+    const finalMovie = await Movie.findById(super8._id);
 
     assert.equal(finalMovie.ratings.length, 0);
   });

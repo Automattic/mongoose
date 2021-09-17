@@ -72,297 +72,290 @@ describe('types.buffer', function() {
     assert.equal(d.toString('utf8'), '');
   });
 
-  it('buffer validation', function(done) {
+  it('buffer validation', async function() {
     const User = db.model('Test', UserBuffer);
 
-    User.on('index', function() {
-      const t = new User({
-        name: 'test validation'
-      });
+    await User.init();
 
-      t.validate(function(err) {
-        assert.ok(err.message.indexOf('Test validation failed') === 0, err.message);
-        assert.equal(err.errors.required.kind, 'required');
-        t.required = { x: [20] };
-        t.save(function(err) {
-          assert.ok(err);
-          assert.equal(err.name, 'ValidationError');
-          assert.equal(err.errors.required.name, 'CastError');
-          assert.equal(err.errors.required.kind, 'Buffer');
-          assert.equal(err.errors.required.message, 'Cast to Buffer failed for value "{ x: [ 20 ] }" (type Object) at path "required"');
-          assert.deepEqual(err.errors.required.value, { x: [20] });
-          t.required = Buffer.from('hello');
 
-          t.sub.push({ name: 'Friday Friday' });
-          t.save(function(err) {
-            assert.ok(err.message.indexOf('Test validation failed') === 0, err.message);
-            assert.equal(err.errors['sub.0.buf'].kind, 'required');
-            t.sub[0].buf = Buffer.from('well well');
-            t.save(function(err) {
-              assert.ok(err.message.indexOf('Test validation failed') === 0, err.message);
-              assert.equal(err.errors['sub.0.buf'].kind, 'user defined');
-              assert.equal(err.errors['sub.0.buf'].message, 'valid failed');
-
-              t.sub[0].buf = Buffer.from('well well well');
-              t.validate(function(err) {
-                assert.ifError(err);
-                done();
-              });
-            });
-          });
-        });
-      });
+    const t = new User({
+      name: 'test validation'
     });
+
+    const err = await t.validate().then(() => null, err => err);
+
+    assert.ok(err.message.indexOf('Test validation failed') === 0, err.message);
+    assert.equal(err.errors.required.kind, 'required');
+    t.required = { x: [20] };
+
+    const err2 = await t.save().then(() => null, err => err);
+
+    assert.ok(err2);
+    assert.equal(err2.name, 'ValidationError');
+    assert.equal(err2.errors.required.name, 'CastError');
+    assert.equal(err2.errors.required.kind, 'Buffer');
+    assert.equal(err2.errors.required.message, 'Cast to Buffer failed for value "{ x: [ 20 ] }" (type Object) at path "required"');
+    assert.deepEqual(err2.errors.required.value, { x: [20] });
+    t.required = Buffer.from('hello');
+
+    t.sub.push({ name: 'Friday Friday' });
+    const err3 = await t.save().then(() => null, err => err);
+
+    assert.ok(err3.message.indexOf('Test validation failed') === 0, err3.message);
+    assert.equal(err3.errors['sub.0.buf'].kind, 'required');
+    t.sub[0].buf = Buffer.from('well well');
+
+    const err4 = await t.save().then(() => null, err => err);
+
+    assert.ok(err4.message.indexOf('Test validation failed') === 0, err4.message);
+    assert.equal(err4.errors['sub.0.buf'].kind, 'user defined');
+    assert.equal(err4.errors['sub.0.buf'].message, 'valid failed');
+
+    t.sub[0].buf = Buffer.from('well well well');
+
+    // Should not throw
+    await t.validate();
   });
 
-  it('buffer storage', function(done) {
+  it('buffer storage', async function() {
     const User = db.model('Test', UserBuffer);
+    await User.init();
 
-    User.on('index', function() {
-      const sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
+    const sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
 
-      const tj = new User({
-        name: 'tj',
-        serial: sampleBuffer,
-        required: Buffer.from(sampleBuffer)
-      });
-
-      tj.save(function(err) {
-        assert.ifError(err);
-        User.find({}, function(err, users) {
-          assert.ifError(err);
-          assert.equal(users.length, 1);
-          const user = users[0];
-          const base64 = sampleBuffer.toString('base64');
-          assert.equal(base64,
-            user.serial.toString('base64'), 'buffer mismatch');
-          assert.equal(base64,
-            user.required.toString('base64'), 'buffer mismatch');
-          done();
-        });
-      });
+    const tj = new User({
+      name: 'tj',
+      serial: sampleBuffer,
+      required: Buffer.from(sampleBuffer)
     });
+
+    await tj.save();
+
+    const users = await User.find({});
+
+    assert.equal(users.length, 1);
+
+    const user = users[0];
+    const base64 = sampleBuffer.toString('base64');
+
+    assert.equal(base64,
+      user.serial.toString('base64'), 'buffer mismatch');
+    assert.equal(base64,
+      user.required.toString('base64'), 'buffer mismatch');
   });
 
-  it('test write markModified', function(done) {
+  it('test write markModified', async function() {
     const User = db.model('Test', UserBuffer);
+    await User.init();
 
-    User.on('index', function() {
-      const sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
+    const sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
 
-      const tj = new User({
-        name: 'tj',
-        serial: sampleBuffer,
-        required: sampleBuffer
-      });
-
-      tj.save(function(err) {
-        assert.ifError(err);
-
-        tj.serial.write('aa', 1, 'ascii');
-        assert.equal(true, tj.isModified('serial'));
-
-        tj.save(function(err) {
-          assert.ifError(err);
-
-          User.findById(tj._id, function(err, user) {
-            assert.ifError(err);
-
-            const expectedBuffer = Buffer.from([123, 97, 97, 42, 11]);
-
-            assert.equal(expectedBuffer.toString('base64'),
-              user.serial.toString('base64'), 'buffer mismatch');
-
-            assert.equal(false, tj.isModified('required'));
-            tj.serial.copy(tj.required, 1);
-            assert.equal(true, tj.isModified('required'));
-            assert.equal('e3thYSo=', tj.required.toString('base64'));
-
-            function not(tj) {
-              assert.equal(false, tj.isModified('required'));
-            }
-
-            function is(tj) {
-              assert.equal(true, tj.isModified('required'));
-            }
-
-            // buffer method tests
-            const fns = {
-              writeUInt8: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeUInt8(0x3, 0, 'big');
-                is(tj);
-              },
-              writeUInt16: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeUInt16(0xbeef, 0, 'little');
-                is(tj);
-              },
-              writeUInt16LE: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeUInt16LE(0xbeef, 0);
-                is(tj);
-              },
-              writeUInt16BE: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeUInt16BE(0xbeef, 0);
-                is(tj);
-              },
-              writeUInt32: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeUInt32(0xfeedface, 0, 'little');
-                is(tj);
-              },
-              writeUInt32LE: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeUInt32LE(0xfeedface, 0);
-                is(tj);
-              },
-              writeUInt32BE: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeUInt32BE(0xfeedface, 0);
-                is(tj);
-              },
-              writeInt8: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeInt8(-5, 0, 'big');
-                is(tj);
-              },
-              writeInt16: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeInt16(0x0023, 2, 'little');
-                is(tj);
-                assert.equal(tj.required[2], 0x23);
-                assert.equal(tj.required[3], 0x00);
-              },
-              writeInt16LE: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeInt16LE(0x0023, 2);
-                is(tj);
-                assert.equal(tj.required[2], 0x23);
-                assert.equal(tj.required[3], 0x00);
-              },
-              writeInt16BE: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeInt16BE(0x0023, 2);
-                is(tj);
-              },
-              writeInt32: function() {
-                reset(tj);
-                not(tj);
-                tj.required.writeInt32(0x23, 0, 'big');
-                is(tj);
-                assert.equal(tj.required[0], 0x00);
-                assert.equal(tj.required[1], 0x00);
-                assert.equal(tj.required[2], 0x00);
-                assert.equal(tj.required[3], 0x23);
-                tj.required = Buffer.alloc(8);
-              },
-              writeInt32LE: function() {
-                tj.required = Buffer.alloc(8);
-                reset(tj);
-                not(tj);
-                tj.required.writeInt32LE(0x23, 0);
-                is(tj);
-              },
-              writeInt32BE: function() {
-                tj.required = Buffer.alloc(8);
-                reset(tj);
-                not(tj);
-                tj.required.writeInt32BE(0x23, 0);
-                is(tj);
-                assert.equal(tj.required[0], 0x00);
-                assert.equal(tj.required[1], 0x00);
-                assert.equal(tj.required[2], 0x00);
-                assert.equal(tj.required[3], 0x23);
-              },
-              writeFloat: function() {
-                tj.required = Buffer.alloc(16);
-                reset(tj);
-                not(tj);
-                tj.required.writeFloat(2.225073858507201e-308, 0, 'big');
-                is(tj);
-                assert.equal(tj.required[0], 0x00);
-                assert.equal(tj.required[1], 0x0f);
-                assert.equal(tj.required[2], 0xff);
-                assert.equal(tj.required[3], 0xff);
-                assert.equal(tj.required[4], 0xff);
-                assert.equal(tj.required[5], 0xff);
-                assert.equal(tj.required[6], 0xff);
-                assert.equal(tj.required[7], 0xff);
-              },
-              writeFloatLE: function() {
-                tj.required = Buffer.alloc(16);
-                reset(tj);
-                not(tj);
-                tj.required.writeFloatLE(2.225073858507201e-308, 0);
-                is(tj);
-              },
-              writeFloatBE: function() {
-                tj.required = Buffer.alloc(16);
-                reset(tj);
-                not(tj);
-                tj.required.writeFloatBE(2.225073858507201e-308, 0);
-                is(tj);
-              },
-              writeDoubleLE: function() {
-                tj.required = Buffer.alloc(8);
-                reset(tj);
-                not(tj);
-                tj.required.writeDoubleLE(0xdeadbeefcafebabe, 0);
-                is(tj);
-              },
-              writeDoubleBE: function() {
-                tj.required = Buffer.alloc(8);
-                reset(tj);
-                not(tj);
-                tj.required.writeDoubleBE(0xdeadbeefcafebabe, 0);
-                is(tj);
-              },
-              fill: function() {
-                tj.required = Buffer.alloc(8);
-                reset(tj);
-                not(tj);
-                tj.required.fill(0);
-                is(tj);
-                for (let i = 0; i < tj.required.length; i++) {
-                  assert.strictEqual(tj.required[i], 0);
-                }
-              },
-              set: function() {
-                reset(tj);
-                not(tj);
-                tj.required[0] = 1;
-                tj.markModified('required');
-                is(tj);
-              }
-            };
-
-            const keys = Object.keys(fns);
-            let i = keys.length;
-
-            while (i--) {
-              const key = keys[i];
-              if (Buffer.prototype[key]) {
-                fns[key]();
-              }
-            }
-            done();
-          });
-        });
-      });
+    const tj = new User({
+      name: 'tj',
+      serial: sampleBuffer,
+      required: sampleBuffer
     });
+
+    await tj.save();
+
+    tj.serial.write('aa', 1, 'ascii');
+    assert.equal(true, tj.isModified('serial'));
+
+    await tj.save();
+
+    const user = await User.findById(tj._id);
+
+    const expectedBuffer = Buffer.from([123, 97, 97, 42, 11]);
+
+    assert.equal(expectedBuffer.toString('base64'),
+      user.serial.toString('base64'), 'buffer mismatch');
+
+    assert.equal(false, tj.isModified('required'));
+    tj.serial.copy(tj.required, 1);
+    assert.equal(true, tj.isModified('required'));
+    assert.equal('e3thYSo=', tj.required.toString('base64'));
+
+    function not(tj) {
+      assert.equal(false, tj.isModified('required'));
+    }
+
+    function is(tj) {
+      assert.equal(true, tj.isModified('required'));
+    }
+
+    // buffer method tests
+    const fns = {
+      writeUInt8: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeUInt8(0x3, 0, 'big');
+        is(tj);
+      },
+      writeUInt16: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeUInt16(0xbeef, 0, 'little');
+        is(tj);
+      },
+      writeUInt16LE: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeUInt16LE(0xbeef, 0);
+        is(tj);
+      },
+      writeUInt16BE: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeUInt16BE(0xbeef, 0);
+        is(tj);
+      },
+      writeUInt32: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeUInt32(0xfeedface, 0, 'little');
+        is(tj);
+      },
+      writeUInt32LE: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeUInt32LE(0xfeedface, 0);
+        is(tj);
+      },
+      writeUInt32BE: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeUInt32BE(0xfeedface, 0);
+        is(tj);
+      },
+      writeInt8: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeInt8(-5, 0, 'big');
+        is(tj);
+      },
+      writeInt16: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeInt16(0x0023, 2, 'little');
+        is(tj);
+        assert.equal(tj.required[2], 0x23);
+        assert.equal(tj.required[3], 0x00);
+      },
+      writeInt16LE: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeInt16LE(0x0023, 2);
+        is(tj);
+        assert.equal(tj.required[2], 0x23);
+        assert.equal(tj.required[3], 0x00);
+      },
+      writeInt16BE: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeInt16BE(0x0023, 2);
+        is(tj);
+      },
+      writeInt32: function() {
+        reset(tj);
+        not(tj);
+        tj.required.writeInt32(0x23, 0, 'big');
+        is(tj);
+        assert.equal(tj.required[0], 0x00);
+        assert.equal(tj.required[1], 0x00);
+        assert.equal(tj.required[2], 0x00);
+        assert.equal(tj.required[3], 0x23);
+        tj.required = Buffer.alloc(8);
+      },
+      writeInt32LE: function() {
+        tj.required = Buffer.alloc(8);
+        reset(tj);
+        not(tj);
+        tj.required.writeInt32LE(0x23, 0);
+        is(tj);
+      },
+      writeInt32BE: function() {
+        tj.required = Buffer.alloc(8);
+        reset(tj);
+        not(tj);
+        tj.required.writeInt32BE(0x23, 0);
+        is(tj);
+        assert.equal(tj.required[0], 0x00);
+        assert.equal(tj.required[1], 0x00);
+        assert.equal(tj.required[2], 0x00);
+        assert.equal(tj.required[3], 0x23);
+      },
+      writeFloat: function() {
+        tj.required = Buffer.alloc(16);
+        reset(tj);
+        not(tj);
+        tj.required.writeFloat(2.225073858507201e-308, 0, 'big');
+        is(tj);
+        assert.equal(tj.required[0], 0x00);
+        assert.equal(tj.required[1], 0x0f);
+        assert.equal(tj.required[2], 0xff);
+        assert.equal(tj.required[3], 0xff);
+        assert.equal(tj.required[4], 0xff);
+        assert.equal(tj.required[5], 0xff);
+        assert.equal(tj.required[6], 0xff);
+        assert.equal(tj.required[7], 0xff);
+      },
+      writeFloatLE: function() {
+        tj.required = Buffer.alloc(16);
+        reset(tj);
+        not(tj);
+        tj.required.writeFloatLE(2.225073858507201e-308, 0);
+        is(tj);
+      },
+      writeFloatBE: function() {
+        tj.required = Buffer.alloc(16);
+        reset(tj);
+        not(tj);
+        tj.required.writeFloatBE(2.225073858507201e-308, 0);
+        is(tj);
+      },
+      writeDoubleLE: function() {
+        tj.required = Buffer.alloc(8);
+        reset(tj);
+        not(tj);
+        tj.required.writeDoubleLE(0xdeadbeefcafebabe, 0);
+        is(tj);
+      },
+      writeDoubleBE: function() {
+        tj.required = Buffer.alloc(8);
+        reset(tj);
+        not(tj);
+        tj.required.writeDoubleBE(0xdeadbeefcafebabe, 0);
+        is(tj);
+      },
+      fill: function() {
+        tj.required = Buffer.alloc(8);
+        reset(tj);
+        not(tj);
+        tj.required.fill(0);
+        is(tj);
+        for (let i = 0; i < tj.required.length; i++) {
+          assert.strictEqual(tj.required[i], 0);
+        }
+      },
+      set: function() {
+        reset(tj);
+        not(tj);
+        tj.required[0] = 1;
+        tj.markModified('required');
+        is(tj);
+      }
+    };
+
+    const keys = Object.keys(fns);
+    let i = keys.length;
+
+    while (i--) {
+      const key = keys[i];
+      if (Buffer.prototype[key]) {
+        fns[key]();
+      }
+    }
+
 
     function reset(model) {
       // internal

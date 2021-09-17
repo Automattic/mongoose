@@ -11,43 +11,34 @@ describe('transactions', function() {
   let _skipped = false;
   this.timeout(10000);
 
-  before(function() {
-
+  before(async function() {
     if (!process.env.REPLICA_SET) {
       _skipped = true;
       this.skip();
     }
     db = start({ replicaSet: process.env.REPLICA_SET });
+    try {
+      await db.asPromise();
 
-    return db.asPromise().
-      then(() => {
-        // Skip if not a repl set
-        if (db.client.topology.constructor.name !== 'ReplSet' &&
-            !db.client.topology.s.description.type.includes('ReplicaSet')) {
-          _skipped = true;
-          this.skip();
-
-          throw new Error('skip');
-        }
-      }).
-      then(() => new Promise((resolve, reject) => {
-        start.mongodVersion(function(err, version) {
-          if (err) {
-            return reject(err);
-          }
-          resolve(version);
-        });
-      })).
-      then(version => {
-        if (version[0] < 4) {
-          _skipped = true;
-          this.skip();
-        }
-      }).
-      catch(() => {
+      // Skip if not a repl set
+      if (db.client.topology.constructor.name !== 'ReplSet' &&
+      !db.client.topology.s.description.type.includes('ReplicaSet')) {
         _skipped = true;
         this.skip();
-      });
+
+        throw new Error('skip');
+      }
+
+      const version = await start.mongodVersion();
+
+      if (version[0] < 4) {
+        _skipped = true;
+        this.skip();
+      }
+    } catch (err) {
+      _skipped = true;
+      this.skip();
+    }
   });
 
   it('basic example', function() {

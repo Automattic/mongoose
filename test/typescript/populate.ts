@@ -39,3 +39,39 @@ ParentModel.findOne({}).populate('child').orFail().then((doc: Parent & Document)
 function useChildDoc(child: Child): void {
   console.log(child.name.trim());
 }
+
+interface IPerson {
+  name?: string;
+  stories?: PopulatedDoc<IStory>[];
+}
+
+interface IStory {
+  title?: string;
+  author?: PopulatedDoc<IPerson>;
+  fans?: PopulatedDoc<IPerson>[];
+}
+
+const personSchema = new Schema<IPerson>({
+  name: String,
+  stories: [{ type: Schema.Types.ObjectId, ref: 'Story' }]
+});
+
+const storySchema = new Schema<IStory>({
+  title: String,
+  author: { type: Schema.Types.ObjectId, ref: 'Person' },
+  fans: [{ type: Schema.Types.ObjectId, ref: 'Person' }]
+});
+
+const Person = model<IPerson>('Person', personSchema);
+
+const Story = model<IStory>('Story', storySchema);
+
+(async() => {
+  const story = await Story.findOne().orFail();
+
+  await story.populate('author');
+  await story.populate({ path: 'fans' });
+  await story.populate(['author']);
+  await story.populate([{ path: 'fans' }]);
+  await story.populate(['author', { path: 'fans' }]);
+})();

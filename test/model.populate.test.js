@@ -5713,53 +5713,38 @@ describe('model: populate:', function() {
         });
       });
 
-      it('populate with Decimal128 as ref (gh-4759)', function(done) {
-        start.mongodVersion(function(err, version) {
-          if (err) {
-            done(err);
-            return;
-          }
-          const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-          if (!mongo34) {
-            done();
-            return;
-          }
+      it('populate with Decimal128 as ref (gh-4759)', async function() {
+        const version = await start.mongodVersion();
 
-          test();
+        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          return;
+        }
+
+        const parentSchema = new Schema({
+          name: String,
+          child: {
+            type: 'Decimal128',
+            ref: 'Child'
+          }
         });
 
-        function test() {
-          const parentSchema = new Schema({
-            name: String,
-            child: {
-              type: 'Decimal128',
-              ref: 'Child'
-            }
-          });
+        const childSchema = new Schema({
+          _id: 'Decimal128',
+          name: String
+        });
 
-          const childSchema = new Schema({
-            _id: 'Decimal128',
-            name: String
-          });
+        const Child = db.model('Child', childSchema);
+        const Parent = db.model('Parent', parentSchema);
 
-          const Child = db.model('Child', childSchema);
-          const Parent = db.model('Parent', parentSchema);
+        const decimal128 = childSchema.path('_id').cast('1.337e+3');
 
-          const decimal128 = childSchema.path('_id').cast('1.337e+3');
-          Child.create({ name: 'Luke', _id: '1.337e+3' }).
-            then(function() {
-              return Parent.create({ name: 'Anakin', child: decimal128.bytes });
-            }).
-            then(function(parent) {
-              return Parent.findById(parent._id).populate('child');
-            }).
-            then(function(parent) {
-              assert.equal(parent.child.name, 'Luke');
-              assert.equal(parent.child._id.toString(), '1337');
-              done();
-            }).
-            catch(done);
-        }
+        await Child.create({ name: 'Luke', _id: '1.337e+3' });
+        const parent = await Parent.create({ name: 'Anakin', child: decimal128.bytes });
+        const foundParent = await Parent.findById(parent._id).populate('child');
+
+        assert.equal(foundParent.child.name, 'Luke');
+        assert.equal(foundParent.child._id.toString(), '1337');
       });
 
       it('handles circular virtual -> regular (gh-5128)', function(done) {
@@ -10416,5 +10401,40 @@ describe('model: populate:', function() {
       assert.equal(res.list[0].data.textName, 'test');
       assert.equal(res.list[1].data.imageName, 'test');
     });
+  });
+
+  it('avoids setting empty array on lean document when populate result is undefined (gh-10599)', async function() {
+    const ImageSchema = Schema({ imageName: String }, { _id: false });
+    const TextSchema = Schema({
+      textName: String,
+      attached: [{ type: 'ObjectId', ref: 'Test2' }]
+    }, { _id: false });
+
+    const ItemSchema = Schema({ objectType: String }, {
+      discriminatorKey: 'objectType',
+      _id: false
+    });
+
+    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+
+    ExampleSchema.path('list').discriminator('Image', ImageSchema);
+    ExampleSchema.path('list').discriminator('Text', TextSchema);
+    const Example = db.model('Test', ExampleSchema);
+    const Another = db.model('Test2', Schema({ test: 'String' }));
+
+    await Another.create({ _id: '61254490ea89de0004c8f2a0', test: 'test' });
+
+    const example = await Example.create({
+      test: 'example',
+      list: [
+        { imageName: 'an image', objectType: 'Image' },
+        { textName: 'this is a text', attached: ['61254490ea89de0004c8f2a0'], objectType: 'Text' }
+      ]
+    });
+    const query = Example.findById(example._id).populate('list.attached').lean();
+
+    const result = await query.exec();
+    assert.strictEqual(result.list[0].attached, void 0);
+    assert.equal(result.list[1].attached[0].test, 'test');
   });
 });

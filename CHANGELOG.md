@@ -1,3 +1,40 @@
+6.0.6 / 2021-09-15
+==================
+ * perf(index.d.ts): streamline SchemaDefinitionType and SchemaTypeOptions to reduce number of instantiations and speed up lib checking #10349
+ * perf(document): make $locals a getter/setter, avoid creating unnecessary `undefined` properties in Document constructor, remove unnecessary event listeners #10400
+ * fix(connection): use username parameter for MongoDB driver instead of user #10727 [saveman71](https://github.com/saveman71)
+ * fix(update): handle casting $or and $and in array filters #10696
+ * fix(connection): allow calling connection helpers before calling `mongoose.connect()` #10706
+ * fix(document): correctly handle subpaths of arrays that contain non-alphanumeric chars like `-` #10709
+ * fix(index.d.ts): correct return value for findOneAndUpdate(), `findByIdAndUpdate()` to support query helpers #10658
+ * fix(index.d.ts): add missing methods to ValidationError & ValidatorError classes #10725 [medfreeman](https://github.com/medfreeman)
+ * perf(subdocument): make internal $isSingleNested and `$isDocumentArrayElement` properties constants on the prototype rather than setting them on every instance #10400
+ * docs: improve Document#populate documentation, tests #10728 [saveman71](https://github.com/saveman71)
+
+6.0.5 / 2021-09-06
+==================
+ * fix(model): allow calling Model.validate() static with POJO array #10669
+ * fix(cast): let $expr through in query filters if strict mode enabled #10662
+ * fix(map): propagate flattenMaps option down to nested maps #10653
+ * fix(setDefaultsOnInsert): avoid adding unnecessary auto _id to $setOnInsert #10646
+ * fix(schema): support object with values and message syntax for Number enums #10648
+ * fix(index.d.ts): fix Document#populate() type #10651 [thiagokisaki](https://github.com/thiagokisaki)
+ * fix(index.d.ts): allow using $in and $nin on array paths #10605
+ * fix(index.d.ts): make _id required in query results and return value from `create()` #10657
+ * docs: update deprecations.md to reflect version 6 #10673 [multiwebinc](https://github.com/multiwebinc)
+ * docs: fix typo in queries.md #10681 [yogabonito](https://github.com/yogabonito)
+ * docs: fix typo in models.md #10680 [yogabonito](https://github.com/yogabonito)
+ * ci: add test for ubuntu-20.04 #10679 [YC](https://github.com/YC)
+
+5.13.9 / 2021-09-06
+===================
+ * fix(populate): avoid setting empty array on lean document when populate result is undefined #10599
+ * fix(document): make depopulate() handle populated paths underneath document arrays #10592
+ * fix: peg @types/bson version to 1.x || 4.0.x to avoid stubbed 4.2.x release #10678
+ * fix(index.d.ts): simplify UpdateQuery to avoid "excessively deep and possibly infinite" errors with `extends Document` and `any` #10647
+ * fix(index.d.ts): allow specifying weights as an IndexOption #10586
+ * fix: upgrade to mpath v0.8.4 re: security issue #10683
+
 6.0.4 / 2021-09-01
 ==================
  * fix(schema): handle maps of maps #10644

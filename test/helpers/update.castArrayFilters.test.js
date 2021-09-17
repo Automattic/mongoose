@@ -188,4 +188,26 @@ describe('castArrayFilters', function() {
     castArrayFilters(q);
     assert.strictEqual(q.options.arrayFilters[0]['arr.notInSchema'], '42');
   });
+
+  it('respects `$or` option (gh-10696)', function() {
+    const schema = new Schema({
+      arr: [{
+        id: Number
+      }]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    const p = { 'arr.$[arr].id': 42 };
+    const opts = {
+      arrayFilters: [
+        { $or: [{ 'arr.id': '12' }] }
+      ]
+    };
+
+    q.updateOne({}, p, opts);
+    castArrayFilters(q);
+
+    assert.strictEqual(q.options.arrayFilters[0].$or[0]['arr.id'], 12);
+  });
 });

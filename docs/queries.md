@@ -137,7 +137,7 @@ immediately executes the query, and calling [`then()`](https://masteringjs.io/tu
 executes the query again.
 
 Mixing promises and callbacks can lead to duplicate entries in arrays.
-For example, the below code inserts 2 entries into the `tags` array, **not* just 1.
+For example, the below code inserts 2 entries into the `tags` array, **not** just 1.
 
 ```javascript
 const BlogPost = mongoose.model('BlogPost', new Schema({

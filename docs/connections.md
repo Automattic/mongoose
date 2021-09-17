@@ -140,7 +140,7 @@ Mongoose passes options to the driver without modification, modulo a few
 exceptions that are explained below.
 
 * `bufferCommands`    - This is a mongoose-specific option (not passed to the MongoDB driver) that disables [Mongoose's buffering mechanism](http://mongoosejs.com/docs/faq.html#callback_never_executes)
-* `user`/`pass`       - The username and password for authentication. These options are Mongoose-specific, they are equivalent to the MongoDB driver's `auth.user` and `auth.password` options.
+* `user`/`pass`       - The username and password for authentication. These options are Mongoose-specific, they are equivalent to the MongoDB driver's `auth.username` and `auth.password` options.
 * `autoIndex`         - By default, mongoose will automatically build indexes defined in your schema when it connects. This is great for development, but not ideal for large production deployments, because index builds can cause performance degradation. If you set `autoIndex` to false, mongoose will not automatically build indexes for **any** model associated with this connection.
 * `dbName`            - Specifies which database to connect to and overrides any database specified in the connection string. This is useful if you are unable to specify a default database in the connection string like with [some `mongodb+srv` syntax connections](https://stackoverflow.com/questions/48917591/fail-to-connect-mongoose-to-atlas/48917626#48917626).
 

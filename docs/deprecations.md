@@ -9,127 +9,11 @@ cause any problems for your application. Please [report any issues on GitHub](ht
 
 To fix all deprecation warnings, follow the below steps:
 
-* `mongoose.set('useNewUrlParser', true);`
-* `mongoose.set('useFindAndModify', false);`
-* `mongoose.set('useCreateIndex', true);`
-* `mongoose.set('useUnifiedTopology', true);`
 * Replace `update()` with `updateOne()`, `updateMany()`, or `replaceOne()`
 * Replace `remove()` with `deleteOne()` or `deleteMany()`.
 * Replace `count()` with `countDocuments()`, unless you want to count how many documents are in the whole collection (no filter). In the latter case, use `estimatedDocumentCount()`.
 
 Read below for more a more detailed description of each deprecation warning.
-
-<h2 id="the-usenewurlparser-option"><a href="#the-usenewurlparser-option">The <code>useNewUrlParser</code> Option</a></h2>
-
-By default, `mongoose.connect()` will print out the below warning:
-
-```
-DeprecationWarning: current URL string parser is deprecated, and will be
-removed in a future version. To use the new parser, pass option
-{ useNewUrlParser: true } to MongoClient.connect.
-```
-
-The MongoDB Node.js driver rewrote the tool it uses to parse [MongoDB connection strings](https://docs.mongodb.com/manual/reference/connection-string/).
-Because this is such a big change, they put the new connection string parser
-behind a flag. To turn on this option, pass the `useNewUrlParser` option to
-[`mongoose.connect()`](/docs/api.html#mongoose_Mongoose-connect)
-or [`mongoose.createConnection()`](/docs/api.html#mongoose_Mongoose-createConnection).
-
-```javascript
-mongoose.connect(uri, { useNewUrlParser: true });
-mongoose.createConnection(uri, { useNewUrlParser: true });
-```
-
-You can also [set the global `useNewUrlParser` option](/docs/api.html#mongoose_Mongoose-set)
-to turn on `useNewUrlParser` for every connection by default.
-
-```javascript
-// Optional. Use this if you create a lot of connections and don't want
-// to copy/paste `{ useNewUrlParser: true }`.
-mongoose.set('useNewUrlParser', true);
-```
-
-To test your app with `{ useNewUrlParser: true }`, you only need to check
-whether your app successfully connects. Once Mongoose has successfully
-connected, the URL parser is no longer important. If you can't connect
-with `{ useNewUrlParser: true }`, please [open an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
-
-<h2 id="findandmodify"><a href="#findandmodify"><code>findAndModify()</code></a></h2>
-
-If you use [`Model.findOneAndUpdate()`](/docs/api.html#model_Model.findOneAndUpdate),
-by default you'll see one of the below deprecation warnings.
-
-```
-DeprecationWarning: Mongoose: `findOneAndUpdate()` and `findOneAndDelete()` without the `useFindAndModify` option set to false are deprecated. See: https://mongoosejs.com/docs/deprecations.html#findandmodify
-DeprecationWarning: collection.findAndModify is deprecated. Use findOneAndUpdate, findOneAndReplace or findOneAndDelete instead.
-```
-
-Mongoose's `findOneAndUpdate()` long pre-dates the MongoDB driver's `findOneAndUpdate()`
-function, so it uses the MongoDB driver's [`findAndModify()` function](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findAndModify)
-instead. You can opt in to using the MongoDB driver's `findOneAndUpdate()`
-function using the [`useFindAndModify` global option](/docs/api.html#mongoose_Mongoose-set).
-
-```javascript
-// Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
-// by default, you need to set it to false.
-mongoose.set('useFindAndModify', false);
-```
-
-You can also configure `useFindAndModify` by passing it through the connection options.
-
-```javascript
-mongoose.connect(uri, { useFindAndModify: false });
-```
-
-This option affects the following model and query functions. There are
-no intentional backwards breaking changes, so you should be able to turn
-this option on without any code changes. If you discover any issues,
-please [open an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
-
-* [`Model.findByIdAndDelete()`](/docs/api.html#model_Model.findByIdAndDelete)
-* [`Model.findByIdAndRemove()`](/docs/api.html#model_Model.findByIdAndRemove)
-* [`Model.findByIdAndUpdate()`](/docs/api.html#model_Model.findByIdAndUpdate)
-* [`Model.findOneAndDelete()`](/docs/api.html#model_Model.findOneAndDelete)
-* [`Model.findOneAndRemove()`](/docs/api.html#model_Model.findOneAndRemove)
-* [`Model.findOneAndUpdate()`](/docs/api.html#model_Model.findOneAndUpdate)
-* [`Query.findOneAndDelete()`](/docs/api.html#query_Query-findOneAndDelete)
-* [`Query.findOneAndRemove()`](/docs/api.html#query_Query-findOneAndRemove)
-* [`Query.findOneAndUpdate()`](/docs/api.html#query_Query-findOneAndUpdate)
-
-You can also safely ignore this warning. Mongoose will not remove the legacy `useFindAndModify: true`
-behavior until Mongoose 6.0.
-
-<h2 id="ensureindex"><a href="#ensureindex"><code>ensureIndex()</code></a></h2>
-
-If you define [indexes in your Mongoose schemas](https://mongoosejs.com/docs/guide.html#indexes), you'll see the below
-deprecation warning.
-
-```
-DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes
-instead.
-```
-
-By default, Mongoose 5.x calls the [MongoDB driver's `ensureIndex()` function](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#ensureIndex).
-The MongoDB driver deprecated this function in favor of [`createIndex()`](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#createIndex).
-Set the [`useCreateIndex` global option](/docs/api.html#mongoose_Mongoose-set) to opt in to making Mongoose use `createIndex()` instead.
-
-```javascript
-mongoose.set('useCreateIndex', true);
-```
-
-You can also configure `useCreateIndex` by passing it through the connection options.
-
-```javascript
-mongoose.connect(uri, { useCreateIndex: true });
-```
-
-There are no intentional backwards breaking changes with the `useCreateIndex`
-option, so you should be able to turn
-this option on without any code changes. If you discover any issues,
-please [open an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
-
-You can also safely ignore this warning. Mongoose will not remove the legacy `useCreateIndex: false`
-behavior until Mongoose 6.0.
 
 <h2 id="remove"><a href="#remove"><code>remove()</code></a></h2>
 
@@ -159,42 +43,6 @@ MyModel.remove({ answer: 42 }, { single: true });
 // With this:
 MyModel.deleteOne({ answer: 42 });
 ```
-
-<h2 id="useunifiedtopology"><a href="#useunifiedtopology"><code>useUnifiedTopology</code></a></h2>
-
-By default, `mongoose.connect()` will print out the below warning:
-
-```
-DeprecationWarning: current Server Discovery and Monitoring engine is
-deprecated, and will be removed in a future version. To use the new Server
-Discover and Monitoring engine, pass option { useUnifiedTopology: true } to
-the MongoClient constructor.
-```
-
-Mongoose 5.7 uses MongoDB driver 3.3.x, which introduced a significant
-refactor of how it handles monitoring all the servers in a replica set
-or sharded cluster. In MongoDB parlance, this is known as
-[server discovery and monitoring](https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst).
-
-To opt in to using the new topology engine, use the below line:
-
-```javascript
-mongoose.set('useUnifiedTopology', true);
-```
-
-The `useUnifiedTopology` option removes support for several
-[connection options](/docs/connections.html#options) that are
-no longer relevant with the new topology engine:
-
-- `autoReconnect`
-- `reconnectTries`
-- `reconnectInterval`
-
-When you enable `useUnifiedTopology`, please remove those options
-from your [`mongoose.connect()`](/docs/api/mongoose.html#mongoose_Mongoose-connect) or
-[`createConnection()`](/docs/api/mongoose.html#mongoose_Mongoose-createConnection) calls.
-
-If you find any unexpected behavior, please [open up an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
 
 <h2 id="update"><a href="#update"><code>update()</code></a></h2>
 
@@ -265,29 +113,4 @@ MyModel.find({ answer: 42 }).countDocuments().exec();
 MyModel.find().count().exec();
 // With this, since there's no filter
 MyModel.find().estimatedDocumentCount().exec();
-```
-
-<h2 id="gridstore"><a href="#gridstore"><code>GridStore</code></a></h2>
-
-If you're using [gridfs-stream](https://www.npmjs.com/package/gridfs-stream),
-you'll see the below deprecation warning:
-
-```
-DeprecationWarning: GridStore is deprecated, and will be removed in a
-future version. Please use GridFSBucket instead.
-```
-
-That is because gridfs-stream relies on a [deprecated MongoDB driver class](http://mongodb.github.io/node-mongodb-native/3.1/api/GridStore.html).
-You should instead use the [MongoDB driver's own streaming API](https://thecodebarbarian.com/mongodb-gridfs-stream).
-
-```javascript
-// Replace this:
-const conn = mongoose.createConnection('mongodb://localhost:27017/gfstest');
-const gfs = require('gridfs-store')(conn.db);
-const writeStream = gfs.createWriteStream({ filename: 'test.dat' });
-
-// With this:
-const conn = mongoose.createConnection('mongodb://localhost:27017/gfstest');
-const gridFSBucket = new mongoose.mongo.GridFSBucket(conn.db);
-const writeStream = gridFSBucket.openUploadStream('test.dat');
 ```

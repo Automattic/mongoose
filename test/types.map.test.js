@@ -1019,4 +1019,35 @@ describe('Map', function() {
     assert.equal(res.myMap.get('key2').data.length, 1);
     assert.equal(res.myMap.get('key2').data[0]._id.title, 'Intro to CS');
   });
+
+  it('propagates `flattenMaps` to nested maps (gh-10653)', function() {
+    const NestedChildSchema = Schema({ value: String }, { _id: false });
+    const L2Schema = Schema({
+      l2: {
+        type: Map,
+        of: NestedChildSchema
+      }
+    }, { _id: false });
+
+    const schema = Schema({
+      l1: {
+        type: Map,
+        of: L2Schema
+      }
+    }, { minimize: false });
+
+    const Test = db.model('Test', schema);
+
+    const nestedChild = { value: 'abc' };
+    const child = {
+      l2: new Map().set('l2key', nestedChild)
+    };
+    const parent = {
+      l1: new Map().set('l1key', child)
+    };
+    const doc = new Test(parent);
+
+    const res = doc.toObject({ flattenMaps: true });
+    assert.equal(res.l1.l1key.l2.l2key.value, 'abc');
+  });
 });

@@ -9,7 +9,7 @@ const start = require('./common');
 const DocumentArray = require('../lib/types/DocumentArray');
 const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const assert = require('assert');
-const idGetter = require('../lib/plugins/idGetter');
+const idGetter = require('../lib/helpers/schema/idGetter');
 const setValue = require('../lib/utils').setValue;
 
 const mongoose = require('./common').mongoose;

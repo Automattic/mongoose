@@ -5893,7 +5893,6 @@ describe('document', function() {
 
       const Person = db.model('Person', personSchema);
 
-
       await Person.create({
         name: 'test',
         assets: [{ name: 'Cash', namePlural: 'Cash' }]

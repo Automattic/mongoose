@@ -1641,7 +1641,7 @@ declare module 'mongoose' {
     auto?: boolean;
 
     /** Attaches a validator that succeeds if the data string matches the given regular expression, and fails otherwise. */
-    match?: RegExp;
+    match?: RegExp | [RegExp, string] | readonly [RegExp, string];;
 
     /** If truthy, Mongoose will add a custom setter that lowercases this string using JavaScript's built-in `String#toLowerCase()`. */
     lowercase?: boolean;

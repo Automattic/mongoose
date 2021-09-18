@@ -787,11 +787,11 @@ describe('timestamps', function() {
     const schema = Schema({
       createdAt: {
         type: Schema.Types.Number,
-        get: (createdAt) => new Date(createdAt * 1000),
+        get: (createdAt) => new Date(createdAt * 1000)
       },
       updatedAt: {
         type: Schema.Types.Number,
-        get: (updatedAt) => new Date(updatedAt * 1000),
+        get: (updatedAt) => new Date(updatedAt * 1000)
       },
       name: String
     }, {

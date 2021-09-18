@@ -1064,6 +1064,8 @@ declare module 'mongoose' {
     timestamps?: boolean;
     upsert?: boolean;
     writeConcern?: any;
+
+    [other: string]: any;
   }
 
   type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'strict' | 'sanitizeProjection' | 'sanitizeFilter'>;

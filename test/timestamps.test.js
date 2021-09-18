@@ -782,6 +782,30 @@ describe('timestamps', function() {
     assert.equal(doc.updatedAt, 42);
   });
 
+  it('timestamps with custom timestamp using getter method (gh-3957)', async function() {
+    const now = Date.now();
+    const schema = Schema({
+      createdAt: {
+        type: Schema.Types.Number,
+        get: (createdAt) => new Date(createdAt * 1000),
+      },
+      updatedAt: {
+        type: Schema.Types.Number,
+        get: (updatedAt) => new Date(updatedAt * 1000),
+      },
+      name: String
+    }, {
+      timestamps: { currentTime: () => Math.floor(now / 1000) }
+    });
+    const Model = db.model('Test', schema);
+    const doc = await Model.create({ name: 'test' });
+
+    assert.equal(typeof doc.createdAt, 'object');
+    assert.equal(typeof doc.updatedAt, 'object');
+    assert.equal(Math.floor(doc.createdAt.getTime() / 1000), Math.floor(now / 1000));
+    assert.equal(Math.floor(doc.updatedAt.getTime() / 1000), Math.floor(now / 1000));
+  });
+
   it('shouldnt bump updatedAt in single nested subdocs that are not modified (gh-9357)', async function() {
     const nestedSchema = Schema({
       nestedA: { type: String },

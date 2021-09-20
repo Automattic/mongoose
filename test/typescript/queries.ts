@@ -57,6 +57,7 @@ Test.findOne({ 'docs.id': 42 }).exec().then(console.log);
 // ObjectId casting
 Test.find({ parent: new Types.ObjectId('0'.repeat(24)) });
 Test.find({ parent: '0'.repeat(24) });
+Test.find({ parent: { $in: ['0'.repeat(24)] } });
 
 // Operators
 Test.find({ name: { $in: ['Test'] } }).exec().then((res: Array<ITest>) => console.log(res));

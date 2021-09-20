@@ -2532,7 +2532,8 @@ declare module 'mongoose' {
   type AllowRegexpForStrings<T> = T extends string ? T | RegExp : T;
   type AllowArrayElementQuery<T> = T extends (infer U)[] ? T | U : T;
 
-  type Condition<T> = AllowStringForObjectId<T> | AllowRegexpForStrings<T> | AllowArrayElementQuery<T> | QuerySelector<T>;
+  type ApplyBasicQueryCasting<T> = AllowStringForObjectId<T> | AllowRegexpForStrings<T> | AllowArrayElementQuery<T>;
+  type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
   type _FilterQuery<T> = {
     [P in keyof T]?: Condition<T[P]>;

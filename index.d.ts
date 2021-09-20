@@ -746,11 +746,18 @@ declare module 'mongoose' {
      * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
      * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one
      * command. This is faster than sending multiple independent operations (e.g.
-     * if you use `create()`) because with `bulkWrite()` there is only one round
-     * trip to MongoDB.
+     * if you use `create()`) because with `bulkWrite()` there is only one network
+     * round trip to the MongoDB server.
      */
     bulkWrite(writes: Array<any>, options?: mongodb.BulkWriteOptions): Promise<mongodb.BulkWriteResult>;
     bulkWrite(writes: Array<any>, options?: mongodb.BulkWriteOptions, cb?: Callback<mongodb.BulkWriteResult>): void;
+
+    /**
+     * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than
+     * sending multiple `save()` calls because with `bulkSave()` there is only one
+     * network round trip to the MongoDB server.
+     */
+    bulkSave(documents: Array<Document>): Promise<mongodb.BulkWriteResult>;
 
     /** Collection the model uses. */
     collection: Collection;

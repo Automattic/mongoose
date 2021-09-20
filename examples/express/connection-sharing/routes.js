@@ -1,21 +1,24 @@
+"use strict";
+const model = require("./modelA");
 
-'use strict';
-const model = require('./modelA');
-
-exports.home = function(req, res, next) {
-  model.find(function(err, docs) {
-    if (err) return next(err);
+exports.home = async (req, res, next) => {
+  try {
+    const docs = await model.find();
     res.send(docs);
-  });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.modelName = function(req, res) {
-  res.send('my model name is ' + model.modelName);
+exports.modelName = (req, res) => {
+  res.send("my model name is " + model.modelName);
 };
 
-exports.insert = function(req, res, next) {
-  model.create({ name: 'inserting ' + Date.now() }, function(err, doc) {
-    if (err) return next(err);
+exports.insert = async (req, res, next) => {
+  try {
+    const doc = await model.create({ name: "inserting " + Date.now() });
     res.send(doc);
-  });
+  } catch (err) {
+    next(err);
+  }
 };

@@ -1,6 +1,6 @@
 ## Discriminators
 
-### The `model.discriminator()` function
+### [The `model.discriminator()` function](#the-modeldiscriminator-function)
 
 Discriminators are a schema inheritance mechanism. They enable
 you to have multiple models with overlapping schemas on top of the
@@ -18,7 +18,7 @@ is the union of the base schema and the discriminator schema.
 [require:The `model.discriminator\(\)` function]
 ```
 
-### Discriminators save to the Event model's collection
+### [Discriminators save to the Event model's collection](#discriminators-save-to-the-event-models-collection)
 
 Suppose you created another discriminator to track events where
 a new user registered. These `SignedUpEvent` instances will be
@@ -29,7 +29,7 @@ instances.
 [require:Discriminators save to the Event model's collection]
 ```
 
-### Discriminator keys
+### [Discriminator keys](discriminator-keys)
 
 The way mongoose tells the difference between the different
 discriminator models is by the 'discriminator key', which is

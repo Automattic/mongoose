@@ -9,7 +9,7 @@ const start = require('./common');
 const DocumentArray = require('../lib/types/DocumentArray');
 const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const assert = require('assert');
-const idGetter = require('../lib/plugins/idGetter');
+const idGetter = require('../lib/helpers/schema/idGetter');
 const setValue = require('../lib/utils').setValue;
 
 const mongoose = require('./common').mongoose;
@@ -731,5 +731,21 @@ describe('types.documentarray', function() {
 
     assert.ok(doc.children.$atomics().$set);
     assert.deepEqual(doc.children.$atomics().$set.map(v => v.name), ['John', 'Mary']);
+  });
+
+  it('handles `DocumentArray#create()` with populated paths (gh-10749)', async function() {
+    const schema = new Schema({ subdoc: { ref: 'Test2', type: 'ObjectId' }, arr: [{ num: Number }] });
+    const Test = mongoose.model('Test', schema);
+    const Test2 = mongoose.model('Test2', Schema({ name: String }));
+
+    const doc2 = new Test2({ name: 'test' });
+    const doc = new Test({ subdoc: doc2, arr: [] });
+
+    const subdoc = doc.arr.create({ num: '42' });
+    await subdoc.validate();
+    assert.strictEqual(subdoc.num, 42);
+
+    doc.arr.push(subdoc);
+    await doc.validate();
   });
 });

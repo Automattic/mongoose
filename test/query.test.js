@@ -3838,4 +3838,15 @@ describe('Query', function() {
     assert.ifError(q.error());
     assert.deepEqual(q._conditions, { username: 'val', pwd: { $gt: null } });
   });
+  it('should not error when $not is used with $size (gh-10716)', async function() {
+    const barSchema = Schema({
+      bar: String
+    });
+    const testSchema = Schema({ foo: String, bars: [barSchema] });
+    const Test = db.model('Zulu', testSchema);
+    const entry = await Test.create({ foo: 'hello', bars: [{ bar: 'world' }, { bar: 'world1' }] });
+    await entry.save();
+    const foos = await Test.find({ bars: { $not: { $size: 0 } } });
+    assert.ok(foos);
+  });
 });

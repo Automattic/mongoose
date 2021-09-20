@@ -1823,4 +1823,48 @@ describe('model', function() {
       assert.deepEqual(res.toObject().tenantRefs, ['abc', '123']);
     });
   });
+
+  it('handles nested discriminators (gh-10702)', async function() {
+    const GrandChildSchema1 = new mongoose.Schema({
+      gc11: String,
+      gc12: Number
+    });
+
+    const GrandChildSchema2 = new mongoose.Schema({
+      gc21: Number,
+      gc22: Number
+    });
+
+    const ParentSchema = new mongoose.Schema({
+      top: String,
+      c: Schema({})
+    });
+
+    const ChildSchema1 = Schema({ str: String, num: Number, gc: Schema({}) });
+
+    ParentSchema.path('c').discriminator('Child1', ChildSchema1, { clone: false });
+    ParentSchema.path('c').discriminator('Child2', Schema({ anotherStr: String }));
+
+    ChildSchema1.path('gc').discriminator('GrandChild1', GrandChildSchema1);
+    ChildSchema1.path('gc').discriminator('GrandChild2', GrandChildSchema2);
+
+    const Parent = db.model('Parent', ParentSchema);
+
+    const p = await Parent.create({
+      top: 'Top',
+      c: {
+        __t: 'Child1',
+        str: 'string',
+        num: 3,
+        gc: {
+          __t: 'GrandChild1',
+          gc11: 'eleventy',
+          gc12: 110
+        }
+      }
+    });
+    const res = await Parent.findById(p);
+    assert.equal(res.c.gc.gc11, 'eleventy');
+    assert.equal(res.c.gc.gc12, 110);
+  });
 });

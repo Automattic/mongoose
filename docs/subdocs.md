@@ -33,7 +33,7 @@ a group of fields (e.g. dateRange.fromDate <= dateRange.toDate).
   <li><a href="#altsyntaxsingle">Alternate declaration syntax for single subdocuments</a></li>
 </ul>
 
-### What is a Subdocument?
+### [What is a Subdocument?](#what-is-a-subdocument)
 
 Subdocuments are similar to normal documents. Nested schemas can have
 [middleware](./middleware.html), [custom validation logic](./validation.html),
@@ -106,7 +106,7 @@ parentSchema.pre('save', function(next) {
 });
 ```
 
-### Subdocuments versus Nested Paths
+### [Subdocuments versus Nested Paths](#subdocuments-versus-nested-paths)
 
 In Mongoose, nested paths are subtly different from subdocuments.
 For example, below are two schemas: one with `child` as a subdocument,
@@ -145,7 +145,7 @@ console.log(doc2.child); // Prints 'MongooseDocument { undefined }'
 doc2.child.name = 'test'; // Works
 ```
 
-### Subdocument Defaults
+### [Subdocument Defaults](#subdocument-defaults)
 
 Subdocument paths are undefined by default, and Mongoose does
 not apply subdocument defaults unless you set the subdocument
@@ -205,7 +205,7 @@ const doc = new Subdoc();
 doc.child; // { age: 0 }
 ```
 
-### Finding a Subdocument
+### [Finding a Subdocument](#finding-a-subdocument)
 
 Each subdocument has an `_id` by default. Mongoose document arrays have a
 special [id](./api.html#types_documentarray_MongooseDocumentArray-id) method
@@ -214,7 +214,7 @@ for searching a document array to find a document with a given `_id`.
 const doc = parent.children.id(_id);
 ```
 
-### Adding Subdocs to Arrays
+### [Adding Subdocs to Arrays](#adding-subdocs-to-arrays)
 
 MongooseArray methods such as
 [push](./api.html#mongoosearray_MongooseArray-push),
@@ -245,7 +245,7 @@ method of MongooseArrays.
 const newdoc = parent.children.create({ name: 'Aaron' });
 ```
 
-### Removing Subdocs
+### [Removing Subdocs](#removing-subdocs)
 
 Each subdocument has it's own
 [remove](./api.html#types_embedded_EmbeddedDocument-remove) method. For
@@ -305,7 +305,7 @@ doc.level1.level2.parent() === doc.level1; // true
 doc.level1.level2.ownerDocument() === doc; // true
 ```
 
-<h4 id="altsyntaxarrays">Alternate declaration syntax for arrays</h4>
+<h4 id="altsyntaxarrays"><a href="#altsyntaxarrays">Alternate declaration syntax for arrays</a></h4>
 
 If you create a schema with an array of objects, Mongoose will automatically
 convert the object to a schema for you:
@@ -320,7 +320,7 @@ const parentSchema = new Schema({
 });
 ```
 
-<h4 id="altsyntaxsingle">Alternate declaration syntax for single nested subdocuments</h4>
+<h4 id="altsyntaxsingle"><a href="#altsyntaxsingle">Alternate declaration syntax for single nested subdocuments</a></h4>
 
 Unlike document arrays, Mongoose 5 does not convert an objects in schemas
 into nested schemas. In the below example, `nested` is a _nested path_

@@ -11,7 +11,7 @@ const EventEmitter = require('events').EventEmitter;
 const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const Query = require('../lib/query');
 const assert = require('assert');
-const idGetter = require('../lib/plugins/idGetter');
+const idGetter = require('../lib/helpers/schema/idGetter');
 const util = require('./util');
 const utils = require('../lib/utils');
 const validator = require('validator');
@@ -5892,7 +5892,6 @@ describe('document', function() {
       });
 
       const Person = db.model('Person', personSchema);
-
 
       await Person.create({
         name: 'test',

@@ -151,6 +151,21 @@ describe('mongoose module:', function() {
     assert.ok(M2.schema === s);
   });
 
+  it('supports disabling `id` via global plugin (gh-10701)', function() {
+    const mongoose = new Mongoose();
+
+    mongoose.plugin((schema) => {
+      schema.set('id', false);
+    });
+
+    const s = new Schema({});
+    const M = mongoose.model('Test', s);
+
+    assert.equal(M.schema.options.id, false);
+    const doc = new M();
+    assert.ok(!doc.id);
+  });
+
   it('objectIdGetter option (gh-6588)', function() {
     const mongoose = new Mongoose();
 

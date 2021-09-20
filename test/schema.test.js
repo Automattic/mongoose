@@ -17,6 +17,7 @@ const Mixed = SchemaTypes.Mixed;
 const DocumentObjectId = mongoose.Types.ObjectId;
 const ReadPref = mongoose.mongo.ReadPreference;
 const vm = require('vm');
+const idGetter = require('../lib/helpers/schema/idGetter');
 const applyPlugins = require('../lib/helpers/schema/applyPlugins');
 
 /**
@@ -2410,8 +2411,6 @@ describe('schema', function() {
   });
 
   it('disables `id` virtual if no `_id` path (gh-3936)', function() {
-    const idGetter = require('../lib/plugins/idGetter');
-
     const schema = Schema({ name: String }, { _id: false });
     applyPlugins(schema, [[idGetter]]);
     assert.ok(!schema.paths._id);

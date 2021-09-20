@@ -24,4 +24,24 @@ describe('setDefaultsOnInsert', function() {
 
     done();
   });
+
+  it('ignores defaults underneath single nested subdocs (gh-10660)', async function() {
+    // Embedded Sub Document
+    const EntitySchema = new Schema({
+      _id: { type: String, default: () => 'test' },
+      name: String,
+      color: String
+    });
+
+    // Main Schema
+    const AppointmentSchema = new Schema({
+      date: Date,
+      overhead: { type: EntitySchema }
+    });
+
+    const opts = { upsert: true };
+    let update = { $set: { date: new Date() } };
+    update = setDefaultsOnInsert({}, AppointmentSchema, update, opts);
+    assert.ok(!update.$setOnInsert);
+  });
 });

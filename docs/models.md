@@ -12,7 +12,7 @@ reading documents from the underlying MongoDB database.
 * [Updating](#updating)
 * [Change Streams](#change-streams)
 
-<h3 id="compiling">Compiling your first model</h3>
+<h3 id="compiling"><a href="#compiling">Compiling your first model</a></h3>
 
 When you call `mongoose.model()` on a schema, Mongoose _compiles_ a model
 for you.
@@ -31,7 +31,7 @@ in the database.
 you've added everything you want to `schema`, including hooks,
 before calling `.model()`!
 
-### Constructing Documents
+### [Constructing Documents](#constructing-documents)
 
 An instance of a model is called a [document](./documents.html). Creating
 them and saving to the database is easy.
@@ -73,7 +73,7 @@ const connection = mongoose.createConnection('mongodb://localhost:27017/test');
 const Tank = connection.model('Tank', yourSchema);
 ```
 
-### Querying
+### [Querying](#querying)
 
 Finding documents is easy with Mongoose, which supports the [rich](http://www.mongodb.org/display/DOCS/Advanced+Queries) query syntax of MongoDB. Documents can be retrieved using a `model`'s [find](./api.html#model_Model.find), [findById](./api.html#model_Model.findById), [findOne](./api.html#model_Model.findOne), or [where](./api.html#model_Model.where) static methods.
 
@@ -83,7 +83,7 @@ Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
 
 See the chapter on [queries](./queries.html) for more details on how to use the [Query](./api.html#query-js) api.
 
-### Deleting
+### [Deleting](#deleting)
 
 Models have static `deleteOne()` and `deleteMany()` functions
 for removing all documents matching the given `filter`.
@@ -95,7 +95,7 @@ Tank.deleteOne({ size: 'large' }, function (err) {
 });
 ```
 
-### Updating
+### [Updating](#updating)
 
 Each `model` has its own `update` method for modifying documents in the
 database without returning them to your application. See the
@@ -112,7 +112,7 @@ _If you want to update a single document in the db and return it to your
 application, use [findOneAndUpdate](./api.html#model_Model.findOneAndUpdate)
 instead._
 
-### Change Streams
+### [Change Streams](#change-streams)
 
 _New in MongoDB 3.6.0 and Mongoose 5.0.0_
 
@@ -154,10 +154,10 @@ The output from the above [async function](http://thecodebarbarian.com/80-20-gui
 
 You can read more about [change streams in mongoose in this blog post](http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-36-change-streams.html#change-streams-in-mongoose).
 
-### Yet more
+### [Yet more](#yet-more)
 
 The [API docs](./api.html#model_Model) cover many additional methods available like [count](./api.html#model_Model.count), [mapReduce](./api.html#model_Model.mapReduce), [aggregate](./api.html#model_Model.aggregate), and [more](./api.html#model_Model.findOneAndRemove).
 
-### Next Up
+### [Next Up](#next-up)
 
 Now that we've covered `Models`, let's take a look at [Documents](/docs/documents.html).

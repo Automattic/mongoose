@@ -1,5 +1,5 @@
-"use strict";
-const model = require("./modelA");
+'use strict';
+const model = require('./modelA');
 
 exports.home = async (req, res, next) => {
   try {
@@ -11,12 +11,12 @@ exports.home = async (req, res, next) => {
 };
 
 exports.modelName = (req, res) => {
-  res.send("my model name is " + model.modelName);
+  res.send('my model name is ' + model.modelName);
 };
 
 exports.insert = async (req, res, next) => {
   try {
-    const doc = await model.create({ name: "inserting " + Date.now() });
+    const doc = await model.create({ name: 'inserting ' + Date.now() });
     res.send(doc);
   } catch (err) {
     next(err);

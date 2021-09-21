@@ -24,7 +24,7 @@ const schema = new Schema<User>({
 By default, Mongoose does **not** check if your document interface lines up with your schema.
 For example, the above code won't throw an error if `email` is optional in the document interface, but `required` in `schema`.
 
-## Generic parameters
+## [Generic parameters](#generic-parameters)
 
 The Mongoose `Schema` class in TypeScript has 3 [generic parameters](https://www.typescriptlang.org/docs/handbook/2/generics.html):
 
@@ -45,19 +45,19 @@ The Mongoose `Schema` class in TypeScript has 3 [generic parameters](https://www
   
 </details>
 
-### Mongoose's usage of the generic parameters
-The first generic param, `DocType`, represents the type that Mongoose uses as `this` for document middleware.
+The first generic param, `DocType`, represents the type of documents that Mongoose will store in MongoDB.
+Mongoose wraps `DocType` in a Mongoose document for cases like the `this` parameter to document middleware.
 For example:
 
 ```typescript
 schema.pre('save', function(): void {
-  console.log(this.name); // TypeScript knows that `this` is a `User` by default
+  console.log(this.name); // TypeScript knows that `this` is a `mongoose.Document & User` by default
 });
 ```
 
 The second generic param, `M`, is the model used with the schema. Mongoose uses the `M` type in model middleware defined in the schema.
 
-The third generic param, `TInstanceMethods` is used to add types for instace methods defined in the schema.
+The third generic param, `TInstanceMethods` is used to add types for instance methods defined in the schema.
 
 ## Schema vs Interface fields
 

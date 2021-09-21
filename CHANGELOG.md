@@ -1,3 +1,22 @@
+6.0.7 / 2021-09-20
+==================
+ * fix(populate): wrap populate filters in trusted() so they work with `sanitizeFilter` #10740
+ * fix(aggregate): handle calling aggregate() before initial connection succeeds #10722
+ * fix(query): avoid throwing error when using `$not` with `$size` #10716 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(discriminator): handle setting nested discriminator paths #10702
+ * fix(documentarray): don't throw TypeError on DocumentArray#create() when top-level doc has populated paths #10749
+ * fix(update): avoid setting single nested subdoc defaults if subdoc isn't set #10660
+ * fix: delay creating id virtual until right before model compilation to allow plugins to disable the `id` option #10701
+ * fix(connection): correct `auth` object when using `user` option to `connect()` #10727 #10726 [saveman71](https://github.com/saveman71)
+ * fix(timestamps): avoid calling getters when checking whether `createdAt` is set #10742 [kaishu16](https://github.com/kaishu16)
+ * fix(index.d.ts): allow using strings for ObjectIds with $in #10735
+ * fix(index.d.ts): add TVirtuals generic to Model to make it easier to separate virtuals from DocType #10689
+ * fix(index.d.ts): add Model.bulkSave() definition #10745
+ * fix(index.d.ts): allow RegExp for `match` in schema definition #10744 [easen-amp](https://github.com/easen-amp)
+ * fix(index.d.ts): allow arbitrary additional keys in QueryOptions #10688
+ * docs: correct TypeScript schema generic params in docs #10739 [minifjurt123](https://github.com/minifjurt123)
+ * docs: fix h2 header links #10682 [IslandRhythms](https://github.com/IslandRhythms)
+
 6.0.6 / 2021-09-15
 ==================
  * perf(index.d.ts): streamline SchemaDefinitionType and SchemaTypeOptions to reduce number of instantiations and speed up lib checking #10349

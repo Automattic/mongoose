@@ -19,7 +19,7 @@ on the schema level and is useful for writing [plugins](./plugins.html).
   <li><a href="#synchronous">Synchronous Hooks</a></li>
 </ul>
 
-### Types of Middleware
+### [Types of Middleware](#types-of-middleware)
 
 Mongoose has 4 types
 of middleware: document middleware, model middleware, aggregate middleware, and query middleware.
@@ -123,7 +123,7 @@ schema.pre('save', function(next) {
 });
 ```
 
-<h4 id="use-cases">Use Cases</h4>
+<h4 id="use-cases"><a href="#use-cases">Use Cases</a></h4>
 
 Middleware are useful for atomizing model logic. Here are some other ideas:
 
@@ -132,7 +132,7 @@ Middleware are useful for atomizing model logic. Here are some other ideas:
 * asynchronous defaults
 * asynchronous tasks that a certain action triggers
 
-<h4 id="error-handling">Errors in Pre Hooks</h4>
+<h4 id="error-handling"><a href="#error-handling">Errors in Pre Hooks</a></h4>
 
 If any pre hook errors out, mongoose will not execute subsequent middleware
 or the hooked function. Mongoose will instead pass an error to the callback

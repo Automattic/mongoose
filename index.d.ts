@@ -2606,6 +2606,7 @@ declare module 'mongoose' {
   type __UpdateDefProperty<T> =
     0 extends (1 & T) ? T : // any
     T extends unknown[] ? LeanArray<T> : // Array
+    T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> :
     T extends Document ? LeanDocument<T> : // Subdocument
     [Extract<T, mongodb.ObjectId>] extends [never] ? T :
     T | string;
@@ -2632,6 +2633,7 @@ declare module 'mongoose' {
   type LeanType<T> =
     0 extends (1 & T) ? T : // any
     T extends TreatAsPrimitives ? T : // primitives
+    T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> : // subdocs
     LeanDocument<T>; // Documents and everything else
 
   type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];

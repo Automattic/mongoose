@@ -15,34 +15,34 @@ a {
   color: #0971B2;
 }
 
-h2 a {
-  color: #000;
-}
-
-h2:hover::before {
+h2 a::before,
+h3 a::before,
+h4 a::before {
   position: absolute;
   left: 22px;
   margin-top: 4px;
   background-image: url('/docs/images/link_64x64.png');
   background-size: contain;
+  background-repeat: no-repeat;
   height: 1em;
-  width: 1em;
+  /* Any width that will be over the size of the icon and overlap the link to keep the hover state will work */
+  width: 2em;
   content: ' ';
+
+  /* Hide it when not hover */
+  opacity: 0;
 }
 
-h3 a {
+h2 a:hover::before,
+h3 a:hover::before,
+h4 a:hover::before {
+  opacity: 1;
+}
+
+h2 a,
+h3 a,
+h4 a {
   color: #000;
-}
-
-h3:hover::before {
-  position: absolute;
-  left: 22px;
-  margin-top: 4px;
-  background-image: url('/docs/images/link_64x64.png');
-  background-size: contain;
-  height: 1em;
-  width: 1em;
-  content: ' ';
 }
 
 code {

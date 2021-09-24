@@ -15,9 +15,11 @@ a {
   color: #0971B2;
 }
 
+h1 a::before,
 h2 a::before,
 h3 a::before,
-h4 a::before {
+h4 a::before,
+a.anchor::before {
   position: absolute;
   left: 22px;
   margin-top: 4px;
@@ -33,12 +35,15 @@ h4 a::before {
   opacity: 0;
 }
 
+h1 a:hover::before,
 h2 a:hover::before,
 h3 a:hover::before,
-h4 a:hover::before {
+h4 a:hover::before,
+a.anchor:hover::before {
   opacity: 1;
 }
 
+h1 a,
 h2 a,
 h3 a,
 h4 a {

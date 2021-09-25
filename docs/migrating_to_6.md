@@ -300,7 +300,13 @@ However, Mongoose 6 does **not** buffer commands while a connection is disconnec
 
 <h3 id="objectid-valueof"><a href="#objectid-valueof">ObjectId `valueOf()`</a></h3>
 
-Mongoose now adds a `valueOf()` function to ObjectIds. This means you can now use `==` to compare two ObjectId instances.
+Mongoose now adds a `valueOf()` function to ObjectIds. This means you can now use `==` to compare an ObjectId against a string.
+
+```javascript
+const a = ObjectId('6143b55ac9a762738b15d4f0');
+
+a == '6143b55ac9a762738b15d4f0'; // true
+```
 
 <h3 id="immutable-createdat"><a href="#immutable-createdat">Immutable `createdAt`</a></h3>
 

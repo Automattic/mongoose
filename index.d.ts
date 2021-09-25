@@ -2624,7 +2624,14 @@ declare module 'mongoose' {
         : _AllowStringsForIds<T[K]>
       : T[K] | string;
     };
-  export type DocumentDefinition<T> = _AllowStringsForIds<LeanDocument<T>>;
+  export type DocumentDefinition<T> = {
+    [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:
+      [Extract<T[K], mongodb.ObjectId>] extends [never]
+      ? T[K] extends TreatAsPrimitives
+        ? T[K]
+        : LeanDocumentElement<T[K]>
+      : T[K] | string;
+    };
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   type TreatAsPrimitives = actualPrimitives |

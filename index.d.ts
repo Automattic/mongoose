@@ -1538,10 +1538,10 @@ declare module 'mongoose' {
     type?:
       T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends object[] ? (AnyArray<Schema<any>> | AnyArray<SchemaDefinition<Unpacked<T>>>) :
-      T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> :
-      T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> :
-      T extends boolean[] ? AnyArray<SchemaDefinitionWithBuiltInClass<boolean>> :
-      T extends Function[] ? AnyArray<SchemaDefinitionWithBuiltInClass<Function>> :
+      T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> | AnyArray<SchemaTypeOptions<string>> :
+      T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> | AnyArray<SchemaTypeOptions<number>> :
+      T extends boolean[] ? AnyArray<SchemaDefinitionWithBuiltInClass<boolean>> | AnyArray<SchemaTypeOptions<boolean>> :
+      T extends Function[] ? AnyArray<SchemaDefinitionWithBuiltInClass<Function>> | AnyArray<SchemaTypeOptions<Unpacked<T>>> :
       T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T>;
 
     /** Defines a virtual with the given name that gets/sets this path. */

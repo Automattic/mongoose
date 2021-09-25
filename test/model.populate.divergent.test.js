@@ -28,25 +28,22 @@ describe('model: populate: divergent arrays', function() {
 
   let db, C, M;
 
-  before(function(done) {
+  before(async function() {
     db = start();
     C = db.model('Child', { _id: Number, name: String });
     M = db.model('Parent', { array: { type: [{ type: Number, ref: 'Child' }] } });
 
-    C.create(
-      { _id: 0, name: 'zero' }
-      , { _id: 1, name: 'one' }
-      , { _id: 2, name: 'two' }, function(err) {
-        assert.ifError(err);
-        M.create({ array: [0, 1, 2] }, function(err) {
-          assert.ifError(err);
-          done();
-        });
-      });
+    await C.create(
+      { _id: 0, name: 'zero' },
+      { _id: 1, name: 'one' },
+      { _id: 2, name: 'two' }
+    );
+
+    await M.create({ array: [0, 1, 2] });
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   function test(check, fn) {

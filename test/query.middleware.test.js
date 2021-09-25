@@ -18,8 +18,8 @@ describe('query middleware', function() {
     db = start();
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   const initializeData = function(done) {

@@ -60,8 +60,8 @@ describe('debug: colors', function() {
     Test = db.model('Test', test, 'Test');
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   it('Document', function(done) {

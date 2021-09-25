@@ -4310,7 +4310,7 @@ describe('Model', function() {
     });
   });
 
-  it('save max bson size error with buffering (gh-3906)', function(done) {
+  it('save max bson size error with buffering (gh-3906)', async function() {
     this.timeout(10000);
     const db = start({ noErrorListener: true });
     const Test = db.model('Test', { name: Object });
@@ -4321,16 +4321,16 @@ describe('Model', function() {
       }
     });
 
-    test.save(function(error) {
-      assert.ok(error);
-      assert.equal(error.name, 'MongoServerError');
-      db.close(done);
-    });
+    const error = await test.save().then(() => null, err => err);
+
+    assert.ok(error);
+    assert.equal(error.name, 'MongoServerError');
+    await db.close();
   });
 
-  it('reports max bson size error in save (gh-3906)', function(done) {
+  it('reports max bson size error in save (gh-3906)', async function() {
     this.timeout(10000);
-    const db = start({ noErrorListener: true });
+    const db = await start({ noErrorListener: true });
     const Test = db.model('Test', { name: Object });
 
     const test = new Test({
@@ -4339,13 +4339,11 @@ describe('Model', function() {
       }
     });
 
-    db.on('connected', function() {
-      test.save(function(error) {
-        assert.ok(error);
-        assert.equal(error.name, 'MongoServerError');
-        db.close(done);
-      });
-    });
+    const error = await test.save().then(() => null, err => err);
+
+    assert.ok(error);
+    assert.equal(error.name, 'MongoServerError');
+    await db.close();
   });
 
   describe('bug fixes', function() {

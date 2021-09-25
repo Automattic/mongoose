@@ -11,8 +11,8 @@ describe('Advanced Schemas', function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   /**
@@ -22,7 +22,7 @@ describe('Advanced Schemas', function() {
    * method, a static method maps to a schema static, and getters/setters map
    * to virtuals.
    */
-  it('Creating from ES6 Classes Using `loadClass()`', function(done) {
+  it('Creating from ES6 Classes Using `loadClass()`', async function() {
     const schema = new Schema({ firstName: String, lastName: String });
 
     class HumanClass {
@@ -59,20 +59,18 @@ describe('Advanced Schemas', function() {
 
     schema.loadClass(PersonClass);
     const Person = db.model('Person', schema);
+    
+    const doc = await Person.create({
+      firstName: 'Jon',
+      lastName: 'Snow'
+    });
 
-    Person.create({ firstName: 'Jon', lastName: 'Snow' }).
-      then(doc => {
-        assert.equal(doc.fullName, 'My name is Jon Snow');
-        doc.fullName = 'Jon Stark';
-        assert.equal(doc.firstName, 'Jon');
-        assert.equal(doc.lastName, 'Stark');
-        return Person.findByFullName('Jon Snow');
-      }).
-      then(doc => {
-        assert.equal(doc.fullName, 'My name is Jon Snow');
-        // acquit:ignore:start
-        done();
-        // acquit:ignore:end
-      });
+    assert.equal(doc.fullName, 'My name is Jon Snow');
+    doc.fullName = 'Jon Stark';
+    assert.equal(doc.firstName, 'Jon');
+    assert.equal(doc.lastName, 'Stark');
+    const foundPerson = await Person.findByFullName('Jon Snow');
+    
+    assert.equal(foundPerson.fullName, 'My name is Jon Snow');
   });
 });

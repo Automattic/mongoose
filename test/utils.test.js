@@ -27,37 +27,33 @@ const ActiveRoster = StateMachine.ctor('require', 'init', 'modify');
 
 describe('utils', function() {
   describe('ActiveRoster', function() {
-    it('should detect a path as required if it has been required', function(done) {
+    it('should detect a path as required if it has been required', function() {
       const ar = new ActiveRoster();
       ar.require('hello');
       assert.equal(ar.paths.hello, 'require');
-      done();
     });
 
-    it('should detect a path as inited if it has been inited', function(done) {
+    it('should detect a path as inited if it has been inited', function() {
       const ar = new ActiveRoster();
       ar.init('hello');
       assert.equal(ar.paths.hello, 'init');
-      done();
     });
 
-    it('should detect a path as modified', function(done) {
+    it('should detect a path as modified', function() {
       const ar = new ActiveRoster();
       ar.modify('hello');
       assert.equal(ar.paths.hello, 'modify');
-      done();
     });
 
-    it('should remove a path from an old state upon a state change', function(done) {
+    it('should remove a path from an old state upon a state change', function() {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('hello');
       assert.ok(!ar.states.init.hasOwnProperty('hello'));
       assert.ok(ar.states.modify.hasOwnProperty('hello'));
-      done();
     });
 
-    it('forEach should be able to iterate through the paths belonging to one state', function(done) {
+    it('forEach should be able to iterate through the paths belonging to one state', function() {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
@@ -66,10 +62,9 @@ describe('utils', function() {
       ar.forEach('init', function(path) {
         assert.ok(~['hello', 'goodbye'].indexOf(path));
       });
-      done();
     });
 
-    it('forEach should be able to iterate through the paths in the union of two or more states', function(done) {
+    it('forEach should be able to iterate through the paths in the union of two or more states', function() {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
@@ -78,10 +73,9 @@ describe('utils', function() {
       ar.forEach('modify', 'require', function(path) {
         assert.ok(~['world', 'foo'].indexOf(path));
       });
-      done();
     });
 
-    it('forEach should iterate through all paths that have any state if given no state arguments', function(done) {
+    it('forEach should iterate through all paths that have any state if given no state arguments', function() {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
@@ -90,10 +84,9 @@ describe('utils', function() {
       ar.forEach(function(path) {
         assert.ok(~['hello', 'goodbye', 'world', 'foo'].indexOf(path));
       });
-      done();
     });
 
-    it('should be able to detect if at least one path exists in a set of states', function(done) {
+    it('should be able to detect if at least one path exists in a set of states', function() {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
@@ -103,10 +96,9 @@ describe('utils', function() {
       assert.ok(ar.some('init', 'modify'));
       assert.ok(ar.some('init', 'require'));
       assert.ok(ar.some('modify', 'require'));
-      done();
     });
 
-    it('should be able to `map` over the set of paths in a given state', function(done) {
+    it('should be able to `map` over the set of paths in a given state', function() {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
@@ -115,10 +107,9 @@ describe('utils', function() {
         return path + '-suffix';
       });
       assert.deepEqual(suffixedPaths, ['hello-suffix', 'world-suffix']);
-      done();
     });
 
-    it('should `map` over all states\' paths if no states are specified in a `map` invocation', function(done) {
+    it('should `map` over all states\' paths if no states are specified in a `map` invocation', function() {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
@@ -127,11 +118,10 @@ describe('utils', function() {
         return path + '-suffix';
       });
       assert.deepEqual(suffixedPaths, ['iAmTheWalrus-suffix', 'hello-suffix', 'world-suffix']);
-      done();
     });
   });
 
-  it('utils.options', function(done) {
+  it('utils.options', function() {
     const o = { a: 1, b: 2, c: 3, 0: 'zero1' };
     const defaults = { b: 10, d: 20, 0: 'zero2' };
     const result = utils.options(defaults, o);
@@ -152,10 +142,9 @@ describe('utils', function() {
 
     // same object
     assert.notEqual(defaults, result2);
-    done();
   });
 
-  it('deepEquals on ObjectIds', function(done) {
+  it('deepEquals on ObjectIds', function() {
     const s = (new ObjectId).toString();
 
     const a = new ObjectId(s);
@@ -164,7 +153,6 @@ describe('utils', function() {
     assert.ok(utils.deepEqual(a, b));
     assert.ok(utils.deepEqual(a, a));
     assert.ok(!utils.deepEqual(a, new ObjectId));
-    done();
   });
 
   it('deepEquals on maps (gh-9549)', function() {
@@ -180,7 +168,7 @@ describe('utils', function() {
     assert.ok(!utils.deepEqual(a, b));
   });
 
-  it('deepEquals on MongooseDocumentArray works', function(done) {
+  it('deepEquals on MongooseDocumentArray works', function() {
     const A = new Schema({ a: String });
     mongoose.deleteModel(/Test/);
     const M = mongoose.model('Test', new Schema({
@@ -202,11 +190,10 @@ describe('utils', function() {
 
     m2.set(m1.toObject());
     assert.ok(utils.deepEqual(m1.a1, m2.a1));
-    done();
   });
 
   // gh-688
-  it('deepEquals with MongooseBuffer', function(done) {
+  it('deepEquals with MongooseBuffer', function() {
     const str = 'this is the day';
     const a = new MongooseBuffer(str);
     const b = new MongooseBuffer(str);
@@ -220,7 +207,6 @@ describe('utils', function() {
     assert.ok(!utils.deepEqual(a, e));
     assert.ok(!utils.deepEqual(a, []));
     assert.ok(!utils.deepEqual([], a));
-    done();
   });
 
   it('`deepEqual` treats objects with different order of keys as different (gh-9571)', function() {
@@ -237,7 +223,7 @@ describe('utils', function() {
   });
 
   describe('clone', function() {
-    it('retains RegExp options gh-1355', function(done) {
+    it('retains RegExp options gh-1355', function() {
       const a = new RegExp('hello', 'igm');
       assert.ok(a.global);
       assert.ok(a.ignoreCase);
@@ -248,10 +234,9 @@ describe('utils', function() {
       assert.equal(a.global, b.global);
       assert.equal(a.ignoreCase, b.ignoreCase);
       assert.equal(a.multiline, b.multiline);
-      done();
     });
 
-    it('clones objects created with Object.create(null)', function(done) {
+    it('clones objects created with Object.create(null)', function() {
       const o = Object.create(null);
       o.a = 0;
       o.b = '0';
@@ -264,8 +249,6 @@ describe('utils', function() {
       assert.strictEqual(1, out.c);
       assert.strictEqual('1', out.d);
       assert.equal(Object.keys(out).length, 4);
-
-      done();
     });
 
     it('doesnt minimize empty objects in arrays to null (gh-7322)', function() {
@@ -278,13 +261,12 @@ describe('utils', function() {
     });
   });
 
-  it('array.flatten', function(done) {
+  it('array.flatten', function() {
     const orig = [0, [1, 2, [3, 4, [5, [6]], 7], 8], 9];
     assert.deepEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], utils.array.flatten(orig));
-    done();
   });
 
-  it('array.unique', function(done) {
+  it('array.unique', function() {
     const case1 = [1, 2, 3, 3, 5, 'a', 6, 'a'];
     assert.deepEqual(utils.array.unique(case1), [1, 2, 3, 5, 'a', 6]);
     const objId = new ObjectId('000000000000000000000001');
@@ -299,11 +281,10 @@ describe('utils', function() {
     ];
     assert.deepEqual(utils.array.unique(case2),
       [1, '000000000000000000000001', objId]);
-    done();
   });
 
   describe('merge', function() {
-    it('merges two objects together without overriding properties & methods', function(done) {
+    it('merges two objects together without overriding properties & methods', function() {
       function To() {
         this.name = 'to';
         this.toProperty = true;
@@ -329,13 +310,11 @@ describe('utils', function() {
       assert.ok(to.getName === To.prototype.getName);
       assert.ok(to.toMethod === To.prototype.toMethod);
       assert.equal(to.fomMethod, From.prototype.fomMethod);
-
-      done();
     });
   });
 
   describe('mergeClone', function() {
-    it('handles object with valueOf() (gh-6059)', function(done) {
+    it('handles object with valueOf() (gh-6059)', function() {
       const from = {
         val: {
           valueOf: function() { return 42; }
@@ -346,11 +325,9 @@ describe('utils', function() {
       utils.mergeClone(to, from);
 
       assert.equal(to.val, 42);
-
-      done();
     });
 
-    it('copies dates correctly (gh-6145)', function(done) {
+    it('copies dates correctly (gh-6145)', function() {
       const from = {
         val: new Date('2011-06-01')
       };
@@ -359,8 +336,6 @@ describe('utils', function() {
       utils.mergeClone(to, from);
 
       assert.ok(to.val instanceof Date);
-
-      done();
     });
 
     it('skips cloning types that have `toBSON()` if `bson` is set (gh-8299)', function() {

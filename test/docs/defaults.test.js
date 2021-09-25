@@ -11,8 +11,8 @@ describe('defaults docs', function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   afterEach(function() {
@@ -26,7 +26,7 @@ describe('defaults docs', function() {
    * Note: Mongoose only applies a default if the value of the path is
    * strictly `undefined`.
    */
-  it('Declaring defaults in your schema', function(done) {
+  it('Declaring defaults in your schema', async function() {
     const schema = new Schema({
       name: String,
       role: { type: String, default: 'guitarist' }
@@ -47,17 +47,12 @@ describe('defaults docs', function() {
     const foo = new Person({ name: 'Bar', role: null });
     assert.strictEqual(foo.role, null);
 
-    Person.create(axl, slash, function(error) {
-      assert.ifError(error);
-      Person.find({ role: 'guitarist' }, function(error, docs) {
-        assert.ifError(error);
-        assert.equal(docs.length, 1);
-        assert.equal(docs[0].name, 'Slash');
-        // acquit:ignore:start
-        done();
-        // acquit:ignore:end
-      });
-    });
+    await Person.create(axl, slash);
+    
+    const docs = await Person.find({ role: 'guitarist' });
+    
+    assert.equal(docs.length, 1);
+    assert.equal(docs[0].name, 'Slash');
   });
 
   /**

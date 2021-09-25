@@ -23,8 +23,8 @@ describe('collections: capped:', function() {
     db = start();
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   it('schemas should have option size', function() {

@@ -19,10 +19,10 @@ describe('promises docs', function () {
     Band.deleteMany({}, done);
   });
 
-  after(function (done) {
+  after(async function () {
     mongoose.Promise = global.Promise;
 
-    db.close(done);
+    await db.close();
   });
 
   /**

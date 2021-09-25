@@ -64,15 +64,12 @@ describe('connections:', function() {
         });
     });
 
-    it('with autoIndex (gh-5423)', function(done) {
-      const promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
+    it('with autoIndex (gh-5423)', async function() {
+      const conn = await mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
         autoIndex: false
       }).asPromise();
 
-      promise.then(function(conn) {
-        assert.strictEqual(conn.config.autoIndex, false);
-        done();
-      }).catch(done);
+      assert.strictEqual(conn.config.autoIndex, false);
     });
 
     it('with autoCreate (gh-6489)', async function() {
@@ -139,7 +136,7 @@ describe('connections:', function() {
       }, /string.*createConnection/);
     });
 
-    it('resolving with q (gh-5714)', function(done) {
+    it('resolving with q (gh-5714)', async function() {
       const bootMongo = Q.defer();
 
       const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
@@ -148,10 +145,8 @@ describe('connections:', function() {
         bootMongo.resolve(this);
       });
 
-      bootMongo.promise.then(function(_conn) {
-        assert.equal(_conn, conn);
-        done();
-      }).catch(done);
+      const _conn = await bootMongo.promise;
+      assert.equal(_conn, conn);
     });
 
     it('connection plugins (gh-7378)', function() {
@@ -183,58 +178,42 @@ describe('connections:', function() {
       return conn.close();
     });
 
-    it('dropDatabase()', function(done) {
-      conn.dropDatabase(function(error) {
-        assert.ifError(error);
-        done();
+    it('dropDatabase()', async function() {
+      await conn.dropDatabase();
+    });
+
+    it('dropCollection()', async function() {
+      await conn.db.collection('test').insertOne({ x: 1 });
+      await conn.dropCollection('test');
+      const doc = await conn.db.collection('test').findOne();
+      assert.ok(!doc);
+    });
+
+    it('createCollection()', async function() {
+      await conn.dropDatabase();
+
+      await conn.createCollection('gh5712', {
+        capped: true,
+        size: 1024
       });
-    });
 
-    it('dropCollection()', function() {
-      return conn.db.collection('test').insertOne({ x: 1 }).
-        then(function() {
-          return conn.dropCollection('test');
-        }).
-        then(function() {
-          return conn.db.collection('test').findOne();
-        }).
-        then(function(doc) {
-          assert.ok(!doc);
-        });
-    });
+      const collections = await conn.db.listCollections().toArray();
 
-    it('createCollection()', function() {
-      return conn.dropDatabase().
-        then(function() {
-          return conn.createCollection('gh5712', {
-            capped: true,
-            size: 1024
-          });
-        }).
-        then(function() {
-          return conn.db.listCollections().toArray();
-        }).
-        then(function(collections) {
-          const names = collections.map(function(c) { return c.name; });
-          assert.ok(names.indexOf('gh5712') !== -1);
-          assert.ok(collections[names.indexOf('gh5712')].options.capped);
-          return conn.createCollection('gh5712_0');
-        }).
-        then(function() {
-          return conn.db.listCollections().toArray();
-        }).
-        then(function(collections) {
-          const names = collections.map(function(c) { return c.name; });
-          assert.ok(names.indexOf('gh5712') !== -1);
-        });
+      const names = collections.map(function(c) { return c.name; });
+      assert.ok(names.indexOf('gh5712') !== -1);
+      assert.ok(collections[names.indexOf('gh5712')].options.capped);
+      await conn.createCollection('gh5712_0');
+      const collectionsAfterCreation = await conn.db.listCollections().toArray();
+      const newCollectionsNames = collectionsAfterCreation.map(function(c) { return c.name; });
+      assert.ok(newCollectionsNames.indexOf('gh5712') !== -1);
     });
   });
 
-  it('should allow closing a closed connection', function(done) {
+  it('should allow closing a closed connection', async function() {
     const db = mongoose.createConnection();
 
     assert.equal(db.readyState, 0);
-    db.close(done);
+    await db.close();
   });
 
   describe('errors', function() {
@@ -297,8 +276,8 @@ describe('connections:', function() {
       db = start();
     });
 
-    after(function(done) {
-      db.close(done);
+    after(async function() {
+      await db.close();
     });
 
     beforeEach(function() {
@@ -490,7 +469,7 @@ describe('connections:', function() {
   });
 
   describe('modelNames()', function() {
-    it('returns names of all models registered on it', function(done) {
+    it('returns names of all models registered on it', async function() {
       const m = new mongoose.Mongoose;
       m.model('root', { x: String });
       const another = m.model('another', { x: String });
@@ -511,12 +490,12 @@ describe('connections:', function() {
       assert.equal(names[1], 'another');
       assert.equal(names[2], 'discriminated');
 
-      db.close(done);
+      await db.close();
     });
   });
 
   describe('connection pool sharing: ', function() {
-    it('works', function(done) {
+    it('works', async function() {
       const db = mongoose.createConnection('mongodb://localhost:27017/mongoose1');
 
       const db2 = db.useDb('mongoose2');
@@ -532,10 +511,10 @@ describe('connections:', function() {
       assert.equal(db2.pass, db.pass);
       assert.deepEqual(db.options, db2.options);
 
-      db2.close(done);
+      await db2.close();
     });
 
-    it('saves correctly', function(done) {
+    it('saves correctly', async function() {
       const db = start();
       const db2 = db.useDb('mongoose-test-2');
 
@@ -547,62 +526,52 @@ describe('connections:', function() {
       const m1 = db.model('Test', schema);
       const m2 = db2.model('Test', schema);
 
-      m1.create({ body: 'this is some text', thing: 1 }, function(err, i1) {
-        assert.ifError(err);
-        m2.create({ body: 'this is another body', thing: 2 }, function(err, i2) {
-          assert.ifError(err);
+      const i1 = await m1.create({ body: 'this is some text', thing: 1 });
 
-          m1.findById(i1.id, function(err, item1) {
-            assert.ifError(err);
-            assert.equal('this is some text', item1.body);
-            assert.equal(1, item1.thing);
+      const i2 = await m2.create({ body: 'this is another body', thing: 2 });
 
-            m2.findById(i2.id, function(err, item2) {
-              assert.ifError(err);
-              assert.equal('this is another body', item2.body);
-              assert.equal(2, item2.thing);
+      const item1 = await m1.findById(i1.id);
 
-              // validate the doc doesn't exist in the other db
-              m1.findById(i2.id, function(err, nothing) {
-                assert.ifError(err);
-                assert.strictEqual(null, nothing);
+      assert.equal('this is some text', item1.body);
+      assert.equal(1, item1.thing);
 
-                m2.findById(i1.id, function(err, nothing) {
-                  assert.ifError(err);
-                  assert.strictEqual(null, nothing);
+      const item2 = await m2.findById(i2.id);
+      assert.equal('this is another body', item2.body);
+      assert.equal(2, item2.thing);
 
-                  db2.close(done);
-                });
-              });
-            });
-          });
-        });
-      });
+      // validate the doc doesn't exist in the other db
+      const nothing = await m1.findById(i2.id);
+      assert.strictEqual(null, nothing);
+
+      const nothing2 = await m2.findById(i1.id);
+      assert.strictEqual(null, nothing2);
+
+      await db2.close();
     });
 
-    it('emits connecting events on both', function(done) {
+    it('emits connecting events on both', async function() {
       const db = mongoose.createConnection();
       const db2 = db.useDb('mongoose-test-2');
       let hit = false;
 
-      db2.on('connecting', function() {
-        hit && close();
+      db2.on('connecting', async function() {
+        hit && await close();
         hit = true;
       });
 
-      db.on('connecting', function() {
-        hit && close();
+      db.on('connecting', async function() {
+        hit && await close();
         hit = true;
       });
 
       db.openUri(start.uri);
 
-      function close() {
-        db.close(done);
+      async function close() {
+        await db.close();
       }
     });
 
-    it('emits connected events on both', function(done) {
+    it('emits connected events on both', function() {
       const db = mongoose.createConnection();
       const db2 = db.useDb('mongoose-test-2');
       let hit = false;
@@ -618,12 +587,12 @@ describe('connections:', function() {
 
       db.openUri(start.uri);
 
-      function close() {
-        db.close(done);
+      async function close() {
+        await db.close();
       }
     });
 
-    it('emits open events on both', function(done) {
+    it('emits open events on both', function() {
       const db = mongoose.createConnection();
       const db2 = db.useDb('mongoose-test-2');
       let hit = false;
@@ -638,8 +607,8 @@ describe('connections:', function() {
 
       db.openUri(start.uri);
 
-      function close() {
-        db.close(done);
+      async function close() {
+        await db.close();
       }
     });
 

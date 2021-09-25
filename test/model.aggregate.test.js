@@ -59,60 +59,54 @@ describe('model aggregate', function() {
     }
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   describe('works', function() {
-    it('when return promise', function(done) {
-      A.aggregate([group, project]).then(function(res) {
-        assert.ok(res);
-        assert.equal(1, res.length);
-        assert.ok('maxAge' in res[0]);
-        assert.equal(maxAge, res[0].maxAge);
-        done();
-      });
+    it('when return promise', async function() {
+      const res = await A.aggregate([group, project]);
+
+      assert.ok(res);
+      assert.equal(1, res.length);
+      assert.ok('maxAge' in res[0]);
+      assert.equal(maxAge, res[0].maxAge);
     });
 
-    it('with arrays', function(done) {
-      A.aggregate([group, project], function(err, res) {
-        assert.ifError(err);
-        assert.ok(res);
-        assert.equal(res.length, 1);
-        assert.ok('maxAge' in res[0]);
-        assert.equal(res[0].maxAge, maxAge);
-        done();
-      });
+    it('with arrays', async function() {
+      const res = await A.aggregate([group, project]);
+
+      assert.ok(res);
+      assert.equal(res.length, 1);
+      assert.ok('maxAge' in res[0]);
+      assert.equal(res[0].maxAge, maxAge);
     });
 
-    it('with Aggregate syntax', function(done) {
-      A.aggregate()
+    it('with Aggregate syntax', async function() {
+      const res = await A.aggregate()
         .group(group.$group)
         .project(project.$project)
-        .exec(function(err, res) {
-          assert.ifError(err);
-          assert.ok(res);
-          assert.equal(res.length, 1);
-          assert.ok('maxAge' in res[0]);
-          assert.equal(res[0].maxAge, maxAge);
-          done();
-        });
+        .exec();
+
+      assert.ok(res);
+      assert.equal(res.length, 1);
+      assert.ok('maxAge' in res[0]);
+      assert.equal(res[0].maxAge, maxAge);
     });
 
-    it('with Aggregate syntax if callback not provided', function(done) {
+    it('with Aggregate syntax if callback not provided', async function() {
       const promise = A.aggregate()
         .group(group.$group)
         .project(project.$project)
         .exec();
 
-      promise.then(function(res) {
-        assert.ok(promise instanceof mongoose.Promise);
-        assert.ok(res);
-        assert.equal(res.length, 1);
-        assert.ok('maxAge' in res[0]);
-        assert.equal(maxAge, res[0].maxAge);
-        done();
-      });
+      const res = await promise;
+
+      assert.ok(promise instanceof mongoose.Promise);
+      assert.ok(res);
+      assert.equal(res.length, 1);
+      assert.ok('maxAge' in res[0]);
+      assert.equal(maxAge, res[0].maxAge);
     });
 
     it('when returning Aggregate', function() {
@@ -123,26 +117,23 @@ describe('model aggregate', function() {
       assert.throws(() => A.aggregate({}), /disallows passing a spread/);
     });
 
-    it('can use helper for $out', function(done) {
+    it('can use helper for $out', async function() {
       if (!mongo26_or_greater) {
-        return done();
+        return;
       }
 
       const outputCollection = 'aggregate_output_' + random();
-      A.aggregate()
+      await A.aggregate()
         .group(group.$group)
         .project(project.$project)
         .out(outputCollection)
-        .exec(function(error) {
-          assert.ifError(error);
-          A.db.collection(outputCollection).find().toArray(function(error, documents) {
-            assert.ifError(error);
-            assert.equal(documents.length, 1);
-            assert.ok('maxAge' in documents[0]);
-            assert.equal(maxAge, documents[0].maxAge);
-            done();
-          });
-        });
+        .exec();
+
+      const documents = await A.db.collection(outputCollection).find().toArray();
+
+      assert.equal(documents.length, 1);
+      assert.ok('maxAge' in documents[0]);
+      assert.equal(maxAge, documents[0].maxAge);
     });
   });
 });

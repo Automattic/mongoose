@@ -20,8 +20,8 @@ describe('document modified', function() {
   before(function() {
     db = start();
   });
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   beforeEach(() => db.deleteModel(/.*/));
@@ -344,8 +344,8 @@ describe('document modified', function() {
         db = start();
       });
 
-      after(function(done) {
-        db.close(done);
+      after(async function() {
+        await db.close();
       });
 
       it('gh-1530 for arrays (gh-3575)', function() {

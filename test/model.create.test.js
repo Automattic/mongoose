@@ -30,26 +30,22 @@ describe('model', function() {
       B = db.model('Test', schema);
     });
 
-    after(function(done) {
-      db.close(done);
+    after(async function() {
+      await db.close();
     });
 
-    it('accepts an array and returns an array', function(done) {
-      B.create([{ title: 'hi' }, { title: 'bye' }], function(err, posts) {
-        assert.ifError(err);
+    it('accepts an array and returns an array', async function() {
+      const posts = await B.create([{ title: 'hi' }, { title: 'bye' }]);
 
-        assert.ok(posts instanceof Array);
-        assert.equal(posts.length, 2);
-        const post1 = posts[0];
-        const post2 = posts[1];
-        assert.ok(post1.get('_id') instanceof DocumentObjectId);
-        assert.equal(post1.title, 'hi');
+      assert.ok(posts instanceof Array);
+      assert.equal(posts.length, 2);
+      const post1 = posts[0];
+      const post2 = posts[1];
+      assert.ok(post1.get('_id') instanceof DocumentObjectId);
+      assert.equal(post1.title, 'hi');
 
-        assert.ok(post2.get('_id') instanceof DocumentObjectId);
-        assert.equal(post2.title, 'bye');
-
-        done();
-      });
+      assert.ok(post2.get('_id') instanceof DocumentObjectId);
+      assert.equal(post2.title, 'bye');
     });
 
     it('fires callback when passed 0 docs', function(done) {
@@ -68,24 +64,21 @@ describe('model', function() {
       });
     });
 
-    it('supports passing options', function(done) {
-      B.create([{}], { validateBeforeSave: false }, function(error, docs) {
-        assert.ifError(error);
-        assert.ok(Array.isArray(docs));
-        assert.equal(docs.length, 1);
-        done();
-      });
+    it('supports passing options', async function() {
+      const docs = await B.create([{}], { validateBeforeSave: false });
+
+      assert.ok(Array.isArray(docs));
+      assert.equal(docs.length, 1);
     });
 
-    it('returns a promise', function(done) {
+    it('returns a promise', function() {
       const p = B.create({ title: 'returns promise' });
       assert.ok(p instanceof mongoose.Promise);
-      done();
     });
 
-    it('creates in parallel', function(done) {
-      let countPre = 0,
-          countPost = 0;
+    it('creates in parallel', async function() {
+      let countPre = 0;
+      let countPost = 0;
 
       const SchemaWithPreSaveHook = new Schema({
         preference: String
@@ -107,85 +100,67 @@ describe('model', function() {
 
       db.deleteModel(/Test/);
       const MWPSH = db.model('Test', SchemaWithPreSaveHook);
-      MWPSH.create([
+      const docs = await MWPSH.create([
         { preference: 'xx' },
         { preference: 'yy' },
         { preference: '1' },
         { preference: '2' }
-      ], function(err, docs) {
-        assert.ifError(err);
+      ]);
 
-        assert.ok(docs instanceof Array);
-        assert.equal(docs.length, 4);
-        const doc1 = docs[0];
-        const doc2 = docs[1];
-        const doc3 = docs[2];
-        const doc4 = docs[3];
-        assert.ok(doc1);
-        assert.ok(doc2);
-        assert.ok(doc3);
-        assert.ok(doc4);
-        assert.equal(countPre, 4);
-        assert.equal(countPost, 4);
-        assert.ok(endTime - startTime < 4 * 100); // serial: >= 4 * 100 parallel: < 4 * 100
-        done();
-      });
+      assert.ok(docs instanceof Array);
+      assert.equal(docs.length, 4);
+
+      const [doc1, doc2, doc3, doc4] = docs;
+
+      assert.ok(doc1);
+      assert.ok(doc2);
+      assert.ok(doc3);
+      assert.ok(doc4);
+      assert.equal(countPre, 4);
+      assert.equal(countPost, 4);
+      assert.ok(endTime - startTime < 4 * 100); // serial: >= 4 * 100 parallel: < 4 * 100
     });
 
     describe('callback is optional', function() {
-      it('with one doc', function(done) {
-        const p = B.create({ title: 'optional callback' });
-        p.then(function(doc) {
-          assert.equal(doc.title, 'optional callback');
-          done();
-        }, done);
+      it('with one doc', async function() {
+        const doc = await B.create({ title: 'optional callback' });
+
+        assert.equal(doc.title, 'optional callback');
       });
 
-      it('with more than one doc', function(done) {
-        const p = B.create({ title: 'optional callback 2' }, { title: 'orient expressions' });
-        p.then(function(docs) {
-          assert.equal(docs.length, 2);
-          const doc1 = docs[0];
-          const doc2 = docs[1];
-          assert.equal(doc1.title, 'optional callback 2');
-          assert.equal(doc2.title, 'orient expressions');
-          done();
-        }, done);
+      it('with more than one doc', async function() {
+        const docs = await B.create({ title: 'optional callback 2' }, { title: 'orient expressions' });
+
+        assert.equal(docs.length, 2);
+        const doc1 = docs[0];
+        const doc2 = docs[1];
+        assert.equal(doc1.title, 'optional callback 2');
+        assert.equal(doc2.title, 'orient expressions');
       });
 
-      it('with array of docs', function(done) {
-        const p = B.create([{ title: 'optional callback3' }, { title: '3' }]);
-        p.then(function(docs) {
-          assert.ok(docs instanceof Array);
-          assert.equal(docs.length, 2);
-          const doc1 = docs[0];
-          const doc2 = docs[1];
-          assert.equal(doc1.title, 'optional callback3');
-          assert.equal(doc2.title, '3');
-          done();
-        }, done);
+      it('with array of docs', async function() {
+        const docs = await B.create([{ title: 'optional callback3' }, { title: '3' }]);
+
+        assert.ok(docs instanceof Array);
+        assert.equal(docs.length, 2);
+        const doc1 = docs[0];
+        const doc2 = docs[1];
+        assert.equal(doc1.title, 'optional callback3');
+        assert.equal(doc2.title, '3');
       });
 
-      it('and should reject promise on error', function(done) {
+      it('and should reject promise on error', async function() {
         const p = B.create({ title: 'optional callback 4' });
-        p.then(function(doc) {
-          const p2 = B.create({ _id: doc._id });
-          p2.then(function() {
-            assert(false);
-          }, function(err) {
-            assert(err);
-            done();
-          });
-        }, done);
+        const doc = await p;
+
+        const err = await B.create({ _id: doc._id }).then(() => null, err => err);
+        assert(err);
       });
 
-      it('if callback is falsy, will ignore it (gh-5061)', function(done) {
-        B.create({ title: 'test' }, null).
-          then(function(doc) {
-            assert.equal(doc.title, 'test');
-            done();
-          }).
-          catch(done);
+      it('if callback is falsy, will ignore it (gh-5061)', async function() {
+        const doc = await B.create({ title: 'test' }, null);
+
+        assert.equal(doc.title, 'test');
       });
 
       it('when passed an empty array, returns an empty array', async function() {

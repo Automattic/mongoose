@@ -61,8 +61,8 @@ describe('model: populate:', function() {
     db = start();
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   beforeEach(() => db.deleteModel(/.*/));
@@ -90,61 +90,51 @@ describe('model: populate:', function() {
     await post.populate('comments');
   });
 
-  it('deep population (gh-3103)', function(done) {
+  it('deep population (gh-3103)', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db.model('User', userSchema);
 
-    User.create({ name: 'User 01' }, function(err, user1) {
-      assert.ifError(err);
+    const user1 = await User.create({ name: 'User 01' });
 
-      User.create({ name: 'User 02', followers: [user1._id] }, function(err, user2) {
-        assert.ifError(err);
+    const user2 = await User.create({ name: 'User 02', followers: [user1._id] });
 
-        User.create({ name: 'User 03', followers: [user2._id] }, function(err, user3) {
-          assert.ifError(err);
+    const user3 = await User.create({ name: 'User 03', followers: [user2._id] });
 
-          BlogPost.create({
-            title: 'w00tabulous',
-            _creator: user3._id
-          }, function(err, post) {
-            assert.ifError(err);
 
-            assert.doesNotThrow(function() {
-              BlogPost
-                .findById(post._id)
-                .select('_creator')
-                .populate({
-                  path: '_creator',
-                  model: 'User',
-                  select: 'name followers',
-                  populate: [{
-                    path: 'followers',
-                    select: 'name followers',
-                    options: { limit: 5 },
-                    populate: { // can also use a single object instead of array of objects
-                      path: 'followers',
-                      select: 'name',
-                      options: { limit: 2 }
-                    }
-                  }]
-                })
-                .exec(function(err, post) {
-                  assert.ifError(err);
-                  assert.ok(post._creator);
-                  assert.equal(post._creator.name, 'User 03');
-                  assert.ok(post._creator.followers);
-                  assert.ok(post._creator.followers[0]);
-                  assert.equal(post._creator.followers[0].name, 'User 02');
-                  assert.ok(post._creator.followers[0].followers);
-                  assert.ok(post._creator.followers[0].followers[0]);
-                  assert.equal(post._creator.followers[0].followers[0].name, 'User 01');
-                  done();
-                });
-            });
-          });
-        });
-      });
+    const post = await BlogPost.create({
+      title: 'w00tabulous',
+      _creator: user3._id
     });
+
+
+    const post2 = await BlogPost
+      .findById(post._id)
+      .select('_creator')
+      .populate({
+        path: '_creator',
+        model: 'User',
+        select: 'name followers',
+        populate: [{
+          path: 'followers',
+          select: 'name followers',
+          options: { limit: 5 },
+          populate: { // can also use a single object instead of array of objects
+            path: 'followers',
+            select: 'name',
+            options: { limit: 2 }
+          }
+        }]
+      })
+      .exec();
+
+    assert.ok(post2._creator);
+    assert.equal(post2._creator.name, 'User 03');
+    assert.ok(post2._creator.followers);
+    assert.ok(post2._creator.followers[0]);
+    assert.equal(post2._creator.followers[0].name, 'User 02');
+    assert.ok(post2._creator.followers[0].followers);
+    assert.ok(post2._creator.followers[0].followers[0]);
+    assert.equal(post2._creator.followers[0].followers[0].name, 'User 01');
   });
 
   describe('deep populate', function() {

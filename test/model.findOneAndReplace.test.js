@@ -22,8 +22,8 @@ describe('model: findOneAndReplace:', function() {
     db = start();
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   beforeEach(() => db.deleteModel(/.*/));
@@ -90,7 +90,7 @@ describe('model: findOneAndReplace:', function() {
     assert.equal(post.id, doc.id);
   });
 
-  it('options/conditions/doc are merged when no callback is passed', function(done) {
+  it('options/conditions/doc are merged when no callback is passed', function() {
     const M = BlogPost;
 
     const now = new Date;
@@ -123,7 +123,6 @@ describe('model: findOneAndReplace:', function() {
     query = M.find().findOneAndReplace();
     assert.equal(query._fields, undefined);
     assert.equal(query._conditions.author, undefined);
-    done();
   });
 
   it('executes when a callback is passed', function(done) {
@@ -139,12 +138,14 @@ describe('model: findOneAndReplace:', function() {
     function cb(err, doc) {
       assert.ifError(err);
       assert.equal(doc, null); // no previously existing doc
-      if (--pending) return;
+      if (--pending) {
+        return;
+      }
       done();
     }
   });
 
-  it('executed with only a callback throws', function(done) {
+  it('executed with only a callback throws', function() {
     const M = BlogPost;
     let err;
 
@@ -155,10 +156,9 @@ describe('model: findOneAndReplace:', function() {
     }
 
     assert.ok(/First argument must not be a function/.test(err));
-    done();
   });
 
-  it('executed with only a callback throws', function(done) {
+  it('executed with only a callback throws', function() {
     const M = BlogPost;
     let err;
 
@@ -169,7 +169,6 @@ describe('model: findOneAndReplace:', function() {
     }
 
     assert.ok(/First argument must not be a function/.test(err));
-    done();
   });
 
   it('executes when a callback is passed', function(done) {
@@ -188,26 +187,21 @@ describe('model: findOneAndReplace:', function() {
     }
   });
 
-  it('returns the original document', function(done) {
+  it('returns the original document', async function() {
     const M = BlogPost;
     const title = 'remove muah pleez';
 
-    const post = new M({ title: title });
-    post.save(function(err) {
-      assert.ifError(err);
-      M.findByIdAndDelete(post.id, function(err, doc) {
-        assert.ifError(err);
-        assert.equal(post.id, doc.id);
-        M.findById(post.id, function(err, gone) {
-          assert.ifError(err);
-          assert.equal(gone, null);
-          done();
-        });
-      });
-    });
+    const post = await M.create({ title: title });
+    await post.save();
+
+    const doc = await M.findByIdAndDelete(post.id);
+    assert.equal(post.id, doc.id);
+
+    const gone = await M.findById(post.id);
+    assert.equal(gone, null);
   });
 
-  it('options/conditions/doc are merged when no callback is passed', function(done) {
+  it('options/conditions/doc are merged when no callback is passed', function() {
     const M = BlogPost;
     const _id = new DocumentObjectId();
 
@@ -226,67 +220,57 @@ describe('model: findOneAndReplace:', function() {
     assert.equal(query.options.new, undefined);
     assert.equal(query._fields, undefined);
     assert.equal(query._conditions._id, undefined);
-    done();
   });
 
-  it('supports v3 select string syntax', function(done) {
+  it('supports v3 select string syntax', function() {
     const M = BlogPost;
 
     const query = M.findOneAndReplace({}, {}, { select: 'author -title' });
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
-    done();
   });
 
-  it('supports v3 select object syntax', function(done) {
+  it('supports v3 select object syntax', function() {
     const M = BlogPost;
 
     const query = M.findOneAndReplace({}, {}, { select: { author: 1, title: 0 } });
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
-    done();
   });
 
-  it('supports v3 sort string syntax', function(done) {
+  it('supports v3 sort string syntax', function() {
     const M = BlogPost;
 
     const query = M.findOneAndReplace({}, {}, { sort: 'author -title' });
     assert.equal(Object.keys(query.options.sort).length, 2);
     assert.equal(query.options.sort.author, 1);
     assert.equal(query.options.sort.title, -1);
-    done();
   });
 
-  it('supports v3 sort object syntax', function(done) {
+  it('supports v3 sort object syntax', function() {
     const M = BlogPost;
 
     const query = M.findOneAndReplace({}, {}, { sort: { author: 1, title: -1 } });
     assert.equal(Object.keys(query.options.sort).length, 2);
     assert.equal(query.options.sort.author, 1);
     assert.equal(query.options.sort.title, -1);
-    done();
   });
 
-  it('supports population (gh-1395)', function(done) {
+  it('supports population (gh-1395)', async function() {
     const M = db.model('Test1', { name: String });
     const N = db.model('Test2', { a: { type: Schema.ObjectId, ref: 'Test1' }, i: Number });
 
-    M.create({ name: 'i am an A' }, function(err, a) {
-      if (err) return done(err);
-      N.create({ a: a._id, i: 10 }, function(err, b) {
-        if (err) return done(err);
+    const a = await M.create({ name: 'i am an A' });
 
-        N.findOneAndReplace({ _id: b._id }, { a: a._id })
-          .populate('a')
-          .exec(function(err, doc) {
-            if (err) return done(err);
-            assert.ok(doc);
-            assert.ok(doc.a);
-            assert.equal(doc.a.name, 'i am an A');
-            done();
-          });
-      });
-    });
+    const b = await N.create({ a: a._id, i: 10 });
+
+    const doc = await N.findOneAndReplace({ _id: b._id }, { a: a._id })
+      .populate('a')
+      .exec();
+
+    assert.ok(doc);
+    assert.ok(doc.a);
+    assert.equal(doc.a.name, 'i am an A');
   });
 
   it('only calls setters once (gh-6203)', async function() {
@@ -310,7 +294,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   describe('middleware', function() {
-    it('works', function(done) {
+    it('works', async function() {
       const s = new Schema({
         topping: { type: String, default: 'bacon' },
         base: String
@@ -327,27 +311,16 @@ describe('model: findOneAndReplace:', function() {
       });
 
       const Breakfast = db.model('Test', s);
-      const breakfast = new Breakfast({
-        base: 'eggs'
-      });
+      await Breakfast.create({ base: 'eggs' });
 
-      breakfast.save(function(error) {
-        assert.ifError(error);
 
-        Breakfast.findOneAndReplace(
-          { base: 'eggs' },
-          {},
-          function(error, breakfast) {
-            assert.ifError(error);
-            assert.equal(breakfast.base, 'eggs');
-            assert.equal(preCount, 1);
-            assert.equal(postCount, 1);
-            done();
-          });
-      });
+      const breakfast = await Breakfast.findOneAndReplace({ base: 'eggs' }, {});
+      assert.equal(breakfast.base, 'eggs');
+      assert.equal(preCount, 1);
+      assert.equal(postCount, 1);
     });
 
-    it('works with exec() (gh-439)', function(done) {
+    it('works with exec() (gh-439)', async function() {
       const s = new Schema({
         topping: { type: String, default: 'bacon' },
         base: String
@@ -368,19 +341,13 @@ describe('model: findOneAndReplace:', function() {
         base: 'eggs'
       });
 
-      breakfast.save(function(error) {
-        assert.ifError(error);
+      await breakfast.save();
 
-        Breakfast.
-          findOneAndReplace({ base: 'eggs' }, {}).
-          exec(function(error, breakfast) {
-            assert.ifError(error);
-            assert.equal(breakfast.base, 'eggs');
-            assert.equal(preCount, 1);
-            assert.equal(postCount, 1);
-            done();
-          });
-      });
+      const updatedBreakfast = await Breakfast.findOneAndReplace({ base: 'eggs' }, {}).exec();
+
+      assert.equal(updatedBreakfast.base, 'eggs');
+      assert.equal(preCount, 1);
+      assert.equal(postCount, 1);
     });
   });
 

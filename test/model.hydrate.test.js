@@ -51,11 +51,11 @@ describe('model', function() {
       return db;
     });
 
-    after(function(done) {
-      db.close(done);
+    after(async function() {
+      await db.close();
     });
 
-    it('hydrates documents with no modified paths', function(done) {
+    it('hydrates documents with no modified paths', function() {
       const hydrated = B.hydrate({ _id: '541085faedb2f28965d0e8e7', title: 'chair' });
 
       assert.ok(hydrated.get('_id') instanceof DocumentObjectId);
@@ -64,25 +64,22 @@ describe('model', function() {
       assert.equal(hydrated.isNew, false);
       assert.equal(hydrated.isModified(), false);
       assert.equal(hydrated.isModified('title'), false);
-
-      done();
     });
 
-    it('runs validators', function(done) {
+    it('runs validators', async function() {
       const hydrated = Breakfast.hydrate({
         _id: '000000000000000000000001',
         food: 'waffles'
       });
 
-      hydrated.validate(function(err) {
-        assert.ok(err);
-        assert.ok(err.errors.food);
-        assert.deepEqual(['food'], Object.keys(err.errors));
-        done();
-      });
+      const err = await hydrated.validate().then(() => null, err => err);
+
+      assert.ok(err);
+      assert.ok(err.errors.food);
+      assert.deepEqual(['food'], Object.keys(err.errors));
     });
 
-    it('supports projection (gh-9209)', function(done) {
+    it('supports projection (gh-9209)', function() {
       const schema = new Schema({
         prop: String,
         arr: [String]
@@ -94,16 +91,13 @@ describe('model', function() {
       assert.equal(doc.isNew, false);
       assert.equal(doc.isModified(), false);
       assert.ok(!doc.$__delta());
-
-      done();
     });
 
-    it('works correctly with model discriminators', function(done) {
+    it('works correctly with model discriminators', function() {
       const hydrated = B.hydrate({ _id: '541085faedb2f28965d0e8e8', title: 'chair', type: 'C' });
 
       assert.equal(hydrated.test, 'test');
       assert.deepEqual(hydrated.schema.tree, C.schema.tree);
-      done();
     });
   });
 });

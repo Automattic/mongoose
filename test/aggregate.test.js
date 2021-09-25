@@ -80,8 +80,8 @@ describe('aggregate: ', function() {
     db = start();
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   beforeEach(() => db.deleteModel(/.*/));
@@ -561,61 +561,48 @@ describe('aggregate: ', function() {
 
     });
 
-    it('group', function(done) {
+    it('group', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      aggregate.
+      const docs = await aggregate.
         group({ _id: '$dept' }).
-        exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs.length, 2);
+        exec();
 
-          const depts = docs.map(function(doc) {
-            return doc._id;
-          });
-          assert.notEqual(depts.indexOf('sales'), -1);
-          assert.notEqual(depts.indexOf('r&d'), -1);
-          done();
-        });
+      assert.equal(docs.length, 2);
+
+      const depts = docs.map((doc) => doc._id);
+      assert.notEqual(depts.indexOf('sales'), -1);
+      assert.notEqual(depts.indexOf('r&d'), -1);
     });
 
-    it('skip', function(done) {
+    it('skip', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      aggregate.
+      const docs = await aggregate.
         skip(1).
-        exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs.length, 3);
+        exec();
 
-          done();
-        });
+      assert.equal(docs.length, 3);
     });
 
-    it('limit', function(done) {
+    it('limit', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      aggregate.
+      const docs = await aggregate.
         limit(3).
-        exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs.length, 3);
+        exec();
 
-          done();
-        });
+      assert.equal(docs.length, 3);
     });
 
-    it('unwind', function(done) {
+    it('unwind', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      aggregate.
+      const docs = await aggregate.
         unwind('customers').
-        exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs.length, 5);
+        exec();
 
-          done();
-        });
+      assert.equal(docs.length, 5);
     });
 
     it('unwind with obj', function() {

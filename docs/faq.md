@@ -12,48 +12,6 @@ hr {
 }
 </style>
 
-<hr id="array-changes-not-saved" />
-
-<a href="#array-changes-not-saved">**Q**</a>. Why don't my changes to arrays get saved when I update an element
-    directly?
-
-```javascript
-doc.array[3] = 'changed';
-doc.save();
-```
-
-**A**. Mongoose doesn't create getters/setters for array indexes; without
-them mongoose never gets notified of the change and so doesn't know to
-persist the new value. There are two workarounds:
-[`MongooseArray#set`](./api.html#types_array_MongooseArray.set) or
-[`Document#markModified()`](/docs/api/document.html#document_Document-markModified).
-
-```javascript
-// Saves changes successfully
-doc.array.set(3, 'changed');
-doc.save();
-
-// Also saves changes successfully
-doc.array[3] = 'changed';
-doc.markModified('array');
-doc.save();
-```
-
-This **only** affects when you set an array index directly. If you set
-a path on a document array element, you do not need to use `markModified()`.
-
-```javascript
-// Saves changes successfully without `markModified()`, because this
-// code doesn't set an array index, it sets a path underneath an array index.
-doc.docArray[3].name = 'changed';
-doc.save();
-
-// Does **not** save changes successfully. You need to use `markModified()`
-// or `set()` because this sets an array index.
-doc.docArray[3] = { name: 'changed' };
-doc.save();
-```
-
 <hr id="unique-doesnt-work" />
 
 <a href="#unique-doesnt-work">**Q**</a>. I declared a schema property as `unique` but I can still save duplicates. What gives?

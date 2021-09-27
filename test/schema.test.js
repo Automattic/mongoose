@@ -45,8 +45,8 @@ describe('schema', function() {
     db = start();
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   before(function() {
@@ -1434,35 +1434,35 @@ describe('schema', function() {
 
   describe('property names', function() {
     describe('reserved keys are log a warning (gh-9010)', () => {
-      const originalWarn = console.warn;
-      let lastWarnMessage;
-      beforeEach(() => {
-        console.warn = (message) => lastWarnMessage = message;
-      });
-
-      afterEach(() => {
-        console.warn = originalWarn;
-        lastWarnMessage = null;
-      });
-
       [
         'emit', 'listeners', 'on', 'removeListener', /* 'collection', */ // TODO: add `collection`
         'errors', 'get', 'init', 'isModified', 'isNew', 'populated',
         'remove', 'save', 'toObject', 'validate'
       ].forEach((reservedProperty) => {
-        it(`\`${reservedProperty}\` when used as a schema path logs a warning`, () => {
-          new Schema({ [reservedProperty]: String });
+        it(`\`${reservedProperty}\` when used as a schema path logs a warning`, async() => {
+          const waitForWarning = new Promise(resolve => {
+            process.once('warning', warning => resolve(warning.message));
+          });
 
-          assert.ok(lastWarnMessage.includes(`\`${reservedProperty}\` is a reserved schema pathname`));
+          new Schema({ [reservedProperty]: String });
+          const lastWarnMessage = await waitForWarning;
+          assert.ok(lastWarnMessage.includes(`\`${reservedProperty}\` is a reserved schema pathname`), lastWarnMessage);
         });
 
-        it(`\`${reservedProperty}\` when used as a schema path doesn't log a warning if \`supressReservedKeysWarning\` is true`, () => {
+        it(`\`${reservedProperty}\` when used as a schema path doesn't log a warning if \`supressReservedKeysWarning\` is true`, async() => {
           new Schema(
             { [reservedProperty]: String },
             { supressReservedKeysWarning: true }
           );
 
-          assert.deepEqual(lastWarnMessage, null);
+          let lastWarning = null;
+          const listener = warning => { lastWarning = warning.message; };
+          process.once('warning', listener);
+
+          setImmediate(() => {
+            assert.strictEqual(lastWarning, null);
+            process.removeListener('warning', listener);
+          });
         });
 
       });

@@ -164,8 +164,8 @@ describe('schema', function() {
           Person = db.model('person-schema-validation-test', PersonSchema);
         });
 
-        after(function(done) {
-          db.close(done);
+        after(async function() {
+          await db.close();
         });
 
         it('and can be set to "undefined" (gh-1594)', function(done) {

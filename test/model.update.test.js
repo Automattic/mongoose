@@ -77,8 +77,8 @@ describe('model: update:', function() {
     BlogPost = db.model('BlogPost', schema);
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   beforeEach(function() {
@@ -2897,8 +2897,8 @@ describe('model: updateOne: ', function() {
     db = start();
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   beforeEach(() => db.deleteModel(/.*/));

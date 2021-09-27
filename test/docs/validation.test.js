@@ -15,8 +15,8 @@ describe('validation docs', function() {
     });
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   /**

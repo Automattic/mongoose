@@ -22,8 +22,8 @@ describe('model', function() {
     return db.createCollection('Test').catch(() => {});
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   beforeEach(() => db.deleteModel(/.*/));
@@ -215,7 +215,7 @@ describe('model', function() {
       assert.equal(found, 2);
     });
 
-    it('nested embedded docs (gh-5199)', function(done) {
+    it('nested embedded docs (gh-5199)', function() {
       const SubSubSchema = mongoose.Schema({
         nested2: String
       });
@@ -241,11 +241,9 @@ describe('model', function() {
         { 'sub.nested1': 1 },
         { nested0: 1 }
       ]);
-
-      done();
     });
 
-    it('primitive arrays (gh-3347)', function(done) {
+    it('primitive arrays (gh-3347)', function() {
       const schema = new Schema({
         arr: [{ type: String, unique: true }]
       });
@@ -254,27 +252,23 @@ describe('model', function() {
       assert.equal(indexes.length, 1);
       assert.deepEqual(indexes[0][0], { arr: 1 });
       assert.ok(indexes[0][1].unique);
-
-      done();
     });
 
-    it('error should emit on the model', function(done) {
+    it('error should emit on the model', async function() {
       const schema = new Schema({ name: { type: String } });
       const Test = db.model('Test', schema);
 
-      Test.create({ name: 'hi' }, { name: 'hi' }, function(err) {
-        assert.strictEqual(err, null);
-        Test.schema.index({ name: 1 }, { unique: true });
-        Test.schema.index({ other: 1 });
+      await Test.create({ name: 'hi' }, { name: 'hi' });
 
-        Test.on('index', function(err) {
-          assert.ok(/E11000 duplicate key error/.test(err.message), err);
-          done();
-        });
+      Test.schema.index({ name: 1 }, { unique: true });
+      Test.schema.index({ other: 1 });
 
-        delete Test.$init;
-        Test.init().catch(() => {});
-      });
+      const err = await Test.ensureIndexes().then(() => null, err => err);
+
+      assert.ok(/E11000 duplicate key error/.test(err.message), err);
+
+      delete Test.$init;
+      await Test.init().catch(() => {});
     });
 
     it('when one index creation errors', async function() {
@@ -333,7 +327,7 @@ describe('model', function() {
     });
 
     describe('auto creation', function() {
-      it('can be disabled', function(done) {
+      it('can be disabled', async function() {
         const schema = new Schema({ name: { type: String, index: true } });
         schema.set('autoIndex', false);
 
@@ -344,17 +338,13 @@ describe('model', function() {
 
         // Create a doc because mongodb 3.0 getIndexes errors if db doesn't
         // exist
-        Test.create({ name: 'Bacon' }, function(err) {
-          assert.ifError(err);
-          setTimeout(function() {
-            Test.collection.getIndexes(function(err, indexes) {
-              assert.ifError(err);
-              // Only default _id index should exist
-              assert.deepEqual(['_id_'], Object.keys(indexes));
-              done();
-            });
-          }, 100);
-        });
+        await Test.create({ name: 'Bacon' });
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        const indexes = await Test.collection.getIndexes();
+
+        // Only default _id index should exist
+        assert.deepEqual(['_id_'], Object.keys(indexes));
       });
 
       describe('global autoIndexes (gh-1875)', function() {
@@ -365,21 +355,18 @@ describe('model', function() {
 
         beforeEach(() => db.deleteModel(/Test/));
 
-        it('will create indexes as a default', function(done) {
+        it('will create indexes as a default', async function() {
           const schema = new Schema({ name: { type: String, index: true } });
           const Test = db.model('Test', schema);
-          Test.on('index', function(error) {
-            assert.ifError(error);
-            assert.ok(true, 'Model.ensureIndexes() was called');
-            Test.collection.getIndexes(function(err, indexes) {
-              assert.ifError(err);
-              assert.equal(Object.keys(indexes).length, 2);
-              done();
-            });
-          });
+          await Test.init();
+
+          assert.ok(true, 'Model.ensureIndexes() was called');
+          const indexes = await Test.collection.getIndexes();
+
+          assert.equal(Object.keys(indexes).length, 2);
         });
 
-        it('will not create indexes if the global auto index is false and schema option isnt set (gh-1875)', function(done) {
+        it('will not create indexes if the global auto index is false and schema option isnt set (gh-1875)', async function() {
           const db = start({ config: { autoIndex: false } });
           const schema = new Schema({ name: { type: String, index: true } });
           const Test = db.model('Test', schema);
@@ -387,37 +374,32 @@ describe('model', function() {
             assert.ok(false, 'Model.ensureIndexes() was called');
           });
 
-          Test.create({ name: 'Bacon' }, function(err) {
-            assert.ifError(err);
-            setTimeout(function() {
-              Test.collection.getIndexes(function(err, indexes) {
-                assert.ifError(err);
-                assert.deepEqual(['_id_'], Object.keys(indexes));
-                db.close(done);
-              });
-            }, 100);
-          });
+          await Test.create({ name: 'Bacon' });
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          const indexes = await Test.collection.getIndexes();
+          assert.deepEqual(['_id_'], Object.keys(indexes));
+
+          await db.close();
         });
       });
     });
 
     describe.skip('model.ensureIndexes()', function() {
-      it('is a function', function(done) {
+      it('is a function', function() {
         const schema = mongoose.Schema({ x: 'string' });
         const Test = mongoose.createConnection().model('ensureIndexes-' + random, schema);
         assert.equal(typeof Test.ensureIndexes, 'function');
-        done();
       });
 
-      it('returns a Promise', function(done) {
+      it('returns a Promise', function() {
         const schema = mongoose.Schema({ x: 'string' });
         const Test = mongoose.createConnection().model('ensureIndexes-' + random, schema);
         const p = Test.ensureIndexes();
         assert.ok(p instanceof mongoose.Promise);
-        done();
       });
 
-      it('creates indexes', function(done) {
+      it('creates indexes', async function() {
         const schema = new Schema({ name: { type: String } });
         const Test = db.model('ManualIndexing' + random(), schema, 'x' + random());
 
@@ -428,11 +410,9 @@ describe('model', function() {
           called = true;
         });
 
-        Test.ensureIndexes(function(err) {
-          assert.ifError(err);
-          assert.ok(called);
-          done();
-        });
+        await Test.ensureIndexes();
+
+        assert.ok(called);
       });
     });
   });

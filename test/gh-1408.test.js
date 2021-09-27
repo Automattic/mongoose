@@ -13,7 +13,7 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
 describe('documents should not be converted to _id (gh-1408)', function() {
-  it('if an embedded doc', function(done) {
+  it('if an embedded doc', async function() {
     this.timeout(process.env.TRAVIS ? 8000 : 4500);
 
     const db = start();
@@ -35,7 +35,8 @@ describe('documents should not be converted to _id (gh-1408)', function() {
     const a = new A({
       settings: {
         preferences:
-         [{ preference: 'group_colors', value: false },
+         [
+           { preference: 'group_colors', value: false },
            { preference: 'can_force_orders', value: true },
            { preference: 'hide_from_buyers', value: true },
            { preference: 'no_orders', value: '' }
@@ -43,42 +44,35 @@ describe('documents should not be converted to _id (gh-1408)', function() {
       }
     });
 
-    a.save(function(err, a) {
-      if (err) return done(err);
+    await a.save();
 
-      A.findById(a, function(err, doc) {
-        if (err) return done(err);
+    const doc = await A.findById(a);
 
-        const newData = {
-          settings: {
-            preferences:
-             [{ preference: 'group_colors', value: true },
-               { preference: 'can_force_orders', value: true },
-               { preference: 'custom_csv', value: '' },
-               { preference: 'hide_from_buyers', value: false },
-               { preference: 'nozoom', value: false },
-               { preference: 'no_orders', value: false }
-             ]
-          }
-        };
+    const newData = {
+      settings: {
+        preferences: [
+          { preference: 'group_colors', value: true },
+          { preference: 'can_force_orders', value: true },
+          { preference: 'custom_csv', value: '' },
+          { preference: 'hide_from_buyers', value: false },
+          { preference: 'nozoom', value: false },
+          { preference: 'no_orders', value: false }
+        ]
+      }
+    };
 
-        doc.set('settings', newData.settings, { merge: true });
-        doc.markModified('settings'); // <== this caused the bug
-        doc.save(function(err) {
-          if (err) return done(err);
+    doc.set('settings', newData.settings, { merge: true });
+    doc.markModified('settings'); // <== this caused the bug
+    await doc.save();
 
-          A.findById(doc, function(err, doc) {
-            if (err) return done(err);
+    const doc2 = await A.findById(doc);
 
-            doc.settings.preferences.forEach(function(pref, i) {
-              assert.equal(pref.preference, newData.settings.preferences[i].preference);
-              assert.equal(pref.value, newData.settings.preferences[i].value);
-            });
 
-            db.close(done);
-          });
-        });
-      });
+    doc2.settings.preferences.forEach(function(pref, i) {
+      assert.equal(pref.preference, newData.settings.preferences[i].preference);
+      assert.equal(pref.value, newData.settings.preferences[i].value);
     });
+
+    await db.close();
   });
 });

@@ -78,8 +78,8 @@ describe('model: querying:', function() {
     }
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   it('find returns a Query', function(done) {

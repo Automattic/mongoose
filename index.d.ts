@@ -1538,10 +1538,10 @@ declare module 'mongoose' {
     type?:
       T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends object[] ? (AnyArray<Schema<any>> | AnyArray<SchemaDefinition<Unpacked<T>>>) :
-      T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> :
-      T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> :
-      T extends boolean[] ? AnyArray<SchemaDefinitionWithBuiltInClass<boolean>> :
-      T extends Function[] ? AnyArray<SchemaDefinitionWithBuiltInClass<Function>> :
+      T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> | AnyArray<SchemaTypeOptions<string>> :
+      T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> | AnyArray<SchemaTypeOptions<number>> :
+      T extends boolean[] ? AnyArray<SchemaDefinitionWithBuiltInClass<boolean>> | AnyArray<SchemaTypeOptions<boolean>> :
+      T extends Function[] ? AnyArray<SchemaDefinitionWithBuiltInClass<Function>> | AnyArray<SchemaTypeOptions<Unpacked<T>>> :
       T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
@@ -2606,6 +2606,7 @@ declare module 'mongoose' {
   type __UpdateDefProperty<T> =
     0 extends (1 & T) ? T : // any
     T extends unknown[] ? LeanArray<T> : // Array
+    T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> :
     T extends Document ? LeanDocument<T> : // Subdocument
     [Extract<T, mongodb.ObjectId>] extends [never] ? T :
     T | string;
@@ -2623,7 +2624,14 @@ declare module 'mongoose' {
         : _AllowStringsForIds<T[K]>
       : T[K] | string;
     };
-  export type DocumentDefinition<T> = _AllowStringsForIds<LeanDocument<T>>;
+  export type DocumentDefinition<T> = {
+    [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:
+      [Extract<T[K], mongodb.ObjectId>] extends [never]
+      ? T[K] extends TreatAsPrimitives
+        ? T[K]
+        : LeanDocumentElement<T[K]>
+      : T[K] | string;
+    };
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   type TreatAsPrimitives = actualPrimitives |
@@ -2632,6 +2640,7 @@ declare module 'mongoose' {
   type LeanType<T> =
     0 extends (1 & T) ? T : // any
     T extends TreatAsPrimitives ? T : // primitives
+    T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> : // subdocs
     LeanDocument<T>; // Documents and everything else
 
   type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];

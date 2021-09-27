@@ -28,8 +28,8 @@ describe('model: findOneAndUpdate:', function() {
     db = start();
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   beforeEach(() => db.deleteModel(/.*/));
@@ -2365,5 +2365,29 @@ describe('model: findOneAndUpdate:', function() {
     const res = await Parent.findOneAndUpdate({ _id: parent._id, 'children.vals.github': { $exists: true } },
       { $set: { 'children.$.vals': { telegram: 'hello' } } }, { new: true });
     assert.deepEqual(res.toObject().children[0].vals, new Map([['telegram', 'hello']]));
+  });
+
+  it('supports $set on elements of map of subdocuments (gh-10720)', async function() {
+    const parentSchema = new mongoose.Schema({
+      data: new mongoose.Schema({
+        children: {
+          type: Map,
+          of: new mongoose.Schema({ age: Number }, { _id: false })
+        }
+      }, { _id: false })
+    });
+    const Parent = db.model('Parent', parentSchema);
+    const parent = new Parent({
+      data: {
+        children: {
+          lisa: { age: 5 },
+          john: { age: 7 }
+        }
+      }
+    });
+    await parent.save();
+    const update = { $set: { 'data.children.kenny': { age: '1' } } };
+    const res = await Parent.findOneAndUpdate({ _id: parent.id }, update, { new: true });
+    assert.strictEqual(res.data.children.get('kenny').age, 1);
   });
 });

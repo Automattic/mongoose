@@ -40,8 +40,10 @@ For more information on the `ClientSession#withTransaction()` function, please s
 [the MongoDB Node.js driver docs](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html#withTransaction).
 
 Mongoose's `Connection#transaction()` function is a wrapper around `withTransaction()` that
-integrates Mongoose change tracking with transactions. For example, the `Connection#transaction()`
-function handles resetting a document if you `save()` that document in a transaction that later fails.
+integrates Mongoose change tracking with transactions.
+For example, suppose you `save()` a document in a transaction that later fails.
+The changes in that document are not persisted to MongoDB.
+The `Connection#transaction()` function informs Mongoose change tracking that the `save()` was rolled back, and marks all fields that were changed in the transaction as modified.
 
 ```javascript
 [require:transactions.*can save document after aborted transaction]

@@ -1,3 +1,15 @@
+6.0.8 / 2021-09-27
+==================
+ * fix: support $set on elements of map of subdocuments #10720
+ * fix(schematype): handle schema type definition where unique: false and `index` not set #10738
+ * fix(timestamps): handle `createdAt` with custom `typeKey` #10768 #10761 [jclaudan](https://github.com/jclaudan)
+ * fix(model): amend Model.translateAliases to observe non-aliased sub schemas #10772 [frisbee09](https://github.com/frisbee09)
+ * fix: allow ObjectId#valueOf() to override built-in `Object#valueOf()`, clarify using `==` with ObjectIds in migration guide #10741
+ * fix: use process.emitWarning() instead of console.warn() for warnings #10687
+ * fix(index.d.ts): allow array of schema type options for string[], `number[]` property Schema definitions #10731
+ * fix(index.d.ts): make built-in subdocument properties not required in UpdateQuery #10597
+ * docs(ssl): correct sslCA option and clarify that sslCA should be the path to the CA file #10705
+
 6.0.7 / 2021-09-20
 ==================
  * fix(populate): wrap populate filters in trusted() so they work with `sanitizeFilter` #10740

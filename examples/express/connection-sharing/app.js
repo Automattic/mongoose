@@ -1,4 +1,3 @@
-
 'use strict';
 const express = require('express');
 const mongoose = require('../../../lib');
@@ -13,6 +12,4 @@ app.get('/', routes.home);
 app.get('/insert', routes.insert);
 app.get('/name', routes.modelName);
 
-app.listen(8000, function() {
-  console.log('listening on http://localhost:8000');
-});
+app.listen(8000, () => console.log('listening on http://localhost:8000'));

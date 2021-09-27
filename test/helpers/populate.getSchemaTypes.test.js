@@ -6,7 +6,7 @@ const getSchemaTypes = require('../../lib/helpers/populate/getSchemaTypes');
 const mongoose = require('../common').mongoose;
 
 describe('getSchemaTypes', function() {
-  it('handles embedded discriminators (gh-5970)', function(done) {
+  it('handles embedded discriminators (gh-5970)', function() {
     const ItemSchema = new Schema({
       title: {
         type: String,
@@ -57,11 +57,9 @@ describe('getSchemaTypes', function() {
     assert.equal(schemaTypes.length, 2);
     assert.equal(schemaTypes[0].options.ref, 'Ref1');
     assert.equal(schemaTypes[1].options.ref, 'Ref2');
-
-    done();
   });
 
-  it('multiple embedded discriminators (gh-6064)', function(done) {
+  it('multiple embedded discriminators (gh-6064)', function() {
     const ItemSchema = new Schema({
       title: {
         type: String,
@@ -132,11 +130,9 @@ describe('getSchemaTypes', function() {
     assert.equal(schemaTypes.length, 2);
     assert.equal(schemaTypes[0].options.ref, 'Ref1');
     assert.equal(schemaTypes[1].options.ref, 'Ref2');
-
-    done();
   });
 
-  it('handles already populated paths (gh-6798)', function(done) {
+  it('handles already populated paths (gh-6798)', function() {
     const DriverSchema = new mongoose.Schema({
       name: 'String',
       cars: [{ type: 'ObjectId', required: false, ref: 'gh6798_Car' }]
@@ -163,8 +159,6 @@ describe('getSchemaTypes', function() {
 
     const schematype = getSchemaTypes(null, DriverSchema, driver, 'cars.producer');
     assert.equal(schematype.options.ref, 'gh6798_Producer');
-
-    done();
   });
 
   it('handles embedded discriminators in nested arrays (gh-9984)', function() {

@@ -28,8 +28,8 @@ describe('asyncIterator', function() {
     ]);
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   function wait() {

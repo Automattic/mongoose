@@ -198,3 +198,23 @@ function gh10605_2() {
     someObject: { type: [{ id: String }] }
   });
 }
+
+function gh10731() {
+  interface IProduct {
+    keywords: string[];
+  }
+
+  const productSchema = new Schema<IProduct>({
+    keywords: {
+      type: [
+        {
+          type: String,
+          trim: true,
+          lowercase: true,
+          required: true
+        }
+      ],
+      required: true
+    }
+  });
+}

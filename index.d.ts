@@ -2068,6 +2068,9 @@ declare module 'mongoose' {
     all(val: Array<any>): this;
     all(path: string, val: Array<any>): this;
 
+    /** Sets the allowDiskUse option for the query (ignored for < 4.4.0) */
+    allowDiskUse(value: boolean): this;
+
     /** Specifies arguments for an `$and` condition. */
     and(array: FilterQuery<DocType>[]): this;
 

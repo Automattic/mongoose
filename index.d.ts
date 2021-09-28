@@ -552,8 +552,11 @@ declare module 'mongoose' {
     deleteOne(options: QueryOptions, cb?: Callback): void;
     deleteOne(cb: Callback): void;
 
-    /** Takes a populated field and returns it to its unpopulated state. */
-    depopulate(path: string): this;
+    /**
+     * Takes a populated field and returns it to its unpopulated state. If called with
+     * no arguments, then all populated fields are returned to their unpopulated state.
+     */
+    depopulate(path?: string | string[]): this;
 
     /**
      * Returns the list of paths that have been directly modified. A direct
@@ -2067,6 +2070,9 @@ declare module 'mongoose' {
     /** Specifies an `$all` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     all(val: Array<any>): this;
     all(path: string, val: Array<any>): this;
+
+    /** Sets the allowDiskUse option for the query (ignored for < 4.4.0) */
+    allowDiskUse(value: boolean): this;
 
     /** Specifies arguments for an `$and` condition. */
     and(array: FilterQuery<DocType>[]): this;

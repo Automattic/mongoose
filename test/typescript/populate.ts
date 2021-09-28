@@ -75,3 +75,11 @@ const Story = model<IStory>('Story', storySchema);
   await story.populate([{ path: 'fans' }]);
   await story.populate(['author', { path: 'fans' }]);
 })();
+
+async function documentDepopulate() {
+  const story = await Story.findOne().populate('author').orFail();
+
+  story.depopulate('author');
+  story.depopulate(['author']);
+  story.depopulate();
+}

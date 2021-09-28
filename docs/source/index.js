@@ -42,5 +42,5 @@ exports['docs/compatibility.md'] = {
 };
 exports['docs/search.pug'] = { title: 'Search' };
 exports['docs/enterprise.md'] = { title: 'Mongoose for Enterprise', markdown: true };
-exports['docs/built-with-mongoose.md'] = { title: 'Built with Mongoose', markdown: true };
+exports['docs/sponsors.md'] = { title: 'Mongoose Sponsors', markdown: true };
 exports['docs/async-await.md'] = { title: 'Using Async/Await with Mongoose', markdown: true };

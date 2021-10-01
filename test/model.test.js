@@ -7557,6 +7557,22 @@ describe('Model', function() {
     assert.ok(!test.name);
 
   });
+
+  it('shoud not mutate the object ids (gh-10766)', async function() {
+    const MutatingSchema = new Schema({
+      objectIdArray: [
+        {
+          type: Schema.Types.ObjectId,
+        },
+      ],
+    });
+    const Mutating = db.model('Mutating', MutatingSchema);
+    const id = '614bf569793eb0b25e631952';
+    const objectIdArray = [id];
+    assert(id === objectIdArray[0], 'before model creation');
+    new Mutating({ objectIdArray });
+    assert(id === objectIdArray[0], 'after model creation');
+  });
 });
 
 

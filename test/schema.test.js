@@ -2661,4 +2661,15 @@ describe('schema', function() {
     });
     assert.equal(schema.path('myMap').$__schemaType.$__schemaType.instance, 'String');
   });
+
+  it('handles `type: { subpath: String }` in document array definitions (gh-10750)', function() {
+    const schema = new mongoose.Schema({
+      something: [{ type: { somePath: String } }],
+      // also, same error message when doing:
+      somethingElse: { type: [{ type: { somePath: String } }] }
+    });
+
+    assert.equal(schema.path('something').caster.schema.path('somePath').instance, 'String');
+    assert.equal(schema.path('somethingElse').caster.schema.path('somePath').instance, 'String');
+  });
 });

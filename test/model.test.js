@@ -7570,7 +7570,9 @@ describe('Model', function() {
     const id = '614bf569793eb0b25e631952';
     const objectIdArray = [id];
     assert(id === objectIdArray[0], 'before model creation');
+    console.log('before')
     new Mutating({ objectIdArray });
+    console.log('after')
     assert(id === objectIdArray[0], 'after model creation');
   });
 });

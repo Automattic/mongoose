@@ -147,7 +147,8 @@ exceptions that are explained below.
 Below are some of the options that are important for tuning Mongoose.
 
 * `promiseLibrary`    - Sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html).
-* `poolSize`          - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `poolSize` is 5. Keep in mind that, as of MongoDB 3.4, MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See [Slow Trains in MongoDB and Node.js](http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs).
+* `maxPoolSize`       - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `maxPoolSize` is 100. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See [Slow Trains in MongoDB and Node.js](http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs). You may want to decrease `maxPoolSize` if you are running into [connection limits](https://docs.atlas.mongodb.com/reference/atlas-limits/#connection-limits-and-cluster-tier).
+* `minPoolSize`       - The minimum number of sockets the MongoDB driver will keep open for this connection. The MongoDB driver may close sockets that have been inactive for some time. You may want to increase `minPoolSize` if you expect your app to go through long idle times and want to make sure your sockets stay open to avoid slow trains when activity picks up.
 * `socketTimeoutMS`   - How long the MongoDB driver will wait before killing a socket due to inactivity _after initial connection_. A socket may be inactive because of either no activity or a long-running operation. This is set to `30000` by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
 * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
 * `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://docs.mongodb.com/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
@@ -165,7 +166,7 @@ Example:
 ```javascript
 const options = {
   autoIndex: false, // Don't build indexes
-  poolSize: 10, // Maintain up to 10 socket connections
+  maxPoolSize: 10, // Maintain up to 10 socket connections
   serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
   socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
   family: 4 // Use IPv4, skip trying IPv6
@@ -215,7 +216,7 @@ single configuration option, the URI, rather than separate options for
 `socketTimeoutMS`, `connectTimeoutMS`, etc. Best practice is to put options
 that likely differ between development and production, like `replicaSet`
 or `ssl`, in the connection string, and options that should remain constant,
-like `connectTimeoutMS` or `poolSize`, in the options object.
+like `connectTimeoutMS` or `maxPoolSize`, in the options object.
 
 The MongoDB docs have a full list of
 [supported connection string options](https://docs.mongodb.com/manual/reference/connection-string/).
@@ -434,14 +435,15 @@ module.exports = function connectionFactory() {
 
 Each `connection`, whether created with `mongoose.connect` or
 `mongoose.createConnection` are all backed by an internal configurable
-connection pool defaulting to a maximum size of 5. Adjust the pool size
+connection pool defaulting to a maximum size of 100. Adjust the pool size
 using your connection options:
 
 ```javascript
 // With object options
-mongoose.createConnection(uri, { poolSize: 4 });
+mongoose.createConnection(uri, { maxPoolSize: 10 });
 
-const uri = 'mongodb://localhost:27017/test?poolSize=4';
+// With connection string options
+const uri = 'mongodb://localhost:27017/test?maxPoolSize=10';
 mongoose.createConnection(uri);
 ```
 

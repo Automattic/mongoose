@@ -48,6 +48,7 @@ See [the MongoDB Node drivers' migration guide](https://github.com/mongodb/node-
 Below are some of the most noteworthy changes:
 
 * MongoDB Driver 4.x is written in TypeScript and has its own TypeScript type definitions. These may conflict with `@types/mongodb`, so if you have TypeScript compiler errors please make sure you upgrade to the [latest version of `@types/mongodb`](https://www.npmjs.com/package/@types/mongodb), which is an empty stub.
+* The `poolSize` option for connections has been [replaced with `minPoolSize` and `maxPoolSize`](https://github.com/mongodb/node-mongodb-native/blob/4.1/docs/CHANGES_4.0.0.md#connection-pool-options). The Mongoose 5.x `poolSize` option is equivalent to the Mongoose 6 `maxPoolSize` option. The default value of `maxPoolSize` has been increased to 100.
 * The result of `updateOne()` and `updateMany()` is now different.
 * The result of `deleteOne()` and `deleteMany()` no longer has an `n` property.
 

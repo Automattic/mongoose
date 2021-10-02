@@ -9181,6 +9181,41 @@ describe('document', function() {
     assert.ok(foo.isModified('subdoc.bar'));
   });
 
+  it('correctly tracks saved state for deeply nested objects (gh-10773) (gh-9396)', async function() {
+    const PaymentSchema = Schema({ status: String }, { _id: false });
+    const OrderSchema = new Schema({
+      status: String,
+      payments: {
+        payout: PaymentSchema
+      }
+    });
+
+    const Order = db.model('Order', OrderSchema);
+
+    const order = new Order({
+      status: 'unpaid',
+      payments: {
+        payout: {
+          status: 'unpaid'
+        }
+      }
+    });
+
+    await order.save();
+
+    const newPaymentsStatus = Object.assign({}, order.payments);
+
+    newPaymentsStatus.payout.status = 'paid';
+
+    order.payments = newPaymentsStatus;
+    assert.ok(order.isModified('payments'));
+
+    await order.save();
+
+    const fromDb = await Order.findById(order._id).lean();
+    assert.equal(fromDb.payments.payout.status, 'paid');
+  });
+
   it('marks path as errored if default function throws (gh-9408)', function() {
     const jobSchema = new Schema({
       deliveryAt: Date,

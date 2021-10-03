@@ -83,7 +83,7 @@ const schema = new Schema<User>({
 });
 ```
 
-However, Mongoose does **not ** check for paths that exist in the document interface, but not in the schema.
+However, Mongoose does **not** check for paths that exist in the document interface, but not in the schema.
 For example, the below code compiles.
 
 ```typescript

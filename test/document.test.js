@@ -9181,6 +9181,41 @@ describe('document', function() {
     assert.ok(foo.isModified('subdoc.bar'));
   });
 
+  it('correctly tracks saved state for deeply nested objects (gh-10773) (gh-9396)', async function() {
+    const PaymentSchema = Schema({ status: String }, { _id: false });
+    const OrderSchema = new Schema({
+      status: String,
+      payments: {
+        payout: PaymentSchema
+      }
+    });
+
+    const Order = db.model('Order', OrderSchema);
+
+    const order = new Order({
+      status: 'unpaid',
+      payments: {
+        payout: {
+          status: 'unpaid'
+        }
+      }
+    });
+
+    await order.save();
+
+    const newPaymentsStatus = Object.assign({}, order.payments);
+
+    newPaymentsStatus.payout.status = 'paid';
+
+    order.payments = newPaymentsStatus;
+    assert.ok(order.isModified('payments'));
+
+    await order.save();
+
+    const fromDb = await Order.findById(order._id).lean();
+    assert.equal(fromDb.payments.payout.status, 'paid');
+  });
+
   it('marks path as errored if default function throws (gh-9408)', function() {
     const jobSchema = new Schema({
       deliveryAt: Date,
@@ -10600,6 +10635,7 @@ describe('document', function() {
     assert.ok(!band.populated('embeddedMembers.member'));
     assert.ok(!band.embeddedMembers[0].member.name);
   });
+
   it('should allow dashes in the path name (gh-10677)', async function() {
     const schema = new mongoose.Schema({
       values: {
@@ -10617,5 +10653,31 @@ describe('document', function() {
     document.values.set('abc', { entries: 'a' });
     document.values.set('abc-d', { entries: 'b' });
     await document.save();
+  });
+
+  it('inits non-schema values if strict is false (gh-10828)', function() {
+    const FooSchema = new Schema({}, {
+      id: false,
+      _id: false,
+      strict: false
+    });
+    const BarSchema = new Schema({
+      name: String,
+      foo: FooSchema
+    });
+
+    const Test = db.model('Test', BarSchema);
+
+    const doc = new Test();
+    doc.init({
+      name: 'Test',
+      foo: {
+        something: 'A',
+        other: 2
+      }
+    });
+
+    assert.strictEqual(doc.foo.something, 'A');
+    assert.strictEqual(doc.foo.other, 2);
   });
 });

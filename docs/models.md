@@ -127,7 +127,7 @@ async function run() {
   const personSchema = new mongoose.Schema({
     name: String
   });
-  const Person = mongoose.model('Person', personSchema, 'Person');
+  const Person = mongoose.model('Person', personSchema);
 
   // Create a change stream. The 'change' event gets emitted when there's a
   // change in the database

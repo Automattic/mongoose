@@ -669,6 +669,31 @@ describe('QueryCursor', function() {
     assert.ok(err);
     assert.equal(err.name, 'CastError');
   });
+
+  it('reports error in pre save hook (gh-10785)', async function() {
+    const schema = new mongoose.Schema({ name: String });
+
+    schema.pre('find', async() => {
+      await new Promise(resolve => setTimeout(resolve, 10));
+      throw new Error('Oops!');
+    });
+
+    const Movie = db.model('Movie', schema);
+
+    await Movie.deleteMany({});
+    await Movie.create([
+      { name: 'Kickboxer' },
+      { name: 'Ip Man' },
+      { name: 'Enter the Dragon' }
+    ]);
+
+    const arr = [];
+    const err = await Movie.find({ name: { $lt: 'foo' } }).cursor().
+      eachAsync(doc => arr.push(doc.name)).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.message, 'Oops!');
+  });
 });
 
 

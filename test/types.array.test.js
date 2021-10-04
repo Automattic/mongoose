@@ -2141,4 +2141,14 @@ describe('types array', function() {
       assert.ok(!arr.isMongooseArray);
     });
   });
+
+  it('does not mutate passed-in array (gh-10766)', function() {
+    const Test = db.model('Test', new Schema({ arr: [String] }));
+
+    const arr = [42];
+    const doc = new Test({ arr });
+
+    assert.strictEqual(doc.arr[0], '42');
+    assert.strictEqual(arr[0], 42);
+  });
 });

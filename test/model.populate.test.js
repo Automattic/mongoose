@@ -10427,4 +10427,24 @@ describe('model: populate:', function() {
     assert.strictEqual(result.list[0].attached, void 0);
     assert.equal(result.list[1].attached[0].test, 'test');
   });
+
+  it('supports ref: Model with virtual populate (gh-10695)', async function() {
+    const userSchema = Schema({ _id: Number, email: String });
+    const blogPostSchema = Schema({ title: String, authorId: Number });
+
+    const User = db.model('User', userSchema);
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+    blogPostSchema.virtual('author', {
+      ref: User,
+      localField: 'authorId',
+      foreignField: '_id',
+      justOne: true
+    });
+
+    await BlogPost.create({ title: 'Introduction to Mongoose', authorId: 1 });
+    await User.create({ _id: 1, email: 'test@gmail.com' });
+
+    const doc = await BlogPost.findOne().populate('author');
+    assert.equal(doc.author.email, 'test@gmail.com');
+  });
 });

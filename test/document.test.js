@@ -10635,6 +10635,7 @@ describe('document', function() {
     assert.ok(!band.populated('embeddedMembers.member'));
     assert.ok(!band.embeddedMembers[0].member.name);
   });
+
   it('should allow dashes in the path name (gh-10677)', async function() {
     const schema = new mongoose.Schema({
       values: {
@@ -10652,5 +10653,31 @@ describe('document', function() {
     document.values.set('abc', { entries: 'a' });
     document.values.set('abc-d', { entries: 'b' });
     await document.save();
+  });
+
+  it('inits non-schema values if strict is false (gh-10828)', function() {
+    const FooSchema = new Schema({}, {
+      id: false,
+      _id: false,
+      strict: false
+    });
+    const BarSchema = new Schema({
+      name: String,
+      foo: FooSchema
+    });
+
+    const Test = db.model('Test', BarSchema);
+
+    const doc = new Test();
+    doc.init({
+      name: 'Test',
+      foo: {
+        something: 'A',
+        other: 2
+      }
+    });
+
+    assert.strictEqual(doc.foo.something, 'A');
+    assert.strictEqual(doc.foo.other, 2);
   });
 });

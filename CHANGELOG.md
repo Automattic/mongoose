@@ -1,3 +1,24 @@
+6.0.9 / 2021-10-04
+==================
+ * fix(document): init non-schema values if strict is set to false #10828
+ * fix(document): correctly track saved state for deeply nested objects #10773
+ * fix(array): avoid mutating arrays passed into Model() constructor #10766
+ * fix(cursor): allow using find().cursor() before connecting, report errors in pre('find') hooks when using `.cursor()` #10785
+ * fix(populate): support ref: Model with virtual populate #10695
+ * fix(schema): support type: { subpath: String } in document array definitions and improve schema `interpretAsType` error messages if type name is undefined #10750
+ * fix: upgrade to mongodb driver 4.1.2 #10810 [orgads](https://github.com/orgads)
+ * fix(subdocument): add extra precaution to throw an error if a subdocument is a parent of itself in `ownerDocument()` #9259
+ * perf(index.d.ts): make `model()` call more strict to improve VS Code autocomplete perf #10801 [traverse1984](https://github.com/traverse1984)
+ * fix(index.d.ts): allow calling depopulate with 0 args #10793
+ * fix(index.d.ts): Add type definitions for allowDiskUse #10791 [coyotte508](https://github.com/coyotte508)
+ * docs(populate): expand virtual populate docs with info on principle of least cardinality and other info #10558
+ * docs: add migration guide to side bar #10769
+ * docs(connections+api): clarify that maxPoolSize is now 100 by default #10809
+ * docs(schema): add Schema#virtuals to docs as a public property #10829
+ * docs: remove array indexes section from FAQ #10784 [Duchynko](https://github.com/Duchynko)
+ * docs(model): fix broken example #10831 [Okekeprince1](https://github.com/Okekeprince1)
+ * docs: fix markdown issue with schemas.md #10839 [aseerkt](https://github.com/aseerkt)
+
 6.0.8 / 2021-09-27
 ==================
  * fix: support $set on elements of map of subdocuments #10720

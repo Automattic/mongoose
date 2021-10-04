@@ -100,7 +100,7 @@ declare module 'mongoose' {
    */
   export function isValidObjectId(v: any): boolean;
 
-  export function model<T>(name: string, schema?: Schema<any>, collection?: string, skipInit?: boolean): Model<T>;
+  export function model<T>(name: string, schema?: Schema<T> | Schema<T & Document>, collection?: string, skipInit?: boolean): Model<T>;
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
     schema?: Schema<T, U, TQueryHelpers>,

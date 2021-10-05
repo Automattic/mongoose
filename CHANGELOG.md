@@ -1,3 +1,8 @@
+5.13.10 / 2021-10-05
+====================
+ * fix(index.d.ts): allow using type: SchemaDefinitionProperty in schema definitions #10674
+ * fix(index.d.ts): allow AnyObject as param to findOneAndReplace() #10714
+
 6.0.9 / 2021-10-04
 ==================
  * fix(document): init non-schema values if strict is set to false #10828

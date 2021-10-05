@@ -1540,6 +1540,7 @@ declare module 'mongoose' {
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
+      T extends Schema<any, any> ? T :
       T extends object[] ? (AnyArray<Schema<any>> | AnyArray<SchemaDefinition<Unpacked<T>>>) :
       T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> | AnyArray<SchemaTypeOptions<string>> :
       T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> | AnyArray<SchemaTypeOptions<number>> :

@@ -6,3 +6,11 @@ Object.values(mongoose.models).forEach(model => {
 });
 
 mongoose.pluralize(null);
+
+function gh10746() {
+  type A = string extends Function ? never : string;
+
+  let testVar: A;
+  testVar = 'A string';
+  testVar = 'B string';
+}

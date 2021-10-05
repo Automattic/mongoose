@@ -1,3 +1,8 @@
+5.13.10 / 2021-10-05
+====================
+ * fix(index.d.ts): allow using type: SchemaDefinitionProperty in schema definitions #10674
+ * fix(index.d.ts): allow AnyObject as param to findOneAndReplace() #10714
+
 5.13.9 / 2021-09-06
 ===================
  * fix(populate): avoid setting empty array on lean document when populate result is undefined #10599

@@ -863,8 +863,8 @@ declare module 'mongoose' {
     insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
     insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options?: InsertManyOptions): Promise<Array<EnforceDocument<T, TMethods, TVirtuals>>>;
     insertMany(doc: T | DocumentDefinition<T> | AnyObject, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
-    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions): Promise<EnforceDocument<T, TMethods, TVirtuals>>;
-    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<EnforceDocument<T, TMethods, TVirtuals> | InsertManyResult>): void;
+    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions): Promise<EnforceDocument<T, TMethods, TVirtuals>[]>;
+    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<EnforceDocument<T, TMethods, TVirtuals>[] | InsertManyResult>): void;
     insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options?: InsertManyOptions, callback?: Callback<Array<EnforceDocument<T, TMethods, TVirtuals>> | InsertManyResult>): void;
 
     /**

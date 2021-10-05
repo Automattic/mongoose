@@ -35,7 +35,7 @@ A query also has a `.then()` function, and thus can be used as a promise.
   <li><a href="#versus-aggregation">Versus Aggregation</a></li>
 </ul>
 
-### [Executing](#executing)
+### Executing
 
 When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://docs.mongodb.org/manual/tutorial/query-documents/).
 

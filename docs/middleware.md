@@ -19,7 +19,7 @@ on the schema level and is useful for writing [plugins](./plugins.html).
   <li><a href="#synchronous">Synchronous Hooks</a></li>
 </ul>
 
-### [Types of Middleware](#types-of-middleware)
+### Types of Middleware
 
 Mongoose has 4 types
 of middleware: document middleware, model middleware, aggregate middleware, and query middleware.

@@ -24,7 +24,7 @@ const schema = new Schema<User>({
 By default, Mongoose does **not** check if your document interface lines up with your schema.
 For example, the above code won't throw an error if `email` is optional in the document interface, but `required` in `schema`.
 
-## [Generic parameters](#generic-parameters)
+## Generic parameters
 
 The Mongoose `Schema` class in TypeScript has 3 [generic parameters](https://www.typescriptlang.org/docs/handbook/2/generics.html):
 

@@ -1221,7 +1221,7 @@ console.log(schema.virtuals); // { myVirtual: VirtualType { ... } }
 Schemas are also [pluggable](./plugins.html) which allows us to package up reusable features into
 plugins that can be shared with the community or just between your projects.
 
-<h3 id="further-reading">Further Reading</h3>
+<h3 id="further-reading"><a href="further-reading">Further Reading</a></h3>
 
 Here's an [alternative introduction to Mongoose schemas](https://masteringjs.io/tutorials/mongoose/schema).
 

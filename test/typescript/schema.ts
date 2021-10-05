@@ -218,3 +218,47 @@ function gh10731() {
     }
   });
 }
+
+function gh10789() {
+  interface IAddress {
+    city: string;
+    state: string;
+    country: string;
+  }
+
+  interface IUser {
+    name: string;
+    addresses: IAddress[];
+  }
+
+  const addressSchema = new Schema<IAddress>({
+    city: {
+      type: String,
+      required: true
+    },
+    state: {
+      type: String,
+      required: true
+    },
+    country: {
+      type: String,
+      required: true
+    }
+  });
+
+  const userSchema = new Schema<IUser>({
+    name: {
+      type: String,
+      required: true
+    },
+    addresses: {
+      type: [
+        {
+          type: addressSchema,
+          required: true
+        }
+      ],
+      required: true
+    }
+  });
+}

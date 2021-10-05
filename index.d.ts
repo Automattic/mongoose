@@ -730,7 +730,7 @@ declare module 'mongoose' {
 
   export const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethods = {}, TVirtuals = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
-    new(doc?: AnyKeys<T> & AnyObject): EnforceDocument<T, TMethods, TVirtuals>;
+    new(doc?: AnyKeys<T> & AnyObject, fields?: any | null, options?: boolean | AnyObject): EnforceDocument<T, TMethods, TVirtuals>;
 
     aggregate<R = any>(pipeline?: any[], options?: Record<string, unknown>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: any[], cb: Function): Promise<Array<R>>;

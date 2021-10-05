@@ -1589,13 +1589,15 @@ declare module 'mongoose' {
     currentTime?: () => (NativeDate | number);
   }
 
+  type AnyArray<T> = T[] | ReadonlyArray<T>;
+
   type Unpacked<T> = T extends (infer U)[] ? U : T;
 
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends Schema<any, any> ? T :
-      T extends object[] ? (Schema<Unpacked<T>>[] | ReadonlyArray<Schema<Unpacked<T>>> | Schema<Document & Unpacked<T>>[] | ReadonlyArray<Schema<Document & Unpacked<T>>>) :
+      T extends object[] ? (AnyArray<Schema<Unpacked<T>>> | AnyArray<Schema<Document & Unpacked<T>>> | AnyArray<SchemaDefinition<Unpacked<T>>>) :
       T extends string[] ? (SchemaDefinitionWithBuiltInClass<string>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<string>>) :
       T extends number[] ? (SchemaDefinitionWithBuiltInClass<number>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<number>>) :
       T extends boolean[] ? (SchemaDefinitionWithBuiltInClass<boolean>[] | ReadonlyArray<SchemaDefinitionWithBuiltInClass<boolean>>) :

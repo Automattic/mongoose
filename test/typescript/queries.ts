@@ -1,4 +1,4 @@
-import { Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc } from 'mongoose';
+import { Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc, FilterQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
 interface QueryHelpers {
@@ -144,4 +144,20 @@ async function gh10617(): Promise<void> {
 
   const DBModel: Model<IDBModel> = model<IDBModel>('Meep', schema);
   await DBModel.findOne({});
+}
+
+function gh10757() {
+  enum MyEnum {
+    VALUE1,
+    VALUE2,
+    VALUE3
+  }
+
+  interface MyClass {
+    status: MyEnum;
+  }
+
+  type MyClassDocument = MyClass & Document;
+
+  const test: FilterQuery<MyClass> = { status: { $in: [MyEnum.VALUE1, MyEnum.VALUE2] } };
 }

@@ -2470,11 +2470,11 @@ declare module 'mongoose' {
     $eq?: T;
     $gt?: T;
     $gte?: T;
-    $in?: T extends AnyArray<any> ? Unpacked<T>[] : T[];
+    $in?: T[];
     $lt?: T;
     $lte?: T;
     $ne?: T;
-    $nin?: T extends AnyArray<any> ? Unpacked<T>[] : T[];
+    $nin?: T[];
     // Logical
     $not?: T extends string ? QuerySelector<T> | RegExp : QuerySelector<T>;
     // Element
@@ -2568,8 +2568,6 @@ declare module 'mongoose' {
     $position?: number;
     $sort?: SortValues | Record<string, SortValues>;
   };
-
-  type ObjectQuerySelector<T> = T extends object ? { [key in keyof T]?: QuerySelector<T[key]> } : QuerySelector<T>;
 
   type OnlyFieldsOfType<TSchema, FieldType = any, AssignableType = FieldType> = {
     [key in keyof TSchema]?: [Extract<TSchema[key], FieldType>] extends [never] ? never : AssignableType;

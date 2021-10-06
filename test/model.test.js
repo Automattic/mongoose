@@ -7570,8 +7570,6 @@ describe('Model', function() {
     assert.ok(!test.name);
 
   });
-
-  
 });
 
 

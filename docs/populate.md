@@ -330,7 +330,7 @@ We may find however, if we use the `author` object, we are unable to get a
 list of the stories. This is because no `story` objects were ever 'pushed'
 onto `author.stories`.
 
-There are two perspectives here. First, you may want the `author` know
+There are two perspectives here. First, you may want the `author` to know
 which stories are theirs. Usually, your schema should resolve
 one-to-many relationships by having a parent pointer in the 'many' side.
 But, if you have a good reason to want an array of child pointers, you

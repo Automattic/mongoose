@@ -1065,6 +1065,11 @@ declare module 'mongoose' {
     sort?: any;
     /** overwrites the schema's strict mode option */
     strict?: boolean | string;
+    /**
+     * equal to `strict` by default, may be `false`, `true`, or `'throw'`. Sets the default
+     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
+     */
+    strictQuery?: boolean | 'throw';
     tailable?: number;
     /**
      * If set to `false` and schema-level timestamps are enabled,
@@ -1472,6 +1477,11 @@ declare module 'mongoose' {
      * specified in our schema do not get saved to the db.
      */
     strict?: boolean | 'throw';
+    /**
+     * equal to `strict` by default, may be `false`, `true`, or `'throw'`. Sets the default
+     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
+     */
+    strictQuery?: boolean | 'throw';
     /** Exactly the same as the toObject option but only applies when the document's toJSON method is called. */
     toJSON?: ToObjectOptions;
     /**

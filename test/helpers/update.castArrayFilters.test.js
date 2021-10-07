@@ -176,7 +176,7 @@ describe('castArrayFilters', function() {
       castArrayFilters(q);
     }, /Could not find path.*in schema/);
 
-    q.schema.options.strict = false;
+    q.schema.options.strictQuery = false;
     castArrayFilters(q);
     assert.strictEqual(q.options.arrayFilters[0]['arr.notInSchema'], '42');
   });

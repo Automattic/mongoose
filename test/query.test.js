@@ -3205,14 +3205,13 @@ describe('Query', function() {
     });
   });
 
-  it('strictQuery option (gh-4136) (gh-7178)', function() {
+  it('strictQuery option (gh-4136) (gh-7178)', async function() {
     const modelSchema = new Schema({
       field: Number,
       nested: { path: String }
     }, { strictQuery: 'throw' });
 
     const Model = db.model('Test', modelSchema);
-
 
     // `find()` on a top-level path not in the schema
     let err = await Model.find({ notInschema: 1 }).then(() => null, e => e);
@@ -3226,6 +3225,20 @@ describe('Query', function() {
 
     // `find()` on a nested path not in the schema
     err = await Model.find({ 'nested.bad': 'foo' }).then(() => null, e => e);
+    assert.ok(err);
+    assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
+  });
+
+  it('strictQuery inherits from strict (gh-10763) (gh-4136) (gh-7178)', async function() {
+    const modelSchema = new Schema({
+      field: Number,
+      nested: { path: String }
+    }, { strict: 'throw' });
+
+    const Model = db.model('Test', modelSchema);
+
+    // `find()` on a top-level path not in the schema
+    const err = await Model.find({ notInschema: 1 }).then(() => null, e => e);
     assert.ok(err);
     assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
   });

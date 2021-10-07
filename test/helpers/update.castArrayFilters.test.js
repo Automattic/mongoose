@@ -150,7 +150,7 @@ describe('castArrayFilters', function() {
     assert.strictEqual(q.options.arrayFilters[1]['nArr.nestedId'], 2);
   });
 
-  it('respects `strict` option (gh-7728)', function() {
+  it('respects `strictQuery` option (gh-7728)', function() {
     const schema = new Schema({
       arr: [{
         id: Number
@@ -167,7 +167,11 @@ describe('castArrayFilters', function() {
     };
 
     q.updateOne({}, p, opts);
-    q.schema.options.strict = true;
+
+    castArrayFilters(q);
+    assert.strictEqual(q.options.arrayFilters[0]['arr.notInSchema'], '42');
+
+    q.schema.options.strictQuery = true;
     assert.throws(function() {
       castArrayFilters(q);
     }, /Could not find path.*in schema/);

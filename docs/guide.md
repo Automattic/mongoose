@@ -786,7 +786,7 @@ const mySchema = new Schema({ field: Number }, {
   strictQuery: false // Turn off strict mode for query filters
 });
 const MyModel = mongoose.model('Test', mySchema);
-// Mongoose will strip out `notInSchema: 1` because `strictQuery` is `true`
+// Mongoose will strip out `notInSchema: 1` because `strictQuery` is false
 MyModel.find({ notInSchema: 1 });
 ```
 

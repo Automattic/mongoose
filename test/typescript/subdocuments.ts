@@ -1,4 +1,4 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Model, Document, Types } from 'mongoose';
 
 const childSchema: Schema = new Schema({ name: String });
 
@@ -44,4 +44,31 @@ async function gh10597(): Promise<void> {
 
   const doc = await GameModel.findOne().orFail();
   await doc.update({ events: [{ description: 'test' }] });
+}
+
+function gh10674() {
+  type Foo = {
+    bar: string
+    schedule: {
+      date: string;
+      hours: number;
+    }[];
+  };
+
+  type FooModel = Model<Foo>;
+
+  const FooSchema = new Schema<Foo, FooModel, Foo>(
+    {
+      bar: { type: String },
+      schedule: {
+        type: [
+          {
+            date: { type: String, required: true },
+            hours: { type: Number, required: true }
+          }
+        ],
+        required: true
+      }
+    }
+  );
 }

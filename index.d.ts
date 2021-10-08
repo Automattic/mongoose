@@ -74,8 +74,15 @@ declare module 'mongoose' {
   /** An array containing all connections associated with this Mongoose instance. */
   export const connections: Connection[];
 
+  /**
+   * Can be extended to explicitly type specific models.
+   */
+  interface Models {
+    [modelName: string]: Model<any>
+  }
+
   /** An array containing all models associated with this Mongoose instance. */
-  export const models: { [index: string]: Model<any> };
+  export const models: Models;
   /** Creates a Connection instance. */
   export function createConnection(uri: string, options?: ConnectOptions): Connection;
   export function createConnection(): Connection;
@@ -730,7 +737,7 @@ declare module 'mongoose' {
 
   export const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethods = {}, TVirtuals = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
-    new(doc?: AnyKeys<T> & AnyObject): EnforceDocument<T, TMethods, TVirtuals>;
+    new(doc?: AnyKeys<T> & AnyObject, fields?: any | null, options?: boolean | AnyObject): EnforceDocument<T, TMethods, TVirtuals>;
 
     aggregate<R = any>(pipeline?: any[], options?: Record<string, unknown>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: any[], cb: Function): Promise<Array<R>>;
@@ -863,8 +870,8 @@ declare module 'mongoose' {
     insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
     insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options?: InsertManyOptions): Promise<Array<EnforceDocument<T, TMethods, TVirtuals>>>;
     insertMany(doc: T | DocumentDefinition<T> | AnyObject, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
-    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions): Promise<EnforceDocument<T, TMethods, TVirtuals>>;
-    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<EnforceDocument<T, TMethods, TVirtuals> | InsertManyResult>): void;
+    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions): Promise<EnforceDocument<T, TMethods, TVirtuals>[]>;
+    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<EnforceDocument<T, TMethods, TVirtuals>[] | InsertManyResult>): void;
     insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options?: InsertManyOptions, callback?: Callback<Array<EnforceDocument<T, TMethods, TVirtuals>> | InsertManyResult>): void;
 
     /**
@@ -951,10 +958,10 @@ declare module 'mongoose' {
     findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals> | null, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: T, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, callback: (err: CallbackError, doc: T | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<mongodb.ModifyResult<EnforceDocument<T, TMethods, TVirtuals>>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals>, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals> | null, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, callback: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals> | null, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals> | null, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
@@ -963,13 +970,13 @@ declare module 'mongoose' {
     findOneAndRemove(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals> | null, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
-    findOneAndReplace(filter: FilterQuery<T>, replacement: DocumentDefinition<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals>, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals> | null, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOneAndReplace(filter: FilterQuery<T>, replacement: DocumentDefinition<T> | AnyObject, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals>, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T> | AnyObject, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals> | null, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: T, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<mongodb.ModifyResult<EnforceDocument<T, TMethods, TVirtuals>>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals>, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals> | null, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: Callback<Array<EnforceDocument<T, TMethods, TVirtuals>>>): QueryWithHelpers<Array<EnforceDocument<T, TMethods, TVirtuals>>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
@@ -1065,6 +1072,11 @@ declare module 'mongoose' {
     sort?: any;
     /** overwrites the schema's strict mode option */
     strict?: boolean | string;
+    /**
+     * equal to `strict` by default, may be `false`, `true`, or `'throw'`. Sets the default
+     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
+     */
+    strictQuery?: boolean | 'throw';
     tailable?: number;
     /**
      * If set to `false` and schema-level timestamps are enabled,
@@ -1472,6 +1484,11 @@ declare module 'mongoose' {
      * specified in our schema do not get saved to the db.
      */
     strict?: boolean | 'throw';
+    /**
+     * equal to `strict` by default, may be `false`, `true`, or `'throw'`. Sets the default
+     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
+     */
+    strictQuery?: boolean | 'throw';
     /** Exactly the same as the toObject option but only applies when the document's toJSON method is called. */
     toJSON?: ToObjectOptions;
     /**
@@ -1540,7 +1557,8 @@ declare module 'mongoose' {
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends object[] ? (AnyArray<Schema<any>> | AnyArray<SchemaDefinition<Unpacked<T>>>) :
+      T extends Schema<any, any> ? T :
+      T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>>> | AnyArray<SchemaTypeOptions<Unpacked<T>>>) :
       T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> | AnyArray<SchemaTypeOptions<string>> :
       T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> | AnyArray<SchemaTypeOptions<number>> :
       T extends boolean[] ? AnyArray<SchemaDefinitionWithBuiltInClass<boolean>> | AnyArray<SchemaTypeOptions<boolean>> :
@@ -2189,9 +2207,9 @@ declare module 'mongoose' {
     findOneAndRemove(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
-    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: DocType, res: any) => void): QueryWithHelpers<DocType, DocType, THelpers, RawDocType>;
-    findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
+    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: DocType | null, res: mongodb.ModifyResult<DocType>) => void): QueryWithHelpers<mongodb.ModifyResult<DocType>, DocType, THelpers, RawDocType>;
+    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: DocType, res: mongodb.ModifyResult<DocType>) => void): QueryWithHelpers<DocType, DocType, THelpers, RawDocType>;
+    findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: DocType | null, res: mongodb.ModifyResult<DocType>) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: CallbackError, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
@@ -2200,7 +2218,7 @@ declare module 'mongoose' {
     findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res?: any) => void): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
     findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: DocType, res?: any) => void): QueryWithHelpers<DocType, DocType, THelpers, RawDocType>;
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (CallbackError: any, doc: DocType | null, res?: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, callback: (CallbackError: any, doc: DocType, res?: any) => void): QueryWithHelpers<DocType, DocType, THelpers, RawDocType>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, callback: (CallbackError: any, doc: DocType | null, res?: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
     /** Specifies a `$geometry` condition */
     geometry(object: { type: string, coordinates: any[] }): this;
@@ -2469,11 +2487,11 @@ declare module 'mongoose' {
     $eq?: T;
     $gt?: T;
     $gte?: T;
-    $in?: T extends AnyArray<any> ? Unpacked<T>[] : T[];
+    $in?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
     $lt?: T;
     $lte?: T;
     $ne?: T;
-    $nin?: T extends AnyArray<any> ? Unpacked<T>[] : T[];
+    $nin?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
     // Logical
     $not?: T extends string ? QuerySelector<T> | RegExp : QuerySelector<T>;
     // Element
@@ -2567,8 +2585,6 @@ declare module 'mongoose' {
     $position?: number;
     $sort?: SortValues | Record<string, SortValues>;
   };
-
-  type ObjectQuerySelector<T> = T extends object ? { [key in keyof T]?: QuerySelector<T[key]> } : QuerySelector<T>;
 
   type OnlyFieldsOfType<TSchema, FieldType = any, AssignableType = FieldType> = {
     [key in keyof TSchema]?: [Extract<TSchema[key], FieldType>] extends [never] ? never : AssignableType;

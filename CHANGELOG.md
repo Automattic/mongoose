@@ -1,3 +1,28 @@
+6.0.10 / 2021-10-08
+===================
+ * fix(query): add back strictQuery option to avoid empty filter issues, tie it to `strict` by default for compatibility #10781 #10763
+ * fix(model): avoid unnecessarily dropping text indexes in `syncIndexes()` #10851 #10850 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(query): avoid trying to call toArray() on cursor if find() error occurred #10845
+ * fix: accepts uppercase values in mongoose.isValidObjectId #10846 [foxadb](https://github.com/foxadb)
+ * perf(document): further reduce unnecessary objects and keys to minimize document memory overhead #10400
+ * fix(index.d.ts): restore unpacked type and avoid distributive conditional types #10859 [dbellavista](https://github.com/dbellavista)
+ * fix(index.d.ts): add correct null typings for `findOneAndUpdate()` and `findByIdAndUpdate()` #10820
+ * fix(index.d.ts): make insertMany() correctly return Promise<Array> if passing single document to `insertMany()` #10802
+ * fix(index.d.ts): avoid weird issue where TypeScript 4.3.x and 4.4.x makes string extend Function #10746
+ * fix(index.d.ts): allow type: `SchemaTypeOptions[]` when defining schema #10789
+ * fix(index.d.ts): allow using `$in` with enum fields #10757 #10734
+ * fix(index.d.ts): add missing fields and options params to Model constructor #10817
+ * fix(index.d.ts): support extending type for mongoose.models #10806 [MunifTanjim](https://github.com/MunifTanjim)
+ * docs: enhance docs section linking #10779 [saveman71](https://github.com/saveman71)
+ * docs(middleware): add missing query middleware #10721
+ * docs: fix typo #10853 [mdatif796](https://github.com/mdatif796)
+ * docs: add missing to #10848 [digidub](https://github.com/digidub)
+
+5.13.10 / 2021-10-05
+====================
+ * fix(index.d.ts): allow using type: SchemaDefinitionProperty in schema definitions #10674
+ * fix(index.d.ts): allow AnyObject as param to findOneAndReplace() #10714
+
 6.0.9 / 2021-10-04
 ==================
  * fix(document): init non-schema values if strict is set to false #10828

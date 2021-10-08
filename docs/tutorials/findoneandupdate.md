@@ -7,7 +7,7 @@ The [`findOneAndUpdate()` function in Mongoose](/docs/api.html#query_Query-findO
 * [Upsert](#upsert)
 * [The `rawResult` Option](#raw-result)
 
-<h2 id="getting-started">Getting Started</h2>
+## Getting Started
 
 As the name implies, `findOneAndUpdate()` finds the first document that matches a given `filter`, applies an `update`, and returns the document. By default, `findOneAndUpdate()` returns the document as it was **before** `update` was applied.
 
@@ -32,7 +32,7 @@ which has the same option.
 [require:Tutorial.*findOneAndUpdate.*returnOriginal option]
 ```
 
-<h2 id="atomic-updates">Atomic Updates</h2>
+## Atomic Updates
 
 With the exception of an [unindexed upsert](https://docs.mongodb.com/manual/reference/method/db.collection.findAndModify/#upsert-with-unique-index), [`findOneAndUpdate()` is atomic](https://docs.mongodb.com/manual/core/write-operations-atomicity/#atomicity). That means you can assume the document doesn't change between when MongoDB finds the document and when it updates the document, _unless_ you're doing an [upsert](#upsert).
 
@@ -42,7 +42,7 @@ For example, if you're using `save()` to update a document, the document can cha
 [require:Tutorial.*findOneAndUpdate.*save race condition]
 ```
 
-<h2 id="upsert">Upsert</h2>
+## Upsert
 
 Using the `upsert` option, you can use `findOneAndUpdate()` as a find-and-[upsert](https://docs.mongodb.com/manual/reference/method/db.collection.update/#db.collection.update) operation. An upsert behaves like a normal `findOneAndUpdate()` if it finds a document that matches `filter`. But, if no document matches `filter`, MongoDB will insert one by combining `filter` and `update` as shown below.
 

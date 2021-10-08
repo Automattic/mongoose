@@ -6231,6 +6231,19 @@ describe('Model', function() {
       assert.strictEqual(indexes[1].background, false);
     });
 
+    it('should not drop a text index on .syncIndexes() call (gh-10850)', async function() {
+      const collation = { collation: { locale: 'simple' } };
+      const someSchema = new Schema({
+        title: String,
+        author: String
+      });
+      someSchema.index({ title: 1, author: 'text' }, collation);
+      const M = db.model('Some', someSchema);
+      await M.init();
+      await M.syncIndexes();
+      assert(await M.syncIndexes(), []);
+    });
+
     it('using `new db.model()()` (gh-6698)', function(done) {
       db.model('Test', new Schema({
         name: String

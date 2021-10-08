@@ -16,11 +16,22 @@ require('acquit-ignore')();
 
 const markdown = require('marked');
 const highlight = require('highlight.js');
+const renderer = {
+  heading: function(text, level, raw, slugger) {
+    const slug = slugger.slug(raw);
+    return `<h${level} id="${slug}">
+      <a href="#${slug}">
+        ${text}
+      </a>
+    </h${level}>\n`;
+  }
+};
 markdown.setOptions({
   highlight: function(code) {
     return highlight.highlight('JavaScript', code).value;
   }
 });
+markdown.use({ renderer });
 
 const tests = [
   ...acquit.parse(fs.readFileSync('./test/geojson.test.js').toString()),

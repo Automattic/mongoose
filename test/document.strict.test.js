@@ -451,6 +451,7 @@ describe('document: strict mode:', function() {
     });
 
     nestedSchema.options.strict = 'throw';
+    nestedSchema.options.strictQuery = 'throw';
 
     const schema = new mongoose.Schema({
       nested: {

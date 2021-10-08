@@ -74,8 +74,15 @@ declare module 'mongoose' {
   /** An array containing all connections associated with this Mongoose instance. */
   export const connections: Connection[];
 
+  /**
+   * Can be extended to explicitly type specific models.
+   */
+  interface Models {
+    [modelName: string]: Model<any>
+  }
+
   /** An array containing all models associated with this Mongoose instance. */
-  export const models: { [index: string]: Model<any> };
+  export const models: Models;
   /** Creates a Connection instance. */
   export function createConnection(uri: string, options?: ConnectOptions): Connection;
   export function createConnection(): Connection;

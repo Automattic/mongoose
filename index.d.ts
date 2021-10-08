@@ -2487,11 +2487,11 @@ declare module 'mongoose' {
     $eq?: T;
     $gt?: T;
     $gte?: T;
-    $in?: T[];
+    $in?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
     $lt?: T;
     $lte?: T;
     $ne?: T;
-    $nin?: T[];
+    $nin?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
     // Logical
     $not?: T extends string ? QuerySelector<T> | RegExp : QuerySelector<T>;
     // Element

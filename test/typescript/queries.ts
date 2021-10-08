@@ -161,3 +161,12 @@ function gh10757() {
 
   const test: FilterQuery<MyClass> = { status: { $in: [MyEnum.VALUE1, MyEnum.VALUE2] } };
 }
+
+function gh10857() {
+  type MyUnion = 'VALUE1'|'VALUE2';
+  interface MyClass {
+    status: MyUnion;
+  }
+  type MyClassDocument = MyClass & Document;
+  const test: FilterQuery<MyClass> = { status: { $in: ['VALUE1', 'VALUE2'] } };
+}

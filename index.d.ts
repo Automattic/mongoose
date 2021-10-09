@@ -2948,6 +2948,9 @@ declare module 'mongoose' {
     /** String representation of what type this is, like 'ObjectID' or 'Number' */
     instance: string;
 
+    /** The caster instance associated with this schematype (for embedded). */
+    caster?: SchemaType;
+
     /** The options this SchemaType was instantiated with */
     options: AnyObject;
 

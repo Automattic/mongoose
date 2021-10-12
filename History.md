@@ -1,3 +1,8 @@
+5.13.11 / 2021-10-12
+====================
+ * fix: upgrade mongodb -> 3.7.2 #10871 [winstonralph](https://github.com/winstonralph)
+ * fix(connection): call setMaxListeners(0) on MongoClient to avoid event emitter memory leak warnings with `useDb()` #10732
+
 5.13.10 / 2021-10-05
 ====================
  * fix(index.d.ts): allow using type: SchemaDefinitionProperty in schema definitions #10674

@@ -1,4 +1,4 @@
-import { Schema, Document, SchemaDefinition, Model, DocumentDefinition } from 'mongoose';
+import { Schema, Document, SchemaDefinition, Model } from 'mongoose';
 
 enum Genre {
   Action,
@@ -121,7 +121,7 @@ function gh10261() {
   }
 
   const type: ReadonlyArray<typeof String> = [String];
-  const colorEntitySchemaDefinition: SchemaDefinition<DocumentDefinition<ValuesEntity>> = {
+  const colorEntitySchemaDefinition: SchemaDefinition<ValuesEntity> = {
     values: {
       type: type,
       required: true

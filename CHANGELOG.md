@@ -1,3 +1,8 @@
+5.13.11 / 2021-10-12
+====================
+ * fix: upgrade mongodb -> 3.7.2 #10871 [winstonralph](https://github.com/winstonralph)
+ * fix(connection): call setMaxListeners(0) on MongoClient to avoid event emitter memory leak warnings with `useDb()` #10732
+
 6.0.10 / 2021-10-08
 ===================
  * fix(query): add back strictQuery option to avoid empty filter issues, tie it to `strict` by default for compatibility #10781 #10763

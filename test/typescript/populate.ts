@@ -83,3 +83,12 @@ async function documentDepopulate() {
   story.depopulate(['author']);
   story.depopulate();
 }
+
+async function testPathsParam() {
+  const story = await Story.findOne().populate<{ author: IPerson }>('author').orFail();
+
+  if (story.author.name === undefined) {
+    return;
+  }
+  const name: string = story.author.name;
+}

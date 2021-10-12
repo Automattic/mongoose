@@ -2550,11 +2550,11 @@ declare module 'mongoose' {
   };
 
   type DotAndArrayNotation<AssignableType> = {
-    readonly [key: string]: AssignableType;
+    [key: string]: AssignableType;
   };
 
   type ReadonlyPartial<TSchema> = {
-    readonly [key in keyof TSchema]?: TSchema[key];
+    [key in keyof TSchema]?: TSchema[key];
   };
 
   type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & DotAndArrayNotation<any>;

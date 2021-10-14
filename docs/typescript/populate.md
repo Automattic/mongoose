@@ -1,13 +1,13 @@
 # Populate with TypeScript
 
-[Mongoose's TypeScript bindings](https://thecodebarbarian.com/working-with-mongoose-in-typescript.html) export a `PopulatedDoc` type that helps you define populated documents in your TypeScript definitions:
+[Mongoose's TypeScript bindings](https://thecodebarbarian.com/working-with-mongoose-in-typescript.html) add a generic parameter `Paths` to the `populate()`:
 
 ```typescript
-import { Schema, model, Document, PopulatedDoc } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
 
-// `child` is either an ObjectId or a populated document
+// `Parent` represents the object as it is stored in MongoDB
 interface Parent {
-  child?: PopulatedDoc<Child & Document>,
+  child?: Types.ObjectId,
   name?: string
 }
 const ParentModel = model<Parent>('Parent', new Schema({
@@ -16,35 +16,44 @@ const ParentModel = model<Parent>('Parent', new Schema({
 }));
 
 interface Child {
-  name?: string;
+  name: string;
 }
 const childSchema: Schema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
-ParentModel.findOne({}).populate('child').orFail().then((doc: Parent) => {
+// Populate with `Paths` generic `{ child: Child }` to override `child` path
+ParentModel.findOne({}).populate<{ child: Child }>('child').orFail().then(doc => {
   // Works
-  doc.child.name.trim();
+  const t: string = doc.child.name;
 });
 ```
 
-Below is a simplified implementation of the `PopulatedDoc` type. It takes 2 generic parameters: the populated document type `PopulatedType`, and the unpopulated type `RawId`.
-`RawId` defaults to an ObjectId.
+An alternative approach is to define a `PopulatedParent` interface and use `Pick<>` to pull the properties you're populating.
 
-```typescript
-type PopulatedDoc<PopulatedType, RawId = Types.ObjectId> = PopulatedType | RawId;
-```
+```ts
+import { Schema, model, Document, Types } from 'mongoose';
 
-You as the developer are responsible for enforcing strong typing between populated and non-populated docs.
-Below is an example.
-
-```typescript
-ParentModel.findOne({}).populate('child').orFail().then((doc: Parent) => {
-  // `doc` doesn't have type information that `child` is populated
-  useChildDoc(doc.child);
-});
-
-// You can use a function signature to make type checking more strict.
-function useChildDoc(child: Child): void {
-  console.log(child.name.trim());
+// `Parent` represents the object as it is stored in MongoDB
+interface Parent {
+  child?: Types.ObjectId,
+  name?: string
 }
+interface Child {
+  name: string;
+}
+interface PopulatedParent {
+  child: Child | null;
+}
+const ParentModel = model<Parent>('Parent', new Schema({
+  child: { type: 'ObjectId', ref: 'Child' },
+  name: String
+}));
+const childSchema: Schema = new Schema({ name: String });
+const ChildModel = model<Child>('Child', childSchema);
+
+// Populate with `Paths` generic `{ child: Child }` to override `child` path
+ParentModel.findOne({}).populate<Pick<PopulatedParent, 'child'>>('child').orFail().then(doc => {
+  // Works
+  const t: string = doc.child.name;
+});
 ```

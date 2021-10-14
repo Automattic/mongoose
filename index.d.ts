@@ -107,7 +107,7 @@ declare module 'mongoose' {
    */
   export function isValidObjectId(v: any): boolean;
 
-  export function model<T>(name: string, schema?: Schema<T> | Schema<T & Document>, collection?: string, skipInit?: boolean): Model<T>;
+  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, skipInit?: boolean): Model<T>;
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
     schema?: Schema<T, U, TQueryHelpers>,
@@ -644,7 +644,7 @@ declare module 'mongoose' {
      * for immutable properties. Behaves similarly to `set()`, except for it
      * unsets all properties that aren't in `obj`.
      */
-    overwrite(obj: DocumentDefinition<this>): this;
+    overwrite(obj: AnyObject): this;
 
     /**
      * If this document is a subdocument or populated document, returns the
@@ -653,10 +653,10 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /** Populates document references. */
-    populate(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this>;
-    populate(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this>): void;
-    populate(path: string, names: string): Promise<this>;
-    populate(path: string, names: string, callback: Callback<this>): void;
+    populate<Paths>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this & Paths>;
+    populate<Paths>(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this & Paths>): void;
+    populate<Paths>(path: string, names: string): Promise<this & Paths>;
+    populate<Paths>(path: string, names: string, callback: Callback<this & Paths>): void;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
@@ -666,8 +666,8 @@ declare module 'mongoose' {
     remove(options?: QueryOptions, cb?: Callback): void;
 
     /** Sends a replaceOne command with this document `_id` as the query selector. */
-    replaceOne(replacement?: DocumentDefinition<this>, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
-    replaceOne(replacement?: Object, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
+    replaceOne(replacement?: AnyObject, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
+    replaceOne(replacement?: AnyObject, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
 
     /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
     save(options?: SaveOptions): Promise<this>;
@@ -781,15 +781,15 @@ declare module 'mongoose' {
     countDocuments(filter: FilterQuery<T>, callback?: Callback<number>): QueryWithHelpers<number, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a new document or documents */
-    create(docs: (T | DocumentDefinition<T> | AnyObject)[], options?: SaveOptions): Promise<EnforceDocument<T, TMethods, TVirtuals>[]>;
-    create(docs: (T | DocumentDefinition<T> | AnyObject)[], callback: Callback<EnforceDocument<T, TMethods, TVirtuals>[]>): void;
-    create(doc: T | DocumentDefinition<T> | AnyObject): Promise<EnforceDocument<T, TMethods, TVirtuals>>;
-    create(doc: T | DocumentDefinition<T> | AnyObject, callback: Callback<EnforceDocument<T, TMethods, TVirtuals>>): void;
-    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], options?: SaveOptions): Promise<EnforceDocument<T, TMethods, TVirtuals>[]>;
-    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], callback: Callback<EnforceDocument<T, TMethods, TVirtuals>[]>): void;
-    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<EnforceDocument<T, TMethods, TVirtuals>>;
-    create<DocContents = T | DocumentDefinition<T>>(...docs: DocContents[]): Promise<EnforceDocument<T, TMethods, TVirtuals>[]>;
-    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents, callback: Callback<EnforceDocument<T, TMethods, TVirtuals>>): void;
+    create(docs: (AnyKeys<T> | AnyObject)[], options?: SaveOptions): Promise<EnforceDocument<T, TMethods, TVirtuals>[]>;
+    create(docs: (AnyKeys<T> | AnyObject)[], callback: Callback<EnforceDocument<T, TMethods, TVirtuals>[]>): void;
+    create(doc: AnyKeys<T> | AnyObject): Promise<EnforceDocument<T, TMethods, TVirtuals>>;
+    create(doc: AnyKeys<T> | AnyObject, callback: Callback<EnforceDocument<T, TMethods, TVirtuals>>): void;
+    create<DocContents = AnyKeys<T>>(docs: DocContents[], options?: SaveOptions): Promise<EnforceDocument<T, TMethods, TVirtuals>[]>;
+    create<DocContents = AnyKeys<T>>(docs: DocContents[], callback: Callback<EnforceDocument<T, TMethods, TVirtuals>[]>): void;
+    create<DocContents = AnyKeys<T>>(doc: DocContents): Promise<EnforceDocument<T, TMethods, TVirtuals>>;
+    create<DocContents = AnyKeys<T>>(...docs: DocContents[]): Promise<EnforceDocument<T, TMethods, TVirtuals>[]>;
+    create<DocContents = AnyKeys<T>>(doc: DocContents, callback: Callback<EnforceDocument<T, TMethods, TVirtuals>>): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,
@@ -867,12 +867,12 @@ declare module 'mongoose' {
     init(callback?: CallbackWithoutResult): Promise<EnforceDocument<T, TMethods, TVirtuals>>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
-    insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
-    insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options?: InsertManyOptions): Promise<Array<EnforceDocument<T, TMethods, TVirtuals>>>;
-    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
-    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions): Promise<EnforceDocument<T, TMethods, TVirtuals>[]>;
-    insertMany(doc: T | DocumentDefinition<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<EnforceDocument<T, TMethods, TVirtuals>[] | InsertManyResult>): void;
-    insertMany(docs: Array<T | DocumentDefinition<T> | AnyObject>, options?: InsertManyOptions, callback?: Callback<Array<EnforceDocument<T, TMethods, TVirtuals>> | InsertManyResult>): void;
+    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options?: InsertManyOptions): Promise<Array<EnforceDocument<T, TMethods, TVirtuals>>>;
+    insertMany(doc: AnyKeys<T> | AnyObject, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(doc: AnyKeys<T> | AnyObject, options?: InsertManyOptions): Promise<EnforceDocument<T, TMethods, TVirtuals>[]>;
+    insertMany(doc: AnyKeys<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<EnforceDocument<T, TMethods, TVirtuals>[] | InsertManyResult>): void;
+    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options?: InsertManyOptions, callback?: Callback<Array<EnforceDocument<T, TMethods, TVirtuals>> | InsertManyResult>): void;
 
     /**
      * Lists the indexes currently defined in MongoDB. This may or may not be
@@ -970,8 +970,8 @@ declare module 'mongoose' {
     findOneAndRemove(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals> | null, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
-    findOneAndReplace(filter: FilterQuery<T>, replacement: DocumentDefinition<T> | AnyObject, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals>, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T> | AnyObject, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals> | null, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOneAndReplace(filter: FilterQuery<T>, replacement: T | AnyObject, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals>, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOneAndReplace(filter?: FilterQuery<T>, replacement?: T | AnyObject, options?: QueryOptions | null, callback?: (err: CallbackError, doc: EnforceDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<EnforceDocument<T, TMethods, TVirtuals> | null, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
     findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<mongodb.ModifyResult<EnforceDocument<T, TMethods, TVirtuals>>, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
@@ -989,8 +989,8 @@ declare module 'mongoose' {
     remove(filter?: any, callback?: CallbackWithoutResult): QueryWithHelpers<any, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
-    replaceOne(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    replaceOne(filter?: FilterQuery<T>, replacement?: Object, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    replaceOne(filter?: FilterQuery<T>, replacement?: T | AnyObject, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    replaceOne(filter?: FilterQuery<T>, replacement?: T | AnyObject, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, EnforceDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Schema the model uses. */
     schema: Schema;
@@ -1557,7 +1557,7 @@ declare module 'mongoose' {
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends Schema<any, any> ? T :
+      T extends Schema<any, any, any> ? T :
       T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>>> | AnyArray<SchemaTypeOptions<Unpacked<T>>>) :
       T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> | AnyArray<SchemaTypeOptions<string>> :
       T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> | AnyArray<SchemaTypeOptions<number>> :
@@ -2346,8 +2346,8 @@ declare module 'mongoose' {
     polygon(path: string, ...coordinatePairs: number[][]): this;
 
     /** Specifies paths which should be populated with other documents. */
-    populate(path: string | any, select?: string | any, model?: string | Model<any, THelpers>, match?: any): this;
-    populate(options: PopulateOptions | Array<PopulateOptions>): this;
+    populate<Paths>(path: string | any, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<ResultType & Paths, DocType, THelpers, RawDocType>;
+    populate<Paths>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<ResultType & Paths, DocType, THelpers, RawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
     projection(fields?: any | null): any;
@@ -2374,8 +2374,8 @@ declare module 'mongoose' {
      * `update()`, except MongoDB will replace the existing document and will
      * not accept any [atomic](https://docs.mongodb.com/manual/tutorial/model-data-for-atomic-operations/#pattern) operators (`$set`, etc.)
      */
-    replaceOne(filter?: FilterQuery<DocType>, replacement?: DocumentDefinition<DocType>, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
-    replaceOne(filter?: FilterQuery<DocType>, replacement?: Object, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    replaceOne(filter?: FilterQuery<DocType>, replacement?: DocType | AnyObject, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    replaceOne(filter?: FilterQuery<DocType>, replacement?: DocType | AnyObject, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
 
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
     select(arg: string | any): this;
@@ -2516,9 +2516,9 @@ declare module 'mongoose' {
     $maxDistance?: number;
     // Array
     // TODO: define better types for $all and $elemMatch
-    $all?: T extends ReadonlyArray<infer U> ? any[] : never;
-    $elemMatch?: T extends ReadonlyArray<infer U> ? object : never;
-    $size?: T extends ReadonlyArray<infer U> ? number : never;
+    $all?: T extends AnyArray<any> ? any[] : never;
+    $elemMatch?: T extends AnyArray<any> ? object : never;
+    $size?: T extends AnyArray<any> ? number : never;
     // Bitwise
     $bitsAllClear?: number | mongodb.Binary | number[];
     $bitsAllSet?: number | mongodb.Binary | number[];
@@ -2549,21 +2549,16 @@ declare module 'mongoose' {
     [key: string]: any;
   };
 
-  type DotAndArrayNotation<AssignableType> = {
-    readonly [key: string]: AssignableType;
-  };
-
   type ReadonlyPartial<TSchema> = {
-    readonly [key in keyof TSchema]?: TSchema[key];
+    [key in keyof TSchema]?: TSchema[key];
   };
 
-  type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & DotAndArrayNotation<any>;
+  type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & AnyObject;
 
-  type AllowStringForObjectId<T> = T extends mongodb.ObjectId ? T | string : T;
-  type AllowRegexpForStrings<T> = T extends string ? T | RegExp : T;
-  type AllowArrayElementQuery<T> = T extends (infer U)[] ? T | U : T;
-
-  type ApplyBasicQueryCasting<T> = AllowStringForObjectId<T> | AllowRegexpForStrings<T> | AllowArrayElementQuery<T>;
+  type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string : // Allow strings for ObjectIds
+    T extends string ? T | RegExp : // Allow RegExps for strings
+    T extends (infer U)[] ? T | U : // Allow single array elements for arrays
+    T;
   type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
   type _FilterQuery<T> = {
@@ -2596,13 +2591,13 @@ declare module 'mongoose' {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
     $currentDate?: OnlyFieldsOfType<TSchema, NativeDate, true | { $type: 'date' | 'timestamp' }> & AnyObject;
     $inc?: OnlyFieldsOfType<TSchema, NumericTypes | undefined> & AnyObject;
-    $min?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
-    $max?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
+    $min?: AnyKeys<TSchema> & AnyObject;
+    $max?: AnyKeys<TSchema> & AnyObject;
     $mul?: OnlyFieldsOfType<TSchema, NumericTypes | undefined> & AnyObject;
     $rename?: { [key: string]: string };
-    $set?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
-    $setOnInsert?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
-    $unset?: OnlyFieldsOfType<TSchema, any, any> & AnyObject;
+    $set?: AnyKeys<TSchema> & AnyObject;
+    $setOnInsert?: AnyKeys<TSchema> & AnyObject;
+    $unset?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
     $addToSet?: OnlyFieldsOfType<TSchema, any[], any> & AnyObject;
@@ -2626,16 +2621,11 @@ declare module 'mongoose' {
     { $replaceWith: any };
 
   type __UpdateDefProperty<T> =
-    0 extends (1 & T) ? T : // any
-    T extends unknown[] ? LeanArray<T> : // Array
-    T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> :
-    T extends Document ? LeanDocument<T> : // Subdocument
     [Extract<T, mongodb.ObjectId>] extends [never] ? T :
     T | string;
-  type __UpdateQueryDef<T> = {
+  type _UpdateQueryDef<T> = {
     [K in keyof T]: __UpdateDefProperty<T[K]>;
   };
-  type _UpdateQueryDef<T> = __UpdateQueryDef<T>;
 
   export type UpdateQuery<T> = (_UpdateQuery<_UpdateQueryDef<T>> & MatchKeysAndValues<_UpdateQueryDef<LeanDocument<T>>>);
 
@@ -2644,14 +2634,6 @@ declare module 'mongoose' {
       ? T[K] extends TreatAsPrimitives
         ? T[K]
         : _AllowStringsForIds<T[K]>
-      : T[K] | string;
-    };
-  export type DocumentDefinition<T> = {
-    [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:
-      [Extract<T[K], mongodb.ObjectId>] extends [never]
-      ? T[K] extends TreatAsPrimitives
-        ? T[K]
-        : LeanDocumentElement<T[K]>
       : T[K] | string;
     };
 
@@ -2675,7 +2657,6 @@ declare module 'mongoose' {
   // This way, the conditional type is distributive over union types.
   // This is required for PopulatedDoc.
   type LeanDocumentElement<T> =
-    0 extends (1 & T) ? T : // any
     T extends unknown[] ? LeanArray<T> : // Array
     T extends Document ? LeanDocument<T> : // Subdocument
     T;
@@ -3107,6 +3088,8 @@ declare module 'mongoose' {
       name: 'VersionError';
       version: number;
       modifiedPaths: Array<string>;
+
+      constructor(doc: Document, currentVersion: number, modifiedPaths: Array<string>);
     }
   }
 

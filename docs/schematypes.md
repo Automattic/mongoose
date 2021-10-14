@@ -263,7 +263,7 @@ const schema2 = new Schema({
 
 * `lowercase`: boolean, whether to always call `.toLowerCase()` on the value
 * `uppercase`: boolean, whether to always call `.toUpperCase()` on the value
-* `trim`: boolean, whether to always call `.trim()` on the value
+* `trim`: boolean, whether to always call [`.trim()`](https://masteringjs.io/tutorials/fundamentals/trim-string) on the value
 * `match`: RegExp, creates a [validator](./validation.html) that checks if the value matches the given regular expression
 * `enum`: Array, creates a [validator](./validation.html) that checks if the value is in the given array.
 * `minLength`: Number, creates a [validator](./validation.html) that checks if the value length is not less than the given number

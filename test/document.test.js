@@ -10680,4 +10680,32 @@ describe('document', function() {
     assert.strictEqual(doc.foo.something, 'A');
     assert.strictEqual(doc.foo.other, 2);
   });
+
+  it('avoids depopulating when setting array of subdocs from different doc (gh-10819)', function() {
+    const Model1 = db.model('Test', Schema({ someField: String }));
+    const Model2 = db.model('Test2', Schema({
+      subDocuments: [{
+        subDocument: {
+          type: 'ObjectId',
+          ref: 'Test'
+        }
+      }]
+    }));
+
+    const doc1 = new Model1({ someField: '111' });
+    const doc2 = new Model2({
+      subDocuments: {
+        subDocument: doc1
+      }
+    });
+
+    const doc3 = new Model2(doc2);
+    assert.ok(doc3.populated('subDocuments.subDocument'));
+    assert.equal(doc3.subDocuments[0].subDocument.someField, '111');
+
+    const doc4 = new Model2();
+    doc4.subDocuments = doc2.subDocuments;
+    assert.ok(doc4.populated('subDocuments.subDocument'));
+    assert.equal(doc4.subDocuments[0].subDocument.someField, '111');
+  });
 });

@@ -1,4 +1,4 @@
-import { Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc, FilterQuery } from 'mongoose';
+import { Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc, FilterQuery, UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
 interface QueryHelpers {
@@ -169,4 +169,16 @@ function gh10857() {
   }
   type MyClassDocument = MyClass & Document;
   const test: FilterQuery<MyClass> = { status: { $in: ['VALUE1', 'VALUE2'] } };
+}
+
+function gh10786() {
+  interface User {
+    phone?: string;
+    name?: string
+  }
+
+  const updateQuery : UpdateQuery<User> = { name: 'John' };
+  if (true) {
+    updateQuery.phone = 'XXXX';
+  }
 }

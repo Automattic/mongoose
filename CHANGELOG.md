@@ -1,3 +1,17 @@
+6.0.11 / 2021-10-14
+===================
+ * perf(index.d.ts): remove some unnecessary definitions, streamline some union types to reduce number of instantiations #10349
+ * fix(cursor): use stream destroy method on close to prevent emitting duplicate 'close' #10878 #10876 [iovanom](https://github.com/iovanom)
+ * fix: create indexes when readPreference=primary is set #10861 #10855 [gemyero](https://github.com/gemyero)
+ * fix(document): avoid depopulating when setting array of subdocs from different doc #10819
+ * fix(index.d.ts): allow modifying properties of UpdateQuery instances #10786
+ * fix(index.d.ts): add generic Paths to populate() to allow overriding path types #10758
+
+5.13.11 / 2021-10-12
+====================
+ * fix: upgrade mongodb -> 3.7.2 #10871 [winstonralph](https://github.com/winstonralph)
+ * fix(connection): call setMaxListeners(0) on MongoClient to avoid event emitter memory leak warnings with `useDb()` #10732
+
 6.0.10 / 2021-10-08
 ===================
  * fix(query): add back strictQuery option to avoid empty filter issues, tie it to `strict` by default for compatibility #10781 #10763

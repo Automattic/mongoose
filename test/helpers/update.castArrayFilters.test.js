@@ -168,9 +168,6 @@ describe('castArrayFilters', function() {
 
     q.updateOne({}, p, opts);
 
-    castArrayFilters(q);
-    assert.strictEqual(q.options.arrayFilters[0]['arr.notInSchema'], '42');
-
     q.schema.options.strictQuery = true;
     assert.throws(function() {
       castArrayFilters(q);

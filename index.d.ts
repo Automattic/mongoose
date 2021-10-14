@@ -3088,7 +3088,7 @@ declare module 'mongoose' {
       name: 'VersionError';
       version: number;
       modifiedPaths: Array<string>;
-      
+
       constructor(doc: Document, currentVersion: number, modifiedPaths: Array<string>);
     }
   }

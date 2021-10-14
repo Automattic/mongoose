@@ -2524,15 +2524,9 @@ declare module 'mongoose' {
   }
 
   type _FilterQuery<T> = {
-    [P in keyof T]?: P extends '_id'
-    ? [Extract<T[P], mongodb.ObjectId>] extends [never]
-    ? mongodb.Condition<T[P]>
-    : mongodb.Condition<T[P] | string | { _id: mongodb.ObjectId }>
-    : [Extract<T[P], mongodb.ObjectId>] extends [never]
-    ? mongodb.Condition<T[P]>
-    : mongodb.Condition<T[P] | string>;
+    [P in keyof T]?: mongodb.Condition<[Extract<T[P], mongodb.ObjectId>] extends [never] ? T[P] : T[P] | string>;
   } &
-    mongodb.RootQuerySelector<DocumentDefinition<T>>;
+    mongodb.RootQuerySelector<T>;
 
   export type FilterQuery<T> = _FilterQuery<T>;
 
@@ -2589,14 +2583,14 @@ declare module 'mongoose' {
 
   export type UpdateQuery<T> = (_UpdateQuery<_UpdateQueryDef<T>> & mongodb.MatchKeysAndValues<_UpdateQueryDef<LeanDocument<T>>>);
 
-  type _AllowStringsForIds<T> = {
-    [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never]
+  export type DocumentDefinition<T> = {
+    [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:
+      [Extract<T[K], mongodb.ObjectId>] extends [never]
       ? T[K] extends TreatAsPrimitives
         ? T[K]
-        : _AllowStringsForIds<T[K]>
+        : LeanDocumentElement<T[K]>
       : T[K] | string;
     };
-  export type DocumentDefinition<T> = _AllowStringsForIds<LeanDocument<T>>;
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   type TreatAsPrimitives = actualPrimitives |

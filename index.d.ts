@@ -1637,10 +1637,10 @@ declare module 'mongoose' {
     transform?: (this: any, val: T) => any;
 
     /** defines a custom getter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
-    get?: (value: T, schematype?: this) => any;
+    get?: (value: T, doc?: this) => any;
 
     /** defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
-    set?: (value: T, schematype?: this) => any;
+    set?: (value: any, priorVal?: T, doc?: this) => any;
 
     /** array of allowed values for this path. Allowed for strings, numbers, and arrays of strings */
     enum?: Array<string | number | null> | ReadonlyArray<string | number | null> | { values: Array<string | number | null> | ReadonlyArray<string | number | null>, message?: string } | { [path: string]: string | number | null };
@@ -2555,10 +2555,10 @@ declare module 'mongoose' {
 
   type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & AnyObject;
 
-  type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string : // Allow strings for ObjectIds
-    T extends string ? T | RegExp : // Allow RegExps for strings
+  type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string | AnyArray<T | string | Document> : // Allow strings for ObjectIds
+    T extends string ? T | RegExp | AnyArray<T> : // Allow RegExps for strings
     T extends (infer U)[] ? T | U : // Allow single array elements for arrays
-    T;
+    T | AnyArray<T>;
   type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
   type _FilterQuery<T> = {

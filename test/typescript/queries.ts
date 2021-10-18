@@ -64,6 +64,9 @@ Test.find({ name: { $in: ['Test'] } }).exec().then((res: Array<ITest>) => consol
 Test.find({ tags: 'test' }).exec();
 Test.find({ tags: { $in: ['test'] } }).exec();
 
+// Implicit `$in`
+Test.find({ name: ['Test1', 'Test2'] }).exec();
+
 Test.find({ name: 'test' }, (err: Error, docs: ITest[]) => {
   console.log(!!err, docs[0].age);
 });

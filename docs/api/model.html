@@ -517,8 +517,8 @@ A.findByIdAndRemove()           <span class="hljs-comment">// returns Query</spa
 </li><li class="param">[update]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
-</li><ul style="margin-top: 0.5em"><li>[options.new=false]
-<span class="method-type">&laquo;Boolean&raquo;</span> By default, <code>findByIdAndUpdate()</code> returns the document as it was <strong>before</strong> <code>update</code> was applied. If you set <code>new: true</code>, <code>findOneAndUpdate()</code> will instead give you the object after <code>update</code> was applied. To change the default to <code>true</code>, use <code>mongoose.set(&#39;returnOriginal&#39;, false);</code>.</p>
+</li><ul style="margin-top: 0.5em"><li>[options.returnDocument='before']
+<span class="method-type">&laquo;String&raquo;</span> Has two possible values, <code>&#39;before&#39;</code> and <code>&#39;after&#39;</code>. By default, it will return the document before the update was applied.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.lean]
 <span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api.html#query_Query-lean"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.session=null]
@@ -527,8 +527,6 @@ A.findByIdAndRemove()           <span class="hljs-comment">// returns Query</spa
 <span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.timestamps=null]
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
-</li></ul><ul style="margin-top: 0.5em"><li>[options.returnOriginal=null]
-<span class="method-type">&laquo;Boolean&raquo;</span> An alias for the <code>new</code> option. <code>returnOriginal: false</code> is equivalent to <code>new: true</code>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.overwrite=false]
 <span class="method-type">&laquo;Boolean&raquo;</span> By default, if you don&#39;t include any <a href="https://docs.mongodb.com/manual/reference/operator/update/">update operators</a> in <code>update</code>, Mongoose will wrap <code>update</code> in <code>$set</code> for you. This prevents you from accidentally overwriting the document. This option tells Mongoose to skip adding <code>$set</code>. An alternative to this would be using <a href="https://mongoosejs.com/docs/api/model.html#model_Model.findOneAndReplace">Model.findOneAndReplace({ _id: id }, update, options, callback)</a>.</p>
 </li></ul><li class="param">[callback]
@@ -713,8 +711,8 @@ A.findOneAndRemove()           <span class="hljs-comment">// returns Query</span
 <span class="method-type">&laquo;Object&raquo;</span> Replace with this document</p>
 </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
-</li><ul style="margin-top: 0.5em"><li>[options.new=false]
-<span class="method-type">&laquo;Boolean&raquo;</span> By default, <code>findOneAndReplace()</code> returns the document as it was <strong>before</strong> <code>update</code> was applied. If you set <code>new: true</code>, <code>findOneAndReplace()</code> will instead give you the object after <code>update</code> was applied. To change the default to <code>true</code>, use <code>mongoose.set(&#39;returnOriginal&#39;, false);</code>.</p>
+</li><ul style="margin-top: 0.5em"><li>[options.returnDocument='before']
+<span class="method-type">&laquo;String&raquo;</span> Has two possible values, <code>&#39;before&#39;</code> and <code>&#39;after&#39;</code>. By default, it will return the document before the update was applied.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.lean]
 <span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api.html#query_Query-lean"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.session=null]
@@ -723,8 +721,6 @@ A.findOneAndRemove()           <span class="hljs-comment">// returns Query</span
 <span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.timestamps=null]
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
-</li></ul><ul style="margin-top: 0.5em"><li>[options.returnOriginal=null]
-<span class="method-type">&laquo;Boolean&raquo;</span> An alias for the <code>new</code> option. <code>returnOriginal: false</code> is equivalent to <code>new: true</code>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.projection=null]
 <span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li></ul><li class="param">[callback]
@@ -761,8 +757,8 @@ A.findOneAndReplace()           <span class="hljs-comment">// returns Query</spa
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[update]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
-</li><ul style="margin-top: 0.5em"><li>[options.new=false]
-<span class="method-type">&laquo;Boolean&raquo;</span> By default, <code>findOneAndUpdate()</code> returns the document as it was <strong>before</strong> <code>update</code> was applied. If you set <code>new: true</code>, <code>findOneAndUpdate()</code> will instead give you the object after <code>update</code> was applied. To change the default to <code>true</code>, use <code>mongoose.set(&#39;returnOriginal&#39;, false);</code>.</p>
+</li><ul style="margin-top: 0.5em"><li>[options.returnDocument='before']
+<span class="method-type">&laquo;String&raquo;</span> Has two possible values, <code>&#39;before&#39;</code> and <code>&#39;after&#39;</code>. By default, it will return the document before the update was applied.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.lean]
 <span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api.html#query_Query-lean"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.session=null]
@@ -771,8 +767,6 @@ A.findOneAndReplace()           <span class="hljs-comment">// returns Query</spa
 <span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.timestamps=null]
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
-</li></ul><ul style="margin-top: 0.5em"><li>[options.returnOriginal=null]
-<span class="method-type">&laquo;Boolean&raquo;</span> An alias for the <code>new</code> option. <code>returnOriginal: false</code> is equivalent to <code>new: true</code>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.overwrite=false]
 <span class="method-type">&laquo;Boolean&raquo;</span> By default, if you don&#39;t include any <a href="https://docs.mongodb.com/manual/reference/operator/update/">update operators</a> in <code>update</code>, Mongoose will wrap <code>update</code> in <code>$set</code> for you. This prevents you from accidentally overwriting the document. This option tells Mongoose to skip adding <code>$set</code>. An alternative to this would be using <a href="https://mongoosejs.com/docs/api/model.html#model_Model.findOneAndReplace">Model.findOneAndReplace(conditions, update, options, callback)</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.upsert=false]

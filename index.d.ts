@@ -2555,10 +2555,10 @@ declare module 'mongoose' {
 
   type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & AnyObject;
 
-  type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string : // Allow strings for ObjectIds
-    T extends string ? T | RegExp : // Allow RegExps for strings
+  type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string | AnyArray<T | string | Document> : // Allow strings for ObjectIds
+    T extends string ? T | RegExp | AnyArray<T> : // Allow RegExps for strings
     T extends (infer U)[] ? T | U : // Allow single array elements for arrays
-    T;
+    T | AnyArray<T>;
   type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
   type _FilterQuery<T> = {

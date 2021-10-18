@@ -644,6 +644,48 @@ describe('QueryCursor', function() {
     }, 20);
   });
 
+  it('closing query cursor emits `close` event only once with stream pause/resume (gh-10876)', function(done) {
+    const User = db.model('User', new Schema({ name: String }));
+
+    User.create({ name: 'First' }, { name: 'Second' })
+      .then(() => {
+        const cursor = User.find().cursor();
+        cursor.on('data', () => {
+          cursor.pause();
+          setTimeout(() => cursor.resume(), 50);
+        });
+
+        let closeEventTriggeredCount = 0;
+        cursor.on('close', () => closeEventTriggeredCount++);
+        setTimeout(() => {
+          assert.equal(closeEventTriggeredCount, 1);
+          done();
+        }, 200);
+      });
+  });
+
+  it('closing aggregation cursor emits `close` event only once with stream pause/resume (gh-10876)', function(done) {
+    const User = db.model('User', new Schema({ name: String }));
+
+    User.create({ name: 'First' }, { name: 'Second' })
+      .then(() => {
+        const cursor = User.aggregate([{ $match: {} }]).cursor().exec();
+        cursor.on('data', () => {
+          cursor.pause();
+          setTimeout(() => cursor.resume(), 50);
+        });
+
+        let closeEventTriggeredCount = 0;
+        cursor.on('close', () => closeEventTriggeredCount++);
+
+
+        setTimeout(() => {
+          assert.equal(closeEventTriggeredCount, 1);
+          done();
+        }, 200);
+      });
+  });
+
   it('passes document index as the second argument for query cursor (gh-8972)', function() {
     return co(function *() {
       const User = db.model('User', Schema({ order: Number }));

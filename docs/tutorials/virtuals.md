@@ -45,15 +45,23 @@ setters, `this` refers to the document the virtual is attached to.
 
 ## Virtuals in JSON
 
-By default, Mongoose does not include virtuals when you convert a document to 
-JSON. For example, if you pass a document to [Express'  `res.json()` function](http://expressjs.com/en/4x/api.html#res.json),
-virtuals will **not** be included by default.
+By default, Mongoose does not include virtuals when you convert a document to JSON.
+For example, if you pass a document to [Express'  `res.json()` function](http://expressjs.com/en/4x/api.html#res.json), virtuals will **not** be included by default.
 
 To include virtuals in `res.json()`, you need to set the
 [`toJSON` schema option](/docs/guide.html#toJSON) to `{ virtuals: true }`.
 
 ```javascript
 [require:Virtuals.*toJSON]
+```
+
+## Virtuals in `console.log()`
+
+By default, Mongoose does **not** include virtuals in `console.log()` output.
+To include virtuals in `console.log()`, you need to set the [`toObject` schema option](/docs/guide.html#toObject) to `{ virtuals: true }`, or use `toObject()` before printing the object.
+
+```javascript
+console.log(doc.toObject({ virtuals: true }));
 ```
 
 ## Virtuals with Lean

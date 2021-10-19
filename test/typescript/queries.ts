@@ -1,4 +1,4 @@
-import { Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc } from 'mongoose';
+import { Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc, FilterQuery, UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
 interface QueryHelpers {
@@ -63,6 +63,9 @@ Test.find({ parent: { $in: ['0'.repeat(24)] } });
 Test.find({ name: { $in: ['Test'] } }).exec().then((res: Array<ITest>) => console.log(res));
 Test.find({ tags: 'test' }).exec();
 Test.find({ tags: { $in: ['test'] } }).exec();
+
+// Implicit `$in`
+Test.find({ name: ['Test1', 'Test2'] }).exec();
 
 Test.find({ name: 'test' }, (err: Error, docs: ITest[]) => {
   console.log(!!err, docs[0].age);
@@ -144,4 +147,41 @@ async function gh10617(): Promise<void> {
 
   const DBModel: Model<IDBModel> = model<IDBModel>('Meep', schema);
   await DBModel.findOne({});
+}
+
+function gh10757() {
+  enum MyEnum {
+    VALUE1,
+    VALUE2,
+    VALUE3
+  }
+
+  interface MyClass {
+    status: MyEnum;
+  }
+
+  type MyClassDocument = MyClass & Document;
+
+  const test: FilterQuery<MyClass> = { status: { $in: [MyEnum.VALUE1, MyEnum.VALUE2] } };
+}
+
+function gh10857() {
+  type MyUnion = 'VALUE1'|'VALUE2';
+  interface MyClass {
+    status: MyUnion;
+  }
+  type MyClassDocument = MyClass & Document;
+  const test: FilterQuery<MyClass> = { status: { $in: ['VALUE1', 'VALUE2'] } };
+}
+
+function gh10786() {
+  interface User {
+    phone?: string;
+    name?: string
+  }
+
+  const updateQuery : UpdateQuery<User> = { name: 'John' };
+  if (true) {
+    updateQuery.phone = 'XXXX';
+  }
 }

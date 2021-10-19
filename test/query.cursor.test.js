@@ -589,6 +589,48 @@ describe('QueryCursor', function() {
     }, 20);
   });
 
+  it('closing query cursor emits `close` event only once with stream pause/resume (gh-10876)', function(done) {
+    const User = db.model('User', new Schema({ name: String }));
+
+    User.create({ name: 'First' }, { name: 'Second' })
+      .then(() => {
+        const cursor = User.find().cursor();
+        cursor.on('data', () => {
+          cursor.pause();
+          setTimeout(() => cursor.resume(), 50);
+        });
+
+        let closeEventTriggeredCount = 0;
+        cursor.on('close', () => closeEventTriggeredCount++);
+        setTimeout(() => {
+          assert.equal(closeEventTriggeredCount, 1);
+          done();
+        }, 200);
+      });
+  });
+
+  it('closing aggregation cursor emits `close` event only once with stream pause/resume (gh-10876)', function(done) {
+    const User = db.model('User', new Schema({ name: String }));
+
+    User.create({ name: 'First' }, { name: 'Second' })
+      .then(() => {
+        const cursor = User.aggregate([{ $match: {} }]).cursor();
+        cursor.on('data', () => {
+          cursor.pause();
+          setTimeout(() => cursor.resume(), 50);
+        });
+
+        let closeEventTriggeredCount = 0;
+        cursor.on('close', () => closeEventTriggeredCount++);
+
+
+        setTimeout(() => {
+          assert.equal(closeEventTriggeredCount, 1);
+          done();
+        }, 200);
+      });
+  });
+
   it('passes document index as the second argument for query cursor (gh-8972)', async function() {
     const User = db.model('User', Schema({ order: Number }));
 
@@ -668,6 +710,31 @@ describe('QueryCursor', function() {
       then(() => null, err => err);
     assert.ok(err);
     assert.equal(err.name, 'CastError');
+  });
+
+  it('reports error in pre save hook (gh-10785)', async function() {
+    const schema = new mongoose.Schema({ name: String });
+
+    schema.pre('find', async() => {
+      await new Promise(resolve => setTimeout(resolve, 10));
+      throw new Error('Oops!');
+    });
+
+    const Movie = db.model('Movie', schema);
+
+    await Movie.deleteMany({});
+    await Movie.create([
+      { name: 'Kickboxer' },
+      { name: 'Ip Man' },
+      { name: 'Enter the Dragon' }
+    ]);
+
+    const arr = [];
+    const err = await Movie.find({ name: { $lt: 'foo' } }).cursor().
+      eachAsync(doc => arr.push(doc.name)).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.message, 'Oops!');
   });
 });
 

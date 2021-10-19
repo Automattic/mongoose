@@ -4,7 +4,7 @@ Mongoose introduced [officially supported TypeScript bindings in v5.11.0](https:
 Mongoose's `index.d.ts` file supports a wide variety of syntaxes and strives to be compatible with `@types/mongoose` where possible.
 This guide describes Mongoose's recommended approach to working with Mongoose in TypeScript.
 
-### [Creating Your First Document](#creating-your-first-document)
+### Creating Your First Document
 
 To get started with Mongoose in TypeScript, you need to: 
 
@@ -53,7 +53,7 @@ async function run(): Promise<void> {
 You as the developer are responsible for ensuring that your document interface lines up with your Mongoose schema.
 For example, Mongoose won't report an error if `email` is `required` in your Mongoose schema but optional in your document interface.
 
-### [Using `extends Document`](#using-extends-document)
+### Using `extends Document`
 
 Alternatively, your document interface can extend Mongoose's `Document` class.
 Many Mongoose TypeScript codebases use the below approach.
@@ -74,7 +74,7 @@ Using `extends Document` makes it difficult for Mongoose to infer which properti
 We recommend your document interface contain the properties defined in your schema and line up with what your documents look like in MongoDB.
 Although you can add [instance methods](/docs/guide.html#methods) to your document interface, we do not recommend doing so.
 
-### [Using Custom Bindings](#using-custom-bindings)
+### Using Custom Bindings
 
 If Mongoose's built-in `index.d.ts` file does not work for you, you can remove it in a postinstall script in your `package.json` as shown below.
 However, before you do, please [open an issue on Mongoose's GitHub page](https://github.com/Automattic/mongoose/issues/new) and describe the issue you're experiencing.

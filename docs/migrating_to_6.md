@@ -11,7 +11,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [The `asPromise()` Method for Connections](#the-aspromise-method-for-connections)
 * [`mongoose.connect()` Returns a Promise](#mongoose-connect-returns-a-promise)
 * [Duplicate Query Execution](#duplicate-query-execution)
-* [`strictQuery` is removed and replaced by `strict`](#strictquery-is-removed-and-replaced-by-strict)
+* [`strictQuery` is now equal to `strict` by default](#strictquery-is-removed-and-replaced-by-strict)
 * [MongoError is now MongoServerError](#mongoerror-is-now-mongoservererror)
 * [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)
 * [Schema Defined Document Key Order](#schema-defined-document-key-order)
@@ -48,6 +48,7 @@ See [the MongoDB Node drivers' migration guide](https://github.com/mongodb/node-
 Below are some of the most noteworthy changes:
 
 * MongoDB Driver 4.x is written in TypeScript and has its own TypeScript type definitions. These may conflict with `@types/mongodb`, so if you have TypeScript compiler errors please make sure you upgrade to the [latest version of `@types/mongodb`](https://www.npmjs.com/package/@types/mongodb), which is an empty stub.
+* The `poolSize` option for connections has been [replaced with `minPoolSize` and `maxPoolSize`](https://github.com/mongodb/node-mongodb-native/blob/4.1/docs/CHANGES_4.0.0.md#connection-pool-options). The Mongoose 5.x `poolSize` option is equivalent to the Mongoose 6 `maxPoolSize` option. The default value of `maxPoolSize` has been increased to 100.
 * The result of `updateOne()` and `updateMany()` is now different.
 * The result of `deleteOne()` and `deleteMany()` no longer has an `n` property.
 
@@ -112,9 +113,12 @@ await q;
 await q.clone(); // Can `clone()` the query to allow executing the query again
 ```
 
-<h3 id="strictquery-is-removed-and-replaced-by-strict"><a href="#strictquery-is-removed-and-replaced-by-strict">`strictQuery` is removed and replaced by `strict`</a></h3>
+<h3 id="strictquery-is-removed-and-replaced-by-strict"><a href="#strictquery-is-removed-and-replaced-by-strict">`strictQuery` is now equal to `strict` by default</a></h3>
 
-Mongoose no longer supports a `strictQuery` option. You must now use `strict`. This means that, by default, Mongoose will filter out filter properties that are not in the schema.
+~Mongoose no longer supports a `strictQuery` option. You must now use `strict`.~
+As of Mongoose 6.0.10, we brought back the `strictQuery` option.
+However, `strictQuery` is tied to `strict` by default.
+This means that, by default, Mongoose will filter out query filter properties that are not in the schema.
 
 ```javascript
 const userSchema = new Schema({ name: String });
@@ -123,10 +127,16 @@ const User = mongoose.model('User', userSchema);
 // By default, this is equivalent to `User.find()` because Mongoose filters out `notInSchema`
 await User.find({ notInSchema: 1 });
 
-// Set `strict: false` to opt in to filtering by properties that aren't in the schema
-await User.find({ notInSchema: 1 }, null, { strict: false });
+// Set `strictQuery: false` to opt in to filtering by properties that aren't in the schema
+await User.find({ notInSchema: 1 }, null, { strictQuery: false });
 // equivalent:
-await User.find({ notInSchema: 1 }).setOptions({ strict: false });
+await User.find({ notInSchema: 1 }).setOptions({ strictQuery: false });
+```
+
+You can also disable `strictQuery` globally to override:
+
+```javascript
+mongoose.set('strictQuery', false);
 ```
 
 <h3 id="mongoerror-is-now-mongoservererror"><a href="#mongoerror-is-now-mongoservererror">MongoError is now MongoServerError</a></h3>

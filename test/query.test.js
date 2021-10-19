@@ -3205,19 +3205,18 @@ describe('Query', function() {
     });
   });
 
-  it('strict option (gh-4136) (gh-7178)', async function() {
+  it('strictQuery option (gh-4136) (gh-7178)', async function() {
     const modelSchema = new Schema({
       field: Number,
       nested: { path: String }
-    }, { strict: 'throw' });
+    }, { strictQuery: 'throw' });
 
     const Model = db.model('Test', modelSchema);
-
 
     // `find()` on a top-level path not in the schema
     let err = await Model.find({ notInschema: 1 }).then(() => null, e => e);
     assert.ok(err);
-    assert.ok(err.message.indexOf('strict') !== -1, err.message);
+    assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
 
     // Shouldn't throw on nested path re: gh-7178
     await Model.create({ nested: { path: 'a' } });
@@ -3227,12 +3226,25 @@ describe('Query', function() {
     // `find()` on a nested path not in the schema
     err = await Model.find({ 'nested.bad': 'foo' }).then(() => null, e => e);
     assert.ok(err);
-    assert.ok(err.message.indexOf('strict') !== -1, err.message);
+    assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
   });
 
-  it('strict = true (gh-6032)', async function() {
-    const modelSchema = new Schema({ field: Number }, { strict: true });
+  it('strictQuery inherits from strict (gh-10763) (gh-4136) (gh-7178)', async function() {
+    const modelSchema = new Schema({
+      field: Number,
+      nested: { path: String }
+    }, { strict: 'throw' });
 
+    const Model = db.model('Test', modelSchema);
+
+    // `find()` on a top-level path not in the schema
+    const err = await Model.find({ notInschema: 1 }).then(() => null, e => e);
+    assert.ok(err);
+    assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
+  });
+
+  it('strictQuery = true (gh-6032)', async function() {
+    const modelSchema = new Schema({ field: Number }, { strictQuery: true });
 
     const Model = db.model('Test', modelSchema);
 

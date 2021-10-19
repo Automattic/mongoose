@@ -19,7 +19,7 @@ on the schema level and is useful for writing [plugins](./plugins.html).
   <li><a href="#synchronous">Synchronous Hooks</a></li>
 </ul>
 
-### [Types of Middleware](#types-of-middleware)
+### Types of Middleware
 
 Mongoose has 4 types
 of middleware: document middleware, model middleware, aggregate middleware, and query middleware.
@@ -37,14 +37,18 @@ Query middleware is supported for the following Model and Query functions.
 In query middleware functions, `this` refers to the query.
 
 * [count](./api.html#query_Query-count)
+* [countDocuments](./api/query.html#query_Query-countDocuments)
 * [deleteMany](./api.html#query_Query-deleteMany)
 * [deleteOne](./api.html#query_Query-deleteOne)
+* [estimatedDocumentCount](./api/query.html#query_Query-estimatedDocumentCount)
 * [find](./api.html#query_Query-find)
 * [findOne](./api.html#query_Query-findOne)
 * [findOneAndDelete](./api.html#query_Query-findOneAndDelete)
 * [findOneAndRemove](./api.html#query_Query-findOneAndRemove)
+* [findOneAndReplace](./api/query.html#query_Query-findOneAndReplace)
 * [findOneAndUpdate](./api.html#query_Query-findOneAndUpdate)
 * [remove](./api.html#model_Model.remove)
+* [replaceOne](./api/query.html#query_Query-replaceOne)
 * [update](./api.html#query_Query-update)
 * [updateOne](./api.html#query_Query-updateOne)
 * [updateMany](./api.html#query_Query-updateMany)

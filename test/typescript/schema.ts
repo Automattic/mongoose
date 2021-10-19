@@ -1,4 +1,4 @@
-import { Schema, Document, SchemaDefinition, Model, DocumentDefinition } from 'mongoose';
+import { Schema, Document, SchemaDefinition, Model } from 'mongoose';
 
 enum Genre {
   Action,
@@ -121,7 +121,7 @@ function gh10261() {
   }
 
   const type: ReadonlyArray<typeof String> = [String];
-  const colorEntitySchemaDefinition: SchemaDefinition<DocumentDefinition<ValuesEntity>> = {
+  const colorEntitySchemaDefinition: SchemaDefinition<ValuesEntity> = {
     values: {
       type: type,
       required: true
@@ -211,6 +211,50 @@ function gh10731() {
           type: String,
           trim: true,
           lowercase: true,
+          required: true
+        }
+      ],
+      required: true
+    }
+  });
+}
+
+function gh10789() {
+  interface IAddress {
+    city: string;
+    state: string;
+    country: string;
+  }
+
+  interface IUser {
+    name: string;
+    addresses: IAddress[];
+  }
+
+  const addressSchema = new Schema<IAddress>({
+    city: {
+      type: String,
+      required: true
+    },
+    state: {
+      type: String,
+      required: true
+    },
+    country: {
+      type: String,
+      required: true
+    }
+  });
+
+  const userSchema = new Schema<IUser>({
+    name: {
+      type: String,
+      required: true
+    },
+    addresses: {
+      type: [
+        {
+          type: addressSchema,
           required: true
         }
       ],

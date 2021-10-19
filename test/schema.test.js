@@ -2417,6 +2417,35 @@ describe('schema', function() {
     assert.ok(!schema.virtuals.id);
   });
 
+  describe('mongoose.set(`strictQuery`, value); (gh-6658)', function() {
+    let strictQueryOriginalValue;
+
+    this.beforeEach(() => strictQueryOriginalValue = mongoose.get('strictQuery'));
+    this.afterEach(() => mongoose.set('strictQuery', strictQueryOriginalValue));
+
+    it('setting `strictQuery` on base sets strictQuery to schema (gh-6658)', function() {
+      // Arrange
+      mongoose.set('strictQuery', 'some value');
+
+      // Act
+      const schema = new Schema();
+
+      // Assert
+      assert.equal(schema.get('strictQuery'), 'some value');
+    });
+
+    it('`strictQuery` set on base gets overwritten by option set on schema (gh-6658)', function() {
+      // Arrange
+      mongoose.set('strictQuery', 'base option');
+
+      // Act
+      const schema = new Schema({}, { strictQuery: 'schema option' });
+
+      // Assert
+      assert.equal(schema.get('strictQuery'), 'schema option');
+    });
+  });
+
   it('treats dotted paths with no parent as a nested path (gh-9020)', function() {
     const customerSchema = new Schema({
       'card.brand': String,
@@ -2660,5 +2689,16 @@ describe('schema', function() {
       }
     });
     assert.equal(schema.path('myMap').$__schemaType.$__schemaType.instance, 'String');
+  });
+
+  it('handles `type: { subpath: String }` in document array definitions (gh-10750)', function() {
+    const schema = new mongoose.Schema({
+      something: [{ type: { somePath: String } }],
+      // also, same error message when doing:
+      somethingElse: { type: [{ type: { somePath: String } }] }
+    });
+
+    assert.equal(schema.path('something').caster.schema.path('somePath').instance, 'String');
+    assert.equal(schema.path('somethingElse').caster.schema.path('somePath').instance, 'String');
   });
 });

@@ -6787,7 +6787,7 @@ describe('document', function() {
     return event.validate();
   });
 
-  it('flattenMaps option for toObject() (gh-7274) (gh-10486)', function() {
+  it('flattenMaps option for toObject() (gh-10872) (gh-7274) (gh-10486)', function() {
     const subSchema = new Schema({ name: String });
 
     let schema = new Schema({
@@ -6804,6 +6804,9 @@ describe('document', function() {
     mapTest.test.set('key1', { name: 'value1' });
     // getters: true for gh-10486
     assert.equal(mapTest.toObject({ getters: true, flattenMaps: true }).test.key1.name, 'value1');
+
+    assert.equal(mapTest.toJSON({ getters: true, flattenMaps: true }).test.key1.name, 'value1');
+    assert.equal(mapTest.toJSON({ getters: true, flattenMaps: false }).test.get('key1').name, 'value1');
 
     schema = new Schema({
       test: {
@@ -6825,7 +6828,6 @@ describe('document', function() {
   it('`collection` property with strict: false (gh-7276)', async function() {
     const schema = new Schema({}, { strict: false, versionKey: false });
     const Model = db.model('Test', schema);
-
 
     let doc = new Model({ test: 'foo', collection: 'bar' });
 
@@ -9181,6 +9183,41 @@ describe('document', function() {
     assert.ok(foo.isModified('subdoc.bar'));
   });
 
+  it('correctly tracks saved state for deeply nested objects (gh-10773) (gh-9396)', async function() {
+    const PaymentSchema = Schema({ status: String }, { _id: false });
+    const OrderSchema = new Schema({
+      status: String,
+      payments: {
+        payout: PaymentSchema
+      }
+    });
+
+    const Order = db.model('Order', OrderSchema);
+
+    const order = new Order({
+      status: 'unpaid',
+      payments: {
+        payout: {
+          status: 'unpaid'
+        }
+      }
+    });
+
+    await order.save();
+
+    const newPaymentsStatus = Object.assign({}, order.payments);
+
+    newPaymentsStatus.payout.status = 'paid';
+
+    order.payments = newPaymentsStatus;
+    assert.ok(order.isModified('payments'));
+
+    await order.save();
+
+    const fromDb = await Order.findById(order._id).lean();
+    assert.equal(fromDb.payments.payout.status, 'paid');
+  });
+
   it('marks path as errored if default function throws (gh-9408)', function() {
     const jobSchema = new Schema({
       deliveryAt: Date,
@@ -10600,6 +10637,7 @@ describe('document', function() {
     assert.ok(!band.populated('embeddedMembers.member'));
     assert.ok(!band.embeddedMembers[0].member.name);
   });
+
   it('should allow dashes in the path name (gh-10677)', async function() {
     const schema = new mongoose.Schema({
       values: {
@@ -10617,5 +10655,59 @@ describe('document', function() {
     document.values.set('abc', { entries: 'a' });
     document.values.set('abc-d', { entries: 'b' });
     await document.save();
+  });
+
+  it('inits non-schema values if strict is false (gh-10828)', function() {
+    const FooSchema = new Schema({}, {
+      id: false,
+      _id: false,
+      strict: false
+    });
+    const BarSchema = new Schema({
+      name: String,
+      foo: FooSchema
+    });
+
+    const Test = db.model('Test', BarSchema);
+
+    const doc = new Test();
+    doc.init({
+      name: 'Test',
+      foo: {
+        something: 'A',
+        other: 2
+      }
+    });
+
+    assert.strictEqual(doc.foo.something, 'A');
+    assert.strictEqual(doc.foo.other, 2);
+  });
+
+  it('avoids depopulating when setting array of subdocs from different doc (gh-10819)', function() {
+    const Model1 = db.model('Test', Schema({ someField: String }));
+    const Model2 = db.model('Test2', Schema({
+      subDocuments: [{
+        subDocument: {
+          type: 'ObjectId',
+          ref: 'Test'
+        }
+      }]
+    }));
+
+    const doc1 = new Model1({ someField: '111' });
+    const doc2 = new Model2({
+      subDocuments: {
+        subDocument: doc1
+      }
+    });
+
+    const doc3 = new Model2(doc2);
+    assert.ok(doc3.populated('subDocuments.subDocument'));
+    assert.equal(doc3.subDocuments[0].subDocument.someField, '111');
+
+    const doc4 = new Model2();
+    doc4.subDocuments = doc2.subDocuments;
+    assert.ok(doc4.populated('subDocuments.subDocument'));
+    assert.equal(doc4.subDocuments[0].subDocument.someField, '111');
   });
 });

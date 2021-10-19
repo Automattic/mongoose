@@ -1,3 +1,63 @@
+6.0.11 / 2021-10-14
+===================
+ * perf(index.d.ts): remove some unnecessary definitions, streamline some union types to reduce number of instantiations #10349
+ * fix(cursor): use stream destroy method on close to prevent emitting duplicate 'close' #10878 #10876 [iovanom](https://github.com/iovanom)
+ * fix: create indexes when readPreference=primary is set #10861 #10855 [gemyero](https://github.com/gemyero)
+ * fix(document): avoid depopulating when setting array of subdocs from different doc #10819
+ * fix(index.d.ts): allow modifying properties of UpdateQuery instances #10786
+ * fix(index.d.ts): add generic Paths to populate() to allow overriding path types #10758
+
+5.13.11 / 2021-10-12
+====================
+ * fix: upgrade mongodb -> 3.7.2 #10871 [winstonralph](https://github.com/winstonralph)
+ * fix(connection): call setMaxListeners(0) on MongoClient to avoid event emitter memory leak warnings with `useDb()` #10732
+
+6.0.10 / 2021-10-08
+===================
+ * fix(query): add back strictQuery option to avoid empty filter issues, tie it to `strict` by default for compatibility #10781 #10763
+ * fix(model): avoid unnecessarily dropping text indexes in `syncIndexes()` #10851 #10850 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(query): avoid trying to call toArray() on cursor if find() error occurred #10845
+ * fix: accepts uppercase values in mongoose.isValidObjectId #10846 [foxadb](https://github.com/foxadb)
+ * perf(document): further reduce unnecessary objects and keys to minimize document memory overhead #10400
+ * fix(index.d.ts): restore unpacked type and avoid distributive conditional types #10859 [dbellavista](https://github.com/dbellavista)
+ * fix(index.d.ts): add correct null typings for `findOneAndUpdate()` and `findByIdAndUpdate()` #10820
+ * fix(index.d.ts): make insertMany() correctly return Promise<Array> if passing single document to `insertMany()` #10802
+ * fix(index.d.ts): avoid weird issue where TypeScript 4.3.x and 4.4.x makes string extend Function #10746
+ * fix(index.d.ts): allow type: `SchemaTypeOptions[]` when defining schema #10789
+ * fix(index.d.ts): allow using `$in` with enum fields #10757 #10734
+ * fix(index.d.ts): add missing fields and options params to Model constructor #10817
+ * fix(index.d.ts): support extending type for mongoose.models #10806 [MunifTanjim](https://github.com/MunifTanjim)
+ * docs: enhance docs section linking #10779 [saveman71](https://github.com/saveman71)
+ * docs(middleware): add missing query middleware #10721
+ * docs: fix typo #10853 [mdatif796](https://github.com/mdatif796)
+ * docs: add missing to #10848 [digidub](https://github.com/digidub)
+
+5.13.10 / 2021-10-05
+====================
+ * fix(index.d.ts): allow using type: SchemaDefinitionProperty in schema definitions #10674
+ * fix(index.d.ts): allow AnyObject as param to findOneAndReplace() #10714
+
+6.0.9 / 2021-10-04
+==================
+ * fix(document): init non-schema values if strict is set to false #10828
+ * fix(document): correctly track saved state for deeply nested objects #10773
+ * fix(array): avoid mutating arrays passed into Model() constructor #10766
+ * fix(cursor): allow using find().cursor() before connecting, report errors in pre('find') hooks when using `.cursor()` #10785
+ * fix(populate): support ref: Model with virtual populate #10695
+ * fix(schema): support type: { subpath: String } in document array definitions and improve schema `interpretAsType` error messages if type name is undefined #10750
+ * fix: upgrade to mongodb driver 4.1.2 #10810 [orgads](https://github.com/orgads)
+ * fix(subdocument): add extra precaution to throw an error if a subdocument is a parent of itself in `ownerDocument()` #9259
+ * perf(index.d.ts): make `model()` call more strict to improve VS Code autocomplete perf #10801 [traverse1984](https://github.com/traverse1984)
+ * fix(index.d.ts): allow calling depopulate with 0 args #10793
+ * fix(index.d.ts): Add type definitions for allowDiskUse #10791 [coyotte508](https://github.com/coyotte508)
+ * docs(populate): expand virtual populate docs with info on principle of least cardinality and other info #10558
+ * docs: add migration guide to side bar #10769
+ * docs(connections+api): clarify that maxPoolSize is now 100 by default #10809
+ * docs(schema): add Schema#virtuals to docs as a public property #10829
+ * docs: remove array indexes section from FAQ #10784 [Duchynko](https://github.com/Duchynko)
+ * docs(model): fix broken example #10831 [Okekeprince1](https://github.com/Okekeprince1)
+ * docs: fix markdown issue with schemas.md #10839 [aseerkt](https://github.com/aseerkt)
+
 6.0.8 / 2021-09-27
 ==================
  * fix: support $set on elements of map of subdocuments #10720

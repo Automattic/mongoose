@@ -330,7 +330,7 @@ We may find however, if we use the `author` object, we are unable to get a
 list of the stories. This is because no `story` objects were ever 'pushed'
 onto `author.stories`.
 
-There are two perspectives here. First, you may want the `author` know
+There are two perspectives here. First, you may want the `author` to know
 which stories are theirs. Usually, your schema should resolve
 one-to-many relationships by having a parent pointer in the 'many' side.
 But, if you have a good reason to want an array of child pointers, you
@@ -577,83 +577,81 @@ regardless of how many models your `commentSchema` can point to.
 
 <h3 id="populate-virtuals"><a href="#populate-virtuals">Populate Virtuals</a></h3>
 
-So far you've only populated based on the `_id` field. However, that's
-sometimes not the right choice.
-In particular, [arrays that grow without bound are a MongoDB anti-pattern](https://docs.mongodb.com/manual/tutorial/model-referenced-one-to-many-relationships-between-documents/).
-Using mongoose virtuals, you can define more sophisticated relationships
-between documents.
+So far you've only populated based on the `_id` field.
+However, that's sometimes not the right choice.
+For example, suppose you have 2 models: `Author` and `BlogPost`.
 
 ```javascript
-const PersonSchema = new Schema({
+const AuthorSchema = new Schema({
   name: String,
-  band: String
+  posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost' }]
 });
 
-const BandSchema = new Schema({
+const BlogPostSchema = new Schema({
+  title: String,
+  comments: [{
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
+    content: String
+  }]
+});
+
+const Author = mongoose.model('Author', AuthorSchema, 'Author');
+const BlogPost = mongoose.model('BlogPost', BlogPostSchema, 'BlogPost');
+```
+
+The above is an example of **bad schema design**. Why?
+Suppose you have an extremely prolific author that writes over 10k blog posts.
+That `author` document will be huge, over 12kb, and large documents lead to performance issues on both server and client.
+The [Principle of Least Cardinality](https://dev.to/swyx/4-things-i-learned-from-mastering-mongoose-js-25e#4-principle-of-least-cardinality) states that one-to-many relationships, like author to blog post, should be stored on the "many" side.
+In other words, blog posts should store their `author`, authors should **not** store all their `posts`.
+
+```javascript
+const AuthorSchema = new Schema({
   name: String
 });
-BandSchema.virtual('members', {
-  ref: 'Person', // The model to use
-  localField: 'name', // Find people where `localField`
-  foreignField: 'band', // is equal to `foreignField`
-  // If `justOne` is true, 'members' will be a single doc as opposed to
-  // an array. `justOne` is false by default.
-  justOne: false,
-  options: { sort: { name: -1 }, limit: 5 } // Query options, see http://bit.ly/mongoose-query-options
-});
 
-const Person = mongoose.model('Person', PersonSchema);
-const Band = mongoose.model('Band', BandSchema);
-
-/**
- * Suppose you have 2 bands: "Guns N' Roses" and "Motley Crue"
- * And 4 people: "Axl Rose" and "Slash" with "Guns N' Roses", and
- * "Vince Neil" and "Nikki Sixx" with "Motley Crue"
- */
-Band.find({}).populate('members').exec(function(error, bands) {
-  /* `bands.members` is now an array of instances of `Person` */
+const BlogPostSchema = new Schema({
+  title: String,
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
+  comments: [{
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
+    content: String
+  }]
 });
 ```
 
-You can also use [the populate `match` option](http://thecodebarbarian.com/mongoose-5-5-static-hooks-and-populate-match-functions.html#populate-match-function)
-to add an additional filter to the `populate()` query. This is useful
-if you need to split up `populate()` data:
+Unfortunately, these two schemas, as written, don't support populating an author's list of blog posts.
+That's where _virtual populate_ comes in.
+Virtual populate means calling `populate()` on a virtual property that has a `ref` option as shown below.
 
 ```javascript
-const PersonSchema = new Schema({
-  name: String,
-  band: String,
-  isActive: Boolean
+// Specifying a virtual with a `ref` property is how you enable virtual
+// population
+AuthorSchema.virtual('posts', {
+  ref: 'BlogPost',
+  localField: '_id',
+  foreignField: 'author'
 });
 
-const BandSchema = new Schema({
-  name: String
-});
-BandSchema.virtual('activeMembers', {
-  ref: 'Person',
-  localField: 'name',
-  foreignField: 'band',
-  justOne: false,
-  match: { isActive: true }
-});
-BandSchema.virtual('formerMembers', {
-  ref: 'Person',
-  localField: 'name',
-  foreignField: 'band',
-  justOne: false,
-  match: { isActive: false }
-});
+const Author = mongoose.model('Author', AuthorSchema, 'Author');
+const BlogPost = mongoose.model('BlogPost', BlogPostSchema, 'BlogPost');
 ```
 
-Keep in mind that virtuals are _not_ included in `toJSON()` and `toObject()` output by default. If you want populate
-virtuals to show up when using functions that rely on `JSON.stringify()`, like Express'
-[`res.json()` function](https://masteringjs.io/tutorials/express/json),
-set the `virtuals: true` option on your schema's `toJSON` options.
+You can then `populate()` the author's `posts` as shown below.
 
 ```javascript
-const BandSchema = new Schema({ name: String }, {
+const author = await Author.findOne().populate('posts');
+
+author.posts[0].title; // Title of the first blog post
+```
+
+Keep in mind that virtuals are _not_ included in `toJSON()` and `toObject()` output by default.
+If you want populate virtuals to show up when using functions like Express' [`res.json()` function](https://masteringjs.io/tutorials/express/json) or `console.log()`, set the `virtuals: true` option on your schema's `toJSON` and `toObject()` options.
+
+```javascript
+const authorSchema = new Schema({ name: String }, {
   toJSON: { virtuals: true }, // So `res.json()` and other `JSON.stringify()` functions include virtuals
-  toObject: { virtuals: true } // So `toObject()` output includes virtuals
+  toObject: { virtuals: true } // So `console.log()` and other functions that use `toObject()` include virtuals
 });
 ```
 
@@ -661,19 +659,17 @@ If you're using populate projections, make sure `foreignField` is included
 in the projection.
 
 ```javascript
-Band.
+let authors = await Author.
   find({}).
-  populate({ path: 'members', select: 'name' }).
-  exec(function(error, bands) {
-    // Won't work, foreign field `band` is not selected in the projection
-  });
+  // Won't work because the foreign field `author` is not selected
+  populate({ path: 'posts', select: 'title' }).
+  exec();
 
-Band.
+authors = await Author.
   find({}).
-  populate({ path: 'members', select: 'name band' }).
-  exec(function(error, bands) {
-    // Works, foreign field `band` is selected
-  });
+  // Works, foreign field `band` is selected
+  populate({ path: 'posts', select: 'title author' }).
+  exec();
 ```
 
 <h3 id="count"><a href="#count">Populate Virtuals: The Count Option</a></h3>

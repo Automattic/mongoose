@@ -408,6 +408,7 @@ Valid options:
 - [writeConcern](#writeConcern)
 - [shardKey](#shardKey)
 - [strict](#strict)
+- [strictQuery](#strictQuery)
 - [toJSON](#toJSON)
 - [toObject](#toObject)
 - [typeKey](#typeKey)
@@ -753,6 +754,60 @@ const Thing = mongoose.model('Thing', thingSchema);
 const thing = new Thing;
 thing.iAmNotInTheSchema = true;
 thing.save(); // iAmNotInTheSchema is never saved to the db
+```
+
+<h3 id="strictQuery"><a href="#strictQuery">option: strictQuery</a></h3>
+
+Mongoose supports a separate `strictQuery` option to avoid strict mode for query filters.
+This is because empty query filters cause Mongoose to return all documents in the model, which can cause issues.
+
+```javascript
+const mySchema = new Schema({ field: Number }, { strict: true });
+const MyModel = mongoose.model('Test', mySchema);
+// Mongoose will filter out `notInSchema: 1` because `strict: true`, meaning this query will return
+// _all_ documents in the 'tests' collection
+MyModel.find({ notInSchema: 1 });
+```
+
+The `strict` option does apply to updates.
+The `strictQuery` option is **just** for query filters.
+
+```javascript
+// Mongoose will strip out `notInSchema` from the update if `strict` is
+// not `false`
+MyModel.updateMany({}, { $set: { notInSchema: 1 } });
+```
+
+Mongoose has a separate `strictQuery` option to toggle strict mode for the `filter` parameter to queries.
+
+```javascript
+const mySchema = new Schema({ field: Number }, {
+  strict: true,
+  strictQuery: false // Turn off strict mode for query filters
+});
+const MyModel = mongoose.model('Test', mySchema);
+// Mongoose will strip out `notInSchema: 1` because `strictQuery` is false
+MyModel.find({ notInSchema: 1 });
+```
+
+In general, we do **not** recommend passing user-defined objects as query filters:
+
+```javascript
+// Don't do this!
+const docs = await MyModel.find(req.query);
+
+// Do this instead:
+const docs = await MyModel.find({ name: req.query.name, age: req.query.age }).setOptions({ sanitizeFilter: true });
+```
+
+In Mongoose 6, `strictQuery` is equal to `strict` by default.
+However, you can override this behavior globally:
+
+```javascript
+// Set `strictQuery` to `false`, so Mongoose doesn't strip out non-schema
+// query filter properties by default.
+// This does **not** affect `strict`.
+mongoose.set('strictQuery', false);
 ```
 
 <h3 id="toJSON"><a href="#toJSON">option: toJSON</a></h3>
@@ -1221,7 +1276,7 @@ console.log(schema.virtuals); // { myVirtual: VirtualType { ... } }
 Schemas are also [pluggable](./plugins.html) which allows us to package up reusable features into
 plugins that can be shared with the community or just between your projects.
 
-<h3 id="further-reading">Further Reading</h3>
+<h3 id="further-reading"><a href="further-reading">Further Reading</a></h3>
 
 Here's an [alternative introduction to Mongoose schemas](https://masteringjs.io/tutorials/mongoose/schema).
 

@@ -2123,26 +2123,6 @@ describe('model: update:', function() {
       });
     });
 
-    it('update handles casting with mongoose-long (gh-4283)', function(done) {
-      require('mongoose-long')(mongoose);
-
-      const Model = db.model('Test', {
-        number: { type: mongoose.Types.Long }
-      });
-
-      Model.create({ number: mongoose.mongo.Long.fromString('0') }, function(error) {
-        assert.ifError(error);
-        Model.update({}, { $inc: { number: mongoose.mongo.Long.fromString('2147483648') } }, function(error) {
-          assert.ifError(error);
-          Model.findOne({ number: { $type: 18 } }, function(error, doc) {
-            assert.ifError(error);
-            assert.ok(doc);
-            done();
-          });
-        });
-      });
-    });
-
     it('single nested with runValidators (gh-4420)', function(done) {
       const FileSchema = new Schema({
         name: String

@@ -58,7 +58,6 @@
     "mkdirp": "0.5.5",
     "mocha": "5.x",
     "moment": "2.x",
-    "mongoose-long": "0.2.1",
     "node-static": "0.7.11",
     "object-sizeof": "1.3.0",
     "pug": "2.0.3",

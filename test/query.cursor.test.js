@@ -623,7 +623,6 @@ describe('QueryCursor', function() {
         let closeEventTriggeredCount = 0;
         cursor.on('close', () => closeEventTriggeredCount++);
 
-
         setTimeout(() => {
           assert.equal(closeEventTriggeredCount, 1);
           done();

@@ -2630,11 +2630,12 @@ declare module 'mongoose' {
 
   export type UpdateQuery<T> = (_UpdateQuery<_UpdateQueryDef<T>> & MatchKeysAndValues<_UpdateQueryDef<LeanDocument<T>>>);
 
-  type _AllowStringsForIds<T> = {
-    [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never]
+  export type DocumentDefinition<T> = {
+    [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:
+      [Extract<T[K], mongodb.ObjectId>] extends [never]
       ? T[K] extends TreatAsPrimitives
         ? T[K]
-        : _AllowStringsForIds<T[K]>
+        : LeanDocumentElement<T[K]>
       : T[K] | string;
     };
 

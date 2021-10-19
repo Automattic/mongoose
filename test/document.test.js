@@ -6787,7 +6787,7 @@ describe('document', function() {
     return event.validate();
   });
 
-  it('flattenMaps option for toObject() (gh-7274) (gh-10486)', function() {
+  it('flattenMaps option for toObject() (gh-10872) (gh-7274) (gh-10486)', function() {
     const subSchema = new Schema({ name: String });
 
     let schema = new Schema({
@@ -6804,6 +6804,9 @@ describe('document', function() {
     mapTest.test.set('key1', { name: 'value1' });
     // getters: true for gh-10486
     assert.equal(mapTest.toObject({ getters: true, flattenMaps: true }).test.key1.name, 'value1');
+
+    assert.equal(mapTest.toJSON({ getters: true, flattenMaps: true }).test.key1.name, 'value1');
+    assert.equal(mapTest.toJSON({ getters: true }).test.get('key1').name, 'value1');
 
     schema = new Schema({
       test: {
@@ -6825,7 +6828,6 @@ describe('document', function() {
   it('`collection` property with strict: false (gh-7276)', async function() {
     const schema = new Schema({}, { strict: false, versionKey: false });
     const Model = db.model('Test', schema);
-
 
     let doc = new Model({ test: 'foo', collection: 'bar' });
 

@@ -6806,7 +6806,7 @@ describe('document', function() {
     assert.equal(mapTest.toObject({ getters: true, flattenMaps: true }).test.key1.name, 'value1');
 
     assert.equal(mapTest.toJSON({ getters: true, flattenMaps: true }).test.key1.name, 'value1');
-    assert.equal(mapTest.toJSON({ getters: true }).test.get('key1').name, 'value1');
+    assert.equal(mapTest.toJSON({ getters: true, flattenMaps: false }).test.get('key1').name, 'value1');
 
     schema = new Schema({
       test: {

@@ -683,8 +683,9 @@ declare module 'mongoose' {
     set(value: any): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON(options?: ToObjectOptions): LeanDocument<this>;
-    toJSON<T = DocType>(options?: ToObjectOptions): T;
+    toJSON(options: ToObjectOptions & { flattenMaps: false }): LeanDocument<this>;
+    toJSON(options?: ToObjectOptions): FlattenMaps<LeanDocument<this>>;
+    toJSON<T = FlattenMaps<DocType>>(options?: ToObjectOptions): T;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
     toObject(options?: ToObjectOptions): LeanDocument<this>;
@@ -2555,10 +2556,10 @@ declare module 'mongoose' {
 
   type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & AnyObject;
 
-  type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string | AnyArray<T | string | Document> : // Allow strings for ObjectIds
-    T extends string ? T | RegExp | AnyArray<T> : // Allow RegExps for strings
+  type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string | (T | string)[] : // Allow strings for ObjectIds
+    T extends string ? T | RegExp | T[] : // Allow RegExps for strings
     T extends (infer U)[] ? T | U : // Allow single array elements for arrays
-    T | AnyArray<T>;
+    T | T[];
   type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
   type _FilterQuery<T> = {
@@ -2636,6 +2637,10 @@ declare module 'mongoose' {
         : _AllowStringsForIds<T[K]>
       : T[K] | string;
     };
+
+  export type FlattenMaps<T> = {
+    [K in keyof T]: T[K] extends Map<any, any> ? AnyObject : FlattenMaps<T[K]>;
+  };
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   type TreatAsPrimitives = actualPrimitives |

@@ -64,3 +64,9 @@ function gh10575() {
   someMap.set('A', Model1);
   someMap.set('B', Model2);
 }
+
+function gh10872(): void {
+  const doc: ITest = new Test({});
+
+  doc.toJSON().map1.foo;
+}

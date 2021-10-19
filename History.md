@@ -1,3 +1,8 @@
+5.13.12 / 2021-10-19
+====================
+ * fix(cursor): use stream destroy method on close to prevent emitting duplicate 'close' #10897 [iovanom](https://github.com/iovanom)
+ * fix(index.d.ts): backport streamlining of FilterQuery and DocumentDefinition to avoid "excessively deep and possibly infinite" TS errors #10617
+
 5.13.11 / 2021-10-12
 ====================
  * fix: upgrade mongodb -> 3.7.2 #10871 [winstonralph](https://github.com/winstonralph)

@@ -1839,6 +1839,9 @@ declare module 'mongoose' {
         discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
+        /** The schematype embedded in this array */
+        caster?: SchemaType;
+
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
          * `SchemaString.prototype.enum()` or `SchemaNumber.prototype.enum()`
@@ -1898,6 +1901,9 @@ declare module 'mongoose' {
 
         /** The schema used for documents in this array */
         schema: Schema;
+
+        /** The constructor used for subdocuments in this array */
+        caster?: typeof Types.Subdocument;
       }
 
       class Map extends SchemaType {

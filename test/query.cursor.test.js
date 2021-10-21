@@ -623,11 +623,92 @@ describe('QueryCursor', function() {
         let closeEventTriggeredCount = 0;
         cursor.on('close', () => closeEventTriggeredCount++);
 
-
         setTimeout(() => {
           assert.equal(closeEventTriggeredCount, 1);
           done();
         }, 200);
+      });
+  });
+
+  it('query cursor emit end event (gh-10902)', function(done) {
+    const User = db.model('User', new Schema({ name: String }));
+
+    User.create({ name: 'First' }, { name: 'Second' })
+      .then(() => {
+        const cursor = User.find({}).cursor();
+        cursor.on('data', () => {
+          cursor.pause();
+          setTimeout(() => cursor.resume(), 50);
+        });
+
+        let endEventTriggeredCount = 0;
+        cursor.on('end', () => endEventTriggeredCount++);
+
+        setTimeout(() => {
+          assert.equal(endEventTriggeredCount, 1);
+          done();
+        }, 200);
+      });
+  });
+
+  it('aggregate cursor emit end event (gh-10902)', function(done) {
+    const User = db.model('User', new Schema({ name: String }));
+
+    User.create({ name: 'First' }, { name: 'Second' })
+      .then(() => {
+        const cursor = User.aggregate([{ $match: {} }]).cursor();
+        cursor.on('data', () => {
+          cursor.pause();
+          setTimeout(() => cursor.resume(), 50);
+        });
+
+        let endEventTriggeredCount = 0;
+        cursor.on('end', () => endEventTriggeredCount++);
+
+        setTimeout(() => {
+          assert.equal(endEventTriggeredCount, 1);
+          done();
+        }, 200);
+      });
+  });
+
+  it('query cursor emit end event before close event (gh-10902)', function(done) {
+    const User = db.model('User', new Schema({ name: String }));
+
+    User.create({ name: 'First' }, { name: 'Second' })
+      .then(() => {
+        const cursor = User.find({}).cursor();
+        cursor.on('data', () => {
+          cursor.pause();
+          setTimeout(() => cursor.resume(), 50);
+        });
+
+        let endEventTriggeredCount = 0;
+        cursor.on('end', () => endEventTriggeredCount++);
+        cursor.on('close', () => {
+          assert.equal(endEventTriggeredCount, 1);
+          done();
+        });
+      });
+  });
+
+  it('aggregate cursor emit end event before close event (gh-10902)', function(done) {
+    const User = db.model('User', new Schema({ name: String }));
+
+    User.create({ name: 'First' }, { name: 'Second' })
+      .then(() => {
+        const cursor = User.aggregate([{ $match: {} }]).cursor();
+        cursor.on('data', () => {
+          cursor.pause();
+          setTimeout(() => cursor.resume(), 50);
+        });
+
+        let endEventTriggeredCount = 0;
+        cursor.on('end', () => endEventTriggeredCount++);
+        cursor.on('close', () => {
+          assert.equal(endEventTriggeredCount, 1);
+          done();
+        });
       });
   });
 

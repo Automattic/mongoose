@@ -91,6 +91,9 @@ describe('defaults docs', function() {
     });
 
     const Movie = db.model('Movie', schema);
+    // acquit:ignore:start
+    await Movie.deleteMany({});
+    // acquit:ignore:end
 
     const query = {};
     const update = { title: 'The Terminator' };

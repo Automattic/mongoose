@@ -132,7 +132,7 @@ describe('promises docs', function () {
       //   at process._tickCallback (internal/process/next_tick.js:68:7)
       err.stack;
       // acquit:ignore:start
-      assert.ok(!err.stack.includes('promises.test.es6.js'));
+      assert.ok(!err.stack.includes('promises.test.js'));
       // acquit:ignore:end
     }
 
@@ -149,7 +149,7 @@ describe('promises docs', function () {
       //   at process._tickCallback (internal/process/next_tick.js:68:7)
       err.stack;
       // acquit:ignore:start
-      assert.ok(err.stack.includes('promises.test.es6.js'));
+      assert.ok(err.stack.includes('promises.test.js'));
       // acquit:ignore:end
     }
   });

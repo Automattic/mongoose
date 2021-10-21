@@ -683,8 +683,9 @@ declare module 'mongoose' {
     set(value: any): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON(options?: ToObjectOptions): LeanDocument<this>;
-    toJSON<T = DocType>(options?: ToObjectOptions): T;
+    toJSON(options: ToObjectOptions & { flattenMaps: false }): LeanDocument<this>;
+    toJSON(options?: ToObjectOptions): FlattenMaps<LeanDocument<this>>;
+    toJSON<T = FlattenMaps<DocType>>(options?: ToObjectOptions): T;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
     toObject(options?: ToObjectOptions): LeanDocument<this>;
@@ -1257,7 +1258,7 @@ declare module 'mongoose' {
     childSchemas: { schema: Schema, model: any }[];
 
     /** Returns a copy of this schema */
-    clone(): Schema;
+    clone(): this;
 
     /** Object containing discriminators defined on this schema */
     discriminators?: { [name: string]: Schema };
@@ -1838,6 +1839,9 @@ declare module 'mongoose' {
         discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
+        /** The schematype embedded in this array */
+        caster?: SchemaType;
+
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
          * `SchemaString.prototype.enum()` or `SchemaNumber.prototype.enum()`
@@ -1897,6 +1901,9 @@ declare module 'mongoose' {
 
         /** The schema used for documents in this array */
         schema: Schema;
+
+        /** The constructor used for subdocuments in this array */
+        caster?: typeof Types.Subdocument;
       }
 
       class Map extends SchemaType {
@@ -2555,10 +2562,10 @@ declare module 'mongoose' {
 
   type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & AnyObject;
 
-  type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string | AnyArray<T | string | Document> : // Allow strings for ObjectIds
-    T extends string ? T | RegExp | AnyArray<T> : // Allow RegExps for strings
+  type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string | (T | string)[] : // Allow strings for ObjectIds
+    T extends string ? T | RegExp | T[] : // Allow RegExps for strings
     T extends (infer U)[] ? T | U : // Allow single array elements for arrays
-    T | AnyArray<T>;
+    T | T[];
   type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
   type _FilterQuery<T> = {
@@ -2629,13 +2636,18 @@ declare module 'mongoose' {
 
   export type UpdateQuery<T> = (_UpdateQuery<_UpdateQueryDef<T>> & MatchKeysAndValues<_UpdateQueryDef<LeanDocument<T>>>);
 
-  type _AllowStringsForIds<T> = {
-    [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never]
+  export type DocumentDefinition<T> = {
+    [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:
+      [Extract<T[K], mongodb.ObjectId>] extends [never]
       ? T[K] extends TreatAsPrimitives
         ? T[K]
-        : _AllowStringsForIds<T[K]>
+        : LeanDocumentElement<T[K]>
       : T[K] | string;
     };
+
+  export type FlattenMaps<T> = {
+    [K in keyof T]: T[K] extends Map<any, any> ? AnyObject : FlattenMaps<T[K]>;
+  };
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   type TreatAsPrimitives = actualPrimitives |

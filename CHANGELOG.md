@@ -1,3 +1,21 @@
+6.0.12 / 2021-10-21
+===================
+ * fix(cursor): remove the logic for emitting close, rely on autoDestroy option for Node 12 support #10906 [iovanom](https://github.com/iovanom)
+ * * fix(map): support passing flattenMaps: false to Map toJSON(), make `toJSON()` flatten maps by default in TypeScript #10872
+ * fix: upgrade to mongodb driver 4.1.3 #10911 [orgads](https://github.com/orgads)
+ * fix(index.d.ts): correct TS function signature for `SchemaType.prototype.set()` #10799
+ * fix(index.d.ts): support implicit $in in FilterQuery #10826
+ * fix(index.d.ts): More precise type for Schema.clone() #10899 [coyotte508](https://github.com/coyotte508)
+ * fix(index.d.ts): add caster property to schema arrays and document arrays #10865
+ * docs: update `updateMany()` and `deleteMany()` docs to reflect new `matchedCount`, `modifiedCount`, `deletedCount` properties #10908 [IslandRhythms](https://github.com/IslandRhythms)
+ * docs: fix broken links to populate virtuals #10870 [IslandRhythms](https://github.com/IslandRhythms)
+ * docs: updated docs to have returnOriginal, removed new and returnDocument #10887 [IslandRhythms](https://github.com/IslandRhythms)
+
+5.13.12 / 2021-10-19
+====================
+ * fix(cursor): use stream destroy method on close to prevent emitting duplicate 'close' #10897 [iovanom](https://github.com/iovanom)
+ * fix(index.d.ts): backport streamlining of FilterQuery and DocumentDefinition to avoid "excessively deep and possibly infinite" TS errors #10617
+
 6.0.11 / 2021-10-14
 ===================
  * perf(index.d.ts): remove some unnecessary definitions, streamline some union types to reduce number of instantiations #10349

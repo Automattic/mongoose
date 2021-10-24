@@ -336,7 +336,7 @@ If you set `timestamps: true`, Mongoose will now make the `createdAt` property `
 SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`.
 
 In v5.x schema types setters received the second parameter `self`, which is the schemaType itself.
-in v6.x schema types setters receive `priorValue` as the second parameter, and `self` as the third parameter. We should add this to the migration guide.
+in v6.x schema types setters receive `priorValue` as the second parameter, and `self` as the third parameter.
 
 ```ts
 const userSchema = new Schema({

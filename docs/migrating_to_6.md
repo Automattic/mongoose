@@ -35,6 +35,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [Immutable `createdAt`](#immutable-createdat)
 * [Removed Validator `isAsync`](#removed-validator-isasync)
 * [Removed `safe`](#removed-safe)
+* [SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`](#schematype-set-parameters)
 * [TypeScript changes](#typescript-changes)
 
 <h3 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h3>
@@ -330,6 +331,33 @@ If you set `timestamps: true`, Mongoose will now make the `createdAt` property `
 
 `safe` is no longer an option for schemas, queries, or `save()`. Use `writeConcern` instead.
 
+<h3 id="schematype-set-parameters"><a href="#schematype-set-parameters">SchemaType `set` parameters</a></h3>
+
+SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`.
+
+In v5.x schema types setters received the second parameter `self`, which is the schemaType itself.
+in v6.x schema types setters receive `priorValue` as the second parameter, and `self` as the third parameter. We should add this to the migration guide.
+
+```ts
+const userSchema = new Schema({
+  name: {
+    type: String,
+    // in v5.x, the second parameter was `self`
+    set: (val, self) => {
+      return self.cast(val.toLowerCase());
+    },
+    // in v6.x, add a second parameter `priorValue`
+    set: (val, priorValue, self) => {
+      return self.cast(val.toLowerCase());
+    }
+  }
+});
+
+const User = mongoose.model('User', userSchema);
+
+const user = new User({ name: 'Robert Martin' });
+console.log(user.name); // 'robert martin'
+```
 ## TypeScript changes
 
 The `Schema` class now takes 3 generic params instead of 4. The 3rd generic param, `SchemaDefinitionType`, is now the same as the 1st generic param `DocType`. Replace `new Schema<UserDocument, UserModel, User>(schemaDefinition)` with `new Schema<UserDocument, UserModel>(schemaDefinition)`

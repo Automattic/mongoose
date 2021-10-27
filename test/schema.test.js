@@ -2701,4 +2701,14 @@ describe('schema', function() {
     assert.equal(schema.path('something').caster.schema.path('somePath').instance, 'String');
     assert.equal(schema.path('somethingElse').caster.schema.path('somePath').instance, 'String');
   });
+  it('should inherit minimize option (gh-10827)', function() {
+    // thing is there, just not printing
+    const child = new mongoose.Schema({
+      thing: Mixed
+    })
+    const parentSchema = new mongoose.Schema({child}, {minimize: false});
+    const Parent = db.model('Test', parentSchema);
+    const p = new Parent({child: {thing: {} } });
+    assert(p.child.thing);
+  })
 });

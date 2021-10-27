@@ -2709,6 +2709,7 @@ describe('schema', function() {
     const parentSchema = new mongoose.Schema({child}, {minimize: false});
     const Parent = db.model('Test', parentSchema);
     const p = new Parent({child: {thing: {} } });
+    // console.log(p.child.thing);
     assert(p.child.thing);
   })
 });

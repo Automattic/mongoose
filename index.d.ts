@@ -2129,6 +2129,9 @@ declare module 'mongoose' {
     circle(area: any): this;
     circle(path: string, area: any): this;
 
+    /** Make a copy of this query so you can re-execute it. */
+    clone(): this;
+
     /** Adds a collation to this op (MongoDB 3.4 and up) */
     collation(value: mongodb.CollationOptions): this;
 

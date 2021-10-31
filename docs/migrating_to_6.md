@@ -333,25 +333,24 @@ If you set `timestamps: true`, Mongoose will now make the `createdAt` property `
 
 <h3 id="schematype-set-parameters"><a href="#schematype-set-parameters">SchemaType `set` parameters</a></h3>
 
-SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`.
+Mongoose now calls setter functions with `priorValue` as the 2nd parameter, rather than `schemaType` in Mongoose 5.
 
-In v5.x schema types setters received the second parameter `self`, which is the schemaType itself.
-in v6.x schema types setters receive `priorValue` as the second parameter, and `self` as the third parameter. We should add this to the migration guide.
 
-```ts
+```js
 const userSchema = new Schema({
   name: {
     type: String,
-    // in v5.x, the second parameter was `self`
-    set: (val, self) => {
-      return self.cast(val.toLowerCase());
-    },
-    // in v6.x, add a second parameter `priorValue`
-    set: (val, priorValue, self) => {
-      return self.cast(val.toLowerCase());
-    }
+    trimStart: true,
+    set: trimStartSetter
   }
 });
+
+// in v5.x the parameters were (value, schemaType), in v6.x the parameters are (value, priorValue, schemaType).
+function trimStartSetter(val, priorValue, schemaType) {
+  if (schemaType.options.trimStart && typeof val === 'string') {
+    return val.trimStart();
+  }
+}
 
 const User = mongoose.model('User', userSchema);
 

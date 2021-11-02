@@ -35,6 +35,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [Immutable `createdAt`](#immutable-createdat)
 * [Removed Validator `isAsync`](#removed-validator-isasync)
 * [Removed `safe`](#removed-safe)
+* [SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`](#schematype-set-parameters)
 * [TypeScript changes](#typescript-changes)
 
 <h3 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h3>
@@ -329,6 +330,34 @@ If you set `timestamps: true`, Mongoose will now make the `createdAt` property `
 <h3 id="removed-safe"><a href="#removed-safe">Removed `safe`</a></h3>
 
 `safe` is no longer an option for schemas, queries, or `save()`. Use `writeConcern` instead.
+
+<h3 id="schematype-set-parameters"><a href="#schematype-set-parameters">SchemaType `set` parameters</a></h3>
+
+Mongoose now calls setter functions with `priorValue` as the 2nd parameter, rather than `schemaType` in Mongoose 5.
+
+
+```js
+const userSchema = new Schema({
+  name: {
+    type: String,
+    trimStart: true,
+    set: trimStartSetter
+  }
+});
+
+// in v5.x the parameters were (value, schemaType), in v6.x the parameters are (value, priorValue, schemaType).
+function trimStartSetter(val, priorValue, schemaType) {
+  if (schemaType.options.trimStart && typeof val === 'string') {
+    return val.trimStart();
+  }
+  return val;
+}
+
+const User = mongoose.model('User', userSchema);
+
+const user = new User({ name: 'Robert Martin' });
+console.log(user.name); // 'robert martin'
+```
 
 ## TypeScript changes
 

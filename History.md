@@ -1,3 +1,9 @@
+5.13.13 / 2021-11-02
+====================
+ * fix: upgrade to mongodb@3.7.3 #10909 [gaurav-sharma-gs](https://github.com/gaurav-sharma-gs)
+ * fix: correctly emit end event in before close #10916 [iovanom](https://github.com/iovanom)
+ * fix(index.d.ts): improve ts types for query set #10942 [jneal-afs](https://github.com/jneal-afs)
+
 5.13.12 / 2021-10-19
 ====================
  * fix(cursor): use stream destroy method on close to prevent emitting duplicate 'close' #10897 [iovanom](https://github.com/iovanom)

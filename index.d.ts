@@ -2442,7 +2442,7 @@ declare module 'mongoose' {
      * This is useful for query middleware so you can add an update regardless
      * of whether you use `updateOne()`, `updateMany()`, `findOneAndUpdate()`, etc.
      */
-    set(path: string, value: any): this;
+    set(path: string | Record<string, unknown>, value?: any): this;
 
     /** Sets query options. Some options only make sense for certain operations. */
     setOptions(options: QueryOptions, overwrite?: boolean): this;

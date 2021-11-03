@@ -2704,10 +2704,10 @@ describe('schema', function() {
   it('should inherit minimize option (gh-10827)', function() {
     const child = new mongoose.Schema({
       thing: Mixed
-    })
-    const parentSchema = new mongoose.Schema({child}, {minimize: false});
+    });
+    const parentSchema = new mongoose.Schema({ child }, { minimize: false });
     const Parent = db.model('hojpoj', parentSchema);
-    const p = new Parent({child: {thing: {} }});
-    assert.equal(JSON.stringify(p), JSON.stringify({child: {thing: {}, _id: p.child._id, }, _id: p._id}))
+    const p = new Parent({ child: { thing: {} } });
+    assert.equal(JSON.stringify(p), JSON.stringify({child: {thing: {}, _id: p.child._id, }, _id: p._id}));
   })
 });

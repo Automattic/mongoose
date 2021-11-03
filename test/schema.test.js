@@ -2708,6 +2708,6 @@ describe('schema', function() {
     const parentSchema = new mongoose.Schema({ child }, { minimize: false });
     const Parent = db.model('hojpoj', parentSchema);
     const p = new Parent({ child: { thing: {} } });
-    assert.equal(JSON.stringify(p), JSON.stringify({child: {thing: {}, _id: p.child._id, }, _id: p._id}));
-  })
+    assert.equal(JSON.stringify(p), JSON.stringify({ child: { thing: {}, _id: p.child._id }, _id: p._id }));
+  });
 });

@@ -773,11 +773,9 @@ describe('document', function() {
       let obj = post.toObject();
       assert.strictEqual(obj.props, void 0);
       assert.deepEqual(obj.owner.props, {});
-
       obj = post.toObject({ minimize: false });
       assert.deepEqual(obj.props, {});
       assert.deepEqual(obj.owner.props, {});
-
       obj = post.toObject({ minimize: true });
       assert.strictEqual(obj.props, void 0);
       assert.strictEqual(obj.owner.props, void 0);

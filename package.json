@@ -1,5 +1,5 @@
 {
-  "name": "mongoose",
+  "name": "@r6sbot/mongoose",
   "description": "Mongoose MongoDB ODM",
   "version": "6.0.12",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",

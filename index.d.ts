@@ -245,6 +245,12 @@ declare module 'mongoose' {
     strict?: boolean | 'throw';
 
     /**
+     * false by default, may be `false`, `true`, or `'throw'`. Sets the default
+     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
+     */
+    strictQuery?: boolean | 'throw';
+
+    /**
      * `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to
      * `toJSON()`, for determining how Mongoose documents get serialized by `JSON.stringify()`
      */

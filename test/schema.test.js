@@ -2701,6 +2701,7 @@ describe('schema', function() {
     assert.equal(schema.path('something').caster.schema.path('somePath').instance, 'String');
     assert.equal(schema.path('somethingElse').caster.schema.path('somePath').instance, 'String');
   });
+
   it('should inherit minimize option (gh-10827)', function() {
     const child = new mongoose.Schema({
       thing: Mixed
@@ -2709,5 +2710,17 @@ describe('schema', function() {
     const Parent = db.model('hojpoj', parentSchema);
     const p = new Parent({ child: { thing: {} } });
     assert.equal(JSON.stringify(p), JSON.stringify({ child: { thing: {}, _id: p.child._id }, _id: p._id }));
+  });
+
+  it('handles `Date` with `type` (gh-10807)', function() {
+    Date.type = Date;
+    const schema = new mongoose.Schema({
+      something: Date,
+      somethingElse: { type: Date, immutable: true }
+    });
+
+    assert.equal(schema.path('something').instance, 'Date');
+    assert.equal(schema.path('somethingElse').instance, 'Date');
+    delete Date.type;
   });
 });

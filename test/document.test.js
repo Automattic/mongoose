@@ -10708,4 +10708,38 @@ describe('document', function() {
     assert.ok(doc4.populated('subDocuments.subDocument'));
     assert.equal(doc4.subDocuments[0].subDocument.someField, '111');
   });
+
+  it('allows validating doc again if pre validate errors out (gh-10830)', async function() {
+    const BookSchema = Schema({
+      name: String,
+      price: Number,
+      quantity: Number
+    });
+
+    BookSchema.pre('validate', disallownumflows);
+
+    const Book = db.model('Test', BookSchema);
+
+    function disallownumflows(next) {
+      const self = this;
+      if (self.isNew) return next();
+
+      if (self.quantity === 27) {
+        return next(new Error('Wrong Quantity'));
+      }
+
+      next();
+    }
+
+    const { _id } = await Book.create({ name: 'Hello', price: 50, quantity: 25 });
+
+    const doc = await Book.findById(_id);
+
+    doc.quantity = 27;
+    const err = await doc.save().then(() => null, err => err);
+    assert.ok(err);
+
+    doc.quantity = 26;
+    await doc.save();
+  });
 });

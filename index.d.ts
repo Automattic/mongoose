@@ -1264,7 +1264,7 @@ declare module 'mongoose' {
     childSchemas: { schema: Schema, model: any }[];
 
     /** Returns a copy of this schema */
-    clone(): this;
+    clone<T = this>(): T;
 
     /** Object containing discriminators defined on this schema */
     discriminators?: { [name: string]: Schema };

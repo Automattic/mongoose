@@ -2701,4 +2701,16 @@ describe('schema', function() {
     assert.equal(schema.path('something').caster.schema.path('somePath').instance, 'String');
     assert.equal(schema.path('somethingElse').caster.schema.path('somePath').instance, 'String');
   });
+
+  it('handles `Date` with `type` (gh-10807)', function() {
+    Date.type = Date;
+    const schema = new mongoose.Schema({
+      something: Date,
+      somethingElse: { type: Date, immutable: true }
+    });
+
+    assert.equal(schema.path('something').instance, 'Date');
+    assert.equal(schema.path('somethingElse').instance, 'Date');
+    delete Date.type;
+  });
 });

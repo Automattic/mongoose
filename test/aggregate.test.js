@@ -342,14 +342,14 @@ describe('aggregate: ', function() {
     });
   });
 
-  describe('unionWith', function () {
-    it('works', function () {
+  describe('unionWith', function() {
+    it('works', function() {
       const aggregate = new Aggregate();
       const obj = {
         coll: 'users',
         pipeline: [
           {
-            $match: {_id: 1}
+            $match: { _id: 1 }
           }
         ]
       };

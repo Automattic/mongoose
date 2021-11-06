@@ -2870,6 +2870,9 @@ declare module 'mongoose' {
      */
     sortByCount(arg: string | any): this;
 
+    /** Appends new $unionWith operator to this aggregate pipeline. */
+    unionWith(options: any): this;
+
     /** Appends new custom $unwind operator(s) to this aggregate pipeline. */
     unwind(...args: any[]): this;
   }

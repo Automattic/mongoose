@@ -342,6 +342,25 @@ describe('aggregate: ', function() {
     });
   });
 
+  describe('unionWith', function () {
+    it('works', function () {
+      const aggregate = new Aggregate();
+      const obj = {
+        coll: 'users',
+        pipeline: [
+          {
+            $match: {_id: 1}
+          }
+        ]
+      };
+
+      aggregate.unionWith(obj);
+
+      assert.equal(aggregate._pipeline.length, 1);
+      assert.deepEqual(aggregate._pipeline[0].$unionWith, obj);
+    });
+  });
+
   describe('sample', function() {
     it('works', function() {
       const aggregate = new Aggregate();

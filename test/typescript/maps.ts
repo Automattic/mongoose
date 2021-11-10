@@ -1,6 +1,12 @@
 import { Schema, model, Document, Model, Types } from 'mongoose';
 
-const schema: Schema = new Schema({
+interface ITest extends Document {
+  map1: Map<string, number>,
+  map2: Map<string, string>,
+  map3: Map<string, number>
+}
+
+const schema: Schema = new Schema<ITest>({
   map1: {
     type: Map,
     of: Number
@@ -17,12 +23,6 @@ const schema: Schema = new Schema({
     }
   }
 });
-
-interface ITest extends Document {
-  map1: Map<string, number>,
-  map2: Map<string, string>,
-  map3: Map<string, number>
-}
 
 const Test = model<ITest>('Test', schema);
 

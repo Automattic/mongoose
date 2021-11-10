@@ -1,7 +1,13 @@
+5.13.13 / 2021-11-02
+====================
+ * fix: upgrade to mongodb@3.7.3 #10909 [gaurav-sharma-gs](https://github.com/gaurav-sharma-gs)
+ * fix: correctly emit end event in before close #10916 [iovanom](https://github.com/iovanom)
+ * fix(index.d.ts): improve ts types for query set #10942 [jneal-afs](https://github.com/jneal-afs)
+
 6.0.12 / 2021-10-21
 ===================
  * fix(cursor): remove the logic for emitting close, rely on autoDestroy option for Node 12 support #10906 [iovanom](https://github.com/iovanom)
- * * fix(map): support passing flattenMaps: false to Map toJSON(), make `toJSON()` flatten maps by default in TypeScript #10872
+ * fix(map): support passing flattenMaps: false to Map toJSON(), make `toJSON()` flatten maps by default in TypeScript #10872
  * fix: upgrade to mongodb driver 4.1.3 #10911 [orgads](https://github.com/orgads)
  * fix(index.d.ts): correct TS function signature for `SchemaType.prototype.set()` #10799
  * fix(index.d.ts): support implicit $in in FilterQuery #10826

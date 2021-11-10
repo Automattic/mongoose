@@ -245,6 +245,12 @@ declare module 'mongoose' {
     strict?: boolean | 'throw';
 
     /**
+     * false by default, may be `false`, `true`, or `'throw'`. Sets the default
+     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
+     */
+    strictQuery?: boolean | 'throw';
+
+    /**
      * `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to
      * `toJSON()`, for determining how Mongoose documents get serialized by `JSON.stringify()`
      */
@@ -1258,7 +1264,7 @@ declare module 'mongoose' {
     childSchemas: { schema: Schema, model: any }[];
 
     /** Returns a copy of this schema */
-    clone(): this;
+    clone<T = this>(): T;
 
     /** Object containing discriminators defined on this schema */
     discriminators?: { [name: string]: Schema };
@@ -1559,6 +1565,7 @@ declare module 'mongoose' {
     type?:
       T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends Schema<any, any, any> ? T :
+      T extends Map<any, any> ? SchemaDefinition<typeof Map> :
       T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>>> | AnyArray<SchemaTypeOptions<Unpacked<T>>>) :
       T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> | AnyArray<SchemaTypeOptions<string>> :
       T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> | AnyArray<SchemaTypeOptions<number>> :
@@ -2129,6 +2136,9 @@ declare module 'mongoose' {
     circle(area: any): this;
     circle(path: string, area: any): this;
 
+    /** Make a copy of this query so you can re-execute it. */
+    clone(): this;
+
     /** Adds a collation to this op (MongoDB 3.4 and up) */
     collation(value: mongodb.CollationOptions): this;
 
@@ -2408,7 +2418,7 @@ declare module 'mongoose' {
      * This is useful for query middleware so you can add an update regardless
      * of whether you use `updateOne()`, `updateMany()`, `findOneAndUpdate()`, etc.
      */
-    set(path: string, value: any): this;
+    set(path: string | Record<string, unknown>, value?: any): this;
 
     /** Sets query options. Some options only make sense for certain operations. */
     setOptions(options: QueryOptions, overwrite?: boolean): this;

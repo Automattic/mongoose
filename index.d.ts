@@ -2995,7 +2995,7 @@ declare module 'mongoose' {
       >
     }
 
-    export interface GeoNear<T = any> {
+    export interface GeoNear<T = AnyObject> {
       /** [`$geoNear` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/) */
       $geoNear: {
         near: { type: 'Point'; coordinates: [number, number] } | [number, number]
@@ -3011,7 +3011,7 @@ declare module 'mongoose' {
       }
     }
 
-    export interface GraphLookup<T = any> {
+    export interface GraphLookup<T = AnyObject> {
       /** [`$graphLookup` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/graphLookup/) */
       $graphLookup: {
         from: string
@@ -3060,7 +3060,7 @@ declare module 'mongoose' {
       }
     }
 
-    export interface Match<T = any> {
+    export interface Match<T = AnyObject> {
       /** [`$match` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/match/) */
       $match: mongoose.FilterQuery<T>
     }

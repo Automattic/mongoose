@@ -2913,7 +2913,7 @@ declare module 'mongoose' {
   /**
    * [Stages reference](https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/#aggregation-pipeline-stages)
    */
-  export type PipelineStage<T = AnyObject> =
+  export type PipelineStage<T = any> =
     | PipelineStage.AddFields
     | PipelineStage.Bucket
     | PipelineStage.BucketAuto
@@ -2995,7 +2995,7 @@ declare module 'mongoose' {
       >
     }
 
-    export interface GeoNear<T = AnyObject> {
+    export interface GeoNear<T = any> {
       /** [`$geoNear` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/) */
       $geoNear: {
         near: { type: 'Point'; coordinates: [number, number] } | [number, number]
@@ -3011,7 +3011,7 @@ declare module 'mongoose' {
       }
     }
 
-    export interface GraphLookup<T = AnyObject> {
+    export interface GraphLookup<T = any> {
       /** [`$graphLookup` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/graphLookup/) */
       $graphLookup: {
         from: string
@@ -3060,7 +3060,7 @@ declare module 'mongoose' {
       }
     }
 
-    export interface Match<T = AnyObject> {
+    export interface Match<T = any> {
       /** [`$match` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/match/) */
       $match: mongoose.FilterQuery<T>
     }

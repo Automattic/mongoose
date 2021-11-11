@@ -746,7 +746,7 @@ declare module 'mongoose' {
   interface Model<T, TQueryHelpers = {}, TMethods = {}, TVirtuals = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
     new(doc?: AnyKeys<T> & AnyObject, fields?: any | null, options?: boolean | AnyObject): EnforceDocument<T, TMethods, TVirtuals>;
 
-    aggregate<R = any>(pipeline?: PipelineStage<T>[], options?: mongodb.AggregateOptions, callback: Callback<R[]>): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline?: PipelineStage<T>[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
     base: typeof mongoose;

@@ -2991,7 +2991,7 @@ declare module 'mongoose' {
       /** [`$facet` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/facet/) */
       $facet: Record<
         string,
-        Exclude<PipelineStage,PipelineStage.CollStats | PipelineStage.Facet | PipelineStage.GeoNear | PipelineStage.IndexStats | PipelineStage.Out | PipelineStage.Merge | PipelineStage.PlanCacheStats>[]
+        Exclude<PipelineStage, PipelineStage.CollStats | PipelineStage.Facet | PipelineStage.GeoNear | PipelineStage.IndexStats | PipelineStage.Out | PipelineStage.Merge | PipelineStage.PlanCacheStats>[]
       >
     }
 
@@ -3175,7 +3175,7 @@ declare module 'mongoose' {
       $unwind: string | { path: string; includeArrayIndex?: string; preserveNullAndEmptyArrays?: boolean }
     }
 
-    type AccumulatorOperator = '$accumulator' | '$addToSet' | '$avg' | '$count' | '$first' | '$last' | '$max'  | '$mergeObjects' | '$min' | '$push' | '$stdDevPop' | '$stdDevSamp' | '$sum'
+    type AccumulatorOperator = '$accumulator' | '$addToSet' | '$avg' | '$count' | '$first' | '$last' | '$max' | '$mergeObjects' | '$min' | '$push' | '$stdDevPop' | '$stdDevSamp' | '$sum'
 
     type WindowOperator = '$addToSet' | '$avg' | '$count' | '$covariancePop' | '$covarianceSamp' | '$derivative' | '$expMovingAvg' | '$integral' | '$max' | '$min' | '$push' | '$stdDevSamp' | '$stdDevPop' | '$sum' | '$first' | '$last' | '$shift' | '$denseRank' | '$documentNumber' | '$rank'
   }

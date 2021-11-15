@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.0.12: Connecting to MongoDB</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><style>p { line-height: 1.5em }
-</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.0.12</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.13</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item tertiary-item"><a class="pure-menu-link" href="/docs/tutorials/ssl.html">SSL Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/connections.md" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.0.13: Connecting to MongoDB</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.0.13</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.13</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item tertiary-item"><a class="pure-menu-link" href="/docs/tutorials/ssl.html">SSL Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/connections.md" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h2 id="connections">
       <a href="#connections">
@@ -24,12 +24,14 @@
 </script>
 
 <p>You can connect to MongoDB with the <code>mongoose.connect()</code> method.</p>
-<pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/myapp'</span>);</code></pre>
+<pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/myapp'</span>);
+</code></pre>
 <p>This is the minimum needed to connect the <code>myapp</code> database running locally
 on the default port (27017). If connecting fails on your machine, try using
 <code>127.0.0.1</code> instead of <code>localhost</code>.</p>
 <p>You can also specify several more parameters in the <code>uri</code>:</p>
-<pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://username:password@host:port/database?options...'</span>);</code></pre>
+<pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://username:password@host:port/database?options...'</span>);
+</code></pre>
 <p>See the <a href="http://docs.mongodb.org/manual/reference/connection-string/">mongodb connection string spec</a> for more details.</p>
 <ul class="toc">
   <li><a href="#buffering">Buffering</a></li>
@@ -54,7 +56,8 @@ mongoose to establish a connection to MongoDB.</p>
 <pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/myapp'</span>);
 <span class="hljs-keyword">const</span> MyModel = mongoose.model(<span class="hljs-string">'Test'</span>, <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> }));
 <span class="hljs-comment">// Works</span>
-MyModel.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, result</span>) </span>{ <span class="hljs-comment">/* ... */</span> });</code></pre>
+MyModel.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, result</span>) </span>{ <span class="hljs-comment">/* ... */</span> });
+</code></pre>
 <p>That&#39;s because mongoose buffers model function calls internally. This
 buffering is convenient, but also a common source of confusion. Mongoose
 will <em>not</em> throw any errors by default if you use a model without
@@ -65,12 +68,14 @@ MyModel.findOne(<span class="hljs-function"><span class="hljs-keyword">function<
 
 setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
   mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/myapp'</span>);
-}, <span class="hljs-number">60000</span>);</code></pre>
+}, <span class="hljs-number">60000</span>);
+</code></pre>
 <p>To disable buffering, turn off the <a href="./guide.html#bufferCommands"><code>bufferCommands</code> option on your schema</a>.
 If you have <code>bufferCommands</code> on and your connection is hanging, try turning
 <code>bufferCommands</code> off to see if you haven&#39;t opened a connection properly.
 You can also disable <code>bufferCommands</code> globally:</p>
-<pre><code class="language-javascript">mongoose.set(<span class="hljs-string">'bufferCommands'</span>, <span class="hljs-literal">false</span>);</code></pre>
+<pre><code class="language-javascript">mongoose.set(<span class="hljs-string">'bufferCommands'</span>, <span class="hljs-literal">false</span>);
+</code></pre>
 <p>Note that buffering is also responsible for waiting until Mongoose
 creates collections if you use the <a href="/docs/guide.html#autoCreate"><code>autoCreate</code> option</a>.
 If you disable buffering, you should also disable the <code>autoCreate</code>
@@ -88,7 +93,8 @@ to create <a href="/docs/guide.html#capped">capped collections</a> or
 <span class="hljs-keyword">const</span> Model = mongoose.model(<span class="hljs-string">'Test'</span>, schema);
 <span class="hljs-comment">// Explicitly create the collection before using it</span>
 <span class="hljs-comment">// so the collection is capped.</span>
-<span class="hljs-keyword">await</span> Model.createCollection();</code></pre>
+<span class="hljs-keyword">await</span> Model.createCollection();
+</code></pre>
 <h3 id="error-handling"><a href="#error-handling">Error Handling</a></h3>
 
 <p>There are two classes of errors that can occur with a Mongoose connection.</p>
@@ -105,20 +111,23 @@ to create <a href="/docs/guide.html#capped">capped collections</a> or
   <span class="hljs-keyword">await</span> mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/test'</span>);
 } <span class="hljs-keyword">catch</span> (error) {
   handleError(error);
-}</code></pre>
+}
+</code></pre>
 <p>To handle errors after initial connection was established, you should
 listen for error events on the connection. However, you still need to
 handle initial connection errors as shown above.</p>
 <pre><code class="language-javascript">mongoose.connection.on(<span class="hljs-string">'error'</span>, err =&gt; {
   logError(err);
-});</code></pre>
+});
+</code></pre>
 <p>Note that Mongoose does not necessarily emit an &#39;error&#39; event if it loses connectivity to MongoDB. You should
 listen to the <code>disconnected</code> event to report when Mongoose is disconnected from MongoDB.</p>
 <h3 id="options"><a href="#options">Options</a></h3>
 
 <p>The <code>connect</code> method also accepts an <code>options</code> object which will be passed
 on to the underlying MongoDB driver.</p>
-<pre><code class="language-javascript">mongoose.connect(uri, options);</code></pre>
+<pre><code class="language-javascript">mongoose.connect(uri, options);
+</code></pre>
 <p>A full list of options can be found on the <a href="http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html#connect">MongoDB Node.js driver docs for <code>connect()</code></a>.
 Mongoose passes options to the driver without modification, modulo a few
 exceptions that are explained below.</p>
@@ -152,7 +161,8 @@ to 5000 as shown below.</p>
   <span class="hljs-attr">socketTimeoutMS</span>: <span class="hljs-number">45000</span>, <span class="hljs-comment">// Close sockets after 45 seconds of inactivity</span>
   <span class="hljs-attr">family</span>: <span class="hljs-number">4</span> <span class="hljs-comment">// Use IPv4, skip trying IPv6</span>
 };
-mongoose.connect(uri, options);</code></pre>
+mongoose.connect(uri, options);
+</code></pre>
 <p>See <a href="http://mongodb.github.io/node-mongodb-native/3.1/reference/faq/">this page</a> for more information about <code>connectTimeoutMS</code> and <code>socketTimeoutMS</code></p>
 <h3 id="callback"><a href="#callback">Callback</a></h3>
 
@@ -166,7 +176,8 @@ mongoose.connect(uri, options);</code></pre>
 mongoose.connect(uri, options).then(
   <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> { <span class="hljs-comment">/** ready to use. The `mongoose.connect()` promise resolves to mongoose instance. */</span> },
   err =&gt; { <span class="hljs-comment">/** handle initial connection error */</span> }
-);</code></pre>
+);
+</code></pre>
 <h3 id="connection-string-options"><a href="#connection-string-options">Connection String Options</a></h3>
 
 <p>You can also specify driver options in your connection string as
@@ -179,7 +190,8 @@ in the query string.</p>
 mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/test'</span>, {
   <span class="hljs-attr">connectTimeoutMS</span>: <span class="hljs-number">1000</span>
   <span class="hljs-comment">// Note that mongoose will **not** pull `bufferCommands` from the query string</span>
-});</code></pre>
+});
+</code></pre>
 <p>The disadvantage of putting options in the query string is that query
 string options are harder to read. The advantage is that you only need a
 single configuration option, the URI, rather than separate options for
@@ -225,29 +237,35 @@ you may start to see <code>&quot;connection closed&quot;</code> errors for what 
 no reason. If so, after
 <a href="http://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html">reading this</a>,
 you may decide to enable <code>keepAlive</code>:</p>
-<pre><code class="language-javascript">mongoose.connect(uri, { <span class="hljs-attr">keepAlive</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">keepAliveInitialDelay</span>: <span class="hljs-number">300000</span> });</code></pre>
+<pre><code class="language-javascript">mongoose.connect(uri, { <span class="hljs-attr">keepAlive</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">keepAliveInitialDelay</span>: <span class="hljs-number">300000</span> });
+</code></pre>
 <p><code>keepAliveInitialDelay</code> is the number of milliseconds to wait before initiating <code>keepAlive</code> on the socket.
 <code>keepAlive</code> is true by default since mongoose 5.2.0.</p>
 <h3 id="replicaset_connections"><a href="#replicaset_connections">Replica Set Connections</a></h3>
 
 <p>To connect to a replica set you pass a comma delimited list of hosts to
 connect to rather than a single host.</p>
-<pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]'</span> [, options]);</code></pre>
+<pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]'</span> [, options]);
+</code></pre>
 <p>For example:</p>
-<pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://user:pw@host1.com:27017,host2.com:27017,host3.com:27017/testdb'</span>);</code></pre>
+<pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://user:pw@host1.com:27017,host2.com:27017,host3.com:27017/testdb'</span>);
+</code></pre>
 <p>To connect to a single node replica set, specify the <code>replicaSet</code> option.</p>
-<pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://host1:port1/?replicaSet=rsName'</span>);</code></pre>
+<pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://host1:port1/?replicaSet=rsName'</span>);
+</code></pre>
 <h3 id="server-selection"><a href="#server-selection">Server Selection</a></h3>
 
 <p>The underlying MongoDB driver uses a process known as <a href="https://github.com/mongodb/specifications/blob/master/source/server-selection/server-selection.rst">server selection</a> to connect to MongoDB and send operations to MongoDB.
 If the MongoDB driver can&#39;t find a server to send an operation to after <code>serverSelectionTimeoutMS</code>,
 you&#39;ll get the below error:</p>
-<pre><code>MongoTimeoutError: Server selection timed out after <span class="hljs-number">30000</span> ms</code></pre>
+<pre><code>MongoTimeoutError: Server selection timed out after <span class="hljs-number">30000</span> ms
+</code></pre>
 <p>You can configure the timeout using the <code>serverSelectionTimeoutMS</code> option
 to <code>mongoose.connect()</code>:</p>
 <pre><code class="language-javascript">mongoose.connect(uri, {
   <span class="hljs-attr">serverSelectionTimeoutMS</span>: <span class="hljs-number">5000</span> <span class="hljs-comment">// Timeout after 5s instead of 30s</span>
-});</code></pre>
+});
+</code></pre>
 <p>A <code>MongoTimeoutError</code> has a <code>reason</code> property that explains why
 server selection timed out. For example, if you&#39;re connecting to
 a standalone server with an incorrect password, <code>reason</code>
@@ -259,7 +277,8 @@ will contain an &quot;Authentication failed&quot; error.</p>
 <span class="hljs-comment">// Prints "MongoServerError: bad auth Authentication failed."</span>
 mongoose.connect(uri, {
   <span class="hljs-attr">serverSelectionTimeoutMS</span>: <span class="hljs-number">5000</span>
-}).catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(err.reason));</code></pre>
+}).catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(err.reason));
+</code></pre>
 <h3 id="replicaset-hostnames"><a href="#replicaset-hostnames">Replica Set Host Names</a></h3>
 
 <p>MongoDB replica sets rely on being able to reliably figure out the domain name
@@ -271,7 +290,8 @@ reports its <code>hostname</code> as <code>localhost</code>:</p>
 <pre><code><span class="hljs-comment">// Can get this error even if your connection string doesn't include</span>
 <span class="hljs-comment">// `localhost` if `rs.conf()` reports that one replica set member has</span>
 <span class="hljs-comment">// `localhost` as its host name.</span>
-failed to connect to server [localhost:<span class="hljs-number">27017</span>] on first connect</code></pre>
+failed to connect to server [localhost:<span class="hljs-number">27017</span>] on first connect
+</code></pre>
 <p>If you&#39;re experiencing a similar error, connect to the replica set using the
 <code>mongo</code> shell and run the
 <a href="https://docs.mongodb.com/manual/reference/method/rs.conf/"><code>rs.conf()</code></a> command to check the host names of each replica set member. Follow
@@ -282,7 +302,8 @@ failed to connect to server [localhost:<span class="hljs-number">27017</span>] o
 for high availability in a sharded cluster. You do
 <a href="http://mongodb.github.io/node-mongodb-native/3.0/tutorials/connect/#connect-to-sharded-cluster">not need to pass any special options to connect to multiple mongos</a> in mongoose 5.x.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Connect to 2 mongos servers</span>
-mongoose.connect(<span class="hljs-string">'mongodb://mongosA:27501,mongosB:27501'</span>, cb);</code></pre>
+mongoose.connect(<span class="hljs-string">'mongodb://mongosA:27501,mongosB:27501'</span>, cb);
+</code></pre>
 <h3 id="multiple_connections"><a href="#multiple_connections">Multiple connections</a></h3>
 
 <p>So far we&#39;ve seen how to connect to MongoDB using Mongoose&#39;s default
@@ -293,11 +314,13 @@ One reason is if you have multiple databases or multiple MongoDB clusters.
 Another reason is to work around <a href="https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs">slow trains</a>.
 The <code>mongoose.createConnection()</code> function takes the same arguments as
 <code>mongoose.connect()</code> and returns a new connection.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> conn = mongoose.createConnection(<span class="hljs-string">'mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]'</span>, options);</code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> conn = mongoose.createConnection(<span class="hljs-string">'mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]'</span>, options);
+</code></pre>
 <p>This <a href="./api.html#connection_Connection">connection</a> object is then used to
 create and retrieve <a href="./api.html#model_Model">models</a>. Models are
 <strong>always</strong> scoped to a single connection.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> UserModel = conn.model(<span class="hljs-string">'User'</span>, userSchema);</code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> UserModel = conn.model(<span class="hljs-string">'User'</span>, userSchema);
+</code></pre>
 <p>If you use multiple connections, you should make sure you export schemas,
 <strong>not</strong> models. Exporting a model from a file is called the <em>export model pattern</em>.
 The export model pattern is limited because you can only use one connection.</p>
@@ -308,7 +331,8 @@ The export model pattern is limited because you can only use one connection.</p>
 
 <span class="hljs-comment">// Because if you export a model as shown below, the model will be scoped</span>
 <span class="hljs-comment">// to Mongoose's default connection.</span>
-<span class="hljs-comment">// module.exports = mongoose.model('User', userSchema);</span></code></pre>
+<span class="hljs-comment">// module.exports = mongoose.model('User', userSchema);</span>
+</code></pre>
 <p>If you use the export schema pattern, you still need to create models
 somewhere. There are two common patterns. First is to export a connection
 and register the models on the connection in the file:</p>
@@ -327,7 +351,8 @@ conn.model(<span class="hljs-string">'User'</span>, <span class="hljs-built_in">
 conn.model(<span class="hljs-string">'User'</span>, <span class="hljs-built_in">require</span>(<span class="hljs-string">'../schemas/user'</span>));
 conn.model(<span class="hljs-string">'PageView'</span>, <span class="hljs-built_in">require</span>(<span class="hljs-string">'../schemas/pageView'</span>));
 
-<span class="hljs-built_in">module</span>.exports = conn;</code></pre>
+<span class="hljs-built_in">module</span>.exports = conn;
+</code></pre>
 <p>Another alternative is to register connections with a dependency injector
 or another <a href="https://thecodebarbarian.com/using-ramda-as-a-dependency-injector">inversion of control (IOC) pattern</a>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
@@ -339,7 +364,8 @@ or another <a href="https://thecodebarbarian.com/using-ramda-as-a-dependency-inj
   conn.model(<span class="hljs-string">'PageView'</span>, <span class="hljs-built_in">require</span>(<span class="hljs-string">'../schemas/pageView'</span>));
 
   <span class="hljs-keyword">return</span> conn; 
-};</code></pre>
+};
+</code></pre>
 <h3 id="connection_pools"><a href="#connection_pools">Connection Pools</a></h3>
 
 <p>Each <code>connection</code>, whether created with <code>mongoose.connect</code> or
@@ -351,7 +377,8 @@ mongoose.createConnection(uri, { <span class="hljs-attr">maxPoolSize</span>: <sp
 
 <span class="hljs-comment">// With connection string options</span>
 <span class="hljs-keyword">const</span> uri = <span class="hljs-string">'mongodb://localhost:27017/test?maxPoolSize=10'</span>;
-mongoose.createConnection(uri);</code></pre>
+mongoose.createConnection(uri);
+</code></pre>
 <h3 id="next">Next Up</h3>
 
 <p>Now that we&#39;ve covered connections, let&#39;s take a look at <a href="/docs/models.html">models</a>.</p>

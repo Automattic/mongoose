@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.0.12: FAQ</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><style>p { line-height: 1.5em }
-</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.0.12</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.13</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link selected" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/faq.md" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.0.13: FAQ</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.0.13</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.13</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link selected" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/faq.md" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h2 id="faq">
       <a href="#faq">
@@ -48,7 +48,8 @@ For example, if MongoDB doesn&#39;t already have a unique index on <code>name</c
 
 Model.create([{ <span class="hljs-attr">name</span>: <span class="hljs-string">'Val'</span> }, { <span class="hljs-attr">name</span>: <span class="hljs-string">'Val'</span> }], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
   <span class="hljs-built_in">console</span>.log(err); <span class="hljs-comment">// No error, unless index was already built</span>
-});</code></pre>
+});
+</code></pre>
 <p>However, if you wait for the index to build using the <code>Model.on(&#39;index&#39;)</code> event, attempts to save duplicates will correctly error.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
   <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> }
@@ -69,7 +70,8 @@ Model.init().then(<span class="hljs-function"><span class="hljs-keyword">functio
   Model.create([{ <span class="hljs-attr">name</span>: <span class="hljs-string">'Val'</span> }, { <span class="hljs-attr">name</span>: <span class="hljs-string">'Val'</span> }], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
     <span class="hljs-built_in">console</span>.log(err);
   });
-});</code></pre>
+});
+</code></pre>
 <p>MongoDB persists indexes, so you only need to rebuild indexes if you&#39;re starting
 with a fresh database or you ran <code>db.dropDatabase()</code>. In a production environment,
 you should <a href="https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/">create your indexes using the MongoDB shell</a>
@@ -87,7 +89,8 @@ convenient for development and documentation, but mongoose is <em>not</em> an in
 
 <span class="hljs-comment">// The below prints `{ _id: /* ... */, nested: {} }`, mongoose assigns</span>
 <span class="hljs-comment">// `nested` to an empty object `{}` by default.</span>
-<span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">new</span> Model());</code></pre>
+<span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">new</span> Model());
+</code></pre>
 <p><strong>A</strong>. This is a performance optimization. These empty objects are not saved
 to the database, nor are they in the result <code>toObject()</code>, nor do they show
 up in <code>JSON.stringify()</code> output unless you turn off the <a href="./guide.html#minimize"><code>minimize</code> option</a>.</p>
@@ -118,7 +121,8 @@ obj.foo(); <span class="hljs-comment">// "42"</span>
 
 <span class="hljs-comment">// file3.js</span>
 <span class="hljs-keyword">const</span> { foo } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./file1'</span>);
-foo(); <span class="hljs-comment">// "undefined"</span></code></pre>
+foo(); <span class="hljs-comment">// "undefined"</span>
+</code></pre>
 <hr id="arrow-functions" />
 
 <p><a class="anchor" href="#arrow-functions"><strong>Q</strong></a>. I&#39;m using an arrow function for a <a href="./guide.html#virtuals">virtual</a>, <a href="./middleware.html">middleware</a>, <a href="./api.html#schematype_SchemaType-get">getter</a>/<a href="./api.html#schematype_SchemaType-set">setter</a>, or <a href="./guide.html#methods">method</a> and the value of <code>this</code> is wrong.</p>
@@ -143,7 +147,8 @@ schema.method.arrowMethod = <span class="hljs-function"><span class="hljs-params
 schema.virtual(<span class="hljs-string">'virtualWithArrow'</span>).get(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
   <span class="hljs-comment">// `this` will **not** be the doc, do **not** use arrow functions for virtuals</span>
   <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">this</span>);
-});</code></pre>
+});
+</code></pre>
 <hr id="type-key">
 
 <p><a class="anchor" href="#type-key"><strong>Q</strong></a>. I have an embedded property named <code>type</code> like this:</p>
@@ -155,14 +160,16 @@ schema.virtual(<span class="hljs-string">'virtualWithArrow'</span>).get(<span cl
     <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>,
     <span class="hljs-attr">ticker</span>: <span class="hljs-built_in">String</span>
   }
-});</code></pre>
+});
+</code></pre>
 <p>But mongoose gives me a CastError telling me that it can&#39;t cast an object
 to a string when I try to save a <code>Holding</code> with an <code>asset</code> object. Why
 is this?</p>
 <pre><code class="language-javascript">Holding.create({ <span class="hljs-attr">asset</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">'stock'</span>, <span class="hljs-attr">ticker</span>: <span class="hljs-string">'MDB'</span> } }).catch(<span class="hljs-function"><span class="hljs-params">error</span> =&gt;</span> {
   <span class="hljs-comment">// Cast to String failed for value "{ type: 'stock', ticker: 'MDB' }" at path "asset"</span>
   <span class="hljs-built_in">console</span>.error(error);
-});</code></pre>
+});
+</code></pre>
 <p><strong>A</strong>. The <code>type</code> property is special in mongoose, so when you say
 <code>type: String</code>, mongoose interprets it as a type declaration. In the
 above schema, mongoose thinks <code>asset</code> is a string, not an object. Do
@@ -175,7 +182,8 @@ this instead:</p>
     <span class="hljs-attr">type</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span> },
     <span class="hljs-attr">ticker</span>: <span class="hljs-built_in">String</span>
   }
-});</code></pre>
+});
+</code></pre>
 <hr id="populate_sort_order" />
 
 <p><a class="anchor" href="#populate_sort_order"><strong>Q</strong></a>. I&#39;m populating a nested property under an array like the below code:</p>
@@ -183,7 +191,8 @@ this instead:</p>
   <span class="hljs-attr">arr</span>: [{
     <span class="hljs-attr">child</span>: { <span class="hljs-attr">ref</span>: <span class="hljs-string">'OtherModel'</span>, <span class="hljs-attr">type</span>: Schema.Types.ObjectId }
   }]
-});</code></pre>
+});
+</code></pre>
 <p><code>.populate({ path: &#39;arr.child&#39;, options: { sort: &#39;name&#39; } })</code> won&#39;t sort by <code>arr.child.name</code>?</p>
 <p><strong>A</strong>. See <a href="https://github.com/Automattic/mongoose/issues/2202">this GitHub issue</a>. It&#39;s a known issue but one that&#39;s exceptionally difficult to fix.</p>
 <hr id="model_functions_hanging" />
@@ -198,12 +207,13 @@ for more information.</p>
 <p><strong>A</strong>. Set the <code>debug</code> option:</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// all executed methods log output to console</span>
 mongoose.set(<span class="hljs-string">'debug'</span>, <span class="hljs-literal">true</span>)
-
+    
 <span class="hljs-comment">// disable colors in debug mode</span>
 mongoose.set(<span class="hljs-string">'debug'</span>, { <span class="hljs-attr">color</span>: <span class="hljs-literal">false</span> })
 
 <span class="hljs-comment">// get mongodb-shell friendly output (ISODate)</span>
-mongoose.set(<span class="hljs-string">'debug'</span>, { <span class="hljs-attr">shell</span>: <span class="hljs-literal">true</span> })</code></pre>
+mongoose.set(<span class="hljs-string">'debug'</span>, { <span class="hljs-attr">shell</span>: <span class="hljs-literal">true</span> })
+</code></pre>
 <p>For more debugging options (streams, callbacks), see the <a href="./api.html#mongoose_Mongoose-set">&#39;debug&#39; option under <code>.set()</code></a>.</p>
 <hr id="callback_never_executes" />
 
@@ -215,11 +225,13 @@ until Mongoose successfully connects to MongoDB. It is likely you haven&#39;t ca
 Mongoose will allow an operation to stay buffered before throwing an error.</p>
 <p>If you want to opt out of Mongoose&#39;s buffering mechanism across your entire
 application, set the global <code>bufferCommands</code> option to false:</p>
-<pre><code class="language-javascript">mongoose.set(<span class="hljs-string">'bufferCommands'</span>, <span class="hljs-literal">false</span>);</code></pre>
+<pre><code class="language-javascript">mongoose.set(<span class="hljs-string">'bufferCommands'</span>, <span class="hljs-literal">false</span>);
+</code></pre>
 <p>Instead of opting out of Mongoose&#39;s buffering mechanism, you may want to instead reduce <code>bufferTimeoutMS</code>
 to make Mongoose only buffer for a short time.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// If an operation is buffered for more than 500ms, throw an error.</span>
-mongoose.set(<span class="hljs-string">'bufferTimeoutMS'</span>, <span class="hljs-number">500</span>);</code></pre>
+mongoose.set(<span class="hljs-string">'bufferTimeoutMS'</span>, <span class="hljs-number">500</span>);
+</code></pre>
 <hr id="creating_connections" />
 
 <p><a class="anchor" href="#creating_connections"><strong>Q</strong></a>. Should I create/destroy a new connection for each database operation?</p>
@@ -244,7 +256,8 @@ same name, create a new connection and bind the model to the connection.</p>
 <span class="hljs-keyword">const</span> kittySchema = mongoose.Schema({ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> });
 
 <span class="hljs-comment">// use connection.model</span>
-<span class="hljs-keyword">const</span> Kitten = connection.model(<span class="hljs-string">'Kitten'</span>, kittySchema);</code></pre>
+<span class="hljs-keyword">const</span> Kitten = connection.model(<span class="hljs-string">'Kitten'</span>, kittySchema);
+</code></pre>
 <hr id="array-defaults" />
 
 <p><a class="anchor" href="#array-defaults"><strong>Q</strong></a>. How can I change mongoose&#39;s default behavior of initializing an array path to an empty array so that I can require real data on document creation?</p>
@@ -254,9 +267,10 @@ same name, create a new connection and bind the model to the connection.</p>
     <span class="hljs-attr">type</span>: [<span class="hljs-built_in">String</span>],
     <span class="hljs-attr">default</span>: <span class="hljs-keyword">void</span> <span class="hljs-number">0</span>
   }
-});</code></pre>
+});
+</code></pre>
 <hr id="initialize-array-path-null" />
-
+    
 <p><a class="anchor" href="#initialize-array-path-null"><strong>Q</strong></a>. How can I initialize an array path to <code>null</code>?</p>
 <p><strong>A</strong>. You can set the default of the array to a function that returns <code>null</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> CollectionSchema = <span class="hljs-keyword">new</span> Schema({
@@ -264,7 +278,8 @@ same name, create a new connection and bind the model to the connection.</p>
     <span class="hljs-attr">type</span>: [<span class="hljs-built_in">String</span>],
     <span class="hljs-attr">default</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> { <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>; }
   }
-});</code></pre>
+});
+</code></pre>
 <hr id="aggregate-casting" />
 
 <p><a class="anchor" href="#aggregate-casting"><strong>Q</strong></a>. Why does my aggregate $match fail to return the document that my find query returns when working with dates?</p>
@@ -277,7 +292,8 @@ that you&#39;re passing in a valid date.</p>
 <p><a class="anchor" href="#date_changes"><strong>Q</strong></a>. Why don&#39;t in-place modifications to date objects
 (e.g. <code>date.setMonth(1);</code>) get saved?</p>
 <pre><code class="language-javascript">doc.createdAt.setDate(<span class="hljs-number">2011</span>, <span class="hljs-number">5</span>, <span class="hljs-number">1</span>);
-doc.save(); <span class="hljs-comment">// createdAt changes won't get saved!</span></code></pre>
+doc.save(); <span class="hljs-comment">// createdAt changes won't get saved!</span>
+</code></pre>
 <p><strong>A</strong>. Mongoose currently doesn&#39;t watch for in-place updates to date
 objects. If you have need for this feature, feel free to discuss on
 <a href="https://github.com/Automattic/mongoose/issues/3738">this GitHub issue</a>.
@@ -287,7 +303,8 @@ doc.markModified(<span class="hljs-string">'createdAt'</span>);
 doc.save(); <span class="hljs-comment">// Works</span>
 
 doc.createdAt = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(<span class="hljs-number">2011</span>, <span class="hljs-number">5</span>, <span class="hljs-number">1</span>).setHours(<span class="hljs-number">4</span>);
-doc.save(); <span class="hljs-comment">// Works</span></code></pre>
+doc.save(); <span class="hljs-comment">// Works</span>
+</code></pre>
 <hr id="parallel_saves" />
 
 <p><a class="anchor" href="#parallel_saves"><strong>Q</strong></a>. Why does calling <code>save()</code> multiple times on the same document in parallel only let
@@ -330,7 +347,8 @@ For example, the below code inserts 2 entries into the <code>tags</code> array, 
 <span class="hljs-keyword">const</span> update = { <span class="hljs-attr">$push</span>: { <span class="hljs-attr">tags</span>: [<span class="hljs-string">'javascript'</span>] } };
 <span class="hljs-keyword">await</span> BlogPost.updateOne({ <span class="hljs-attr">title</span>: <span class="hljs-string">'Introduction to Promises'</span> }, update, (err, res) =&gt; {
   <span class="hljs-built_in">console</span>.log(res);
-});</code></pre>
+});
+</code></pre>
 <hr id="add_something" />
 
 <p><strong>Something to add?</strong></p>

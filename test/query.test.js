@@ -2798,6 +2798,22 @@ describe('Query', function() {
       assert.equal(res.deletedCount, 1);
     });
 
+    it('replaceOne()', async function() {
+      let threw = false;
+      try {
+        await Model.replaceOne({ name: 'na' }, { name: 'bar' }).orFail(new Error('Oops!'));
+      } catch (error) {
+        assert.ok(error);
+        assert.equal(error.message, 'Oops!');
+        threw = true;
+      }
+      assert.ok(threw);
+
+      // Shouldn't throw
+      const res = await Model.replaceOne({ name: 'Test' }, { name: 'bar' }).orFail(new Error('Oops'));
+      assert.equal(res.modifiedCount, 1);
+    });
+
     it('update()', async function() {
 
       let threw = false;

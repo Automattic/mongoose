@@ -1078,4 +1078,12 @@ describe('connections:', function() {
     assert.deepStrictEqual(conn2.id, m1.connection.id + 1);
     assert.deepStrictEqual(conn3.id, m.connection.id + 2);
   });
+
+  it('Allows a syncIndexes option (gh-10893)', async function() {
+    const m = new mongoose.Mongoose();
+    const conn = m.createConnection('mongodb://localhost:27017');
+    conn.model('Test', new Schema({name: {type: String, index: true}}));
+    const sync = await conn.syncIndexes();
+    assert(sync, [[]] );
+  });
 });

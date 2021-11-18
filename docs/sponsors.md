@@ -35,7 +35,7 @@
 <div style="position: relative; margin-top: 1em;">
   <div style="position: absolute; width: 100px; height: 100px">
     <a href="https://helloclub.com/">
-      <img src="https://helloclub.com/images/logo/logo-text.svg">
+      <img src="/docs/images/helloclub.svg">
     </a>
   </div>
   <div style="padding-left: 110px; min-height: 100px">

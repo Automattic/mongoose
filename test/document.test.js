@@ -10744,4 +10744,20 @@ describe('document', function() {
     doc.quantity = 26;
     await doc.save();
   });
+
+  it('catches errors in `required` functions (gh-10968)', async function() {
+    const TestSchema = new Schema({
+      url: {
+        type: String,
+        required: function() {
+          throw new Error('oops!');
+        }
+      }
+    });
+    const Test = db.model('Test', TestSchema);
+
+    const err = await Test.create({}).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.errors['url'].message, 'oops!');
+  });
 });

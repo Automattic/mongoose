@@ -23,6 +23,7 @@ const DocumentObjectId = mongoose.Types.ObjectId;
 const SchemaType = mongoose.SchemaType;
 const ValidatorError = SchemaType.ValidatorError;
 const ValidationError = mongoose.Document.ValidationError;
+const VersionError = mongoose.Error.VersionError;
 const MongooseError = mongoose.Error;
 const DocumentNotFoundError = mongoose.Error.DocumentNotFoundError;
 
@@ -1873,6 +1874,21 @@ describe('document', function() {
       const err = await person.save().then(() => null, err => err);
       assert.equal(err instanceof DocumentNotFoundError, true);
       assert.equal(err.message, `No document found for query "{ _id: new ObjectId("${person._id}") }" on model "Person"`);
+    });
+
+    it('saving a document with no changes, throws a VersionError when document is not found and version bump required (gh-10974)', async function() {
+      const personSchema = new Schema({ tags: [String] });
+      const Person = db.model('Person', personSchema);
+
+      const person = await Person.create({ tags: ['tag1', 'tag2'] });
+
+      await Person.deleteOne({ _id: person._id });
+
+      person.tags.splice(0, 1);
+
+      const err = await person.save().then(() => null, err => err);
+      assert.ok(err instanceof VersionError);
+      assert.equal(err.message, `No matching document found for id "${person._id}" version 0 modifiedPaths "tags"`);
     });
 
     it('saving a document with changes, throws an error when document is not found', async function() {

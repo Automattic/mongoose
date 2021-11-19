@@ -10744,4 +10744,15 @@ describe('document', function() {
     doc.quantity = 26;
     await doc.save();
   });
+  it('ensures that doc.ownerDocument() and doc.parent() by default return this on the root document (gh-10884)', async function() {
+    const userSchema = new mongoose.Schema({
+      name: String,
+      email: String
+    });
+
+    const Event = db.model('Rainbow', userSchema);
+
+    const e = new Event({ name: 'test'});
+    assert.strictEqual(e, e.parent());
+  });
 });

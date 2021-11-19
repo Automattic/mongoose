@@ -1102,9 +1102,4 @@ describe('connections:', function() {
       assert.deepEqual(dropped, [['name_1']]);
       await M.collection.drop();
   });
-  it('Allows a syncIndexes shorthand mongoose.syncIndexes (gh-10893)', async function () {
-    // const m = new mongoose.Mongoose();
-    // console.log(m.syncIndexes());
-    assert(true, true)
-  });
 });

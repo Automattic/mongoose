@@ -1086,20 +1086,20 @@ describe('connections:', function() {
     const coll = 'tests2';
     const m = new mongoose.Mongoose();
     const conn = m.createConnection('mongodb://localhost:27017');
-    let M = conn.model('Test', new Schema({name: {type: String, index: true}}, {autoIndex: false}), coll);
+    let M = conn.model('Test', new Schema({ name: { type: String, index: true } }, { autoIndex: false }), coll);
     const sync = await conn.syncIndexes();
-    assert(sync, [[]] );
-    let indexes = await M.listIndexes();
-      assert.deepEqual(indexes.map(i => i.key), [
-        { _id: 1 },
-        { name: 1 }
-      ]);
-      conn.deleteModel(/Test/);
-      M = conn.model('Test', new Schema({
-        otherName: { type: String, index: true }
-      }, { autoIndex: false }), coll);
-      const dropped = await conn.syncIndexes();
-      assert.deepEqual(dropped, [['name_1']]);
-      await M.collection.drop();
+    assert(sync, [[]]);
+    const indexes = await M.listIndexes();
+    assert.deepEqual(indexes.map(i => i.key), [
+      { _id: 1 },
+      { name: 1 }
+    ]);
+    conn.deleteModel(/Test/);
+    M = conn.model('Test', new Schema({
+      otherName: { type: String, index: true }
+    }, { autoIndex: false }), coll);
+    const dropped = await conn.syncIndexes();
+    assert.deepEqual(dropped, [['name_1']]);
+    await M.collection.drop();
   });
 });

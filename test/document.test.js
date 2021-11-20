@@ -1876,7 +1876,7 @@ describe('document', function() {
       assert.equal(err.message, `No document found for query "{ _id: new ObjectId("${person._id}") }" on model "Person"`);
     });
 
-    it('saving a document with no changes, throws a VersionError when document is not found and version bump required (gh-10974)', async function() {
+    it('saving a document when version bump required, throws a VersionError when document is not found (gh-10974)', async function() {
       const personSchema = new Schema({ tags: [String] });
       const Person = db.model('Person', personSchema);
 

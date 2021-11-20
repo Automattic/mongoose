@@ -1,3 +1,19 @@
+6.0.13 / 2021-11-15
+===================
+ * fix(document): allows validating doc again if pre validate errors out #10830
+ * fix: upgrade to mongodb driver 4.1.4 #10955 [mohd-akram](https://github.com/mohd-akram)
+ * fix(schema): handle functions with accidental type properties in schema definitions #10807
+ * fix(path): add check to avoid flattening dotted paths on Mongoose docs, improve error when flattening dotted paths causes conflicts #10825
+ * fix(index.d.ts): rename EnforceDocument -> HydratedDocument, export HydratedDocument for easier typing for users #10843
+ * fix(index.d.ts): handle maps in TypeScript schema definitions #10838
+ * fix(index.d.ts): add clone to query #10943 [asportnoy](https://github.com/asportnoy)
+ * fix(index.d.ts): add strictQuery global option #10933
+ * fix(index.d.ts): add generic to allow overriding `Schema#clone()` return type #10951 [StefanoA1](https://github.com/StefanoA1)
+ * docs(typescript): add quick guide to virtuals in TypeScript #10754
+ * docs(aggregate): remove exec() from AggregationCursor example, no longer correct for Mongoose 6 #10862
+ * docs(document.js): fix link leading to old github pages site #10958 [PuneetGopinath](https://github.com/PuneetGopinath)
+ * docs: fixed typo in document.js #10950 [Haosik](https://github.com/Haosik)
+
 5.13.13 / 2021-11-02
 ====================
  * fix: upgrade to mongodb@3.7.3 #10909 [gaurav-sharma-gs](https://github.com/gaurav-sharma-gs)

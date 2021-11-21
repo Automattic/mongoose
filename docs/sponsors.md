@@ -19,7 +19,7 @@
 <div style="position: relative; margin-top: 1em;">
   <div style="position: absolute; width: 100px; height: 100px">
     <a href="https://birb.app/">
-      <img src="//birb.app/wp-content/uploads/2021/07/cropped-white-filled-birb-1.png">
+      <img src="https://uploads-ssl.webflow.com/618b15b23212e0b2b4f8f67b/618b1fe1146ed447bb1cc820_white%20filled%20birb2.png">
     </a>
   </div>
   <div style="padding-left: 110px; min-height: 100px">
@@ -34,17 +34,17 @@
 
 <div style="position: relative; margin-top: 1em;">
   <div style="position: absolute; width: 100px; height: 100px">
-    <a href="https://helloclub.com/">
-      <img src="https://helloclub.com/images/logo/logo-text.svg">
+    <a href="https://helloclub.com/?source=Mongoose">
+      <img src="/docs/images/helloclub.svg">
     </a>
   </div>
   <div style="padding-left: 110px; min-height: 100px">
     <h4 style="margin-top: 0.2em; margin-bottom: 0.25em;">
-      <a href="https://helloclub.com/">
+      <a href="https://helloclub.com/?source=Mongoose">
         Hello Club
       </a>
     </h4>
-    Hello Club is a cloud-based club and membership management solution which offers a range of features for tracking members, finances, bookings, events, resources and access control. Hello Club makes member management easy and efficient, and caters to a large variety of organisations, including clubs, associations, non-profits, sport centres, gyms and co-working spaces. Consistent 5 star reviews, monthly new features, and a team that is dedicated to helping you succeed make Hello Club the best choice for your organisation.Try it now with a 30 day free trial!
+    <a href="https://helloclub.com/?source=Mongoose">Hello Club</a> is a cloud-based club and membership management solution which offers a range of features for tracking members, finances, bookings, events, resources and access control. Hello Club makes member management easy and efficient, and caters to a large variety of organisations, including clubs, associations, non-profits, sport centres, gyms and co-working spaces. Consistent 5 star reviews, monthly new features, and a team that is dedicated to helping you succeed make Hello Club the best choice for your organisation.Try it now with a 30 day free trial!
   </div>
 </div>
 

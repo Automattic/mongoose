@@ -10754,5 +10754,6 @@ describe('document', function() {
 
     const e = new Event({ name: 'test'});
     assert.strictEqual(e, e.parent());
+    assert.strictEqual(e, e.ownerDocument());
   });
 });

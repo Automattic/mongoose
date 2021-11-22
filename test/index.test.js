@@ -693,6 +693,24 @@ describe('mongoose module:', function() {
     assert.ok(mongoose.isValidObjectId(new mongoose.Types.ObjectId()));
     assert.ok(!mongoose.isValidObjectId(6));
   });
+  it('allows global `strictPopulate` option (gh-10694)', async function() {
+    const mongoose = new Mongoose();
+    mongoose.set('strictPopulate', false);
+    const schema = new mongoose.Schema({ name: String });
+    const db = await mongoose.connect('mongodb://localhost:27017/mongoose_test_10694');
+    const Movie = db.model('Movie', schema);
+    const Person = db.model('Person', new mongoose.Schema({
+      name: String,
+    }));
+
+    const movies = await Movie.create([
+      { name: 'The Empire Strikes Back' },
+      { name: 'Jingle All The Way' }
+    ]);
+    const people = await Person.create({ name: 'Test1', favoriteMovie: movies[1]._id });
+    await Person.findOne().populate({path: 'favoriteMovie'});
+
+  });
 
   describe('exports', function() {
     function test(mongoose) {
@@ -794,5 +812,6 @@ describe('mongoose module:', function() {
       const goodIdString2 = '1'.repeat(12);
       assert.deepStrictEqual(mongoose.isValidObjectId(goodIdString2), true);
     });
+    
   });
 });

@@ -1088,10 +1088,10 @@ describe('connections:', function() {
     const conn = mongooseInstance.createConnection('mongodb://localhost:27017');
     let User = conn.model('Test', new Schema({ name: { type: String, index: true } }, { autoIndex: false }), coll);
     const indexesAfterFirstSync = await conn.syncIndexes();
-    assert(indexesAfterFirstSync, {Test: []});
+    assert(indexesAfterFirstSync, { Test: [] });
     const indexesAfterSecondSync = await User.listIndexes();
     assert.deepEqual(indexesAfterSecondSync.map(i => i.key), [
-      {_id: 1 },
+      { _id: 1 },
       { name: 1 }
     ]);
     conn.deleteModel(/Test/);
@@ -1099,7 +1099,7 @@ describe('connections:', function() {
       otherName: { type: String, index: true }
     }, { autoIndex: false }), coll);
     const dropped = await conn.syncIndexes();
-    assert.deepEqual(dropped, {Test: ['name_1']});
+    assert.deepEqual(dropped, { Test: ['name_1'] });
     await User.collection.drop();
   });
 });

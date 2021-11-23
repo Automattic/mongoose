@@ -10447,4 +10447,34 @@ describe('model: populate:', function() {
     const doc = await BlogPost.findOne().populate('author');
     assert.equal(doc.author.email, 'test@gmail.com');
   });
+
+  it('supports ref on subdocuments (gh-10856)', async function() {
+    const userSchema = Schema({ _id: Number, name: String, email: String });
+    const blogPostSchema = Schema({
+      title: String,
+      author: {
+        type: new Schema({ _id: Number, name: String }),
+        ref: 'User'
+      }
+    });
+
+    const User = db.model('User', userSchema);
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+
+    await User.create({ _id: 1, name: 'John Smith', email: 'test@gmail.com' });
+    await BlogPost.create({ title: 'Introduction to Mongoose', author: { _id: 1, name: 'John Smith' } });
+
+    const doc = await BlogPost.findOne().populate('author');
+    assert.equal(doc.author.email, 'test@gmail.com');
+    assert.equal(doc.toObject().author.email, 'test@gmail.com');
+
+    doc.depopulate();
+    assert.equal(doc.author.name, 'John Smith');
+
+    doc.author.name = 'John Smythe';
+    await doc.save();
+
+    const fromDb = await BlogPost.findById(doc);
+    assert.equal(fromDb.author.name, 'John Smythe');
+  });
 });

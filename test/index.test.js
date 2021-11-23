@@ -796,7 +796,7 @@ describe('mongoose module:', function() {
     });
     it('Allows a syncIndexes shorthand mongoose.syncIndexes (gh-10893)', async function() {
       const m = new mongoose.Mongoose();
-      assert([], await m.syncIndexes());
+      assert.deepEqual(await m.syncIndexes(), {});
     });
   });
 });

@@ -700,16 +700,16 @@ describe('mongoose module:', function() {
     const db = await mongoose.connect('mongodb://localhost:27017/mongoose_test_10694');
     const Movie = db.model('Movie', schema);
     const Person = db.model('Person', new mongoose.Schema({
-      name: String,
+      name: String
     }));
 
     const movie = await Movie.create({ name: 'The Empire Strikes Back' });
     await Person.create({ name: 'Test1', favoriteMovie: movie._id });
-    const test = await Person.findOne().populate({path: 'favoriteMovie'});
+    const test = await Person.findOne().populate({ path: 'favoriteMovie' });
     assert(test);
     // respects individual options
-    assert.rejects(async () => {
-      const error = await Person.findOne().populate({path: 'favoriteGame', strictPopulate: true});
+    assert.rejects(async() => {
+      await Person.findOne().populate({ path: 'favoriteGame', strictPopulate: true });
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
 
   });
@@ -814,6 +814,5 @@ describe('mongoose module:', function() {
       const goodIdString2 = '1'.repeat(12);
       assert.deepStrictEqual(mongoose.isValidObjectId(goodIdString2), true);
     });
-    
   });
 });

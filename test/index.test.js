@@ -5,7 +5,6 @@ const start = require('./common');
 const assert = require('assert');
 const random = require('../lib/utils').random;
 const stream = require('stream');
-const { AssertionError } = require('assert/strict');
 
 const collection = 'blogposts_' + random();
 

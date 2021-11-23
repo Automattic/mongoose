@@ -5,6 +5,7 @@ const start = require('./common');
 const assert = require('assert');
 const random = require('../lib/utils').random;
 const stream = require('stream');
+const { AssertionError } = require('assert/strict');
 
 const collection = 'blogposts_' + random();
 
@@ -703,12 +704,14 @@ describe('mongoose module:', function() {
       name: String,
     }));
 
-    const movies = await Movie.create([
-      { name: 'The Empire Strikes Back' },
-      { name: 'Jingle All The Way' }
-    ]);
-    const people = await Person.create({ name: 'Test1', favoriteMovie: movies[1]._id });
-    await Person.findOne().populate({path: 'favoriteMovie'});
+    const movie = await Movie.create({ name: 'The Empire Strikes Back' });
+    await Person.create({ name: 'Test1', favoriteMovie: movie._id });
+    const test = await Person.findOne().populate({path: 'favoriteMovie'});
+    assert(test);
+    // respects individual options
+    assert.rejects(async () => {
+      const error = await Person.findOne().populate({path: 'favoriteGame', strictPopulate: true});
+    }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
 
   });
 

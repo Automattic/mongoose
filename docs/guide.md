@@ -100,6 +100,9 @@ To do so, we pass it into `mongoose.model(modelName, schema)`:
 
 <h3 id="_id"><a href="#_id">Ids</a></h3>
 
+>MongoDB(on which Mongoose runs) adds `_id` property to each document.
+>Here, for better understanding of user we have mentioned it as Mongoose.
+
 By default, Mongoose adds an `_id` property to your schemas.
 
 ```javascript

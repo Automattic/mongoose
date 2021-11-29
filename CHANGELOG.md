@@ -1,3 +1,17 @@
+6.0.14 / 2021-11-29
+===================
+ * fix(document): catch errors in required functions #10968
+ * fix(connection): clone schema when passing a schema from a different copy of Mongoose to `Connection#model()` #10904
+ * fix(populate): set empty array [] on virtual populate with no result #10992
+ * fix(query): handle orFail() with replaceOne() #10963
+ * fix(populate): use Model by default when using Model.populate() on a POJO #10978
+ * fix(document): throw VersionError if saving a document with version bump and document isn't found #10974
+ * fix(index.d.ts): make populate type param optional #10989 [mohd-akram](https://github.com/mohd-akram)
+ * docs(migrating_to_6): add a note about minimize and toObject() behavior change in v5.10.5 #10827
+ * docs: remove duplicate `path` in docs #11020 [ItWorksOnMyMachine](https://github.com/ItWorksOnMyMachine)
+ * docs: fix typo in populate docs #11015 [gavi-shandler](https://github.com/gavi-shandler)
+ * docs: fix typo in model.js #10982 [eltociear](https://github.com/eltociear)
+
 6.0.13 / 2021-11-15
 ===================
  * fix(document): allows validating doc again if pre validate errors out #10830

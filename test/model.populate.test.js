@@ -10447,4 +10447,37 @@ describe('model: populate:', function() {
     const doc = await BlogPost.findOne().populate('author');
     assert.equal(doc.author.email, 'test@gmail.com');
   });
+
+  it('uses `Model` by default when doing `Model.populate()` on a POJO (gh-10978)', async function() {
+    const UserSchema = new Schema({
+      name: { type: String, default: '' }
+    });
+
+    const TestSchema = new Schema({
+      users: [{ user: { type: 'ObjectId', ref: 'User' } }]
+    });
+
+    const User = db.model('User', UserSchema);
+    const Test = db.model('Test', TestSchema);
+
+    const users = await User.create([{ name: 'user-name' }, { name: 'user-name-2' }]);
+    await Test.create([{ users: [{ user: users[0]._id }, { user: users[1]._id }] }]);
+
+    const found = await Test.aggregate([
+      {
+        $project: {
+          users: '$users'
+        }
+      },
+      { $unwind: '$users' },
+      { $sort: { 'users.name': 1 } }
+    ]);
+
+    const _users = found.reduce((users, cur) => [...users, cur.users], []);
+
+    await User.populate(_users, { path: 'user' });
+    assert.equal(_users.length, 2);
+    assert.equal(_users[0].user.name, 'user-name');
+    assert.equal(_users[1].user.name, 'user-name-2');
+  });
 });

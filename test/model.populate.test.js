@@ -4491,7 +4491,6 @@ describe('model: populate:', function() {
       });
 
       it('justOne + lean (gh-6234)', async function() {
-
         const PersonSchema = new mongoose.Schema({
           name: String,
           band: String
@@ -4528,6 +4527,35 @@ describe('model: populate:', function() {
         assert.equal(res[0].member.name, 'Axl Rose');
         assert.equal(res[1].name, 'Motley Crue');
         assert.equal(res[1].member.name, 'Vince Neil');
+      });
+
+      it('sets empty array if lean with justOne = false and no results (gh-10992)', async function() {
+        const PersonSchema = new mongoose.Schema({
+          name: String,
+          band: String
+        });
+
+        const BandSchema = new mongoose.Schema({
+          name: String
+        });
+
+        BandSchema.virtual('members', {
+          ref: 'Person',
+          localField: 'name',
+          foreignField: 'band',
+          justOne: false
+        });
+
+        db.model('Person', PersonSchema);
+        const Band = db.model('Test', BandSchema);
+
+        await Band.create({ name: 'Guns N\' Roses' });
+
+        const res = await Band.find().populate('members').lean();
+
+        assert.equal(res.length, 1);
+        assert.equal(res[0].name, 'Guns N\' Roses');
+        assert.deepStrictEqual(res[0].members, []);
       });
 
       it('justOne underneath array (gh-6867)', async function() {
@@ -6570,7 +6598,6 @@ describe('model: populate:', function() {
     });
 
     it('virtual populate with embedded discriminators (gh-6273)', async function() {
-
       // Generate Users Model
       const userSchema = new Schema({ employeeId: Number, name: String });
       const UserModel = db.model('User', userSchema);

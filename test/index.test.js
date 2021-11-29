@@ -693,7 +693,7 @@ describe('mongoose module:', function() {
     assert.ok(mongoose.isValidObjectId(new mongoose.Types.ObjectId()));
     assert.ok(!mongoose.isValidObjectId(6));
   });
-  it('allows global `strictPopulate` option (gh-10694)', async function() {
+  it('global `strictPopulate` works when false (gh-10694)', async function() {
     const mongoose = new Mongoose();
     mongoose.set('strictPopulate', false);
     const schema = new mongoose.Schema({ name: String });
@@ -705,13 +705,53 @@ describe('mongoose module:', function() {
 
     const movie = await Movie.create({ name: 'The Empire Strikes Back' });
     await Person.create({ name: 'Test1', favoriteMovie: movie._id });
-    const test = await Person.findOne().populate({ path: 'favoriteMovie' });
-    assert(test);
-    // respects individual options
+    const entry = await Person.findOne().populate({ path: 'favoriteMovie' });
+    assert(entry);
+  });
+  it('global `strictPopulate` works when true (gh-10694)', async function() {
+    const mongoose = new Mongoose();
+    mongoose.set('strictPopulate', true);
+    const schema = new mongoose.Schema({ name: String });
+    const db = await mongoose.connect('mongodb://localhost:27017/mongoose_test_10694');
+    const Movie = db.model('Movie', schema);
+    const Person = db.model('Person', new mongoose.Schema({
+      name: String
+    }));
+
+    const movie = await Movie.create({ name: 'The Empire Strikes Back' });
+    await Person.create({ name: 'Test1', favoriteMovie: movie._id });
+    assert.rejects(async() => {
+      await Person.findOne().populate({ path: 'favoriteGame' });
+    }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
+  });
+  it('allows global `strictPopulate` to be overriden on specific queries set to true (gh-10694)', async function() {
+    const mongoose = new Mongoose();
+    mongoose.set('strictPopulate', false);
+    const schema = new mongoose.Schema({ name: String });
+    const db = await mongoose.connect('mongodb://localhost:27017/mongoose_test_10694');
+    const Movie = db.model('Movie', schema);
+    const Person = db.model('Person', new mongoose.Schema({
+      name: String
+    }));
+    const movie = await Movie.create({ name: 'The Empire Strikes Back' });
+    await Person.create({ name: 'Test1', favoriteMovie: movie._id });
     assert.rejects(async() => {
       await Person.findOne().populate({ path: 'favoriteGame', strictPopulate: true });
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
-
+  });
+  it('allows global `strictPopulate` to be overriden on specific queries set to false (gh-10694)', async function() {
+    const mongoose = new Mongoose();
+    mongoose.set('strictPopulate', false);
+    const schema = new mongoose.Schema({ name: String });
+    const db = await mongoose.connect('mongodb://localhost:27017/mongoose_test_10694');
+    const Movie = db.model('Movie', schema);
+    const Person = db.model('Person', new mongoose.Schema({
+      name: String
+    }));
+    const movie = await Movie.create({ name: 'The Empire Strikes Back' });
+    await Person.create({ name: 'Test1', favoriteMovie: movie._id });
+    const entry = await Person.findOne().populate({ path: 'favoriteMovie' });
+    assert(entry);
   });
 
   describe('exports', function() {

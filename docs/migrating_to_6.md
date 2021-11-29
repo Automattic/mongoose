@@ -36,6 +36,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [Removed Validator `isAsync`](#removed-validator-isasync)
 * [Removed `safe`](#removed-safe)
 * [SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`](#schematype-set-parameters)
+* [`toObject()` and `toJSON()` Use Nested Schema `minimize`](#toobject-and-tojson-use-nested-schema-minimize)
 * [TypeScript changes](#typescript-changes)
 
 <h3 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h3>
@@ -357,6 +358,37 @@ const User = mongoose.model('User', userSchema);
 
 const user = new User({ name: 'Robert Martin' });
 console.log(user.name); // 'robert martin'
+```
+
+<h3 id="toobject-and-tojson-use-nested-schema-minimize"><a href="#toobject-and-tojson-use-nested-schema-minimize">`toObject()` and `toJSON()` Use Nested Schema `minimize`</a></h3>
+
+This change was technically released with 5.10.5, but [caused issues for users migrating from 5.9.x to 6.x](https://github.com/Automattic/mongoose/issues/10827).
+In Mongoose `< 5.10.5`, `toObject()` and `toJSON()` would use the top-level schema's `minimize` option by default.
+
+```javascript
+const child = new Schema({ thing: Schema.Types.Mixed });
+const parent = new Schema({ child }, { minimize: false });
+const Parent = model('Parent', parent);
+const p = new Parent({ child: { thing: {} } });
+
+// In v5.10.4, would contain `child.thing` because `toObject()` uses `parent` schema's `minimize` option
+// In `>= 5.10.5`, `child.thing` is omitted because `child` schema has `minimize: true`
+console.log(p.toObject());
+```
+
+As a workaround, you can either explicitly pass `minimize` to `toObject()` or `toJSON()`:
+
+```javascript
+console.log(p.toObject({ minimize: false }));
+```
+
+Or define the `child` schema inline (Mongoose 6 only) to inherit the parent's `minimize` option.
+
+```javascript
+const parent = new Schema({
+  // Implicitly creates a new schema with the top-level schema's `minimize` option.
+  child: { type: { thing: Schema.Types.Mixed } }
+}, { minimize: false });
 ```
 
 ## TypeScript changes

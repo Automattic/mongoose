@@ -6354,7 +6354,35 @@ describe('Model', function() {
       const res = await db.collection(collectionName).
         find({}).sort({ name: 1 }).toArray();
       assert.deepEqual(res.map(v => v.name), ['alpha', 'Zeta']);
+    });
 
+    it('createCollection() respects timeseries (gh-10611)', async function() {
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false,
+        expireAfterSeconds: 86400
+      });
+
+      const Test = db.model('Test', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection();
+
+      const collections = await Test.db.db.listCollections().toArray();
+      const coll = collections.find(coll => coll.name === 'Test');
+      assert.ok(coll);
+      assert.equal(coll.type, 'timeseries');
+      assert.equal(coll.options.timeseries.timeField, 'timestamp');
     });
 
     it('createCollection() handles NamespaceExists errors (gh-9447)', async function() {

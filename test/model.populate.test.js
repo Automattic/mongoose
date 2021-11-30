@@ -4491,7 +4491,6 @@ describe('model: populate:', function() {
       });
 
       it('justOne + lean (gh-6234)', async function() {
-
         const PersonSchema = new mongoose.Schema({
           name: String,
           band: String
@@ -4528,6 +4527,35 @@ describe('model: populate:', function() {
         assert.equal(res[0].member.name, 'Axl Rose');
         assert.equal(res[1].name, 'Motley Crue');
         assert.equal(res[1].member.name, 'Vince Neil');
+      });
+
+      it('sets empty array if lean with justOne = false and no results (gh-10992)', async function() {
+        const PersonSchema = new mongoose.Schema({
+          name: String,
+          band: String
+        });
+
+        const BandSchema = new mongoose.Schema({
+          name: String
+        });
+
+        BandSchema.virtual('members', {
+          ref: 'Person',
+          localField: 'name',
+          foreignField: 'band',
+          justOne: false
+        });
+
+        db.model('Person', PersonSchema);
+        const Band = db.model('Test', BandSchema);
+
+        await Band.create({ name: 'Guns N\' Roses' });
+
+        const res = await Band.find().populate('members').lean();
+
+        assert.equal(res.length, 1);
+        assert.equal(res[0].name, 'Guns N\' Roses');
+        assert.deepStrictEqual(res[0].members, []);
       });
 
       it('justOne underneath array (gh-6867)', async function() {
@@ -6570,7 +6598,6 @@ describe('model: populate:', function() {
     });
 
     it('virtual populate with embedded discriminators (gh-6273)', async function() {
-
       // Generate Users Model
       const userSchema = new Schema({ employeeId: Number, name: String });
       const UserModel = db.model('User', userSchema);
@@ -10476,5 +10503,38 @@ describe('model: populate:', function() {
 
     const fromDb = await BlogPost.findById(doc);
     assert.equal(fromDb.author.name, 'John Smythe');
+  });
+
+  it('uses `Model` by default when doing `Model.populate()` on a POJO (gh-10978)', async function() {
+    const UserSchema = new Schema({
+      name: { type: String, default: '' }
+    });
+
+    const TestSchema = new Schema({
+      users: [{ user: { type: 'ObjectId', ref: 'User' } }]
+    });
+
+    const User = db.model('User', UserSchema);
+    const Test = db.model('Test', TestSchema);
+
+    const users = await User.create([{ name: 'user-name' }, { name: 'user-name-2' }]);
+    await Test.create([{ users: [{ user: users[0]._id }, { user: users[1]._id }] }]);
+
+    const found = await Test.aggregate([
+      {
+        $project: {
+          users: '$users'
+        }
+      },
+      { $unwind: '$users' },
+      { $sort: { 'users.name': 1 } }
+    ]);
+
+    const _users = found.reduce((users, cur) => [...users, cur.users], []);
+
+    await User.populate(_users, { path: 'user' });
+    assert.equal(_users.length, 2);
+    assert.equal(_users[0].user.name, 'user-name');
+    assert.equal(_users[1].user.name, 'user-name-2');
   });
 });

@@ -6383,6 +6383,8 @@ describe('Model', function() {
       assert.ok(coll);
       assert.equal(coll.type, 'timeseries');
       assert.equal(coll.options.timeseries.timeField, 'timestamp');
+
+      await Test.collection.drop().catch(() => {});
     });
 
     it('createCollection() handles NamespaceExists errors (gh-9447)', async function() {

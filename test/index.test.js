@@ -794,5 +794,9 @@ describe('mongoose module:', function() {
       const goodIdString2 = '1'.repeat(12);
       assert.deepStrictEqual(mongoose.isValidObjectId(goodIdString2), true);
     });
+    it('Allows a syncIndexes shorthand mongoose.syncIndexes (gh-10893)', async function() {
+      const m = new mongoose.Mongoose();
+      assert.deepEqual(await m.syncIndexes(), {});
+    });
   });
 });

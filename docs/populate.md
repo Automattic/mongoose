@@ -667,7 +667,7 @@ let authors = await Author.
 
 authors = await Author.
   find({}).
-  // Works, foreign field `band` is selected
+  // Works, foreign field `author` is selected
   populate({ path: 'posts', select: 'title author' }).
   exec();
 ```

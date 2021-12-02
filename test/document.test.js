@@ -424,7 +424,7 @@ describe('document', function() {
     doc.schema.options.toObject = {};
     doc.schema.options.toObject.transform = function xform(doc, ret) {
       // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
+      if (doc.$__.isSubDocument) {
         return;
       }
 
@@ -433,7 +433,6 @@ describe('document', function() {
       delete ret.oids;
       ret._id = ret._id.toString();
     };
-
     clone = doc.toObject();
     assert.equal(doc.id, clone._id);
     assert.ok(undefined === clone.em);
@@ -446,7 +445,7 @@ describe('document', function() {
     const out = { myid: doc._id.toString() };
     doc.schema.options.toObject.transform = function(doc, ret) {
       // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
+      if (doc.$__.isSubDocument) {
         return;
       }
 
@@ -846,7 +845,7 @@ describe('document', function() {
       doc.schema.options.toJSON = {};
       doc.schema.options.toJSON.transform = function xform(doc, ret) {
         // ignore embedded docs
-        if (typeof doc.ownerDocument === 'function') {
+        if (doc.$__.isSubDocument) {
           return;
         }
 
@@ -868,7 +867,7 @@ describe('document', function() {
       const out = { myid: doc._id.toString() };
       doc.schema.options.toJSON.transform = function(doc, ret) {
         // ignore embedded docs
-        if (typeof doc.ownerDocument === 'function') {
+        if (doc.$__.isSubDocument) {
           return;
         }
 

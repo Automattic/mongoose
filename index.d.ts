@@ -659,10 +659,10 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /** Populates document references. */
-    populate<Paths>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this & Paths>;
-    populate<Paths>(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this & Paths>): void;
-    populate<Paths>(path: string, names: string): Promise<this & Paths>;
-    populate<Paths>(path: string, names: string, callback: Callback<this & Paths>): void;
+    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this & Paths>;
+    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this & Paths>): void;
+    populate<Paths = {}>(path: string, names: string): Promise<this & Paths>;
+    populate<Paths = {}>(path: string, names: string, callback: Callback<this & Paths>): void;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
@@ -1248,7 +1248,7 @@ declare module 'mongoose' {
   type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
   type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
 
-  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}> extends events.EventEmitter {
+  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = any> extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -2364,8 +2364,8 @@ declare module 'mongoose' {
     polygon(path: string, ...coordinatePairs: number[][]): this;
 
     /** Specifies paths which should be populated with other documents. */
-    populate<Paths>(path: string | any, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<ResultType & Paths, DocType, THelpers, RawDocType>;
-    populate<Paths>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<ResultType & Paths, DocType, THelpers, RawDocType>;
+    populate<Paths = {}>(path: string | any, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<ResultType & Paths, DocType, THelpers, RawDocType>;
+    populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<ResultType & Paths, DocType, THelpers, RawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
     projection(fields?: any | null): any;

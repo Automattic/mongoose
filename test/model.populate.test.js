@@ -10505,6 +10505,35 @@ describe('model: populate:', function() {
     assert.equal(fromDb.author.name, 'John Smythe');
   });
 
+  it('supports ref on array containing subdocuments (gh-10856)', async function() {
+    const userSchema = Schema({ _id: Number, name: String, email: String });
+    const blogPostSchema = Schema({
+      title: String,
+      authors: [{
+        user: {
+          type: new Schema({ _id: Number, name: String }),
+          ref: 'User'
+        }
+      }]
+    });
+
+    const User = db.model('User', userSchema);
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+
+    await User.create({ _id: 1, name: 'John Smith', email: 'test@gmail.com' });
+    await BlogPost.create({
+      title: 'Introduction to Mongoose',
+      authors: [{ user: { _id: 1, name: 'John Smith' } }]
+    });
+
+    const doc = await BlogPost.findOne().populate('authors.user');
+    assert.equal(doc.authors[0].user.email, 'test@gmail.com');
+    assert.equal(doc.toObject().authors[0].user.email, 'test@gmail.com');
+
+    doc.depopulate();
+    assert.equal(doc.authors[0].user.name, 'John Smith');
+  });
+
   it('uses `Model` by default when doing `Model.populate()` on a POJO (gh-10978)', async function() {
     const UserSchema = new Schema({
       name: { type: String, default: '' }

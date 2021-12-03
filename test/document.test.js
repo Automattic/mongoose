@@ -10768,7 +10768,7 @@ describe('document', function() {
 
     const Event = db.model('Rainbow', userSchema);
 
-    const e = new Event({ name: 'test'});
+    const e = new Event({ name: 'test' });
     assert.strictEqual(e, e.parent());
     assert.strictEqual(e, e.ownerDocument());
   });

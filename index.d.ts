@@ -1436,6 +1436,10 @@ declare module 'mongoose' {
     capped?: boolean | number | { size?: number; max?: number; autoIndexId?: boolean; };
     /** Sets a default collation for every query and aggregation. */
     collation?: mongodb.CollationOptions;
+
+    /** The timeseries option to use when creating the model's collection. */
+    timeseries?: mongodb.TimeSeriesCollectionOptions;
+
     /**
      * Mongoose by default produces a collection name by passing the model name to the utils.toCollectionName
      * method. This method pluralizes the name. Set this option if you need a different name for your collection.
@@ -2871,6 +2875,9 @@ declare module 'mongoose' {
      * or a pipeline object.
      */
     sortByCount(arg: string | any): this;
+
+    /** Appends new $unionWith operator to this aggregate pipeline. */
+    unionWith(options: any): this;
 
     /** Appends new custom $unwind operator(s) to this aggregate pipeline. */
     unwind(...args: any[]): this;

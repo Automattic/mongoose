@@ -14,7 +14,6 @@ const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
 const util = require('./util');
 const utils = require('../lib/utils');
-const validator = require('validator');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -3216,20 +3215,6 @@ describe('document', function() {
       ev.recurrence = null;
       ev.save(function(error) {
         assert.ifError(error);
-        done();
-      });
-    });
-
-    it('using validator.isEmail as a validator (gh-4064) (gh-4084)', function(done) {
-      const schema = new Schema({
-        email: { type: String, validate: validator.isEmail }
-      });
-
-      const MyModel = db.model('Test', schema);
-
-      MyModel.create({ email: 'invalid' }, function(error) {
-        assert.ok(error);
-        assert.ok(error.errors['email']);
         done();
       });
     });

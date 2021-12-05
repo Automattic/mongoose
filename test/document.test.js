@@ -6519,28 +6519,6 @@ describe('document', function() {
     return Promise.resolve();
   });
 
-  it('supports validator.isUUID as a custom validator (gh-7145)', async function() {
-    const schema = new Schema({
-      name: {
-        type: String,
-        validate: [validator.isUUID, 'invalid name']
-      }
-    });
-
-    const Test = db.model('Test', schema);
-
-    const doc = new Test({ name: 'not-a-uuid' });
-    const syncValidationError = doc.validateSync();
-    assert.ok(syncValidationError instanceof Error);
-    assert.ok(/invalid name/.test(syncValidationError.message));
-
-
-    const asyncValidationError = await doc.validate().then(() => null, err => err);
-
-    assert.ok(asyncValidationError instanceof Error);
-    assert.ok(/invalid name/.test(asyncValidationError.message));
-  });
-
   it('propsParameter option (gh-7145)', async function() {
     const schema = new Schema({
       name: {

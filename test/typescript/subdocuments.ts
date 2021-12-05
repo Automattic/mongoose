@@ -16,7 +16,7 @@ const schema: Schema = new Schema({
 });
 
 interface ITest extends Document {
-  child1: { name: string },
+  child1: { _id: Types.ObjectId, name: string },
   child2: { name: string }
 }
 
@@ -24,7 +24,7 @@ const Test = model<ITest>('Test', schema);
 
 const doc: ITest = new Test({});
 
-doc.child1 = { name: 'test1' };
+doc.child1 = { _id: new Types.ObjectId(), name: 'test1' };
 doc.child2 = { name: 'test2' };
 
 
@@ -71,4 +71,8 @@ function gh10674() {
       }
     }
   );
+}
+
+async function gh10947(): Promise<void> {
+  await Test.findOneAndUpdate({}, { child1: { name: 'foo' } });
 }

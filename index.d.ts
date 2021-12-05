@@ -2042,7 +2042,7 @@ declare module 'mongoose' {
 
     class Decimal128 extends mongodb.Decimal128 { }
 
-    class DocumentArray<T extends Document> extends Types.Array<T> {
+    class DocumentArray<T> extends Types.Array<T> {
       /** DocumentArray constructor */
       constructor(values: any[]);
 
@@ -2647,7 +2647,7 @@ declare module 'mongoose' {
     [K in keyof T]: __UpdateDefProperty<T[K]>;
   };
 
-  export type UpdateQuery<T> = (_UpdateQuery<_UpdateQueryDef<T>> & MatchKeysAndValues<_UpdateQueryDef<LeanDocument<T>>>);
+  export type UpdateQuery<T> = (_UpdateQuery<_UpdateQueryDef<T>> & MatchKeysAndValues<_UpdateQueryDef<DeepPartial<T>>>);
 
   export type DocumentDefinition<T> = {
     [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:
@@ -2688,6 +2688,10 @@ declare module 'mongoose' {
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
   export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
+
+  type DeepPartial<T> = {
+    [K in keyof T]?: DeepPartial<T[K]>;
+  }
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :

@@ -14,7 +14,6 @@ const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
 const util = require('./util');
 const utils = require('../lib/utils');
-const validator = require('validator');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -3215,20 +3214,6 @@ describe('document', function() {
       ev.recurrence = null;
       ev.save(function(error) {
         assert.ifError(error);
-        done();
-      });
-    });
-
-    it('using validator.isEmail as a validator (gh-4064) (gh-4084)', function(done) {
-      const schema = new Schema({
-        email: { type: String, validate: validator.isEmail }
-      });
-
-      const MyModel = db.model('Test', schema);
-
-      MyModel.create({ email: 'invalid' }, function(error) {
-        assert.ok(error);
-        assert.ok(error.errors['email']);
         done();
       });
     });
@@ -6531,28 +6516,6 @@ describe('document', function() {
     assert.ok(test.validateSync() == null, test.validateSync());
 
     return Promise.resolve();
-  });
-
-  it('supports validator.isUUID as a custom validator (gh-7145)', async function() {
-    const schema = new Schema({
-      name: {
-        type: String,
-        validate: [validator.isUUID, 'invalid name']
-      }
-    });
-
-    const Test = db.model('Test', schema);
-
-    const doc = new Test({ name: 'not-a-uuid' });
-    const syncValidationError = doc.validateSync();
-    assert.ok(syncValidationError instanceof Error);
-    assert.ok(/invalid name/.test(syncValidationError.message));
-
-
-    const asyncValidationError = await doc.validate().then(() => null, err => err);
-
-    assert.ok(asyncValidationError instanceof Error);
-    assert.ok(/invalid name/.test(asyncValidationError.message));
   });
 
   it('propsParameter option (gh-7145)', async function() {

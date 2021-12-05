@@ -96,7 +96,7 @@ interface User {
   createdAt: number;
 }
 
-const schema = new Schema<User, Model<User>, User>({
+const schema = new Schema<User, Model<User>>({
   name: { type: String, required: true },
   email: { type: String, required: true },
   avatar: String
@@ -104,3 +104,36 @@ const schema = new Schema<User, Model<User>, User>({
 ```
 
 This is because Mongoose has numerous features that add paths to your schema that should be included in the `DocType` interface without you explicitly putting these paths in the `Schema()` constructor. For example, [timestamps](https://masteringjs.io/tutorials/mongoose/timestamps) and [plugins](/docs/plugins.html).
+
+## Arrays
+
+When you define an array in a document interface, we recommend using Mongoose's `Types.Array` type for primitive arrays or `Types.DocumentArray` for arrays of documents.
+
+```typescript
+import { Schema, Model, Types } from 'mongoose';
+
+interface BlogPost {
+  _id: Types.ObjectId;
+  title: string;
+}
+
+interface User {
+  tags: Types.Array<string>,
+  blogPosts: Types.DocumentArray<BlogPost>
+}
+
+const schema = new Schema<User, Model<User>>({
+  tags: [String],
+  blogPosts: [{ title: String }]
+});
+```
+
+Using `Types.DocumentArray` is helpful when dealing with defaults.
+For example, `BlogPost` has an `_id` property that Mongoose will set by default.
+If you use `Types.DocumentArray` in the above case, you'll be able to `push()` a subdocument without an `_id`.
+
+```typescript
+const user = new User({ blogPosts: [] });
+
+user.blogPosts.push({ title: 'test' }); // Would not work if you did `blogPosts: BlogPost[]`
+```

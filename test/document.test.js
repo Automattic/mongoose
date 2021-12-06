@@ -10751,4 +10751,27 @@ describe('document', function() {
     assert.ok(err);
     assert.equal(err.errors['url'].message, 'oops!');
   });
+
+  it('does not allow overwriting schema methods with strict: false (gh-11001)', async function() {
+    const TestSchema = new Schema({
+      text: { type: String, default: 'text' }
+    }, { strict: false });
+    TestSchema.methods.someFn = () => 'good';
+    const Test = db.model('Test', TestSchema);
+
+    const unTrusted = { someFn: () => 'bad' };
+
+    let x = await Test.create(unTrusted);
+    await x.save();
+    assert.equal(x.someFn(), 'good');
+
+    x = new Test(unTrusted);
+    await x.save();
+    assert.equal(x.someFn(), 'good');
+
+    x = await Test.create({});
+    await x.set(unTrusted);
+    assert.equal(x.someFn(), 'good');
+
+  });
 });

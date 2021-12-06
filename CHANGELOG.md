@@ -1,3 +1,12 @@
+6.0.15 / 2021-12-06
+===================
+ * fix(document): avoid overwriting schema methods when creating a new document with `new Model()` and `strict: false` #11001
+ * fix(document): avoid overwriting top-level document _id with nested `_id` when `strict = false` #10934
+ * fix(collection): avoid double-calling callback on sync error #10956
+ * fix(connection): handle direct connection to uninitialized replica set that then becomes initialized #10948
+ * fix(index.d.ts): allow partial updates on subdocuments for defaults #10947
+ * fix(index.d.ts): handle buffer type in schema definitions #11026
+
 6.0.14 / 2021-11-29
 ===================
  * fix(document): catch errors in required functions #10968

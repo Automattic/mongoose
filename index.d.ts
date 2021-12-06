@@ -747,7 +747,8 @@ declare module 'mongoose' {
   interface Model<T, TQueryHelpers = {}, TMethods = {}, TVirtuals = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
     new(doc?: AnyKeys<T> & AnyObject, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethods, TVirtuals>;
 
-    aggregate<R = any>(pipeline?: PipelineStage<T>[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline: PipelineStage[], cb: Function): Aggregate<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
     base: typeof mongoose;
@@ -2925,21 +2926,21 @@ declare module 'mongoose' {
   /**
    * [Stages reference](https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/#aggregation-pipeline-stages)
    */
-  export type PipelineStage<T = any> =
+  export type PipelineStage =
     | PipelineStage.AddFields
     | PipelineStage.Bucket
     | PipelineStage.BucketAuto
     | PipelineStage.CollStats
     | PipelineStage.Count
     | PipelineStage.Facet
-    | PipelineStage.GeoNear<T>
-    | PipelineStage.GraphLookup<T>
+    | PipelineStage.GeoNear
+    | PipelineStage.GraphLookup
     | PipelineStage.Group
     | PipelineStage.IndexStats
     | PipelineStage.Limit
     | PipelineStage.ListSessions
     | PipelineStage.Lookup
-    | PipelineStage.Match<T>
+    | PipelineStage.Match
     | PipelineStage.Merge
     | PipelineStage.Out
     | PipelineStage.PlanCacheStats
@@ -3007,7 +3008,7 @@ declare module 'mongoose' {
       >
     }
 
-    export interface GeoNear<T = any> {
+    export interface GeoNear {
       /** [`$geoNear` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/) */
       $geoNear: {
         near: { type: 'Point'; coordinates: [number, number] } | [number, number]
@@ -3017,13 +3018,13 @@ declare module 'mongoose' {
         key?: string
         maxDistance?: number
         minDistance?: number
-        query?: mongoose.FilterQuery<T>
+        query?: AnyObject
         spherical?: boolean
         uniqueDocs?: boolean
       }
     }
 
-    export interface GraphLookup<T = any> {
+    export interface GraphLookup {
       /** [`$graphLookup` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/graphLookup/) */
       $graphLookup: {
         from: string
@@ -3033,7 +3034,7 @@ declare module 'mongoose' {
         as: string
         maxDepth?: number
         depthField?: string
-        restrictSearchWithMatch?: mongoose.FilterQuery<T>
+        restrictSearchWithMatch?: AnyObject
       }
     }
 
@@ -3072,9 +3073,9 @@ declare module 'mongoose' {
       }
     }
 
-    export interface Match<T = any> {
+    export interface Match {
       /** [`$match` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/match/) */
-      $match: mongoose.FilterQuery<T>
+      $match: AnyObject
     }
 
     export interface Merge {

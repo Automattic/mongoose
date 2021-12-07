@@ -1,3 +1,15 @@
+6.1.0 / 2021-12-07
+==================
+ * feat(populate): support ref on subdocuments #10856
+ * feat(document): add `ownerDocument()` method to top-level document for consistency with subdocs #10884 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix: upgrade to mongodb driver 4.2.1 #11032 #10985 [lorand-horvath](https://github.com/lorand-horvath) [has-n](https://github.com/has-n)
+ * feat(schema): support `timeseries` option for MongoDB 5 time series collections support #10611
+ * feat(mongoose): add global `strictPopulate` option #10694 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(mongoose+connection): add global `mongoose.syncIndexes()` and `Connection.prototype.syncIndexes()` #10893 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(query): support removing fields from projections #10630 [canac](https://github.com/canac)
+ * feat(aggregate): add unionWith method to aggregate #10961 [saeidasadi](https://github.com/saeidasadi)
+ * fix(index.d.ts): types for aggregation pipeline stages #10971 [jeremyben](https://github.com/jeremyben)
+
 6.0.15 / 2021-12-06
 ===================
  * fix(document): avoid overwriting schema methods when creating a new document with `new Model()` and `strict: false` #11001

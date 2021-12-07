@@ -423,7 +423,7 @@ describe('document', function() {
     doc.schema.options.toObject = {};
     doc.schema.options.toObject.transform = function xform(doc, ret) {
       // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
+      if (doc.$__.isSubDocument) {
         return;
       }
 
@@ -432,7 +432,6 @@ describe('document', function() {
       delete ret.oids;
       ret._id = ret._id.toString();
     };
-
     clone = doc.toObject();
     assert.equal(doc.id, clone._id);
     assert.ok(undefined === clone.em);
@@ -445,7 +444,7 @@ describe('document', function() {
     const out = { myid: doc._id.toString() };
     doc.schema.options.toObject.transform = function(doc, ret) {
       // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
+      if (doc.$__.isSubDocument) {
         return;
       }
 
@@ -845,7 +844,7 @@ describe('document', function() {
       doc.schema.options.toJSON = {};
       doc.schema.options.toJSON.transform = function xform(doc, ret) {
         // ignore embedded docs
-        if (typeof doc.ownerDocument === 'function') {
+        if (doc.$__.isSubDocument) {
           return;
         }
 
@@ -867,7 +866,7 @@ describe('document', function() {
       const out = { myid: doc._id.toString() };
       doc.schema.options.toJSON.transform = function(doc, ret) {
         // ignore embedded docs
-        if (typeof doc.ownerDocument === 'function') {
+        if (doc.$__.isSubDocument) {
           return;
         }
 
@@ -10722,6 +10721,19 @@ describe('document', function() {
 
     doc.quantity = 26;
     await doc.save();
+  });
+
+  it('ensures that doc.ownerDocument() and doc.parent() by default return this on the root document (gh-10884)', async function() {
+    const userSchema = new mongoose.Schema({
+      name: String,
+      email: String
+    });
+
+    const Event = db.model('Rainbow', userSchema);
+
+    const e = new Event({ name: 'test' });
+    assert.strictEqual(e, e.parent());
+    assert.strictEqual(e, e.ownerDocument());
   });
 
   it('catches errors in `required` functions (gh-10968)', async function() {

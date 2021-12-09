@@ -1000,7 +1000,7 @@ declare module 'mongoose' {
     replaceOne(filter?: FilterQuery<T>, replacement?: T | AnyObject, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Schema the model uses. */
-    schema: Schema;
+    schema: Schema<T>;
 
     /**
      * @deprecated use `updateOne` or `updateMany` instead.
@@ -1301,7 +1301,7 @@ declare module 'mongoose' {
     methods: { [name: string]: (this: HydratedDocument<DocType, TInstanceMethods, ExtractVirtuals<M>>, ...args: any[]) => any };
 
     /** The original object passed to the schema constructor */
-    obj: any;
+    obj: SchemaDefinition<SchemaDefinitionType<DocType>>;
 
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType>(path: string): ResultType;
@@ -1398,7 +1398,8 @@ declare module 'mongoose' {
     SchemaTypeOptions<T extends undefined ? any : T>[] |
     Function[] |
     SchemaDefinition<T> |
-    SchemaDefinition<T>[];
+    SchemaDefinition<T>[] |
+    typeof SchemaTypes.Mixed;
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }

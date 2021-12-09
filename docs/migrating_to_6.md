@@ -395,6 +395,9 @@ const parent = new Schema({
 
 The `Schema` class now takes 3 generic params instead of 4. The 3rd generic param, `SchemaDefinitionType`, is now the same as the 1st generic param `DocType`. Replace `new Schema<UserDocument, UserModel, User>(schemaDefinition)` with `new Schema<UserDocument, UserModel>(schemaDefinition)`
 
+`Types.ObjectId` is now a class, which means you can no longer omit `new` when creating a new ObjectId using `new mongoose.Types.ObjectId()`.
+Currently, you can still omit `new` in JavaScript, but you **must** put `new` in TypeScript.
+
 The following legacy types have been removed:
 
 * `ModelUpdateOptions`

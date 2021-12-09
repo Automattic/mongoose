@@ -1398,7 +1398,8 @@ declare module 'mongoose' {
     SchemaTypeOptions<T extends undefined ? any : T>[] |
     Function[] |
     SchemaDefinition<T> |
-    SchemaDefinition<T>[];
+    SchemaDefinition<T>[] |
+    typeof SchemaTypes.Mixed;
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }

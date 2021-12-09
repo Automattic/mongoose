@@ -168,12 +168,35 @@ describe('castArrayFilters', function() {
 
     q.updateOne({}, p, opts);
 
-    q.schema.options.strictQuery = true;
+    q.schema._userProvidedOptions.strictQuery = true;
     assert.throws(function() {
       castArrayFilters(q);
     }, /Could not find path.*in schema/);
 
-    q.schema.options.strictQuery = false;
+    q.schema._userProvidedOptions.strictQuery = false;
+    castArrayFilters(q);
+    assert.strictEqual(q.options.arrayFilters[0]['arr.notInSchema'], '42');
+  });
+
+  it('respects `strict` override (gh-11062)', function() {
+    const schema = new Schema({
+      arr: [{
+        id: Number
+      }]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    const p = { 'arr.$[arr].id': 42 };
+    const opts = {
+      strict: false,
+      arrayFilters: [
+        { 'arr.notInSchema': '42' }
+      ]
+    };
+
+    q.updateOne({}, p, opts);
+
     castArrayFilters(q);
     assert.strictEqual(q.options.arrayFilters[0]['arr.notInSchema'], '42');
   });

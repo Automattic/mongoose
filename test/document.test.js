@@ -10772,6 +10772,38 @@ describe('document', function() {
     x = await Test.create({});
     await x.set(unTrusted);
     assert.equal(x.someFn(), 'good');
+  });
 
+  it('allows setting nested to instance of document (gh-11011)', async function() {
+    const TransactionSchema = new Schema({
+      payments: [
+        {
+          id: { type: String },
+          terminal: {
+            _id: { type: Schema.Types.ObjectId },
+            name: { type: String }
+          }
+        }
+      ]
+    });
+
+    const TerminalSchema = new Schema({
+      name: { type: String },
+      apiKey: { type: String }
+    });
+
+    const Transaction = db.model('Test1', TransactionSchema);
+    const Terminal = db.model('Test2', TerminalSchema);
+
+    const transaction = new Transaction();
+    const terminal = new Terminal({
+      name: 'Front desk',
+      apiKey: 'somesecret'
+    });
+    transaction.payments.push({
+      id: 'testPayment',
+      terminal: terminal
+    });
+    assert.equal(transaction.payments[0].terminal.name, 'Front desk');
   });
 });

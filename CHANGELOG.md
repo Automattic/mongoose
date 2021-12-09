@@ -1,3 +1,11 @@
+6.1.1 / 2021-12-09
+==================
+ * fix(document): allow setting nested path to instance of document #11011
+ * fix(update): respect strict option when casting array filters #11062
+ * fix(index.d.ts): allow SchemaTypes.Mixed for all schema definition properties to allow using union types #10900
+ * fix(index.d.ts): correct types for Schema.prototype.obj and `Model.schema` #10895
+ * docs(migrating_to_6): add note about Types.ObjectId() being a class and requiring `new` #10960
+
 6.1.0 / 2021-12-07
 ==================
  * feat(populate): support ref on subdocuments #10856

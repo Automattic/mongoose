@@ -3177,7 +3177,7 @@ declare module 'mongoose' {
       /** [`$unionWith` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/) */
       $unionWith:
         | string
-        | { coll: string; pipeline?: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge> }
+        | { coll: string; pipeline?: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge>[] }
     }
 
     export interface Unset {

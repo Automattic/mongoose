@@ -3042,8 +3042,7 @@ declare module 'mongoose' {
 
     export interface Group {
       /** [`$group` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/group) */
-      $group: {
-        _id: any
+      $group: { _id: any } & {
         [key: string]: { [op in AccumulatorOperator]?: any }
       }
     }

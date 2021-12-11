@@ -1343,11 +1343,11 @@ describe('Query', function() {
         assert.equal(query.options.tailable, false);
         done();
       });
-      it('supports passing the `await` option', function(done) {
+      it('supports passing the `awaitData` option', function(done) {
         const query = new Query({});
-        query.tailable({ awaitdata: true });
+        query.tailable({ awaitData: true });
         assert.equal(query.options.tailable, true);
-        assert.equal(query.options.awaitdata, true);
+        assert.equal(query.options.awaitData, true);
         done();
       });
     });

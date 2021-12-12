@@ -1237,7 +1237,7 @@ declare module 'mongoose' {
     /** remove empty objects (defaults to true) */
     minimize?: boolean;
     /** if set, mongoose will call this function to allow you to transform the returned object */
-    transform?: (doc: any, ret: any, options: any) => any;
+    transform?: boolean | ((doc: any, ret: any, options: any) => any);
     /** if true, replace any conventionally populated paths with the original id in the output. Has no affect on virtual populated paths. */
     depopulate?: boolean;
     /** if false, exclude the version key (`__v` by default) from the output */
@@ -3195,7 +3195,7 @@ declare module 'mongoose' {
       /** [`$unionWith` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/) */
       $unionWith:
         | string
-        | { coll: string; pipeline?: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge> }
+        | { coll: string; pipeline?: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge>[] }
     }
 
     export interface Unset {

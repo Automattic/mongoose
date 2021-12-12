@@ -308,15 +308,17 @@ describe('model: populate:', function() {
       function(err, post) {
         assert.ifError(err);
 
-        BlogPost.
-          findByIdAndUpdate(post._id, { $set: { _creator: {} } }, function(err) {
-            assert.ok(err);
-            done();
-          });
+        assert.throws(function() {
+          BlogPost.
+            findByIdAndUpdate(post._id, { $set: { _creator: {} } }, function(err) {
+              assert.ok(err);
+              done();
+            });
+        });
       });
   });
 
-  it ('fail on undefined id update', function(done) {
+  it('fail on undefined id update', function(done) {
     const BlogPost = db.model('BlogPost', blogPostSchema);
 
     BlogPost.create(

@@ -68,6 +68,15 @@ declare module 'mongoose' {
   export function connect(uri: string, callback: CallbackWithoutResult): void;
   export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
 
+  /**
+     * Makes the indexes in MongoDB match the indexes defined in every model's
+     * schema. This function will drop any indexes that are not defined in
+     * the model's schema except the `_id` index, and build any indexes that
+     * are in your schema but not in MongoDB.
+     */
+  export function syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
+  export function syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
+
   /** The Mongoose module's default connection. Equivalent to `mongoose.connections[0]`, see [`connections`](#mongoose_Mongoose-connections). */
   export const connection: Connection;
 
@@ -419,6 +428,15 @@ declare module 'mongoose' {
      */
     startSession(options?: mongodb.ClientSessionOptions): Promise<mongodb.ClientSession>;
     startSession(options: mongodb.ClientSessionOptions, cb: Callback<mongodb.ClientSession>): void;
+
+    /**
+     * Makes the indexes in MongoDB match the indexes defined in every model's
+     * schema. This function will drop any indexes that are not defined in
+     * the model's schema except the `_id` index, and build any indexes that
+     * are in your schema but not in MongoDB.
+     */
+    syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
+    syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
 
     /**
      * _Requires MongoDB >= 3.6.0._ Executes the wrapped async function

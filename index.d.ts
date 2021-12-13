@@ -2620,30 +2620,26 @@ declare module 'mongoose' {
     $sort?: SortValues | Record<string, SortValues>;
   };
 
-  type OnlyFieldsOfType<TSchema, FieldType = any, AssignableType = FieldType> = {
-    [key in keyof TSchema]?: [Extract<TSchema[key], FieldType>] extends [never] ? never : AssignableType;
-  };
-
   type NumericTypes = number | Decimal128 | mongodb.Double | mongodb.Int32 | mongodb.Long;
 
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: OnlyFieldsOfType<TSchema, NativeDate, true | { $type: 'date' | 'timestamp' }> & AnyObject;
-    $inc?: OnlyFieldsOfType<TSchema, NumericTypes | undefined> & AnyObject;
+    $currentDate?: AnyKeys<TSchema> & AnyObject;
+    $inc?: AnyKeys<TSchema> & AnyObject;
     $min?: AnyKeys<TSchema> & AnyObject;
     $max?: AnyKeys<TSchema> & AnyObject;
-    $mul?: OnlyFieldsOfType<TSchema, NumericTypes | undefined> & AnyObject;
+    $mul?: AnyKeys<TSchema> & AnyObject;
     $rename?: { [key: string]: string };
     $set?: AnyKeys<TSchema> & AnyObject;
     $setOnInsert?: AnyKeys<TSchema> & AnyObject;
     $unset?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: OnlyFieldsOfType<TSchema, any[], any> & AnyObject;
-    $pop?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1> & AnyObject;
-    $pull?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
-    $push?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
-    $pullAll?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
+    $addToSet?: AnyKeys<TSchema> & AnyObject;
+    $pop?: AnyKeys<TSchema> & AnyObject;
+    $pull?: AnyKeys<TSchema> & AnyObject;
+    $push?: AnyKeys<TSchema> & AnyObject;
+    $pullAll?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: {

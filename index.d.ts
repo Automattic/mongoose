@@ -2594,8 +2594,6 @@ declare module 'mongoose' {
     [key in keyof TSchema]?: TSchema[key];
   };
 
-  type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & AnyObject;
-
   type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string | (T | string)[] : // Allow strings for ObjectIds
     T extends string ? T | RegExp | T[] : // Allow RegExps for strings
     T extends (infer U)[] ? T | U : // Allow single array elements for arrays
@@ -2665,10 +2663,10 @@ declare module 'mongoose' {
     [Extract<T, mongodb.ObjectId>] extends [never] ? T :
     T | string;
   type _UpdateQueryDef<T> = {
-    [K in keyof T]: __UpdateDefProperty<T[K]>;
+    [K in keyof T]?: __UpdateDefProperty<T[K]>;
   };
 
-  export type UpdateQuery<T> = (_UpdateQuery<_UpdateQueryDef<T>> & MatchKeysAndValues<_UpdateQueryDef<DeepPartial<T>>>);
+  export type UpdateQuery<T> = _UpdateQuery<_UpdateQueryDef<T>> & AnyObject;
 
   export type DocumentDefinition<T> = {
     [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:

@@ -222,7 +222,7 @@ MongooseArray methods such as
 [addToSet](./api.html#mongoosearray_MongooseArray-addToSet),
 and others cast arguments to their proper types transparently:
 ```javascript
-const Parent = mongoose.model('Parent');
+const Parent = mongoose.model('Parent', 'SomeParentSchema');
 const parent = new Parent;
 
 // create a comment

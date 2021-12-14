@@ -14,7 +14,6 @@ const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
 const util = require('./util');
 const utils = require('../lib/utils');
-const validator = require('validator');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -23,6 +22,7 @@ const DocumentObjectId = mongoose.Types.ObjectId;
 const SchemaType = mongoose.SchemaType;
 const ValidatorError = SchemaType.ValidatorError;
 const ValidationError = mongoose.Document.ValidationError;
+const VersionError = mongoose.Error.VersionError;
 const MongooseError = mongoose.Error;
 const DocumentNotFoundError = mongoose.Error.DocumentNotFoundError;
 
@@ -423,7 +423,7 @@ describe('document', function() {
     doc.schema.options.toObject = {};
     doc.schema.options.toObject.transform = function xform(doc, ret) {
       // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
+      if (doc.$__.isSubDocument) {
         return;
       }
 
@@ -432,7 +432,6 @@ describe('document', function() {
       delete ret.oids;
       ret._id = ret._id.toString();
     };
-
     clone = doc.toObject();
     assert.equal(doc.id, clone._id);
     assert.ok(undefined === clone.em);
@@ -445,7 +444,7 @@ describe('document', function() {
     const out = { myid: doc._id.toString() };
     doc.schema.options.toObject.transform = function(doc, ret) {
       // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
+      if (doc.$__.isSubDocument) {
         return;
       }
 
@@ -845,7 +844,7 @@ describe('document', function() {
       doc.schema.options.toJSON = {};
       doc.schema.options.toJSON.transform = function xform(doc, ret) {
         // ignore embedded docs
-        if (typeof doc.ownerDocument === 'function') {
+        if (doc.$__.isSubDocument) {
           return;
         }
 
@@ -867,7 +866,7 @@ describe('document', function() {
       const out = { myid: doc._id.toString() };
       doc.schema.options.toJSON.transform = function(doc, ret) {
         // ignore embedded docs
-        if (typeof doc.ownerDocument === 'function') {
+        if (doc.$__.isSubDocument) {
           return;
         }
 
@@ -1873,6 +1872,21 @@ describe('document', function() {
       const err = await person.save().then(() => null, err => err);
       assert.equal(err instanceof DocumentNotFoundError, true);
       assert.equal(err.message, `No document found for query "{ _id: new ObjectId("${person._id}") }" on model "Person"`);
+    });
+
+    it('saving a document when version bump required, throws a VersionError when document is not found (gh-10974)', async function() {
+      const personSchema = new Schema({ tags: [String] });
+      const Person = db.model('Person', personSchema);
+
+      const person = await Person.create({ tags: ['tag1', 'tag2'] });
+
+      await Person.deleteOne({ _id: person._id });
+
+      person.tags.splice(0, 1);
+
+      const err = await person.save().then(() => null, err => err);
+      assert.ok(err instanceof VersionError);
+      assert.equal(err.message, `No matching document found for id "${person._id}" version 0 modifiedPaths "tags"`);
     });
 
     it('saving a document with changes, throws an error when document is not found', async function() {
@@ -3200,20 +3214,6 @@ describe('document', function() {
       ev.recurrence = null;
       ev.save(function(error) {
         assert.ifError(error);
-        done();
-      });
-    });
-
-    it('using validator.isEmail as a validator (gh-4064) (gh-4084)', function(done) {
-      const schema = new Schema({
-        email: { type: String, validate: validator.isEmail }
-      });
-
-      const MyModel = db.model('Test', schema);
-
-      MyModel.create({ email: 'invalid' }, function(error) {
-        assert.ok(error);
-        assert.ok(error.errors['email']);
         done();
       });
     });
@@ -6516,28 +6516,6 @@ describe('document', function() {
     assert.ok(test.validateSync() == null, test.validateSync());
 
     return Promise.resolve();
-  });
-
-  it('supports validator.isUUID as a custom validator (gh-7145)', async function() {
-    const schema = new Schema({
-      name: {
-        type: String,
-        validate: [validator.isUUID, 'invalid name']
-      }
-    });
-
-    const Test = db.model('Test', schema);
-
-    const doc = new Test({ name: 'not-a-uuid' });
-    const syncValidationError = doc.validateSync();
-    assert.ok(syncValidationError instanceof Error);
-    assert.ok(/invalid name/.test(syncValidationError.message));
-
-
-    const asyncValidationError = await doc.validate().then(() => null, err => err);
-
-    assert.ok(asyncValidationError instanceof Error);
-    assert.ok(/invalid name/.test(asyncValidationError.message));
   });
 
   it('propsParameter option (gh-7145)', async function() {
@@ -10743,5 +10721,89 @@ describe('document', function() {
 
     doc.quantity = 26;
     await doc.save();
+  });
+
+  it('ensures that doc.ownerDocument() and doc.parent() by default return this on the root document (gh-10884)', async function() {
+    const userSchema = new mongoose.Schema({
+      name: String,
+      email: String
+    });
+
+    const Event = db.model('Rainbow', userSchema);
+
+    const e = new Event({ name: 'test' });
+    assert.strictEqual(e, e.parent());
+    assert.strictEqual(e, e.ownerDocument());
+  });
+
+  it('catches errors in `required` functions (gh-10968)', async function() {
+    const TestSchema = new Schema({
+      url: {
+        type: String,
+        required: function() {
+          throw new Error('oops!');
+        }
+      }
+    });
+    const Test = db.model('Test', TestSchema);
+
+    const err = await Test.create({}).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.errors['url'].message, 'oops!');
+  });
+
+  it('does not allow overwriting schema methods with strict: false (gh-11001)', async function() {
+    const TestSchema = new Schema({
+      text: { type: String, default: 'text' }
+    }, { strict: false });
+    TestSchema.methods.someFn = () => 'good';
+    const Test = db.model('Test', TestSchema);
+
+    const unTrusted = { someFn: () => 'bad' };
+
+    let x = await Test.create(unTrusted);
+    await x.save();
+    assert.equal(x.someFn(), 'good');
+
+    x = new Test(unTrusted);
+    await x.save();
+    assert.equal(x.someFn(), 'good');
+
+    x = await Test.create({});
+    await x.set(unTrusted);
+    assert.equal(x.someFn(), 'good');
+  });
+
+  it('allows setting nested to instance of document (gh-11011)', async function() {
+    const TransactionSchema = new Schema({
+      payments: [
+        {
+          id: { type: String },
+          terminal: {
+            _id: { type: Schema.Types.ObjectId },
+            name: { type: String }
+          }
+        }
+      ]
+    });
+
+    const TerminalSchema = new Schema({
+      name: { type: String },
+      apiKey: { type: String }
+    });
+
+    const Transaction = db.model('Test1', TransactionSchema);
+    const Terminal = db.model('Test2', TerminalSchema);
+
+    const transaction = new Transaction();
+    const terminal = new Terminal({
+      name: 'Front desk',
+      apiKey: 'somesecret'
+    });
+    transaction.payments.push({
+      id: 'testPayment',
+      terminal: terminal
+    });
+    assert.equal(transaction.payments[0].terminal.name, 'Front desk');
   });
 });

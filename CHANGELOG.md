@@ -1,3 +1,62 @@
+6.1.1 / 2021-12-09
+==================
+ * fix(document): allow setting nested path to instance of document #11011
+ * fix(update): respect strict option when casting array filters #11062
+ * fix(index.d.ts): allow SchemaTypes.Mixed for all schema definition properties to allow using union types #10900
+ * fix(index.d.ts): correct types for Schema.prototype.obj and `Model.schema` #10895
+ * docs(migrating_to_6): add note about Types.ObjectId() being a class and requiring `new` #10960
+
+6.1.0 / 2021-12-07
+==================
+ * feat(populate): support ref on subdocuments #10856
+ * feat(document): add `ownerDocument()` method to top-level document for consistency with subdocs #10884 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix: upgrade to mongodb driver 4.2.1 #11032 #10985 [lorand-horvath](https://github.com/lorand-horvath) [has-n](https://github.com/has-n)
+ * feat(schema): support `timeseries` option for MongoDB 5 time series collections support #10611
+ * feat(mongoose): add global `strictPopulate` option #10694 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(mongoose+connection): add global `mongoose.syncIndexes()` and `Connection.prototype.syncIndexes()` #10893 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(query): support removing fields from projections #10630 [canac](https://github.com/canac)
+ * feat(aggregate): add unionWith method to aggregate #10961 [saeidasadi](https://github.com/saeidasadi)
+ * fix(index.d.ts): types for aggregation pipeline stages #10971 [jeremyben](https://github.com/jeremyben)
+
+6.0.15 / 2021-12-06
+===================
+ * fix(document): avoid overwriting schema methods when creating a new document with `new Model()` and `strict: false` #11001
+ * fix(document): avoid overwriting top-level document _id with nested `_id` when `strict = false` #10934
+ * fix(collection): avoid double-calling callback on sync error #10956
+ * fix(connection): handle direct connection to uninitialized replica set that then becomes initialized #10948
+ * fix(index.d.ts): allow partial updates on subdocuments for defaults #10947
+ * fix(index.d.ts): handle buffer type in schema definitions #11026
+
+6.0.14 / 2021-11-29
+===================
+ * fix(document): catch errors in required functions #10968
+ * fix(connection): clone schema when passing a schema from a different copy of Mongoose to `Connection#model()` #10904
+ * fix(populate): set empty array [] on virtual populate with no result #10992
+ * fix(query): handle orFail() with replaceOne() #10963
+ * fix(populate): use Model by default when using Model.populate() on a POJO #10978
+ * fix(document): throw VersionError if saving a document with version bump and document isn't found #10974
+ * fix(index.d.ts): make populate type param optional #10989 [mohd-akram](https://github.com/mohd-akram)
+ * docs(migrating_to_6): add a note about minimize and toObject() behavior change in v5.10.5 #10827
+ * docs: remove duplicate `path` in docs #11020 [ItWorksOnMyMachine](https://github.com/ItWorksOnMyMachine)
+ * docs: fix typo in populate docs #11015 [gavi-shandler](https://github.com/gavi-shandler)
+ * docs: fix typo in model.js #10982 [eltociear](https://github.com/eltociear)
+
+6.0.13 / 2021-11-15
+===================
+ * fix(document): allows validating doc again if pre validate errors out #10830
+ * fix: upgrade to mongodb driver 4.1.4 #10955 [mohd-akram](https://github.com/mohd-akram)
+ * fix(schema): handle functions with accidental type properties in schema definitions #10807
+ * fix(path): add check to avoid flattening dotted paths on Mongoose docs, improve error when flattening dotted paths causes conflicts #10825
+ * fix(index.d.ts): rename EnforceDocument -> HydratedDocument, export HydratedDocument for easier typing for users #10843
+ * fix(index.d.ts): handle maps in TypeScript schema definitions #10838
+ * fix(index.d.ts): add clone to query #10943 [asportnoy](https://github.com/asportnoy)
+ * fix(index.d.ts): add strictQuery global option #10933
+ * fix(index.d.ts): add generic to allow overriding `Schema#clone()` return type #10951 [StefanoA1](https://github.com/StefanoA1)
+ * docs(typescript): add quick guide to virtuals in TypeScript #10754
+ * docs(aggregate): remove exec() from AggregationCursor example, no longer correct for Mongoose 6 #10862
+ * docs(document.js): fix link leading to old github pages site #10958 [PuneetGopinath](https://github.com/PuneetGopinath)
+ * docs: fixed typo in document.js #10950 [Haosik](https://github.com/Haosik)
+
 5.13.13 / 2021-11-02
 ====================
  * fix: upgrade to mongodb@3.7.3 #10909 [gaurav-sharma-gs](https://github.com/gaurav-sharma-gs)

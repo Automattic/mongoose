@@ -92,31 +92,6 @@ Because mongoose needs to define getters and setters for `nested.prop`, `nested`
 must always be defined as an object on a mongoose document, even if `nested`
 is undefined on the underlying [POJO](./guide.html#minimize).
 
-<hr id="destructured-imports" />
-
-<a class="anchor" href="#destructured-imports">**Q**</a>. When I use named imports like `import { set } from 'mongoose'`, I
-    get a `TypeError`. What causes this issue and how can I fix it?
-
-**A**. The only import syntax Mongoose supports is `import mongoose from 'mongoose'`.
-Syntaxes like `import * from 'mongoose'` or `import { model } from 'mongoose'` do **not** work.
-The global Mongoose object stores types, [global options](/docs/api.html#mongoose_Mongoose-set), and other important
-properties that Mongoose needs. When you do `import { model } from 'mongoose'`, the
-`this` value in `model()` is not the Mongoose global.
-
-```javascript
-// file1.js
-exports.answer = 42;
-exports.foo = function() { console.log(this.answer); };
-
-// file2.js
-const obj = require('./file1');
-obj.foo(); // "42"
-
-// file3.js
-const { foo } = require('./file1');
-foo(); // "undefined"
-```
-
 <hr id="arrow-functions" />
 
 <a class="anchor" href="#arrow-functions">**Q**</a>. I'm using an arrow function for a [virtual](./guide.html#virtuals), [middleware](./middleware.html), [getter](./api.html#schematype_SchemaType-get)/[setter](./api.html#schematype_SchemaType-set), or [method](./guide.html#methods) and the value of `this` is wrong.

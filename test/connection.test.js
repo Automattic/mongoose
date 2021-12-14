@@ -1078,4 +1078,28 @@ describe('connections:', function() {
     assert.deepStrictEqual(conn2.id, m1.connection.id + 1);
     assert.deepStrictEqual(conn3.id, m.connection.id + 2);
   });
+
+  it('Allows a syncIndexes option with connection mongoose.connection.syncIndexes (gh-10893)', async function() {
+    this.timeout(10000);
+
+
+    const coll = 'tests2';
+    const mongooseInstance = new mongoose.Mongoose();
+    const conn = mongooseInstance.createConnection('mongodb://localhost:27017');
+    let User = conn.model('Test', new Schema({ name: { type: String, index: true } }, { autoIndex: false }), coll);
+    const indexesAfterFirstSync = await conn.syncIndexes();
+    assert(indexesAfterFirstSync, { Test: [] });
+    const indexesAfterSecondSync = await User.listIndexes();
+    assert.deepEqual(indexesAfterSecondSync.map(i => i.key), [
+      { _id: 1 },
+      { name: 1 }
+    ]);
+    conn.deleteModel(/Test/);
+    User = conn.model('Test', new Schema({
+      otherName: { type: String, index: true }
+    }, { autoIndex: false }), coll);
+    const dropped = await conn.syncIndexes();
+    assert.deepEqual(dropped, { Test: ['name_1'] });
+    await User.collection.drop();
+  });
 });

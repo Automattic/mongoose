@@ -2858,7 +2858,7 @@ declare module 'mongoose' {
     redact(expression: any, thenExpr: string | any, elseExpr: string | any): this;
 
     /** Appends a new $replaceRoot operator to this aggregate pipeline. */
-    replaceRoot(newRoot: PipelineStage.ReplaceRoot['$replaceRoot'] | string): this;
+    replaceRoot(newRoot: PipelineStage.ReplaceRoot['$replaceRoot']['newRoot'] | string): this;
 
     /**
      * Helper for [Atlas Text Search](https://docs.atlas.mongodb.com/reference/atlas-search/tutorial/)'s

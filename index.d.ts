@@ -803,7 +803,7 @@ declare module 'mongoose' {
 
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
     countDocuments(callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    countDocuments(filter: FilterQuery<T>, callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    countDocuments(filter: FilterQuery<T>, options?: QueryOptions, callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a new document or documents */
     create(docs: (AnyKeys<T> | AnyObject)[], options?: SaveOptions): Promise<HydratedDocument<T, TMethods, TVirtuals>[]>;
@@ -2182,7 +2182,7 @@ declare module 'mongoose' {
 
     /** Specifies this query as a `countDocuments` query. */
     countDocuments(callback?: Callback<number>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
-    countDocuments(criteria: FilterQuery<DocType>, callback?: Callback<number>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
+    countDocuments(criteria: FilterQuery<DocType>, options?: QueryOptions, callback?: Callback<number>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
 
     /**
      * Returns a wrapper around a [mongodb driver cursor](http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html).

@@ -1398,14 +1398,19 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
+  type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;
+  type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String;
+  type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean;
+  type DateSchemaDefinition = typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date;
+
   type SchemaDefinitionWithBuiltInClass<T> = T extends number
-    ? (typeof Number | 'number' | 'Number' | typeof Schema.Types.Number)
+    ? NumberSchemaDefinition
     : T extends string
-    ? (typeof String | 'string' | 'String' | typeof Schema.Types.String)
+    ? StringSchemaDefinition
     : T extends boolean
-    ? (typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean)
+    ? BooleanSchemaDefinition
     : T extends NativeDate
-    ? (typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date)
+    ? DateSchemaDefinition
     : (Function | string);
 
   type SchemaDefinitionProperty<T = undefined> = SchemaDefinitionWithBuiltInClass<T> |
@@ -1586,16 +1591,18 @@ declare module 'mongoose' {
 
   export class SchemaTypeOptions<T> {
     type?:
-      T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends Schema<any, any, any> ? T :
+      T extends string ? StringSchemaDefinition :
+      T extends number ? NumberSchemaDefinition :
+      T extends boolean ? BooleanSchemaDefinition :
+      T extends NativeDate ? DateSchemaDefinition :
       T extends Map<any, any> ? SchemaDefinition<typeof Map> :
       T extends Buffer ? SchemaDefinition<typeof Buffer> :
       T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>>> | AnyArray<SchemaTypeOptions<Unpacked<T>>>) :
-      T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> | AnyArray<SchemaTypeOptions<string>> :
-      T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> | AnyArray<SchemaTypeOptions<number>> :
-      T extends boolean[] ? AnyArray<SchemaDefinitionWithBuiltInClass<boolean>> | AnyArray<SchemaTypeOptions<boolean>> :
-      T extends Function[] ? AnyArray<SchemaDefinitionWithBuiltInClass<Function>> | AnyArray<SchemaTypeOptions<Unpacked<T>>> :
-      T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T>;
+      T extends string[] ? AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string>> :
+      T extends number[] ? AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number>> :
+      T extends boolean[] ? AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean>> :
+      T extends Function[] ? AnyArray<Function | string> | AnyArray<SchemaTypeOptions<Unpacked<T>>> :
+      T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T> | Function | AnyArray<Function>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;

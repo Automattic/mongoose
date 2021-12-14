@@ -2590,14 +2590,7 @@ declare module 'mongoose' {
     [key: string]: any;
   };
 
-  type ReadonlyPartial<TSchema> = {
-    [key in keyof TSchema]?: TSchema[key];
-  };
-
-  type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string | (T | string)[] : // Allow strings for ObjectIds
-    T extends string ? T | RegExp | T[] : // Allow RegExps for strings
-    T extends (infer U)[] ? T | U : // Allow single array elements for arrays
-    T | T[];
+  type ApplyBasicQueryCasting<T> = T | T[] | any;
   type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
   type _FilterQuery<T> = {

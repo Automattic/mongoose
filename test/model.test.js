@@ -5116,33 +5116,63 @@ describe('Model', function() {
       });
 
       describe('watch()', function() {
+        this.timeout(10000);
+        let changeStream;
+        let listener;
+
         before(function() {
           if (!process.env.REPLICA_SET) {
             this.skip();
           }
         });
 
-        it('watch() (gh-5964)', async function() {
+        afterEach(() => {
+          if (listener == null) {
+            return;
+          }
+          changeStream.removeListener('change', listener);
+          listener = null;
+          changeStream.close();
+          changeStream = null;
+        });
 
+        it('watch() (gh-5964)', async function() {
           const MyModel = db.model('Test', new Schema({ name: String }));
+
+          const changed = new global.Promise(resolve => {
+            changeStream = MyModel.watch();
+            listener = data => resolve(data);
+            changeStream.once('change', listener);
+          });
 
           const doc = await MyModel.create({ name: 'Ned Stark' });
 
+          const changeData = await changed;
+          assert.equal(changeData.operationType, 'insert');
+          assert.equal(changeData.fullDocument._id.toHexString(),
+            doc._id.toHexString());
+        });
+
+        it('respects discriminators (gh-11007)', async function() {
+          const BaseModel = db.model('Test', new Schema({ name: String }));
+          const ChildModel = BaseModel.discriminator('Test1', new Schema({ email: String }));
+
           const changed = new global.Promise(resolve => {
-            MyModel.watch().once('change', data => resolve(data));
+            changeStream = ChildModel.watch();
+            listener = data => resolve(data);
+            changeStream.once('change', listener);
           });
 
-          await doc.remove();
+          await BaseModel.create({ name: 'Base' });
+          await ChildModel.create({ name: 'Child', email: 'test' });
 
           const changeData = await changed;
-          assert.equal(changeData.operationType, 'delete');
-          assert.equal(changeData.documentKey._id.toHexString(),
-            doc._id.toHexString());
-
+          // Should get change data from 2nd insert, skipping first insert
+          assert.equal(changeData.operationType, 'insert');
+          assert.equal(changeData.fullDocument.name, 'Child');
         });
 
         it('watch() before connecting (gh-5964)', async function() {
-
           const db = start();
 
           const MyModel = db.model('Test', new Schema({ name: String }));
@@ -5159,11 +5189,9 @@ describe('Model', function() {
           const changeData = await changed;
           assert.equal(changeData.operationType, 'insert');
           assert.equal(changeData.fullDocument.name, 'Ned Stark');
-
         });
 
         it('watch() close() prevents buffered watch op from running (gh-7022)', async function() {
-
           const db = start();
           const MyModel = db.model('Test', new Schema({}));
           const changeStream = MyModel.watch();
@@ -5178,11 +5206,9 @@ describe('Model', function() {
           await db;
           const readyCalled = await ready;
           assert.strictEqual(readyCalled, false);
-
         });
 
         it('watch() close() closes the stream (gh-7022)', async function() {
-
           const db = await start();
           const MyModel = db.model('Test', new Schema({ name: String }));
 
@@ -5198,7 +5224,6 @@ describe('Model', function() {
           changeStream.close();
           const closedData = await closed;
           assert.strictEqual(closedData, true);
-
         });
       });
 
@@ -6354,7 +6379,37 @@ describe('Model', function() {
       const res = await db.collection(collectionName).
         find({}).sort({ name: 1 }).toArray();
       assert.deepEqual(res.map(v => v.name), ['alpha', 'Zeta']);
+    });
 
+    it('createCollection() respects timeseries (gh-10611)', async function() {
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false,
+        expireAfterSeconds: 86400
+      });
+
+      const Test = db.model('Test', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection();
+
+      const collections = await Test.db.db.listCollections().toArray();
+      const coll = collections.find(coll => coll.name === 'Test');
+      assert.ok(coll);
+      assert.equal(coll.type, 'timeseries');
+      assert.equal(coll.options.timeseries.timeField, 'timestamp');
+
+      await Test.collection.drop().catch(() => {});
     });
 
     it('createCollection() handles NamespaceExists errors (gh-9447)', async function() {

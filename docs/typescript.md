@@ -53,6 +53,20 @@ async function run(): Promise<void> {
 You as the developer are responsible for ensuring that your document interface lines up with your Mongoose schema.
 For example, Mongoose won't report an error if `email` is `required` in your Mongoose schema but optional in your document interface.
 
+The `UserModel()` constructor returns an instance of `HydratedDocument<User>`.
+`User` is a _document interface_, it represents the raw object structure that `User` objects look like in MongoDB.
+`HydratedDocument<User>` represents a hydrated Mongoose document, with methods, virtuals, and other Mongoose-specific features.
+
+```ts
+import { HydratedDocument } from 'mongoose';
+
+const doc: HydratedDocument<User> = new UserModel({
+  name: 'Bill',
+  email: 'bill@initech.com',
+  avatar: 'https://i.imgur.com/dM7Thhn.png'
+});
+```
+
 ### Using `extends Document`
 
 Alternatively, your document interface can extend Mongoose's `Document` class.

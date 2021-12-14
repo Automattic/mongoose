@@ -88,10 +88,40 @@ describe('Query', function() {
       assert.deepEqual(query._fields, { a: 1 });
       query.select('b');
       assert.deepEqual(query._fields, { a: 1, b: 1 });
-      query.select({ c: 0 });
-      assert.deepEqual(query._fields, { a: 1, b: 1, c: 0 });
-      query.select('-d');
-      assert.deepEqual(query._fields, { a: 1, b: 1, c: 0, d: 0 });
+      query.select({ c: 1 });
+      assert.deepEqual(query._fields, { a: 1, b: 1, c: 1 });
+      query.select('d');
+      assert.deepEqual(query._fields, { a: 1, b: 1, c: 1, d: 1 });
+      done();
+    });
+
+    it('should remove existing fields from inclusive projection', function(done) {
+      const query = new Query({});
+      query.select({
+        a: 1,
+        b: 1,
+        c: 1,
+        'parent1.child1': 1,
+        'parent1.child2': 1,
+        'parent2.child1': 1,
+        'parent2.child2': 1
+      }).select({ b: 0, d: 1, 'c.child': 0, parent1: 0, 'parent2.child1': 0 });
+      assert.deepEqual(query._fields, { a: 1, c: 1, d: 1, 'parent2.child2': 1 });
+      done();
+    });
+
+    it('should remove existing fields from exclusive projection', function(done) {
+      const query = new Query({});
+      query.select({
+        a: 0,
+        b: 0,
+        c: 0,
+        'parent1.child1': 0,
+        'parent1.child2': 0,
+        'parent2.child1': 0,
+        'parent2.child2': 0
+      }).select({ b: 1, d: 0, 'c.child': 1, parent1: 1, 'parent2.child1': 1 });
+      assert.deepEqual(query._fields, { a: 0, c: 0, d: 0, 'parent2.child2': 0 });
       done();
     });
   });
@@ -1313,11 +1343,11 @@ describe('Query', function() {
         assert.equal(query.options.tailable, false);
         done();
       });
-      it('supports passing the `await` option', function(done) {
+      it('supports passing the `awaitData` option', function(done) {
         const query = new Query({});
-        query.tailable({ awaitdata: true });
+        query.tailable({ awaitData: true });
         assert.equal(query.options.tailable, true);
-        assert.equal(query.options.awaitdata, true);
+        assert.equal(query.options.awaitData, true);
         done();
       });
     });
@@ -2796,6 +2826,22 @@ describe('Query', function() {
       // Shouldn't throw
       const res = await Model.remove({ name: 'Test' }).orFail(new Error('Oops'));
       assert.equal(res.deletedCount, 1);
+    });
+
+    it('replaceOne()', async function() {
+      let threw = false;
+      try {
+        await Model.replaceOne({ name: 'na' }, { name: 'bar' }).orFail(new Error('Oops!'));
+      } catch (error) {
+        assert.ok(error);
+        assert.equal(error.message, 'Oops!');
+        threw = true;
+      }
+      assert.ok(threw);
+
+      // Shouldn't throw
+      const res = await Model.replaceOne({ name: 'Test' }, { name: 'bar' }).orFail(new Error('Oops'));
+      assert.equal(res.modifiedCount, 1);
     });
 
     it('update()', async function() {

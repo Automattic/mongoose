@@ -77,6 +77,10 @@ declare module 'mongoose' {
   export function syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
   export function syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
 
+  /* Tells `sanitizeFilter()` to skip the given object when filtering out potential query selector injection attacks.
+   * Use this method when you have a known query selector that you want to use. */
+  export function trusted<T>(obj: T): T;
+
   /** The Mongoose module's default connection. Equivalent to `mongoose.connections[0]`, see [`connections`](#mongoose_Mongoose-connections). */
   export const connection: Connection;
 

@@ -3115,7 +3115,7 @@ declare module 'mongoose' {
 
     export interface Project {
       /** [`$project` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/project/) */
-      $project: { _id?: 0 | false; [field: string]: any } | {_id: 1 | true}
+      $project: { [field: string]: any }
     }
 
     export interface Redact {

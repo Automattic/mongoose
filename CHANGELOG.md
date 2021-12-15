@@ -1,3 +1,17 @@
+6.1.2 / 2021-12-14
+==================
+ * fix: upgrade mongodb driver to 4.2.2 #11092 [lorand-horvath](https://github.com/lorand-horvath)
+ * fix(model): respect discriminators when calling Model.watch() #11007
+ * fix(populate): allow referencing parent connection models by name when using `useDb()` #11003
+ * fix(query): support options param to `Query.prototype.countDocuments()` #11037
+ * fix(query): correctly use awaitData instead of awaitdata in `Query.prototype.tailable()` #10875
+ * fix(index.d.ts): fix replaceRoot type #11098 [alibehroozi](https://github.com/alibehroozi)
+ * fix(index.d.ts): add missing syncIndexes() definition to Mongoose global and Connection class #11065
+ * fix(index.d.ts): add boolean type for transform option #11057 [AliYusuf95](https://github.com/AliYusuf95)
+ * docs(model.estimatedDocumentCount): add await into example to get value from the Query #11044 [olecom](https://github.com/olecom)
+ * docs: fix broken build from awaitdata comment #11096 [medolino](https://github.com/medolino)
+ * docs: correct Query.prototype.transform() docs #11094 [medolino](https://github.com/medolino)
+
 6.1.1 / 2021-12-09
 ==================
  * fix(document): allow setting nested path to instance of document #11011

@@ -8,4 +8,6 @@ m.connect('mongodb://localhost:27017/test').then(() => {
   console.log('Connected!');
 });
 
+m.syncIndexes().then(() => console.log('Synced indexes!'));
+
 mongoose.Promise = Promise;

@@ -10566,4 +10566,30 @@ describe('model: populate:', function() {
     assert.equal(_users[0].user.name, 'user-name');
     assert.equal(_users[1].user.name, 'user-name-2');
   });
+
+  it('can reference parent connection models by name after `useDb()` (gh-11003)', async function() {
+    const UserSchema = new Schema({
+      name: String
+    });
+
+    const TestSchema = new Schema({
+      user: { type: 'ObjectId', ref: 'User' }
+    });
+
+    const User = db.model('User', UserSchema);
+
+    const conn2 = db.useDb('mongoose-test2');
+    const Test = conn2.model('Test', TestSchema);
+
+    await Test.deleteMany({});
+    const users = await User.create([{ name: 'user-name' }, { name: 'user-name-2' }]);
+    await Test.create([{ user: users[0]._id }, { user: users[1]._id }]);
+
+    const res = await Test.find().populate('user').sort({ user: 1 });
+    assert.equal(res.length, 2);
+    assert.equal(res[0].user.name, 'user-name');
+    assert.equal(res[1].user.name, 'user-name-2');
+
+    await Test.deleteMany({});
+  });
 });

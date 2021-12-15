@@ -311,7 +311,7 @@ describe('aggregate: ', function() {
 
       assert.equal(aggregate.near({ a: 1 }), aggregate);
       // Run exec so we apply discriminator pipeline
-      Aggregate._prepareDiscriminatorPipeline(aggregate);
+      Aggregate._prepareDiscriminatorPipeline(aggregate._pipeline, stub.schema);
       assert.deepEqual(aggregate._pipeline,
         [{ $geoNear: { a: 1, query: { __t: 'subschema' } } }]);
 
@@ -319,7 +319,7 @@ describe('aggregate: ', function() {
       aggregate._model = stub;
 
       aggregate.near({ b: 2, query: { x: 1 } });
-      Aggregate._prepareDiscriminatorPipeline(aggregate);
+      Aggregate._prepareDiscriminatorPipeline(aggregate._pipeline, stub.schema);
       assert.deepEqual(aggregate._pipeline,
         [{ $geoNear: { b: 2, query: { x: 1, __t: 'subschema' } } }]);
     });

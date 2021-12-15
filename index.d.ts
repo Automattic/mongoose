@@ -68,6 +68,15 @@ declare module 'mongoose' {
   export function connect(uri: string, callback: CallbackWithoutResult): void;
   export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
 
+  /**
+     * Makes the indexes in MongoDB match the indexes defined in every model's
+     * schema. This function will drop any indexes that are not defined in
+     * the model's schema except the `_id` index, and build any indexes that
+     * are in your schema but not in MongoDB.
+     */
+  export function syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
+  export function syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
+
   /** The Mongoose module's default connection. Equivalent to `mongoose.connections[0]`, see [`connections`](#mongoose_Mongoose-connections). */
   export const connection: Connection;
 
@@ -419,6 +428,15 @@ declare module 'mongoose' {
      */
     startSession(options?: mongodb.ClientSessionOptions): Promise<mongodb.ClientSession>;
     startSession(options: mongodb.ClientSessionOptions, cb: Callback<mongodb.ClientSession>): void;
+
+    /**
+     * Makes the indexes in MongoDB match the indexes defined in every model's
+     * schema. This function will drop any indexes that are not defined in
+     * the model's schema except the `_id` index, and build any indexes that
+     * are in your schema but not in MongoDB.
+     */
+    syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
+    syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
 
     /**
      * _Requires MongoDB >= 3.6.0._ Executes the wrapped async function
@@ -785,7 +803,7 @@ declare module 'mongoose' {
 
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
     countDocuments(callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    countDocuments(filter: FilterQuery<T>, callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    countDocuments(filter: FilterQuery<T>, options?: QueryOptions, callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a new document or documents */
     create(docs: (AnyKeys<T> | AnyObject)[], options?: SaveOptions): Promise<HydratedDocument<T, TMethods, TVirtuals>[]>;
@@ -1219,7 +1237,7 @@ declare module 'mongoose' {
     /** remove empty objects (defaults to true) */
     minimize?: boolean;
     /** if set, mongoose will call this function to allow you to transform the returned object */
-    transform?: (doc: any, ret: any, options: any) => any;
+    transform?: boolean | ((doc: any, ret: any, options: any) => any);
     /** if true, replace any conventionally populated paths with the original id in the output. Has no affect on virtual populated paths. */
     depopulate?: boolean;
     /** if false, exclude the version key (`__v` by default) from the output */
@@ -1380,14 +1398,19 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
+  type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;
+  type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String;
+  type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean;
+  type DateSchemaDefinition = typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date;
+
   type SchemaDefinitionWithBuiltInClass<T> = T extends number
-    ? (typeof Number | 'number' | 'Number' | typeof Schema.Types.Number)
+    ? NumberSchemaDefinition
     : T extends string
-    ? (typeof String | 'string' | 'String' | typeof Schema.Types.String)
+    ? StringSchemaDefinition
     : T extends boolean
-    ? (typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean)
+    ? BooleanSchemaDefinition
     : T extends NativeDate
-    ? (typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date)
+    ? DateSchemaDefinition
     : (Function | string);
 
   type SchemaDefinitionProperty<T = undefined> = SchemaDefinitionWithBuiltInClass<T> |
@@ -1568,16 +1591,18 @@ declare module 'mongoose' {
 
   export class SchemaTypeOptions<T> {
     type?:
-      T extends string | number | boolean | NativeDate | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends Schema<any, any, any> ? T :
+      T extends string ? StringSchemaDefinition :
+      T extends number ? NumberSchemaDefinition :
+      T extends boolean ? BooleanSchemaDefinition :
+      T extends NativeDate ? DateSchemaDefinition :
       T extends Map<any, any> ? SchemaDefinition<typeof Map> :
       T extends Buffer ? SchemaDefinition<typeof Buffer> :
       T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>>> | AnyArray<SchemaTypeOptions<Unpacked<T>>>) :
-      T extends string[] ? AnyArray<SchemaDefinitionWithBuiltInClass<string>> | AnyArray<SchemaTypeOptions<string>> :
-      T extends number[] ? AnyArray<SchemaDefinitionWithBuiltInClass<number>> | AnyArray<SchemaTypeOptions<number>> :
-      T extends boolean[] ? AnyArray<SchemaDefinitionWithBuiltInClass<boolean>> | AnyArray<SchemaTypeOptions<boolean>> :
-      T extends Function[] ? AnyArray<SchemaDefinitionWithBuiltInClass<Function>> | AnyArray<SchemaTypeOptions<Unpacked<T>>> :
-      T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T>;
+      T extends string[] ? AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string>> :
+      T extends number[] ? AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number>> :
+      T extends boolean[] ? AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean>> :
+      T extends Function[] ? AnyArray<Function | string> | AnyArray<SchemaTypeOptions<Unpacked<T>>> :
+      T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T> | Function | AnyArray<Function>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;
@@ -2157,7 +2182,7 @@ declare module 'mongoose' {
 
     /** Specifies this query as a `countDocuments` query. */
     countDocuments(callback?: Callback<number>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
-    countDocuments(criteria: FilterQuery<DocType>, callback?: Callback<number>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
+    countDocuments(criteria: FilterQuery<DocType>, options?: QueryOptions, callback?: Callback<number>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
 
     /**
      * Returns a wrapper around a [mongodb driver cursor](http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html).
@@ -2572,16 +2597,7 @@ declare module 'mongoose' {
     [key: string]: any;
   };
 
-  type ReadonlyPartial<TSchema> = {
-    [key in keyof TSchema]?: TSchema[key];
-  };
-
-  type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & AnyObject;
-
-  type ApplyBasicQueryCasting<T> = T extends mongodb.ObjectId ? T | string | (T | string)[] : // Allow strings for ObjectIds
-    T extends string ? T | RegExp | T[] : // Allow RegExps for strings
-    T extends (infer U)[] ? T | U : // Allow single array elements for arrays
-    T | T[];
+  type ApplyBasicQueryCasting<T> = T | T[] | any;
   type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
   type _FilterQuery<T> = {
@@ -2604,30 +2620,26 @@ declare module 'mongoose' {
     $sort?: SortValues | Record<string, SortValues>;
   };
 
-  type OnlyFieldsOfType<TSchema, FieldType = any, AssignableType = FieldType> = {
-    [key in keyof TSchema]?: [Extract<TSchema[key], FieldType>] extends [never] ? never : AssignableType;
-  };
-
   type NumericTypes = number | Decimal128 | mongodb.Double | mongodb.Int32 | mongodb.Long;
 
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: OnlyFieldsOfType<TSchema, NativeDate, true | { $type: 'date' | 'timestamp' }> & AnyObject;
-    $inc?: OnlyFieldsOfType<TSchema, NumericTypes | undefined> & AnyObject;
+    $currentDate?: AnyKeys<TSchema> & AnyObject;
+    $inc?: AnyKeys<TSchema> & AnyObject;
     $min?: AnyKeys<TSchema> & AnyObject;
     $max?: AnyKeys<TSchema> & AnyObject;
-    $mul?: OnlyFieldsOfType<TSchema, NumericTypes | undefined> & AnyObject;
+    $mul?: AnyKeys<TSchema> & AnyObject;
     $rename?: { [key: string]: string };
     $set?: AnyKeys<TSchema> & AnyObject;
     $setOnInsert?: AnyKeys<TSchema> & AnyObject;
     $unset?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: OnlyFieldsOfType<TSchema, any[], any> & AnyObject;
-    $pop?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1> & AnyObject;
-    $pull?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
-    $push?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
-    $pullAll?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, any> & AnyObject;
+    $addToSet?: AnyKeys<TSchema> & AnyObject;
+    $pop?: AnyKeys<TSchema> & AnyObject;
+    $pull?: AnyKeys<TSchema> & AnyObject;
+    $push?: AnyKeys<TSchema> & AnyObject;
+    $pullAll?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: {
@@ -2647,10 +2659,10 @@ declare module 'mongoose' {
     [Extract<T, mongodb.ObjectId>] extends [never] ? T :
     T | string;
   type _UpdateQueryDef<T> = {
-    [K in keyof T]: __UpdateDefProperty<T[K]>;
+    [K in keyof T]?: __UpdateDefProperty<T[K]>;
   };
 
-  export type UpdateQuery<T> = (_UpdateQuery<_UpdateQueryDef<T>> & MatchKeysAndValues<_UpdateQueryDef<DeepPartial<T>>>);
+  export type UpdateQuery<T> = _UpdateQuery<_UpdateQueryDef<T>> & AnyObject;
 
   export type DocumentDefinition<T> = {
     [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:
@@ -2846,7 +2858,7 @@ declare module 'mongoose' {
     redact(expression: any, thenExpr: string | any, elseExpr: string | any): this;
 
     /** Appends a new $replaceRoot operator to this aggregate pipeline. */
-    replaceRoot(newRoot: PipelineStage.ReplaceRoot['$replaceRoot'] | string): this;
+    replaceRoot(newRoot: PipelineStage.ReplaceRoot['$replaceRoot']['newRoot'] | string): this;
 
     /**
      * Helper for [Atlas Text Search](https://docs.atlas.mongodb.com/reference/atlas-search/tutorial/)'s
@@ -3177,7 +3189,7 @@ declare module 'mongoose' {
       /** [`$unionWith` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/) */
       $unionWith:
         | string
-        | { coll: string; pipeline?: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge> }
+        | { coll: string; pipeline?: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge>[] }
     }
 
     export interface Unset {

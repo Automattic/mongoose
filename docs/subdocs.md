@@ -238,7 +238,7 @@ parent.save(function (err) {
 });
 ```
 
-You can also create a subdocument without adding it to an array by using the `create()` method of Document Arrays.
+You can also create a subdocument without adding it to an array by using the [`create()` method](./api/mongoosedocumentarray.html#mongoosedocumentarray_MongooseDocumentArray-create) of Document Arrays.
 
 ```javascript
 const newdoc = parent.children.create({ name: 'Aaron' });

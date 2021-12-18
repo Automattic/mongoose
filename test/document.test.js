@@ -10806,4 +10806,35 @@ describe('document', function() {
     });
     assert.equal(transaction.payments[0].terminal.name, 'Front desk');
   });
+
+  it('cleans modified paths on deeply nested subdocuments (gh-11060)', async function() {
+    const childSchema = new Schema({ status: String });
+
+    const deploymentsSchema = new Schema({
+      before: { type: childSchema, required: false },
+      after: { type: childSchema, required: false }
+    }, { _id: false });
+
+    const testSchema = new Schema({
+      name: String,
+      deployments: { type: deploymentsSchema }
+    });
+    const Test = db.model('Test', testSchema);
+
+    await Test.create({
+      name: 'hello',
+      deployments: {
+        before: { status: 'foo' }
+      }
+    });
+
+    const entry = await Test.findOne({ name: 'hello' });
+    const deployment = entry.deployments.before;
+    deployment.status = 'bar';
+    entry.deployments.before = null;
+    entry.deployments.after = deployment;
+
+    assert.ok(!entry.isDirectModified('deployments.before.status'));
+    await entry.save();
+  });
 });

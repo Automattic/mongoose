@@ -10603,6 +10603,7 @@ describe('model: populate:', function() {
       l1: { type: 'ObjectId', ref: L1 }
     }));
 
+    await Parent.deleteMany();
     const l2 = await L2.create({ name: 'test' });
     const l1 = await L1.create({ l2 });
     await Parent.create({ l1 });

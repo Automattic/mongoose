@@ -423,7 +423,7 @@ describe('document', function() {
     doc.schema.options.toObject = {};
     doc.schema.options.toObject.transform = function xform(doc, ret) {
       // ignore embedded docs
-      if (doc.$__.isSubDocument) {
+      if (doc.$isSubdocument) {
         return;
       }
 
@@ -444,7 +444,7 @@ describe('document', function() {
     const out = { myid: doc._id.toString() };
     doc.schema.options.toObject.transform = function(doc, ret) {
       // ignore embedded docs
-      if (doc.$__.isSubDocument) {
+      if (doc.$isSubdocument) {
         return;
       }
 
@@ -844,7 +844,7 @@ describe('document', function() {
       doc.schema.options.toJSON = {};
       doc.schema.options.toJSON.transform = function xform(doc, ret) {
         // ignore embedded docs
-        if (doc.$__.isSubDocument) {
+        if (doc.$isSubdocument) {
           return;
         }
 
@@ -866,7 +866,7 @@ describe('document', function() {
       const out = { myid: doc._id.toString() };
       doc.schema.options.toJSON.transform = function(doc, ret) {
         // ignore embedded docs
-        if (doc.$__.isSubDocument) {
+        if (doc.$isSubdocument) {
           return;
         }
 

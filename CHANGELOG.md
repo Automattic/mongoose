@@ -1,3 +1,20 @@
+6.1.3 / 2021-12-21
+==================
+ * perf(populate): avoid duplicate model names when using refPath to avoid O(n^2) memory growth with number of array elements #10983
+ * fix(schema+model): cast paths marked with ref when hydrating #11052
+ * fix(schema): handle default function that returns null on document arrays #11058
+ * fix(document): clean modified paths when setting deeply nested subdocument #11060
+ * fix(populate): report full path when throwing strictPopulate error with deep populate #10923
+ * fix(connection): allow calling `setClient()` when disconnected #11114 [hustxiaoc](https://github.com/hustxiaoc)
+ * fix(index.d.ts): fix typings in Group stage #11124 [DavideViolante](https://github.com/DavideViolante)
+ * fix(index.d.ts): add Mongoose.prototype.trusted() function to type defs #10957
+ * fix(index.d.ts): allow use type string in $unset update with aggregation pipeline #11107 [rpenido](https://github.com/rpenido)
+ * fix(index.d.ts) treat _id like other fields in $project #11102
+ * docs(migrating_to_6): add omitUndefined to Mongoose 6 migration guide #10672
+ * docs: add MongooseDocumentArray to API docs #10998
+ * docs: fix typo in model.js #11121 [eltociear](https://github.com/eltociear)
+ * docs: fix typo in validation.md #11103 [warlock1996](https://github.com/warlock1996)
+
 6.1.2 / 2021-12-14
 ==================
  * fix: upgrade mongodb driver to 4.2.2 #11092 [lorand-horvath](https://github.com/lorand-horvath)

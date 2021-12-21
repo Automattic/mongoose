@@ -39,7 +39,7 @@
     "acquit-require": "0.1.x",
     "babel-loader": "8.1.0",
     "benchmark": "2.1.4",
-    "bluebird": "3.5.5",
+    "bluebird": "3.7.2",
     "chalk": "4.1.2",
     "cheerio": "1.0.0-rc.5",
     "dox": "0.3.1",

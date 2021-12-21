@@ -32,7 +32,8 @@ const files = [
   'lib/options/SchemaDateOptions.js',
   'lib/options/SchemaNumberOptions.js',
   'lib/options/SchemaObjectIdOptions.js',
-  'lib/options/SchemaStringOptions.js'
+  'lib/options/SchemaStringOptions.js',
+  'lib/types/DocumentArray/methods/index.js'
 ];
 
 module.exports = {
@@ -58,7 +59,8 @@ function parse() {
     let name = props.file.
       replace('lib/', '').
       replace('.js', '').
-      replace('/index', '');
+      replace('/index', '').
+      replace('/methods', '');
     const lastSlash = name.lastIndexOf('/');
     const fullName = name;
     name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
@@ -70,6 +72,9 @@ function parse() {
     }
     if (name === 'documentarray') {
       name = 'DocumentArrayPath';
+    }
+    if (name === 'DocumentArray') {
+      name = 'MongooseDocumentArray';
     }
     const data = {
       name: name.charAt(0).toUpperCase() === name.charAt(0) ? name : name.charAt(0).toUpperCase() + name.substr(1),
@@ -157,6 +162,7 @@ function parse() {
       if (/\.prototype[^.]/.test(ctx.string)) {
         ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
       }
+
       // Backwards compat
       if (typeof ctx.constructor === 'string') {
         ctx.anchorId = `${ctx.constructor.toLowerCase()}_${ctx.constructor}-${ctx.name}`;

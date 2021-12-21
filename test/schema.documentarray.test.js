@@ -114,4 +114,16 @@ describe('schema.documentarray', function() {
 
     mongoose.Schema.Types.DocumentArray.defaultOptions = {};
   });
+
+  it('handles default function that returns null (gh-11058)', async function() {
+    const testSchema = new Schema({
+      comments: {
+        type: [{ prop: String }],
+        default: () => null
+      }
+    });
+
+    const value = testSchema.path('comments').getDefault();
+    assert.strictEqual(value, null);
+  });
 });

@@ -138,7 +138,7 @@ caveats.
 ### Update Validators and `this`
 
 There are a couple of key differences between update validators and
-document validators. In the color validation function above, `this` refers
+document validators. In the color validation function below, `this` refers
 to the document being validated when using document validation.
 However, when running update validators, the document being updated
 may not be in the server's memory, so by default the value of `this` is

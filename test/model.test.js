@@ -7625,6 +7625,27 @@ describe('Model', function() {
     assert.ok(!test.name);
 
   });
+
+  it('casts ObjectIds with `ref` in schema when calling `hydrate()` (gh-11052)', async function() {
+    const authorSchema = new Schema({
+      name: String
+    });
+    const bookSchema = new Schema({
+      author: { type: 'ObjectId', required: true, ref: 'Author' }
+    });
+
+    const Book = db.model('Book', bookSchema);
+    const Author = db.model('Author', authorSchema);
+    const entry = await Author.create({
+      name: 'John'
+    });
+
+    const book = Book.hydrate({
+      author: entry.id
+    });
+
+    assert.ok(book.author instanceof mongoose.Types.ObjectId);
+  });
 });
 
 

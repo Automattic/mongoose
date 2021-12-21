@@ -10592,4 +10592,25 @@ describe('model: populate:', function() {
 
     await Test.deleteMany({});
   });
+
+  it('reports full path when throwing `strictPopulate` error with deep populate (gh-10923)', async function() {
+    const L2 = db.model('Test', new Schema({ name: String }));
+
+    const schema = new Schema({ l2: { type: 'ObjectId', ref: L2 } });
+    const L1 = db.model('Child', schema);
+
+    const Parent = db.model('Parent', new Schema({
+      l1: { type: 'ObjectId', ref: L1 }
+    }));
+
+    await Parent.deleteMany();
+    const l2 = await L2.create({ name: 'test' });
+    const l1 = await L1.create({ l2 });
+    await Parent.create({ l1 });
+
+    const err = await Parent.findOne().populate({ path: 'l1', populate: { path: 'l22' } }).
+      then(() => null, err => err);
+
+    assert.ok(err.message.indexOf('l1.l22') !== -1, err.message);
+  });
 });

@@ -16,6 +16,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)
 * [Schema Defined Document Key Order](#schema-defined-document-key-order)
 * [`sanitizeFilter` and `trusted()`](#sanitizefilter-and-trusted)
+* [Removed `omitUndefined`](#removed-omitundefined)
 * [Document Parameter to Default Functions](#document-parameter-to-default-functions)
 * [Arrays are Proxies](#arrays-are-proxies)
 * [`typePojoToMixed`](#typepojotomixed)
@@ -197,6 +198,25 @@ To explicitly allow a query selector, use `mongoose.trusted()`:
 ```javascript
 // `mongoose.trusted()` allows query selectors through
 await Test.find({ username: 'val', pwd: mongoose.trusted({ $ne: null }) }).setOptions({ sanitizeFilter: true });
+```
+
+<h3 id="removed-omitundefined"><a href="#removed-omitundefined">Removed `omitUndefined`</a></h3>
+
+In Mongoose 5.x, setting a key to `undefined` in an update operation was equivalent to setting it to `null`.
+
+```javascript
+const res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true });
+
+res.name; // null
+```
+
+Mongoose 5.x supported an `omitUndefined` option to strip out `undefined` keys.
+In Mongoose 6.x, the `omitUndefined` option has been removed, and Mongoose will always strip out undefined keys.
+
+```javascript
+// In Mongoose 6, equivalent to `findOneAndUpdate({}, {}, { new: true })` because Mongoose will
+// remove `name: undefined`
+const res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true });
 ```
 
 <h3 id="document-parameter-to-default-functions"><a href="#document-parameter-to-default-functions">Document Parameter to Default Functions</a></h3>

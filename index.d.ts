@@ -1332,7 +1332,7 @@ declare module 'mongoose' {
     /** Lists all paths and their type in the schema. */
     paths: {
       [key: string]: SchemaType;
-    }
+    };
 
     /** Returns the pathType of `path` for this schema. */
     pathType(path: string): string;
@@ -1689,7 +1689,7 @@ declare module 'mongoose' {
     enum?: Array<string | number | null> | ReadonlyArray<string | number | null> | { values: Array<string | number | null> | ReadonlyArray<string | number | null>, message?: string } | { [path: string]: string | number | null };
 
     /** The default [subtype](http://bsonspec.org/spec.html) associated with this buffer when it is stored in MongoDB. Only allowed for buffer paths */
-    subtype?: number
+    subtype?: number;
 
     /** The minimum value allowed for this path. Only allowed for numbers and dates. */
     min?: number | NativeDate | [number, string] | [NativeDate, string] | readonly [number, string] | readonly [NativeDate, string];

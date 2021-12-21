@@ -317,14 +317,14 @@ describe('types.buffer', function() {
         tj.required = Buffer.alloc(8);
         reset(tj);
         not(tj);
-        tj.required.writeDoubleLE(0xdeadbeefcafebabe, 0);
+        tj.required.writeDoubleLE(0xdeadbeefcafebabe, 0); // eslint-disable-line no-loss-of-precision
         is(tj);
       },
       writeDoubleBE: function() {
         tj.required = Buffer.alloc(8);
         reset(tj);
         not(tj);
-        tj.required.writeDoubleBE(0xdeadbeefcafebabe, 0);
+        tj.required.writeDoubleBE(0xdeadbeefcafebabe, 0); // eslint-disable-line no-loss-of-precision
         is(tj);
       },
       fill: function() {

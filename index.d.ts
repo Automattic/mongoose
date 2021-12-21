@@ -77,6 +77,10 @@ declare module 'mongoose' {
   export function syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
   export function syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
 
+  /* Tells `sanitizeFilter()` to skip the given object when filtering out potential query selector injection attacks.
+   * Use this method when you have a known query selector that you want to use. */
+  export function trusted<T>(obj: T): T;
+
   /** The Mongoose module's default connection. Equivalent to `mongoose.connections[0]`, see [`connections`](#mongoose_Mongoose-connections). */
   export const connection: Connection;
 
@@ -1328,7 +1332,7 @@ declare module 'mongoose' {
     /** Lists all paths and their type in the schema. */
     paths: {
       [key: string]: SchemaType;
-    }
+    };
 
     /** Returns the pathType of `path` for this schema. */
     pathType(path: string): string;
@@ -1685,7 +1689,7 @@ declare module 'mongoose' {
     enum?: Array<string | number | null> | ReadonlyArray<string | number | null> | { values: Array<string | number | null> | ReadonlyArray<string | number | null>, message?: string } | { [path: string]: string | number | null };
 
     /** The default [subtype](http://bsonspec.org/spec.html) associated with this buffer when it is stored in MongoDB. Only allowed for buffer paths */
-    subtype?: number
+    subtype?: number;
 
     /** The minimum value allowed for this path. Only allowed for numbers and dates. */
     min?: number | NativeDate | [number, string] | [NativeDate, string] | readonly [number, string] | readonly [NativeDate, string];
@@ -3054,10 +3058,7 @@ declare module 'mongoose' {
 
     export interface Group {
       /** [`$group` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/group) */
-      $group: {
-        _id: any
-        [key: string]: { [op in AccumulatorOperator]?: any }
-      }
+      $group: { _id: any } | { _id: any; [key: string]: { [op in AccumulatorOperator]?: any } }
     }
 
     export interface IndexStats {
@@ -3115,7 +3116,7 @@ declare module 'mongoose' {
 
     export interface Project {
       /** [`$project` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/project/) */
-      $project: { _id?: 0 | false; [field: string]: any }
+      $project: { [field: string]: any }
     }
 
     export interface Redact {

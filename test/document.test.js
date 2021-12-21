@@ -423,7 +423,7 @@ describe('document', function() {
     doc.schema.options.toObject = {};
     doc.schema.options.toObject.transform = function xform(doc, ret) {
       // ignore embedded docs
-      if (doc.$__.isSubDocument) {
+      if (doc.$isSubdocument) {
         return;
       }
 
@@ -444,7 +444,7 @@ describe('document', function() {
     const out = { myid: doc._id.toString() };
     doc.schema.options.toObject.transform = function(doc, ret) {
       // ignore embedded docs
-      if (doc.$__.isSubDocument) {
+      if (doc.$isSubdocument) {
         return;
       }
 
@@ -844,7 +844,7 @@ describe('document', function() {
       doc.schema.options.toJSON = {};
       doc.schema.options.toJSON.transform = function xform(doc, ret) {
         // ignore embedded docs
-        if (doc.$__.isSubDocument) {
+        if (doc.$isSubdocument) {
           return;
         }
 
@@ -866,7 +866,7 @@ describe('document', function() {
       const out = { myid: doc._id.toString() };
       doc.schema.options.toJSON.transform = function(doc, ret) {
         // ignore embedded docs
-        if (doc.$__.isSubDocument) {
+        if (doc.$isSubdocument) {
           return;
         }
 
@@ -10805,5 +10805,36 @@ describe('document', function() {
       terminal: terminal
     });
     assert.equal(transaction.payments[0].terminal.name, 'Front desk');
+  });
+
+  it('cleans modified paths on deeply nested subdocuments (gh-11060)', async function() {
+    const childSchema = new Schema({ status: String });
+
+    const deploymentsSchema = new Schema({
+      before: { type: childSchema, required: false },
+      after: { type: childSchema, required: false }
+    }, { _id: false });
+
+    const testSchema = new Schema({
+      name: String,
+      deployments: { type: deploymentsSchema }
+    });
+    const Test = db.model('Test', testSchema);
+
+    await Test.create({
+      name: 'hello',
+      deployments: {
+        before: { status: 'foo' }
+      }
+    });
+
+    const entry = await Test.findOne({ name: 'hello' });
+    const deployment = entry.deployments.before;
+    deployment.status = 'bar';
+    entry.deployments.before = null;
+    entry.deployments.after = deployment;
+
+    assert.ok(!entry.isDirectModified('deployments.before.status'));
+    await entry.save();
   });
 });

@@ -3237,6 +3237,20 @@ describe('model: updateOne: ', function() {
       assert.strictEqual(doc.newProp, void 0);
     });
 
+    it('update pipeline - $unset with string (gh-11106)', async function() {
+      const schema = Schema({ oldProp: String, newProp: String });
+      const Model = db.model('Test', schema);
+
+      await Model.create({ oldProp: 'test' });
+      await Model.updateOne({}, [
+        { $set: { newProp: 'test2' } },
+        { $unset: 'oldProp' }
+      ]);
+      const doc = await Model.findOne();
+      assert.equal(doc.newProp, 'test2');
+      assert.strictEqual(doc.oldProp, void 0);
+    });
+
     it('update pipeline timestamps (gh-8524)', async function() {
       const Cat = db.model('Test', Schema({ name: String }, { timestamps: true }));
 

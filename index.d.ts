@@ -3099,7 +3099,7 @@ declare module 'mongoose' {
         into: string | { db: string; coll: string }
         on?: string | string[]
         let?: Record<string, any>
-        whenMatched?: 'replace' | 'keepExisting' | 'merge' | 'fail' | 'pipeline'
+        whenMatched?: 'replace' | 'keepExisting' | 'merge' | 'fail' | Extract<PipelineStage, PipelineStage.AddFields | PipelineStage.Set | PipelineStage.Project | PipelineStage.Unset | PipelineStage.ReplaceRoot | PipelineStage.ReplaceWith>[]
         whenNotMatched?: 'insert' | 'discard' | 'fail'
       }
     }

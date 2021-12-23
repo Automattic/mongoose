@@ -10837,4 +10837,49 @@ describe('document', function() {
     assert.ok(!entry.isDirectModified('deployments.before.status'));
     await entry.save();
   });
+
+  it('can manually populate subdocument refs (gh-10856)', async function() {
+    // Bar model, has a name property and some other properties that we are interested in
+    const BarSchema = new Schema({
+      name: String,
+      more: String,
+      another: Number
+    });
+    const Bar = db.model('Bar', BarSchema);
+
+    // Denormalised Bar schema with just the name, for use on the Foo model
+    const BarNameSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Bar'
+      },
+      name: String
+    });
+
+    // Foo model, which contains denormalized bar data (just the name)
+    const FooSchema = new Schema({
+      something: String,
+      other: Number,
+      bar: {
+        type: BarNameSchema,
+        ref: 'Bar'
+      }
+    });
+    const Foo = db.model('Foo', FooSchema);
+
+    const bar2 = await Bar.create({
+      name: 'I am another Bar',
+      more: 'With even more data',
+      another: 3
+    });
+    const foo2 = await Foo.create({
+      something: 'I am another Foo',
+      other: 4
+    });
+
+    foo2.bar = bar2;
+    assert.ok(foo2.bar instanceof Bar);
+    assert.equal(foo2.bar.another, 3);
+    assert.equal(foo2.get('bar.another'), 3);
+  });
 });

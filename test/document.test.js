@@ -10882,4 +10882,49 @@ describe('document', function() {
     assert.equal(foo2.bar.another, 3);
     assert.equal(foo2.get('bar.another'), 3);
   });
+
+  it('can manually populate subdocument refs in `create()` (gh-10856)', async function() {
+    // Bar model, has a name property and some other properties that we are interested in
+    const BarSchema = new Schema({
+      name: String,
+      more: String,
+      another: Number
+    });
+    const Bar = db.model('Bar', BarSchema);
+
+    // Denormalised Bar schema with just the name, for use on the Foo model
+    const BarNameSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Bar'
+      },
+      name: String
+    });
+
+    // Foo model, which contains denormalized bar data (just the name)
+    const FooSchema = new Schema({
+      something: String,
+      other: Number,
+      bar: {
+        type: BarNameSchema,
+        ref: 'Bar'
+      }
+    });
+    const Foo = db.model('Foo', FooSchema);
+
+    const bar = await Bar.create({
+      name: 'I am Bar',
+      more: 'With more data',
+      another: 2
+    });
+    const foo = await Foo.create({
+      something: 'I am Foo',
+      other: 1,
+      bar
+    });
+
+    assert.ok(foo.bar instanceof Bar);
+    assert.equal(foo.bar.another, 2);
+    assert.equal(foo.get('bar.another'), 2);
+  });
 });

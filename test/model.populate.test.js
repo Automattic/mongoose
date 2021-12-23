@@ -10613,4 +10613,50 @@ describe('model: populate:', function() {
 
     assert.ok(err.message.indexOf('l1.l22') !== -1, err.message);
   });
+
+  it('handles refPath underneath map of subdocuments (gh-9359)', async function() {
+    // user schema
+    const userSchema = Schema({ name: String });
+
+    // list schema
+    const listSchema = Schema({ listName: String });
+
+    // row value schema
+    const rowValuesSchema = Schema({
+      valueObject: {
+        type: mongoose.Schema.Types.ObjectId,
+        refPath: 'values.$*.refp'
+      },
+      refp: String
+    });
+
+    // row schema
+    const rowSchema = Schema({
+      sortOrder: { type: mongoose.Schema.Types.Number, required: true },
+      values: { type: mongoose.Schema.Types.Map, of: rowValuesSchema }
+    });
+
+    const User = db.model('User', userSchema);
+    const List = db.model('List', listSchema);
+    const Row = db.model('Row', rowSchema);
+
+    const createUser = await User.create({ name: 'test' });
+    const createList = await List.create({ listName: 'hi' });
+
+    await Row.create({
+      sortOrder: 1,
+      values: {
+        [createList._id]: {
+          valueObject: mongoose.Types.ObjectId(createUser._id),
+          refp: 'User'
+        }
+      }
+    });
+
+    const row = await Row.findOne().populate({
+      path: 'values.$*.valueObject'
+    });
+
+    assert.equal(row.values.get(createList._id.toString()).valueObject.name, 'test');
+  });
 });

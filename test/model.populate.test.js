@@ -308,13 +308,11 @@ describe('model: populate:', function() {
       function(err, post) {
         assert.ifError(err);
 
-        assert.throws(function() {
-          BlogPost.
-            findByIdAndUpdate(post._id, { $set: { _creator: {} } }, function(err) {
-              assert.ok(err);
-              done();
-            });
-        });
+        BlogPost.
+          findByIdAndUpdate(post._id, { $set: { _creator: {} } }, function(err) {
+            assert.ok(err);
+            done();
+          });
       });
   });
 

@@ -318,20 +318,12 @@ describe('model: populate:', function() {
       });
   });
 
-  it('fail on undefined id update', function(done) {
+  it('fail on undefined id update', function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
 
-    BlogPost.create(
-      { title: 'woot' },
-      function(err, post) {
-        assert.ifError(err);
-
-        BlogPost.
-          findByIdAndUpdate(undefined, { $set: { _creator: {} } }, function(err) {
-            assert.ok(err);
-            done();
-          });
-      });
+    assert.throws(function() {
+      BlogPost.findByIdAndUpdate(undefined, { $set: { _creator: {} } });
+    }, /id cannot be undefined/);
   })
 
   it('across DBs', function(done) {

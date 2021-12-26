@@ -322,7 +322,7 @@ describe('model: populate:', function() {
     assert.throws(function() {
       BlogPost.findByIdAndUpdate(undefined, { $set: { _creator: {} } });
     }, /id cannot be undefined/);
-  })
+  });
 
   it('across DBs', function(done) {
     const db = start();

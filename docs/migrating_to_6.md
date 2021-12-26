@@ -16,6 +16,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)
 * [Schema Defined Document Key Order](#schema-defined-document-key-order)
 * [`sanitizeFilter` and `trusted()`](#sanitizefilter-and-trusted)
+* [Removed `omitUndefined`](#removed-omitundefined)
 * [Document Parameter to Default Functions](#document-parameter-to-default-functions)
 * [Arrays are Proxies](#arrays-are-proxies)
 * [`typePojoToMixed`](#typepojotomixed)
@@ -36,6 +37,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [Removed Validator `isAsync`](#removed-validator-isasync)
 * [Removed `safe`](#removed-safe)
 * [SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`](#schematype-set-parameters)
+* [`toObject()` and `toJSON()` Use Nested Schema `minimize`](#toobject-and-tojson-use-nested-schema-minimize)
 * [TypeScript changes](#typescript-changes)
 
 <h3 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h3>
@@ -196,6 +198,25 @@ To explicitly allow a query selector, use `mongoose.trusted()`:
 ```javascript
 // `mongoose.trusted()` allows query selectors through
 await Test.find({ username: 'val', pwd: mongoose.trusted({ $ne: null }) }).setOptions({ sanitizeFilter: true });
+```
+
+<h3 id="removed-omitundefined"><a href="#removed-omitundefined">Removed `omitUndefined`</a></h3>
+
+In Mongoose 5.x, setting a key to `undefined` in an update operation was equivalent to setting it to `null`.
+
+```javascript
+const res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true });
+
+res.name; // null
+```
+
+Mongoose 5.x supported an `omitUndefined` option to strip out `undefined` keys.
+In Mongoose 6.x, the `omitUndefined` option has been removed, and Mongoose will always strip out undefined keys.
+
+```javascript
+// In Mongoose 6, equivalent to `findOneAndUpdate({}, {}, { new: true })` because Mongoose will
+// remove `name: undefined`
+const res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true });
 ```
 
 <h3 id="document-parameter-to-default-functions"><a href="#document-parameter-to-default-functions">Document Parameter to Default Functions</a></h3>
@@ -359,9 +380,43 @@ const user = new User({ name: 'Robert Martin' });
 console.log(user.name); // 'robert martin'
 ```
 
+<h3 id="toobject-and-tojson-use-nested-schema-minimize"><a href="#toobject-and-tojson-use-nested-schema-minimize">`toObject()` and `toJSON()` Use Nested Schema `minimize`</a></h3>
+
+This change was technically released with 5.10.5, but [caused issues for users migrating from 5.9.x to 6.x](https://github.com/Automattic/mongoose/issues/10827).
+In Mongoose `< 5.10.5`, `toObject()` and `toJSON()` would use the top-level schema's `minimize` option by default.
+
+```javascript
+const child = new Schema({ thing: Schema.Types.Mixed });
+const parent = new Schema({ child }, { minimize: false });
+const Parent = model('Parent', parent);
+const p = new Parent({ child: { thing: {} } });
+
+// In v5.10.4, would contain `child.thing` because `toObject()` uses `parent` schema's `minimize` option
+// In `>= 5.10.5`, `child.thing` is omitted because `child` schema has `minimize: true`
+console.log(p.toObject());
+```
+
+As a workaround, you can either explicitly pass `minimize` to `toObject()` or `toJSON()`:
+
+```javascript
+console.log(p.toObject({ minimize: false }));
+```
+
+Or define the `child` schema inline (Mongoose 6 only) to inherit the parent's `minimize` option.
+
+```javascript
+const parent = new Schema({
+  // Implicitly creates a new schema with the top-level schema's `minimize` option.
+  child: { type: { thing: Schema.Types.Mixed } }
+}, { minimize: false });
+```
+
 ## TypeScript changes
 
 The `Schema` class now takes 3 generic params instead of 4. The 3rd generic param, `SchemaDefinitionType`, is now the same as the 1st generic param `DocType`. Replace `new Schema<UserDocument, UserModel, User>(schemaDefinition)` with `new Schema<UserDocument, UserModel>(schemaDefinition)`
+
+`Types.ObjectId` is now a class, which means you can no longer omit `new` when creating a new ObjectId using `new mongoose.Types.ObjectId()`.
+Currently, you can still omit `new` in JavaScript, but you **must** put `new` in TypeScript.
 
 The following legacy types have been removed:
 

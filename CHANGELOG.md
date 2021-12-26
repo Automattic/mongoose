@@ -1,3 +1,77 @@
+6.1.3 / 2021-12-21
+==================
+ * perf(populate): avoid duplicate model names when using refPath to avoid O(n^2) memory growth with number of array elements #10983
+ * fix(schema+model): cast paths marked with ref when hydrating #11052
+ * fix(schema): handle default function that returns null on document arrays #11058
+ * fix(document): clean modified paths when setting deeply nested subdocument #11060
+ * fix(populate): report full path when throwing strictPopulate error with deep populate #10923
+ * fix(connection): allow calling `setClient()` when disconnected #11114 [hustxiaoc](https://github.com/hustxiaoc)
+ * fix(index.d.ts): fix typings in Group stage #11124 [DavideViolante](https://github.com/DavideViolante)
+ * fix(index.d.ts): add Mongoose.prototype.trusted() function to type defs #10957
+ * fix(index.d.ts): allow use type string in $unset update with aggregation pipeline #11107 [rpenido](https://github.com/rpenido)
+ * fix(index.d.ts) treat _id like other fields in $project #11102
+ * docs(migrating_to_6): add omitUndefined to Mongoose 6 migration guide #10672
+ * docs: add MongooseDocumentArray to API docs #10998
+ * docs: fix typo in model.js #11121 [eltociear](https://github.com/eltociear)
+ * docs: fix typo in validation.md #11103 [warlock1996](https://github.com/warlock1996)
+
+6.1.2 / 2021-12-14
+==================
+ * fix: upgrade mongodb driver to 4.2.2 #11092 [lorand-horvath](https://github.com/lorand-horvath)
+ * fix(model): respect discriminators when calling Model.watch() #11007
+ * fix(populate): allow referencing parent connection models by name when using `useDb()` #11003
+ * fix(query): support options param to `Query.prototype.countDocuments()` #11037
+ * fix(query): correctly use awaitData instead of awaitdata in `Query.prototype.tailable()` #10875
+ * fix(index.d.ts): fix replaceRoot type #11098 [alibehroozi](https://github.com/alibehroozi)
+ * fix(index.d.ts): add missing syncIndexes() definition to Mongoose global and Connection class #11065
+ * fix(index.d.ts): add boolean type for transform option #11057 [AliYusuf95](https://github.com/AliYusuf95)
+ * docs(model.estimatedDocumentCount): add await into example to get value from the Query #11044 [olecom](https://github.com/olecom)
+ * docs: fix broken build from awaitdata comment #11096 [medolino](https://github.com/medolino)
+ * docs: correct Query.prototype.transform() docs #11094 [medolino](https://github.com/medolino)
+
+6.1.1 / 2021-12-09
+==================
+ * fix(document): allow setting nested path to instance of document #11011
+ * fix(update): respect strict option when casting array filters #11062
+ * fix(index.d.ts): allow SchemaTypes.Mixed for all schema definition properties to allow using union types #10900
+ * fix(index.d.ts): correct types for Schema.prototype.obj and `Model.schema` #10895
+ * docs(migrating_to_6): add note about Types.ObjectId() being a class and requiring `new` #10960
+
+6.1.0 / 2021-12-07
+==================
+ * feat(populate): support ref on subdocuments #10856
+ * feat(document): add `ownerDocument()` method to top-level document for consistency with subdocs #10884 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix: upgrade to mongodb driver 4.2.1 #11032 #10985 [lorand-horvath](https://github.com/lorand-horvath) [has-n](https://github.com/has-n)
+ * feat(schema): support `timeseries` option for MongoDB 5 time series collections support #10611
+ * feat(mongoose): add global `strictPopulate` option #10694 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(mongoose+connection): add global `mongoose.syncIndexes()` and `Connection.prototype.syncIndexes()` #10893 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(query): support removing fields from projections #10630 [canac](https://github.com/canac)
+ * feat(aggregate): add unionWith method to aggregate #10961 [saeidasadi](https://github.com/saeidasadi)
+ * fix(index.d.ts): types for aggregation pipeline stages #10971 [jeremyben](https://github.com/jeremyben)
+
+6.0.15 / 2021-12-06
+===================
+ * fix(document): avoid overwriting schema methods when creating a new document with `new Model()` and `strict: false` #11001
+ * fix(document): avoid overwriting top-level document _id with nested `_id` when `strict = false` #10934
+ * fix(collection): avoid double-calling callback on sync error #10956
+ * fix(connection): handle direct connection to uninitialized replica set that then becomes initialized #10948
+ * fix(index.d.ts): allow partial updates on subdocuments for defaults #10947
+ * fix(index.d.ts): handle buffer type in schema definitions #11026
+
+6.0.14 / 2021-11-29
+===================
+ * fix(document): catch errors in required functions #10968
+ * fix(connection): clone schema when passing a schema from a different copy of Mongoose to `Connection#model()` #10904
+ * fix(populate): set empty array [] on virtual populate with no result #10992
+ * fix(query): handle orFail() with replaceOne() #10963
+ * fix(populate): use Model by default when using Model.populate() on a POJO #10978
+ * fix(document): throw VersionError if saving a document with version bump and document isn't found #10974
+ * fix(index.d.ts): make populate type param optional #10989 [mohd-akram](https://github.com/mohd-akram)
+ * docs(migrating_to_6): add a note about minimize and toObject() behavior change in v5.10.5 #10827
+ * docs: remove duplicate `path` in docs #11020 [ItWorksOnMyMachine](https://github.com/ItWorksOnMyMachine)
+ * docs: fix typo in populate docs #11015 [gavi-shandler](https://github.com/gavi-shandler)
+ * docs: fix typo in model.js #10982 [eltociear](https://github.com/eltociear)
+
 6.0.13 / 2021-11-15
 ===================
  * fix(document): allows validating doc again if pre validate errors out #10830

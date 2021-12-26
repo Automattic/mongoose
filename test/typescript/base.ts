@@ -14,3 +14,10 @@ function gh10746() {
   testVar = 'A string';
   testVar = 'B string';
 }
+
+function gh10957() {
+  type TestType = { name: string };
+  const obj: TestType = { name: 'foo' };
+
+  const t: TestType = mongoose.trusted(obj);
+}

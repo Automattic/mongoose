@@ -67,6 +67,32 @@ const doc: HydratedDocument<User> = new UserModel({
 });
 ```
 
+### ObjectIds and Other Mongoose Types
+
+To define a property of type `ObjectId`, you should use `Types.ObjectId` in the TypeScript document interface. You should use `'ObjectId'` or `Schema.Types.ObjectId` in your schema definition.
+
+```ts
+import { Schema, Types } from 'mongoose';
+
+// 1. Create an interface representing a document in MongoDB.
+interface User {
+  name: string;
+  email: string;
+  // Use `Types.ObjectId` in document interface...
+  organization: Types.ObjectId;
+}
+
+// 2. Create a Schema corresponding to the document interface.
+const schema = new Schema<User>({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  // And `Schema.Types.ObjectId` in the schema definition.
+  organization: { type: Schema.Types.ObjectId, ref: 'Organization' }
+});
+```
+
+That's because `Schema.Types.ObjectId` is a [class that inherits from SchemaType](/docs/schematypes.html), **not** the class you use to create a new MongoDB ObjectId.
+
 ### Using `extends Document`
 
 Alternatively, your document interface can extend Mongoose's `Document` class.

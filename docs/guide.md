@@ -417,6 +417,7 @@ Valid options:
 - [versionKey](#versionKey)
 - [optimisticConcurrency](#optimisticConcurrency)
 - [collation](#collation)
+- [timeseries](#timeseries)
 - [selectPopulatedPaths](#selectPopulatedPaths)
 - [skipVersioning](#skipVersioning)
 - [timestamps](#timestamps)
@@ -786,7 +787,7 @@ const mySchema = new Schema({ field: Number }, {
   strictQuery: false // Turn off strict mode for query filters
 });
 const MyModel = mongoose.model('Test', mySchema);
-// Mongoose will strip out `notInSchema: 1` because `strictQuery` is false
+// Mongoose will not strip out `notInSchema: 1` because `strictQuery` is false
 MyModel.find({ notInSchema: 1 });
 ```
 
@@ -1061,6 +1062,25 @@ MyModel.create([{ name: 'val' }, { name: 'Val' }]).
     // `docs` will contain both docs, because `strength: 1` means
     // MongoDB will ignore case when matching.
   });
+```
+
+<h3 id="timeseries"><a href="#timeseries">option: timeseries</a></h3>
+
+If you set the `timeseries` option on a schema, Mongoose will create a [timeseries collection](https://docs.mongodb.com/manual/core/timeseries-collections/) for any model that you create from that schema.
+
+```javascript
+const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+  timeseries: {
+    timeField: 'timestamp',
+    metaField: 'metadata',
+    granularity: 'hours'
+  },
+  autoCreate: false,
+  expireAfterSeconds: 86400
+});
+
+// `Test` collection will be a timeseries collection
+const Test = db.model('Test', schema);
 ```
 
 <h3 id="skipVersioning"><a href="#skipVersioning">option: skipVersioning</a></h3>

@@ -14,7 +14,6 @@ const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
 const util = require('./util');
 const utils = require('../lib/utils');
-const validator = require('validator');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -424,7 +423,7 @@ describe('document', function() {
     doc.schema.options.toObject = {};
     doc.schema.options.toObject.transform = function xform(doc, ret) {
       // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
+      if (doc.$isSubdocument) {
         return;
       }
 
@@ -433,7 +432,6 @@ describe('document', function() {
       delete ret.oids;
       ret._id = ret._id.toString();
     };
-
     clone = doc.toObject();
     assert.equal(doc.id, clone._id);
     assert.ok(undefined === clone.em);
@@ -446,7 +444,7 @@ describe('document', function() {
     const out = { myid: doc._id.toString() };
     doc.schema.options.toObject.transform = function(doc, ret) {
       // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
+      if (doc.$isSubdocument) {
         return;
       }
 
@@ -846,7 +844,7 @@ describe('document', function() {
       doc.schema.options.toJSON = {};
       doc.schema.options.toJSON.transform = function xform(doc, ret) {
         // ignore embedded docs
-        if (typeof doc.ownerDocument === 'function') {
+        if (doc.$isSubdocument) {
           return;
         }
 
@@ -868,7 +866,7 @@ describe('document', function() {
       const out = { myid: doc._id.toString() };
       doc.schema.options.toJSON.transform = function(doc, ret) {
         // ignore embedded docs
-        if (typeof doc.ownerDocument === 'function') {
+        if (doc.$isSubdocument) {
           return;
         }
 
@@ -3216,20 +3214,6 @@ describe('document', function() {
       ev.recurrence = null;
       ev.save(function(error) {
         assert.ifError(error);
-        done();
-      });
-    });
-
-    it('using validator.isEmail as a validator (gh-4064) (gh-4084)', function(done) {
-      const schema = new Schema({
-        email: { type: String, validate: validator.isEmail }
-      });
-
-      const MyModel = db.model('Test', schema);
-
-      MyModel.create({ email: 'invalid' }, function(error) {
-        assert.ok(error);
-        assert.ok(error.errors['email']);
         done();
       });
     });
@@ -6532,28 +6516,6 @@ describe('document', function() {
     assert.ok(test.validateSync() == null, test.validateSync());
 
     return Promise.resolve();
-  });
-
-  it('supports validator.isUUID as a custom validator (gh-7145)', async function() {
-    const schema = new Schema({
-      name: {
-        type: String,
-        validate: [validator.isUUID, 'invalid name']
-      }
-    });
-
-    const Test = db.model('Test', schema);
-
-    const doc = new Test({ name: 'not-a-uuid' });
-    const syncValidationError = doc.validateSync();
-    assert.ok(syncValidationError instanceof Error);
-    assert.ok(/invalid name/.test(syncValidationError.message));
-
-
-    const asyncValidationError = await doc.validate().then(() => null, err => err);
-
-    assert.ok(asyncValidationError instanceof Error);
-    assert.ok(/invalid name/.test(asyncValidationError.message));
   });
 
   it('propsParameter option (gh-7145)', async function() {
@@ -10761,6 +10723,19 @@ describe('document', function() {
     await doc.save();
   });
 
+  it('ensures that doc.ownerDocument() and doc.parent() by default return this on the root document (gh-10884)', async function() {
+    const userSchema = new mongoose.Schema({
+      name: String,
+      email: String
+    });
+
+    const Event = db.model('Rainbow', userSchema);
+
+    const e = new Event({ name: 'test' });
+    assert.strictEqual(e, e.parent());
+    assert.strictEqual(e, e.ownerDocument());
+  });
+
   it('catches errors in `required` functions (gh-10968)', async function() {
     const TestSchema = new Schema({
       url: {
@@ -10775,5 +10750,181 @@ describe('document', function() {
     const err = await Test.create({}).then(() => null, err => err);
     assert.ok(err);
     assert.equal(err.errors['url'].message, 'oops!');
+  });
+
+  it('does not allow overwriting schema methods with strict: false (gh-11001)', async function() {
+    const TestSchema = new Schema({
+      text: { type: String, default: 'text' }
+    }, { strict: false });
+    TestSchema.methods.someFn = () => 'good';
+    const Test = db.model('Test', TestSchema);
+
+    const unTrusted = { someFn: () => 'bad' };
+
+    let x = await Test.create(unTrusted);
+    await x.save();
+    assert.equal(x.someFn(), 'good');
+
+    x = new Test(unTrusted);
+    await x.save();
+    assert.equal(x.someFn(), 'good');
+
+    x = await Test.create({});
+    await x.set(unTrusted);
+    assert.equal(x.someFn(), 'good');
+  });
+
+  it('allows setting nested to instance of document (gh-11011)', async function() {
+    const TransactionSchema = new Schema({
+      payments: [
+        {
+          id: { type: String },
+          terminal: {
+            _id: { type: Schema.Types.ObjectId },
+            name: { type: String }
+          }
+        }
+      ]
+    });
+
+    const TerminalSchema = new Schema({
+      name: { type: String },
+      apiKey: { type: String }
+    });
+
+    const Transaction = db.model('Test1', TransactionSchema);
+    const Terminal = db.model('Test2', TerminalSchema);
+
+    const transaction = new Transaction();
+    const terminal = new Terminal({
+      name: 'Front desk',
+      apiKey: 'somesecret'
+    });
+    transaction.payments.push({
+      id: 'testPayment',
+      terminal: terminal
+    });
+    assert.equal(transaction.payments[0].terminal.name, 'Front desk');
+  });
+
+  it('cleans modified paths on deeply nested subdocuments (gh-11060)', async function() {
+    const childSchema = new Schema({ status: String });
+
+    const deploymentsSchema = new Schema({
+      before: { type: childSchema, required: false },
+      after: { type: childSchema, required: false }
+    }, { _id: false });
+
+    const testSchema = new Schema({
+      name: String,
+      deployments: { type: deploymentsSchema }
+    });
+    const Test = db.model('Test', testSchema);
+
+    await Test.create({
+      name: 'hello',
+      deployments: {
+        before: { status: 'foo' }
+      }
+    });
+
+    const entry = await Test.findOne({ name: 'hello' });
+    const deployment = entry.deployments.before;
+    deployment.status = 'bar';
+    entry.deployments.before = null;
+    entry.deployments.after = deployment;
+
+    assert.ok(!entry.isDirectModified('deployments.before.status'));
+    await entry.save();
+  });
+
+  it('can manually populate subdocument refs (gh-10856)', async function() {
+    // Bar model, has a name property and some other properties that we are interested in
+    const BarSchema = new Schema({
+      name: String,
+      more: String,
+      another: Number
+    });
+    const Bar = db.model('Bar', BarSchema);
+
+    // Denormalised Bar schema with just the name, for use on the Foo model
+    const BarNameSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Bar'
+      },
+      name: String
+    });
+
+    // Foo model, which contains denormalized bar data (just the name)
+    const FooSchema = new Schema({
+      something: String,
+      other: Number,
+      bar: {
+        type: BarNameSchema,
+        ref: 'Bar'
+      }
+    });
+    const Foo = db.model('Foo', FooSchema);
+
+    const bar2 = await Bar.create({
+      name: 'I am another Bar',
+      more: 'With even more data',
+      another: 3
+    });
+    const foo2 = await Foo.create({
+      something: 'I am another Foo',
+      other: 4
+    });
+
+    foo2.bar = bar2;
+    assert.ok(foo2.bar instanceof Bar);
+    assert.equal(foo2.bar.another, 3);
+    assert.equal(foo2.get('bar.another'), 3);
+  });
+
+  it('can manually populate subdocument refs in `create()` (gh-10856)', async function() {
+    // Bar model, has a name property and some other properties that we are interested in
+    const BarSchema = new Schema({
+      name: String,
+      more: String,
+      another: Number
+    });
+    const Bar = db.model('Bar', BarSchema);
+
+    // Denormalised Bar schema with just the name, for use on the Foo model
+    const BarNameSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Bar'
+      },
+      name: String
+    });
+
+    // Foo model, which contains denormalized bar data (just the name)
+    const FooSchema = new Schema({
+      something: String,
+      other: Number,
+      bar: {
+        type: BarNameSchema,
+        ref: 'Bar'
+      }
+    });
+    const Foo = db.model('Foo', FooSchema);
+
+    const bar = await Bar.create({
+      name: 'I am Bar',
+      more: 'With more data',
+      another: 2
+    });
+    const foo = await Foo.create({
+      something: 'I am Foo',
+      other: 1,
+      bar
+    });
+
+    assert.ok(foo.bar instanceof Bar);
+    assert.equal(foo.bar.another, 2);
+    assert.equal(foo.get('bar.another'), 2);
   });
 });

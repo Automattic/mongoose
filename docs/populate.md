@@ -519,21 +519,21 @@ const post = await BlogPost.create({ title: 'Top 10 French Novels' });
 
 const commentOnBook = await Comment.create({
   body: 'Great read',
-  on: book._id,
-  onModel: 'Product'
+  doc: book._id,
+  docModel: 'Product'
 });
 
 const commentOnPost = await Comment.create({
   body: 'Very informative',
-  on: post._id,
-  onModel: 'BlogPost'
+  doc: post._id,
+  docModel: 'BlogPost'
 });
 
 // The below `populate()` works even though one comment references the
 // 'Product' collection and the other references the 'BlogPost' collection.
-const comments = await Comment.find().populate('on').sort({ body: 1 });
-comments[0].on.name; // "The Count of Monte Cristo"
-comments[1].on.title; // "Top 10 French Novels"
+const comments = await Comment.find().populate('doc').sort({ body: 1 });
+comments[0].doc.name; // "The Count of Monte Cristo"
+comments[1].doc.title; // "Top 10 French Novels"
 ```
 
 An alternative approach is to define separate `blogPost` and
@@ -667,7 +667,7 @@ let authors = await Author.
 
 authors = await Author.
   find({}).
-  // Works, foreign field `band` is selected
+  // Works, foreign field `author` is selected
   populate({ path: 'posts', select: 'title author' }).
   exec();
 ```

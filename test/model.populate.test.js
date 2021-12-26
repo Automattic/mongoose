@@ -316,6 +316,14 @@ describe('model: populate:', function() {
       });
   });
 
+  it('fail on undefined id update', function() {
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+
+    assert.throws(function() {
+      BlogPost.findByIdAndUpdate(undefined, { $set: { _creator: {} } });
+    }, /id cannot be undefined/);
+  })
+
   it('across DBs', function(done) {
     const db = start();
     const db2 = db.useDb('mongoose_test2');
@@ -4491,7 +4499,6 @@ describe('model: populate:', function() {
       });
 
       it('justOne + lean (gh-6234)', async function() {
-
         const PersonSchema = new mongoose.Schema({
           name: String,
           band: String
@@ -4528,6 +4535,35 @@ describe('model: populate:', function() {
         assert.equal(res[0].member.name, 'Axl Rose');
         assert.equal(res[1].name, 'Motley Crue');
         assert.equal(res[1].member.name, 'Vince Neil');
+      });
+
+      it('sets empty array if lean with justOne = false and no results (gh-10992)', async function() {
+        const PersonSchema = new mongoose.Schema({
+          name: String,
+          band: String
+        });
+
+        const BandSchema = new mongoose.Schema({
+          name: String
+        });
+
+        BandSchema.virtual('members', {
+          ref: 'Person',
+          localField: 'name',
+          foreignField: 'band',
+          justOne: false
+        });
+
+        db.model('Person', PersonSchema);
+        const Band = db.model('Test', BandSchema);
+
+        await Band.create({ name: 'Guns N\' Roses' });
+
+        const res = await Band.find().populate('members').lean();
+
+        assert.equal(res.length, 1);
+        assert.equal(res[0].name, 'Guns N\' Roses');
+        assert.deepStrictEqual(res[0].members, []);
       });
 
       it('justOne underneath array (gh-6867)', async function() {
@@ -6570,7 +6606,6 @@ describe('model: populate:', function() {
     });
 
     it('virtual populate with embedded discriminators (gh-6273)', async function() {
-
       // Generate Users Model
       const userSchema = new Schema({ employeeId: Number, name: String });
       const UserModel = db.model('User', userSchema);
@@ -10446,5 +10481,190 @@ describe('model: populate:', function() {
 
     const doc = await BlogPost.findOne().populate('author');
     assert.equal(doc.author.email, 'test@gmail.com');
+  });
+
+  it('supports ref on subdocuments (gh-10856)', async function() {
+    const userSchema = Schema({ _id: Number, name: String, email: String });
+    const blogPostSchema = Schema({
+      title: String,
+      author: {
+        type: new Schema({ _id: Number, name: String }),
+        ref: 'User'
+      }
+    });
+
+    const User = db.model('User', userSchema);
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+
+    await User.create({ _id: 1, name: 'John Smith', email: 'test@gmail.com' });
+    await BlogPost.create({ title: 'Introduction to Mongoose', author: { _id: 1, name: 'John Smith' } });
+
+    const doc = await BlogPost.findOne().populate('author');
+    assert.equal(doc.author.email, 'test@gmail.com');
+    assert.equal(doc.toObject().author.email, 'test@gmail.com');
+
+    doc.depopulate();
+    assert.equal(doc.author.name, 'John Smith');
+
+    doc.author.name = 'John Smythe';
+    await doc.save();
+
+    const fromDb = await BlogPost.findById(doc);
+    assert.equal(fromDb.author.name, 'John Smythe');
+  });
+
+  it('supports ref on array containing subdocuments (gh-10856)', async function() {
+    const userSchema = Schema({ _id: Number, name: String, email: String });
+    const blogPostSchema = Schema({
+      title: String,
+      authors: [{
+        user: {
+          type: new Schema({ _id: Number, name: String }),
+          ref: 'User'
+        }
+      }]
+    });
+
+    const User = db.model('User', userSchema);
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+
+    await User.create({ _id: 1, name: 'John Smith', email: 'test@gmail.com' });
+    await BlogPost.create({
+      title: 'Introduction to Mongoose',
+      authors: [{ user: { _id: 1, name: 'John Smith' } }]
+    });
+
+    const doc = await BlogPost.findOne().populate('authors.user');
+    assert.equal(doc.authors[0].user.email, 'test@gmail.com');
+    assert.equal(doc.toObject().authors[0].user.email, 'test@gmail.com');
+
+    doc.depopulate();
+    assert.equal(doc.authors[0].user.name, 'John Smith');
+  });
+
+  it('uses `Model` by default when doing `Model.populate()` on a POJO (gh-10978)', async function() {
+    const UserSchema = new Schema({
+      name: { type: String, default: '' }
+    });
+
+    const TestSchema = new Schema({
+      users: [{ user: { type: 'ObjectId', ref: 'User' } }]
+    });
+
+    const User = db.model('User', UserSchema);
+    const Test = db.model('Test', TestSchema);
+
+    const users = await User.create([{ name: 'user-name' }, { name: 'user-name-2' }]);
+    await Test.create([{ users: [{ user: users[0]._id }, { user: users[1]._id }] }]);
+
+    const found = await Test.aggregate([
+      {
+        $project: {
+          users: '$users'
+        }
+      },
+      { $unwind: '$users' },
+      { $sort: { 'users.name': 1 } }
+    ]);
+
+    const _users = found.reduce((users, cur) => [...users, cur.users], []);
+
+    await User.populate(_users, { path: 'user' });
+    assert.equal(_users.length, 2);
+    assert.equal(_users[0].user.name, 'user-name');
+    assert.equal(_users[1].user.name, 'user-name-2');
+  });
+
+  it('can reference parent connection models by name after `useDb()` (gh-11003)', async function() {
+    const UserSchema = new Schema({
+      name: String
+    });
+
+    const TestSchema = new Schema({
+      user: { type: 'ObjectId', ref: 'User' }
+    });
+
+    const User = db.model('User', UserSchema);
+
+    const conn2 = db.useDb('mongoose-test2');
+    const Test = conn2.model('Test', TestSchema);
+
+    await Test.deleteMany({});
+    const users = await User.create([{ name: 'user-name' }, { name: 'user-name-2' }]);
+    await Test.create([{ user: users[0]._id }, { user: users[1]._id }]);
+
+    const res = await Test.find().populate('user').sort({ user: 1 });
+    assert.equal(res.length, 2);
+    assert.equal(res[0].user.name, 'user-name');
+    assert.equal(res[1].user.name, 'user-name-2');
+
+    await Test.deleteMany({});
+  });
+
+  it('reports full path when throwing `strictPopulate` error with deep populate (gh-10923)', async function() {
+    const L2 = db.model('Test', new Schema({ name: String }));
+
+    const schema = new Schema({ l2: { type: 'ObjectId', ref: L2 } });
+    const L1 = db.model('Child', schema);
+
+    const Parent = db.model('Parent', new Schema({
+      l1: { type: 'ObjectId', ref: L1 }
+    }));
+
+    await Parent.deleteMany();
+    const l2 = await L2.create({ name: 'test' });
+    const l1 = await L1.create({ l2 });
+    await Parent.create({ l1 });
+
+    const err = await Parent.findOne().populate({ path: 'l1', populate: { path: 'l22' } }).
+      then(() => null, err => err);
+
+    assert.ok(err.message.indexOf('l1.l22') !== -1, err.message);
+  });
+
+  it('handles refPath underneath map of subdocuments (gh-9359)', async function() {
+    // user schema
+    const userSchema = Schema({ name: String });
+
+    // list schema
+    const listSchema = Schema({ listName: String });
+
+    // row value schema
+    const rowValuesSchema = Schema({
+      valueObject: {
+        type: mongoose.Schema.Types.ObjectId,
+        refPath: 'values.$*.refp'
+      },
+      refp: String
+    });
+
+    // row schema
+    const rowSchema = Schema({
+      sortOrder: { type: mongoose.Schema.Types.Number, required: true },
+      values: { type: mongoose.Schema.Types.Map, of: rowValuesSchema }
+    });
+
+    const User = db.model('User', userSchema);
+    const List = db.model('List', listSchema);
+    const Row = db.model('Row', rowSchema);
+
+    const createUser = await User.create({ name: 'test' });
+    const createList = await List.create({ listName: 'hi' });
+
+    await Row.create({
+      sortOrder: 1,
+      values: {
+        [createList._id]: {
+          valueObject: mongoose.Types.ObjectId(createUser._id),
+          refp: 'User'
+        }
+      }
+    });
+
+    const row = await Row.findOne().populate({
+      path: 'values.$*.valueObject'
+    });
+
+    assert.equal(row.values.get(createList._id.toString()).valueObject.name, 'test');
   });
 });

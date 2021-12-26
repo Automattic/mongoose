@@ -969,11 +969,11 @@ declare module 'mongoose' {
     estimatedDocumentCount(options?: QueryOptions, callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /**
-     * Returns true if at least one document exists in the database that matches
-     * the given `filter`, and false otherwise.
+     * Returns a document with its `_id` if at least one document exists in the database that matches
+     * the given `filter`, and `null` otherwise.
      */
-    exists(filter: FilterQuery<T>): Promise<boolean>;
-    exists(filter: FilterQuery<T>, callback: Callback<boolean>): void;
+    exists(filter: FilterQuery<T>): Promise<LeanDocument<T> | null>;
+    exists(filter: FilterQuery<T>, callback: Callback<LeanDocument<T> | null>): void;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find(callback?: Callback<HydratedDocument<T, TMethods, TVirtuals>[]>): QueryWithHelpers<Array<HydratedDocument<T, TMethods, TVirtuals>>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;

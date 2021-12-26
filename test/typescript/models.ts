@@ -178,3 +178,11 @@ Project.create({
 }).then(project => {
   project.myMethod();
 });
+
+
+Project.exists({ name: 'Hello' }).then(result => {
+  result._id;
+});
+Project.exists({ name: 'Hello' }, (err, result) => {
+  result._id;
+});

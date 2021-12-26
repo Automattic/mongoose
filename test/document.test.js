@@ -10927,4 +10927,39 @@ describe('document', function() {
     assert.equal(foo.bar.another, 2);
     assert.equal(foo.get('bar.another'), 2);
   });
+
+  it('handles save with undefined nested doc under subdoc (gh-11110)', async function() {
+    const testSchema = new Schema({
+      level_1_array: [new Schema({
+        level_1: {
+          level_2: new Schema({
+            level_3: {
+              name_3: String,
+              level_4: {
+                name_4: String
+              }
+            }
+          })
+        }
+      })]
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    const doc = {
+      level_1_array: [{
+        level_1: {
+          level_2: {
+            level_3: {
+              name_3: 'test',
+              level_4: undefined
+            }
+          }
+        }
+      }]
+    };
+
+    await new Test(doc).save();
+
+  });
 });

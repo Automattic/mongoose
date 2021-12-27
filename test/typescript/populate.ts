@@ -1,4 +1,4 @@
-import { Schema, model, Document, PopulatedDoc } from 'mongoose';
+import { Schema, model, Document, PopulatedDoc, Types } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
 
@@ -91,4 +91,34 @@ async function testPathsParam() {
     return;
   }
   const name: string = story.author.name;
+}
+
+function gh11014() {
+  interface Parent {
+    child?: Types.ObjectId
+    name?: string
+  }
+  interface Child {
+    name: string
+  }
+  interface PopulatedParent {
+    child: Child | null
+  }
+  const ParentModel = model<Parent>(
+    'Parent',
+    new Schema({
+      child: { type: 'ObjectId', ref: 'Child' },
+      name: String
+    })
+  );
+  const childSchema: Schema = new Schema({ name: String });
+  const ChildModel = model<Child>('Child', childSchema);
+
+  // Populate with `Paths` generic `{ child: Child }` to override `child` path
+  ParentModel.find({})
+    .populate<{child: Child}>('child')
+    .orFail()
+    .then(parents => {
+      parents.map(p => p.child.name);
+    });
 }

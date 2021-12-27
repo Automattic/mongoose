@@ -103,7 +103,7 @@ database without returning them to your application. See the
 
 ```javascript
 Tank.updateOne({ size: 'large' }, { name: 'T-90' }, function(err, res) {
-  // Updated at most one doc, `res.modifiedCount` contains the number
+  // Updated at most one doc, `res.nModified` contains the number
   // of docs that MongoDB updated
 });
 ```

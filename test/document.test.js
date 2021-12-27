@@ -10837,4 +10837,129 @@ describe('document', function() {
     assert.ok(!entry.isDirectModified('deployments.before.status'));
     await entry.save();
   });
+
+  it('can manually populate subdocument refs (gh-10856)', async function() {
+    // Bar model, has a name property and some other properties that we are interested in
+    const BarSchema = new Schema({
+      name: String,
+      more: String,
+      another: Number
+    });
+    const Bar = db.model('Bar', BarSchema);
+
+    // Denormalised Bar schema with just the name, for use on the Foo model
+    const BarNameSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Bar'
+      },
+      name: String
+    });
+
+    // Foo model, which contains denormalized bar data (just the name)
+    const FooSchema = new Schema({
+      something: String,
+      other: Number,
+      bar: {
+        type: BarNameSchema,
+        ref: 'Bar'
+      }
+    });
+    const Foo = db.model('Foo', FooSchema);
+
+    const bar2 = await Bar.create({
+      name: 'I am another Bar',
+      more: 'With even more data',
+      another: 3
+    });
+    const foo2 = await Foo.create({
+      something: 'I am another Foo',
+      other: 4
+    });
+
+    foo2.bar = bar2;
+    assert.ok(foo2.bar instanceof Bar);
+    assert.equal(foo2.bar.another, 3);
+    assert.equal(foo2.get('bar.another'), 3);
+  });
+
+  it('can manually populate subdocument refs in `create()` (gh-10856)', async function() {
+    // Bar model, has a name property and some other properties that we are interested in
+    const BarSchema = new Schema({
+      name: String,
+      more: String,
+      another: Number
+    });
+    const Bar = db.model('Bar', BarSchema);
+
+    // Denormalised Bar schema with just the name, for use on the Foo model
+    const BarNameSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Bar'
+      },
+      name: String
+    });
+
+    // Foo model, which contains denormalized bar data (just the name)
+    const FooSchema = new Schema({
+      something: String,
+      other: Number,
+      bar: {
+        type: BarNameSchema,
+        ref: 'Bar'
+      }
+    });
+    const Foo = db.model('Foo', FooSchema);
+
+    const bar = await Bar.create({
+      name: 'I am Bar',
+      more: 'With more data',
+      another: 2
+    });
+    const foo = await Foo.create({
+      something: 'I am Foo',
+      other: 1,
+      bar
+    });
+
+    assert.ok(foo.bar instanceof Bar);
+    assert.equal(foo.bar.another, 2);
+    assert.equal(foo.get('bar.another'), 2);
+  });
+
+  it('handles save with undefined nested doc under subdoc (gh-11110)', async function() {
+    const testSchema = new Schema({
+      level_1_array: [new Schema({
+        level_1: {
+          level_2: new Schema({
+            level_3: {
+              name_3: String,
+              level_4: {
+                name_4: String
+              }
+            }
+          })
+        }
+      })]
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    const doc = {
+      level_1_array: [{
+        level_1: {
+          level_2: {
+            level_3: {
+              name_3: 'test',
+              level_4: undefined
+            }
+          }
+        }
+      }]
+    };
+
+    await new Test(doc).save();
+
+  });
 });

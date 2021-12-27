@@ -234,8 +234,8 @@ connectivity to the MongoDB server. Below is a list of events that a
 connection may emit.
 
 * `connecting`: Emitted when Mongoose starts making its initial connection to the MongoDB server
-* `connected`: Emitted when Mongoose successfully makes its initial connection to the MongoDB server, or when Mongoose reconnects after losing connectivity.
-* `open`: Equivalent to `connected`
+* `connected`: Emitted when Mongoose successfully makes its initial connection to the MongoDB server, or when Mongoose reconnects after losing connectivity. May be emitted multiple times if Mongoose loses connectivity.
+* `open`: Emitted after `'connected'` and `onOpen` is executed on all of this connection's models.
 * `disconnecting`: Your app called [`Connection#close()`](api.html#connection_Connection-close) to disconnect from MongoDB
 * `disconnected`: Emitted when Mongoose lost connection to the MongoDB server. This event may be due to your code explicitly closing the connection, the database server crashing, or network connectivity issues.
 * `close`: Emitted after [`Connection#close()`](api.html#connection_Connection-close) successfully closes the connection. If you call `conn.close()`, you'll get both a 'disconnected' event and a 'close' event.

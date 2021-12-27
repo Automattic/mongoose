@@ -1,3 +1,8 @@
+5.13.14 / 2021-12-27
+====================
+ * fix(timestamps): avoid setting createdAt on documents that already exist but dont have createdAt #11024
+ * docs(models): fix up nModified example for 5.x #11055
+
 6.1.3 / 2021-12-21
 ==================
  * perf(populate): avoid duplicate model names when using refPath to avoid O(n^2) memory growth with number of array elements #10983

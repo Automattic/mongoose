@@ -1,3 +1,8 @@
+5.13.14 / 2021-12-27
+====================
+ * fix(timestamps): avoid setting createdAt on documents that already exist but dont have createdAt #11024
+ * docs(models): fix up nModified example for 5.x #11055
+
 5.13.13 / 2021-11-02
 ====================
  * fix: upgrade to mongodb@3.7.3 #10909 [gaurav-sharma-gs](https://github.com/gaurav-sharma-gs)

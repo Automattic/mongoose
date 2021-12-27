@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.13.13: SchemaTypes</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
-</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.13.13</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs">Version 6.x</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/5.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/schematypes.md" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.13.14: SchemaTypes</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.13.14</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs">Version 6.x</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/5.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/5.x/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/schematypes.md" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h2 id="schematypes"><a href="#schematypes">SchemaTypes</a></h2>
 
@@ -49,7 +49,8 @@ valid for that path.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> });
 schema.path(<span class="hljs-string">'name'</span>) <span class="hljs-keyword">instanceof</span> mongoose.SchemaType; <span class="hljs-comment">// true</span>
 schema.path(<span class="hljs-string">'name'</span>) <span class="hljs-keyword">instanceof</span> mongoose.Schema.Types.String; <span class="hljs-comment">// true</span>
-schema.path(<span class="hljs-string">'name'</span>).instance; <span class="hljs-comment">// 'String'</span></code></pre>
+schema.path(<span class="hljs-string">'name'</span>).instance; <span class="hljs-comment">// 'String'</span>
+</code></pre>
 <p>A SchemaType is different from a type. In other words, <code>mongoose.ObjectId !== mongoose.Types.ObjectId</code>.
 A SchemaType is just a configuration object for Mongoose. An instance of
 the <code>mongoose.ObjectId</code> SchemaType doesn&#39;t actually create MongoDB ObjectIds,
@@ -122,7 +123,8 @@ m.ofBuffer.pop();
 m.ofMixed = [<span class="hljs-number">1</span>, [], <span class="hljs-string">'three'</span>, { <span class="hljs-attr">four</span>: <span class="hljs-number">5</span> }];
 m.nested.stuff = <span class="hljs-string">'good'</span>;
 m.map = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>([[<span class="hljs-string">'key'</span>, <span class="hljs-string">'value'</span>]]);
-m.save(callback);</code></pre>
+m.save(callback);
+</code></pre>
 <h3 id="type-key"><a href="#type-key">The `type` Key</a></h3>
 
 <p><code>type</code> is a special property in Mongoose schemas. When Mongoose finds
@@ -135,7 +137,8 @@ it needs to define a SchemaType with the given type.</p>
     <span class="hljs-attr">firstName</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span> },
     <span class="hljs-attr">lastName</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span> }
   }
-});</code></pre>
+});
+</code></pre>
 <p>As a consequence, <a href="/docs/faq.html#type-key">you need a little extra work to define a property named <code>type</code> in your schema</a>.
 For example, suppose you&#39;re building a stock portfolio app, and you
 want to store the asset&#39;s <code>type</code> (stock, bond, ETF, etc.). Naively,
@@ -148,7 +151,8 @@ you might define your schema as shown below:</p>
     <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>,
     <span class="hljs-attr">ticker</span>: <span class="hljs-built_in">String</span>
   }
-});</code></pre>
+});
+</code></pre>
 <p>However, when Mongoose sees <code>type: String</code>, it assumes that you mean
 <code>asset</code> should be a string, not an object with a property <code>type</code>.
 The correct way to define an object with a property <code>type</code> is shown
@@ -161,7 +165,8 @@ below.</p>
     <span class="hljs-attr">type</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span> },
     <span class="hljs-attr">ticker</span>: <span class="hljs-built_in">String</span>
   }
-});</code></pre>
+});
+</code></pre>
 <h3 id="schematype-options"><a href="#schematype-options">SchemaType Options</a></h3>
 
 <p>You can declare a schema type using the type directly, or an object with
@@ -173,7 +178,8 @@ a <code>type</code> property.</p>
 <span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({
   <span class="hljs-comment">// The `test` object contains the "SchemaType options"</span>
   <span class="hljs-attr">test</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span> } <span class="hljs-comment">// `test` is a path of type string</span>
-});</code></pre>
+});
+</code></pre>
 <p>In addition to the type property, you can specify additional properties
 for a path. For example, if you want to lowercase a string before saving:</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({
@@ -181,7 +187,8 @@ for a path. For example, if you want to lowercase a string before saving:</p>
     <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>,
     <span class="hljs-attr">lowercase</span>: <span class="hljs-literal">true</span> <span class="hljs-comment">// Always convert `test` to lowercase</span>
   }
-});</code></pre>
+});
+</code></pre>
 <p>You can add any property you want to your SchemaType options. Many plugins
 rely on custom SchemaType options. For example, the <a href="http://plugins.mongoosejs.io/plugins/autopopulate">mongoose-autopopulate</a>
 plugin automatically populates paths if you set <code>autopopulate: true</code> in your
@@ -220,7 +227,8 @@ doc.integerOnly; <span class="hljs-comment">// 2</span>
 doc.i; <span class="hljs-comment">// 2</span>
 doc.i = <span class="hljs-number">3.001</span>;
 doc.integerOnly; <span class="hljs-comment">// 3</span>
-doc.i; <span class="hljs-comment">// 3</span></code></pre>
+doc.i; <span class="hljs-comment">// 3</span>
+</code></pre>
 <h5>Indexes</h5>
 
 <p>You can also define <a href="https://docs.mongodb.com/manual/indexes/">MongoDB indexes</a>
@@ -237,7 +245,8 @@ using schema type options.</p>
     <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> <span class="hljs-comment">// Unique index. If you specify `unique: true`</span>
     <span class="hljs-comment">// specifying `index: true` is optional if you do `unique: true`</span>
   }
-});</code></pre>
+});
+</code></pre>
 <h5 id="string-validators">String</h5>
 
 <ul>
@@ -278,7 +287,8 @@ constructor or the string <code>&#39;String&#39;</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema1 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> }); <span class="hljs-comment">// name will be cast to string</span>
 <span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-string">'String'</span> }); <span class="hljs-comment">// Equivalent</span>
 
-<span class="hljs-keyword">const</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, schema2);</code></pre>
+<span class="hljs-keyword">const</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, schema2);
+</code></pre>
 <p>If you pass an element that has a <code>toString()</code> function, Mongoose will call it,
 unless the element is an array or the <code>toString()</code> function is strictly equal to
 <code>Object.prototype.toString()</code>.</p>
@@ -286,7 +296,8 @@ unless the element is an array or the <code>toString()</code> function is strict
 <span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">toString</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-number">42</span> } }).name; <span class="hljs-comment">// "42" as a string</span>
 
 <span class="hljs-comment">// "undefined", will get a cast error if you `save()` this document</span>
-<span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">foo</span>: <span class="hljs-number">42</span> } }).name;</code></pre>
+<span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">foo</span>: <span class="hljs-number">42</span> } }).name;
+</code></pre>
 <h4 id="numbers">Number</h4>
 
 <p>To declare a path as a number, you may use either the <code>Number</code> global
@@ -294,12 +305,14 @@ constructor or the string <code>&#39;Number&#39;</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema1 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">age</span>: <span class="hljs-built_in">Number</span> }); <span class="hljs-comment">// age will be cast to a Number</span>
 <span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">age</span>: <span class="hljs-string">'Number'</span> }); <span class="hljs-comment">// Equivalent</span>
 
-<span class="hljs-keyword">const</span> Car = mongoose.model(<span class="hljs-string">'Car'</span>, schema2);</code></pre>
+<span class="hljs-keyword">const</span> Car = mongoose.model(<span class="hljs-string">'Car'</span>, schema2);
+</code></pre>
 <p>There are several types of values that will be successfully cast to a Number.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">new</span> Car({ <span class="hljs-attr">age</span>: <span class="hljs-string">'15'</span> }).age; <span class="hljs-comment">// 15 as a Number</span>
 <span class="hljs-keyword">new</span> Car({ <span class="hljs-attr">age</span>: <span class="hljs-literal">true</span> }).age; <span class="hljs-comment">// 1 as a Number</span>
 <span class="hljs-keyword">new</span> Car({ <span class="hljs-attr">age</span>: <span class="hljs-literal">false</span> }).age; <span class="hljs-comment">// 0 as a Number</span>
-<span class="hljs-keyword">new</span> Car({ <span class="hljs-attr">age</span>: { <span class="hljs-attr">valueOf</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-number">83</span> } }).age; <span class="hljs-comment">// 83 as a Number</span></code></pre>
+<span class="hljs-keyword">new</span> Car({ <span class="hljs-attr">age</span>: { <span class="hljs-attr">valueOf</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-number">83</span> } }).age; <span class="hljs-comment">// 83 as a Number</span>
+</code></pre>
 <p>If you pass an object with a <code>valueOf()</code> function that returns a Number, Mongoose will
 call it and assign the returned value to the path.</p>
 <p>The values <code>null</code> and <code>undefined</code> are not cast.</p>
@@ -315,7 +328,8 @@ Assignment.findOne(<span class="hljs-function"><span class="hljs-keyword">functi
 
   doc.markModified(<span class="hljs-string">'dueDate'</span>);
   doc.save(callback); <span class="hljs-comment">// works</span>
-})</code></pre>
+})
+</code></pre>
 <h4 id="buffers">Buffer</h4>
 
 <p>To declare a path as a Buffer, you may use either the <code>Buffer</code> global
@@ -323,11 +337,13 @@ constructor or the string <code>&#39;Buffer&#39;</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema1 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">binData</span>: Buffer }); <span class="hljs-comment">// binData will be cast to a Buffer</span>
 <span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">binData</span>: <span class="hljs-string">'Buffer'</span> }); <span class="hljs-comment">// Equivalent</span>
 
-<span class="hljs-keyword">const</span> Data = mongoose.model(<span class="hljs-string">'Data'</span>, schema2);</code></pre>
+<span class="hljs-keyword">const</span> Data = mongoose.model(<span class="hljs-string">'Data'</span>, schema2);
+</code></pre>
 <p>Mongoose will successfully cast the below values to buffers.</p>
 <pre><code><span class="hljs-keyword">const</span> file1 = <span class="hljs-keyword">new</span> Data({ <span class="hljs-attr">binData</span>: <span class="hljs-string">'test'</span>}); <span class="hljs-comment">// {"type":"Buffer","data":[116,101,115,116]}</span>
 <span class="hljs-keyword">const</span> file2 = <span class="hljs-keyword">new</span> Data({ <span class="hljs-attr">binData</span>: <span class="hljs-number">72987</span> }); <span class="hljs-comment">// {"type":"Buffer","data":[27]}</span>
-<span class="hljs-keyword">const</span> file4 = <span class="hljs-keyword">new</span> Data({ <span class="hljs-attr">binData</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">'Buffer'</span>, <span class="hljs-attr">data</span>: [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]}}); <span class="hljs-comment">// {"type":"Buffer","data":[1,2,3]}</span></code></pre>
+<span class="hljs-keyword">const</span> file4 = <span class="hljs-keyword">new</span> Data({ <span class="hljs-attr">binData</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">'Buffer'</span>, <span class="hljs-attr">data</span>: [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]}}); <span class="hljs-comment">// {"type":"Buffer","data":[1,2,3]}</span>
+</code></pre>
 <h4 id="mixed">Mixed</h4>
 
 <p>An &quot;anything goes&quot; SchemaType. Mongoose will not do any casting on mixed paths.
@@ -350,7 +366,8 @@ object literal. The following are equivalent.</p>
   <span class="hljs-attr">any</span>: {
     <span class="hljs-attr">type</span>: { <span class="hljs-attr">foo</span>: <span class="hljs-built_in">String</span> }
   } <span class="hljs-comment">// "any" will be a single nested subdocument.</span>
-}, {<span class="hljs-attr">typePojoToMixed</span>: <span class="hljs-literal">false</span>});</code></pre>
+}, {<span class="hljs-attr">typePojoToMixed</span>: <span class="hljs-literal">false</span>});
+</code></pre>
 <p>Since Mixed is a schema-less type, you can change the value to anything else you
 like, but Mongoose loses the ability to auto detect and save those changes.
 To tell Mongoose that the value of a Mixed type has changed, you need to
@@ -359,14 +376,16 @@ call <code>doc.markModified(path)</code>, passing the path to the Mixed type you
 instead.</p>
 <pre><code class="language-javascript">person.anything = { <span class="hljs-attr">x</span>: [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>, { <span class="hljs-attr">y</span>: <span class="hljs-string">"changed"</span> }] };
 person.markModified(<span class="hljs-string">'anything'</span>);
-person.save(); <span class="hljs-comment">// Mongoose will save changes to `anything`.</span></code></pre>
+person.save(); <span class="hljs-comment">// Mongoose will save changes to `anything`.</span>
+</code></pre>
 <h4 id="objectids">ObjectIds</h4>
 
 <p>An <a href="https://docs.mongodb.com/manual/reference/method/ObjectId/">ObjectId</a>
 is a special type typically used for unique identifiers. Here&#39;s how
 you declare a schema with a path <code>driver</code> that is an ObjectId:</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">const</span> carSchema = <span class="hljs-keyword">new</span> mongoose.Schema({ <span class="hljs-attr">driver</span>: mongoose.ObjectId });</code></pre>
+<span class="hljs-keyword">const</span> carSchema = <span class="hljs-keyword">new</span> mongoose.Schema({ <span class="hljs-attr">driver</span>: mongoose.ObjectId });
+</code></pre>
 <p><code>ObjectId</code> is a class, and ObjectIds are objects. However, they are
 often represented as strings. When you convert an ObjectId to a string
 using <code>toString()</code>, you get a 24-character hexadecimal string:</p>
@@ -378,7 +397,8 @@ car.driver = <span class="hljs-keyword">new</span> mongoose.Types.ObjectId();
 <span class="hljs-keyword">typeof</span> car.driver; <span class="hljs-comment">// 'object'</span>
 car.driver <span class="hljs-keyword">instanceof</span> mongoose.Types.ObjectId; <span class="hljs-comment">// true</span>
 
-car.driver.toString(); <span class="hljs-comment">// Something like "5e1a0651741b255ddda996c4"</span></code></pre>
+car.driver.toString(); <span class="hljs-comment">// Something like "5e1a0651741b255ddda996c4"</span>
+</code></pre>
 <h4 id="booleans">Boolean</h4>
 
 <p>Booleans in Mongoose are <a href="https://www.w3schools.com/js/js_booleans.asp">plain JavaScript booleans</a>.
@@ -408,7 +428,8 @@ You can modify what values Mongoose converts to true or false using the
 <span class="hljs-built_in">console</span>.log(mongoose.Schema.Types.Boolean.convertToFalse);
 
 mongoose.Schema.Types.Boolean.convertToFalse.add(<span class="hljs-string">'nay'</span>);
-<span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">new</span> M({ <span class="hljs-attr">b</span>: <span class="hljs-string">'nay'</span> }).b); <span class="hljs-comment">// false</span></code></pre>
+<span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">new</span> M({ <span class="hljs-attr">b</span>: <span class="hljs-string">'nay'</span> }).b); <span class="hljs-comment">// false</span>
+</code></pre>
 <h4 id="arrays">Arrays</h4>
 
 <p>Mongoose supports arrays of <a href="./api.html#schema_Schema.Types">SchemaTypes</a>
@@ -422,23 +443,27 @@ also called <em>primitive arrays</em>, and arrays of subdocuments are also calle
   <span class="hljs-attr">strings</span>: [<span class="hljs-built_in">String</span>],
   <span class="hljs-attr">numbers</span>: [<span class="hljs-built_in">Number</span>]
   <span class="hljs-comment">// ... etc</span>
-});</code></pre>
+});
+</code></pre>
 <p>Arrays are special because they implicitly have a default value of <code>[]</code> (empty array).</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ToyBox = mongoose.model(<span class="hljs-string">'ToyBox'</span>, ToyBoxSchema);
-<span class="hljs-built_in">console</span>.log((<span class="hljs-keyword">new</span> ToyBox()).toys); <span class="hljs-comment">// []</span></code></pre>
+<span class="hljs-built_in">console</span>.log((<span class="hljs-keyword">new</span> ToyBox()).toys); <span class="hljs-comment">// []</span>
+</code></pre>
 <p>To overwrite this default, you need to set the default value to <code>undefined</code></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ToyBoxSchema = <span class="hljs-keyword">new</span> Schema({
   <span class="hljs-attr">toys</span>: {
     <span class="hljs-attr">type</span>: [ToySchema],
     <span class="hljs-attr">default</span>: <span class="hljs-literal">undefined</span>
   }
-});</code></pre>
+});
+</code></pre>
 <p>Note: specifying an empty array is equivalent to <code>Mixed</code>. The following all create arrays of
 <code>Mixed</code>:</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> Empty1 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: [] });
 <span class="hljs-keyword">const</span> Empty2 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: <span class="hljs-built_in">Array</span> });
 <span class="hljs-keyword">const</span> Empty3 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: [Schema.Types.Mixed] });
-<span class="hljs-keyword">const</span> Empty4 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: [{}] });</code></pre>
+<span class="hljs-keyword">const</span> Empty4 = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">any</span>: [{}] });
+</code></pre>
 <h4 id="maps">Maps</h4>
 
 <p><em>New in Mongoose 5.1.0</em></p>
@@ -462,7 +487,8 @@ In Mongoose, maps are how you create a nested document with arbitrary keys.</p>
     <span class="hljs-attr">github</span>: <span class="hljs-string">'vkarpov15'</span>,
     <span class="hljs-attr">twitter</span>: <span class="hljs-string">'@code_barbarian'</span>
   }
-}).socialMediaHandles);</code></pre>
+}).socialMediaHandles);
+</code></pre>
 <p>The above example doesn&#39;t explicitly declare <code>github</code> or <code>twitter</code> as paths,
 but, since <code>socialMediaHandles</code> is a map, you can store arbitrary key/value
 pairs. However, since <code>socialMediaHandles</code> is a map, you <strong>must</strong> use
@@ -486,7 +512,8 @@ user.socialMediaHandles.myspace = <span class="hljs-string">'fail'</span>;
 user.socialMediaHandles.github;
 
 <span class="hljs-comment">// Will only save the 'github' and 'twitter' properties</span>
-user.save();</code></pre>
+user.save();
+</code></pre>
 <p>Map types are stored as <a href="https://en.wikipedia.org/wiki/BSON#Data_types_and_syntax">BSON objects in MongoDB</a>.
 Keys in a BSON object are ordered, so this means the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#Description">insertion order</a>
 property of maps is maintained.</p>
@@ -504,10 +531,12 @@ For example, suppose your <code>socialMediaHandles</code> map contains a <code>r
     })
   }
 });
-<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema);</code></pre>
+<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema);
+</code></pre>
 <p>To populate every <code>socialMediaHandles</code> entry&#39;s <code>oauth</code> property, you should populate
 on <code>socialMediaHandles.$*.oauth</code>:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> User.findOne().populate(<span class="hljs-string">'socialMediaHandles.$*.oauth'</span>);</code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> User.findOne().populate(<span class="hljs-string">'socialMediaHandles.$*.oauth'</span>);
+</code></pre>
 <h3 id="getters"><a href="#getters">Getters</a></h3>
 
 <p>Getters are like virtuals for paths defined in your schema. For example,
@@ -528,7 +557,8 @@ your <code>userSchema</code>:</p>
 
 <span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> User({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Val'</span>, <span class="hljs-attr">picture</span>: <span class="hljs-string">'/123.png'</span> });
 doc.picture; <span class="hljs-comment">// 'https://s3.amazonaws.com/mybucket/123.png'</span>
-doc.toObject({ <span class="hljs-attr">getters</span>: <span class="hljs-literal">false</span> }).picture; <span class="hljs-comment">// '/123.png'</span></code></pre>
+doc.toObject({ <span class="hljs-attr">getters</span>: <span class="hljs-literal">false</span> }).picture; <span class="hljs-comment">// '/123.png'</span>
+</code></pre>
 <p>Generally, you only use getters on primitive paths as opposed to arrays
 or subdocuments. Because getters override what accessing a Mongoose path returns,
 declaring a getter on an object may remove Mongoose change tracking for
@@ -546,7 +576,8 @@ schema.path(<span class="hljs-string">'arr'</span>).get(<span class="hljs-functi
 
 <span class="hljs-comment">// Later</span>
 doc.arr.push({ <span class="hljs-attr">key</span>: <span class="hljs-built_in">String</span> });
-doc.arr[<span class="hljs-number">0</span>]; <span class="hljs-comment">// 'undefined' because every `doc.arr` creates a new array!</span></code></pre>
+doc.arr[<span class="hljs-number">0</span>]; <span class="hljs-comment">// 'undefined' because every `doc.arr` creates a new array!</span>
+</code></pre>
 <p>Instead of declaring a getter on the array as shown above, you should
 declare a getter on the <code>url</code> string as shown below. If you need to declare
 a getter on a nested document or array, be very careful!</p>
@@ -557,7 +588,8 @@ a getter on a nested document or array, be very careful!</p>
 <span class="hljs-keyword">const</span> root = <span class="hljs-string">'https://s3.amazonaws.com/mybucket'</span>;
 
 <span class="hljs-comment">// Good, do this instead of declaring a getter on `arr`</span>
-schema.path(<span class="hljs-string">'arr.0.url'</span>).get(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> <span class="hljs-string">`<span class="hljs-subst">${root}</span><span class="hljs-subst">${v}</span>`</span>);</code></pre>
+schema.path(<span class="hljs-string">'arr.0.url'</span>).get(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> <span class="hljs-string">`<span class="hljs-subst">${root}</span><span class="hljs-subst">${v}</span>`</span>);
+</code></pre>
 <h3 id="schemas"><a href="#schemas">Schemas</a></h3>
 
 <p>To declare a path as another <a href="./guide.html#definition">schema</a>,
@@ -574,7 +606,8 @@ during document creation.</p>
     <span class="hljs-attr">type</span>: subSchema
     <span class="hljs-attr">default</span>: {}
   }
-});</code></pre>
+});
+</code></pre>
 <h3 id="customtypes"><a href="#customtypes">Creating Custom Types</a></h3>
 
 <p>Mongoose can also be extended with <a href="customschematypes.html">custom SchemaTypes</a>. Search the
@@ -600,7 +633,8 @@ given path.</p>
   *   path: 'name',
   *   instance: 'String',
   *   validators: ...
-  */</span></code></pre>
+  */</span>
+</code></pre>
 <p>You can use this function to inspect the schema type for a given path,
 including what validators it has and what the type is.</p>
 <h3 id="further-reading"><a href="#further-reading">Further Reading</a></h3>

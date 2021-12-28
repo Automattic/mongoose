@@ -3022,11 +3022,10 @@ declare module 'mongoose' {
 
     export interface Facet {
       /** [`$facet` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/facet/) */
-      $facet: Record<
-        string,
-        Exclude<PipelineStage, PipelineStage.CollStats | PipelineStage.Facet | PipelineStage.GeoNear | PipelineStage.IndexStats | PipelineStage.Out | PipelineStage.Merge | PipelineStage.PlanCacheStats>[]
-      >
+      $facet: Record<string, FacetPipelineStep[]>
     }
+
+    export type FacetPipelineStep = Exclude<PipelineStage, PipelineStage.CollStats | PipelineStage.Facet | PipelineStage.GeoNear | PipelineStage.IndexStats | PipelineStage.Out | PipelineStage.Merge | PipelineStage.PlanCacheStats>
 
     export interface GeoNear {
       /** [`$geoNear` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/) */

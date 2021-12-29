@@ -972,8 +972,8 @@ declare module 'mongoose' {
      * Returns a document with its `_id` if at least one document exists in the database that matches
      * the given `filter`, and `null` otherwise.
      */
-    exists(filter: FilterQuery<T>): Promise<LeanDocument<T> | null>;
-    exists(filter: FilterQuery<T>, callback: Callback<LeanDocument<T> | null>): void;
+    exists(filter: FilterQuery<T>): QueryWithHelpers<Pick<Document<T>, '_id'> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    exists(filter: FilterQuery<T>, callback: Callback<Pick<Document<T>, '_id'> | null>): QueryWithHelpers<Pick<Document<T>, '_id'> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find(callback?: Callback<HydratedDocument<T, TMethods, TVirtuals>[]>): QueryWithHelpers<Array<HydratedDocument<T, TMethods, TVirtuals>>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;

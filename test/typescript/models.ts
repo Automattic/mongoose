@@ -181,8 +181,8 @@ Project.create({
 
 
 Project.exists({ name: 'Hello' }).then(result => {
-  result._id;
+  result?._id;
 });
 Project.exists({ name: 'Hello' }, (err, result) => {
-  result._id;
+  result?._id;
 });

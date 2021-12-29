@@ -1,4 +1,4 @@
-import { Schema, model, Document, LeanDocument } from 'mongoose';
+import { Schema, model, Document, LeanDocument, Types } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
@@ -80,4 +80,27 @@ function gh10345() {
     const doc2 = await UserModel.findOne().orFail().lean();
     doc2.id = 43;
   })();
+}
+
+async function gh11118(): Promise<void> {
+  interface User {
+    name: string;
+    email: string;
+    avatar?: string;
+}
+
+  const schema = new Schema<User>({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    avatar: String
+  });
+
+  const UserModel = model<User>('User', schema);
+
+  const docs = await UserModel.find().lean().exec();
+
+  for (const doc of docs) {
+    const _id: Types.ObjectId = doc._id;
+  }
+
 }

@@ -6,7 +6,7 @@ Population is the process of automatically replacing the specified paths in the 
 
 ```javascript
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
 const personSchema = Schema({
   _id: Schema.Types.ObjectId,

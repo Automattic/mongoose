@@ -3,13 +3,13 @@ import { ObjectId } from 'mongodb';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
-  byName(name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
+  byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
 }
 
 const childSchema: Schema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
-const schema: Schema<ITest, Model<ITest, QueryHelpers>> = new Schema({
+const schema: Schema<ITest, Model<ITest, QueryHelpers>, {}, QueryHelpers> = new Schema({
   name: { type: 'String' },
   tags: [String],
   child: { type: 'ObjectId', ref: 'Child' },
@@ -17,11 +17,11 @@ const schema: Schema<ITest, Model<ITest, QueryHelpers>> = new Schema({
   endDate: Date
 });
 
-schema.query._byName = function(name: string): QueryWithHelpers<any, ITest> {
+schema.query._byName = function(name: string): QueryWithHelpers<any, ITest, QueryHelpers> {
   return this.find({ name });
 };
 
-schema.query.byName = function(name: string): QueryWithHelpers<any, ITest> {
+schema.query.byName = function(name: string): QueryWithHelpers<any, ITest, QueryHelpers> {
   this.notAQueryHelper();
   return this._byName(name);
 };

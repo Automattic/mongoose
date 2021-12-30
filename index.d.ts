@@ -2679,7 +2679,9 @@ declare module 'mongoose' {
     };
 
   export type FlattenMaps<T> = {
-    [K in keyof T]: T[K] extends Map<any, any> ? AnyObject : FlattenMaps<T[K]>;
+    [K in keyof T]: T[K] extends Map<any, any>
+      ? AnyObject : T[K] extends TreatAsPrimitives
+      ? T[K] : FlattenMaps<T[K]>;
   };
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;

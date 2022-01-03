@@ -970,7 +970,7 @@ describe('document.populate', function() {
     assert.ok(finalDoc.i.populated('g'));
   });
 
-  it.only('works with single strings (gh-11160)', async() => {
+  it('works with single strings (gh-11160)', async() => {
     const bookSchema = mongoose.Schema({
       title: String,
       authorId: { type: Schema.ObjectId, ref: 'Author' }

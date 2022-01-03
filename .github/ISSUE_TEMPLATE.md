@@ -1,5 +1,9 @@
 <!-- *Before creating an issue please make sure you are using the latest version of mongoose -->
 
+<!-- *Having an issue connecting to mongoose? Check here https://mongoosejs.com/docs/faq.html#operation-buffering-timed-out -->
+
+<!-- *Is a function being used against your will? Check here https://mongoosejs.com/docs/faq.html#not-a-function -->
+
 **Do you want to request a *feature* or report a *bug*?**
 
 **What is the current behavior?**

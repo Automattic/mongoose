@@ -26,7 +26,7 @@
 <p>MongoDB has the join-like <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/">$lookup</a> aggregation operator in versions &gt;= 3.2. Mongoose has a more powerful alternative called <code>populate()</code>, which lets you reference documents in other collections.</p>
 <p>Population is the process of automatically replacing the specified paths in the document with document(s) from other collection(s). We may populate a single document, multiple documents, a plain object, multiple plain objects, or all objects returned from a query. Let&#39;s look at some examples.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">const</span> Schema = mongoose.Schema;
+<span class="hljs-keyword">const</span> { Schema } = mongoose;
 
 <span class="hljs-keyword">const</span> personSchema = Schema({
   <span class="hljs-attr">_id</span>: Schema.Types.ObjectId,

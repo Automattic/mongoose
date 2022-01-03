@@ -17,7 +17,7 @@ hr {
 <a class="anchor" href="#operation-buffering-timed-out">**Q**</a>. Operation `...` timed out after 10000 ms. What gives?
 
 **A**. At its core, this issue stems from being unable to connect to mongoose. If you are using an application, like a bot,
-that wishes to connect to mongoose, you must ensure that you are connecting before the bot bot activates. For example, when working
+that wishes to connect to mongoose, you must ensure that you are connecting before the bot activates. For example, when working
 with discord bots, the last line of your index file is `client.login(token)`. You want to place the connection string, `mongoose.connect().then()` before this line.
 Do not place it in an event handler like `client.on('message')`, as this activates after you have logged in to the bot.
 

@@ -1,3 +1,23 @@
+6.1.4 / 2021-12-27
+==================
+ * fix(document): handle save with undefined nested doc under subdoc #11110
+ * fix(document): allow manually populating subdocument refs with `create()` #10856
+ * fix(populate): handles refPath underneath map of subdocuments #9359
+ * fix(update): throw error when calling findByIdAndUpdate with undefined id #11079 [gramliu](https://github.com/gramliu)
+ * fix(mongoose): export ConnectionStates #11133 [orgads](https://github.com/orgads)
+ * fix(index.d.ts): unpack array when using generic type override with `populate()` #11027
+ * fix(index.d.ts): fix typings in Merge stage #11132
+ * fix(index.d.ts): PipelineStage.Merge interface definition is wrong #11109
+ * docs(typescript): add note about Schema.Types.ObjectId vs Types.ObjectId in document definition #10949
+ * docs(connection): clarify that "connected" and "open" are different #10886
+ * docs(populate): correct refPath example to not use on as a schema path name #11113
+ * docs: fix `strictQuery` example #11135 [MontgomeryWatts](https://github.com/MontgomeryWatts)
+
+5.13.14 / 2021-12-27
+====================
+ * fix(timestamps): avoid setting createdAt on documents that already exist but dont have createdAt #11024
+ * docs(models): fix up nModified example for 5.x #11055
+
 6.1.3 / 2021-12-21
 ==================
  * perf(populate): avoid duplicate model names when using refPath to avoid O(n^2) memory growth with number of array elements #10983

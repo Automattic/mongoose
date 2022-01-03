@@ -87,3 +87,31 @@ function testRequiredId(): void {
     return await Foo.create(foo);
   };
 }
+
+async function gh11117(): Promise<void> {
+  interface Foo {
+    someDate: Date;
+    someId: Types.ObjectId;
+    someNumber: number;
+    someString: string;
+  }
+  const fooSchema = new Schema<Foo, Model<Foo>>({
+    someDate: { required: true, type: Date },
+    someId: { required: true, type: Schema.Types.ObjectId },
+    someNumber: { required: true, type: Number },
+    someString: { required: true, type: String }
+  });
+
+  const fooModel = model('foos', fooSchema);
+
+  const items = await fooModel.create<Foo>([
+    {
+      someId: new Types.ObjectId(),
+      someDate: new Date(),
+      someNumber: 5,
+      someString: 'test'
+    }
+  ]);
+  const json = items[0].toJSON();
+  const someDate: Date = json.someDate;
+}

@@ -647,6 +647,14 @@ describe('mongoose module:', function() {
     });
   });
 
+  it('clones schema when instance of another Mongoose instance\'s Schema class (gh-11047)', function() {
+    const m = new Mongoose;
+    const schema = new Schema({ name: String });
+
+    const Test = m.connection.model('Test', schema);
+    assert.equal(Test.schema.obj.name, String);
+  });
+
   it('deleteModel()', function() {
     const mongoose = new Mongoose();
 

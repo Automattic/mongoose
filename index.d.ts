@@ -2403,7 +2403,7 @@ declare module 'mongoose' {
     populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
-    projection(fields?: any | null): any;
+    projection(fields?: any | null): this;
 
     /** Determines the MongoDB nodes from which to read. */
     read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;

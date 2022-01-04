@@ -763,8 +763,16 @@ describe('Query', function() {
     it('works', function(done) {
       const query = new Query({});
       query.limit(5);
-      assert.equal(query.options.limit, 5);
+      assert.strictEqual(query.options.limit, 5);
       done();
+    });
+
+    it('with string limit (gh-11017)', function() {
+      const query = new Query({});
+      query.limit('5');
+      assert.strictEqual(query.options.limit, 5);
+
+      assert.throws(() => query.limit('fail'), /CastError/);
     });
   });
 

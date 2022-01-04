@@ -817,8 +817,45 @@ describe('QueryCursor', function() {
     assert.ok(err);
     assert.equal(err.message, 'Oops!');
   });
-});
 
+  it('applies selected fields when using discriminators (gh-11130)', async function() {
+    const schemaOptions = { discriminatorKey: 'type' };
+    const schema = new Schema({
+      type: { type: String, enum: ['type1', 'type2'] },
+      foo: { type: String, default: 'foo' },
+      bar: { type: String }
+    }, schemaOptions);
+
+    const Example = db.model('Example', schema);
+
+    Example.discriminator('type1', Schema({ type1: String }, schemaOptions), 'type1');
+    Example.discriminator('type2', Schema({ type2: String }, schemaOptions), 'type2');
+
+    await Example.create({
+      type: 'type1',
+      foo: 'example1',
+      bar: 'example1',
+      type1: 'example1'
+    });
+    await Example.create({
+      type: 'type2',
+      foo: 'example2',
+      bar: 'example2',
+      type2: 'example2'
+    });
+
+    const cursor = Example.find().select('bar type');
+    const dirty = [];
+    for await (const doc of cursor) {
+      dirty.push(doc.$__dirty());
+      await doc.save();
+    }
+    assert.deepStrictEqual(dirty, [[], []]);
+
+    const docs = await Example.find().sort('foo');
+    assert.deepStrictEqual(docs.map(d => d.foo), ['example1', 'example2']);
+  });
+});
 
 async function delay(ms) {
   await new Promise((resolve) => setTimeout(resolve, ms));

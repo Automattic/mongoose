@@ -54,6 +54,7 @@ user and have a good reason for doing so.
   <li><a href="#count">Populate Virtuals: The Count Option</a></li>
   <li><a href="#populating-maps">Populating Maps</a></li>
   <li><a href="#populate-middleware">Populate in Middleware</a></li>
+  <li><a href="#populating-multiple-paths-middleware">Populating Multiple Paths in Middleware</a></li>
 </ul>
 
 <h3 id="saving-refs"><a href="#saving-refs">Saving refs</a></h3>
@@ -801,6 +802,31 @@ MySchema.post('save', function(doc, next) {
   doc.populate('user').then(function() {
     next();
   });
+});
+```
+
+<h3 id="populating-multiple-paths-middleware"><a href="#populating-multiple-paths-middleware">Populating Multiple Paths in Middleware</a></h3>
+
+Populating multiple paths in middleware is just a little bit trickier than what you may think. Here's how you may expect it to work:
+
+```javascript
+userSchema.pre('find', function (next) {
+    this.populate("followers following");
+    next();
+});
+```
+
+However, this will not work. By default, passing multiple paths to `populate()` in the middleware will trigger an infinite recursion, which means that it will basically trigger the same middleware for all of the paths provided to the `populate()` method - For example, `this.populate('followers following')` will trigger the same middleware for both `followers` and `following` fields and the request will just be left hanging in an infinite loop.
+
+To avoid this, we have to add the `_recursed` option, so that our middleware will avoid populating recursively. The example below will make it work as expected.
+
+```javascript
+userSchema.pre('find', function (next) {
+    if (this.options._recursed) {
+      return next();
+    }
+    this.populate({ path: "followers following", options: { _recursed: true } });
+    next();
 });
 ```
 

@@ -968,6 +968,40 @@ describe('document.populate', function() {
 
     assert.ok(finalDoc.populated('i.g'));
     assert.ok(finalDoc.i.populated('g'));
+  });
 
+  it('works with single strings (gh-11160)', async() => {
+    const bookSchema = mongoose.Schema({
+      title: String,
+      authorId: { type: Schema.ObjectId, ref: 'Author' }
+    });
+
+    const authorSchema = mongoose.Schema({
+      name: String,
+      websiteId: { type: Schema.ObjectId, ref: 'Website' }
+    });
+
+    const websiteSchema = mongoose.Schema({
+      url: String
+    });
+
+    const Book = db.model('Book', bookSchema);
+    const Author = db.model('Author', authorSchema);
+    const Website = db.model('Website', websiteSchema);
+
+
+    const website = new Website({ url: 'http://www.clean-code.com' });
+    const author = new Author({ name: 'Robert C. Martin', websiteId: website._id });
+    const book = new Book({ title: 'Clean Code', authorId: author._id });
+    await Promise.all([
+      website.save(),
+      author.save(),
+      book.save()
+    ]);
+
+    const foundBook = await Book.findOne({ _id: book._id });
+    await foundBook.populate({ path: 'authorId', populate: 'websiteId' });
+    assert.ok(foundBook.populated('authorId'));
+    assert.ok(foundBook.authorId.populated('websiteId'));
   });
 });

@@ -36,6 +36,8 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 ### Running the tests
 - Open a terminal and navigate to the root of the project
 - execute `npm install` to install the necessary dependencies
+- execute `mkdir ./test/typescript/node_modules`
+- execute `ln -s "$(pwd)" ./test/typescript/node_modules/mongoose` to create a symlink so typescript tests could run (for windows users using Git Bash: prefix the previous command with `MSYS=winsymlinks:nativestrict`)
 - start a MongoDB instance on port 27017 if one isn't running already. `mongod --dbpath <path to store data>`. We typically use [MongoDB Enterprise](https://www.mongodb.com/try/download/enterprise) with the [in-memory storage engine](https://docs.mongodb.com/manual/core/inmemory/) in order to run tests faster.
 - execute `npm test` to run the tests (we're using [mocha](http://mochajs.org/))
   - or to execute a single test `npm test -- -g 'some regexp that matches the test description'`

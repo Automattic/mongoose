@@ -1,3 +1,18 @@
+6.1.5 / 2022-01-04
+==================
+ * perf(index.d.ts): simplify Schema typedef for query helpers and methods to significantly reduce TS compiler overhead #10349
+ * fix(document): allow populating deeply nested models as strings #11168 #11160 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(query): allow calling limit() and skip() with a string #11017
+ * fix(cursor): propery apply selected fields when loading discriminator docs with query cursor #11130
+ * fix(mongoose+connection): clone schema correctly when passing instance of another Mongoose instance's Schema to Connection.prototype.model() #11047
+ * fix(index.d.ts): handle primitives with FlattenMaps #11117
+ * fix(index.d.ts): enforce id on lean query result type #11118
+ * fix(index.d.ts): export facet stage type #11150 [mhoc](https://github.com/mhoc)
+ * fix(index.d.ts): correct return type of projection method #11176 [EugeneKorshenko](https://github.com/EugeneKorshenko)
+ * fix(index.d.ts): additional fix for `$group` pipeline stage #11140 #11067 [EugeneKorshenko](https://github.com/EugeneKorshenko)
+ * docs: update CONTRIBUTING.md for TS tests #11164 [ahmedelshenawy25](https://github.com/ahmedelshenawy25)
+ * docs: use es6 object destructuring instead of regular dot operator for accessing value in object #11147 [Shivaansh-Agarwal](https://github.com/Shivaansh-Agarwal)
+
 6.1.4 / 2021-12-27
 ==================
  * fix(document): handle save with undefined nested doc under subdoc #11110

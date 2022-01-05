@@ -1221,7 +1221,7 @@ declare module 'mongoose' {
     /** optional query options like sort, limit, etc */
     options?: any;
     /** deep populate */
-    populate?: PopulateOptions | Array<PopulateOptions>;
+    populate?: string | PopulateOptions | (string | PopulateOptions)[];
     /**
      * If true Mongoose will always set `path` to an array, if false Mongoose will
      * always set `path` to a document. Inferred from schema by default.

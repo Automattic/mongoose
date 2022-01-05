@@ -1627,7 +1627,7 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: T | ((this: any, doc: any) => T);
+    default?: T | ((this: any, doc: any) => Partial<T>);
 
     /**
      * The model that `populate()` should use if populating this path.
@@ -2097,7 +2097,7 @@ declare module 'mongoose' {
       _id: this;
     }
 
-    class Subdocument extends Document {
+    class Subdocument<IdType = any> extends Document<IdType> {
       $isSingleNested: true;
 
       /** Returns the top level document of this sub-document. */

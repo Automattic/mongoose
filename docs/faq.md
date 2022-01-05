@@ -16,16 +16,36 @@ hr {
 
 <a class="anchor" href="#operation-buffering-timed-out">**Q**</a>. Operation `...` timed out after 10000 ms. What gives?
 
-**A**. At its core, this issue stems from being unable to connect to mongoose. If you are using an application, like a bot,
-that wishes to connect to mongoose, you must ensure that you are connecting before the bot activates. For example, when working
-with discord bots, the last line of your index file is `client.login(token)`. You want to place the connection string, `mongoose.connect().then()` before this line.
+**A**. At its core, this issue stems from not connecting to MongoDB.
+You can use Mongoose before connecting to MongoDB, but you must connect at some point. For example:
+
+```javascript
+await mongoose.createConnection(mongodbUri);
+
+const Test = mongoose.model('Test', schema);
+
+await Test.findOne(); // Will throw "Operation timed out" error because didn't call `mongoose.connect()`
+```
+
+```javascript
+await mongoose.connect(mongodbUri);
+
+const db = mongoose.createConnection();
+
+const Test = db.model('Test', schema);
+
+await Test.findOne(); // Will throw "Operation timed out" error because `db` isn't connected to MongoDB
+```
+
+If you are using an application, like a bot, that wishes to connect to Mongoose, you must ensure that you are connecting before the bot activates.
+For example, when working with discord bots, the last line of your index file is `client.login(token)`.
+You want to place the connection string, `mongoose.connect().then()` before this line.
 Do not place it in an event handler like `client.on('message')`, as this activates after you have logged in to the bot.
 
-<a class="anchor" href="#not-local"> **Q**</a>. I am able to connect locally but when I try to connect to a server I get this error. What gives?
+<a class="anchor" href="#not-local"> **Q**</a>. I am able to connect locally but when I try to connect to MongoDB Atlas I get this error. What gives?
 
 You must ensure that you have whitelisted your ip on [mongodb](https://docs.atlas.mongodb.com/security/ip-access-list/) to let it connect.
-If security is of no concern for your application, like a personal project that doesn't use user's information, you can allow access from all
-ips with `0.0.0.0/0`.
+You can allow access from all ips with `0.0.0.0/0`.
 
 <hr id="not-a-function" />
 

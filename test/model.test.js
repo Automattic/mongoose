@@ -7565,7 +7565,7 @@ describe('Model', function() {
     it('Using bulkSave should not trigger an error (gh-11071)', async function() {
 
       class TestModel {
-        static _instance;
+        static _instance
         _model;
     
         /**

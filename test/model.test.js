@@ -7617,6 +7617,7 @@ describe('Model', function() {
     
             // !!! "TypeError: path.indexOf is not a function" occurs here
             let res = await this._model.bulkSave(tests);
+            return res;
         }
     
     }

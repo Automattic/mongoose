@@ -7563,68 +7563,31 @@ describe('Model', function() {
 
     });
     it('Using bulkSave should not trigger an error (gh-11071)', async function() {
+    
+      const pairSchema = mongoose.Schema({
+          name: String,
+          timestamp: String
+      }, { versionKey: false });
+    
+      const model = db.model('test', pairSchema);
+      const tests = [
+        { name: 't1', timestamp: Date.now() },
+        { name: 't2', timestamp: Date.now() },
+        { name: 't3', timestamp: Date.now() },
+        { name: 't4', timestamp: Date.now() },
+      ];
 
-      class TestModel {
-        static _instance
-        _model;
-    
-        /**
-         * @private
-         */
-        constructor() {}
-    
-        static create() {
-            if (this._instance) {return this._instance;}
-            this._instance = new this();
-    
-            let pairSchema = mongoose.Schema({
-                name: String,
-                timestamp: String
-            }, { versionKey: false });
-    
-            this._instance._model = db.model('test', pairSchema);
-    
-            return this._instance;
-        }
-    
-        async insertTests() {
-    
-            const tests = [
-                {name: 't1', timestamp: Date.now()},
-                {name: 't2', timestamp: Date.now()},
-                {name: 't3', timestamp: Date.now()},
-                {name: 't4', timestamp: Date.now()},
-            ];
-    
-            try {
-                return this._model.insertMany(tests, {
-                    ordered: false
-                });
-            }
-            catch (err) {
-                throw new Error(`${this.constructor.name} insertMany: ${err}`);
-            }
-        }
-    
-        async all() {
-            return await this._model.find({});
-        }
-    
-        async bulkSaveTest(tests) {
-            for (let p of tests) {
-                p.timestamp = Date.now();
-            }
-    
-            // !!! "TypeError: path.indexOf is not a function" occurs here
-            let res = await this._model.bulkSave(tests);
-            return res;
-        }
-    
-    }
-      const testModel = TestModel.create();
-      await testModel.insertTests();
-      let tests = await testModel.all();
-      assert.ok(await testModel.bulkSaveTest(tests));
+      model.insertMany(tests, {
+          ordered: false
+      });
+      const entries = await model.find({});
+      for (const p of entries) {
+        p.timestamp = Date.now();
+      }
+
+      // !!! "TypeError: path.indexOf is not a function" occurs here
+      const res = await model.bulkSave(entries);
+      assert.ok(res);
     });
   });
 

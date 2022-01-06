@@ -316,14 +316,6 @@ describe('model: populate:', function() {
       });
   });
 
-  it('fail on undefined id update', function() {
-    const BlogPost = db.model('BlogPost', blogPostSchema);
-
-    assert.throws(function() {
-      BlogPost.findByIdAndUpdate(undefined, { $set: { _creator: {} } });
-    }, /id cannot be undefined/);
-  });
-
   it('across DBs', function(done) {
     const db = start();
     const db2 = db.useDb('mongoose_test2');

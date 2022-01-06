@@ -7563,22 +7563,22 @@ describe('Model', function() {
 
     });
     it('Using bulkSave should not trigger an error (gh-11071)', async function() {
-    
+
       const pairSchema = mongoose.Schema({
-          name: String,
-          timestamp: String
+        name: String,
+        timestamp: String
       }, { versionKey: false });
-    
+
       const model = db.model('test', pairSchema);
       const tests = [
         { name: 't1', timestamp: Date.now() },
         { name: 't2', timestamp: Date.now() },
         { name: 't3', timestamp: Date.now() },
-        { name: 't4', timestamp: Date.now() },
+        { name: 't4', timestamp: Date.now() }
       ];
 
       model.insertMany(tests, {
-          ordered: false
+        ordered: false
       });
       const entries = await model.find({});
       for (const p of entries) {

@@ -26,4 +26,8 @@ async function run() {
   await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).cursor().eachAsync(async(res) => {
     console.log(res);
   });
+
+  for await (const obj of Test.aggregate<ITest>()) {
+    obj.name;
+  }
 }

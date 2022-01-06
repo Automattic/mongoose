@@ -2766,6 +2766,13 @@ declare module 'mongoose' {
 
   class Aggregate<R> {
     /**
+     * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js
+     * You do not need to call this function explicitly, the JavaScript runtime
+     * will call it for you.
+     */
+    [Symbol.asyncIterator](): AsyncIterableIterator<Unpacked<R>>;
+
+    /**
      * Sets an option on this aggregation. This function will be deprecated in a
      * future release. */
     addCursorFlag(flag: string, value: boolean): this;

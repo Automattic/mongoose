@@ -10973,14 +10973,15 @@ describe('document', function() {
     });
     const Order = db.model('Order', orderSchema);
 
-    const order = await Order.create({ cumulativeConsumption: [{ unit: 'bar', value: 42 }] });
-
-    order.cumulativeConsumption = [{ unit: 'bar', value: 42 }];
+    const createdOrder = await Order.create({ cumulativeConsumption: [{ unit: 'bar', value: 42 }] });
+    const order = await Order.findOne({ _id: createdOrder._id });
+    order.cumulativeConsumption = [{ value: 42, unit: 'bar' }];
     order.cumulativeConsumption[0].value = 43;
 
     const documentIsModified = order.isModified();
     const pathisModified = order.isModified('cumulativeConsumption');
 
+    assert.ok(order.$__delta());
     assert.equal(documentIsModified, true);
     assert.equal(pathisModified, true);
   });

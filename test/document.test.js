@@ -10962,4 +10962,26 @@ describe('document', function() {
     await new Test(doc).save();
 
   });
+
+  it('Document#isModified() marks document as modified correctly when `_id` is false (gh-11172)', async() => {
+    const orderSchema = new Schema({
+      cumulativeConsumption: [{
+        _id: false,
+        unit: String,
+        value: Number
+      }]
+    });
+    const Order = db.model('Order', orderSchema);
+
+    const order = await Order.create({ cumulativeConsumption: [{ unit: 'bar', value: 42 }] });
+
+    order.cumulativeConsumption = [{ unit: 'bar', value: 42 }];
+    order.cumulativeConsumption[0].value = 43;
+
+    const documentIsModified = order.isModified();
+    const pathisModified = order.isModified('cumulativeConsumption');
+
+    assert.equal(documentIsModified, true);
+    assert.equal(pathisModified, true);
+  });
 });

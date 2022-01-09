@@ -3252,8 +3252,14 @@ declare module 'mongoose' {
     /** String representation of what type this is, like 'ObjectID' or 'Number' */
     instance: string;
 
+    /** True if this SchemaType has a required validator. False otherwise. */
+    isRequired?: boolean;
+
     /** The options this SchemaType was instantiated with */
     options: AnyObject;
+
+    /** The path to this SchemaType in a Schema. */
+    path: string;
 
     /**
      * Set the model that this path refers to. This is the option that [populate](https://mongoosejs.com/docs/populate.html)
@@ -3287,6 +3293,9 @@ declare module 'mongoose' {
 
     /** Declares an unique index. */
     unique(bool: boolean): this;
+
+    /** The validators that Mongoose should run to validate properties at this SchemaType's path. */
+    validators: { message?: string; type?: string; validator?: Function }[];
 
     /** Adds validator(s) for this document path. */
     validate(obj: RegExp | Function | any, errorMsg?: string,

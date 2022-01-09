@@ -135,7 +135,7 @@ on to the underlying MongoDB driver.
 mongoose.connect(uri, options);
 ```
 
-A full list of options can be found on the [MongoDB Node.js driver docs for `connect()`](https://mongodb.github.io/node-mongodb-native/4.2/classes/MongoClient.html#connect).
+A full list of options can be found on the [MongoDB Node.js driver docs for `MongoClientOptions`](https://mongodb.github.io/node-mongodb-native/4.2/interfaces/MongoClientOptions.html).
 Mongoose passes options to the driver without modification, modulo a few
 exceptions that are explained below.
 

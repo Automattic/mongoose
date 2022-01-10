@@ -18,6 +18,8 @@ function conventionalSyntax(): void {
   const doc = new Test({ foo: '42' });
   console.log(doc.foo);
   doc.save();
+
+  const doc2 = new Test<{ foo: string }>({});
 }
 
 function rawDocSyntax(): void {

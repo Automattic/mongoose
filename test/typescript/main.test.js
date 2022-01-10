@@ -155,7 +155,9 @@ describe('typescript syntax', function() {
   it('models', function() {
     const errors = runTest('models.ts');
     printTSErrors(errors);
-    assert.equal(errors.length, 0);
+    assert.equal(errors.length, 1);
+    const messageText = errors[0].messageText.messageText;
+    assert.ok(/Argument of type .* not assignable to parameter of type .*foo: string;.*/.test(messageText), messageText);
   });
 
   it('methods', function() {

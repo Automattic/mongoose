@@ -31,7 +31,7 @@ interface ITest extends Document {
   name?: string;
 }
 
-schema.pre<ITest>('save', function(next) {
+schema.pre('save', function(next) {
   console.log(this.name);
 });
 

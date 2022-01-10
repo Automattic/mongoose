@@ -7562,6 +7562,33 @@ describe('Model', function() {
       assert.ok(err == null);
 
     });
+    it('Using bulkSave should not trigger an error (gh-11071)', async function() {
+
+      const pairSchema = mongoose.Schema({
+        name: String,
+        timestamp: String
+      }, { versionKey: false });
+
+      const model = db.model('test', pairSchema);
+      const tests = [
+        { name: 't1', timestamp: Date.now() },
+        { name: 't2', timestamp: Date.now() },
+        { name: 't3', timestamp: Date.now() },
+        { name: 't4', timestamp: Date.now() }
+      ];
+
+      model.insertMany(tests, {
+        ordered: false
+      });
+      const entries = await model.find({});
+      for (const p of entries) {
+        p.timestamp = Date.now();
+      }
+
+      // !!! "TypeError: path.indexOf is not a function" occurs here
+      const res = await model.bulkSave(entries);
+      assert.ok(res);
+    });
   });
 
   describe('Setting the explain flag', function() {

@@ -116,6 +116,17 @@ query instanceof Query;
 Test.findOne().where({ name: 'test' });
 Test.where().find({ name: 'test' });
 
+// Projection
+const p0: Record<string, number> = Test.find().projection({
+  age: 1,
+  parent: 1,
+  'docs.id': 1
+});
+const p1: Record<string, number> = Test.find().projection('age docs.id');
+const p2: Record<string, number> | null = Test.find().projection();
+const p3: null = Test.find().projection(null);
+
+
 // Super generic query
 function testGenericQuery(): void {
   interface CommonInterface<T> extends Document {

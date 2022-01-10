@@ -2407,7 +2407,7 @@ declare module 'mongoose' {
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
     projection(): ProjectionFields<DocType> | null;
     projection(fields: null): null;
-    projection(fields?: ProjectionFields<DocType>): ProjectionFields<DocType>;
+    projection(fields?: ProjectionFields<DocType> | string): ProjectionFields<DocType>;
 
     /** Determines the MongoDB nodes from which to read. */
     read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;

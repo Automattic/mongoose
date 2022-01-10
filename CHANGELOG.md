@@ -1,3 +1,18 @@
+6.1.6 / 2022-01-10
+==================
+ * perf(document): delay creating document event emitter until used to improve memory usage, several small improvements to improve initing docs with large arrays #10400
+ * fix(model): avoid `bulkSave()` error when `versionKey: false` #11186 #11071 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(model): revert #11079: `findByIdAndUpdate(undefined)` breaking change #11149
+ * fix(index.d.ts): support strings in deep populate #11181 [ivalduan](https://github.com/ivalduan)
+ * fix(index.d.ts): rename map() -> transform() to line up with change in v6.0 #11161
+ * fix(index.d.ts): allow new Model<DocType>(obj) for stricter type checks #11148
+ * fix(index.d.ts): make Schema.prototype.pre() and post() generics default to HydratedDocument<DocType> #11180
+ * docs: improve autoCreate docs #11116
+ * docs(schematype): add missing parameter to example #11185 [kerolloz](https://github.com/kerolloz)
+ * docs(connections): use updated link to list of MongoDB Node driver `connect()` options #11184 [splinter](https://github.com/splinter)
+ * docs(aggregate): fix formatting #11191 [enieber](https://github.com/enieber)
+ * docs: fix broken link #11179 [khairnarsaurabh23](https://github.com/khairnarsaurabh23)
+
 6.1.5 / 2022-01-04
 ==================
  * perf(index.d.ts): simplify Schema typedef for query helpers and methods to significantly reduce TS compiler overhead #10349

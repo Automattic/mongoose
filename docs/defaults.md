@@ -33,7 +33,7 @@ You can disable this behavior by setting the `setDefaultsOnInsert` option to `fa
 You can also set `setDefaultsOnInsert` to `false` globally:
 
 ```javascript
-mongoose.set('setDefaultsOnInsert', false);`
+mongoose.set('setDefaultsOnInsert', false);
 ```
 
 ### Default functions and `this`

@@ -37,22 +37,18 @@ const Test = db.model('Test', schema);
 await Test.findOne(); // Will throw "Operation timed out" error because `db` isn't connected to MongoDB
 ```
 
-If you are using an application, like a bot, that wishes to connect to Mongoose, you must ensure that you are connecting before the bot activates.
-For example, when working with discord bots, the last line of your index file is `client.login(token)`.
-You want to place the connection string, `mongoose.connect().then()` before this line.
-Do not place it in an event handler like `client.on('message')`, as this activates after you have logged in to the bot.
-
 <a class="anchor" href="#not-local"> **Q**</a>. I am able to connect locally but when I try to connect to MongoDB Atlas I get this error. What gives?
 
-You must ensure that you have whitelisted your ip on [mongodb](https://docs.atlas.mongodb.com/security/ip-access-list/) to let it connect.
+You must ensure that you have whitelisted your ip on [mongodb](https://docs.atlas.mongodb.com/security/ip-access-list/) to allow Mongoose to connect.
 You can allow access from all ips with `0.0.0.0/0`.
 
 <hr id="not-a-function" />
 
 <a class="anchor" href="#not-a-function">**Q**</a>. x.$__y is not a function. What gives?
 
-**A**. This issue is a result of having multiple versions of mongoose installed that are incompatible with each other. Run `npm list | grep "mongoose"` to
-find and remedy the problem.
+**A**. This issue is a result of having multiple versions of mongoose installed that are incompatible with each other.
+Run `npm list | grep "mongoose"` to find and remedy the problem.
+If you're storing schemas or models in a separate npm package, please list Mongoose in `peerDependencies` rather than `dependencies` in your separate package.
 
 <hr id="unique-doesnt-work" />
 

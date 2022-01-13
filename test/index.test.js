@@ -868,16 +868,22 @@ describe('mongoose module:', function() {
     });
     it('Allows a syncIndexes global option (gh-11030)', async function() {
       const m = new mongoose.Mongoose();
-      m.set('syncIndexes', true);
 
+      m.set('debug', true);
       const db = await m.connect('mongodb://localhost:27017/mongoose_test_11030');
 
       const schema = new m.Schema({
-        title: String,
+        title: String
       });
-
-      const Movie = db.model('Movie', schema);
-
+      const syncFalse = db.model('Movie', schema);
+      await syncFalse.collection.createIndex({ title: 1 });
+      let indexes = await syncFalse.listIndexes();
+      assert.equal(indexes.length, 2);
+      m.set('syncIndexes', true);
+      const syncTrue = db.model('Sync', schema);
+      await syncTrue.collection.createIndex({ title: 1 });
+      indexes = await syncTrue.listIndexes();
+      assert.equal(indexes.length, 1);
     });
   });
 });

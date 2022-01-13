@@ -872,23 +872,22 @@ describe('mongoose module:', function() {
       m.set('debug', true);
       const db = await m.connect('mongodb://localhost:27017/mongoose_test_11030');
       const schema = new m.Schema({
-        title: String
+        title: {type: String, index: true}
       });
-      const syncFalse = db.model('Sync', schema, 'Sync');
-      await syncFalse.collection.createIndex({ title: 1 });
-      await syncFalse.init();
+      const syncFalse = db.model('NoSync', schema, 'NoSync');
       const Indexes = await syncFalse.listIndexes();
       console.log(Indexes);
       assert.equal(Indexes.length, 2);
-      await db.connection.db.dropCollection('Sync');
+      syncFalse.collection.drop();
+      mongoose.connection.models = {};
       m.set('syncIndexes', true);
-      const syncTrue = db.model('Sync', schema, 'Sync');
-      await syncTrue.collection.createIndex({ title: 1 });
-      await syncTrue.init();
+      const syncSchema = new m.Schema({ name: String });
+      m.connection.db.collection('Sync').createIndex({name: 1});
+      const syncTrue = db.model('Sync', syncSchema, 'Sync');
       const Index = await syncTrue.listIndexes();
       console.log(Index);
-      assert.equal(Index.length, 1);
-      await db.connection.db.dropCollection('Sync');
+
+      
       // https://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes
     });
   });

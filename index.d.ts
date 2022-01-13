@@ -756,7 +756,7 @@ declare module 'mongoose' {
 
   type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
 
-  export type HydratedDocument<DocType, TMethods = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<any, any, DocType> & Require_id<DocType> & TVirtuals & TMethods);
+  export type HydratedDocument<DocType, TMethods = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethods);
 
   interface IndexesDiff {
     /** Indexes that would be created in mongodb. */

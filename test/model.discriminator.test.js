@@ -1867,4 +1867,19 @@ describe('model', function() {
     assert.equal(res.c.gc.gc11, 'eleventy');
     assert.equal(res.c.gc.gc12, 110);
   });
+  it('Should allow reusing discriminators (gh-10931)', async function() {
+    const options = { discriminatorKey: 'kind', overwriteModels: false };
+    const eventSchema = new mongoose.Schema({ time: Date }, options);
+    const Event = db.model('Event', eventSchema);
+
+    const ClickedLinkEvent = Event.discriminator('ClickedLink',
+      new mongoose.Schema({ url: String }, options));
+
+
+    const genericEvent = new Event({ time: Date.now(), url: 'google.com' });
+    assert.ok(!genericEvent.url);
+
+    const clickedEvent = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    assert.ok(clickedEvent.url);
+  });
 });

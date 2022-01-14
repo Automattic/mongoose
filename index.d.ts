@@ -2109,6 +2109,11 @@ declare module 'mongoose' {
       /** Returns this sub-documents parent document. */
       $parent(): Document;
     }
+
+    class ArraySubdocument<IdType = any> extends Subdocument<IdType> {
+      /** Returns this sub-documents parent array. */
+      parentArray(): Types.DocumentArray<unknown>;
+    }
   }
 
   type ReturnsNewDoc = { new: true } | { returnOriginal: false } | {returnDocument: 'after'};

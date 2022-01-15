@@ -2817,6 +2817,7 @@ declare module 'mongoose' {
 
     /** Execute the aggregation with explain */
     explain(callback?: Callback): Promise<any>;
+    explain(verbosity?: string, callback?: Callback): Promise<any>;
 
     /** Combines multiple aggregation pipelines. */
     facet(options: PipelineStage.Facet['$facet']): this;

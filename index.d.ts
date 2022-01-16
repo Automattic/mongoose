@@ -114,18 +114,21 @@ declare module 'mongoose' {
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
+  /*! ignore */
+  type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
+
   /**
    * Returns true if Mongoose can cast the given value to an ObjectId, or
    * false otherwise.
    */
   export function isValidObjectId(v: any): boolean;
 
-  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, skipInit?: boolean): Model<T>;
+  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
     schema?: Schema<T, U, TQueryHelpers>,
     collection?: string,
-    skipInit?: boolean
+    options?: CompileModelOptions
   ): U;
 
   /** Returns an array of model names created on this instance of Mongoose. */
@@ -371,12 +374,12 @@ declare module 'mongoose' {
     models: { [index: string]: Model<any> };
 
     /** Defines or retrieves a model. */
-    model<T>(name: string, schema?: Schema<any>, collection?: string): Model<T>;
+    model<T>(name: string, schema?: Schema<any>, collection?: string, options?: CompileModelOptions): Model<T>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<T, U, TQueryHelpers>,
       collection?: string,
-      skipInit?: boolean
+      options?: CompileModelOptions
     ): U;
 
     /** Returns an array of model names created on this connection. */

@@ -2117,7 +2117,7 @@ declare module 'mongoose' {
 
   type UnpackedIntersection<T, U> = T extends (infer V)[] ? (V & U)[] : T & U;
 
-  type ProjectionFields<DocType> = {[Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: number} & Record<string, number>;
+  type ProjectionFields<DocType> = {[Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any} & Record<string, any>;
 
   class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
     _mongooseOptions: MongooseQueryOptions;

@@ -118,7 +118,7 @@ Test.where().find({ name: 'test' });
 
 // Projection
 const p0: Record<string, number> = Test.find().projection({
-  age: 1,
+  age: true,
   parent: 1,
   'docs.id': 1
 });

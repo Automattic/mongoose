@@ -881,7 +881,7 @@ describe('mongoose module:', function() {
       await syncFalse.collection.createIndex({ name: 1 });
       await m.deleteModel('Sync');
       m.set('syncIndexes', true);
-      const syncSchema = new m.Schema({ nickname: {type: String, index: true} });
+      const syncSchema = new m.Schema({ nickname: { type: String, index: true } });
       const syncTrue = db.model('Sync', syncSchema, 'Sync');
       await syncTrue.init();
       const Index = await syncTrue.listIndexes();

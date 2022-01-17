@@ -664,10 +664,16 @@ describe('versioning', function() {
     post1.comments = [{ likedBy: ['test'] }];
     await post1.save();
 
-    const comment = post2.comments[0];
+    let comment = post2.comments[0];
     comment.likedBy.push('Some User');
 
     const err = await post2.save().then(() => null, err => err);
     assert.equal(err.name, 'VersionError');
+
+    const post3 = await Test.findById(entry._id).exec();
+    comment = post3.comments[0];
+    comment.likedBy.push('Some User');
+    await post3.save();
+    assert.equal(post3.__v, 2);
   });
 });

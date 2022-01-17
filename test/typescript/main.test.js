@@ -4,44 +4,6 @@ const assert = require('assert');
 const typescript = require('typescript');
 const tsconfig = require('./tsconfig.json');
 
-function printTSErrors(errors) {
-  if (!process.env.D) {
-    return;
-  }
-  if (!errors.length) {
-    return;
-  }
-  errors.forEach(e => {
-    if (typeof e.messageText === 'string') {
-      let lineStart = e.file.text.slice(0, e.start).lastIndexOf('\n');
-      if (lineStart === -1) {
-        lineStart = 0;
-      }
-      let lineEnd = e.file.text.slice(e.start).indexOf('\n');
-      if (lineEnd === -1) {
-        lineEnd = e.file.text.length;
-      } else {
-        lineEnd += e.start;
-      }
-      console.log(`-----\n\nERROR: ${e.messageText}\n\n${e.file.text.slice(lineStart, lineEnd - 1)}\n${' '.repeat(e.start - lineStart - 1)}^`);
-    } else if (e.messageText.messageText) {
-      let lineStart = e.file.text.slice(0, e.start).lastIndexOf('\n');
-      if (lineStart === -1) {
-        lineStart = 0;
-      }
-      let lineEnd = e.file.text.slice(e.start).indexOf('\n');
-      if (lineEnd === -1) {
-        lineEnd = e.file.text.length;
-      } else {
-        lineEnd += e.start;
-      }
-      console.log(`-----\n\nERROR: ${e.messageText.messageText}\n\n${e.file.text.slice(lineStart, lineEnd - 1)}\n${' '.repeat(e.start - lineStart - 1)}^`);
-    } else {
-      console.log(e);
-    }
-  });
-}
-
 describe('typescript syntax', function() {
   this.timeout(60000);
 
@@ -193,7 +155,9 @@ describe('typescript syntax', function() {
   it('models', function() {
     const errors = runTest('models.ts');
     printTSErrors(errors);
-    assert.equal(errors.length, 0);
+    assert.equal(errors.length, 1);
+    const messageText = errors[0].messageText.messageText;
+    assert.ok(/Argument of type .* not assignable to parameter of type .*foo: string;.*/.test(messageText), messageText);
   });
 
   it('methods', function() {
@@ -215,7 +179,9 @@ describe('typescript syntax', function() {
   it('document', function() {
     const errors = runTest('document.ts', { strict: true });
     printTSErrors(errors);
-    assert.equal(errors.length, 0);
+    assert.equal(errors.length, 1);
+    const messageText = errors[0].messageText;
+    assert.ok(/Type 'ObjectId' is not assignable to type 'number'/.test(messageText), messageText);
   });
 
   it('populate', function() {
@@ -248,4 +214,42 @@ function runTest(file, configOverride) {
   const emitResult = program.emit();
 
   return typescript.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
+}
+
+function printTSErrors(errors) {
+  if (!process.env.D) {
+    return;
+  }
+  if (!errors.length) {
+    return;
+  }
+  errors.forEach(e => {
+    if (typeof e.messageText === 'string') {
+      let lineStart = e.file.text.slice(0, e.start).lastIndexOf('\n');
+      if (lineStart === -1) {
+        lineStart = 0;
+      }
+      let lineEnd = e.file.text.slice(e.start).indexOf('\n');
+      if (lineEnd === -1) {
+        lineEnd = e.file.text.length;
+      } else {
+        lineEnd += e.start;
+      }
+      console.log(`-----\n\nERROR: ${e.messageText}\n\n${e.file.text.slice(lineStart, lineEnd - 1)}\n${' '.repeat(e.start - lineStart - 1)}^`);
+    } else if (e.messageText.messageText) {
+      let lineStart = e.file.text.slice(0, e.start).lastIndexOf('\n');
+      if (lineStart === -1) {
+        lineStart = 0;
+      }
+      let lineEnd = e.file.text.slice(e.start).indexOf('\n');
+      if (lineEnd === -1) {
+        lineEnd = e.file.text.length;
+      } else {
+        lineEnd += e.start;
+      }
+      console.log(`-----\n\nERROR: ${e.messageText.messageText}\n\n${e.file.text.slice(lineStart, lineEnd - 1)}\n${' '.repeat(e.start - lineStart - 1)}^`);
+    } else {
+      console.log(e);
+    }
+  });
 }

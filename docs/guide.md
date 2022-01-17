@@ -239,6 +239,8 @@ Disable the behavior by setting the `autoIndex` option of your schema to `false`
   // or
   mongoose.createConnection('mongodb://user:pass@localhost:port/database', { autoIndex: false });
   // or
+  mongoose.set('autoIndex', false);
+  // or
   animalSchema.set('autoIndex', false);
   // or
   new Schema({..}, { autoIndex: false });
@@ -444,28 +446,28 @@ default by setting [`mongoose.set('autoIndex', false);`](/docs/api/mongoose.html
 
 <h3 id="autoCreate"><a href="#autoCreate">option: autoCreate</a></h3>
 
-Before Mongoose builds indexes, it calls `Model.createCollection()`
-to create the underlying collection in MongoDB if `autoCreate` is set to true.
-Calling `createCollection()`
-sets the [collection's default collation](https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations)
-based on the [collation option](#collation) and establishes the collection as
-a capped collection if you set the [`capped` schema option](#capped). Like
-`autoIndex`, setting `autoCreate` to true is helpful for development and
-test environments.
+Before Mongoose builds indexes, it calls `Model.createCollection()` to create the underlying collection in MongoDB by default.
+Calling `createCollection()` sets the [collection's default collation](https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations) based on the [collation option](#collation) and establishes the collection as
+a capped collection if you set the [`capped` schema option](#capped).
+
+You can disable this behavior by setting `autoCreate` to `false` using [`mongoose.set('autoCreate', false)`](/docs/api/mongoose.html#mongoose_Mongoose-set).
+Like `autoIndex`, `autoCreate` is helpful for development and test environments, but you may want to disable it for production to avoid unnecessary database calls.
 
 Unfortunately, `createCollection()` cannot change an existing collection.
-For example, if you add `capped: 1024` to your schema and the existing
-collection is not capped, `createCollection()` will throw an error.
-Generally, `autoCreate` should be `false` for production environments.
+For example, if you add `capped: { size: 1024 }` to your schema and the existing collection is not capped, `createCollection()` will **not** overwrite the existing collection.
+That is because the MongoDB server does not allow changing a collection's options without dropping the collection first.
 
 ```javascript
-const schema = new Schema({..}, { autoCreate: true, capped: 1024 });
-const Clock = mongoose.model('Clock', schema);
-// Mongoose will create the capped collection for you.
-```
+const schema = new Schema({ name: String }, {
+  autoCreate: false,
+  capped: { size: 1024 }
+});
+const Test = mongoose.model('Test', schema);
 
-Unlike `autoIndex`, `autoCreate` is `false` by default. You can change this
-default by setting [`mongoose.set('autoCreate', true);`](/docs/api/mongoose.html#mongoose_Mongoose-set)
+// No-op if collection already exists, even if the collection is not capped.
+// This means that `capped` won't be applied if the 'tests' collection already exists.
+await Test.createCollection();
+```
 
 <h3 id="bufferCommands"><a href="#bufferCommands">option: bufferCommands</a></h3>
 

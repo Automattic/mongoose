@@ -33,7 +33,9 @@ const files = [
   'lib/options/SchemaNumberOptions.js',
   'lib/options/SchemaObjectIdOptions.js',
   'lib/options/SchemaStringOptions.js',
-  'lib/types/DocumentArray/methods/index.js'
+  'lib/types/DocumentArray/methods/index.js',
+  'lib/types/subdocument.js',
+  'lib/types/ArraySubdocument.js'
 ];
 
 module.exports = {

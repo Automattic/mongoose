@@ -7329,7 +7329,6 @@ describe('document', function() {
 
     const User = db.model('User', userSchema);
 
-
     const position = {
       geometry: {
         type: 'Point',
@@ -10960,6 +10959,29 @@ describe('document', function() {
     };
 
     await new Test(doc).save();
+  });
 
+  it('correctly handles modifying array subdoc after setting array subdoc to same value (gh-11172)', async function() {
+    const Order = db.model('Order', new Schema({
+      cumulativeConsumption: [{
+        _id: false,
+        unit: String,
+        value: Number
+      }]
+    }));
+
+    await Order.create({
+      cumulativeConsumption: [{ unit: 'foo', value: 123 }, { unit: 'bar', value: 42 }]
+    });
+
+    const doc = await Order.findOne();
+    doc.cumulativeConsumption = doc.toObject().cumulativeConsumption;
+
+    const match = doc.cumulativeConsumption.find(o => o.unit === 'bar');
+    match.value = 43;
+    match.unit = 'baz';
+
+    assert.ok(doc.isModified());
+    assert.ok(doc.isModified('cumulativeConsumption.1'));
   });
 });

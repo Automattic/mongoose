@@ -1,3 +1,33 @@
+6.1.6 / 2022-01-10
+==================
+ * perf(document): delay creating document event emitter until used to improve memory usage, several small improvements to improve initing docs with large arrays #10400
+ * fix(model): avoid `bulkSave()` error when `versionKey: false` #11186 #11071 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(model): revert #11079: `findByIdAndUpdate(undefined)` breaking change #11149
+ * fix(index.d.ts): support strings in deep populate #11181 [ivalduan](https://github.com/ivalduan)
+ * fix(index.d.ts): rename map() -> transform() to line up with change in v6.0 #11161
+ * fix(index.d.ts): allow new Model<DocType>(obj) for stricter type checks #11148
+ * fix(index.d.ts): make Schema.prototype.pre() and post() generics default to HydratedDocument<DocType> #11180
+ * docs: improve autoCreate docs #11116
+ * docs(schematype): add missing parameter to example #11185 [kerolloz](https://github.com/kerolloz)
+ * docs(connections): use updated link to list of MongoDB Node driver `connect()` options #11184 [splinter](https://github.com/splinter)
+ * docs(aggregate): fix formatting #11191 [enieber](https://github.com/enieber)
+ * docs: fix broken link #11179 [khairnarsaurabh23](https://github.com/khairnarsaurabh23)
+
+6.1.5 / 2022-01-04
+==================
+ * perf(index.d.ts): simplify Schema typedef for query helpers and methods to significantly reduce TS compiler overhead #10349
+ * fix(document): allow populating deeply nested models as strings #11168 #11160 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(query): allow calling limit() and skip() with a string #11017
+ * fix(cursor): propery apply selected fields when loading discriminator docs with query cursor #11130
+ * fix(mongoose+connection): clone schema correctly when passing instance of another Mongoose instance's Schema to Connection.prototype.model() #11047
+ * fix(index.d.ts): handle primitives with FlattenMaps #11117
+ * fix(index.d.ts): enforce id on lean query result type #11118
+ * fix(index.d.ts): export facet stage type #11150 [mhoc](https://github.com/mhoc)
+ * fix(index.d.ts): correct return type of projection method #11176 [EugeneKorshenko](https://github.com/EugeneKorshenko)
+ * fix(index.d.ts): additional fix for `$group` pipeline stage #11140 #11067 [EugeneKorshenko](https://github.com/EugeneKorshenko)
+ * docs: update CONTRIBUTING.md for TS tests #11164 [ahmedelshenawy25](https://github.com/ahmedelshenawy25)
+ * docs: use es6 object destructuring instead of regular dot operator for accessing value in object #11147 [Shivaansh-Agarwal](https://github.com/Shivaansh-Agarwal)
+
 6.1.4 / 2021-12-27
 ==================
  * fix(document): handle save with undefined nested doc under subdoc #11110

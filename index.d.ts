@@ -114,18 +114,21 @@ declare module 'mongoose' {
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
+  /*! ignore */
+  type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
+
   /**
    * Returns true if Mongoose can cast the given value to an ObjectId, or
    * false otherwise.
    */
   export function isValidObjectId(v: any): boolean;
 
-  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, skipInit?: boolean): Model<T>;
+  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
     schema?: Schema<T, U, TQueryHelpers>,
     collection?: string,
-    skipInit?: boolean
+    options?: CompileModelOptions
   ): U;
 
   /** Returns an array of model names created on this instance of Mongoose. */
@@ -371,12 +374,12 @@ declare module 'mongoose' {
     models: { [index: string]: Model<any> };
 
     /** Defines or retrieves a model. */
-    model<T>(name: string, schema?: Schema<any>, collection?: string): Model<T>;
+    model<T>(name: string, schema?: Schema<any>, collection?: string, options?: CompileModelOptions): Model<T>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<T, U, TQueryHelpers>,
       collection?: string,
-      skipInit?: boolean
+      options?: CompileModelOptions
     ): U;
 
     /** Returns an array of model names created on this connection. */
@@ -756,7 +759,7 @@ declare module 'mongoose' {
 
   type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
 
-  export type HydratedDocument<DocType, TMethods = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<any, any, DocType> & Require_id<DocType> & TVirtuals & TMethods);
+  export type HydratedDocument<DocType, TMethods = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethods);
 
   interface IndexesDiff {
     /** Indexes that would be created in mongodb. */
@@ -767,7 +770,7 @@ declare module 'mongoose' {
 
   export const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethods = {}, TVirtuals = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
-    new(doc?: AnyKeys<T> & AnyObject, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethods, TVirtuals>;
+    new<DocType = AnyKeys<T> & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethods, TVirtuals>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[], cb: Function): Aggregate<Array<R>>;
@@ -1221,7 +1224,7 @@ declare module 'mongoose' {
     /** optional query options like sort, limit, etc */
     options?: any;
     /** deep populate */
-    populate?: PopulateOptions | Array<PopulateOptions>;
+    populate?: string | PopulateOptions | (string | PopulateOptions)[];
     /**
      * If true Mongoose will always set `path` to an array, if false Mongoose will
      * always set `path` to a document. Inferred from schema by default.
@@ -1340,8 +1343,8 @@ declare module 'mongoose' {
     plugin(fn: (schema: Schema<DocType>, opts?: any) => void, opts?: any): this;
 
     /** Defines a post hook for the model. */
-    post<T extends Document>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T>): this;
-    post<T extends Document>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
     post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PostMiddlewareFunction<T>): this;
     post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PostMiddlewareFunction<T, Array<any>>): this;
@@ -1349,8 +1352,8 @@ declare module 'mongoose' {
     post<T = M>(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<T>): this;
     post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
 
-    post<T extends Document>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
-    post<T extends Document>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
@@ -1359,8 +1362,8 @@ declare module 'mongoose' {
     post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
 
     /** Defines a pre hook for the model. */
-    pre<T extends Document>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
-    pre<T extends Document>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
+    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
+    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Query<any, any>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
@@ -1627,7 +1630,7 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: T | ((this: any, doc: any) => T);
+    default?: T | ((this: any, doc: any) => Partial<T>);
 
     /**
      * The model that `populate()` should use if populating this path.
@@ -2097,7 +2100,7 @@ declare module 'mongoose' {
       _id: this;
     }
 
-    class Subdocument extends Document {
+    class Subdocument<IdType = any> extends Document<IdType> {
       $isSingleNested: true;
 
       /** Returns the top level document of this sub-document. */
@@ -2108,6 +2111,11 @@ declare module 'mongoose' {
 
       /** Returns this sub-documents parent document. */
       $parent(): Document;
+    }
+
+    class ArraySubdocument<IdType = any> extends Subdocument<IdType> {
+      /** Returns this sub-documents parent array. */
+      parentArray(): Types.DocumentArray<unknown>;
     }
   }
 
@@ -2337,7 +2345,7 @@ declare module 'mongoose' {
      * Runs a function `fn` and treats the return value of `fn` as the new value
      * for the query to resolve to.
      */
-    map<MappedType>(fn: (doc: ResultType) => MappedType): QueryWithHelpers<MappedType, DocType, THelpers, RawDocType>;
+    transform<MappedType>(fn: (doc: ResultType) => MappedType): QueryWithHelpers<MappedType, DocType, THelpers, RawDocType>;
 
     /** Specifies an `$maxDistance` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     maxDistance(val: number): this;
@@ -2403,7 +2411,7 @@ declare module 'mongoose' {
     populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
-    projection(fields?: any | null): any;
+    projection(fields?: any | null): this;
 
     /** Determines the MongoDB nodes from which to read. */
     read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
@@ -2766,6 +2774,13 @@ declare module 'mongoose' {
 
   class Aggregate<R> {
     /**
+     * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js
+     * You do not need to call this function explicitly, the JavaScript runtime
+     * will call it for you.
+     */
+    [Symbol.asyncIterator](): AsyncIterableIterator<Unpacked<R>>;
+
+    /**
      * Sets an option on this aggregation. This function will be deprecated in a
      * future release. */
     addCursorFlag(flag: string, value: boolean): this;
@@ -2805,6 +2820,7 @@ declare module 'mongoose' {
 
     /** Execute the aggregation with explain */
     explain(callback?: Callback): Promise<any>;
+    explain(verbosity?: string, callback?: Callback): Promise<any>;
 
     /** Combines multiple aggregation pipelines. */
     facet(options: PipelineStage.Facet['$facet']): this;

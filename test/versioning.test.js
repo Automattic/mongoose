@@ -651,4 +651,23 @@ describe('versioning', function() {
     assert.ok(err);
     assert.equal(err.name, 'VersionError');
   });
+
+  it('adds version to filter if pushing to a nested array (gh-11108)', async function() {
+    const Test = db.model('Test', Schema({ comments: [{ likedBy: [String] }] }));
+    const entry = await Test.create({
+      comments: [{ likedBy: ['Friends', 'Family'] }]
+    });
+
+    const post1 = await Test.findById(entry._id).exec();
+    const post2 = await Test.findById(entry._id).exec();
+
+    post1.comments = [{ likedBy: ['test'] }];
+    await post1.save();
+
+    const comment = post2.comments[0];
+    comment.likedBy.push('Some User');
+
+    const err = await post2.save().then(() => null, err => err);
+    assert.equal(err.name, 'VersionError');
+  });
 });

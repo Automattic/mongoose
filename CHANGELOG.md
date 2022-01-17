@@ -1,3 +1,14 @@
+6.1.7 / 2022-01-17
+==================
+ * fix(model): correct handling for $push on a nested array #11108
+ * fix(update): correctly apply timestamps to update pipelines #11151
+ * fix(document): correctly handle modifying array subdocument after setting array subdocument to itself #11172
+ * fix(index.d.ts): allow passing options to model() in place of removed `skipInit` #11137
+ * fix(aggregate): allow passing verbosity to Aggregate.prototype.explain() #11144
+ * fix(index.d.ts): avoid TypeScript inferring _id as any type with HydratedDocument #11085
+ * docs: fix Node.js Driver compat link #11214 [wesbos](https://github.com/wesbos)
+ * docs: remove extraneous backquote #11204 [joebowbeer](https://github.com/joebowbeer)
+
 6.1.6 / 2022-01-10
 ==================
  * perf(document): delay creating document event emitter until used to improve memory usage, several small improvements to improve initing docs with large arrays #10400

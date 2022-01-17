@@ -114,18 +114,21 @@ declare module 'mongoose' {
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
+  /*! ignore */
+  type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
+
   /**
    * Returns true if Mongoose can cast the given value to an ObjectId, or
    * false otherwise.
    */
   export function isValidObjectId(v: any): boolean;
 
-  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, skipInit?: boolean): Model<T>;
+  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
     schema?: Schema<T, U, TQueryHelpers>,
     collection?: string,
-    skipInit?: boolean
+    options?: CompileModelOptions
   ): U;
 
   /** Returns an array of model names created on this instance of Mongoose. */
@@ -371,12 +374,12 @@ declare module 'mongoose' {
     models: { [index: string]: Model<any> };
 
     /** Defines or retrieves a model. */
-    model<T>(name: string, schema?: Schema<any>, collection?: string): Model<T>;
+    model<T>(name: string, schema?: Schema<any>, collection?: string, options?: CompileModelOptions): Model<T>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<T, U, TQueryHelpers>,
       collection?: string,
-      skipInit?: boolean
+      options?: CompileModelOptions
     ): U;
 
     /** Returns an array of model names created on this connection. */
@@ -756,7 +759,7 @@ declare module 'mongoose' {
 
   type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
 
-  export type HydratedDocument<DocType, TMethods = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<any, any, DocType> & Require_id<DocType> & TVirtuals & TMethods);
+  export type HydratedDocument<DocType, TMethods = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethods);
 
   interface IndexesDiff {
     /** Indexes that would be created in mongodb. */
@@ -2109,6 +2112,11 @@ declare module 'mongoose' {
       /** Returns this sub-documents parent document. */
       $parent(): Document;
     }
+
+    class ArraySubdocument<IdType = any> extends Subdocument<IdType> {
+      /** Returns this sub-documents parent array. */
+      parentArray(): Types.DocumentArray<unknown>;
+    }
   }
 
   type ReturnsNewDoc = { new: true } | { returnOriginal: false } | {returnDocument: 'after'};
@@ -2812,6 +2820,7 @@ declare module 'mongoose' {
 
     /** Execute the aggregation with explain */
     explain(callback?: Callback): Promise<any>;
+    explain(verbosity?: string, callback?: Callback): Promise<any>;
 
     /** Combines multiple aggregation pipelines. */
     facet(options: PipelineStage.Facet['$facet']): this;

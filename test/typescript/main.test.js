@@ -179,7 +179,9 @@ describe('typescript syntax', function() {
   it('document', function() {
     const errors = runTest('document.ts', { strict: true });
     printTSErrors(errors);
-    assert.equal(errors.length, 0);
+    assert.equal(errors.length, 1);
+    const messageText = errors[0].messageText;
+    assert.ok(/Type 'ObjectId' is not assignable to type 'number'/.test(messageText), messageText);
   });
 
   it('populate', function() {

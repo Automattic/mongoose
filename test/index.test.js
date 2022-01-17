@@ -869,25 +869,24 @@ describe('mongoose module:', function() {
     it('Allows a syncIndexes global option (gh-11030)', async function() {
       const m = new mongoose.Mongoose();
 
-      m.set('debug', true);
       const db = await m.connect('mongodb://localhost:27017/mongoose_test_11030');
       const schema = new m.Schema({
         title: { type: String, index: true }
       });
       const syncFalse = db.model('Sync', schema, 'Sync');
+      await syncFalse.collection.dropIndexes();
       await syncFalse.init();
       const Indexes = await syncFalse.listIndexes();
-      console.log(Indexes);
       assert.equal(Indexes.length, 2);
       await syncFalse.collection.createIndex({ name: 1 });
-      delete m.connection.models['Sync'];
+      await m.deleteModel('Sync');
       m.set('syncIndexes', true);
-      const syncSchema = new m.Schema({ title: String });
+      const syncSchema = new m.Schema({ nickname: {type: String, index: true} });
       const syncTrue = db.model('Sync', syncSchema, 'Sync');
       await syncTrue.init();
       const Index = await syncTrue.listIndexes();
-      console.log(Index);
-      assert.equal(Index.length, 1);
+      assert.equal(Index[0].name, '_id_');
+      assert.equal(Index.length, 2);
     });
   });
 });

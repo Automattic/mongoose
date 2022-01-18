@@ -9,10 +9,9 @@
 const start = require('./common');
 
 const assert = require('assert');
-const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;
-const random = utils.random;
+const random = require('./util').random;
 const Schema = mongoose.Schema;
 const DocObjectId = mongoose.Types.ObjectId;
 

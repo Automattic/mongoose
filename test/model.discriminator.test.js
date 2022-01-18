@@ -1874,7 +1874,7 @@ describe('model', function() {
 
     const ClickedLinkEvent = Event.discriminator('ClickedLink',
       new mongoose.Schema({ url: String }, options));
-    const reUse = Event.discriminator('ClickedLink', new mongoose.Schema({ url: String }, options))
+    const reUse = Event.discriminator('ClickedLink', new mongoose.Schema({ url: String }, options));
     assert.ok(reUse);
 
 
@@ -1884,7 +1884,7 @@ describe('model', function() {
     const clickedEvent = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
     assert.ok(clickedEvent.url);
 
-    const reUseEvent = new reUse({ time: Date.now(), url: 'test.com'});
+    const reUseEvent = new reUse({ time: Date.now(), url: 'test.com' });
     assert.ok(reUseEvent.url);
   });
 });

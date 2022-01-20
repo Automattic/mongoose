@@ -20,7 +20,6 @@
   "license": "MIT",
   "dependencies": {
     "@lukeed/ms": "^2.0.0",
-    "@types/node": "< 17.0.6",
     "bson": "^4.2.2",
     "kareem": "2.3.3",
     "mongodb": "4.3.0",

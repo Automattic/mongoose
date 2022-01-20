@@ -46,8 +46,9 @@ describe('typescript syntax', function() {
   it('queries', function() {
     const errors = runTest('queries.ts', { strict: true });
     printTSErrors(errors);
-    assert.equal(errors.length, 1);
+    assert.equal(errors.length, 2);
     assert.ok(errors[0].messageText.includes('notAQueryHelper'), errors[0].messageText);
+    assert.ok(errors[1].messageText.includes('Property \'age\' is missing'), errors[0].messageText);
   });
 
   it('create', function() {

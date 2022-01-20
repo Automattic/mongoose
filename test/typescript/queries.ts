@@ -185,3 +185,19 @@ function gh10786() {
     updateQuery.phone = 'XXXX';
   }
 }
+
+async function gh11156(): Promise<void> {
+  interface User {
+    name: string;
+    age: number;
+  }
+
+  const schema = new Schema<User>({
+    name: String,
+    age: Number
+  });
+
+  const User: Model<User> = model<User>('User', schema);
+
+  const overwritten: User = await User.findOne<Pick<User, 'name'>>({}).orFail();
+}

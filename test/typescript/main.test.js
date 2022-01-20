@@ -46,8 +46,9 @@ describe('typescript syntax', function() {
   it('queries', function() {
     const errors = runTest('queries.ts', { strict: true });
     printTSErrors(errors);
-    assert.equal(errors.length, 1);
+    assert.equal(errors.length, 2);
     assert.ok(errors[0].messageText.includes('notAQueryHelper'), errors[0].messageText);
+    assert.ok(errors[1].messageText.includes('Property \'age\' is missing'), errors[0].messageText);
   });
 
   it('create', function() {
@@ -179,7 +180,9 @@ describe('typescript syntax', function() {
   it('document', function() {
     const errors = runTest('document.ts', { strict: true });
     printTSErrors(errors);
-    assert.equal(errors.length, 0);
+    assert.equal(errors.length, 1);
+    const messageText = errors[0].messageText;
+    assert.ok(/Type 'ObjectId' is not assignable to type 'number'/.test(messageText), messageText);
   });
 
   it('populate', function() {

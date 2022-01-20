@@ -115,3 +115,22 @@ async function gh11117(): Promise<void> {
   const json = items[0].toJSON();
   const someDate: Date = json.someDate;
 }
+
+function gh11085(): void {
+  interface User {
+    username: string;
+    email: string;
+  }
+
+  const userSchema = new Schema<User>({
+    username: String,
+    email: String
+  });
+
+  const UserModel = model('User', userSchema);
+
+  const newUser = new UserModel();
+
+  const _id: number = newUser._id;
+  const _id2: Types.ObjectId = newUser._id;
+}

@@ -6668,36 +6668,47 @@ describe('Model', function() {
     }, /Model\.discriminator.*MyModel/);
   });
 
-  describe('exists() (gh-6872)', function() {
-    it('returns true if document exists', function() {
-      const Model = db.model('Test', new Schema({ name: String }));
-
-      return Model.create({ name: 'foo' }).
-        then(() => Model.exists({ name: 'foo' })).
-        then(res => assert.ok(res)).
-        then(() => Model.exists({})).
-        then(res => assert.ok(res)).
-        then(() => Model.exists()).
-        then(res => assert.ok(res));
+  describe('exists() (gh-6872) (gh-8097) (gh-11138)', function() {
+    it('returns a query', () => {
+      const User = db.model('Test', new Schema({ name: String }));
+      const query = User.exists({ name: 'Hafez' });
+      assert.ok(query instanceof mongoose.Query);
     });
 
-    it('returns false if no doc exists', function() {
+    it('returns lean document with `_id` only if document exists', async function() {
       const Model = db.model('Test', new Schema({ name: String }));
 
-      return Model.create({ name: 'foo' }).
-        then(() => Model.exists({ name: 'bar' })).
-        then(res => assert.ok(!res)).
-        then(() => Model.exists({ otherProp: 'foo' }, { strict: false })).
-        then(res => assert.ok(!res));
+      const docFromCreation = await Model.create({ name: 'foo' });
+      const existingDocument = await Model.exists({ _id: docFromCreation._id });
+      assert.equal(existingDocument._id.toString(), docFromCreation._id.toString());
+      assert.deepStrictEqual(existingDocument, { _id: docFromCreation._id });
+      assert.ok(isLean(existingDocument));
     });
 
-    it('options (gh-8075)', function() {
+
+    it('returns `null` when no document exists', async() => {
       const Model = db.model('Test', new Schema({ name: String }));
 
-      return Model.exists({}).
-        then(res => assert.ok(!res)).
-        then(() => Model.exists({}, { explain: true })).
-        then(res => assert.ok(res));
+      const existingDocument = await Model.exists({ name: 'I do not exist' });
+      assert.equal(existingDocument, null);
+    });
+    it('returns `null` if no doc exists', async function() {
+      const Model = db.model('Test', new Schema({ name: String }));
+
+      await Model.create({ name: 'foo' });
+
+      const existingDocumentWithStrict = await Model.exists({ otherProp: 'foo' }, { strict: false });
+      assert.equal(existingDocumentWithStrict, null);
+    });
+
+    it('options (gh-8075)', async function() {
+      const Model = db.model('Test', new Schema({ name: String }));
+
+      const existingDocument = await Model.exists({});
+      assert.equal(existingDocument, null);
+
+      const explainResult = await Model.exists({}, { explain: true });
+      assert.ok(explainResult);
     });
   });
 
@@ -7680,4 +7691,8 @@ describe('Model', function() {
 
 async function delay(ms) {
   await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isLean(document) {
+  return document != null && !(document instanceof mongoose.Document);
 }

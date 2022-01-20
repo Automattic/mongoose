@@ -2125,6 +2125,8 @@ declare module 'mongoose' {
 
   type UnpackedIntersection<T, U> = T extends (infer V)[] ? (V & U)[] : T & U;
 
+  type ProjectionFields<DocType> = {[Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any} & Record<string, any>;
+
   class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
     _mongooseOptions: MongooseQueryOptions;
 
@@ -2411,7 +2413,9 @@ declare module 'mongoose' {
     populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
-    projection(fields?: any | null): this;
+    projection(): ProjectionFields<DocType> | null;
+    projection(fields: null): null;
+    projection(fields?: ProjectionFields<DocType> | string): ProjectionFields<DocType>;
 
     /** Determines the MongoDB nodes from which to read. */
     read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;

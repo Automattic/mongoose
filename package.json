@@ -27,8 +27,7 @@
     "mquery": "4.0.0",
     "ms": "2.1.2",
     "regexp-clone": "1.0.0",
-    "sift": "13.5.2",
-    "sliced": "1.0.1"
+    "sift": "13.5.2"
   },
   "devDependencies": {
     "@babel/core": "7.10.5",

@@ -19,13 +19,13 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@lukeed/ms": "^2.0.0",
     "@types/node": "< 17.0.6",
     "bson": "^4.2.2",
     "kareem": "2.3.3",
     "mongodb": "4.3.0",
     "mpath": "0.8.4",
     "mquery": "4.0.0",
-    "ms": "2.1.2",
     "regexp-clone": "1.0.0",
     "sift": "13.5.2",
     "sliced": "1.0.1"

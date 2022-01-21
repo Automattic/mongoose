@@ -8,7 +8,7 @@ const start = require('./common');
 
 const assert = require('assert');
 const clone = require('../lib/utils').clone;
-const random = require('../lib/utils').random;
+const random = require('./util').random;
 const util = require('util');
 
 const mongoose = start.mongoose;

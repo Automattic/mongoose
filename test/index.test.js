@@ -798,10 +798,10 @@ describe('mongoose module:', function() {
       await m.disconnect();
     });
 
-    it('connect with url doesnt cause unhandled rejection (gh-6997)', function() {
+    it('connect with url doesnt cause unhandled rejection (gh-6997)', async function() {
       const m = new mongoose.Mongoose;
       const _options = Object.assign({}, options, { serverSelectionTimeoutMS: 100 });
-      const error = m.connect('mongodb://doesnotexist:27009/test', _options).then(() => null, err => err);
+      const error = await m.connect('mongodb://doesnotexist:27009/test', _options).then(() => null, err => err);
 
       assert.ok(error);
     });

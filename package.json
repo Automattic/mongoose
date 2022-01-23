@@ -74,7 +74,7 @@
     "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 5.x && git push origin 5.x --tags && npm publish --tag legacy",
-    "start:mongo:rs": "node ./tools/repl.js",
+    "mongo": "node ./tools/repl.js",
     "test": "mocha --exit ./test/*.test.js ./test/typescript/main.test.js",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"

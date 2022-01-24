@@ -1958,8 +1958,6 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('avoids edge case with middleware cloning buffers (gh-5702)', function(done) {
-      const uuidParse = require('uuid');
-
       function toUUID(string) {
         if (!string) {
           return null;

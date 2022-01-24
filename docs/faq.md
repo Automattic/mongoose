@@ -12,6 +12,44 @@ hr {
 }
 </style>
 
+<hr id="operation-buffering-timed-out" />
+
+<a class="anchor" href="#operation-buffering-timed-out">**Q**</a>. Operation `...` timed out after 10000 ms. What gives?
+
+**A**. At its core, this issue stems from not connecting to MongoDB.
+You can use Mongoose before connecting to MongoDB, but you must connect at some point. For example:
+
+```javascript
+await mongoose.createConnection(mongodbUri);
+
+const Test = mongoose.model('Test', schema);
+
+await Test.findOne(); // Will throw "Operation timed out" error because didn't call `mongoose.connect()`
+```
+
+```javascript
+await mongoose.connect(mongodbUri);
+
+const db = mongoose.createConnection();
+
+const Test = db.model('Test', schema);
+
+await Test.findOne(); // Will throw "Operation timed out" error because `db` isn't connected to MongoDB
+```
+
+<a class="anchor" href="#not-local"> **Q**</a>. I am able to connect locally but when I try to connect to MongoDB Atlas I get this error. What gives?
+
+You must ensure that you have whitelisted your ip on [mongodb](https://docs.atlas.mongodb.com/security/ip-access-list/) to allow Mongoose to connect.
+You can allow access from all ips with `0.0.0.0/0`.
+
+<hr id="not-a-function" />
+
+<a class="anchor" href="#not-a-function">**Q**</a>. x.$__y is not a function. What gives?
+
+**A**. This issue is a result of having multiple versions of mongoose installed that are incompatible with each other.
+Run `npm list | grep "mongoose"` to find and remedy the problem.
+If you're storing schemas or models in a separate npm package, please list Mongoose in `peerDependencies` rather than `dependencies` in your separate package.
+
 <hr id="unique-doesnt-work" />
 
 <a class="anchor" href="#unique-doesnt-work">**Q**</a>. I declared a schema property as `unique` but I can still save duplicates. What gives?

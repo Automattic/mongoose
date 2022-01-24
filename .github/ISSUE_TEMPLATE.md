@@ -1,5 +1,9 @@
 <!-- *Before creating an issue please make sure you are using the latest version of mongoose -->
 
+<!-- *Getting a `Operaion ... timed out after 10000ms` error? Read this FAQ entry: https://mongoosejs.com/docs/faq.html#operation-buffering-timed-out -->
+
+<!-- *Getting a `x.$__y is not a function` error? Read this FAQ entry: https://mongoosejs.com/docs/faq.html#not-a-function -->
+
 **Do you want to request a *feature* or report a *bug*?**
 
 **What is the current behavior?**

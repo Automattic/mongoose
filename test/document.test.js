@@ -10984,4 +10984,18 @@ describe('document', function() {
     assert.ok(doc.isModified());
     assert.ok(doc.isModified('cumulativeConsumption.1'));
   });
+
+  it('handles `String` with `type` (gh-11199)', function() {
+    String.type = String;
+    const schema = new mongoose.Schema({
+      something: String,
+      somethingElse: { type: String, trim: true }
+    });
+
+    const Test = db.model('Test', schema);
+    const doc = new Test({ something: 'test', somethingElse: 'test 2' });
+    assert.equal(typeof doc.something, 'string');
+    assert.equal(typeof doc.somethingElse, 'string');
+    delete String.type;
+  });
 });

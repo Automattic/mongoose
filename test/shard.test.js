@@ -12,11 +12,11 @@ const uri = process.env.MONGOOSE_SHARD_TEST_URI;
 
 if (!uri) {
   console.log([
-      '\x1b[31m',
-      'You\'re not testing shards!',
-      'Please set the MONGOOSE_SHARD_TEST_URI env variable.',
-      'e.g: `mongodb://localhost:27017/database',
-      'Sharding must already be enabled on your database'
+    '\x1b[31m',
+    'You\'re not testing shards!',
+    'Please set the MONGOOSE_SHARD_TEST_URI env variable.',
+    'e.g: `mongodb://localhost:27017/database',
+    'Sharding must already be enabled on your database'
   ].join('\n'));
 
   return;

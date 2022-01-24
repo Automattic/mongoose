@@ -13,7 +13,6 @@ const random = require('./util').random;
 const Utils = require('../lib/utils');
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
-const ObjectIdType = mongoose.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
 const util = require('./util');
 const uuid = require('uuid');
@@ -927,7 +926,7 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     function compareObjectIds(a, b) {
-      if (a instanceof ObjectIdType && b instanceof ObjectIdType) {
+      if (a instanceof DocumentObjectId && b instanceof DocumentObjectId) {
         return a.toString('hex') === b.toString('hex');
       }
     }

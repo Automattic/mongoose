@@ -68,14 +68,20 @@ declare module 'mongoose' {
   export function connect(uri: string, callback: CallbackWithoutResult): void;
   export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
 
+  export interface SyncIndexesOptions {
+    continueOnError?: boolean
+  }
+  export type SyncIndexesResult = Array<string>| Record<string, Array<string> | SyncIndexesError>
+
+
   /**
      * Makes the indexes in MongoDB match the indexes defined in every model's
      * schema. This function will drop any indexes that are not defined in
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-  export function syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
-  export function syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
+  export function syncIndexes(options?:SyncIndexesOptions): Promise<SyncIndexesResult>;
+  export function syncIndexes(options: SyncIndexesOptions | null, callback: Callback<SyncIndexesResult>): void;
 
   /* Tells `sanitizeFilter()` to skip the given object when filtering out potential query selector injection attacks.
    * Use this method when you have a known query selector that you want to use. */
@@ -930,8 +936,8 @@ declare module 'mongoose' {
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-    syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
-    syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
+    syncIndexes(options?: SyncIndexesOptions): Promise<Array<string> | >;
+    syncIndexes(options: SyncIndexesOptions | null, callback: Callback<Array<string>>): void;
 
     /**
      * Does a dry-run of Model.syncIndexes(), meaning that

@@ -3,7 +3,7 @@
 const start = require('./common');
 
 const assert = require('assert');
-const random = require('../lib/utils').random;
+const random = require('./util').random;
 const stream = require('stream');
 
 const collection = 'blogposts_' + random();

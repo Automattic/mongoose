@@ -24,10 +24,9 @@
     "kareem": "2.3.3",
     "mongodb": "4.3.0",
     "mpath": "0.8.4",
-    "mquery": "4.0.0",
+    "mquery": "4.0.1",
     "regexp-clone": "1.0.0",
-    "sift": "13.5.2",
-    "sliced": "1.0.1"
+    "sift": "13.5.2"
   },
   "devDependencies": {
     "@babel/core": "7.10.5",

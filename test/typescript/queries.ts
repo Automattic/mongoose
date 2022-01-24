@@ -212,3 +212,23 @@ async function gh11156(): Promise<void> {
 
   const overwritten: User = await User.findOne<Pick<User, 'name'>>({}).orFail();
 }
+
+async function gh11041(): Promise<void> {
+  interface User {
+    name: string;
+    email: string;
+    avatar?: string;
+  }
+
+  // 2. Create a Schema corresponding to the document interface.
+  const schema = new Schema<User>({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    avatar: String
+  });
+
+  // 3. Create a Model.
+  const MyModel = model<User>('User', schema);
+
+  const maybeDoc3: { _id: Types.ObjectId } = await MyModel.findOne({}).populate('someField').exec();
+}

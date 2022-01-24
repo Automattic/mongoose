@@ -3,7 +3,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const chalk = require('chalk');
 const random = require('./util').random;
 
 const mongoose = start.mongoose;
@@ -12,14 +11,13 @@ const Schema = mongoose.Schema;
 const uri = process.env.MONGOOSE_SHARD_TEST_URI;
 
 if (!uri) {
-  console.log(
-    chalk.red(
-      '\n', 'You\'re not testing shards!',
-      '\n', 'Please set the MONGOOSE_SHARD_TEST_URI env variable.', '\n',
-      'e.g: `mongodb://localhost:27017/database', '\n',
+  console.log([
+      '\x1b[31m',
+      'You\'re not testing shards!',
+      'Please set the MONGOOSE_SHARD_TEST_URI env variable.',
+      'e.g: `mongodb://localhost:27017/database',
       'Sharding must already be enabled on your database'
-    )
-  );
+  ].join('\n'));
 
   return;
 }

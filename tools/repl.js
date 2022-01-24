@@ -6,31 +6,29 @@ run().catch(error => {
 });
 
 async function run () {
-  const ReplSet = require('mongodb-topology-manager').ReplSet;
+  const ReplSet = require('mongodb-memory-server').MongoMemoryReplSet;
 
   // Create new instance
-  const topology = new ReplSet('mongod', [{
-    // mongod process options
-    options: {
-      bind_ip: 'localhost', port: 31000, dbpath: `/data/db/31000`
-    }
-  }, {
-    // mongod process options
-    options: {
-      bind_ip: 'localhost', port: 31001, dbpath: `/data/db/31001`
-    }
-  }, {
-    // Type of node
-    arbiterOnly: true,
-    // mongod process options
-    options: {
-      bind_ip: 'localhost', port: 31002, dbpath: `/data/db/31002`
-    }
-  }], {
-    replSet: 'rs'
+  const replSet = new ReplSet({
+    binary: {
+      version: process.argv[3]
+    },
+    instanceOpts: [
+      // Set the expiry job in MongoDB to run every second
+      { 
+        port: 27017,
+        args: ["--setParameter", "ttlMonitorSleepSecs=1"] },
+    ],
+    dbName: 'mongoose_test',
+    replSet: {
+      name: "rs0",
+      count: 2,
+      storageEngine: "wiredTiger",
+    },
   });
 
-  await topology.start();
-
-  console.log('done');
+  await replSet.start();
+  await replSet.waitUntilRunning();
+  console.log("MongoDB-ReplicaSet is now running.")
+  console.log(replSet.getUri("mongoose_test"));
 }

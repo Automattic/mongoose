@@ -4,43 +4,29 @@ on:
     push:
 jobs:
   test:
+    name: Node ${{ matrix.node }}, Mongo ${{ matrix.mongodb-version }}, on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         node: [12, 14, 16]
         os: [ubuntu-18.04, ubuntu-20.04]
-        include:
-          - os: ubuntu-18.04
-            mongo-os: ubuntu1804
-            mongo: 4.0.2
-          - os: ubuntu-20.04
-            mongo-os: ubuntu2004
-            mongo: 5.0.2
-    name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongo }}
+        mongodb-version: [4.0, 4.2, 4.4, 5.0]
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup node
-        uses: actions/setup-node@v1
+      - name: Setup Node.js v${{ matrix.node }}
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Start MongoDB v${{ matrix.mongodb-version }}
+        uses: supercharge/mongodb-github-action@1.7.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
+          mongodb-replica-set: test-rs
+
       - run: npm install
-
-      - name: Setup
-        run: |
-          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}.tgz
-          tar xf mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}.tgz
-          mkdir -p ./data/db/27017 ./data/db/27000
-          printf "\n--timeout 8000" >> ./test/mocha.opts
-          ./mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
-          sleep 2
-          mongod --version
-          mkdir ./test/typescript/node_modules
-          ln -s `pwd` ./test/typescript/node_modules/mongoose
-          echo `pwd`/mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin >> $GITHUB_PATH
-
       - run: npm test
 
   lint:
@@ -50,7 +36,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: 14
 

@@ -1506,6 +1506,11 @@ declare module 'mongoose' {
      */
     optimisticConcurrency?: boolean;
     /**
+     * If `plugin()` called with tags, Mongoose will only apply plugins to schemas that have
+     * a matching tag in `pluginTags`
+     */
+    pluginTags?: string[];
+    /**
      * Allows setting query#read options at the schema level, providing us a way to apply default ReadPreferences
      * to all queries derived from a model.
      */

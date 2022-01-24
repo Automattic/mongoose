@@ -319,6 +319,41 @@ describe('mongoose module:', function() {
     await mong.disconnect();
   });
 
+  it('declaring global plugins with tags (gh-9780)', async function() {
+    const mong = new Mongoose();
+    const schema1 = new Schema({}, { pluginTags: ['tag1'] });
+    const schema2 = new Schema({}, { pluginTags: ['tag2'] });
+    const schema3 = new Schema({});
+
+    mong.plugin(function(s) {
+      s.add({ prop1: String });
+    }, { tags: ['tag1'] });
+
+    mong.plugin(function(s) {
+      s.add({ prop2: String });
+    }, { tags: ['tag1', 'tag2'] });
+
+    mong.plugin(function(s) {
+      s.add({ prop3: String });
+    });
+
+    const Test1 = mong.model('Test1', schema1);
+    const Test2 = mong.model('Test2', schema2);
+    const Test3 = mong.model('Test3', schema3);
+
+    assert.ok(Test1.schema.path('prop1'));
+    assert.ok(Test1.schema.path('prop2'));
+    assert.ok(Test1.schema.path('prop3'));
+
+    assert.ok(!Test2.schema.path('prop1'));
+    assert.ok(Test2.schema.path('prop2'));
+    assert.ok(Test2.schema.path('prop3'));
+
+    assert.ok(!Test3.schema.path('prop1'));
+    assert.ok(!Test3.schema.path('prop2'));
+    assert.ok(Test3.schema.path('prop3'));
+  });
+
   it('global plugins on nested schemas underneath embedded discriminators (gh-7370)', function() {
     const m = new Mongoose();
 

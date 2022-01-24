@@ -913,7 +913,7 @@ describe('model: findOneAndUpdate:', function() {
             assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
             assert.ok(compareObjectIds(doc.contacts[0].account, a2._id));
             assert.deepEqual(doc.contacts[0].account, a2._id);
-            assert(compareObjectIds(doc.contacts[0].account, a2._id))
+            assert(compareObjectIds(doc.contacts[0].account, a2._id));
 
             User.findOne({ name: 'parent' }, function(error, doc) {
               assert.ifError(error);

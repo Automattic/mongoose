@@ -48,6 +48,12 @@ const BlogPost = new Schema({
     default: 'kandinsky'
   }
 });
+const commentData = {
+  title: 'test comment',
+  date: new Date(),
+  body: 'this be some crazzzyyyyy text that would go in a comment',
+  comments: [{title: 'second level', date: new Date(), body: 'texttt'}]
+};
 
 const blogData = {
   title: 'dummy post',
@@ -84,12 +90,6 @@ for (let i = 0; i < 1000; i++) {
 for (let i = 0; i < 10000; i++) {
   blogData10000.comments.push(commentData);
 }
-const commentData = {
-  title: 'test comment',
-  date: new Date(),
-  body: 'this be some crazzzyyyyy text that would go in a comment',
-  comments: [{title: 'second level', date: new Date(), body: 'texttt'}]
-};
 mongoose.model('BlogPost', BlogPost);
 
 suite.add('Casting - Embedded Docs - 0 Docs', {

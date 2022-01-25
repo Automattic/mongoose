@@ -1296,6 +1296,37 @@ describe('connections:', function() {
       assert.ok(result['Floor'].name, 'MongoServerError');
       assert.ok(Array.isArray(result['Office']));
     });
+
+    it('mongoose.syncIndexes(...) accepts `continueOnError`', async() => {
+      const m = new mongoose.Mongoose;
+      await m.connect('mongodb://localhost:27017/connection_sync_indexes_test');
+
+      // Arrange
+      const buildingSchema = new Schema({ name: String }, { autoIndex: false });
+      buildingSchema.index({ name: 1 });
+      m.model('Building', buildingSchema);
+
+      const floorSchema = new Schema({ name: String }, { autoIndex: false });
+      floorSchema.index({ name: 1 }, { unique: true });
+      const Floor = m.model('Floor', floorSchema);
+
+      const officeSchema = new Schema({ name: String }, { autoIndex: false });
+      officeSchema.index({ name: 1 });
+      m.model('Office', officeSchema);
+
+      await Floor.insertMany([
+        { name: 'I am a duplicate' },
+        { name: 'I am a duplicate' }
+      ]);
+
+      // Act
+      const result = await m.syncIndexes({ continueOnError: true });
+
+      // Assert
+      assert.ok(Array.isArray(result['Building']));
+      assert.ok(result['Floor'].name, 'MongoServerError');
+      assert.ok(Array.isArray(result['Office']));
+    });
   });
 
 });

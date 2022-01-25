@@ -149,6 +149,7 @@
       "no-whitespace-before-property": "error",
       "no-buffer-constructor": "warn",
       "no-console": "off",
+      "no-constant-condition": "off",
       "no-multi-spaces": "error",
       "func-call-spacing": "error",
       "no-trailing-spaces": "error",

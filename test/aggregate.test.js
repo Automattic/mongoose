@@ -53,7 +53,7 @@ function setupData(db, callback) {
  *
  * @param {String} semver, `3.4`, specify minimum compatible mongod version
  * @param {Object} ctx, `this`, so that mocha tests can be skipped
- * @return {Promise.<void>}
+ * @return {Promise<void>}
  */
 async function onlyTestAtOrAbove(semver, ctx) {
   const versions = {

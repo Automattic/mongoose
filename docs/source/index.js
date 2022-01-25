@@ -1,5 +1,9 @@
 
 'use strict';
+
+const fs = require('fs');
+const yaml = require('js-yaml');
+
 exports['index.pug'] = require('./home');
 exports['docs/api.pug'] = require('./api');
 exports['docs/prior.pug'] = require('./prior');
@@ -42,5 +46,8 @@ exports['docs/compatibility.md'] = {
 };
 exports['docs/search.pug'] = { title: 'Search' };
 exports['docs/enterprise.md'] = { title: 'Mongoose for Enterprise', markdown: true };
-exports['docs/sponsors.md'] = { title: 'Mongoose Sponsors', markdown: true };
+exports['docs/sponsors.pug'] = {
+  title: 'Mongoose Sponsors',
+  sponsors: yaml.load(fs.readFileSync(`${__dirname}/../sponsor-data/sponsors.yml`, 'utf8'))
+};
 exports['docs/async-await.md'] = { title: 'Using Async/Await with Mongoose', markdown: true };

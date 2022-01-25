@@ -57,9 +57,9 @@ function setupData(db, callback) {
  */
 async function onlyTestAtOrAbove(semver, ctx) {
   const versions = {
-    '3.4' : [3, 4],
-    '3.6' : [3, 6]
-  }
+    3.4: [3, 4],
+    3.6: [3, 6]
+  };
 
   if (semver.length !== 3 || Object.keys(versions).indexOf(semver) === -1) {
     throw new TypeError('onlyTestAtOrAbove expects either ' + Object.keys(versions).join(', ') + ' as first parameter.');

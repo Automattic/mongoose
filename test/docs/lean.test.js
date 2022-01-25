@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const { serialize } = require('v8');
 const start = require('../common');
 
 // This file is in `es-next` because it uses async/await for convenience
@@ -27,23 +28,17 @@ describe('Lean Tutorial', function() {
 
     await MyModel.create({ name: 'test' });
 
-    // Module that estimates the size of an object in memory
-    const sizeof = require('object-sizeof');
-
     const normalDoc = await MyModel.findOne();
     // To enable the `lean` option for a query, use the `lean()` function.
     const leanDoc = await MyModel.findOne().lean();
-
-    sizeof(normalDoc); // approximately 600
-    sizeof(leanDoc); // 36, more than 10x smaller!
 
     // In case you were wondering, the JSON form of a Mongoose doc is the same
     // as the POJO. This additional memory only affects how much memory your
     // Node.js process uses, not how much data is sent over the network.
     JSON.stringify(normalDoc).length === JSON.stringify(leanDoc.length); // true
     // acquit:ignore:start
-    assert.ok(sizeof(normalDoc) >= 400 && sizeof(normalDoc) <= 800, sizeof(normalDoc));
-    assert.equal(sizeof(leanDoc), 36);
+    assert.ok(serialize(normalDoc).length >= 300 && serialize(normalDoc).length <= 800, serialize(normalDoc).length);
+    assert.equal(serialize(leanDoc).length, 32);
     assert.equal(JSON.stringify(normalDoc).length, JSON.stringify(leanDoc).length);
     // acquit:ignore:end
   });

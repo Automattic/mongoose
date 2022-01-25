@@ -53,14 +53,21 @@ function setupData(db, callback) {
  *
  * @param {String} semver, `3.4`, specify minimum compatible mongod version
  * @param {Object} ctx, `this`, so that mocha tests can be skipped
- * @return {Void}
+ * @return {Promise.<void>}
  */
 async function onlyTestAtOrAbove(semver, ctx) {
+  const versions = {
+    '3.4' : [3, 4],
+    '3.6' : [3, 6]
+  }
+
+  if (semver.length !== 3 || Object.keys(versions).indexOf(semver) === -1) {
+    throw new TypeError('onlyTestAtOrAbove expects either ' + Object.keys(versions).join(', ') + ' as first parameter.');
+  }
+
   const version = await start.mongodVersion();
 
-  const desired = semver.split('.').map(function(s) {
-    return parseInt(s);
-  });
+  const desired = versions[semver];
 
   const meetsMinimum = version[0] > desired[0] || (version[0] === desired[0] && version[1] >= desired[1]);
 

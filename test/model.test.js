@@ -6134,13 +6134,13 @@ describe('Model', function() {
 
 
       const coll = 'tests' + random();
-      let M = db.model('Test', new Schema({
+      let Model = db.model('Test', new Schema({
         name: { type: String, index: true }
       }, { autoIndex: false }), coll);
-      let dropped = await M.syncIndexes();
+      let dropped = await Model.syncIndexes();
       assert.deepEqual(dropped, []);
 
-      let indexes = await M.listIndexes();
+      let indexes = await Model.listIndexes();
       assert.deepEqual(indexes.map(i => i.key), [
         { _id: 1 },
         { name: 1 }
@@ -6148,14 +6148,14 @@ describe('Model', function() {
 
       // New model, same collection, index on different property
       db.deleteModel(/Test/);
-      M = db.model('Test', new Schema({
+      Model = db.model('Test', new Schema({
         otherName: { type: String, index: true }
       }, { autoIndex: false }), coll);
 
-      dropped = await M.syncIndexes();
+      dropped = await Model.syncIndexes();
       assert.deepEqual(dropped, ['name_1']);
 
-      indexes = await M.listIndexes();
+      indexes = await Model.listIndexes();
       assert.deepEqual(indexes.map(i => i.key), [
         { _id: 1 },
         { otherName: 1 }
@@ -6163,24 +6163,24 @@ describe('Model', function() {
 
       // New model, same collection, different options
       db.deleteModel(/Test/);
-      M = db.model('Test', new Schema({
+      Model = db.model('Test', new Schema({
         otherName: { type: String, unique: true }
       }, { autoIndex: false }), coll);
 
-      dropped = await M.syncIndexes();
+      dropped = await Model.syncIndexes();
       assert.deepEqual(dropped, ['otherName_1']);
 
-      indexes = await M.listIndexes();
+      indexes = await Model.listIndexes();
       assert.deepEqual(indexes.map(i => i.key), [
         { _id: 1 },
         { otherName: 1 }
       ]);
 
       // Re-run syncIndexes(), shouldn't change anything
-      dropped = await M.syncIndexes();
+      dropped = await Model.syncIndexes();
       assert.deepEqual(dropped, []);
 
-      await M.collection.drop();
+      await Model.collection.drop();
 
     });
 

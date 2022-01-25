@@ -68,20 +68,14 @@ declare module 'mongoose' {
   export function connect(uri: string, callback: CallbackWithoutResult): void;
   export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
 
-  export interface SyncIndexesOptions {
-    continueOnError?: boolean
-  }
-  export type SyncIndexesResult = Array<string>| Record<string, Array<string> | SyncIndexesError>
-
-
   /**
      * Makes the indexes in MongoDB match the indexes defined in every model's
      * schema. This function will drop any indexes that are not defined in
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-  export function syncIndexes(options?:SyncIndexesOptions): Promise<SyncIndexesResult>;
-  export function syncIndexes(options: SyncIndexesOptions | null, callback: Callback<SyncIndexesResult>): void;
+  export function syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
+  export function syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
 
   /* Tells `sanitizeFilter()` to skip the given object when filtering out potential query selector injection attacks.
    * Use this method when you have a known query selector that you want to use. */
@@ -455,7 +449,7 @@ declare module 'mongoose' {
      * _Requires MongoDB >= 3.6.0._ Executes the wrapped async function
      * in a transaction. Mongoose will commit the transaction if the
      * async function executes successfully and attempt to retry if
-     * there was a retriable error.
+     * there was a retryable error.
      */
     transaction(fn: (session: mongodb.ClientSession) => Promise<any>): Promise<any>;
 
@@ -936,8 +930,8 @@ declare module 'mongoose' {
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-    syncIndexes(options?: SyncIndexesOptions): Promise<Array<string> | >;
-    syncIndexes(options: SyncIndexesOptions | null, callback: Callback<Array<string>>): void;
+    syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
+    syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
 
     /**
      * Does a dry-run of Model.syncIndexes(), meaning that
@@ -2130,6 +2124,7 @@ declare module 'mongoose' {
   type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType> = Query<ResultType, DocType, THelpers, RawDocType> & THelpers;
 
   type UnpackedIntersection<T, U> = T extends (infer V)[] ? (V & U)[] : T & U;
+  type UnpackedIntersectionWithNull<T, U> = T extends null ? UnpackedIntersection<T, U> | null : UnpackedIntersection<T, U>;
 
   class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
     _mongooseOptions: MongooseQueryOptions;
@@ -2413,8 +2408,8 @@ declare module 'mongoose' {
     polygon(path: string, ...coordinatePairs: number[][]): this;
 
     /** Specifies paths which should be populated with other documents. */
-    populate<Paths = {}>(path: string | any, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
-    populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
+    populate<Paths = {}>(path: string | any, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
+    populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
     projection(fields?: any | null): this;

@@ -14,7 +14,6 @@ createConnection('mongodb://localhost:27017/test').close();
 
 conn.db.collection('Test').findOne({ name: String }).then(doc => console.log(doc));
 conn.collection('Test').findOne({ name: String }).then(doc => console.log(doc));
-conn.syncIndexes({ continueOnError: false }).then(result => {
-  const a = result['Test'][0];
-  a['Test'].name;
+conn.syncIndexes().then(result => {
+  result;
 });

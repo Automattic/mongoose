@@ -221,7 +221,9 @@ const res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new
 
 <h3 id="document-parameter-to-default-functions"><a href="#document-parameter-to-default-functions">Document Parameter to Default Functions</a></h3>
 
-Mongoose now passes the document as the first parameter to `default` functions, which is helpful for using [arrow functions](https://masteringjs.io/tutorials/fundamentals/arrow) with defaults. This may affect you if you pass a function that expects different parameters to `default`, like `default: mongoose.Types.ObjectId`. See [gh-9633](https://github.com/Automattic/mongoose/issues/9633)
+Mongoose now passes the document as the first parameter to `default` functions, which is helpful for using [arrow functions](https://masteringjs.io/tutorials/fundamentals/arrow) with defaults.
+
+This may affect you if you pass a function that expects different parameters to `default`, like `default: mongoose.Types.ObjectId`. See [gh-9633](https://github.com/Automattic/mongoose/issues/9633). If you're passing a default function that does **not** utilize the document, change `default: myFunction` to `default: () => myFunction()` to avoid accidentally passing parameters that potentially change the behavior.
 
 ```javascript
 const schema = new Schema({

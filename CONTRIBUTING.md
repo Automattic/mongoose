@@ -57,7 +57,7 @@ If you'd like to preview your documentation changes, first commit your changes t
 * `make gendocs`
 * `node static.js`
 
-Visit `http://localhost:8088` and you should see the docs with your local changes. Make sure you `git reset --hard` before committing, because changes to `docs/*` should **not** be in PRs.
+Visit `http://localhost:8089` and you should see the docs with your local changes. Make sure you `git reset --hard` before committing, because changes to `docs/*` should **not** be in PRs.
 
 ### Plugins website
 

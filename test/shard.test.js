@@ -9,10 +9,11 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
 const uri = process.env.MONGOOSE_SHARD_TEST_URI;
+const redColorEscapeCharacter = '\x1b[31m';
 
 if (!uri) {
   console.log([
-    '\x1b[31m',
+    redColorEscapeCharacter,
     'You\'re not testing shards!',
     'Please set the MONGOOSE_SHARD_TEST_URI env variable.',
     'e.g: `mongodb://localhost:27017/database',

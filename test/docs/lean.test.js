@@ -86,7 +86,7 @@ describe('Lean Tutorial', function() {
     });
     function capitalizeFirstLetter(v) {
       // Convert 'bob' -> 'Bob'
-      return v.charAt(0).toUpperCase() + v.substr(1);
+      return v.charAt(0).toUpperCase() + v.substring(1);
     }
     const Person = mongoose.model('Person', personSchema);
     // acquit:ignore:start

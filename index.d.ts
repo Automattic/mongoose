@@ -74,8 +74,8 @@ declare module 'mongoose' {
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-  export function syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
-  export function syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
+  export function syncIndexes(options?: SyncIndexesOptions): Promise<ConnectionSyncIndexesResult>;
+  export function syncIndexes(options: SyncIndexesOptions | null, callback: Callback<ConnectionSyncIndexesResult>): void;
 
   /* Tells `sanitizeFilter()` to skip the given object when filtering out potential query selector injection attacks.
    * Use this method when you have a known query selector that you want to use. */
@@ -165,6 +165,7 @@ declare module 'mongoose' {
   export const version: string;
 
   export type CastError = Error.CastError;
+  export type SyncIndexesError = Error.SyncIndexesError;
 
   type Mongoose = typeof mongoose;
 
@@ -442,8 +443,8 @@ declare module 'mongoose' {
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-    syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
-    syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
+    syncIndexes(options?: SyncIndexesOptions): Promise<ConnectionSyncIndexesResult>;
+    syncIndexes(options: SyncIndexesOptions | null, callback: Callback<ConnectionSyncIndexesResult>): void;
 
     /**
      * _Requires MongoDB >= 3.6.0._ Executes the wrapped async function
@@ -3303,6 +3304,11 @@ declare module 'mongoose' {
       type?: string): this;
   }
 
+  export interface SyncIndexesOptions {
+    continueOnError?: boolean
+  }
+  export type ConnectionSyncIndexesResult = Record<string, OneCollectionSyncIndexesResult>;
+  type OneCollectionSyncIndexesResult = Array<string> & mongodb.MongoServerError;
   type Callback<T = any> = (error: CallbackError, result: T) => void;
 
   type CallbackWithoutResult = (error: CallbackError) => void;
@@ -3330,6 +3336,12 @@ declare module 'mongoose' {
       path: string;
       reason?: NativeError | null;
       model?: any;
+
+      constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
+    }
+    export class SyncIndexesError extends Error {
+      name: 'SyncIndexesError';
+      errors?: Record<string, mongodb.MongoServerError>;
 
       constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
     }

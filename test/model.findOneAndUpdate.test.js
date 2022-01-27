@@ -1958,8 +1958,6 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('avoids edge case with middleware cloning buffers (gh-5702)', function(done) {
-      const uuidParse = require('uuid-parse');
-
       function toUUID(string) {
         if (!string) {
           return null;
@@ -1967,7 +1965,7 @@ describe('model: findOneAndUpdate:', function() {
         if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
           return string;
         }
-        const buffer = uuidParse.parse(string);
+        const buffer = uuid.parse(string);
         return new mongoose.Types.Buffer(buffer).toObject(0x04);
       }
 
@@ -1975,7 +1973,7 @@ describe('model: findOneAndUpdate:', function() {
         if (!buffer || buffer.length !== 16) {
           return null;
         }
-        return uuidParse.unparse(buffer);
+        return uuid.stringify(buffer);
       }
 
       const UserSchema = new mongoose.Schema({
@@ -2022,7 +2020,7 @@ describe('model: findOneAndUpdate:', function() {
         this.skip();
       }
 
-      const uuidParse = require('uuid-parse');
+      const uuid = require('uuid');
       function toUUID(string) {
         if (!string) {
           return null;
@@ -2030,7 +2028,7 @@ describe('model: findOneAndUpdate:', function() {
         if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
           return string;
         }
-        const buffer = uuidParse.parse(string);
+        const buffer = uuid.parse(string);
         return new mongoose.Types.Buffer(buffer).toObject(0x04);
       }
 

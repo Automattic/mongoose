@@ -6,7 +6,7 @@ const cast$expr = require('../../lib/helpers/query/cast$expr');
 
 describe('castexpr', function() {
   it('casts comparisons', function() {
-    const testSchema = new Schema({ date: Date, spent: Number, budget: Number });
+    const testSchema = new Schema({ date: Date, spent: Number, budget: Number, nums: [Number] });
 
     let res = cast$expr({ $eq: ['$date', '2021-06-01'] }, testSchema);
     assert.deepEqual(res, { $eq: ['$date', new Date('2021-06-01')] });
@@ -25,6 +25,9 @@ describe('castexpr', function() {
 
     res = cast$expr({ $gt: ['$spent', '$budget'] }, testSchema);
     assert.deepStrictEqual(res, { $gt: ['$spent', '$budget'] });
+
+    res = cast$expr({ $gt: [{ $last: '$nums' }, '42'] }, testSchema);
+    assert.deepStrictEqual(res, { $gt: [{ $last: '$nums' }, 42] });
   });
 
   it('casts conditions', function() {
@@ -86,5 +89,16 @@ describe('castexpr', function() {
     assert.throws(() => {
       cast$expr({ $eq: [{ $year: '$date' }, 'not a number'] }, testSchema);
     }, /Cast to Number failed/);
+  });
+
+  it('casts $in', function() {
+    const testSchema = new Schema({ nums: [Number], docs: [new Schema({ prop: Number }, { _id: false })] });
+
+    let res = cast$expr({ $in: ['42', '$nums'] }, testSchema);
+    assert.deepStrictEqual(res, { $in: [42, '$nums'] });
+
+    res = cast$expr({ $in: [{ prop: '42' }, '$docs'] }, testSchema);
+    res.$in[0] = res.$in[0].toBSON(); // So `deepStrictEqual()` doesn't complain about subdoc internals
+    assert.deepStrictEqual(res, { $in: [{ prop: 42 }, '$docs'] });
   });
 });

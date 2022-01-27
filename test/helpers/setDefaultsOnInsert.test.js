@@ -44,4 +44,32 @@ describe('setDefaultsOnInsert', function() {
     update = setDefaultsOnInsert({}, AppointmentSchema, update, opts);
     assert.ok(!update.$setOnInsert);
   });
+
+  it('ignores defaults underneath maps (gh-11235)', function() {
+    const PositionSchema = Schema({
+      _id: false,
+      x: { type: Number, default: 0 },
+      y: { type: Number, default: 0 }
+    });
+
+    const MapSchema = Schema({
+      name: { type: String, default: null },
+      enabled: { type: Boolean, default: false },
+      positions: {
+        type: Map,
+        of: [PositionSchema],
+        default: () => ({
+          center: { x: 0, y: 0 },
+          npc_1: { x: 15, y: 36 },
+          npc_2: { x: 76, y: 52 }
+        })
+      }
+    });
+
+    const opts = { upsert: true };
+    let update = { $set: { enabled: true } };
+    update = setDefaultsOnInsert({}, MapSchema, update, opts);
+    assert.ok(!update.$setOnInsert['positions.$*']);
+    assert.ok(update.$setOnInsert['positions'] instanceof Map);
+  });
 });

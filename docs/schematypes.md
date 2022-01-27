@@ -510,6 +510,8 @@ const Empty3 = new Schema({ any: [Schema.Types.Mixed] });
 const Empty4 = new Schema({ any: [{}] });
 ```
 
+Note: when updating arrays with $addToSet, an $each will be applied on the arguments passed to addToSet.
+
 <h4 id="maps">Maps</h4>
 
 _New in Mongoose 5.1.0_

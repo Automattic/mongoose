@@ -1,3 +1,19 @@
+6.1.8 / 2022-01-24
+==================
+ * fix(connection): stop leaking sessions in .transaction() #11259 #11256 [Uzlopak](https://github.com/Uzlopak)
+ * perf: remove sliced in favor of Array.prototype.slice() #11238 [Uzlopak](https://github.com/Uzlopak)
+ * perf: improve setDottedPath #11264 [Uzlopak](https://github.com/Uzlopak)
+ * fix(document): handle edge case where NestJS sets String.type = String, mixing up schema definitions #11199
+ * fix: remove obsolete code after upgrading to bson4 #11265 [Uzlopak](https://github.com/Uzlopak)
+ * fix: remove util.isArray in favor of Array.isArray #11234 [Uzlopak](https://github.com/Uzlopak)
+ * fix(index.d.ts): avoid UnpackedIntersection making `findOne().populate()` result non-nullable #11041
+ * docs(migration): add note to change default functions to schema #11245 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: updated docs and issue templates for new FAQs #11171 [IslandRhythms](https://github.com/IslandRhythms)
+ * chore: fix casting benchmark #11262 [Uzlopak](https://github.com/Uzlopak)
+ * chore: add mongodb-memory-server to test easier locally #11255 [Uzlopak](https://github.com/Uzlopak)
+ * chore: fix testing tsconfig #11243 [Uzlopak](https://github.com/Uzlopak)
+ * refactor: move utils.random to test folder #11239 [Uzlopak](https://github.com/Uzlopak)
+
 6.1.7 / 2022-01-17
 ==================
  * fix(model): correct handling for $push on a nested array #11108

@@ -449,7 +449,7 @@ declare module 'mongoose' {
      * _Requires MongoDB >= 3.6.0._ Executes the wrapped async function
      * in a transaction. Mongoose will commit the transaction if the
      * async function executes successfully and attempt to retry if
-     * there was a retriable error.
+     * there was a retryable error.
      */
     transaction(fn: (session: mongodb.ClientSession) => Promise<any>): Promise<any>;
 

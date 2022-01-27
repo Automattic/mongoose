@@ -110,9 +110,7 @@ describe('typescript syntax', function() {
 
   it('lean documents', function() {
     const errors = runTest('leanDocuments.ts');
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
+    printTSErrors(errors);
     assert.equal(errors.length, 5);
     assert.ok(errors[0].messageText.includes('Property \'save\' does not exist'), errors[0].messageText);
     assert.ok(errors[1].messageText.includes('Property \'save\' does not exist'), errors[1].messageText);

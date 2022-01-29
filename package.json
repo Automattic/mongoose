@@ -71,7 +71,9 @@
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 5.x && git push origin 5.x --tags && npm publish --tag legacy",
     "mongo": "node ./tools/repl.js",
-    "test": "mocha --exit ./test/*.test.js ./test/typescript/main.test.js",
+    "test": "mocha --exit ./test/*.test.js && npm run test-ts",
+    "test-ts": "mocha --exit ./test/typescript/main.test.js",
+    "sym-link-mongoose": "npm link && npm link mongoose",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },

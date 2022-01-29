@@ -12,6 +12,11 @@ const href = require('./docs/helpers/href');
 const klass = require('./docs/helpers/klass');
 const transform = require('acquit-require');
 
+let jobs = [];
+try {
+  jobs = require('./docs/data/jobs.json');
+} catch (err) {}
+
 require('acquit-ignore')();
 
 const markdown = require('marked');
@@ -155,6 +160,7 @@ function pugify(filename, options, newfile) {
 
   newfile = newfile || filename.replace('.pug', '.html');
   options.outputUrl = newfile.replace(process.cwd(), '');
+  options.jobs = jobs;
 
   pug.render(contents, options, function(err, str) {
     if (err) {

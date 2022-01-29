@@ -3304,7 +3304,7 @@ declare module 'mongoose' {
       type?: string): this;
   }
 
-  export interface SyncIndexesOptions {
+  export interface SyncIndexesOptions extends mongodb.CreateIndexesOptions {
     continueOnError?: boolean
   }
   export type ConnectionSyncIndexesResult = Record<string, OneCollectionSyncIndexesResult>;

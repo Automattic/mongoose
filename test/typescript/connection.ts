@@ -21,6 +21,6 @@ conn.syncIndexes({ continueOnError: true }).then(result => {
   result['Order'].message;
   result['Order'].code;
 });
-conn.syncIndexes({ continueOnError: false }).then().catch(err => {
+conn.syncIndexes({ continueOnError: false, background: true }).then().catch(err => {
   err.errors['Order'].code;
 });

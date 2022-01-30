@@ -699,7 +699,8 @@ describe('mongoose module:', function() {
     assert.ok(mongoose.isValidObjectId('5f5c2d56f6e911019ec2acdc'));
     assert.ok(mongoose.isValidObjectId('608DE01F32B6A93BBA314159'));
     assert.ok(mongoose.isValidObjectId(new mongoose.Types.ObjectId()));
-    assert.ok(!mongoose.isValidObjectId(6));
+    assert.ok(mongoose.isValidObjectId(6));
+    assert.ok(!mongoose.isValidObjectId({ test: 42 }));
   });
   it('global `strictPopulate` works when false (gh-10694)', async function() {
     const mongoose = new Mongoose();

@@ -887,7 +887,7 @@ describe('model: findOneAndUpdate:', function() {
     });
   });
 
-  it('can do deep equals on object id after findOneAndUpdate (gh-2070)', function(done) {
+  it('can do various deep equal checks (lodash.isEqual, lodash.isEqualWith, assert.deepEqual, utils.deepEqual) on object id after findOneAndUpdate (gh-2070)', function(done) {
     const userSchema = new Schema({
       name: String,
       contacts: [{
@@ -911,22 +911,20 @@ describe('model: findOneAndUpdate:', function() {
           { new: true },
           function(error, doc) {
             assert.ifError(error);
+            assert.deepEqual(doc.contacts[0].account, a2._id);
             assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
             assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
             // Re: commends on https://github.com/mongodb/js-bson/commit/aa0b54597a0af28cce3530d2144af708e4b66bf0
             // Deep equality checks no longer work as expected with node 0.10.
             // Please file an issue if this is a problem for you
-            if (!/^v0.10.\d+$/.test(process.version)) {
-              assert.ok(isEqual(doc.contacts[0].account, a2._id));
-            }
+            assert.ok(isEqual(doc.contacts[0].account, a2._id));
 
             User.findOne({ name: 'parent' }, function(error, doc) {
               assert.ifError(error);
+              assert.deepEqual(doc.contacts[0].account, a2._id);
               assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
               assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
-              if (!/^v0.10.\d+$/.test(process.version)) {
-                assert.ok(isEqual(doc.contacts[0].account, a2._id));
-              }
+              assert.ok(isEqual(doc.contacts[0].account, a2._id));
               done();
             });
           });

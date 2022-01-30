@@ -10,7 +10,7 @@ describe('isMongooseObject', () => {
   });
 
   it('is when value is a MongooseArray', () => {
-    const mongooseArray = new MongooseArray()
+    const mongooseArray = new MongooseArray();
     assert.ok(isMongooseObject(mongooseArray));
   });
 

@@ -53,6 +53,7 @@
     "mocha": "9.2.0",
     "moment": "2.x",
     "mongodb-memory-server": "^8.2.0",
+    "nyc": "^15.1.0",
     "pug": "3.0.2",
     "q": "1.5.1",
     "rimraf": "2.6.3",
@@ -73,7 +74,7 @@
     "mongo": "node ./tools/repl.js",
     "test": "mocha --exit ./test/*.test.js ./test/typescript/main.test.js",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
-    "test-cov": "nyc --reporter=html --reporter=text npm test"
+    "test-coverage": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
   "types": "./index.d.ts",

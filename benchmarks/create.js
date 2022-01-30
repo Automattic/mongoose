@@ -3,36 +3,48 @@
 'use strict';
 
 const mongoose = require('../../mongoose');
-const fs = require('fs');
+const Benchmark = require('benchmark');
 
 const Schema = mongoose.Schema;
 
-const CheckItem = new Schema({
-  name: {type: String},
-  type: {type: String},
-  pos: {type: Number}
+let CheckItem = new Schema({
+  name: { type: String },
+  type: { type: String },
+  pos: { type: Number }
 });
 
 const Checklist = new Schema({
-  name: {type: String},
-  checkItems: {type: [CheckItem]}
+  name: { type: String },
+  checkItems: { type: [CheckItem] }
 });
 
 let Board = new Schema({
-  checklists: {type: [Checklist]}
+  checklists: { type: [Checklist] }
 });
 
 // const start1 = new Date();
-Board = mongoose.model('Board', Board);
+const BoardModel = mongoose.model('Board', Board);
+const CheckItemModel = mongoose.model('CheckItem', CheckItem);
 // const Cl = mongoose.model('Checklist', Checklist);
-const doc = JSON.parse(fs.readFileSync(__dirname + '/bigboard.json'));
+const doc = require('./bigboard.json');
 // const time1 = (new Date - start1);
 // console.error('reading from disk and parsing JSON took %d ms', time1);
 
-const start2 = new Date();
-const iterations = 1000;
-for (let i = 0; i < iterations; ++i) {
-  new Board(doc);
-}
-const time2 = (new Date - start2);
-console.error('creation of large object took %d ms, %d ms per object', time2, time2 / iterations);
+new Benchmark.Suite()
+  .add('CheckItem', function () {
+    const test = new CheckItemModel({
+      "_id": "4daee8a2aae47fe55305eabf",
+      "pos": 32768,
+      "type": "check",
+      "name": "delete checklists"
+  });
+  })
+  .add('Board', function () {
+    const test = new BoardModel(doc);
+  })
+  .on('cycle', function (evt) {
+    if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
+      console.log(String(evt.target));
+    }
+  })
+  .run();

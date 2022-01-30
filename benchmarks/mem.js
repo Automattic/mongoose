@@ -4,7 +4,7 @@ const mongoose = require('../');
 
 const Schema = mongoose.Schema;
 
-mongoose.connect('localhost', 'testing_bench');
+mongoose.connect('mongodb://localhost/mongoose-bench');
 
 const DocSchema = new Schema({
   title: String
@@ -57,10 +57,10 @@ methods.push(function(a, cb) {
   A.where('date', a.date).where('array').in(3).limit(10).exec(cb);
 }); // 1.82 MB
 methods.push(function(a, cb) {
-  A.update({_id: a._id}, {$addToset: {array: 'heeeeello'}}, cb);
+  A.updateOne({_id: a._id}, {$addToset: {array: 'heeeeello'}}, cb);
 }); // 3.32 MB
 methods.push(function(a, cb) {
-  A.remove({_id: a._id}, cb);
+  A.deleteOne({_id: a._id}, cb);
 }); // 3.32 MB
 methods.push(function(a, cb) {
   A.find().where('objectids').exists().select('dates').limit(10).exec(cb);
@@ -75,7 +75,7 @@ methods.push(function(a, cb) {
   a.bool = false;
   a.array.push(3);
   a.dates.push(new Date);
-  a.bools.push([true, false]);
+  // a.bools.push([true, false]);
   a.docs.addToSet({title: 'woot'});
   a.strings.remove('three');
   a.numbers.pull(72);

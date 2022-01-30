@@ -5,7 +5,7 @@ const Benchmark = require('benchmark');
 const suite = new Benchmark.Suite();
 
 const Schema = mongoose.Schema;
-const mongo = require('mongodb');
+const mongoClient = require('mongodb').MongoClient;
 const utils = require('../../lib/utils.js');
 const ObjectId = Schema.Types.ObjectId;
 
@@ -20,11 +20,11 @@ const ObjectId = Schema.Types.ObjectId;
  */
 
 
-mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
+ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
   if (err) {
     throw err;
   }
-  mongo.connect('mongodb://localhost', function(err, client) {
+  mongoClient.connect('mongodb://localhost/mongoose-bench', function(err, client) {
     if (err) {
       throw err;
     }
@@ -127,7 +127,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       defer: true,
       fn: function(deferred) {
         const nData = utils.clone(data);
-        user.insert(nData, function(err) {
+        user.insertOne(nData, function(err) {
           if (err) {
             throw err;
           }
@@ -149,7 +149,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       defer: true,
       fn: function(deferred) {
         const bp = utils.clone(blogData);
-        blogpost.insert(bp, function(err) {
+        blogpost.insertOne(bp, function(err) {
           if (err) {
             throw err;
           }

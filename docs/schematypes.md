@@ -512,6 +512,42 @@ const Empty4 = new Schema({ any: [{}] });
 
 Note: when updating arrays with $addToSet, an $each will be applied on the arguments passed to addToSet.
 
+```javascript
+const mongoose = require('mongoose');
+
+const testSchema = new mongoose.Schema({
+    name: []
+});
+
+const Test = mongoose.model('Test', testSchema);
+
+async function run() {
+await mongoose.connect('mongodb://localhost:27017');
+await mongoose.connection.dropDatabase();
+
+const entry = await Test.create({
+    name: [1,2,3,4,5]
+});
+
+console.log(entry);
+
+await Test.findOneAndUpdate({_id: entry._id}, {$addToSet: {name: [6,7,8,9,0]}});
+console.log(await Test.find());
+}
+
+run();
+
+
+the response will be : 
+name: [1,2,3,4,5,6,7,8,9,0] 
+instead of :
+
+name: [1,2,3,4,5,[6,7,8,9,0]] as it should according to mongo docs.
+
+```
+
+Mongoose is adding $each to $addToSet command.
+
 <h4 id="maps">Maps</h4>
 
 _New in Mongoose 5.1.0_

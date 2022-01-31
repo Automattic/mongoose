@@ -26,6 +26,6 @@ void async function main() {
   await doc.save();
 
   const _doc: LeanDocument<ITest> = await Test.findOne().orFail().lean();
-  _doc.tags[0].name.substr(1);
+  _doc.tags[0].name.substring(1);
   _doc.tags.create({ name: 'fail' });
 }();

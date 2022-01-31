@@ -7,7 +7,7 @@
  */
 
 exports.random = function() {
-  return Math.random().toString().substr(3);
+  return Math.random().toString().substring(3);
 };
 
 exports.clearTestData = function clearTestData(db) {

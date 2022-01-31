@@ -1,3 +1,30 @@
+6.1.8 / 2022-01-24
+==================
+ * fix(connection): stop leaking sessions in .transaction() #11259 #11256 [Uzlopak](https://github.com/Uzlopak)
+ * perf: remove sliced in favor of Array.prototype.slice() #11238 [Uzlopak](https://github.com/Uzlopak)
+ * perf: improve setDottedPath #11264 [Uzlopak](https://github.com/Uzlopak)
+ * fix(document): handle edge case where NestJS sets String.type = String, mixing up schema definitions #11199
+ * fix: remove obsolete code after upgrading to bson4 #11265 [Uzlopak](https://github.com/Uzlopak)
+ * fix: remove util.isArray in favor of Array.isArray #11234 [Uzlopak](https://github.com/Uzlopak)
+ * fix(index.d.ts): avoid UnpackedIntersection making `findOne().populate()` result non-nullable #11041
+ * docs(migration): add note to change default functions to schema #11245 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: updated docs and issue templates for new FAQs #11171 [IslandRhythms](https://github.com/IslandRhythms)
+ * chore: fix casting benchmark #11262 [Uzlopak](https://github.com/Uzlopak)
+ * chore: add mongodb-memory-server to test easier locally #11255 [Uzlopak](https://github.com/Uzlopak)
+ * chore: fix testing tsconfig #11243 [Uzlopak](https://github.com/Uzlopak)
+ * refactor: move utils.random to test folder #11239 [Uzlopak](https://github.com/Uzlopak)
+
+6.1.7 / 2022-01-17
+==================
+ * fix(model): correct handling for $push on a nested array #11108
+ * fix(update): correctly apply timestamps to update pipelines #11151
+ * fix(document): correctly handle modifying array subdocument after setting array subdocument to itself #11172
+ * fix(index.d.ts): allow passing options to model() in place of removed `skipInit` #11137
+ * fix(aggregate): allow passing verbosity to Aggregate.prototype.explain() #11144
+ * fix(index.d.ts): avoid TypeScript inferring _id as any type with HydratedDocument #11085
+ * docs: fix Node.js Driver compat link #11214 [wesbos](https://github.com/wesbos)
+ * docs: remove extraneous backquote #11204 [joebowbeer](https://github.com/joebowbeer)
+
 6.1.6 / 2022-01-10
 ==================
  * perf(document): delay creating document event emitter until used to improve memory usage, several small improvements to improve initing docs with large arrays #10400

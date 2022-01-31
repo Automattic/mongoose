@@ -2527,15 +2527,14 @@ describe('Query', function() {
     });
 
     it('cast embedded discriminators with $elemMatch discriminator key (gh-7449)', async function() {
-
       const ListingLineSchema = new Schema({
         sellerId: Number
-      });
+      }, { strictQuery: false });
 
       const OrderSchema = new Schema({
         lines: [new Schema({
           amount: Number
-        }, { discriminatorKey: 'kind' })]
+        }, { discriminatorKey: 'kind', strictQuery: false })]
       });
 
       OrderSchema.path('lines').discriminator('listing', ListingLineSchema);

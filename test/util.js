@@ -1,5 +1,15 @@
 'use strict';
 
+/*!
+ * Generates a random string
+ *
+ * @api private
+ */
+
+exports.random = function() {
+  return Math.random().toString().substring(3);
+};
+
 exports.clearTestData = function clearTestData(db) {
   if (db.models == null) {
     return;

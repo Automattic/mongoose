@@ -9,7 +9,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
   reproduces your issue. Do **not** describe your issue in prose. **Show your code.**
   - If the bug involves an error, please post the stack trace.
   - Please post the version of Mongoose and MongoDB that you're using.
-  - Please write bug reports in JavaScript (ES5, ES6, etc) that runs in Node.js, **not** CoffeeScript, TypeScript, JSX, etc.
+  - Please write bug reports in JavaScript (ES5, ES6, etc) that runs in Node.js, **not** CoffeeScript, TypeScript, JSX, etc.
 
 ### Requesting new features
 
@@ -57,7 +57,7 @@ If you'd like to preview your documentation changes, first commit your changes t
 * `make gendocs`
 * `node static.js`
 
-Visit `http://localhost:8088` and you should see the docs with your local changes. Make sure you `git reset --hard` before committing, because changes to `docs/*` should **not** be in PRs.
+Visit `http://localhost:8089` and you should see the docs with your local changes. Make sure you `git reset --hard` before committing, because changes to `docs/*` should **not** be in PRs.
 
 ### Plugins website
 

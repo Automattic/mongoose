@@ -8,7 +8,7 @@ const start = require('./common');
 
 const Query = require('../lib/query');
 const assert = require('assert');
-const random = require('../lib/utils').random;
+const random = require('./util').random;
 const util = require('./util');
 
 const mongoose = start.mongoose;

@@ -2768,7 +2768,7 @@ describe('model: update:', function() {
       return Test.update({}, { total: 10000, capitalGainsTax: 1500 });
     });
 
-    it('cast error in update conditions (gh-5477)', function(done) {
+    it('cast error in update conditions (gh-5477)', async function() {
       const schema = new mongoose.Schema({
         name: String
       }, { strict: true });
@@ -2778,28 +2778,15 @@ describe('model: update:', function() {
       const u = { $set: { name: 'Test' } };
       const o = { upsert: true };
 
-      let outstanding = 3;
+      let error = await Model.update(q, u, o).then(() => null, err => err);
+      assert.ok(error);
+      assert.ok(error.message.indexOf('notAField') !== -1, error.message);
+      assert.ok(error.message.indexOf('upsert') !== -1, error.message);
 
-      Model.update(q, u, o, function(error) {
-        assert.ok(error);
-        assert.ok(error.message.indexOf('notAField') !== -1, error.message);
-        assert.ok(error.message.indexOf('upsert') !== -1, error.message);
-        --outstanding || done();
-      });
-
-      Model.update(q, u, o, function(error) {
-        assert.ok(error);
-        assert.ok(error.message.indexOf('notAField') !== -1, error.message);
-        assert.ok(error.message.indexOf('upsert') !== -1, error.message);
-        --outstanding || done();
-      });
-
-      Model.updateMany(q, u, o, function(error) {
-        assert.ok(error);
-        assert.ok(error.message.indexOf('notAField') !== -1, error.message);
-        assert.ok(error.message.indexOf('upsert') !== -1, error.message);
-        --outstanding || done();
-      });
+      error = await Model.updateMany(q, u, o).then(() => null, err => err);
+      assert.ok(error);
+      assert.ok(error.message.indexOf('notAField') !== -1, error.message);
+      assert.ok(error.message.indexOf('upsert') !== -1, error.message);
     });
 
     it('single embedded schema under document array (gh-4519)', function(done) {

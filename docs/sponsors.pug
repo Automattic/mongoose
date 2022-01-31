@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  div
+    h2 Mongoose Sponsors
+
+  each sponsor in sponsors
+    div(style='position: relative; margin-top: 1em;')
+      div(style='position: absolute; width: 100px; height: 100px')
+        a(href=sponsor.url)
+          img(src=sponsor.logo)
+      div(style='padding-left: 110px; min-height: 100px')
+        h4(style='margin-top: 0.2em; margin-bottom: 0.25em;')
+          a(href=sponsor.url) #{sponsor.name}
+        div !{sponsor.description}
+
+
+  h2 Add Your Own
+  div.
+    Want to feature your app on this page?
+    <a href="https://github.com/sponsors/mongoosejs">Sponsor Mongoose on GitHub!</a>

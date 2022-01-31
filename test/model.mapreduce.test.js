@@ -8,7 +8,7 @@
 const start = require('./common');
 
 const assert = require('assert');
-const random = require('../lib/utils').random;
+const random = require('./util').random;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -174,8 +174,7 @@ describe('model: mapreduce:', function() {
       verbose: false
     };
 
-    const res = await MR.mapReduce(o);
-    console.log(res);
+    assert.deepEqual(await MR.mapReduce(o), []);
     assert.equal(typeof stats, 'undefined');
   });
 

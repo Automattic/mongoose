@@ -449,7 +449,7 @@ declare module 'mongoose' {
      * _Requires MongoDB >= 3.6.0._ Executes the wrapped async function
      * in a transaction. Mongoose will commit the transaction if the
      * async function executes successfully and attempt to retry if
-     * there was a retriable error.
+     * there was a retryable error.
      */
     transaction(fn: (session: mongodb.ClientSession) => Promise<any>): Promise<any>;
 
@@ -2124,6 +2124,7 @@ declare module 'mongoose' {
   type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType> = Query<ResultType, DocType, THelpers, RawDocType> & THelpers;
 
   type UnpackedIntersection<T, U> = T extends (infer V)[] ? (V & U)[] : T & U;
+  type UnpackedIntersectionWithNull<T, U> = T extends null ? UnpackedIntersection<T, U> | null : UnpackedIntersection<T, U>;
 
   class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
     _mongooseOptions: MongooseQueryOptions;
@@ -2407,8 +2408,8 @@ declare module 'mongoose' {
     polygon(path: string, ...coordinatePairs: number[][]): this;
 
     /** Specifies paths which should be populated with other documents. */
-    populate<Paths = {}>(path: string | any, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
-    populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
+    populate<Paths = {}>(path: string | any, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
+    populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
     projection(fields?: any | null): this;

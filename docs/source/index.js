@@ -1,5 +1,11 @@
 
 'use strict';
+
+let sponsors = [];
+try {
+  sponsors = require('../data/sponsors.json');
+} catch (err) {}
+
 exports['index.pug'] = require('./home');
 exports['docs/api.pug'] = require('./api');
 exports['docs/prior.pug'] = require('./prior');
@@ -42,5 +48,8 @@ exports['docs/compatibility.md'] = {
 };
 exports['docs/search.pug'] = { title: 'Search' };
 exports['docs/enterprise.md'] = { title: 'Mongoose for Enterprise', markdown: true };
-exports['docs/sponsors.md'] = { title: 'Mongoose Sponsors', markdown: true };
+exports['docs/sponsors.pug'] = {
+  title: 'Mongoose Sponsors',
+  sponsors
+};
 exports['docs/async-await.md'] = { title: 'Using Async/Await with Mongoose', markdown: true };

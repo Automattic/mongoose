@@ -40,7 +40,7 @@ describe('Advanced Schemas', function() {
       set fullName(v) {
         const firstSpace = v.indexOf(' ');
         this.firstName = v.split(' ')[0];
-        this.lastName = firstSpace === -1 ? '' : v.substr(firstSpace + 1);
+        this.lastName = firstSpace === -1 ? '' : v.substring(firstSpace + 1);
       }
 
       // `getFullName()` becomes a document method
@@ -52,7 +52,7 @@ describe('Advanced Schemas', function() {
       static findByFullName(name) {
         const firstSpace = name.indexOf(' ');
         const firstName = name.split(' ')[0];
-        const lastName = firstSpace === -1 ? '' : name.substr(firstSpace + 1);
+        const lastName = firstSpace === -1 ? '' : name.substring(firstSpace + 1);
         return this.findOne({ firstName, lastName });
       }
     }

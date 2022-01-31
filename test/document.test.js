@@ -1713,8 +1713,8 @@ describe('document', function() {
         get((v, virtual, doc) => `${doc.name.first} ${doc.name.last}`).
         set((v, virtual, doc) => {
           const parts = v.split(' ');
-          doc.name.first = parts.slice(0, parts.length - 1).join(' ');
           doc.name.last = parts[parts.length - 1];
+          doc.name.first = parts.slice(0, parts.length - 1).join(' ');
         });
       const Model = db.model('Person', schema);
 
@@ -2456,7 +2456,7 @@ describe('document', function() {
     it('single embedded schemas with methods (gh-3534)', function() {
       const personSchema = new Schema({ name: String });
       personSchema.methods.firstName = function() {
-        return this.name.substr(0, this.name.indexOf(' '));
+        return this.name.substring(0, this.name.indexOf(' '));
       };
 
       const bandSchema = new Schema({ leadSinger: personSchema });
@@ -10983,5 +10983,19 @@ describe('document', function() {
 
     assert.ok(doc.isModified());
     assert.ok(doc.isModified('cumulativeConsumption.1'));
+  });
+
+  it('handles `String` with `type` (gh-11199)', function() {
+    String.type = String;
+    const schema = new mongoose.Schema({
+      something: String,
+      somethingElse: { type: String, trim: true }
+    });
+
+    const Test = db.model('Test', schema);
+    const doc = new Test({ something: 'test', somethingElse: 'test 2' });
+    assert.equal(typeof doc.something, 'string');
+    assert.equal(typeof doc.somethingElse, 'string');
+    delete String.type;
   });
 });

@@ -1,3 +1,13 @@
+6.1.9 / 2022-01-31
+==================
+ * fix(query): respect nested schema strict as default when casting query filters #11291
+ * fix(mongoose): make isValidObjectId() consistent with isValid(), make `ObjectId()` casting more flexible #11209
+ * fix(setDefaultsOnInsert): ignore defaults underneath maps #11235
+ * fix(query): avoid setting nested schema properties that are stripped out by strictQuery to undefined in query filter #11291
+ * fix: check for all flags in a regex deepequal #11242 [Uzlopak](https://github.com/Uzlopak)
+ * fix: replace substr with substring #11278 [Uzlopak](https://github.com/Uzlopak)
+ * docs: port for documentation testing in CONTRIBUTING.md #11273 [Uzlopak](https://github.com/Uzlopak)
+
 6.1.8 / 2022-01-24
 ==================
  * fix(connection): stop leaking sessions in .transaction() #11259 #11256 [Uzlopak](https://github.com/Uzlopak)

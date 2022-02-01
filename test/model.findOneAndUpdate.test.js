@@ -887,7 +887,7 @@ describe('model: findOneAndUpdate:', function() {
     });
   });
 
-  it('can do deep equals on object id after findOneAndUpdate (gh-2070)', function(done) {
+  it('can do various deep equal checks (lodash.isEqual, lodash.isEqualWith, assert.deepEqual, utils.deepEqual) on object id after findOneAndUpdate (gh-2070)', function(done) {
     const userSchema = new Schema({
       name: String,
       contacts: [{
@@ -911,22 +911,20 @@ describe('model: findOneAndUpdate:', function() {
           { new: true },
           function(error, doc) {
             assert.ifError(error);
+            assert.deepEqual(doc.contacts[0].account, a2._id);
             assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
             assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
             // Re: commends on https://github.com/mongodb/js-bson/commit/aa0b54597a0af28cce3530d2144af708e4b66bf0
             // Deep equality checks no longer work as expected with node 0.10.
             // Please file an issue if this is a problem for you
-            if (!/^v0.10.\d+$/.test(process.version)) {
-              assert.ok(isEqual(doc.contacts[0].account, a2._id));
-            }
+            assert.ok(isEqual(doc.contacts[0].account, a2._id));
 
             User.findOne({ name: 'parent' }, function(error, doc) {
               assert.ifError(error);
+              assert.deepEqual(doc.contacts[0].account, a2._id);
               assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
               assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
-              if (!/^v0.10.\d+$/.test(process.version)) {
-                assert.ok(isEqual(doc.contacts[0].account, a2._id));
-              }
+              assert.ok(isEqual(doc.contacts[0].account, a2._id));
               done();
             });
           });
@@ -1958,8 +1956,6 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('avoids edge case with middleware cloning buffers (gh-5702)', function(done) {
-      const uuidParse = require('uuid-parse');
-
       function toUUID(string) {
         if (!string) {
           return null;
@@ -1967,7 +1963,7 @@ describe('model: findOneAndUpdate:', function() {
         if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
           return string;
         }
-        const buffer = uuidParse.parse(string);
+        const buffer = uuid.parse(string);
         return new mongoose.Types.Buffer(buffer).toObject(0x04);
       }
 
@@ -1975,7 +1971,7 @@ describe('model: findOneAndUpdate:', function() {
         if (!buffer || buffer.length !== 16) {
           return null;
         }
-        return uuidParse.unparse(buffer);
+        return uuid.stringify(buffer);
       }
 
       const UserSchema = new mongoose.Schema({
@@ -2017,12 +2013,12 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('setting subtype when saving (gh-5551)', function(done) {
-      if (parseInt(process.version.substr(1).split('.')[0], 10) < 4) {
+      if (parseInt(process.version.substring(1).split('.')[0], 10) < 4) {
         // Don't run on node 0.x because of `const` issues
         this.skip();
       }
 
-      const uuidParse = require('uuid-parse');
+      const uuid = require('uuid');
       function toUUID(string) {
         if (!string) {
           return null;
@@ -2030,7 +2026,7 @@ describe('model: findOneAndUpdate:', function() {
         if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
           return string;
         }
-        const buffer = uuidParse.parse(string);
+        const buffer = uuid.parse(string);
         return new mongoose.Types.Buffer(buffer).toObject(0x04);
       }
 

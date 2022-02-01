@@ -117,4 +117,43 @@ describe('cast: ', function() {
       assert.deepEqual(res.$expr.$gt, ['$spent', '$budget']);
     });
   });
+
+  it('uses nested schema strict by default (gh-11291)', function() {
+    const nested = new Schema({}, {
+      id: false,
+      _id: false,
+      strict: false
+    });
+
+    const schema = new Schema({ roles: [String], customFields: nested });
+
+    const res = cast(schema, {
+      roles: { $ne: 'super' },
+      'customFields.region': { $exists: true }
+    });
+
+    assert.deepEqual(res, {
+      roles: { $ne: 'super' },
+      'customFields.region': { $exists: true }
+    });
+  });
+
+  it('avoids setting stripped out nested schema values to undefined (gh-11291)', function() {
+    const nested = new Schema({}, {
+      id: false,
+      _id: false,
+      strict: false
+    });
+
+    const schema = new Schema({ roles: [String], customFields: nested });
+
+    const res = cast(schema, {
+      roles: { $ne: 'super' },
+      'customFields.region': { $exists: true }
+    }, { strictQuery: true });
+
+    assert.deepEqual(res, {
+      roles: { $ne: 'super' }
+    });
+  });
 });

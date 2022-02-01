@@ -178,7 +178,7 @@ describe('mongoose module:', function() {
     assert.strictEqual(o._id, o);
   });
 
-  it('runValidators option (gh-6865) (gh-6578)', function() {
+  it('runValidators option (gh-6865) (gh-6578)', async function() {
     const mongoose = new Mongoose();
 
     mongoose.set('runValidators', true);
@@ -187,13 +187,12 @@ describe('mongoose module:', function() {
       name: { type: String, required: true }
     }));
 
-    return mongoose.connect(uri, options).
-      then(() => M.updateOne({}, { name: null })).
-      then(
-        () => assert.ok(false),
-        err => assert.ok(err.errors['name'])
-      ).
-      then(() => mongoose.disconnect());
+    await mongoose.connect(uri, options);
+
+    const err = await M.updateOne({}, { name: null }).then(() => null, err => err);
+    assert.ok(err.errors['name']);
+
+    mongoose.disconnect();
   });
 
   it('toJSON options (gh-6815)', function() {
@@ -834,10 +833,10 @@ describe('mongoose module:', function() {
       await m.disconnect();
     });
 
-    it('connect with url doesnt cause unhandled rejection (gh-6997)', function() {
+    it('connect with url doesnt cause unhandled rejection (gh-6997)', async function() {
       const m = new mongoose.Mongoose;
       const _options = Object.assign({}, options, { serverSelectionTimeoutMS: 100 });
-      const error = m.connect('mongodb://doesnotexist:27009/test', _options).then(() => null, err => err);
+      const error = await m.connect('mongodb://doesnotexist:27009/test', _options).then(() => null, err => err);
 
       assert.ok(error);
     });

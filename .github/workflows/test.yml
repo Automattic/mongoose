@@ -71,7 +71,7 @@ jobs:
       - run: npm install
 
       - name: Typings
-        run: npm run test-types
+        run: npm run test-ts-types
 
   test-ts-integration:
     runs-on: ubuntu-latest

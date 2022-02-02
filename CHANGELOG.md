@@ -1,3 +1,8 @@
+6.1.10 / 2022-02-01
+===================
+ * fix(mongoose): correctly handle destructured isValidObjectId #11304
+ * fix(mongoose): defer to MongoDB driver isValid() for `isValidObjectId()` #11227
+
 6.1.9 / 2022-01-31
 ==================
  * fix(query): respect nested schema strict as default when casting query filters #11291

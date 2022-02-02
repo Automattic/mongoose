@@ -97,8 +97,7 @@ jobs:
           ./mongodb-linux-x86_64-ubuntu2004-5.0.2/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
           sleep 2
           mongod --version
-          mkdir ./test/typescript/node_modules
-          ln -s `pwd` ./test/typescript/node_modules/mongoose
+          npm link && npm link mongoose
           echo `pwd`/mongodb-linux-x86_64-ubuntu2004-5.0.2/bin >> $GITHUB_PATH
 
       - run: npm run test-ts-integration

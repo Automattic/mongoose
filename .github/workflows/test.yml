@@ -39,7 +39,7 @@ jobs:
           mongod --version
           echo `pwd`/mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin >> $GITHUB_PATH
 
-      - run: npm test-code
+      - run: npm run test-code
 
   lint:
     runs-on: ubuntu-latest

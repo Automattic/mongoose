@@ -178,7 +178,7 @@ describe('mongoose module:', function() {
     assert.strictEqual(o._id, o);
   });
 
-  it('runValidators option (gh-6865) (gh-6578)', function() {
+  it('runValidators option (gh-6865) (gh-6578)', async function() {
     const mongoose = new Mongoose();
 
     mongoose.set('runValidators', true);
@@ -187,13 +187,12 @@ describe('mongoose module:', function() {
       name: { type: String, required: true }
     }));
 
-    return mongoose.connect(uri, options).
-      then(() => M.updateOne({}, { name: null })).
-      then(
-        () => assert.ok(false),
-        err => assert.ok(err.errors['name'])
-      ).
-      then(() => mongoose.disconnect());
+    await mongoose.connect(uri, options);
+
+    const err = await M.updateOne({}, { name: null }).then(() => null, err => err);
+    assert.ok(err.errors['name']);
+
+    mongoose.disconnect();
   });
 
   it('toJSON options (gh-6815)', function() {
@@ -317,6 +316,41 @@ describe('mongoose module:', function() {
     assert.equal(doc.testMethod(), 42);
     assert.equal(doc.test[0].testMethod(), 42);
     await mong.disconnect();
+  });
+
+  it('declaring global plugins with tags (gh-9780)', async function() {
+    const mong = new Mongoose();
+    const schema1 = new Schema({}, { pluginTags: ['tag1'] });
+    const schema2 = new Schema({}, { pluginTags: ['tag2'] });
+    const schema3 = new Schema({});
+
+    mong.plugin(function(s) {
+      s.add({ prop1: String });
+    }, { tags: ['tag1'] });
+
+    mong.plugin(function(s) {
+      s.add({ prop2: String });
+    }, { tags: ['tag1', 'tag2'] });
+
+    mong.plugin(function(s) {
+      s.add({ prop3: String });
+    });
+
+    const Test1 = mong.model('Test1', schema1);
+    const Test2 = mong.model('Test2', schema2);
+    const Test3 = mong.model('Test3', schema3);
+
+    assert.ok(Test1.schema.path('prop1'));
+    assert.ok(Test1.schema.path('prop2'));
+    assert.ok(Test1.schema.path('prop3'));
+
+    assert.ok(!Test2.schema.path('prop1'));
+    assert.ok(Test2.schema.path('prop2'));
+    assert.ok(Test2.schema.path('prop3'));
+
+    assert.ok(!Test3.schema.path('prop1'));
+    assert.ok(!Test3.schema.path('prop2'));
+    assert.ok(Test3.schema.path('prop3'));
   });
 
   it('global plugins on nested schemas underneath embedded discriminators (gh-7370)', function() {
@@ -799,10 +833,10 @@ describe('mongoose module:', function() {
       await m.disconnect();
     });
 
-    it('connect with url doesnt cause unhandled rejection (gh-6997)', function() {
+    it('connect with url doesnt cause unhandled rejection (gh-6997)', async function() {
       const m = new mongoose.Mongoose;
       const _options = Object.assign({}, options, { serverSelectionTimeoutMS: 100 });
-      const error = m.connect('mongodb://doesnotexist:27009/test', _options).then(() => null, err => err);
+      const error = await m.connect('mongodb://doesnotexist:27009/test', _options).then(() => null, err => err);
 
       assert.ok(error);
     });

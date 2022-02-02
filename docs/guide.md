@@ -414,7 +414,6 @@ Valid options:
 - [toJSON](#toJSON)
 - [toObject](#toObject)
 - [typeKey](#typeKey)
-- [useNestedStrict](#useNestedStrict)
 - [validateBeforeSave](#validateBeforeSave)
 - [versionKey](#versionKey)
 - [optimisticConcurrency](#optimisticConcurrency)
@@ -1155,42 +1154,6 @@ const schema = Schema({
 }, {
   // Make Mongoose use Unix time (seconds since Jan 1, 1970)
   timestamps: { currentTime: () => Math.floor(Date.now() / 1000) }
-});
-```
-
-<h3 id="useNestedStrict"><a href="#useNestedStrict">option: useNestedStrict</a></h3>
-
-Write operations like `update()`, `updateOne()`, `updateMany()`,
-and `findOneAndUpdate()` only check the top-level
-schema's strict mode setting.
-
-```javascript
-const childSchema = new Schema({}, { strict: false });
-const parentSchema = new Schema({ child: childSchema }, { strict: 'throw' });
-const Parent = mongoose.model('Parent', parentSchema);
-Parent.update({}, { 'child.name': 'Luke Skywalker' }, (error) => {
-  // Error because parentSchema has `strict: throw`, even though
-  // `childSchema` has `strict: false`
-});
-
-const update = { 'child.name': 'Luke Skywalker' };
-const opts = { strict: false };
-Parent.update({}, update, opts, function(error) {
-  // This works because passing `strict: false` to `update()` overwrites
-  // the parent schema.
-});
-```
-
-If you set `useNestedStrict` to true, mongoose will use the child schema's
-`strict` option for casting updates.
-
-```javascript
-const childSchema = new Schema({}, { strict: false });
-const parentSchema = new Schema({ child: childSchema },
-  { strict: 'throw', useNestedStrict: true });
-const Parent = mongoose.model('Parent', parentSchema);
-Parent.update({}, { 'child.name': 'Luke Skywalker' }, error => {
-  // Works!
 });
 ```
 

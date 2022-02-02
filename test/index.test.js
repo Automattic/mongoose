@@ -901,46 +901,5 @@ describe('mongoose module:', function() {
       const m = new mongoose.Mongoose();
       assert.deepEqual(await m.syncIndexes(), {});
     });
-    it('Allows a syncIndexes global option (gh-11030)', async function() {
-      const m = new mongoose.Mongoose();
-
-      const db = await m.connect('mongodb://localhost:27017/mongoose_test_11030');
-
-      m.set('syncIndexes', true);
-
-      const initialSchema = new m.Schema({ location: { type: String, index: true } });
-      const initialModel = db.model('Sync', initialSchema, 'Sync');
-      await initialModel.init();
-      const initialIndexes = await initialModel.listIndexes();
-
-      assert.equal(initialIndexes.length, 2);
-
-      await m.deleteModel('Sync');
-
-      m.set('syncIndexes', false);
-
-      const schema = new m.Schema({
-        title: { type: String, index: true }
-      });
-      const syncFalse = db.model('Sync', schema, 'Sync');
-      await syncFalse.init();
-      const Indexes = await syncFalse.listIndexes();
-
-      assert.equal(Indexes.length, 3);
-
-      await syncFalse.collection.createIndex({ name: 1 });
-      await m.deleteModel('Sync');
-
-      m.set('syncIndexes', true);
-
-      const syncSchema = new m.Schema({ nickname: { type: String, index: true } });
-      const syncTrue = db.model('Sync', syncSchema, 'Sync');
-      await syncTrue.init();
-      const Index = await syncTrue.listIndexes();
-
-      assert.equal(Index[0].name, '_id_');
-
-      assert.equal(Index.length, 2);
-    });
   });
 });

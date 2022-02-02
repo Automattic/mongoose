@@ -58,3 +58,19 @@ jobs:
 
       - name: Linter
         run: npm run lint
+
+  typings:
+    runs-on: ubuntu-latest
+    name: Typings
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - run: npm install
+
+      - name: Typings
+        run: npm run test-typings

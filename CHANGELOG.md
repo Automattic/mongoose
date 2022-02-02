@@ -1,3 +1,17 @@
+6.2.0 / 2022-02-02
+==================
+ * feat(connection+mongoose): add support for continueOnError for syncIndexes #11266 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(query): cast literals in `$expr` where possible #10663
+ * feat(schema+mongoose): add pluginTags to allow applying global plugins to only schemas with matching tags #9780
+ * feat(discriminator): support overwriteModels:true to reuse discriminator names #11244 #10931 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(index.d.ts): add DocType generic param to Model functions that return queries to better support projections #11156
+ * feat(error): export MongooseServerSelectionError #11202
+ * feat(schematype): add validators, path, isRequired to public API and TypeScript types #11139
+ * fix(model): make exists(...) return lean document with _id or null instead of boolean #11142 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(model): support storing versionKey in nested paths #10980
+ * fix(index.d.ts): add options to `bulkSave()` type def #11201 [Uzlopak](https://github.com/Uzlopak)
+ * fix(index.d.ts): better support for query projections #11210 [EugeneKorshenko](https://github.com/EugeneKorshenko)
+
 6.1.10 / 2022-02-01
 ===================
  * fix(mongoose): correctly handle destructured isValidObjectId #11304

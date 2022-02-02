@@ -71,8 +71,10 @@
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 5.x && git push origin 5.x --tags && npm publish --tag legacy",
     "mongo": "node ./tools/repl.js",
-    "test": "mocha --exit ./test/*.test.js ./test/typescript/main.test.js",
-    "test-typings": "tsd",
+    "test": "npm run test-code && npm run test-ts-integration && npm run test-ts-types",
+    "test-code": "mocha --exit ./test/*.test.js",
+    "test-ts-integration": "mocha --exit ./test/typescript/main.test.js",
+    "test-ts-types": "tsd",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },

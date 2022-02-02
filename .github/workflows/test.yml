@@ -37,11 +37,9 @@ jobs:
           ./mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
           sleep 2
           mongod --version
-          mkdir ./test/typescript/node_modules
-          ln -s `pwd` ./test/typescript/node_modules/mongoose
           echo `pwd`/mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin >> $GITHUB_PATH
 
-      - run: npm test
+      - run: npm test-code
 
   lint:
     runs-on: ubuntu-latest
@@ -59,18 +57,48 @@ jobs:
       - name: Linter
         run: npm run lint
 
-  typings:
+  test-ts-types:
     runs-on: ubuntu-latest
-    name: Typings
+    name: Typescript Types
     steps:
       - uses: actions/checkout@v2
 
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 16
+          node-version: 12
 
       - run: npm install
 
       - name: Typings
-        run: npm run test-typings
+        run: npm run test-types
+
+  test-ts-integration:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    name: Typescript Integration
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - run: npm install
+
+      - name: Setup
+        run: |
+          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.2.tgz
+          tar xf mongodb-linux-x86_64-ubuntu2004-5.0.2.tgz
+          mkdir -p ./data/db/27017 ./data/db/27000
+          printf "\n--timeout 8000" >> ./test/mocha.opts
+          ./mongodb-linux-x86_64-ubuntu2004-5.0.2/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
+          sleep 2
+          mongod --version
+          mkdir ./test/typescript/node_modules
+          ln -s `pwd` ./test/typescript/node_modules/mongoose
+          echo `pwd`/mongodb-linux-x86_64-ubuntu2004-5.0.2/bin >> $GITHUB_PATH
+
+      - run: npm run test-ts-typescript

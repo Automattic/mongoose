@@ -7,6 +7,6 @@
   "strictNullChecks": true,
   "include": [
     "./**/*.ts",
-    "../../index.d.ts"
+    "../../types/index.d.ts"
   ]
 }

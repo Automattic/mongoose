@@ -676,4 +676,21 @@ describe('versioning', function() {
     await post3.save();
     assert.equal(post3.__v, 2);
   });
+
+  it('can store version key in nested property (gh-10980)', async function() {
+    const mongooseSchema = Schema({
+      name: String,
+      meta: {
+        test: String
+      }
+    }, { versionKey: 'meta.versionKey' });
+    const Model = db.model('Test', mongooseSchema);
+
+    const doc = new Model({ name: 'test' });
+    await doc.save();
+
+    assert.strictEqual(doc.meta.versionKey, 0);
+    const fromDb = await Model.findById(doc);
+    assert.strictEqual(fromDb.meta.versionKey, 0);
+  });
 });

@@ -74,8 +74,8 @@ declare module 'mongoose' {
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-  export function syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
-  export function syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
+  export function syncIndexes(options?: SyncIndexesOptions): Promise<ConnectionSyncIndexesResult>;
+  export function syncIndexes(options: SyncIndexesOptions | null, callback: Callback<ConnectionSyncIndexesResult>): void;
 
   /* Tells `sanitizeFilter()` to skip the given object when filtering out potential query selector injection attacks.
    * Use this method when you have a known query selector that you want to use. */
@@ -165,6 +165,7 @@ declare module 'mongoose' {
   export const version: string;
 
   export type CastError = Error.CastError;
+  export type SyncIndexesError = Error.SyncIndexesError;
 
   type Mongoose = typeof mongoose;
 
@@ -442,8 +443,8 @@ declare module 'mongoose' {
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-    syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
-    syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
+    syncIndexes(options?: SyncIndexesOptions): Promise<ConnectionSyncIndexesResult>;
+    syncIndexes(options: SyncIndexesOptions | null, callback: Callback<ConnectionSyncIndexesResult>): void;
 
     /**
      * _Requires MongoDB >= 3.6.0._ Executes the wrapped async function
@@ -768,6 +769,12 @@ declare module 'mongoose' {
     toDrop: Array<any>
   }
 
+  interface ModifyResult<T> {
+    value: Require_id<T> | null;
+    lastErrorObject?: mongodb.Document;
+    ok: 0 | 1;
+  }
+
   export const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethods = {}, TVirtuals = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
     new<DocType = AnyKeys<T> & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethods, TVirtuals>;
@@ -799,7 +806,7 @@ declare module 'mongoose' {
      * sending multiple `save()` calls because with `bulkSave()` there is only one
      * network round trip to the MongoDB server.
      */
-    bulkSave(documents: Array<Document>): Promise<mongodb.BulkWriteResult>;
+    bulkSave(documents: Array<Document>, options?: mongodb.BulkWriteOptions): Promise<mongodb.BulkWriteResult>;
 
     /** Collection the model uses. */
     collection: Collection;
@@ -877,10 +884,10 @@ declare module 'mongoose' {
      * equivalent to `findOne({ _id: id })`. If you want to query by a document's
      * `_id`, use `findById()` instead of `findOne()`.
      */
-    findById(id: any, projection?: any | null, options?: QueryOptions | null, callback?: Callback<HydratedDocument<T, TMethods, TVirtuals> | null>): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findById<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(id: any, projection?: any | null, options?: QueryOptions | null, callback?: Callback<ResultDoc | null>): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 
     /** Finds one document. */
-    findOne(filter?: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: Callback<HydratedDocument<T, TMethods, TVirtuals> | null>): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOne<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: Callback<ResultDoc | null>): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 
     /**
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
@@ -972,45 +979,45 @@ declare module 'mongoose' {
     estimatedDocumentCount(options?: QueryOptions, callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /**
-     * Returns true if at least one document exists in the database that matches
-     * the given `filter`, and false otherwise.
+     * Returns a document with its `_id` if at least one document exists in the database that matches
+     * the given `filter`, and `null` otherwise.
      */
-    exists(filter: FilterQuery<T>): Promise<boolean>;
-    exists(filter: FilterQuery<T>, callback: Callback<boolean>): void;
+    exists(filter: FilterQuery<T>): QueryWithHelpers<Pick<Document<T>, '_id'> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    exists(filter: FilterQuery<T>, callback: Callback<Pick<Document<T>, '_id'> | null>): QueryWithHelpers<Pick<Document<T>, '_id'> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
-    find(callback?: Callback<HydratedDocument<T, TMethods, TVirtuals>[]>): QueryWithHelpers<Array<HydratedDocument<T, TMethods, TVirtuals>>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    find(filter: FilterQuery<T>, callback?: Callback<T[]>): QueryWithHelpers<Array<HydratedDocument<T, TMethods, TVirtuals>>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    find(filter: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: Callback<HydratedDocument<T, TMethods, TVirtuals>[]>): QueryWithHelpers<Array<HydratedDocument<T, TMethods, TVirtuals>>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    find<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(callback?: Callback<ResultDoc[]>): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
+    find<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter: FilterQuery<T>, callback?: Callback<ResultDoc[]>): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
+    find<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: Callback<ResultDoc[]>): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
-    findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: CallbackError, doc: HydratedDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findByIdAndDelete<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `findByIdAndRemove` query, filtering by the given `_id`. */
-    findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: CallbackError, doc: HydratedDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findByIdAndRemove<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<mongodb.ModifyResult<HydratedDocument<T, TMethods, TVirtuals>>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: HydratedDocument<T, TMethods, TVirtuals>, res: any) => void): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: HydratedDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, callback: (err: CallbackError, doc: HydratedDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findByIdAndUpdate<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, T>;
+    findByIdAndUpdate<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: ResultDoc, res: any) => void): QueryWithHelpers<ResultDoc, ResultDoc, TQueryHelpers, T>;
+    findByIdAndUpdate<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
+    findByIdAndUpdate<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(id: mongodb.ObjectId | any, update: UpdateQuery<T>, callback: (err: CallbackError, doc: ResultDoc | null, res: any) => void): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
-    findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: HydratedDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOneAndDelete<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
-    findOneAndRemove(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: HydratedDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOneAndRemove<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
-    findOneAndReplace(filter: FilterQuery<T>, replacement: T | AnyObject, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: HydratedDocument<T, TMethods, TVirtuals>, res: any) => void): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findOneAndReplace(filter?: FilterQuery<T>, replacement?: T | AnyObject, options?: QueryOptions | null, callback?: (err: CallbackError, doc: HydratedDocument<T, TMethods, TVirtuals> | null, res: any) => void): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOneAndReplace<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter: FilterQuery<T>, replacement: T | AnyObject, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: ResultDoc, res: any) => void): QueryWithHelpers<ResultDoc, ResultDoc, TQueryHelpers, T>;
+    findOneAndReplace<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: FilterQuery<T>, replacement?: T | AnyObject, options?: QueryOptions | null, callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<mongodb.ModifyResult<HydratedDocument<T, TMethods, TVirtuals>>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: HydratedDocument<T, TMethods, TVirtuals>, res: any) => void): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null, res: any) => void): QueryWithHelpers<HydratedDocument<T, TMethods, TVirtuals> | null, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    findOneAndUpdate<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, T>;
+    findOneAndUpdate<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: ResultDoc, res: any) => void): QueryWithHelpers<ResultDoc, ResultDoc, TQueryHelpers, T>;
+    findOneAndUpdate<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null, res: any) => void): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 
-    geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: Callback<Array<HydratedDocument<T, TMethods, TVirtuals>>>): QueryWithHelpers<Array<HydratedDocument<T, TMethods, TVirtuals>>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    geoSearch<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: Callback<Array<ResultDoc>>): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
 
     /** Executes a mapReduce command. */
     mapReduce<Key, Value>(
@@ -1018,11 +1025,11 @@ declare module 'mongoose' {
       callback?: Callback
     ): Promise<any>;
 
-    remove(filter?: any, callback?: CallbackWithoutResult): QueryWithHelpers<any, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    remove<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: any, callback?: CallbackWithoutResult): QueryWithHelpers<any, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
-    replaceOne(filter?: FilterQuery<T>, replacement?: T | AnyObject, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    replaceOne(filter?: FilterQuery<T>, replacement?: T | AnyObject, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    replaceOne<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: FilterQuery<T>, replacement?: T | AnyObject, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, ResultDoc, TQueryHelpers, T>;
+    replaceOne<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: FilterQuery<T>, replacement?: T | AnyObject, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<any, ResultDoc, TQueryHelpers, T>;
 
     /** Schema the model uses. */
     schema: Schema<T>;
@@ -1031,18 +1038,18 @@ declare module 'mongoose' {
      * @deprecated use `updateOne` or `updateMany` instead.
      * Creates a `update` query: updates one or many documents that match `filter` with `update`, based on the `multi` option.
      */
-    update(filter?: FilterQuery<T>, update?: UpdateQuery<T> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<UpdateWriteOpResult, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    update<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: FilterQuery<T>, update?: UpdateQuery<T> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
-    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<UpdateWriteOpResult, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    updateMany<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: FilterQuery<T>, update?: UpdateQuery<T> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
-    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<UpdateWriteOpResult, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    updateOne<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(filter?: FilterQuery<T>, update?: UpdateQuery<T> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: Callback): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */
-    where(path: string, val?: any): QueryWithHelpers<Array<HydratedDocument<T, TMethods, TVirtuals>>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    where(obj: object): QueryWithHelpers<Array<HydratedDocument<T, TMethods, TVirtuals>>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
-    where(): QueryWithHelpers<Array<HydratedDocument<T, TMethods, TVirtuals>>, HydratedDocument<T, TMethods, TVirtuals>, TQueryHelpers, T>;
+    where<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(path: string, val?: any): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
+    where<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(obj: object): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
+    where<ResultDoc = HydratedDocument<T, TMethods, TVirtuals>>(): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
   }
 
   type UpdateWriteOpResult = mongodb.UpdateResult;
@@ -1505,6 +1512,11 @@ declare module 'mongoose' {
      * optimistic concurrency.
      */
     optimisticConcurrency?: boolean;
+    /**
+     * If `plugin()` called with tags, Mongoose will only apply plugins to schemas that have
+     * a matching tag in `pluginTags`
+     */
+    pluginTags?: string[];
     /**
      * Allows setting query#read options at the schema level, providing us a way to apply default ReadPreferences
      * to all queries derived from a model.
@@ -2126,6 +2138,8 @@ declare module 'mongoose' {
   type UnpackedIntersection<T, U> = T extends (infer V)[] ? (V & U)[] : T & U;
   type UnpackedIntersectionWithNull<T, U> = T extends null ? UnpackedIntersection<T, U> | null : UnpackedIntersection<T, U>;
 
+  type ProjectionFields<DocType> = {[Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any} & Record<string, any>;
+
   class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
     _mongooseOptions: MongooseQueryOptions;
 
@@ -2269,9 +2283,24 @@ declare module 'mongoose' {
     findOneAndRemove(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: CallbackError, doc: DocType | null, res: mongodb.ModifyResult<DocType>) => void): QueryWithHelpers<mongodb.ModifyResult<DocType>, DocType, THelpers, RawDocType>;
-    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: DocType, res: mongodb.ModifyResult<DocType>) => void): QueryWithHelpers<DocType, DocType, THelpers, RawDocType>;
-    findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, doc: DocType | null, res: mongodb.ModifyResult<DocType>) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
+    findOneAndUpdate(
+      filter: FilterQuery<DocType>,
+      update: UpdateQuery<DocType>,
+      options: QueryOptions & { rawResult: true },
+      callback?: (err: CallbackError, doc: DocType | null, res: ModifyResult<DocType>) => void
+    ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType>;
+    findOneAndUpdate(
+      filter: FilterQuery<DocType>,
+      update: UpdateQuery<DocType>,
+      options: QueryOptions & { upsert: true } & ReturnsNewDoc,
+      callback?: (err: CallbackError, doc: DocType, res: ModifyResult<DocType>) => void
+    ): QueryWithHelpers<DocType, DocType, THelpers, RawDocType>;
+    findOneAndUpdate(
+      filter?: FilterQuery<DocType>,
+      update?: UpdateQuery<DocType>,
+      options?: QueryOptions | null,
+      callback?: (err: CallbackError, doc: DocType | null, res: ModifyResult<DocType>) => void
+    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: CallbackError, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
@@ -2412,7 +2441,9 @@ declare module 'mongoose' {
     populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
-    projection(fields?: any | null): this;
+    projection(): ProjectionFields<DocType> | null;
+    projection(fields: null): null;
+    projection(fields?: ProjectionFields<DocType> | string): ProjectionFields<DocType>;
 
     /** Determines the MongoDB nodes from which to read. */
     read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
@@ -3262,8 +3293,14 @@ declare module 'mongoose' {
     /** String representation of what type this is, like 'ObjectID' or 'Number' */
     instance: string;
 
+    /** True if this SchemaType has a required validator. False otherwise. */
+    isRequired?: boolean;
+
     /** The options this SchemaType was instantiated with */
     options: AnyObject;
+
+    /** The path to this SchemaType in a Schema. */
+    path: string;
 
     /**
      * Set the model that this path refers to. This is the option that [populate](https://mongoosejs.com/docs/populate.html)
@@ -3298,11 +3335,19 @@ declare module 'mongoose' {
     /** Declares an unique index. */
     unique(bool: boolean): this;
 
+    /** The validators that Mongoose should run to validate properties at this SchemaType's path. */
+    validators: { message?: string; type?: string; validator?: Function }[];
+
     /** Adds validator(s) for this document path. */
     validate(obj: RegExp | Function | any, errorMsg?: string,
       type?: string): this;
   }
 
+  export interface SyncIndexesOptions extends mongodb.CreateIndexesOptions {
+    continueOnError?: boolean
+  }
+  export type ConnectionSyncIndexesResult = Record<string, OneCollectionSyncIndexesResult>;
+  type OneCollectionSyncIndexesResult = Array<string> & mongodb.MongoServerError;
   type Callback<T = any> = (error: CallbackError, result: T) => void;
 
   type CallbackWithoutResult = (error: CallbackError) => void;
@@ -3330,6 +3375,12 @@ declare module 'mongoose' {
       path: string;
       reason?: NativeError | null;
       model?: any;
+
+      constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
+    }
+    export class SyncIndexesError extends Error {
+      name: 'SyncIndexesError';
+      errors?: Record<string, mongodb.MongoServerError>;
 
       constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
     }

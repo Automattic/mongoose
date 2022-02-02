@@ -101,4 +101,4 @@ jobs:
           ln -s `pwd` ./test/typescript/node_modules/mongoose
           echo `pwd`/mongodb-linux-x86_64-ubuntu2004-5.0.2/bin >> $GITHUB_PATH
 
-      - run: npm run test-ts-typescript
+      - run: npm run test-ts-integration

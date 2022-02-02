@@ -19,6 +19,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@types/node": "< 17.0.6",
     "bson": "^4.2.2",
     "kareem": "2.3.3",
     "mongodb": "4.2.2",
@@ -29,7 +30,6 @@
     "sift": "13.5.2"
   },
   "devDependencies": {
-    "@types/node": "< 17.0.6",
     "@babel/core": "7.10.5",
     "@babel/preset-env": "7.10.4",
     "@typescript-eslint/eslint-plugin": "5.8.0",

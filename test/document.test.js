@@ -11000,6 +11000,11 @@ describe('document', function() {
   });
 
   it('applies subdocument defaults when projecting dotted subdocument fields', async function() {
+    const version = await start.mongodVersion();
+    if (version[0] < 5) {
+      return this.skip();
+    }
+
     const grandChildSchema = new mongoose.Schema({
       name: {
         type: mongoose.Schema.Types.String,

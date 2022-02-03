@@ -1,5 +1,6 @@
-import { Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc, FilterQuery, UpdateQuery } from 'mongoose';
+import { HydratedDocument, Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc, FilterQuery, UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { expectError, expectType } from 'tsd';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
@@ -22,7 +23,7 @@ schema.query._byName = function(name: string): QueryWithHelpers<any, ITest, Quer
 };
 
 schema.query.byName = function(name: string): QueryWithHelpers<any, ITest, QueryHelpers> {
-  this.notAQueryHelper();
+  expectError(this.notAQueryHelper());
   return this._byName(name);
 };
 
@@ -210,7 +211,7 @@ async function gh11156(): Promise<void> {
 
   const User: Model<User> = model<User>('User', schema);
 
-  const overwritten: User = await User.findOne<Pick<User, 'name'>>({}).orFail();
+  expectType<{ name: string }>(await User.findOne<Pick<User, 'name'>>({}).orFail());
 }
 
 async function gh11041(): Promise<void> {
@@ -230,5 +231,5 @@ async function gh11041(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  const maybeDoc3: { _id: Types.ObjectId } = await MyModel.findOne({}).populate('someField').exec();
+  expectType<HydratedDocument<User> | null>(await MyModel.findOne({}).populate('someField').exec());
 }

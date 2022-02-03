@@ -1,6 +1,7 @@
 import { Schema, model, Document, PopulatedDoc, Types } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
+import { expectError } from 'tsd';
 
 interface Child {
   name: string;
@@ -32,7 +33,7 @@ ParentModel.findOne({}).populate('child').orFail().then((doc: Parent & Document)
     throw new Error('should be populated');
   } else {
     const name = leanChild.name;
-    leanChild.save();
+    expectError(leanChild.save());
   }
 });
 

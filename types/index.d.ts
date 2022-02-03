@@ -122,7 +122,7 @@ declare module 'mongoose' {
    * false otherwise.
    */
   export function isValidObjectId(v: Types.ObjectId): true;
-  export function isValidObjectId(v: unknown): boolean;
+  export function isValidObjectId(v: any): boolean;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
   export function model<T, U, TQueryHelpers = {}>(

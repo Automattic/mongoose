@@ -261,6 +261,9 @@ declare module 'mongoose' {
     /** true by default, may be `false`, `true`, or `'throw'`. Sets the default strict mode for schemas. */
     strict?: boolean | 'throw';
 
+    /** true by default. set to `false` to allow populating paths that aren't in the schema */
+    strictPopulate?: boolean;
+
     /**
      * false by default, may be `false`, `true`, or `'throw'`. Sets the default
      * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.

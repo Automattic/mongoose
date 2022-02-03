@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "6.1.10",
+  "version": "6.2.0",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -75,7 +75,7 @@
     "test": "npm run test-code && npm run test-ts-integration && npm run test-ts-types",
     "test-code": "mocha --exit ./test/*.test.js",
     "test-ts-integration": "mocha --exit ./test/typescript/main.test.js",
-    "test-ts-types": "tsd",
+    "sym-link-mongoose": "npm link && npm link mongoose",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-coverage": "nyc --reporter=html --reporter=text npm test"
   },

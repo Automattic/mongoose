@@ -10998,4 +10998,71 @@ describe('document', function() {
     assert.equal(typeof doc.somethingElse, 'string');
     delete String.type;
   });
+
+  it('applies subdocument defaults when projecting dotted subdocument fields', async function() {
+    const version = await start.mongodVersion();
+    if (version[0] < 5) {
+      return this.skip();
+    }
+
+    const grandChildSchema = new mongoose.Schema({
+      name: {
+        type: mongoose.Schema.Types.String,
+        default: () => 'grandchild'
+      }
+    });
+
+    const childSchema = new mongoose.Schema({
+      name: {
+        type: mongoose.Schema.Types.String,
+        default: () => 'child'
+      },
+      grandChild: {
+        type: grandChildSchema,
+        default: () => ({})
+      }
+    });
+
+    const parentSchema = new mongoose.Schema({
+      name: mongoose.Schema.Types.String,
+      child: {
+        type: childSchema,
+        default: () => ({})
+      }
+    });
+
+    const ParentModel = db.model('Parent', parentSchema);
+    // insert an object without mongoose adding missing defaults
+    const result = await db.collection('Parent').insertOne({ name: 'parent' });
+
+    // ensure that the defaults are populated when no projections are used
+    const doc = await ParentModel.findById(result.insertedId).exec();
+    assert.equal(doc.name, 'parent');
+    assert.equal(doc.child.name, 'child');
+    assert.equal(doc.child.grandChild.name, 'grandchild');
+
+    // ensure that defaults are populated when using an object projection
+    const projectedDoc = await ParentModel.findById(result.insertedId, {
+      name: 1,
+      child: {
+        name: 1,
+        grandChild: {
+          name: 1
+        }
+      }
+    }).exec();
+    assert.equal(projectedDoc.name, 'parent');
+    assert.equal(projectedDoc.child.name, 'child');
+    assert.equal(projectedDoc.child.grandChild.name, 'grandchild');
+
+    // ensure that defaults are populated when using dotted path projections
+    const dottedProjectedDoc = await ParentModel.findById(result.insertedId, {
+      name: 1,
+      'child.name': 1,
+      'child.grandChild.name': 1
+    }).exec();
+    assert.equal(dottedProjectedDoc.name, 'parent');
+    assert.equal(dottedProjectedDoc.child.name, 'child');
+    assert.equal(dottedProjectedDoc.child.grandChild.name, 'grandchild');
+  });
 });

@@ -262,6 +262,9 @@ declare module 'mongoose' {
     /** true by default, may be `false`, `true`, or `'throw'`. Sets the default strict mode for schemas. */
     strict?: boolean | 'throw';
 
+    /** true by default. set to `false` to allow populating paths that aren't in the schema */
+    strictPopulate?: boolean;
+
     /**
      * false by default, may be `false`, `true`, or `'throw'`. Sets the default
      * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
@@ -306,7 +309,7 @@ declare module 'mongoose' {
     close(force?: boolean): Promise<void>;
 
     /** Retrieves a collection, creating it if not cached. */
-    collection(name: string, options?: mongodb.CreateCollectionOptions): Collection;
+    collection<T = AnyObject>(name: string, options?: mongodb.CreateCollectionOptions): Collection<T>;
 
     /** A hash of the collections associated with this connection */
     collections: { [index: string]: Collection };
@@ -322,9 +325,9 @@ declare module 'mongoose' {
      * with specified options. Used to create [capped collections](https://docs.mongodb.com/manual/core/capped-collections/)
      * and [views](https://docs.mongodb.com/manual/core/views/) from mongoose.
      */
-    createCollection(name: string, options?: mongodb.CreateCollectionOptions): Promise<mongodb.Collection>;
-    createCollection(name: string, cb: Callback<mongodb.Collection>): void;
-    createCollection(name: string, options: mongodb.CreateCollectionOptions, cb?: Callback<mongodb.Collection>): Promise<mongodb.Collection>;
+    createCollection<T = AnyObject>(name: string, options?: mongodb.CreateCollectionOptions): Promise<mongodb.Collection<T>>;
+    createCollection<T = AnyObject>(name: string, cb: Callback<mongodb.Collection<T>>): void;
+    createCollection<T = AnyObject>(name: string, options: mongodb.CreateCollectionOptions, cb?: Callback<mongodb.Collection<T>>): Promise<mongodb.Collection<T>>;
 
     /**
      * Removes the model named `name` from this connection, if it exists. You can
@@ -469,7 +472,7 @@ declare module 'mongoose' {
    * section collection.js
    * http://mongoosejs.com/docs/api.html#collection-js
    */
-  interface CollectionBase extends mongodb.Collection {
+  interface CollectionBase<T> extends mongodb.Collection<T> {
     /*
       * Abstract methods. Some of these are already defined on the
       * mongodb.Collection interface so they've been commented out.
@@ -491,7 +494,7 @@ declare module 'mongoose' {
    * http://mongoosejs.com/docs/api.html#drivers-node-mongodb-native-collection-js
    */
   let Collection: Collection;
-  interface Collection extends CollectionBase {
+  interface Collection<T = AnyObject> extends CollectionBase<T> {
     /**
      * Collection constructor
      * @param name name of the collection
@@ -499,7 +502,7 @@ declare module 'mongoose' {
      * @param opts optional collection options
      */
     // eslint-disable-next-line @typescript-eslint/no-misused-new
-    new(name: string, conn: Connection, opts?: any): Collection;
+    new(name: string, conn: Connection, opts?: any): Collection<T>;
     /** Formatter for debug print args */
     $format(arg: any): string;
     /** Debug print helper */
@@ -836,8 +839,8 @@ declare module 'mongoose' {
      * mongoose will not create the collection for the model until any documents are
      * created. Use this method to create the collection explicitly.
      */
-    createCollection(options?: mongodb.CreateCollectionOptions): Promise<mongodb.Collection>;
-    createCollection(options: mongodb.CreateCollectionOptions | null, callback: Callback<mongodb.Collection>): void;
+    createCollection<T>(options?: mongodb.CreateCollectionOptions): Promise<mongodb.Collection<T>>;
+    createCollection<T>(options: mongodb.CreateCollectionOptions | null, callback: Callback<mongodb.Collection<T>>): void;
 
     /**
      * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)

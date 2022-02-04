@@ -2,16 +2,12 @@
     "extends": [
         "eslint:recommended"
     ],
-    "ignore": [
-        "docs/",
-        "bin/",
-        "test/triage/",
-        "tools/",
-        "test/es-next/",
-        "test/files/",
-        "dist/",
-        "benchmarks/",
-        "search.js"
+    "ignorePatterns": [
+        "docs",
+        "tools",
+        "dist",
+        "test/files/*",
+        "benchmarks"
     ],
     "overrides": [
         {

@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true
+    "esModuleInterop": false
   },
-  "esModuleInterop": true,
   "outDir": "test/dist",
   "strictNullChecks": true,
   "include": [

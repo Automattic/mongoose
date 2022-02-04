@@ -7,6 +7,12 @@ const tsconfig = require('./tsconfig.json');
 describe('typescript syntax', function() {
   this.timeout(60000);
 
+  it('esm', function() {
+    const errors = runTest('esm.ts');
+    printTSErrors(errors);
+    assert.equal(errors.length, 0);
+  });
+
   it('base', function() {
     const errors = runTest('base.ts');
     printTSErrors(errors);

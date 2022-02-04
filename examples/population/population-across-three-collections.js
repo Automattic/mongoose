@@ -47,7 +47,7 @@ mongoose.connection.on('open', function() {
    * Generate data
    */
 
-  const userIds = [new ObjectId, new ObjectId, new ObjectId, new ObjectId];
+  const userIds = [new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId()];
   const users = [];
 
   users.push({

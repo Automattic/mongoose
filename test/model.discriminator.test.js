@@ -295,7 +295,7 @@ describe('model', function() {
         const employee = new Employee();
         assert.strictEqual(employee.getFullName, PersonSchema.methods.getFullName);
         assert.strictEqual(employee.getDepartment, EmployeeSchema.methods.getDepartment);
-        assert.equal((new Person).getDepartment, undefined);
+        assert.equal((new Person()).getDepartment, undefined);
       });
 
       it('inherits statics', function() {

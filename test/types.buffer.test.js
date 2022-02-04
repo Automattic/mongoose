@@ -55,7 +55,7 @@ describe('types.buffer', function() {
   afterEach(() => require('./util').stopRemainingOps(db));
 
   it('test that a mongoose buffer behaves and quacks like a buffer', function() {
-    let a = new MongooseBuffer;
+    let a = new MongooseBuffer();
 
     assert.ok(a instanceof Buffer);
     assert.ok(a.isMongooseBuffer);

@@ -264,12 +264,12 @@ describe('schema', function() {
     assert.equal(Test.path('simple').getDefault(), 'a');
     assert.equal((+Test.path('callback').getDefault({ a: 'b' })), 3);
     assert.equal(typeof Test.path('array').defaultValue, 'function');
-    assert.equal(Test.path('array').getDefault(new TestDocument)[3], 4);
-    assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
+    assert.equal(Test.path('array').getDefault(new TestDocument())[3], 4);
+    assert.equal(Test.path('arrayX').getDefault(new TestDocument())[0], 9);
     assert.equal(typeof Test.path('arrayFn').defaultValue, 'function');
-    assert.ok(Test.path('arrayFn').getDefault(new TestDocument).isMongooseArray);
-    assert.ok(Test.path('arrayX').getDefault(new TestDocument).isMongooseArray);
-    assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
+    assert.ok(Test.path('arrayFn').getDefault(new TestDocument()).isMongooseArray);
+    assert.ok(Test.path('arrayX').getDefault(new TestDocument()).isMongooseArray);
+    assert.equal(Test.path('arrayX').getDefault(new TestDocument())[0], 9);
     done();
   });
 
@@ -319,8 +319,8 @@ describe('schema', function() {
         assert.equal(Tobi.path('nickname').cast(0), '0');
 
         // test any object that implements toString
-        assert.equal(typeof Tobi.path('nickname').cast(new Test), 'string');
-        assert.equal(Tobi.path('nickname').cast(new Test), 'woot');
+        assert.equal(typeof Tobi.path('nickname').cast(new Test()), 'string');
+        assert.equal(Tobi.path('nickname').cast(new Test()), 'woot');
         done();
       });
     });
@@ -332,7 +332,7 @@ describe('schema', function() {
 
       assert.ok(Loki.path('birth_date').cast(1294525628301) instanceof Date);
       assert.ok(Loki.path('birth_date').cast('8/24/2000') instanceof Date);
-      assert.ok(Loki.path('birth_date').cast(new Date) instanceof Date);
+      assert.ok(Loki.path('birth_date').cast(new Date()) instanceof Date);
       assert.ok(Loki.path('birth_date').cast('') === null);
       assert.ok(Loki.path('birth_date').cast(null) === null);
       done();
@@ -367,7 +367,7 @@ describe('schema', function() {
         mixed: [Mixed]
       });
 
-      const oids = Loki.path('oids').cast(['4c54f3453e688c000000001a', new DocumentObjectId]);
+      const oids = Loki.path('oids').cast(['4c54f3453e688c000000001a', new DocumentObjectId()]);
 
       assert.ok(oids[0] instanceof DocumentObjectId);
       assert.ok(oids[1] instanceof DocumentObjectId);
@@ -403,7 +403,7 @@ describe('schema', function() {
       assert.equal(typeof nocasts[1], 'number');
       assert.equal(nocasts[1], 123);
 
-      const mixed = Loki.path('mixed').cast(['test', 123, '123', {}, new Date, new DocumentObjectId]);
+      const mixed = Loki.path('mixed').cast(['test', 123, '123', {}, new Date(), new DocumentObjectId()]);
 
       assert.equal(typeof mixed[0], 'string');
       assert.equal(typeof mixed[1], 'number');
@@ -468,7 +468,7 @@ describe('schema', function() {
   });
 
   it('methods declaration', function(done) {
-    const a = new Schema;
+    const a = new Schema();
     a.method('test', function() {
     });
     a.method({
@@ -482,7 +482,7 @@ describe('schema', function() {
   });
 
   it('static declaration', function(done) {
-    const a = new Schema;
+    const a = new Schema();
     a.static('test', function() {
     });
     a.static({
@@ -531,7 +531,7 @@ describe('schema', function() {
         name: { type: Schema.ObjectId, set: extract }
       });
 
-      const id = new DocumentObjectId;
+      const id = new DocumentObjectId();
       const sid = id.toString();
       const _id = { _id: id };
 
@@ -910,7 +910,7 @@ describe('schema', function() {
 
   describe('plugins', function() {
     it('work', function(done) {
-      const Tobi = new Schema;
+      const Tobi = new Schema();
       let called = false;
 
       Tobi.plugin(function(schema) {
@@ -1132,7 +1132,7 @@ describe('schema', function() {
 
     describe('getter', function() {
       it('scope', function(done) {
-        const Tobi = new Schema;
+        const Tobi = new Schema();
 
         Tobi.virtual('name').get(function(v, self) {
           assert.equal(this.a, 'b');
@@ -1147,7 +1147,7 @@ describe('schema', function() {
 
     describe('setter', function() {
       it('scope', function(done) {
-        const Tobi = new Schema;
+        const Tobi = new Schema();
 
         Tobi.virtual('name').set(function(v, self) {
           assert.equal(this.a, 'b');
@@ -1343,7 +1343,7 @@ describe('schema', function() {
 
   describe('construction', function() {
     it('array of object literal missing a type is interpreted as DocumentArray', function(done) {
-      const goose = new mongoose.Mongoose;
+      const goose = new mongoose.Mongoose();
       const s = new Schema({
         arr: [
           { something: { type: String } }
@@ -1358,7 +1358,7 @@ describe('schema', function() {
     });
 
     it('array of object literal with type.type is interpreted as DocumentArray', function(done) {
-      const goose = new mongoose.Mongoose;
+      const goose = new mongoose.Mongoose();
       const s = new Schema({
         arr: [
           { type: { type: String } }
@@ -1500,7 +1500,7 @@ describe('schema', function() {
     it('permit _scope to be used (gh-1184)', function(done) {
       const child = new Schema({ _scope: Schema.ObjectId });
       const C = db.model('Test', child);
-      const c = new C;
+      const c = new C();
       c.save(function(err) {
         assert.ifError(err);
         try {

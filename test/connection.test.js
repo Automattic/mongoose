@@ -305,16 +305,16 @@ describe('connections:', function() {
 
     it('prevents overwriting pre-existing models', function() {
       db.deleteModel(/Test/);
-      db.model('Test', new Schema);
+      db.model('Test', new Schema());
 
       assert.throws(function() {
-        db.model('Test', new Schema);
+        db.model('Test', new Schema());
       }, /Cannot overwrite `Test` model/);
     });
 
     it('allows passing identical name + schema args', function() {
       const name = 'Test';
-      const schema = new Schema;
+      const schema = new Schema();
 
       db.deleteModel(/Test/);
       const model = db.model(name, schema);
@@ -470,7 +470,7 @@ describe('connections:', function() {
 
   describe('modelNames()', function() {
     it('returns names of all models registered on it', async function() {
-      const m = new mongoose.Mongoose;
+      const m = new mongoose.Mongoose();
       m.model('root', { x: String });
       const another = m.model('another', { x: String });
       another.discriminator('discriminated', new Schema({ x: String }));
@@ -887,7 +887,7 @@ describe('connections:', function() {
   });
 
   it('connection.asPromise() resolves to a connection instance (gh-9496)', async function() {
-    const m = new mongoose.Mongoose;
+    const m = new mongoose.Mongoose();
 
     m.connect('mongodb://localhost:27017/test_gh9496');
     const conn = await m.connection.asPromise();
@@ -936,7 +936,7 @@ describe('connections:', function() {
   });
 
   it('can use destructured `connect` and `disconnect` (gh-9597)', async function() {
-    const m = new mongoose.Mongoose;
+    const m = new mongoose.Mongoose();
     const connect = m.connect;
     const disconnect = m.disconnect;
 
@@ -1067,9 +1067,9 @@ describe('connections:', function() {
   });
 
   it('Connection id should be scoped per Mongoose Instance (gh-10025)', function() {
-    const m = new mongoose.Mongoose;
+    const m = new mongoose.Mongoose();
     const conn = m.createConnection();
-    const m1 = new mongoose.Mongoose;
+    const m1 = new mongoose.Mongoose();
     const conn2 = m1.createConnection();
     const conn3 = m.createConnection();
     assert.deepStrictEqual(m.connection.id, 0);
@@ -1298,7 +1298,7 @@ describe('connections:', function() {
     });
 
     it('mongoose.syncIndexes(...) accepts `continueOnError`', async() => {
-      const m = new mongoose.Mongoose;
+      const m = new mongoose.Mongoose();
       await m.connect('mongodb://localhost:27017/connection_sync_indexes_test');
 
       // Arrange

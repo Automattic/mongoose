@@ -224,7 +224,7 @@ MongooseArray methods such as
 and others cast arguments to their proper types transparently:
 ```javascript
 const Parent = mongoose.model('Parent');
-const parent = new Parent;
+const parent = new Parent();
 
 // create a comment
 parent.children.push({ name: 'Liesl' });

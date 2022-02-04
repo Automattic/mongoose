@@ -20,7 +20,7 @@ const threeFour = new TimeSignature({
   unit: 4,
   description: '3/4',
   additive: false,
-  created: new Date,
+  created: new Date(),
   links: ['http://en.wikipedia.org/wiki/Time_signature'],
   user_id: '518d31a0ef32bbfa853a9814'
 });

@@ -134,20 +134,20 @@ describe('document: strict mode:', function() {
     const Lax = db.model('Test1', lax);
     const Strict = db.model('Test2', strict);
 
-    let l = new Lax;
+    let l = new Lax();
     l.set('name', { last: 'goose', hack: 'xx' });
     l = l.toObject();
     assert.equal(l.name.last, 'goose');
     assert.equal(l.name.hack, 'xx');
 
-    let s = new Strict;
+    let s = new Strict();
     s.set({ name: { last: 'goose', hack: 'xx' } });
     s = s.toObject();
     assert.equal(s.name.last, 'goose');
     assert.ok(!('hack' in s.name));
     assert.ok(!s.name.hack);
 
-    s = new Strict;
+    s = new Strict();
     s.set('name', { last: 'goose', hack: 'xx' });
     s.set('shouldnt.exist', ':(');
     s = s.toObject();
@@ -350,7 +350,7 @@ describe('document: strict mode:', function() {
       const schema = new Schema({ n: String, docs: [{ x: [{ y: String }] }] });
       schema.set('strict', 'throw');
       const M = db.model('Test', schema);
-      const m = new M;
+      const m = new M();
 
       const badField = /Field `[\w.]+` is not in schema/;
 

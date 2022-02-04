@@ -59,7 +59,7 @@ describe('model: mapreduce:', function() {
   it('works', async function() {
     const MR = db.model('MapReduce', BlogPost);
 
-    const id = new mongoose.Types.ObjectId;
+    const id = new mongoose.Types.ObjectId();
     const authors = 'aaron guillermo brian nathan'.split(' ');
     const num = 10;
     const docs = [];
@@ -206,7 +206,7 @@ describe('model: mapreduce:', function() {
       db = start();
       MR = db.model('MapReduce', BlogPost);
 
-      id = new mongoose.Types.ObjectId;
+      id = new mongoose.Types.ObjectId();
       const authors = 'aaron guillermo brian nathan'.split(' ');
       const num = 10;
       for (let i = 0; i < num; ++i) {

@@ -29,7 +29,7 @@ const test = new Schema({
 
 function TestDoc(schema) {
   const Subdocument = function() {
-    ArraySubdocument.call(this, {}, new DocumentArray);
+    ArraySubdocument.call(this, {}, new DocumentArray());
   };
 
   /**

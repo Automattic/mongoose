@@ -1446,7 +1446,7 @@ describe('model: populate:', function() {
     });
     const BlogPost = db.model('BlogPost', blogpost);
 
-    const userIds = [new ObjectId, new ObjectId, new ObjectId, new ObjectId];
+    const userIds = [new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId()];
     const users = [];
 
     users.push({
@@ -1880,7 +1880,7 @@ describe('model: populate:', function() {
   it('refs should cast to ObjectId from hexstrings', function(done) {
     const BP = db.model('BlogPost', blogPostSchema);
 
-    const bp = new BP;
+    const bp = new BP();
     bp._creator = new DocObjectId().toString();
     assert.ok(bp._creator instanceof DocObjectId);
     bp.set('_creator', new DocObjectId().toString());
@@ -2386,7 +2386,7 @@ describe('model: populate:', function() {
       B = db.model('BlogPost', blogPostSchema);
       User = db.model('User', userSchema);
 
-      _id = new mongoose.Types.ObjectId;
+      _id = new mongoose.Types.ObjectId();
 
       User.create({
         name: 'Phoenix',

@@ -876,13 +876,13 @@ describe('types array', function() {
       });
 
       const M = db.model('Test', schema);
-      const m = new M;
+      const m = new M();
 
       m.num.push(1, 2, 3);
       m.str.push('one', 'two', 'tres');
       m.doc.push({ name: 'Dubstep', arr: [1] }, { name: 'Polka', arr: [{ x: 3 }] });
 
-      const d1 = new Date;
+      const d1 = new Date();
       const d2 = new Date(+d1 + 60000);
       const d3 = new Date(+d1 + 30000);
       const d4 = new Date(+d1 + 20000);
@@ -890,12 +890,12 @@ describe('types array', function() {
       const d6 = new Date(+d1 + 10000);
       m.date.push(d1, d2);
 
-      const id1 = new mongoose.Types.ObjectId;
-      const id2 = new mongoose.Types.ObjectId;
-      const id3 = new mongoose.Types.ObjectId;
-      const id4 = new mongoose.Types.ObjectId;
-      const id5 = new mongoose.Types.ObjectId;
-      const id6 = new mongoose.Types.ObjectId;
+      const id1 = new mongoose.Types.ObjectId();
+      const id2 = new mongoose.Types.ObjectId();
+      const id3 = new mongoose.Types.ObjectId();
+      const id4 = new mongoose.Types.ObjectId();
+      const id5 = new mongoose.Types.ObjectId();
+      const id6 = new mongoose.Types.ObjectId();
 
       m.id.push(id1, id2);
 
@@ -1108,7 +1108,7 @@ describe('types array', function() {
       });
 
       const M = db.model('Test', schema);
-      const m = new M;
+      const m = new M();
 
       m.doc.addToSet({ name: 'Rap' });
       m.save(function(error, m) {
@@ -1222,9 +1222,9 @@ describe('types array', function() {
       const U = db.model('User', UserSchema);
       const ID = mongoose.Types.ObjectId;
 
-      const u = new U({ name: 'banana', pets: [new ID] });
+      const u = new U({ name: 'banana', pets: [new ID()] });
       assert.equal(u.pets.length, 1);
-      u.pets.nonAtomicPush(new ID);
+      u.pets.nonAtomicPush(new ID());
       assert.equal(u.pets.length, 2);
       u.save(function(err) {
         assert.ifError(err);
@@ -1233,7 +1233,7 @@ describe('types array', function() {
           assert.equal(u.pets.length, 2);
           const id0 = u.pets[0];
           const id1 = u.pets[1];
-          const id2 = new ID;
+          const id2 = new ID();
           u.pets.pull(id0);
           u.pets.nonAtomicPush(id2);
           assert.equal(u.pets.length, 2);
@@ -1957,7 +1957,7 @@ describe('types array', function() {
     });
 
     it('works', function(done) {
-      const post = new B;
+      const post = new B();
       post.numbers.push(1, 2, 3);
 
       post.save(function(err) {
@@ -2039,9 +2039,9 @@ describe('types array', function() {
       });
       it('supports passing objectids', function(done) {
         const OID = mongoose.Types.ObjectId;
-        const a = new OID;
-        const b = new OID;
-        const c = new OID;
+        const a = new OID();
+        const b = new OID();
+        const c = new OID();
         const post = new B({ oidIds: docs([a, b, c]) });
         post.save(function(err) {
           assert.ifError(err);

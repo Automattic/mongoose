@@ -24,7 +24,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
     throw err;
   }
 
-  const commentSchema = new Schema;
+  const commentSchema = new Schema();
   commentSchema.add({
     title: String,
     date: Date,

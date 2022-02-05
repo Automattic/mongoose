@@ -1418,6 +1418,7 @@ declare module 'mongoose' {
   type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String;
   type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean;
   type DateSchemaDefinition = typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date;
+  type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId;
 
   type SchemaDefinitionWithBuiltInClass<T> = T extends number
     ? NumberSchemaDefinition
@@ -1618,6 +1619,8 @@ declare module 'mongoose' {
       T extends NativeDate ? DateSchemaDefinition :
       T extends Map<any, any> ? SchemaDefinition<typeof Map> :
       T extends Buffer ? SchemaDefinition<typeof Buffer> :
+      T extends Types.ObjectId ? ObjectIdSchemaDefinition :
+      T extends Types.ObjectId[] ? AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId>> :
       T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>>> | AnyArray<SchemaTypeOptions<Unpacked<T>>>) :
       T extends string[] ? AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string>> :
       T extends number[] ? AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number>> :

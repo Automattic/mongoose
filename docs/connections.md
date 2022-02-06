@@ -247,7 +247,7 @@ connection may emit.
 
 When you're connecting to a single MongoDB server (a "standalone"), Mongoose will emit 'disconnected' if it gets
 disconnected from the standalone server, and 'connected' if it successfully connects to the standalone. In a
-replica set, Mongoose will emit 'disconnected' if it loses connectivity to the replica set primary, and 'connected' if it manages to reconnect to a the replica set primary.
+replica set, Mongoose will emit 'disconnected' if it loses connectivity to the replica set primary, and 'connected' if it manages to reconnect to the replica set primary.
 
 <h3 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h3>
 

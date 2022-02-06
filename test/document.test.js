@@ -11065,4 +11065,40 @@ describe('document', function() {
     assert.equal(dottedProjectedDoc.child.name, 'child');
     assert.equal(dottedProjectedDoc.child.grandChild.name, 'grandchild');
   });
+
+  it('handles initing nested properties in non-strict documents (gh-11309)', async function() {
+    const NestedSchema = new Schema({}, {
+      id: false,
+      _id: false,
+      strict: false
+    });
+
+    const ItemSchema = new Schema({
+      name: {
+        type: String
+      },
+      nested: NestedSchema
+    });
+
+    const Test = db.model('Test', ItemSchema);
+
+    const item = await Test.create({
+      nested: {
+        foo: {
+          bar: 55
+        }
+      }
+    });
+
+    // Modify nested data
+    item.nested.foo.bar = 66;
+    item.markModified('nested.foo.bar');
+    await item.save();
+
+    const reloaded = await Test.findOne({ _id: item._id });
+
+    assert.deepEqual(reloaded.nested.foo, { bar: 66 });
+    assert.ok(!reloaded.nested.foo.$__isNested);
+    assert.strictEqual(reloaded.nested.foo.bar, 66);
+  });
 });

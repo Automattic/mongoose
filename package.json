@@ -79,7 +79,7 @@
     "test-coverage": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
-  "types": "./index.d.ts",
+  "types": "./types/index.d.ts",
   "engines": {
     "node": ">=12.0.0"
   },
@@ -100,6 +100,12 @@
       "test/**/*.js"
     ]
   },
+<<<<<<< HEAD
+=======
+  "tsd": {
+    "directory": "test/types"
+  },
+>>>>>>> a27bfe4a96ffa8f95b52cd1f391c4d3e0105900c
   "config": {
     "mongodbMemoryServer": {
       "disablePostinstall": true

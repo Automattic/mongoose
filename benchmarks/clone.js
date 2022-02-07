@@ -2,14 +2,20 @@
 
 const mongoose = require('../');
 const Schema = mongoose.Schema;
+const Benchmark = require('benchmark');
 
 const DocSchema = new Schema({
   title: String
 });
 
+const SimpleSchema = new Schema({
+  string: { type: String, required: true },
+  number: { type: Number, min: 10 },
+});
+
 const AllSchema = new Schema({
-  string: {type: String, required: true},
-  number: {type: Number, min: 10},
+  string: { type: String, required: true },
+  number: { type: Number, min: 10 },
   date: Date,
   bool: Boolean,
   buffer: Buffer,
@@ -22,11 +28,11 @@ const AllSchema = new Schema({
   buffers: [Buffer],
   objectids: [Schema.ObjectId],
   docs: {
-    type: [DocSchema], validate: function() {
+    type: [DocSchema], validate: function () {
       return true;
     }
   },
-  s: {nest: String}
+  s: { nest: String }
 });
 
 const A = mongoose.model('A', AllSchema);
@@ -44,21 +50,29 @@ const a = new A({
   bools: [true, false, false, true, true],
   buffers: [Buffer.from([33]), Buffer.from([12])],
   objectids: [new mongoose.Types.ObjectId],
-  docs: [{title: 'yo'}, {title: 'nowafasdi0fas asjkdfla fa'}],
-  s: {nest: 'hello there everyone!'}
+  docs: [{ title: 'yo' }, { title: 'nowafasdi0fas asjkdfla fa' }],
+  s: { nest: 'hello there everyone!' }
 });
 
-const start = new Date;
-const total = 100000;
-let i = total;
-let len;
+const Simple = mongoose.model('Simple', SimpleSchema);
+const simple = new Simple({
+  string: 'hello world',
+  number: 444848484,
+});
 
-for (i = 0, len = total; i < len; ++i) {
-  a.toObject({depopulate: true});
-}
-
-const time = (new Date - start) / 1000;
-console.error('took %d seconds for %d docs (%d dps)', time, total, total / time);
+new Benchmark.Suite()
+  .add('Simple', function () {
+    simple.toObject({ depopulate: true });
+  })
+  .add('AllSchema', function () {
+    a.toObject({ depopulate: true });
+  })
+  .on('cycle', function (evt) {
+    if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
+      console.log(String(evt.target));
+    }
+  })
+  .run();
 process.memoryUsage();
 
 // --trace-opt --trace-deopt --trace-bailout

@@ -87,7 +87,7 @@ async function gh11118(): Promise<void> {
     name: string;
     email: string;
     avatar?: string;
-}
+  }
 
   const schema = new Schema<User>({
     name: { type: String, required: true },
@@ -102,5 +102,4 @@ async function gh11118(): Promise<void> {
   for (const doc of docs) {
     const _id: Types.ObjectId = doc._id;
   }
-
 }

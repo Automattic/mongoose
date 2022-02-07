@@ -116,6 +116,17 @@ query instanceof Query;
 Test.findOne().where({ name: 'test' });
 Test.where().find({ name: 'test' });
 
+// Projection
+const p0: Record<string, number> = Test.find().projection({
+  age: true,
+  parent: 1,
+  'docs.id': 1
+});
+const p1: Record<string, number> = Test.find().projection('age docs.id');
+const p2: Record<string, number> | null = Test.find().projection();
+const p3: null = Test.find().projection(null);
+
+
 // Super generic query
 function testGenericQuery(): void {
   interface CommonInterface<T> extends Document {
@@ -184,6 +195,22 @@ function gh10786() {
   if (true) {
     updateQuery.phone = 'XXXX';
   }
+}
+
+async function gh11156(): Promise<void> {
+  interface User {
+    name: string;
+    age: number;
+  }
+
+  const schema = new Schema<User>({
+    name: String,
+    age: Number
+  });
+
+  const User: Model<User> = model<User>('User', schema);
+
+  const overwritten: User = await User.findOne<Pick<User, 'name'>>({}).orFail();
 }
 
 async function gh11041(): Promise<void> {

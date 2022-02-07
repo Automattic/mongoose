@@ -1157,6 +1157,39 @@ const schema = Schema({
 });
 ```
 
+<h3 id="pluginTags"><a href="#pluginTags">option: pluginTags</a></h3>
+
+Mongoose supports defining global plugins, plugins that apply to all schemas.
+
+```javascript
+// Add a `meta` property to all schemas
+mongoose.plugin(function myPlugin(schema) {
+  schema.add({ meta: {} });
+});
+```
+
+Sometimes, you may only want to apply a given plugin to some schemas.
+In that case, you can add `pluginTags` to a schema:
+
+```javascript
+const schema1 = new Schema({
+  name: String
+}, { pluginTags: ['useMetaPlugin'] });
+
+const schema2 = new Schema({
+  name: String
+});
+```
+
+If you call `plugin()` with a `tags` option, Mongoose will only apply that plugin to schemas that have a matching entry in `pluginTags`.
+
+```javascript
+// Add a `meta` property to all schemas
+mongoose.plugin(function myPlugin(schema) {
+  schema.add({ meta: {} });
+}, { tags: ['useMetaPlugin'] });
+```
+
 <h3 id="selectPopulatedPaths">
   <a href="#selectPopulatedPaths">
     option: selectPopulatedPaths

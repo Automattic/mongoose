@@ -37,11 +37,10 @@ jobs:
           ./mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
           sleep 2
           mongod --version
-          mkdir ./test/typescript/node_modules
-          ln -s `pwd` ./test/typescript/node_modules/mongoose
           echo `pwd`/mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin >> $GITHUB_PATH
-
+      - run: npm run sym-link-mongoose
       - run: npm test
+      - run: npm run test-ts
 
   lint:
     runs-on: ubuntu-latest

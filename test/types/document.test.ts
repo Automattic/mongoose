@@ -1,4 +1,5 @@
 import { Schema, model, Model, Document, Error, Types } from 'mongoose';
+import { expectError } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String', required: true }, address: new Schema({ city: { type: String, required: true } }) });
 
@@ -131,6 +132,7 @@ function gh11085(): void {
 
   const newUser = new UserModel();
 
-  const _id: number = newUser._id;
+  let _id: number;
+  expectError(_id = newUser._id);
   const _id2: Types.ObjectId = newUser._id;
 }

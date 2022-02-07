@@ -61,8 +61,9 @@ function gh10575() {
   const Model2 = model<IModel2, Model<IModel2>>('m2', Model2Schema);
 
   const someMap: Map<string, Model<IBase>> = new Map();
-  someMap.set('A', Model1);
-  someMap.set('B', Model2);
+  // Add `as any` to work around errors in strict mode
+  someMap.set('A', Model1 as any);
+  someMap.set('B', Model2 as any);
 }
 
 function gh10872(): void {

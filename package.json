@@ -57,6 +57,7 @@
     "q": "1.5.1",
     "rimraf": "2.6.3",
     "serve-handler": "6.1.3",
+    "tsd": "0.19.1",
     "typescript": "4.5.3",
     "uuid": "8.3.2",
     "webpack": "4.44.1"
@@ -72,7 +73,7 @@
     "release-legacy": "git pull origin 5.x && git push origin 5.x --tags && npm publish --tag legacy",
     "mongo": "node ./tools/repl.js",
     "test": "mocha --exit ./test/*.test.js",
-    "test-ts": "mocha --exit ./test/typescript/main.test.js",
+    "test-tsd": "tsd",
     "sym-link-mongoose": "npm link && npm link mongoose",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-coverage": "nyc --reporter=html --reporter=text npm test"
@@ -107,5 +108,17 @@
   "funding": {
     "type": "opencollective",
     "url": "https://opencollective.com/mongoose"
+  },
+  "tsd": {
+    "directory": "test/types",
+    "compilerOptions": {
+      "esModuleInterop": false,
+      "strict": true,
+      "allowSyntheticDefaultImports": true,
+      "strictPropertyInitialization": false,
+      "noImplicitAny": false,
+      "module": "commonjs",
+      "target": "ES2017"
+    }
   }
 }

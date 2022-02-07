@@ -148,9 +148,11 @@ describe('clone', () => {
 
     describe('constructor is RegExp', () => {
       it('return new equal date ', () => {
-        const base = new RegExp(/A-Z.*/);
+        const base = new RegExp(/A-Z.*/g);
+        base.lastIndex = 2;
         const cloned = clone(base);
         assert.deepStrictEqual(base, cloned);
+        assert.ok(base.lastIndex === cloned.lastIndex);
       });
     });
   });

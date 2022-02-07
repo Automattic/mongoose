@@ -25,7 +25,6 @@
     "mpath": "0.8.4",
     "mquery": "4.0.2",
     "ms": "2.1.2",
-    "regexp-clone": "1.0.0",
     "sift": "13.5.2"
   },
   "devDependencies": {

@@ -85,7 +85,7 @@ describe('transactions', function() {
     // The `withTransaction()` function's first parameter is a function
     // that returns a promise.
     await session.withTransaction(() => {
-      return Customer.create([{ name: 'Test' }], { session: session })
+      return Customer.create([{ name: 'Test' }], { session: session });
     });
 
     const count = await Customer.countDocuments();

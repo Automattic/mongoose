@@ -1,4 +1,5 @@
 import { Schema, model, Document, Types, LeanDocument } from 'mongoose';
+import { expectError } from 'tsd';
 
 const schema: Schema = new Schema({ tags: [new Schema({ name: String })] });
 
@@ -27,5 +28,5 @@ void async function main() {
 
   const _doc: LeanDocument<ITest> = await Test.findOne().orFail().lean();
   _doc.tags[0].name.substring(1);
-  _doc.tags.create({ name: 'fail' });
+  expectError(_doc.tags.create({ name: 'fail' }));
 }();

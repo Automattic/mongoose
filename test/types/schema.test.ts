@@ -1,4 +1,5 @@
 import { Schema, Document, SchemaDefinition, Model } from 'mongoose';
+import { expectType, expectNotType, expectError } from 'tsd';
 
 enum Genre {
   Action,
@@ -108,11 +109,12 @@ async function gh9857() {
   type UserSchemaDefinition = SchemaDefinition<User>;
   type UserModel = Model<UserDocument>;
 
-  const schemaDefinition: UserSchemaDefinition = {
+  let u: UserSchemaDefinition;
+  expectError(u = {
     name: { type: String },
     active: { type: Boolean },
     points: Number
-  };
+  });
 }
 
 function gh10261() {

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "mongoose" : ["./types/index.d.ts"]
+    }
+  },
+  "esModuleInterop": true,
+  "strictNullChecks": true
+}

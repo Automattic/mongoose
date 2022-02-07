@@ -540,7 +540,25 @@ describe('versioning', function() {
     assert.equal(thing_1.__v, 1);
     thing_2.set({ price: 1 });
     const err = await thing_2.save().then(() => null, err => err);
-    assert.equal(err.name, 'DocumentNotFoundError');
+    assert.equal(err.name, 'VersionError');
+  });
+
+  it('throws VersionError when saving with no changes and optimistic concurrency is false (gh-11295)', async function() {
+    const robotSchema = new mongoose.Schema({
+      name: String
+    }, { optimisticConcurrency: true });
+
+    const Robot = db.model('Robot', robotSchema);
+
+    const entry = await Robot.create({ name: 'WallE' });
+    const changes = await Robot.findOne({ _id: entry._id }).orFail().exec();
+    const other = await Robot.findOne({ _id: entry._id }).orFail().exec();
+    changes.name = 'John';
+    await changes.save();
+
+    other.name = 'WallE';
+    const err = await other.save().then(() => null, err => err);
+    assert.equal(err.name, 'VersionError');
   });
 
   it('gh-1898', function(done) {

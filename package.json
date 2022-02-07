@@ -100,12 +100,6 @@
       "test/**/*.js"
     ]
   },
-<<<<<<< HEAD
-=======
-  "tsd": {
-    "directory": "test/types"
-  },
->>>>>>> a27bfe4a96ffa8f95b52cd1f391c4d3e0105900c
   "config": {
     "mongodbMemoryServer": {
       "disablePostinstall": true

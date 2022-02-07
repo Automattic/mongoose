@@ -216,7 +216,7 @@ describe('document', function() {
 
   describe('shortcut getters', function() {
     it('return undefined for properties with a null/undefined parent object (gh-1326)', function() {
-      const doc = new TestDocument;
+      const doc = new TestDocument();
       doc.init({ nested: null });
       assert.strictEqual(undefined, doc.nested.age);
     });
@@ -347,7 +347,7 @@ describe('document', function() {
         path: 'my path'
       },
       nested2: {},
-      date: new Date
+      date: new Date()
     });
 
     let clone = doc.toObject({ getters: true, virtuals: false });
@@ -1056,9 +1056,9 @@ describe('document', function() {
 
   describe.skip('#update', function() {
     it('returns a Query', function() {
-      const mg = new mongoose.Mongoose;
+      const mg = new mongoose.Mongoose();
       const M = mg.model('Test', { s: String });
-      const doc = new M;
+      const doc = new M();
       assert.ok(doc.update() instanceof Query);
     });
     it('calling update on document should relay to its model (gh-794)', async function() {
@@ -1102,7 +1102,7 @@ describe('document', function() {
     });
     it('ValidationErrors should be instances of Error', function() {
       const ValidationError = Document.ValidationError;
-      const err = new ValidationError(new TestDocument);
+      const err = new ValidationError(new TestDocument());
       assert.ok(err instanceof Error);
     });
   });
@@ -1128,7 +1128,7 @@ describe('document', function() {
     assert.equal(E.ten(), 10);
 
     // test push casting
-    p = new P;
+    p = new P();
     p.embed.push({ name: 'apple' });
     assert.equal(typeof p.embed[0].test, 'function');
     assert.equal(typeof E.ten, 'function');
@@ -1136,7 +1136,7 @@ describe('document', function() {
   });
 
   it('setting a positional path does not cast value to array', function() {
-    const doc = new TestDocument;
+    const doc = new TestDocument();
     doc.init({ numbers: [1, 3] });
     assert.equal(doc.numbers[0], 1);
     assert.equal(doc.numbers[1], 3);
@@ -1519,12 +1519,12 @@ describe('document', function() {
         assert.ok(n1.equals(n2));
       });
       it('with ObjectId _ids', function() {
-        let id = new mongoose.Types.ObjectId;
+        let id = new mongoose.Types.ObjectId();
         let o1 = new O({ _id: id });
         let o2 = new O({ _id: id });
         assert.ok(o1.equals(o2));
 
-        id = String(new mongoose.Types.ObjectId);
+        id = String(new mongoose.Types.ObjectId());
         o1 = new O({ _id: id });
         o2 = new O({ _id: id });
         assert.ok(o1.equals(o2));
@@ -1535,8 +1535,8 @@ describe('document', function() {
         assert.ok(n1.equals(n2));
       });
       it('with _id disabled (gh-1687)', function() {
-        const m1 = new M;
-        const m2 = new M;
+        const m1 = new M();
+        const m2 = new M();
         assert.doesNotThrow(function() {
           m1.equals(m2);
         });
@@ -5453,7 +5453,7 @@ describe('document', function() {
 
       const Test = db.model('Test', schema);
 
-      const test = new Test;
+      const test = new Test();
       assert.strictEqual(test.s, '');
 
       // use native driver directly to insert an empty doc
@@ -6056,7 +6056,7 @@ describe('document', function() {
         randomID: { type: Number, default: generateRandomID }
       }));
 
-      const post = new TestDefaultsWithFunction;
+      const post = new TestDefaultsWithFunction();
       assert.equal(post.get('randomID'), 1);
       assert.equal(called, 1);
 

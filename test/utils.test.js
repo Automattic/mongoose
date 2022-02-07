@@ -145,14 +145,14 @@ describe('utils', function() {
   });
 
   it('deepEquals on ObjectIds', function() {
-    const s = (new ObjectId).toString();
+    const s = (new ObjectId()).toString();
 
     const a = new ObjectId(s);
     const b = new ObjectId(s);
 
     assert.ok(utils.deepEqual(a, b));
     assert.ok(utils.deepEqual(a, a));
-    assert.ok(!utils.deepEqual(a, new ObjectId));
+    assert.ok(!utils.deepEqual(a, new ObjectId()));
   });
 
   it('deepEquals on maps (gh-9549)', function() {
@@ -183,7 +183,7 @@ describe('utils', function() {
     m1.a2 = m1.a1;
     assert.ok(utils.deepEqual(m1.a1, m1.a2));
 
-    const m2 = new M;
+    const m2 = new M();
     m2.init(m1.toObject());
 
     assert.ok(utils.deepEqual(m1.a1, m2.a1));

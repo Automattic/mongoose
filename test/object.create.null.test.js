@@ -59,7 +59,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
       e.e = 'hi i am a string';
       o.b.d = [e];
 
-      const date = new Date;
+      const date = new Date();
       const f = Object.create(null);
       f.g = date;
       o.f = f;
@@ -84,7 +84,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
   });
 
   it('with .set(path, obj)', function(done) {
-    const m = new M;
+    const m = new M();
 
     const b = Object.create(null);
     b.c = 9;
@@ -95,7 +95,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     const e = [ee];
     m.set('b.d', e);
 
-    const date = new Date;
+    const date = new Date();
     const f = Object.create(null);
     f.g = date;
     m.set('f', f);
@@ -123,14 +123,14 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     }();
 
     void function() {
-      const s = new Schema;
+      const s = new Schema();
       const o = Object.create(null);
       o.yay = Number;
       s.path('works', o);
     }();
 
     void function() {
-      const s = new Schema;
+      const s = new Schema();
       let o = Object.create(null);
       o = {};
       o.name = String;

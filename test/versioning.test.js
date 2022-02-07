@@ -77,13 +77,13 @@ describe('versioning', function() {
   it('versioning without version key', function(done) {
     const V = BlogPost;
 
-    const doc = new V;
+    const doc = new V();
     doc.numbers = [3, 4, 5, 6, 7];
     doc.comments = [
-      { title: 'does it work?', date: new Date },
+      { title: 'does it work?', date: new Date() },
       { title: '1', comments: [{ title: 'this is sub #1' }, { title: 'this is sub #2' }] },
       { title: '2', comments: [{ title: 'this is sub #3' }, { title: 'this is sub #4' }] },
-      { title: 'hi', date: new Date }
+      { title: 'hi', date: new Date() }
     ];
 
     function test(err) {
@@ -208,7 +208,7 @@ describe('versioning', function() {
     it('works without any other changes (gh-1475)', function(done) {
       const V = BlogPost;
 
-      const doc = new V;
+      const doc = new V();
       doc.save(function(err) {
         assert.ifError(err);
         assert.equal(doc.__v, 0);

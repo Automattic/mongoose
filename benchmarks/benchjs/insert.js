@@ -31,7 +31,7 @@ const ObjectId = Schema.Types.ObjectId;
 
     const db = client.db('mongoose-bench');
 
-    const Comments = new Schema;
+    const Comments = new Schema();
     Comments.add({
       title: String,
       date: Date,

@@ -30,11 +30,11 @@ describe('isMongooseObject', () => {
     assert.ok(!isMongooseObject(null));
     assert.ok(!isMongooseObject(false));
     assert.ok(!isMongooseObject(undefined));
-    assert.ok(!isMongooseObject(new Array));
-    assert.ok(!isMongooseObject(new Function));
-    assert.ok(!isMongooseObject(new Object));
-    assert.ok(!isMongooseObject(new RegExp));
-    assert.ok(!isMongooseObject(new String));
+    assert.ok(!isMongooseObject(new Array()));
+    assert.ok(!isMongooseObject(new Function()));
+    assert.ok(!isMongooseObject(new Object()));
+    assert.ok(!isMongooseObject(new RegExp()));
+    assert.ok(!isMongooseObject(new String()));
     assert.ok(!isMongooseObject(Buffer.from([])));
   });
 });

@@ -14,7 +14,7 @@ describe('isObject', () => {
     });
 
     it('Object', () => {
-      assert.ok(isObject(new Object));
+      assert.ok(isObject(new Object()));
     });
   });
 
@@ -32,19 +32,19 @@ describe('isObject', () => {
     });
 
     it('Array', () => {
-      assert.ok(!isObject(new Array));
+      assert.ok(!isObject(new Array()));
     });
 
     it('Function', () => {
-      assert.ok(!isObject(new Function));
+      assert.ok(!isObject(new Function()));
     });
 
     it('RegExp', () => {
-      assert.ok(!isObject(new RegExp));
+      assert.ok(!isObject(new RegExp()));
     });
 
     it('String', () => {
-      assert.ok(!isObject(new String));
+      assert.ok(!isObject(new String()));
     });
 
     it('"[object Object]"', () => {

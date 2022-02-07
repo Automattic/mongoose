@@ -31,7 +31,7 @@ describe('model: findOneAndDelete:', function() {
   afterEach(() => require('./util').stopRemainingOps(db));
 
   beforeEach(function() {
-    Comments = new Schema;
+    Comments = new Schema();
 
     Comments.add({
       title: String,
@@ -96,7 +96,7 @@ describe('model: findOneAndDelete:', function() {
   it('options/conditions/doc are merged when no callback is passed', function() {
     const M = BlogPost;
 
-    const now = new Date;
+    const now = new Date();
     let query;
 
     // Model.findOneAndDelete
@@ -174,7 +174,7 @@ describe('model: findOneAndDelete:', function() {
 
   it('executes when a callback is passed', function(done) {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
     let pending = 2;
 
     M.findByIdAndDelete(_id, { select: 'name' }, cb);
@@ -241,7 +241,7 @@ describe('model: findOneAndDelete:', function() {
 
   it('supports v3 select object syntax', function() {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
 
     let query;
 

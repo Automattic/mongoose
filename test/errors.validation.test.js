@@ -190,7 +190,7 @@ describe('ValidationError', function() {
       });
 
       const M = mongoose.model('A', BSchema);
-      const m = new M;
+      const m = new M();
       m.contents.push({ key: 'asdf' });
       const err = await m.validate().then(() => null, err => err);
 

@@ -18,7 +18,7 @@ const B = mongoose.model('B', Schema({
 let start;
 let count = 0;
 
-mongoose.connect('localhost', 'benchmark-populate', function(err) {
+mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
   if (err) {
     return done(err);
   }

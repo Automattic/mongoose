@@ -19,7 +19,7 @@ const options = {};
 describe('mongoose module:', function() {
   describe('default connection works', function() {
     it('without options', async function() {
-      const goose = new Mongoose;
+      const goose = new Mongoose();
       const db = goose.connection;
 
       await goose.connect(process.env.MONGOOSE_TEST_URI || uri, options);
@@ -27,7 +27,7 @@ describe('mongoose module:', function() {
     });
 
     it('with promise (gh-3790)', async function() {
-      const goose = new Mongoose;
+      const goose = new Mongoose();
       const db = goose.connection;
 
       await goose.connect(process.env.MONGOOSE_TEST_URI || uri, options);
@@ -616,17 +616,17 @@ describe('mongoose module:', function() {
     });
 
     it('prevents overwriting pre-existing models', function() {
-      const m = new Mongoose;
-      m.model('A', new Schema);
+      const m = new Mongoose();
+      m.model('A', new Schema());
 
       assert.throws(function() {
-        m.model('A', new Schema);
+        m.model('A', new Schema());
       }, /Cannot overwrite `A` model/);
     });
 
     it('allows passing identical name + schema args', function() {
-      const m = new Mongoose;
-      const schema = new Schema;
+      const m = new Mongoose();
+      const schema = new Schema();
       const model = m.model('A', schema);
 
       assert.doesNotThrow(function() {
@@ -637,8 +637,8 @@ describe('mongoose module:', function() {
     });
 
     it('allows passing identical name+schema+collection args (gh-5767)', function() {
-      const m = new Mongoose;
-      const schema = new Schema;
+      const m = new Mongoose();
+      const schema = new Schema();
       const model = m.model('A', schema, 'AA');
 
       assert.doesNotThrow(function() {
@@ -657,7 +657,7 @@ describe('mongoose module:', function() {
     describe('passing collection name', function() {
       describe('when model name already exists', function() {
         it('returns a new uncached model', function() {
-          const m = new Mongoose;
+          const m = new Mongoose();
           const s1 = new Schema({ a: [] });
           const name = 'Test';
           const A = m.model(name, s1);
@@ -673,7 +673,7 @@ describe('mongoose module:', function() {
 
     describe('passing object literal schemas', function() {
       it('works', function() {
-        const m = new Mongoose;
+        const m = new Mongoose();
         const A = m.model('A', { n: [{ age: 'number' }] });
         const a = new A({ n: [{ age: '47' }] });
         assert.strictEqual(47, a.n[0].age);
@@ -682,7 +682,7 @@ describe('mongoose module:', function() {
   });
 
   it('clones schema when instance of another Mongoose instance\'s Schema class (gh-11047)', function() {
-    const m = new Mongoose;
+    const m = new Mongoose();
     const schema = new Schema({ name: String });
 
     const Test = m.connection.model('Test', schema);
@@ -822,11 +822,11 @@ describe('mongoose module:', function() {
     });
 
     it('of new Mongoose instances', function() {
-      test(new mongoose.Mongoose);
+      test(new mongoose.Mongoose());
     });
 
     it('of result from .connect() (gh-3940)', async function() {
-      const m = new mongoose.Mongoose;
+      const m = new mongoose.Mongoose();
       const resolvedMongoose = await m.connect('mongodb://localhost:27017/test', options);
 
       test(resolvedMongoose);
@@ -834,7 +834,7 @@ describe('mongoose module:', function() {
     });
 
     it('connect with url doesnt cause unhandled rejection (gh-6997)', async function() {
-      const m = new mongoose.Mongoose;
+      const m = new mongoose.Mongoose();
       const _options = Object.assign({}, options, { serverSelectionTimeoutMS: 100 });
       const error = await m.connect('mongodb://doesnotexist:27009/test', _options).then(() => null, err => err);
 

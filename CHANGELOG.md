@@ -1,3 +1,24 @@
+6.2.1 / 2022-02-07
+==================
+ * perf: improve performance especially of validate and clone #11298 [Uzlopak](https://github.com/Uzlopak)
+ * perf: remove regexp-clone #11327 [Uzlopak](https://github.com/Uzlopak)
+ * fix(document): handle initing nested properties in non-strict documents #11309
+ * fix(query): cast $elemMatch underneath $all #11314
+ * fix(populate): respect schema-level strictPopulate option #11290
+ * fix: set default for dotted path projection #11293 [noseworthy](https://github.com/noseworthy)
+ * fix(model): correctly handle writeConcern.w = 0 when saving #11300
+ * fix(model): throw VersionError when saving with no changes and optimisticConcurrency = true #11295
+ * fix(query): avoid adding $each to $addToSet on mixed arrays #11284
+ * fix(index.d.ts): allow using type: [Schema.Types.ObjectId] for ObjectId arrays #11194
+ * fix(index.d.ts): make Types.DocumentArray<> convert type to subdoc, rename TMethods -> TMethodsAndOverrides #11061
+ * fix(index.d.ts): support passing generic to createCollection() and `collection()` for integration with MongoDB Node driver's collection class #11131
+ * fix(index.d.ts): add strictPopulate to MongooseOptions #11276
+ * docs: mark Mongoose 6 as compatible with MongoDB 4 #11320 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * docs: remove documentation for useNestedStrict #11313 [mark-langer](https://github.com/mark-langer)
+ * docs: add "new" to ObjectId class in aggregate.js docs #11322 [JavanPoirier](https://github.com/JavanPoirier)
+ * chore: handle eslint configuration in .eslintrc.json #11326 [Uzlopak](https://github.com/Uzlopak)
+ * refactor: add parenthesis for constructors in tests #11330 [apeltop](https://github.com/apeltop)
+
 6.2.0 / 2022-02-02
 ==================
  * feat(connection+mongoose): add support for continueOnError for syncIndexes #11266 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

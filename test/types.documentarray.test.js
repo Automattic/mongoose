@@ -22,7 +22,7 @@ const MongooseDocumentArray = mongoose.Types.DocumentArray;
 
 function TestDoc(schema) {
   const Subdocument = function() {
-    ArraySubdocument.call(this, {}, new DocumentArray);
+    ArraySubdocument.call(this, {}, new DocumentArray());
   };
 
   /**
@@ -234,7 +234,7 @@ describe('types.documentarray', function() {
 
       const db = mongoose.createConnection();
       const M = db.model('Test', { docs: [subSchema] });
-      const m = new M;
+      const m = new M();
       m.docs.push({ docs: [{ title: 'hello' }] });
       const delta = m.$__delta()[1];
       assert.equal(delta.$push.docs.$each[0].changed, undefined);
@@ -302,12 +302,12 @@ describe('types.documentarray', function() {
     it('does not re-cast instances of its embedded doc', function(done) {
       const child = new Schema({ name: String, date: Date });
       child.pre('save', function(next) {
-        this.date = new Date;
+        this.date = new Date();
         next();
       });
       const schema = new Schema({ children: [child] });
       const M = db.model('Test', schema);
-      const m = new M;
+      const m = new M();
       m.save(function(err) {
         assert.ifError(err);
         M.findById(m._id, function(err, doc) {
@@ -341,9 +341,9 @@ describe('types.documentarray', function() {
     });
 
     it('corrects #ownerDocument() and index if value was created with array.create() (gh-1385)', function(done) {
-      const mg = new mongoose.Mongoose;
+      const mg = new mongoose.Mongoose();
       const M = mg.model('Test', { docs: [{ name: String }] });
-      const m = new M;
+      const m = new M();
       const doc = m.docs.create({ name: 'test 1385' });
       assert.equal(String(doc.ownerDocument()._id), String(m._id));
       m.docs.push(doc);
@@ -397,7 +397,7 @@ describe('types.documentarray', function() {
   });
 
   it('#push should work on ArraySubdocument more than 2 levels deep', function(done) {
-    const Comments = new Schema;
+    const Comments = new Schema();
     Comments.add({
       title: String,
       comments: [Comments]
@@ -498,7 +498,7 @@ describe('types.documentarray', function() {
       });
       mongoose.deleteModel(/Test/);
       const T = mongoose.model('Test', schema);
-      const t = new T;
+      const t = new T();
       t.docs.push({ name: 100 });
 
       const subdoc = t.docs.create({ name: 'yep' });

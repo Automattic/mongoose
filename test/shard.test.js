@@ -187,7 +187,7 @@ describe('shard', function() {
       }
     });
 
-    const p = new P;
+    const p = new P();
     p.save(function(err) {
       assert.ok(err);
       assert.ok(err.message);

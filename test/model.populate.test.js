@@ -1446,7 +1446,7 @@ describe('model: populate:', function() {
     });
     const BlogPost = db.model('BlogPost', blogpost);
 
-    const userIds = [new ObjectId, new ObjectId, new ObjectId, new ObjectId];
+    const userIds = [new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId()];
     const users = [];
 
     users.push({
@@ -1880,7 +1880,7 @@ describe('model: populate:', function() {
   it('refs should cast to ObjectId from hexstrings', function(done) {
     const BP = db.model('BlogPost', blogPostSchema);
 
-    const bp = new BP;
+    const bp = new BP();
     bp._creator = new DocObjectId().toString();
     assert.ok(bp._creator instanceof DocObjectId);
     bp.set('_creator', new DocObjectId().toString());
@@ -2386,7 +2386,7 @@ describe('model: populate:', function() {
       B = db.model('BlogPost', blogPostSchema);
       User = db.model('User', userSchema);
 
-      _id = new mongoose.Types.ObjectId;
+      _id = new mongoose.Types.ObjectId();
 
       User.create({
         name: 'Phoenix',
@@ -10593,27 +10593,6 @@ describe('model: populate:', function() {
     await Test.deleteMany({});
   });
 
-  it('reports full path when throwing `strictPopulate` error with deep populate (gh-10923)', async function() {
-    const L2 = db.model('Test', new Schema({ name: String }));
-
-    const schema = new Schema({ l2: { type: 'ObjectId', ref: L2 } });
-    const L1 = db.model('Child', schema);
-
-    const Parent = db.model('Parent', new Schema({
-      l1: { type: 'ObjectId', ref: L1 }
-    }));
-
-    await Parent.deleteMany();
-    const l2 = await L2.create({ name: 'test' });
-    const l1 = await L1.create({ l2 });
-    await Parent.create({ l1 });
-
-    const err = await Parent.findOne().populate({ path: 'l1', populate: { path: 'l22' } }).
-      then(() => null, err => err);
-
-    assert.ok(err.message.indexOf('l1.l22') !== -1, err.message);
-  });
-
   it('handles refPath underneath map of subdocuments (gh-9359)', async function() {
     // user schema
     const userSchema = Schema({ name: String });
@@ -10658,5 +10637,44 @@ describe('model: populate:', function() {
     });
 
     assert.equal(row.values.get(createList._id.toString()).valueObject.name, 'test');
+  });
+
+  describe('strictPopulate', function() {
+    it('reports full path when throwing `strictPopulate` error with deep populate (gh-10923)', async function() {
+      const L2 = db.model('Test', new Schema({ name: String }));
+
+      const schema = new Schema({ l2: { type: 'ObjectId', ref: L2 } });
+      const L1 = db.model('Child', schema);
+
+      const Parent = db.model('Parent', new Schema({
+        l1: { type: 'ObjectId', ref: L1 }
+      }));
+
+      await Parent.deleteMany();
+      const l2 = await L2.create({ name: 'test' });
+      const l1 = await L1.create({ l2 });
+      await Parent.create({ l1 });
+
+      const err = await Parent.findOne().populate({ path: 'l1', populate: { path: 'l22' } }).
+        then(() => null, err => err);
+
+      assert.ok(err.message.indexOf('l1.l22') !== -1, err.message);
+    });
+
+    it('respects strictPopulate schema option (gh-11290)', async function() {
+      const kittySchema = Schema({ name: String }, { strictPopulate: false });
+
+      const Kitten = db.model('Test', kittySchema);
+
+      const kitty1 = new Kitten({ name: 'Henry' });
+      await kitty1.save();
+      // Does not throw
+      await Kitten.findById(kitty1._id).populate('hello');
+
+      const err = await Kitten.findById(kitty1._id).populate({ path: 'hello', strictPopulate: true }).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.message.includes('strictPopulate'), err.message);
+    });
   });
 });

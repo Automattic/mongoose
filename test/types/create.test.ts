@@ -16,7 +16,6 @@ Test.create([{ name: 'test' }], { validateBeforeSave: false }).then((docs: ITest
 Test.create({ name: 'test' }, { name: 'test2' }).then((docs: ITest[]) => console.log(docs[0].name));
 
 Test.insertMany({ name: 'test' }).then((docs: ITest[]) => console.log(docs[0].name));
-Test.insertMany([{ name: 'test' }], { session: null }).then((docs: ITest[]) => console.log(docs[0].name));
 
 Test.create([{ name: 'test' }], { validateBeforeSave: true }).then((docs: ITest[]) => console.log(docs[0].name));
 

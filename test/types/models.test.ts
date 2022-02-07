@@ -1,4 +1,5 @@
 import { Schema, Document, Model, connection, model } from 'mongoose';
+import { expectError } from 'tsd';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -19,7 +20,7 @@ function conventionalSyntax(): void {
   console.log(doc.foo);
   doc.save();
 
-  const doc2 = new Test<{ foo: string }>({});
+  expectError(new Test<{ foo: string }>({}));
 }
 
 function rawDocSyntax(): void {
@@ -188,3 +189,17 @@ Project.exists({ name: 'Hello' }).then(result => {
 Project.exists({ name: 'Hello' }, (err, result) => {
   result?._id;
 });
+
+function inheritance() {
+  class InteractsWithDatabase extends Model {
+    async _update(): Promise<void> {
+      await this.save();
+    }
+  }
+
+  class SourceProvider extends InteractsWithDatabase {
+    static async deleteInstallation(installationId: number): Promise<void> {
+      await this.findOneAndDelete({ installationId });
+    }
+  }
+}

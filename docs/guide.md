@@ -414,7 +414,6 @@ Valid options:
 - [toJSON](#toJSON)
 - [toObject](#toObject)
 - [typeKey](#typeKey)
-- [useNestedStrict](#useNestedStrict)
 - [validateBeforeSave](#validateBeforeSave)
 - [versionKey](#versionKey)
 - [optimisticConcurrency](#optimisticConcurrency)

@@ -30,10 +30,10 @@ const petSchema = new Schema<IPet & Document, Model<IPet & Document>, IPet>({
 
 // Virtual getters and setters
 personSchema.virtual('fullName')
-  .get(function(value, virtual, doc) {
+  .get(function(this: IPerson, value, virtual, doc) {
     return `${this.firstName} ${this.lastName}`;
   })
-  .set(function(value, virtual, doc) {
+  .set(function(this: IPerson, value, virtual, doc) {
     const splittedName = value.split(' ');
     this.firstName = splittedName[0];
     this.lastName = splittedName[1];

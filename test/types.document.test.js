@@ -34,10 +34,10 @@ describe('types.document', function() {
     }
     Dummy = _Dummy;
     Dummy.prototype.__proto__ = mongoose.Document.prototype;
-    Dummy.prototype.$__setSchema(new Schema);
+    Dummy.prototype.$__setSchema(new Schema());
 
     function _Subdocument() {
-      const arr = new DocumentArray([], 'jsconf.ar', new Dummy);
+      const arr = new DocumentArray([], 'jsconf.ar', new Dummy());
       arr[0] = this;
       ArraySubdocument.call(this, {}, arr);
     }
@@ -107,17 +107,17 @@ describe('types.document', function() {
 
   it('cached _ids', function() {
     const Movie = db.model('Movie', MovieSchema);
-    const m = new Movie;
+    const m = new Movie();
 
     assert.equal(m.id, m.$__._id);
     const old = m.id;
-    m._id = new mongoose.Types.ObjectId;
+    m._id = new mongoose.Types.ObjectId();
     assert.equal(m.id, m.$__._id);
     assert.strictEqual(true, old !== m.$__._id);
 
-    const m2 = new Movie;
+    const m2 = new Movie();
     delete m2._doc._id;
-    m2.init({ _id: new mongoose.Types.ObjectId });
+    m2.init({ _id: new mongoose.Types.ObjectId() });
     assert.equal(m2.id, m2.$__._id);
     assert.strictEqual(true, m.$__._id !== m2.$__._id);
     assert.strictEqual(true, m.id !== m2.id);
@@ -195,7 +195,7 @@ describe('types.document', function() {
           description: {
             source: {
               url: 'http://www.imdb.com/title/tt0454876/',
-              time: new Date
+              time: new Date()
             }
           }
         }]

@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "6.2.0",
+  "version": "6.2.1",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -25,7 +25,6 @@
     "mpath": "0.8.4",
     "mquery": "4.0.2",
     "ms": "2.1.2",
-    "regexp-clone": "1.0.0",
     "sift": "13.5.2"
   },
   "devDependencies": {
@@ -57,6 +56,7 @@
     "q": "1.5.1",
     "rimraf": "2.6.3",
     "serve-handler": "6.1.3",
+    "tsd": "0.19.1",
     "typescript": "4.5.3",
     "uuid": "8.3.2",
     "webpack": "4.44.1"
@@ -71,12 +71,14 @@
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 5.x && git push origin 5.x --tags && npm publish --tag legacy",
     "mongo": "node ./tools/repl.js",
-    "test": "mocha --exit ./test/*.test.js ./test/typescript/main.test.js",
+    "test": "mocha --exit ./test/*.test.js",
+    "test-tsd": "tsd",
+    "sym-link-mongoose": "npm link && npm link mongoose",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-coverage": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
-  "types": "./index.d.ts",
+  "types": "./types/index.d.ts",
   "engines": {
     "node": ">=12.0.0"
   },
@@ -97,149 +99,6 @@
       "test/**/*.js"
     ]
   },
-  "eslintConfig": {
-    "extends": [
-      "eslint:recommended"
-    ],
-    "overrides": [
-      {
-        "files": [
-          "**/*.{ts,tsx}"
-        ],
-        "extends": [
-          "plugin:@typescript-eslint/eslint-recommended",
-          "plugin:@typescript-eslint/recommended"
-        ],
-        "plugins": [
-          "@typescript-eslint"
-        ],
-        "rules": {
-          "@typescript-eslint/no-explicit-any": "off",
-          "@typescript-eslint/ban-types": "off",
-          "@typescript-eslint/no-unused-vars": "off",
-          "@typescript-eslint/explicit-module-boundary-types": "off"
-        }
-      }
-    ],
-    "plugins": [
-      "mocha-no-only"
-    ],
-    "parserOptions": {
-      "ecmaVersion": 2020
-    },
-    "env": {
-      "node": true,
-      "es6": true
-    },
-    "rules": {
-      "comma-style": "error",
-      "indent": [
-        "error",
-        2,
-        {
-          "SwitchCase": 1,
-          "VariableDeclarator": 2
-        }
-      ],
-      "keyword-spacing": "error",
-      "no-whitespace-before-property": "error",
-      "no-buffer-constructor": "warn",
-      "no-console": "off",
-      "no-constant-condition": "off",
-      "no-multi-spaces": "error",
-      "func-call-spacing": "error",
-      "no-trailing-spaces": "error",
-      "no-undef": "error",
-      "no-unneeded-ternary": "error",
-      "no-const-assign": "error",
-      "no-useless-rename": "error",
-      "no-dupe-keys": "error",
-      "space-in-parens": [
-        "error",
-        "never"
-      ],
-      "spaced-comment": [
-        "error",
-        "always",
-        {
-          "block": {
-            "markers": [
-              "!"
-            ],
-            "balanced": true
-          }
-        }
-      ],
-      "key-spacing": [
-        "error",
-        {
-          "beforeColon": false,
-          "afterColon": true
-        }
-      ],
-      "comma-spacing": [
-        "error",
-        {
-          "before": false,
-          "after": true
-        }
-      ],
-      "array-bracket-spacing": 1,
-      "arrow-spacing": [
-        "error",
-        {
-          "before": true,
-          "after": true
-        }
-      ],
-      "object-curly-spacing": [
-        "error",
-        "always"
-      ],
-      "comma-dangle": [
-        "error",
-        "never"
-      ],
-      "no-unreachable": "error",
-      "quotes": [
-        "error",
-        "single"
-      ],
-      "quote-props": [
-        "error",
-        "as-needed"
-      ],
-      "semi": "error",
-      "no-extra-semi": "error",
-      "semi-spacing": "error",
-      "no-spaced-func": "error",
-      "no-throw-literal": "error",
-      "space-before-blocks": "error",
-      "space-before-function-paren": [
-        "error",
-        "never"
-      ],
-      "space-infix-ops": "error",
-      "space-unary-ops": "error",
-      "no-var": "warn",
-      "prefer-const": "warn",
-      "strict": [
-        "error",
-        "global"
-      ],
-      "no-restricted-globals": [
-        "error",
-        {
-          "name": "context",
-          "message": "Don't use Mocha's global context"
-        }
-      ],
-      "no-prototype-builtins": "off",
-      "mocha-no-only/mocha-no-only": [
-        "error"
-      ]
-    }
-  },
   "config": {
     "mongodbMemoryServer": {
       "disablePostinstall": true
@@ -248,5 +107,17 @@
   "funding": {
     "type": "opencollective",
     "url": "https://opencollective.com/mongoose"
+  },
+  "tsd": {
+    "directory": "test/types",
+    "compilerOptions": {
+      "esModuleInterop": false,
+      "strict": true,
+      "allowSyntheticDefaultImports": true,
+      "strictPropertyInitialization": false,
+      "noImplicitAny": false,
+      "module": "commonjs",
+      "target": "ES2017"
+    }
   }
 }

@@ -11,7 +11,7 @@ async function run () {
   // Create new instance
   const replSet = new ReplSet({
     binary: {
-      version: process.argv[3]
+      version: process.argv[2]
     },
     instanceOpts: [
       // Set the expiry job in MongoDB to run every second

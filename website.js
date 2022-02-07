@@ -173,7 +173,7 @@ function pugify(filename, options, newfile) {
       if (err) {
         console.error('could not write', err.stack);
       } else {
-        console.log('%s : rendered ', new Date, newfile);
+        console.log('%s : rendered ', new Date(), newfile);
       }
     });
   });

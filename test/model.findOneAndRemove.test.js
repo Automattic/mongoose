@@ -31,7 +31,7 @@ describe('model: findOneAndRemove:', async function() {
   afterEach(() => require('./util').stopRemainingOps(db));
 
   beforeEach(function() {
-    Comments = new Schema;
+    Comments = new Schema();
 
     Comments.add({
       title: String,
@@ -96,7 +96,7 @@ describe('model: findOneAndRemove:', async function() {
   it('options/conditions/doc are merged when no callback is passed', function(done) {
     const M = BlogPost;
 
-    const now = new Date;
+    const now = new Date();
     let query;
 
     // Model.findOneAndRemove
@@ -177,7 +177,7 @@ describe('model: findOneAndRemove:', async function() {
 
   it('executes when a callback is passed', function(done) {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
     let pending = 2;
 
     M.findByIdAndRemove(_id, { select: 'name' }, cb);
@@ -212,7 +212,7 @@ describe('model: findOneAndRemove:', async function() {
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
 
     let query;
 
@@ -234,7 +234,7 @@ describe('model: findOneAndRemove:', async function() {
 
   it('supports v3 select string syntax', function(done) {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
 
     let query;
 
@@ -250,7 +250,7 @@ describe('model: findOneAndRemove:', async function() {
 
   it('supports v3 select object syntax', function(done) {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
 
     let query;
 
@@ -266,7 +266,7 @@ describe('model: findOneAndRemove:', async function() {
 
   it('supports v3 sort string syntax', function(done) {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
 
     let query;
 
@@ -284,7 +284,7 @@ describe('model: findOneAndRemove:', async function() {
 
   it('supports v3 sort object syntax', function(done) {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
 
     let query;
 

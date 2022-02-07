@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document, connection, Collection } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
@@ -15,3 +15,5 @@ Test.collection.findOneAndDelete({});
 Test.collection.ensureIndex();
 Test.collection.findAndModify();
 Test.collection.getIndexes();
+
+const coll: Collection<ITest> = connection.collection<ITest>('test');

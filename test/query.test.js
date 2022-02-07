@@ -827,7 +827,7 @@ describe('Query', function() {
 
   describe('or', function() {
     it('works', function(done) {
-      const query = new Query;
+      const query = new Query();
       query.find({ $or: [{ x: 1 }, { x: 2 }] });
       assert.equal(query._conditions.$or.length, 2);
       query.or([{ y: 'We\'re under attack' }, { z: 47 }]);
@@ -843,7 +843,7 @@ describe('Query', function() {
 
   describe('and', function() {
     it('works', function(done) {
-      const query = new Query;
+      const query = new Query();
       query.find({ $and: [{ x: 1 }, { y: 2 }] });
       assert.equal(query._conditions.$and.length, 2);
       query.and([{ z: 'We\'re under attack' }, { w: 47 }]);
@@ -922,7 +922,7 @@ describe('Query', function() {
     it('to an array of mixed', function(done) {
       const query = new Query({});
       const Product = db.model('Product', productSchema);
-      const params = { _id: new DocumentObjectId, tags: { $in: [4, 8, 15, 16] } };
+      const params = { _id: new DocumentObjectId(), tags: { $in: [4, 8, 15, 16] } };
       query.cast(Product, params);
       assert.deepEqual(params.tags.$in, [4, 8, 15, 16]);
       done();
@@ -971,7 +971,7 @@ describe('Query', function() {
       const Product = db.model('Product', productSchema);
       const Comment = db.model('Comment', commentSchema);
 
-      const id = new DocumentObjectId;
+      const id = new DocumentObjectId();
       const castedComment = { _id: id, text: 'hello there' };
       const comment = new Comment(castedComment);
 
@@ -1028,7 +1028,7 @@ describe('Query', function() {
       const Product = db.model('Product', productSchema);
       const Comment = db.model('Comment', commentSchema);
 
-      const id = new DocumentObjectId;
+      const id = new DocumentObjectId();
       const castedComment = { _id: id, text: 'hello there' };
       const comment = new Comment(castedComment);
 
@@ -1070,7 +1070,7 @@ describe('Query', function() {
     it('an $elemMatch with $in works (gh-1100)', function(done) {
       const query = new Query({});
       const Product = db.model('Product', productSchema);
-      const ids = [String(new DocumentObjectId), String(new DocumentObjectId)];
+      const ids = [String(new DocumentObjectId()), String(new DocumentObjectId())];
       const params = { ids: { $elemMatch: { $in: ids } } };
       query.cast(Product, params);
       assert.ok(params.ids.$elemMatch.$in[0] instanceof DocumentObjectId);
@@ -1085,7 +1085,7 @@ describe('Query', function() {
       const Product = db.model('Product', productSchema);
       const Comment = db.model('Comment', commentSchema);
 
-      const id = new DocumentObjectId;
+      const id = new DocumentObjectId();
       const castedComment = { _id: id, text: 'hello there' };
       const comment = new Comment(castedComment);
 
@@ -1264,7 +1264,7 @@ describe('Query', function() {
       const hint = { x: 1, y: 1, z: 1 };
       const a = JSON.stringify({ hint: hint });
 
-      const q = new Query;
+      const q = new Query();
       q.hint(hint);
 
       const options = q._optionsForExec({ schema: { options: {} } });
@@ -1362,7 +1362,7 @@ describe('Query', function() {
 
     describe('comment', function() {
       it('works', function(done) {
-        const query = new Query;
+        const query = new Query();
         assert.equal(typeof query.comment, 'function');
         assert.equal(query.comment('Lowpass is more fun'), query);
         assert.equal(query.options.comment, 'Lowpass is more fun');
@@ -1536,7 +1536,7 @@ describe('Query', function() {
 
   describe('setOptions', function() {
     it('works', function(done) {
-      const q = new Query;
+      const q = new Query();
       q.setOptions({ thing: 'cat' });
       q.setOptions({ populate: ['fans'] });
       q.setOptions({ batchSize: 10 });
@@ -1575,7 +1575,7 @@ describe('Query', function() {
     });
 
     it('populate as array in options (gh-4446)', function(done) {
-      const q = new Query;
+      const q = new Query();
       q.setOptions({ populate: [{ path: 'path1' }, { path: 'path2' }] });
       assert.deepEqual(Object.keys(q._mongooseOptions.populate),
         ['path1', 'path2']);
@@ -1584,7 +1584,7 @@ describe('Query', function() {
   });
 
   describe('getOptions', function() {
-    const q = new Query;
+    const q = new Query();
     q.limit(10);
     q.setOptions({ maxTimeMS: 1000 });
     const opts = q.getOptions();

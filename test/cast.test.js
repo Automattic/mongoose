@@ -82,6 +82,28 @@ describe('cast: ', function() {
     });
   });
 
+  describe('$all', function() {
+    it('casts $elemMatch (gh-11314)', async function() {
+      const nested = new Schema({ _id: Number }, {});
+
+      const schema = new Schema({ status: [nested] });
+
+      const filter = {
+        status: {
+          $all: {
+            $elemMatch: { _id: 42 }
+          }
+        }
+      };
+
+      assert.deepStrictEqual(cast(schema, filter), {
+        status: {
+          $all: [{ $elemMatch: { _id: 42 } }]
+        }
+      });
+    });
+  });
+
   describe('bitwise query operators: ', function() {
     it('with a number', function() {
       const schema = new Schema({ x: Buffer });

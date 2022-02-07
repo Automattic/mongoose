@@ -63,7 +63,7 @@ describe('debug: shell', function() {
 
   it('shell', async function() {
     mongoose.set('debug', { shell: true });
-    await testModel.create({ dob: new Date() })
+    await testModel.create({ dob: new Date() });
     assert.equal(true, lastLog.includes('ISODate'));
   });
 

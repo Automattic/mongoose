@@ -121,6 +121,7 @@ declare module 'mongoose' {
    * Returns true if Mongoose can cast the given value to an ObjectId, or
    * false otherwise.
    */
+  export function isValidObjectId(v: Types.ObjectId): true;
   export function isValidObjectId(v: any): boolean;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;

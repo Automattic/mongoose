@@ -19,7 +19,7 @@ const utils = require('../../lib/utils.js');
  */
 
 
-const Comments = new Schema;
+const Comments = new Schema();
 
 Comments.add({
   title: String,

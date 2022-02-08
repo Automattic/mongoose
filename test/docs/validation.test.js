@@ -148,7 +148,7 @@ describe('validation docs', function() {
       eggs: 2,
       drink: 'Milk'
     });
-    let error = badBreakfast.validateSync();
+    const error = badBreakfast.validateSync();
     assert.equal(error.errors['eggs'].message,
       'Must be at least 6, got 2');
     assert.equal(error.errors['drink'].message, 'Milk is not supported');

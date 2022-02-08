@@ -34,7 +34,7 @@ describe('schema.documentarray', function() {
     const O = mongoose.model('DefaultDocArrays3', schema3);
 
     [M, N, O].forEach(function(M) {
-      const m = new M;
+      const m = new M();
       assert.ok(Array.isArray(m.x));
       assert.equal(m.x.length, 1);
       assert.equal(m.x[0].title, 'Prometheus');

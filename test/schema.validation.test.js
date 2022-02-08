@@ -554,7 +554,7 @@ describe('schema', function() {
 
           const A = mongoose.model('schema-validation-messages-' + random(), schema);
 
-          const a = new A;
+          const a = new A();
           a.validate(function(err) {
             assert.equal(err.errors.requiredString1, 'Path `requiredString1` is required.');
             assert.equal(err.errors.requiredString2, 'oops, requiredString2 is missing. required');

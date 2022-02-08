@@ -295,7 +295,7 @@ describe('model', function() {
         const employee = new Employee();
         assert.strictEqual(employee.getFullName, PersonSchema.methods.getFullName);
         assert.strictEqual(employee.getDepartment, EmployeeSchema.methods.getDepartment);
-        assert.equal((new Person).getDepartment, undefined);
+        assert.equal((new Person()).getDepartment, undefined);
       });
 
       it('inherits statics', function() {
@@ -1866,5 +1866,25 @@ describe('model', function() {
     const res = await Parent.findById(p);
     assert.equal(res.c.gc.gc11, 'eleventy');
     assert.equal(res.c.gc.gc12, 110);
+  });
+  it('Should allow reusing discriminators (gh-10931)', async function() {
+    const options = { discriminatorKey: 'kind', overwriteModels: true };
+    const eventSchema = new mongoose.Schema({ time: Date }, options);
+    const Event = db.model('Event', eventSchema);
+
+    const ClickedLinkEvent = Event.discriminator('ClickedLink',
+      new mongoose.Schema({ url: String }, options));
+    const reUse = Event.discriminator('ClickedLink', new mongoose.Schema({ url: String }, options));
+    assert.ok(reUse);
+
+
+    const genericEvent = new Event({ time: Date.now(), url: 'google.com' });
+    assert.ok(!genericEvent.url);
+
+    const clickedEvent = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    assert.ok(clickedEvent.url);
+
+    const reUseEvent = new reUse({ time: Date.now(), url: 'test.com' });
+    assert.ok(reUseEvent.url);
   });
 });

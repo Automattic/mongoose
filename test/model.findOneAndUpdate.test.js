@@ -88,14 +88,14 @@ describe('model: findOneAndUpdate:', function() {
     const title = 'Tobi ' + random();
     const author = 'Brian ' + random();
     const newTitle = 'Woot ' + random();
-    const id0 = new DocumentObjectId;
-    const id1 = new DocumentObjectId;
+    const id0 = new DocumentObjectId();
+    const id1 = new DocumentObjectId();
 
-    const post = new M;
+    const post = new M();
     post.set('title', title);
     post.author = author;
     post.meta.visitors = 0;
-    post.date = new Date;
+    post.date = new Date();
     post.published = true;
     post.mixed = { x: 'ex' };
     post.numbers = [4, 5, 6, 7];
@@ -127,7 +127,7 @@ describe('model: findOneAndUpdate:', function() {
         const update = {
           title: newTitle, // becomes $set
           $inc: { 'meta.visitors': 2 },
-          $set: { date: new Date },
+          $set: { date: new Date() },
           published: false, // becomes $set
           mixed: { x: 'ECKS', y: 'why' }, // $set
           $pullAll: { numbers: [4, 6] },
@@ -228,14 +228,14 @@ describe('model: findOneAndUpdate:', function() {
     const title = 'Tobi ' + random();
     const author = 'Brian ' + random();
     const newTitle = 'Woot ' + random();
-    const id0 = new DocumentObjectId;
-    const id1 = new DocumentObjectId;
+    const id0 = new DocumentObjectId();
+    const id1 = new DocumentObjectId();
 
-    const post = new M;
+    const post = new M();
     post.set('title', title);
     post.author = author;
     post.meta.visitors = 0;
-    post.date = new Date;
+    post.date = new Date();
     post.published = true;
     post.mixed = { x: 'ex' };
     post.numbers = [4, 5, 6, 7];
@@ -250,7 +250,7 @@ describe('model: findOneAndUpdate:', function() {
         const update = {
           title: newTitle, // becomes $set
           $inc: { 'meta.visitors': 2 },
-          $set: { date: new Date },
+          $set: { date: new Date() },
           published: false, // becomes $set
           mixed: { x: 'ECKS', y: 'why' }, // $set
           $pullAll: { numbers: [4, 6] },
@@ -288,14 +288,14 @@ describe('model: findOneAndUpdate:', function() {
     const title = 'Tobi ' + random();
     const author = 'Brian ' + random();
     const newTitle = 'Woot ' + random();
-    const id0 = new DocumentObjectId;
-    const id1 = new DocumentObjectId;
+    const id0 = new DocumentObjectId();
+    const id1 = new DocumentObjectId();
 
-    const post = new M;
+    const post = new M();
     post.set('title', title);
     post.author = author;
     post.meta.visitors = 0;
-    post.date = new Date;
+    post.date = new Date();
     post.published = true;
     post.mixed = { x: 'ex' };
     post.numbers = [4, 5, 6, 7];
@@ -305,7 +305,7 @@ describe('model: findOneAndUpdate:', function() {
     const update = {
       title: newTitle, // becomes $set
       $inc: { 'meta.visitors': 2 },
-      $set: { date: new Date },
+      $set: { date: new Date() },
       published: false, // becomes $set
       mixed: { x: 'ECKS', y: 'why' }, // $set
       $pullAll: { numbers: [4, 6] },
@@ -331,7 +331,7 @@ describe('model: findOneAndUpdate:', function() {
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
     const M = BlogPost;
-    const now = new Date;
+    const now = new Date();
     let query;
 
     // Model.findOneAndUpdate
@@ -526,7 +526,7 @@ describe('model: findOneAndUpdate:', function() {
 
   it('executes when a callback is passed', function(done) {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
     let pending = 2;
 
     M.findByIdAndUpdate(_id, { $set: { name: 'Aaron' } }, { new: false }, cb);
@@ -544,7 +544,7 @@ describe('model: findOneAndUpdate:', function() {
 
   it('executes when a callback is passed to a succeeding function', function(done) {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
     let pending = 2;
 
     M.findByIdAndUpdate(_id, { $set: { name: 'Aaron' } }, { new: false }).exec(cb);
@@ -565,14 +565,14 @@ describe('model: findOneAndUpdate:', function() {
     const title = 'Tobi ' + random();
     const author = 'Brian ' + random();
     const newTitle = 'Woot ' + random();
-    const id0 = new DocumentObjectId;
-    const id1 = new DocumentObjectId;
+    const id0 = new DocumentObjectId();
+    const id1 = new DocumentObjectId();
 
-    const post = new M;
+    const post = new M();
     post.set('title', title);
     post.author = author;
     post.meta.visitors = 0;
-    post.date = new Date;
+    post.date = new Date();
     post.published = true;
     post.mixed = { x: 'ex' };
     post.numbers = [4, 5, 6, 7];
@@ -586,7 +586,7 @@ describe('model: findOneAndUpdate:', function() {
     const update = {
       title: newTitle, // becomes $set
       $inc: { 'meta.visitors': 2 },
-      $set: { date: new Date },
+      $set: { date: new Date() },
       published: false, // becomes $set
       mixed: { x: 'ECKS', y: 'why' }, // $set
       $pullAll: { numbers: [4, 6] },
@@ -617,9 +617,9 @@ describe('model: findOneAndUpdate:', function() {
 
   it('options/conditions/doc are merged when no callback is passed', function() {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
 
-    const now = new Date;
+    const now = new Date();
     let query;
 
     // Model.findByIdAndUpdate
@@ -646,9 +646,9 @@ describe('model: findOneAndUpdate:', function() {
 
   it('supports v3 select string syntax', function() {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
 
-    const now = new Date;
+    const now = new Date();
     let query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now } }, { select: 'author -title' });
@@ -662,9 +662,9 @@ describe('model: findOneAndUpdate:', function() {
 
   it('supports v3 select object syntax', function() {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
 
-    const now = new Date;
+    const now = new Date();
     let query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now } }, { select: { author: 1, title: 0 } });
@@ -679,8 +679,8 @@ describe('model: findOneAndUpdate:', function() {
   it('supports v3 sort string syntax', async function() {
     const M = BlogPost;
 
-    const now = new Date;
-    const _id = new DocumentObjectId;
+    const now = new Date();
+    const _id = new DocumentObjectId();
     let query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now } }, { sort: 'author -title' });
@@ -708,9 +708,9 @@ describe('model: findOneAndUpdate:', function() {
 
   it('supports v3 sort object syntax', function(done) {
     const M = BlogPost;
-    const _id = new DocumentObjectId;
+    const _id = new DocumentObjectId();
 
-    const now = new Date;
+    const now = new Date();
     let query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now } }, { sort: { author: 1, title: -1 } });
@@ -734,8 +734,8 @@ describe('model: findOneAndUpdate:', function() {
 
     db.deleteModel(/BlogPost/);
     const B = db.model('BlogPost', postSchema);
-    const _id1 = new mongoose.Types.ObjectId;
-    const _id2 = new mongoose.Types.ObjectId;
+    const _id1 = new mongoose.Types.ObjectId();
+    const _id2 = new mongoose.Types.ObjectId();
 
     B.create({ ids: [_id1, _id2] }, function(err, doc) {
       assert.ifError(err);
@@ -887,7 +887,7 @@ describe('model: findOneAndUpdate:', function() {
     });
   });
 
-  it('can do deep equals on object id after findOneAndUpdate (gh-2070)', function(done) {
+  it('can do various deep equal checks (lodash.isEqual, lodash.isEqualWith, assert.deepEqual, utils.deepEqual) on object id after findOneAndUpdate (gh-2070)', function(done) {
     const userSchema = new Schema({
       name: String,
       contacts: [{
@@ -911,22 +911,20 @@ describe('model: findOneAndUpdate:', function() {
           { new: true },
           function(error, doc) {
             assert.ifError(error);
+            assert.deepEqual(doc.contacts[0].account, a2._id);
             assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
             assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
             // Re: commends on https://github.com/mongodb/js-bson/commit/aa0b54597a0af28cce3530d2144af708e4b66bf0
             // Deep equality checks no longer work as expected with node 0.10.
             // Please file an issue if this is a problem for you
-            if (!/^v0.10.\d+$/.test(process.version)) {
-              assert.ok(isEqual(doc.contacts[0].account, a2._id));
-            }
+            assert.ok(isEqual(doc.contacts[0].account, a2._id));
 
             User.findOne({ name: 'parent' }, function(error, doc) {
               assert.ifError(error);
+              assert.deepEqual(doc.contacts[0].account, a2._id);
               assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
               assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
-              if (!/^v0.10.\d+$/.test(process.version)) {
-                assert.ok(isEqual(doc.contacts[0].account, a2._id));
-              }
+              assert.ok(isEqual(doc.contacts[0].account, a2._id));
               done();
             });
           });

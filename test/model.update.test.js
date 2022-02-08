@@ -82,14 +82,14 @@ describe('model: update:', function() {
   });
 
   beforeEach(function() {
-    id0 = new DocumentObjectId;
-    id1 = new DocumentObjectId;
+    id0 = new DocumentObjectId();
+    id1 = new DocumentObjectId();
 
-    post = new BlogPost;
+    post = new BlogPost();
     post.set('title', title);
     post.author = author;
     post.meta.visitors = 0;
-    post.date = new Date;
+    post.date = new Date();
     post.published = true;
     post.mixed = { x: 'ex' };
     post.numbers = [4, 5, 6, 7];
@@ -127,7 +127,7 @@ describe('model: update:', function() {
       const update = {
         title: newTitle, // becomes $set
         $inc: { 'meta.visitors': 2 },
-        $set: { date: new Date },
+        $set: { date: new Date() },
         published: false, // becomes $set
         mixed: { x: 'ECKS', y: 'why' }, // $set
         $pullAll: { numbers: [4, 6] },
@@ -227,7 +227,7 @@ describe('model: update:', function() {
       BlogPost.collection.findOne({ _id: post._id }, function(err, doc) {
         assert.ifError(err);
 
-        const up = new BlogPost;
+        const up = new BlogPost();
         up.init(doc);
         assert.equal(up.comments.length, 1);
         assert.equal(up.comments[0].body, 'worked great');
@@ -255,7 +255,7 @@ describe('model: update:', function() {
     a.prototype.toString = function() {
       return 'MongoDB++';
     };
-    const crazy = new a;
+    const crazy = new a();
 
     const update = {
       $addToSet: { 'comments.$.comments': { body: 'The Ring Of Power' } },
@@ -291,7 +291,7 @@ describe('model: update:', function() {
     it('handles date casting (gh-479)', function(done) {
       const update = {
         $inc: { 'comments.$.newprop': '1' },
-        $set: { date: (new Date).getTime() } // check for single val casting
+        $set: { date: (new Date()).getTime() } // check for single val casting
       };
 
       BlogPost.update({ _id: post._id, 'comments.body': 'been there' }, update, { strict: false }, function(err) {
@@ -330,7 +330,7 @@ describe('model: update:', function() {
 
     it('handles $addToSet with $each (gh-545)', function(done) {
       const owner = post.owners[0];
-      const newowner = new DocumentObjectId;
+      const newowner = new DocumentObjectId();
       const numOwners = post.owners.length;
 
       const update = {
@@ -461,7 +461,7 @@ describe('model: update:', function() {
   it('updates numbers atomically', function(done) {
     let totalDocs = 4;
 
-    const post = new BlogPost;
+    const post = new BlogPost();
     post.set('meta.visitors', 5);
 
     function complete() {
@@ -2646,7 +2646,7 @@ describe('model: update:', function() {
 
       const Test = db.model('Test', schema);
 
-      const test = new Test;
+      const test = new Test();
 
       await test.save();
       const cond = { _id: test._id };

@@ -28,7 +28,7 @@ describe('Model', function() {
   beforeEach(() => db.deleteModel(/.*/));
 
   beforeEach(function() {
-    Comments = new Schema;
+    Comments = new Schema();
 
     Comments.add({
       title: String,
@@ -146,7 +146,7 @@ describe('Model', function() {
   });
   describe('isNew', function() {
     it('is true on instantiation', function(done) {
-      const post = new BlogPost;
+      const post = new BlogPost();
       assert.equal(post.isNew, true);
       done();
     });
@@ -190,7 +190,7 @@ describe('Model', function() {
 
   describe('structure', function() {
     it('default when instantiated', function(done) {
-      const post = new BlogPost;
+      const post = new BlogPost();
       assert.equal(post.db.model('BlogPost').modelName, 'BlogPost');
       assert.equal(post.constructor.modelName, 'BlogPost');
 
@@ -223,7 +223,7 @@ describe('Model', function() {
             single: { type: Array, cast: String, default: ['a'] }
           });
           const DefaultArray = db.model('Test', DefaultArraySchema);
-          const arr = new DefaultArray;
+          const arr = new DefaultArray();
           assert.equal(arr.get('arr').length, 3);
           assert.equal(arr.get('arr')[0], 'a');
           assert.equal(arr.get('arr')[1], 'b');
@@ -312,16 +312,16 @@ describe('Model', function() {
         post.init({
           title: 'Test',
           slug: 'test',
-          date: new Date,
+          date: new Date(),
           meta: {
-            date: new Date,
+            date: new Date(),
             visitors: 5
           },
           published: true,
-          owners: [new DocumentObjectId, new DocumentObjectId],
+          owners: [new DocumentObjectId(), new DocumentObjectId()],
           comments: [
-            { title: 'Test', date: new Date, body: 'Test' },
-            { title: 'Super', date: new Date, body: 'Cool' }
+            { title: 'Test', date: new Date(), body: 'Test' },
+            { title: 'Super', date: new Date(), body: 'Cool' }
           ]
         });
 
@@ -360,11 +360,11 @@ describe('Model', function() {
       });
 
       it('partially', function(done) {
-        const post = new BlogPost;
+        const post = new BlogPost();
         post.init({
           title: 'Test',
           slug: 'test',
-          date: new Date
+          date: new Date()
         });
 
         assert.equal(post.get('title'), 'Test');
@@ -385,7 +385,7 @@ describe('Model', function() {
       it('with partial hash', function(done) {
         const post = new BlogPost({
           meta: {
-            date: new Date,
+            date: new Date(),
             visitors: 5
           }
         });
@@ -399,7 +399,7 @@ describe('Model', function() {
         post.init({
           title: 'Test',
           slug: 'test',
-          comments: [{ title: 'Test', date: new Date, body: 'Test' }]
+          comments: [{ title: 'Test', date: new Date(), body: 'Test' }]
         });
 
         assert.equal(post.get('comments')[0].isNew, false);
@@ -521,7 +521,7 @@ describe('Model', function() {
     });
 
     const M = db.model('Test', schema);
-    const m = new M;
+    const m = new M();
     m.nested = null;
     m.save(function(err) {
       assert.ifError(err);
@@ -566,7 +566,7 @@ describe('Model', function() {
   it('over-writing a number should persist to the db (gh-342)', function(done) {
     const post = new BlogPost({
       meta: {
-        date: new Date,
+        date: new Date(),
         visitors: 10
       }
     });
@@ -605,7 +605,7 @@ describe('Model', function() {
       const ChildA = db.model('Child', ChildSchema);
       const ParentA = db.model('Parent', ParentSchema);
 
-      const c = new ChildA;
+      const c = new ChildA();
       assert.equal(typeof c.talk, 'function');
 
       const p = new ParentA();
@@ -660,8 +660,8 @@ describe('Model', function() {
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof ValidationError);
         assert.equal(Object.keys(err.errors).length, 2);
-        post.date = new Date;
-        post.meta.date = new Date;
+        post.date = new Date();
+        post.meta.date = new Date();
         post.save(function(err) {
           assert.ifError(err);
           done();
@@ -671,7 +671,7 @@ describe('Model', function() {
     it('nested error', function(done) {
       let threw = false;
 
-      const post = new BlogPost;
+      const post = new BlogPost();
 
       try {
         post.init({
@@ -705,7 +705,7 @@ describe('Model', function() {
       const post = new BlogPost({
         title: 'Test',
         slug: 'test',
-        comments: [{ title: 'Test', date: new Date, body: 'Test' }]
+        comments: [{ title: 'Test', date: new Date(), body: 'Test' }]
       });
 
       post.get('comments')[0].set('date', 'invalid');
@@ -863,7 +863,7 @@ describe('Model', function() {
 
       const M = db.model('Test', S);
 
-      const m = new M;
+      const m = new M();
       m.save(function(err) {
         assert.ifError(err);
         M.findById(m._id, function(err, m) {
@@ -965,7 +965,7 @@ describe('Model', function() {
         simple: { type: String, required: true }
       }));
 
-      const post = new TestUndefinedValidation;
+      const post = new TestUndefinedValidation();
 
       post.save(function(err) {
         assert.ok(err instanceof MongooseError);
@@ -1024,7 +1024,7 @@ describe('Model', function() {
         resultv: { type: String, required: true }
       }));
 
-      const post = new TestV;
+      const post = new TestV();
 
       post.validate(function(err) {
         assert.ok(err instanceof MongooseError);
@@ -1151,7 +1151,7 @@ describe('Model', function() {
         item: { type: String, required: true }
       }));
 
-      const post = new TestCallingValidation;
+      const post = new TestCallingValidation();
 
       assert.equal(post.schema.path('item').isRequired, true);
       assert.strictEqual(post.isNew, true);
@@ -1179,7 +1179,7 @@ describe('Model', function() {
         result: { type: String, validate: [validator, 'chump validator'], required: false }
       }));
 
-      const post = new TestV;
+      const post = new TestV();
 
       assert.equal(post.schema.path('result').isRequired, false);
       done();
@@ -1333,7 +1333,7 @@ describe('Model', function() {
         date: { type: Date, default: now }
       }));
 
-      const post = new TestDefaults;
+      const post = new TestDefaults();
       assert.ok(post.get('date') instanceof Date);
       assert.equal(+post.get('date'), now);
       done();
@@ -1705,7 +1705,7 @@ describe('Model', function() {
       assert.equal(a.$__getValue('number').valueOf(), 50);
 
       called = false;
-      const b = new A;
+      const b = new A();
       b.init({ number: 50 });
       assert.equal(called, false);
       num = b.number;
@@ -1742,7 +1742,7 @@ describe('Model', function() {
       });
 
       it('works with object literals', function(done) {
-        const date = new Date;
+        const date = new Date();
 
         const meta = {
           date: date,
@@ -1775,7 +1775,7 @@ describe('Model', function() {
         assert.equal(getter2.visitors, 5);
         assert.equal(getter1.date, getter2.date);
 
-        post.meta.date = new Date - 1000;
+        post.meta.date = new Date() - 1000;
         assert.ok(post.meta.date instanceof Date);
         assert.ok(post.get('meta').date instanceof Date);
 
@@ -2058,7 +2058,7 @@ describe('Model', function() {
       let totalDocs = 4;
       const saveQueue = [];
 
-      const post = new BlogPost;
+      const post = new BlogPost();
 
       function complete() {
         BlogPost.findOne({ _id: post.get('_id') }, function(err, doc) {
@@ -2734,7 +2734,7 @@ describe('Model', function() {
 
         BlogPost.findById(post.get('_id'), function(err, doc) {
           assert.ifError(err);
-          assert.strictEqual(doc.comments.id(new DocumentObjectId), null);
+          assert.strictEqual(doc.comments.id(new DocumentObjectId()), null);
           done();
         });
       });
@@ -2855,7 +2855,7 @@ describe('Model', function() {
 
           // date
           const post3 = new BlogPost();
-          post3.mixed = new Date;
+          post3.mixed = new Date();
           post3.save(function(err) {
             assert.ifError(err);
 
@@ -2909,7 +2909,7 @@ describe('Model', function() {
       x: { y: { type: { type: String }, owner: String } }
     }));
 
-    post = new TestDefaults2;
+    post = new TestDefaults2();
     post.x.y.type = '#402';
     post.x.y.owner = 'me';
     post.save(function(err) {
@@ -3521,7 +3521,7 @@ describe('Model', function() {
       it('should emit error on its Model when there are listeners', function(done) {
         const DefaultErrSchema = new Schema({});
         DefaultErrSchema.pre('save', function(next) {
-          next(new Error);
+          next(new Error());
         });
 
         const DefaultErr = db.model('Test', DefaultErrSchema);
@@ -3561,7 +3561,7 @@ describe('Model', function() {
     it('rejects new documents that have no _id set (1595)', function(done) {
       const s = new Schema({ _id: { type: String } });
       const B = db.model('Test', s);
-      const b = new B;
+      const b = new B();
       b.save(function(err) {
         assert.ok(err);
         assert.ok(/must have an _id/.test(err));
@@ -3729,7 +3729,7 @@ describe('Model', function() {
       db.on('open', function() {
         const o = {
           name: 'gh-1048',
-          _id: new mongoose.Types.ObjectId,
+          _id: new mongoose.Types.ObjectId(),
           databases: {
             0: { keys: 100, expires: 0 },
             15: { keys: 1, expires: 0 }
@@ -3757,7 +3757,7 @@ describe('Model', function() {
     it('are not saved', function(done) {
       const B = BlogPost;
 
-      const b = new B;
+      const b = new B();
       b.whateveriwant = 10;
       b.save(function(err) {
         assert.ifError(err);
@@ -3882,7 +3882,7 @@ describe('Model', function() {
 
   it('setting a path to undefined should retain the value as undefined', function(done) {
     const B = BlogPost;
-    const doc = new B;
+    const doc = new B();
     doc.title = 'css3';
     assert.equal(doc.$__delta()[1].$set.title, 'css3');
     doc.title = undefined;
@@ -3892,7 +3892,7 @@ describe('Model', function() {
     doc.title = 'css3';
     doc.author = 'aaron';
     doc.numbers = [3, 4, 5];
-    doc.meta.date = new Date;
+    doc.meta.date = new Date();
     doc.meta.visitors = 89;
     doc.comments = [{ title: 'thanksgiving', body: 'yuuuumm' }];
     doc.comments.push({ title: 'turkey', body: 'cranberries' });
@@ -6134,13 +6134,13 @@ describe('Model', function() {
 
 
       const coll = 'tests' + random();
-      let M = db.model('Test', new Schema({
+      let Model = db.model('Test', new Schema({
         name: { type: String, index: true }
       }, { autoIndex: false }), coll);
-      let dropped = await M.syncIndexes();
+      let dropped = await Model.syncIndexes();
       assert.deepEqual(dropped, []);
 
-      let indexes = await M.listIndexes();
+      let indexes = await Model.listIndexes();
       assert.deepEqual(indexes.map(i => i.key), [
         { _id: 1 },
         { name: 1 }
@@ -6148,14 +6148,14 @@ describe('Model', function() {
 
       // New model, same collection, index on different property
       db.deleteModel(/Test/);
-      M = db.model('Test', new Schema({
+      Model = db.model('Test', new Schema({
         otherName: { type: String, index: true }
       }, { autoIndex: false }), coll);
 
-      dropped = await M.syncIndexes();
+      dropped = await Model.syncIndexes();
       assert.deepEqual(dropped, ['name_1']);
 
-      indexes = await M.listIndexes();
+      indexes = await Model.listIndexes();
       assert.deepEqual(indexes.map(i => i.key), [
         { _id: 1 },
         { otherName: 1 }
@@ -6163,24 +6163,24 @@ describe('Model', function() {
 
       // New model, same collection, different options
       db.deleteModel(/Test/);
-      M = db.model('Test', new Schema({
+      Model = db.model('Test', new Schema({
         otherName: { type: String, unique: true }
       }, { autoIndex: false }), coll);
 
-      dropped = await M.syncIndexes();
+      dropped = await Model.syncIndexes();
       assert.deepEqual(dropped, ['otherName_1']);
 
-      indexes = await M.listIndexes();
+      indexes = await Model.listIndexes();
       assert.deepEqual(indexes.map(i => i.key), [
         { _id: 1 },
         { otherName: 1 }
       ]);
 
       // Re-run syncIndexes(), shouldn't change anything
-      dropped = await M.syncIndexes();
+      dropped = await Model.syncIndexes();
       assert.deepEqual(dropped, []);
 
-      await M.collection.drop();
+      await Model.collection.drop();
 
     });
 
@@ -6668,36 +6668,47 @@ describe('Model', function() {
     }, /Model\.discriminator.*MyModel/);
   });
 
-  describe('exists() (gh-6872)', function() {
-    it('returns true if document exists', function() {
-      const Model = db.model('Test', new Schema({ name: String }));
-
-      return Model.create({ name: 'foo' }).
-        then(() => Model.exists({ name: 'foo' })).
-        then(res => assert.ok(res)).
-        then(() => Model.exists({})).
-        then(res => assert.ok(res)).
-        then(() => Model.exists()).
-        then(res => assert.ok(res));
+  describe('exists() (gh-6872) (gh-8097) (gh-11138)', function() {
+    it('returns a query', () => {
+      const User = db.model('Test', new Schema({ name: String }));
+      const query = User.exists({ name: 'Hafez' });
+      assert.ok(query instanceof mongoose.Query);
     });
 
-    it('returns false if no doc exists', function() {
+    it('returns lean document with `_id` only if document exists', async function() {
       const Model = db.model('Test', new Schema({ name: String }));
 
-      return Model.create({ name: 'foo' }).
-        then(() => Model.exists({ name: 'bar' })).
-        then(res => assert.ok(!res)).
-        then(() => Model.exists({ otherProp: 'foo' }, { strict: false })).
-        then(res => assert.ok(!res));
+      const docFromCreation = await Model.create({ name: 'foo' });
+      const existingDocument = await Model.exists({ _id: docFromCreation._id });
+      assert.equal(existingDocument._id.toString(), docFromCreation._id.toString());
+      assert.deepStrictEqual(existingDocument, { _id: docFromCreation._id });
+      assert.ok(isLean(existingDocument));
     });
 
-    it('options (gh-8075)', function() {
+
+    it('returns `null` when no document exists', async() => {
       const Model = db.model('Test', new Schema({ name: String }));
 
-      return Model.exists({}).
-        then(res => assert.ok(!res)).
-        then(() => Model.exists({}, { explain: true })).
-        then(res => assert.ok(res));
+      const existingDocument = await Model.exists({ name: 'I do not exist' });
+      assert.equal(existingDocument, null);
+    });
+    it('returns `null` if no doc exists', async function() {
+      const Model = db.model('Test', new Schema({ name: String }));
+
+      await Model.create({ name: 'foo' });
+
+      const existingDocumentWithStrict = await Model.exists({ otherProp: 'foo' }, { strict: false });
+      assert.equal(existingDocumentWithStrict, null);
+    });
+
+    it('options (gh-8075)', async function() {
+      const Model = db.model('Test', new Schema({ name: String }));
+
+      const existingDocument = await Model.exists({});
+      assert.equal(existingDocument, null);
+
+      const explainResult = await Model.exists({}, { explain: true });
+      assert.ok(explainResult);
     });
   });
 
@@ -7680,4 +7691,8 @@ describe('Model', function() {
 
 async function delay(ms) {
   await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isLean(document) {
+  return document != null && !(document instanceof mongoose.Document);
 }

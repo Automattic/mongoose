@@ -414,7 +414,6 @@ Valid options:
 - [toJSON](#toJSON)
 - [toObject](#toObject)
 - [typeKey](#typeKey)
-- [useNestedStrict](#useNestedStrict)
 - [validateBeforeSave](#validateBeforeSave)
 - [versionKey](#versionKey)
 - [optimisticConcurrency](#optimisticConcurrency)
@@ -1158,40 +1157,37 @@ const schema = Schema({
 });
 ```
 
-<h3 id="useNestedStrict"><a href="#useNestedStrict">option: useNestedStrict</a></h3>
+<h3 id="pluginTags"><a href="#pluginTags">option: pluginTags</a></h3>
 
-Write operations like `update()`, `updateOne()`, `updateMany()`,
-and `findOneAndUpdate()` only check the top-level
-schema's strict mode setting.
+Mongoose supports defining global plugins, plugins that apply to all schemas.
 
 ```javascript
-const childSchema = new Schema({}, { strict: false });
-const parentSchema = new Schema({ child: childSchema }, { strict: 'throw' });
-const Parent = mongoose.model('Parent', parentSchema);
-Parent.update({}, { 'child.name': 'Luke Skywalker' }, (error) => {
-  // Error because parentSchema has `strict: throw`, even though
-  // `childSchema` has `strict: false`
-});
-
-const update = { 'child.name': 'Luke Skywalker' };
-const opts = { strict: false };
-Parent.update({}, update, opts, function(error) {
-  // This works because passing `strict: false` to `update()` overwrites
-  // the parent schema.
+// Add a `meta` property to all schemas
+mongoose.plugin(function myPlugin(schema) {
+  schema.add({ meta: {} });
 });
 ```
 
-If you set `useNestedStrict` to true, mongoose will use the child schema's
-`strict` option for casting updates.
+Sometimes, you may only want to apply a given plugin to some schemas.
+In that case, you can add `pluginTags` to a schema:
 
 ```javascript
-const childSchema = new Schema({}, { strict: false });
-const parentSchema = new Schema({ child: childSchema },
-  { strict: 'throw', useNestedStrict: true });
-const Parent = mongoose.model('Parent', parentSchema);
-Parent.update({}, { 'child.name': 'Luke Skywalker' }, error => {
-  // Works!
+const schema1 = new Schema({
+  name: String
+}, { pluginTags: ['useMetaPlugin'] });
+
+const schema2 = new Schema({
+  name: String
 });
+```
+
+If you call `plugin()` with a `tags` option, Mongoose will only apply that plugin to schemas that have a matching entry in `pluginTags`.
+
+```javascript
+// Add a `meta` property to all schemas
+mongoose.plugin(function myPlugin(schema) {
+  schema.add({ meta: {} });
+}, { tags: ['useMetaPlugin'] });
 ```
 
 <h3 id="selectPopulatedPaths">

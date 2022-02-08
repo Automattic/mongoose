@@ -1,4 +1,5 @@
 import { Schema, model, Document, LeanDocument, Types } from 'mongoose';
+import { expectError } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
@@ -31,12 +32,12 @@ void async function main() {
   doc.testMethod();
 
   const pojo = doc.toObject();
-  await pojo.save();
+  expectError(await pojo.save());
 
   const _doc: ITestBase = await Test.findOne().orFail().lean();
-  await _doc.save();
+  expectError(await _doc.save());
 
-  _doc.testMethod();
+  expectError(_doc.testMethod());
   _doc.name = 'test';
   _doc.mixed = 42;
   console.log(_doc._id);
@@ -75,10 +76,10 @@ function gh10345() {
     const doc = new UserModel({ name: 'test' });
 
     const leanDoc = doc.toObject<User>();
-    leanDoc.id = 43;
+    expectError(leanDoc.id = 43);
 
     const doc2 = await UserModel.findOne().orFail().lean();
-    doc2.id = 43;
+    expectError(doc2.id = 43);
   })();
 }
 
@@ -87,7 +88,7 @@ async function gh11118(): Promise<void> {
     name: string;
     email: string;
     avatar?: string;
-}
+  }
 
   const schema = new Schema<User>({
     name: { type: String, required: true },
@@ -102,5 +103,4 @@ async function gh11118(): Promise<void> {
   for (const doc of docs) {
     const _id: Types.ObjectId = doc._id;
   }
-
 }

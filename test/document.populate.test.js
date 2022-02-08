@@ -113,7 +113,7 @@ describe('document.populate', function() {
     B = db.model('BlogPost', BlogPostSchema);
     User = db.model('User', UserSchema);
 
-    _id = new mongoose.Types.ObjectId;
+    _id = new mongoose.Types.ObjectId();
 
     User.create({
       name: 'Phoenix',

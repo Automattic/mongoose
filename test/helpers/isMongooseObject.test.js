@@ -2,14 +2,16 @@
 
 const assert = require('assert');
 const isMongooseObject = require('../../lib/helpers/isMongooseObject');
+const MongooseArray = require('../../lib/types/array');
 
 describe('isMongooseObject', () => {
   it('is when value.$__ != null', () => {
     assert.ok(isMongooseObject({ $__: !null }));
   });
 
-  it('is when value.isMongooseArray is truthy', () => {
-    assert.ok(isMongooseObject({ isMongooseArray: true }));
+  it('is when value is a MongooseArray', () => {
+    const mongooseArray = new MongooseArray();
+    assert.ok(isMongooseObject(mongooseArray));
   });
 
   it('is when value.isMongooseBuffer is truthy', () => {
@@ -28,11 +30,11 @@ describe('isMongooseObject', () => {
     assert.ok(!isMongooseObject(null));
     assert.ok(!isMongooseObject(false));
     assert.ok(!isMongooseObject(undefined));
-    assert.ok(!isMongooseObject(new Array));
-    assert.ok(!isMongooseObject(new Function));
-    assert.ok(!isMongooseObject(new Object));
-    assert.ok(!isMongooseObject(new RegExp));
-    assert.ok(!isMongooseObject(new String));
+    assert.ok(!isMongooseObject(new Array()));
+    assert.ok(!isMongooseObject(new Function()));
+    assert.ok(!isMongooseObject(new Object()));
+    assert.ok(!isMongooseObject(new RegExp()));
+    assert.ok(!isMongooseObject(new String()));
     assert.ok(!isMongooseObject(Buffer.from([])));
   });
 });

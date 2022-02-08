@@ -305,16 +305,16 @@ describe('connections:', function() {
 
     it('prevents overwriting pre-existing models', function() {
       db.deleteModel(/Test/);
-      db.model('Test', new Schema);
+      db.model('Test', new Schema());
 
       assert.throws(function() {
-        db.model('Test', new Schema);
+        db.model('Test', new Schema());
       }, /Cannot overwrite `Test` model/);
     });
 
     it('allows passing identical name + schema args', function() {
       const name = 'Test';
-      const schema = new Schema;
+      const schema = new Schema();
 
       db.deleteModel(/Test/);
       const model = db.model(name, schema);
@@ -470,7 +470,7 @@ describe('connections:', function() {
 
   describe('modelNames()', function() {
     it('returns names of all models registered on it', async function() {
-      const m = new mongoose.Mongoose;
+      const m = new mongoose.Mongoose();
       m.model('root', { x: String });
       const another = m.model('another', { x: String });
       another.discriminator('discriminated', new Schema({ x: String }));
@@ -887,7 +887,7 @@ describe('connections:', function() {
   });
 
   it('connection.asPromise() resolves to a connection instance (gh-9496)', async function() {
-    const m = new mongoose.Mongoose;
+    const m = new mongoose.Mongoose();
 
     m.connect('mongodb://localhost:27017/test_gh9496');
     const conn = await m.connection.asPromise();
@@ -936,7 +936,7 @@ describe('connections:', function() {
   });
 
   it('can use destructured `connect` and `disconnect` (gh-9597)', async function() {
-    const m = new mongoose.Mongoose;
+    const m = new mongoose.Mongoose();
     const connect = m.connect;
     const disconnect = m.disconnect;
 
@@ -1067,9 +1067,9 @@ describe('connections:', function() {
   });
 
   it('Connection id should be scoped per Mongoose Instance (gh-10025)', function() {
-    const m = new mongoose.Mongoose;
+    const m = new mongoose.Mongoose();
     const conn = m.createConnection();
-    const m1 = new mongoose.Mongoose;
+    const m1 = new mongoose.Mongoose();
     const conn2 = m1.createConnection();
     const conn3 = m.createConnection();
     assert.deepStrictEqual(m.connection.id, 0);
@@ -1079,27 +1079,254 @@ describe('connections:', function() {
     assert.deepStrictEqual(conn3.id, m.connection.id + 2);
   });
 
-  it('Allows a syncIndexes option with connection mongoose.connection.syncIndexes (gh-10893)', async function() {
-    this.timeout(10000);
+  describe('Connection#syncIndexes() (gh-10893) (gh-11039)', () => {
+    let connection;
+    this.beforeEach(async() => {
+      const mongooseInstance = new mongoose.Mongoose();
+      connection = mongooseInstance.createConnection('mongodb://localhost:27017/connection_sync_indexes_test');
+    });
+    this.afterEach(async() => {
+      await connection.dropDatabase();
+    });
+    it('Allows a syncIndexes option with connection mongoose.connection.syncIndexes (gh-10893)', async function() {
+      const coll = 'tests2';
+
+      let User = connection.model('Test', new Schema({ name: { type: String, index: true } }, { autoIndex: false }), coll);
+      const indexesAfterFirstSync = await connection.syncIndexes();
+      assert.deepEqual(indexesAfterFirstSync, { Test: [] });
+
+      const indexesAfterSecondSync = await User.listIndexes();
+      assert.deepEqual(
+        indexesAfterSecondSync.map(i => i.key),
+        [{ _id: 1 }, { name: 1 }]
+      );
+
+      connection.deleteModel(/Test/);
+
+      User = connection.model('Test', new Schema({
+        otherName: { type: String, index: true }
+      }, { autoIndex: false }), coll);
+
+      const indexesAfterDropping = await connection.syncIndexes();
+      assert.deepEqual(indexesAfterDropping, { Test: ['name_1'] });
+    });
+    it('does not sync indexes automatically when `autoIndex: true` (gh-11039)', async function() {
+      // Arrange
+      const buildingSchema = new Schema({ name: String }, { autoIndex: false });
+      buildingSchema.index({ name: 1 });
+      const Building = connection.model('Building', buildingSchema);
+
+      const floorSchema = new Schema({ name: String }, { autoIndex: false });
+      floorSchema.index({ name: 1 }, { unique: true });
+      const Floor = connection.model('Floor', floorSchema);
+
+      const officeSchema = new Schema({ name: String }, { autoIndex: false });
+      const Office = connection.model('Office', officeSchema);
+
+      // ensure all colections exist
+      // otherwise `listIndexes` randomly fails because a collection hasn't been created in the database yt.
+      await Promise.all([
+        Building.createCollection(),
+        Floor.createCollection(),
+        Office.createCollection()
+      ]);
+
+      // Act
+      const [
+        buildingIndexes,
+        floorIndexes,
+        officeIndexes
+      ] = await Promise.all([
+        Building.listIndexes(),
+        Floor.listIndexes(),
+        Office.listIndexes()
+      ]);
+
+      // Assert
+      assert.deepEqual(buildingIndexes.map(index => index.key), [{ _id: 1 }]);
+      assert.deepEqual(floorIndexes.map(index => index.key), [{ _id: 1 }]);
+      assert.deepEqual(officeIndexes.map(index => index.key), [{ _id: 1 }]);
+    });
+    it('stops as soon as one model fails with `continueOnError: false` (gh-11039)', async function() {
+      // Arrange
+      const buildingSchema = new Schema({ name: String }, { autoIndex: false });
+      buildingSchema.index({ name: 1 });
+      const Building = connection.model('Building', buildingSchema);
+
+      const floorSchema = new Schema({ name: String }, { autoIndex: false });
+      floorSchema.index({ name: 1 }, { unique: true });
+      const Floor = connection.model('Floor', floorSchema);
+
+      const officeSchema = new Schema({ name: String }, { autoIndex: false });
+      officeSchema.index({ name: 1 });
+      const Office = connection.model('Office', officeSchema);
+      await Floor.insertMany([
+        { name: 'I am a duplicate' },
+        { name: 'I am a duplicate' }
+      ]);
+
+      // Act
+      const err = await connection.syncIndexes().then(() => null, err => err);
+      assert.ok(err);
 
 
-    const coll = 'tests2';
-    const mongooseInstance = new mongoose.Mongoose();
-    const conn = mongooseInstance.createConnection('mongodb://localhost:27017');
-    let User = conn.model('Test', new Schema({ name: { type: String, index: true } }, { autoIndex: false }), coll);
-    const indexesAfterFirstSync = await conn.syncIndexes();
-    assert(indexesAfterFirstSync, { Test: [] });
-    const indexesAfterSecondSync = await User.listIndexes();
-    assert.deepEqual(indexesAfterSecondSync.map(i => i.key), [
-      { _id: 1 },
-      { name: 1 }
-    ]);
-    conn.deleteModel(/Test/);
-    User = conn.model('Test', new Schema({
-      otherName: { type: String, index: true }
-    }, { autoIndex: false }), coll);
-    const dropped = await conn.syncIndexes();
-    assert.deepEqual(dropped, { Test: ['name_1'] });
-    await User.collection.drop();
+      // Assert
+      const [
+        buildingIndexes,
+        floorIndexes,
+        officeIndexes
+      ] = await Promise.all([
+        Building.listIndexes(),
+        Floor.listIndexes(),
+        Office.listIndexes()
+      ]);
+
+      assert.deepEqual(buildingIndexes.map(index => index.key), [{ _id: 1 }, { name: 1 }]);
+      assert.deepEqual(floorIndexes.map(index => index.key), [{ _id: 1 }]);
+      assert.deepEqual(officeIndexes.map(index => index.key), [{ _id: 1 }]);
+    });
+
+    it('error includes a property with all the errors when `continueOnError: false`', async() => {
+      // Arrange
+      const bookSchema = new Schema({ name: String }, { autoIndex: false });
+      bookSchema.index({ name: 1 }, { unique: true });
+      const Book = connection.model('Book', bookSchema);
+
+
+      await Book.insertMany([
+        { name: 'I am a duplicate' },
+        { name: 'I am a duplicate' }
+      ]);
+
+      // Act
+      const err = await connection.syncIndexes({ continueOnError: false }).then(() => null, err => err);
+
+      // Assert
+      assert.ok(err);
+      assert.ok(err.message.includes('E11000'));
+      assert.equal(err.name, 'SyncIndexesError');
+      assert.equal(err.errors['Book'].code, 11000);
+      assert.equal(err.errors['Book'].code, 11000);
+    });
+
+    it('`continueOnError` is false by default', async() => {
+      // Arrange
+      const bookSchema = new Schema({ name: String }, { autoIndex: false });
+      bookSchema.index({ name: 1 }, { unique: true });
+      const Book = connection.model('Book', bookSchema);
+
+
+      await Book.insertMany([
+        { name: 'I am a duplicate' },
+        { name: 'I am a duplicate' }
+      ]);
+
+      // Act
+      const err = await connection.syncIndexes().then(() => null, err => err);
+
+      // Assert
+      assert.ok(err);
+      assert.ok(err.message.includes('E11000'));
+      assert.equal(err.name, 'SyncIndexesError');
+      assert.equal(err.errors['Book'].code, 11000);
+      assert.equal(err.errors['Book'].code, 11000);
+    });
+    it('when `continueOnError: true` it will continue to sync indexes even if one model fails', async() => {
+      // Arrange
+      const buildingSchema = new Schema({ name: String }, { autoIndex: false });
+      buildingSchema.index({ name: 1 });
+      const Building = connection.model('Building', buildingSchema);
+
+      const floorSchema = new Schema({ name: String }, { autoIndex: false });
+      floorSchema.index({ name: 1 }, { unique: true });
+      const Floor = connection.model('Floor', floorSchema);
+
+      const officeSchema = new Schema({ name: String }, { autoIndex: false });
+      officeSchema.index({ name: 1 });
+      const Office = connection.model('Office', officeSchema);
+
+      await Floor.insertMany([
+        { name: 'I am a duplicate' },
+        { name: 'I am a duplicate' }
+      ]);
+
+      // Act
+      await connection.syncIndexes({ continueOnError: true });
+
+      // Assert
+      const [
+        buildingIndexes,
+        floorIndexes,
+        officeIndexes
+      ] = await Promise.all([
+        Building.listIndexes(),
+        Floor.listIndexes(),
+        Office.listIndexes()
+      ]);
+
+      assert.deepEqual(buildingIndexes.map(index => index.key), [{ _id: 1 }, { name: 1 }]);
+      assert.deepEqual(floorIndexes.map(index => index.key), [{ _id: 1 }]);
+      assert.deepEqual(officeIndexes.map(index => index.key), [{ _id: 1 }, { name: 1 }]);
+    });
+
+    it('when `continueOnError: true` it will return a map of modelNames and their sync results/errors', async() => {
+      // Arrange
+      const buildingSchema = new Schema({ name: String }, { autoIndex: false });
+      buildingSchema.index({ name: 1 });
+      connection.model('Building', buildingSchema);
+
+      const floorSchema = new Schema({ name: String }, { autoIndex: false });
+      floorSchema.index({ name: 1 }, { unique: true });
+      const Floor = connection.model('Floor', floorSchema);
+
+      const officeSchema = new Schema({ name: String }, { autoIndex: false });
+      officeSchema.index({ name: 1 });
+      connection.model('Office', officeSchema);
+
+      await Floor.insertMany([
+        { name: 'I am a duplicate' },
+        { name: 'I am a duplicate' }
+      ]);
+
+      // Act
+      const result = await connection.syncIndexes({ continueOnError: true });
+
+      // Assert
+      assert.ok(Array.isArray(result['Building']));
+      assert.ok(result['Floor'].name, 'MongoServerError');
+      assert.ok(Array.isArray(result['Office']));
+    });
+
+    it('mongoose.syncIndexes(...) accepts `continueOnError`', async() => {
+      const m = new mongoose.Mongoose();
+      await m.connect('mongodb://localhost:27017/connection_sync_indexes_test');
+
+      // Arrange
+      const buildingSchema = new Schema({ name: String }, { autoIndex: false });
+      buildingSchema.index({ name: 1 });
+      m.model('Building', buildingSchema);
+
+      const floorSchema = new Schema({ name: String }, { autoIndex: false });
+      floorSchema.index({ name: 1 }, { unique: true });
+      const Floor = m.model('Floor', floorSchema);
+
+      const officeSchema = new Schema({ name: String }, { autoIndex: false });
+      officeSchema.index({ name: 1 });
+      m.model('Office', officeSchema);
+
+      await Floor.insertMany([
+        { name: 'I am a duplicate' },
+        { name: 'I am a duplicate' }
+      ]);
+
+      // Act
+      const result = await m.syncIndexes({ continueOnError: true });
+
+      // Assert
+      assert.ok(Array.isArray(result['Building']));
+      assert.ok(result['Floor'].name, 'MongoServerError');
+      assert.ok(Array.isArray(result['Office']));
+    });
   });
+
 });

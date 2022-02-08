@@ -1,3 +1,53 @@
+6.2.1 / 2022-02-07
+==================
+ * perf: improve performance especially of validate and clone #11298 [Uzlopak](https://github.com/Uzlopak)
+ * perf: remove regexp-clone #11327 [Uzlopak](https://github.com/Uzlopak)
+ * fix(document): handle initing nested properties in non-strict documents #11309
+ * fix(query): cast $elemMatch underneath $all #11314
+ * fix(populate): respect schema-level strictPopulate option #11290
+ * fix: set default for dotted path projection #11293 [noseworthy](https://github.com/noseworthy)
+ * fix(model): correctly handle writeConcern.w = 0 when saving #11300
+ * fix(model): throw VersionError when saving with no changes and optimisticConcurrency = true #11295
+ * fix(query): avoid adding $each to $addToSet on mixed arrays #11284
+ * fix(index.d.ts): allow using type: [Schema.Types.ObjectId] for ObjectId arrays #11194
+ * fix(index.d.ts): make Types.DocumentArray<> convert type to subdoc, rename TMethods -> TMethodsAndOverrides #11061
+ * fix(index.d.ts): support passing generic to createCollection() and `collection()` for integration with MongoDB Node driver's collection class #11131
+ * fix(index.d.ts): add strictPopulate to MongooseOptions #11276
+ * docs: mark Mongoose 6 as compatible with MongoDB 4 #11320 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * docs: remove documentation for useNestedStrict #11313 [mark-langer](https://github.com/mark-langer)
+ * docs: add "new" to ObjectId class in aggregate.js docs #11322 [JavanPoirier](https://github.com/JavanPoirier)
+ * chore: handle eslint configuration in .eslintrc.json #11326 [Uzlopak](https://github.com/Uzlopak)
+ * refactor: add parenthesis for constructors in tests #11330 [apeltop](https://github.com/apeltop)
+
+6.2.0 / 2022-02-02
+==================
+ * feat(connection+mongoose): add support for continueOnError for syncIndexes #11266 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(query): cast literals in `$expr` where possible #10663
+ * feat(schema+mongoose): add pluginTags to allow applying global plugins to only schemas with matching tags #9780
+ * feat(discriminator): support overwriteModels:true to reuse discriminator names #11244 #10931 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(index.d.ts): add DocType generic param to Model functions that return queries to better support projections #11156
+ * feat(error): export MongooseServerSelectionError #11202
+ * feat(schematype): add validators, path, isRequired to public API and TypeScript types #11139
+ * fix(model): make exists(...) return lean document with _id or null instead of boolean #11142 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(model): support storing versionKey in nested paths #10980
+ * fix(index.d.ts): add options to `bulkSave()` type def #11201 [Uzlopak](https://github.com/Uzlopak)
+ * fix(index.d.ts): better support for query projections #11210 [EugeneKorshenko](https://github.com/EugeneKorshenko)
+
+6.1.10 / 2022-02-01
+===================
+ * fix(mongoose): correctly handle destructured isValidObjectId #11304
+ * fix(mongoose): defer to MongoDB driver isValid() for `isValidObjectId()` #11227
+
+6.1.9 / 2022-01-31
+==================
+ * fix(query): respect nested schema strict as default when casting query filters #11291
+ * fix(mongoose): make isValidObjectId() consistent with isValid(), make `ObjectId()` casting more flexible #11209
+ * fix(setDefaultsOnInsert): ignore defaults underneath maps #11235
+ * fix(query): avoid setting nested schema properties that are stripped out by strictQuery to undefined in query filter #11291
+ * fix: check for all flags in a regex deepequal #11242 [Uzlopak](https://github.com/Uzlopak)
+ * fix: replace substr with substring #11278 [Uzlopak](https://github.com/Uzlopak)
+ * docs: port for documentation testing in CONTRIBUTING.md #11273 [Uzlopak](https://github.com/Uzlopak)
+
 6.1.8 / 2022-01-24
 ==================
  * fix(connection): stop leaking sessions in .transaction() #11259 #11256 [Uzlopak](https://github.com/Uzlopak)

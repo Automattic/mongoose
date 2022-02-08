@@ -1,5 +1,6 @@
-import { Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc, FilterQuery, UpdateQuery } from 'mongoose';
+import { HydratedDocument, Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc, FilterQuery, UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { expectError, expectType } from 'tsd';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
@@ -22,7 +23,7 @@ schema.query._byName = function(name: string): QueryWithHelpers<any, ITest, Quer
 };
 
 schema.query.byName = function(name: string): QueryWithHelpers<any, ITest, QueryHelpers> {
-  this.notAQueryHelper();
+  expectError(this.notAQueryHelper());
   return this._byName(name);
 };
 
@@ -116,6 +117,17 @@ query instanceof Query;
 Test.findOne().where({ name: 'test' });
 Test.where().find({ name: 'test' });
 
+// Projection
+const p0: Record<string, number> = Test.find().projection({
+  age: true,
+  parent: 1,
+  'docs.id': 1
+});
+const p1: Record<string, number> = Test.find().projection('age docs.id');
+const p2: Record<string, number> | null = Test.find().projection();
+const p3: null = Test.find().projection(null);
+
+
 // Super generic query
 function testGenericQuery(): void {
   interface CommonInterface<T> extends Document {
@@ -186,6 +198,22 @@ function gh10786() {
   }
 }
 
+async function gh11156(): Promise<void> {
+  interface User {
+    name: string;
+    age: number;
+  }
+
+  const schema = new Schema<User>({
+    name: String,
+    age: Number
+  });
+
+  const User: Model<User> = model<User>('User', schema);
+
+  expectType<{ name: string }>(await User.findOne<Pick<User, 'name'>>({}).orFail());
+}
+
 async function gh11041(): Promise<void> {
   interface User {
     name: string;
@@ -203,5 +231,5 @@ async function gh11041(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  const maybeDoc3: { _id: Types.ObjectId } = await MyModel.findOne({}).populate('someField').exec();
+  expectType<HydratedDocument<User> | null>(await MyModel.findOne({}).populate('someField').exec());
 }

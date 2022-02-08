@@ -31,7 +31,7 @@ describe('model: querying:', function() {
   afterEach(() => require('./util').stopRemainingOps(db));
 
   beforeEach(function() {
-    Comments = new Schema;
+    Comments = new Schema();
 
     Comments.add({
       title: String,
@@ -130,7 +130,7 @@ describe('model: querying:', function() {
 
   it('a query is executed when a callback is passed', function(done) {
     let count = 5;
-    const q = { _id: new DocumentObjectId }; // make sure the query is fast
+    const q = { _id: new DocumentObjectId() }; // make sure the query is fast
 
     function fn() {
       if (--count) {
@@ -157,7 +157,7 @@ describe('model: querying:', function() {
 
   it('query is executed where a callback for findOne', function(done) {
     let count = 5;
-    const q = { _id: new DocumentObjectId }; // make sure the query is fast
+    const q = { _id: new DocumentObjectId() }; // make sure the query is fast
 
     function fn() {
       if (--count) {
@@ -595,8 +595,8 @@ describe('model: querying:', function() {
     });
 
     it('works with $elemMatch and $in combo (gh-1100)', function(done) {
-      const id1 = new DocumentObjectId;
-      const id2 = new DocumentObjectId;
+      const id1 = new DocumentObjectId();
+      const id2 = new DocumentObjectId();
 
       BlogPostB.create({ owners: [id1, id2] }, function(err, created) {
         assert.ifError(err);
@@ -845,10 +845,10 @@ describe('model: querying:', function() {
 
       const NE = db.model('Test', schema);
 
-      const id1 = new DocumentObjectId;
-      const id2 = new DocumentObjectId;
-      const id3 = new DocumentObjectId;
-      const id4 = new DocumentObjectId;
+      const id1 = new DocumentObjectId();
+      const id2 = new DocumentObjectId();
+      const id3 = new DocumentObjectId();
+      const id4 = new DocumentObjectId();
 
       NE.create({ ids: [id1, id4], b: id3 }, function(err) {
         assert.ifError(err);
@@ -965,8 +965,8 @@ describe('model: querying:', function() {
     });
 
     it('works with $elemMatch (gh-1100)', function(done) {
-      const id1 = new DocumentObjectId;
-      const id2 = new DocumentObjectId;
+      const id1 = new DocumentObjectId();
+      const id2 = new DocumentObjectId();
 
       BlogPostB.create({ owners: [id1, id2] }, function(err) {
         assert.ifError(err);
@@ -1574,7 +1574,7 @@ describe('model: querying:', function() {
 
   it('by Date (gh-336)', function(done) {
     const Test = db.model('Test', new Schema({ date: Date }));
-    const now = new Date;
+    const now = new Date();
 
     Test.create({ date: now }, { date: new Date(now - 10000) }, function(err) {
       assert.ifError(err);
@@ -1590,7 +1590,7 @@ describe('model: querying:', function() {
     const S = new Schema({ a: [{}], b: Number });
     const M = db.model('Test', S);
 
-    const m = new M;
+    const m = new M();
     m.a = [1, 2, { name: 'Frodo' }, 'IDK', { name: 100 }];
     m.b = 10;
 
@@ -1636,7 +1636,7 @@ describe('model: querying:', function() {
           assert.ifError(err);
           assert.equal(doc.id, p.id);
 
-          P.findOne({ 'sub._id': { $all: [o0, new DocumentObjectId] } }, function(err, doc) {
+          P.findOne({ 'sub._id': { $all: [o0, new DocumentObjectId()] } }, function(err, doc) {
             assert.ifError(err);
             assert.equal(!!doc, false);
 
@@ -1657,7 +1657,7 @@ describe('model: querying:', function() {
 
       const P = db.model('Test', PSchema);
       const sub = [
-        { d: new Date },
+        { d: new Date() },
         { d: new Date(Date.now() - 10000) },
         { d: new Date(Date.now() - 30000) }
       ];
@@ -1673,7 +1673,7 @@ describe('model: querying:', function() {
           assert.ifError(err);
           assert.equal(doc.id, p.id);
 
-          P.findOne({ 'sub.d': { $all: [o0, new Date] } }, function(err, doc) {
+          P.findOne({ 'sub.d': { $all: [o0, new Date()] } }, function(err, doc) {
             assert.ifError(err);
             assert.equal(!!doc, false);
 

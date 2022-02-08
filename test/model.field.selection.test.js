@@ -31,7 +31,7 @@ describe('model field selection', function() {
   afterEach(() => require('./util').stopRemainingOps(db));
 
   beforeEach(function() {
-    Comments = new Schema;
+    Comments = new Schema();
 
     Comments.add({
       title: String,
@@ -64,12 +64,12 @@ describe('model field selection', function() {
   });
 
   it('excluded fields should be undefined', function(done) {
-    const date = new Date;
+    const date = new Date();
 
     const doc = {
       title: 'subset 1',
       author: 'me',
-      comments: [{ title: 'first comment', date: new Date }, { title: '2nd', date: new Date }],
+      comments: [{ title: 'first comment', date: new Date() }, { title: '2nd', date: new Date() }],
       meta: { date: date }
     };
 
@@ -98,8 +98,8 @@ describe('model field selection', function() {
   });
 
   it('excluded fields should be undefined and defaults applied to other fields', function(done) {
-    const id = new DocumentObjectId;
-    const date = new Date;
+    const id = new DocumentObjectId();
+    const date = new Date();
 
     BlogPostB.collection.insertOne({ _id: id, title: 'hahaha1', meta: { date: date } }, function(err) {
       assert.ifError(err);
@@ -180,7 +180,7 @@ describe('model field selection', function() {
   });
 
   it('included fields should have defaults applied when no value exists in db (gh-870)', function(done) {
-    const id = new DocumentObjectId;
+    const id = new DocumentObjectId();
 
     BlogPostB.collection.insertOne(
       { _id: id, title: 'issue 870' }, function(err) {
@@ -258,8 +258,8 @@ describe('model field selection', function() {
       });
 
       const B = db.model('Test', postSchema);
-      const _id1 = new mongoose.Types.ObjectId;
-      const _id2 = new mongoose.Types.ObjectId;
+      const _id1 = new mongoose.Types.ObjectId();
+      const _id2 = new mongoose.Types.ObjectId();
 
       B.create({ ids: [_id1, _id2] }, function(err, doc) {
         assert.ifError(err);
@@ -297,8 +297,8 @@ describe('model field selection', function() {
       });
 
       const B = db.model('Test', postSchema);
-      const _id1 = new mongoose.Types.ObjectId;
-      const _id2 = new mongoose.Types.ObjectId;
+      const _id1 = new mongoose.Types.ObjectId();
+      const _id2 = new mongoose.Types.ObjectId();
 
       B.create({ ids: [_id1, _id2], ids2: [_id2, _id1] }, function(err, doc) {
         assert.ifError(err);

@@ -1,4 +1,5 @@
 import { Schema, model, Model, Document, SaveOptions, Query, Aggregate } from 'mongoose';
+import { expectError } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
@@ -7,7 +8,7 @@ schema.pre<Query<any, any>>('find', async function() {
 });
 
 schema.pre<Query<any, any>>('find', async function() {
-  console.log('Find', this.notAFunction());
+  expectError(this.notAFunction());
 });
 
 schema.pre<Aggregate<any>>('aggregate', async function() {

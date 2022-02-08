@@ -345,19 +345,32 @@ pre {
     bottom: 0;
 }
 
-@media (max-width: 1170px) {
-  #carbonads {
-    display: none !important;
-  }
+.cpc-ad #carbonads {
+  display: flex;
+  max-width: 250px;
+  background-color: hsl(0, 0%, 98%);
+  box-shadow: 0 1px 4px 1px hsla(0, 0%, 0%, 0.1);
+  z-index: 100;
 }
 
-@media (max-width: 1360px) {
-  #jobs {
-    display: none !important;
-  }
+.cpc-ad #carbonads a {
+  color: inherit;
+  text-decoration: none;
 }
 
-#carbonads a{color:#333;text-decoration:none}
+.cpc-ad #carbonads a:hover {
+  color: inherit;
+}
+
+.cpc-ad #carbonads span {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.cpc-ad #carbonads .carbon-wrap {
+  display: flex;
+}
 
 .cpc-ad #carbonads .carbon-img {
   display: block;
@@ -393,7 +406,6 @@ pre {
   bottom: 0;
   right: 0;
 }
-.carbon-poweredby{display:block;color:#777!important}
 
 /* job board */
 

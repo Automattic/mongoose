@@ -81,10 +81,6 @@ pre code {
   text-transform: none;
 }
 
-.pure-menu {
-  padding-bottom: 180px;
-}
-
 .pure-menu-item {
   height: 28px;
   font-size: 12pt;
@@ -332,80 +328,42 @@ pre {
 
 /* CPM ads */
 
-.cpc-ad #carbonads * {
-  margin: initial;
-  padding: initial;
+.carbonad{
+  margin-top:0!important;
+  margin-bottom:-3rem!important
 }
 
-.cpc-ad #carbonads {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial,
-    sans-serif;
-    position: fixed;
-    bottom: 0;
+#carbonads {
+  position:fixed;
+  right: 0px;
+  bottom: 0px;
+  display:block;
+  width:160px;
+  padding:15px 15px 15px 150px;
+  overflow:hidden;
+  font-size:13px;
+  line-height:1.4;
+  text-align:left;
+  background-color: #fafafa;
 }
 
-.cpc-ad #carbonads {
-  display: flex;
-  max-width: 250px;
-  background-color: hsl(0, 0%, 98%);
-  box-shadow: 0 1px 4px 1px hsla(0, 0%, 0%, 0.1);
-  z-index: 100;
+@media (max-width: 1170px) {
+  #carbonads {
+    display: none !important;
+  }
 }
 
-.cpc-ad #carbonads a {
-  color: inherit;
-  text-decoration: none;
+@media (max-width: 1360px) {
+  #jobs {
+    display: none !important;
+  }
 }
 
-.cpc-ad #carbonads a:hover {
-  color: inherit;
-}
+#carbonads a{color:#333;text-decoration:none}
 
-.cpc-ad #carbonads span {
-  position: relative;
-  display: block;
-  overflow: hidden;
-}
+.carbon-img{float:left;margin-left:-145px}
 
-.cpc-ad #carbonads .carbon-wrap {
-  display: flex;
-}
-
-.cpc-ad #carbonads .carbon-img {
-  display: block;
-  line-height: 1;
-}
-
-.cpc-ad #carbonads .carbon-img img {
-  display: block;
-  width: 110px;
-  height: auto;
-}
-
-.cpc-ad #carbonads .carbon-text {
-  font-size: 11px;
-  padding: 10px;
-  margin-bottom: 16px;
-  line-height: 1.5;
-  text-align: left;
-}
-
-.cpc-ad #carbonads .carbon-poweredby {
-  display: block;
-  padding: 6px 8px;
-  background: #f1f1f2;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 600;
-  font-size: 8px;
-  line-height: 1;
-  border-top-left-radius: 3px;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-}
+.carbon-poweredby{display:block;color:#777!important}
 
 /* job board */
 

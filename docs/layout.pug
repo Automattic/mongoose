@@ -151,6 +151,21 @@ html(lang='en')
             block content
         include includes/track
 
+        - if (!outputUrl.startsWith('/docs/jobs'))
+          div#jobs
+            each job in jobs
+              .job-listing
+                a(href='/jobs' + job._id)
+                  .company-logo
+                    img(src=job.logo)
+                  .description
+                    .company #{job.company}
+                    .title #{job.title}
+                    .location #{job.location}
+            .button.jobs-view-more
+              a(href='/docs/jobs') View more jobs!
+    
+
         script(type="text/javascript" src="/docs/js/navbar-search.js")
         script(type="text/javascript").
           (function (window, document) {

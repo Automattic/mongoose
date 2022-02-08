@@ -5,6 +5,10 @@ let sponsors = [];
 try {
   sponsors = require('../data/sponsors.json');
 } catch (err) {}
+let jobs = [];
+try {
+  jobs = require('../data/jobs.json');
+} catch (err) {}
 
 exports['index.pug'] = require('./home');
 exports['docs/api.pug'] = require('./api');
@@ -53,3 +57,11 @@ exports['docs/sponsors.pug'] = {
   sponsors
 };
 exports['docs/async-await.md'] = { title: 'Using Async/Await with Mongoose', markdown: true };
+exports['docs/jobs.pug'] = {
+  title: 'Mongoose MongoDB Jobs',
+  jobs
+};
+
+for (const props of Object.values(exports)) {
+  props.jobs = jobs;
+}

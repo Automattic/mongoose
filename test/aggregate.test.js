@@ -1168,7 +1168,7 @@ describe('aggregate: ', function() {
         return MyModel.aggregate([{ $sort: { name: 1 } }]).
           cursor().
           eachAsync(checkDoc, { parallel: 2 }).then(function() {
-            assert.ok(Date.now() - startedAt[1] >= 100);
+            assert.ok(Date.now() - startedAt[1] >= 100, Date.now() - startedAt[1]);
             assert.equal(startedAt.length, 2);
             assert.ok(startedAt[1] - startedAt[0] < 50, `${startedAt[1] - startedAt[0]}`);
             assert.deepEqual(names.sort(), expectedNames);

@@ -16,7 +16,7 @@ const addFields1: PipelineStage = {
 const addFields2: PipelineStage = {
   $addFields: {
     totalScore:
-            { $add: ['$totalHomework', '$totalQuiz', '$extraCredit'] }
+      { $add: ['$totalHomework', '$totalQuiz', '$extraCredit'] }
   }
 };
 
@@ -55,12 +55,12 @@ const bucket1: PipelineStage = {
     output: { // Output for each bucket
       count: { $sum: 1 },
       artists:
-            {
-              $push: {
-                name: { $concat: ['$first_name', ' ', '$last_name'] },
-                year_born: '$year_born'
-              }
-            }
+      {
+        $push: {
+          name: { $concat: ['$first_name', ' ', '$last_name'] },
+          year_born: '$year_born'
+        }
+      }
     }
   }
 };
@@ -97,3 +97,14 @@ const bucket2: PipelineStage = {
   }
 };
 
+/**
+ * $unwind
+ *
+ * @see https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/
+ */
+
+const unwind1: PipelineStage = { $unwind: '$sizes' };
+const unwind2: PipelineStage = { $unwind: { path: '$sizes' } };
+const unwind3: PipelineStage = { $unwind: { path: '$sizes', includeArrayIndex: 'arrayIndex' } };
+const unwind4: PipelineStage = { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } };
+const unwind5: PipelineStage = { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } };

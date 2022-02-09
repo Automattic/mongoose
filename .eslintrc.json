@@ -6,6 +6,7 @@
         "docs",
         "tools",
         "dist",
+        "website.js",
         "test/files/*",
         "benchmarks"
     ],

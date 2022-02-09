@@ -52,4 +52,6 @@ const trunc2: Expression = { $trunc: ['$value'] };
 // TextExpressionOperators
 
 const meta1: Expression = { $meta: 'textScore' };
-const meta2: Expression = { $meta: 'indexKey'}
+const meta2: Expression = { $meta: 'indexKey' };
+
+const tanh1: Expression = { $tanh: { $degreesToRadians: '$angle' } };

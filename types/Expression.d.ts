@@ -15,8 +15,6 @@ declare module 'mongoose' {
 
     type Path = string;
 
-    type NumberExpression = Path | ArithmeticExpressionOperators | DateExpressionOperators;
-
     export namespace Expression {
         export interface Abs {
             /**
@@ -161,6 +159,143 @@ declare module 'mongoose' {
             $trunc: [NumberExpression, NumberExpression?];
         }
 
+        export interface Sin {
+            /**
+             * Returns the sine of a value that is measured in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/sin/#mongodb-expression-exp.-sin
+             */
+            $sin: NumberExpression;
+        }
+
+        export interface Cos {
+            /**
+             * Returns the cosine of a value that is measured in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cos/#mongodb-expression-exp.-cos
+             */
+            $cos: NumberExpression;
+        }
+
+        export interface Tan {
+            /**
+             * Returns the tangent of a value that is measured in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/tan/#mongodb-expression-exp.-tan
+             */
+            $tan: NumberExpression;
+        }
+
+        export interface Asin {
+            /**
+             * Returns the inverse sin (arc sine) of a value in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/asin/#mongodb-expression-exp.-asin
+             */
+            $asin: NumberExpression;
+        }
+
+        export interface Acos {
+            /**
+             * Returns the inverse cosine (arc cosine) of a value in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/acos/#mongodb-expression-exp.-acos
+             */
+            $acos: NumberExpression;
+        }
+
+        export interface Atan {
+            /**
+             * Returns the inverse tangent (arc tangent) of a value in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/atan/#mongodb-expression-exp.-atan
+             */
+            $atan: NumberExpression;
+        }
+
+        export interface Atan2 {
+            /**
+             * Returns the inverse tangent (arc tangent) of y / x in radians, where y and x are the first and second values passed to the expression respectively.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/atan2/#mongodb-expression-exp.-atan2
+             */
+            $atan2: NumberExpression;
+        }
+
+        export interface Asinh {
+            /**
+             * Returns the inverse hyperbolic sine (hyperbolic arc sine) of a value in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/asinh/#mongodb-expression-exp.-asinh
+             */
+            $asinh: NumberExpression;
+        }
+
+        export interface Acosh {
+            /**
+             * Returns the inverse hyperbolic cosine (hyperbolic arc cosine) of a value in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/acosh/#mongodb-expression-exp.-acosh
+             */
+            $acosh: NumberExpression;
+        }
+
+        export interface Atanh {
+
+            /**
+             * Returns the inverse hyperbolic tangent (hyperbolic arc tangent) of a value in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/atanh/#mongodb-expression-exp.-atanh
+             */
+            $atanh: NumberExpression;
+        }
+
+        export interface Sinh {
+            /**
+             * Returns the hyperbolic sine of a value that is measured in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/sinh/#mongodb-expression-exp.-sinh
+             */
+            $sinh: NumberExpression;
+        }
+
+        export interface Cosh {
+            /**
+             * Returns the hyperbolic cosine of a value that is measured in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cosh/#mongodb-expression-exp.-cosh
+             */
+            $cosh: NumberExpression;
+        }
+
+        export interface Tanh {
+            /**
+             * Returns the hyperbolic tangent of a value that is measured in radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/tanh/#mongodb-expression-exp.-tanh
+             */
+            $tanh: NumberExpression;
+        }
+
+        export interface DegreesToRadians {
+            /**
+             * Converts a value from degrees to radians.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/degreesToRadians/#mongodb-expression-exp.-degreesToRadians
+             */
+            $degreesToRadians: NumberExpression;
+        }
+
+        export interface RadiansToDegrees {
+            /**
+             * Converts a value from radians to degrees.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/radiansToDegrees/#mongodb-expression-exp.-radiansToDegrees
+             */
+            $radiansToDegrees: NumberExpression;
+        }
+
+
         export interface Meta {
             /**
              * Access available per-document metadata related to the aggregation operation.
@@ -185,7 +320,17 @@ declare module 'mongoose' {
             };
         }
     }
-    export type Expression = ArithmeticExpressionOperators | DateExpressionOperators | TextExpressionOperators;
+    export type Expression =
+        ArithmeticExpressionOperators |
+        DateExpressionOperators |
+        TextExpressionOperators |
+        TrigonometryExpressionOperators;
+
+    export type NumberExpression =
+        Path |
+        ArithmeticExpressionOperators |
+        TrigonometryExpressionOperators |
+        DateExpressionOperators;
 
     export type ArithmeticExpressionOperators =
         number |
@@ -206,7 +351,30 @@ declare module 'mongoose' {
         Expression.Subtract |
         Expression.Trunc;
 
-    export type TextExpressionOperators = 
+    /**
+     * Trigonometry expressions perform trigonometric operations on numbers.
+     * Values that represent angles are always input or output in radians.
+     * Use $degreesToRadians and $radiansToDegrees to convert between degree
+     * and radian measurements.
+     */
+    export type TrigonometryExpressionOperators =
+        Expression.Sin |
+        Expression.Cos |
+        Expression.Tan |
+        Expression.Asin |
+        Expression.Acos |
+        Expression.Atan |
+        Expression.Atan2 |
+        Expression.Asinh |
+        Expression.Acosh |
+        Expression.Atanh |
+        Expression.Sinh |
+        Expression.Cosh |
+        Expression.Tanh |
+        Expression.DegreesToRadians |
+        Expression.RadiansToDegrees;
+
+    export type TextExpressionOperators =
         Expression.Meta;
 
     type DateUnit = 'year' | 'quarter' | 'week' | 'month' | 'day' | 'hour' | 'minute' | 'second' | 'millisecond';

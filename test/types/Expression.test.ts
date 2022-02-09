@@ -1,6 +1,8 @@
 import type { Expression } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
+// ArithmeticExpressionOperators
+
 const abs1: Expression = { $abs: '$date' };
 const abs2: Expression = { $abs: { $add: ['$price', '$fee'] } };
 
@@ -47,3 +49,7 @@ const subtract2: Expression = { $subtract: ['$price', '$fee'] };
 const trunc1: Expression = { $trunc: ['$value', 1] };
 const trunc2: Expression = { $trunc: ['$value'] };
 
+// TextExpressionOperators
+
+const meta1: Expression = { $meta: 'textScore' };
+const meta2: Expression = { $meta: 'indexKey'}

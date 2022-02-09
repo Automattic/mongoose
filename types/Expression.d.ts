@@ -161,6 +161,15 @@ declare module 'mongoose' {
             $trunc: [NumberExpression, NumberExpression?];
         }
 
+        export interface Meta {
+            /**
+             * Access available per-document metadata related to the aggregation operation.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/meta/#mongodb-expression-exp.-meta
+             */
+            $meta: 'textScore' | 'indexKey';
+        }
+
         export interface DateAdd {
             /**
              * Adds a number of time units to a date object.
@@ -176,7 +185,7 @@ declare module 'mongoose' {
             };
         }
     }
-    export type Expression = ArithmeticExpressionOperators | DateExpressionOperators;
+    export type Expression = ArithmeticExpressionOperators | DateExpressionOperators | TextExpressionOperators;
 
     export type ArithmeticExpressionOperators =
         number |
@@ -196,6 +205,9 @@ declare module 'mongoose' {
         Expression.Sqrt |
         Expression.Subtract |
         Expression.Trunc;
+
+    export type TextExpressionOperators = 
+        Expression.Meta;
 
     type DateUnit = 'year' | 'quarter' | 'week' | 'month' | 'day' | 'hour' | 'minute' | 'second' | 'millisecond';
     export type DateExpressionOperators = Expression.DateAdd;

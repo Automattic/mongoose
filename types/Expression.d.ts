@@ -172,6 +172,7 @@ declare module 'mongoose' {
             /**
              * Returns the cosine of a value that is measured in radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cos/#mongodb-expression-exp.-cos
              */
             $cos: NumberExpression;
@@ -181,6 +182,7 @@ declare module 'mongoose' {
             /**
              * Returns the tangent of a value that is measured in radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/tan/#mongodb-expression-exp.-tan
              */
             $tan: NumberExpression;
@@ -190,6 +192,7 @@ declare module 'mongoose' {
             /**
              * Returns the inverse sin (arc sine) of a value in radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/asin/#mongodb-expression-exp.-asin
              */
             $asin: NumberExpression;
@@ -199,6 +202,7 @@ declare module 'mongoose' {
             /**
              * Returns the inverse cosine (arc cosine) of a value in radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/acos/#mongodb-expression-exp.-acos
              */
             $acos: NumberExpression;
@@ -208,6 +212,7 @@ declare module 'mongoose' {
             /**
              * Returns the inverse tangent (arc tangent) of a value in radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/atan/#mongodb-expression-exp.-atan
              */
             $atan: NumberExpression;
@@ -217,6 +222,7 @@ declare module 'mongoose' {
             /**
              * Returns the inverse tangent (arc tangent) of y / x in radians, where y and x are the first and second values passed to the expression respectively.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/atan2/#mongodb-expression-exp.-atan2
              */
             $atan2: NumberExpression;
@@ -226,6 +232,7 @@ declare module 'mongoose' {
             /**
              * Returns the inverse hyperbolic sine (hyperbolic arc sine) of a value in radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/asinh/#mongodb-expression-exp.-asinh
              */
             $asinh: NumberExpression;
@@ -235,6 +242,7 @@ declare module 'mongoose' {
             /**
              * Returns the inverse hyperbolic cosine (hyperbolic arc cosine) of a value in radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/acosh/#mongodb-expression-exp.-acosh
              */
             $acosh: NumberExpression;
@@ -245,6 +253,7 @@ declare module 'mongoose' {
             /**
              * Returns the inverse hyperbolic tangent (hyperbolic arc tangent) of a value in radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/atanh/#mongodb-expression-exp.-atanh
              */
             $atanh: NumberExpression;
@@ -254,6 +263,7 @@ declare module 'mongoose' {
             /**
              * Returns the hyperbolic sine of a value that is measured in radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/sinh/#mongodb-expression-exp.-sinh
              */
             $sinh: NumberExpression;
@@ -263,6 +273,7 @@ declare module 'mongoose' {
             /**
              * Returns the hyperbolic cosine of a value that is measured in radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cosh/#mongodb-expression-exp.-cosh
              */
             $cosh: NumberExpression;
@@ -272,6 +283,7 @@ declare module 'mongoose' {
             /**
              * Returns the hyperbolic tangent of a value that is measured in radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/tanh/#mongodb-expression-exp.-tanh
              */
             $tanh: NumberExpression;
@@ -281,6 +293,7 @@ declare module 'mongoose' {
             /**
              * Converts a value from degrees to radians.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/degreesToRadians/#mongodb-expression-exp.-degreesToRadians
              */
             $degreesToRadians: NumberExpression;
@@ -290,6 +303,7 @@ declare module 'mongoose' {
             /**
              * Converts a value from radians to degrees.
              *
+             * @version 4.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/radiansToDegrees/#mongodb-expression-exp.-radiansToDegrees
              */
             $radiansToDegrees: NumberExpression;

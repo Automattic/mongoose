@@ -31,7 +31,7 @@ declare module 'mongoose' {
              *
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/add/#mongodb-expression-exp.-add
              */
-            $add: NumberExpression[];
+            $add: (NumberExpression | DateExpressionOperators)[];
         }
 
         export interface Ceil {
@@ -147,7 +147,7 @@ declare module 'mongoose' {
              *
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/subtract/#mongodb-expression-exp.-subtract
              */
-            $subtract: NumberExpression[];
+            $subtract: (NumberExpression | DateExpressionOperators)[];
         }
 
         export interface Trunc {
@@ -343,8 +343,7 @@ declare module 'mongoose' {
     export type NumberExpression =
         Path |
         ArithmeticExpressionOperators |
-        TrigonometryExpressionOperators |
-        DateExpressionOperators;
+        TrigonometryExpressionOperators;
 
     export type ArithmeticExpressionOperators =
         number |

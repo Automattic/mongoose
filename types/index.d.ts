@@ -1,4 +1,4 @@
-// / <reference path="./PipelineStage.d.ts" />
+/// <reference path="./PipelineStage.d.ts" />
 
 declare module 'mongoose' {
   import events = require('events');
@@ -116,7 +116,7 @@ declare module 'mongoose' {
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
-  /*! ignore */
+  /* ! ignore */
   type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
 
   /**

@@ -98,6 +98,16 @@ const bucket2: PipelineStage = {
 };
 
 /**
+ * $unset
+ *
+ * @see https://docs.mongodb.com/manual/reference/operator/aggregation/unset/
+ */
+const unset1 = { $unset: '<field.nestedfield>' };
+const unset2 = { $unset: ['isbn', 'copies'] };
+const unset3 = { $unset: ['isbn', 'author.first', 'copies.warehouse'] };
+
+
+/**
  * $unwind
  *
  * @see https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/

@@ -1,3 +1,5 @@
+/// <reference path="./Expression.d.ts" />
+
 declare module 'mongoose' {
   import events = require('events');
   import mongodb = require('mongodb');

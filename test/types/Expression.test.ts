@@ -54,4 +54,6 @@ const trunc2: Expression = { $trunc: ['$value'] };
 const meta1: Expression = { $meta: 'textScore' };
 const meta2: Expression = { $meta: 'indexKey' };
 
+// TrigonometryExpressionOperators
 const tanh1: Expression = { $tanh: { $degreesToRadians: '$angle' } };
+

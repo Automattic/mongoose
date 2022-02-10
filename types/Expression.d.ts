@@ -504,7 +504,7 @@ declare module 'mongoose' {
                 /**
                  * The input date for which to return parts. <dateExpression> can be any expression that resolves to a Date, a Timestamp, or an ObjectID. For more information on expressions, see Expressions.
                  */
-                date : DateExpression;
+                date: DateExpression;
                 /**
                  * The timezone of the operation result. <tzExpression> must be a valid expression that resolves to a string formatted as either an Olson Timezone Identifier or a UTC Offset. If no timezone is provided, the result is displayed in UTC.
                  *
@@ -852,20 +852,117 @@ declare module 'mongoose' {
                 timezone?: tzExpression;
             };
         }
+
+        export interface And {
+            /**
+             * Returns true only when all its expressions evaluate to true. Accepts any number of argument expressions.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/and/#mongodb-expression-exp.-and
+             */
+            $and: Expression[];
+        }
+
+        export interface Not {
+            /**
+             * Returns the boolean value that is the opposite of its argument expression. Accepts a single argument expression.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/not/#mongodb-expression-exp.-not
+             */
+            $not: [Expression];
+        }
+
+        export interface Or {
+            /**
+             * Returns true when any of its expressions evaluates to true. Accepts any number of argument expressions.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/or/#mongodb-expression-exp.-or
+             */
+            $or: Expression[];
+        }
+
+        export interface Cmp {
+            /**
+             * Returns 0 if the two values are equivalent, 1 if the first value is greater than the second, and -1 if the first value is less than the second.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cmp/#mongodb-expression-exp.-cmp
+             */
+            $cmp: [Expression, Expression];
+        }
+
+        export interface Eq {
+            /**
+             * Returns true if the values are equivalent.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/eq/#mongodb-expression-exp.-eq
+             */
+            $eq: [Expression, Expression];
+        }
+
+        export interface Gt {
+            /**
+             * Returns true if the first value is greater than the second.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/gt/#mongodb-expression-exp.-gt
+             */
+            $gt: [NumberExpression, NumberExpression];
+        }
+
+        export interface Gte {
+            /**
+             * Returns true if the first value is greater than or equal to the second.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/gte/#mongodb-expression-exp.-gte
+             */
+            $gte: [NumberExpression, NumberExpression];
+        }
+
+        export interface Lt {
+            /**
+             * Returns true if the first value is less than the second.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/lt/#mongodb-expression-exp.-lt
+             */
+            $lt: [NumberExpression, NumberExpression];
+        }
+
+        export interface Lte {
+            /**
+             * Returns true if the first value is less than or equal to the second.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/lte/#mongodb-expression-exp.-lte
+             */
+            $lte: [NumberExpression, NumberExpression];
+        }
+
+        export interface Ne {
+            /**
+             * Returns true if the values are not equivalent.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ne/#mongodb-expression-exp.-ne
+             */
+            $ne: [Expression, Expression];
+        }
+
     }
 
     type Path = string;
 
     export type Expression =
         ArithmeticExpressionOperator |
+        ComparisonExpressionOperator |
         DateExpressionOperator |
         TextExpressionOperator |
         TrigonometryExpressionOperator;
+
+    export type BooleanExpression =
+        ComparisonExpressionOperatorReturningBoolean |
+        BooleanExpressionOperator;
 
     export type NumberExpression =
         number |
         Path |
         ArithmeticExpressionOperator |
+        ComparisonExpressionOperatorReturningNumber |
         TrigonometryExpressionOperator;
 
     export type StringExpression<T> =
@@ -896,6 +993,26 @@ declare module 'mongoose' {
         Expression.Subtract |
         Expression.Trunc;
 
+    export type BooleanExpressionOperator =
+        Expression.And |
+        Expression.Or |
+        Expression.Not;
+
+    export type ComparisonExpressionOperator =
+        ComparisonExpressionOperatorReturningBoolean |
+        ComparisonExpressionOperatorReturningNumber;
+
+    export type ComparisonExpressionOperatorReturningBoolean =
+        Expression.Eq |
+        Expression.Gt |
+        Expression.Gte |
+        Expression.Lt |
+        Expression.Lte |
+        Expression.Ne;
+
+    export type ComparisonExpressionOperatorReturningNumber =
+        Expression.Cmp;
+
     /**
      * Trigonometry expressions perform trigonometric operations on numbers.
      * Values that represent angles are always input or output in radians.
@@ -918,6 +1035,8 @@ declare module 'mongoose' {
         Expression.Tanh |
         Expression.DegreesToRadians |
         Expression.RadiansToDegrees;
+
+
 
     export type TextExpressionOperator =
         Expression.Meta;

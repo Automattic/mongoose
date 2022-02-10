@@ -943,13 +943,54 @@ declare module 'mongoose' {
             $ne: [Expression, Expression];
         }
 
+        export interface Cond {
+            /**
+             * A ternary operator that evaluates one expression, and depending on the result, returns the value of one of the other two expressions. Accepts either three expressions in an ordered list or three named parameters.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cond/#mongodb-expression-exp.-cond
+             */
+            $cond: { if: BooleanExpression, then: Expression, else: Expression } | [BooleanExpression, Expression, Expression];
+        }
+
+        export interface IfNull {
+            /**
+             * Returns either the non-null result of the first expression or the result of the second expression if the first expression results in a null result. Null result encompasses instances of undefined values or missing fields. Accepts two expressions as arguments. The result of the second expression can be null.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ifNull/#mongodb-expression-exp.-ifNull
+             */
+            $ifNull: Expression[];
+        }
+
+        export interface Switch {
+            /**
+             * Evaluates a series of case expressions. When it finds an expression which evaluates to true, $switch executes a specified expression and breaks out of the control flow.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/switch/#mongodb-expression-exp.-switch
+             */
+            $switch: {
+                /**
+                 * An array of control branch documents. Each branch is a document with the following fields:
+                 * - $case
+                 * - $then
+                 */
+                $branches: { $case: Expression, then: Expression }[];
+                /**
+                 * The path to take if no branch case expression evaluates to true.
+                 *
+                 * Although optional, if default is unspecified and no branch case evaluates to true, $switch returns an error.
+                 */
+                $default: Expression;
+            };
+        }
     }
 
     type Path = string;
 
     export type Expression =
         ArithmeticExpressionOperator |
+        BooleanExpressionOperator |
         ComparisonExpressionOperator |
+        ConditionalExpressionOperator |
         DateExpressionOperator |
         TextExpressionOperator |
         TrigonometryExpressionOperator;
@@ -1013,6 +1054,11 @@ declare module 'mongoose' {
     export type ComparisonExpressionOperatorReturningNumber =
         Expression.Cmp;
 
+    export type ConditionalExpressionOperator =
+        Expression.Cond |
+        Expression.IfNull |
+        Expression.Switch;
+
     /**
      * Trigonometry expressions perform trigonometric operations on numbers.
      * Values that represent angles are always input or output in radians.
@@ -1035,8 +1081,6 @@ declare module 'mongoose' {
         Expression.Tanh |
         Expression.DegreesToRadians |
         Expression.RadiansToDegrees;
-
-
 
     export type TextExpressionOperator =
         Expression.Meta;

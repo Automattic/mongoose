@@ -57,3 +57,42 @@ const meta2: Expression = { $meta: 'indexKey' };
 // TrigonometryExpressionOperators
 const tanh1: Expression = { $tanh: { $degreesToRadians: '$angle' } };
 
+const isoWeekYear: Expression = { $isoWeekYear: { date: new Date('2017-01-02T00:00:00Z'), timezone: '-0500' } };
+
+const millisecond1: Expression = { $millisecond: new Date('2016-01-01') };
+const millisecond2: Expression = { $millisecond: { date: new Date('Jan 7, 2003') } };
+const millisecond3: Expression = { $millisecond: { date: new Date('August 14, 2011'), timezone: 'America/Chicago' } };
+const millisecond4: Expression = { $millisecond: '$date' };
+
+const dateTrunc: Expression = {
+  $dateTrunc: {
+    date: '$orderDate', unit: 'week', binSize: 2,
+    timezone: 'America/Los_Angeles', startOfWeek: 'Monday'
+  }
+};
+
+
+const yearMonthDayUTCDateToString: Expression = { $dateToString: { format: '%Y-%m-%d', date: '$date' } };
+const timewithOffsetNYDateToString: Expression = { $dateToString: { format: '%H:%M:%S:%L%z', date: '$date', timezone: 'America/New_York' } };
+const timewithOffset430DateToString: Expression = { $dateToString: { format: '%H:%M:%S:%L%z', date: '$date', timezone: '+04:30' } };
+const minutesOffsetNYDateToString: Expression = { $dateToString: { format: '%Z', date: '$date', timezone: 'America/New_York' } };
+const minutesOffset430DateToString: Expression = { $dateToString: { format: '%Z', date: '$date', timezone: '+04:30' } };
+
+const dateSubtract1: Expression = {
+  $dateSubtract:
+  {
+    startDate: new Date('2021-03-31T12:10:05Z'),
+    unit: 'month',
+    amount: 1
+  }
+};
+
+const dateSubtract2: Expression = {
+  $dateSubtract:
+  {
+    startDate: '$logout',
+    unit: 'hour',
+    amount: 3,
+    timezone: 'Europe/Amsterdam'
+  }
+};

@@ -1313,6 +1313,390 @@ declare module 'mongoose' {
                 defaults?: ArrayExpression;
             };
         }
+
+        export interface Concat {
+            /**
+             * Concatenates any number of strings.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/concat/#mongodb-expression-exp.-concat
+             */
+            $concat: StringExpression[];
+        }
+
+        export interface IndexOfBytes {
+            /**
+             * Searches a string for an occurrence of a substring and returns the UTF-8 byte index of the first occurrence. If the substring is not found, returns -1.
+             *
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/indexOfBytes/#mongodb-expression-exp.-indexOfBytes
+             */
+            $indexOfBytes: [StringExpression, StringExpression] | [StringExpression, StringExpression, NumberExpression] | [StringExpression, StringExpression, NumberExpression, NumberExpression];
+        }
+
+        export interface IndexOfCP {
+            /**
+             * Searches a string for an occurrence of a substring and returns the UTF-8 code point index of the first occurrence. If the substring is not found, returns -1
+             *
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/indexOfCP/#mongodb-expression-exp.-indexOfCP
+             */
+            $indexOfCP: [StringExpression, StringExpression] | [StringExpression, StringExpression, NumberExpression] | [StringExpression, StringExpression, NumberExpression, NumberExpression];
+        }
+
+        export interface Ltrim {
+            /**
+             * Removes whitespace or the specified characters from the beginning of a string.
+             *
+             * @version 4.0
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ltrim/#mongodb-expression-exp.-ltrim
+             */
+            $ltrim: {
+                /**
+                 * The string to trim. The argument can be any valid expression that resolves to a string. For more information on expressions, see Expressions.
+                 */
+                input: StringExpression;
+                /**
+                 * The character(s) to trim from the beginning of the input.
+                 *
+                 * The argument can be any valid expression that resolves to a string. The $ltrim operator breaks down the string into individual UTF code point to trim from input.
+                 *
+                 * If unspecified, $ltrim removes whitespace characters, including the null character. For the list of whitespace characters, see Whitespace Characters.
+                 */
+                chars?: StringExpression;
+            };
+        }
+
+        export interface RegexFind {
+            /**
+             * Applies a regular expression (regex) to a string and returns information on the first matched substring.
+             *
+             * @version 4.2
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/regexFind/#mongodb-expression-exp.-regexFind
+             */
+            $regexFind: {
+                /**
+                 * The string on which you wish to apply the regex pattern. Can be a string or any valid expression that resolves to a string.
+                 */
+                input: Expression; // TODO: Resolving to string, which ones?
+                /**
+                 * The regex pattern to apply. Can be any valid expression that resolves to either a string or regex pattern /<pattern>/. When using the regex /<pattern>/, you can also specify the regex options i and m (but not the s or x options):
+                 * - "pattern"
+                 * - /pattern/
+                 * - /pattern/options
+                 *
+                 * Alternatively, you can also specify the regex options with the options field. To specify the s or x options, you must use the options field.
+                 *
+                 * You cannot specify options in both the regex and the options field.
+                 */
+                regex: RegExp | string;
+                /**
+                 * The following <options> are available for use with regular expression.
+                 *
+                 * Note: You cannot specify options in both the regex and the options field.
+                 *
+                 * Option   Description
+                 *
+                 * `i`      Case insensitivity to match both upper and lower cases. You can specify the option in the options field or as part of the regex field.
+                 *
+                 * `m`      For patterns that include anchors (i.e. ^ for the start, $ for the end), match at the beginning or end of each line for strings with multiline values. Without this option, these anchors match at beginning or end of the string.
+                 *          If the pattern contains no anchors or if the string value has no newline characters (e.g. \n), the m option has no effect.
+                 *
+                 * `x`      "Extended" capability to ignore all white space characters in the pattern unless escaped or included in a character class.
+                 *          Additionally, it ignores characters in-between and including an un-escaped hash/pound (#) character and the next new line, so that you may include comments in complicated patterns. This only applies to data characters; white space characters may never appear within special character sequences in a pattern.
+                 *          The x option does not affect the handling of the VT character (i.e. code 11).
+                 *          You can specify the option only in the options field.
+                 *
+                 * `s`      Allows the dot character (i.e. .) to match all characters including newline characters.
+                 *          You can specify the option only in the options field.
+                 */
+                options?: RegexOptions;
+            };
+        }
+
+        export interface RegexFindAll {
+            /**
+             * Applies a regular expression (regex) to a string and returns information on the all matched substrings.
+             *
+             * @version 4.2
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/regexFindAll/#mongodb-expression-exp.-regexFindAll
+             */
+            $regexFindAll: {
+                /**
+                 * The string on which you wish to apply the regex pattern. Can be a string or any valid expression that resolves to a string.
+                 */
+                input: Expression; // TODO: Resolving to string, which ones?
+                /**
+                 * The regex pattern to apply. Can be any valid expression that resolves to either a string or regex pattern /<pattern>/. When using the regex /<pattern>/, you can also specify the regex options i and m (but not the s or x options):
+                 * - "pattern"
+                 * - /pattern/
+                 * - /pattern/options
+                 *
+                 * Alternatively, you can also specify the regex options with the options field. To specify the s or x options, you must use the options field.
+                 *
+                 * You cannot specify options in both the regex and the options field.
+                 */
+                regex: RegExp | string;
+                /**
+                 * The following <options> are available for use with regular expression.
+                 *
+                 * Note: You cannot specify options in both the regex and the options field.
+                 *
+                 * Option   Description
+                 *
+                 * `i`      Case insensitivity to match both upper and lower cases. You can specify the option in the options field or as part of the regex field.
+                 *
+                 * `m`      For patterns that include anchors (i.e. ^ for the start, $ for the end), match at the beginning or end of each line for strings with multiline values. Without this option, these anchors match at beginning or end of the string.
+                 *          If the pattern contains no anchors or if the string value has no newline characters (e.g. \n), the m option has no effect.
+                 *
+                 * `x`      "Extended" capability to ignore all white space characters in the pattern unless escaped or included in a character class.
+                 *          Additionally, it ignores characters in-between and including an un-escaped hash/pound (#) character and the next new line, so that you may include comments in complicated patterns. This only applies to data characters; white space characters may never appear within special character sequences in a pattern.
+                 *          The x option does not affect the handling of the VT character (i.e. code 11).
+                 *          You can specify the option only in the options field.
+                 *
+                 * `s`      Allows the dot character (i.e. .) to match all characters including newline characters.
+                 *          You can specify the option only in the options field.
+                 */
+                options?: RegexOptions;
+            };
+        }
+
+        export interface RegexMatch {
+            /**
+             * Applies a regular expression (regex) to a string and returns a boolean that indicates if a match is found or not.
+             *
+             * @version 4.2
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/regexMatch/#mongodb-expression-exp.-regexMatch
+             */
+            $regexMatch: {
+                /**
+                 * The string on which you wish to apply the regex pattern. Can be a string or any valid expression that resolves to a string.
+                 */
+                input: Expression; // TODO: Resolving to string, which ones?
+                /**
+                 * The regex pattern to apply. Can be any valid expression that resolves to either a string or regex pattern /<pattern>/. When using the regex /<pattern>/, you can also specify the regex options i and m (but not the s or x options):
+                 * - "pattern"
+                 * - /pattern/
+                 * - /pattern/options
+                 *
+                 * Alternatively, you can also specify the regex options with the options field. To specify the s or x options, you must use the options field.
+                 *
+                 * You cannot specify options in both the regex and the options field.
+                 */
+                regex: RegExp | string;
+                /**
+                 * The following <options> are available for use with regular expression.
+                 *
+                 * Note: You cannot specify options in both the regex and the options field.
+                 *
+                 * Option   Description
+                 *
+                 * `i`      Case insensitivity to match both upper and lower cases. You can specify the option in the options field or as part of the regex field.
+                 *
+                 * `m`      For patterns that include anchors (i.e. ^ for the start, $ for the end), match at the beginning or end of each line for strings with multiline values. Without this option, these anchors match at beginning or end of the string.
+                 *          If the pattern contains no anchors or if the string value has no newline characters (e.g. \n), the m option has no effect.
+                 *
+                 * `x`      "Extended" capability to ignore all white space characters in the pattern unless escaped or included in a character class.
+                 *          Additionally, it ignores characters in-between and including an un-escaped hash/pound (#) character and the next new line, so that you may include comments in complicated patterns. This only applies to data characters; white space characters may never appear within special character sequences in a pattern.
+                 *          The x option does not affect the handling of the VT character (i.e. code 11).
+                 *          You can specify the option only in the options field.
+                 *
+                 * `s`      Allows the dot character (i.e. .) to match all characters including newline characters.
+                 *          You can specify the option only in the options field.
+                 */
+                options?: RegexOptions;
+            };
+        }
+
+        export interface ReplaceOne {
+            /**
+             * Replaces the first instance of a matched string in a given input.
+             *
+             * @version 4.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/replaceOne/#mongodb-expression-exp.-replaceOne
+             */
+            $replaceOne: {
+                /**
+                 * The string on which you wish to apply the find. Can be any valid expression that resolves to a string or a null. If input refers to a field that is missing, $replaceOne returns null.
+                 */
+                input: StringExpression;
+                /**
+                 * The string to search for within the given input. Can be any valid expression that resolves to a string or a null. If find refers to a field that is missing, $replaceOne returns null.
+                 */
+                find: StringExpression;
+                /**
+                 * The string to use to replace the first matched instance of find in input. Can be any valid expression that resolves to a string or a null.
+                 */
+                replacement: StringExpression;
+            };
+        }
+
+        export interface ReplaceAll {
+            /**
+             * Replaces all instances of a matched string in a given input.
+             *
+             * @version 4.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/replaceAll/#mongodb-expression-exp.-replaceAll
+             */
+            $replaceAll: {
+                /**
+                 * The string on which you wish to apply the find. Can be any valid expression that resolves to a string or a null. If input refers to a field that is missing, $replaceAll returns null.
+                 */
+                input: StringExpression;
+                /**
+                 * The string to search for within the given input. Can be any valid expression that resolves to a string or a null. If find refers to a field that is missing, $replaceAll returns null.
+                 */
+                find: StringExpression;
+                /**
+                 * The string to use to replace all matched instances of find in input. Can be any valid expression that resolves to a string or a null.
+                 */
+                replacement: StringExpression;
+            };
+        }
+
+        export interface Rtrim {
+            /**
+             * Removes whitespace or the specified characters from the end of a string.
+             *
+             * @version 4.0
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/rtrim/#mongodb-expression-exp.-rtrim
+             */
+            $rtrim: {
+                /**
+                 * The string to trim. The argument can be any valid expression that resolves to a string. For more information on expressions, see Expressions.
+                 */
+                input: StringExpression;
+                /**
+                 * The character(s) to trim from the beginning of the input.
+                 *
+                 * The argument can be any valid expression that resolves to a string. The $rtrim operator breaks down the string into individual UTF code point to trim from input.
+                 *
+                 * If unspecified, $rtrim removes whitespace characters, including the null character. For the list of whitespace characters, see Whitespace Characters.
+                 */
+                chars?: StringExpression;
+            };
+        }
+
+        export interface Split {
+            /**
+             * Splits a string into substrings based on a delimiter. Returns an array of substrings. If the delimiter is not found within the string, returns an array containing the original string.
+             *
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/split/#mongodb-expression-exp.-split
+             */
+            $split: [StringExpression, StringExpression];
+        }
+
+        export interface StrLenBytes {
+            /**
+             * Returns the number of UTF-8 encoded bytes in a string.
+             *
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/strLenBytes/#mongodb-expression-exp.-strLenBytes
+             */
+            $strLenBytes: StringExpression;
+        }
+
+        export interface StrLenCP {
+            /**
+             * Returns the number of UTF-8 code points in a string.
+             *
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/strLenCP/#mongodb-expression-exp.-strLenCP
+             */
+            $strLenCP: StringExpression;
+        }
+
+        export interface Strcasecmp {
+            /**
+             * Performs case-insensitive string comparison and returns: 0 if two strings are equivalent, 1 if the first string is greater than the second, and -1 if the first string is less than the second.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/strcasecmp/#mongodb-expression-exp.-strcasecmp
+             */
+            $strcasecmp: [StringExpression, StringExpression];
+        }
+
+        export interface Substr {
+            /**
+             * Deprecated. Use $substrBytes or $substrCP.
+             *
+             * @deprecated 3.4
+             * @alias {Expression.SubstrBytes}
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/substr/#mongodb-expression-exp.-substr
+             */
+            $substr: [StringExpression, NumberExpression, NumberExpression];
+        }
+
+        export interface SubstrBytes {
+            /**
+             * Returns the substring of a string. Starts with the character at the specified UTF-8 byte index (zero-based) in the string and continues for the specified number of bytes.
+             *
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/substrBytes/#mongodb-expression-exp.-substrBytes
+             */
+            $substrBytes: [StringExpression, NumberExpression, NumberExpression];
+        }
+
+        export interface SubstrCP {
+            /**
+             * Returns the substring of a string. Starts with the character at the specified UTF-8 code point (CP) index (zero-based) in the string and continues for the number of code points specified.
+             *
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/substrCP/#mongodb-expression-exp.-substrCP
+             */
+            $substrCP: [StringExpression, NumberExpression, NumberExpression];
+        }
+
+        export interface ToLower {
+            /**
+             * Converts a string to lowercase. Accepts a single argument expression.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toLower/#mongodb-expression-exp.-toLower
+             */
+            $toLower: StringExpression;
+        }
+
+        export interface ToString {
+            /**
+             * Converts value to a string.
+             *
+             * @version 4.0
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toString/#mongodb-expression-exp.-toString
+             */
+            $toString: Expression;
+        }
+
+        export interface Trim {
+            /**
+             * Removes whitespace or the specified characters from the beginning and end of a string.
+             *
+             * @version 4.0
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/trim/#mongodb-expression-exp.-trim
+             */
+            $trim: {
+                /**
+                 * The string to trim. The argument can be any valid expression that resolves to a string. For more information on expressions, see Expressions.
+                 */
+                input: StringExpression;
+                /**
+                 * The character(s) to trim from the beginning of the input.
+                 *
+                 * The argument can be any valid expression that resolves to a string. The $trim operator breaks down the string into individual UTF code point to trim from input.
+                 *
+                 * If unspecified, $trim removes whitespace characters, including the null character. For the list of whitespace characters, see Whitespace Characters.
+                 */
+                chars?: StringExpression;
+            };
+        }
+
+        export interface ToUpper {
+            /**
+             * Converts a string to uppercase. Accepts a single argument expression.
+             *
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toUpper/#mongodb-expression-exp.-toUpper
+             */
+            $toUpper: StringExpression;
+        }
+
     }
 
     type Path = string;
@@ -1325,20 +1709,23 @@ declare module 'mongoose' {
         ConditionalExpressionOperator |
         DateExpressionOperator |
         TextExpressionOperator |
-        TrigonometryExpressionOperator;
+        TrigonometryExpressionOperator |
+        StringExpressionOperator;
 
     export type ArrayExpression<T = any> =
         T[] |
         Path |
         ArrayExpressionOperatorReturningAny |
-        ArrayExpressionOperatorReturningArray;
+        ArrayExpressionOperatorReturningArray |
+        StringExpressionOperatorReturningArray;
 
     export type BooleanExpression =
         boolean |
         Path |
+        BooleanExpressionOperator |
         ArrayExpressionOperatorReturningAny |
         ComparisonExpressionOperatorReturningBoolean |
-        BooleanExpressionOperator;
+        StringExpressionOperatorReturningBoolean;
 
     export type NumberExpression =
         number |
@@ -1346,17 +1733,20 @@ declare module 'mongoose' {
         ArrayExpressionOperatorReturningAny |
         ArithmeticExpressionOperator |
         ComparisonExpressionOperatorReturningNumber |
-        TrigonometryExpressionOperator;
+        TrigonometryExpressionOperator |
+        StringExpressionOperatorReturningNumber;
 
     export type ObjectExpression =
         Path |
         ArrayExpressionOperatorReturningAny |
-        DateExpressionOperatorReturningObject;
+        DateExpressionOperatorReturningObject |
+        StringExpressionOperatorReturningObject;
 
-    export type StringExpression<T> =
+    export type StringExpression<T = string> =
         Path |
         ArrayExpressionOperatorReturningAny |
         DateExpressionOperatorReturningString |
+        StringExpressionOperatorReturningString |
         T;
 
     export type DateExpression =
@@ -1440,6 +1830,44 @@ declare module 'mongoose' {
         Expression.IfNull |
         Expression.Switch;
 
+    export type StringExpressionOperator =
+        StringExpressionOperatorReturningArray |
+        StringExpressionOperatorReturningBoolean |
+        StringExpressionOperatorReturningNumber |
+        StringExpressionOperatorReturningObject |
+        StringExpressionOperatorReturningString;
+
+    export type StringExpressionOperatorReturningArray =
+        Expression.RegexFindAll |
+        Expression.Split;
+
+    export type StringExpressionOperatorReturningBoolean =
+        Expression.RegexMatch;
+
+    export type StringExpressionOperatorReturningNumber =
+        Expression.IndexOfBytes |
+        Expression.IndexOfCP |
+        Expression.Strcasecmp |
+        Expression.StrLenBytes|
+        Expression.StrLenCP;
+
+    export type StringExpressionOperatorReturningObject =
+        Expression.RegexFind;
+
+    export type StringExpressionOperatorReturningString =
+        Expression.Concat |
+        Expression.Ltrim |
+        Expression.Ltrim |
+        Expression.ReplaceOne |
+        Expression.ReplaceAll |
+        Expression.Substr |
+        Expression.SubstrBytes |
+        Expression.SubstrCP |
+        Expression.ToLower |
+        Expression.ToString |
+        Expression.ToUpper |
+        Expression.Trim;
+
     /**
      * Trigonometry expressions perform trigonometric operations on numbers.
      * Values that represent angles are always input or output in radians.
@@ -1473,6 +1901,12 @@ declare module 'mongoose' {
     type mm = '00' | '30' | '45';
 
     type UTCOffset = `${hh}` | `${hh}${mm}` | `${hh}:${mm}`;
+
+    type RegexOptions =
+        'i' | 'm' | 's' | 'x' |
+        'is' | 'im' | 'ix' | 'si' | 'sm' | 'sx' | 'mi' | 'ms' | 'mx' | 'xi' | 'xs' | 'xm' |
+        'ism' | 'isx' | 'ims' | 'imx' | 'ixs' | 'ixm' | 'sim' | 'six' | 'smi' | 'smx' | 'sxi' | 'sxm' | 'mis' | 'mix' | 'msi' | 'msx' | 'mxi' | 'mxs' | 'xis' | 'xim' | 'xsi' | 'xsm' | 'xmi' | 'xms' |
+        'ismx' | 'isxm' | 'imsx' | 'imxs' | 'ixsm' | 'ixms' | 'simx' | 'sixm' | 'smix' | 'smxi' | 'sxim' | 'sxmi' | 'misx' | 'mixs' | 'msix' | 'msxi' | 'mxis' | 'mxsi' | 'xism' | 'xims' | 'xsim' | 'xsmi' | 'xmis' | 'xmsi';
 
     type StartOfWeek =
         'monday' | 'mon' |

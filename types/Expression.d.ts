@@ -982,12 +982,250 @@ declare module 'mongoose' {
                 $default: Expression;
             };
         }
+
+        export interface ArrayElemAt {
+            /**
+             * Returns the element at the specified array index.
+             * 
+             * @version 3.2
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/arrayElemAt/#mongodb-expression-exp.-arrayElemAt
+             */
+            $arrayElemAt: [ArrayExpression, NumberExpression];
+        }
+
+        export interface ArrayToObject {
+            /**
+             * Converts an array of key value pairs to a document.
+             * 
+             * @version 3.4.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/arrayToObject/#mongodb-expression-exp.-arrayToObject
+             */
+            $arrayToObject: ArrayExpression;
+        }
+
+        export interface ConcatArrays {
+            /**
+             * Concatenates arrays to return the concatenated array.
+             * 
+             * @version 3.2
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/concatArrays/#mongodb-expression-exp.-concatArrays
+             */
+            $concatArrays: ArrayExpression[];
+        }
+
+        export interface Filter {
+            /**
+             * Selects a subset of the array to return an array with only the elements that match the filter condition.
+             * 
+             * @version 3.2
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/filter/#mongodb-expression-exp.-filter
+             */
+            $filter: {
+                /**
+                 * An expression that resolves to an array.
+                 */
+                input: ArrayExpression;
+                /**
+                 * A name for the variable that represents each individual element of the input array. If no name is specified, the variable name defaults to this.
+                 */
+                as?: string;
+                /**
+                 * An expression that resolves to a boolean value used to determine if an element should be included in the output array. The expression references each element of the input array individually with the variable name specified in as.
+                 */
+                cond: BooleanExpression;
+            }
+        }
+
+        export interface First {
+            /**
+             * Returns the first array element. Distinct from $first accumulator.
+             * 
+             * @version 5.0
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/first/#mongodb-expression-exp.-first
+             */
+            $first: Expression;
+        }
+
+        export interface In {
+            /**
+             * Returns a boolean indicating whether a specified value is in an array.
+             * 
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/in/#mongodb-expression-exp.-in
+             */
+            $in: [Expression, ArrayExpression];
+        }
+
+        export interface IndexOfArray {
+            /**
+             * Searches an array for an occurrence of a specified value and returns the array index of the first occurrence. If the substring is not found, returns -1.
+             * 
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/indexOfArray/#mongodb-expression-exp.-indexOfArray
+             */
+            $indexOfArray: [ArrayExpression, Expression] | [ArrayExpression, Expression, NumberExpression] | [ArrayExpression, Expression, NumberExpression, NumberExpression];
+        }
+
+        export interface IsArray {
+            /**
+             * Determines if the operand is an array. Returns a boolean.
+             * 
+             * @version 3.2
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/isArray/#mongodb-expression-exp.-isArray
+             */
+            $isArray: [Expression];
+        }
+
+        export interface Last {
+            /**
+             * Returns the last array element. Distinct from $last accumulator.
+             * 
+             * @version 5.0
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/last/#mongodb-expression-exp.-last
+             */
+            $last: Expression;
+        }
+
+        export interface Map {
+            /**
+             * Applies a subexpression to each element of an array and returns the array of resulting values in order. Accepts named parameters.
+             * 
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/map/#mongodb-expression-exp.-map
+             */
+            $map: {
+                /**
+                 * An expression that resolves to an array.
+                 */
+                input: ArrayExpression;
+                /**
+                 * A name for the variable that represents each individual element of the input array. If no name is specified, the variable name defaults to this.
+                 */
+                as?: string;
+                /**
+                 * An expression that is applied to each element of the input array. The expression references each element individually with the variable name specified in as.
+                 */
+                in: Expression;
+            };
+        }
+
+        export interface ObjectToArray {
+            /**
+             * Converts a document to an array of documents representing key-value pairs.
+             * 
+             * @version 3.4.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/objectToArray/#mongodb-expression-exp.-objectToArray
+             */
+            $objectToArray: ObjectExpression;
+        }
+
+        export interface Range {
+            /**
+             * Outputs an array containing a sequence of integers according to user-defined inputs.
+             * 
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/range/#mongodb-expression-exp.-range
+             */
+            $range: [NumberExpression, NumberExpression] | [NumberExpression, NumberExpression, NumberExpression];
+        }
+
+        export interface Reduce {
+            /**
+             * Applies an expression to each element in an array and combines them into a single value.
+             * 
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/reduce/#mongodb-expression-exp.-reduce
+             */
+            $reduce: {
+                /**
+                 * Can be any valid expression that resolves to an array. For more information on expressions, see Expressions. 
+                 * 
+                 * If the argument resolves to a value of null or refers to a missing field, $reduce returns null.
+                 * 
+                 * If the argument does not resolve to an array or null nor refers to a missing field, $reduce returns an error.
+                 */
+                input: ArrayExpression;
+                /**
+                 * The initial cumulative value set before in is applied to the first element of the input array.
+                 */
+                initialValue: Expression;
+                /**
+                 * A valid expression that $reduce applies to each element in the input array in left-to-right order. Wrap the input value with $reverseArray to yield the equivalent of applying the combining expression from right-to-left.
+                 * 
+                 * During evaluation of the in expression, two variables will be available:
+                 * - `value` is the variable that represents the cumulative value of the expression.
+                 * - `this` is the variable that refers to the element being processed.
+                 */
+                in: Expression;
+            };
+        }
+
+        export interface ReverseArray {
+            /**
+             * Returns an array with the elements in reverse order.
+             * 
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/reverseArray/#mongodb-expression-exp.-reverseArray
+             */
+            $reverseArray: ArrayExpression;
+        }
+
+        export interface Size {
+            /**
+             * Returns the number of elements in the array. Accepts a single expression as argument.
+             * 
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/size/#mongodb-expression-exp.-size
+             */
+            $size: ArrayExpression;
+        }
+
+        export interface Slice {
+            /**
+             * Returns a subset of an array.
+             * 
+             * @version 3.2
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/slice/#mongodb-expression-exp.-slice
+             */
+            $slice: [ArrayExpression, NumberExpression] | [ArrayExpression, NumberExpression, NumberExpression];
+        }
+
+        export interface Zip {
+            /**
+             * Merge two arrays together.
+             * 
+             * @version 3.4
+             * @see https://docs.mongodb.com/manual/reference/operator/aggregation/zip/#mongodb-expression-exp.-zip
+             */
+            $zip: {
+                /**
+                 * An array of expressions that resolve to arrays. The elements of these input arrays combine to form the arrays of the output array.
+                 * 
+                 * If any of the inputs arrays resolves to a value of null or refers to a missing field, $zip returns null.
+                 * 
+                 * If any of the inputs arrays does not resolve to an array or null nor refers to a missing field, $zip returns an error.
+                 */
+                inputs: ArrayExpression[];
+                /**
+                 * A boolean which specifies whether the length of the longest array determines the number of arrays in the output array.
+                 * 
+                 * The default value is false: the shortest array length determines the number of arrays in the output array.
+                 */
+                useLongestLength?: boolean;
+                /**
+                 * An array of default element values to use if the input arrays have different lengths. You must specify useLongestLength: true along with this field, or else $zip will return an error.
+                 * 
+                 * If useLongestLength: true but defaults is empty or not specified, $zip uses null as the default value.
+                 * 
+                 * If specifying a non-empty defaults, you must specify a default for each input array or else $zip will return an error.
+                 */
+                defaults?: ArrayExpression;
+            };
+        }
     }
 
     type Path = string;
 
     export type Expression =
         ArithmeticExpressionOperator |
+        ArrayExpressionOperator |
         BooleanExpressionOperator |
         ComparisonExpressionOperator |
         ConditionalExpressionOperator |
@@ -995,19 +1233,35 @@ declare module 'mongoose' {
         TextExpressionOperator |
         TrigonometryExpressionOperator;
 
+    export type ArrayExpression<T = any> =
+        T[] |
+        Path |
+        ArrayExpressionOperatorReturningAny |
+        ArrayExpressionOperatorReturningArray;
+
     export type BooleanExpression =
+        boolean |
+        Path |
+        ArrayExpressionOperatorReturningAny |
         ComparisonExpressionOperatorReturningBoolean |
         BooleanExpressionOperator;
 
     export type NumberExpression =
         number |
         Path |
+        ArrayExpressionOperatorReturningAny |
         ArithmeticExpressionOperator |
         ComparisonExpressionOperatorReturningNumber |
         TrigonometryExpressionOperator;
 
+    export type ObjectExpression =
+        Path |
+        ArrayExpressionOperatorReturningAny |
+        DateExpressionOperatorReturningObject;
+
     export type StringExpression<T> =
         Path |
+        ArrayExpressionOperatorReturningAny |
         DateExpressionOperatorReturningString |
         T;
 
@@ -1033,6 +1287,39 @@ declare module 'mongoose' {
         Expression.Sqrt |
         Expression.Subtract |
         Expression.Trunc;
+
+    export type ArrayExpressionOperator =
+        ArrayExpressionOperatorReturningAny |
+        ArrayExpressionOperatorReturningBoolean |
+        ArrayExpressionOperatorReturningNumber |
+        ArrayExpressionOperatorReturningObject;
+
+    export type ArrayExpressionOperatorReturningAny =
+        Expression.ArrayElemAt |
+        Expression.First |
+        Expression.Last |
+        Expression.Reduce;
+
+    export type ArrayExpressionOperatorReturningArray =
+        Expression.ConcatArrays |
+        Expression.Filter |
+        Expression.Map |
+        Expression.ObjectToArray |
+        Expression.Range |
+        Expression.ReverseArray |
+        Expression.Slice |
+        Expression.Zip;
+
+    export type ArrayExpressionOperatorReturningNumber =
+        Expression.IndexOfArray |
+        Expression.Size;
+
+    export type ArrayExpressionOperatorReturningObject =
+        Expression.ArrayToObject;
+
+    export type ArrayExpressionOperatorReturningBoolean =
+        Expression.In |
+        Expression.IsArray;
 
     export type BooleanExpressionOperator =
         Expression.And |

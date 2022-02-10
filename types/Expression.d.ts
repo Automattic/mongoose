@@ -402,6 +402,7 @@ declare module 'mongoose' {
             }
         }
 
+        // TODO: Can be done better
         export interface DateFromParts {
             /**
              * Constructs a BSON Date object given the date's constituent parts.
@@ -410,7 +411,100 @@ declare module 'mongoose' {
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dateFromParts/#mongodb-expression-exp.-dateFromParts
              */
             $dateFromParts: {
-
+                /**
+                 * ISO Week Date Year. Can be any expression that evaluates to a number.
+                 *
+                 * Value range: 1-9999
+                 *
+                 * If the number specified is outside this range, $dateFromParts errors. Starting in MongoDB 4.4, the lower bound for this value is 1. In previous versions of MongoDB, the lower bound was 0.
+                 */
+                isoWeekYear?: NumberExpression;
+                /**
+                 * Week of year. Can be any expression that evaluates to a number.
+                 *
+                 * Defaults to 1.
+                 *
+                 * Value range: 1-53
+                 *
+                 * Starting in MongoDB 4.0, if the number specified is outside this range, $dateFromParts incorporates the difference in the date calculation. See Value Range for examples.
+                 */
+                isoWeek?: NumberExpression;
+                /**
+                 * Day of week (Monday 1 - Sunday 7). Can be any expression that evaluates to a number.
+                 *
+                 * Defaults to 1.
+                 *
+                 * Value range: 1-7
+                 *
+                 * Starting in MongoDB 4.0, if the number specified is outside this range, $dateFromParts incorporates the difference in the date calculation. See Value Range for examples.
+                 */
+                isoDayOfWeek?: NumberExpression;
+                /**
+                 * Calendar year. Can be any expression that evaluates to a number.
+                 *
+                 * Value range: 1-9999
+                 *
+                 * If the number specified is outside this range, $dateFromParts errors. Starting in MongoDB 4.4, the lower bound for this value is 1. In previous versions of MongoDB, the lower bound was 0.
+                 */
+                year?: NumberExpression;
+                /**
+                 * Month. Can be any expression that evaluates to a number.
+                 *
+                 * Defaults to 1.
+                 *
+                 * Value range: 1-12
+                 *
+                 * Starting in MongoDB 4.0, if the number specified is outside this range, $dateFromParts incorporates the difference in the date calculation. See Value Range for examples.
+                 */
+                month?: NumberExpression;
+                /**
+                 * Day of month. Can be any expression that evaluates to a number.
+                 *
+                 * Defaults to 1.
+                 *
+                 * Value range: 1-31
+                 *
+                 * Starting in MongoDB 4.0, if the number specified is outside this range, $dateFromParts incorporates the difference in the date calculation. See Value Range for examples.
+                 */
+                day?: NumberExpression;
+                /**
+                 * Hour. Can be any expression that evaluates to a number.
+                 *
+                 * Defaults to 0.
+                 *
+                 * Value range: 0-23
+                 *
+                 * Starting in MongoDB 4.0, if the number specified is outside this range, $dateFromParts incorporates the difference in the date calculation. See Value Range for examples.
+                 */
+                hour?: NumberExpression;
+                /**
+                 * Minute. Can be any expression that evaluates to a number.
+                 *
+                 * Defaults to 0.
+                 *
+                 * Value range: 0-59 Starting in MongoDB 4.0, if the number specified is outside this range, $dateFromParts incorporates the difference in the date calculation. See Value Range for examples.
+                 */
+                minute?: NumberExpression;
+                /**
+                 * Second. Can be any expression that evaluates to a number.
+                 *
+                 * Defaults to 0.
+                 *
+                 * Value range: 0-59
+                 *
+                 * Starting in MongoDB 4.0, if the number specified is outside this range, $dateFromParts incorporates the difference in the date calculation. See Value Range for examples.
+                 */
+                second?: NumberExpression;
+                /**
+                 * Millisecond. Can be any expression that evaluates to a number.
+                 *
+                 * Defaults to 0.
+                 *
+                 * Value range: 0-999
+                 *
+                 * Starting in MongoDB 4.0, if the number specified is outside this range, $dateFromParts incorporates the difference in the date calculation. See Value Range for examples.
+                 */
+                millisecond?: NumberExpression;
                 /**
                  * The timezone to carry out the operation. <tzExpression> must be a valid expression that resolves to a string formatted as either an Olson Timezone Identifier or a UTC Offset. If no timezone is provided, the result is displayed in UTC.
                  */
@@ -986,7 +1080,7 @@ declare module 'mongoose' {
         export interface ArrayElemAt {
             /**
              * Returns the element at the specified array index.
-             * 
+             *
              * @version 3.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/arrayElemAt/#mongodb-expression-exp.-arrayElemAt
              */
@@ -996,7 +1090,7 @@ declare module 'mongoose' {
         export interface ArrayToObject {
             /**
              * Converts an array of key value pairs to a document.
-             * 
+             *
              * @version 3.4.4
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/arrayToObject/#mongodb-expression-exp.-arrayToObject
              */
@@ -1006,7 +1100,7 @@ declare module 'mongoose' {
         export interface ConcatArrays {
             /**
              * Concatenates arrays to return the concatenated array.
-             * 
+             *
              * @version 3.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/concatArrays/#mongodb-expression-exp.-concatArrays
              */
@@ -1016,7 +1110,7 @@ declare module 'mongoose' {
         export interface Filter {
             /**
              * Selects a subset of the array to return an array with only the elements that match the filter condition.
-             * 
+             *
              * @version 3.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/filter/#mongodb-expression-exp.-filter
              */
@@ -1039,7 +1133,7 @@ declare module 'mongoose' {
         export interface First {
             /**
              * Returns the first array element. Distinct from $first accumulator.
-             * 
+             *
              * @version 5.0
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/first/#mongodb-expression-exp.-first
              */
@@ -1049,7 +1143,7 @@ declare module 'mongoose' {
         export interface In {
             /**
              * Returns a boolean indicating whether a specified value is in an array.
-             * 
+             *
              * @version 3.4
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/in/#mongodb-expression-exp.-in
              */
@@ -1059,7 +1153,7 @@ declare module 'mongoose' {
         export interface IndexOfArray {
             /**
              * Searches an array for an occurrence of a specified value and returns the array index of the first occurrence. If the substring is not found, returns -1.
-             * 
+             *
              * @version 3.4
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/indexOfArray/#mongodb-expression-exp.-indexOfArray
              */
@@ -1069,7 +1163,7 @@ declare module 'mongoose' {
         export interface IsArray {
             /**
              * Determines if the operand is an array. Returns a boolean.
-             * 
+             *
              * @version 3.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/isArray/#mongodb-expression-exp.-isArray
              */
@@ -1079,7 +1173,7 @@ declare module 'mongoose' {
         export interface Last {
             /**
              * Returns the last array element. Distinct from $last accumulator.
-             * 
+             *
              * @version 5.0
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/last/#mongodb-expression-exp.-last
              */
@@ -1089,7 +1183,7 @@ declare module 'mongoose' {
         export interface Map {
             /**
              * Applies a subexpression to each element of an array and returns the array of resulting values in order. Accepts named parameters.
-             * 
+             *
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/map/#mongodb-expression-exp.-map
              */
             $map: {
@@ -1111,7 +1205,7 @@ declare module 'mongoose' {
         export interface ObjectToArray {
             /**
              * Converts a document to an array of documents representing key-value pairs.
-             * 
+             *
              * @version 3.4.4
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/objectToArray/#mongodb-expression-exp.-objectToArray
              */
@@ -1121,7 +1215,7 @@ declare module 'mongoose' {
         export interface Range {
             /**
              * Outputs an array containing a sequence of integers according to user-defined inputs.
-             * 
+             *
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/range/#mongodb-expression-exp.-range
              */
             $range: [NumberExpression, NumberExpression] | [NumberExpression, NumberExpression, NumberExpression];
@@ -1130,16 +1224,16 @@ declare module 'mongoose' {
         export interface Reduce {
             /**
              * Applies an expression to each element in an array and combines them into a single value.
-             * 
+             *
              * @version 3.4
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/reduce/#mongodb-expression-exp.-reduce
              */
             $reduce: {
                 /**
-                 * Can be any valid expression that resolves to an array. For more information on expressions, see Expressions. 
-                 * 
+                 * Can be any valid expression that resolves to an array. For more information on expressions, see Expressions.
+                 *
                  * If the argument resolves to a value of null or refers to a missing field, $reduce returns null.
-                 * 
+                 *
                  * If the argument does not resolve to an array or null nor refers to a missing field, $reduce returns an error.
                  */
                 input: ArrayExpression;
@@ -1149,7 +1243,7 @@ declare module 'mongoose' {
                 initialValue: Expression;
                 /**
                  * A valid expression that $reduce applies to each element in the input array in left-to-right order. Wrap the input value with $reverseArray to yield the equivalent of applying the combining expression from right-to-left.
-                 * 
+                 *
                  * During evaluation of the in expression, two variables will be available:
                  * - `value` is the variable that represents the cumulative value of the expression.
                  * - `this` is the variable that refers to the element being processed.
@@ -1161,7 +1255,7 @@ declare module 'mongoose' {
         export interface ReverseArray {
             /**
              * Returns an array with the elements in reverse order.
-             * 
+             *
              * @version 3.4
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/reverseArray/#mongodb-expression-exp.-reverseArray
              */
@@ -1171,7 +1265,7 @@ declare module 'mongoose' {
         export interface Size {
             /**
              * Returns the number of elements in the array. Accepts a single expression as argument.
-             * 
+             *
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/size/#mongodb-expression-exp.-size
              */
             $size: ArrayExpression;
@@ -1180,7 +1274,7 @@ declare module 'mongoose' {
         export interface Slice {
             /**
              * Returns a subset of an array.
-             * 
+             *
              * @version 3.2
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/slice/#mongodb-expression-exp.-slice
              */
@@ -1190,30 +1284,30 @@ declare module 'mongoose' {
         export interface Zip {
             /**
              * Merge two arrays together.
-             * 
+             *
              * @version 3.4
              * @see https://docs.mongodb.com/manual/reference/operator/aggregation/zip/#mongodb-expression-exp.-zip
              */
             $zip: {
                 /**
                  * An array of expressions that resolve to arrays. The elements of these input arrays combine to form the arrays of the output array.
-                 * 
+                 *
                  * If any of the inputs arrays resolves to a value of null or refers to a missing field, $zip returns null.
-                 * 
+                 *
                  * If any of the inputs arrays does not resolve to an array or null nor refers to a missing field, $zip returns an error.
                  */
                 inputs: ArrayExpression[];
                 /**
                  * A boolean which specifies whether the length of the longest array determines the number of arrays in the output array.
-                 * 
+                 *
                  * The default value is false: the shortest array length determines the number of arrays in the output array.
                  */
                 useLongestLength?: boolean;
                 /**
                  * An array of default element values to use if the input arrays have different lengths. You must specify useLongestLength: true along with this field, or else $zip will return an error.
-                 * 
+                 *
                  * If useLongestLength: true but defaults is empty or not specified, $zip uses null as the default value.
-                 * 
+                 *
                  * If specifying a non-empty defaults, you must specify a default for each input array or else $zip will return an error.
                  */
                 defaults?: ArrayExpression;

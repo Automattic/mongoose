@@ -96,3 +96,10 @@ const dateSubtract2: Expression = {
     timezone: 'Europe/Amsterdam'
   }
 };
+
+const dateFromParts: Expression = {
+  $dateFromParts: {
+    year: 'asdf',
+    hour: 'asdf'
+  }
+};

@@ -38,7 +38,6 @@ jobs:
           sleep 2
           mongod --version
           echo `pwd`/mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin >> $GITHUB_PATH
-      - run: npm run sym-link-mongoose
       - run: npm test
 
   lint:

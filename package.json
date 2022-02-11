@@ -73,7 +73,6 @@
     "mongo": "node ./tools/repl.js",
     "test": "mocha --exit ./test/*.test.js",
     "test-tsd": "tsd",
-    "sym-link-mongoose": "npm link && npm link mongoose",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-coverage": "nyc --reporter=html --reporter=text npm test"
   },

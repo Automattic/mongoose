@@ -20,7 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "bson": "^4.2.2",
-    "kareem": "2.3.3",
+    "kareem": "2.3.4",
     "mongodb": "4.3.1",
     "mpath": "0.8.4",
     "mquery": "4.0.2",

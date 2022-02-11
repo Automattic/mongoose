@@ -145,6 +145,7 @@
         "no-prototype-builtins": "off",
         "mocha-no-only/mocha-no-only": [
             "error"
-        ]
+        ],
+        "no-empty": "off"
     }
 }

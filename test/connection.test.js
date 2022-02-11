@@ -684,14 +684,27 @@ describe('connections:', function() {
       db.openUri(start.uri);
     });
 
-    it('closes correctly for all dbs, closing initial db', function(done) {
-      const db = start();
+    it('closes correctly for all dbs, closing initial db', async function() {
+      const db = await start({ noErrorListener: true }).asPromise();
       const db2 = db.useDb('mongoose-test-2');
 
-      db2.on('close', function() {
-        done();
+      const p = new Promise(resolve => {
+        db2.on('close', function() {
+          resolve();
+        });
       });
-      db.close();
+      await db.close();
+      await p;
+    });
+
+    it('handles re-opening base connection (gh-11240)', async function() {
+      const db = await start().asPromise();
+      const db2 = db.useDb('mongoose-test-2');
+
+      await db.close();
+
+      await db.openUri(start.uri);
+      assert.strictEqual(db.client, db2.client);
     });
 
     it('closes correctly for all dbs, closing secondary db', function(done) {

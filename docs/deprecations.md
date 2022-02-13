@@ -60,7 +60,7 @@ If you use [`Model.findOneAndUpdate()`](/docs/api.html#model_Model.findOneAndUpd
 by default you'll see one of the below deprecation warnings.
 
 ```
-DeprecationWarning: Mongoose: `findOneAndUpdate()` and `findOneAndDelete()` without the `useFindAndModify` option set to false are deprecated. See: https://mongoosejs.com/docs/deprecations.html#findandmodify
+DeprecationWarning: Mongoose: `findOneAndUpdate()` and `findOneAndDelete()` without the `useFindAndModify` option set to false are deprecated. See: https://mongoosejs.com/docs/5.x/docs/deprecations.html#findandmodify
 DeprecationWarning: collection.findAndModify is deprecated. Use findOneAndUpdate, findOneAndReplace or findOneAndDelete instead.
 ```
 

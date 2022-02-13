@@ -3200,7 +3200,12 @@ declare module 'mongoose' {
       $search: {
         [key: string]: any
         index?: string
-        highlight?: { path: string; maxCharsToExamine?: number; maxNumPassages?: number }
+        highlight?: {
+        /** [`highlightPath` reference](https://docs.atlas.mongodb.com/atlas-search/path-construction/#multiple-field-search) */
+          path: string | string[] | { value: string, multi: string};
+          maxCharsToExamine?: number;
+          maxNumPassages?: number;
+        }
       }
     }
 

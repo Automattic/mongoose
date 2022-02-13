@@ -7684,6 +7684,15 @@ describe('Model', function() {
 
     assert.ok(book.author instanceof mongoose.Types.ObjectId);
   });
+
+  it('respects `hydrate()` projection (gh-11375)', function() {
+    const PieSchema = Schema({ filling: String, hoursToMake: Number, tasteRating: Number });
+    const Test = db.model('Test', PieSchema);
+    const doc = Test.hydrate({ filling: 'cherry', hoursToMake: 2 }, { filling: 1 });
+
+    assert.equal(doc.filling, 'cherry');
+    assert.equal(doc.hoursToMake, null);
+  });
 });
 
 

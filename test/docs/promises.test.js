@@ -8,7 +8,7 @@ describe('promises docs', function () {
   let db;
 
   before(function (done) {
-    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+    db = mongoose.createConnection('mongodb://127.0.0.1:27017/mongoose_test');
 
     Band = db.model('band-promises', {name: String, members: [String]});
 

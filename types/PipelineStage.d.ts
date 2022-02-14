@@ -199,9 +199,14 @@ declare module 'mongoose' {
       export interface Search {
         /** [`$search` reference](https://docs.atlas.mongodb.com/reference/atlas-search/query-syntax/) */
         $search: {
-          [key: string]: any
-          index?: string
-          highlight?: { path: string; maxCharsToExamine?: number; maxNumPassages?: number }
+          index?: string;
+          highlight?: {
+          /** [`highlightPath` reference](https://docs.atlas.mongodb.com/atlas-search/path-construction/#multiple-field-search) */
+            path: string | string[] | { value: string, multi: string};
+            maxCharsToExamine?: number;
+            maxNumPassages?: number;
+          };
+          [key: string]: any;
         }
       }
 

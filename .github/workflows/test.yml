@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [12, 14, 16]
+        node: [12, 14, 16, 17]
         os: [ubuntu-18.04, ubuntu-20.04]
         include:
           - os: ubuntu-18.04
@@ -38,7 +38,6 @@ jobs:
           sleep 2
           mongod --version
           echo `pwd`/mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin >> $GITHUB_PATH
-      - run: npm run sym-link-mongoose
       - run: npm test
 
   lint:

@@ -1,10 +1,11 @@
 /// <reference path="./PipelineStage.d.ts" />
 
+import events = require('events');
+import mongodb = require('mongodb');
+import mongoose = require('mongoose');
+import stream = require('stream');
+
 declare module 'mongoose' {
-  import events = require('events');
-  import mongodb = require('mongodb');
-  import mongoose = require('mongoose');
-  import stream = require('stream');
 
   export enum ConnectionStates {
     disconnected = 0,
@@ -3225,3 +3226,5 @@ declare module 'mongoose' {
   /* for ts-mongoose */
   class mquery {}
 }
+
+export default mongoose;

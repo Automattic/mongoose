@@ -1,0 +1,151 @@
+extends layout
+
+block content
+  div
+    h2 Mongoose Jobs
+  
+  style.
+    .job {
+      position: relative;
+    }
+
+    .job .company-logo {
+      vertical-align: top;
+      display: inline-block;
+      margin-top: 0.25em;
+      margin-right: 0.75em;
+    }
+
+    .job .title {
+      cursor: pointer;
+      color: #0971B2;
+    }
+
+    .job .company-logo img {
+      width: 60px;
+      height: auto;
+      border: 0px;
+    }
+
+    .job .description {
+      display: inline-block;
+      width: 600px;
+    }
+
+    .job .location {
+      background-color: #ddd;
+      border-radius: 3px;
+      font-size: 0.75em;
+      display: inline-block;
+      padding: 0.25em;
+      padding-left: 0.75em;
+      padding-right: 0.75em;
+    }
+
+    .job .apply-button {
+      position: absolute;
+      right: 10px;
+      top: 0px;
+      font-size: 1.5em;
+      padding-top: 0.75em;
+      padding-bottom: 0.75em;
+      margin-top: 0.75em;
+      width: 180px;
+      background-color: #4DBA13;
+      text-align: center;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0;
+    }
+
+    .job:hover .apply-button {
+      opacity: 100%;
+    }
+
+    .job a .apply-button {
+      color: black;
+    }
+
+    .job a .apply {
+      color: black;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+
+    .job-description .apply {
+      font-size: 1.5em;
+      padding-top: 0.75em;
+      padding-bottom: 0.75em;
+      margin-top: 0.75em;
+      width: 180px;
+      background-color: #4DBA13;
+      text-align: center;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .post {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .post .title {
+      font-size: 1.5em;
+      margin-bottom: 0.25em;
+    }
+
+    .post .tags {
+      margin-top: 1em;
+    }
+
+    .post .tags .tag {
+      color: white;
+      background-color: #208E96;
+      border-radius: 3px;
+      padding: 5px;
+      margin-right: 0.5em;
+    }
+
+    .post .tags .tag a {
+      color: white;
+    }
+
+    input[type="checkbox"] {
+      display: none;
+    }
+
+    input + label + div + .job-description {
+      display: none;
+    }
+
+    input:checked + label + div + .job-description {
+      display: block;
+    }
+
+  div
+    each job in jobs
+      .post.job
+        .company-logo
+          img(src=job.logo)
+        .description
+          div #{job.company}
+          input(id='checkbox-' + job._id, type="checkbox")
+          label.title(for='checkbox-' + job._id) #{job.title}
+          div
+            .location.
+              #{job.location}   
+          div.job-description
+            div !{job.description}
+
+            a(href=job.url)
+              div.apply Apply
+        a(href=job.url)
+          div.apply-button Apply
+
+  h2 Add Your Own
+  div.
+    Hiring Node.js and MongoDB developers?
+    <a href="https://github.com/sponsors/mongoosejs">Sponsor Mongoose on GitHub to post your job here!</a>

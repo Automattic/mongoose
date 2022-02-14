@@ -1,8 +1,9 @@
+import events = require('events');
+import mongodb = require('mongodb');
+import mongoose = require('mongoose');
+import stream = require('stream');
+
 declare module 'mongoose' {
-  import events = require('events');
-  import mongodb = require('mongodb');
-  import mongoose = require('mongoose');
-  import stream = require('stream');
 
   export enum ConnectionStates {
     disconnected = 0,
@@ -3199,7 +3200,12 @@ declare module 'mongoose' {
       $search: {
         [key: string]: any
         index?: string
-        highlight?: { path: string; maxCharsToExamine?: number; maxNumPassages?: number }
+        highlight?: {
+        /** [`highlightPath` reference](https://docs.atlas.mongodb.com/atlas-search/path-construction/#multiple-field-search) */
+          path: string | string[] | { value: string, multi: string};
+          maxCharsToExamine?: number;
+          maxNumPassages?: number;
+        }
       }
     }
 
@@ -3489,3 +3495,5 @@ declare module 'mongoose' {
   /* for ts-mongoose */
   class mquery {}
 }
+
+export default mongoose;

@@ -7,6 +7,12 @@ block content
   style.
     .job {
       position: relative;
+      cursor: pointer;
+      border: 1px solid #eef0f1;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      transition: all .2s ease-in-out;
     }
 
     .job .company-logo {
@@ -17,7 +23,6 @@ block content
     }
 
     .job .title {
-      cursor: pointer;
       color: #0971B2;
     }
 
@@ -30,66 +35,20 @@ block content
     .job .description {
       display: inline-block;
       width: 600px;
-    }
-
-    .job .location {
-      background-color: #ddd;
-      border-radius: 3px;
-      font-size: 0.75em;
-      display: inline-block;
-      padding: 0.25em;
-      padding-left: 0.75em;
-      padding-right: 0.75em;
-    }
-
-    .job .apply-button {
-      position: absolute;
-      right: 10px;
-      top: 0px;
-      font-size: 1.5em;
-      padding-top: 0.75em;
-      padding-bottom: 0.75em;
-      margin-top: 0.75em;
-      width: 180px;
-      background-color: #4DBA13;
-      text-align: center;
-      border-radius: 4px;
-      cursor: pointer;
-      opacity: 0;
-    }
-
-    .job:hover .apply-button {
-      opacity: 100%;
-    }
-
-    .job a .apply-button {
-      color: black;
-    }
-
-    .job a .apply {
-      color: black;
-      margin-left: auto;
-      margin-right: auto;
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
-    }
-
-    .job-description .apply {
-      font-size: 1.5em;
-      padding-top: 0.75em;
-      padding-bottom: 0.75em;
-      margin-top: 0.75em;
-      width: 180px;
-      background-color: #4DBA13;
-      text-align: center;
-      border-radius: 4px;
+      margin-top: 0.25em;
       cursor: pointer;
     }
 
-    .post {
-      border: 1px solid #ddd;
-      padding: 15px;
-      margin-bottom: 15px;
+    .job .company {
+      font-weight: bold;
+    }
+
+    .job:hover {
+      background-color: #eef0f1;
+    }
+
+    .job .at {
+      color: #495057;
     }
 
     .post .title {
@@ -125,25 +84,38 @@ block content
       display: block;
     }
 
+    .job-description .apply {
+      font-size: 1.5em;
+      padding-top: 0.75em;
+      padding-bottom: 0.75em;
+      margin-top: 0.75em;
+      width: 180px;
+      background-color: #4DBA13;
+      text-align: center;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: auto;
+      margin-right: auto;
+      color: #495057;
+    }
+
   div
     each job in jobs
       .post.job
         .company-logo
           img(src=job.logo)
-        .description
-          div #{job.company}
+        label.description(for='checkbox-' + job._id)
           input(id='checkbox-' + job._id, type="checkbox")
-          label.title(for='checkbox-' + job._id) #{job.title}
-          div
-            .location.
-              #{job.location}   
+          label.title #{job.title}
+          div.at
+            span at
+            span.company &nbsp;#{job.company}
+            span.location &nbsp;&bull; #{job.location} 
           div.job-description
             div !{job.description}
 
             a(href=job.url)
               div.apply Apply
-        a(href=job.url)
-          div.apply-button Apply
 
   h2 Add Your Own
   div.

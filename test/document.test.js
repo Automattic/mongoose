@@ -781,6 +781,17 @@ describe('document', function() {
       assert.strictEqual(obj.props, void 0);
       assert.strictEqual(obj.owner.props, void 0);
     });
+
+    it('minimizes single nested subdocs (gh-11247)', async function() {
+      const nestedSchema = Schema({ bar: String }, { _id: false });
+      const schema = Schema({ foo: nestedSchema });
+
+      const MyModel = db.model('Test', schema);
+
+      const myModel = await MyModel.create({ foo: {} });
+
+      assert.strictEqual(myModel.toObject().foo, void 0);
+    });
   });
 
   describe('toJSON', function() {
@@ -5012,7 +5023,7 @@ describe('document', function() {
           return Parent.findOne();
         }).
         then(function(doc) {
-          assert.deepEqual(doc.toObject().child, {});
+          assert.deepEqual(doc.toObject({ minimize: false }).child, {});
           done();
         }).
         catch(done);

@@ -98,13 +98,24 @@ const bucket2: PipelineStage = {
 };
 
 /**
+ * $unionWith
+ *
+ * @see https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/
+ */
+
+const unionWith1: PipelineStage = { $unionWith: { coll: 'warehouses', pipeline: [{ $project: { state: 1, _id: 0 } }] } };
+const unionWith2: PipelineStage = { $unionWith: { coll: 'sales2019q2', pipeline: [{ $set: { _id: '2019Q2' } }] } };
+const unionWith3: PipelineStage = { $unionWith: 'sales2019q2' };
+const unionWith4: PipelineStage = { $unionWith: { coll: 'sales2019q2', pipeline: [{ $group: { _id: '$item', total: { $sum: '$quantity' } } }] } };
+
+/**
  * $unset
  *
  * @see https://docs.mongodb.com/manual/reference/operator/aggregation/unset/
  */
-const unset1 = { $unset: '<field.nestedfield>' };
-const unset2 = { $unset: ['isbn', 'copies'] };
-const unset3 = { $unset: ['isbn', 'author.first', 'copies.warehouse'] };
+const unset1: PipelineStage = { $unset: '<field.nestedfield>' };
+const unset2: PipelineStage = { $unset: ['isbn', 'copies'] };
+const unset3: PipelineStage = { $unset: ['isbn', 'author.first', 'copies.warehouse'] };
 
 
 /**

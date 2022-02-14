@@ -27,7 +27,7 @@ template: `
 <span class="method-type">&laquo;[fields]&raquo;</span> object containing the fields that were selected in the query which returned this document. You do <strong>not</strong> need to set this parameter to ensure Mongoose handles your <a href="./api.html#query_Query-select">query projection</a>.</p>
 </li><li class="param">[skipId=false]
 <span class="method-type">&laquo;Boolean&raquo;</span> optional boolean. If true, mongoose doesn&#39;t add an <code>_id</code> field to the document.</p>
-</li></ul><h5>Inherits:</h5><ul><li><span class="method-type">&laquo;Document http://mongoosejs.com/docs/api/document.html&raquo;</span></li></ul><div><p>A Model is a class that's your primary tool for interacting with MongoDB. An instance of a Model is called a <a href="./api.html#Document">Document</a>.</p>
+</li></ul><h5>Inherits:</h5><ul><li><span class="method-type">&laquo;Document https://mongoosejs.com/docs/api/document.html&raquo;</span></li></ul><div><p>A Model is a class that's your primary tool for interacting with MongoDB. An instance of a Model is called a <a href="./api.html#Document">Document</a>.</p>
 
 <p>In Mongoose, the term "Model" refers to subclasses of the <code>mongoose.Model</code> class. You should not use the <code>mongoose.Model</code> class directly. The <a href="./api.html#mongoose_Mongoose-model"><code>mongoose.model()</code></a> and <a href="./api.html#connection_Connection-model"><code>connection.model()</code></a> functions create subclasses of <code>mongoose.Model</code> as shown below.</p>
 
@@ -46,7 +46,7 @@ template: `
 </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> aggregation options</p>
 </li><li class="param">[callback]
-<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Performs <a href="http://docs.mongodb.org/manual/applications/aggregation/">aggregations</a> on the models collection.</p>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Performs <a href="https://docs.mongodb.org/manual/applications/aggregation/">aggregations</a> on the models collection.</p>
 
 <p>If a <code>callback</code> is passed, the <code>aggregate</code> is executed and a <code>Promise</code> is returned. If a callback is not passed, the <code>aggregate</code> itself is returned.</p>
 
@@ -85,7 +85,7 @@ template: `
 <ul>
 <li><a href="/docs/api/aggregate.html">Mongoose <code>Aggregate</code></a></li>
 <li><a href="https://masteringjs.io/tutorials/mongoose/aggregate">An Introduction to Mongoose Aggregate</a></li>
-<li><a href="http://docs.mongodb.org/manual/applications/aggregation/">MongoDB Aggregation docs</a></li>
+<li><a href="https://docs.mongodb.org/manual/applications/aggregation/">MongoDB Aggregation docs</a></li>
 </ul>  </div><hr class="separate-api-elements"><h3 id="model_Model.buildBulkWriteOperations"><a href="#model_Model.buildBulkWriteOperations">Model.buildBulkWriteOperations()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">options.skipValidation
 <span class="method-type">&laquo;Boolean&raquo;</span> defaults to <code>false</code>, when set to true, building the write operations will bypass validating the documents.</p>
@@ -156,12 +156,12 @@ template: `
 <span class="method-type">&laquo;Boolean&raquo;</span> Overwrites the <a href="/docs/guide.html#strict"><code>strict</code> option</a> on schema. If false, allows filtering and writing fields not defined in the schema for all writes in this bulk.</p>
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> callback <code>function(error, bulkWriteOpResult) {}</code></p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> resolves to a <a href="http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~BulkWriteOpResult"><code>BulkWriteOpResult</code></a> if the operation succeeds</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> resolves to a <a href="https://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~BulkWriteOpResult"><code>BulkWriteOpResult</code></a> if the operation succeeds</p>
 </li></ul><div><p>Sends multiple <code>insertOne</code>, <code>updateOne</code>, <code>updateMany</code>, <code>replaceOne</code>, <code>deleteOne</code>, and/or <code>deleteMany</code> operations to the MongoDB server in one command. This is faster than sending multiple independent operations (e.g. if you use <code>create()</code>) because with <code>bulkWrite()</code> there is only one round trip to MongoDB.</p>
 
 <p>Mongoose will perform casting on all operations you provide.</p>
 
-<p>This function does <strong>not</strong> trigger any middleware, neither <code>save()</code>, nor <code>update()</code>. If you need to trigger <code>save()</code> middleware for every document use <a href="http://mongoosejs.com/docs/api.html#model_Model.create"><code>create()</code></a> instead.</p>
+<p>This function does <strong>not</strong> trigger any middleware, neither <code>save()</code>, nor <code>update()</code>. If you need to trigger <code>save()</code> middleware for every document use <a href="https://mongoosejs.com/docs/api.html#model_Model.create"><code>create()</code></a> instead.</p>
 
 <h4>Example:</h4>
 
@@ -262,7 +262,7 @@ template: `
 <span class="hljs-comment">// pass an array as the first parameter to `create()` if you want to</span>
 <span class="hljs-comment">// specify options.</span>
 <span class="hljs-keyword">await</span> Character.create([{ <span class="hljs-attr">name</span>: <span class="hljs-string">'Jean-Luc Picard'</span> }], { session });</code></pre>  </div><hr class="separate-api-elements"><h3 id="model_Model.createCollection"><a href="#model_Model.createCollection">Model.createCollection()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> see <a href="http://mongodb.github.io/node-mongodb-native/3.1/api/Db.html#createCollection">MongoDB driver docs</a></p>
+<span class="method-type">&laquo;Object&raquo;</span> see <a href="https://mongodb.github.io/node-mongodb-native/3.1/api/Db.html#createCollection">MongoDB driver docs</a></p>
 </li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><div><p>Create the collection for this model. By default, if no indexes are specified, mongoose will not create the collection for the model until any documents are created. Use this method to create the collection explicitly.</p>
 
@@ -281,9 +281,9 @@ User.createCollection().then(<span class="hljs-function"><span class="hljs-keywo
 <span class="method-type">&laquo;Object&raquo;</span> internal options</p>
 </li><li class="param">[cb]
 <span class="method-type">&laquo;Function&raquo;</span> optional callback</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Similar to <code>ensureIndexes()</code>, except for it uses the <a href="http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex"><code>createIndex</code></a> function.</p>  </div><hr class="separate-api-elements"><h3 id="model_Model.deleteMany"><a href="#model_Model.deleteMany">Model.deleteMany()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">conditions
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Similar to <code>ensureIndexes()</code>, except for it uses the <a href="https://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex"><code>createIndex</code></a> function.</p>  </div><hr class="separate-api-elements"><h3 id="model_Model.deleteMany"><a href="#model_Model.deleteMany">Model.deleteMany()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">conditions
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Deletes all of the documents that match <code>conditions</code> from the collection. It returns an object with the property <code>deletedCount</code> containing the number of documents deleted. Behaves like <code>remove()</code>, but deletes all documents that match <code>conditions</code> regardless of the <code>single</code> option.</p>
 
@@ -295,7 +295,7 @@ User.createCollection().then(<span class="hljs-function"><span class="hljs-keywo
 
 <p>This function triggers <code>deleteMany</code> query hooks. Read the <a href="/docs/middleware.html#naming">middleware docs</a> to learn more.</p>  </div><hr class="separate-api-elements"><h3 id="model_Model.deleteOne"><a href="#model_Model.deleteOne">Model.deleteOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">conditions
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Deletes the first document that matches <code>conditions</code> from the collection. It returns an object with the property <code>deletedCount</code> indicating how many documents were deleted. Behaves like <code>remove()</code>, but deletes at most one document regardless of the <code>single</code> option.</p>
 
@@ -401,7 +401,7 @@ Event.on(<span class="hljs-string">'index'</span>, <span class="hljs-function"><
 <span class="hljs-comment">// Prints a 'CastError' because of the above handler</span>
 <span class="hljs-keyword">await</span> MyModel.findOne({ <span class="hljs-attr">_id</span>: <span class="hljs-string">'notanid'</span> }).catch(noop);</code></pre>  </div><hr class="separate-api-elements"><h3 id="model_Model.exists"><a href="#model_Model.exists">Model.exists()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">filter
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> callback</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Returns a document with <code>_id</code> only if at least one document exists in the database that matches the given <code>filter</code>, and <code>null</code> otherwise.</p>
@@ -422,9 +422,9 @@ Event.on(<span class="hljs-string">'index'</span>, <span class="hljs-function"><
 <li><code>findOne()</code></li>
 </ul>  </div><hr class="separate-api-elements"><h3 id="model_Model.find"><a href="#model_Model.find">Model.find()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">filter
 <span class="method-type">&laquo;Object|ObjectId&raquo;</span> </li><li class="param">[projection]
-<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="http://mongoosejs.com/docs/api.html#query_Query-select"><code>Query.prototype.select()</code></a></p>
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="https://mongoosejs.com/docs/api.html#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Finds documents.</p>
 
@@ -450,7 +450,7 @@ MyModel.find({ <span class="hljs-attr">name</span>: <span class="hljs-string">'j
 </li><li class="param">[projection]
 <span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Finds a single document by its _id field. <code>findById(id)</code> is almost* equivalent to <code>findOne({ _id: id })</code>. If you want to query by a document's <code>_id</code>, use <code>findById()</code> instead of <code>findOne()</code>.</p>
 
@@ -476,9 +476,9 @@ Adventure.findById(id, <span class="hljs-function"><span class="hljs-keyword">fu
 <span class="hljs-keyword">await</span> Adventure.findById(id, <span class="hljs-string">'name length'</span>).exec();</code></pre>  </div><hr class="separate-api-elements"><h3 id="model_Model.findByIdAndDelete"><a href="#model_Model.findByIdAndDelete">Model.findByIdAndDelete()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">id
 <span class="method-type">&laquo;Object|Number|String&raquo;</span> value of <code>_id</code> to query by</p>
 </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.strict]
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Issue a MongoDB <code>findOneAndDelete()</code> command by a document's _id field. In other words, <code>findByIdAndDelete(id)</code> is a shorthand for <code>findOneAndDelete({ _id: id })</code>.</p>
 
@@ -489,9 +489,9 @@ Adventure.findById(id, <span class="hljs-function"><span class="hljs-keyword">fu
 </ul>  </div><hr class="separate-api-elements"><h3 id="model_Model.findByIdAndRemove"><a href="#model_Model.findByIdAndRemove">Model.findByIdAndRemove()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">id
 <span class="method-type">&laquo;Object|Number|String&raquo;</span> value of <code>_id</code> to query by</p>
 </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.strict]
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.session=null]
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.projection=null]
@@ -514,8 +514,8 @@ Adventure.findById(id, <span class="hljs-function"><span class="hljs-keyword">fu
 <ul>
 <li><code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</li>
 <li><code>select</code>: sets the document fields to return</li>
-<li><code>rawResult</code>: if true, returns the <a href="http://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
-<li><code>strict</code>: overwrites the schema's <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
+<li><code>rawResult</code>: if true, returns the <a href="https://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
+<li><code>strict</code>: overwrites the schema's <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
 </ul>
 
 <h4>Examples:</h4>
@@ -528,7 +528,7 @@ A.findByIdAndRemove()           <span class="hljs-comment">// returns Query</spa
 <span class="method-type">&laquo;Object|Number|String&raquo;</span> value of <code>_id</code> to query by</p>
 </li><li class="param">[update]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.returnDocument='before']
 <span class="method-type">&laquo;String&raquo;</span> Has two possible values, <code>&#39;before&#39;</code> and <code>&#39;after&#39;</code>. By default, it will return the document before the update was applied.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.lean]
@@ -536,7 +536,7 @@ A.findByIdAndRemove()           <span class="hljs-comment">// returns Query</spa
 </li></ul><ul style="margin-top: 0.5em"><li>[options.session=null]
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.strict]
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.timestamps=null]
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.overwrite=false]
@@ -558,11 +558,11 @@ A.findByIdAndRemove()           <span class="hljs-comment">// returns Query</spa
 <li><code>new</code>: bool - true to return the modified document rather than the original. defaults to false</li>
 <li><code>upsert</code>: bool - creates the object if it doesn't exist. defaults to false.</li>
 <li><code>runValidators</code>: if true, runs <a href="/docs/validation.html#update-validators">update validators</a> on this command. Update validators validate the update operation against the model's schema.</li>
-<li><code>setDefaultsOnInsert</code>: <code>true</code> by default. If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="http://mongoosejs.com/docs/defaults.html">defaults</a> specified in the model's schema if a new document is created.</li>
+<li><code>setDefaultsOnInsert</code>: <code>true</code> by default. If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="https://mongoosejs.com/docs/defaults.html">defaults</a> specified in the model's schema if a new document is created.</li>
 <li><code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</li>
 <li><code>select</code>: sets the document fields to return</li>
-<li><code>rawResult</code>: if true, returns the <a href="http://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
-<li><code>strict</code>: overwrites the schema's <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
+<li><code>rawResult</code>: if true, returns the <a href="https://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
+<li><code>strict</code>: overwrites the schema's <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
 </ul>
 
 <h4>Examples:</h4>
@@ -600,7 +600,7 @@ Model.findByIdAndUpdate(id, { <span class="hljs-attr">$set</span>: { <span class
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[projection]
 <span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Finds one document.</p>
 
@@ -619,9 +619,9 @@ Adventure.findOne({ <span class="hljs-attr">country</span>: <span class="hljs-st
 <span class="hljs-comment">// select only the adventures name and length</span>
 <span class="hljs-keyword">await</span> Adventure.findOne({ <span class="hljs-attr">country</span>: <span class="hljs-string">'Croatia'</span> }, <span class="hljs-string">'name length'</span>).exec();</code></pre>  </div><hr class="separate-api-elements"><h3 id="model_Model.findOneAndDelete"><a href="#model_Model.findOneAndDelete">Model.findOneAndDelete()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">conditions
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.strict]
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.projection=null]
 <span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.session=null]
@@ -648,8 +648,8 @@ Adventure.findOne({ <span class="hljs-attr">country</span>: <span class="hljs-st
 <li><code>maxTimeMS</code>: puts a time limit on the query - requires mongodb >= 2.6.0</li>
 <li><code>select</code>: sets the document fields to return, ex. <code>{ projection: { _id: 0 } }</code></li>
 <li><code>projection</code>: equivalent to <code>select</code></li>
-<li><code>rawResult</code>: if true, returns the <a href="http://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
-<li><code>strict</code>: overwrites the schema's <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
+<li><code>rawResult</code>: if true, returns the <a href="https://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
+<li><code>strict</code>: overwrites the schema's <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
 </ul>
 
 <h4>Examples:</h4>
@@ -670,11 +670,11 @@ A.findOneAndDelete()           <span class="hljs-comment">// returns Query</span
   doc.save(callback);
 });</code></pre>  </div><hr class="separate-api-elements"><h3 id="model_Model.findOneAndRemove"><a href="#model_Model.findOneAndRemove">Model.findOneAndRemove()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">conditions
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.session=null]
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.strict]
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.projection=null]
 <span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li></ul><li class="param">[callback]
@@ -697,8 +697,8 @@ A.findOneAndDelete()           <span class="hljs-comment">// returns Query</span
 <li><code>maxTimeMS</code>: puts a time limit on the query - requires mongodb >= 2.6.0</li>
 <li><code>select</code>: sets the document fields to return</li>
 <li><code>projection</code>: like select, it determines which fields to return, ex. <code>{ projection: { _id: 0 } }</code></li>
-<li><code>rawResult</code>: if true, returns the <a href="http://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
-<li><code>strict</code>: overwrites the schema's <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
+<li><code>rawResult</code>: if true, returns the <a href="https://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
+<li><code>strict</code>: overwrites the schema's <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
 </ul>
 
 <h4>Examples:</h4>
@@ -722,7 +722,7 @@ A.findOneAndRemove()           <span class="hljs-comment">// returns Query</span
 </li><li class="param">[replacement]
 <span class="method-type">&laquo;Object&raquo;</span> Replace with this document</p>
 </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.returnDocument='before']
 <span class="method-type">&laquo;String&raquo;</span> Has two possible values, <code>&#39;before&#39;</code> and <code>&#39;after&#39;</code>. By default, it will return the document before the update was applied.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.lean]
@@ -730,7 +730,7 @@ A.findOneAndRemove()           <span class="hljs-comment">// returns Query</span
 </li></ul><ul style="margin-top: 0.5em"><li>[options.session=null]
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.strict]
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.timestamps=null]
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.projection=null]
@@ -755,8 +755,8 @@ A.findOneAndRemove()           <span class="hljs-comment">// returns Query</span
 <li><code>maxTimeMS</code>: puts a time limit on the query - requires mongodb >= 2.6.0</li>
 <li><code>select</code>: sets the document fields to return</li>
 <li><code>projection</code>: like select, it determines which fields to return, ex. <code>{ projection: { _id: 0 } }</code></li>
-<li><code>rawResult</code>: if true, returns the <a href="http://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
-<li><code>strict</code>: overwrites the schema's <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
+<li><code>rawResult</code>: if true, returns the <a href="https://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
+<li><code>strict</code>: overwrites the schema's <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
 </ul>
 
 <h4>Examples:</h4>
@@ -768,7 +768,7 @@ A.findOneAndReplace(conditions) <span class="hljs-comment">// returns Query</spa
 A.findOneAndReplace()           <span class="hljs-comment">// returns Query</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="model_Model.findOneAndUpdate"><a href="#model_Model.findOneAndUpdate">Model.findOneAndUpdate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[conditions]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[update]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.returnDocument='before']
 <span class="method-type">&laquo;String&raquo;</span> Has two possible values, <code>&#39;before&#39;</code> and <code>&#39;after&#39;</code>. By default, it will return the document before the update was applied.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.lean]
@@ -776,7 +776,7 @@ A.findOneAndReplace()           <span class="hljs-comment">// returns Query</spa
 </li></ul><ul style="margin-top: 0.5em"><li>[options.session=null]
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.strict]
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.timestamps=null]
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.overwrite=false]
@@ -800,9 +800,9 @@ A.findOneAndReplace()           <span class="hljs-comment">// returns Query</spa
 <li><code>maxTimeMS</code>: puts a time limit on the query - requires mongodb >= 2.6.0</li>
 <li><code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</li>
 <li><code>runValidators</code>: if true, runs <a href="/docs/validation.html#update-validators">update validators</a> on this command. Update validators validate the update operation against the model's schema.</li>
-<li><code>setDefaultsOnInsert</code>: <code>true</code> by default. If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="http://mongoosejs.com/docs/defaults.html">defaults</a> specified in the model's schema if a new document is created.</li>
-<li><code>rawResult</code>: if true, returns the <a href="http://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
-<li><code>strict</code>: overwrites the schema's <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
+<li><code>setDefaultsOnInsert</code>: <code>true</code> by default. If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="https://mongoosejs.com/docs/defaults.html">defaults</a> specified in the model's schema if a new document is created.</li>
+<li><code>rawResult</code>: if true, returns the <a href="https://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
+<li><code>strict</code>: overwrites the schema's <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
 </ul>
 
 <h4>Examples:</h4>
@@ -845,7 +845,7 @@ doc.name = <span class="hljs-string">'jason bourne'</span>;
 
 <pre><code><span class="hljs-comment">// hydrate previous data into a Mongoose document</span>
 <span class="hljs-keyword">const</span> mongooseCandy = Candy.hydrate({ <span class="hljs-attr">_id</span>: <span class="hljs-string">'54108337212ffb6d459f854c'</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">'jelly bean'</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="model_Model.init"><a href="#model_Model.init">Model.init()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[callback]
-<span class="method-type">&laquo;Function&raquo;</span> </li></ul><div><p>This function is responsible for building <a href="https://docs.mongodb.com/manual/indexes/">indexes</a>, unless <a href="http://mongoosejs.com/docs/guide.html#autoIndex"><code>autoIndex</code></a> is turned off.</p>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><div><p>This function is responsible for building <a href="https://docs.mongodb.com/manual/indexes/">indexes</a>, unless <a href="https://mongoosejs.com/docs/guide.html#autoIndex"><code>autoIndex</code></a> is turned off.</p>
 
 <p>Mongoose calls this function automatically when a model is created using <a href="/docs/api.html#mongoose_Mongoose-model"><code>mongoose.model()</code></a> or <a href="/docs/api.html#connection_Connection-model"><code>connection.model()</code></a>, so you don't need to call it. This function is also idempotent, so you may call it to get back a promise that will resolve when your indexes are finished building as an alternative to <a href="/docs/guide.html#indexes"><code>MyModel.on('index')</code></a></p>
 
@@ -862,11 +862,11 @@ Event.init().then(<span class="hljs-function"><span class="hljs-keyword">functio
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Indexes are done building!'</span>);
 });</code></pre>  </div><hr class="separate-api-elements"><h3 id="model_Model.insertMany"><a href="#model_Model.insertMany">Model.insertMany()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">doc(s)
 <span class="method-type">&laquo;Array|Object|*&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> see the <a href="http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#insertMany">mongodb driver options</a></p>
+<span class="method-type">&laquo;Object&raquo;</span> see the <a href="https://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#insertMany">mongodb driver options</a></p>
 </li><li class="param">[options.ordered
 <span class="method-type">&laquo;Boolean&raquo;</span> = true] if true, will fail fast on the first error encountered. If false, will insert all the documents it can and report errors later. An <code>insertMany()</code> with <code>ordered = false</code> is called an &quot;unordered&quot; <code>insertMany()</code>.</p>
 </li><li class="param">[options.rawResult
-<span class="method-type">&laquo;Boolean&raquo;</span> = false] if false, the returned promise resolves to the documents that passed mongoose document validation. If <code>true</code>, will return the <a href="http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#~insertWriteOpCallback">raw result from the MongoDB driver</a> with a <code>mongoose</code> property that contains <code>validationErrors</code> if this is an unordered <code>insertMany</code>.</p>
+<span class="method-type">&laquo;Boolean&raquo;</span> = false] if false, the returned promise resolves to the documents that passed mongoose document validation. If <code>true</code>, will return the <a href="https://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#~insertWriteOpCallback">raw result from the MongoDB driver</a> with a <code>mongoose</code> property that contains <code>validationErrors</code> if this is an unordered <code>insertMany</code>.</p>
 </li><li class="param">[options.lean
 <span class="method-type">&laquo;Boolean&raquo;</span> = false] if <code>true</code>, skips hydrating and validating the documents. This option is useful if you need the extra performance, but Mongoose won&#39;t validate the documents before inserting.</p>
 </li><li class="param">[options.limit
@@ -906,7 +906,7 @@ MyModel.inspect(); <span class="hljs-comment">// 'Model { Test }'</span>
 <span class="method-type">&laquo;Function&raquo;</span> optional callback</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes a mapReduce command.</p>
 
-<p><code>o</code> is an object specifying all mapReduce options as well as the map and reduce functions. All options are delegated to the driver implementation. See <a href="http://mongodb.github.io/node-mongodb-native/api-generated/collection.html#mapreduce">node-mongodb-native mapReduce() documentation</a> for more detail about options.</p>
+<p><code>o</code> is an object specifying all mapReduce options as well as the map and reduce functions. All options are delegated to the driver implementation. See <a href="https://mongodb.github.io/node-mongodb-native/api-generated/collection.html#mapreduce">node-mongodb-native mapReduce() documentation</a> for more detail about options.</p>
 
 <p>This function does not trigger any middleware.</p>
 
@@ -1090,7 +1090,7 @@ doc.model(<span class="hljs-string">'User'</span>).findById(id, callback);</code
 </li><ul style="margin-top: 0.5em"><li>[options.session=null]
 <span class="method-type">&laquo;Session&raquo;</span> the <a href="https://docs.mongodb.com/manual/reference/server-sessions/">session</a> associated with this save operation. If not specified, defaults to the <a href="api.html#document_Document-$session">document&#39;s associated session</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.safe]
-<span class="method-type">&laquo;Object&raquo;</span> (DEPRECATED) overrides <a href="http://mongoosejs.com//docs/guide.html#safe">schema&#39;s safe option</a>. Use the <code>w</code> option instead.</p>
+<span class="method-type">&laquo;Object&raquo;</span> (DEPRECATED) overrides <a href="https://mongoosejs.com//docs/guide.html#safe">schema&#39;s safe option</a>. Use the <code>w</code> option instead.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.validateBeforeSave]
 <span class="method-type">&laquo;Boolean&raquo;</span> set to false to save without validating.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.validateModifiedOnly=false]
@@ -1139,9 +1139,9 @@ res.deletedCount; <span class="hljs-comment">// Number of documents removed</spa
 <p>This method sends a remove command directly to MongoDB, no Mongoose documents are involved. Because no Mongoose documents are involved, Mongoose does not execute <a href="/docs/middleware.html#types-of-middleware">document middleware</a>.</p>  </div><hr class="separate-api-elements"><h3 id="model_Model.replaceOne"><a href="#model_Model.replaceOne">Model.replaceOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">filter
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">doc
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.strict]
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.upsert=false]
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.writeConcern=null]
@@ -1166,12 +1166,12 @@ res.upsertedCount; <span class="hljs-comment">// Number indicating how many docu
 <ul>
 <li><code>replaceOne()</code></li>
 </ul>  </div><hr class="separate-api-elements"><h3 id="model_Model.startSession"><a href="#model_Model.startSession">Model.startSession()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> see the <a href="http://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html#startSession">mongodb driver options</a></p>
+<span class="method-type">&laquo;Object&raquo;</span> see the <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html#startSession">mongodb driver options</a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.causalConsistency=true]
 <span class="method-type">&laquo;Boolean&raquo;</span> set to false to disable causal consistency</p>
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;ClientSession&gt;&raquo;</span> promise that resolves to a MongoDB driver <code>ClientSession</code></p>
-</li></ul><div><p><em>Requires MongoDB >= 3.6.0.</em> Starts a <a href="https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions">MongoDB session</a> for benefits like causal consistency, <a href="https://docs.mongodb.com/manual/core/retryable-writes/">retryable writes</a>, and <a href="http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html">transactions</a>.</p>
+</li></ul><div><p><em>Requires MongoDB >= 3.6.0.</em> Starts a <a href="https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions">MongoDB session</a> for benefits like causal consistency, <a href="https://docs.mongodb.com/manual/core/retryable-writes/">retryable writes</a>, and <a href="https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html">transactions</a>.</p>
 
 <p>Calling <code>MyModel.startSession()</code> is equivalent to calling <code>MyModel.db.startSession()</code>.</p>
 
@@ -1195,7 +1195,7 @@ doc = <span class="hljs-keyword">await</span> Person.findOne({ <span class="hljs
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise,undefined&raquo;</span> Returns <code>undefined</code> if callback is specified, returns a promise if no callback.</p>
 </li></ul><div><p>Makes the indexes in MongoDB match the indexes defined in this model's schema. This function will drop any indexes that are not defined in the model's schema except the <code>_id</code> index, and build any indexes that are in your schema but not in MongoDB.</p>
 
-<p>See the <a href="http://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes">introductory blog post</a> for more information.</p>
+<p>See the <a href="https://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes">introductory blog post</a> for more information.</p>
 
 <h4>Example:</h4>
 
@@ -1233,7 +1233,7 @@ doc = <span class="hljs-keyword">await</span> Person.findOne({ <span class="hljs
 </li></ul><ul style="margin-top: 0.5em"><li>[options.runValidators=false]
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, runs <a href="/docs/validation.html#update-validators">update validators</a> on this command. Update validators validate the update operation against the model&#39;s schema.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.setDefaultsOnInsert=false]
-<span class="method-type">&laquo;Boolean&raquo;</span> <code>true</code> by default. If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="http://mongoosejs.com/docs/defaults.html">defaults</a> specified in the model&#39;s schema if a new document is created.</p>
+<span class="method-type">&laquo;Boolean&raquo;</span> <code>true</code> by default. If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="https://mongoosejs.com/docs/defaults.html">defaults</a> specified in the model&#39;s schema if a new document is created.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.timestamps=null]
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.overwrite=false]
@@ -1269,7 +1269,7 @@ res.nModified;</code></pre>
 <li><code>writeConcern</code> (object): sets the <a href="https://docs.mongodb.com/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></li>
 <li><code>multi</code> (boolean): whether multiple documents should be updated (false)</li>
 <li><code>runValidators</code>: if true, runs <a href="/docs/validation.html#update-validators">update validators</a> on this command. Update validators validate the update operation against the model's schema.</li>
-<li><code>setDefaultsOnInsert</code> (boolean): if this and <code>upsert</code> are true, mongoose will apply the <a href="http://mongoosejs.com/docs/defaults.html">defaults</a> specified in the model's schema if a new document is created. This option only works on MongoDB >= 2.4 because it relies on <a href="https://docs.mongodb.org/v2.4/reference/operator/update/setOnInsert/">MongoDB's <code>$setOnInsert</code> operator</a>.</li>
+<li><code>setDefaultsOnInsert</code> (boolean): if this and <code>upsert</code> are true, mongoose will apply the <a href="https://mongoosejs.com/docs/defaults.html">defaults</a> specified in the model's schema if a new document is created. This option only works on MongoDB >= 2.4 because it relies on <a href="https://docs.mongodb.org/v2.4/reference/operator/update/setOnInsert/">MongoDB's <code>$setOnInsert</code> operator</a>.</li>
 <li><code>timestamps</code> (boolean): If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</li>
 <li><code>overwrite</code> (boolean): disables update-only mode, allowing you to overwrite the doc (false)</li>
 </ul>
@@ -1304,9 +1304,9 @@ Model.update(query, { <span class="hljs-attr">$set</span>: { <span class="hljs-a
 <p>Be careful to not use an existing model instance for the update clause (this won't work and can cause weird behavior like infinite loops). Also, ensure that the update clause does not have an _id property, which causes Mongo to return a "Mod on _id not allowed" error.</p>  </div><hr class="separate-api-elements"><h3 id="model_Model.updateMany"><a href="#model_Model.updateMany">Model.updateMany()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">filter
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">update
 <span class="method-type">&laquo;Object|Array&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.strict]
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.upsert=false]
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.writeConcern=null]
@@ -1335,9 +1335,9 @@ res.upsertedCount; <span class="hljs-comment">// Number indicating how many docu
 </ul>  </div><hr class="separate-api-elements"><h3 id="model_Model.updateOne"><a href="#model_Model.updateOne">Model.updateOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">filter
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">update
 <span class="method-type">&laquo;Object|Array&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.strict]
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.upsert=false]
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.writeConcern=null]
@@ -1386,7 +1386,7 @@ res.upsertedCount; <span class="hljs-comment">// Number indicating how many docu
   <span class="hljs-built_in">Object</span>.keys(err.errors); <span class="hljs-comment">// ['name']</span>
 }</code></pre>  </div><hr class="separate-api-elements"><h3 id="model_Model.watch"><a href="#model_Model.watch">Model.watch()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[pipeline]
 <span class="method-type">&laquo;Array&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> see the <a href="http://mongodb.github.io/node-mongodb-native/3.0/api/Collection.html#watch">mongodb driver options</a></p>
+<span class="method-type">&laquo;Object&raquo;</span> see the <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection.html#watch">mongodb driver options</a></p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;ChangeStream&raquo;</span> mongoose-specific change stream wrapper, inherits from EventEmitter</p>
 </li></ul><div><p><em>Requires a replica set running MongoDB >= 3.6.0.</em> Watches the underlying collection for changes using <a href="https://docs.mongodb.com/manual/changeStreams/">MongoDB change streams</a>.</p>
 

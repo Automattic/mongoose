@@ -46,7 +46,7 @@ mongoose <span class="hljs-keyword">instanceof</span> mongoose.Mongoose; <span c
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">test</span>: <span class="hljs-built_in">Date</span> });
-schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">instanceof</span> mongoose.Date; <span class="hljs-comment">// true</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Decimal128"><a href="#mongoose_Mongoose-Decimal128">Mongoose.prototype.Decimal128</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The Mongoose Decimal128 <a href="/docs/schematypes.html">SchemaType</a>. Used for declaring paths in your schema that should be <a href="http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-decimal.html">128-bit decimal floating points</a>. Do not use this to create a new Decimal128 instance, use <code>mongoose.Types.Decimal128</code> instead.</p>
+schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">instanceof</span> mongoose.Date; <span class="hljs-comment">// true</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Decimal128"><a href="#mongoose_Mongoose-Decimal128">Mongoose.prototype.Decimal128</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The Mongoose Decimal128 <a href="/docs/schematypes.html">SchemaType</a>. Used for declaring paths in your schema that should be <a href="https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-decimal.html">128-bit decimal floating points</a>. Do not use this to create a new Decimal128 instance, use <code>mongoose.Types.Decimal128</code> instead.</p>
 
 <h4>Example:</h4>
 
@@ -106,9 +106,9 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 <pre><code><span class="hljs-keyword">const</span> ObjectId = mongoose.Types.ObjectId;
 <span class="hljs-keyword">const</span> id1 = <span class="hljs-keyword">new</span> ObjectId;</code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-VirtualType"><a href="#mongoose_Mongoose-VirtualType">Mongoose.prototype.VirtualType()</a></h3><div><p>The Mongoose <a href="#virtualtype_VirtualType">VirtualType</a> constructor</p>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-connect"><a href="#mongoose_Mongoose-connect">Mongoose.prototype.connect()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">uri(s)
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> passed down to the <a href="http://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html">MongoDB driver&#39;s <code>connect()</code> function</a>, except for 4 mongoose-specific options explained below.</p>
+<span class="method-type">&laquo;Object&raquo;</span> passed down to the <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html">MongoDB driver&#39;s <code>connect()</code> function</a>, except for 4 mongoose-specific options explained below.</p>
 </li><ul style="margin-top: 0.5em"><li>[options.bufferCommands=true]
-<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose specific option. Set to false to <a href="http://mongoosejs.com/docs/faq.html#callback_never_executes">disable buffering</a> on all models associated with this connection.</p>
+<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose specific option. Set to false to <a href="https://mongoosejs.com/docs/faq.html#callback_never_executes">disable buffering</a> on all models associated with this connection.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.bufferTimeoutMS=10000]
 <span class="method-type">&laquo;Number&raquo;</span> Mongoose specific option. If <code>bufferCommands</code> is true, Mongoose will throw an error after <code>bufferTimeoutMS</code> if the operation is still buffered.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.dbName]
@@ -118,7 +118,7 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 </li></ul><ul style="margin-top: 0.5em"><li>[options.pass]
 <span class="method-type">&laquo;String&raquo;</span> password for authentication, equivalent to <code>options.auth.password</code>. Maintained for backwards compatibility.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.maxPoolSize=100]
-<span class="method-type">&laquo;Number&raquo;</span> The maximum number of sockets the MongoDB driver will keep open for this connection. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See <a href="http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs">Slow Trains in MongoDB and Node.js</a>.</p>
+<span class="method-type">&laquo;Number&raquo;</span> The maximum number of sockets the MongoDB driver will keep open for this connection. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See <a href="https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs">Slow Trains in MongoDB and Node.js</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.minPoolSize=0]
 <span class="method-type">&laquo;Number&raquo;</span> The minimum number of sockets the MongoDB driver will keep open for this connection.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.serverSelectionTimeoutMS]
@@ -132,7 +132,7 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 </li></ul><ul style="margin-top: 0.5em"><li>[options.reconnectInterval=1000]
 <span class="method-type">&laquo;Number&raquo;</span> See <code>reconnectTries</code> option above.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.promiseLibrary]
-<span class="method-type">&laquo;Class&raquo;</span> Sets the <a href="http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html">underlying driver&#39;s promise library</a>.</p>
+<span class="method-type">&laquo;Class&raquo;</span> Sets the <a href="https://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html">underlying driver&#39;s promise library</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.connectTimeoutMS=30000]
 <span class="method-type">&laquo;Number&raquo;</span> How long the MongoDB driver will wait before killing a socket due to inactivity <em>during initial connection</em>. Defaults to 30000. This option is passed transparently to <a href="https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback">Node.js&#39; <code>socket#setTimeout()</code> function</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.socketTimeoutMS=30000]
@@ -182,9 +182,9 @@ mongoose.createConnection(<span class="hljs-string">'mongodb://localhost:27017/t
 mongoose.connections.length; <span class="hljs-comment">// 2</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-createConnection"><a href="#mongoose_Mongoose-createConnection">Mongoose.prototype.createConnection()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[uri]
 <span class="method-type">&laquo;String&raquo;</span> a mongodb:// URI</p>
 </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> passed down to the <a href="http://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html">MongoDB driver&#39;s <code>connect()</code> function</a>, except for 4 mongoose-specific options explained below.</p>
+<span class="method-type">&laquo;Object&raquo;</span> passed down to the <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html">MongoDB driver&#39;s <code>connect()</code> function</a>, except for 4 mongoose-specific options explained below.</p>
 </li><ul style="margin-top: 0.5em"><li>[options.bufferCommands=true]
-<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose specific option. Set to false to <a href="http://mongoosejs.com/docs/faq.html#callback_never_executes">disable buffering</a> on all models associated with this connection.</p>
+<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose specific option. Set to false to <a href="https://mongoosejs.com/docs/faq.html#callback_never_executes">disable buffering</a> on all models associated with this connection.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.dbName]
 <span class="method-type">&laquo;String&raquo;</span> The name of the database you want to use. If not provided, Mongoose uses the database name from connection string.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.user]
@@ -198,11 +198,11 @@ mongoose.connections.length; <span class="hljs-comment">// 2</span></code></pre>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.reconnectInterval=1000]
 <span class="method-type">&laquo;Number&raquo;</span> See <code>reconnectTries</code> option above.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.promiseLibrary]
-<span class="method-type">&laquo;Class&raquo;</span> Sets the <a href="http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html">underlying driver&#39;s promise library</a>.</p>
+<span class="method-type">&laquo;Class&raquo;</span> Sets the <a href="https://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html">underlying driver&#39;s promise library</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.maxPoolSize=5]
-<span class="method-type">&laquo;Number&raquo;</span> The maximum number of sockets the MongoDB driver will keep open for this connection. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See <a href="http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs">Slow Trains in MongoDB and Node.js</a>.</p>
+<span class="method-type">&laquo;Number&raquo;</span> The maximum number of sockets the MongoDB driver will keep open for this connection. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See <a href="https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs">Slow Trains in MongoDB and Node.js</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.minPoolSize=1]
-<span class="method-type">&laquo;Number&raquo;</span> The minimum number of sockets the MongoDB driver will keep open for this connection. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See <a href="http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs">Slow Trains in MongoDB and Node.js</a>.</p>
+<span class="method-type">&laquo;Number&raquo;</span> The minimum number of sockets the MongoDB driver will keep open for this connection. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See <a href="https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs">Slow Trains in MongoDB and Node.js</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.connectTimeoutMS=30000]
 <span class="method-type">&laquo;Number&raquo;</span> How long the MongoDB driver will wait before killing a socket due to inactivity <em>during initial connection</em>. Defaults to 30000. This option is passed transparently to <a href="https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback">Node.js&#39; <code>socket#setTimeout()</code> function</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.socketTimeoutMS=30000]
@@ -370,12 +370,12 @@ mongoose.set(<span class="hljs-string">'debug'</span>, <span class="hljs-functio
 <li>'autoCreate': Set to <code>true</code> to make Mongoose call <a href="/docs/api/model.html#model_Model.createCollection"><code>Model.createCollection()</code></a> automatically when you create a model with <code>mongoose.model()</code> or <code>conn.model()</code>. This is useful for testing transactions, change streams, and other features that require the collection to exist.</li>
 <li>'overwriteModels': Set to <code>true</code> to default to overwriting models with the same name when calling <code>mongoose.model()</code>, as opposed to throwing an <code>OverwriteModelError</code>.</li>
 </ul>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-startSession"><a href="#mongoose_Mongoose-startSession">Mongoose.prototype.startSession()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> see the <a href="http://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html#startSession">mongodb driver options</a></p>
+<span class="method-type">&laquo;Object&raquo;</span> see the <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html#startSession">mongodb driver options</a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.causalConsistency=true]
 <span class="method-type">&laquo;Boolean&raquo;</span> set to false to disable causal consistency</p>
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;ClientSession&gt;&raquo;</span> promise that resolves to a MongoDB driver <code>ClientSession</code></p>
-</li></ul><div><p><em>Requires MongoDB >= 3.6.0.</em> Starts a <a href="https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions">MongoDB session</a> for benefits like causal consistency, <a href="https://docs.mongodb.com/manual/core/retryable-writes/">retryable writes</a>, and <a href="http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html">transactions</a>.</p>
+</li></ul><div><p><em>Requires MongoDB >= 3.6.0.</em> Starts a <a href="https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions">MongoDB session</a> for benefits like causal consistency, <a href="https://docs.mongodb.com/manual/core/retryable-writes/">retryable writes</a>, and <a href="https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html">transactions</a>.</p>
 
 <p>Calling <code>mongoose.startSession()</code> is equivalent to calling <code>mongoose.connection.startSession()</code>. Sessions are scoped to a connection, so calling <code>mongoose.startSession()</code> starts a session on the <a href="/docs/api.html#mongoose_Mongoose-connection">default mongoose connection</a>.</p>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-syncIndexes"><a href="#mongoose_Mongoose-syncIndexes">Mongoose.prototype.syncIndexes()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">options.continueOnError

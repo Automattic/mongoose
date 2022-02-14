@@ -423,7 +423,7 @@ s.path(<span class="hljs-string">'name'</span>).index({ <span class="hljs-attr">
 
 <pre><code><span class="hljs-comment">// make sure every value is equal to "something"</span>
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">validator</span> (<span class="hljs-params">val</span>) </span>{
-  <span class="hljs-keyword">return</span> val == <span class="hljs-string">'something'</span>;
+  <span class="hljs-keyword">return</span> val === <span class="hljs-string">'something'</span>;
 }
 <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">validate</span>: validator }});
 

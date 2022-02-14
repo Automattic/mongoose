@@ -348,7 +348,7 @@ doc.fans[<span class="hljs-number">0</span>].email <span class="hljs-comment">//
 </li><ul style="margin-top: 0.5em"><li>[options.session=null]
 <span class="method-type">&laquo;Session&raquo;</span> the <a href="https://docs.mongodb.com/manual/reference/server-sessions/">session</a> associated with this save operation. If not specified, defaults to the <a href="api.html#document_Document-$session">document&#39;s associated session</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.safe]
-<span class="method-type">&laquo;Object&raquo;</span> (DEPRECATED) overrides <a href="http://mongoosejs.com//docs/guide.html#safe">schema&#39;s safe option</a>. Use the <code>w</code> option instead.</p>
+<span class="method-type">&laquo;Object&raquo;</span> (DEPRECATED) overrides <a href="https://mongoosejs.com//docs/guide.html#safe">schema&#39;s safe option</a>. Use the <code>w</code> option instead.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.validateBeforeSave]
 <span class="method-type">&laquo;Boolean&raquo;</span> set to false to save without validating.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.validateModifiedOnly=false]
@@ -439,7 +439,7 @@ doc.set(path, value, { <span class="hljs-attr">strict</span>: <span class="hljs-
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> js object</p>
 </li></ul><div><p>Converts this document into a plain-old JavaScript object (<a href="https://masteringjs.io/tutorials/fundamentals/pojo">POJO</a>).</p>
 
-<p>Buffers are converted to instances of <a href="http://mongodb.github.com/node-mongodb-native/api-bson-generated/binary.html">mongodb.Binary</a> for proper storage.</p>
+<p>Buffers are converted to instances of <a href="https://mongodb.github.com/node-mongodb-native/api-bson-generated/binary.html">mongodb.Binary</a> for proper storage.</p>
 
 <h4>Options:</h4>
 
@@ -593,11 +593,11 @@ doc.save(); <span class="hljs-comment">// changes to foo will not be persisted</
 <li>same as in <a href="#model_Model.update">Model.update</a></li>
 </ul>  </div><hr class="separate-api-elements"><h3 id="document_Document-updateOne"><a href="#document_Document-updateOne">Document.prototype.updateOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">doc
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.lean]
 <span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api.html#query_Query-lean"><code>Query.lean()</code></a> and the <a href="/docs/tutorials/lean.html">Mongoose lean tutorial</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.strict]
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.timestamps=null]
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><li class="param">callback

@@ -2,6 +2,7 @@
 
 const assert = require('assert');
 const mongoose = require('../../');
+const start = require('../common');
 
 const Schema = mongoose.Schema;
 

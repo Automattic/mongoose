@@ -1,9 +1,12 @@
-import { connect } from 'mongoose';
+import mongoose, { connect } from 'mongoose';
+import { expectType } from 'tsd';
 
 // Promise
-connect('mongodb://localhost:27017/test').then(mongoose => console.log(mongoose.connect));
+expectType<Promise<typeof mongoose>>(connect('mongodb://localhost:27017/test'));
+expectType<Promise<typeof mongoose>>(connect('mongodb://localhost:27017/test', {}));
+expectType<Promise<typeof mongoose>>(connect('mongodb://localhost:27017/test', { bufferCommands: true }));
 
 // Callback
-connect('mongodb://localhost:27017/test', {}, (err: Error | null) => {
-  console.log(err);
-});
+expectType<void>(connect('mongodb://localhost:27017/test', (err: Error | null) => { return; }));
+expectType<void>(connect('mongodb://localhost:27017/test', {}, (err: Error | null) => { return; }));
+expectType<void>(connect('mongodb://localhost:27017/test', { bufferCommands: true }, (err: Error | null) => { return; }));

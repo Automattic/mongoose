@@ -117,7 +117,7 @@ module.exports = function(options) {
  * testing uri
  */
 
-module.exports.uri = 'mongodb://127.0.0.1:27017/mongoose_test';
+module.exports.uri = process.env.MONGOOSE_TEST_URI || 'mongodb://127.0.0.1:27017/mongoose_test';
 
 /*!
  * testing uri for 2nd db

@@ -17,7 +17,7 @@ describe('Date Tutorial', function() {
     });
     User = mongoose.model('User', userSchema);
 
-    return mongoose.connect('mongodb://127.0.0.1:27017/mongoose');
+    return mongoose.connect(start.uri);
   });
 
   it('Example 1.2: casts strings to dates', function() {

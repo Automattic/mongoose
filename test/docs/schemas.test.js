@@ -2,13 +2,14 @@
 
 const assert = require('assert');
 const mongoose = require('../../');
+const start = require('../common');
 
 describe('Advanced Schemas', function() {
   let db;
   const Schema = mongoose.Schema;
 
   before(function() {
-    db = mongoose.createConnection('mongodb://127.0.0.1:27017/mongoose_test');
+    db = mongoose.createConnection(start.uri);
   });
 
   after(async function() {

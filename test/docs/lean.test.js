@@ -14,7 +14,7 @@ describe('Lean Tutorial', function() {
     const schema = new mongoose.Schema({ name: String });
     MyModel = mongoose.model('Test1', schema);
 
-    return mongoose.connect('mongodb://127.0.0.1:27017/mongoose');
+    return mongoose.connect(start.uri);
   });
 
   beforeEach(function() {

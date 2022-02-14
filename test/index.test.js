@@ -12,7 +12,7 @@ const mongoose = start.mongoose;
 const Mongoose = mongoose.Mongoose;
 const Schema = mongoose.Schema;
 
-const uri = 'mongodb://127.0.0.1:27017/mongoose_test';
+const uri = start.uri;
 
 const options = {};
 
@@ -740,7 +740,7 @@ describe('mongoose module:', function() {
     const mongoose = new Mongoose();
     mongoose.set('strictPopulate', false);
     const schema = new mongoose.Schema({ name: String });
-    const db = await mongoose.connect('mongodb://127.0.0.1:27017/mongoose_test_10694');
+    const db = await mongoose.connect(start.uri);
     const Movie = db.model('Movie', schema);
     const Person = db.model('Person', new mongoose.Schema({
       name: String
@@ -755,7 +755,7 @@ describe('mongoose module:', function() {
     const mongoose = new Mongoose();
     mongoose.set('strictPopulate', true);
     const schema = new mongoose.Schema({ name: String });
-    const db = await mongoose.connect('mongodb://127.0.0.1:27017/mongoose_test_10694');
+    const db = await mongoose.connect(start.uri);
     const Movie = db.model('Movie', schema);
     const Person = db.model('Person', new mongoose.Schema({
       name: String
@@ -771,7 +771,7 @@ describe('mongoose module:', function() {
     const mongoose = new Mongoose();
     mongoose.set('strictPopulate', false);
     const schema = new mongoose.Schema({ name: String });
-    const db = await mongoose.connect('mongodb://127.0.0.1:27017/mongoose_test_10694');
+    const db = await mongoose.connect(start.uri);
     const Movie = db.model('Movie', schema);
     const Person = db.model('Person', new mongoose.Schema({
       name: String
@@ -786,7 +786,7 @@ describe('mongoose module:', function() {
     const mongoose = new Mongoose();
     mongoose.set('strictPopulate', false);
     const schema = new mongoose.Schema({ name: String });
-    const db = await mongoose.connect('mongodb://127.0.0.1:27017/mongoose_test_10694');
+    const db = await mongoose.connect(start.uri);
     const Movie = db.model('Movie', schema);
     const Person = db.model('Person', new mongoose.Schema({
       name: String
@@ -827,7 +827,7 @@ describe('mongoose module:', function() {
 
     it('of result from .connect() (gh-3940)', async function() {
       const m = new mongoose.Mongoose();
-      const resolvedMongoose = await m.connect('mongodb://127.0.0.1:27017/test', options);
+      const resolvedMongoose = await m.connect(start.uri, options);
 
       test(resolvedMongoose);
       await m.disconnect();
@@ -844,7 +844,7 @@ describe('mongoose module:', function() {
     it('can set `setDefaultsOnInsert` as a global option (gh-9032)', async function() {
       const m = new mongoose.Mongoose();
       m.set('setDefaultsOnInsert', true);
-      const db = await m.connect('mongodb://127.0.0.1:27017/mongoose_test_9032');
+      const db = await m.connect(start.uri);
 
       const schema = new m.Schema({
         title: String,
@@ -869,7 +869,7 @@ describe('mongoose module:', function() {
       const m = new mongoose.Mongoose();
       m.set('setDefaultsOnInsert', true);
 
-      const db = await m.connect('mongodb://127.0.0.1:27017/mongoose_test_9032');
+      const db = await m.connect(start.uri);
 
       const schema = new m.Schema({
         title: String,

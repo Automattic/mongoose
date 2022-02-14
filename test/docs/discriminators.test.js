@@ -12,7 +12,7 @@ describe('discriminator docs', function() {
   let db;
 
   before(function() {
-    db = mongoose.createConnection('mongodb://127.0.0.1:27017/mongoose_test');
+    db = mongoose.createConnection(start.uri);
 
     const eventSchema = new mongoose.Schema({ time: Date });
     Event = db.model('_event', eventSchema);

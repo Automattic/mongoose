@@ -1,13 +1,14 @@
 'use strict';
 const assert = require('assert');
 const mongoose = require('../../');
+const start = require('../common');
 
 describe('schemaTypes', function() {
   let db;
   const Schema = mongoose.Schema;
 
   before(function() {
-    db = mongoose.createConnection('mongodb://127.0.0.1:27017/mongoose_test');
+    db = mongoose.createConnection(start.uri);
   });
 
   after(async function() {

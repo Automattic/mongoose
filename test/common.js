@@ -117,13 +117,13 @@ module.exports = function(options) {
  * testing uri
  */
 
-module.exports.uri = 'mongodb://localhost:27017/mongoose_test';
+module.exports.uri = process.env.MONGOOSE_TEST_URI || 'mongodb://127.0.0.1:27017/mongoose_test';
 
 /*!
  * testing uri for 2nd db
  */
 
-module.exports.uri2 = 'mongodb://localhost:27017/mongoose_test_2';
+module.exports.uri2 = 'mongodb://127.0.0.1:27017/mongoose_test_2';
 
 /**
  * expose mongoose
@@ -171,7 +171,7 @@ function dropDBs(done) {
 
 
 before(function(done) {
-  this.timeout(10 * 1000);
+  this.timeout(60 * 1000);
   dropDBs(done);
 });
 

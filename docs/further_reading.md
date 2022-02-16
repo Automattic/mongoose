@@ -39,7 +39,7 @@ on this page to make sure it is high quality.
 
 This course is a great introduction to building a RESTful API with [Express](http://expressjs.com/)
 and Mongoose. The instructor is [Scott Moss](https://frontendmasters.com/teachers/scott-moss/),
-a serial entrepreneur and former intructor at [Hack Reactor](https://www.hackreactor.com/), San Francisco's number one coding bootcamp.
+a serial entrepreneur and former instructor at [Hack Reactor](https://www.hackreactor.com/), San Francisco's number one coding bootcamp.
 
 <div style="clear: both"></div>
 <br><br>
@@ -170,7 +170,7 @@ of the Node.js driver, Christian saw more Node.js+MongoDB code bases than
 anyone, and his experience is unmatched.
 This book distills 6 years of hard-learned lessons into concrete examples
 of how to design MongoDB schemas for massive scale. If you want to learn
-how to structure MongoDB schemas for an ecommerce store, a category tree, or a
+how to structure MongoDB schemas for an e-commerce store, a category tree, or a
 blog that can support hundreds of millions of requests per day, this is
 the book for you.
 

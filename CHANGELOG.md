@@ -1,3 +1,21 @@
+6.2.2 / 2022-02-16
+==================
+ * fix: fix QueryCursor and AggregationCursor compatibility with Node v17.5 #11381 [benjamingr](https://github.com/benjamingr)
+ * fix: better esm support, no necessity for setting allowSyntheticDefaultImports and esModuleInterop #11343 [Uzlopak](https://github.com/Uzlopak)
+ * fix(model): apply projection parameter to hydrate() #11375
+ * fix: fix issue with creating arrays of length > 10000 #11405 [Uzlopak](https://github.com/Uzlopak)
+ * fix(document): minimize single nested subdocs #11247
+ * fix(connection): handle reopening base connection with useDb() #11240
+ * perf: use property access instead of `get()` helper where possible #11389 [Uzlopak](https://github.com/Uzlopak)
+ * fix: use `isArray()` instead of `instanceof Array` #11393 [Uzlopak](https://github.com/Uzlopak)
+ * perf: improve performance of `cast$expr()` #11388 [Uzlopak](https://github.com/Uzlopak)
+ * perf: remove `startsWith()` from `isOperator()` #11400 [Uzlopak](https://github.com/Uzlopak)
+ * fix(index.d.ts): extract `PipelineStage` into separate file #11368 [Uzlopak](https://github.com/Uzlopak)
+ * fix(index.d.ts): fix $search highlight path option type #11373 [lmX2015](https://github.com/lmX2015)
+ * docs: update changelog file to CHANGELOG.md #11365 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: fix broken links #11388 #11377 [saibbyweb](https://github.com/saibbyweb)
+ * docs: remove double determiners in connections docs #11340 [Erma32](https://github.com/Erma32)
+
 6.2.1 / 2022-02-07
 ==================
  * perf: improve performance especially of validate and clone #11298 [Uzlopak](https://github.com/Uzlopak)

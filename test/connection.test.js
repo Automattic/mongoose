@@ -12,26 +12,9 @@ const assert = require('assert');
 const mongodb = require('mongodb');
 const MongooseError = require('../lib/error/index');
 
-const Server = require('./connection_server');
-const server = new Server('mongod', {
-  bind_ip: '127.0.0.1',
-  port: 27000,
-  dbpath: './data/db/27000'
-});
-
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
-
-const uri = 'mongodb://localhost:27017/mongoose_test';
-
-before(function() {
-  return server.purge();
-});
-
-after(function() {
-  this.timeout(15000);
-  return server.stop();
-});
+const uri = start.uri;
 
 /**
  * Test.
@@ -42,7 +25,7 @@ describe('connections:', function() {
 
   describe('openUri (gh-5304)', function() {
     it('with mongoose.createConnection()', function() {
-      const conn = mongoose.createConnection('mongodb://localhost/mongoosetest');
+      const conn = mongoose.createConnection('mongodb://127.0.0.1/mongoosetest');
       assert.equal(conn.constructor.name, 'NativeConnection');
 
       const Test = conn.model('Test', new Schema({ name: String }));
@@ -53,7 +36,7 @@ describe('connections:', function() {
       return conn.asPromise().
         then(function(conn) {
           assert.equal(conn.constructor.name, 'NativeConnection');
-          assert.equal(conn.host, 'localhost');
+          assert.equal(conn.host, '127.0.0.1');
           assert.equal(conn.port, 27017);
           assert.equal(conn.name, 'mongoosetest');
 
@@ -65,7 +48,7 @@ describe('connections:', function() {
     });
 
     it('with autoIndex (gh-5423)', async function() {
-      const conn = await mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
+      const conn = await mongoose.createConnection(start.uri, {
         autoIndex: false
       }).asPromise();
 
@@ -126,7 +109,7 @@ describe('connections:', function() {
 
     it('throws helpful error with legacy syntax (gh-6756)', function() {
       assert.throws(function() {
-        mongoose.createConnection('localhost', 'dbname', 27017);
+        mongoose.createConnection('127.0.0.1', 'dbname', 27017);
       }, /mongoosejs\.com.*connections\.html/);
     });
 
@@ -139,7 +122,7 @@ describe('connections:', function() {
     it('resolving with q (gh-5714)', async function() {
       const bootMongo = Q.defer();
 
-      const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
+      const conn = mongoose.createConnection(start.uri);
 
       conn.on('connected', function() {
         bootMongo.resolve(this);
@@ -150,8 +133,8 @@ describe('connections:', function() {
     });
 
     it('connection plugins (gh-7378)', function() {
-      const conn1 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
-      const conn2 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
+      const conn1 = mongoose.createConnection(start.uri);
+      const conn2 = mongoose.createConnection(start.uri);
 
       const called = [];
       conn1.plugin(schema => called.push(schema));
@@ -170,7 +153,7 @@ describe('connections:', function() {
     let conn;
 
     before(function() {
-      conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest_2');
+      conn = mongoose.createConnection(start.uri2);
       return conn;
     });
 
@@ -362,7 +345,7 @@ describe('connections:', function() {
 
   it('force close (gh-5664)', function(done) {
     const opts = {};
-    const db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    const db = mongoose.createConnection(start.uri, opts);
     const coll = db.collection('Test');
     db.asPromise().then(function() {
       setTimeout(function() {
@@ -379,7 +362,7 @@ describe('connections:', function() {
 
   it('force close with connection created after close (gh-5664)', function(done) {
     const opts = {};
-    const db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    const db = mongoose.createConnection(start.uri, opts);
     db.asPromise().then(function() {
       setTimeout(function() {
         let threw = false;
@@ -401,27 +384,27 @@ describe('connections:', function() {
 
   it('bufferCommands (gh-5720)', function() {
     let opts = { bufferCommands: false };
-    let db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    let db = mongoose.createConnection(start.uri, opts);
 
     let M = db.model('gh5720', new Schema({}));
     assert.ok(!M.collection._shouldBufferCommands());
     db.close();
 
     opts = { bufferCommands: true };
-    db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    db = mongoose.createConnection(start.uri, opts);
     M = db.model('gh5720', new Schema({}, { bufferCommands: false }));
     assert.ok(!M.collection._shouldBufferCommands());
     db.close();
 
     opts = { bufferCommands: true };
-    db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    db = mongoose.createConnection(start.uri, opts);
     M = db.model('gh5720', new Schema({}));
     assert.ok(M.collection._shouldBufferCommands());
 
     db = mongoose.createConnection();
     M = db.model('gh5720', new Schema({}));
     opts = { bufferCommands: false };
-    db.openUri('mongodb://localhost:27017/test', opts);
+    db.openUri(start.uri, opts);
     assert.ok(!M.collection._shouldBufferCommands());
 
     return M.findOne().then(() => assert.ok(false), err => assert.ok(err.message.includes('initial connection'))).
@@ -431,7 +414,7 @@ describe('connections:', function() {
   it('dbName option (gh-6106)', function() {
     const opts = { dbName: 'bacon' };
     return mongoose.
-      createConnection('mongodb://localhost:27017/test', opts).
+      createConnection(start.uri, opts).
       asPromise().
       then(db => {
         assert.equal(db.name, 'bacon');
@@ -440,7 +423,7 @@ describe('connections:', function() {
   });
 
   it('uses default database in uri if options.dbName is not provided', function() {
-    return mongoose.createConnection('mongodb://localhost:27017/default-db-name').
+    return mongoose.createConnection('mongodb://127.0.0.1:27017/default-db-name').
       asPromise().
       then(db => {
         assert.equal(db.name, 'default-db-name');
@@ -449,7 +432,7 @@ describe('connections:', function() {
   });
 
   it('startSession() (gh-6653)', function() {
-    const conn = mongoose.createConnection('mongodb://localhost:27017/test');
+    const conn = mongoose.createConnection(start.uri);
 
     let lastUse;
     let session;
@@ -496,7 +479,7 @@ describe('connections:', function() {
 
   describe('connection pool sharing: ', function() {
     it('works', async function() {
-      const db = mongoose.createConnection('mongodb://localhost:27017/mongoose1');
+      const db = mongoose.createConnection(start.uri);
 
       const db2 = db.useDb('mongoose2');
 
@@ -731,7 +714,7 @@ describe('connections:', function() {
     describe('when using standard authentication', function() {
       describe('when username and password are undefined', function() {
         it('should return false', function() {
-          const db = mongoose.createConnection('mongodb://localhost:27017/fake', {});
+          const db = mongoose.createConnection(start.uri, {});
 
           assert.equal(db.shouldAuthenticate(), false);
 
@@ -740,7 +723,7 @@ describe('connections:', function() {
       });
       describe('when username and password are empty strings', function() {
         it('should return false', function() {
-          const db = mongoose.createConnection('mongodb://localhost:27017/fake', {
+          const db = mongoose.createConnection(start.uri, {
             user: '',
             pass: ''
           });
@@ -753,7 +736,7 @@ describe('connections:', function() {
       });
       describe('when both username and password are defined', function() {
         it('should return true', function() {
-          const db = mongoose.createConnection('mongodb://localhost:27017/fake', {
+          const db = mongoose.createConnection(start.uri, {
             user: 'user',
             pass: 'pass'
           });
@@ -768,7 +751,7 @@ describe('connections:', function() {
     describe('when using MONGODB-X509 authentication', function() {
       describe('when username and password are undefined', function() {
         it('should return false', function() {
-          const db = mongoose.createConnection('mongodb://localhost:27017/fake', {});
+          const db = mongoose.createConnection(start.uri, {});
           db.on('error', function() {
           });
 
@@ -779,7 +762,7 @@ describe('connections:', function() {
       });
       describe('when only username is defined', function() {
         it('should return false', function() {
-          const db = mongoose.createConnection('mongodb://localhost:27017/fake', {
+          const db = mongoose.createConnection(start.uri, {
             user: 'user',
             auth: { authMechanism: 'MONGODB-X509' }
           });
@@ -791,7 +774,7 @@ describe('connections:', function() {
       });
       describe('when both username and password are defined', function() {
         it('should return false', function() {
-          const db = mongoose.createConnection('mongodb://localhost:27017/fake', {
+          const db = mongoose.createConnection(start.uri, {
             user: 'user',
             pass: 'pass',
             auth: { authMechanism: 'MONGODB-X509' }
@@ -808,7 +791,7 @@ describe('connections:', function() {
 
   describe('passing a function into createConnection', function() {
     it('should store the name of the function (gh-6517)', function() {
-      const conn = mongoose.createConnection('mongodb://localhost:27017/gh6517');
+      const conn = mongoose.createConnection(start.uri);
       const schema = new Schema({ name: String });
       class Person extends mongoose.Model {}
       conn.model(Person, schema);
@@ -817,7 +800,7 @@ describe('connections:', function() {
   });
 
   it('deleteModel()', function() {
-    const conn = mongoose.createConnection('mongodb://localhost:27017/gh6813');
+    const conn = mongoose.createConnection(start.uri);
 
     let Model = conn.model('gh6813', new Schema({ name: String }));
 
@@ -859,7 +842,7 @@ describe('connections:', function() {
     const opts = {
       replicaSet: process.env.REPLICA_SET
     };
-    const conn = await mongoose.createConnection('mongodb://localhost:27017/gh8425', opts);
+    const conn = await mongoose.createConnection(start.uri, opts);
 
     const Model = conn.model('Test', Schema({ name: String }));
     await Model.create({ name: 'test' });
@@ -882,14 +865,14 @@ describe('connections:', function() {
   });
 
   it('useDB inherits config from default connection (gh-8267)', async function() {
-    await mongoose.connect('mongodb://localhost:27017/gh8267-0', { sanitizeFilter: true });
+    await mongoose.connect(start.uri, { sanitizeFilter: true });
 
     const db2 = mongoose.connection.useDb('gh8267-1');
     assert.equal(db2.config.sanitizeFilter, true);
   });
 
   it('allows setting client on a disconnected connection (gh-9164)', async function() {
-    const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/mongoose_test');
+    const client = await mongodb.MongoClient.connect(start.uri);
     const conn = mongoose.createConnection().setClient(client);
 
     assert.equal(conn.readyState, 1);
@@ -902,7 +885,7 @@ describe('connections:', function() {
   it('connection.asPromise() resolves to a connection instance (gh-9496)', async function() {
     const m = new mongoose.Mongoose();
 
-    m.connect('mongodb://localhost:27017/test_gh9496');
+    m.connect(start.uri);
     const conn = await m.connection.asPromise();
 
     assert.ok(conn instanceof m.Connection);
@@ -956,7 +939,7 @@ describe('connections:', function() {
     await disconnect();
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    const errorOnConnect = await connect('mongodb://localhost:27017/test_gh9597').then(() => null, err => err);
+    const errorOnConnect = await connect(start.uri).then(() => null, err => err);
     assert.ifError(errorOnConnect);
 
     const errorOnDisconnect = await disconnect().then(() => null, err => err);
@@ -966,8 +949,7 @@ describe('connections:', function() {
   describe('when connecting with a secondary read preference(gh-9374)', function() {
     describe('mongoose.connect', function() {
       it('forces autoIndex & autoCreate to be false if read preference is secondary or secondaryPreferred', async function() {
-        const secondaryURI =
-                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
+        const secondaryURI = start.uri + '?readPreference=secondary';
         const m = new mongoose.Mongoose();
         await m.connect(secondaryURI);
 
@@ -981,8 +963,7 @@ describe('connections:', function() {
       });
 
       it('throws if options try to set autoIndex to true', function() {
-        const secondaryURI =
-                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
+        const secondaryURI = start.uri + '/test_gh9374_1?readPreference=secondary';
         const opts = {
           autoIndex: true
         };
@@ -999,8 +980,7 @@ describe('connections:', function() {
       });
 
       it('throws if options.config.autoIndex is true, even if options.autoIndex is false', function() {
-        const secondaryURI =
-                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
+        const secondaryURI = start.uri + '?readPreference=secondary';
         const opts = {
           autoIndex: false,
           config: {
@@ -1020,10 +1000,8 @@ describe('connections:', function() {
 
     describe('mongoose.createConnection', function() {
       it('forces autoIndex & autoCreate to be false if read preference is secondary or secondaryPreferred (gh-9374)', function() {
-        const secondaryURI =
-                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
-        const secondaryPrefURI =
-                    'mongodb://localhost:27017/test_gh9374_2?readPreference=secondaryPreferred';
+        const secondaryURI = start.uri + '?readPreference=secondary';
+        const secondaryPrefURI = start.uri + '?readPreference=secondaryPreferred';
 
         const conn = new mongoose.createConnection(secondaryURI);
 
@@ -1037,8 +1015,7 @@ describe('connections:', function() {
       });
 
       it('throws if options try to set autoIndex to true', function() {
-        const secondaryURI =
-                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
+        const secondaryURI = start.uri + '?readPreference=secondary';
         const opts = {
           autoIndex: true
         };
@@ -1056,8 +1033,7 @@ describe('connections:', function() {
       });
 
       it('throws if options.config.autoIndex is true, even if options.autoIndex is false', function() {
-        const secondaryURI =
-                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
+        const secondaryURI = start.uri + '?readPreference=secondary';
         const opts = {
           autoIndex: false,
           config: {
@@ -1096,7 +1072,7 @@ describe('connections:', function() {
     let connection;
     this.beforeEach(async() => {
       const mongooseInstance = new mongoose.Mongoose();
-      connection = mongooseInstance.createConnection('mongodb://localhost:27017/connection_sync_indexes_test');
+      connection = mongooseInstance.createConnection(start.uri);
     });
     this.afterEach(async() => {
       await connection.dropDatabase();
@@ -1312,7 +1288,7 @@ describe('connections:', function() {
 
     it('mongoose.syncIndexes(...) accepts `continueOnError`', async() => {
       const m = new mongoose.Mongoose();
-      await m.connect('mongodb://localhost:27017/connection_sync_indexes_test');
+      await m.connect(start.uri);
 
       // Arrange
       const buildingSchema = new Schema({ name: String }, { autoIndex: false });

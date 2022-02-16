@@ -21,6 +21,7 @@
 
 6.2.0 / 2022-02-02
 ==================
+ * feat: upgrade MongoDB driver to 4.3.1
  * feat(connection+mongoose): add support for continueOnError for syncIndexes #11266 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
  * feat(query): cast literals in `$expr` where possible #10663
  * feat(schema+mongoose): add pluginTags to allow applying global plugins to only schemas with matching tags #9780

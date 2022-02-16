@@ -1,6 +1,7 @@
 'use strict';
 const assert = require('assert');
 const mongoose = require('../../');
+const start = require('../common');
 
 const Promise = global.Promise || require('bluebird');
 
@@ -9,7 +10,7 @@ describe('validation docs', function() {
   const Schema = mongoose.Schema;
 
   before(function() {
-    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test', {
+    db = mongoose.createConnection(start.uri, {
       minPoolSize: 1,
       maxPoolSize: 1
     });

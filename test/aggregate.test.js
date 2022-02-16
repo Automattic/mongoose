@@ -458,6 +458,18 @@ describe('aggregate: ', function() {
     });
 
     describe('addFields', function() {
+      it('should throw if passed a non object', function() {
+        const aggregate = new Aggregate();
+        assert.throws(() => {aggregate.addFields('invalid');}, /Invalid addFields\(\) argument\. Must be an object/);
+      });
+      it('should throw if passed null', function() {
+        const aggregate = new Aggregate();
+        assert.throws(() => {aggregate.addFields(null);}, /Invalid addFields\(\) argument\. Must be an object/);
+      });
+      it('should throw if passed an Array', function() {
+        const aggregate = new Aggregate();
+        assert.throws(() => {aggregate.addFields([]);}, /Invalid addFields\(\) argument\. Must be an object/);
+      });
       it('(object)', function() {
         const aggregate = new Aggregate();
 
@@ -1168,7 +1180,7 @@ describe('aggregate: ', function() {
         return MyModel.aggregate([{ $sort: { name: 1 } }]).
           cursor().
           eachAsync(checkDoc, { parallel: 2 }).then(function() {
-            assert.ok(Date.now() - startedAt[1] >= 100);
+            assert.ok(Date.now() - startedAt[1] >= 100, Date.now() - startedAt[1]);
             assert.equal(startedAt.length, 2);
             assert.ok(startedAt[1] - startedAt[0] < 50, `${startedAt[1] - startedAt[0]}`);
             assert.deepEqual(names.sort(), expectedNames);

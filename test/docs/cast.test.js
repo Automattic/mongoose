@@ -13,7 +13,7 @@ describe('Cast Tutorial', function() {
     const schema = new mongoose.Schema({ name: String, age: Number });
     Character = mongoose.model('Character', schema);
 
-    await mongoose.connect('mongodb://localhost:27017/mongoose');
+    await mongoose.connect(start.uri);
 
     await Character.deleteMany({});
     await Character.create({

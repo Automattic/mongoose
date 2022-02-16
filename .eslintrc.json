@@ -6,6 +6,7 @@
         "docs",
         "tools",
         "dist",
+        "website.js",
         "test/files/*",
         "benchmarks"
     ],
@@ -22,6 +23,8 @@
                 "@typescript-eslint"
             ],
             "rules": {
+                "@typescript-eslint/triple-slash-reference": "off",
+                "spaced-comment": ["error", "always", { "markers": ["/"] }],
                 "@typescript-eslint/no-explicit-any": "off",
                 "@typescript-eslint/ban-types": "off",
                 "@typescript-eslint/no-unused-vars": "off",

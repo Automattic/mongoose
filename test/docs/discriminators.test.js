@@ -2,6 +2,7 @@
 
 const assert = require('assert');
 const mongoose = require('../../');
+const start = require('../common');
 
 const Schema = mongoose.Schema;
 
@@ -12,7 +13,7 @@ describe('discriminator docs', function() {
   let db;
 
   before(function() {
-    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+    db = mongoose.createConnection(start.uri);
 
     const eventSchema = new mongoose.Schema({ time: Date });
     Event = db.model('_event', eventSchema);

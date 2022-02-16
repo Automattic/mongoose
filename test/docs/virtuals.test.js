@@ -10,7 +10,7 @@ const Schema = mongoose.Schema;
 
 describe('Virtuals', function() {
   before(async function() {
-    await mongoose.connect('mongodb://localhost:27017/test');
+    await mongoose.connect(start.uri);
   });
 
   beforeEach(function() {

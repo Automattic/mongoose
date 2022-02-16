@@ -1,14 +1,15 @@
 'use strict';
-const PromiseProvider = require('../../lib/promise_provider');
+
 const assert = require('assert');
 const mongoose = require('../../');
+const start = require('../common');
 
 describe('promises docs', function () {
   let Band;
   let db;
 
   before(function (done) {
-    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+    db = mongoose.createConnection(start.uri);
 
     Band = db.model('band-promises', {name: String, members: [String]});
 

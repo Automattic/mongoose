@@ -10,7 +10,7 @@ describe('Tutorial: findOneAndUpdate()', function() {
   let Character;
 
   before(async function() {
-    await mongoose.connect('mongodb://localhost:27017/mongoose');
+    await mongoose.connect(start.uri);
 
     await mongoose.connection.dropDatabase();
   });

@@ -11,6 +11,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [The `asPromise()` Method for Connections](#the-aspromise-method-for-connections)
 * [`mongoose.connect()` Returns a Promise](#mongoose-connect-returns-a-promise)
 * [Duplicate Query Execution](#duplicate-query-execution)
+* [`Model.exists()` Returns a lean document instead of Boolean](#model-exists-returns-a-lean-document-instead-of-boolean)
 * [`strictQuery` is now equal to `strict` by default](#strictquery-is-removed-and-replaced-by-strict)
 * [MongoError is now MongoServerError](#mongoerror-is-now-mongoservererror)
 * [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)
@@ -114,6 +115,17 @@ await Model.find({}, function(err, result) {});
 const q = Model.find();
 await q;
 await q.clone(); // Can `clone()` the query to allow executing the query again
+```
+
+<h3 id="model-exists-returns-a-lean-document-instead-of-boolean"><a href="#model-exists-returns-a-lean-document-instead-of-boolean">Model.exists(...) now returns a lean document instead of boolean</a></h3>
+
+```js
+// in Mongoose 5.x, `existingUser` used to be a boolean
+// now `existingUser` will be either `{ _id: ObjectId(...) }` or `null`.
+const existingUser = await User.exists({ name: 'John' });
+if (existingUser) {
+  console.log(existingUser._id); 
+}
 ```
 
 <h3 id="strictquery-is-removed-and-replaced-by-strict"><a href="#strictquery-is-removed-and-replaced-by-strict">`strictQuery` is now equal to `strict` by default</a></h3>

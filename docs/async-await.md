@@ -136,7 +136,7 @@ async function observePromise() {
 // By contrast, the value we receive when we try to observe the same Query more than 
 // once is different every time.  The Query is re-executing.
 async function observeQuery() {
-  const query = User.findOne({firstname: 'leroy', lastName: 'jenkins'});
+  const query = User.findOne({firstName: 'leroy', lastName: 'jenkins'});
 
   console.log(isPromise(query));  //false
 
@@ -148,4 +148,4 @@ async function observeQuery() {
 
 You are most likely to accidentally re-execute queries in this way when mixing callbacks with async/await.
  This is never necessary and should be avoided.
- If you need a Query to return a fully-fleged promise instead of a thenable, you can use [Query#exec()](./api/query.html#query_Query-exec).
+ If you need a Query to return a fully-fledged promise instead of a thenable, you can use [Query#exec()](./api/query.html#query_Query-exec).

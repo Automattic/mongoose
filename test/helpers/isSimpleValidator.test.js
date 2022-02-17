@@ -15,13 +15,13 @@ describe('isSimpleValidator', function() {
     assert.ok(isSimpleValidator({ a: true }));
   });
   it('object with one simple array attribute', function() {
-    assert.ok(isSimpleValidator({ a: [1] }));
-    assert.ok(isSimpleValidator({ a: [1n] }));
-    assert.ok(isSimpleValidator({ a: ['primitive'] }));
-    assert.ok(isSimpleValidator({ a: ['primitive'] }));
-    assert.ok(isSimpleValidator({ a: ['primitive', 'primitive'] }));
-    assert.ok(isSimpleValidator({ a: [new Date()] }));
-    assert.ok(isSimpleValidator({ a: [true] }));
+    assert.ok(!isSimpleValidator({ a: [1] }));
+    assert.ok(!isSimpleValidator({ a: [1n] }));
+    assert.ok(!isSimpleValidator({ a: ['primitive'] }));
+    assert.ok(!isSimpleValidator({ a: ['primitive'] }));
+    assert.ok(!isSimpleValidator({ a: ['primitive', 'primitive'] }));
+    assert.ok(!isSimpleValidator({ a: [new Date()] }));
+    assert.ok(!isSimpleValidator({ a: [true] }));
   });
   it('object with some native objects', function() {
     assert.ok(!isSimpleValidator({ a: /a/g }));
@@ -33,7 +33,7 @@ describe('isSimpleValidator', function() {
     assert.ok(!isSimpleValidator({ a: { b: 1 } }));
   });
   it('object with one attribute of type MongooseDocumentArray', function() {
-    assert.ok(isSimpleValidator({ a: new MongooseDocumentArray(['a']) }));
+    assert.ok(!isSimpleValidator({ a: new MongooseDocumentArray(['a']) }));
     assert.ok(!isSimpleValidator({ a: new MongooseDocumentArray([{}]) }));
   });
 });

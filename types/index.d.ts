@@ -89,10 +89,11 @@ declare module 'mongoose' {
 
   /** An array containing all models associated with this Mongoose instance. */
   export const models: Models;
+
   /** Creates a Connection instance. */
+  export function createConnection(uri: string, options: ConnectOptions, callback: Callback<Connection>): void;
   export function createConnection(uri: string, options?: ConnectOptions): Connection;
   export function createConnection(): Connection;
-  export function createConnection(uri: string, options: ConnectOptions, callback: Callback<Connection>): void;
 
   /**
    * Removes the model named `name` from the default connection, if it exists.

@@ -79,14 +79,14 @@ declare module 'mongoose' {
        * Helper for `dropCollection()`. Will delete the given collection, including
        * all documents and indexes.
        */
-      dropCollection(collection: string, cb: CallbackWithoutResult): void;
+      dropCollection(collection: string, callback: CallbackWithoutResult): void;
       dropCollection(collection: string): Promise<void>;
 
       /**
        * Helper for `dropDatabase()`. Deletes the given database, including all
        * collections, documents, and indexes.
        */
-      dropDatabase(cb: CallbackWithoutResult): void;
+      dropDatabase(callback: CallbackWithoutResult): void;
       dropDatabase(): Promise<void>;
 
       /** Gets the value of the option `key`. */

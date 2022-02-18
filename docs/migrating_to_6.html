@@ -33,6 +33,7 @@ you should be aware of when migrating from Mongoose 5.x to Mongoose 6.x.</p>
 <li><a href="#the-aspromise-method-for-connections">The <code>asPromise()</code> Method for Connections</a></li>
 <li><a href="#mongoose-connect-returns-a-promise"><code>mongoose.connect()</code> Returns a Promise</a></li>
 <li><a href="#duplicate-query-execution">Duplicate Query Execution</a></li>
+<li><a href="#model-exists-returns-a-lean-document-instead-of-boolean"><code>Model.exists()</code> Returns a lean document instead of Boolean</a></li>
 <li><a href="#strictquery-is-removed-and-replaced-by-strict"><code>strictQuery</code> is now equal to <code>strict</code> by default</a></li>
 <li><a href="#mongoerror-is-now-mongoservererror">MongoError is now MongoServerError</a></li>
 <li><a href="#clone-discriminator-schemas-by-default">Clone Discriminator Schemas By Default</a></li>
@@ -122,6 +123,15 @@ mongoose.set(<span class="hljs-string">'useFindAndModify'</span>, <span class="h
 <span class="hljs-keyword">const</span> q = Model.find();
 <span class="hljs-keyword">await</span> q;
 <span class="hljs-keyword">await</span> q.clone(); <span class="hljs-comment">// Can `clone()` the query to allow executing the query again</span>
+</code></pre>
+<h3 id="model-exists-returns-a-lean-document-instead-of-boolean"><a href="#model-exists-returns-a-lean-document-instead-of-boolean">Model.exists(...) now returns a lean document instead of boolean</a></h3>
+
+<pre><code class="language-js"><span class="hljs-comment">// in Mongoose 5.x, `existingUser` used to be a boolean</span>
+<span class="hljs-comment">// now `existingUser` will be either `{ _id: ObjectId(...) }` or `null`.</span>
+<span class="hljs-keyword">const</span> existingUser = <span class="hljs-keyword">await</span> User.exists({ <span class="hljs-attr">name</span>: <span class="hljs-string">'John'</span> });
+<span class="hljs-keyword">if</span> (existingUser) {
+  <span class="hljs-built_in">console</span>.log(existingUser._id); 
+}
 </code></pre>
 <h3 id="strictquery-is-removed-and-replaced-by-strict"><a href="#strictquery-is-removed-and-replaced-by-strict">`strictQuery` is now equal to `strict` by default</a></h3>
 

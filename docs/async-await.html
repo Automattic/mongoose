@@ -154,7 +154,7 @@ Because Queries are also <em>thenables</em>, we can interact with a Query using 
 <span class="hljs-comment">// By contrast, the value we receive when we try to observe the same Query more than </span>
 <span class="hljs-comment">// once is different every time.  The Query is re-executing.</span>
 <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">observeQuery</span>(<span class="hljs-params"></span>) </span>{
-  <span class="hljs-keyword">const</span> query = User.findOne({<span class="hljs-attr">firstname</span>: <span class="hljs-string">'leroy'</span>, <span class="hljs-attr">lastName</span>: <span class="hljs-string">'jenkins'</span>});
+  <span class="hljs-keyword">const</span> query = User.findOne({<span class="hljs-attr">firstName</span>: <span class="hljs-string">'leroy'</span>, <span class="hljs-attr">lastName</span>: <span class="hljs-string">'jenkins'</span>});
 
   <span class="hljs-built_in">console</span>.log(isPromise(query));  <span class="hljs-comment">//false</span>
 
@@ -165,7 +165,7 @@ Because Queries are also <em>thenables</em>, we can interact with a Query using 
 </code></pre>
 <p>You are most likely to accidentally re-execute queries in this way when mixing callbacks with async/await.
  This is never necessary and should be avoided.
- If you need a Query to return a fully-fleged promise instead of a thenable, you can use <a href="./api/query.html#query_Query-exec">Query#exec()</a>.</p>
+ If you need a Query to return a fully-fledged promise instead of a thenable, you can use <a href="./api/query.html#query_Query-exec">Query#exec()</a>.</p>
 </div></div><script type="text/javascript">var xhr = new XMLHttpRequest();
 xhr.open('POST', 'https://g0a3nbw0xa.execute-api.us-east-1.amazonaws.com/prod/track', true);
 xhr.setRequestHeader('Content-Type', 'application/json');

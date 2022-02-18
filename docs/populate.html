@@ -69,6 +69,7 @@ user and have a good reason for doing so.</p>
   <li><a href="#dynamic-ref">Dynamic References via `refPath`</a></li>
   <li><a href="#populate-virtuals">Populate Virtuals</a></li>
   <li><a href="#count">Populate Virtuals: The Count Option</a></li>
+  <li><a href="#match">Populate Virtuals: The Match Option</a></li>
   <li><a href="#populating-maps">Populating Maps</a></li>
   <li><a href="#populate-middleware">Populate in Middleware</a></li>
   <li><a href="#populating-multiple-paths-middleware">Populating Multiple Paths in Middleware</a></li>
@@ -600,6 +601,26 @@ BandSchema.virtual(<span class="hljs-string">'numMembers'</span>, {
 <span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> Band.findOne({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Motley Crue'</span> }).
   populate(<span class="hljs-string">'numMembers'</span>);
 doc.numMembers; <span class="hljs-comment">// 2</span>
+</code></pre>
+<h3 id="match"><a href="#match">Populate Virtuals: The Match Option</a></h3>
+
+<p>Another option for Populate virtuals is <code>match</code>. This option add an extra match
+condition to <code>populate()</code> :</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Same example as 'Populate Virtuals' section</span>
+AuthorSchema.virtual(<span class="hljs-string">'posts'</span>, {
+  <span class="hljs-attr">ref</span>: <span class="hljs-string">'BlogPost'</span>,
+  <span class="hljs-attr">localField</span>: <span class="hljs-string">'_id'</span>,
+  <span class="hljs-attr">foreignField</span>: <span class="hljs-string">'author'</span>,
+  <span class="hljs-attr">match</span>: { <span class="hljs-attr">archived</span>: <span class="hljs-literal">false</span> } <span class="hljs-comment">// match option with basic query selector</span>
+});
+
+<span class="hljs-keyword">const</span> Author = mongoose.model(<span class="hljs-string">'Author'</span>, AuthorSchema, <span class="hljs-string">'Author'</span>);
+<span class="hljs-keyword">const</span> BlogPost = mongoose.model(<span class="hljs-string">'BlogPost'</span>, BlogPostSchema, <span class="hljs-string">'BlogPost'</span>);
+
+<span class="hljs-comment">// After population</span>
+<span class="hljs-keyword">const</span> author = <span class="hljs-keyword">await</span> Author.findOne().populate(<span class="hljs-string">'posts'</span>);
+
+author.posts <span class="hljs-comment">// Array of not `archived` posts</span>
 </code></pre>
 <h3 id="populating-maps"><a href="#populating-maps">Populating Maps</a></h3>
 

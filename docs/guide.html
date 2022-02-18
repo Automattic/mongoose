@@ -738,7 +738,7 @@ will interpret it as a type declaration.</p>
 the &#39;type&#39; property is important. If you want to control which key mongoose
 uses to find type declarations, set the &#39;typeKey&#39; schema option.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-comment">// Mongoose interpets this as 'loc is an object with 2 keys, type and coordinates'</span>
+  <span class="hljs-comment">// Mongoose interprets this as 'loc is an object with 2 keys, type and coordinates'</span>
   <span class="hljs-attr">loc</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">coordinates</span>: [<span class="hljs-built_in">Number</span>] },
   <span class="hljs-comment">// Mongoose interprets this as 'name is a String'</span>
   <span class="hljs-attr">name</span>: { <span class="hljs-attr">$type</span>: <span class="hljs-built_in">String</span> }

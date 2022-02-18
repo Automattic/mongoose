@@ -1429,6 +1429,8 @@ doc.save() <span class="hljs-comment">// changes to mixed.type are now persisted
 <span class="method-type">&laquo;Object&raquo;</span> Options for the population query (sort, etc)</p>
 </li><ul style="margin-top: 0.5em"><li>[options.path=null]
 <span class="method-type">&laquo;String&raquo;</span> The path to populate.</p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.populate=null]
+<span class="method-type">&laquo;string|PopulateOptions&raquo;</span> Recursively populate paths in the populated documents. See <a href="/docs/populate.html#deep-populate">deep populate docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.retainNullValues=false]
 <span class="method-type">&laquo;boolean&raquo;</span> by default, Mongoose removes null and undefined values from populated arrays. Use this option to make <code>populate()</code> retain <code>null</code> and <code>undefined</code> array entries.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.getters=false]
@@ -2753,6 +2755,8 @@ promise.then(<span class="hljs-function"><span class="hljs-keyword">function</sp
 <span class="method-type">&laquo;Object|String&raquo;</span> Either the paths to populate or an object specifying all parameters</p>
 </li><ul style="margin-top: 0.5em"><li>[options.path=null]
 <span class="method-type">&laquo;string&raquo;</span> The path to populate.</p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.populate=null]
+<span class="method-type">&laquo;string|PopulateOptions&raquo;</span> Recursively populate paths in the populated documents. See <a href="/docs/populate.html#deep-populate">deep populate docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.retainNullValues=false]
 <span class="method-type">&laquo;boolean&raquo;</span> By default, Mongoose removes null and undefined values from populated arrays. Use this option to make <code>populate()</code> retain <code>null</code> and <code>undefined</code> array entries.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.getters=false]

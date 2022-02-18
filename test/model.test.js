@@ -6128,7 +6128,7 @@ describe('Model', function() {
         counter();
       });
     });
-    describe('Model.syncIndexes()', () => {
+    describe.only('Model.syncIndexes()', () => {
       afterEach(() => db.dropDatabase());
       it('adds indexes to the collection', async() => {
         // Arrange
@@ -6350,6 +6350,10 @@ describe('Model', function() {
         const actorIdIndex = indexes.find(index => index.name === 'actorId_1');
         assert.ok(actorIdIndex);
       });
+      it('syncing main model\'s indexes should not drop the discriminators indexes', () => {
+
+      });
+      it('syncing one discriminator\'s indexes should not drop the main model\'s indexes');
     });
 
     it('using `new db.model()()` (gh-6698)', function() {

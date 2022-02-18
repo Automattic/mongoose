@@ -6350,9 +6350,7 @@ describe('Model', function() {
         const actorIdIndex = indexes.find(index => index.name === 'actorId_1');
         assert.ok(actorIdIndex);
       });
-      it('syncing main model\'s indexes should not drop the discriminators indexes', () => {
-
-      });
+      it('syncing main model\'s indexes should not drop the discriminators indexes');
       it('syncing one discriminator\'s indexes should not drop the main model\'s indexes');
     });
 

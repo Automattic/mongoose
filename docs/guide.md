@@ -873,7 +873,7 @@ uses to find type declarations, set the 'typeKey' schema option.
 
 ```javascript
 const schema = new Schema({
-  // Mongoose interpets this as 'loc is an object with 2 keys, type and coordinates'
+  // Mongoose interprets this as 'loc is an object with 2 keys, type and coordinates'
   loc: { type: String, coordinates: [Number] },
   // Mongoose interprets this as 'name is a String'
   name: { $type: String }

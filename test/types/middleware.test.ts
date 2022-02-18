@@ -1,7 +1,11 @@
-import { Schema, model, Model, Document, SaveOptions, Query, Aggregate } from 'mongoose';
-import { expectError } from 'tsd';
+import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument } from 'mongoose';
+import { expectError, expectType } from 'tsd';
 
-const schema: Schema = new Schema({ name: { type: 'String' } });
+interface ITest extends Document {
+  name?: string;
+}
+
+const schema: Schema<ITest> = new Schema<ITest>({ name: { type: 'String' } });
 
 schema.pre<Query<any, any>>('find', async function() {
   console.log('Find', this.getFilter());
@@ -27,10 +31,6 @@ schema.pre('save', function(next, opts: SaveOptions) {
   console.log(opts.session);
   next();
 });
-
-interface ITest extends Document {
-  name?: string;
-}
 
 schema.pre('save', function(next) {
   console.log(this.name);
@@ -69,3 +69,9 @@ schema.pre<Model<ITest>>('insertMany', function(next, docs: Array<ITest>) {
 });
 
 const Test = model<ITest>('Test', schema);
+
+function gh11257(): void {
+  schema.pre('save', { document: true }, function() {
+    expectType<HydratedDocument<ITest>>(this);
+  });
+}

@@ -6330,6 +6330,26 @@ describe('Model', function() {
         await M.syncIndexes();
         assert(await M.syncIndexes(), []);
       });
+
+      it('adding discriminators should not drop the parent model\'s indexes', async() => {
+        // Arrange
+        const eventSchema = new Schema({
+          actorId: { type: Schema.Types.ObjectId, index: true }
+        });
+
+        const Event = db.model('Event', eventSchema);
+
+        Event.discriminator('AEvent', { aField: String });
+        Event.discriminator('BEvent', { bField: String });
+
+        // Act
+        await db.syncIndexes();
+        const indexes = await Event.listIndexes();
+
+        // Assert
+        const actorIdIndex = indexes.find(index => index.name === 'actorId_1');
+        assert.ok(actorIdIndex);
+      });
     });
 
     it('using `new db.model()()` (gh-6698)', function() {

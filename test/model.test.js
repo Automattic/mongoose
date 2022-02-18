@@ -6128,7 +6128,8 @@ describe('Model', function() {
         counter();
       });
     });
-    describe.only('Model.syncIndexes()', () => {
+    describe('Model.syncIndexes()', () => {
+      afterEach(() => db.dropDatabase());
       it('adds indexes to the collection', async() => {
         // Arrange
         const collectionName = generateRandomCollectionName();
@@ -6145,6 +6146,7 @@ describe('Model', function() {
         const indexes = await User.listIndexes();
         assert.deepStrictEqual(indexes.map(index => index.name), ['_id_', 'name_1']);
       });
+
       it('drops indexes that are not present in schema', async() => {
         // Arrange
         const collectionName = generateRandomCollectionName();
@@ -6166,6 +6168,7 @@ describe('Model', function() {
         assert.deepStrictEqual(droppedIndexes, ['age_1']);
         assert.deepStrictEqual(indexesAfterSync.map(index => index.name), ['_id_', 'name_1']);
       });
+
       it('when two different models connect to the same collection, syncIndexes(...) respects the last call', async() => {
         // Arrange
         const collectionName = generateRandomCollectionName();
@@ -6234,6 +6237,7 @@ describe('Model', function() {
         const orderCustomIdIndex = orderIndexes.find(index => index.key.customId === 1);
         assert.strictEqual(orderCustomIdIndex.unique, true);
       });
+
       it('when syncIndexes(...) is called twice with no changes on the model, the second call should not do anything', async() => {
         // Arrange
         const collectionName = generateRandomCollectionName();
@@ -6255,94 +6259,80 @@ describe('Model', function() {
         assert.deepStrictEqual(droppedIndexesFromFirstSync, ['age_1']);
         assert.deepStrictEqual(droppedIndexesFromSecondSync, []);
       });
-    });
 
-    it('syncIndexes() with different key order (gh-8135)', async function() {
-      this.timeout(10000);
+      it('when called with different key order, it treats different order as different indexes (gh-8135)', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          { name: String, age: Number },
+          { autoIndex: false }
+        );
+        userSchema.index({ name: 1, age: -1 });
+        const User = db.model('User', userSchema, collectionName);
+        await User.collection.createIndex({ age: -1, name: 1 });
 
+        // Act
+        const droppedIndexes = await User.syncIndexes();
+        const indexesAfterSync = await User.listIndexes();
 
-      const opts = { autoIndex: false };
-      let schema = new Schema({ name: String, age: Number }, opts);
-      schema.index({ name: 1, age: -1 });
+        // Assert
+        assert.deepStrictEqual(droppedIndexes, ['age_-1_name_1']);
 
-      const coll = 'tests' + random();
-      let M = db.model('Test', schema, coll);
-
-      let dropped = await M.syncIndexes();
-      assert.deepEqual(dropped, []);
-
-      const indexes = await M.listIndexes();
-      assert.deepEqual(indexes.map(i => i.key), [
-        { _id: 1 },
-        { name: 1, age: -1 }
-      ]);
-
-      // New model, same collection, different key order
-      schema = new Schema({ name: String, age: Number }, opts);
-      schema.index({ age: -1, name: 1 });
-      db.deleteModel(/Test/);
-      M = db.model('Test', schema, coll);
-
-      dropped = await M.syncIndexes();
-      assert.deepEqual(dropped, ['name_1_age_-1']);
-
-    });
-
-    it('syncIndexes() with different key order (gh-8559)', async function() {
-      this.timeout(5000);
-
-
-      await db.dropDatabase();
-
-      const opts = { autoIndex: false };
-      let schema = new Schema({ name: String, age: Number }, opts);
-      schema.index({ name: 1, _id: 1 });
-
-      let M = db.model('Test', schema);
-
-      let dropped = await M.syncIndexes();
-      assert.deepEqual(dropped, []);
-
-      // New model, same collection, different key order
-      schema = new Schema({ name: String, age: Number }, opts);
-      schema.index({ name: 1 });
-      db.deleteModel(/Test/);
-      M = db.model('Test', schema);
-
-      dropped = await M.syncIndexes();
-      assert.deepEqual(dropped, ['name_1__id_1']);
-
-    });
-
-    it('syncIndexes() allows overwriting `background` option (gh-8645)', async function() {
-      await db.dropDatabase();
-
-      const opts = { autoIndex: false };
-      const schema = new Schema({ name: String }, opts);
-      schema.index({ name: 1 }, { background: true });
-
-      const M = db.model('Test', schema);
-      await M.syncIndexes({ background: false });
-
-      const indexes = await M.listIndexes();
-      assert.deepEqual(indexes[1].key, { name: 1 });
-      assert.strictEqual(indexes[1].background, false);
-    });
-
-    it('should not drop a text index on .syncIndexes() call (gh-10850)', async function() {
-      const collation = { collation: { locale: 'simple' } };
-      const someSchema = new Schema({
-        title: String,
-        author: String
+        const compoundIndex = indexesAfterSync.find(index => index.key.name === 1 && index.key.age === -1);
+        assert.strictEqual(compoundIndex.name, 'name_1_age_-1');
       });
-      someSchema.index({ title: 1, author: 'text' }, collation);
-      const M = db.model('Some', someSchema);
-      await M.init();
-      await M.syncIndexes();
-      assert(await M.syncIndexes(), []);
+
+      it('syncIndexes(...) compound index including `_id` (gh-8559)', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          { name: String, age: Number },
+          { autoIndex: false }
+        );
+        userSchema.index({ name: 1 });
+        const User = db.model('User', userSchema, collectionName);
+        await User.collection.createIndex({ name: 1, _id: 1 });
+
+        // Act
+        const droppedIndexes = await User.syncIndexes();
+        const indexesAfterSync = await User.listIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedIndexes, ['name_1__id_1']);
+        assert.deepStrictEqual(
+          indexesAfterSync.map(index => index.name),
+          ['_id_', 'name_1']
+        );
+      });
+
+      it('syncIndexes() allows overwriting `background` option (gh-8645)', async function() {
+        const opts = { autoIndex: false };
+        const schema = new Schema({ name: String }, opts);
+        schema.index({ name: 1 }, { background: true });
+
+        const M = db.model('Test', schema);
+        await M.syncIndexes({ background: false });
+
+        const indexes = await M.listIndexes();
+        assert.deepEqual(indexes[1].key, { name: 1 });
+        assert.strictEqual(indexes[1].background, false);
+      });
+
+      it('should not drop a text index on .syncIndexes() call (gh-10850)', async function() {
+        const collation = { collation: { locale: 'simple' } };
+        const someSchema = new Schema({
+          title: String,
+          author: String
+        });
+        someSchema.index({ title: 1, author: 'text' }, collation);
+        const M = db.model('Some', someSchema);
+        await M.init();
+        await M.syncIndexes();
+        assert(await M.syncIndexes(), []);
+      });
     });
 
-    it('using `new db.model()()` (gh-6698)', function(done) {
+    it('using `new db.model()()` (gh-6698)', function() {
       db.model('Test', new Schema({
         name: String
       }));
@@ -6350,8 +6340,6 @@ describe('Model', function() {
       assert.throws(function() {
         new db.model('Test')({ name: 'test' });
       }, /should not be run with `new`/);
-
-      done();
     });
 
     it('throws if non-function passed as callback (gh-6640)', function() {

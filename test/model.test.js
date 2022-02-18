@@ -6128,60 +6128,133 @@ describe('Model', function() {
         counter();
       });
     });
+    describe.only('Model.syncIndexes()', () => {
+      it('adds indexes to the collection', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          { name: { type: String, index: true } },
+          { autoIndex: false }
+        );
+        const User = db.model('User', userSchema, collectionName);
 
-    it('syncIndexes() (gh-6281)', async function() {
-      this.timeout(10000);
+        // Act
+        await User.syncIndexes();
 
+        // Assert
+        const indexes = await User.listIndexes();
+        assert.deepStrictEqual(indexes.map(index => index.name), ['_id_', 'name_1']);
+      });
+      it('drops indexes that are not present in schema', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          {
+            name: { type: String, index: true },
+            age: Number
+          },
+          { autoIndex: false }
+        );
+        const User = db.model('User', userSchema, collectionName);
+        await User.collection.createIndex({ age: 1 });
 
-      const coll = 'tests' + random();
-      let Model = db.model('Test', new Schema({
-        name: { type: String, index: true }
-      }, { autoIndex: false }), coll);
-      let dropped = await Model.syncIndexes();
-      assert.deepEqual(dropped, []);
+        // Act
+        const droppedIndexes = await User.syncIndexes();
+        const indexesAfterSync = await User.listIndexes();
 
-      let indexes = await Model.listIndexes();
-      assert.deepEqual(indexes.map(i => i.key), [
-        { _id: 1 },
-        { name: 1 }
-      ]);
+        // Assert
+        assert.deepStrictEqual(droppedIndexes, ['age_1']);
+        assert.deepStrictEqual(indexesAfterSync.map(index => index.name), ['_id_', 'name_1']);
+      });
+      it('when two different models connect to the same collection, syncIndexes(...) respects the last call', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          {
+            name: { type: String, index: true },
+            age: Number
+          },
+          { autoIndex: false }
+        );
+        const User = db.model('User', userSchema, collectionName);
 
-      // New model, same collection, index on different property
-      db.deleteModel(/Test/);
-      Model = db.model('Test', new Schema({
-        otherName: { type: String, index: true }
-      }, { autoIndex: false }), coll);
+        const orderSchema = new Schema(
+          {
+            totalPrice: { type: Number, index: true }
+          },
+          { autoIndex: false }
+        );
+        const Order = db.model('Order', orderSchema, collectionName);
+        await User.createCollection();
 
-      dropped = await Model.syncIndexes();
-      assert.deepEqual(dropped, ['name_1']);
+        // Act
+        const userIndexesBeforeSync = await User.listIndexes();
+        await User.syncIndexes();
+        const orderIndexesBeforeSync = await Order.listIndexes();
+        const droppedOrderIndexes = await Order.syncIndexes();
 
-      indexes = await Model.listIndexes();
-      assert.deepEqual(indexes.map(i => i.key), [
-        { _id: 1 },
-        { otherName: 1 }
-      ]);
+        // Assert
+        assert.deepStrictEqual(userIndexesBeforeSync.map(index => index.name), ['_id_']);
 
-      // New model, same collection, different options
-      db.deleteModel(/Test/);
-      Model = db.model('Test', new Schema({
-        otherName: { type: String, unique: true }
-      }, { autoIndex: false }), coll);
+        assert.deepStrictEqual(orderIndexesBeforeSync.map(index => index.name), ['_id_', 'name_1']);
+        assert.deepStrictEqual(droppedOrderIndexes, ['name_1']);
+      });
 
-      dropped = await Model.syncIndexes();
-      assert.deepEqual(dropped, ['otherName_1']);
+      it('when two models have the same collection name, same field but different options, syncIndexes(...) respects the last call', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          {
+            customId: { type: String, index: true },
+            age: Number
+          },
+          { autoIndex: false }
+        );
+        const User = db.model('User', userSchema, collectionName);
 
-      indexes = await Model.listIndexes();
-      assert.deepEqual(indexes.map(i => i.key), [
-        { _id: 1 },
-        { otherName: 1 }
-      ]);
+        const orderSchema = new Schema(
+          {
+            customId: { type: String, unique: true }
+          },
+          { autoIndex: false }
+        );
+        const Order = db.model('Order', orderSchema, collectionName);
+        await User.createCollection();
 
-      // Re-run syncIndexes(), shouldn't change anything
-      dropped = await Model.syncIndexes();
-      assert.deepEqual(dropped, []);
+        // Act
+        await User.syncIndexes();
+        const userIndexes = await User.listIndexes();
+        await Order.syncIndexes();
+        const orderIndexes = await Order.listIndexes();
 
-      await Model.collection.drop();
+        // Assert
+        const userCustomIdIndex = userIndexes.find(index => index.key.customId === 1);
+        assert.strictEqual(userCustomIdIndex.unique, undefined);
 
+        const orderCustomIdIndex = orderIndexes.find(index => index.key.customId === 1);
+        assert.strictEqual(orderCustomIdIndex.unique, true);
+      });
+      it('when syncIndexes(...) is called twice with no changes on the model, the second call should not do anything', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          {
+            name: { type: String, index: true },
+            age: Number
+          },
+          { autoIndex: false }
+        );
+        const User = db.model('User', userSchema, collectionName);
+
+        // Act
+        await User.collection.createIndex({ age: 1 });
+        const droppedIndexesFromFirstSync = await User.syncIndexes();
+        const droppedIndexesFromSecondSync = await User.syncIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedIndexesFromFirstSync, ['age_1']);
+        assert.deepStrictEqual(droppedIndexesFromSecondSync, []);
+      });
     });
 
     it('syncIndexes() with different key order (gh-8135)', async function() {
@@ -6281,7 +6354,7 @@ describe('Model', function() {
       done();
     });
 
-    it('throws if non-function passed as callback (gh-6640)', function(done) {
+    it('throws if non-function passed as callback (gh-6640)', function() {
       const Model = db.model('Test', new Schema({
         name: String
       }));
@@ -6291,8 +6364,6 @@ describe('Model', function() {
       assert.throws(function() {
         doc.save({}, {});
       }, /callback must be a function/i);
-
-      done();
     });
 
     it('Throws when saving same doc in parallel w/ promises (gh-6456)', function(done) {
@@ -7704,4 +7775,8 @@ async function delay(ms) {
 
 function isLean(document) {
   return document != null && !(document instanceof mongoose.Document);
+}
+
+function generateRandomCollectionName() {
+  return 'mongoose_test_' + random();
 }

@@ -6641,8 +6641,11 @@ describe('Model', function() {
           [
             { key: { _id: 1 } },
             {
-              unique: true,
-              key: { actorId: 1 }
+              key: { clickedAt: 1 },
+              partialFilterExpression: {
+                productCategory: 'Computers',
+                __t: 'ClickEvent'
+              }
             }
           ]
         );
@@ -6651,15 +6654,15 @@ describe('Model', function() {
           [
             { key: { _id: 1 } },
             {
-              unique: true,
-              key: { actorId: 1 }
-            },
-            {
               key: { clickedAt: 1 },
               partialFilterExpression: {
                 productCategory: 'Computers',
                 __t: 'ClickEvent'
               }
+            },
+            {
+              unique: true,
+              key: { actorId: 1 }
             }
           ]
         );

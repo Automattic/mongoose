@@ -6128,7 +6128,7 @@ describe('Model', function() {
         counter();
       });
     });
-    describe.only('Model.syncIndexes()', () => {
+    describe('Model.syncIndexes()', () => {
       afterEach(() => db.dropDatabase());
       it('adds indexes to the collection', async() => {
         // Arrange
@@ -6646,7 +6646,6 @@ describe('Model', function() {
             }
           ]
         );
-
         assert.deepStrictEqual(
           eventIndexesAfterSyncingEverything.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
           [

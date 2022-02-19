@@ -496,7 +496,7 @@ describe('model', function() {
     });
 
     it('decorated discriminator index with syncIndexes (gh-6347)', async function() {
-      const userSchema = new Schema({}, { discriminatorKey: 'kind' });
+      const userSchema = new Schema({}, { discriminatorKey: 'kind', autoIndex: false });
 
       const User = db.model('User', userSchema);
 

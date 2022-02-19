@@ -6333,17 +6333,20 @@ describe('Model', function() {
 
       it('adding discriminators should not drop the parent model\'s indexes', async() => {
         // Arrange
+        const collectionName = generateRandomCollectionName();
+
         const eventSchema = new Schema({
           actorId: { type: Schema.Types.ObjectId, index: true }
-        });
+        }, { autoIndex: false });
 
-        const Event = db.model('Event', eventSchema);
+        const Event = db.model('Event', eventSchema, collectionName);
 
         Event.discriminator('AEvent', { aField: String });
         Event.discriminator('BEvent', { bField: String });
 
         // Act
         await db.syncIndexes();
+
         const indexes = await Event.listIndexes();
 
         // Assert

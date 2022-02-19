@@ -3978,27 +3978,28 @@ describe('document', function() {
       assert.equal(p.children[0].favorites.color, 'Red');
     });
 
-    it('handles selected nested elements with defaults (gh-4739)', function(done) {
+    it('handles selected nested elements with defaults (gh-4739) (gh-11376)', async function() {
       const userSchema = new Schema({
         preferences: {
           sleep: { type: Boolean, default: false },
           test: { type: Boolean, default: true }
         },
+        arr: [{ test: Number, test2: Number }],
         name: String
       });
 
       const User = db.model('User', userSchema);
 
-      const user = { name: 'test' };
-      User.collection.insertOne(user, function(error) {
-        assert.ifError(error);
-        User.findById(user, { 'preferences.sleep': 1, name: 1 }, function(error, user) {
-          assert.ifError(error);
-          assert.strictEqual(user.preferences.sleep, false);
-          assert.ok(!user.preferences.test);
-          done();
-        });
-      });
+      let user = { name: 'test' };
+      await User.collection.insertOne(user);
+      user = await User.findById(user, { 'preferences.sleep': 1, name: 1 });
+      assert.strictEqual(user.preferences.sleep, false);
+      assert.ok(!user.preferences.test);
+
+      user = await User.findById(user, { 'arr.test': 1 });
+      assert.strictEqual(user.name, undefined);
+      assert.strictEqual(user.toObject().preferences, undefined);
+      assert.deepEqual(user.toObject().arr, []);
     });
 
     it('handles mark valid in subdocs correctly (gh-4778)', function() {

@@ -1,4 +1,4 @@
-import { Schema, Document, Model, connection, model } from 'mongoose';
+import { Schema, Document, Model, Types, connection, model } from 'mongoose';
 import { expectError } from 'tsd';
 
 function conventionalSyntax(): void {
@@ -67,7 +67,7 @@ function tAndDocSyntax(): void {
   const bar = (SomeModel: Model<ITest & Document>) => console.log(SomeModel);
 }
 
-function insertManyTest() {
+async function insertManyTest() {
   interface ITest {
     foo: string;
   }
@@ -81,6 +81,9 @@ function insertManyTest() {
   Test.insertMany([{ foo: 'bar' }]).then(async res => {
     res.length;
   });
+
+  const res = await Test.insertMany([{ foo: 'bar' }], { rawResult: true });
+  const ids: Types.ObjectId[] = Object.values(res.insertedIds);
 }
 
 function schemaStaticsWithoutGenerics() {

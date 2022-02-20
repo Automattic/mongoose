@@ -445,7 +445,7 @@ describe('schema', function() {
       }
       assert.ok(threw);
 
-      let strs = test.path('strings').cast('test');
+      const strs = test.path('strings').cast('test');
       assert.equal(strs.length, 1);
       assert.deepEqual(strs[0].toObject(), ['test']);
 

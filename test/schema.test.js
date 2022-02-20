@@ -424,7 +424,8 @@ describe('schema', function() {
 
     it('array of arrays', function(done) {
       const test = new Schema({
-        nums: [[Number]]
+        nums: [[Number]],
+        strings: [{ type: [String] }]
       });
       let nums = test.path('nums').cast([['1', '2']]);
       assert.equal(nums.length, 1);
@@ -443,6 +444,10 @@ describe('schema', function() {
         assert.ok(error.message.includes('Cast to [[Number]] failed'), error.message);
       }
       assert.ok(threw);
+
+      let strs = test.path('strings').cast('test');
+      assert.equal(strs.length, 1);
+      assert.deepEqual(strs[0].toObject(), ['test']);
 
       done();
     });

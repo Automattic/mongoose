@@ -2718,4 +2718,16 @@ describe('schema', function() {
     assert.equal(schema.path('somethingElse').instance, 'Date');
     delete Date.type;
   });
+  it('setting path with `Mixed` type to an array after number (gh-11417)', async() => {
+    const userSchema = new Schema({ data: {} });
+    const User = db.model('User', userSchema);
+
+    const user = await User.create({ data: 2 });
+    user.set({ data: [] });
+    await user.save();
+    assert.ok(Array.isArray(user.data));
+
+    const foundUser = await User.findOne({ _id: user._id });
+    assert.ok(Array.isArray(foundUser.data));
+  });
 });

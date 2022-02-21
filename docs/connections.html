@@ -281,21 +281,30 @@ mongoose.connect(uri, {
 </code></pre>
 <h3 id="replicaset-hostnames"><a href="#replicaset-hostnames">Replica Set Host Names</a></h3>
 
-<p>MongoDB replica sets rely on being able to reliably figure out the domain name
-for each member. On Linux and OSX, the MongoDB server uses the output of the
-<a href="https://linux.die.net/man/1/hostname"><code>hostname</code> command</a> to figure out the
-domain name to report to the replica set. This can cause confusing errors
-if you&#39;re connecting to a remote MongoDB replica set running on a machine that
-reports its <code>hostname</code> as <code>localhost</code>:</p>
+<p>MongoDB replica sets rely on being able to reliably figure out the domain name for each member. 
+On Linux and OSX, the MongoDB server uses the output of the <a href="https://linux.die.net/man/1/hostname"><code>hostname</code> command</a> to figure out the domain name to report to the replica set.
+This can cause confusing errors if you&#39;re connecting to a remote MongoDB replica set running on a machine that reports its <code>hostname</code> as <code>localhost</code>:</p>
 <pre><code><span class="hljs-comment">// Can get this error even if your connection string doesn't include</span>
 <span class="hljs-comment">// `localhost` if `rs.conf()` reports that one replica set member has</span>
 <span class="hljs-comment">// `localhost` as its host name.</span>
-failed to connect to server [localhost:<span class="hljs-number">27017</span>] on first connect
+<span class="hljs-attr">MongooseServerSelectionError</span>: connect ECONNREFUSED localhost:<span class="hljs-number">27017</span>
 </code></pre>
-<p>If you&#39;re experiencing a similar error, connect to the replica set using the
-<code>mongo</code> shell and run the
-<a href="https://docs.mongodb.com/manual/reference/method/rs.conf/"><code>rs.conf()</code></a> command to check the host names of each replica set member. Follow
-<a href="https://docs.mongodb.com/manual/tutorial/change-hostnames-in-a-replica-set/#change-hostnames-while-maintaining-replica-set-availability">this page&#39;s instructions to change a replica set member&#39;s host name</a>.</p>
+<p>If you&#39;re experiencing a similar error, connect to the replica set using the <code>mongo</code> shell and run the <a href="https://docs.mongodb.com/manual/reference/method/rs.conf/"><code>rs.conf()</code></a> command to check the host names of each replica set member.
+Follow <a href="https://docs.mongodb.com/manual/tutorial/change-hostnames-in-a-replica-set/#change-hostnames-while-maintaining-replica-set-availability">this page&#39;s instructions to change a replica set member&#39;s host name</a>.</p>
+<p>You can also check the <code>reason.servers</code> property of <code>MongooseServerSelectionError</code> to see what the MongoDB Node driver thinks the state of your replica set is.
+The <code>reason.servers</code> property contains a <a href="https://masteringjs.io/tutorials/fundamentals/map">map</a> of server descriptions.</p>
+<pre><code><span class="hljs-keyword">if</span> (err.name === <span class="hljs-string">'MongooseServerSelectionError'</span>) {
+  <span class="hljs-comment">// Contains a Map describing the state of your replica set. For example:</span>
+  <span class="hljs-comment">// Map(1) {</span>
+  <span class="hljs-comment">//   'localhost:27017' =&gt; ServerDescription {</span>
+  <span class="hljs-comment">//     address: 'localhost:27017',</span>
+  <span class="hljs-comment">//     type: 'Unknown',</span>
+  <span class="hljs-comment">//     ...</span>
+  <span class="hljs-comment">//   }</span>
+  <span class="hljs-comment">// }</span>
+  <span class="hljs-built_in">console</span>.log(err.reason.servers);
+}
+</code></pre>
 <h3 id="mongos_connections"><a href="#mongos_connections">Multi-mongos support</a></h3>
 
 <p>You can also connect to multiple <a href="https://docs.mongodb.com/manual/reference/program/mongos/">mongos</a> instances

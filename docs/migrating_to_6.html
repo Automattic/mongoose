@@ -39,7 +39,7 @@ you should be aware of when migrating from Mongoose 5.x to Mongoose 6.x.</p>
 <li><a href="#clone-discriminator-schemas-by-default">Clone Discriminator Schemas By Default</a></li>
 <li><a href="#schema-defined-document-key-order">Schema Defined Document Key Order</a></li>
 <li><a href="#sanitizefilter-and-trusted"><code>sanitizeFilter</code> and <code>trusted()</code></a></li>
-<li><a href="#removed-omitundefined">Removed <code>omitUndefined</code></a></li>
+<li><a href="#removed-omitundefined">Removed <code>omitUndefined</code>: Mongoose now removes <code>undefined</code> keys in updates instead of setting them to <code>null</code></a></li>
 <li><a href="#document-parameter-to-default-functions">Document Parameter to Default Functions</a></li>
 <li><a href="#arrays-are-proxies">Arrays are Proxies</a></li>
 <li><a href="#typepojotomixed"><code>typePojoToMixed</code></a></li>
@@ -198,18 +198,25 @@ assert.deepEqual(<span class="hljs-built_in">Object</span>.keys(doc.toObject().p
 <pre><code class="language-javascript"><span class="hljs-comment">// `mongoose.trusted()` allows query selectors through</span>
 <span class="hljs-keyword">await</span> Test.find({ <span class="hljs-attr">username</span>: <span class="hljs-string">'val'</span>, <span class="hljs-attr">pwd</span>: mongoose.trusted({ <span class="hljs-attr">$ne</span>: <span class="hljs-literal">null</span> }) }).setOptions({ <span class="hljs-attr">sanitizeFilter</span>: <span class="hljs-literal">true</span> });
 </code></pre>
-<h3 id="removed-omitundefined"><a href="#removed-omitundefined">Removed `omitUndefined`</a></h3>
+<h3 id="removed-omitundefined"><a href="#removed-omitundefined">Removed `omitUndefined`: Mongoose now removes `undefined` keys in updates instead of setting them to `null`</a></h3>
 
 <p>In Mongoose 5.x, setting a key to <code>undefined</code> in an update operation was equivalent to setting it to <code>null</code>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> Test.findOneAndUpdate({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-literal">undefined</span> } }, { <span class="hljs-attr">new</span>: <span class="hljs-literal">true</span> });
+<pre><code class="language-javascript"><span class="hljs-keyword">let</span> res = <span class="hljs-keyword">await</span> Test.findOneAndUpdate({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-literal">undefined</span> } }, { <span class="hljs-attr">new</span>: <span class="hljs-literal">true</span> });
 
-res.name; <span class="hljs-comment">// null</span>
+res.name; <span class="hljs-comment">// `null` in Mongoose 5.x</span>
+
+<span class="hljs-comment">// Equivalent to `findOneAndUpdate({}, {}, { new: true })` because `omitUndefined` will</span>
+<span class="hljs-comment">// remove `name: undefined`</span>
+res = <span class="hljs-keyword">await</span> Test.findOneAndUpdate({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-literal">undefined</span> } }, { <span class="hljs-attr">new</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">omitUndefined</span>: <span class="hljs-literal">true</span> });
 </code></pre>
 <p>Mongoose 5.x supported an <code>omitUndefined</code> option to strip out <code>undefined</code> keys.
 In Mongoose 6.x, the <code>omitUndefined</code> option has been removed, and Mongoose will always strip out undefined keys.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// In Mongoose 6, equivalent to `findOneAndUpdate({}, {}, { new: true })` because Mongoose will</span>
 <span class="hljs-comment">// remove `name: undefined`</span>
 <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> Test.findOneAndUpdate({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-literal">undefined</span> } }, { <span class="hljs-attr">new</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+<p>The only workaround is to explicitly set properties to <code>null</code> in your updates:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> Test.findOneAndUpdate({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-literal">null</span> } }, { <span class="hljs-attr">new</span>: <span class="hljs-literal">true</span> });
 </code></pre>
 <h3 id="document-parameter-to-default-functions"><a href="#document-parameter-to-default-functions">Document Parameter to Default Functions</a></h3>
 

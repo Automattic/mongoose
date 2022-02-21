@@ -411,13 +411,17 @@ doc.set(path, value, <span class="hljs-built_in">String</span>)
 
 <span class="hljs-comment">// changing strict mode behavior</span>
 doc.set(path, value, { <span class="hljs-attr">strict</span>: <span class="hljs-literal">false</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="document_Document-toJSON"><a href="#document_Document-toJSON">Document.prototype.toJSON()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> </li></ul><div><p>The return value of this method is used in calls to JSON.stringify(doc).</p>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.flattenMaps=true]
+<span class="method-type">&laquo;Boolean&raquo;</span> if true, convert Maps to <a href="https://masteringjs.io/tutorials/fundamentals/pojo">POJOs</a>. Useful if you want to <code>JSON.stringify()</code> the result.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> </li></ul><div><p>The return value of this method is used in calls to <a href="https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript#the-tojson-function"><code>JSON.stringify(doc)</code></a>.</p>
 
 <p>This method accepts the same options as <a href="#document_Document-toObject">Document#toObject</a>. To apply the options to every document of your schema by default, set your <a href="#schema_Schema">schemas</a> <code>toJSON</code> option to the same argument.</p>
 
-<pre><code>schema.set(<span class="hljs-string">'toJSON'</span>, { <span class="hljs-attr">virtuals</span>: <span class="hljs-literal">true</span> })</code></pre>
+<pre><code>schema.set(<span class="hljs-string">'toJSON'</span>, { <span class="hljs-attr">virtuals</span>: <span class="hljs-literal">true</span> });</code></pre>
 
-<p>See <a href="/docs/guide.html#toJSON">schema options</a> for details.</p>  </div><hr class="separate-api-elements"><h3 id="document_Document-toObject"><a href="#document_Document-toObject">Document.prototype.toObject()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
+<p>There is one difference between <code>toJSON()</code> and <code>toObject()</code> options. When you call <code>toJSON()</code>, the <a href="./document.html#document_Document-toObject"><code>flattenMaps</code> option</a> defaults to <code>true</code>, because <code>JSON.stringify()</code> doesn't convert maps to objects by default. When you call <code>toObject()</code>, the <code>flattenMaps</code> option is <code>false</code> by default.</p>
+
+<p>See <a href="/docs/guide.html#toJSON">schema options</a> for more information on setting <code>toJSON</code> option defaults.</p>  </div><hr class="separate-api-elements"><h3 id="document_Document-toObject"><a href="#document_Document-toObject">Document.prototype.toObject()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.getters=false]
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, apply all getters, including virtuals</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.virtuals=false]

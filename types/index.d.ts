@@ -913,12 +913,12 @@ declare module 'mongoose' {
     init(callback?: CallbackWithoutResult): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
-    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<T>>;
     insertMany(docs: Array<AnyKeys<T> | AnyObject>, options?: InsertManyOptions): Promise<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>;
-    insertMany(doc: AnyKeys<T> | AnyObject, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(doc: AnyKeys<T> | AnyObject, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<T>>;
     insertMany(doc: AnyKeys<T> | AnyObject, options?: InsertManyOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    insertMany(doc: AnyKeys<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[] | InsertManyResult>): void;
-    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options?: InsertManyOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>> | InsertManyResult>): void;
+    insertMany(doc: AnyKeys<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[] | InsertManyResult<T>>): void;
+    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options?: InsertManyOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>> | InsertManyResult<T>>): void;
 
     /**
      * Lists the indexes currently defined in MongoDB. This may or may not be
@@ -1169,9 +1169,13 @@ declare module 'mongoose' {
     populate?: string | string[] | PopulateOptions | PopulateOptions[];
   }
 
-  interface InsertManyResult extends mongodb.InsertManyResult {
-    mongoose?: { validationErrors?: Array<Error.CastError | Error.ValidatorError> }
-  }
+  type InferIdType<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
+  type InsertManyResult<T> = mongodb.InsertManyResult<T> & {
+    insertedIds: {
+      [key: number]: InferIdType<T>;
+    };
+    mongoose?: { validationErrors?: Array<Error.CastError | Error.ValidatorError> };
+  };
 
   interface MapReduceOptions<T, Key, Val> {
     map: Function | string;
@@ -1603,6 +1607,13 @@ declare module 'mongoose' {
      * field names by setting timestamps.createdAt and timestamps.updatedAt.
      */
     timestamps?: boolean | SchemaTimestampsConfig;
+
+    /**
+     * Using `save`, `isNew`, and other Mongoose reserved names as schema path names now triggers a warning, not an error.
+     * You can suppress the warning by setting { supressReservedKeysWarning: true } schema options. Keep in mind that this
+     * can break plugins that rely on these reserved names.
+     */
+     supressReservedKeysWarning?: boolean
   }
 
   interface SchemaTimestampsConfig {

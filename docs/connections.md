@@ -323,24 +323,36 @@ mongoose.connect(uri, {
 
 <h3 id="replicaset-hostnames"><a href="#replicaset-hostnames">Replica Set Host Names</a></h3>
 
-MongoDB replica sets rely on being able to reliably figure out the domain name
-for each member. On Linux and OSX, the MongoDB server uses the output of the
-[`hostname` command](https://linux.die.net/man/1/hostname) to figure out the
-domain name to report to the replica set. This can cause confusing errors
-if you're connecting to a remote MongoDB replica set running on a machine that
-reports its `hostname` as `localhost`:
+MongoDB replica sets rely on being able to reliably figure out the domain name for each member. 
+On Linux and OSX, the MongoDB server uses the output of the [`hostname` command](https://linux.die.net/man/1/hostname) to figure out the domain name to report to the replica set.
+This can cause confusing errors if you're connecting to a remote MongoDB replica set running on a machine that reports its `hostname` as `localhost`:
 
 ```
 // Can get this error even if your connection string doesn't include
 // `localhost` if `rs.conf()` reports that one replica set member has
 // `localhost` as its host name.
-failed to connect to server [localhost:27017] on first connect
+MongooseServerSelectionError: connect ECONNREFUSED localhost:27017
 ```
 
-If you're experiencing a similar error, connect to the replica set using the
-`mongo` shell and run the
-[`rs.conf()`](https://docs.mongodb.com/manual/reference/method/rs.conf/) command to check the host names of each replica set member. Follow
-[this page's instructions to change a replica set member's host name](https://docs.mongodb.com/manual/tutorial/change-hostnames-in-a-replica-set/#change-hostnames-while-maintaining-replica-set-availability).
+If you're experiencing a similar error, connect to the replica set using the `mongo` shell and run the [`rs.conf()`](https://docs.mongodb.com/manual/reference/method/rs.conf/) command to check the host names of each replica set member.
+Follow [this page's instructions to change a replica set member's host name](https://docs.mongodb.com/manual/tutorial/change-hostnames-in-a-replica-set/#change-hostnames-while-maintaining-replica-set-availability).
+
+You can also check the `reason.servers` property of `MongooseServerSelectionError` to see what the MongoDB Node driver thinks the state of your replica set is.
+The `reason.servers` property contains a [map](https://masteringjs.io/tutorials/fundamentals/map) of server descriptions.
+
+```
+if (err.name === 'MongooseServerSelectionError') {
+  // Contains a Map describing the state of your replica set. For example:
+  // Map(1) {
+  //   'localhost:27017' => ServerDescription {
+  //     address: 'localhost:27017',
+  //     type: 'Unknown',
+  //     ...
+  //   }
+  // }
+  console.log(err.reason.servers);
+}
+```
 
 <h3 id="mongos_connections"><a href="#mongos_connections">Multi-mongos support</a></h3>
 

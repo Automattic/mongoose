@@ -23,7 +23,7 @@ void async function run() {
   const user = new Test({ name: {}, address: {} });
   const error = user.validateSync();
   if (error != null) {
-    const _error: Error.ValidationError = error.errors.address as Error.ValidationError;
+    const _error = error.errors.address;
   }
 }();
 

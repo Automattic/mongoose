@@ -883,7 +883,7 @@ describe('schema', function() {
         done();
       });
 
-      it('with embedded discriminator (gh-6485)', function(done) {
+      it('with embedded discriminator (gh-6485)', function() {
         const eventSchema = new Schema({
           message: { type: String, index: true }
         }, { discriminatorKey: 'kind', _id: false });
@@ -907,14 +907,12 @@ describe('schema', function() {
           { 'events.element': 1 },
           { 'events.product': 1 }
         ]);
-
-        done();
       });
     });
   });
 
   describe('plugins', function() {
-    it('work', function(done) {
+    it('work', function() {
       const Tobi = new Schema();
       let called = false;
 
@@ -924,12 +922,11 @@ describe('schema', function() {
       });
 
       assert.equal(called, true);
-      done();
     });
   });
 
   describe('options', function() {
-    it('defaults are set', function(done) {
+    it('defaults are set', function() {
       const Tobi = new Schema();
 
       assert.equal(typeof Tobi.options, 'object');
@@ -941,7 +938,6 @@ describe('schema', function() {
       assert.equal(Tobi.options.shardKey, null);
       assert.equal(Tobi.options.read, null);
       assert.equal(Tobi.options._id, true);
-      done();
     });
 
     it('setting', function(done) {

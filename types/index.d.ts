@@ -1609,8 +1609,8 @@ declare module 'mongoose' {
     timestamps?: boolean | SchemaTimestampsConfig;
 
     /**
-     * Using `save`, `isNew`, and other Mongoose reserved names as schema path names now triggers a warning, not an error. 
-     * You can suppress the warning by setting { supressReservedKeysWarning: true } schema options. Keep in mind that this 
+     * Using `save`, `isNew`, and other Mongoose reserved names as schema path names now triggers a warning, not an error.
+     * You can suppress the warning by setting { supressReservedKeysWarning: true } schema options. Keep in mind that this
      * can break plugins that rely on these reserved names.
      */
      supressReservedKeysWarning?: boolean

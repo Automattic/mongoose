@@ -10493,16 +10493,29 @@ describe('model: populate:', function() {
 
     const doc = await BlogPost.findOne().populate('author');
     assert.equal(doc.author.email, 'test@gmail.com');
+    assert.equal(doc.toObject().author.name, 'John Smith');
     assert.equal(doc.toObject().author.email, 'test@gmail.com');
+    assert.equal(doc.toObject({ depopulate: true }).author.name, 'John Smith');
+    assert.strictEqual(doc.toObject({ depopulate: true }).author.email, undefined);
 
     doc.depopulate();
     assert.equal(doc.author.name, 'John Smith');
+    assert.strictEqual(doc.author.email, undefined);
 
     doc.author.name = 'John Smythe';
     await doc.save();
 
-    const fromDb = await BlogPost.findById(doc);
+    let fromDb = await BlogPost.findById(doc);
     assert.equal(fromDb.author.name, 'John Smythe');
+
+    await fromDb.populate('author');
+    fromDb.author = { _id: fromDb.author._id, name: 'John Smithe' };
+    assert.strictEqual(doc.author.email, undefined);
+    await fromDb.save();
+
+    fromDb = await BlogPost.findById(doc);
+    assert.strictEqual(fromDb.author.email, undefined);
+    assert.equal(fromDb.author.name, 'John Smithe');
   });
 
   it('supports ref on array containing subdocuments (gh-10856)', async function() {

@@ -10892,6 +10892,15 @@ describe('document', function() {
     assert.ok(foo2.bar instanceof Bar);
     assert.equal(foo2.bar.another, 3);
     assert.equal(foo2.get('bar.another'), 3);
+
+    const obj = foo2.toObject({ depopulate: true });
+    assert.equal(obj.bar.name, 'I am another Bar');
+    assert.strictEqual(obj.bar.another, undefined);
+
+    await foo2.save();
+    const fromDb = await Foo.findById(foo2).lean();
+    assert.strictEqual(fromDb.bar.name, 'I am another Bar');
+    assert.strictEqual(fromDb.bar.another, undefined);
   });
 
   it('can manually populate subdocument refs in `create()` (gh-10856)', async function() {

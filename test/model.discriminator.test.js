@@ -312,7 +312,10 @@ describe('model', function() {
 
       it('does not inherit indexes', function() {
         assert.deepEqual(Person.schema.indexes(), [[{ name: 1 }, { background: true }]]);
-        assert.deepEqual(Employee.schema.indexes(), [[{ department: 1 }, { background: true }]]);
+        assert.deepEqual(
+          Employee.schema.indexes(),
+          [[{ department: 1 }, { background: true, partialFilterExpression: { __t: 'Employee' } }]]
+        );
       });
 
       it('gets options overridden by root options except toJSON and toObject', function() {

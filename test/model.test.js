@@ -6330,6 +6330,344 @@ describe('Model', function() {
         await M.syncIndexes();
         assert(await M.syncIndexes(), []);
       });
+
+      it('adding discriminators should not drop the parent model\'s indexes', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+
+        const eventSchema = new Schema({
+          actorId: { type: Schema.Types.ObjectId, index: true }
+        }, { autoIndex: false });
+
+        const Event = db.model('Event', eventSchema, collectionName);
+
+        Event.discriminator('AEvent', { aField: String });
+        Event.discriminator('BEvent', { bField: String });
+
+        // Act
+        await db.syncIndexes();
+
+        const indexes = await Event.listIndexes();
+
+        // Assert
+        const actorIdIndex = indexes.find(index => index.name === 'actorId_1');
+        assert.ok(actorIdIndex);
+      });
+
+      it('syncing model with multiple discriminators works', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const eventSchema = new Schema(
+          { actorId: { type: Schema.Types.ObjectId } },
+          { autoIndex: false }
+        );
+        eventSchema.index({ actorId: 1 }, { unique: true });
+
+        const Event = db.model('Event', eventSchema, collectionName);
+
+        const clickEventSchema = new Schema(
+          {
+            clickedAt: Date,
+            productCategory: String
+          },
+          { autoIndex: false }
+        );
+        clickEventSchema.index(
+          { clickedAt: 1 },
+          { partialFilterExpression: { productCategory: 'Computers' } }
+        );
+        const ClickEvent = Event.discriminator('ClickEvent', clickEventSchema);
+
+        const buyEventSchema = new Schema(
+          {
+            boughtAt: String,
+            productPrice: Number
+          },
+          { autoIndex: false }
+        );
+        buyEventSchema.index(
+          { boughtAt: 1 },
+          {
+            unique: true,
+            partialFilterExpression: { productPrice: { $gt: 100 } }
+          }
+        );
+        const BuyEvent = Event.discriminator('BuyEvent', buyEventSchema);
+
+        // Act
+        const droppedByEvent = await Event.syncIndexes({ background: false });
+        const droppedByClickEvent = await ClickEvent.syncIndexes({ background: false });
+        const droppedByBuyEvent = await BuyEvent.syncIndexes({ background: false });
+
+        const eventIndexes = await Event.listIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedByEvent, []);
+        assert.deepStrictEqual(droppedByClickEvent, []);
+        assert.deepStrictEqual(droppedByBuyEvent, []);
+
+        assert.deepStrictEqual(
+          eventIndexes.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              unique: true,
+              key: { actorId: 1 }
+            },
+            {
+              key: { clickedAt: 1 },
+              partialFilterExpression: {
+                productCategory: 'Computers',
+                __t: 'ClickEvent'
+              }
+            },
+            {
+              unique: true,
+              key: { boughtAt: 1 },
+              partialFilterExpression: {
+                productPrice: { $gt: 100 },
+                __t: 'BuyEvent'
+              }
+            }
+          ]
+        );
+      });
+
+      it('syncing one discriminator\'s indexes should not drop the main model\'s indexes', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const eventSchema = new Schema(
+          { actorId: { type: Schema.Types.ObjectId } },
+          { autoIndex: false }
+        );
+        eventSchema.index({ actorId: 1 }, { unique: true });
+
+        const Event = db.model('Event', eventSchema, collectionName);
+
+        const clickEventSchema = new Schema(
+          {
+            clickedAt: Date,
+            productCategory: String
+          },
+          { autoIndex: false }
+        );
+        clickEventSchema.index(
+          { clickedAt: 1 },
+          { partialFilterExpression: { productCategory: 'Computers' } }
+        );
+        const ClickEvent = Event.discriminator('ClickEvent', clickEventSchema);
+
+        const buyEventSchema = new Schema(
+          {
+            boughtAt: String,
+            productPrice: Number
+          },
+          { autoIndex: false }
+        );
+        buyEventSchema.index(
+          { boughtAt: 1 },
+          {
+            unique: true,
+            partialFilterExpression: { productPrice: { $gt: 100 } }
+          }
+        );
+        Event.discriminator('BuyEvent', buyEventSchema);
+
+        // Act
+        const droppedByEvent = await Event.syncIndexes();
+        const droppedByClickEvent = await ClickEvent.syncIndexes();
+
+        const eventIndexes = await Event.listIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedByEvent, []);
+        assert.deepStrictEqual(droppedByClickEvent, []);
+
+        assert.deepStrictEqual(
+          eventIndexes.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              unique: true,
+              key: { actorId: 1 }
+            },
+            {
+              key: { clickedAt: 1 },
+              partialFilterExpression: {
+                productCategory: 'Computers',
+                __t: 'ClickEvent'
+              }
+            }
+          ]
+        );
+      });
+
+      it('syncing main model does not sync discrimator indexes', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const eventSchema = new Schema(
+          { actorId: { type: Schema.Types.ObjectId } },
+          { autoIndex: false }
+        );
+        eventSchema.index({ actorId: 1 }, { unique: true });
+
+        const Event = db.model('Event', eventSchema, collectionName);
+
+        const clickEventSchema = new Schema(
+          {
+            clickedAt: Date,
+            productCategory: String
+          },
+          { autoIndex: false }
+        );
+        clickEventSchema.index(
+          { clickedAt: 1 },
+          { partialFilterExpression: { productCategory: 'Computers' } }
+        );
+        const ClickEvent = Event.discriminator('ClickEvent', clickEventSchema);
+
+        const buyEventSchema = new Schema(
+          {
+            boughtAt: String,
+            productPrice: Number
+          },
+          { autoIndex: false }
+        );
+        buyEventSchema.index(
+          { boughtAt: 1 },
+          {
+            unique: true,
+            partialFilterExpression: { productPrice: { $gt: 100 } }
+          }
+        );
+        Event.discriminator('BuyEvent', buyEventSchema);
+
+        // Act
+        const droppedByEvent = await Event.syncIndexes();
+        const eventIndexesBeforeSyncingClickEvents = await Event.listIndexes();
+
+        const droppedByClickEvent = await ClickEvent.syncIndexes();
+        const eventIndexesAfterSyncingClickEvents = await ClickEvent.listIndexes();
+
+
+        // Assert
+        assert.deepStrictEqual(droppedByEvent, []);
+        assert.deepStrictEqual(droppedByClickEvent, []);
+
+        assert.deepStrictEqual(
+          eventIndexesBeforeSyncingClickEvents.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              unique: true,
+              key: { actorId: 1 }
+            }
+          ]
+        );
+
+        assert.deepStrictEqual(
+          eventIndexesAfterSyncingClickEvents.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              unique: true,
+              key: { actorId: 1 }
+            },
+            {
+              key: { clickedAt: 1 },
+              partialFilterExpression: {
+                productCategory: 'Computers',
+                __t: 'ClickEvent'
+              }
+            }
+          ]
+        );
+
+      });
+      it('syncing discriminator does not attempt to sync parent model\'s indexes', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const eventSchema = new Schema(
+          { actorId: { type: Schema.Types.ObjectId } },
+          { autoIndex: false }
+        );
+        eventSchema.index({ actorId: 1 }, { unique: true });
+
+        const Event = db.model('Event', eventSchema, collectionName);
+
+        const clickEventSchema = new Schema(
+          {
+            clickedAt: Date,
+            productCategory: String
+          },
+          { autoIndex: false }
+        );
+        clickEventSchema.index(
+          { clickedAt: 1 },
+          { partialFilterExpression: { productCategory: 'Computers' } }
+        );
+        const ClickEvent = Event.discriminator('ClickEvent', clickEventSchema);
+
+        const buyEventSchema = new Schema(
+          {
+            boughtAt: String,
+            productPrice: Number
+          },
+          { autoIndex: false }
+        );
+        buyEventSchema.index(
+          { boughtAt: 1 },
+          {
+            unique: true,
+            partialFilterExpression: { productPrice: { $gt: 100 } }
+          }
+        );
+        Event.discriminator('BuyEvent', buyEventSchema);
+
+        // Act
+
+        const droppedByClickEvent = await ClickEvent.syncIndexes();
+        const eventIndexesAfterSyncingClickEvents = await ClickEvent.listIndexes();
+
+        const droppedByEvent = await Event.syncIndexes();
+        const eventIndexesAfterSyncingEverything = await Event.listIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedByClickEvent, []);
+        assert.deepStrictEqual(droppedByEvent, []);
+
+        assert.deepStrictEqual(
+          eventIndexesAfterSyncingClickEvents.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              key: { clickedAt: 1 },
+              partialFilterExpression: {
+                productCategory: 'Computers',
+                __t: 'ClickEvent'
+              }
+            }
+          ]
+        );
+        assert.deepStrictEqual(
+          eventIndexesAfterSyncingEverything.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              key: { clickedAt: 1 },
+              partialFilterExpression: {
+                productCategory: 'Computers',
+                __t: 'ClickEvent'
+              }
+            },
+            {
+              unique: true,
+              key: { actorId: 1 }
+            }
+          ]
+        );
+
+      });
     });
 
     it('using `new db.model()()` (gh-6698)', function() {
@@ -7767,4 +8105,14 @@ function isLean(document) {
 
 function generateRandomCollectionName() {
   return 'mongoose_test_' + random();
+}
+
+function pick(obj, keys) {
+  const newObj = {};
+  for (const key of keys) {
+    if (obj[key] !== undefined) {
+      newObj[key] = obj[key];
+    }
+  }
+  return newObj;
 }

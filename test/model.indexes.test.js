@@ -495,22 +495,21 @@ describe('model', function() {
       assert.deepEqual(index.partialFilterExpression, { kind: 'Device' });
     });
 
-    it('decorated discriminator index with syncIndexes (gh-6347)', function() {
-      const baseOptions = { discriminatorKey: 'kind' };
-      const baseSchema = new Schema({}, baseOptions);
+    it('decorated discriminator index with syncIndexes (gh-6347)', async function() {
+      const userSchema = new Schema({}, { discriminatorKey: 'kind', autoIndex: false });
 
-      const Base = db.model('Test', baseSchema);
+      const User = db.model('User', userSchema);
 
-      const userSchema = new Schema({
+      const customerSchema = new Schema({
         emailId: { type: String, unique: true }, // Should become a partial
         firstName: { type: String }
       });
 
-      const User = Base.discriminator('User', userSchema);
+      const Customer = User.discriminator('Customer', customerSchema);
 
-      return User.init().
-        then(() => User.syncIndexes()).
-        then(dropped => assert.equal(dropped.length, 0));
+      await Customer.init();
+      const droppedIndexes = await Customer.syncIndexes();
+      assert.equal(droppedIndexes.length, 0);
     });
 
     it('uses schema-level collation by default (gh-9912)', async function() {

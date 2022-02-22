@@ -55,13 +55,30 @@ const goodBreakfast = new Breakfast({
 
 // const time = (new Date - start) / 1000;
 // console.error('took %d seconds for %d docs (%d dps)', time, total, total / time);
-new Benchmark.Suite()
-.add('invalid', function () {
-  badBreakfast.validateSync();
-})
-.add('valid', function () {
-  goodBreakfast.validateSync();
-})
+const suite = new Benchmark.Suite()
+  suite
+  .add('invalid async', {
+    'defer': true,
+    'fn': function (deferred) {
+      // avoid test inlining
+      suite.name;
+      badBreakfast.validate().catch(() => deferred.resolve())
+    },
+  })
+  .add('valid async', {
+    'defer': true,
+    'fn': function (deferred) {
+      // avoid test inlining
+      suite.name;
+      goodBreakfast.validate().then(() => deferred.resolve())
+    },
+  })
+  .add('invalid sync', function () {
+    badBreakfast.validateSync();
+  })
+  .add('valid sync', function () {
+    goodBreakfast.validateSync();
+  })
   .on('cycle', function (evt) {
     if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
       console.log(String(evt.target));

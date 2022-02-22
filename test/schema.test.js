@@ -424,7 +424,8 @@ describe('schema', function() {
 
     it('array of arrays', function(done) {
       const test = new Schema({
-        nums: [[Number]]
+        nums: [[Number]],
+        strings: [{ type: [String] }]
       });
       let nums = test.path('nums').cast([['1', '2']]);
       assert.equal(nums.length, 1);
@@ -443,6 +444,10 @@ describe('schema', function() {
         assert.ok(error.message.includes('Cast to [[Number]] failed'), error.message);
       }
       assert.ok(threw);
+
+      const strs = test.path('strings').cast('test');
+      assert.equal(strs.length, 1);
+      assert.deepEqual(strs[0].toObject(), ['test']);
 
       done();
     });
@@ -878,7 +883,7 @@ describe('schema', function() {
         done();
       });
 
-      it('with embedded discriminator (gh-6485)', function(done) {
+      it('with embedded discriminator (gh-6485)', function() {
         const eventSchema = new Schema({
           message: { type: String, index: true }
         }, { discriminatorKey: 'kind', _id: false });
@@ -902,14 +907,12 @@ describe('schema', function() {
           { 'events.element': 1 },
           { 'events.product': 1 }
         ]);
-
-        done();
       });
     });
   });
 
   describe('plugins', function() {
-    it('work', function(done) {
+    it('work', function() {
       const Tobi = new Schema();
       let called = false;
 
@@ -919,12 +922,11 @@ describe('schema', function() {
       });
 
       assert.equal(called, true);
-      done();
     });
   });
 
   describe('options', function() {
-    it('defaults are set', function(done) {
+    it('defaults are set', function() {
       const Tobi = new Schema();
 
       assert.equal(typeof Tobi.options, 'object');
@@ -936,7 +938,6 @@ describe('schema', function() {
       assert.equal(Tobi.options.shardKey, null);
       assert.equal(Tobi.options.read, null);
       assert.equal(Tobi.options._id, true);
-      done();
     });
 
     it('setting', function(done) {
@@ -2712,5 +2713,17 @@ describe('schema', function() {
     assert.equal(schema.path('something').instance, 'Date');
     assert.equal(schema.path('somethingElse').instance, 'Date');
     delete Date.type;
+  });
+  it('setting path with `Mixed` type to an array after number (gh-11417)', async() => {
+    const userSchema = new Schema({ data: {} });
+    const User = db.model('User', userSchema);
+
+    const user = await User.create({ data: 2 });
+    user.set({ data: [] });
+    await user.save();
+    assert.ok(Array.isArray(user.data));
+
+    const foundUser = await User.findOne({ _id: user._id });
+    assert.ok(Array.isArray(foundUser.data));
   });
 });

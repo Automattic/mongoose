@@ -11,12 +11,13 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [The `asPromise()` Method for Connections](#the-aspromise-method-for-connections)
 * [`mongoose.connect()` Returns a Promise](#mongoose-connect-returns-a-promise)
 * [Duplicate Query Execution](#duplicate-query-execution)
+* [`Model.exists()` Returns a lean document instead of Boolean](#model-exists-returns-a-lean-document-instead-of-boolean)
 * [`strictQuery` is now equal to `strict` by default](#strictquery-is-removed-and-replaced-by-strict)
 * [MongoError is now MongoServerError](#mongoerror-is-now-mongoservererror)
 * [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)
 * [Schema Defined Document Key Order](#schema-defined-document-key-order)
 * [`sanitizeFilter` and `trusted()`](#sanitizefilter-and-trusted)
-* [Removed `omitUndefined`](#removed-omitundefined)
+* [Removed `omitUndefined`: Mongoose now removes `undefined` keys in updates instead of setting them to `null`](#removed-omitundefined)
 * [Document Parameter to Default Functions](#document-parameter-to-default-functions)
 * [Arrays are Proxies](#arrays-are-proxies)
 * [`typePojoToMixed`](#typepojotomixed)
@@ -116,6 +117,17 @@ await q;
 await q.clone(); // Can `clone()` the query to allow executing the query again
 ```
 
+<h3 id="model-exists-returns-a-lean-document-instead-of-boolean"><a href="#model-exists-returns-a-lean-document-instead-of-boolean">Model.exists(...) now returns a lean document instead of boolean</a></h3>
+
+```js
+// in Mongoose 5.x, `existingUser` used to be a boolean
+// now `existingUser` will be either `{ _id: ObjectId(...) }` or `null`.
+const existingUser = await User.exists({ name: 'John' });
+if (existingUser) {
+  console.log(existingUser._id); 
+}
+```
+
 <h3 id="strictquery-is-removed-and-replaced-by-strict"><a href="#strictquery-is-removed-and-replaced-by-strict">`strictQuery` is now equal to `strict` by default</a></h3>
 
 ~Mongoose no longer supports a `strictQuery` option. You must now use `strict`.~
@@ -200,14 +212,18 @@ To explicitly allow a query selector, use `mongoose.trusted()`:
 await Test.find({ username: 'val', pwd: mongoose.trusted({ $ne: null }) }).setOptions({ sanitizeFilter: true });
 ```
 
-<h3 id="removed-omitundefined"><a href="#removed-omitundefined">Removed `omitUndefined`</a></h3>
+<h3 id="removed-omitundefined"><a href="#removed-omitundefined">Removed `omitUndefined`: Mongoose now removes `undefined` keys in updates instead of setting them to `null`</a></h3>
 
 In Mongoose 5.x, setting a key to `undefined` in an update operation was equivalent to setting it to `null`.
 
 ```javascript
-const res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true });
+let res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true });
 
-res.name; // null
+res.name; // `null` in Mongoose 5.x
+
+// Equivalent to `findOneAndUpdate({}, {}, { new: true })` because `omitUndefined` will
+// remove `name: undefined`
+res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true, omitUndefined: true });
 ```
 
 Mongoose 5.x supported an `omitUndefined` option to strip out `undefined` keys.
@@ -217,6 +233,12 @@ In Mongoose 6.x, the `omitUndefined` option has been removed, and Mongoose will 
 // In Mongoose 6, equivalent to `findOneAndUpdate({}, {}, { new: true })` because Mongoose will
 // remove `name: undefined`
 const res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true });
+```
+
+The only workaround is to explicitly set properties to `null` in your updates:
+
+```javascript
+const res = await Test.findOneAndUpdate({}, { $set: { name: null } }, { new: true });
 ```
 
 <h3 id="document-parameter-to-default-functions"><a href="#document-parameter-to-default-functions">Document Parameter to Default Functions</a></h3>

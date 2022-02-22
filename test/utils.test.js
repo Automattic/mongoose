@@ -222,6 +222,11 @@ describe('utils', function() {
     assert.equal(utils.deepEqual(user1, user2), false);
   });
 
+  it('deepEqual on arrays and non-arrays (gh-11417)', function() {
+    assert.ok(!utils.deepEqual([], 2));
+    assert.ok(!utils.deepEqual(2, []));
+  });
+
   describe('clone', function() {
     it('retains RegExp options gh-1355', function() {
       const a = new RegExp('hello', 'igm');

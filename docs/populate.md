@@ -52,6 +52,7 @@ user and have a good reason for doing so.
   <li><a href="#dynamic-ref">Dynamic References via `refPath`</a></li>
   <li><a href="#populate-virtuals">Populate Virtuals</a></li>
   <li><a href="#count">Populate Virtuals: The Count Option</a></li>
+  <li><a href="#match">Populate Virtuals: The Match Option</a></li>
   <li><a href="#populating-maps">Populating Maps</a></li>
   <li><a href="#populate-middleware">Populate in Middleware</a></li>
   <li><a href="#populating-multiple-paths-middleware">Populating Multiple Paths in Middleware</a></li>
@@ -699,6 +700,29 @@ BandSchema.virtual('numMembers', {
 const doc = await Band.findOne({ name: 'Motley Crue' }).
   populate('numMembers');
 doc.numMembers; // 2
+```
+
+<h3 id="match"><a href="#match">Populate Virtuals: The Match Option</a></h3>
+
+Another option for Populate virtuals is `match`. This option add an extra match
+condition to `populate()` :
+
+```javascript
+// Same example as 'Populate Virtuals' section
+AuthorSchema.virtual('posts', {
+  ref: 'BlogPost',
+  localField: '_id',
+  foreignField: 'author',
+  match: { archived: false } // match option with basic query selector
+});
+
+const Author = mongoose.model('Author', AuthorSchema, 'Author');
+const BlogPost = mongoose.model('BlogPost', BlogPostSchema, 'BlogPost');
+
+// After population
+const author = await Author.findOne().populate('posts');
+
+author.posts // Array of not `archived` posts
 ```
 
 <h3 id="populating-maps"><a href="#populating-maps">Populating Maps</a></h3>

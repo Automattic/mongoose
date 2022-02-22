@@ -1,3 +1,4 @@
+/// <reference path="./Error.d.ts" />
 /// <reference path="./PipelineStage.d.ts" />
 
 import events = require('events');
@@ -913,12 +914,12 @@ declare module 'mongoose' {
     init(callback?: CallbackWithoutResult): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
-    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<T>>;
     insertMany(docs: Array<AnyKeys<T> | AnyObject>, options?: InsertManyOptions): Promise<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>;
-    insertMany(doc: AnyKeys<T> | AnyObject, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(doc: AnyKeys<T> | AnyObject, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<T>>;
     insertMany(doc: AnyKeys<T> | AnyObject, options?: InsertManyOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    insertMany(doc: AnyKeys<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[] | InsertManyResult>): void;
-    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options?: InsertManyOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>> | InsertManyResult>): void;
+    insertMany(doc: AnyKeys<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[] | InsertManyResult<T>>): void;
+    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options?: InsertManyOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>> | InsertManyResult<T>>): void;
 
     /**
      * Lists the indexes currently defined in MongoDB. This may or may not be
@@ -1169,9 +1170,13 @@ declare module 'mongoose' {
     populate?: string | string[] | PopulateOptions | PopulateOptions[];
   }
 
-  interface InsertManyResult extends mongodb.InsertManyResult {
-    mongoose?: { validationErrors?: Array<Error.CastError | Error.ValidatorError> }
-  }
+  type InferIdType<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
+  type InsertManyResult<T> = mongodb.InsertManyResult<T> & {
+    insertedIds: {
+      [key: number]: InferIdType<T>;
+    };
+    mongoose?: { validationErrors?: Array<Error.CastError | Error.ValidatorError> };
+  };
 
   interface MapReduceOptions<T, Key, Val> {
     map: Function | string;
@@ -1377,7 +1382,9 @@ declare module 'mongoose' {
 
     /** Defines a pre hook for the model. */
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
+    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', options: SchemaPreOptions, fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
+    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Query<any, any>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
@@ -1601,6 +1608,13 @@ declare module 'mongoose' {
      * field names by setting timestamps.createdAt and timestamps.updatedAt.
      */
     timestamps?: boolean | SchemaTimestampsConfig;
+
+    /**
+     * Using `save`, `isNew`, and other Mongoose reserved names as schema path names now triggers a warning, not an error.
+     * You can suppress the warning by setting { supressReservedKeysWarning: true } schema options. Keep in mind that this
+     * can break plugins that rely on these reserved names.
+     */
+     supressReservedKeysWarning?: boolean
   }
 
   interface SchemaTimestampsConfig {
@@ -3097,131 +3111,6 @@ declare module 'mongoose' {
   type Callback<T = any> = (error: CallbackError, result: T) => void;
 
   type CallbackWithoutResult = (error: CallbackError) => void;
-
-  class NativeError extends global.Error { }
-  type CallbackError = NativeError | null;
-
-  class Error extends global.Error {
-    constructor(msg: string);
-
-    /** The type of error. "MongooseError" for generic errors. */
-    name: string;
-
-    static messages: any;
-
-    static Messages: any;
-  }
-
-  namespace Error {
-    export class CastError extends Error {
-      name: 'CastError';
-      stringValue: string;
-      kind: string;
-      value: any;
-      path: string;
-      reason?: NativeError | null;
-      model?: any;
-
-      constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
-    }
-    export class SyncIndexesError extends Error {
-      name: 'SyncIndexesError';
-      errors?: Record<string, mongodb.MongoServerError>;
-
-      constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
-    }
-
-    export class DisconnectedError extends Error {
-      name: 'DisconnectedError';
-    }
-
-    export class DivergentArrayError extends Error {
-      name: 'DivergentArrayError';
-    }
-
-    export class MissingSchemaError extends Error {
-      name: 'MissingSchemaError';
-    }
-
-    export class DocumentNotFoundError extends Error {
-      name: 'DocumentNotFoundError';
-      result: any;
-      numAffected: number;
-      filter: any;
-      query: any;
-    }
-
-    export class ObjectExpectedError extends Error {
-      name: 'ObjectExpectedError';
-      path: string;
-    }
-
-    export class ObjectParameterError extends Error {
-      name: 'ObjectParameterError';
-    }
-
-    export class OverwriteModelError extends Error {
-      name: 'OverwriteModelError';
-    }
-
-    export class ParallelSaveError extends Error {
-      name: 'ParallelSaveError';
-    }
-
-    export class ParallelValidateError extends Error {
-      name: 'ParallelValidateError';
-    }
-
-    export class MongooseServerSelectionError extends Error {
-      name: 'MongooseServerSelectionError';
-    }
-
-    export class StrictModeError extends Error {
-      name: 'StrictModeError';
-      isImmutableError: boolean;
-      path: string;
-    }
-
-    export class ValidationError extends Error {
-      name: 'ValidationError';
-
-      errors: { [path: string]: ValidatorError | CastError | ValidationError };
-      addError: (path: string, error: ValidatorError | CastError | ValidationError) => void;
-
-      constructor(instance?: Error);
-    }
-
-    export class ValidatorError extends Error {
-      name: 'ValidatorError';
-      properties: {
-        message: string,
-        type?: string,
-        path?: string,
-        value?: any,
-        reason?: any
-      };
-      kind: string;
-      path: string;
-      value: any;
-      reason?: Error | null;
-
-      constructor(properties: {
-        message?: string,
-        type?: string,
-        path?: string,
-        value?: any,
-        reason?: any
-      });
-    }
-
-    export class VersionError extends Error {
-      name: 'VersionError';
-      version: number;
-      modifiedPaths: Array<string>;
-
-      constructor(doc: Document, currentVersion: number, modifiedPaths: Array<string>);
-    }
-  }
 
   /* for ts-mongoose */
   class mquery {}

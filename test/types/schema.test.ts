@@ -264,3 +264,15 @@ function gh10789() {
     }
   });
 }
+
+function gh11439() {
+  type Book = {
+    collection: string
+  }
+
+  const bookSchema = new Schema<Book>({
+    collection: String
+  }, {
+    supressReservedKeysWarning: true
+  });
+}

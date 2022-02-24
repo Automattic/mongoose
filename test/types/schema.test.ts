@@ -283,7 +283,7 @@ function gh11448() {
     age: number;
   }
 
-  const originSchema = new Schema<IUser>({ name: String, age: Number });
+  const userSchema = new Schema<IUser>({ name: String, age: Number });
 
-  originSchema.pick<Pick<IUser, 'age'>>(['age']);
+  userSchema.pick<Pick<IUser, 'age'>>(['age']);
 }

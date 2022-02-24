@@ -8088,6 +8088,26 @@ describe('Model', function() {
     assert.equal(doc.filling, 'cherry');
     assert.equal(doc.hoursToMake, null);
   });
+
+  it('throws readable errors when parsing circular objects (gh-10378)', async() => {
+    // Arrange
+    const userSchema = new Schema({
+      name: { type: String, required: true },
+      result: Schema.Types.Mixed
+    });
+    const User = db.model('User', userSchema);
+    const circularObject = {};
+    circularObject.a = circularObject;
+
+    // Act
+    const err = await User.updateOne(
+      { },
+      { result: circularObject }
+    ).then(() => null, err => err);
+
+    // Assert
+    assert.deepStrictEqual(err.message, 'Can not parse path `result` due to circular reference.');
+  });
 });
 
 

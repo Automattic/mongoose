@@ -276,3 +276,14 @@ function gh11439() {
     supressReservedKeysWarning: true
   });
 }
+
+function pickedSchema() {
+  type SchemaDefinition = {
+    field: string;
+    pickedField: string;
+  }
+
+  const originSchema = new Schema<SchemaDefinition>({ field: String, pickedField: String });
+
+  originSchema.pick<Pick<SchemaDefinition, 'pickedField'>>(['pickedField']);
+}

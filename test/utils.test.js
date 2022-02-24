@@ -400,4 +400,69 @@ describe('utils', function() {
       assert.deepEqual(pojoError.metadata, { hello: 'world' });
     });
   });
+  describe('isCircular', () => {
+    it('works with objects - true', () => {
+      // Arrange
+      const circularObject = { a: 'Hello' };
+      circularObject.b = circularObject;
+
+      // Act
+      const isCircular = utils.isCircular(circularObject);
+
+      // Assert
+      assert.deepStrictEqual(isCircular, true);
+    });
+    it('works with deeply circular objects - true', () => {
+      // Arrange
+      const circularObject = { a: 'Hello', b: { name: 'Hafez', c: { age: 27 } } };
+      circularObject.b.c.d = circularObject;
+
+      // Act
+      const isCircular = utils.isCircular(circularObject);
+
+      // Assert
+      assert.deepStrictEqual(isCircular, true);
+    });
+    it('works with objects - false', () => {
+      // Arrange
+      const normalObject = { name: 'Hafez', age: 27 };
+
+      // Act
+      const isCircular = utils.isCircular(normalObject);
+
+      // Assert
+      assert.deepStrictEqual(isCircular, false);
+    });
+    it('works with arrays - true', () => {
+      // Arrange
+      const ciruclarArray = [{ a: 'b' }, { c: 'd' }];
+      ciruclarArray[2] = ciruclarArray;
+      // Act
+      const isCircular = utils.isCircular(ciruclarArray);
+
+      // Assert
+      assert.deepStrictEqual(isCircular, true);
+    });
+    it('works with deeply circular arrays - true', () => {
+      // Arrange
+      const ciruclarArray = [{ a: 'b' }, { c: '3', d: { e: {} } }];
+      ciruclarArray[1].d.k = ciruclarArray[1];
+
+      // Act
+      const isCircular = utils.isCircular(ciruclarArray);
+
+      // Assert
+      assert.deepStrictEqual(isCircular, true);
+    });
+    it('works with arrays - false', () => {
+      // Arrange
+      const normalArray = [{ a: 'b' }, { c: '3', d: { e: {} } }];
+
+      // Act
+      const isCircular = utils.isCircular(normalArray);
+
+      // Assert
+      assert.deepStrictEqual(isCircular, false);
+    });
+  });
 });

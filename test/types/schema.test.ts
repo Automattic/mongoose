@@ -283,7 +283,7 @@ function pickedSchema() {
     pickedField: string;
   }
 
-  const originSchema = new Schema<SchemaDefinition>({field: String, pickedField: String})
+  const originSchema = new Schema<SchemaDefinition>({ field: String, pickedField: String });
 
-  originSchema.pick<Pick<SchemaDefinition, 'pickedField'>>(['pickedField'])
+  originSchema.pick<Pick<SchemaDefinition, 'pickedField'>>(['pickedField']);
 }

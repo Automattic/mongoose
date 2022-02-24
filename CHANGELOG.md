@@ -10,6 +10,7 @@
  * fix(index.d.ts): ValidationError `errors` only contains CastError or ValidationError #11369 [Uzlopak](https://github.com/Uzlopak)
  * fix(index.d.ts): make InsertManyResult.insertedIds return an array of Types.ObjectId by default #11197
  * fix(index.d.ts): allow pre('save') middleware with pre options #11257
+ * fix(index.d.ts): add `supressReservedKeysWarning` option to schema #11439 [hiukky](https://github.com/hiukky)
  * docs(connections): improve replica set hostname docs with correct error message and info about `err.reason.servers` #11200
  * docs(populate): add virtual populate match option documentation #11411 [remirobichet](https://github.com/remirobichet)
  * docs(document): add note to API docs that flattenMaps defaults to `true` for `toJSON()` but not `toObject()` #11213

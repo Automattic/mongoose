@@ -8023,7 +8023,6 @@ describe('Model', function() {
   });
 
   it('saves all error object properties to paths with type `Mixed` (gh-10126)', async() => {
-
     const userSchema = new Schema({ err: Schema.Types.Mixed });
 
     const User = db.model('User', userSchema);
@@ -8043,7 +8042,6 @@ describe('Model', function() {
       assert.ok(user.err.stack);
       assert.deepEqual(user.err.metadata, { reasons: ['Cloudflare is down', 'DNS'] });
     }
-
   });
 
   it('supports skipping defaults on a find operation gh-7287', async function() {

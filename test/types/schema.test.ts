@@ -277,13 +277,13 @@ function gh11439() {
   });
 }
 
-function pickedSchema() {
-  type SchemaDefinition = {
-    field: string;
-    pickedField: string;
+function gh11448() {
+  interface IUser {
+    name: string;
+    age: number;
   }
 
-  const originSchema = new Schema<SchemaDefinition>({ field: String, pickedField: String });
+  const originSchema = new Schema<IUser>({ name: String, age: Number });
 
-  originSchema.pick<Pick<SchemaDefinition, 'pickedField'>>(['pickedField']);
+  originSchema.pick<Pick<IUser, 'age'>>(['age']);
 }

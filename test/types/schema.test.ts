@@ -276,3 +276,14 @@ function gh11439() {
     supressReservedKeysWarning: true
   });
 }
+
+function gh11448() {
+  interface IUser {
+    name: string;
+    age: number;
+  }
+
+  const userSchema = new Schema<IUser>({ name: String, age: Number });
+
+  userSchema.pick<Pick<IUser, 'age'>>(['age']);
+}

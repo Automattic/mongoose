@@ -407,10 +407,11 @@ describe('utils', function() {
       circularObject.b = circularObject;
 
       // Act
-      const isCircular = utils.isCircular(circularObject);
+      const { isCircular, path } = utils.isCircular(circularObject);
 
       // Assert
       assert.deepStrictEqual(isCircular, true);
+      assert.deepStrictEqual(path, 'b');
     });
     it('works with deeply circular objects - true', () => {
       // Arrange
@@ -418,30 +419,33 @@ describe('utils', function() {
       circularObject.b.c.d = circularObject;
 
       // Act
-      const isCircular = utils.isCircular(circularObject);
+      const { isCircular, path } = utils.isCircular(circularObject);
 
       // Assert
       assert.deepStrictEqual(isCircular, true);
+      assert.deepStrictEqual(path, 'b.c.d');
     });
     it('works with objects - false', () => {
       // Arrange
       const normalObject = { name: 'Hafez', age: 27 };
 
       // Act
-      const isCircular = utils.isCircular(normalObject);
+      const { isCircular, path } = utils.isCircular(normalObject);
 
       // Assert
       assert.deepStrictEqual(isCircular, false);
+      assert.deepStrictEqual(path, null);
     });
     it('works with arrays - true', () => {
       // Arrange
       const ciruclarArray = [{ a: 'b' }, { c: 'd' }];
       ciruclarArray[2] = ciruclarArray;
       // Act
-      const isCircular = utils.isCircular(ciruclarArray);
+      const { isCircular, path } = utils.isCircular(ciruclarArray);
 
       // Assert
       assert.deepStrictEqual(isCircular, true);
+      assert.deepStrictEqual(path, '2');
     });
     it('works with deeply circular arrays - true', () => {
       // Arrange
@@ -449,20 +453,22 @@ describe('utils', function() {
       ciruclarArray[1].d.k = ciruclarArray[1];
 
       // Act
-      const isCircular = utils.isCircular(ciruclarArray);
+      const { isCircular, path } = utils.isCircular(ciruclarArray);
 
       // Assert
       assert.deepStrictEqual(isCircular, true);
+      assert.deepStrictEqual(path, '1.d.k');
     });
     it('works with arrays - false', () => {
       // Arrange
       const normalArray = [{ a: 'b' }, { c: '3', d: { e: {} } }];
 
       // Act
-      const isCircular = utils.isCircular(normalArray);
+      const { isCircular, path } = utils.isCircular(normalArray);
 
       // Assert
       assert.deepStrictEqual(isCircular, false);
+      assert.deepStrictEqual(path, null);
     });
   });
 });

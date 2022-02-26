@@ -788,7 +788,7 @@ declare module 'mongoose' {
     translateAliases(raw: any): any;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct(field: string, filter?: FilterQuery<T>, callback?: Callback<number>): QueryWithHelpers<Array<any>, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
+    distinct<ReturnType = any>(field: string, filter?: FilterQuery<T>, callback?: Callback<number>): QueryWithHelpers<Array<ReturnType>, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
     estimatedDocumentCount(options?: QueryOptions, callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
@@ -2073,7 +2073,7 @@ declare module 'mongoose' {
     deleteOne(callback: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct(field: string, filter?: FilterQuery<DocType>, callback?: Callback<number>): QueryWithHelpers<Array<any>, DocType, THelpers, RawDocType>;
+    distinct<ReturnType = any>(field: string, filter?: FilterQuery<DocType>, callback?: Callback<number>): QueryWithHelpers<Array<ReturnType>, DocType, THelpers, RawDocType>;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     elemMatch(val: Function | any): this;

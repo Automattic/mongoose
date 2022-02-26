@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const random = require('./util').random;
 const util = require('./util');
 
 const mongoose = start.mongoose;
@@ -8088,25 +8087,81 @@ describe('Model', function() {
     assert.equal(doc.filling, 'cherry');
     assert.equal(doc.hoursToMake, null);
   });
+  describe('Using circular references (gh-10378)', () => {
+    const operationsContainers = [
+      { operationName: 'findOneAndReplace', testSecondParam: true },
+      { operationName: 'findOneAndUpdate', testSecondParam: true },
+      { operationName: 'replaceOne', testSecondParam: true },
+      { operationName: 'update', testSecondParam: true },
+      { operationName: 'updateMany', testSecondParam: true },
+      { operationName: 'updateOne', testSecondParam: true },
 
-  it('throws readable errors when parsing circular objects (gh-10378)', async() => {
-    // Arrange
-    const userSchema = new Schema({
-      name: { type: String, required: true },
-      result: Schema.Types.Mixed
-    });
-    const User = db.model('User', userSchema);
-    const circularObject = {};
-    circularObject.a = circularObject;
+      { operationName: 'insertMany', testSecondParam: false },
+      { operationName: 'insertOne', testSecondParam: false },
+      { operationName: 'create', testSecondParam: false },
 
-    // Act
-    const err = await User.updateOne(
-      { },
-      { result: circularObject }
-    ).then(() => null, err => err);
+      { operationName: 'count', testSecondParam: false },
+      { operationName: 'countDocuments', testSecondParam: false },
+      { operationName: 'distinct', testSecondParam: false },
+      { operationName: 'estimatedDocumentCount', testSecondParam: false },
+      { operationName: 'find', testSecondParam: false },
+      { operationName: 'findOne', testSecondParam: false },
 
-    // Assert
-    assert.deepStrictEqual(err.message, 'Can not parse path `result` due to circular reference.');
+      { operationName: 'deleteMany', testSecondParam: false },
+      { operationName: 'deleteOne', testSecondParam: false },
+      { operationName: 'findOneAndDelete', testSecondParam: false },
+      { operationName: 'findOneAndRemove', testSecondParam: false },
+      { operationName: 'remove', testSecondParam: false }
+    ];
+    for (const { operationName, testSecondParam } of operationsContainers) {
+
+      generateTestCase({
+        operationName,
+        paramToTest: 'first',
+        testMessage: `Model.${operationName}() - first parameter with circular references`
+      });
+
+      if (testSecondParam) {
+        generateTestCase({
+          operationName,
+          paramToTest: 'second',
+          testMessage: `Model.${operationName}() - second parameter with circular references`
+        });
+      }
+
+    }
+    function generateTestCase({ operationName, paramToTest = 'first', testMessage }) {
+      return it(testMessage, () => {
+        // Arrange
+        const userSchema = new Schema({
+          name: { type: String, required: true },
+          result: {
+            rawResult: Schema.Types.Mixed,
+            stringifiedResult: String
+          }
+        });
+        const User = db.model('User', userSchema);
+        const circularObject = {};
+        circularObject.a = circularObject;
+
+        // Act
+        let err;
+        try {
+          if (paramToTest === 'first') {
+            User[operationName]({ result: { rawResult: circularObject } });
+          } else {
+            User[operationName]({}, { result: { rawResult: circularObject } });
+          }
+
+        } catch (_err) {
+          err = _err;
+        }
+
+        // Assert
+        assert.deepStrictEqual(err.message, 'Can not parse path `result.rawResult` due to circular reference.');
+      });
+
+    }
   });
 });
 
@@ -8122,7 +8177,7 @@ function isLean(document) {
 }
 
 function generateRandomCollectionName() {
-  return 'mongoose_test_' + random();
+  return 'mongoose_test_' + util.random();
 }
 
 function pick(obj, keys) {

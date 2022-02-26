@@ -1438,6 +1438,7 @@ declare module 'mongoose' {
     T extends ReadonlyArray<infer U> ? U : T;
 
   type AnyArray<T> = T[] | ReadonlyArray<T>;
+  type SchemaValidator<T> = RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T> | ValidateOpts<T>[];
 
   export class SchemaTypeOptions<T> {
     type?:
@@ -1460,7 +1461,7 @@ declare module 'mongoose' {
     alias?: string;
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
-    validate?: RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T> | ValidateOpts<T>[];
+    validate?: SchemaValidator<T> | AnyArray<SchemaValidator<T>>;
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
     cast?: string;

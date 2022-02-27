@@ -2489,8 +2489,9 @@ declare module 'mongoose' {
 
   /**
    * Filter query to select the documents that match the query
-   * @example ```js
-   * { "age": { "$gte": 30 } }
+   * @example
+   * ```js
+   * { age: { $gte: 30 } }
    * ```
    */
   export type FilterQuery<T> = _FilterQuery<T>;
@@ -2552,8 +2553,9 @@ declare module 'mongoose' {
 
   /**
    * Update query command to perform on the document
-   * @example ```js
-   * { "age": 30 }
+   * @example
+   * ```js
+   * { age: 30 }
    * ```
    */
   export type UpdateQuery<T> = _UpdateQuery<_UpdateQueryDef<T>> & AnyObject;

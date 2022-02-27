@@ -2487,6 +2487,13 @@ declare module 'mongoose' {
   } &
     RootQuerySelector<T>;
 
+  /**
+   * Filter query to select the documents that match the query
+   * @example
+   * ```js
+   * { age: { $gte: 30 } }
+   * ```
+   */
   export type FilterQuery<T> = _FilterQuery<T>;
 
   type AddToSetOperators<Type> = {
@@ -2544,6 +2551,13 @@ declare module 'mongoose' {
     [K in keyof T]?: __UpdateDefProperty<T[K]>;
   };
 
+  /**
+   * Update query command to perform on the document
+   * @example
+   * ```js
+   * { age: 30 }
+   * ```
+   */
   export type UpdateQuery<T> = _UpdateQuery<_UpdateQueryDef<T>> & AnyObject;
 
   export type DocumentDefinition<T> = {
@@ -2586,6 +2600,12 @@ declare module 'mongoose' {
     T;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
+
+  /**
+   * Documents returned from queries with the lean option enabled.
+   * Plain old JavaScript object documents (POJO).
+   * @see https://mongoosejs.com/docs/tutorials/lean.html
+   */
   export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :

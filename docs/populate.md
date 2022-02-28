@@ -704,8 +704,8 @@ doc.numMembers; // 2
 
 <h3 id="match"><a href="#match">Populate Virtuals: The Match Option</a></h3>
 
-Another option for Populate virtuals is `match`. This option add an extra match
-condition to `populate()` :
+Another option for Populate virtuals is `match`.
+This option adds an extra filter condition to the query Mongoose uses to `populate()`:
 
 ```javascript
 // Same example as 'Populate Virtuals' section
@@ -723,6 +723,22 @@ const BlogPost = mongoose.model('BlogPost', BlogPostSchema, 'BlogPost');
 const author = await Author.findOne().populate('posts');
 
 author.posts // Array of not `archived` posts
+```
+
+You can also set the `match` option to a function.
+That allows configuring the `match` based on the document being populated.
+For example, suppose you only want to populate blog posts whose `tags` contain one of the author's `favoriteTags`.
+
+```javascript
+AuthorSchema.virtual('posts', {
+  ref: 'BlogPost',
+  localField: '_id',
+  foreignField: 'author',
+  // Add an additional filter `{ tags: author.favoriteTags }` to the populate query
+  // Mongoose calls the `match` function with the document being populated as the
+  // first argument.
+  match: author => ({ tags: author.favoriteTags })
+});
 ```
 
 <h3 id="populating-maps"><a href="#populating-maps">Populating Maps</a></h3>
@@ -842,8 +858,8 @@ const userSchema = new Schema({
 })
 
 userSchema.pre('find', function (next) {
-    this.populate("followers following");
-    next();
+  this.populate("followers following");
+  next();
 });
 
 const User = mongoose.model('User', userSchema)
@@ -855,15 +871,11 @@ To avoid this, we have to add the `_recursed` option, so that our middleware wil
 
 ```javascript
 userSchema.pre('find', function (next) {
-    if (this.options._recursed) {
-      return next();
-    }
-    this.populate({ path: "followers following", options: { _recursed: true } });
-    next();
+  if (this.options._recursed) {
+    return next();
+  }
+  this.populate({ path: "followers following", options: { _recursed: true } });
+  next();
 });
 ```
 Alternatively, you can check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
-
-### Next Up
-
-Now that we've covered `populate()`, let's take a look at [discriminators](/docs/discriminators.html).

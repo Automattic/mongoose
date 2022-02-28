@@ -1,3 +1,18 @@
+6.2.4 / 2022-02-28
+==================
+ * fix(query): correctly return full deleteOne(), deleteMany() result #11211
+ * fix(query): handle update validators on deeply nested subdocuments #11455 #11394
+ * fix(discriminator): handle modifying multiple nested paths underneath a discriminator #11428
+ * perf: improve isAsyncFunction #11408 [Uzlopak](https://github.com/Uzlopak)
+ * fix(index.d.ts): add typedefs for Schema `pick()` #11448 [Moisei-Shkil](https://github.com/Moisei-Shkil)
+ * fix(index.d.ts): allow type override for distinct() #11306
+ * fix(index.d.ts): allow array of validators in schema definition #11355
+ * fix(index.d.ts): improve connection typings #11418 [Uzlopak](https://github.com/Uzlopak)
+ * docs: add timestamps docs #11336
+ * docs(timestamps): explain how timestamps works under the hood #11336
+ * docs(migrating_to_6): add model.exists breaking change returning doument instead of boolean #11407 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(index.d.ts): add docs for FilterQuery, UpdateQuery, and LeanDocument #11457 [Moisei-Shkil](https://github.com/Moisei-Shkil)
+
 6.2.3 / 2022-02-21
 ==================
  * fix(model): avoid dropping base model indexes when using discriminators with `Connection.prototype.syncIndexes()` #11424 #11421 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
@@ -10,6 +25,7 @@
  * fix(index.d.ts): ValidationError `errors` only contains CastError or ValidationError #11369 [Uzlopak](https://github.com/Uzlopak)
  * fix(index.d.ts): make InsertManyResult.insertedIds return an array of Types.ObjectId by default #11197
  * fix(index.d.ts): allow pre('save') middleware with pre options #11257
+ * fix(index.d.ts): add `supressReservedKeysWarning` option to schema #11439 [hiukky](https://github.com/hiukky)
  * docs(connections): improve replica set hostname docs with correct error message and info about `err.reason.servers` #11200
  * docs(populate): add virtual populate match option documentation #11411 [remirobichet](https://github.com/remirobichet)
  * docs(document): add note to API docs that flattenMaps defaults to `true` for `toJSON()` but not `toObject()` #11213

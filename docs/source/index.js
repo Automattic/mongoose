@@ -50,6 +50,7 @@ exports['docs/compatibility.md'] = {
   guide: true,
   markdown: true
 };
+exports['docs/timestamps.md'] = { title: 'Mongoose Timestamps', markdown: true };
 exports['docs/search.pug'] = { title: 'Search' };
 exports['docs/enterprise.md'] = { title: 'Mongoose for Enterprise', markdown: true };
 exports['docs/sponsors.pug'] = {

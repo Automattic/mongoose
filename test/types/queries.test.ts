@@ -233,3 +233,24 @@ async function gh11041(): Promise<void> {
 
   expectType<HydratedDocument<User> | null>(await MyModel.findOne({}).populate('someField').exec());
 }
+
+async function gh11306(): Promise<void> {
+  interface User {
+    name: string;
+    email: string;
+    avatar?: string;
+  }
+
+  // 2. Create a Schema corresponding to the document interface.
+  const schema = new Schema<User>({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    avatar: String
+  });
+
+  // 3. Create a Model.
+  const MyModel = model<User>('User', schema);
+
+  expectType<any[]>(await MyModel.distinct('name'));
+  expectType<string[]>(await MyModel.distinct<string>('name'));
+}

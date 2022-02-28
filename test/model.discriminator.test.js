@@ -1870,6 +1870,7 @@ describe('model', function() {
     assert.equal(res.c.gc.gc11, 'eleventy');
     assert.equal(res.c.gc.gc12, 110);
   });
+
   it('Should allow reusing discriminators (gh-10931)', async function() {
     const options = { discriminatorKey: 'kind', overwriteModels: true };
     const eventSchema = new mongoose.Schema({ time: Date }, options);
@@ -1889,5 +1890,44 @@ describe('model', function() {
 
     const reUseEvent = new reUse({ time: Date.now(), url: 'test.com' });
     assert.ok(reUseEvent.url);
+  });
+
+  it('handles updating multiple properties nested underneath a discriminator (gh-11428)', async function() {
+    const StepSchema = new Schema({ url: String }, { discriminatorKey: 'type' });
+    const SheetReadOptionsSchema = new Schema({
+      location: {
+        id: String,
+        timeout: Number
+      }
+    });
+    const ClickSchema = new Schema(
+      [StepSchema, { sheetOptions: SheetReadOptionsSchema }],
+      { discriminatorKey: 'type' }
+    );
+
+    const Step = db.model('Step', StepSchema);
+
+    Step.discriminator('click', ClickSchema);
+
+    const doc = await Step.create({
+      type: 'click',
+      url: 'https://google.com',
+      sheetOptions: {
+        location: {
+          id: 'currentCell',
+          timeout: 1000
+        }
+      }
+    });
+
+    doc.set({
+      'sheetOptions.location.id': 'inColumn',
+      'sheetOptions.location.timeout': 2000
+    });
+    await doc.save();
+
+    const updatedDoc = await Step.findOne({ type: 'click', _id: doc._id });
+    assert.equal(updatedDoc.sheetOptions.location.id, 'inColumn');
+    assert.equal(updatedDoc.sheetOptions.location.timeout, 2000);
   });
 });

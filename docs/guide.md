@@ -1099,11 +1099,16 @@ thing.save(); // version is not incremented
 
 <h3 id="timestamps"><a href="#timestamps">option: timestamps</a></h3>
 
-The `timestamps` option tells mongoose to assign `createdAt` and `updatedAt` fields
+The `timestamps` option tells Mongoose to assign `createdAt` and `updatedAt` fields
 to your schema. The type assigned is [Date](./api.html#schema-date-js).
 
 By default, the names of the fields are `createdAt` and `updatedAt`. Customize
 the field names by setting `timestamps.createdAt` and `timestamps.updatedAt`.
+
+The way `timestamps` works under the hood is:
+* If you create a new document, mongoose simply sets `createdAt`, and `updatedAt` to the time of creation.
+* If you update a document, mongoose will add `updatedAt` to the `$set` object.
+* If you set `upsert: true` on an update operation, mongoose will use [`$setOnInsert`](https://docs.mongodb.com/manual/reference/operator/update/setOnInsert/) operator to add `createdAt` to the document in case the `upsert` operation resulted into a new inserted document.
 
 ```javascript
 const thingSchema = new Schema({..}, { timestamps: { createdAt: 'created_at' } });

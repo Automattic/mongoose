@@ -1,6 +1,6 @@
-/// <reference path="./Error.d.ts" />
-/// <reference path="./PipelineStage.d.ts" />
-/// <reference path="./Connection.d.ts" />
+/// <reference path="./connection.d.ts" />
+/// <reference path="./error.d.ts" />
+/// <reference path="./pipelinestage.d.ts" />
 
 import events = require('events');
 import mongodb = require('mongodb');

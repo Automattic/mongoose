@@ -25,7 +25,8 @@
     "mpath": "0.8.4",
     "mquery": "4.0.2",
     "ms": "2.1.3",
-    "sift": "16.0.0"
+    "sift": "16.0.0",
+    "update-notifier": "^5.1.0"
   },
   "devDependencies": {
     "@babel/core": "7.17.5",

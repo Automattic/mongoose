@@ -2790,7 +2790,7 @@ declare module 'mongoose' {
     skip(num: number): this;
 
     /** Appends a new $sort operator to this aggregate pipeline. */
-    sort(arg: PipelineStage.Sort['$sort']): this;
+    sort(arg: string | PipelineStage.Sort['$sort']): this;
 
     /** Provides promise for aggregate. */
     then: Promise<R>['then'];

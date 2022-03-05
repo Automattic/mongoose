@@ -1267,7 +1267,6 @@ declare module 'mongoose' {
     ? { [path: string]: SchemaDefinitionProperty; }
     : { [path in keyof T]?: SchemaDefinitionProperty<T[path]>; };
 
-  
   type Unpacked<T> = T extends (infer U)[] ?
     U :
     T extends ReadonlyArray<infer U> ? U : T;

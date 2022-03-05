@@ -8076,14 +8076,31 @@ describe('model: populate:', function() {
       const s2docs = await S2.create([{ s1: s1doc }, { s1: s1doc }]);
       await S3.create([{ s2: s2docs[0] }, { s2: s2docs[0] }, { s2: s2docs[1] }]);
 
-      const doc = await S1.findOne({}).populate({
+      let doc = await S1.findOne({}).populate({
         path: 's2',
         populate: {
           path: 'numS3'
         }
       });
-
       assert.deepEqual(doc.s2.map(s => s.numS3).sort(), [1, 2]);
+
+      await S3.deleteMany({ s2: s2docs[1] });
+      doc = await S1.findOne({}).populate({
+        path: 's2',
+        populate: {
+          path: 'numS3'
+        }
+      });
+      assert.deepEqual(doc.s2.map(s => s.numS3).sort(), [0, 2]);
+
+      await S3.deleteMany({});
+      doc = await S1.findOne({}).populate({
+        path: 's2',
+        populate: {
+          path: 'numS3'
+        }
+      });
+      assert.deepEqual(doc.s2.map(s => s.numS3).sort(), [0, 0]);
     });
 
     it('explicit model option overrides refPath (gh-7273)', async function() {
@@ -8551,6 +8568,54 @@ describe('model: populate:', function() {
       assert.equal(team.developers[0].ticketCount, 2);
       assert.equal(team.developers[1].ticketCount, 1);
       assert.equal(team.developers[2].ticketCount, 0);
+    });
+
+    it('returns an array when count on an array localField (gh-11307) (gh-7573)', async function() {
+      const CommentSchema = Schema({
+        content: String,
+        replies: [{ type: 'ObjectId', ref: 'Comment' }]
+      });
+      CommentSchema.virtual('reportReplyCount', {
+        ref: 'Report',
+        localField: 'replies',
+        foreignField: 'reportModel',
+        justOne: false,
+        count: true,
+        match: { reportType: 'Comment' }
+      });
+      const ReportSchema = Schema({
+        reportType: String,
+        reportModel: 'ObjectId'
+      });
+
+      const Comment = db.model('Comment', CommentSchema);
+      const Report = db.model('Report', ReportSchema);
+
+      const comment1 = await Comment.create({ content: 'comment1' });
+      const comment2 = await Comment.create({ content: 'comment2' });
+      const comment3 = await Comment.create({ content: 'comment3' });
+
+      comment1.replies = [comment2, comment3];
+      await comment1.save();
+      await Report.create([
+        { reportType: 'Comment', reportModel: comment2._id },
+        { reportType: 'Comment', reportModel: comment2._id },
+        { reportType: 'Comment', reportModel: comment3._id },
+        { reportType: 'Other', reportModel: comment3._id }
+      ]);
+
+      let doc;
+
+      doc = await Comment.findOne({ _id: comment1._id }).populate('reportReplyCount');
+      assert.deepStrictEqual(doc.reportReplyCount, [2, 1]);
+
+      await Report.deleteMany({ reportModel: comment3._id });
+      doc = await Comment.findOne({ _id: comment1._id }).populate('reportReplyCount');
+      assert.deepStrictEqual(doc.reportReplyCount, [2, 0]);
+
+      await Report.deleteMany({});
+      doc = await Comment.findOne({ _id: comment1._id }).populate('reportReplyCount');
+      assert.deepStrictEqual(doc.reportReplyCount, [0, 0]);
     });
 
     it('handles virtual populate of an embedded discriminator nested path (gh-6488) (gh-8173)', async function() {

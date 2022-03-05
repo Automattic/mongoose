@@ -2500,7 +2500,7 @@ declare module 'mongoose' {
     $each: Type;
   };
 
-  type SortValues = -1 | 1 | 'asc' | 'desc';
+  type SortValues = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
   type ArrayOperator<Type> = {
     $each: Type;
@@ -2790,7 +2790,7 @@ declare module 'mongoose' {
     skip(num: number): this;
 
     /** Appends a new $sort operator to this aggregate pipeline. */
-    sort(arg: PipelineStage.Sort['$sort']): this;
+    sort(arg: string | Record<string, SortValues> | PipelineStage.Sort['$sort']): this;
 
     /** Provides promise for aggregate. */
     then: Promise<R>['then'];

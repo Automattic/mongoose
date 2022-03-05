@@ -2,9 +2,9 @@ import { Schema, Document, SchemaDefinition, Model } from 'mongoose';
 import { expectType, expectNotType, expectError } from 'tsd';
 
 enum Genre {
-  Action,
-  Adventure,
-  Comedy
+  Action = 'Action',
+  Adventure = 'Adventure',
+  Comedy = 'Comedy'
 }
 
 interface Actor {
@@ -27,7 +27,8 @@ interface Movie {
 const movieSchema = new Schema<Document & Movie, Model<Document & Movie>>({
   title: {
     type: String,
-    index: 'text'
+    index: 'text',
+    text: true
   },
   featuredIn: {
     type: String,

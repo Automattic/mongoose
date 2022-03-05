@@ -2690,7 +2690,7 @@ declare module 'mongoose' {
     static get(getter: (value: any) => any): void;
 
     /** The class that Mongoose uses internally to instantiate this SchemaType's `options` property. */
-    OptionsConstructor: typeof SchemaTypeOptions;
+    OptionsConstructor: SchemaTypeOptionsClass;
 
     /** Cast `val` to this schema type. Each class that inherits from schema type should implement this function. */
     cast(val: any, doc: Document<any>, init: boolean, prev?: any, options?: any): any;

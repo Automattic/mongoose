@@ -52,12 +52,19 @@ declare module 'mongoose' {
      * When you define a [discriminator](/docs/discriminators.html), Mongoose adds a path to your
      * schema that stores which discriminator a document is an instance of. By default, Mongoose
      * adds an `__t` path, but you can set `discriminatorKey` to overwrite this default.
+     *
+     * @default '__t'
      */
     discriminatorKey?: string;
-    /** defaults to false. */
-    emitIndexErrors?: boolean;
 
-    excludeIndexes?: any;
+    /**
+     * Option for nested Schemas.
+     *
+     * If true, skip building indexes on this schema's path.
+     *
+     * @default false
+     */
+    excludeIndexes?: boolean;
     /**
      * Mongoose assigns each of your schemas an id virtual getter by default which returns the document's _id field
      * cast to a string, or in the case of ObjectIds, its hexString.
@@ -136,10 +143,14 @@ declare module 'mongoose' {
      * The versionKey is a property set on each document when first created by Mongoose. This keys value
      * contains the internal revision of the document. The versionKey option is a string that represents
      * the path to use for versioning. The default is '__v'.
+     *
+     * @default '__v'
      */
     versionKey?: string | boolean;
     /**
      * By default, Mongoose will automatically select() any populated paths for you, unless you explicitly exclude them.
+     *
+     * @default true
      */
     selectPopulatedPaths?: boolean;
     /**
@@ -147,7 +158,7 @@ declare module 'mongoose' {
      * incremented even if these paths are updated). DO NOT do this unless you know what you're doing.
      * For subdocuments, include this on the parent document using the fully qualified path.
      */
-    skipVersioning?: any;
+    skipVersioning?: {[key: string]: boolean; };
     /**
      * Validation errors in a single nested schema are reported
      * both on the child and on the parent schema.

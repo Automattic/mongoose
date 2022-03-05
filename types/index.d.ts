@@ -1256,10 +1256,10 @@ declare module 'mongoose' {
     typeof SchemaType |
     Schema<any, any, any> |
     Schema<any, any, any>[] |
-    SchemaTypeOptions<T extends undefined ? any : T>[] |
+    SchemaTypeOptions<T extends undefined ? any : Unpacked<T>>[] |
     Function[] |
     SchemaDefinition<T> |
-    SchemaDefinition<T>[] |
+    SchemaDefinition<Unpacked<T>>[] |
     typeof SchemaTypes.Mixed;
 
   type SchemaDefinition<T = undefined> = T extends undefined

@@ -197,7 +197,7 @@ You'll see the below output from Mongoose debug mode:
 Mongoose: users.findOneAndUpdate({}, { '$setOnInsert': { createdAt: new Date("Sun, 27 Feb 2022 00:26:27 GMT") }, '$set': { updatedAt: new Date("Sun, 27 Feb 2022 00:26:27 GMT"), name: 'test' }}, {...})
 ```
 
-Notice the `$setOnInsert` for `createdAt` and `$set` for `createdAt`.
+Notice the `$setOnInsert` for `createdAt` and `$set` for `updatedAt`.
 MongoDB's [`$setOnInsert` operator](https://docs.mongodb.com/manual/reference/operator/update/setOnInsert/) applies the update only if a new document is [upserted](https://masteringjs.io/tutorials/mongoose/upsert).
 So, for example, if you want to _only_ set `updatedAt` if the document if a new document is created, you can disable the `updatedAt` timestamp and set it yourself as shown below:
 

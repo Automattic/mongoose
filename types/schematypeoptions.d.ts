@@ -1,12 +1,12 @@
 declare module 'mongoose' {
 
-  interface ValidatorProps {
+  interface ValidatorProps<T> {
     path: string;
-    value: any;
+    value: T;
   }
 
-  interface ValidatorMessageFn {
-    (props: ValidatorProps): string;
+  interface ValidatorMessageFn<T> {
+    (props: ValidatorProps<T>): string;
   }
 
   interface ValidateFn<T> {
@@ -14,16 +14,16 @@ declare module 'mongoose' {
   }
 
   interface LegacyAsyncValidateFn<T> {
-    (value: T, done: (result: boolean) => void): void;
+    (value: T, callback: (result: boolean) => void): void;
   }
 
   interface AsyncValidateFn<T> {
-    (value: any): Promise<boolean>;
+    (value: T): Promise<boolean>;
   }
 
   interface ValidateOpts<T> {
     msg?: string;
-    message?: string | ValidatorMessageFn;
+    message?: string | ValidatorMessageFn<T>;
     type?: string;
     validator: ValidateFn<T> | LegacyAsyncValidateFn<T> | AsyncValidateFn<T>;
   }

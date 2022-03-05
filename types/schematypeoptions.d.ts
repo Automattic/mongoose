@@ -165,7 +165,7 @@ declare module 'mongoose' {
 
   export interface BufferSchemaTypeOptions {
     /** The default [subtype](http://bsonspec.org/spec.html) associated with this buffer when it is stored in MongoDB. Only allowed for buffer paths */
-    subtype?: 0x0 | 0x1 | 0x2 | 0x3 | 0x4 | 0x5 | 0x6 | 0x80;
+    subtype?: 0x00 | 0x01 | 0x02 | 0x03 | 0x04 | 0x05 | 0x06 | 0x80;
   }
 
   export interface DateSchemaTypeOptions {

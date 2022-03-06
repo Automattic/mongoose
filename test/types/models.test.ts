@@ -1,5 +1,6 @@
 import { Schema, Document, Model, Types, connection, model } from 'mongoose';
 import { expectError } from 'tsd';
+import {  m0_0aSchema } from './schema.test';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -205,4 +206,21 @@ function inheritance() {
       await this.findOneAndDelete({ installationId });
     }
   }
+}
+
+function m0_0aModel() {
+  const AutoTypeSchema = m0_0aSchema();
+  const AutoTypeModel = model('AutoTypeModel', AutoTypeSchema);
+
+  /* -------------------------------------------------------------------------- */
+  /*                            Model-functions-test                            */
+  /* -------------------------------------------------------------------------- */
+
+  AutoTypeModel.create({ });
+
+  /* -------------------------------------------------------------------------- */
+  /*                                Instance-Test                               */
+  /* -------------------------------------------------------------------------- */
+
+  const AutoTypeModelInstance = new AutoTypeModel({ });
 }

@@ -51,20 +51,20 @@ declare module 'mongoose' {
 
     /**
      * A string containing the current operation that Mongoose is executing
-     * on this document. May be `null`, `'save'`, `'validate'`, or `'remove'`.
+     * on this document. Can be `null`, `'save'`, `'validate'`, or `'remove'`.
      */
-    $op: string | null;
+    $op: 'save' | 'validate' | 'remove' | null;
 
     /**
      * Getter/setter around the session associated with this document. Used to
      * automatically set `session` if you `save()` a doc that you got from a
      * query with an associated session.
      */
-    $session(session?: mongodb.ClientSession | null): mongodb.ClientSession;
+    $session(session?: mongodb.ClientSession | null): mongodb.ClientSession | null;
 
     /** Alias for `set()`, used internally to avoid conflicts */
-    $set(path: string, val: any, options?: any): this;
     $set(path: string, val: any, type: any, options?: any): this;
+    $set(path: string, val: any, options?: any): this;
     $set(value: any): this;
 
     /** Set this property to add additional query filters when Mongoose saves this document and `isNew` is false. */
@@ -80,14 +80,14 @@ declare module 'mongoose' {
     db: Connection;
 
     /** Removes this document from the db. */
+    delete(options: QueryOptions, callback: Callback): void;
+    delete(callback: Callback): void;
     delete(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
-    delete(options: QueryOptions, cb?: Callback): void;
-    delete(cb: Callback): void;
 
     /** Removes this document from the db. */
+    deleteOne(options: QueryOptions, callback: Callback): void;
+    deleteOne(callback: Callback): void;
     deleteOne(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
-    deleteOne(options: QueryOptions, cb?: Callback): void;
-    deleteOne(cb: Callback): void;
 
     /**
      * Takes a populated field and returns it to its unpopulated state. If called with
@@ -111,7 +111,7 @@ declare module 'mongoose' {
      */
     equals(doc: Document<T>): boolean;
 
-    /** Hash containing current validation errors. */
+    /** Returns the current validation errors. */
     errors?: Error.ValidationError;
 
     /** Returns the value of a path. */
@@ -134,7 +134,7 @@ declare module 'mongoose' {
     * Called internally after a document is returned from mongodb. Normally,
     * you do **not** need to call this function on your own.
     */
-    init(obj: any, opts?: any, cb?: Callback<this>): this;
+    init(obj: AnyObject, opts?: AnyObject, callback?: Callback<this>): this;
 
     /** Marks a path as invalid, causing validation to fail. */
     invalidate(path: string, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
@@ -149,7 +149,7 @@ declare module 'mongoose' {
     isInit(path: string): boolean;
 
     /**
-     * Returns true if any of the given paths is modified, else false. If no arguments, returns `true` if any path
+     * Returns true if any of the given paths are modified, else false. If no arguments, returns `true` if any path
      * in this document is modified.
      */
     isModified(path?: string | Array<string>): boolean;
@@ -183,33 +183,33 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /** Populates document references. */
-    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this & Paths>;
     populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this & Paths>): void;
-    populate<Paths = {}>(path: string, names: string): Promise<this & Paths>;
     populate<Paths = {}>(path: string, names: string, callback: Callback<this & Paths>): void;
+    populate<Paths = {}>(path: string, names: string): Promise<this & Paths>;
+    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this & Paths>;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
 
     /** Removes this document from the db. */
+    remove(options: QueryOptions, callback: Callback): void;
+    remove(callback: Callback): void;
     remove(options?: QueryOptions): Promise<this>;
-    remove(options?: QueryOptions, cb?: Callback): void;
 
     /** Sends a replaceOne command with this document `_id` as the query selector. */
     replaceOne(replacement?: AnyObject, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
-    replaceOne(replacement?: AnyObject, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
 
     /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
+    save(options: SaveOptions, callback: Callback<this>): void;
+    save(callback: Callback<this>): void;
     save(options?: SaveOptions): Promise<this>;
-    save(options?: SaveOptions, fn?: Callback<this>): void;
-    save(fn?: Callback<this>): void;
 
     /** The document's schema. */
     schema: Schema;
 
     /** Sets the value of a path, or many paths. */
-    set(path: string, val: any, options?: any): this;
     set(path: string, val: any, type: any, options?: any): this;
+    set(path: string, val: any, options?: any): this;
     set(value: any): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
@@ -231,14 +231,14 @@ declare module 'mongoose' {
     updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
 
     /** Executes registered validation rules for this document. */
-    validate(options: { pathsToSkip?: pathsToSkip }): Promise<void>;
-    validate(pathsToValidate?: pathsToValidate, options?: any): Promise<void>;
-    validate(callback: CallbackWithoutResult): void;
+    validate(pathsToValidate: pathsToValidate, options: AnyObject, callback: CallbackWithoutResult): void;
     validate(pathsToValidate: pathsToValidate, callback: CallbackWithoutResult): void;
-    validate(pathsToValidate: pathsToValidate, options: any, callback: CallbackWithoutResult): void;
+    validate(callback: CallbackWithoutResult): void;
+    validate(pathsToValidate?: pathsToValidate, options?: AnyObject): Promise<void>;
+    validate(options: { pathsToSkip?: pathsToSkip }): Promise<void>;
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
     validateSync(options: { pathsToSkip?: pathsToSkip, [k: string]: any }): Error.ValidationError | null;
-    validateSync(pathsToValidate?: Array<string>, options?: any): Error.ValidationError | null;
+    validateSync(pathsToValidate?: Array<string>, options?: AnyObject): Error.ValidationError | null;
   }
 }

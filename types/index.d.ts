@@ -9,6 +9,7 @@
 import events = require('events');
 import mongodb = require('mongodb');
 import mongoose = require('mongoose');
+import { ObtainDocumentPropertyType, ObtainDocumentType } from './infer-doc-type';
 
 declare module 'mongoose' {
 
@@ -230,7 +231,7 @@ declare module 'mongoose' {
     discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
-  type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
+  type AnyKeys<T> = { [P in keyof T]?: ObtainDocumentPropertyType<T[P]> };
   interface AnyObject { [k: string]: any }
 
   type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
@@ -252,7 +253,7 @@ declare module 'mongoose' {
 
   export const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
-    new<DocType = AnyKeys<T> & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
+    new<DocType = ObtainDocumentType<T> & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[], cb: Function): Aggregate<Array<R>>;
@@ -763,7 +764,7 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<DocType>>, options?: SchemaOptions);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<DocType>> | DocType, options?: SchemaOptions);
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<DocType>> | Schema, prefix?: string): this;

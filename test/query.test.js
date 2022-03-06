@@ -3914,4 +3914,16 @@ describe('Query', function() {
     const foos = await Test.find({ bars: { $not: { $size: 0 } } });
     assert.ok(foos);
   });
+  it('should not error when $not is used on an array of strings (gh-11467)', async function() {
+    const testSchema = Schema({ names: [String] });
+    const Test = db.model('Test', testSchema);
+
+    await Test.create([{ names: ['foo'] }, { names: ['bar'] }]);
+
+    let res = await Test.find({ names: { $not: /foo/ } });
+    assert.deepStrictEqual(res.map(el => el.names), [['bar']]);
+
+    res = await Test.find({ names: { $not: { $regex: 'foo' } } });
+    assert.deepStrictEqual(res.map(el => el.names), [['bar']]);
+  });
 });

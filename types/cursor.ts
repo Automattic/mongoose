@@ -1,4 +1,3 @@
-
 import stream = require('stream');
 
 declare module 'mongoose' {

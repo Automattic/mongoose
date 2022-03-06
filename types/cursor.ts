@@ -35,7 +35,7 @@ declare module 'mongoose' {
      * Registers a transform function which subsequently maps documents retrieved
      * via the streams interface or `.next()`
      */
-    map<ResultType>(fn: (res: DocType) => ResultType): Cursor<ResultType>;
+    map<ResultType>(fn: (res: DocType) => ResultType): Cursor<ResultType, Options>;
 
     /**
      * Get the next document from this cursor. Will return `null` when there are

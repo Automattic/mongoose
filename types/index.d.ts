@@ -1,8 +1,7 @@
 /// <reference path="./connection.d.ts" />
-/// <reference path="./aggregationcursor.d.ts" />
+/// <reference path="./cursor.ts" />
 /// <reference path="./error.d.ts" />
 /// <reference path="./pipelinestage.d.ts" />
-/// <reference path="./querycursor.d.ts" />
 
 import events = require('events');
 import mongodb = require('mongodb');
@@ -2055,7 +2054,7 @@ declare module 'mongoose' {
      * Returns a wrapper around a [mongodb driver cursor](http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html).
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      */
-    cursor(options?: any): QueryCursor<DocType>;
+    cursor(options?: QueryOptions): Cursor<DocType, QueryOptions>;
 
     /**
      * Declare and/or execute this query as a `deleteMany()` operation. Works like
@@ -2661,7 +2660,7 @@ declare module 'mongoose' {
     /**
      * Sets the cursor option for the aggregation query (ignored for < 2.6.0).
      */
-    cursor(options?: Record<string, unknown>): AggregationCursor;
+    cursor<DocType = any>(options?: Record<string, unknown>): Cursor<DocType>;
 
     /** Executes the aggregate pipeline on the currently bound Model. */
     exec(callback?: Callback<R>): Promise<R>;

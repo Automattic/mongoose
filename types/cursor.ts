@@ -2,19 +2,23 @@
 import stream = require('stream');
 
 declare module 'mongoose' {
-  class AggregationCursor extends stream.Readable {
+  type CursorFlag = 'tailable' | 'oplogReplay' | 'noCursorTimeout' | 'awaitData' | 'partial';
+
+  class Cursor<DocType = any, Options = never> extends stream.Readable {
+    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
+
     /**
      * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
      * Useful for setting the `noCursorTimeout` and `tailable` flags.
      */
-    addCursorFlag(flag: string, value: boolean): this;
+    addCursorFlag(flag: CursorFlag, value: boolean): this;
 
     /**
      * Marks this cursor as closed. Will stop streaming and subsequent calls to
      * `next()` will error.
      */
-    close(): Promise<void>;
     close(callback: CallbackWithoutResult): void;
+    close(): Promise<void>;
 
     /**
      * Execute `fn` for every document(s) in the cursor. If batchSize is provided
@@ -22,20 +26,24 @@ declare module 'mongoose' {
      * will wait for the promise to resolve before iterating on to the next one.
      * Returns a promise that resolves when done.
      */
-    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }): Promise<void>;
-    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }, cb?: CallbackWithoutResult): void;
+    eachAsync(fn: (doc: DocType[]) => void, options: { parallel?: number, batchSize: number }, callback: CallbackWithoutResult): void;
+    eachAsync(fn: (doc: DocType) => void, options: { parallel?: number }, callback: CallbackWithoutResult): void;
+    eachAsync(fn: (doc: DocType[]) => void, options: { parallel?: number, batchSize: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType) => void, options?: { parallel?: number }): Promise<void>;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved
      * via the streams interface or `.next()`
      */
-    map(fn: (res: any) => any): this;
+    map<ResultType>(fn: (res: DocType) => ResultType): Cursor<ResultType>;
 
     /**
      * Get the next document from this cursor. Will return `null` when there are
      * no documents left.
      */
-    next(): Promise<any>;
-    next(callback: Callback): void;
+    next(callback: Callback<DocType | null>): void;
+    next(): Promise<DocType>;
+
+    options: Options;
   }
 }

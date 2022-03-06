@@ -1,4 +1,4 @@
-import { Schema, Document, SchemaDefinition, Model } from 'mongoose';
+import { Schema, Document, SchemaDefinition, Model, SchemaTypes } from 'mongoose';
 import { expectType, expectNotType, expectError } from 'tsd';
 
 enum Genre {
@@ -287,4 +287,17 @@ function gh11448() {
   const userSchema = new Schema<IUser>({ name: String, age: Number });
 
   userSchema.pick<Pick<IUser, 'age'>>(['age']);
+}
+
+interface IPatient {
+  birthday?: string | Date;
+}
+
+function gh10900() {
+
+  const patientSchema = new Schema<IPatient>({
+    birthday: {
+      type: SchemaTypes.Mixed
+    }
+  });
 }

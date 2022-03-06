@@ -77,7 +77,7 @@ movieSchema.index({ title: 1 }, { unique: true });
 
 // Using `SchemaDefinition`
 interface IProfile { age: number; }
-interface ProfileDoc extends Document, IProfile {}
+interface ProfileDoc extends Document, IProfile { }
 const ProfileSchemaDef: SchemaDefinition<IProfile> = { age: Number };
 export const ProfileSchema = new Schema<ProfileDoc, Model<ProfileDoc>, ProfileDoc>(ProfileSchemaDef);
 
@@ -86,7 +86,7 @@ interface IUser {
   profile: ProfileDoc;
 }
 
-interface UserDoc extends Document, IUser {}
+interface UserDoc extends Document, IUser { }
 
 const ProfileSchemaDef2: SchemaDefinition<IProfile> = {
   age: Schema.Types.Number
@@ -194,7 +194,7 @@ function gh10605() {
 
 function gh10605_2() {
   interface ITestSchema extends Document {
-    someObject: Array<{id: string}>
+    someObject: Array<{ id: string }>
   }
 
   const testSchema = new Schema<ITestSchema>({
@@ -295,9 +295,26 @@ interface IPatient {
 
 function gh10900() {
 
-  const patientSchema = new Schema<IPatient>({
+  const patientSchemaDate = new Schema<IPatient>({
+    birthday: {
+      type: 'Date'
+    }
+  });
+  const patientSchemaString = new Schema<IPatient>({
+    birthday: {
+      type: 'String'
+    }
+  });
+
+  const patientSchemaMixed = new Schema<IPatient>({
     birthday: {
       type: SchemaTypes.Mixed
     }
   });
+
+  expectError(new Schema<IPatient>({
+    birthday: {
+      type: SchemaTypes.ObjectId
+    }
+  }));
 }

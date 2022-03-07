@@ -295,15 +295,15 @@ declare module 'mongoose' {
     countDocuments(filter: FilterQuery<T>, options?: QueryOptions, callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a new document or documents */
-    create(docs: (AnyKeys<T> | AnyObject)[], options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create(docs: (AnyKeys<T> | AnyObject)[], callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
-    create(doc: AnyKeys<T> | AnyObject): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
-    create(doc: AnyKeys<T> | AnyObject, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
-    create<DocContents = AnyKeys<T>>(docs: DocContents[], options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = AnyKeys<T>>(docs: DocContents[], callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
-    create<DocContents = AnyKeys<T>>(doc: DocContents): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
-    create<DocContents = AnyKeys<T>>(...docs: DocContents[]): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = AnyKeys<T>>(doc: DocContents, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
+    create(docs: (T)[], options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create(docs: (T)[], callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
+    create(doc: T): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
+    create(doc: T, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
+    create<DocContents = T>(docs: DocContents[], options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = T>(docs: DocContents[], callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
+    create<DocContents = T>(doc: DocContents): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
+    create<DocContents = { [P in keyof T]?: T[P] }>(...docs: DocContents[]): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = T>(doc: DocContents, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,
@@ -2048,7 +2048,7 @@ declare module 'mongoose' {
     [Extract<T, mongodb.ObjectId>] extends [never] ? T :
     T | string;
   type _UpdateQueryDef<T> = {
-    [K in keyof T]?: __UpdateDefProperty<T[K]>;
+    [K in keyof T]?: __UpdateDefProperty<T[K]> | any;
   };
 
   /**

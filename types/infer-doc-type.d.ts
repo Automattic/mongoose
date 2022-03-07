@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
 
 type RequiredPropertyKeys<T> = {
-  [K in keyof T]: T[K] extends { required: any } ? K : never;
+  [K in keyof T]: T[K] extends { required: true | [true, string|undefined] } ? K : never;
 }[keyof T];
 
 type RequiredProperties<T> = {
@@ -9,7 +9,7 @@ type RequiredProperties<T> = {
 };
 
 type OptionalPropertyKeys<T> = {
-  [K in keyof T]: T[K] extends { required: any } ? never : K;
+  [K in keyof T]: T[K] extends { required: true | [true, string|undefined] } ? never : K;
 }[keyof T];
 
 type OptionalProperties<T> = {
@@ -22,13 +22,14 @@ type ResolvePropertyType<PropertyValue> = PropertyValue extends (
   ? ReturnType<PropertyValue>
   : PropertyValue;
 
-export type ObtainDocumentPropertyType<PropertyValue> = ResolvePropertyType<
+export type ObtainDocumentPropertyType<PropertyValue> = PropertyValue extends Schema<any> ? InferSchemaType<PropertyValue>: ResolvePropertyType<
   PropertyValue extends { type: any }
     ? ResolvePropertyType<PropertyValue['type']>
     : PropertyValue
 >;
 
-export type ObtainDocumentType<DocDefinition, DocType = any> = DoesDocTypeExist<DocType> extends true ? DocType :{
+export type ObtainDocumentType<DocDefinition, DocType = any> =
+  DoesDocTypeExist<DocType> extends true ? DocType : {
   [K in keyof (RequiredProperties<DocDefinition> &
     OptionalProperties<DocDefinition>)]: ObtainDocumentPropertyType<DocDefinition[K]>;
 };

@@ -38,7 +38,7 @@ describe('Lean Tutorial', function() {
     // In case you were wondering, the JSON form of a Mongoose doc is the same
     // as the POJO. This additional memory only affects how much memory your
     // Node.js process uses, not how much data is sent over the network.
-    JSON.stringify(normalDoc).length === JSON.stringify(leanDoc.length); // true
+    JSON.stringify(normalDoc).length === JSON.stringify(leanDoc).length; // true
     // acquit:ignore:start
     assert.ok(v8Serialize(normalDoc).length >= 300 && v8Serialize(normalDoc).length <= 800, v8Serialize(normalDoc).length);
     assert.equal(v8Serialize(leanDoc).length, 32);

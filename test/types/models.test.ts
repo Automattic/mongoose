@@ -1,6 +1,6 @@
 import { Schema, Document, Model, Types, connection, model } from 'mongoose';
-import { expectError } from 'tsd';
-import { m0_0aSchema } from './schema.test';
+import { expectError, expectType } from 'tsd';
+import { M0_0aAutoTypedSchemaType, m0_0aSchema } from './schema.test';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -216,9 +216,13 @@ function m0_0aModel() {
   /*                            Model-functions-test                            */
   /* -------------------------------------------------------------------------- */
 
+  AutoTypeModel.create({ });
+
   /* -------------------------------------------------------------------------- */
   /*                                Instance-Test                               */
   /* -------------------------------------------------------------------------- */
 
-  const AutoTypeModelInstance = new AutoTypeModel({ });
+  const AutoTypeModelInstance = new AutoTypeModel({});
+
+  expectType<M0_0aAutoTypedSchemaType['userName']>(AutoTypeModelInstance.userName);
 }

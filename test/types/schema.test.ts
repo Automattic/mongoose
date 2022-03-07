@@ -1,6 +1,5 @@
 import { Schema, Document, SchemaDefinition, Model } from 'mongoose';
-import { expectError } from 'tsd';
-import { assert, Equals } from 'tsafe';
+import { expectError, expectType } from 'tsd';
 import { InferSchemaType } from '../../types/infer-doc-type';
 
 enum Genre {
@@ -304,14 +303,11 @@ export function m0_0aSchema() {
     description: String
   });
 
-  assert<Equals<InferSchemaType<typeof AutoTypedSchema>, M0_0aAutoTypedSchemaType >>();
+  type InferredSchemaType = InferSchemaType<typeof AutoTypedSchema>
 
-  // @ts-expect-error: This should complain because isNotExist property not exist in AutoTypeSchema.
-  assert<Equals<InferSchemaType<typeof AutoTypedSchema>, {
-    userName: string;
-    description?: string;
-    isNotExist: boolean;
-  }>>();
+  expectType<M0_0aAutoTypedSchemaType>({} as InferredSchemaType);
+
+  expectError<M0_0aAutoTypedSchemaType & { doesNotExist: boolean; }>({} as InferredSchemaType);
 
   return AutoTypedSchema;
 }

@@ -1,6 +1,6 @@
 import { Schema, Document, Model, Types, connection, model } from 'mongoose';
 import { expectError } from 'tsd';
-import {  m0_0aSchema } from './schema.test';
+import { m0_0aSchema } from './schema.test';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {

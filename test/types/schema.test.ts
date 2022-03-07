@@ -308,11 +308,16 @@ expectError(new Schema({}, { expireAfterSeconds: '5 seconds' }));
 new Schema({}, { expireAfterSeconds: 5 });
 
 export type M0_0aAutoTypedSchemaType = {
+  schema: {
   userName: string;
   description?: string;
   nested?: {
     age: number;
     hobby?: string
+  }
+  }
+  , statics: {
+    staticFn:()=>'Returned from staticFn'
   }
 }
 
@@ -333,13 +338,13 @@ export function m0_0aSchema() {
         required: false
       }
     })
-  });
+  }, { statics: { staticFn() {return 'Returned from staticFn';} } });
 
   type InferredSchemaType = InferSchemaType<typeof AutoTypedSchema>
 
-  expectType<M0_0aAutoTypedSchemaType>({} as InferredSchemaType);
+  expectType<M0_0aAutoTypedSchemaType['schema']>({} as InferredSchemaType);
 
-  expectError<M0_0aAutoTypedSchemaType & { doesNotExist: boolean; }>({} as InferredSchemaType);
+  expectError<M0_0aAutoTypedSchemaType['schema'] & { doesNotExist: boolean; }>({} as InferredSchemaType);
 
   return AutoTypedSchema;
 }

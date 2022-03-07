@@ -212,7 +212,7 @@ Project.createCollection({ expires: '5 seconds' });
 Project.createCollection({ expireAfterSeconds: 5 });
 expectError(Project.createCollection({ expireAfterSeconds: '5 seconds' }));
 
-function m0_0aModel() {
+export function m0_0aModel() {
   const AutoTypeSchema = m0_0aSchema();
   const AutoTypeModel = model('AutoTypeModel', AutoTypeSchema);
 
@@ -224,10 +224,17 @@ function m0_0aModel() {
   AutoTypeModel.create({});
 
   /* -------------------------------------------------------------------------- */
+  /*                        Model-statics-functions-test                        */
+  /* -------------------------------------------------------------------------- */
+  expectType<ReturnType<M0_0aAutoTypedSchemaType['statics']['staticFn']>>(AutoTypeModel.staticFn());
+
+  /* -------------------------------------------------------------------------- */
   /*                                Instance-Test                               */
   /* -------------------------------------------------------------------------- */
 
   const AutoTypeModelInstance = new AutoTypeModel({});
 
-  expectType<M0_0aAutoTypedSchemaType['userName']>(AutoTypeModelInstance.userName);
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
+
+  return AutoTypeModel;
 }

@@ -120,6 +120,13 @@ declare module 'mongoose' {
   export function isValidObjectId(v: Types.ObjectId): true;
   export function isValidObjectId(v: any): boolean;
 
+  /**
+   * Returns true if the given value is a Mongoose ObjectId (using `instanceof`) or if the
+   * given value is a 24 character hex string, which is the most commonly used string representation
+   * of an ObjectId.
+   */
+  export function isObjectIdOrHexString(v: any): boolean;
+
   export function model<T, U = unknown, TQueryHelpers = {}, DocDefinition = unknown, StaticsMethods = {}>(
     name: string,
     schema?: Schema<T, any, TQueryHelpers, any, DocDefinition, StaticsMethods> | Schema<T & Document, any, TQueryHelpers, any, DocDefinition, StaticsMethods>,
@@ -1226,7 +1233,7 @@ declare module 'mongoose' {
     statics: { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
-    virtual(name: string, options?: VirtualTypeOptions): VirtualType;
+    virtual<T = HydratedDocument<DocType, TInstanceMethods>>(name: string, options?: VirtualTypeOptions<T>): VirtualType;
 
     /** Object of currently defined virtuals on this schema */
     virtuals: any;
@@ -1662,15 +1669,15 @@ declare module 'mongoose' {
 
   type InferId<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
 
-  interface VirtualTypeOptions {
+  interface VirtualTypeOptions<HydratedDocType = Document> {
     /** If `ref` is not nullish, this becomes a populated virtual. */
     ref?: string | Function;
 
     /**  The local field to populate on if this is a populated virtual. */
-    localField?: string | Function;
+    localField?: string | ((this: HydratedDocType, doc: HydratedDocType) => string);
 
     /** The foreign field to populate on if this is a populated virtual. */
-    foreignField?: string | Function;
+    foreignField?: string | ((this: HydratedDocType, doc: HydratedDocType) => string);
 
     /**
      * By default, a populated virtual is an array. If you set `justOne`,
@@ -2279,7 +2286,7 @@ declare module 'mongoose' {
     polygon(path: string, ...coordinatePairs: number[][]): this;
 
     /** Specifies paths which should be populated with other documents. */
-    populate<Paths = {}>(path: string | any, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
+    populate<Paths = {}>(path: string, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
     populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */

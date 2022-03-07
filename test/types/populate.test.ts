@@ -1,4 +1,4 @@
-import { Schema, model, Document, PopulatedDoc, Types } from 'mongoose';
+import { Schema, model, Document, PopulatedDoc, Types, HydratedDocument } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
 import { expectError } from 'tsd';
@@ -122,4 +122,31 @@ function gh11014() {
     .then(parents => {
       parents.map(p => p.child.name);
     });
+}
+
+function gh11321(): void {
+  interface Parent {
+    child?: ObjectId,
+    name?: string
+  }
+
+  const parentSchema: Schema<Parent> = new Schema<Parent>({
+    child: { type: 'ObjectId', ref: 'Child' },
+    name: String
+  });
+
+  parentSchema.virtual('test', {
+    localField: (doc: HydratedDocument<Parent, {}>): string => {
+      if (typeof doc.name === 'string') {
+        return doc.name;
+      }
+      return 'foo';
+    },
+    foreignField: (doc: HydratedDocument<Parent, {}>): string => {
+      if (typeof doc.name === 'string') {
+        return doc.name;
+      }
+      return 'foo';
+    }
+  });
 }

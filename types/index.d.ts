@@ -1226,7 +1226,7 @@ declare module 'mongoose' {
     statics: { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
-    virtual(name: string, options?: VirtualTypeOptions): VirtualType;
+    virtual<T = HydratedDocument<DocType, TInstanceMethods>>(name: string, options?: VirtualTypeOptions<T>): VirtualType;
 
     /** Object of currently defined virtuals on this schema */
     virtuals: any;
@@ -1657,15 +1657,15 @@ declare module 'mongoose' {
 
   type InferId<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
 
-  interface VirtualTypeOptions {
+  interface VirtualTypeOptions<HydratedDocType = Document> {
     /** If `ref` is not nullish, this becomes a populated virtual. */
     ref?: string | Function;
 
     /**  The local field to populate on if this is a populated virtual. */
-    localField?: string | Function;
+    localField?: string | ((this: HydratedDocType, doc: HydratedDocType) => string);
 
     /** The foreign field to populate on if this is a populated virtual. */
-    foreignField?: string | Function;
+    foreignField?: string | ((this: HydratedDocType, doc: HydratedDocType) => string);
 
     /**
      * By default, a populated virtual is an array. If you set `justOne`,

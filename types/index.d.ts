@@ -119,6 +119,13 @@ declare module 'mongoose' {
   export function isValidObjectId(v: Types.ObjectId): true;
   export function isValidObjectId(v: any): boolean;
 
+  /**
+   * Returns true if the given value is a Mongoose ObjectId (using `instanceof`) or if the
+   * given value is a 24 character hex string, which is the most commonly used string representation
+   * of an ObjectId.
+   */
+  export function isObjectIdOrHexString(v: any): boolean;
+
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
   export function model<T, U, TQueryHelpers = {}>(
     name: string,

@@ -292,6 +292,10 @@ function gh11448() {
 export type M0_0aAutoTypedSchemaType = {
   userName: string;
   description?: string;
+  nested?: {
+    age: number;
+    hobby?: string
+  }
 }
 
 export function m0_0aSchema() {
@@ -300,7 +304,17 @@ export function m0_0aSchema() {
       type: String,
       required: [true, 'userName is required']
     },
-    description: String
+    description: String,
+    nested: new Schema({
+      age: {
+        type: Number,
+        required: true
+      },
+      hobby: {
+        type: String,
+        required: false
+      }
+    })
   });
 
   type InferredSchemaType = InferSchemaType<typeof AutoTypedSchema>

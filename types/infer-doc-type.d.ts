@@ -28,14 +28,13 @@ export type ObtainDocumentPropertyType<PropertyValue> = ResolvePropertyType<
     : PropertyValue
 >;
 
-export type ObtainDocumentType<T> = {
-  [K in keyof (RequiredProperties<T> &
-    OptionalProperties<T>)]: ObtainDocumentPropertyType<T[K]>;
+export type ObtainDocumentType<DocDefinition, DocType = any> = DoesDocTypeExist<DocType> extends true ? DocType :{
+  [K in keyof (RequiredProperties<DocDefinition> &
+    OptionalProperties<DocDefinition>)]: ObtainDocumentPropertyType<DocDefinition[K]>;
 };
 
-export type InferSchemaType<SchemaType = {}> = SchemaType extends Schema<
-	infer DocType
->
-	? ObtainDocumentType<DocType>
-	: unknown;
+export type InferSchemaType<SchemaType> = SchemaType extends Schema<infer DocType, any, any, any, infer DocDefinition>
+	? DoesDocTypeExist<DocType> extends true ? DocType : ObtainDocumentType<DocDefinition>
+  : unknown;
 
+export type DoesDocTypeExist<DocType> = keyof DocType extends string ? true : false;

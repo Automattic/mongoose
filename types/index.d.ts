@@ -1979,7 +1979,7 @@ declare module 'mongoose' {
     [key: string]: any;
   };
 
-  type ApplyBasicQueryCasting<T> = T | T[] | any;
+  type ApplyBasicQueryCasting<T, defaultT = T | T[] | RegExp | {}> = T extends any[] ? T[0] & defaultT: defaultT;
   type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
   type _FilterQuery<T> = {

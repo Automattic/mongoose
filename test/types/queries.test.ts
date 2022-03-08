@@ -18,11 +18,11 @@ const schema: Schema<ITest, Model<ITest, QueryHelpers>, {}, QueryHelpers> = new 
   endDate: Date
 });
 
-schema.query._byName = function(name: string): QueryWithHelpers<any, ITest, QueryHelpers> {
+schema.query._byName = function(name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
   return this.find({ name });
 };
 
-schema.query.byName = function(name: string): QueryWithHelpers<any, ITest, QueryHelpers> {
+schema.query.byName = function(name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
   expectError(this.notAQueryHelper());
   return this._byName(name);
 };
@@ -231,7 +231,7 @@ async function gh11041(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  expectType<Omit<HydratedDocument<User>, never> | null>(await MyModel.findOne({}).populate('someField').exec());
+  expectType<HydratedDocument<User> | null>(await MyModel.findOne({}).populate('someField').exec());
 }
 
 async function gh11306(): Promise<void> {

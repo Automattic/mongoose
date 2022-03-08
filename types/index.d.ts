@@ -1979,10 +1979,8 @@ declare module 'mongoose' {
 
   type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType> = Query<ResultType, DocType, THelpers, RawDocType> & THelpers;
 
-  type UnpackedIntersection<T, U> = T extends (infer V)[]
-    ? UnpackedIntersectionMerge<V, U>[]
-    : UnpackedIntersectionMerge<T, U>;
-  type UnpackedIntersectionMerge<T, U> = T extends AnyObject ? Omit<T, keyof U> & U: T & U;
+  type UnpackedIntersection<T, U> = T extends (infer A)[] ? (A & U)[] : keyof U extends never ? T & U: { [P in keyof U]: U[P] extends (infer B)[] ? (B & T)[] : U[P] & T };
+
   type UnpackedIntersectionWithNull<T, U> = T extends null ? UnpackedIntersection<T, U> | null : UnpackedIntersection<T, U>;
 
   type ProjectionFields<DocType> = {[Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any} & Record<string, any>;

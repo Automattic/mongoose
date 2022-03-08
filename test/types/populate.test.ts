@@ -1,7 +1,7 @@
 import { Schema, model, Document, PopulatedDoc, Types, HydratedDocument } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
-import { expectError } from 'tsd';
+import { expectError, expectType } from 'tsd';
 
 interface Child {
   name: string;
@@ -148,5 +148,37 @@ function gh11321(): void {
       }
       return 'foo';
     }
+  });
+}
+
+function gh11496() {
+  interface Friend {
+    blocked: boolean
+  }
+  const FriendSchema = new Schema<Friend>({
+    blocked: Boolean
+  });
+  const Friends = model<Friend>('friends', FriendSchema);
+
+
+  interface User {
+    friends: Types.ObjectId[];
+  }
+  const UserSchema = new Schema<User>({
+    friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
+  });
+  const Users = model<User>('friends', UserSchema);
+
+
+  Users.findOne({}).populate('friends').then(user => {
+    expectType<Types.ObjectId | undefined>(user?.friends[0]);
+    expectError(user?.friends[0].blocked);
+    expectError(user?.friends.map(friend => friend.blocked));
+  });
+
+  Users.findOne({}).populate<{friends: Friend[]}>('friends').then(user => {
+    expectType<Friend | undefined>(user?.friends[0]);
+    user?.friends[0].blocked; // works
+    user?.friends.map(friend => friend.blocked); // Property 'blocked' does not exist on type 'ObjectId'.ts(2339)
   });
 }

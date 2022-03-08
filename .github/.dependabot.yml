@@ -6,3 +6,5 @@ updates:
     interval: "daily"
   open-pull-requests-limit: 100
   target-branch: master
+  ignore:
+    - dependency-name: "dox"

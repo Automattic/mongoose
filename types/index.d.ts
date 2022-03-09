@@ -7,7 +7,7 @@ import events = require('events');
 import mongodb = require('mongodb');
 import mongoose = require('mongoose');
 import stream = require('stream');
-import { ObtainDocumentType } from './infer-doc-type';
+import { InferSchemaType, ObtainDocumentType, ObtainSchemaGeneric } from './infer-doc-type';
 
 declare module 'mongoose' {
 
@@ -128,12 +128,14 @@ declare module 'mongoose' {
    */
   export function isObjectIdOrHexString(v: any): boolean;
 
-  export function model<T, U = unknown, TQueryHelpers = {}, DocDefinition = unknown, StaticsMethods = {}>(
+export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     name: string,
-    schema?: Schema<T, any, TQueryHelpers, any, DocDefinition, StaticsMethods> | Schema<T & Document, any, TQueryHelpers, any, DocDefinition, StaticsMethods>,
+    schema?: TSchema,
     collection?: string,
     options?: CompileModelOptions
-  ): U extends Model<infer IT, infer ITQ, infer ITM, infer ITV> ? Model<ObtainDocumentType<DocDefinition, T & IT>, TQueryHelpers & ITQ, ITM, ITV, StaticsMethods> & Omit<U, keyof Model<IT>> : Model<ObtainDocumentType<DocDefinition, T>, TQueryHelpers, {}, {}, StaticsMethods>;
+): U extends Model<any>
+  ? U
+  : Model<T & InferSchemaType<TSchema>, TQueryHelpers, {}, {}, TSchema>;
 
   /** Returns an array of model names created on this instance of Mongoose. */
   export function modelNames(): Array<string>;
@@ -599,7 +601,9 @@ declare module 'mongoose' {
   }
 
   export const Model: Model<any>;
-  type Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, StaticsMethods = {}> = NodeJS.EventEmitter& AcceptsDiscriminator & StaticsMethods &{
+  type Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> = NodeJS.EventEmitter& AcceptsDiscriminator & ObtainSchemaGeneric<TSchema, 'StaticsMethods'> &{
+
+  // type Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, StaticsMethods = {}> = NodeJS.EventEmitter& AcceptsDiscriminator & StaticsMethods &{
     new <DocType = T & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
@@ -1105,7 +1109,7 @@ declare module 'mongoose' {
   type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
   type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
 
-  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = any, TQueryHelpers = any, DocDefinition = unknown, StaticsMethods = {}> extends events.EventEmitter {
+  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = any, TQueryHelpers = any, DocDefinition extends ObtainDocumentType<DocDefinition, DocType> = any, StaticsMethods = {}> extends events.EventEmitter {
     /**
      * Create a new schema
      */

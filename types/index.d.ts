@@ -5,11 +5,11 @@
 /// <reference path="./mongooseoptions.d.ts" />
 /// <reference path="./pipelinestage.d.ts" />
 /// <reference path="./schemaoptions.d.ts" />
+/// <reference path="./inferschematype.d.ts" />
 
 import events = require('events');
 import mongodb = require('mongodb');
 import mongoose = require('mongoose');
-import { InferSchemaType, ObtainDocumentType, ObtainSchemaGeneric } from './infer-doc-type';
 
 declare module 'mongoose' {
 

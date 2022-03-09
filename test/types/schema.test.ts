@@ -1,6 +1,5 @@
-import { Schema, Document, SchemaDefinition, Model, Types } from 'mongoose';
+import { Schema, Document, SchemaDefinition, Model, Types, InferSchemaType } from 'mongoose';
 import { expectError, expectType } from 'tsd';
-import { InferSchemaType } from '../../types/infer-doc-type';
 
 enum Genre {
   Action,

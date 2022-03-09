@@ -22,11 +22,13 @@ type ResolvePropertyType<PropertyValue> = PropertyValue extends (
   ? ReturnType<PropertyValue>
   : PropertyValue;
 
-export type ObtainDocumentPropertyType<PropertyValue> = PropertyValue extends Schema<any> ? InferSchemaType<PropertyValue>: ResolvePropertyType<
+type ObtainDocumentPropertyType<PropertyValue> = PropertyValue extends Schema<any> ? InferSchemaType<PropertyValue>: ResolvePropertyType<
   PropertyValue extends { type: any }
     ? ResolvePropertyType<PropertyValue['type']>
     : PropertyValue
->;
+  >;
+
+type DoesDocTypeExist<DocType> = keyof DocType extends string ? true : false;
 
 export type ObtainDocumentType<DocDefinition, DocType = any> =
   DoesDocTypeExist<DocType> extends true ? DocType : {
@@ -35,7 +37,7 @@ export type ObtainDocumentType<DocDefinition, DocType = any> =
 };
 
 export type InferSchemaType<SchemaType> = SchemaType extends Schema<infer DocType, any, any, any, infer DocDefinition>
-	? DoesDocTypeExist<DocType> extends true ? DocType : ObtainDocumentType<DocDefinition>
+	? DoesDocTypeExist<DocType> extends true ? DocType : DocDefinition
   : unknown;
 
-export type DoesDocTypeExist<DocType> = keyof DocType extends string ? true : false;
+export type ObtainSchemaGeneric<TSchema, name extends 'DocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'DocDefinition'| 'StaticsMethods'> = TSchema extends Schema<infer DocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer DocDefinition, infer StaticsMethods> ? {DocType:DocType, M:M, TInstanceMethods:TInstanceMethods, TQueryHelpers:TQueryHelpers, DocDefinition:DocDefinition, StaticsMethods:StaticsMethods}[name] : never;

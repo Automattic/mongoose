@@ -14,6 +14,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [`Model.exists()` Returns a lean document instead of Boolean](#model-exists-returns-a-lean-document-instead-of-boolean)
 * [`strictQuery` is now equal to `strict` by default](#strictquery-is-removed-and-replaced-by-strict)
 * [MongoError is now MongoServerError](#mongoerror-is-now-mongoservererror)
+* [Simplified `isValidObjectId()` and separate `isObjectIdOrHexString()`](#simplified-isvalidobjectid-and-separate-isobjectidorhexstring)
 * [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)
 * [Schema Defined Document Key Order](#schema-defined-document-key-order)
 * [`sanitizeFilter` and `trusted()`](#sanitizefilter-and-trusted)
@@ -169,6 +170,31 @@ User.discriminator('author', authorSchema.clone());
 
 // To opt out if `clone()` is causing issues, pass `clone: false`
 User.discriminator('author', authorSchema, { clone: false });
+```
+
+<h3 id="simplified-isvalidobjectid-and-separate-isobjectidorhexstring"><a href="#simplified-isvalidobjectid-and-separate-isobjectidorhexstring">Simplified <code>isValidObjectId()</code> and separate <code>isObjectIdOrHexString()</code></a></h3>
+
+In Mongoose 5, `mongoose.isValidObjectId()` returned `false` for values like numbers, which was inconsistent with the MongoDB driver's `ObjectId.isValid()` function.
+Technically, any JavaScript number can be converted to a MongoDB ObjectId.
+
+In Mongoose 6, `mongoose.isValidObjectId()` is just a wrapper for `mongoose.Types.ObjectId.isValid()` for consistency.
+
+Mongoose 6.2.5 now includes a `mongoose.isObjectIdOrHexString()` function, which does a better job of capturing the more common use case for `isValidObjectId()`: is the given value an `ObjectId` instance or a 24 character hex string representing an `ObjectId`?
+
+```javascript
+// `isValidObjectId()` returns `true` for some surprising values, because these
+// values are _technically_ ObjectId representations
+mongoose.isValidObjectId(new mongoose.Types.ObjectId()); // true
+mongoose.isValidObjectId('0123456789ab'); // true
+mongoose.isValidObjectId(6); // true
+mongoose.isValidObjectId(new User({ name: 'test' })); // true
+
+// `isObjectIdOrHexString()` instead only returns `true` for ObjectIds and 24
+// character hex strings.
+mongoose.isObjectIdOrHexString(new mongoose.Types.ObjectId()); // true
+mongoose.isObjectIdOrHexString('62261a65d66c6be0a63c051f'); // true
+mongoose.isValidObjectId('0123456789ab'); // false
+mongoose.isValidObjectId(6); // false
 ```
 
 <h3 id="schema-defined-document-key-order"><a href="#schema-defined-document-key-order">Schema Defined Document Key Order</a></h3>

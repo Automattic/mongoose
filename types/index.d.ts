@@ -1,6 +1,8 @@
-/// <reference path="./Error.d.ts" />
-/// <reference path="./PipelineStage.d.ts" />
-/// <reference path="./Connection.d.ts" />
+/// <reference path="./connection.d.ts" />
+/// <reference path="./cursor.ts" />
+/// <reference path="./error.d.ts" />
+/// <reference path="./pipelinestage.d.ts" />
+/// <reference path="./schemaoptions.d.ts" />
 
 import events = require('events');
 import mongodb = require('mongodb');
@@ -118,6 +120,13 @@ declare module 'mongoose' {
    */
   export function isValidObjectId(v: Types.ObjectId): true;
   export function isValidObjectId(v: any): boolean;
+
+  /**
+   * Returns true if the given value is a Mongoose ObjectId (using `instanceof`) or if the
+   * given value is a 24 character hex string, which is the most commonly used string representation
+   * of an ObjectId.
+   */
+  export function isObjectIdOrHexString(v: any): boolean;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
   export function model<T, U, TQueryHelpers = {}>(
@@ -1226,7 +1235,7 @@ declare module 'mongoose' {
     statics: { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
-    virtual(name: string, options?: VirtualTypeOptions): VirtualType;
+    virtual<T = HydratedDocument<DocType, TInstanceMethods>>(name: string, options?: VirtualTypeOptions<T>): VirtualType;
 
     /** Object of currently defined virtuals on this schema */
     virtuals: any;
@@ -1256,182 +1265,15 @@ declare module 'mongoose' {
     typeof SchemaType |
     Schema<any, any, any> |
     Schema<any, any, any>[] |
-    SchemaTypeOptions<T extends undefined ? any : T>[] |
+    SchemaTypeOptions<T extends undefined ? any : Unpacked<T>>[] |
     Function[] |
     SchemaDefinition<T> |
-    SchemaDefinition<T>[] |
+    SchemaDefinition<Unpacked<T>>[] |
     typeof SchemaTypes.Mixed;
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
     : { [path in keyof T]?: SchemaDefinitionProperty<T[path]>; };
-
-  interface SchemaOptions {
-    /**
-     * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
-     * calling Model.createIndexes() after you successfully connect to MongoDB. If you want to disable
-     * automatic index builds, you can set autoIndex to false.
-     */
-    autoIndex?: boolean;
-    /**
-     * If set to `true`, Mongoose will call Model.createCollection() to create the underlying collection
-     * in MongoDB if autoCreate is set to true. Calling createCollection() sets the collection's default
-     * collation based on the collation option and establishes the collection as a capped collection if
-     * you set the capped schema option.
-     */
-    autoCreate?: boolean;
-    /**
-     * By default, mongoose buffers commands when the connection goes down until the driver manages to reconnect.
-     * To disable buffering, set bufferCommands to false.
-     */
-    bufferCommands?: boolean;
-    /**
-     * If bufferCommands is on, this option sets the maximum amount of time Mongoose buffering will wait before
-     * throwing an error. If not specified, Mongoose will use 10000 (10 seconds).
-     */
-    bufferTimeoutMS?: number;
-    /**
-     * Mongoose supports MongoDBs capped collections. To specify the underlying MongoDB collection be capped, set
-     * the capped option to the maximum size of the collection in bytes.
-     */
-    capped?: boolean | number | { size?: number; max?: number; autoIndexId?: boolean; };
-    /** Sets a default collation for every query and aggregation. */
-    collation?: mongodb.CollationOptions;
-
-    /** The timeseries option to use when creating the model's collection. */
-    timeseries?: mongodb.TimeSeriesCollectionOptions;
-
-    /**
-     * Mongoose by default produces a collection name by passing the model name to the utils.toCollectionName
-     * method. This method pluralizes the name. Set this option if you need a different name for your collection.
-     */
-    collection?: string;
-    /**
-     * When you define a [discriminator](/docs/discriminators.html), Mongoose adds a path to your
-     * schema that stores which discriminator a document is an instance of. By default, Mongoose
-     * adds an `__t` path, but you can set `discriminatorKey` to overwrite this default.
-     */
-    discriminatorKey?: string;
-    /** defaults to false. */
-    emitIndexErrors?: boolean;
-    excludeIndexes?: any;
-    /**
-     * Mongoose assigns each of your schemas an id virtual getter by default which returns the document's _id field
-     * cast to a string, or in the case of ObjectIds, its hexString.
-     */
-    id?: boolean;
-    /**
-     * Mongoose assigns each of your schemas an _id field by default if one is not passed into the Schema
-     * constructor. The type assigned is an ObjectId to coincide with MongoDB's default behavior. If you
-     * don't want an _id added to your schema at all, you may disable it using this option.
-     */
-    _id?: boolean;
-    /**
-     * Mongoose will, by default, "minimize" schemas by removing empty objects. This behavior can be
-     * overridden by setting minimize option to false. It will then store empty objects.
-     */
-    minimize?: boolean;
-    /**
-     * Optimistic concurrency is a strategy to ensure the document you're updating didn't change between when you
-     * loaded it using find() or findOne(), and when you update it using save(). Set to `true` to enable
-     * optimistic concurrency.
-     */
-    optimisticConcurrency?: boolean;
-    /**
-     * If `plugin()` called with tags, Mongoose will only apply plugins to schemas that have
-     * a matching tag in `pluginTags`
-     */
-    pluginTags?: string[];
-    /**
-     * Allows setting query#read options at the schema level, providing us a way to apply default ReadPreferences
-     * to all queries derived from a model.
-     */
-    read?: string;
-    /** Allows setting write concern at the schema level. */
-    writeConcern?: WriteConcern;
-    /** defaults to true. */
-    safe?: boolean | { w?: number | string; wtimeout?: number; j?: boolean };
-    /**
-     * The shardKey option is used when we have a sharded MongoDB architecture. Each sharded collection is
-     * given a shard key which must be present in all insert/update operations. We just need to set this
-     * schema option to the same shard key and we'll be all set.
-     */
-    shardKey?: Record<string, unknown>;
-    /**
-     * The strict option, (enabled by default), ensures that values passed to our model constructor that were not
-     * specified in our schema do not get saved to the db.
-     */
-    strict?: boolean | 'throw';
-    /**
-     * equal to `strict` by default, may be `false`, `true`, or `'throw'`. Sets the default
-     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
-     */
-    strictQuery?: boolean | 'throw';
-    /** Exactly the same as the toObject option but only applies when the document's toJSON method is called. */
-    toJSON?: ToObjectOptions;
-    /**
-     * Documents have a toObject method which converts the mongoose document into a plain JavaScript object.
-     * This method accepts a few options. Instead of applying these options on a per-document basis, we may
-     * declare the options at the schema level and have them applied to all of the schema's documents by
-     * default.
-     */
-    toObject?: ToObjectOptions;
-    /**
-     * By default, if you have an object with key 'type' in your schema, mongoose will interpret it as a
-     * type declaration. However, for applications like geoJSON, the 'type' property is important. If you want to
-     * control which key mongoose uses to find type declarations, set the 'typeKey' schema option.
-     */
-    typeKey?: string;
-
-    /**
-     * By default, documents are automatically validated before they are saved to the database. This is to
-     * prevent saving an invalid document. If you want to handle validation manually, and be able to save
-     * objects which don't pass validation, you can set validateBeforeSave to false.
-     */
-    validateBeforeSave?: boolean;
-    /**
-     * The versionKey is a property set on each document when first created by Mongoose. This keys value
-     * contains the internal revision of the document. The versionKey option is a string that represents
-     * the path to use for versioning. The default is '__v'.
-     */
-    versionKey?: string | boolean;
-    /**
-     * By default, Mongoose will automatically select() any populated paths for you, unless you explicitly exclude them.
-     */
-    selectPopulatedPaths?: boolean;
-    /**
-     * skipVersioning allows excluding paths from versioning (i.e., the internal revision will not be
-     * incremented even if these paths are updated). DO NOT do this unless you know what you're doing.
-     * For subdocuments, include this on the parent document using the fully qualified path.
-     */
-    skipVersioning?: any;
-    /**
-     * Validation errors in a single nested schema are reported
-     * both on the child and on the parent schema.
-     * Set storeSubdocValidationError to false on the child schema
-     * to make Mongoose only report the parent error.
-     */
-    storeSubdocValidationError?: boolean;
-    /**
-     * The timestamps option tells mongoose to assign createdAt and updatedAt fields to your schema. The type
-     * assigned is Date. By default, the names of the fields are createdAt and updatedAt. Customize the
-     * field names by setting timestamps.createdAt and timestamps.updatedAt.
-     */
-    timestamps?: boolean | SchemaTimestampsConfig;
-
-    /**
-     * Using `save`, `isNew`, and other Mongoose reserved names as schema path names now triggers a warning, not an error.
-     * You can suppress the warning by setting { supressReservedKeysWarning: true } schema options. Keep in mind that this
-     * can break plugins that rely on these reserved names.
-     */
-     supressReservedKeysWarning?: boolean
-  }
-
-  interface SchemaTimestampsConfig {
-    createdAt?: boolean | string;
-    updatedAt?: boolean | string;
-    currentTime?: () => (NativeDate | number);
-  }
 
   type Unpacked<T> = T extends (infer U)[] ?
     U :
@@ -1657,15 +1499,15 @@ declare module 'mongoose' {
 
   type InferId<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
 
-  interface VirtualTypeOptions {
+  interface VirtualTypeOptions<HydratedDocType = Document> {
     /** If `ref` is not nullish, this becomes a populated virtual. */
     ref?: string | Function;
 
     /**  The local field to populate on if this is a populated virtual. */
-    localField?: string | Function;
+    localField?: string | ((this: HydratedDocType, doc: HydratedDocType) => string);
 
     /** The foreign field to populate on if this is a populated virtual. */
-    foreignField?: string | Function;
+    foreignField?: string | ((this: HydratedDocType, doc: HydratedDocType) => string);
 
     /**
      * By default, a populated virtual is an array. If you set `justOne`,
@@ -2053,7 +1895,7 @@ declare module 'mongoose' {
      * Returns a wrapper around a [mongodb driver cursor](http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html).
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      */
-    cursor(options?: any): QueryCursor<DocType>;
+    cursor(options?: QueryOptions): Cursor<DocType, QueryOptions>;
 
     /**
      * Declare and/or execute this query as a `deleteMany()` operation. Works like
@@ -2274,7 +2116,7 @@ declare module 'mongoose' {
     polygon(path: string, ...coordinatePairs: number[][]): this;
 
     /** Specifies paths which should be populated with other documents. */
-    populate<Paths = {}>(path: string | any, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
+    populate<Paths = {}>(path: string, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
     populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
@@ -2500,7 +2342,7 @@ declare module 'mongoose' {
     $each: Type;
   };
 
-  type SortValues = -1 | 1 | 'asc' | 'desc';
+  type SortValues = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
   type ArrayOperator<Type> = {
     $each: Type;
@@ -2618,49 +2460,6 @@ declare module 'mongoose' {
     T extends Document ? RawDocType :
     T;
 
-  class QueryCursor<DocType> extends stream.Readable {
-    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
-
-    /**
-     * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
-     * Useful for setting the `noCursorTimeout` and `tailable` flags.
-     */
-    addCursorFlag(flag: string, value: boolean): this;
-
-    /**
-     * Marks this cursor as closed. Will stop streaming and subsequent calls to
-     * `next()` will error.
-     */
-    close(): Promise<void>;
-    close(callback: CallbackWithoutResult): void;
-
-    /**
-     * Execute `fn` for every document(s) in the cursor. If batchSize is provided
-     * `fn` will be executed for each batch of documents. If `fn` returns a promise,
-     * will wait for the promise to resolve before iterating on to the next one.
-     * Returns a promise that resolves when done.
-     */
-    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number, batchSize?: number }, cb?: CallbackWithoutResult): void;
-    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }, cb?: CallbackWithoutResult): void;
-
-    /**
-     * Registers a transform function which subsequently maps documents retrieved
-     * via the streams interface or `.next()`
-     */
-    map<ResultType>(fn: (res: DocType) => ResultType): QueryCursor<ResultType>;
-
-    /**
-     * Get the next document from this cursor. Will return `null` when there are
-     * no documents left.
-     */
-    next(): Promise<DocType>;
-    next(callback: Callback<DocType | null>): void;
-
-    options: any;
-  }
-
   class Aggregate<R> {
     /**
      * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js
@@ -2702,7 +2501,7 @@ declare module 'mongoose' {
     /**
      * Sets the cursor option for the aggregation query (ignored for < 2.6.0).
      */
-    cursor(options?: Record<string, unknown>): AggregationCursor;
+    cursor<DocType = any>(options?: Record<string, unknown>): Cursor<DocType>;
 
     /** Executes the aggregate pipeline on the currently bound Model. */
     exec(callback?: Callback<R>): Promise<R>;
@@ -2790,7 +2589,7 @@ declare module 'mongoose' {
     skip(num: number): this;
 
     /** Appends a new $sort operator to this aggregate pipeline. */
-    sort(arg: PipelineStage.Sort['$sort']): this;
+    sort(arg: string | Record<string, SortValues> | PipelineStage.Sort['$sort']): this;
 
     /** Provides promise for aggregate. */
     then: Promise<R>['then'];
@@ -2806,43 +2605,6 @@ declare module 'mongoose' {
 
     /** Appends new custom $unwind operator(s) to this aggregate pipeline. */
     unwind(...args: PipelineStage.Unwind['$unwind'][]): this;
-  }
-
-  class AggregationCursor extends stream.Readable {
-    /**
-     * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
-     * Useful for setting the `noCursorTimeout` and `tailable` flags.
-     */
-    addCursorFlag(flag: string, value: boolean): this;
-
-    /**
-     * Marks this cursor as closed. Will stop streaming and subsequent calls to
-     * `next()` will error.
-     */
-    close(): Promise<void>;
-    close(callback: CallbackWithoutResult): void;
-
-    /**
-     * Execute `fn` for every document(s) in the cursor. If batchSize is provided
-     * `fn` will be executed for each batch of documents. If `fn` returns a promise,
-     * will wait for the promise to resolve before iterating on to the next one.
-     * Returns a promise that resolves when done.
-     */
-    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }): Promise<void>;
-    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }, cb?: CallbackWithoutResult): void;
-
-    /**
-     * Registers a transform function which subsequently maps documents retrieved
-     * via the streams interface or `.next()`
-     */
-    map(fn: (res: any) => any): this;
-
-    /**
-     * Get the next document from this cursor. Will return `null` when there are
-     * no documents left.
-     */
-    next(): Promise<any>;
-    next(callback: Callback): void;
   }
 
   class SchemaType {

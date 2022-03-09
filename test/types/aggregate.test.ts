@@ -1,4 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
+import { expectType } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
@@ -30,4 +31,21 @@ async function run() {
   for await (const obj of Test.aggregate<ITest>()) {
     obj.name;
   }
+
+  function eachAsync(): void {
+    Test.aggregate().cursor().eachAsync((doc) => {expectType<any>(doc);});
+    Test.aggregate().cursor().eachAsync((docs) => {expectType<any[]>(docs);}, { batchSize: 2 });
+    Test.aggregate().cursor<ITest>().eachAsync((doc) => {expectType<ITest>(doc);});
+    Test.aggregate().cursor<ITest>().eachAsync((docs) => {expectType<ITest[]>(docs);}, { batchSize: 2 });
+  }
+
+  // Aggregate.prototype.sort()
+  expectType<ITest[]>(await Test.aggregate<ITest>().sort('-name'));
+  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 1 }));
+  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: -1 }));
+  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'asc' }));
+  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'ascending' }));
+  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'desc' }));
+  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'descending' }));
+  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: { $meta: 'textScore' } }));
 }

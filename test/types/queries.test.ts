@@ -141,9 +141,8 @@ function testGenericQuery(): void {
 }
 
 function eachAsync(): void {
-  Test.find().cursor().eachAsync((doc: ITest) => console.log(doc.name));
-
-  Test.find().cursor().eachAsync((docs: ITest[]) => console.log(docs[0].name), { batchSize: 2 });
+  Test.find().cursor().eachAsync((doc) => {expectType<(ITest & { _id: any; })>(doc);});
+  Test.find().cursor().eachAsync((docs) => {expectType<(ITest & { _id: any; })[]>(docs);}, { batchSize: 2 });
 }
 
 async function gh10617(): Promise<void> {

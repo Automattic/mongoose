@@ -212,20 +212,30 @@ Project.createCollection({ expires: '5 seconds' });
 Project.createCollection({ expireAfterSeconds: 5 });
 expectError(Project.createCollection({ expireAfterSeconds: '5 seconds' }));
 
-export function m0_0aModel() {
+export async function m0_0aModel() {
   const AutoTypeSchema = m0_0aSchema();
   const AutoTypeModel = model('AutoTypeModel', AutoTypeSchema);
 
   /* -------------------------------------------------------------------------- */
   /*                            Model-functions-test                            */
   /* -------------------------------------------------------------------------- */
+  // TODO: check if these tests work after merging this PR: https://github.com/Automattic/mongoose/pull/11503
 
-  AutoTypeModel.find({ });
-  AutoTypeModel.create({});
+  /*
+  const testDoc1 = await AutoTypeModel.create({ userName: 'M0_0a' });
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc.userName);
+  expectType<M0_0aAutoTypedSchemaType['schema']['nested']['age']>(testDoc.nested.age);
+
+  const testDoc2 = await AutoTypeModel.findOne({ userName: 'M0_0a' });
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc2.userName);
+  expectType<M0_0aAutoTypedSchemaType['schema']['nested']['age']>(testDoc2.nested.age);
+
+  */
 
   /* -------------------------------------------------------------------------- */
   /*                        Model-statics-functions-test                        */
   /* -------------------------------------------------------------------------- */
+
   expectType<ReturnType<M0_0aAutoTypedSchemaType['statics']['staticFn']>>(AutoTypeModel.staticFn());
 
   /* -------------------------------------------------------------------------- */

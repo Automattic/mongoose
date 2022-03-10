@@ -1,3 +1,21 @@
+6.2.5 / 2022-03-09
+==================
+ * fix(mongoose): add isObjectIdOrHexString() to better capture the most common use case for `isValidObjectId()` #11419
+ * fix(query): prevent modifying discriminator key in updates using operators other than `$set` #11456
+ * fix(populate+types): call foreignField functions with doc as 1st param, better typings for `localField` and `foreignField` functions #11321
+ * fix(populate): return an array when using populate count on an array localField #11307
+ * fix(query): avoid error when using $not with arrays #11467
+ * perf: only deep clone validators if necessary #11412 [Uzlopak](https://github.com/Uzlopak)
+ * fix(types): rename definition files to lowercase to avoid typescript bug #11469
+ * fix(types): aggregate.sort() accepts a string but also `{ field: 'asc'|'ascending'|'desc'|'descending' }` #11479 [simonbrunel](https://github.com/simonbrunel)
+ * fix(types): extract and refactor aggregationcursor and querycursor #11488 [Uzlopak](https://github.com/Uzlopak)
+ * fix(types): extract and refactor schemaoptions #11484 [Uzlopak](https://github.com/Uzlopak)
+ * fix(types): make first param to `Query.prototype.populate()` a string #11475 [minhthinhls](https://github.com/minhthinhls)
+ * fix(types): improve type checking for doc arrays in schema definitions #11241
+ * docs: fix length comparaison in lean.test.js #11493 [zazapeta](https://github.com/zazapeta)
+ * docs(timestamps): fix typo #11481 [saibbyweb](https://github.com/saibbyweb)
+ * docs: fix broken link to rawResult #11459 [chhiring90](https://github.com/chhiring90)
+
 6.2.4 / 2022-02-28
 ==================
  * fix(query): correctly return full deleteOne(), deleteMany() result #11211

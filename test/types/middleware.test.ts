@@ -1,11 +1,11 @@
 import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { expectAssignable, expectError, expectType } from 'tsd';
 
 interface ITest extends Document {
   name?: string;
 }
 
-const schema: Schema<ITest> = new Schema<ITest>({ name: { type: 'String' } });
+const schema: Schema<ITest> = new Schema<ITest>({ name: { type: String } });
 
 schema.pre<Query<any, any>>('find', async function() {
   console.log('Find', this.getFilter());
@@ -72,6 +72,6 @@ const Test = model<ITest>('Test', schema);
 
 function gh11257(): void {
   schema.pre('save', { document: true }, function() {
-    expectType<HydratedDocument<ITest>>(this);
+    expectAssignable<HydratedDocument<ITest>>(this);
   });
 }

@@ -255,7 +255,7 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
   export const Model: Model<any>;
   type Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> = NodeJS.EventEmitter & AcceptsDiscriminator & ObtainSchemaGeneric<TSchema, 'StaticsMethods'> & {
 
-    new <DocType = T & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, /* ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & */ TMethodsAndOverrides, TVirtuals>;
+    new <DocType = T & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[], cb: Function): Aggregate<Array<R>>;
@@ -762,17 +762,17 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
   export type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
   export type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
 
-  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = any,
-    DocDefinition extends ObtainDocumentType<DocDefinition, DocType> = any,
+  class Schema<TDocType = any, M = Model<TDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = any,
+    DocType extends ObtainDocumentType<DocType, TDocType> = any,
     StaticsMethods = {}>
     extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<DocType>> | DocDefinition, options?: SchemaOptions<StaticsMethods, TInstanceMethods>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<TDocType>> | DocType, options?: SchemaOptions<StaticsMethods, TInstanceMethods>);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefinitionType<DocType>> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<SchemaDefinitionType<TDocType>> | Schema, prefix?: string): this;
 
     /**
      * Array of child schemas (from document arrays and single nested subdocs)
@@ -822,7 +822,7 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] } & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<DocType>>;
+    obj: SchemaDefinition<SchemaDefinitionType<TDocType>>;
 
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType>(path: string): ResultType;

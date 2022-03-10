@@ -13,7 +13,8 @@ const readFolder = (folder) => {
       if (entry === '.gitignore' || entry.endsWith('.d.ts')) {
         continue;
       } else {
-        throw new Error('File ' + entry + ' is not having a valid file-extension.');
+        console.error('File ' + entry + ' is not having a valid file-extension.\n');
+        process.exit(1);
       }
     }
   }

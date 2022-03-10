@@ -3914,4 +3914,23 @@ describe('Query', function() {
     const foos = await Test.find({ bars: { $not: { $size: 0 } } });
     assert.ok(foos);
   });
+  it('should not error when $not is used on an array of strings (gh-11467)', async function() {
+    const testSchema = Schema({ names: [String] });
+    const Test = db.model('Test', testSchema);
+
+    await Test.create([{ names: ['foo'] }, { names: ['bar'] }]);
+
+    let res = await Test.find({ names: { $not: /foo/ } });
+    assert.deepStrictEqual(res.map(el => el.names), [['bar']]);
+
+    // MongoDB server < 4.4 doesn't support `{ $not: { $regex } }`, see:
+    // https://github.com/Automattic/mongoose/runs/5441062834?check_suite_focus=true
+    const version = await start.mongodVersion();
+    if (version[0] < 4 || (version[0] === 4 && version[1] < 4)) {
+      return;
+    }
+
+    res = await Test.find({ names: { $not: { $regex: 'foo' } } });
+    assert.deepStrictEqual(res.map(el => el.names), [['bar']]);
+  });
 });

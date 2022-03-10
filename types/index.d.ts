@@ -1812,7 +1812,6 @@ declare module 'mongoose' {
   type ReturnsNewDoc = { new: true } | { returnOriginal: false } | {returnDocument: 'after'};
 
   type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType> = Query<ResultType, DocType, THelpers, RawDocType> & THelpers;
-  // type UnpackedIntersection<T, U> = T extends (infer V)[] ? (V & U)[] : T & U;
 
   type UnpackedIntersection<T, U> = T extends (infer A)[]
     ? (A & U)[]

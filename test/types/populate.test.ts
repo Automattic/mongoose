@@ -151,7 +151,7 @@ function gh11321(): void {
   });
 }
 
-function gh11496() {
+function gh11503() {
   interface Friend {
     blocked: boolean
   }
@@ -181,7 +181,7 @@ function gh11496() {
 
     const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
 
-    // FIXME: These two test doesn't work, although it shows correct suggestions.
+    // FIXME: These two tests doesn't work, although it shows correct suggestions.
     expectType<boolean | undefined>(firstFriendBlockedValue?.blocked);
     expectType<Types.ObjectId>(firstFriendBlockedValue?._id);
   });

@@ -287,3 +287,8 @@ function gh11448() {
 
   userSchema.pick<Pick<IUser, 'age'>>(['age']);
 }
+
+// timeSeries
+new Schema({}, { expires: '5 seconds' });
+expectError(new Schema({}, { expireAfterSeconds: '5 seconds' }));
+new Schema({}, { expireAfterSeconds: 5 });

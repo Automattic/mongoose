@@ -69,7 +69,7 @@
     "release-legacy": "git pull origin 5.x && git push origin 5.x --tags && npm publish --tag legacy",
     "mongo": "node ./tools/repl.js",
     "test": "mocha --exit ./test/*.test.js",
-    "test-tsd": "tsd",
+    "test-tsd": "node ./test/types/check-types-extensions && tsd",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-coverage": "nyc --reporter=html --reporter=text npm test"
   },

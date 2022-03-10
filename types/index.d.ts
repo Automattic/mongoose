@@ -135,7 +135,7 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     options?: CompileModelOptions
 ): U extends Model<any>
   ? U
-  : Model<T & InferSchemaType<TSchema>, TQueryHelpers, {}, {}, TSchema>;
+  : Model<T & InferSchemaType<TSchema>, TQueryHelpers, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema>;
 
   /** Returns an array of model names created on this instance of Mongoose. */
   export function modelNames(): Array<string>;
@@ -601,10 +601,9 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
   }
 
   export const Model: Model<any>;
-  type Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> = NodeJS.EventEmitter& AcceptsDiscriminator & ObtainSchemaGeneric<TSchema, 'StaticsMethods'> &{
+  type Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> = NodeJS.EventEmitter & AcceptsDiscriminator & ObtainSchemaGeneric<TSchema, 'StaticsMethods'> & {
 
-  // type Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, StaticsMethods = {}> = NodeJS.EventEmitter& AcceptsDiscriminator & StaticsMethods &{
-    new <DocType = T & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
+    new <DocType = T & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, /* ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & */ TMethodsAndOverrides, TVirtuals>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[], cb: Function): Aggregate<Array<R>>;
@@ -1109,11 +1108,14 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
   type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
   type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
 
-  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = any, TQueryHelpers = any, DocDefinition extends ObtainDocumentType<DocDefinition, DocType> = any, StaticsMethods = {}> extends events.EventEmitter {
+  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = any,
+    DocDefinition extends ObtainDocumentType<DocDefinition, DocType> = any,
+    StaticsMethods = {}>
+    extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<DocType>> | DocDefinition, options?: SchemaOptions<StaticsMethods>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<DocType>> | DocDefinition, options?: SchemaOptions<StaticsMethods, TInstanceMethods>);
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<DocType>> | Schema, prefix?: string): this;
@@ -1163,7 +1165,7 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     method(obj: Partial<TInstanceMethods>): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] };
+    methods: any;
 
     /** The original object passed to the schema constructor */
     obj: SchemaDefinition<SchemaDefinitionType<DocType>>;

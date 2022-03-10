@@ -299,6 +299,9 @@ export type M0_0aAutoTypedSchemaType = {
   }
   , statics: {
     staticFn:()=>'Returned from staticFn'
+  },
+  methods: {
+    instanceFn : ()=> 'Returned from DocumentInstanceFn'
   }
 }
 
@@ -319,7 +322,14 @@ export function m0_0aSchema() {
         required: false
       }
     })
-  }, { statics: { staticFn() {return 'Returned from staticFn';} } });
+  }, {
+    statics: {
+      staticFn() { return 'Returned from staticFn'; }
+    },
+    methods: {
+      instanceFn() { return 'Returned from DocumentInstanceFn'; }
+    }
+  });
 
   type InferredSchemaType = InferSchemaType<typeof AutoTypedSchema>
 

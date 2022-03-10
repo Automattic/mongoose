@@ -242,5 +242,12 @@ export async function m0_0aModel() {
 
   expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
 
+  /* -------------------------------------------------------------------------- */
+  /*                          Document-Instance-Methods                         */
+  /* -------------------------------------------------------------------------- */
+
+  expectType<ReturnType<M0_0aAutoTypedSchemaType['methods']['instanceFn']>>(AutoTypeModelInstance.instanceFn());
+
+
   return AutoTypeModel;
 }

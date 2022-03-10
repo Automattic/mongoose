@@ -11122,4 +11122,12 @@ describe('document', function() {
     assert.ok(!reloaded.nested.foo.$__isNested);
     assert.strictEqual(reloaded.nested.foo.bar, 66);
   });
+  describe('Check if document instance functions that is supplied in schema option is availabe (m0_0a)', function() {
+    it('should give an instance function back rather than undefined', function M0_0aModelJS() {
+      const testSchema = new mongoose.Schema({}, { methods: { instanceFn() { return 'Returned from DocumentInstanceFn'; } } });
+      const TestModel = mongoose.model('TestModel', testSchema);
+      const TestDocument = new TestModel({});
+      assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
+    });
+  });
 });

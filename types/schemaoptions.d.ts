@@ -8,7 +8,7 @@ declare module 'mongoose' {
     currentTime?: () => (NativeDate | number);
   }
 
-  interface SchemaOptions {
+  interface SchemaOptions<StaticsMethods = {}, InstanceMethods = {}> {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
      * calling Model.createIndexes() after you successfully connect to MongoDB. If you want to disable
@@ -184,6 +184,16 @@ declare module 'mongoose' {
      * You can suppress the warning by setting { supressReservedKeysWarning: true } schema options. Keep in mind that this
      * can break plugins that rely on these reserved names.
      */
-     supressReservedKeysWarning?: boolean
+    supressReservedKeysWarning?: boolean,
+
+    /**
+     * Model Statics methods.
+     */
+    statics?: StaticsMethods,
+
+    /**
+     * Document instance methods.
+     */
+     methods?: InstanceMethods,
   }
 }

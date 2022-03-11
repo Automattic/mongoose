@@ -1101,10 +1101,10 @@ declare module 'mongoose' {
   type IndexDirection = 1 | -1 | '2d' | '2dsphere' | 'geoHaystack' | 'hashed' | 'text';
   type IndexDefinition = Record<string, IndexDirection>;
 
-  type PreMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void) => void | Promise<void>;
-  type PreSaveMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void, opts: SaveOptions) => void | Promise<void>;
-  type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
-  type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
+  export type PreMiddlewareFunction<ThisType = any> = (this: ThisType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
+  export type PreSaveMiddlewareFunction<ThisType = any> = (this: ThisType, next: CallbackWithoutResultAndOptionalError, opts: SaveOptions) => void | Promise<void>;
+  export type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
+  export type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
 
   class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = any, TQueryHelpers = any> extends events.EventEmitter {
     /**
@@ -2704,6 +2704,7 @@ declare module 'mongoose' {
   type Callback<T = any> = (error: CallbackError, result: T) => void;
 
   type CallbackWithoutResult = (error: CallbackError) => void;
+  type CallbackWithoutResultAndOptionalError = (error?: CallbackError) => void;
 
   /* for ts-mongoose */
   class mquery {}

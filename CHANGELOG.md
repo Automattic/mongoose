@@ -1,3 +1,9 @@
+6.2.6 / 2022-03-11
+==================
+ * fix(types): correct reference to cursor TypeScript bindings #11513 [SimonHausdorf](https://github.com/SimonHausdorf)
+ * fix(types): allow calling Query.prototype.populate() with array of strings #11518
+ * fix(types): export and refactor types of PreMiddlewareFunction, PreSaveMiddlewareFunction, PostMiddlewareFunction, ErrorHandlingMiddlewareFunction #11485 [Uzlopak](https://github.com/Uzlopak)
+
 6.2.5 / 2022-03-09
 ==================
  * fix(mongoose): add isObjectIdOrHexString() to better capture the most common use case for `isValidObjectId()` #11419

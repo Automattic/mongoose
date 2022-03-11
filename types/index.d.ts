@@ -1817,7 +1817,7 @@ declare module 'mongoose' {
     ? (Omit<A, keyof U> & U)[]
     : keyof U extends never
     ? T
-  : Omit<T, keyof U> & { [P in keyof U]: U[P] extends (infer B)[] ? (HydratedDocument<B> & B)[] : HydratedDocument<U[P]> & U[P]};
+  : Omit<T, keyof U> & U;
 
   type ProjectionFields<DocType> = {[Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any} & Record<string, any>;
 

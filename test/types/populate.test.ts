@@ -176,9 +176,7 @@ function gh11503() {
   Users.findOne({}).populate<{friends: Friend[]}>('friends').then(user => {
     expectAssignable<Friend>(user?.friends[0]);
     expectType<boolean>(user?.friends[0].blocked);
-    expectType<Types.ObjectId>(user?.friends[0]._id);
     const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
     expectType<boolean>(firstFriendBlockedValue?.blocked);
-    expectType<Types.ObjectId>(firstFriendBlockedValue?._id);
   });
 }

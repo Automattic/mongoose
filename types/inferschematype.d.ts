@@ -1,10 +1,10 @@
-import { Schema, InferSchemaType } from 'mongoose';
+import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions } from 'mongoose';
 
 declare module 'mongoose' {
   type ObtainDocumentType<DocDefinition, DocType = any> =
     DoesDocTypeExist<DocType> extends true ? DocType : {
-      [K in keyof (RequiredProperties<DocDefinition> &
-        OptionalProperties<DocDefinition>)]: ObtainDocumentPropertyType<DocDefinition[K]>;
+      [K in keyof (RequiredPaths<DocDefinition> &
+        OptionalPaths<DocDefinition>)]: ObtainDocumentPathType<DocDefinition[K]>;
     };
 
   type InferSchemaType<SchemaType> = SchemaType extends Schema<infer DocType, any, any, any, infer DocDefinition>
@@ -17,33 +17,45 @@ declare module 'mongoose' {
     : never;
 }
 
-type RequiredPropertyKeys<T> = {
-  [K in keyof T]: T[K] extends { required: true | [true, string | undefined] } ? K : never;
-}[keyof T];
-
-type RequiredProperties<T> = {
-  [K in RequiredPropertyKeys<T>]: T[K];
-};
-
-type OptionalPropertyKeys<T> = {
-  [K in keyof T]: T[K] extends { required: true | [true, string | undefined] } ? never : K;
-}[keyof T];
-
-type OptionalProperties<T> = {
-  [K in OptionalPropertyKeys<T>]?: T[K];
-};
-
-type ResolvePropertyType<PropertyValue> = PropertyValue extends (
-  ...args: any
-) => any
-  ? ReturnType<PropertyValue>
-  : PropertyValue;
-
-type ObtainDocumentPropertyType<PropertyValue> = PropertyValue extends Schema<any>
-  ? InferSchemaType<PropertyValue>
-  : ResolvePropertyType<PropertyValue extends { type: any }
-    ? ResolvePropertyType<PropertyValue['type']>
-    : PropertyValue
->;
-
 type DoesDocTypeExist<DocType> = keyof DocType extends string ? true : false;
+
+type RequiredPathBaseType = { required: true | [true, string | undefined] }
+
+type PathWithTypePropertyBaseType = { type: any }
+
+type RequiredPathKeys<T> = {
+  [K in keyof T]: T[K] extends RequiredPathBaseType ? K : never;
+}[keyof T];
+
+type RequiredPaths<T> = {
+  [K in RequiredPathKeys<T>]: T[K];
+};
+
+type OptionalPathKeys<T> = {
+  [K in keyof T]: T[K] extends RequiredPathBaseType ? never : K;
+}[keyof T];
+
+type OptionalPaths<T> = {
+  [K in OptionalPathKeys<T>]?: T[K];
+};
+
+type ObtainDocumentPathType<PathValueType> = PathValueType extends Schema<any>
+  ? InferSchemaType<PathValueType>
+  : ResolvePathType<
+    PathValueType extends PathWithTypePropertyBaseType ? PathValueType['type'] : PathValueType,
+    PathValueType extends PathWithTypePropertyBaseType ? Omit<PathValueType, 'type'> : {}
+  >;
+
+type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}> =
+PathValueType extends (infer Item)[] ? ResolvePathType<Item>[] :
+PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? string :
+PathValueType extends NumberConstructor | 'number' | 'Number' | typeof Schema.Types.Number ? number :
+PathValueType extends DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date ? Date :
+PathValueType extends BufferConstructor | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
+PathValueType extends BooleanConstructor | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean ? boolean :
+PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Schema.Types.ObjectId :
+PathValueType extends ObjectConstructor | typeof Schema.Types.Mixed ? Schema.Types.Mixed :
+keyof PathValueType extends never ? Schema.Types.Mixed :
+PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
+PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+PathValueType

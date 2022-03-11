@@ -18,11 +18,11 @@ const schema: Schema<ITest, Model<ITest, QueryHelpers>, {}, QueryHelpers> = new 
   endDate: Date
 });
 
-schema.query._byName = function(name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
+schema.query._byName = function(name: string): QueryWithHelpers<any, ITest, QueryHelpers> {
   return this.find({ name });
 };
 
-schema.query.byName = function(name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
+schema.query.byName = function(name: string): QueryWithHelpers<any, ITest, QueryHelpers> {
   expectError(this.notAQueryHelper());
   return this._byName(name);
 };

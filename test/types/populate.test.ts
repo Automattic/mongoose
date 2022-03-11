@@ -1,7 +1,7 @@
 import { Schema, model, Document, PopulatedDoc, Types, HydratedDocument } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
-import { expectError } from 'tsd';
+import { expectAssignable, expectError, expectType } from 'tsd';
 
 interface Child {
   name: string;
@@ -75,6 +75,8 @@ const Story = model<IStory>('Story', storySchema);
   await story.populate(['author']);
   await story.populate([{ path: 'fans' }]);
   await story.populate(['author', { path: 'fans' }]);
+
+  await Story.findOne().populate(['author']);
 })();
 
 async function documentDepopulate() {
@@ -148,5 +150,35 @@ function gh11321(): void {
       }
       return 'foo';
     }
+  });
+}
+
+function gh11503() {
+  interface Friend {
+    blocked: boolean
+  }
+  const FriendSchema = new Schema<Friend>({
+    blocked: Boolean
+  });
+
+  interface User {
+    friends: Types.ObjectId[];
+  }
+  const UserSchema = new Schema<User>({
+    friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
+  });
+  const Users = model<User>('friends', UserSchema);
+
+  Users.findOne({}).populate('friends').then(user => {
+    expectType<Types.ObjectId | undefined>(user?.friends[0]);
+    expectError(user?.friends[0].blocked);
+    expectError(user?.friends.map(friend => friend.blocked));
+  });
+
+  Users.findOne({}).populate<{friends: Friend[]}>('friends').then(user => {
+    expectAssignable<Friend>(user?.friends[0]);
+    expectType<boolean>(user?.friends[0].blocked);
+    const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
+    expectType<boolean>(firstFriendBlockedValue?.blocked);
   });
 }

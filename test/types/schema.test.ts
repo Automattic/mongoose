@@ -1,4 +1,4 @@
-import { Schema, Document, SchemaDefinition, Model, InferSchemaType } from 'mongoose';
+import { Schema, Document, SchemaDefinition, Model, InferSchemaType, SchemaType } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
 enum Genre {
@@ -336,6 +336,94 @@ export function m0_0aSchema() {
   expectType<M0_0aAutoTypedSchemaType['schema']>({} as InferredSchemaType);
 
   expectError<M0_0aAutoTypedSchemaType['schema'] & { doesNotExist: boolean; }>({} as InferredSchemaType);
+
+  // Test auto schema type obtaining with all possible path types.
+
+  class Int8 extends SchemaType {
+    constructor(key, options) {
+      super(key, options, 'Int8');
+    }
+    cast(val) {
+      let _val = Number(val);
+      if (isNaN(_val)) {
+        throw new Error('Int8: ' + val + ' is not a number');
+      }
+      _val = Math.round(_val);
+      if (_val < -0x80 || _val > 0x7F) {
+        throw new Error('Int8: ' + val +
+          ' is outside of the range of valid 8-bit ints');
+      }
+      return _val;
+    }
+  }
+
+  type TestSchemaType = {
+    string1?: string;
+    string2?: string;
+    string3?: string;
+    string4?: string;
+    number1?: number;
+    number2?: number;
+    number3?: number;
+    number4?: number;
+    date1?: Date;
+    date2?: Date;
+    date3?: Date;
+    date4?: Date;
+    buffer1?: Buffer;
+    buffer2?: Buffer;
+    buffer3?: Buffer;
+    buffer4?: Buffer;
+    boolean1?: boolean;
+    boolean2?: boolean;
+    boolean3?: boolean;
+    boolean4?: boolean;
+    mixed1?: Schema.Types.Mixed;
+    mixed2?: Schema.Types.Mixed;
+    mixed3?: Schema.Types.Mixed;
+    objectId1?: Schema.Types.ObjectId;
+    objectId2?: Schema.Types.ObjectId;
+    objectId3?: Schema.Types.ObjectId;
+    customSchema?:Int8;
+    map1?: Map<string, string>;
+    map2?: Map<string, number>;
+  }
+
+  const TestSchema = new Schema({
+    string1: String,
+    string2: 'String',
+    string3: 'string',
+    string4: Schema.Types.String,
+    number1: Number,
+    number2: 'Number',
+    number3: 'number',
+    number4: Schema.Types.Number,
+    date1: Date,
+    date2: 'Date',
+    date3: 'date',
+    date4: Schema.Types.Date,
+    buffer1: Buffer,
+    buffer2: 'Buffer',
+    buffer3: 'buffer',
+    buffer4: Schema.Types.Buffer,
+    boolean1: Boolean,
+    boolean2: 'Boolean',
+    boolean3: 'boolean',
+    boolean4: Schema.Types.Boolean,
+    mixed1: Object,
+    mixed2: {},
+    mixed3: Schema.Types.Mixed,
+    objectId1: Schema.Types.ObjectId,
+    objectId2: 'ObjectId',
+    objectId3: 'objectId',
+    customSchema: Int8,
+    map1: { type: Map, of: String },
+    map2: { type: Map, of: Number }
+  });
+
+  type InferredTestSchemaType = InferSchemaType<typeof TestSchema>
+
+  expectType<TestSchemaType>({} as InferredTestSchemaType);
 
   return AutoTypedSchema;
 }

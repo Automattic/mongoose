@@ -215,8 +215,10 @@ export async function m0_0aModel() {
   /* -------------------------------------------------------------------------- */
   /*                            Model-functions-test                            */
   /* -------------------------------------------------------------------------- */
-  // TODO: check if these tests work after merging this PR: https://github.com/Automattic/mongoose/pull/11503
+  // Create should works with arbitrary objects.
+  const testDoc1 = await AutoTypeModel.create({ unExistKey: 'unExistKey' });
 
+  // TODO: check if these tests work after merging this PR: https://github.com/Automattic/mongoose/pull/11503
   /*
   const testDoc1 = await AutoTypeModel.create({ userName: 'M0_0a' });
   expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc.userName);
@@ -225,7 +227,6 @@ export async function m0_0aModel() {
   const testDoc2 = await AutoTypeModel.findOne({ userName: 'M0_0a' });
   expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc2.userName);
   expectType<M0_0aAutoTypedSchemaType['schema']['nested']['age']>(testDoc2.nested.age);
-
   */
 
   /* -------------------------------------------------------------------------- */

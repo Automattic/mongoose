@@ -1,8 +1,9 @@
 import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions } from 'mongoose';
 
 declare module 'mongoose' {
-  type ObtainDocumentType<DocDefinition, DocType = any> =
-    DoesDocTypeExist<DocType> extends true ? DocType : {
+
+  type ObtainDocumentType<DocDefinition, EnforcedDocType = any> =
+    DoesDocTypeExist<EnforcedDocType> extends true ? EnforcedDocType : {
       [K in keyof (RequiredPaths<DocDefinition> &
         OptionalPaths<DocDefinition>)]: ObtainDocumentPathType<DocDefinition[K]>;
     };
@@ -11,9 +12,9 @@ declare module 'mongoose' {
     ? DoesDocTypeExist<DocType> extends true ? DocType : DocDefinition
     : unknown;
 
-  type ObtainSchemaGeneric<TSchema, name extends 'DocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'DocDefinition' | 'StaticsMethods'> =
-    TSchema extends Schema<infer DocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer DocDefinition, infer StaticsMethods>
-    ? { DocType: DocType, M: M, TInstanceMethods: TInstanceMethods, TQueryHelpers: TQueryHelpers, DocDefinition: DocDefinition, StaticsMethods: StaticsMethods }[name]
+  type ObtainSchemaGeneric<TSchema, name extends 'DocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'DocDefinition' | 'StaticMethods'> =
+    TSchema extends Schema<infer DocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer DocDefinition, infer StaticMethods>
+    ? { DocType: DocType, M: M, TInstanceMethods: TInstanceMethods, TQueryHelpers: TQueryHelpers, DocDefinition: DocDefinition, StaticMethods: StaticMethods }[name]
     : never;
 }
 

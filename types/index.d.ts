@@ -232,8 +232,9 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
-  type AnyKeys<T> = { [P in keyof T]?: T[P] | any};
+  type AnyKeys<T> = { [P in keyof T]?: any};
   interface AnyObject { [k: string]: any }
+  type FlexibleObject<T extends {}> = { [P in keyof (T & Omit<any, keyof T>)]?: P extends keyof T ? T[P] : any }
 
   type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
 
@@ -253,7 +254,7 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
   }
 
   export const Model: Model<any>;
-  type Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> = NodeJS.EventEmitter & AcceptsDiscriminator & ObtainSchemaGeneric<TSchema, 'StaticsMethods'> & {
+  type Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> = NodeJS.EventEmitter & AcceptsDiscriminator & ObtainSchemaGeneric<TSchema, 'StaticMethods'> & {
 
     new <DocType = T & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
 
@@ -298,15 +299,11 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     countDocuments(filter: FilterQuery<T>, options?: QueryOptions, callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a new document or documents */
-    create(docs: (T)[], options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create(docs: (T)[], callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
-    create(doc: T): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
-    create(doc: T, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
-    create<DocContents = T>(docs: DocContents[], options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = T>(docs: DocContents[], callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
-    create<DocContents = T>(doc: DocContents): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
-    create<DocContents = { [P in keyof T]?: T[P] }>(...docs: DocContents[]): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = T>(doc: DocContents, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
+    create<DocContents = FlexibleObject<T>>(docs: DocContents[], options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = FlexibleObject<T>>(docs: DocContents[], callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
+    create<DocContents = FlexibleObject<T>>(doc: DocContents): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
+    create<DocContents = FlexibleObject<T>>(...docs: DocContents[]): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = FlexibleObject<T>>(doc: DocContents, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,
@@ -764,12 +761,12 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
 
   class Schema<TDocType = any, M = Model<TDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = any,
     DocType extends ObtainDocumentType<DocType, TDocType> = any,
-    StaticsMethods = {}>
+    StaticMethods = {}>
     extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<TDocType>> | DocType, options?: SchemaOptions<StaticsMethods, TInstanceMethods>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<TDocType>> | DocType, options?: SchemaOptions<StaticMethods, TInstanceMethods>);
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<TDocType>> | Schema, prefix?: string): this;

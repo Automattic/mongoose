@@ -8,7 +8,7 @@ declare module 'mongoose' {
     currentTime?: () => (NativeDate | number);
   }
 
-  interface SchemaOptions<StaticsMethods = {}, InstanceMethods = {}> {
+  interface SchemaOptions<StaticMethods = {}, InstanceMethods = {}> {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
      * calling Model.createIndexes() after you successfully connect to MongoDB. If you want to disable
@@ -183,7 +183,7 @@ declare module 'mongoose' {
     /**
      * Model Statics methods.
      */
-    statics?: StaticsMethods,
+    statics?: StaticMethods,
 
     /**
      * Document instance methods.

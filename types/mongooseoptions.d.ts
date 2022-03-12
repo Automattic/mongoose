@@ -105,9 +105,11 @@ declare module 'mongoose' {
     returnOriginal?: boolean;
 
     /**
-     * false by default. Set to true to enable [update validators](
+     * Set to true to enable [update validators](
      * https://mongoosejs.com/docs/validation.html#update-validators
      * ) for all validators by default.
+     *
+     * @default false
      */
     runValidators?: boolean;
 

@@ -232,7 +232,6 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
-  type AnyKeys<T> = { [P in keyof T]?: any};
   interface AnyObject { [k: string]: any }
   type FlexibleObject<T extends {}> = { [P in keyof (T & Omit<any, keyof T>)]?: P extends keyof T ? T[P] : any }
 
@@ -299,11 +298,11 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     countDocuments(filter: FilterQuery<T>, options?: QueryOptions, callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a new document or documents */
-    create<DocContents = FlexibleObject<T>>(docs: DocContents[], options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = FlexibleObject<T>>(docs: DocContents[], callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
-    create<DocContents = FlexibleObject<T>>(doc: DocContents): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
-    create<DocContents = FlexibleObject<T>>(...docs: DocContents[]): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = FlexibleObject<T>>(doc: DocContents, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
+    create<DocContents = FlexibleObject<T>>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<UnpackedIntersection<T, DocContents>, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = FlexibleObject<T>>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<UnpackedIntersection<T, DocContents>, TMethodsAndOverrides, TVirtuals>[]>): void;
+    create<DocContents = FlexibleObject<T>>(doc: T | DocContents): Promise<HydratedDocument<UnpackedIntersection<T, DocContents>, TMethodsAndOverrides, TVirtuals>>;
+    create<DocContents = FlexibleObject<T>>(...docs: Array<T | DocContents>): Promise<HydratedDocument<UnpackedIntersection<T, DocContents>, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = FlexibleObject<T>>(doc: T | DocContents, callback: Callback<HydratedDocument<UnpackedIntersection<T, DocContents>, TMethodsAndOverrides, TVirtuals>>): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,
@@ -381,12 +380,12 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     init(callback?: CallbackWithoutResult): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
-    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<T>>;
-    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options?: InsertManyOptions): Promise<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>;
-    insertMany(doc: AnyKeys<T> | AnyObject, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<T>>;
-    insertMany(doc: AnyKeys<T> | AnyObject, options?: InsertManyOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    insertMany(doc: AnyKeys<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[] | InsertManyResult<T>>): void;
-    insertMany(docs: Array<AnyKeys<T> | AnyObject>, options?: InsertManyOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>> | InsertManyResult<T>>): void;
+    insertMany(docs: Array<FlexibleObject<T>>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<T>>;
+    insertMany(docs: Array<FlexibleObject<T>>, options?: InsertManyOptions): Promise<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>;
+    insertMany(doc: FlexibleObject<T>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<T>>;
+    insertMany(doc: FlexibleObject<T>, options?: InsertManyOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    insertMany(doc: FlexibleObject<T>, options?: InsertManyOptions, callback?: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[] | InsertManyResult<T>>): void;
+    insertMany(docs: Array<FlexibleObject<T>>, options?: InsertManyOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>> | InsertManyResult<T>>): void;
 
     /**
      * Lists the indexes currently defined in MongoDB. This may or may not be
@@ -1437,7 +1436,7 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
       /** Searches array items for the first document with a matching _id. */
       id(id: any): (T extends Types.Subdocument ? T : Types.Subdocument<InferId<T>> & T) | null;
 
-      push(...args: (AnyKeys<T> & AnyObject)[]): number;
+      push(...args: (FlexibleObject<T> & AnyObject)[]): number;
     }
 
     class Map<V> extends global.Map<string, V> {
@@ -2016,22 +2015,22 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
 
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: AnyKeys<TSchema> & AnyObject;
-    $inc?: AnyKeys<TSchema> & AnyObject;
-    $min?: AnyKeys<TSchema> & AnyObject;
-    $max?: AnyKeys<TSchema> & AnyObject;
-    $mul?: AnyKeys<TSchema> & AnyObject;
+    $currentDate?: FlexibleObject<TSchema> & AnyObject;
+    $inc?: FlexibleObject<TSchema> & AnyObject;
+    $min?: FlexibleObject<TSchema> & AnyObject;
+    $max?: FlexibleObject<TSchema> & AnyObject;
+    $mul?: FlexibleObject<TSchema> & AnyObject;
     $rename?: { [key: string]: string };
-    $set?: AnyKeys<TSchema> & AnyObject;
-    $setOnInsert?: AnyKeys<TSchema> & AnyObject;
-    $unset?: AnyKeys<TSchema> & AnyObject;
+    $set?: FlexibleObject<TSchema> & AnyObject;
+    $setOnInsert?: FlexibleObject<TSchema> & AnyObject;
+    $unset?: FlexibleObject<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: AnyKeys<TSchema> & AnyObject;
-    $pop?: AnyKeys<TSchema> & AnyObject;
-    $pull?: AnyKeys<TSchema> & AnyObject;
-    $push?: AnyKeys<TSchema> & AnyObject;
-    $pullAll?: AnyKeys<TSchema> & AnyObject;
+    $addToSet?: FlexibleObject<TSchema> & AnyObject;
+    $pop?: FlexibleObject<TSchema> & AnyObject;
+    $pull?: FlexibleObject<TSchema> & AnyObject;
+    $push?: FlexibleObject<TSchema> & AnyObject;
+    $pullAll?: FlexibleObject<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: {

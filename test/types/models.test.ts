@@ -1,5 +1,5 @@
 import { Schema, Document, Model, Types, connection, model } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { expectAssignable, expectError, expectType } from 'tsd';
 import { M0_0aAutoTypedSchemaType, m0_0aSchema } from './schema.test';
 
 function conventionalSyntax(): void {
@@ -220,18 +220,17 @@ export async function m0_0aModel() {
   /*                            Model-functions-test                            */
   /* -------------------------------------------------------------------------- */
   // Create should works with arbitrary objects.
-  const testDoc1 = await AutoTypeModel.create({ unExistKey: 'unExistKey' });
+  const randomObject = await AutoTypeModel.create({ unExistKey: 'unExistKey', description: 'st' });
+  expectType<string>(randomObject.unExistKey);
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(randomObject.userName);
 
-  // TODO: check if these tests work after merging this PR: https://github.com/Automattic/mongoose/pull/11503
-  /*
   const testDoc1 = await AutoTypeModel.create({ userName: 'M0_0a' });
-  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc.userName);
-  expectType<M0_0aAutoTypedSchemaType['schema']['nested']['age']>(testDoc.nested.age);
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
+  expectType<M0_0aAutoTypedSchemaType['schema']['description']>(testDoc1.description);
 
   const testDoc2 = await AutoTypeModel.findOne({ userName: 'M0_0a' });
-  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc2.userName);
-  expectType<M0_0aAutoTypedSchemaType['schema']['nested']['age']>(testDoc2.nested.age);
-  */
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName'] | undefined>(testDoc2?.userName);
+  expectType<M0_0aAutoTypedSchemaType['schema']['description'] | undefined>(testDoc2?.description);
 
   /* -------------------------------------------------------------------------- */
   /*                        Model-statics-functions-test                        */

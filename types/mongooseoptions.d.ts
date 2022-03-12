@@ -3,35 +3,59 @@ import stream = require('stream');
 declare module 'mongoose' {
 
   interface MongooseOptions {
-    /** true by default. Set to false to skip applying global plugins to child schemas */
+    /**
+     * Set to false to skip applying global plugins to child schemas.
+     *
+     * @default true
+     */
     applyPluginsToChildSchemas?: boolean;
 
     /**
-     * false by default. Set to true to apply global plugins to discriminator schemas.
+     * Set to true to apply global plugins to discriminator schemas.
      * This typically isn't necessary because plugins are applied to the base schema and
      * discriminators copy all middleware, methods, statics, and properties from the base schema.
+     *
+     * @default false
      */
     applyPluginsToDiscriminators?: boolean;
 
     /**
-     * Set to `true` to make Mongoose call` Model.createCollection()` automatically when you
-     * create a model with `mongoose.model()` or `conn.model()`. This is useful for testing
-     * transactions, change streams, and other features that require the collection to exist.
+     * autoCreate is true by default unless readPreference is secondary or secondaryPreferred,
+     * which means Mongoose will attempt to create every model's underlying collection before
+     * creating indexes. If readPreference is secondary or secondaryPreferred, Mongoose will
+     * default to false for both autoCreate and autoIndex because both createCollection() and
+     * createIndex() will fail when connected to a secondary.
      */
     autoCreate?: boolean;
 
     /**
-     * true by default. Set to false to disable automatic index creation
-     * for all models associated with this Mongoose instance.
+     * Set to false to disable automatic index creation for all models associated with this Mongoose instance.
+     *
+     * @default true
      */
     autoIndex?: boolean;
 
-    /** enable/disable mongoose's buffering mechanism for all connections and models */
+    /**
+     * enable/disable mongoose's buffering mechanism for all connections and models.
+     *
+     * @default true
+     */
     bufferCommands?: boolean;
 
+    /**
+     * If bufferCommands is on, this option sets the maximum amount of time Mongoose
+     * buffering will wait before throwing an error.
+     * If not specified, Mongoose will use 10000 (10 seconds).
+     *
+     * @default 10000
+     */
     bufferTimeoutMS?: number;
 
-    /** false by default. Set to `true` to `clone()` all schemas before compiling into a model. */
+    /**
+     * Set to `true` to `clone()` all schemas before compiling into a model.
+     *
+     * @default false
+     */
     cloneSchemas?: boolean;
 
     /**
@@ -41,25 +65,31 @@ declare module 'mongoose' {
      * name, then all arguments passed to the method. For example, if you wanted to
      * replicate the default logging, you could output from the callback
      * `Mongoose: ${collectionName}.${methodName}(${methodArgs.join(', ')})`.
+     *
+     * @default false
      */
     debug?:
-      | boolean
-      | { color?: boolean; shell?: boolean }
-      | stream.Writable
-      | ((collectionName: string, methodName: string, ...methodArgs: any[]) => void);
+    | boolean
+    | { color?: boolean; shell?: boolean; }
+    | stream.Writable
+    | ((collectionName: string, methodName: string, ...methodArgs: any[]) => void);
 
     /** If set, attaches [maxTimeMS](https://docs.mongodb.com/manual/reference/operator/meta/maxTimeMS/) to every query */
     maxTimeMS?: number;
 
     /**
-     * true by default. Mongoose adds a getter to MongoDB ObjectId's called `_id` that
+     * Mongoose adds a getter to MongoDB ObjectId's called `_id` that
      * returns `this` for convenience with populate. Set this to false to remove the getter.
+     *
+     * @default true
      */
     objectIdGetter?: boolean;
 
     /**
      * Set to `true` to default to overwriting models with the same name when calling
      * `mongoose.model()`, as opposed to throwing an `OverwriteModelError`.
+     *
+     * @default false
      */
     overwriteModels?: boolean;
 
@@ -69,6 +99,8 @@ declare module 'mongoose' {
      * setting the `new` option to `true` for `findOneAndX()` calls by default. Read our
      * `findOneAndUpdate()` [tutorial](https://mongoosejs.com/docs/tutorials/findoneandupdate.html)
      * for more information.
+     *
+     * @default true
      */
     returnOriginal?: boolean;
 
@@ -79,37 +111,68 @@ declare module 'mongoose' {
      */
     runValidators?: boolean;
 
+    /**
+     * Sanitizes query filters against [query selector injection attacks](
+     * https://thecodebarbarian.com/2014/09/04/defending-against-query-selector-injection-attacks.html
+     * ) by wrapping any nested objects that have a property whose name starts with $ in a $eq.
+     */
     sanitizeFilter?: boolean;
 
     sanitizeProjection?: boolean;
 
     /**
-     * true by default. Set to false to opt out of Mongoose adding all fields that you `populate()`
+     * Set to false to opt out of Mongoose adding all fields that you `populate()`
      * to your `select()`. The schema-level option `selectPopulatedPaths` overwrites this one.
+     *
+     * @default true
      */
     selectPopulatedPaths?: boolean;
 
+    /**
+     * Mongoose also sets defaults on update() and findOneAndUpdate() when the upsert option is
+     * set by adding your schema's defaults to a MongoDB $setOnInsert operator. You can disable
+     * this behavior by setting the setDefaultsOnInsert option to false.
+     *
+     * @default true
+     */
     setDefaultsOnInsert?: boolean;
 
-    /** true by default, may be `false`, `true`, or `'throw'`. Sets the default strict mode for schemas. */
+    /**
+     * Sets the default strict mode for schemas.
+     * May be `false`, `true`, or `'throw'`.
+     *
+     * @default true
+     */
     strict?: boolean | 'throw';
 
-    /** true by default. set to `false` to allow populating paths that aren't in the schema */
+    /**
+     * Set to `false` to allow populating paths that aren't in the schema.
+     *
+     * @default true
+     */
     strictPopulate?: boolean;
 
     /**
-     * false by default, may be `false`, `true`, or `'throw'`. Sets the default
-     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
+     * Sets the default [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
+     * May be `false`, `true`, or `'throw'`.
+     *
+     * @default false
      */
     strictQuery?: boolean | 'throw';
 
     /**
-     * `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to
-     * `toJSON()`, for determining how Mongoose documents get serialized by `JSON.stringify()`
+     * Overwrites default objects to `toJSON()`, for determining how Mongoose
+     * documents get serialized by `JSON.stringify()`
+     *
+     * @default { transform: true, flattenDecimals: true }
      */
     toJSON?: ToObjectOptions;
 
-    /** `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to `toObject()` */
+    /**
+     * Overwrites default objects to `toObject()`
+     *
+     * @default { transform: true, flattenDecimals: true }
+     */
     toObject?: ToObjectOptions;
   }
 }

@@ -1,6 +1,7 @@
 /// <reference path="./connection.d.ts" />
 /// <reference path="./cursor.ts" />
 /// <reference path="./error.d.ts" />
+/// <reference path="./mongooseoptions.d.ts" />
 /// <reference path="./pipelinestage.d.ts" />
 /// <reference path="./schemaoptions.d.ts" />
 

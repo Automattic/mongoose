@@ -3,7 +3,7 @@ import { Schema, model, Document, Types } from 'mongoose';
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
 interface ITest extends Document {
-  _id?: Types.ObjectId;
+  _id?: Types.ObjectId | string;
   name?: string;
 }
 

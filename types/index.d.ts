@@ -1,4 +1,6 @@
 /// <reference path="./connection.d.ts" />
+/// <reference path="./cursor.d.ts" />
+/// <reference path="./document.d.ts" />
 /// <reference path="./error.d.ts" />
 /// <reference path="./pipelinestage.d.ts" />
 /// <reference path="./schemaoptions.d.ts" />
@@ -332,247 +334,8 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     getIndexes(): any;
   }
 
-  class Document<T = any, TQueryHelpers = any, DocType = any> {
-    constructor(doc?: any);
-
-    /** This documents _id. */
-    _id?: T;
-
-    /** This documents __v. */
-    __v?: any;
-
-    /* Get all subdocs (by bfs) */
-    $getAllSubdocs(): Document[];
-
-    /** Don't run validation on this path or persist changes to this path. */
-    $ignore(path: string): void;
-
-    /** Checks if a path is set to its default. */
-    $isDefault(path: string): boolean;
-
-    /** Getter/setter, determines whether the document was removed or not. */
-    $isDeleted(val?: boolean): boolean;
-
-    /** Returns an array of all populated documents associated with the query */
-    $getPopulatedDocs(): Document[];
-
-    /**
-     * Returns true if the given path is nullish or only contains empty objects.
-     * Useful for determining whether this subdoc will get stripped out by the
-     * [minimize option](/docs/guide.html#minimize).
-     */
-    $isEmpty(path: string): boolean;
-
-    /** Checks if a path is invalid */
-    $isValid(path: string): boolean;
-
-    /**
-     * Empty object that you can use for storing properties on the document. This
-     * is handy for passing data to middleware without conflicting with Mongoose
-     * internals.
-     */
-    $locals: Record<string, unknown>;
-
-    /** Marks a path as valid, removing existing validation errors. */
-    $markValid(path: string): void;
-
-    /**
-     * A string containing the current operation that Mongoose is executing
-     * on this document. May be `null`, `'save'`, `'validate'`, or `'remove'`.
-     */
-    $op: string | null;
-
-    /**
-     * Getter/setter around the session associated with this document. Used to
-     * automatically set `session` if you `save()` a doc that you got from a
-     * query with an associated session.
-     */
-    $session(session?: mongodb.ClientSession | null): mongodb.ClientSession;
-
-    /** Alias for `set()`, used internally to avoid conflicts */
-    $set(path: string, val: any, options?: any): this;
-    $set(path: string, val: any, type: any, options?: any): this;
-    $set(value: any): this;
-
-    /** Set this property to add additional query filters when Mongoose saves this document and `isNew` is false. */
-    $where: Record<string, unknown>;
-
-    /** If this is a discriminator model, `baseModelName` is the name of the base model. */
-    baseModelName?: string;
-
-    /** Collection the model uses. */
-    collection: Collection;
-
-    /** Connection the model uses. */
-    db: Connection;
-
-    /** Removes this document from the db. */
-    delete(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
-    delete(options: QueryOptions, cb?: Callback): void;
-    delete(cb: Callback): void;
-
-    /** Removes this document from the db. */
-    deleteOne(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
-    deleteOne(options: QueryOptions, cb?: Callback): void;
-    deleteOne(cb: Callback): void;
-
-    /**
-     * Takes a populated field and returns it to its unpopulated state. If called with
-     * no arguments, then all populated fields are returned to their unpopulated state.
-     */
-    depopulate(path?: string | string[]): this;
-
-    /**
-     * Returns the list of paths that have been directly modified. A direct
-     * modified path is a path that you explicitly set, whether via `doc.foo = 'bar'`,
-     * `Object.assign(doc, { foo: 'bar' })`, or `doc.set('foo', 'bar')`.
-     */
-    directModifiedPaths(): Array<string>;
-
-    /**
-     * Returns true if this document is equal to another document.
-     *
-     * Documents are considered equal when they have matching `_id`s, unless neither
-     * document has an `_id`, in which case this function falls back to using
-     * `deepEqual()`.
-     */
-    equals(doc: Document<T>): boolean;
-
-    /** Hash containing current validation errors. */
-    errors?: Error.ValidationError;
-
-    /** Returns the value of a path. */
-    get(path: string, type?: any, options?: any): any;
-
-    /**
-     * Returns the changes that happened to the document
-     * in the format that will be sent to MongoDB.
-     */
-    getChanges(): UpdateQuery<this>;
-
-    /** The string version of this documents _id. */
-    id?: any;
-
-    /** Signal that we desire an increment of this documents version. */
-    increment(): this;
-
-    /**
-     * Initializes the document without setters or marking anything modified.
-     * Called internally after a document is returned from mongodb. Normally,
-     * you do **not** need to call this function on your own.
-     */
-    init(obj: any, opts?: any, cb?: Callback<this>): this;
-
-    /** Marks a path as invalid, causing validation to fail. */
-    invalidate(path: string, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
-
-    /** Returns true if `path` was directly set and modified, else false. */
-    isDirectModified(path: string): boolean;
-
-    /** Checks if `path` was explicitly selected. If no projection, always returns true. */
-    isDirectSelected(path: string): boolean;
-
-    /** Checks if `path` is in the `init` state, that is, it was set by `Document#init()` and not modified since. */
-    isInit(path: string): boolean;
-
-    /**
-     * Returns true if any of the given paths is modified, else false. If no arguments, returns `true` if any path
-     * in this document is modified.
-     */
-    isModified(path?: string | Array<string>): boolean;
-
-    /** Boolean flag specifying if the document is new. */
-    isNew: boolean;
-
-    /** Checks if `path` was selected in the source query which initialized this document. */
-    isSelected(path: string): boolean;
-
-    /** Marks the path as having pending changes to write to the db. */
-    markModified(path: string, scope?: any): void;
-
-    /** Returns the list of paths that have been modified. */
-    modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;
-
-    /** The name of the model */
-    modelName: string;
-
-    /**
-     * Overwrite all values in this document with the values of `obj`, except
-     * for immutable properties. Behaves similarly to `set()`, except for it
-     * unsets all properties that aren't in `obj`.
-     */
-    overwrite(obj: AnyObject): this;
-
-    /**
-     * If this document is a subdocument or populated document, returns the
-     * document's parent. Returns undefined otherwise.
-     */
-    $parent(): Document | undefined;
-
-    /** Populates document references. */
-    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this & Paths>;
-    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this & Paths>): void;
-    populate<Paths = {}>(path: string, names: string): Promise<this & Paths>;
-    populate<Paths = {}>(path: string, names: string, callback: Callback<this & Paths>): void;
-
-    /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
-    populated(path: string): any;
-
-    /** Removes this document from the db. */
-    remove(options?: QueryOptions): Promise<this>;
-    remove(options?: QueryOptions, cb?: Callback): void;
-
-    /** Sends a replaceOne command with this document `_id` as the query selector. */
-    replaceOne(replacement?: AnyObject, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
-    replaceOne(replacement?: AnyObject, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
-
-    /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
-    save(options?: SaveOptions): Promise<this>;
-    save(options?: SaveOptions, fn?: Callback<this>): void;
-    save(fn?: Callback<this>): void;
-
-    /** The document's schema. */
-    schema: Schema;
-
-    /** Sets the value of a path, or many paths. */
-    set(path: string, val: any, options?: any): this;
-    set(path: string, val: any, type: any, options?: any): this;
-    set(value: any): this;
-
-    /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON(options: ToObjectOptions & { flattenMaps: false }): LeanDocument<this>;
-    toJSON(options?: ToObjectOptions): FlattenMaps<LeanDocument<this>>;
-    toJSON<T = FlattenMaps<DocType>>(options?: ToObjectOptions): T;
-
-    /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject(options?: ToObjectOptions): LeanDocument<this>;
-    toObject<T = DocType>(options?: ToObjectOptions): T;
-
-    /** Clears the modified state on the specified path. */
-    unmarkModified(path: string): void;
-
-    /** Sends an update command with this document `_id` as the query selector. */
-    update(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
-
-    /** Sends an updateOne command with this document `_id` as the query selector. */
-    updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
-
-    /** Executes registered validation rules for this document. */
-    validate(options:{ pathsToSkip?: pathsToSkip }): Promise<void>;
-    validate(pathsToValidate?: pathsToValidate, options?: any): Promise<void>;
-    validate(callback: CallbackWithoutResult): void;
-    validate(pathsToValidate: pathsToValidate, callback: CallbackWithoutResult): void;
-    validate(pathsToValidate: pathsToValidate, options: any, callback: CallbackWithoutResult): void;
-
-    /** Executes registered validation rules (skipping asynchronous validators) for this document. */
-    validateSync(options:{pathsToSkip?: pathsToSkip, [k:string]: any }): Error.ValidationError | null;
-    validateSync(pathsToValidate?: Array<string>, options?: any): Error.ValidationError | null;
-  }
-
   /** A list of paths to validate. If set, Mongoose will validate only the modified paths that are in the given list. */
   type pathsToValidate = string[] | string;
-  /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
-  type pathsToSkip = string[] | string;
 
   interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
@@ -1100,10 +863,10 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
   type IndexDirection = 1 | -1 | '2d' | '2dsphere' | 'geoHaystack' | 'hashed' | 'text';
   type IndexDefinition = Record<string, IndexDirection>;
 
-  type PreMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void) => void | Promise<void>;
-  type PreSaveMiddlewareFunction<T> = (this: T, next: (err?: CallbackError) => void, opts: SaveOptions) => void | Promise<void>;
-  type PostMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, res: ResType, next: (err?: CallbackError) => void) => void | Promise<void>;
-  type ErrorHandlingMiddlewareFunction<ThisType, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: (err?: CallbackError) => void) => void;
+  export type PreMiddlewareFunction<ThisType = any> = (this: ThisType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
+  export type PreSaveMiddlewareFunction<ThisType = any> = (this: ThisType, next: CallbackWithoutResultAndOptionalError, opts: SaveOptions) => void | Promise<void>;
+  export type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
+  export type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
 
   class Schema<TDocType = any, M = Model<TDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = any,
     DocType extends ObtainDocumentType<DocType, TDocType> = any,
@@ -1816,8 +1579,11 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
 
   type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType> = Query<ResultType, DocType, THelpers, RawDocType> & THelpers;
 
-  type UnpackedIntersection<T, U> = T extends (infer V)[] ? (V & U)[] : T & U;
-  type UnpackedIntersectionWithNull<T, U> = T extends null ? UnpackedIntersection<T, U> | null : UnpackedIntersection<T, U>;
+  type UnpackedIntersection<T, U> = T extends (infer A)[]
+    ? (Omit<A, keyof U> & U)[]
+    : keyof U extends never
+    ? T
+  : Omit<T, keyof U> & U;
 
   type ProjectionFields<DocType> = {[Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any} & Record<string, any>;
 
@@ -1897,7 +1663,7 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
      * Returns a wrapper around a [mongodb driver cursor](http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html).
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      */
-    cursor(options?: any): QueryCursor<DocType>;
+    cursor(options?: QueryOptions): Cursor<DocType, QueryOptions>;
 
     /**
      * Declare and/or execute this query as a `deleteMany()` operation. Works like
@@ -2118,8 +1884,8 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     polygon(path: string, ...coordinatePairs: number[][]): this;
 
     /** Specifies paths which should be populated with other documents. */
-    populate<Paths = {}>(path: string, select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
-    populate<Paths = {}>(options: PopulateOptions | Array<PopulateOptions>): QueryWithHelpers<UnpackedIntersectionWithNull<ResultType, Paths>, DocType, THelpers, RawDocType>;
+    populate<Paths = {}>(path: string | string[], select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
+    populate<Paths = {}>(options: PopulateOptions | (PopulateOptions | string)[]): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
     projection(): ProjectionFields<DocType> | null;
@@ -2462,49 +2228,6 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     T extends Document ? RawDocType :
     T;
 
-  class QueryCursor<DocType> extends stream.Readable {
-    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
-
-    /**
-     * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
-     * Useful for setting the `noCursorTimeout` and `tailable` flags.
-     */
-    addCursorFlag(flag: string, value: boolean): this;
-
-    /**
-     * Marks this cursor as closed. Will stop streaming and subsequent calls to
-     * `next()` will error.
-     */
-    close(): Promise<void>;
-    close(callback: CallbackWithoutResult): void;
-
-    /**
-     * Execute `fn` for every document(s) in the cursor. If batchSize is provided
-     * `fn` will be executed for each batch of documents. If `fn` returns a promise,
-     * will wait for the promise to resolve before iterating on to the next one.
-     * Returns a promise that resolves when done.
-     */
-    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number, batchSize?: number }, cb?: CallbackWithoutResult): void;
-    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }, cb?: CallbackWithoutResult): void;
-
-    /**
-     * Registers a transform function which subsequently maps documents retrieved
-     * via the streams interface or `.next()`
-     */
-    map<ResultType>(fn: (res: DocType) => ResultType): QueryCursor<ResultType>;
-
-    /**
-     * Get the next document from this cursor. Will return `null` when there are
-     * no documents left.
-     */
-    next(): Promise<DocType>;
-    next(callback: Callback<DocType | null>): void;
-
-    options: any;
-  }
-
   class Aggregate<R> {
     /**
      * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js
@@ -2546,7 +2269,7 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     /**
      * Sets the cursor option for the aggregation query (ignored for < 2.6.0).
      */
-    cursor(options?: Record<string, unknown>): AggregationCursor;
+    cursor<DocType = any>(options?: Record<string, unknown>): Cursor<DocType>;
 
     /** Executes the aggregate pipeline on the currently bound Model. */
     exec(callback?: Callback<R>): Promise<R>;
@@ -2652,43 +2375,6 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     unwind(...args: PipelineStage.Unwind['$unwind'][]): this;
   }
 
-  class AggregationCursor extends stream.Readable {
-    /**
-     * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
-     * Useful for setting the `noCursorTimeout` and `tailable` flags.
-     */
-    addCursorFlag(flag: string, value: boolean): this;
-
-    /**
-     * Marks this cursor as closed. Will stop streaming and subsequent calls to
-     * `next()` will error.
-     */
-    close(): Promise<void>;
-    close(callback: CallbackWithoutResult): void;
-
-    /**
-     * Execute `fn` for every document(s) in the cursor. If batchSize is provided
-     * `fn` will be executed for each batch of documents. If `fn` returns a promise,
-     * will wait for the promise to resolve before iterating on to the next one.
-     * Returns a promise that resolves when done.
-     */
-    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }): Promise<void>;
-    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }, cb?: CallbackWithoutResult): void;
-
-    /**
-     * Registers a transform function which subsequently maps documents retrieved
-     * via the streams interface or `.next()`
-     */
-    map(fn: (res: any) => any): this;
-
-    /**
-     * Get the next document from this cursor. Will return `null` when there are
-     * no documents left.
-     */
-    next(): Promise<any>;
-    next(callback: Callback): void;
-  }
-
   class SchemaType {
     /** SchemaType constructor */
     constructor(path: string, options?: AnyObject, instance?: string);
@@ -2786,6 +2472,7 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
   type Callback<T = any> = (error: CallbackError, result: T) => void;
 
   type CallbackWithoutResult = (error: CallbackError) => void;
+  type CallbackWithoutResultAndOptionalError = (error?: CallbackError) => void;
 
   /* for ts-mongoose */
   class mquery {}

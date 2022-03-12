@@ -1,11 +1,20 @@
-import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument } from 'mongoose';
-import { expectAssignable, expectError, expectType } from 'tsd';
+import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction } from 'mongoose';
+import { expectAssignable, expectError } from 'tsd';
 
 interface ITest extends Document {
   name?: string;
 }
 
-const schema: Schema<ITest> = new Schema<ITest>({ name: { type: String } });
+const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(next, opts) {
+  this.$markValid('name');
+  if (opts.session) {
+    next();
+  } else {
+    next(new Error('Operation must be in Session.'));
+  }
+};
+
+const schema: Schema<ITest> = new Schema<ITest>({ name: { type: 'String' } });
 
 schema.pre<Query<any, any>>('find', async function() {
   console.log('Find', this.getFilter());

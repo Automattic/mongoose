@@ -1,20 +1,20 @@
-import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions } from 'mongoose';
+import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions, TypeKeyBaseType } from 'mongoose';
 
 declare module 'mongoose' {
 
-  type ObtainDocumentType<DocDefinition, EnforcedDocType = any> =
+  type ObtainDocumentType<DocDefinition, EnforcedDocType = any, typeKey extends TypeKeyBaseType = 'type'> =
     DoesDocTypeExist<EnforcedDocType> extends true ? EnforcedDocType : {
       [K in keyof (RequiredPaths<DocDefinition> &
-        OptionalPaths<DocDefinition>)]: ObtainDocumentPathType<DocDefinition[K]>;
+        OptionalPaths<DocDefinition>)]: ObtainDocumentPathType<DocDefinition[K], typeKey>;
     };
 
-  type InferSchemaType<SchemaType> = SchemaType extends Schema<infer DocType, any, any, any, infer DocDefinition>
-    ? DoesDocTypeExist<DocType> extends true ? DocType : DocDefinition
+  type InferSchemaType<SchemaType> = SchemaType extends Schema<infer DocType>
+    ? DoesDocTypeExist<DocType> extends true ? DocType : ObtainSchemaGeneric<SchemaType, 'DocType'>
     : unknown;
 
-  type ObtainSchemaGeneric<TSchema, name extends 'DocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'DocDefinition' | 'StaticMethods'> =
-    TSchema extends Schema<infer DocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer DocDefinition, infer StaticMethods>
-    ? { DocType: DocType, M: M, TInstanceMethods: TInstanceMethods, TQueryHelpers: TQueryHelpers, DocDefinition: DocDefinition, StaticMethods: StaticMethods }[name]
+  type ObtainSchemaGeneric<TSchema, name extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'PathTypeKey' |'DocType' | 'StaticMethods'> =
+    TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer PathTypeKey, infer DocType, infer StaticMethods>
+    ? { EnforcedDocType: EnforcedDocType, M: M, TInstanceMethods: TInstanceMethods, TQueryHelpers: TQueryHelpers, PathTypeKey:PathTypeKey, DocType: DocType, StaticMethods: StaticMethods }[name]
     : never;
 }
 
@@ -22,7 +22,7 @@ type DoesDocTypeExist<DocType> = keyof DocType extends string ? true : false;
 
 type RequiredPathBaseType = { required: true | [true, string | undefined] }
 
-type PathWithTypePropertyBaseType = { type: any }
+type PathWithTypePropertyBaseType<TypeKey extends TypeKeyBaseType > = { [k in TypeKey]: any }
 
 type RequiredPathKeys<T> = {
   [K in keyof T]: T[K] extends RequiredPathBaseType ? K : never;
@@ -40,11 +40,11 @@ type OptionalPaths<T> = {
   [K in OptionalPathKeys<T>]?: T[K];
 };
 
-type ObtainDocumentPathType<PathValueType> = PathValueType extends Schema<any>
+type ObtainDocumentPathType<PathValueType, typeKey extends TypeKeyBaseType> = PathValueType extends Schema<any>
   ? InferSchemaType<PathValueType>
   : ResolvePathType<
-    PathValueType extends PathWithTypePropertyBaseType ? PathValueType['type'] : PathValueType,
-    PathValueType extends PathWithTypePropertyBaseType ? Omit<PathValueType, 'type'> : {}
+    PathValueType extends PathWithTypePropertyBaseType<typeKey> ? PathValueType[typeKey] : PathValueType,
+    PathValueType extends PathWithTypePropertyBaseType<typeKey> ? Omit<PathValueType, typeKey> : {}
   >;
 
 type PathEnumOrString<T> = T extends (infer E)[] ? E : T extends { values: any } ? PathEnumOrString<T['values']> : string;
@@ -61,4 +61,4 @@ PathValueType extends ObjectConstructor | typeof Schema.Types.Mixed ? Schema.Typ
 keyof PathValueType extends never ? Schema.Types.Mixed :
 PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
 PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-PathValueType
+unknown

@@ -758,17 +758,18 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
   export type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
   export type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
 
-  class Schema<TDocType = any, M = Model<TDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = any,
-    DocType extends ObtainDocumentType<DocType, TDocType> = any,
+  class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = any,
+    PathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
+    DocType extends ObtainDocumentType<DocType, EnforcedDocType, PathTypeKey> = any,
     StaticMethods = {}>
     extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<TDocType>> | DocType, options?: SchemaOptions<StaticMethods, TInstanceMethods>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<PathTypeKey, StaticMethods, TInstanceMethods>);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefinitionType<TDocType>> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
 
     /**
      * Array of child schemas (from document arrays and single nested subdocs)
@@ -818,7 +819,7 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] } & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<TDocType>>;
+    obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>>;
 
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType>(path: string): ResultType;

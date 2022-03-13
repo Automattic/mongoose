@@ -2,7 +2,7 @@ import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions, TypeKeyBaseType
 
 declare module 'mongoose' {
 
-  type ObtainDocumentType<DocDefinition, EnforcedDocType = any, typeKey extends TypeKeyBaseType = 'type'> =
+  type ObtainDocumentType<DocDefinition, EnforcedDocType = any, typeKey extends TypeKeyBaseType = DefaultTypeKey> =
     DoesDocTypeExist<EnforcedDocType> extends true ? EnforcedDocType : {
       [K in keyof (RequiredPaths<DocDefinition> &
         OptionalPaths<DocDefinition>)]: ObtainDocumentPathType<DocDefinition[K], typeKey>;

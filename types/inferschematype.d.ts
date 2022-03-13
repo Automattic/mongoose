@@ -47,9 +47,11 @@ type ObtainDocumentPathType<PathValueType> = PathValueType extends Schema<any>
     PathValueType extends PathWithTypePropertyBaseType ? Omit<PathValueType, 'type'> : {}
   >;
 
+type PathEnumOrString<T> = T extends (infer E)[] ? E : T extends { values: any } ? PathEnumOrString<T['values']> : string;
+
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}> =
 PathValueType extends (infer Item)[] ? ResolvePathType<Item>[] :
-PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? string :
+PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? PathEnumOrString<Options['enum']> :
 PathValueType extends NumberConstructor | 'number' | 'Number' | typeof Schema.Types.Number ? number :
 PathValueType extends DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date ? Date :
 PathValueType extends BufferConstructor | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :

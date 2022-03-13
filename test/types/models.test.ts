@@ -245,6 +245,8 @@ export async function m0_0aModel() {
   const AutoTypeModelInstance = new AutoTypeModel({});
 
   expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
+  expectType<M0_0aAutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
+  expectType<M0_0aAutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
 
   /* -------------------------------------------------------------------------- */
   /*                          Document-Instance-Methods                         */

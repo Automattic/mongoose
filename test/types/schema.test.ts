@@ -313,7 +313,9 @@ export type M0_0aAutoTypedSchemaType = {
   nested?: {
     age: number;
     hobby?: string
-  }
+    },
+    favoritDrink?: 'Tea' | 'Coffee',
+    favoritColorMode:'dark' | 'light'
   }
   , statics: {
     staticFn:()=>'Returned from staticFn'
@@ -339,7 +341,19 @@ export function m0_0aSchema() {
         type: String,
         required: false
       }
-    })
+    }),
+    favoritDrink: {
+      type: String,
+      enum: ['Coffee', 'Tea']
+    },
+    favoritColorMode: {
+      type: String,
+      enum: {
+        values: ['dark', 'light'],
+        message: '{VALUE} is not supported'
+      },
+      required: true
+    }
   }, {
     statics: {
       staticFn() { return 'Returned from staticFn'; }

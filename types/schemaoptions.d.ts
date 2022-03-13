@@ -8,7 +8,11 @@ declare module 'mongoose' {
     currentTime?: () => (NativeDate | number);
   }
 
-  interface SchemaOptions<StaticMethods = {}, InstanceMethods = {}> {
+  type TypeKeyBaseType = string | number | symbol;
+
+  type DefaultTypeKey = 'type'
+
+  type SchemaOptions<PathTypeKey extends TypeKeyBaseType = DefaultTypeKey, StaticMethods = {}, InstanceMethods = {}> = {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
      * calling Model.createIndexes() after you successfully connect to MongoDB. If you want to disable
@@ -131,7 +135,7 @@ declare module 'mongoose' {
      * type declaration. However, for applications like geoJSON, the 'type' property is important. If you want to
      * control which key mongoose uses to find type declarations, set the 'typeKey' schema option.
      */
-    typeKey?: string;
+    typeKey?: PathTypeKey;
 
     /**
      * By default, documents are automatically validated before they are saved to the database. This is to

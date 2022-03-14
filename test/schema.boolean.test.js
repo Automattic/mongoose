@@ -30,5 +30,31 @@ describe('schematype', function() {
       assert.strictEqual(true, m3.b);
       done();
     });
+    it('should cast truthy strings & numbers to true', function(done) {
+      // Check whether a truthy String value can be casted to true
+      const s4 = new Schema({ b: { type: Boolean, default: 'yes' } });
+      const M4 = mongoose.model('Test4', s4);
+      // Check whether a truthy number can be casted to true
+      const s5 = new Schema({ b: { type: Boolean, default: 1 } });
+      const M5 = mongoose.model('Test5', s5);
+
+      const m4 = new M4();
+      assert.strictEqual(true, m4.b);
+      const m5 = new M5();
+      assert.strictEqual(true, m5.b);
+      done();
+    });
+    it('should throw an error for values that can\'t be casted to a boolean value (without custom boolean casting declaration)', async function() {
+      const s6 = new Schema({ b: Boolean });
+      const M6 = mongoose.model('Test6', s6);
+      let threw = false;
+      try {
+        const newRow = new M6({ b: 'sí' });
+        await newRow.save();
+      } catch (error) {
+        threw = true;
+      }
+      assert.ok(threw);
+    });
   });
 });

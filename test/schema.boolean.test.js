@@ -30,6 +30,7 @@ describe('schematype', function() {
       assert.strictEqual(true, m3.b);
       done();
     });
+    // David Xie: add new test suite below
     it('should cast truthy strings & numbers to true', function(done) {
       // Check whether a truthy String value can be casted to true
       const s4 = new Schema({ b: { type: Boolean, default: 'yes' } });
@@ -44,6 +45,7 @@ describe('schematype', function() {
       assert.strictEqual(true, m5.b);
       done();
     });
+    // David Xie: add new test suite below
     it('should throw an error for values that can\'t be casted to a boolean value (without custom boolean casting declaration)', async function() {
       const s6 = new Schema({ b: Boolean });
       const M6 = mongoose.model('Test6', s6);

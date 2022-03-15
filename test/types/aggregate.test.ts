@@ -32,6 +32,13 @@ async function run() {
     obj.name;
   }
 
+  function eachAsync(): void {
+    Test.aggregate().cursor().eachAsync((doc) => {expectType<any>(doc);});
+    Test.aggregate().cursor().eachAsync((docs) => {expectType<any[]>(docs);}, { batchSize: 2 });
+    Test.aggregate().cursor<ITest>().eachAsync((doc) => {expectType<ITest>(doc);});
+    Test.aggregate().cursor<ITest>().eachAsync((docs) => {expectType<ITest[]>(docs);}, { batchSize: 2 });
+  }
+
   // Aggregate.prototype.sort()
   expectType<ITest[]>(await Test.aggregate<ITest>().sort('-name'));
   expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 1 }));

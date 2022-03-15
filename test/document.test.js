@@ -11122,4 +11122,20 @@ describe('document', function() {
     assert.ok(!reloaded.nested.foo.$__isNested);
     assert.strictEqual(reloaded.nested.foo.bar, 66);
   });
+
+  it('saves changes when setting a nested path to itself (gh-11395)', async function() {
+    const Test = db.model('Test', new Schema({
+      co: { value: Number }
+    }));
+
+    await Test.create({});
+
+    const doc = await Test.findOne();
+    doc.co.value = 123;
+    doc.co = doc.co; // < If this line is not present, there is no problem
+    await doc.save();
+
+    const res = await Test.findById(doc._id);
+    assert.strictEqual(res.co.value, 123);
+  });
 });

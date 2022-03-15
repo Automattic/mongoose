@@ -1,5 +1,5 @@
 import { Schema, model, Model, Document, Error, Types } from 'mongoose';
-import { expectError } from 'tsd';
+import { expectError, expectType } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String', required: true }, address: new Schema({ city: { type: String, required: true } }) });
 
@@ -14,8 +14,15 @@ const Test = model<ITest>('Test', schema);
 void async function main() {
   const doc: ITest = await Test.findOne().orFail();
 
-  const p: Promise<ITest> = doc.remove();
-  await p;
+  expectType<Promise<ITest>>(doc.remove());
+  expectType<void>(doc.remove({}, (err, doc) => {
+    expectType<Error | null>(err);
+    expectType<any>(doc);
+  }));
+  expectType<void>(doc.remove((err, doc) => {
+    expectType<Error | null>(err);
+    expectType<any>(doc);
+  }));
 }();
 
 
@@ -33,6 +40,17 @@ void async function run() {
   test.validate({ pathsToSkip: 'name age' });
   test.validateSync({ pathsToSkip: ['name', 'age'] });
   test.validateSync({ pathsToSkip: 'name age' });
+  test.validateSync({ pathsToSkip: 'name age', blub: 1 });
+  expectType<Promise<ITest & { _id: any; }>>(test.save());
+  expectType<Promise<ITest & { _id: any; }>>(test.save({}));
+  expectType<void>(test.save({}, (err, doc) => {
+    expectType<Error | null>(err);
+    expectType<ITest & { _id: any; }>(doc);
+  }));
+  expectType<void>(test.save((err, doc) => {
+    expectType<Error | null>(err);
+    expectType<ITest & { _id: any; }>(doc);
+  }));
 })();
 
 function gh10526<U extends ITest>(arg1: Model<U>) {
@@ -58,7 +76,7 @@ function testMethods(): void {
   const UserModel = model<IUser, User>('User', schema);
 
   const doc = new UserModel({ first: 'test', last: 'test' });
-  doc.fullName().toUpperCase();
+  expectType<string>(doc.fullName());
 }
 
 function testRequiredId(): void {
@@ -114,7 +132,7 @@ async function gh11117(): Promise<void> {
     }
   ]);
   const json = items[0].toJSON();
-  const someDate: Date = json.someDate;
+  expectType<Date>(json.someDate);
 }
 
 function gh11085(): void {

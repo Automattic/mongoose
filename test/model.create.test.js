@@ -23,11 +23,11 @@ const schema = new Schema({
 describe('model', function() {
   describe('create()', function() {
     let db;
-    let B;
+    let testModel;
 
     before(function() {
       db = start();
-      B = db.model('Test', schema);
+      testModel = db.model('Test', schema);
     });
 
     after(async function() {
@@ -35,7 +35,7 @@ describe('model', function() {
     });
 
     it('accepts an array and returns an array', async function() {
-      const posts = await B.create([{ title: 'hi' }, { title: 'bye' }]);
+      const posts = await testModel.create([{ title: 'hi' }, { title: 'bye' }]);
 
       assert.ok(posts instanceof Array);
       assert.equal(posts.length, 2);
@@ -49,7 +49,7 @@ describe('model', function() {
     });
 
     it('fires callback when passed 0 docs', function(done) {
-      B.create(function(err, a) {
+      testModel.create(function(err, a) {
         assert.ifError(err);
         assert.ok(!a);
         done();
@@ -57,7 +57,7 @@ describe('model', function() {
     });
 
     it('fires callback when empty array passed', function(done) {
-      B.create([], function(err, a) {
+      testModel.create([], function(err, a) {
         assert.ifError(err);
         assert.deepEqual(a, []);
         done();
@@ -65,15 +65,15 @@ describe('model', function() {
     });
 
     it('supports passing options', async function() {
-      const docs = await B.create([{}], { validateBeforeSave: false });
+      const docs = await testModel.create([{}], { validateBeforeSave: false });
 
       assert.ok(Array.isArray(docs));
       assert.equal(docs.length, 1);
     });
 
     it('returns a promise', function() {
-      const p = B.create({ title: 'returns promise' });
-      assert.ok(p instanceof mongoose.Promise);
+      const returnPromise = testModel.create({ title: 'returns promise' });
+      assert.ok(returnPromise instanceof mongoose.Promise);
     });
 
     it('creates in parallel', async function() {
@@ -123,13 +123,13 @@ describe('model', function() {
 
     describe('callback is optional', function() {
       it('with one doc', async function() {
-        const doc = await B.create({ title: 'optional callback' });
+        const doc = await testModel.create({ title: 'optional callback' });
 
         assert.equal(doc.title, 'optional callback');
       });
 
       it('with more than one doc', async function() {
-        const docs = await B.create({ title: 'optional callback 2' }, { title: 'orient expressions' });
+        const docs = await testModel.create({ title: 'optional callback 2' }, { title: 'orient expressions' });
 
         assert.equal(docs.length, 2);
         const doc1 = docs[0];
@@ -139,7 +139,7 @@ describe('model', function() {
       });
 
       it('with array of docs', async function() {
-        const docs = await B.create([{ title: 'optional callback3' }, { title: '3' }]);
+        const docs = await testModel.create([{ title: 'optional callback3' }, { title: '3' }]);
 
         assert.ok(docs instanceof Array);
         assert.equal(docs.length, 2);
@@ -150,15 +150,15 @@ describe('model', function() {
       });
 
       it('and should reject promise on error', async function() {
-        const p = B.create({ title: 'optional callback 4' });
-        const doc = await p;
+        const callback = testModel.create({ title: 'optional callback 4' });
+        const doc = await callback;
 
-        const err = await B.create({ _id: doc._id }).then(() => null, err => err);
+        const err = await testModel.create({ _id: doc._id }).then(() => null, err => err);
         assert(err);
       });
 
       it('if callback is falsy, will ignore it (gh-5061)', async function() {
-        const doc = await B.create({ title: 'test' }, null);
+        const doc = await testModel.create({ title: 'test' }, null);
 
         assert.equal(doc.title, 'test');
       });
@@ -172,7 +172,7 @@ describe('model', function() {
       });
 
       it('treats undefined first arg as doc rather than callback (gh-9765)', function() {
-        return B.create(void 0).
+        return testModel.create(void 0).
           then(function(doc) {
             assert.ok(doc);
             assert.ok(doc._id);

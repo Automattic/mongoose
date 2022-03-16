@@ -43,6 +43,12 @@ declare module 'mongoose' {
     /** The timeseries option to use when creating the model's collection. */
     timeseries?: mongodb.TimeSeriesCollectionOptions;
 
+    /** The number of seconds after which a document in a timeseries collection expires. */
+    expireAfterSeconds?: number;
+
+    /** The time after which a document in a timeseries collection expires. */
+    expires?: number | string;
+
     /**
      * Mongoose by default produces a collection name by passing the model name to the utils.toCollectionName
      * method. This method pluralizes the name. Set this option if you need a different name for your collection.

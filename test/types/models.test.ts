@@ -206,3 +206,7 @@ function inheritance() {
     }
   }
 }
+
+Project.createCollection({ expires: '5 seconds' });
+Project.createCollection({ expireAfterSeconds: 5 });
+expectError(Project.createCollection({ expireAfterSeconds: '5 seconds' }));

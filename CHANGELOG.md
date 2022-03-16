@@ -1,3 +1,12 @@
+6.2.7 / 2022-03-16
+==================
+ * perf(document): avoid running validation on every array element if there's no validators to run #11380
+ * fix(cursor): correctly populate in batches when batchSize is set #11509
+ * fix(connection): avoid setting MongoClient on useDb() connections until after setting on base connection #11445
+ * fix(schema): throw more helpful error when using schema from a different version of Mongoose module #10453
+ * fix: add missing timeseries expiration handling #11489 #11229 [Uzlopak](https://github.com/Uzlopak)
+ * docs: correct Model.findOneAndReplace docs param naming #11524 [anatolykopyl](https://github.com/anatolykopyl)
+
 6.2.6 / 2022-03-11
 ==================
  * fix(types): correct reference to cursor TypeScript bindings #11513 [SimonHausdorf](https://github.com/SimonHausdorf)

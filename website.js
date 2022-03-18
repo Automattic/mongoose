@@ -17,6 +17,11 @@ try {
   jobs = require('./docs/data/jobs.json');
 } catch (err) {}
 
+let opencollectiveSponsors = [];
+try {
+  opencollectiveSponsors = require('./docs/data/opencollective.json');
+} catch (err) {}
+
 require('acquit-ignore')();
 
 const markdown = require('marked');
@@ -161,6 +166,8 @@ function pugify(filename, options, newfile) {
   newfile = newfile || filename.replace('.pug', '.html');
   options.outputUrl = newfile.replace(process.cwd(), '');
   options.jobs = jobs;
+
+  options.opencollectiveSponsors = opencollectiveSponsors;
 
   pug.render(contents, options, function(err, str) {
     if (err) {

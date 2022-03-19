@@ -1,4 +1,4 @@
-import { Schema, Document, SchemaDefinition, Model } from 'mongoose';
+import { Schema, Document, SchemaDefinition, Model, Types } from 'mongoose';
 import { expectType, expectNotType, expectError } from 'tsd';
 
 enum Genre {
@@ -286,6 +286,19 @@ function gh11448() {
   const userSchema = new Schema<IUser>({ name: String, age: Number });
 
   userSchema.pick<Pick<IUser, 'age'>>(['age']);
+}
+
+function gh11435(): void {
+  interface User {
+    ids: Types.Array<Types.ObjectId>;
+  }
+
+  const schema = new Schema<User>({
+    ids: {
+      type: [{ type: Schema.Types.ObjectId, ref: 'Something' }],
+      default: []
+    }
+  });
 }
 
 // timeSeries

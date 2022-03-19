@@ -933,6 +933,8 @@ declare module 'mongoose' {
   type AnyArray<T> = T[] | ReadonlyArray<T>;
   type SchemaValidator<T> = RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T> | ValidateOpts<T>[];
 
+  type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;
+
   export class SchemaTypeOptions<T> {
     type?:
       T extends string ? StringSchemaDefinition :
@@ -970,7 +972,7 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: T | ((this: any, doc: any) => Partial<T>);
+    default?: ExtractMongooseArray<T> | ((this: any, doc: any) => Partial<ExtractMongooseArray<T>>);
 
     /**
      * The model that `populate()` should use if populating this path.

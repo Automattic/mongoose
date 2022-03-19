@@ -11154,4 +11154,31 @@ describe('document', function() {
 
     assert.strictEqual(doc.name, void 0);
   });
+
+  it('handles deeply nested subdocuments when getting paths to validate (gh-11501)', async function() {
+    const schema = Schema({
+      parameters: {
+        test: {
+          type: new Schema({
+            value: 'Mixed'
+          })
+        }
+      },
+      nested: Schema({
+        parameters: {
+          type: Map,
+          of: Schema({
+            value: 'Mixed'
+          })
+        }
+      })
+    });
+    const Test = db.model('Test', schema);
+
+    await Test.create({
+      nested: {
+        parameters: new Map([['test', { answer: 42 }]])
+      }
+    });
+  });
 });

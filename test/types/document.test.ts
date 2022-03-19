@@ -159,7 +159,7 @@ function gh11435() {
   interface Item {
     name: string;
   }
-  const ItemSchema = new Schema<Item, Model<Item>, {}>({ name: String });
+  const ItemSchema = new Schema<Item>({ name: String });
 
   ItemSchema.pre('validate', function preValidate() {
     expectType<Model<unknown>>(this.model('Item1'));

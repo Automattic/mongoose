@@ -757,7 +757,7 @@ declare module 'mongoose' {
   export type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
   export type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
 
-  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = any, TQueryHelpers = any> extends events.EventEmitter {
+  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}> extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -811,7 +811,7 @@ declare module 'mongoose' {
     method(obj: Partial<TInstanceMethods>): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] };
+    methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] } & AnyObject;
 
     /** The original object passed to the schema constructor */
     obj: SchemaDefinition<SchemaDefinitionType<DocType>>;

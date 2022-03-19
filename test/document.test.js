@@ -11132,10 +11132,26 @@ describe('document', function() {
 
     const doc = await Test.findOne();
     doc.co.value = 123;
-    doc.co = doc.co; // < If this line is not present, there is no problem
+    doc.co = doc.co;
     await doc.save();
 
     const res = await Test.findById(doc._id);
     assert.strictEqual(res.co.value, 123);
+  });
+
+  it('avoids setting nested properties on top-level document when init-ing with strict: false (gh-11526) (gh-11309)', async function() {
+    const testSchema = Schema({ name: String }, { strict: false, strictQuery: false });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test();
+    doc.init({
+      details: {
+        person: {
+          name: 'Baz'
+        }
+      }
+    });
+
+    assert.strictEqual(doc.name, void 0);
   });
 });

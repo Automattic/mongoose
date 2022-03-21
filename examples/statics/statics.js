@@ -24,7 +24,7 @@ async function run() {
   const result = await Person.findPersonByName('bill');
 
   console.log(result);
-  cleanup();
+  await cleanup();
 }
 
 async function cleanup() {

@@ -773,7 +773,7 @@ describe('mongoose module:', function() {
 
     const movie = await Movie.create({ name: 'The Empire Strikes Back' });
     await Person.create({ name: 'Test1', favoriteMovie: movie._id });
-    assert.rejects(async() => {
+    await assert.rejects(async() => {
       await Person.findOne().populate({ path: 'favoriteGame' });
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
   });
@@ -788,7 +788,7 @@ describe('mongoose module:', function() {
     }));
     const movie = await Movie.create({ name: 'The Empire Strikes Back' });
     await Person.create({ name: 'Test1', favoriteMovie: movie._id });
-    assert.rejects(async() => {
+    await assert.rejects(async() => {
       await Person.findOne().populate({ path: 'favoriteGame', strictPopulate: true });
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
   });

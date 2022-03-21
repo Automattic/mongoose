@@ -75,7 +75,6 @@ function run(label, fn) {
   res.heapUsed = used.heapUsed - started.heapUsed;
   log('change: ', res);
   a = res = used = time = started = start = total = i = null;
-  // console.error(((used.vsize - started.vsize) / 1048576)+' MB');
 }
 
 run('string', function() {

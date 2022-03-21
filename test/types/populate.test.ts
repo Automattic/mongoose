@@ -164,21 +164,37 @@ function gh11503() {
   interface User {
     friends: Types.ObjectId[];
   }
-  const UserSchema = new Schema<User>({
+  const userSchema = new Schema<User>({
     friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
   });
-  const Users = model<User>('friends', UserSchema);
+  const User = model<User>('friends', userSchema);
 
-  Users.findOne({}).populate('friends').then(user => {
+  User.findOne({}).populate('friends').then(user => {
     expectType<Types.ObjectId | undefined>(user?.friends[0]);
     expectError(user?.friends[0].blocked);
     expectError(user?.friends.map(friend => friend.blocked));
   });
 
-  Users.findOne({}).populate<{friends: Friend[]}>('friends').then(user => {
+  User.findOne({}).populate<{friends: Friend[]}>('friends').then(user => {
     expectAssignable<Friend>(user?.friends[0]);
     expectType<boolean>(user?.friends[0].blocked);
     const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
     expectType<boolean>(firstFriendBlockedValue?.blocked);
   });
+}
+
+
+function gh11544() {
+
+  interface User {
+    friends: Types.ObjectId[];
+  }
+  const userSchema = new Schema<User>({
+    friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
+  });
+  const User = model<User>('friends', userSchema);
+
+  User.findOne({}).populate({ path: 'friends', strictPopulate: false });
+  User.findOne({}).populate({ path: 'friends', strictPopulate: true });
+  User.findOne({}).populate({ path: 'friends', populate: { path: 'someNestedPath', strictPopulate: false } });
 }

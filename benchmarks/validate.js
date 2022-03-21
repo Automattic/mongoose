@@ -1,5 +1,3 @@
-// require('nodetime').profile();
-
 'use strict';
 
 const mongoose = require('../../mongoose');
@@ -25,8 +23,7 @@ const breakfastSchema = new Schema({
   }
 });
 const Breakfast = mongoose.model('Breakfast', breakfastSchema);
-// const time1 = (new Date - start1);
-// console.error('reading from disk and parsing JSON took %d ms', time1);
+
 const badBreakfast = new Breakfast({
   eggs: 2,
   bacon: 0,
@@ -38,23 +35,7 @@ const goodBreakfast = new Breakfast({
   bacon: 1,
   drink: 'Tea'
 })
-// const start = new Date;
-// const total = 10000000;
-// let i = total;
-// let len;
 
-// for (i = 0, len = total; i < len; ++i) {
-
-// const goodBreakfast = new Breakfast({
-//   eggs: 6,
-//   bacon: 1,
-//   drink: 'Tea'
-// })
-//       goodBreakfast.validateSync();
-// }
-
-// const time = (new Date - start) / 1000;
-// console.error('took %d seconds for %d docs (%d dps)', time, total, total / time);
 const suite = new Benchmark.Suite()
   suite
   .add('invalid async', {

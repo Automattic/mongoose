@@ -11181,4 +11181,21 @@ describe('document', function() {
       }
     });
   });
+
+  it('handles casting array of spread documents (gh-11522)', async function() {
+    const Test = db.model('Test', new Schema({
+      arr: [{ _id: false, prop1: String, prop2: String }]
+    }));
+
+    const doc = new Test({ arr: [{ prop1: 'test' }] });
+
+    doc.arr = doc.arr.map(member => ({
+      ...member,
+      prop2: 'foo'
+    }));
+
+    assert.deepStrictEqual(doc.toObject().arr, [{ prop1: 'test', prop2: 'foo' }]);
+
+    await doc.validate();
+  });
 });

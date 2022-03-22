@@ -911,5 +911,51 @@ describe('mongoose module:', function() {
       const m = new mongoose.Mongoose();
       assert.deepEqual(await m.syncIndexes(), {});
     });
+    describe('global `allowDiskUse` (gh-11478)', () => {
+      it('is `undefined` by default', async() => {
+        const m = new mongoose.Mongoose();
+
+        const db = await m.connect(start.uri);
+
+        const userSchema = new m.Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+
+        const aggregateQuery = User.aggregate([{ $match: {} }]);
+        assert.strictEqual(aggregateQuery.options.allowDiskUse, undefined);
+      });
+      it('works when set to `true` and no option provided', async() => {
+        const m = new mongoose.Mongoose();
+        m.set('allowDiskUse', true);
+
+        const db = await m.connect(start.uri);
+
+        const userSchema = new m.Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+
+        const aggregateQuery = User.aggregate([{ $match: {} }]);
+        assert.equal(aggregateQuery.options.allowDiskUse, true);
+      });
+      it('can be overridden by a specific query', async() => {
+        const m = new mongoose.Mongoose();
+        m.set('allowDiskUse', true);
+
+        const db = await m.connect(start.uri);
+
+        const userSchema = new m.Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+
+        const aggregateQuery = User.aggregate([{ $match: {} }]).allowDiskUse(false);
+        assert.equal(aggregateQuery.options.allowDiskUse, false);
+      });
+    });
   });
 });

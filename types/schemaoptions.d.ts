@@ -8,7 +8,7 @@ declare module 'mongoose' {
     currentTime?: () => (NativeDate | number);
   }
 
-  type TypeKeyBaseType = string | number | symbol;
+  type TypeKeyBaseType = string;
 
   type DefaultTypeKey = 'type'
 

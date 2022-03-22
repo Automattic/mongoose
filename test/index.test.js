@@ -924,7 +924,7 @@ describe('mongoose module:', function() {
         const User = db.model('User', userSchema);
 
         const aggregateQuery = User.aggregate([{ $match: {} }]);
-        assert.strictEqual(aggregateQuery.options.allowDiskUse, undefined);
+        assert.strictEqual(aggregateQuery.options.allowDiskUse, false);
       });
       it('works when set to `true` and no option provided', async() => {
         const m = new mongoose.Mongoose();

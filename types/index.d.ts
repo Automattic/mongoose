@@ -1774,8 +1774,8 @@ declare module 'mongoose' {
     polygon(path: string, ...coordinatePairs: number[][]): this;
 
     /** Specifies paths which should be populated with other documents. */
-    populate<Paths = {}>(path: string | string[], select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
-    populate<Paths = {}>(options: PopulateOptions | (PopulateOptions | string)[]): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
+    populate<Paths = {}, TRawDocType = UnpackedIntersection<ResultType, Paths>>(path: string | string[], select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<TRawDocType, DocType, THelpers, TRawDocType>;
+    populate<Paths = {}, TRawDocType = UnpackedIntersection<ResultType, Paths>>(options: PopulateOptions | (PopulateOptions | string)[]): QueryWithHelpers<TRawDocType, DocType, THelpers, TRawDocType>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
     projection(): ProjectionFields<DocType> | null;

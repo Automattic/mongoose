@@ -198,3 +198,28 @@ function gh11544() {
   User.findOne({}).populate({ path: 'friends', strictPopulate: true });
   User.findOne({}).populate({ path: 'friends', populate: { path: 'someNestedPath', strictPopulate: false } });
 }
+
+async function _11532() {
+  interface IParent {
+    name: string;
+    child: Types.ObjectId;
+  }
+  interface IChild {
+    name: string;
+  }
+
+  const parentSchema = new Schema(
+    {
+      name: { type: String, required: true },
+      child: { type: Schema.Types.ObjectId, ref: 'Child', required: true }
+    });
+
+  const parent = model<IParent>('Parent', parentSchema);
+
+  const populateQuery = parent.findOne().populate<{ child: IChild }>('child');
+  const populateResult = await populateQuery;
+  const leanResult = await populateQuery.lean();
+
+  expectType<string>(populateResult.child.name);
+  expectType<string>(leanResult.child.name);
+}

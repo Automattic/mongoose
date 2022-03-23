@@ -154,3 +154,14 @@ function gh11085(): void {
   expectError(_id = newUser._id);
   const _id2: Types.ObjectId = newUser._id;
 }
+
+function gh11435() {
+  interface Item {
+    name: string;
+  }
+  const ItemSchema = new Schema<Item>({ name: String });
+
+  ItemSchema.pre('validate', function preValidate() {
+    expectType<Model<unknown>>(this.model('Item1'));
+  });
+}

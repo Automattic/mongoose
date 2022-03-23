@@ -11132,10 +11132,70 @@ describe('document', function() {
 
     const doc = await Test.findOne();
     doc.co.value = 123;
-    doc.co = doc.co; // < If this line is not present, there is no problem
+    doc.co = doc.co;
     await doc.save();
 
     const res = await Test.findById(doc._id);
     assert.strictEqual(res.co.value, 123);
+  });
+
+  it('avoids setting nested properties on top-level document when init-ing with strict: false (gh-11526) (gh-11309)', async function() {
+    const testSchema = Schema({ name: String }, { strict: false, strictQuery: false });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test();
+    doc.init({
+      details: {
+        person: {
+          name: 'Baz'
+        }
+      }
+    });
+
+    assert.strictEqual(doc.name, void 0);
+  });
+
+  it('handles deeply nested subdocuments when getting paths to validate (gh-11501)', async function() {
+    const schema = Schema({
+      parameters: {
+        test: {
+          type: new Schema({
+            value: 'Mixed'
+          })
+        }
+      },
+      nested: Schema({
+        parameters: {
+          type: Map,
+          of: Schema({
+            value: 'Mixed'
+          })
+        }
+      })
+    });
+    const Test = db.model('Test', schema);
+
+    await Test.create({
+      nested: {
+        parameters: new Map([['test', { answer: 42 }]])
+      }
+    });
+  });
+
+  it('handles casting array of spread documents (gh-11522)', async function() {
+    const Test = db.model('Test', new Schema({
+      arr: [{ _id: false, prop1: String, prop2: String }]
+    }));
+
+    const doc = new Test({ arr: [{ prop1: 'test' }] });
+
+    doc.arr = doc.arr.map(member => ({
+      ...member,
+      prop2: 'foo'
+    }));
+
+    assert.deepStrictEqual(doc.toObject().arr, [{ prop1: 'test', prop2: 'foo' }]);
+
+    await doc.validate();
   });
 });

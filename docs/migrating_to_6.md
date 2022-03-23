@@ -39,6 +39,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [Removed Validator `isAsync`](#removed-validator-isasync)
 * [Removed `safe`](#removed-safe)
 * [SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`](#schematype-set-parameters)
+* [No default model for `Query.prototype.populate()`](#no-default-model-for-query-prototype-populate)
 * [`toObject()` and `toJSON()` Use Nested Schema `minimize`](#toobject-and-tojson-use-nested-schema-minimize)
 * [TypeScript changes](#typescript-changes)
 
@@ -459,6 +460,31 @@ const parent = new Schema({
   // Implicitly creates a new schema with the top-level schema's `minimize` option.
   child: { type: { thing: Schema.Types.Mixed } }
 }, { minimize: false });
+```
+
+<h3 id="no-default-model-for-query-prototype-populate"><a href="#no-default-model-for-query-prototype-populate">No default model for <code>Query.prototype.populate()</code></a></h3>
+
+In Mongoose 5, calling `populate()` on a mixed type or other path with no `ref` would fall back to using the query's model.
+
+```javascript
+const testSchema = new mongoose.Schema({
+  data: String,
+  parents: Array // Array of mixed
+});
+
+const Test = mongoose.model('Test', testSchema);
+
+// The below `populate()`...
+await Test.findOne().populate('parents');
+// Is a shorthand for the following populate in Mongoose 5
+await Test.findOne().populate({ path: 'parents', model: Test });
+```
+
+In Mongoose 6, populating a path with no `ref`, `refPath`, or `model` is a no-op.
+
+```javascript
+// The below `populate()` does nothing.
+await Test.findOne().populate('parents');
 ```
 
 ## TypeScript changes

@@ -709,6 +709,8 @@ declare module 'mongoose' {
     model?: string | Model<any>;
     /** optional query options like sort, limit, etc */
     options?: any;
+    /** optional boolean, set to `false` to allow populating paths that aren't in the schema */
+    strictPopulate?: boolean;
     /** deep populate */
     populate?: string | PopulateOptions | (string | PopulateOptions)[];
     /**
@@ -757,7 +759,7 @@ declare module 'mongoose' {
   export type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
   export type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
 
-  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = any, TQueryHelpers = any> extends events.EventEmitter {
+  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}> extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -811,7 +813,7 @@ declare module 'mongoose' {
     method(obj: Partial<TInstanceMethods>): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] };
+    methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] } & AnyObject;
 
     /** The original object passed to the schema constructor */
     obj: SchemaDefinition<SchemaDefinitionType<DocType>>;
@@ -933,6 +935,8 @@ declare module 'mongoose' {
   type AnyArray<T> = T[] | ReadonlyArray<T>;
   type SchemaValidator<T> = RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T> | ValidateOpts<T>[];
 
+  type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;
+
   export class SchemaTypeOptions<T> {
     type?:
       T extends string ? StringSchemaDefinition :
@@ -970,7 +974,7 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: T | ((this: any, doc: any) => Partial<T>);
+    default?: ExtractMongooseArray<T> | ((this: any, doc: any) => Partial<ExtractMongooseArray<T>>);
 
     /**
      * The model that `populate()` should use if populating this path.

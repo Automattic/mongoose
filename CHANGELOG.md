@@ -1,3 +1,13 @@
+6.2.8 / 2022-03-22
+==================
+ * fix(document): handle casting array of spread docs #11522
+ * fix(document): avoid setting nested properties on top-level document when initing with strict: false #11526
+ * fix(document): correctly handle deeply nested subdocuments when getting paths to validate #11501
+ * fix(types): avoid making TInstanceMethods any by default leading to `this = any` in middleware #11435
+ * fix(types): allow defining array default if using Types.Array<> in document interface #11391
+ * docs(migrating_to_6): describe breaking change in Mongoose 6 about default query populate model #11289
+ * docs(middleware): fix typo #11537 [x1489](https://github.com/x1489)
+
 6.2.7 / 2022-03-16
 ==================
  * perf(document): avoid running validation on every array element if there's no validators to run #11380

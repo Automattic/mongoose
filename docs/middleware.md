@@ -69,7 +69,7 @@ How pre and post hooks work is described in more detail below.
 
 **Note:** If you specify `schema.pre('remove')`, Mongoose will register this
 middleware for [`doc.remove()`](./api.html#model_Model-remove) by default. If you
-want to your middleware to run on [`Query.remove()`](./api.html#query_Query-remove)
+want your middleware to run on [`Query.remove()`](./api.html#query_Query-remove)
 use [`schema.pre('remove', { query: true, document: false }, fn)`](./api.html#schema_Schema-pre).
 
 **Note:** Unlike `schema.pre('remove')`, Mongoose registers `updateOne` and

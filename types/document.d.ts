@@ -169,6 +169,9 @@ declare module 'mongoose' {
     /** The name of the model */
     modelName: string;
 
+    /** Returns the model with the given name on this document's associated connection. */
+    model<ModelType = Model<unknown>>(name: string): ModelType;
+
     /**
      * Overwrite all values in this document with the values of `obj`, except
      * for immutable properties. Behaves similarly to `set()`, except for it

@@ -11122,12 +11122,88 @@ describe('document', function() {
     assert.ok(!reloaded.nested.foo.$__isNested);
     assert.strictEqual(reloaded.nested.foo.bar, 66);
   });
-  describe('Check if a document instance function that is supplied in schema option is availabe (m0_0a)', function() {
-    it('should give an instance function back rather than undefined', function M0_0aModelJS() {
-      const testSchema = new mongoose.Schema({}, { methods: { instanceFn() { return 'Returned from DocumentInstanceFn'; } } });
-      const TestModel = mongoose.model('TestModel', testSchema);
-      const TestDocument = new TestModel({});
-      assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
+
+  it('saves changes when setting a nested path to itself (gh-11395)', async function() {
+    const Test = db.model('Test', new Schema({
+      co: { value: Number }
+    }));
+
+    await Test.create({});
+
+    const doc = await Test.findOne();
+    doc.co.value = 123;
+    doc.co = doc.co;
+    await doc.save();
+
+    const res = await Test.findById(doc._id);
+    assert.strictEqual(res.co.value, 123);
+  });
+
+  it('avoids setting nested properties on top-level document when init-ing with strict: false (gh-11526) (gh-11309)', async function() {
+    const testSchema = Schema({ name: String }, { strict: false, strictQuery: false });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test();
+    doc.init({
+      details: {
+        person: {
+          name: 'Baz'
+        }
+      }
+    });
+
+    assert.strictEqual(doc.name, void 0);
+  });
+
+  it('handles deeply nested subdocuments when getting paths to validate (gh-11501)', async function() {
+    const schema = Schema({
+      parameters: {
+        test: {
+          type: new Schema({
+            value: 'Mixed'
+          })
+        }
+      },
+      nested: Schema({
+        parameters: {
+          type: Map,
+          of: Schema({
+            value: 'Mixed'
+          })
+        }
+      })
+    });
+    const Test = db.model('Test', schema);
+
+    await Test.create({
+      nested: {
+        parameters: new Map([['test', { answer: 42 }]])
+      }
     });
   });
+
+  it('handles casting array of spread documents (gh-11522)', async function() {
+    const Test = db.model('Test', new Schema({
+      arr: [{ _id: false, prop1: String, prop2: String }]
+    }));
+
+    const doc = new Test({ arr: [{ prop1: 'test' }] });
+
+    doc.arr = doc.arr.map(member => ({
+      ...member,
+      prop2: 'foo'
+    }));
+
+    assert.deepStrictEqual(doc.toObject().arr, [{ prop1: 'test', prop2: 'foo' }]);
+
+    await doc.validate();
+  });
+
+  it('should give an instance function back rather than undefined (m0_0a)', function M0_0aModelJS() {
+    const testSchema = new mongoose.Schema({}, { methods: { instanceFn() { return 'Returned from DocumentInstanceFn'; } } });
+    const TestModel = mongoose.model('TestModel', testSchema);
+    const TestDocument = new TestModel({});
+    assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
+  });
+
 });

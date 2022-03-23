@@ -1,5 +1,5 @@
-import { Schema, Document, SchemaDefinition, Model, InferSchemaType, SchemaType } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { Schema, Document, SchemaDefinition, Model, Types, SchemaType, InferSchemaType } from 'mongoose';
+import { expectType, expectError } from 'tsd';
 
 enum Genre {
   Action,
@@ -287,6 +287,24 @@ function gh11448() {
 
   userSchema.pick<Pick<IUser, 'age'>>(['age']);
 }
+
+function gh11435(): void {
+  interface User {
+    ids: Types.Array<Types.ObjectId>;
+  }
+
+  const schema = new Schema<User>({
+    ids: {
+      type: [{ type: Schema.Types.ObjectId, ref: 'Something' }],
+      default: []
+    }
+  });
+}
+
+// timeSeries
+new Schema({}, { expires: '5 seconds' });
+expectError(new Schema({}, { expireAfterSeconds: '5 seconds' }));
+new Schema({}, { expireAfterSeconds: 5 });
 
 export type M0_0aAutoTypedSchemaType = {
   schema: {

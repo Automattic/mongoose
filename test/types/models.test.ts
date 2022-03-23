@@ -208,6 +208,10 @@ function inheritance() {
   }
 }
 
+Project.createCollection({ expires: '5 seconds' });
+Project.createCollection({ expireAfterSeconds: 5 });
+expectError(Project.createCollection({ expireAfterSeconds: '5 seconds' }));
+
 export async function m0_0aModel() {
   const AutoTypeSchema = m0_0aSchema();
   const AutoTypeModel = model('AutoTypeModel', AutoTypeSchema);

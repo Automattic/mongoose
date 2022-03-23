@@ -11199,7 +11199,7 @@ describe('document', function() {
     await doc.validate();
   });
 
-  it('should give an instance function back rather than undefined', function M0_0aModelJS() {
+  it('should give an instance function back rather than undefined (m0_0a)', function M0_0aModelJS() {
     const testSchema = new mongoose.Schema({}, { methods: { instanceFn() { return 'Returned from DocumentInstanceFn'; } } });
     const TestModel = mongoose.model('TestModel', testSchema);
     const TestDocument = new TestModel({});

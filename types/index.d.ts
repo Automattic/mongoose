@@ -758,9 +758,9 @@ export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
   export type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
   export type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
 
-  class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = any,
+  class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {},
     TPathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
-    DocType extends ObtainDocumentType<DocType, EnforcedDocType, TPathTypeKey> = any,
+    DocType extends ObtainDocumentType<DocType, EnforcedDocType, TPathTypeKey> = ObtainDocumentType<any, EnforcedDocType, TPathTypeKey>,
     TStaticMethods = {}>
     extends events.EventEmitter {
     /**

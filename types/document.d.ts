@@ -170,7 +170,7 @@ declare module 'mongoose' {
     modelName: string;
 
     /** Returns the model with the given name on this document's associated connection. */
-    model<ModelType = Model<unknown>>(name: string): ModelType;
+    model<ModelType = Model<DocType>>(name: string): ModelType;
 
     /**
      * Overwrite all values in this document with the values of `obj`, except

@@ -10,7 +10,7 @@ declare module 'mongoose' {
   type TypeKeyBaseType = string;
 
   type DefaultTypeKey = 'type';
-  interface SchemaOptions<PathTypeKey extends TypeKeyBaseType = DefaultTypeKey, StaticMethods = {}> {
+  interface SchemaOptions<PathTypeKey extends TypeKeyBaseType = DefaultTypeKey, StaticMethods = {}, InstanceMethods = {}> {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
      * calling Model.createIndexes() after you successfully connect to MongoDB. If you want to disable
@@ -192,5 +192,10 @@ declare module 'mongoose' {
      * Model Statics methods.
      */
     statics?: StaticMethods,
+
+    /**
+     * Document instance methods.
+     */
+    methods?: InstanceMethods,
   }
 }

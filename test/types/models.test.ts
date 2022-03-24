@@ -247,5 +247,17 @@ export async function m0_0aModel() {
 
   expectType<ReturnType<M0_0aAutoTypedSchemaType['statics']['staticFn']>>(AutoTypeModel.staticFn());
 
+  /* -------------------------------------------------------------------------- */
+  /*                                Instance-Test                               */
+  /* -------------------------------------------------------------------------- */
+
+  const AutoTypeModelInstance = new AutoTypeModel({});
+
+  /* -------------------------------------------------------------------------- */
+  /*                          Document-Instance-Methods                         */
+  /* -------------------------------------------------------------------------- */
+
+  expectType<ReturnType<M0_0aAutoTypedSchemaType['methods']['instanceFn']>>(AutoTypeModelInstance.instanceFn());
+
   return AutoTypeModel;
 }

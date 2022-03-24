@@ -11,7 +11,7 @@ declare module 'mongoose' {
   type ObtainDocumentType<DocDefinition, EnforcedDocType = any, TypeKey extends TypeKeyBaseType = DefaultTypeKey> =
     IsItRecordAndNotAny<EnforcedDocType> extends true ? EnforcedDocType : {
       [K in keyof (RequiredPaths<DocDefinition> &
-        OptionalPaths<DocDefinition>)]: ObtainDocumentPathType<DocDefinition[K], TypeKey>;
+      OptionalPaths<DocDefinition>)]: ObtainDocumentPathType<DocDefinition[K], TypeKey>;
     };
 
   /**
@@ -32,10 +32,10 @@ declare module 'mongoose' {
    * @param {TSchema} TSchema A generic of schema type instance.
    * @param {alias} alias Targeted generic alias.
    */
-  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TPathTypeKey' |'DocType' | 'TStaticMethods'> =
-    TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TPathTypeKey, infer DocType, infer TStaticMethods>
-    ? { EnforcedDocType: EnforcedDocType, M: M, TInstanceMethods: TInstanceMethods, TQueryHelpers: TQueryHelpers, TPathTypeKey:TPathTypeKey, DocType: DocType, TStaticMethods: TStaticMethods }[alias]
-    : unknown;
+  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TPathTypeKey' | 'DocType' | 'TStaticMethods'> =
+    TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TPathTypeKey, infer DocType, infer TStaticMethods>
+      ? { EnforcedDocType: EnforcedDocType, M: M, TInstanceMethods: TInstanceMethods, TQueryHelpers: TQueryHelpers, TVirtuals: TVirtuals, TPathTypeKey: TPathTypeKey, DocType: DocType, TStaticMethods: TStaticMethods }[alias]
+      : unknown;
 }
 /**
  * @summary Checks if a type is "Record" or "any".
@@ -49,14 +49,14 @@ type IsItRecordAndNotAny<T> = T extends any[] ? false : T extends Record<any, an
  * @summary Required path base type.
  * @description It helps to check whereas if a path is required OR optional.
  */
-type RequiredPathBaseType = { required: true | [true, string | undefined] }
+type RequiredPathBaseType = { required: true | [true, string | undefined] };
 
 /**
  * @summary Path base type defined by using TypeKey
  * @description It helps to check if a path is defined by TypeKey OR not.
  * @param {TypeKey} TypeKey A literal string refers to path type property key.
  */
-type PathWithTypePropertyBaseType<TypeKey extends TypeKeyBaseType> = { [k in TypeKey]: any }
+type PathWithTypePropertyBaseType<TypeKey extends TypeKeyBaseType> = { [k in TypeKey]: any };
 
 /**
  * @summary A Utility to obtain schema's required path keys.
@@ -103,8 +103,8 @@ type OptionalPaths<T> = {
 type ObtainDocumentPathType<PathValueType, TypeKey extends TypeKeyBaseType> = PathValueType extends Schema<any>
   ? InferSchemaType<PathValueType>
   : ResolvePathType<
-    PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
-    PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {}
+  PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
+  PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {}
   >;
 
 /**
@@ -121,14 +121,14 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
  */
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}> =
 PathValueType extends (infer Item)[] ? ResolvePathType<Item>[] :
-PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? PathEnumOrString<Options['enum']> :
-PathValueType extends NumberConstructor | 'number' | 'Number' | typeof Schema.Types.Number ? number :
-PathValueType extends DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date ? Date :
-PathValueType extends BufferConstructor | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
-PathValueType extends BooleanConstructor | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean ? boolean :
-PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Schema.Types.ObjectId :
-PathValueType extends ObjectConstructor | typeof Schema.Types.Mixed ? Schema.Types.Mixed :
-keyof PathValueType extends never ? Schema.Types.Mixed :
-PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
-PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-unknown
+  PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? PathEnumOrString<Options['enum']> :
+    PathValueType extends NumberConstructor | 'number' | 'Number' | typeof Schema.Types.Number ? number :
+      PathValueType extends DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date ? Date :
+        PathValueType extends BufferConstructor | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
+          PathValueType extends BooleanConstructor | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean ? boolean :
+            PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Schema.Types.ObjectId :
+              PathValueType extends ObjectConstructor | typeof Schema.Types.Mixed ? Schema.Types.Mixed :
+                keyof PathValueType extends never ? Schema.Types.Mixed :
+                  PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
+                    PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+                      unknown;

@@ -19,6 +19,7 @@
 /// <reference path="./types.d.ts" />
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
+/// <reference path="./inferschematype.d.ts" />
 
 declare class NativeDate extends global.Date { }
 
@@ -120,14 +121,18 @@ declare module 'mongoose' {
     useProjection?: boolean;
   }
 
-  export class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any> extends events.EventEmitter {
+  export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any,
+    TPathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
+    DocType extends ObtainDocumentType<DocType, EnforcedDocType, TPathTypeKey> = ObtainDocumentType<any, EnforcedDocType, TPathTypeKey>,
+    TStaticMethods = {}>
+    extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<DocType>>, options?: SchemaOptions);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>>, options?: SchemaOptions);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefinitionType<DocType>> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
 
     /**
      * Array of child schemas (from document arrays and single nested subdocs)
@@ -180,7 +185,7 @@ declare module 'mongoose' {
     methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] } & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<DocType>>;
+    obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>>;
 
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType>(path: string): ResultType;

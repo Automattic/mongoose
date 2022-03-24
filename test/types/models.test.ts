@@ -242,19 +242,35 @@ export async function m0_0aModel() {
   const AutoTypeModel = model('AutoTypeModel', AutoTypeSchema);
 
   /* -------------------------------------------------------------------------- */
-  /*                        Model-statics-functions-test                        */
+  /*                            Model-functions-test                            */
+  /* -------------------------------------------------------------------------- */
+  // Create should works with arbitrary objects.
+  const randomObject = await AutoTypeModel.create({ unExistKey: 'unExistKey', description: 'st' });
+  expectType<string>(randomObject.unExistKey);
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(randomObject.userName);
+
+  const testDoc1 = await AutoTypeModel.create({ userName: 'M0_0a' });
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
+  expectType<M0_0aAutoTypedSchemaType['schema']['description']>(testDoc1.description);
+
+  /* -------------------------------------------------------------------------- */
+  /*                      Model-statics-functions-test                          */
   /* -------------------------------------------------------------------------- */
 
   expectType<ReturnType<M0_0aAutoTypedSchemaType['statics']['staticFn']>>(AutoTypeModel.staticFn());
 
   /* -------------------------------------------------------------------------- */
-  /*                                Instance-Test                               */
+  /*                                Instance-tests                              */
   /* -------------------------------------------------------------------------- */
 
   const AutoTypeModelInstance = new AutoTypeModel({});
 
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
+  expectType<M0_0aAutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
+  expectType<M0_0aAutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
+
   /* -------------------------------------------------------------------------- */
-  /*                          Document-Instance-Methods                         */
+  /*                        Document-Instance-Methods-tests                     */
   /* -------------------------------------------------------------------------- */
 
   expectType<ReturnType<M0_0aAutoTypedSchemaType['methods']['instanceFn']>>(AutoTypeModelInstance.instanceFn());

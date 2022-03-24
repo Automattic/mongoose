@@ -469,6 +469,7 @@ export function m0_0aSchema() {
   type InferredTestSchemaType = InferSchemaType<typeof TestSchema>;
 
   expectType<TestSchemaType>({} as InferredTestSchemaType);
+
   const SchemaWithCustomTypeKey = new Schema({
     name: {
       customKTypeKey: String,

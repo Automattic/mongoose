@@ -1,5 +1,6 @@
 import { Schema, Document, Model, Types, connection, model } from 'mongoose';
-import { expectError } from 'tsd';
+import { expectError, expectType } from 'tsd';
+import { M0_0aAutoTypedSchemaType, m0_0aSchema } from './schema.test';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -234,4 +235,17 @@ function bulkWrite() {
     }
   ];
   M.bulkWrite(ops);
+}
+
+export async function m0_0aModel() {
+  const AutoTypeSchema = m0_0aSchema();
+  const AutoTypeModel = model('AutoTypeModel', AutoTypeSchema);
+
+  /* -------------------------------------------------------------------------- */
+  /*                        Model-statics-functions-test                        */
+  /* -------------------------------------------------------------------------- */
+
+  expectType<ReturnType<M0_0aAutoTypedSchemaType['statics']['staticFn']>>(AutoTypeModel.staticFn());
+
+  return AutoTypeModel;
 }

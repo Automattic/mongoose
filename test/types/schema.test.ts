@@ -367,6 +367,10 @@ export function m0_0aSchema() {
       },
       required: true
     }
+  }, {
+    statics: {
+      staticFn() { return 'Returned from staticFn'; }
+    }
   });
 
   type InferredSchemaType = InferSchemaType<typeof AutoTypedSchema>;

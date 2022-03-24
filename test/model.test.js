@@ -8505,6 +8505,13 @@ describe('Model', function() {
   });
 });
 
+describe('Check if statics functions that is supplied in schema option is availabe (m0_0a)', function() {
+  it('should give a static function back rather than undefined', function M0_0aModelJS() {
+    const testSchema = new mongoose.Schema({}, { statics: { staticFn() { return 'Returned from staticFn'; } } });
+    const TestModel = mongoose.model('TestModel', testSchema);
+    assert.equal(TestModel.staticFn(), 'Returned from staticFn');
+  });
+});
 
 
 

@@ -7,6 +7,9 @@ declare module 'mongoose' {
     currentTime?: () => (NativeDate | number);
   }
 
+  type TypeKeyBaseType = string;
+
+  type DefaultTypeKey = 'type'
   interface SchemaOptions {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by

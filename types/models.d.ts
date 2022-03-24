@@ -164,11 +164,11 @@ declare module 'mongoose' {
       countDocuments(callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
       /** Creates a new document or documents */
-      create<DocContents = FlexibleObject<T>>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<UnpackedIntersection<T, DocContents>, TMethodsAndOverrides, TVirtuals>[]>;
-      create<DocContents = FlexibleObject<T>>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<UnpackedIntersection<T, DocContents>, TMethodsAndOverrides, TVirtuals>[]>): void;
-      create<DocContents = FlexibleObject<T>>(doc: T | DocContents): Promise<HydratedDocument<UnpackedIntersection<T, DocContents>, TMethodsAndOverrides, TVirtuals>>;
-      create<DocContents = FlexibleObject<T>>(...docs: Array<T | DocContents>): Promise<HydratedDocument<UnpackedIntersection<T, DocContents>, TMethodsAndOverrides, TVirtuals>[]>;
-      create<DocContents = FlexibleObject<T>>(doc: T | DocContents, callback: Callback<HydratedDocument<UnpackedIntersection<T, DocContents>, TMethodsAndOverrides, TVirtuals>>): void;
+      create<DocContents = FlexibleObject<T>>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>[]>;
+      create<DocContents = FlexibleObject<T>>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>[]>): void;
+      create<DocContents = FlexibleObject<T>>(doc: T | DocContents): Promise<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>>;
+      create<DocContents = FlexibleObject<T>>(...docs: Array<T | DocContents>): Promise<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>[]>;
+      create<DocContents = FlexibleObject<T>>(doc: T | DocContents, callback: Callback<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>>): void;
 
       /**
      * Create the collection for this model. By default, if no indexes are specified,

@@ -114,7 +114,7 @@ declare module 'mongoose' {
   }
 
   const Model: Model<any>;
-  interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}> extends
+  interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> extends
     NodeJS.EventEmitter,
     AcceptsDiscriminator,
     IndexManager,

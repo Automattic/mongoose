@@ -62,13 +62,14 @@ declare module 'mongoose' {
   /* ! ignore */
   export type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
 
-  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
-  export function model<T, U, TQueryHelpers = {}>(
+  export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
     name: string,
-    schema?: Schema<T, U, {}, TQueryHelpers>,
+    schema?: TSchema,
     collection?: string,
     options?: CompileModelOptions
-  ): U;
+  ): U extends Model<any>
+    ? U
+    : Model<T & InferSchemaType<TSchema>, TQueryHelpers, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema>;
 
   /** Returns an array of model names created on this instance of Mongoose. */
   export function modelNames(): Array<string>;

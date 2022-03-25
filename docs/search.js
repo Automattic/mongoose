@@ -11,7 +11,7 @@ const markdown = require('marked');
 const highlight = require('highlight.js');
 markdown.setOptions({
   highlight: function(code) {
-    return highlight.highlight('JavaScript', code).value;
+    return highlight.highlight(code, { language: 'JavaScript' }).value;
   }
 });
 

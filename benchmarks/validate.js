@@ -17,7 +17,7 @@ const breakfastSchema = new Schema({
   drink: {
     type: String,
     enum: ['Coffee', 'Tea'],
-    required: function () {
+    required: function() {
       return this.bacon > 3;
     }
   }
@@ -34,33 +34,33 @@ const goodBreakfast = new Breakfast({
   eggs: 6,
   bacon: 1,
   drink: 'Tea'
-})
+});
 
-const suite = new Benchmark.Suite()
-  suite
+const suite = new Benchmark.Suite();
+suite
   .add('invalid async', {
-    'defer': true,
-    'fn': function (deferred) {
+    defer: true,
+    fn: function(deferred) {
       // avoid test inlining
       suite.name;
-      badBreakfast.validate().catch(() => deferred.resolve())
-    },
+      badBreakfast.validate().catch(() => deferred.resolve());
+    }
   })
   .add('valid async', {
-    'defer': true,
-    'fn': function (deferred) {
+    defer: true,
+    fn: function(deferred) {
       // avoid test inlining
       suite.name;
-      goodBreakfast.validate().then(() => deferred.resolve())
-    },
+      goodBreakfast.validate().then(() => deferred.resolve());
+    }
   })
-  .add('invalid sync', function () {
+  .add('invalid sync', function() {
     badBreakfast.validateSync();
   })
-  .add('valid sync', function () {
+  .add('valid sync', function() {
     goodBreakfast.validateSync();
   })
-  .on('cycle', function (evt) {
+  .on('cycle', function(evt) {
     if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
       console.log(String(evt.target));
     }

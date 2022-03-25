@@ -55,7 +55,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       tags: [String],
       owners: [ObjectId],
       comments: [Comments],
-      def: {type: String, default: 'kandinsky'}
+      def: { type: String, default: 'kandinsky' }
     });
 
     const blogData = {
@@ -63,9 +63,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       author: 'somebody',
       slug: 'test.post',
       date: new Date(),
-      meta: {date: new Date(), visitors: 9001},
+      meta: { date: new Date(), visitors: 9001 },
       published: true,
-      mixed: {thisIsRandom: true},
+      mixed: { thisIsRandom: true },
       numbers: [1, 2, 7, 10, 23432],
       tags: ['test', 'BENCH', 'things', 'more things'],
       def: 'THANGS!!!',
@@ -75,7 +75,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       title: 'test comment',
       date: new Date(),
       body: 'this be some crazzzyyyyy text that would go in a comment',
-      comments: [{title: 'second level', date: new Date(), body: 'texttt'}]
+      comments: [{ title: 'second level', date: new Date(), body: 'texttt' }]
     };
     for (let i = 0; i < 5; i++) {
       blogData.comments.push(commentData);
@@ -176,7 +176,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     suite.add('Update - Mongoose - Basic', {
       defer: true,
       fn: function(deferred) {
-        User.update({_id: getNextmId()}, {$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+        User.update({ _id: getNextmId() }, { $set: { age: 2 }, $push: { likes: 'metal' } }, function(err) {
           if (err) {
             throw err;
           }
@@ -186,7 +186,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Update - Driver - Basic', {
       defer: true,
       fn: function(deferred) {
-        user.update({_id: getNextdId()}, {$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+        user.update({ _id: getNextdId() }, { $set: { age: 2 }, $push: { likes: 'metal' } }, function(err) {
           if (err) {
             throw err;
           }
@@ -196,7 +196,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Update - Mongoose - Embedded Docs', {
       defer: true,
       fn: function(deferred) {
-        BlogPost.findOne({_id: getNextbmId()}, function(err, bp) {
+        BlogPost.findOne({ _id: getNextbmId() }, function(err, bp) {
           if (err) {
             throw err;
           }
@@ -218,7 +218,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Update - Driver - Embdedded Docs', {
       defer: true,
       fn: function(deferred) {
-        blogpost.findOne({_id: getNextbdId()}, function(err, bp) {
+        blogpost.findOne({ _id: getNextbdId() }, function(err, bp) {
           if (err) {
             throw err;
           }
@@ -240,7 +240,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         for (let i = 0; i < 50; i++) {
           ids.push(getNextmId());
         }
-        User.update({_id: {$in: ids}}, {$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+        User.update({ _id: { $in: ids } }, { $set: { age: 2 }, $push: { likes: 'metal' } }, function(err) {
           if (err) {
             throw err;
           }
@@ -254,7 +254,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         for (let i = 0; i < 50; i++) {
           ids.push(getNextdId());
         }
-        user.update({_id: {$in: ids}}, {$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+        user.update({ _id: { $in: ids } }, { $set: { age: 2 }, $push: { likes: 'metal' } }, function(err) {
           if (err) {
             throw err;
           }
@@ -277,14 +277,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       defer: true,
       fn: function(deferred) {
         let done = false;
-        BlogPost.update({_id: testBp.id}, {$pop: {comments: -1}}, function(err) {
+        BlogPost.update({ _id: testBp.id }, { $pop: { comments: -1 } }, function(err) {
           if (err) {
             throw err;
           }
           done && deferred.resolve();
           done = true;
         });
-        BlogPost.update({_id: testBp.id}, {$push: {comments: commentData}}, function(err) {
+        BlogPost.update({ _id: testBp.id }, { $push: { comments: commentData } }, function(err) {
           if (err) {
             throw err;
           }
@@ -295,7 +295,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Update - Mongoose - findOneAndModify', {
       defer: true,
       fn: function(deferred) {
-        BlogPost.findOneAndUpdate({_id: getNextbmId()}, {$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+        BlogPost.findOneAndUpdate({ _id: getNextbmId() }, { $set: { age: 2 }, $push: { likes: 'metal' } }, function(err) {
           if (err) {
             throw err;
           }
@@ -305,11 +305,11 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Update - Mongoose - find and update, separate ops', {
       defer: true,
       fn: function(deferred) {
-        BlogPost.findOne({_id: getNextbmId()}, function(err, bp) {
+        BlogPost.findOne({ _id: getNextbmId() }, function(err, bp) {
           if (err) {
             throw err;
           }
-          bp.update({$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+          bp.update({ $set: { age: 2 }, $push: { likes: 'metal' } }, function(err) {
             if (err) {
               throw err;
             }
@@ -333,7 +333,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             out.ops = item.hz;
             outObj[item.name.replace(/\s/g, '')] = out;
           });
-          console.dir(outObj, {depth: null, colors: true});
+          console.dir(outObj, { depth: null, colors: true });
         }
       });
     function next() {
@@ -344,7 +344,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         if (err) {
           throw err;
         }
-        suite.run({async: true});
+        suite.run({ async: true });
       });
     }
   });

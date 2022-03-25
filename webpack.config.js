@@ -31,16 +31,12 @@ const webpackConfig = {
       }
     ]
   },
-  // Replace these Node.js native modules with empty objects, Mongoose's
-  // browser library does not use them.
-  // See https://webpack.js.org/configuration/node/
+
   resolve: {
     fallback: {
-      dns: false,
-      fs: false,
-      module: false,
-      net: false,
-      tls: false
+      assert: require.resolve('assert'),
+      crypto: require.resolve('crypto-browserify'),
+      stream: require.resolve('stream-browserify')
     }
   },
   target: 'web',

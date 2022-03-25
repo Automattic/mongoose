@@ -31,15 +31,17 @@ const webpackConfig = {
       }
     ]
   },
-  node: {
-    // Replace these Node.js native modules with empty objects, Mongoose's
-    // browser library does not use them.
-    // See https://webpack.js.org/configuration/node/
-    dns: 'empty',
-    fs: 'empty',
-    module: 'empty',
-    net: 'empty',
-    tls: 'empty'
+  // Replace these Node.js native modules with empty objects, Mongoose's
+  // browser library does not use them.
+  // See https://webpack.js.org/configuration/node/
+  resolve: {
+    fallback: {
+      dns: false,
+      fs: false,
+      module: false,
+      net: false,
+      tls: false
+    }
   },
   target: 'web',
   mode: 'production'

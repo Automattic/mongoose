@@ -31,7 +31,7 @@
     "@babel/core": "7.17.5",
     "@babel/preset-env": "7.16.11",
     "@typescript-eslint/eslint-plugin": "5.12.0",
-    "@typescript-eslint/parser": "5.12.0",
+    "@typescript-eslint/parser": "5.16.0",
     "acquit": "1.x",
     "acquit-ignore": "0.2.x",
     "acquit-require": "0.1.x",

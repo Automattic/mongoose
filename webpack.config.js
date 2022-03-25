@@ -34,7 +34,7 @@ const webpackConfig = {
 
   resolve: {
     fallback: {
-      assert: require.resolve('assert'),
+      assert: require.resolve('assert-browserify'),
       crypto: require.resolve('crypto-browserify'),
       stream: require.resolve('stream-browserify')
     }

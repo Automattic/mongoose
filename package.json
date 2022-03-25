@@ -35,7 +35,7 @@
     "acquit": "1.x",
     "acquit-ignore": "0.2.x",
     "acquit-require": "0.1.x",
-    "assert": "^2.0.0",
+    "assert-browserify": "npm:assert@^2.0.0",
     "axios": "0.26.1",
     "babel-loader": "8.2.4",
     "benchmark": "2.1.4",

@@ -1,5 +1,7 @@
 import { Schema, model, Model, Document, Types } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { expectAssignable, expectError, expectType } from 'tsd';
+import { m0_0aModel } from './models.test';
+import { M0_0aAutoTypedSchemaType } from './schema.test';
 
 const Drink = model('Drink', new Schema({
   name: String
@@ -52,15 +54,16 @@ void async function run() {
   test.validateSync({ pathsToSkip: ['name', 'age'] });
   test.validateSync({ pathsToSkip: 'name age' });
   test.validateSync({ pathsToSkip: 'name age', blub: 1 });
-  expectType<Promise<ITest & { _id: any; }>>(test.save());
-  expectType<Promise<ITest & { _id: any; }>>(test.save({}));
+  const x = test.save();
+  expectAssignable<Promise<ITest & { _id: any; }>>(test.save());
+  expectAssignable<Promise<ITest & { _id: any; }>>(test.save({}));
   expectType<void>(test.save({}, (err, doc) => {
     expectType<Error | null>(err);
-    expectType<ITest & { _id: any; }>(doc);
+    expectAssignable<ITest & { _id: any; }>(doc);
   }));
   expectType<void>(test.save((err, doc) => {
     expectType<Error | null>(err);
-    expectType<ITest & { _id: any; }>(doc);
+    expectAssignable<ITest & { _id: any; }>(doc);
   }));
 })();
 
@@ -180,4 +183,22 @@ function gh11435() {
 async function gh11598() {
   const doc = await Test.findOne().orFail();
   doc.populate('favoritDrink', undefined, model('temp', new Schema()));
+}
+
+async function m0_0aDocument() {
+  const AutoTypeModel = await m0_0aModel();
+  const AutoTypeModelInstance = new AutoTypeModel({ unExistProperty: 1, description: 2 });
+
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
+  expectType<M0_0aAutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
+  expectType<M0_0aAutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
+  expectType<number>(AutoTypeModelInstance.unExistProperty);
+  expectType<number>(AutoTypeModelInstance.description);
+
+  /* -------------------------------------------------------------------------- */
+  /*                        Document-Instance-Methods-tests                     */
+  /* -------------------------------------------------------------------------- */
+
+  expectType<ReturnType<M0_0aAutoTypedSchemaType['methods']['instanceFn']>>(AutoTypeModelInstance.instanceFn());
+
 }

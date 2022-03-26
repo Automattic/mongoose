@@ -263,21 +263,5 @@ export async function m0_0aModel() {
 
   expectType<ReturnType<M0_0aAutoTypedSchemaType['statics']['staticFn']>>(AutoTypeModel.staticFn());
 
-  /* -------------------------------------------------------------------------- */
-  /*                                Instance-tests                              */
-  /* -------------------------------------------------------------------------- */
-
-  const AutoTypeModelInstance = new AutoTypeModel({});
-
-  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
-  expectType<M0_0aAutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
-  expectType<M0_0aAutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
-
-  /* -------------------------------------------------------------------------- */
-  /*                        Document-Instance-Methods-tests                     */
-  /* -------------------------------------------------------------------------- */
-
-  expectType<ReturnType<M0_0aAutoTypedSchemaType['methods']['instanceFn']>>(AutoTypeModelInstance.instanceFn());
-
   return AutoTypeModel;
 }

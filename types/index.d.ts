@@ -62,7 +62,7 @@ declare module 'mongoose' {
   /* ! ignore */
   export type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
 
-  export function model<T, U = unknown, TQueryHelpers = {}, TSchema = any>(
+  export function model<T, U = unknown, TQueryHelpers = {}, TSchema = unknown>(
     name: string,
     schema?: TSchema,
     collection?: string,

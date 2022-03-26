@@ -114,13 +114,13 @@ declare module 'mongoose' {
   }
 
   const Model: Model<any>;
-  type Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any>=
+  type Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> =
     NodeJS.EventEmitter &
     AcceptsDiscriminator &
     IndexManager &
     SessionStarter &
     ObtainSchemaGeneric<TSchema, 'TStaticMethods'> & {
-      new <DocType = AnyKeys<T> & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
+      new<DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<UnpackedIntersection<T, DocType>, TMethodsAndOverrides, TVirtuals>;
 
       aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
       aggregate<R = any>(pipeline: PipelineStage[], callback?: Callback<R[]>): Aggregate<Array<R>>;

@@ -186,8 +186,8 @@ async function gh11598() {
 }
 
 async function m0_0aDocument() {
-  const AutoTypeModel = await m0_0aModel();
-  const AutoTypeModelInstance = new AutoTypeModel({ unExistProperty: 1, description: 2 });
+  const AutoTypedModel = await m0_0aModel();
+  const AutoTypeModelInstance = new AutoTypedModel({ unExistProperty: 1, description: 2 });
 
   expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
   expectType<M0_0aAutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
@@ -196,7 +196,7 @@ async function m0_0aDocument() {
   expectType<number>(AutoTypeModelInstance.description);
 
   /* -------------------------------------------------------------------------- */
-  /*                        Document-Instance-Methods-tests                     */
+  /*                           Document-Methods-tests                           */
   /* -------------------------------------------------------------------------- */
 
   expectType<ReturnType<M0_0aAutoTypedSchemaType['methods']['instanceFn']>>(AutoTypeModelInstance.instanceFn());

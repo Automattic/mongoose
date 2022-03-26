@@ -11198,4 +11198,24 @@ describe('document', function() {
 
     await doc.validate();
   });
+
+  it('avoids setting modified on subdocument defaults (gh-11528)', async function() {
+    const textSchema = new Schema({
+      text: { type: String }
+    }, { _id: false });
+
+    const messageSchema = new Schema({
+      body: { type: textSchema, default: { text: 'hello' } },
+      date: { type: Date, default: Date.now }
+    });
+
+
+    const Message = db.model('Test', messageSchema);
+
+    const entry = await Message.create({});
+
+    const failure = await Message.findById({ _id: entry._id });
+
+    assert.deepEqual(failure.modifiedPaths(), []);
+  });
 });

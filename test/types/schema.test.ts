@@ -472,11 +472,11 @@ export function m0_0aSchema() {
 
   const SchemaWithCustomTypeKey = new Schema({
     name: {
-      customKTypeKey: String,
+      customTypeKey: String,
       required: true
     }
   }, {
-    typeKey: 'customKTypeKey'
+    typeKey: 'customTypeKey'
   });
 
   expectType<string>({} as InferSchemaType<typeof SchemaWithCustomTypeKey>['name']);

@@ -2,7 +2,7 @@ import mongodb = require('mongodb');
 
 declare module 'mongoose' {
 
-    class NativeError extends global.Error { }
+  class NativeError extends global.Error { }
     type CallbackError = NativeError | null;
 
     class MongooseError extends global.Error {
@@ -126,4 +126,4 @@ declare module 'mongoose' {
         constructor(doc: Document, currentVersion: number, modifiedPaths: Array<string>);
       }
     }
-  }
+}

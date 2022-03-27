@@ -67,7 +67,7 @@ function testMethods(): void {
     fullName(): string;
   }
 
-  type User = Model<IUser, {}, IUserMethods>
+  type User = Model<IUser, {}, IUserMethods>;
 
   const schema = new Schema<IUser, User>({ first: String, last: String });
   schema.methods.fullName = function(): string {

@@ -87,10 +87,18 @@ Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).exec().then((res: ITe
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { $set: { name: 'test2' } }).then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { $inc: { age: 2 } }).then((res: ITest | null) => console.log(res));
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, new: true }).then((res: ITest) => { res.name = 'test4'; });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, returnOriginal: false }).then((res: ITest) => { res.name = 'test4'; });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { rawResult: true }).then((res: any) => { console.log(res.ok); });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, rawResult: true }).then((res: any) => { console.log(res.ok); });
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, new: true }).then((res: ITest) => {
+  res.name = 'test4';
+});
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, returnOriginal: false }).then((res: ITest) => {
+  res.name = 'test4';
+});
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { rawResult: true }).then((res: any) => {
+  console.log(res.ok);
+});
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, rawResult: true }).then((res: any) => {
+  console.log(res.ok);
+});
 
 Test.findOneAndReplace({ name: 'test' }, { _id: new Types.ObjectId(), name: 'test2' }).exec().then((res: ITest | null) => console.log(res));
 
@@ -141,8 +149,12 @@ function testGenericQuery(): void {
 }
 
 function eachAsync(): void {
-  Test.find().cursor().eachAsync((doc) => {expectType<(ITest & { _id: any; })>(doc);});
-  Test.find().cursor().eachAsync((docs) => {expectType<(ITest & { _id: any; })[]>(docs);}, { batchSize: 2 });
+  Test.find().cursor().eachAsync((doc) => {
+    expectType<(ITest & { _id: any; })>(doc);
+  });
+  Test.find().cursor().eachAsync((docs) => {
+    expectType<(ITest & { _id: any; })[]>(docs);
+  }, { batchSize: 2 });
 }
 
 async function gh10617(): Promise<void> {
@@ -177,7 +189,7 @@ function gh10757() {
 }
 
 function gh10857() {
-  type MyUnion = 'VALUE1'|'VALUE2';
+  type MyUnion = 'VALUE1' | 'VALUE2';
   interface MyClass {
     status: MyUnion;
   }
@@ -191,7 +203,7 @@ function gh10786() {
     name?: string
   }
 
-  const updateQuery : UpdateQuery<User> = { name: 'John' };
+  const updateQuery: UpdateQuery<User> = { name: 'John' };
   if (true) {
     updateQuery.phone = 'XXXX';
   }

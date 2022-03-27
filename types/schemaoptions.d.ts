@@ -164,7 +164,7 @@ declare module 'mongoose' {
      * incremented even if these paths are updated). DO NOT do this unless you know what you're doing.
      * For subdocuments, include this on the parent document using the fully qualified path.
      */
-    skipVersioning?: {[key: string]: boolean; };
+    skipVersioning?: { [key: string]: boolean; };
     /**
      * Validation errors in a single nested schema are reported
      * both on the child and on the parent schema.
@@ -184,6 +184,6 @@ declare module 'mongoose' {
      * You can suppress the warning by setting { supressReservedKeysWarning: true } schema options. Keep in mind that this
      * can break plugins that rely on these reserved names.
      */
-     supressReservedKeysWarning?: boolean
+    supressReservedKeysWarning?: boolean
   }
 }

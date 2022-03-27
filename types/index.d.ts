@@ -1469,7 +1469,7 @@ declare module 'mongoose' {
 
   type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType> = Query<ResultType, DocType, THelpers, RawDocType> & THelpers;
 
-  type UnpackedIntersection<T, U> = T extends (infer A)[]
+  type UnpackedIntersection<T, U> = T extends null ? null : T extends (infer A)[]
     ? (Omit<A, keyof U> & U)[]
     : keyof U extends never
     ? T

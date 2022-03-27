@@ -170,12 +170,14 @@ function gh11503() {
   const User = model<User>('friends', userSchema);
 
   User.findOne({}).populate('friends').then(user => {
-    expectType<Types.ObjectId | undefined>(user?.friends[0]);
+    if (!user) return;
+    expectType<Types.ObjectId>(user?.friends[0]);
     expectError(user?.friends[0].blocked);
     expectError(user?.friends.map(friend => friend.blocked));
   });
 
-  User.findOne({}).populate<{friends: Friend[]}>('friends').then(user => {
+  User.findOne({}).populate<{ friends: Friend[] }>('friends').then(user => {
+    if (!user) return;
     expectAssignable<Friend>(user?.friends[0]);
     expectType<boolean>(user?.friends[0].blocked);
     const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
@@ -220,6 +222,9 @@ async function _11532() {
   const populateResult = await populateQuery;
   const leanResult = await populateQuery.lean();
 
+  if (!populateResult) return;
   expectType<string>(populateResult.child.name);
+
+  if (!leanResult) return;
   expectType<string>(leanResult.child.name);
 }

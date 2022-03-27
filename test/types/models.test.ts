@@ -1,5 +1,5 @@
-import { UpdateQuery, Schema, Document, Model, Types, connection, model } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { Schema, Document, Model, Types, connection, model } from 'mongoose';
+import { expectError } from 'tsd';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -212,17 +212,3 @@ function inheritance() {
 Project.createCollection({ expires: '5 seconds' });
 Project.createCollection({ expireAfterSeconds: 5 });
 expectError(Project.createCollection({ expireAfterSeconds: '5 seconds' }));
-
-
-function update() {
-  interface IUser {
-    name: string;
-    age: number;
-    isActive: boolean;
-  }
-  const update: UpdateQuery<IUser> = {};
-
-  expectType<string | undefined>(update.name);
-  expectType<number | undefined>(update.age);
-  expectType<boolean | undefined>(update.isActive);
-}

@@ -11,8 +11,8 @@ const DocSchema = new Schema({
 });
 
 const AllSchema = new Schema({
-  string: {type: String, required: true},
-  number: {type: Number, min: 10},
+  string: { type: String, required: true },
+  number: { type: Number, min: 10 },
   date: Date,
   bool: Boolean,
   buffer: Buffer,
@@ -29,17 +29,17 @@ const AllSchema = new Schema({
       return true;
     }
   },
-  s: {nest: String}
+  s: { nest: String }
 });
 
 const A = mongoose.model('A', AllSchema);
 
 const methods = [];
 methods.push(function(a, cb) {
-  A.findOne({_id: a._id}, cb);
+  A.findOne({ _id: a._id }, cb);
 }); // 2 MB
 methods.push(function(a, cb) {
-  A.find({_id: a._id, bool: a.bool}, cb);
+  A.find({ _id: a._id, bool: a.bool }, cb);
 }); // 3.8 MB
 methods.push(function(a, cb) {
   A.findById(a._id, cb);
@@ -57,16 +57,16 @@ methods.push(function(a, cb) {
   A.where('date', a.date).where('array').in(3).limit(10).exec(cb);
 }); // 1.82 MB
 methods.push(function(a, cb) {
-  A.updateOne({_id: a._id}, {$addToset: {array: 'heeeeello'}}, cb);
+  A.updateOne({ _id: a._id }, { $addToset: { array: 'heeeeello' } }, cb);
 }); // 3.32 MB
 methods.push(function(a, cb) {
-  A.deleteOne({_id: a._id}, cb);
+  A.deleteOne({ _id: a._id }, cb);
 }); // 3.32 MB
 methods.push(function(a, cb) {
   A.find().where('objectids').exists().select('dates').limit(10).exec(cb);
 }); // 3.32 MB
 methods.push(function(a, cb) {
-  A.count({strings: a.strings[2], number: a.number}, cb);
+  A.count({ strings: a.strings[2], number: a.number }, cb);
 }); // 3.32 MB
 methods.push(function(a, cb) {
   a.string = 'asdfaf';
@@ -76,7 +76,7 @@ methods.push(function(a, cb) {
   a.array.push(3);
   a.dates.push(new Date);
   // a.bools.push([true, false]);
-  a.docs.addToSet({title: 'woot'});
+  a.docs.addToSet({ title: 'woot' });
   a.strings.remove('three');
   a.numbers.pull(72);
   a.objectids.$pop();
@@ -84,7 +84,7 @@ methods.push(function(a, cb) {
   a.s.nest = 'aooooooga';
 
   if (i % 2) {
-    a.toObject({depopulate: true});
+    a.toObject({ depopulate: true });
   } else {
     if (a._delta) {
       a._delta();
@@ -135,7 +135,7 @@ function cycle() {
     bools: [true, false, false, true, true],
     buffers: [Buffer.from([33]), Buffer.from([12])],
     objectids: [new mongoose.Types.ObjectId],
-    docs: [{title: 'yo'}, {title: 'nowafasdi0fas asjkdfla fa'}]
+    docs: [{ title: 'yo' }, { title: 'nowafasdi0fas asjkdfla fa' }]
   });
 
   a.save(function() {

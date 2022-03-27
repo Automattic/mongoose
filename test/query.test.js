@@ -3933,4 +3933,16 @@ describe('Query', function() {
     res = await Test.find({ names: { $not: { $regex: 'foo' } } });
     assert.deepStrictEqual(res.map(el => el.names), [['bar']]);
   });
+  it('adding `exec` option does not affect the query (gh-11416)', async() => {
+    const userSchema = new Schema({
+      name: { type: String }
+    });
+
+
+    const User = db.model('User', userSchema);
+    const createdUser = await User.create({ name: 'Hafez' });
+    const users = await User.find({ _id: createdUser._id }).setOptions({ exec: false });
+
+    assert.ok(users.length, 1);
+  });
 });

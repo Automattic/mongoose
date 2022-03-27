@@ -119,7 +119,7 @@ function gh11014() {
 
   // Populate with `Paths` generic `{ child: Child }` to override `child` path
   ParentModel.find({})
-    .populate<{child: Child}>('child')
+    .populate<{ child: Child }>('child')
     .orFail()
     .then(parents => {
       parents.map(p => p.child.name);
@@ -161,24 +161,40 @@ function gh11503() {
     blocked: Boolean
   });
 
-  interface User {
+  interface IUser {
     friends: Types.ObjectId[];
   }
-  const UserSchema = new Schema<User>({
+  const userSchema = new Schema<IUser>({
     friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
   });
-  const Users = model<User>('friends', UserSchema);
+  const User = model<IUser>('friends', userSchema);
 
-  Users.findOne({}).populate('friends').then(user => {
+  User.findOne({}).populate('friends').then(user => {
     expectType<Types.ObjectId | undefined>(user?.friends[0]);
     expectError(user?.friends[0].blocked);
     expectError(user?.friends.map(friend => friend.blocked));
   });
 
-  Users.findOne({}).populate<{friends: Friend[]}>('friends').then(user => {
+  User.findOne({}).populate<{ friends: Friend[] }>('friends').then(user => {
     expectAssignable<Friend>(user?.friends[0]);
     expectType<boolean>(user?.friends[0].blocked);
     const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
     expectType<boolean>(firstFriendBlockedValue?.blocked);
   });
+}
+
+
+function gh11544() {
+
+  interface IUser {
+    friends: Types.ObjectId[];
+  }
+  const userSchema = new Schema<IUser>({
+    friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
+  });
+  const User = model<IUser>('friends', userSchema);
+
+  User.findOne({}).populate({ path: 'friends', strictPopulate: false });
+  User.findOne({}).populate({ path: 'friends', strictPopulate: true });
+  User.findOne({}).populate({ path: 'friends', populate: { path: 'someNestedPath', strictPopulate: false } });
 }

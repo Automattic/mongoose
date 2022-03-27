@@ -20,7 +20,7 @@ const ObjectId = Schema.Types.ObjectId;
  */
 
 
- mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
+mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
   if (err) {
     throw err;
   }
@@ -65,9 +65,9 @@ const ObjectId = Schema.Types.ObjectId;
       author: 'somebody',
       slug: 'test.post',
       date: new Date(),
-      meta: {date: new Date(), visitors: 9001},
+      meta: { date: new Date(), visitors: 9001 },
       published: true,
-      mixed: {thisIsRandom: true},
+      mixed: { thisIsRandom: true },
       numbers: [1, 2, 7, 10, 23432],
       tags: ['test', 'BENCH', 'things', 'more things'],
       def: 'THANGS!!!',
@@ -172,8 +172,8 @@ const ObjectId = Schema.Types.ObjectId;
             out.ops = item.hz;
             outObj[item.name.replace(/\s/g, '')] = out;
           });
-          console.dir(outObj, {depth: null, colors: true});
+          console.dir(outObj, { depth: null, colors: true });
         }
-      }).run({async: true});
+      }).run({ async: true });
   });
 });

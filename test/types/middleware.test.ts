@@ -88,7 +88,7 @@ function gh11257(): void {
 function gh11480(): void {
   type IUserSchema = {
     name: string;
-  }
+  };
 
   const UserSchema = new Schema<IUserSchema>({ name: { type: String } });
 

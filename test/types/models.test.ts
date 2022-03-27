@@ -220,7 +220,7 @@ function update() {
   }
   const update: UpdateQuery<IUser> = {};
 
-  expectType<string>(update.name);
-  expectType<number>(update.age);
-  expectType<boolean>(update.isActive);
+  expectType<string | undefined>(update.name);
+  expectType<number | undefined>(update.age);
+  expectType<boolean | undefined>(update.isActive);
 }

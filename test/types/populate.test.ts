@@ -119,7 +119,7 @@ function gh11014() {
 
   // Populate with `Paths` generic `{ child: Child }` to override `child` path
   ParentModel.find({})
-    .populate<{child: Child}>('child')
+    .populate<{ child: Child }>('child')
     .orFail()
     .then(parents => {
       parents.map(p => p.child.name);
@@ -161,13 +161,13 @@ function gh11503() {
     blocked: Boolean
   });
 
-  interface User {
+  interface IUser {
     friends: Types.ObjectId[];
   }
-  const userSchema = new Schema<User>({
+  const userSchema = new Schema<IUser>({
     friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
   });
-  const User = model<User>('friends', userSchema);
+  const User = model<IUser>('friends', userSchema);
 
   User.findOne({}).populate('friends').then(user => {
     if (!user) return;
@@ -188,13 +188,13 @@ function gh11503() {
 
 function gh11544() {
 
-  interface User {
+  interface IUser {
     friends: Types.ObjectId[];
   }
-  const userSchema = new Schema<User>({
+  const userSchema = new Schema<IUser>({
     friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
   });
-  const User = model<User>('friends', userSchema);
+  const User = model<IUser>('friends', userSchema);
 
   User.findOne({}).populate({ path: 'friends', strictPopulate: false });
   User.findOne({}).populate({ path: 'friends', strictPopulate: true });

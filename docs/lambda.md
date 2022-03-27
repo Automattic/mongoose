@@ -30,7 +30,7 @@ exports.handler = async function(event, context) {
     
     // `await`ing connection after assigning to the `conn` variable
     // to avoid multiple function calls creating new connections
-    await conn;
+    await conn.asPromise();
     conn.model('Test', new mongoose.Schema({ name: String }));
   }
 
@@ -65,7 +65,7 @@ exports.connect = async function() {
     
     // `await`ing connection after assigning to the `conn` variable
     // to avoid multiple function calls creating new connections
-    await conn;
+    await conn.asPromise();
   }
 
   return conn;

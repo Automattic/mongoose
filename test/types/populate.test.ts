@@ -161,13 +161,13 @@ function gh11503() {
     blocked: Boolean
   });
 
-  interface User {
+  interface IUser {
     friends: Types.ObjectId[];
   }
-  const userSchema = new Schema<User>({
+  const userSchema = new Schema<IUser>({
     friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
   });
-  const User = model<User>('friends', userSchema);
+  const User = model<IUser>('friends', userSchema);
 
   User.findOne({}).populate('friends').then(user => {
     expectType<Types.ObjectId | undefined>(user?.friends[0]);
@@ -186,13 +186,13 @@ function gh11503() {
 
 function gh11544() {
 
-  interface User {
+  interface IUser {
     friends: Types.ObjectId[];
   }
-  const userSchema = new Schema<User>({
+  const userSchema = new Schema<IUser>({
     friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
   });
-  const User = model<User>('friends', userSchema);
+  const User = model<IUser>('friends', userSchema);
 
   User.findOne({}).populate({ path: 'friends', strictPopulate: false });
   User.findOne({}).populate({ path: 'friends', strictPopulate: true });

@@ -210,19 +210,19 @@ function gh10786() {
 }
 
 async function gh11156(): Promise<void> {
-  interface User {
+  interface IUser {
     name: string;
     age: number;
   }
 
-  const schema = new Schema<User>({
+  const schema = new Schema<IUser>({
     name: String,
     age: Number
   });
 
-  const User: Model<User> = model<User>('User', schema);
+  const User: Model<IUser> = model<IUser>('User', schema);
 
-  expectType<{ name: string }>(await User.findOne<Pick<User, 'name'>>({}).orFail());
+  expectType<{ name: string }>(await User.findOne<Pick<IUser, 'name'>>({}).orFail());
 }
 
 async function gh11041(): Promise<void> {

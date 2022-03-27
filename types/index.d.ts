@@ -2058,7 +2058,7 @@ declare module 'mongoose' {
    * { age: 30 }
    * ```
    */
-  export type UpdateQuery<T> = _UpdateQuery<_UpdateQueryDef<T>>['$set'] & _UpdateQuery<_UpdateQueryDef<T>> & AnyObject;
+  export type UpdateQuery<T> = Partial<T> & _UpdateQuery<_UpdateQueryDef<T>> & AnyObject;
 
   export type DocumentDefinition<T> = {
     [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:

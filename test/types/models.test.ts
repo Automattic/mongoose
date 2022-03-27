@@ -214,9 +214,9 @@ expectError(Project.createCollection({ expireAfterSeconds: '5 seconds' }));
 
 function update() {
   interface IUser {
-    name:string;
-    age:number;
-    isActive:boolean;
+    name: string;
+    age: number;
+    isActive: boolean;
   }
   const update: UpdateQuery<IUser> = {};
 

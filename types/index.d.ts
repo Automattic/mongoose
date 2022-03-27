@@ -94,8 +94,6 @@ declare module 'mongoose' {
     [k: string]: any
   }
 
-  export type FlexibleObject<T extends {}> = { [P in keyof (T & Omit<any, keyof T>)]?: P extends keyof T ? T[P] : any };
-
   export type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
 
   export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);

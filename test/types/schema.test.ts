@@ -369,10 +369,14 @@ export function m0_0aSchema() {
     }
   }, {
     statics: {
-      staticFn() { return 'Returned from staticFn'; }
+      staticFn() {
+        return 'Returned from staticFn';
+      }
     },
     methods: {
-      instanceFn() { return 'Returned from DocumentInstanceFn'; }
+      instanceFn() {
+        return 'Returned from DocumentInstanceFn';
+      }
     }
   });
 

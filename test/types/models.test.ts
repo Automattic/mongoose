@@ -253,9 +253,13 @@ export async function m0_0aModel() {
   expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
   expectType<M0_0aAutoTypedSchemaType['schema']['description']>(testDoc1.description);
 
-  const testDoc2 = await AutoTypeModel.findOne({ userName: 'M0_0a' });
-  expectType<M0_0aAutoTypedSchemaType['schema']['userName'] | undefined>(testDoc2?.userName);
-  expectType<M0_0aAutoTypedSchemaType['schema']['description'] | undefined>(testDoc2?.description);
+  const testDoc2 = await AutoTypeModel.insertMany([{ userName: 'M0_0a' }]);
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc2[0].userName);
+  expectType<M0_0aAutoTypedSchemaType['schema']['description'] | undefined>(testDoc2[0]?.description);
+
+  const testDoc3 = await AutoTypeModel.findOne({ userName: 'M0_0a' });
+  expectType<M0_0aAutoTypedSchemaType['schema']['userName'] | undefined>(testDoc3?.userName);
+  expectType<M0_0aAutoTypedSchemaType['schema']['description'] | undefined>(testDoc3?.description);
 
   /* -------------------------------------------------------------------------- */
   /*                      Model-statics-functions-test                          */

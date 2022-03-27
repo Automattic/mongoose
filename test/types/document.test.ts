@@ -67,7 +67,7 @@ function testMethods(): void {
     fullName(): string;
   }
 
-  type User = Model<IUser, {}, IUserMethods>
+  type User = Model<IUser, {}, IUserMethods>;
 
   const schema = new Schema<IUser, User>({ first: String, last: String });
   schema.methods.fullName = function(): string {
@@ -81,17 +81,17 @@ function testMethods(): void {
 
 function testRequiredId(): void {
   // gh-10657
-  interface Foo {
+  interface IFoo {
     _id: string;
     label: string;
   }
 
-  const FooSchema = new Schema<Foo, Model<Foo>, Foo>({
+  const FooSchema = new Schema<IFoo, Model<IFoo>, IFoo>({
     _id: String,
     label: { type: String }
   });
 
-  const Foo: Model<Foo> = model<Foo>('Foo', FooSchema);
+  const Foo: Model<IFoo> = model<IFoo>('Foo', FooSchema);
 
   type FooInput = {
     label: string;

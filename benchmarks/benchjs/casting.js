@@ -52,7 +52,7 @@ const commentData = {
   title: 'test comment',
   date: new Date(),
   body: 'this be some crazzzyyyyy text that would go in a comment',
-  comments: [{title: 'second level', date: new Date(), body: 'texttt'}]
+  comments: [{ title: 'second level', date: new Date(), body: 'texttt' }]
 };
 
 const blogData = {
@@ -137,6 +137,6 @@ suite.add('Casting - Embedded Docs - 0 Docs', {
         out.ops = item.hz;
         outObj[item.name.replace(/\s/g, '')] = out;
       });
-      console.dir(outObj, {depth: null, colors: true});
+      console.dir(outObj, { depth: null, colors: true });
     }
-  }).run({async: true});
+  }).run({ async: true });

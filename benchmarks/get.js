@@ -23,7 +23,7 @@ for (let i = 0; i < 10000000; ++i) {
 console.log('Array of length 1', Date.now() - start);
 
 // String with dots
-obj = { a: { b: 1 } }
+obj = { a: { b: 1 } };
 start = Date.now();
 for (let i = 0; i < 10000000; ++i) {
   get(obj, 'a.b', null);
@@ -31,7 +31,7 @@ for (let i = 0; i < 10000000; ++i) {
 console.log('String with dots', Date.now() - start);
 
 // Multi element array
-obj = { a: { b: 1 } }
+obj = { a: { b: 1 } };
 start = Date.now();
 arr = ['a', 'b'];
 for (let i = 0; i < 10000000; ++i) {

@@ -80,17 +80,17 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
     numbers: [Number],
     tags: [String],
     owners: [ObjectId],
-    comments: [{type: ObjectId, ref: 'Comment'}],
-    dummy1: [{type: ObjectId, ref: 'Dummy1'}],
-    dummy2: [{type: ObjectId, ref: 'Dummy2'}],
-    dummy3: [{type: ObjectId, ref: 'Dummy3'}],
-    dummy4: [{type: ObjectId, ref: 'Dummy4'}],
-    dummy5: [{type: ObjectId, ref: 'Dummy5'}],
-    dummy6: [{type: ObjectId, ref: 'Dummy6'}],
-    dummy7: [{type: ObjectId, ref: 'Dummy7'}],
-    dummy8: [{type: ObjectId, ref: 'Dummy8'}],
-    dummy9: [{type: ObjectId, ref: 'Dummy9'}],
-    def: {type: String, default: 'kandinsky'}
+    comments: [{ type: ObjectId, ref: 'Comment' }],
+    dummy1: [{ type: ObjectId, ref: 'Dummy1' }],
+    dummy2: [{ type: ObjectId, ref: 'Dummy2' }],
+    dummy3: [{ type: ObjectId, ref: 'Dummy3' }],
+    dummy4: [{ type: ObjectId, ref: 'Dummy4' }],
+    dummy5: [{ type: ObjectId, ref: 'Dummy5' }],
+    dummy6: [{ type: ObjectId, ref: 'Dummy6' }],
+    dummy7: [{ type: ObjectId, ref: 'Dummy7' }],
+    dummy8: [{ type: ObjectId, ref: 'Dummy8' }],
+    dummy9: [{ type: ObjectId, ref: 'Dummy9' }],
+    def: { type: String, default: 'kandinsky' }
   });
 
   const blogData = {
@@ -98,9 +98,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
     author: 'somebody',
     slug: 'test.post',
     date: new Date(),
-    meta: {date: new Date(), visitors: 9001},
+    meta: { date: new Date(), visitors: 9001 },
     published: true,
-    mixed: {thisIsRandom: true},
+    mixed: { thisIsRandom: true },
     numbers: [1, 2, 7, 10, 23432],
     tags: ['test', 'BENCH', 'things', 'more things'],
     def: 'THANGS!!!',
@@ -388,10 +388,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
           out.ops = item.hz;
           outObj[item.name.replace(/\s/g, '')] = out;
         });
-        console.dir(outObj, {depth: null, colors: true});
+        console.dir(outObj, { depth: null, colors: true });
       }
     });
   function next() {
-    suite.run({async: true});
+    suite.run({ async: true });
   }
 });

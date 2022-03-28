@@ -2399,6 +2399,19 @@ describe('model: querying:', function() {
       });
     });
 
+    it('removes the __v property if versionKey: false is set (gh-8934)', function(done) {
+      const title = 'Wooooot ' + random();
+
+      const post = new BlogPostB();
+      post.set('title', title);
+      post.save(function(err) {
+        BlogPostB.find({ title: title }).lean({ versionKey: false }).exec(function(err, docs) {
+          assert(docs[0].__v === undefined);
+          done();
+        });
+      });
+    });
+
     it('findOne', function(done) {
       const title = 'Wooooot ' + random();
 

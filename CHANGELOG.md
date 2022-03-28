@@ -1,3 +1,14 @@
+6.2.9 / 2022-03-28
+==================
+ * perf(document+model): make a few small optimizations #11380
+ * fix(types): improve populate return type #11560 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+ * fix(document): avoid marking paths as modified on subdocument defaults #11528
+ * docs(schema): add example to index `expires` option #11557 [boly38](https://github.com/boly38)
+ * docs(model): add change stream docs #11275
+ * docs(lambda): update Lambda docs for Mongoose 6 #11275
+ * docs(connections): add note about connecting with X509 #11333
+ * docs(populate): fix incorrect path name in `refPath` example #11565 [chandiwalaaadhar](https://github.com/chandiwalaaadhar)
+
 6.2.8 / 2022-03-22
 ==================
  * fix(document): handle casting array of spread docs #11522

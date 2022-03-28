@@ -6,7 +6,7 @@ run().catch(error => {
 });
 
 
-async function run () {
+async function run() {
   const Sharded = require('mongodb-topology-manager').Sharded;
 
   // Create new instance
@@ -17,13 +17,13 @@ async function run () {
 
   await topology.addShard([{
     options: {
-      bind_ip: 'localhost', port: 31000, dbpath: `/data/db/31000`, shardsvr: null
+      bind_ip: 'localhost', port: 31000, dbpath: '/data/db/31000', shardsvr: null
     }
   }], { replSet: 'rs1' });
 
   await topology.addConfigurationServers([{
     options: {
-      bind_ip: 'localhost', port: 35000, dbpath: `/data/db/35000`
+      bind_ip: 'localhost', port: 35000, dbpath: '/data/db/35000'
     }
   }], { replSet: 'rs0' });
 

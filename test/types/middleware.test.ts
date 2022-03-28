@@ -1,5 +1,5 @@
 import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { expectError, expectType, expectNotType } from 'tsd';
 
 interface ITest extends Document {
   name?: string;
@@ -82,5 +82,18 @@ const Test = model<ITest>('Test', schema);
 function gh11257(): void {
   schema.pre('save', { document: true }, function() {
     expectType<HydratedDocument<ITest>>(this);
+  });
+}
+
+function gh11480(): void {
+  type IUserSchema = {
+    name: string;
+  };
+
+  const UserSchema = new Schema<IUserSchema>({ name: { type: String } });
+
+  UserSchema.pre('save', function(next) {
+    expectNotType<any>(this);
+    next();
   });
 }

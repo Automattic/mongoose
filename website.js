@@ -24,7 +24,7 @@ try {
 
 require('acquit-ignore')();
 
-const markdown = require('marked');
+const { marked: markdown } = require('marked');
 const highlight = require('highlight.js');
 const renderer = {
   heading: function(text, level, raw, slugger) {
@@ -161,12 +161,12 @@ function pugify(filename, options, newfile) {
 
   options.marked = markdown;
   options.markedCode = function(v) {
-    return markdown('```javascript\n' + v + '\n```');
+    return markdown.parse('```javascript\n' + v + '\n```');
   };
   options.filename = filename;
   options.filters = {
     markdown: function(block) {
-      return markdown(block);
+      return markdown.parse(block);
     }
   };
 

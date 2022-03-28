@@ -25,21 +25,21 @@ Everything in Mongoose starts with a Schema. Each schema maps to a MongoDB
 collection and defines the shape of the documents within that collection.
 
 ```javascript
-  import mongoose from 'mongoose';
-  const { Schema } = mongoose;
+import mongoose from 'mongoose';
+const { Schema } = mongoose;
 
-  const blogSchema = new Schema({
-    title:  String, // String is shorthand for {type: String}
-    author: String,
-    body:   String,
-    comments: [{ body: String, date: Date }],
-    date: { type: Date, default: Date.now },
-    hidden: Boolean,
-    meta: {
-      votes: Number,
-      favs:  Number
-    }
-  });
+const blogSchema = new Schema({
+  title:  String, // String is shorthand for {type: String}
+  author: String,
+  body:   String,
+  comments: [{ body: String, date: Date }],
+  date: { type: Date, default: Date.now },
+  hidden: Boolean,
+  meta: {
+    votes: Number,
+    favs:  Number
+  }
+});
 ```
 
 If you want to add additional keys later, use the
@@ -94,8 +94,8 @@ To use our schema definition, we need to convert our `blogSchema` into a
 To do so, we pass it into `mongoose.model(modelName, schema)`:
 
 ```javascript
-  const Blog = mongoose.model('Blog', blogSchema);
-  // ready to go!
+const Blog = mongoose.model('Blog', blogSchema);
+// ready to go!
 ```
 
 <h3 id="_id"><a href="#_id">Ids</a></h3>
@@ -142,25 +142,25 @@ many of their own [built-in instance methods](./api/document.html).
 We may also define our own custom document instance methods.
 
 ```javascript
-  // define a schema
-  const animalSchema = new Schema({ name: String, type: String });
+// define a schema
+const animalSchema = new Schema({ name: String, type: String });
 
-  // assign a function to the "methods" object of our animalSchema
-  animalSchema.methods.findSimilarTypes = function(cb) {
-    return mongoose.model('Animal').find({ type: this.type }, cb);
-  };
+// assign a function to the "methods" object of our animalSchema
+animalSchema.methods.findSimilarTypes = function(cb) {
+  return mongoose.model('Animal').find({ type: this.type }, cb);
+};
 ```
 
 Now all of our `animal` instances have a `findSimilarTypes` method available
 to them.
 
 ```javascript
-  const Animal = mongoose.model('Animal', animalSchema);
-  const dog = new Animal({ type: 'dog' });
+const Animal = mongoose.model('Animal', animalSchema);
+const dog = new Animal({ type: 'dog' });
 
-  dog.findSimilarTypes((err, dogs) => {
-    console.log(dogs); // woof
-  });
+dog.findSimilarTypes((err, dogs) => {
+  console.log(dogs); // woof
+});
 ```
 
 * Overwriting a default mongoose document method may lead to unpredictable results. See [this](./api.html#schema_Schema.reserved) for more details.
@@ -176,16 +176,16 @@ ways to add a static:
 - Call the [`Schema#static()` function](/docs/api.html#schema_Schema-static)
 
 ```javascript
-  // Assign a function to the "statics" object of our animalSchema
-  animalSchema.statics.findByName = function(name) {
-    return this.find({ name: new RegExp(name, 'i') });
-  };
-  // Or, equivalently, you can call `animalSchema.static()`.
-  animalSchema.static('findByBreed', function(breed) { return this.find({ breed }); });
+// Assign a function to the "statics" object of our animalSchema
+animalSchema.statics.findByName = function(name) {
+  return this.find({ name: new RegExp(name, 'i') });
+};
+// Or, equivalently, you can call `animalSchema.static()`.
+animalSchema.static('findByBreed', function(breed) { return this.find({ breed }); });
 
-  const Animal = mongoose.model('Animal', animalSchema);
-  let animals = await Animal.findByName('fido');
-  animals = animals.concat(await Animal.findByBreed('Poodle'));
+const Animal = mongoose.model('Animal', animalSchema);
+let animals = await Animal.findByName('fido');
+animals = animals.concat(await Animal.findByBreed('Poodle'));
 ```
 
 Do **not** declare statics using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so the above examples will not work because of the value of `this`.
@@ -197,19 +197,19 @@ but for mongoose queries. Query helper methods let you extend mongoose's
 [chainable query builder API](./queries.html).
 
 ```javascript
-  animalSchema.query.byName = function(name) {
-    return this.where({ name: new RegExp(name, 'i') })
-  };
+animalSchema.query.byName = function(name) {
+  return this.where({ name: new RegExp(name, 'i') })
+};
 
-  const Animal = mongoose.model('Animal', animalSchema);
+const Animal = mongoose.model('Animal', animalSchema);
 
-  Animal.find().byName('fido').exec((err, animals) => {
-    console.log(animals);
-  });
+Animal.find().byName('fido').exec((err, animals) => {
+  console.log(animals);
+});
 
-  Animal.findOne().byName('fido').exec((err, animal) => {
-    console.log(animal);
-  });
+Animal.findOne().byName('fido').exec((err, animal) => {
+  console.log(animal);
+});
 ```
 
 <h3 id="indexes"><a href="#indexes">Indexes</a></h3>
@@ -220,13 +220,13 @@ Defining indexes at the schema level is necessary when creating
 [compound indexes](https://docs.mongodb.com/manual/core/index-compound/).
 
 ```javascript
-  const animalSchema = new Schema({
-    name: String,
-    type: String,
-    tags: { type: [String], index: true } // field level
-  });
+const animalSchema = new Schema({
+  name: String,
+  type: String,
+  tags: { type: [String], index: true } // field level
+});
 
-  animalSchema.index({ name: 1, type: -1 }); // schema level
+animalSchema.index({ name: 1, type: -1 }); // schema level
 ```
 
 When your application starts up, Mongoose automatically calls [`createIndex`](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each defined index in your schema.
@@ -235,30 +235,30 @@ While nice for development, it is recommended this behavior be disabled in produ
 Disable the behavior by setting the `autoIndex` option of your schema to `false`, or globally on the connection by setting the option `autoIndex` to `false`.
 
 ```javascript
-  mongoose.connect('mongodb://user:pass@localhost:port/database', { autoIndex: false });
-  // or
-  mongoose.createConnection('mongodb://user:pass@localhost:port/database', { autoIndex: false });
-  // or
-  mongoose.set('autoIndex', false);
-  // or
-  animalSchema.set('autoIndex', false);
-  // or
-  new Schema({..}, { autoIndex: false });
+mongoose.connect('mongodb://user:pass@localhost:port/database', { autoIndex: false });
+// or
+mongoose.createConnection('mongodb://user:pass@localhost:port/database', { autoIndex: false });
+// or
+mongoose.set('autoIndex', false);
+// or
+animalSchema.set('autoIndex', false);
+// or
+new Schema({..}, { autoIndex: false });
 ```
 
 Mongoose will emit an `index` event on the model when indexes are done
 building or an error occurred.
 
 ```javascript
-  // Will cause an error because mongodb has an _id index by default that
-  // is not sparse
-  animalSchema.index({ _id: 1 }, { sparse: true });
-  const Animal = mongoose.model('Animal', animalSchema);
+// Will cause an error because mongodb has an _id index by default that
+// is not sparse
+animalSchema.index({ _id: 1 }, { sparse: true });
+const Animal = mongoose.model('Animal', animalSchema);
 
-  Animal.on('index', error => {
-    // "_id index cannot be sparse"
-    console.log(error.message);
-  });
+Animal.on('index', error => {
+  // "_id index cannot be sparse"
+  console.log(error.message);
+});
 ```
 
 See also the [Model#ensureIndexes](./api.html#model_Model.ensureIndexes) method.
@@ -271,21 +271,21 @@ are useful for formatting or combining fields, while setters are useful for
 de-composing a single value into multiple values for storage.
 
 ```javascript
-  // define a schema
-  const personSchema = new Schema({
-    name: {
-      first: String,
-      last: String
-    }
-  });
+// define a schema
+const personSchema = new Schema({
+  name: {
+    first: String,
+    last: String
+  }
+});
 
-  // compile our model
-  const Person = mongoose.model('Person', personSchema);
+// compile our model
+const Person = mongoose.model('Person', personSchema);
 
-  // create a document
-  const axl = new Person({
-    name: { first: 'Axl', last: 'Rose' }
-  });
+// create a document
+const axl = new Person({
+  name: { first: 'Axl', last: 'Rose' }
+});
 ```
 
 Suppose you want to print out the person's full name. You could do it yourself:

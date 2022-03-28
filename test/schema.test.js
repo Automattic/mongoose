@@ -1446,19 +1446,19 @@ describe('schema', function() {
       for (const reservedProperty of reservedProperties) {
         it(`\`${reservedProperty}\` when used as a schema path logs a warning`, async() => {
           // Arrange
-          const emitWarningSpy = sinon.stub(process, 'emitWarning').returns();
+          const emitWarningStub = sinon.stub(process, 'emitWarning').returns();
 
           // Act
           new Schema({ [reservedProperty]: String });
 
           // Assert
-          const lastWarnMessage = emitWarningSpy.args[0][0];
+          const lastWarnMessage = emitWarningStub.args[0][0];
           assert.ok(lastWarnMessage.includes(`\`${reservedProperty}\` is a reserved schema pathname`), lastWarnMessage);
         });
 
         it(`\`${reservedProperty}\` when used as a schema path doesn't log a warning if \`supressReservedKeysWarning\` is true`, async() => {
           // Arrange
-          const emitWarningSpy = sinon.stub(process, 'emitWarning').returns();
+          const emitWarningStub = sinon.stub(process, 'emitWarning').returns();
 
 
           // Act
@@ -1467,7 +1467,7 @@ describe('schema', function() {
             { supressReservedKeysWarning: true }
           );
 
-          const lastWarnMessage = emitWarningSpy.args[0] && emitWarningSpy.args[0][0];
+          const lastWarnMessage = emitWarningStub.args[0] && emitWarningStub.args[0][0];
 
           // Assert
           assert.strictEqual(lastWarnMessage, undefined);

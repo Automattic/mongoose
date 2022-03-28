@@ -8,7 +8,7 @@ declare module 'mongoose' {
      *
      * @default false
      */
-     allowDiskUse?: boolean;
+    allowDiskUse?: boolean;
     /**
      * Set to `false` to skip applying global plugins to child schemas.
      *

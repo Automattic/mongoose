@@ -124,9 +124,9 @@ declare module 'mongoose' {
   }
 
   export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any,
+    TStaticMethods = {},
     TPathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
-    DocType extends ObtainDocumentType<DocType, EnforcedDocType, TPathTypeKey> = ObtainDocumentType<any, EnforcedDocType, TPathTypeKey>,
-    TStaticMethods = {}>
+    DocType extends ObtainDocumentType<DocType, EnforcedDocType, TPathTypeKey> = ObtainDocumentType<any, EnforcedDocType, TPathTypeKey>>
     extends events.EventEmitter {
     /**
      * Create a new schema

@@ -69,7 +69,7 @@ declare module 'mongoose' {
     options?: CompileModelOptions
   ): U extends Model<any>
     ? U
-    : Model<T & InferSchemaType<TSchema>, TQueryHelpers, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema>;
+    : Model<T & InferSchemaType<TSchema>, TQueryHelpers & ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema>;
 
   /** Returns an array of model names created on this instance of Mongoose. */
   export function modelNames(): Array<string>;
@@ -131,7 +131,7 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<TPathTypeKey, TStaticMethods, TInstanceMethods>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<TPathTypeKey, TStaticMethods, TInstanceMethods, TQueryHelpers>);
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;

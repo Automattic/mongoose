@@ -1,6 +1,6 @@
 import { Schema, model, Model, Document, Types } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
-import { m0_0aModel } from './models.test';
+import { autoTypedModel } from './models.test';
 import { M0_0aAutoTypedSchemaType } from './schema.test';
 
 const Drink = model('Drink', new Schema({
@@ -185,8 +185,8 @@ async function gh11598() {
   doc.populate('favoritDrink', undefined, model('temp', new Schema()));
 }
 
-async function m0_0aDocument() {
-  const AutoTypedModel = await m0_0aModel();
+function m0_0aDocument() {
+  const AutoTypedModel = autoTypedModel();
   const AutoTypeModelInstance = new AutoTypedModel({ unExistProperty: 1, description: 2 });
 
   expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);

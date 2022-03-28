@@ -1,4 +1,4 @@
-import { Schema, Document, SchemaDefinition, Model, Types, InferSchemaType, SchemaType } from 'mongoose';
+import { Schema, Document, SchemaDefinition, Model, Types, InferSchemaType, SchemaType, Query } from 'mongoose';
 import { expectType, expectError } from 'tsd';
 
 enum Genre {
@@ -319,73 +319,8 @@ function gh10900(): void {
     menuStatus: { type: Schema.Types.Mixed, default: {} }
   });
 }
-export type M0_0aAutoTypedSchemaType = {
-  schema: {
-    userName: string;
-    description?: string;
-    nested?: {
-      age: number;
-      hobby?: string
-    },
-    favoritDrink?: 'Tea' | 'Coffee',
-    favoritColorMode: 'dark' | 'light'
-  }
-  , statics: {
-    staticFn: () => 'Returned from staticFn'
-  },
-  methods: {
-    instanceFn: () => 'Returned from DocumentInstanceFn'
-  }
-};
 
-export function m0_0aSchema() {
-  const AutoTypedSchema = new Schema({
-    userName: {
-      type: String,
-      required: [true, 'userName is required']
-    },
-    description: String,
-    nested: new Schema({
-      age: {
-        type: Number,
-        required: true
-      },
-      hobby: {
-        type: String,
-        required: false
-      }
-    }),
-    favoritDrink: {
-      type: String,
-      enum: ['Coffee', 'Tea']
-    },
-    favoritColorMode: {
-      type: String,
-      enum: {
-        values: ['dark', 'light'],
-        message: '{VALUE} is not supported'
-      },
-      required: true
-    }
-  }, {
-    statics: {
-      staticFn() {
-        return 'Returned from staticFn';
-      }
-    },
-    methods: {
-      instanceFn() {
-        return 'Returned from DocumentInstanceFn';
-      }
-    }
-  });
-
-  type InferredSchemaType = InferSchemaType<typeof AutoTypedSchema>;
-
-  expectType<M0_0aAutoTypedSchemaType['schema']>({} as InferredSchemaType);
-
-  expectError<M0_0aAutoTypedSchemaType['schema'] & { doesNotExist: boolean; }>({} as InferredSchemaType);
-
+export function autoTypedSchema() {
   // Test auto schema type obtaining with all possible path types.
 
   class Int8 extends SchemaType {
@@ -485,5 +420,79 @@ export function m0_0aSchema() {
 
   expectType<string>({} as InferSchemaType<typeof SchemaWithCustomTypeKey>['name']);
 
+  const AutoTypedSchema = new Schema({
+    userName: {
+      type: String,
+      required: [true, 'userName is required']
+    },
+    description: String,
+    nested: new Schema({
+      age: {
+        type: Number,
+        required: true
+      },
+      hobby: {
+        type: String,
+        required: false
+      }
+    }),
+    favoritDrink: {
+      type: String,
+      enum: ['Coffee', 'Tea']
+    },
+    favoritColorMode: {
+      type: String,
+      enum: {
+        values: ['dark', 'light'],
+        message: '{VALUE} is not supported'
+      },
+      required: true
+    }
+  }, {
+    statics: {
+      staticFn() {
+        return 'Returned from staticFn';
+      }
+    },
+    methods: {
+      instanceFn() {
+        return 'Returned from DocumentInstanceFn';
+      }
+    },
+    query: {
+      byUserName(userName) {
+        return this.where({ userName });
+      }
+    }
+  });
+
+  type InferredSchemaType = InferSchemaType<typeof AutoTypedSchema>;
+
+  expectType<M0_0aAutoTypedSchemaType['schema']>({} as InferredSchemaType);
+
+  expectError<M0_0aAutoTypedSchemaType['schema'] & { doesNotExist: boolean; }>({} as InferredSchemaType);
+
   return AutoTypedSchema;
 }
+
+export type M0_0aAutoTypedSchemaType = {
+  schema: {
+    userName: string;
+    description?: string;
+    nested?: {
+      age: number;
+      hobby?: string
+    },
+    favoritDrink?: 'Tea' | 'Coffee',
+    favoritColorMode: 'dark' | 'light'
+  }
+  , statics: {
+    staticFn: () => 'Returned from staticFn'
+  },
+  methods: {
+    instanceFn: () => 'Returned from DocumentInstanceFn'
+  },
+  query: {
+    byUserName: <T extends Query<unknown, unknown>>(this: T, userName: any) => T
+  }
+};

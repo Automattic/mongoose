@@ -19,10 +19,10 @@ jobs:
             mongo: 5.0.2
     name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongo }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
 
@@ -44,10 +44,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Linter
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 14
 
@@ -60,10 +60,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Typescript Types
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 12
 

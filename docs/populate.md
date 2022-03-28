@@ -491,7 +491,7 @@ storing comments. A user may comment on either a blog post or a product.
 ```javascript
 const commentSchema = new Schema({
   body: { type: String, required: true },
-  on: {
+  modelId: {
     type: Schema.Types.ObjectId,
     required: true,
     // Instead of a hardcoded model name in `ref`, `refPath` means Mongoose

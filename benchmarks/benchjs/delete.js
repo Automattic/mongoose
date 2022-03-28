@@ -91,7 +91,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     suite.add('Delete - Mongoose', {
       defer: true,
       fn: function(deferred) {
-        User.remove({_id: mIds.pop()}, function(err) {
+        User.remove({ _id: mIds.pop() }, function(err) {
           if (err) {
             throw err;
           }
@@ -101,7 +101,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Delete - Driver', {
       defer: true,
       fn: function(deferred) {
-        user.remove({_id: dIds.pop()}, function(err) {
+        user.remove({ _id: dIds.pop() }, function(err) {
           if (err) {
             throw err;
           }
@@ -124,11 +124,11 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             out.ops = item.hz;
             outObj[item.name.replace(/\s/g, '')] = out;
           });
-          console.dir(outObj, {depth: null, colors: true});
+          console.dir(outObj, { depth: null, colors: true });
         }
       });
     function next() {
-      suite.run({async: true});
+      suite.run({ async: true });
     }
   });
 });

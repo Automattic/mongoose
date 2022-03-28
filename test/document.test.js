@@ -11198,4 +11198,44 @@ describe('document', function() {
 
     await doc.validate();
   });
+
+  it('avoids setting modified on subdocument defaults (gh-11528)', async function() {
+    const textSchema = new Schema({
+      text: { type: String }
+    }, { _id: false });
+
+    const messageSchema = new Schema({
+      body: { type: textSchema, default: { text: 'hello' } },
+      date: { type: Date, default: Date.now }
+    });
+
+
+    const Message = db.model('Test', messageSchema);
+
+    const entry = await Message.create({});
+
+    const failure = await Message.findById({ _id: entry._id });
+
+    assert.deepEqual(failure.modifiedPaths(), []);
+  });
+
+  it('works when passing dot notation to mixed property (gh-1946)', async function() {
+    const schema = Schema({
+      name: String,
+      mix: { type: Schema.Types.Mixed },
+      nested: { prop: String }
+    });
+    const M = db.model('Test', schema);
+    const m1 = new M({ name: 'test', 'mix.val': 'foo', 'nested.prop': 'bar' });
+    assert.equal(m1.name, 'test');
+    assert.equal(m1.mix.val, 'foo');
+    assert.equal(m1.nested.prop, 'bar');
+    await m1.save();
+    assert.equal(m1.name, 'test');
+    assert.equal(m1.mix.val, 'foo');
+
+    const doc = await M.findById(m1);
+    assert.equal(doc.name, 'test');
+    assert.equal(doc.mix.val, 'foo');
+  });
 });

@@ -1,5 +1,5 @@
 import { Schema, Document, SchemaDefinition, Model, Types, InferSchemaType, SchemaType, Query } from 'mongoose';
-import { expectType, expectError } from 'tsd';
+import { expectType, expectError, expectAssignable, expectNotAssignable } from 'tsd';
 
 enum Genre {
   Action,
@@ -451,17 +451,19 @@ export function autoTypedSchema() {
   }, {
     statics: {
       staticFn() {
-        return 'Returned from staticFn';
+        expectAssignable<Model<any>>(this);
+        return 'Returned from staticFn' as const;
       }
     },
     methods: {
       instanceFn() {
-        return 'Returned from DocumentInstanceFn';
+        expectAssignable<Document>(this);
+        return 'Returned from DocumentInstanceFn' as const;
       }
     },
     query: {
       byUserName(userName) {
-        expectType<Query<unknown, unknown>>(this);
+        expectAssignable<Query<unknown, unknown>>(this);
         return this.where({ userName });
       }
     }

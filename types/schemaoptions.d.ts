@@ -191,12 +191,12 @@ declare module 'mongoose' {
     /**
      * Model Statics methods.
      */
-    statics?: StaticMethods,
+    statics?: Record<any, <T extends Model<any>>(this: T, ...args: any) => unknown> | StaticMethods,
 
     /**
      * Document instance methods.
      */
-    methods?: InstanceMethods,
+    methods?: Record<any, <T extends Document>(this: T, ...args: any) => unknown> | InstanceMethods,
 
     /**
      * Query helper functions

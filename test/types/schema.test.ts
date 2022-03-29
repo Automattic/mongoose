@@ -1,4 +1,4 @@
-import { Schema, Document, SchemaDefinition, Model, Types, InferSchemaType, SchemaType, Query } from 'mongoose';
+import { Schema, Document, SchemaDefinition, Model, Types, InferSchemaType, SchemaType, Query, HydratedDocument } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 
 enum Genre {
@@ -457,7 +457,7 @@ export function autoTypedSchema() {
     },
     methods: {
       instanceFn() {
-        expectAssignable<Document<any, any, M0_0aAutoTypedSchemaType['schema']>>(this);
+        expectType<HydratedDocument<M0_0aAutoTypedSchemaType['schema']>>(this);
         return 'Returned from DocumentInstanceFn' as const;
       }
     },

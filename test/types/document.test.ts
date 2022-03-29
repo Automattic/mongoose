@@ -199,6 +199,6 @@ function m0_0aDocument() {
   /*                           Document-Methods-tests                           */
   /* -------------------------------------------------------------------------- */
 
-  expectType<ReturnType<M0_0aAutoTypedSchemaType['methods']['instanceFn']>>(AutoTypeModelInstance.instanceFn());
+  expectType<ReturnType<M0_0aAutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
 
 }

@@ -292,5 +292,6 @@ async function gh11602(): Promise<void> {
 
 function autoTypedQuery() {
   const AutoTypedModel = autoTypedModel();
-  expectType<M0_0aAutoTypedSchemaType['query']['byUserName']>(AutoTypedModel.find().byUserName);
+  const query = AutoTypedModel.find();
+  expectType<typeof query>(AutoTypedModel.find().byUserName(''));
 }

@@ -461,6 +461,7 @@ export function autoTypedSchema() {
     },
     query: {
       byUserName(userName) {
+        expectType<Query<unknown, unknown>>(this);
         return this.where({ userName });
       }
     }
@@ -492,7 +493,4 @@ export type M0_0aAutoTypedSchemaType = {
   methods: {
     instanceFn: () => 'Returned from DocumentInstanceFn'
   },
-  query: {
-    byUserName: <T extends Query<unknown, unknown>>(this: T, userName: any) => T
-  }
 };

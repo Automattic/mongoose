@@ -201,6 +201,6 @@ declare module 'mongoose' {
     /**
      * Query helper functions
      */
-    query?: Record<any, <T extends Query<unknown, unknown>>(this: T, ...args: any) => T> | QueryHelpers,
+    query?: Record<any, <T extends QueryWithHelpers<unknown, unknown>>(this: T, ...args: any) => T> | QueryHelpers,
   }
 }

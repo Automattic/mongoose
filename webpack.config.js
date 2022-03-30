@@ -2,9 +2,7 @@
 
 const paths = require('path');
 
-const base = require('./webpack.base.config.js');
-
-const webpackConfig = Object.assign({}, base, {
+const webpackConfig = {
   entry: require.resolve('./browser.js'),
   output: {
     filename: './dist/browser.umd.js',
@@ -17,8 +15,33 @@ const webpackConfig = Object.assign({}, base, {
   },
   externals: [
     /^node_modules\/.+$/
-  ]
-});
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        include: [
+          /\/mongoose\//i,
+          /\/kareem\//i
+        ],
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env']
+        }
+      }
+    ]
+  },
+
+  resolve: {
+    fallback: {
+      assert: require.resolve('assert-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      stream: require.resolve('stream-browserify')
+    }
+  },
+  target: 'web',
+  mode: 'production'
+};
 
 module.exports = webpackConfig;
 

@@ -38,3 +38,7 @@ function connectionStates() {
 
   m.Promise = Promise;
 }
+function gh11478() {
+  mongoose.set('allowDiskUse', false);
+  mongoose.set('allowDiskUse', true);
+}

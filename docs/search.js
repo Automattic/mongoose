@@ -7,7 +7,7 @@ const fs = require('fs');
 const pug = require('pug');
 const mongoose = require('../');
 
-const markdown = require('marked');
+const { marked: markdown } = require('marked');
 const highlight = require('highlight.js');
 markdown.setOptions({
   highlight: function(code) {
@@ -47,7 +47,7 @@ for (const filename of files) {
     }
   } else if (file.markdown) {
     let text = fs.readFileSync(filename, 'utf8');
-    text = markdown(text);
+    text = markdown.parse(text);
 
     const content = new Content({
       title: file.title,

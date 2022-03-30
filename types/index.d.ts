@@ -178,7 +178,7 @@ declare module 'mongoose' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface ClientSession extends mongodb.ClientSession { }
 
-   /*
+  /*
    * section collection.js
    * http://mongoosejs.com/docs/api.html#collection-js
    */
@@ -231,7 +231,9 @@ declare module 'mongoose' {
   }
 
   type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
-  interface AnyObject { [k: string]: any }
+  interface AnyObject {
+    [k: string]: any
+  }
 
   type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
 
@@ -906,22 +908,22 @@ declare module 'mongoose' {
   type SchemaDefinitionWithBuiltInClass<T> = T extends number
     ? NumberSchemaDefinition
     : T extends string
-    ? StringSchemaDefinition
-    : T extends boolean
-    ? BooleanSchemaDefinition
-    : T extends NativeDate
-    ? DateSchemaDefinition
-    : (Function | string);
+      ? StringSchemaDefinition
+      : T extends boolean
+        ? BooleanSchemaDefinition
+        : T extends NativeDate
+          ? DateSchemaDefinition
+          : (Function | string);
 
   type SchemaDefinitionProperty<T = undefined> = SchemaDefinitionWithBuiltInClass<T> |
-    SchemaTypeOptions<T extends undefined ? any : T> |
+  SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
-    Schema<any, any, any> |
-    Schema<any, any, any>[] |
-    SchemaTypeOptions<T extends undefined ? any : Unpacked<T>>[] |
-    Function[] |
-    SchemaDefinition<T> |
-    SchemaDefinition<Unpacked<T>>[] |
+  Schema<any, any, any> |
+  Schema<any, any, any>[] |
+  SchemaTypeOptions<T extends undefined ? any : Unpacked<T>>[] |
+  Function[] |
+  SchemaDefinition<T> |
+  SchemaDefinition<Unpacked<T>>[] |
     typeof SchemaTypes.Mixed;
 
   type SchemaDefinition<T = undefined> = T extends undefined
@@ -939,20 +941,20 @@ declare module 'mongoose' {
 
   export class SchemaTypeOptions<T> {
     type?:
-      T extends string ? StringSchemaDefinition :
+    T extends string ? StringSchemaDefinition :
       T extends number ? NumberSchemaDefinition :
-      T extends boolean ? BooleanSchemaDefinition :
-      T extends NativeDate ? DateSchemaDefinition :
-      T extends Map<any, any> ? SchemaDefinition<typeof Map> :
-      T extends Buffer ? SchemaDefinition<typeof Buffer> :
-      T extends Types.ObjectId ? ObjectIdSchemaDefinition :
-      T extends Types.ObjectId[] ? AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId>> :
-      T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>>> | AnyArray<SchemaTypeOptions<Unpacked<T>>>) :
-      T extends string[] ? AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string>> :
-      T extends number[] ? AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number>> :
-      T extends boolean[] ? AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean>> :
-      T extends Function[] ? AnyArray<Function | string> | AnyArray<SchemaTypeOptions<Unpacked<T>>> :
-      T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T> | Function | AnyArray<Function>;
+        T extends boolean ? BooleanSchemaDefinition :
+          T extends NativeDate ? DateSchemaDefinition :
+            T extends Map<any, any> ? SchemaDefinition<typeof Map> :
+              T extends Buffer ? SchemaDefinition<typeof Buffer> :
+                T extends Types.ObjectId ? ObjectIdSchemaDefinition :
+                  T extends Types.ObjectId[] ? AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId>> :
+                    T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>>> | AnyArray<SchemaTypeOptions<Unpacked<T>>>) :
+                      T extends string[] ? AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string>> :
+                        T extends number[] ? AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number>> :
+                          T extends boolean[] ? AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean>> :
+                            T extends Function[] ? AnyArray<Function | string> | AnyArray<SchemaTypeOptions<Unpacked<T>>> :
+                              T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T> | Function | AnyArray<Function>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;
@@ -1097,7 +1099,7 @@ declare module 'mongoose' {
   export type PopulatedDoc<
     PopulatedType,
     RawId extends RefType = (PopulatedType extends { _id?: RefType; } ? NonNullable<PopulatedType['_id']> : mongoose.Types.ObjectId) | undefined
-    > = PopulatedType | RawId;
+  > = PopulatedType | RawId;
 
   interface IndexOptions extends mongodb.CreateIndexesOptions {
     /**
@@ -1465,17 +1467,17 @@ declare module 'mongoose' {
     }
   }
 
-  type ReturnsNewDoc = { new: true } | { returnOriginal: false } | {returnDocument: 'after'};
+  type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
 
   type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType> = Query<ResultType, DocType, THelpers, RawDocType> & THelpers;
 
-  type UnpackedIntersection<T, U> = T extends (infer A)[]
+  type UnpackedIntersection<T, U> = T extends null ? null : T extends (infer A)[]
     ? (Omit<A, keyof U> & U)[]
     : keyof U extends never
-    ? T
-  : Omit<T, keyof U> & U;
+      ? T
+      : Omit<T, keyof U> & U;
 
-  type ProjectionFields<DocType> = {[Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any} & Record<string, any>;
+  type ProjectionFields<DocType> = { [Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any } & Record<string, any>;
 
   class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
     _mongooseOptions: MongooseQueryOptions;
@@ -1774,8 +1776,8 @@ declare module 'mongoose' {
     polygon(path: string, ...coordinatePairs: number[][]): this;
 
     /** Specifies paths which should be populated with other documents. */
-    populate<Paths = {}>(path: string | string[], select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
-    populate<Paths = {}>(options: PopulateOptions | (PopulateOptions | string)[]): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, RawDocType>;
+    populate<Paths = {}>(path: string | string[], select?: string | any, model?: string | Model<any, THelpers>, match?: any): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, UnpackedIntersection<RawDocType, Paths>>;
+    populate<Paths = {}>(options: PopulateOptions | (PopulateOptions | string)[]): QueryWithHelpers<UnpackedIntersection<ResultType, Paths>, DocType, THelpers, UnpackedIntersection<RawDocType, Paths>>;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
     projection(): ProjectionFields<DocType> | null;
@@ -1965,10 +1967,10 @@ declare module 'mongoose' {
     $or?: Array<FilterQuery<T>>;
     /** @see https://docs.mongodb.com/manual/reference/operator/query/text */
     $text?: {
-        $search: string;
-        $language?: string;
-        $caseSensitive?: boolean;
-        $diacriticSensitive?: boolean;
+      $search: string;
+      $language?: string;
+      $caseSensitive?: boolean;
+      $diacriticSensitive?: boolean;
     };
     /** @see https://docs.mongodb.com/manual/reference/operator/query/where/#op._S_where */
     $where?: string | Function;
@@ -1985,7 +1987,7 @@ declare module 'mongoose' {
   type _FilterQuery<T> = {
     [P in keyof T]?: Condition<T[P]>;
   } &
-    RootQuerySelector<T>;
+  RootQuerySelector<T>;
 
   /**
    * Filter query to select the documents that match the query
@@ -2032,21 +2034,21 @@ declare module 'mongoose' {
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: {
-        [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
+      [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
     };
   };
 
   type UpdateWithAggregationPipeline = UpdateAggregationStage[];
   type UpdateAggregationStage = { $addFields: any } |
-    { $set: any } |
-    { $project: any } |
-    { $unset: any } |
-    { $replaceRoot: any } |
-    { $replaceWith: any };
+  { $set: any } |
+  { $project: any } |
+  { $unset: any } |
+  { $replaceRoot: any } |
+  { $replaceWith: any };
 
   type __UpdateDefProperty<T> =
     [Extract<T, mongodb.ObjectId>] extends [never] ? T :
-    T | string;
+      T | string;
   type _UpdateQueryDef<T> = {
     [K in keyof T]?: __UpdateDefProperty<T[K]>;
   };
@@ -2062,28 +2064,28 @@ declare module 'mongoose' {
 
   export type DocumentDefinition<T> = {
     [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:
-      [Extract<T[K], mongodb.ObjectId>] extends [never]
+    [Extract<T[K], mongodb.ObjectId>] extends [never]
       ? T[K] extends TreatAsPrimitives
         ? T[K]
         : LeanDocumentElement<T[K]>
       : T[K] | string;
-    };
+  };
 
   export type FlattenMaps<T> = {
     [K in keyof T]: T[K] extends Map<any, any>
       ? AnyObject : T[K] extends TreatAsPrimitives
-      ? T[K] : FlattenMaps<T[K]>;
+        ? T[K] : FlattenMaps<T[K]>;
   };
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   type TreatAsPrimitives = actualPrimitives |
-    NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
+  NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
 
   type LeanType<T> =
     0 extends (1 & T) ? T : // any
-    T extends TreatAsPrimitives ? T : // primitives
-    T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> : // subdocs
-    LeanDocument<T>; // Documents and everything else
+      T extends TreatAsPrimitives ? T : // primitives
+        T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> : // subdocs
+          LeanDocument<T>; // Documents and everything else
 
   type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
@@ -2096,8 +2098,8 @@ declare module 'mongoose' {
   // This is required for PopulatedDoc.
   type LeanDocumentElement<T> =
     T extends unknown[] ? LeanArray<T> : // Array
-    T extends Document ? LeanDocument<T> : // Subdocument
-    T;
+      T extends Document ? LeanDocument<T> : // Subdocument
+        T;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 
@@ -2110,13 +2112,13 @@ declare module 'mongoose' {
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :
-    T extends Document ? LeanDocument<T> :
-    T;
+      T extends Document ? LeanDocument<T> :
+        T;
 
   export type LeanDocumentOrArrayWithRawType<T, RawDocType> = 0 extends (1 & T) ? T :
     T extends unknown[] ? RawDocType[] :
-    T extends Document ? RawDocType :
-    T;
+      T extends Document ? RawDocType :
+        T;
 
   class Aggregate<R> {
     /**

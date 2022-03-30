@@ -74,6 +74,9 @@ html(lang='en')
                   a.pure-menu-link(href="/docs/tutorials/ssl.html", class=outputUrl === '/docs/tutorials/ssl.html' ? 'selected' : '') SSL Connections
               li.pure-menu-item.sub-item
                 a.pure-menu-link(href="/docs/models.html", class=outputUrl === '/docs/models.html' ? 'selected' : '') Models
+              - if (['/docs/models', '/docs/change-streams'].some(path => outputUrl.startsWith(path)))
+                li.pure-menu-item.tertiary-item
+                  a.pure-menu-link(href="/docs/change-streams.html", class=outputUrl === '/docs/change-streams.html' ? 'selected' : '') Change Streams
               li.pure-menu-item.sub-item
                 a.pure-menu-link(href="/docs/documents.html", class=outputUrl === '/docs/documents.html' ? 'selected' : '') Documents
               li.pure-menu-item.sub-item

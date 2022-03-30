@@ -88,7 +88,9 @@ async function insertManyTest() {
 
 function schemaStaticsWithoutGenerics() {
   const UserSchema = new Schema({});
-  UserSchema.statics.static1 = function() { return ''; };
+  UserSchema.statics.static1 = function() {
+    return '';
+  };
 
   interface IUserDocument extends Document {
     instanceField: string;

@@ -14,7 +14,9 @@ expectType<Model<{ name: string }>>(conn.model<{ name: string }>('Test', new Sch
 
 expectType<Promise<Connection>>(conn.openUri('mongodb://localhost:27017/test'));
 expectType<Promise<Connection>>(conn.openUri('mongodb://localhost:27017/test', { bufferCommands: true }));
-expectType<Connection>(conn.openUri('mongodb://localhost:27017/test', { bufferCommands: true }, (err, value) => { expectType<Connection>(value); }));
+expectType<Connection>(conn.openUri('mongodb://localhost:27017/test', { bufferCommands: true }, (err, value) => {
+  expectType<Connection>(value);
+}));
 
 conn.readyState === 0;
 conn.readyState === 99;
@@ -71,19 +73,35 @@ expectType<mongodb.Collection>(conn.db.collection('test'));
 
 expectType<Promise<mongodb.ClientSession>>(conn.startSession());
 expectType<Promise<mongodb.ClientSession>>(conn.startSession({ causalConsistency: true }));
-expectType<void>(conn.startSession((err, res) => { expectType<mongodb.ClientSession>(res); }));
-expectType<void>(conn.startSession(undefined, (err, res) => { expectType<mongodb.ClientSession>(res); }));
-expectType<void>(conn.startSession(null, (err, res) => { expectType<mongodb.ClientSession>(res); }));
-expectType<void>(conn.startSession({}, (err, res) => { expectType<mongodb.ClientSession>(res); }));
+expectType<void>(conn.startSession((err, res) => {
+  expectType<mongodb.ClientSession>(res);
+}));
+expectType<void>(conn.startSession(undefined, (err, res) => {
+  expectType<mongodb.ClientSession>(res);
+}));
+expectType<void>(conn.startSession(null, (err, res) => {
+  expectType<mongodb.ClientSession>(res);
+}));
+expectType<void>(conn.startSession({}, (err, res) => {
+  expectType<mongodb.ClientSession>(res);
+}));
 
 expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes());
 expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes({ continueOnError: true }));
 expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes({ background: true }));
 
-expectType<void>(conn.syncIndexes(undefined, (err, value) => { expectType<ConnectionSyncIndexesResult>(value); }));
-expectType<void>(conn.syncIndexes(null, (err, value) => { expectType<ConnectionSyncIndexesResult>(value); }));
-expectType<void>(conn.syncIndexes({ continueOnError: true }, (err, value) => { expectType<ConnectionSyncIndexesResult>(value); }));
-expectType<void>(conn.syncIndexes({ background: true }, (err, value) => { expectType<ConnectionSyncIndexesResult>(value); }));
+expectType<void>(conn.syncIndexes(undefined, (err, value) => {
+  expectType<ConnectionSyncIndexesResult>(value);
+}));
+expectType<void>(conn.syncIndexes(null, (err, value) => {
+  expectType<ConnectionSyncIndexesResult>(value);
+}));
+expectType<void>(conn.syncIndexes({ continueOnError: true }, (err, value) => {
+  expectType<ConnectionSyncIndexesResult>(value);
+}));
+expectType<void>(conn.syncIndexes({ background: true }, (err, value) => {
+  expectType<ConnectionSyncIndexesResult>(value);
+}));
 
 expectType<Connection>(conn.useDb('test'));
 expectType<Connection>(conn.useDb('test', {}));

@@ -2401,7 +2401,7 @@ describe('model: querying:', function() {
 
     it('removes the __v property if versionKey: false is set (gh-8934)', async function() {
       const title = 'Wooooot ' + random();
-      const post = await BlogPostB.create({ title });
+      await BlogPostB.create({ title });
       const foundPost = await BlogPostB.find({ title }).lean({ versionKey: false });
       assert.strictEqual(foundPost.__v, undefined);
       const anotherFoundPost = await BlogPostB.findOne({ title }).lean({ versionKey: false });

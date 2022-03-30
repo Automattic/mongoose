@@ -1941,8 +1941,9 @@ describe('model', function() {
       }
     }, { _id: false });
     const batchSchema = new Schema({ events: [eventSchema], mainEvent: { type: eventSchema, discriminators: { Clicked: clickedSchema } } });
-
+    const arraySchema = new Schema({ arrayEvent: [{ type: eventSchema, discriminators: { Clicked: clickedSchema } }] });
     const Batch = db.model('Batch', batchSchema);
+    const Arrays = db.model('Array', arraySchema);
 
     const batch = await Batch.create({
       events: [{ message: 'Hello World' }],
@@ -1950,5 +1951,11 @@ describe('model', function() {
     });
 
     assert(batch.mainEvent.element);
+
+    const array = await Arrays.create({
+      arrayEvent: [{ message: 'An array', element: 'with discriminators', kind: 'Clicked' }]
+    });
+
+    assert(array.arrayEvent[0].element);
   });
 });

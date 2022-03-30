@@ -248,7 +248,11 @@ declare module 'mongoose' {
 
   interface ModifyResult<T> {
     value: Require_id<T> | null;
-    lastErrorObject?: mongodb.Document;
+    /** see https://www.mongodb.com/docs/manual/reference/command/findAndModify/#lasterrorobject */
+    lastErrorObject?: {
+      updatedExisting?: boolean;
+      upserted?: mongodb.ObjectId;
+    };
     ok: 0 | 1;
   }
 

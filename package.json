@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "6.2.8",
+  "version": "6.2.9",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -30,11 +30,11 @@
   "devDependencies": {
     "@babel/core": "7.17.8",
     "@babel/preset-env": "7.16.11",
-    "@typescript-eslint/eslint-plugin": "5.16.0",
-    "@typescript-eslint/parser": "5.16.0",
-    "acquit": "1.x",
-    "acquit-ignore": "0.2.x",
-    "acquit-require": "0.1.x",
+    "@typescript-eslint/eslint-plugin": "5.17.0",
+    "@typescript-eslint/parser": "5.17.0",
+    "acquit": "1.2.1",
+    "acquit-ignore": "0.2.0",
+    "acquit-require": "0.1.1",
     "axios": "0.26.1",
     "babel-loader": "8.2.4",
     "benchmark": "2.1.4",
@@ -71,7 +71,7 @@
     "release-legacy": "git pull origin 5.x && git push origin 5.x --tags && npm publish --tag legacy",
     "mongo": "node ./tools/repl.js",
     "test": "mocha --exit ./test/*.test.js",
-    "test-tsd": "tsd",
+    "test-tsd": "node ./test/types/check-types-filename && tsd",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-coverage": "nyc --reporter=html --reporter=text npm test"
   },

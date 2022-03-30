@@ -5153,6 +5153,20 @@ describe('Model', function() {
             doc._id.toHexString());
         });
 
+        it('using next() and hasNext() (gh-11527)', async function() {
+          const MyModel = db.model('Test', new Schema({ name: String }));
+
+          const changeStream = await MyModel.watch();
+
+          let p = Promise.all([changeStream.next(), changeStream.hasNext()]);
+          const doc = await MyModel.create({ name: 'Ned Stark' });
+
+          const [changeData] = await p;
+          assert.equal(changeData.operationType, 'insert');
+          assert.equal(changeData.fullDocument._id.toHexString(),
+            doc._id.toHexString());
+        });
+
         it('respects discriminators (gh-11007)', async function() {
           const BaseModel = db.model('Test', new Schema({ name: String }));
           const ChildModel = BaseModel.discriminator('Test1', new Schema({ email: String }));
@@ -5196,7 +5210,7 @@ describe('Model', function() {
           const MyModel = db.model('Test', new Schema({}));
           const changeStream = MyModel.watch();
           const ready = new global.Promise(resolve => {
-            changeStream.once('ready', () => {
+            changeStream.once('data', () => {
               resolve(true);
             });
             setTimeout(resolve, 500, false);

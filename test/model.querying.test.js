@@ -2399,17 +2399,15 @@ describe('model: querying:', function() {
       });
     });
 
-    it('removes the __v property if versionKey: false is set (gh-8934)', function(done) {
+    it('removes the __v property if versionKey: false is set (gh-8934)', async function() {
       const title = 'Wooooot ' + random();
-
-      const post = new BlogPostB();
-      post.set('title', title);
-      post.save(function(err) {
-        BlogPostB.find({ title: title }).lean({ versionKey: false }).exec(function(err, docs) {
-          assert(docs[0].__v === undefined);
-          done();
-        });
-      });
+      const post = await BlogPostB.create({ title });
+      const foundPost = await BlogPostB.find({ title }).lean({ versionKey: false });
+      assert.strictEqual(foundPost.__v, undefined);
+      const anotherFoundPost = await BlogPostB.findOne({ title }).lean({ versionKey: false });
+      assert.strictEqual(anotherFoundPost.__v, undefined);
+      const updateFoundPost = await BlogPostB.findOneAndUpdate({ title: title }, { title: 'Woooot' }).lean({ versionKey: false });
+      assert.strictEqual(updateFoundPost.__v, undefined);
     });
 
     it('findOne', function(done) {

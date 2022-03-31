@@ -5158,7 +5158,7 @@ describe('Model', function() {
 
           const changeStream = await MyModel.watch();
 
-          let p = Promise.all([changeStream.next(), changeStream.hasNext()]);
+          const p = Promise.all([changeStream.next(), changeStream.hasNext()]);
           const doc = await MyModel.create({ name: 'Ned Stark' });
 
           const [changeData] = await p;

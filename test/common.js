@@ -66,7 +66,7 @@ Collection.prototype.onClose = function() {
 
 /**
  * Create a connection to the test database.
- * You can set the environmental variable MONGOOSE_TEST_URI to override this.
+ * You can set the environment variable MONGOOSE_TEST_URI to override this.
  *
  * @api private
  */
@@ -169,6 +169,20 @@ function dropDBs(done) {
   });
 }
 
+before(async function() {
+  this.timeout(60000);
+  if (process.env.START_REPLICA_SET) {
+    const uri = await startReplicaSet();
+
+    module.exports.uri = uri;
+    module.exports.uri2 = uri.replace('mongoose_test', 'mongoose_test2');
+
+    process.env.REPLICA_SET = 'rs0';
+
+    await mongoose.connect(uri);
+    await mongoose.connection.db.collection('test').findOne();
+  }
+});
 
 before(function(done) {
   this.timeout(60 * 1000);
@@ -202,3 +216,34 @@ process.on('unhandledRejection', function(error, promise) {
   }
   throw error;
 });
+
+async function startReplicaSet() {
+  const ReplSet = require('mongodb-memory-server').MongoMemoryReplSet;
+
+  // Create new instance
+  const replSet = new ReplSet({
+    binary: {
+      version: '5.0.4'
+    },
+    instanceOpts: [
+      // Set the expiry job in MongoDB to run every second
+      {
+        port: 27017,
+        args: ['--setParameter', 'ttlMonitorSleepSecs=1']
+      }
+    ],
+    dbName: 'mongoose_test',
+    replSet: {
+      name: 'rs0',
+      count: 2,
+      storageEngine: 'wiredTiger'
+    }
+  });
+
+  await replSet.start();
+  await replSet.waitUntilRunning();
+
+  await new Promise(resolve => setTimeout(resolve, 10000));
+
+  return replSet.getUri('mongoose_test');
+}

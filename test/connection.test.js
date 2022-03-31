@@ -865,10 +865,13 @@ describe('connections:', function() {
   });
 
   it('useDB inherits config from default connection (gh-8267)', async function() {
-    await mongoose.connect(start.uri, { sanitizeFilter: true });
+    const m = new mongoose.Mongoose();
+    await m.connect(start.uri, { sanitizeFilter: true });
 
-    const db2 = mongoose.connection.useDb('gh8267-1');
+    const db2 = m.connection.useDb('gh8267-1');
     assert.equal(db2.config.sanitizeFilter, true);
+
+    await m.disconnect();
   });
 
   it('allows setting client on a disconnected connection (gh-9164)', async function() {

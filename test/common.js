@@ -179,8 +179,10 @@ before(async function() {
 
     process.env.REPLICA_SET = 'rs0';
 
-    await mongoose.connect(uri);
-    await mongoose.connection.db.collection('test').findOne();
+    const conn = mongoose.createConnection(uri);
+    await conn.asPromise();
+    await conn.db.collection('test').findOne();
+    await conn.close();
   }
 });
 

@@ -5,6 +5,7 @@ const start = require('./common');
 const assert = require('assert');
 const random = require('./util').random;
 const stream = require('stream');
+const SchemaObjectIdOptions = require('../lib/options/SchemaObjectIdOptions');
 
 const collection = 'blogposts_' + random();
 
@@ -910,6 +911,33 @@ describe('mongoose module:', function() {
     it('Allows a syncIndexes shorthand mongoose.syncIndexes (gh-10893)', async function() {
       const m = new mongoose.Mongoose();
       assert.deepEqual(await m.syncIndexes(), {});
+    });
+    it('Allows for the removal of indexes via string or object (gh-11547)', async function() {
+      const m = new mongoose.Mongoose();
+
+      const db = await m.connect('mongodb://localhost:27017');
+
+      const schema = new m.Schema({
+        title: String,
+        weight: Number,
+        age: Number,
+        name: String,
+        location: String
+      });
+
+      schema.index({ title: 1 });
+      schema.index({ weight: 1 });
+      schema.index({ age: 1 });
+      schema.index({ name: 1 });
+      schema.index({ location: 1 });
+      assert.equal(schema._indexes.length, 5);
+      const startingIndexes = JSON.parse(JSON.stringify(schema._indexes));
+      schema.removeIndex('title');
+      schema.removeIndex({weight: 1});
+      assert.equal(schema._indexes.length, 3);
+      assert.notDeepStrictEqual(startingIndexes, schema._indexes);
+      schema.clearIndexes();
+      assert.equal(schema._indexes.length, 0);
     });
   });
 });

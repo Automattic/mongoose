@@ -2403,11 +2403,11 @@ describe('model: querying:', function() {
       const title = 'Wooooot ' + random();
       await BlogPostB.create({ title });
       const foundPost = await BlogPostB.find({ title }).lean({ versionKey: false });
-      assert.strictEqual(foundPost.__v, undefined);
+      assert.ok(!('__v' in foundPost));
       const anotherFoundPost = await BlogPostB.findOne({ title }).lean({ versionKey: false });
-      assert.strictEqual(anotherFoundPost.__v, undefined);
+      assert.ok(!('__v' in anotherFoundPost));
       const updateFoundPost = await BlogPostB.findOneAndUpdate({ title: title }, { title: 'Woooot' }).lean({ versionKey: false });
-      assert.strictEqual(updateFoundPost.__v, undefined);
+      assert.ok(!('__v' in updateFoundPost));
     });
 
     it('findOne', function(done) {

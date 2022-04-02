@@ -135,7 +135,7 @@ describe('eachAsync()', function() {
     return eachAsync(next, fn, { batchSize, parallel });
   });
 
-  it('executes all documents and aggregates errors if continueOnError set (gh-6355)', () => {
+  it('executes all documents and aggregates errors if continueOnError set (gh-6355)', async() => {
     const max = 3;
     let numCalled = 0;
     function next(cb) {
@@ -151,18 +151,17 @@ describe('eachAsync()', function() {
       return doc.num % 2 === 1 ? Promise.reject(new Error(`Doc number ${doc.num}`)) : null;
     }
 
-    return eachAsync(next, fn, { continueOnError: true }).
-      then(() => { throw new Error('Expected error'); },
-        err => {
-          assert.ok(err);
-          assert.equal(err.name, 'EachAsyncMultiError');
-          assert.equal(err.errors.length, 2);
-          assert.equal(err.errors[0].message, 'Doc number 1');
-          assert.equal(err.errors[1].message, 'Doc number 3');
-        });
+    const err = await eachAsync(next, fn, { continueOnError: true }).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'EachAsyncMultiError');
+    assert.ok(err.message.includes('Doc number 1'));
+    assert.ok(err.message.includes('Doc number 3'));
+    assert.equal(err.errors.length, 2);
+    assert.equal(err.errors[0].message, 'Doc number 1');
+    assert.equal(err.errors[1].message, 'Doc number 3');
   });
 
-  it('returns aggregated error fetching documents with continueOnError (gh-6355)', () => {
+  it('returns aggregated error fetching documents with continueOnError (gh-6355)', async() => {
     const max = 3;
     let numCalled = 0;
     function next(cb) {
@@ -181,14 +180,12 @@ describe('eachAsync()', function() {
       return null;
     }
 
-    return eachAsync(next, fn, { continueOnError: true }).
-      then(() => { throw new Error('Expected error'); },
-        err => {
-          assert.ok(err);
-          assert.equal(err.name, 'EachAsyncMultiError', err);
-          assert.equal(err.errors.length, 1);
-          assert.equal(err.errors[0].message, 'Fetching doc 1');
-          assert.equal(numCalled, 1);
-        });
+    const err = await eachAsync(next, fn, { continueOnError: true }).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'EachAsyncMultiError', err);
+    assert.ok(err.message.includes('Fetching doc 1'));
+    assert.equal(err.errors.length, 1);
+    assert.equal(err.errors[0].message, 'Fetching doc 1');
+    assert.equal(numCalled, 1);
   });
 });

@@ -31,9 +31,9 @@ declare module 'mongoose' {
      * will wait for the promise to resolve before iterating on to the next one.
      * Returns a promise that resolves when done.
      */
-    eachAsync(fn: (doc: DocType[]) => any, options: EachAsyncOptions, callback: CallbackWithoutResult): void;
+    eachAsync(fn: (doc: DocType[]) => any, options: EachAsyncOptions & { batchSize: number }, callback: CallbackWithoutResult): void;
     eachAsync(fn: (doc: DocType) => any, options: EachAsyncOptions, callback: CallbackWithoutResult): void;
-    eachAsync(fn: (doc: DocType[]) => any, options: EachAsyncOptions): Promise<void>;
+    eachAsync(fn: (doc: DocType[]) => any, options: EachAsyncOptions & { batchSize: number }): Promise<void>;
     eachAsync(fn: (doc: DocType) => any, options?: EachAsyncOptions): Promise<void>;
 
     /**

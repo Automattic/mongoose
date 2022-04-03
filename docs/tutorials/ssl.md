@@ -15,7 +15,7 @@ the `ssl` option defaults to `true` for connection strings that start with `mong
 If you try to connect to a MongoDB cluster that requires SSL without enabling the `ssl` option, `mongoose.connect()`
 will error out with the below error:
 
-```javascript
+```no-highlight
 MongooseServerSelectionError: connection <monitor> to 127.0.0.1:27017 closed
     at NativeConnection.Connection.openUri (/node_modules/mongoose/lib/connection.js:800:32)
     ...
@@ -40,7 +40,7 @@ SSL correctly, but there's some issue with the SSL certificate.
 
 For example, a common issue is the below error message:
 
-```
+```no-highlight
 MongooseServerSelectionError: unable to verify the first certificate
 ```
 
@@ -62,7 +62,7 @@ await mongoose.connect('mongodb://localhost:27017/test', {
 
 Another common issue is the below error message:
 
-```
+```no-highlight
 MongooseServerSelectionError: Hostname/IP does not match certificate's altnames: Host: hostname1. is not cert's CN: hostname2
 ```
 

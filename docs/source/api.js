@@ -49,7 +49,7 @@ const out = module.exports.docs;
 
 const combinedFiles = [];
 for (const file of files) {
-  const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'));
+  const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'), { raw: true });
   comments.file = file;
   combinedFiles.push(comments);
 }
@@ -121,7 +121,7 @@ function parse() {
             ctx.string = `${data.name}.${ctx.name}()`;
             break;
           case 'return':
-            tag.description = tag.description ?
+            tag.return = tag.description ?
               md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
               '';
             ctx.return = tag;
@@ -177,7 +177,10 @@ function parse() {
       ctx.description = prop.description.full.
         replace(/<br \/>/ig, ' ').
         replace(/&gt;/ig, '>');
-      ctx.description = highlight(ctx.description);
+      if (ctx.description.includes('function capitalize')) {
+        console.log('\n\n-------\n\n', ctx);
+      }
+      ctx.description = md.parse(ctx.description);
 
       data.props.push(ctx);
     }

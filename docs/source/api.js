@@ -210,6 +210,6 @@ function highlight(str) {
       code[1] = 'javascript';
     }
 
-    return $1 + hl.highlight(code[1], code[2]).value.trim() + $3;
+    return $1 + hl.highlight(code[2], { language: code[1] }).value.trim() + $3;
   });
 }

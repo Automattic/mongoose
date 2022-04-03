@@ -38,7 +38,7 @@ const renderer = {
 };
 markdown.setOptions({
   highlight: function(code) {
-    return highlight.highlight('JavaScript', code).value;
+    return highlight.highlight(code, { language: 'JavaScript' }).value;
   }
 });
 markdown.use({ renderer });

@@ -44,10 +44,14 @@ async function run() {
     totalTime += _totalTime;
   }
 
-  console.log(instantiations / numIterations);
-  console.log(memoryUsed / numIterations);
-  console.log(checkTime / numIterations);
-  console.log(totalTime / numIterations);
+  instantiations /= numIterations;
+  memoryUsed /= numIterations;
+  checkTime /= numIterations;
+  totalTime /= numIterations;
+  console.log(instantiations);
+  console.log(memoryUsed);
+  console.log(checkTime);
+  console.log(totalTime);
 
   await persist({ instantiations, memoryUsed, checkTime, totalTime });
 }
@@ -73,4 +77,6 @@ async function persist(results) {
     { results },
     { upsert: true }
   );
+
+  await mongoose.disconnect();
 }

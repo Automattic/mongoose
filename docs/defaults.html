@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.2.9: Defaults</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><style>p { line-height: 1.5em }
-</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.2.9</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.14</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/defaults.md" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.2.10: Defaults</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.2.10</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.14</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/defaults.md" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h2 id="defaults">
       <a href="#defaults">
@@ -32,32 +32,32 @@
 a new document without that path set, the default will kick in.</p>
 <p>Note: Mongoose only applies a default if the value of the path is
 strictly <code>undefined</code>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">role</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">default</span>: <span class="hljs-string">'guitarist'</span> }
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">role</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">default</span>: <span class="hljs-string">&#x27;guitarist&#x27;</span> }
 });
 
-<span class="hljs-keyword">const</span> Person = db.model(<span class="hljs-string">'Person'</span>, schema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Person</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Person&#x27;</span>, schema);
 
-<span class="hljs-keyword">const</span> axl = <span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Axl Rose'</span>, <span class="hljs-attr">role</span>: <span class="hljs-string">'singer'</span> });
-assert.equal(axl.role, <span class="hljs-string">'singer'</span>);
+<span class="hljs-keyword">const</span> axl = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Axl Rose&#x27;</span>, <span class="hljs-attr">role</span>: <span class="hljs-string">&#x27;singer&#x27;</span> });
+assert.<span class="hljs-title function_">equal</span>(axl.<span class="hljs-property">role</span>, <span class="hljs-string">&#x27;singer&#x27;</span>);
 
-<span class="hljs-keyword">const</span> slash = <span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Slash'</span> });
-assert.equal(slash.role, <span class="hljs-string">'guitarist'</span>);
+<span class="hljs-keyword">const</span> slash = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Slash&#x27;</span> });
+assert.<span class="hljs-title function_">equal</span>(slash.<span class="hljs-property">role</span>, <span class="hljs-string">&#x27;guitarist&#x27;</span>);
 
-<span class="hljs-keyword">const</span> izzy = <span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Izzy'</span>, <span class="hljs-attr">role</span>: <span class="hljs-literal">undefined</span> });
-assert.equal(izzy.role, <span class="hljs-string">'guitarist'</span>);
+<span class="hljs-keyword">const</span> izzy = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Izzy&#x27;</span>, <span class="hljs-attr">role</span>: <span class="hljs-literal">undefined</span> });
+assert.<span class="hljs-title function_">equal</span>(izzy.<span class="hljs-property">role</span>, <span class="hljs-string">&#x27;guitarist&#x27;</span>);
 
-<span class="hljs-comment">// Defaults do **not** run on `null`, `''`, or value other than `undefined`.</span>
-<span class="hljs-keyword">const</span> foo = <span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Bar'</span>, <span class="hljs-attr">role</span>: <span class="hljs-literal">null</span> });
-assert.strictEqual(foo.role, <span class="hljs-literal">null</span>);
+<span class="hljs-comment">// Defaults do **not** run on `null`, `&#x27;&#x27;`, or value other than `undefined`.</span>
+<span class="hljs-keyword">const</span> foo = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Bar&#x27;</span>, <span class="hljs-attr">role</span>: <span class="hljs-literal">null</span> });
+assert.<span class="hljs-title function_">strictEqual</span>(foo.<span class="hljs-property">role</span>, <span class="hljs-literal">null</span>);
 
-<span class="hljs-keyword">await</span> Person.create(axl, slash);
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">create</span>(axl, slash);
     
-<span class="hljs-keyword">const</span> docs = <span class="hljs-keyword">await</span> Person.find({ <span class="hljs-attr">role</span>: <span class="hljs-string">'guitarist'</span> });
+<span class="hljs-keyword">const</span> docs = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">role</span>: <span class="hljs-string">&#x27;guitarist&#x27;</span> });
     
-assert.equal(docs.length, <span class="hljs-number">1</span>);
-assert.equal(docs[<span class="hljs-number">0</span>].name, <span class="hljs-string">'Slash'</span>);
+assert.<span class="hljs-title function_">equal</span>(docs.<span class="hljs-property">length</span>, <span class="hljs-number">1</span>);
+assert.<span class="hljs-title function_">equal</span>(docs[<span class="hljs-number">0</span>].<span class="hljs-property">name</span>, <span class="hljs-string">&#x27;Slash&#x27;</span>);
 </code></pre>
 <h3 id="default-functions">
       <a href="#default-functions">
@@ -66,22 +66,22 @@ assert.equal(docs[<span class="hljs-number">0</span>].name, <span class="hljs-st
     </h3>
 <p>You can also set the <code>default</code> schema option to a function. Mongoose will
 execute that function and use the return value as the default.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">title</span>: <span class="hljs-built_in">String</span>,
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span>,
   <span class="hljs-attr">date</span>: {
-    <span class="hljs-attr">type</span>: <span class="hljs-built_in">Date</span>,
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Date</span>,
     <span class="hljs-comment">// `Date.now()` returns the current unix timestamp as a number</span>
-    <span class="hljs-attr">default</span>: <span class="hljs-built_in">Date</span>.now
+    <span class="hljs-attr">default</span>: <span class="hljs-title class_">Date</span>.<span class="hljs-property">now</span>
   }
 });
 
-<span class="hljs-keyword">const</span> BlogPost = db.model(<span class="hljs-string">'BlogPost'</span>, schema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">BlogPost</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;BlogPost&#x27;</span>, schema);
 
-<span class="hljs-keyword">const</span> post = <span class="hljs-keyword">new</span> BlogPost({ <span class="hljs-attr">title</span>: <span class="hljs-string">'5 Best Arnold Schwarzenegger Movies'</span> });
+<span class="hljs-keyword">const</span> post = <span class="hljs-keyword">new</span> <span class="hljs-title class_">BlogPost</span>({ <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;5 Best Arnold Schwarzenegger Movies&#x27;</span> });
 
 <span class="hljs-comment">// The post has a default Date set to now</span>
-assert.ok(post.date.getTime() &gt;= <span class="hljs-built_in">Date</span>.now() - <span class="hljs-number">1000</span>);
-assert.ok(post.date.getTime() &lt;= <span class="hljs-built_in">Date</span>.now());
+assert.<span class="hljs-title function_">ok</span>(post.<span class="hljs-property">date</span>.<span class="hljs-title function_">getTime</span>() &gt;= <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>() - <span class="hljs-number">1000</span>);
+assert.<span class="hljs-title function_">ok</span>(post.<span class="hljs-property">date</span>.<span class="hljs-title function_">getTime</span>() &lt;= <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>());
 </code></pre>
 <h3 id="the-setdefaultsoninsert-option">
       <a href="#the-setdefaultsoninsert-option">
@@ -90,32 +90,32 @@ assert.ok(post.date.getTime() &lt;= <span class="hljs-built_in">Date</span>.now(
     </h3>
 <p>Mongoose also sets defaults on <code>update()</code> and <code>findOneAndUpdate()</code> when the <code>upsert</code> option is set by adding your schema&#39;s defaults to a <a href="https://docs.mongodb.org/manual/reference/operator/update/setOnInsert/">MongoDB <code>$setOnInsert</code> operator</a>.
 You can disable this behavior by setting the <code>setDefaultsOnInsert</code> option to <code>false</code>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">title</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">genre</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">default</span>: <span class="hljs-string">'Action'</span> }
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">genre</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">default</span>: <span class="hljs-string">&#x27;Action&#x27;</span> }
 });
 
-<span class="hljs-keyword">const</span> Movie = db.model(<span class="hljs-string">'Movie'</span>, schema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Movie</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Movie&#x27;</span>, schema);
 
 <span class="hljs-keyword">const</span> query = {};
-<span class="hljs-keyword">const</span> update = { <span class="hljs-attr">title</span>: <span class="hljs-string">'The Terminator'</span> };
+<span class="hljs-keyword">const</span> update = { <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;The Terminator&#x27;</span> };
 <span class="hljs-keyword">const</span> options = {
   <span class="hljs-comment">// Return the document after updates are applied</span>
   <span class="hljs-attr">new</span>: <span class="hljs-literal">true</span>,
-  <span class="hljs-comment">// Create a document if one isn't found.</span>
+  <span class="hljs-comment">// Create a document if one isn&#x27;t found.</span>
   <span class="hljs-attr">upsert</span>: <span class="hljs-literal">true</span>
 };
 
-<span class="hljs-keyword">let</span> doc = <span class="hljs-keyword">await</span> Movie.findOneAndUpdate(query, update, options).lean();
-doc.genre; <span class="hljs-comment">// 'Action', Mongoose set a default value.</span>
+<span class="hljs-keyword">let</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">findOneAndUpdate</span>(query, update, options).<span class="hljs-title function_">lean</span>();
+doc.<span class="hljs-property">genre</span>; <span class="hljs-comment">// &#x27;Action&#x27;, Mongoose set a default value.</span>
 
-<span class="hljs-keyword">await</span> Movie.deleteMany({});
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">deleteMany</span>({});
 
-doc = <span class="hljs-keyword">await</span> Movie.findOneAndUpdate(query, update, { <span class="hljs-attr">new</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">upsert</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">setDefaultsOnInsert</span>: <span class="hljs-literal">false</span> }).lean();
-doc.genre; <span class="hljs-comment">// undefined, Mongoose did not set a default value</span>
+doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">findOneAndUpdate</span>(query, update, { <span class="hljs-attr">new</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">upsert</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">setDefaultsOnInsert</span>: <span class="hljs-literal">false</span> }).<span class="hljs-title function_">lean</span>();
+doc.<span class="hljs-property">genre</span>; <span class="hljs-comment">// undefined, Mongoose did not set a default value</span>
 </code></pre>
 <p>You can also set <code>setDefaultsOnInsert</code> to <code>false</code> globally:</p>
-<pre><code class="language-javascript">mongoose.set(<span class="hljs-string">'setDefaultsOnInsert'</span>, <span class="hljs-literal">false</span>);
+<pre><code class="language-javascript">mongoose.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;setDefaultsOnInsert&#x27;</span>, <span class="hljs-literal">false</span>);
 </code></pre>
 <h3 id="default-functions-and-this">
       <a href="#default-functions-and-this">
@@ -124,32 +124,32 @@ doc.genre; <span class="hljs-comment">// undefined, Mongoose did not set a defau
     </h3>
 <p>Unless it is running on a query with <code>setDefaultsOnInsert</code>, a default
 function&#39;s <code>this</code> refers to the document.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">title</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">released</span>: <span class="hljs-built_in">Boolean</span>,
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">released</span>: <span class="hljs-title class_">Boolean</span>,
   <span class="hljs-attr">releaseDate</span>: {
-    <span class="hljs-attr">type</span>: <span class="hljs-built_in">Date</span>,
-    <span class="hljs-attr">default</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.released) {
-        <span class="hljs-keyword">return</span> <span class="hljs-built_in">Date</span>.now();
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Date</span>,
+    <span class="hljs-attr">default</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+      <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">released</span>) {
+        <span class="hljs-keyword">return</span> <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>();
       }
       <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
     }
   }
 });
 
-<span class="hljs-keyword">const</span> Movie = db.model(<span class="hljs-string">'Movie'</span>, schema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Movie</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Movie&#x27;</span>, schema);
 
-<span class="hljs-keyword">const</span> movie1 = <span class="hljs-keyword">new</span> Movie({ <span class="hljs-attr">title</span>: <span class="hljs-string">'The Terminator'</span>, <span class="hljs-attr">released</span>: <span class="hljs-literal">true</span> });
+<span class="hljs-keyword">const</span> movie1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Movie</span>({ <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;The Terminator&#x27;</span>, <span class="hljs-attr">released</span>: <span class="hljs-literal">true</span> });
 
 <span class="hljs-comment">// The post has a default Date set to now</span>
-assert.ok(movie1.releaseDate.getTime() &gt;= <span class="hljs-built_in">Date</span>.now() - <span class="hljs-number">1000</span>);
-assert.ok(movie1.releaseDate.getTime() &lt;= <span class="hljs-built_in">Date</span>.now());
+assert.<span class="hljs-title function_">ok</span>(movie1.<span class="hljs-property">releaseDate</span>.<span class="hljs-title function_">getTime</span>() &gt;= <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>() - <span class="hljs-number">1000</span>);
+assert.<span class="hljs-title function_">ok</span>(movie1.<span class="hljs-property">releaseDate</span>.<span class="hljs-title function_">getTime</span>() &lt;= <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>());
 
-<span class="hljs-keyword">const</span> movie2 = <span class="hljs-keyword">new</span> Movie({ <span class="hljs-attr">title</span>: <span class="hljs-string">'The Legend of Conan'</span>, <span class="hljs-attr">released</span>: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">const</span> movie2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Movie</span>({ <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;The Legend of Conan&#x27;</span>, <span class="hljs-attr">released</span>: <span class="hljs-literal">false</span> });
 
 <span class="hljs-comment">// Since `released` is false, the default function will return null</span>
-assert.strictEqual(movie2.releaseDate, <span class="hljs-literal">null</span>);
+assert.<span class="hljs-title function_">strictEqual</span>(movie2.<span class="hljs-property">releaseDate</span>, <span class="hljs-literal">null</span>);
 </code></pre>
 </div></div><script type="text/javascript">var xhr = new XMLHttpRequest();
 xhr.open('POST', 'https://g0a3nbw0xa.execute-api.us-east-1.amazonaws.com/prod/track', true);

@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.2.9: Query Population</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><style>p { line-height: 1.5em }
-</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.2.9</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.14</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/populate.md" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.2.10: Query Population</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.2.10</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.14</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/populate.md" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h2 id="populate">
       <a href="#populate">
@@ -25,24 +25,24 @@
 
 <p>MongoDB has the join-like <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/">$lookup</a> aggregation operator in versions &gt;= 3.2. Mongoose has a more powerful alternative called <code>populate()</code>, which lets you reference documents in other collections.</p>
 <p>Population is the process of automatically replacing the specified paths in the document with document(s) from other collection(s). We may populate a single document, multiple documents, a plain object, multiple plain objects, or all objects returned from a query. Let&#39;s look at some examples.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">const</span> { Schema } = mongoose;
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;mongoose&#x27;</span>);
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">Schema</span> } = mongoose;
 
-<span class="hljs-keyword">const</span> personSchema = Schema({
-  <span class="hljs-attr">_id</span>: Schema.Types.ObjectId,
-  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">age</span>: <span class="hljs-built_in">Number</span>,
-  <span class="hljs-attr">stories</span>: [{ <span class="hljs-attr">type</span>: Schema.Types.ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'Story'</span> }]
+<span class="hljs-keyword">const</span> personSchema = <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">_id</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>,
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span>,
+  <span class="hljs-attr">stories</span>: [{ <span class="hljs-attr">type</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Story&#x27;</span> }]
 });
 
-<span class="hljs-keyword">const</span> storySchema = Schema({
-  <span class="hljs-attr">author</span>: { <span class="hljs-attr">type</span>: Schema.Types.ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'Person'</span> },
-  <span class="hljs-attr">title</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">fans</span>: [{ <span class="hljs-attr">type</span>: Schema.Types.ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'Person'</span> }]
+<span class="hljs-keyword">const</span> storySchema = <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">author</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Person&#x27;</span> },
+  <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">fans</span>: [{ <span class="hljs-attr">type</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Person&#x27;</span> }]
 });
 
-<span class="hljs-keyword">const</span> Story = mongoose.model(<span class="hljs-string">'Story'</span>, storySchema);
-<span class="hljs-keyword">const</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, personSchema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Story</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Story&#x27;</span>, storySchema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Person</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Person&#x27;</span>, personSchema);
 </code></pre>
 <p>So far we&#39;ve created two <a href="./models.html">Models</a>. Our <code>Person</code> model has
 its <code>stories</code> field set to an array of <code>ObjectId</code>s. The <code>ref</code> option is
@@ -79,23 +79,23 @@ user and have a good reason for doing so.</p>
 
 <p>Saving refs to other documents works the same way you normally save
 properties, just assign the <code>_id</code> value:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> author = <span class="hljs-keyword">new</span> Person({
-  <span class="hljs-attr">_id</span>: <span class="hljs-keyword">new</span> mongoose.Types.ObjectId(),
-  <span class="hljs-attr">name</span>: <span class="hljs-string">'Ian Fleming'</span>,
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> author = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>({
+  <span class="hljs-attr">_id</span>: <span class="hljs-keyword">new</span> mongoose.<span class="hljs-property">Types</span>.<span class="hljs-title class_">ObjectId</span>(),
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ian Fleming&#x27;</span>,
   <span class="hljs-attr">age</span>: <span class="hljs-number">50</span>
 });
 
-author.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
-  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
+author.<span class="hljs-title function_">save</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) {
+  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleError</span>(err);
 
-  <span class="hljs-keyword">const</span> story1 = <span class="hljs-keyword">new</span> Story({
-    <span class="hljs-attr">title</span>: <span class="hljs-string">'Casino Royale'</span>,
-    <span class="hljs-attr">author</span>: author._id    <span class="hljs-comment">// assign the _id from the person</span>
+  <span class="hljs-keyword">const</span> story1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Story</span>({
+    <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Casino Royale&#x27;</span>,
+    <span class="hljs-attr">author</span>: author.<span class="hljs-property">_id</span>    <span class="hljs-comment">// assign the _id from the person</span>
   });
 
-  story1.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
-    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
-    <span class="hljs-comment">// that's it!</span>
+  story1.<span class="hljs-title function_">save</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) {
+    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleError</span>(err);
+    <span class="hljs-comment">// that&#x27;s it!</span>
   });
 });
 </code></pre>
@@ -104,13 +104,13 @@ author.save(<span class="hljs-function"><span class="hljs-keyword">function</spa
 <p>So far we haven&#39;t done anything much different. We&#39;ve merely created a
 <code>Person</code> and a <code>Story</code>. Now let&#39;s take a look at populating our story&#39;s
 <code>author</code> using the query builder:</p>
-<pre><code class="language-javascript">Story.
-  findOne({ <span class="hljs-attr">title</span>: <span class="hljs-string">'Casino Royale'</span> }).
-  populate(<span class="hljs-string">'author'</span>).
-  exec(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, story</span>) </span>{
-    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'The author is %s'</span>, story.author.name);
-    <span class="hljs-comment">// prints "The author is Ian Fleming"</span>
+<pre><code class="language-javascript"><span class="hljs-title class_">Story</span>.
+  <span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Casino Royale&#x27;</span> }).
+  <span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;author&#x27;</span>).
+  <span class="hljs-title function_">exec</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err, story</span>) {
+    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleError</span>(err);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;The author is %s&#x27;</span>, story.<span class="hljs-property">author</span>.<span class="hljs-property">name</span>);
+    <span class="hljs-comment">// prints &quot;The author is Ian Fleming&quot;</span>
   });
 </code></pre>
 <p>Populated paths are no longer set to their original <code>_id</code> , their value
@@ -123,12 +123,12 @@ array of documents will be returned <em>in place</em> of the original <code>_id<
 
 <p>You can manually populate a property by setting it to a document. The document
 must be an instance of the model your <code>ref</code> property refers to.</p>
-<pre><code class="language-javascript">Story.findOne({ <span class="hljs-attr">title</span>: <span class="hljs-string">'Casino Royale'</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, story</span>) </span>{
+<pre><code class="language-javascript"><span class="hljs-title class_">Story</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Casino Royale&#x27;</span> }, <span class="hljs-keyword">function</span>(<span class="hljs-params">error, story</span>) {
   <span class="hljs-keyword">if</span> (error) {
-    <span class="hljs-keyword">return</span> handleError(error);
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleError</span>(error);
   }
-  story.author = author;
-  <span class="hljs-built_in">console</span>.log(story.author.name); <span class="hljs-comment">// prints "Ian Fleming"</span>
+  story.<span class="hljs-property">author</span> = author;
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(story.<span class="hljs-property">author</span>.<span class="hljs-property">name</span>); <span class="hljs-comment">// prints &quot;Ian Fleming&quot;</span>
 });
 </code></pre>
 <h3 id="checking-populated"><a href="#checking-populated">Checking Whether a Field is Populated</a></h3>
@@ -136,22 +136,22 @@ must be an instance of the model your <code>ref</code> property refers to.</p>
 <p>You can call the <code>populated()</code> function to check whether a field is populated.
 If <code>populated()</code> returns a <a href="https://masteringjs.io/tutorials/fundamentals/truthy">truthy value</a>,
 you can assume the field is populated.</p>
-<pre><code class="language-javascript">story.populated(<span class="hljs-string">'author'</span>); <span class="hljs-comment">// truthy</span>
+<pre><code class="language-javascript">story.<span class="hljs-title function_">populated</span>(<span class="hljs-string">&#x27;author&#x27;</span>); <span class="hljs-comment">// truthy</span>
 
-story.depopulate(<span class="hljs-string">'author'</span>); <span class="hljs-comment">// Make `author` not populated anymore</span>
-story.populated(<span class="hljs-string">'author'</span>); <span class="hljs-comment">// undefined</span>
+story.<span class="hljs-title function_">depopulate</span>(<span class="hljs-string">&#x27;author&#x27;</span>); <span class="hljs-comment">// Make `author` not populated anymore</span>
+story.<span class="hljs-title function_">populated</span>(<span class="hljs-string">&#x27;author&#x27;</span>); <span class="hljs-comment">// undefined</span>
 </code></pre>
 <p>A common reason for checking whether a path is populated is getting the <code>author</code>
 id. However, for your convenience, Mongoose adds a <a href="/docs/api/mongoose.html#mongoose_Mongoose-set"><code>_id</code> getter to ObjectId instances</a>
 so you can use <code>story.author._id</code> regardless of whether <code>author</code> is populated.</p>
-<pre><code class="language-javascript">story.populated(<span class="hljs-string">'author'</span>); <span class="hljs-comment">// truthy</span>
-story.author._id; <span class="hljs-comment">// ObjectId</span>
+<pre><code class="language-javascript">story.<span class="hljs-title function_">populated</span>(<span class="hljs-string">&#x27;author&#x27;</span>); <span class="hljs-comment">// truthy</span>
+story.<span class="hljs-property">author</span>.<span class="hljs-property">_id</span>; <span class="hljs-comment">// ObjectId</span>
 
-story.depopulate(<span class="hljs-string">'author'</span>); <span class="hljs-comment">// Make `author` not populated anymore</span>
-story.populated(<span class="hljs-string">'author'</span>); <span class="hljs-comment">// undefined</span>
+story.<span class="hljs-title function_">depopulate</span>(<span class="hljs-string">&#x27;author&#x27;</span>); <span class="hljs-comment">// Make `author` not populated anymore</span>
+story.<span class="hljs-title function_">populated</span>(<span class="hljs-string">&#x27;author&#x27;</span>); <span class="hljs-comment">// undefined</span>
 
-story.author <span class="hljs-keyword">instanceof</span> ObjectId; <span class="hljs-comment">// true</span>
-story.author._id; <span class="hljs-comment">// ObjectId, because Mongoose adds a special getter</span>
+story.<span class="hljs-property">author</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">ObjectId</span>; <span class="hljs-comment">// true</span>
+story.<span class="hljs-property">author</span>.<span class="hljs-property">_id</span>; <span class="hljs-comment">// ObjectId, because Mongoose adds a special getter</span>
 </code></pre>
 <h3 id="doc-not-found"><a href="#doc-not-found">What If There's No Foreign Document?</a></h3>
 
@@ -159,22 +159,22 @@ story.author._id; <span class="hljs-comment">// ObjectId, because Mongoose adds 
 <a href="https://www.w3schools.com/sql/sql_join.asp">SQL joins</a>. When there&#39;s no
 document, <code>story.author</code> will be <code>null</code>. This is analogous to a
 <a href="https://www.w3schools.com/sql/sql_join_left.asp">left join</a> in SQL.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">await</span> Person.deleteMany({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Ian Fleming'</span> });
+<pre><code class="language-javascript"><span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">deleteMany</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ian Fleming&#x27;</span> });
 
-<span class="hljs-keyword">const</span> story = <span class="hljs-keyword">await</span> Story.findOne({ <span class="hljs-attr">title</span>: <span class="hljs-string">'Casino Royale'</span> }).populate(<span class="hljs-string">'author'</span>);
-story.author; <span class="hljs-comment">// `null`</span>
+<span class="hljs-keyword">const</span> story = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Story</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Casino Royale&#x27;</span> }).<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;author&#x27;</span>);
+story.<span class="hljs-property">author</span>; <span class="hljs-comment">// `null`</span>
 </code></pre>
 <p>If you have an array of <code>authors</code> in your <code>storySchema</code>, <code>populate()</code> will
 give you an empty array instead.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> storySchema = Schema({
-  <span class="hljs-attr">authors</span>: [{ <span class="hljs-attr">type</span>: Schema.Types.ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'Person'</span> }],
-  <span class="hljs-attr">title</span>: <span class="hljs-built_in">String</span>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> storySchema = <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">authors</span>: [{ <span class="hljs-attr">type</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Person&#x27;</span> }],
+  <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span>
 });
 
 <span class="hljs-comment">// Later</span>
 
-<span class="hljs-keyword">const</span> story = <span class="hljs-keyword">await</span> Story.findOne({ <span class="hljs-attr">title</span>: <span class="hljs-string">'Casino Royale'</span> }).populate(<span class="hljs-string">'authors'</span>);
-story.authors; <span class="hljs-comment">// `[]`</span>
+<span class="hljs-keyword">const</span> story = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Story</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Casino Royale&#x27;</span> }).<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;authors&#x27;</span>);
+story.<span class="hljs-property">authors</span>; <span class="hljs-comment">// `[]`</span>
 </code></pre>
 <h3 id="field-selection"><a href="#field-selection">Field Selection</a></h3>
 
@@ -182,69 +182,69 @@ story.authors; <span class="hljs-comment">// `[]`</span>
 documents? This can be accomplished by passing the usual
 <a href="./api.html#query_Query-select">field name syntax</a> as the second argument
 to the populate method:</p>
-<pre><code class="language-javascript">Story.
-  findOne({ <span class="hljs-attr">title</span>: <span class="hljs-regexp">/casino royale/i</span> }).
-  populate(<span class="hljs-string">'author'</span>, <span class="hljs-string">'name'</span>). <span class="hljs-comment">// only return the Persons name</span>
-  exec(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, story</span>) </span>{
-    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
+<pre><code class="language-javascript"><span class="hljs-title class_">Story</span>.
+  <span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">title</span>: <span class="hljs-regexp">/casino royale/i</span> }).
+  <span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;author&#x27;</span>, <span class="hljs-string">&#x27;name&#x27;</span>). <span class="hljs-comment">// only return the Persons name</span>
+  <span class="hljs-title function_">exec</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err, story</span>) {
+    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleError</span>(err);
 
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'The author is %s'</span>, story.author.name);
-    <span class="hljs-comment">// prints "The author is Ian Fleming"</span>
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;The author is %s&#x27;</span>, story.<span class="hljs-property">author</span>.<span class="hljs-property">name</span>);
+    <span class="hljs-comment">// prints &quot;The author is Ian Fleming&quot;</span>
 
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'The authors age is %s'</span>, story.author.age);
-    <span class="hljs-comment">// prints "The authors age is null"</span>
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;The authors age is %s&#x27;</span>, story.<span class="hljs-property">author</span>.<span class="hljs-property">age</span>);
+    <span class="hljs-comment">// prints &quot;The authors age is null&quot;</span>
   });
 </code></pre>
 <h3 id="populating-multiple-paths"><a href="#populating-multiple-paths">Populating Multiple Paths</a></h3>
 
 <p>What if we wanted to populate multiple paths at the same time?</p>
-<pre><code class="language-javascript">Story.
-  find(...).
-  populate(<span class="hljs-string">'fans'</span>).
-  populate(<span class="hljs-string">'author'</span>).
-  exec();
+<pre><code class="language-javascript"><span class="hljs-title class_">Story</span>.
+  <span class="hljs-title function_">find</span>(...).
+  <span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;fans&#x27;</span>).
+  <span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;author&#x27;</span>).
+  <span class="hljs-title function_">exec</span>();
 </code></pre>
 <p>If you call <code>populate()</code> multiple times with the same path, only the last
 one will take effect.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// The 2nd `populate()` call below overwrites the first because they</span>
-<span class="hljs-comment">// both populate 'fans'.</span>
-Story.
-  find().
-  populate({ <span class="hljs-attr">path</span>: <span class="hljs-string">'fans'</span>, <span class="hljs-attr">select</span>: <span class="hljs-string">'name'</span> }).
-  populate({ <span class="hljs-attr">path</span>: <span class="hljs-string">'fans'</span>, <span class="hljs-attr">select</span>: <span class="hljs-string">'email'</span> });
+<span class="hljs-comment">// both populate &#x27;fans&#x27;.</span>
+<span class="hljs-title class_">Story</span>.
+  <span class="hljs-title function_">find</span>().
+  <span class="hljs-title function_">populate</span>({ <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;fans&#x27;</span>, <span class="hljs-attr">select</span>: <span class="hljs-string">&#x27;name&#x27;</span> }).
+  <span class="hljs-title function_">populate</span>({ <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;fans&#x27;</span>, <span class="hljs-attr">select</span>: <span class="hljs-string">&#x27;email&#x27;</span> });
 <span class="hljs-comment">// The above is equivalent to:</span>
-Story.find().populate({ <span class="hljs-attr">path</span>: <span class="hljs-string">'fans'</span>, <span class="hljs-attr">select</span>: <span class="hljs-string">'email'</span> });
+<span class="hljs-title class_">Story</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">populate</span>({ <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;fans&#x27;</span>, <span class="hljs-attr">select</span>: <span class="hljs-string">&#x27;email&#x27;</span> });
 </code></pre>
 <h3 id="query-conditions"><a href="#query-conditions">Query conditions and other options</a></h3>
 
 <p>What if we wanted to populate our fans array based on their age and
 select just their names?</p>
-<pre><code class="language-javascript">Story.
-  find().
-  populate({
-    <span class="hljs-attr">path</span>: <span class="hljs-string">'fans'</span>,
+<pre><code class="language-javascript"><span class="hljs-title class_">Story</span>.
+  <span class="hljs-title function_">find</span>().
+  <span class="hljs-title function_">populate</span>({
+    <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;fans&#x27;</span>,
     <span class="hljs-attr">match</span>: { <span class="hljs-attr">age</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">21</span> } },
     <span class="hljs-comment">// Explicitly exclude `_id`, see http://bit.ly/2aEfTdB</span>
-    <span class="hljs-attr">select</span>: <span class="hljs-string">'name -_id'</span>
+    <span class="hljs-attr">select</span>: <span class="hljs-string">&#x27;name -_id&#x27;</span>
   }).
-  exec();
+  <span class="hljs-title function_">exec</span>();
 </code></pre>
 <p>The <code>match</code> option doesn&#39;t filter out <code>Story</code> documents. If there are no documents that satisfy <code>match</code>,
 you&#39;ll get a <code>Story</code> document with an empty <code>fans</code> array.</p>
 <p>For example, suppose you <code>populate()</code> a story&#39;s <code>author</code> and the <code>author</code> doesn&#39;t satisfy <code>match</code>. Then
 the story&#39;s <code>author</code> will be <code>null</code>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> story = <span class="hljs-keyword">await</span> Story.
-  findOne({ <span class="hljs-attr">title</span>: <span class="hljs-string">'Casino Royale'</span> }).
-  populate({ <span class="hljs-attr">path</span>: <span class="hljs-string">'author'</span>, <span class="hljs-attr">name</span>: { <span class="hljs-attr">$ne</span>: <span class="hljs-string">'Ian Fleming'</span> } }).
-  exec();
-story.author; <span class="hljs-comment">// `null`</span>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> story = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Story</span>.
+  <span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Casino Royale&#x27;</span> }).
+  <span class="hljs-title function_">populate</span>({ <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;author&#x27;</span>, <span class="hljs-attr">name</span>: { <span class="hljs-attr">$ne</span>: <span class="hljs-string">&#x27;Ian Fleming&#x27;</span> } }).
+  <span class="hljs-title function_">exec</span>();
+story.<span class="hljs-property">author</span>; <span class="hljs-comment">// `null`</span>
 </code></pre>
 <p>In general, there is no way to make <code>populate()</code> filter stories based on properties of the story&#39;s <code>author</code>.
 For example, the below query won&#39;t return any results, even though <code>author</code> is populated.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> story = <span class="hljs-keyword">await</span> Story.
-  findOne({ <span class="hljs-string">'author.name'</span>: <span class="hljs-string">'Ian Fleming'</span> }).
-  populate(<span class="hljs-string">'author'</span>).
-  exec();
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> story = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Story</span>.
+  <span class="hljs-title function_">findOne</span>({ <span class="hljs-string">&#x27;author.name&#x27;</span>: <span class="hljs-string">&#x27;Ian Fleming&#x27;</span> }).
+  <span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;author&#x27;</span>).
+  <span class="hljs-title function_">exec</span>();
 story; <span class="hljs-comment">// null</span>
 </code></pre>
 <p>If you want to filter stories by their author&#39;s name, you should use <a href="https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design-part-3">denormalization</a>.</p>
@@ -253,24 +253,24 @@ story; <span class="hljs-comment">// null</span>
 <p>Populate does support a <code>limit</code> option, however, it currently
 does <strong>not</strong> limit on a per-document basis for backwards compatibility. For example,
 suppose you have 2 stories:</p>
-<pre><code class="language-javascript">Story.create([
-  { <span class="hljs-attr">title</span>: <span class="hljs-string">'Casino Royale'</span>, <span class="hljs-attr">fans</span>: [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>, <span class="hljs-number">8</span>] },
-  { <span class="hljs-attr">title</span>: <span class="hljs-string">'Live and Let Die'</span>, <span class="hljs-attr">fans</span>: [<span class="hljs-number">9</span>, <span class="hljs-number">10</span>] }
+<pre><code class="language-javascript"><span class="hljs-title class_">Story</span>.<span class="hljs-title function_">create</span>([
+  { <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Casino Royale&#x27;</span>, <span class="hljs-attr">fans</span>: [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>, <span class="hljs-number">8</span>] },
+  { <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Live and Let Die&#x27;</span>, <span class="hljs-attr">fans</span>: [<span class="hljs-number">9</span>, <span class="hljs-number">10</span>] }
 ]);
 </code></pre>
 <p>If you were to <code>populate()</code> using the <code>limit</code> option, you
 would find that the 2nd story has 0 fans:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> stories = Story.find().populate({
-  <span class="hljs-attr">path</span>: <span class="hljs-string">'fans'</span>,
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> stories = <span class="hljs-title class_">Story</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">populate</span>({
+  <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;fans&#x27;</span>,
   <span class="hljs-attr">options</span>: { <span class="hljs-attr">limit</span>: <span class="hljs-number">2</span> }
 });
 
-stories[<span class="hljs-number">0</span>].name; <span class="hljs-comment">// 'Casino Royale'</span>
-stories[<span class="hljs-number">0</span>].fans.length; <span class="hljs-comment">// 2</span>
+stories[<span class="hljs-number">0</span>].<span class="hljs-property">name</span>; <span class="hljs-comment">// &#x27;Casino Royale&#x27;</span>
+stories[<span class="hljs-number">0</span>].<span class="hljs-property">fans</span>.<span class="hljs-property">length</span>; <span class="hljs-comment">// 2</span>
 
 <span class="hljs-comment">// 2nd story has 0 fans!</span>
-stories[<span class="hljs-number">1</span>].name; <span class="hljs-comment">// 'Live and Let Die'</span>
-stories[<span class="hljs-number">1</span>].fans.length; <span class="hljs-comment">// 0</span>
+stories[<span class="hljs-number">1</span>].<span class="hljs-property">name</span>; <span class="hljs-comment">// &#x27;Live and Let Die&#x27;</span>
+stories[<span class="hljs-number">1</span>].<span class="hljs-property">fans</span>.<span class="hljs-property">length</span>; <span class="hljs-comment">// 0</span>
 </code></pre>
 <p>That&#39;s because, in order to avoid executing a separate query
 for each document, Mongoose instead queries for fans using
@@ -278,18 +278,18 @@ for each document, Mongoose instead queries for fans using
 <code>limit</code>, you should use the <code>perDocumentLimit</code> option (new in Mongoose 5.9.0).
 Just keep in mind that <code>populate()</code> will execute a separate query
 for each story, which may cause <code>populate()</code> to be slower.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> stories = <span class="hljs-keyword">await</span> Story.find().populate({
-  <span class="hljs-attr">path</span>: <span class="hljs-string">'fans'</span>,
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> stories = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Story</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">populate</span>({
+  <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;fans&#x27;</span>,
   <span class="hljs-comment">// Special option that tells Mongoose to execute a separate query</span>
   <span class="hljs-comment">// for each `story` to make sure we get 2 fans for each story.</span>
   <span class="hljs-attr">perDocumentLimit</span>: <span class="hljs-number">2</span>
 });
 
-stories[<span class="hljs-number">0</span>].name; <span class="hljs-comment">// 'Casino Royale'</span>
-stories[<span class="hljs-number">0</span>].fans.length; <span class="hljs-comment">// 2</span>
+stories[<span class="hljs-number">0</span>].<span class="hljs-property">name</span>; <span class="hljs-comment">// &#x27;Casino Royale&#x27;</span>
+stories[<span class="hljs-number">0</span>].<span class="hljs-property">fans</span>.<span class="hljs-property">length</span>; <span class="hljs-comment">// 2</span>
 
-stories[<span class="hljs-number">1</span>].name; <span class="hljs-comment">// 'Live and Let Die'</span>
-stories[<span class="hljs-number">1</span>].fans.length; <span class="hljs-comment">// 2</span>
+stories[<span class="hljs-number">1</span>].<span class="hljs-property">name</span>; <span class="hljs-comment">// &#x27;Live and Let Die&#x27;</span>
+stories[<span class="hljs-number">1</span>].<span class="hljs-property">fans</span>.<span class="hljs-property">length</span>; <span class="hljs-comment">// 2</span>
 </code></pre>
 <h3 id="refs-to-children"><a href="#refs-to-children">Refs to children</a></h3>
 
@@ -301,26 +301,26 @@ which stories are theirs. Usually, your schema should resolve
 one-to-many relationships by having a parent pointer in the &#39;many&#39; side.
 But, if you have a good reason to want an array of child pointers, you
 can <code>push()</code> documents onto the array as shown below.</p>
-<pre><code class="language-javascript">author.stories.push(story1);
-author.save(callback);
+<pre><code class="language-javascript">author.<span class="hljs-property">stories</span>.<span class="hljs-title function_">push</span>(story1);
+author.<span class="hljs-title function_">save</span>(callback);
 </code></pre>
 <p>This allows us to perform a <code>find</code> and <code>populate</code> combo:</p>
-<pre><code class="language-javascript">Person.
-  findOne({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Ian Fleming'</span> }).
-  populate(<span class="hljs-string">'stories'</span>). <span class="hljs-comment">// only works if we pushed refs to children</span>
-  exec(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, person</span>) </span>{
-    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
-    <span class="hljs-built_in">console</span>.log(person);
+<pre><code class="language-javascript"><span class="hljs-title class_">Person</span>.
+  <span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ian Fleming&#x27;</span> }).
+  <span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;stories&#x27;</span>). <span class="hljs-comment">// only works if we pushed refs to children</span>
+  <span class="hljs-title function_">exec</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err, person</span>) {
+    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleError</span>(err);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(person);
   });
 </code></pre>
 <p>It is debatable that we really want two sets of pointers as they may get
 out of sync. Instead we could skip populating and directly <code>find()</code> the
 stories we are interested in.</p>
-<pre><code class="language-javascript">Story.
-  find({ <span class="hljs-attr">author</span>: author._id }).
-  exec(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, stories</span>) </span>{
-    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'The stories are an array: '</span>, stories);
+<pre><code class="language-javascript"><span class="hljs-title class_">Story</span>.
+  <span class="hljs-title function_">find</span>({ <span class="hljs-attr">author</span>: author.<span class="hljs-property">_id</span> }).
+  <span class="hljs-title function_">exec</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err, stories</span>) {
+    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleError</span>(err);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;The stories are an array: &#x27;</span>, stories);
   });
 </code></pre>
 <p>The documents returned from
@@ -335,20 +335,20 @@ the array.</p>
 <p>If you have an existing mongoose document and want to populate some of its
 paths, you can use the
 <a href="./api.html#document_Document-populate">Document#populate()</a> method.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> person = <span class="hljs-keyword">await</span> Person.findOne({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Ian Fleming'</span> });
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> person = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ian Fleming&#x27;</span> });
 
-person.populated(<span class="hljs-string">'stories'</span>); <span class="hljs-comment">// null</span>
+person.<span class="hljs-title function_">populated</span>(<span class="hljs-string">&#x27;stories&#x27;</span>); <span class="hljs-comment">// null</span>
 
 <span class="hljs-comment">// Call the `populate()` method on a document to populate a path.</span>
-<span class="hljs-keyword">await</span> person.populate(<span class="hljs-string">'stories'</span>);
+<span class="hljs-keyword">await</span> person.<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;stories&#x27;</span>);
 
-person.populated(<span class="hljs-string">'stories'</span>); <span class="hljs-comment">// Array of ObjectIds</span>
-person.stories[<span class="hljs-number">0</span>].name; <span class="hljs-comment">// 'Casino Royale'</span>
+person.<span class="hljs-title function_">populated</span>(<span class="hljs-string">&#x27;stories&#x27;</span>); <span class="hljs-comment">// Array of ObjectIds</span>
+person.<span class="hljs-property">stories</span>[<span class="hljs-number">0</span>].<span class="hljs-property">name</span>; <span class="hljs-comment">// &#x27;Casino Royale&#x27;</span>
 </code></pre>
 <p>The <code>Document#populate()</code> method does not support chaining.
 You need to call <code>populate()</code> multiple times, or with an array of paths, to populate multiple paths</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">await</span> person.populate([<span class="hljs-string">'stories'</span>, <span class="hljs-string">'fans'</span>]);
-person.populated(<span class="hljs-string">'fans'</span>); <span class="hljs-comment">// Array of ObjectIds</span>
+<pre><code class="language-javascript"><span class="hljs-keyword">await</span> person.<span class="hljs-title function_">populate</span>([<span class="hljs-string">&#x27;stories&#x27;</span>, <span class="hljs-string">&#x27;fans&#x27;</span>]);
+person.<span class="hljs-title function_">populated</span>(<span class="hljs-string">&#x27;fans&#x27;</span>); <span class="hljs-comment">// Array of ObjectIds</span>
 </code></pre>
 <h3 id="populate_multiple_documents"><a href="#populate_multiple_documents">Populating multiple existing documents</a></h3>
 
@@ -360,123 +360,123 @@ and <code>Query#populate()</code> use to populate documents.</p>
 <h3 id="deep-populate"><a href="#deep-populate">Populating across multiple levels</a></h3>
 
 <p>Say you have a user schema which keeps track of the user&#39;s friends.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">friends</span>: [{ <span class="hljs-attr">type</span>: ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'User'</span> }]
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">friends</span>: [{ <span class="hljs-attr">type</span>: <span class="hljs-title class_">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;User&#x27;</span> }]
 });
 </code></pre>
 <p>Populate lets you get a list of a user&#39;s friends, but what if you also
 wanted a user&#39;s friends of friends? Specify the <code>populate</code> option to tell
 mongoose to populate the <code>friends</code> array of all the user&#39;s friends:</p>
-<pre><code class="language-javascript">User.
-  findOne({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Val'</span> }).
-  populate({
-    <span class="hljs-attr">path</span>: <span class="hljs-string">'friends'</span>,
-    <span class="hljs-comment">// Get friends of friends - populate the 'friends' array for every friend</span>
-    <span class="hljs-attr">populate</span>: { <span class="hljs-attr">path</span>: <span class="hljs-string">'friends'</span> }
+<pre><code class="language-javascript"><span class="hljs-title class_">User</span>.
+  <span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Val&#x27;</span> }).
+  <span class="hljs-title function_">populate</span>({
+    <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;friends&#x27;</span>,
+    <span class="hljs-comment">// Get friends of friends - populate the &#x27;friends&#x27; array for every friend</span>
+    <span class="hljs-attr">populate</span>: { <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;friends&#x27;</span> }
   });
 </code></pre>
 <h3 id="cross-db-populate"><a href="#cross-db-populate">Cross Database Populate</a></h3>
 
 <p>Let&#39;s say you have a schema representing events, and a schema representing
 conversations. Each event has a corresponding conversation thread.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> db1 = mongoose.createConnection(<span class="hljs-string">'mongodb://localhost:27000/db1'</span>);
-<span class="hljs-keyword">const</span> db2 = mongoose.createConnection(<span class="hljs-string">'mongodb://localhost:27001/db2'</span>);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> db1 = mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://localhost:27000/db1&#x27;</span>);
+<span class="hljs-keyword">const</span> db2 = mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://localhost:27001/db2&#x27;</span>);
 
-<span class="hljs-keyword">const</span> conversationSchema = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">numMessages</span>: <span class="hljs-built_in">Number</span> });
-<span class="hljs-keyword">const</span> Conversation = db2.model(<span class="hljs-string">'Conversation'</span>, conversationSchema);
+<span class="hljs-keyword">const</span> conversationSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">numMessages</span>: <span class="hljs-title class_">Number</span> });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Conversation</span> = db2.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Conversation&#x27;</span>, conversationSchema);
 
-<span class="hljs-keyword">const</span> eventSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
+<span class="hljs-keyword">const</span> eventSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
   <span class="hljs-attr">conversation</span>: {
-    <span class="hljs-attr">type</span>: ObjectId,
-    <span class="hljs-attr">ref</span>: Conversation <span class="hljs-comment">// `ref` is a **Model class**, not a string</span>
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">ObjectId</span>,
+    <span class="hljs-attr">ref</span>: <span class="hljs-title class_">Conversation</span> <span class="hljs-comment">// `ref` is a **Model class**, not a string</span>
   }
 });
-<span class="hljs-keyword">const</span> Event = db1.model(<span class="hljs-string">'Event'</span>, eventSchema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Event</span> = db1.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Event&#x27;</span>, eventSchema);
 </code></pre>
 <p>In the above example, events and conversations are stored in separate MongoDB
 databases. String <code>ref</code> will not work in this situation, because Mongoose
 assumes a string <code>ref</code> refers to a model name on the same connection. In
 the above example, the conversation model is registered on <code>db2</code>, not <code>db1</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Works</span>
-<span class="hljs-keyword">const</span> events = <span class="hljs-keyword">await</span> Event.
-  find().
-  populate(<span class="hljs-string">'conversation'</span>);
+<span class="hljs-keyword">const</span> events = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Event</span>.
+  <span class="hljs-title function_">find</span>().
+  <span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;conversation&#x27;</span>);
 </code></pre>
 <p>This is known as a &quot;cross-database populate,&quot; because it enables you to
 populate across MongoDB databases and even across MongoDB instances.</p>
 <p>If you don&#39;t have access to the model instance when defining your <code>eventSchema</code>,
 you can also pass <a href="/docs/api/model.html#model_Model.populate">the model instance as an option to <code>populate()</code></a>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> events = <span class="hljs-keyword">await</span> Event.
-  find().
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> events = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Event</span>.
+  <span class="hljs-title function_">find</span>().
   <span class="hljs-comment">// The `model` option specifies the model to use for populating.</span>
-  populate({ <span class="hljs-attr">path</span>: <span class="hljs-string">'conversation'</span>, <span class="hljs-attr">model</span>: Conversation });
+  <span class="hljs-title function_">populate</span>({ <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;conversation&#x27;</span>, <span class="hljs-attr">model</span>: <span class="hljs-title class_">Conversation</span> });
 </code></pre>
 <h3 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via `refPath`</a></h3>
 
 <p>Mongoose can also populate from multiple collections based on the value
 of a property in the document. Let&#39;s say you&#39;re building a schema for
 storing comments. A user may comment on either a blog post or a product.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> commentSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">body</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> commentSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">body</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
   <span class="hljs-attr">modelId</span>: {
-    <span class="hljs-attr">type</span>: Schema.Types.ObjectId,
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>,
     <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>,
     <span class="hljs-comment">// Instead of a hardcoded model name in `ref`, `refPath` means Mongoose</span>
     <span class="hljs-comment">// will look at the `onModel` property to find the right model.</span>
-    <span class="hljs-attr">refPath</span>: <span class="hljs-string">'onModel'</span>
+    <span class="hljs-attr">refPath</span>: <span class="hljs-string">&#x27;onModel&#x27;</span>
   },
   <span class="hljs-attr">onModel</span>: {
-    <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>,
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
     <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attr">enum</span>: [<span class="hljs-string">'BlogPost'</span>, <span class="hljs-string">'Product'</span>]
+    <span class="hljs-attr">enum</span>: [<span class="hljs-string">&#x27;BlogPost&#x27;</span>, <span class="hljs-string">&#x27;Product&#x27;</span>]
   }
 });
 
-<span class="hljs-keyword">const</span> Product = mongoose.model(<span class="hljs-string">'Product'</span>, <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> }));
-<span class="hljs-keyword">const</span> BlogPost = mongoose.model(<span class="hljs-string">'BlogPost'</span>, <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">title</span>: <span class="hljs-built_in">String</span> }));
-<span class="hljs-keyword">const</span> Comment = mongoose.model(<span class="hljs-string">'Comment'</span>, commentSchema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Product</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Product&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }));
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">BlogPost</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;BlogPost&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span> }));
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Comment</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Comment&#x27;</span>, commentSchema);
 </code></pre>
 <p>The <code>refPath</code> option is a more sophisticated alternative to <code>ref</code>. If <code>ref</code>
 is just a string, Mongoose will always query the same model to find the
 populated subdocs. With <code>refPath</code>, you can configure what model Mongoose
 uses for each document.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> book = <span class="hljs-keyword">await</span> Product.create({ <span class="hljs-attr">name</span>: <span class="hljs-string">'The Count of Monte Cristo'</span> });
-<span class="hljs-keyword">const</span> post = <span class="hljs-keyword">await</span> BlogPost.create({ <span class="hljs-attr">title</span>: <span class="hljs-string">'Top 10 French Novels'</span> });
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> book = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Product</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;The Count of Monte Cristo&#x27;</span> });
+<span class="hljs-keyword">const</span> post = <span class="hljs-keyword">await</span> <span class="hljs-title class_">BlogPost</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Top 10 French Novels&#x27;</span> });
 
-<span class="hljs-keyword">const</span> commentOnBook = <span class="hljs-keyword">await</span> Comment.create({
-  <span class="hljs-attr">body</span>: <span class="hljs-string">'Great read'</span>,
-  <span class="hljs-attr">doc</span>: book._id,
-  <span class="hljs-attr">docModel</span>: <span class="hljs-string">'Product'</span>
+<span class="hljs-keyword">const</span> commentOnBook = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Comment</span>.<span class="hljs-title function_">create</span>({
+  <span class="hljs-attr">body</span>: <span class="hljs-string">&#x27;Great read&#x27;</span>,
+  <span class="hljs-attr">doc</span>: book.<span class="hljs-property">_id</span>,
+  <span class="hljs-attr">docModel</span>: <span class="hljs-string">&#x27;Product&#x27;</span>
 });
 
-<span class="hljs-keyword">const</span> commentOnPost = <span class="hljs-keyword">await</span> Comment.create({
-  <span class="hljs-attr">body</span>: <span class="hljs-string">'Very informative'</span>,
-  <span class="hljs-attr">doc</span>: post._id,
-  <span class="hljs-attr">docModel</span>: <span class="hljs-string">'BlogPost'</span>
+<span class="hljs-keyword">const</span> commentOnPost = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Comment</span>.<span class="hljs-title function_">create</span>({
+  <span class="hljs-attr">body</span>: <span class="hljs-string">&#x27;Very informative&#x27;</span>,
+  <span class="hljs-attr">doc</span>: post.<span class="hljs-property">_id</span>,
+  <span class="hljs-attr">docModel</span>: <span class="hljs-string">&#x27;BlogPost&#x27;</span>
 });
 
 <span class="hljs-comment">// The below `populate()` works even though one comment references the</span>
-<span class="hljs-comment">// 'Product' collection and the other references the 'BlogPost' collection.</span>
-<span class="hljs-keyword">const</span> comments = <span class="hljs-keyword">await</span> Comment.find().populate(<span class="hljs-string">'doc'</span>).sort({ <span class="hljs-attr">body</span>: <span class="hljs-number">1</span> });
-comments[<span class="hljs-number">0</span>].doc.name; <span class="hljs-comment">// "The Count of Monte Cristo"</span>
-comments[<span class="hljs-number">1</span>].doc.title; <span class="hljs-comment">// "Top 10 French Novels"</span>
+<span class="hljs-comment">// &#x27;Product&#x27; collection and the other references the &#x27;BlogPost&#x27; collection.</span>
+<span class="hljs-keyword">const</span> comments = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Comment</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;doc&#x27;</span>).<span class="hljs-title function_">sort</span>({ <span class="hljs-attr">body</span>: <span class="hljs-number">1</span> });
+comments[<span class="hljs-number">0</span>].<span class="hljs-property">doc</span>.<span class="hljs-property">name</span>; <span class="hljs-comment">// &quot;The Count of Monte Cristo&quot;</span>
+comments[<span class="hljs-number">1</span>].<span class="hljs-property">doc</span>.<span class="hljs-property">title</span>; <span class="hljs-comment">// &quot;Top 10 French Novels&quot;</span>
 </code></pre>
 <p>An alternative approach is to define separate <code>blogPost</code> and
 <code>product</code> properties on <code>commentSchema</code>, and then <code>populate()</code> on both
 properties.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> commentSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">body</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> commentSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">body</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
   <span class="hljs-attr">product</span>: {
-    <span class="hljs-attr">type</span>: Schema.Types.ObjectId,
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>,
     <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attr">ref</span>: <span class="hljs-string">'Product'</span>
+    <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Product&#x27;</span>
   },
   <span class="hljs-attr">blogPost</span>: {
-    <span class="hljs-attr">type</span>: Schema.Types.ObjectId,
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>,
     <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attr">ref</span>: <span class="hljs-string">'BlogPost'</span>
+    <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;BlogPost&#x27;</span>
   }
 });
 
@@ -484,12 +484,12 @@ properties.</p>
 
 <span class="hljs-comment">// The below `populate()` is equivalent to the `refPath` approach, you</span>
 <span class="hljs-comment">// just need to make sure you `populate()` both `product` and `blogPost`.</span>
-<span class="hljs-keyword">const</span> comments = <span class="hljs-keyword">await</span> Comment.find().
-  populate(<span class="hljs-string">'product'</span>).
-  populate(<span class="hljs-string">'blogPost'</span>).
-  sort({ <span class="hljs-attr">body</span>: <span class="hljs-number">1</span> });
-comments[<span class="hljs-number">0</span>].product.name; <span class="hljs-comment">// "The Count of Monte Cristo"</span>
-comments[<span class="hljs-number">1</span>].blogPost.title; <span class="hljs-comment">// "Top 10 French Novels"</span>
+<span class="hljs-keyword">const</span> comments = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Comment</span>.<span class="hljs-title function_">find</span>().
+  <span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;product&#x27;</span>).
+  <span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;blogPost&#x27;</span>).
+  <span class="hljs-title function_">sort</span>({ <span class="hljs-attr">body</span>: <span class="hljs-number">1</span> });
+comments[<span class="hljs-number">0</span>].<span class="hljs-property">product</span>.<span class="hljs-property">name</span>; <span class="hljs-comment">// &quot;The Count of Monte Cristo&quot;</span>
+comments[<span class="hljs-number">1</span>].<span class="hljs-property">blogPost</span>.<span class="hljs-property">title</span>; <span class="hljs-comment">// &quot;Top 10 French Novels&quot;</span>
 </code></pre>
 <p>Defining separate <code>blogPost</code> and <code>product</code> properties works for this simple
 example. But, if you decide to allow users to also comment on articles or
@@ -503,37 +503,37 @@ regardless of how many models your <code>commentSchema</code> can point to.</p>
 <p>So far you&#39;ve only populated based on the <code>_id</code> field.
 However, that&#39;s sometimes not the right choice.
 For example, suppose you have 2 models: <code>Author</code> and <code>BlogPost</code>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> AuthorSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">posts</span>: [{ <span class="hljs-attr">type</span>: mongoose.Schema.Types.ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'BlogPost'</span> }]
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">AuthorSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">posts</span>: [{ <span class="hljs-attr">type</span>: mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;BlogPost&#x27;</span> }]
 });
 
-<span class="hljs-keyword">const</span> BlogPostSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">title</span>: <span class="hljs-built_in">String</span>,
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">BlogPostSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span>,
   <span class="hljs-attr">comments</span>: [{
-    <span class="hljs-attr">author</span>: { <span class="hljs-attr">type</span>: mongoose.Schema.Types.ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'Author'</span> },
-    <span class="hljs-attr">content</span>: <span class="hljs-built_in">String</span>
+    <span class="hljs-attr">author</span>: { <span class="hljs-attr">type</span>: mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Author&#x27;</span> },
+    <span class="hljs-attr">content</span>: <span class="hljs-title class_">String</span>
   }]
 });
 
-<span class="hljs-keyword">const</span> Author = mongoose.model(<span class="hljs-string">'Author'</span>, AuthorSchema, <span class="hljs-string">'Author'</span>);
-<span class="hljs-keyword">const</span> BlogPost = mongoose.model(<span class="hljs-string">'BlogPost'</span>, BlogPostSchema, <span class="hljs-string">'BlogPost'</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Author</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Author&#x27;</span>, <span class="hljs-title class_">AuthorSchema</span>, <span class="hljs-string">&#x27;Author&#x27;</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">BlogPost</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;BlogPost&#x27;</span>, <span class="hljs-title class_">BlogPostSchema</span>, <span class="hljs-string">&#x27;BlogPost&#x27;</span>);
 </code></pre>
 <p>The above is an example of <strong>bad schema design</strong>. Why?
 Suppose you have an extremely prolific author that writes over 10k blog posts.
 That <code>author</code> document will be huge, over 12kb, and large documents lead to performance issues on both server and client.
 The <a href="https://dev.to/swyx/4-things-i-learned-from-mastering-mongoose-js-25e#4-principle-of-least-cardinality">Principle of Least Cardinality</a> states that one-to-many relationships, like author to blog post, should be stored on the &quot;many&quot; side.
 In other words, blog posts should store their <code>author</code>, authors should <strong>not</strong> store all their <code>posts</code>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> AuthorSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">AuthorSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>
 });
 
-<span class="hljs-keyword">const</span> BlogPostSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">title</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">author</span>: { <span class="hljs-attr">type</span>: mongoose.Schema.Types.ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'Author'</span> },
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">BlogPostSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">author</span>: { <span class="hljs-attr">type</span>: mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Author&#x27;</span> },
   <span class="hljs-attr">comments</span>: [{
-    <span class="hljs-attr">author</span>: { <span class="hljs-attr">type</span>: mongoose.Schema.Types.ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'Author'</span> },
-    <span class="hljs-attr">content</span>: <span class="hljs-built_in">String</span>
+    <span class="hljs-attr">author</span>: { <span class="hljs-attr">type</span>: mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Author&#x27;</span> },
+    <span class="hljs-attr">content</span>: <span class="hljs-title class_">String</span>
   }]
 });
 </code></pre>
@@ -542,206 +542,206 @@ That&#39;s where <em>virtual populate</em> comes in.
 Virtual populate means calling <code>populate()</code> on a virtual property that has a <code>ref</code> option as shown below.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Specifying a virtual with a `ref` property is how you enable virtual</span>
 <span class="hljs-comment">// population</span>
-AuthorSchema.virtual(<span class="hljs-string">'posts'</span>, {
-  <span class="hljs-attr">ref</span>: <span class="hljs-string">'BlogPost'</span>,
-  <span class="hljs-attr">localField</span>: <span class="hljs-string">'_id'</span>,
-  <span class="hljs-attr">foreignField</span>: <span class="hljs-string">'author'</span>
+<span class="hljs-title class_">AuthorSchema</span>.<span class="hljs-title function_">virtual</span>(<span class="hljs-string">&#x27;posts&#x27;</span>, {
+  <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;BlogPost&#x27;</span>,
+  <span class="hljs-attr">localField</span>: <span class="hljs-string">&#x27;_id&#x27;</span>,
+  <span class="hljs-attr">foreignField</span>: <span class="hljs-string">&#x27;author&#x27;</span>
 });
 
-<span class="hljs-keyword">const</span> Author = mongoose.model(<span class="hljs-string">'Author'</span>, AuthorSchema, <span class="hljs-string">'Author'</span>);
-<span class="hljs-keyword">const</span> BlogPost = mongoose.model(<span class="hljs-string">'BlogPost'</span>, BlogPostSchema, <span class="hljs-string">'BlogPost'</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Author</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Author&#x27;</span>, <span class="hljs-title class_">AuthorSchema</span>, <span class="hljs-string">&#x27;Author&#x27;</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">BlogPost</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;BlogPost&#x27;</span>, <span class="hljs-title class_">BlogPostSchema</span>, <span class="hljs-string">&#x27;BlogPost&#x27;</span>);
 </code></pre>
 <p>You can then <code>populate()</code> the author&#39;s <code>posts</code> as shown below.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> author = <span class="hljs-keyword">await</span> Author.findOne().populate(<span class="hljs-string">'posts'</span>);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> author = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Author</span>.<span class="hljs-title function_">findOne</span>().<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;posts&#x27;</span>);
 
-author.posts[<span class="hljs-number">0</span>].title; <span class="hljs-comment">// Title of the first blog post</span>
+author.<span class="hljs-property">posts</span>[<span class="hljs-number">0</span>].<span class="hljs-property">title</span>; <span class="hljs-comment">// Title of the first blog post</span>
 </code></pre>
 <p>Keep in mind that virtuals are <em>not</em> included in <code>toJSON()</code> and <code>toObject()</code> output by default.
 If you want populate virtuals to show up when using functions like Express&#39; <a href="https://masteringjs.io/tutorials/express/json"><code>res.json()</code> function</a> or <code>console.log()</code>, set the <code>virtuals: true</code> option on your schema&#39;s <code>toJSON</code> and <code>toObject()</code> options.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> authorSchema = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> }, {
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> authorSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }, {
   <span class="hljs-attr">toJSON</span>: { <span class="hljs-attr">virtuals</span>: <span class="hljs-literal">true</span> }, <span class="hljs-comment">// So `res.json()` and other `JSON.stringify()` functions include virtuals</span>
   <span class="hljs-attr">toObject</span>: { <span class="hljs-attr">virtuals</span>: <span class="hljs-literal">true</span> } <span class="hljs-comment">// So `console.log()` and other functions that use `toObject()` include virtuals</span>
 });
 </code></pre>
 <p>If you&#39;re using populate projections, make sure <code>foreignField</code> is included
 in the projection.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">let</span> authors = <span class="hljs-keyword">await</span> Author.
-  find({}).
-  <span class="hljs-comment">// Won't work because the foreign field `author` is not selected</span>
-  populate({ <span class="hljs-attr">path</span>: <span class="hljs-string">'posts'</span>, <span class="hljs-attr">select</span>: <span class="hljs-string">'title'</span> }).
-  exec();
+<pre><code class="language-javascript"><span class="hljs-keyword">let</span> authors = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Author</span>.
+  <span class="hljs-title function_">find</span>({}).
+  <span class="hljs-comment">// Won&#x27;t work because the foreign field `author` is not selected</span>
+  <span class="hljs-title function_">populate</span>({ <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;posts&#x27;</span>, <span class="hljs-attr">select</span>: <span class="hljs-string">&#x27;title&#x27;</span> }).
+  <span class="hljs-title function_">exec</span>();
 
-authors = <span class="hljs-keyword">await</span> Author.
-  find({}).
+authors = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Author</span>.
+  <span class="hljs-title function_">find</span>({}).
   <span class="hljs-comment">// Works, foreign field `author` is selected</span>
-  populate({ <span class="hljs-attr">path</span>: <span class="hljs-string">'posts'</span>, <span class="hljs-attr">select</span>: <span class="hljs-string">'title author'</span> }).
-  exec();
+  <span class="hljs-title function_">populate</span>({ <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;posts&#x27;</span>, <span class="hljs-attr">select</span>: <span class="hljs-string">&#x27;title author&#x27;</span> }).
+  <span class="hljs-title function_">exec</span>();
 </code></pre>
 <h3 id="count"><a href="#count">Populate Virtuals: The Count Option</a></h3>
 
 <p>Populate virtuals also support counting the number of documents with
 matching <code>foreignField</code> as opposed to the documents themselves. Set the
 <code>count</code> option on your virtual:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> PersonSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">band</span>: <span class="hljs-built_in">String</span>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">PersonSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">band</span>: <span class="hljs-title class_">String</span>
 });
 
-<span class="hljs-keyword">const</span> BandSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">BandSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>
 });
-BandSchema.virtual(<span class="hljs-string">'numMembers'</span>, {
-  <span class="hljs-attr">ref</span>: <span class="hljs-string">'Person'</span>, <span class="hljs-comment">// The model to use</span>
-  <span class="hljs-attr">localField</span>: <span class="hljs-string">'name'</span>, <span class="hljs-comment">// Find people where `localField`</span>
-  <span class="hljs-attr">foreignField</span>: <span class="hljs-string">'band'</span>, <span class="hljs-comment">// is equal to `foreignField`</span>
+<span class="hljs-title class_">BandSchema</span>.<span class="hljs-title function_">virtual</span>(<span class="hljs-string">&#x27;numMembers&#x27;</span>, {
+  <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Person&#x27;</span>, <span class="hljs-comment">// The model to use</span>
+  <span class="hljs-attr">localField</span>: <span class="hljs-string">&#x27;name&#x27;</span>, <span class="hljs-comment">// Find people where `localField`</span>
+  <span class="hljs-attr">foreignField</span>: <span class="hljs-string">&#x27;band&#x27;</span>, <span class="hljs-comment">// is equal to `foreignField`</span>
   <span class="hljs-attr">count</span>: <span class="hljs-literal">true</span> <span class="hljs-comment">// And only get the number of docs</span>
 });
 
 <span class="hljs-comment">// Later</span>
-<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> Band.findOne({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Motley Crue'</span> }).
-  populate(<span class="hljs-string">'numMembers'</span>);
-doc.numMembers; <span class="hljs-comment">// 2</span>
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Band</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Motley Crue&#x27;</span> }).
+  <span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;numMembers&#x27;</span>);
+doc.<span class="hljs-property">numMembers</span>; <span class="hljs-comment">// 2</span>
 </code></pre>
 <h3 id="match"><a href="#match">Populate Virtuals: The Match Option</a></h3>
 
 <p>Another option for Populate virtuals is <code>match</code>.
 This option adds an extra filter condition to the query Mongoose uses to <code>populate()</code>:</p>
-<pre><code class="language-javascript"><span class="hljs-comment">// Same example as 'Populate Virtuals' section</span>
-AuthorSchema.virtual(<span class="hljs-string">'posts'</span>, {
-  <span class="hljs-attr">ref</span>: <span class="hljs-string">'BlogPost'</span>,
-  <span class="hljs-attr">localField</span>: <span class="hljs-string">'_id'</span>,
-  <span class="hljs-attr">foreignField</span>: <span class="hljs-string">'author'</span>,
+<pre><code class="language-javascript"><span class="hljs-comment">// Same example as &#x27;Populate Virtuals&#x27; section</span>
+<span class="hljs-title class_">AuthorSchema</span>.<span class="hljs-title function_">virtual</span>(<span class="hljs-string">&#x27;posts&#x27;</span>, {
+  <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;BlogPost&#x27;</span>,
+  <span class="hljs-attr">localField</span>: <span class="hljs-string">&#x27;_id&#x27;</span>,
+  <span class="hljs-attr">foreignField</span>: <span class="hljs-string">&#x27;author&#x27;</span>,
   <span class="hljs-attr">match</span>: { <span class="hljs-attr">archived</span>: <span class="hljs-literal">false</span> } <span class="hljs-comment">// match option with basic query selector</span>
 });
 
-<span class="hljs-keyword">const</span> Author = mongoose.model(<span class="hljs-string">'Author'</span>, AuthorSchema, <span class="hljs-string">'Author'</span>);
-<span class="hljs-keyword">const</span> BlogPost = mongoose.model(<span class="hljs-string">'BlogPost'</span>, BlogPostSchema, <span class="hljs-string">'BlogPost'</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Author</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Author&#x27;</span>, <span class="hljs-title class_">AuthorSchema</span>, <span class="hljs-string">&#x27;Author&#x27;</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">BlogPost</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;BlogPost&#x27;</span>, <span class="hljs-title class_">BlogPostSchema</span>, <span class="hljs-string">&#x27;BlogPost&#x27;</span>);
 
 <span class="hljs-comment">// After population</span>
-<span class="hljs-keyword">const</span> author = <span class="hljs-keyword">await</span> Author.findOne().populate(<span class="hljs-string">'posts'</span>);
+<span class="hljs-keyword">const</span> author = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Author</span>.<span class="hljs-title function_">findOne</span>().<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;posts&#x27;</span>);
 
-author.posts <span class="hljs-comment">// Array of not `archived` posts</span>
+author.<span class="hljs-property">posts</span> <span class="hljs-comment">// Array of not `archived` posts</span>
 </code></pre>
 <p>You can also set the <code>match</code> option to a function.
 That allows configuring the <code>match</code> based on the document being populated.
 For example, suppose you only want to populate blog posts whose <code>tags</code> contain one of the author&#39;s <code>favoriteTags</code>.</p>
-<pre><code class="language-javascript">AuthorSchema.virtual(<span class="hljs-string">'posts'</span>, {
-  <span class="hljs-attr">ref</span>: <span class="hljs-string">'BlogPost'</span>,
-  <span class="hljs-attr">localField</span>: <span class="hljs-string">'_id'</span>,
-  <span class="hljs-attr">foreignField</span>: <span class="hljs-string">'author'</span>,
+<pre><code class="language-javascript"><span class="hljs-title class_">AuthorSchema</span>.<span class="hljs-title function_">virtual</span>(<span class="hljs-string">&#x27;posts&#x27;</span>, {
+  <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;BlogPost&#x27;</span>,
+  <span class="hljs-attr">localField</span>: <span class="hljs-string">&#x27;_id&#x27;</span>,
+  <span class="hljs-attr">foreignField</span>: <span class="hljs-string">&#x27;author&#x27;</span>,
   <span class="hljs-comment">// Add an additional filter `{ tags: author.favoriteTags }` to the populate query</span>
   <span class="hljs-comment">// Mongoose calls the `match` function with the document being populated as the</span>
   <span class="hljs-comment">// first argument.</span>
-  <span class="hljs-attr">match</span>: <span class="hljs-function"><span class="hljs-params">author</span> =&gt;</span> ({ <span class="hljs-attr">tags</span>: author.favoriteTags })
+  <span class="hljs-attr">match</span>: <span class="hljs-function"><span class="hljs-params">author</span> =&gt;</span> ({ <span class="hljs-attr">tags</span>: author.<span class="hljs-property">favoriteTags</span> })
 });
 </code></pre>
 <h3 id="populating-maps"><a href="#populating-maps">Populating Maps</a></h3>
 
 <p><a href="/docs/schematypes.html#maps">Maps</a> are a type that represents an object with arbitrary
 string keys. For example, in the below schema, <code>members</code> is a map from strings to ObjectIds.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> BandSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">BandSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
   <span class="hljs-attr">members</span>: {
-    <span class="hljs-attr">type</span>: <span class="hljs-built_in">Map</span>,
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Map</span>,
     <span class="hljs-attr">of</span>: {
-      <span class="hljs-attr">type</span>: <span class="hljs-string">'ObjectId'</span>,
-      <span class="hljs-attr">ref</span>: <span class="hljs-string">'Person'</span>
+      <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;ObjectId&#x27;</span>,
+      <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Person&#x27;</span>
     }
   }
 });
-<span class="hljs-keyword">const</span> Band = mongoose.model(<span class="hljs-string">'Band'</span>, bandSchema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Band</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Band&#x27;</span>, bandSchema);
 </code></pre>
 <p>This map has a <code>ref</code>, which means you can use <code>populate()</code> to populate all the ObjectIds
 in the map. Suppose you have the below <code>band</code> document:</p>
-<pre><code><span class="hljs-keyword">const</span> person1 = <span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Vince Neil'</span> });
-<span class="hljs-keyword">const</span> person2 = <span class="hljs-keyword">new</span> Person({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Mick Mars'</span> });
+<pre><code><span class="hljs-keyword">const</span> person1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Vince Neil&#x27;</span> });
+<span class="hljs-keyword">const</span> person2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Mick Mars&#x27;</span> });
 
-<span class="hljs-keyword">const</span> band = <span class="hljs-keyword">new</span> Band({
-  <span class="hljs-attr">name</span>: <span class="hljs-string">'Motley Crue'</span>,
+<span class="hljs-keyword">const</span> band = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Band</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Motley Crue&#x27;</span>,
   <span class="hljs-attr">members</span>: {
-    <span class="hljs-string">'singer'</span>: person1._id,
-    <span class="hljs-string">'guitarist'</span>: person2._id
+    <span class="hljs-string">&#x27;singer&#x27;</span>: person1.<span class="hljs-property">_id</span>,
+    <span class="hljs-string">&#x27;guitarist&#x27;</span>: person2.<span class="hljs-property">_id</span>
   }
 });
 </code></pre>
 <p>You can <code>populate()</code> every element in the map by populating the special path <code>members.$*</code>.
 <code>$*</code> is a special syntax that tells Mongoose to look at every key in the map.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> band = <span class="hljs-keyword">await</span> Band.findOne({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Motley Crue'</span> }).populate(<span class="hljs-string">'members.$*'</span>);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> band = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Band</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Motley Crue&#x27;</span> }).<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;members.$*&#x27;</span>);
 
-band.members.get(<span class="hljs-string">'singer'</span>); <span class="hljs-comment">// { _id: ..., name: 'Vince Neil' }</span>
+band.<span class="hljs-property">members</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;singer&#x27;</span>); <span class="hljs-comment">// { _id: ..., name: &#x27;Vince Neil&#x27; }</span>
 </code></pre>
 <p>You can also populate paths in maps of subdocuments using <code>$*</code>. For example, suppose you
 have the below <code>librarySchema</code>:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> librarySchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>,
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> librarySchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
   <span class="hljs-attr">books</span>: {
-    <span class="hljs-attr">type</span>: <span class="hljs-built_in">Map</span>,
-    <span class="hljs-attr">of</span>: <span class="hljs-keyword">new</span> Schema({
-      <span class="hljs-attr">title</span>: <span class="hljs-built_in">String</span>,
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Map</span>,
+    <span class="hljs-attr">of</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+      <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span>,
       <span class="hljs-attr">author</span>: {
-        <span class="hljs-attr">type</span>: <span class="hljs-string">'ObjectId'</span>,
-        <span class="hljs-attr">ref</span>: <span class="hljs-string">'Person'</span>
+        <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;ObjectId&#x27;</span>,
+        <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Person&#x27;</span>
       }
     })
   }
 });
-<span class="hljs-keyword">const</span> Library = mongoose.model(<span class="hljs-string">'Library, librarySchema'</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Library</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Library, librarySchema&#x27;</span>);
 </code></pre>
 <p>You can <code>populate()</code> every book&#39;s author by populating <code>books.$*.author</code>:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> libraries = <span class="hljs-keyword">await</span> Library.find().populate(<span class="hljs-string">'books.$*.author'</span>);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> libraries = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Library</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;books.$*.author&#x27;</span>);
 </code></pre>
 <h3 id="populate-middleware"><a href="#populate-middleware">Populate in Middleware</a></h3>
 
 <p>You can populate in either pre or post <a href="http://mongoosejs.com/docs/middleware.html">hooks</a>. If you want to
 always populate a certain field, check out the <a href="http://npmjs.com/package/mongoose-autopopulate">mongoose-autopopulate plugin</a>.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Always attach `populate()` to `find()` calls</span>
-MySchema.pre(<span class="hljs-string">'find'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-  <span class="hljs-keyword">this</span>.populate(<span class="hljs-string">'user'</span>);
+<span class="hljs-title class_">MySchema</span>.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;find&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;user&#x27;</span>);
 });
 </code></pre>
 <pre><code class="language-javascript"><span class="hljs-comment">// Always `populate()` after `find()` calls. Useful if you want to selectively populate</span>
 <span class="hljs-comment">// based on the docs found.</span>
-MySchema.post(<span class="hljs-string">'find'</span>, <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">docs</span>) </span>{
+<span class="hljs-title class_">MySchema</span>.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;find&#x27;</span>, <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>(<span class="hljs-params">docs</span>) {
   <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> doc <span class="hljs-keyword">of</span> docs) {
-    <span class="hljs-keyword">if</span> (doc.isPublic) {
-      <span class="hljs-keyword">await</span> doc.populate(<span class="hljs-string">'user'</span>);
+    <span class="hljs-keyword">if</span> (doc.<span class="hljs-property">isPublic</span>) {
+      <span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;user&#x27;</span>);
     }
   }
 });
 </code></pre>
 <pre><code class="language-javascript"><span class="hljs-comment">// `populate()` after saving. Useful for sending populated data back to the client in an</span>
 <span class="hljs-comment">// update API endpoint</span>
-MySchema.post(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc, next</span>) </span>{
-  doc.populate(<span class="hljs-string">'user'</span>).then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-    next();
+<span class="hljs-title class_">MySchema</span>.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">doc, next</span>) {
+  doc.<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;user&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-title function_">next</span>();
   });
 });
 </code></pre>
 <h3 id="populating-multiple-paths-middleware"><a href="#populating-multiple-paths-middleware">Populating Multiple Paths in Middleware</a></h3>
 
 <p>Populating multiple paths in middleware can be helpful when you always want to populate some fields. But, the implementation is just a tiny bit trickier than what you may think. Here&#39;s how you may expect it to work:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> Schema({
-  <span class="hljs-attr">email</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">password</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">followers</span>: [{ <span class="hljs-attr">type</span>: mongoose.Schema.Types.ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'User'</span> }],
-  <span class="hljs-attr">following</span>: [{ <span class="hljs-attr">type</span>: mongoose.Schema.Types.ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'User'</span> }]
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">email</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">password</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">followers</span>: [{ <span class="hljs-attr">type</span>: mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;User&#x27;</span> }],
+  <span class="hljs-attr">following</span>: [{ <span class="hljs-attr">type</span>: mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;User&#x27;</span> }]
 })
 
-userSchema.pre(<span class="hljs-string">'find'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{
-  <span class="hljs-keyword">this</span>.populate(<span class="hljs-string">"followers following"</span>);
-  next();
+userSchema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;find&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) {
+  <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">populate</span>(<span class="hljs-string">&quot;followers following&quot;</span>);
+  <span class="hljs-title function_">next</span>();
 });
 
-<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema)
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema)
 </code></pre>
 <p>However, this will not work. By default, passing multiple paths to <code>populate()</code> in the middleware will trigger an infinite recursion, which means that it will basically trigger the same middleware for all of the paths provided to the <code>populate()</code> method - For example, <code>this.populate(&#39;followers following&#39;)</code> will trigger the same middleware for both <code>followers</code> and <code>following</code> fields and the request will just be left hanging in an infinite loop.</p>
 <p>To avoid this, we have to add the <code>_recursed</code> option, so that our middleware will avoid populating recursively. The example below will make it work as expected.</p>
-<pre><code class="language-javascript">userSchema.pre(<span class="hljs-string">'find'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{
-  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.options._recursed) {
-    <span class="hljs-keyword">return</span> next();
+<pre><code class="language-javascript">userSchema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;find&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">options</span>.<span class="hljs-property">_recursed</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
   }
-  <span class="hljs-keyword">this</span>.populate({ <span class="hljs-attr">path</span>: <span class="hljs-string">"followers following"</span>, <span class="hljs-attr">options</span>: { <span class="hljs-attr">_recursed</span>: <span class="hljs-literal">true</span> } });
-  next();
+  <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">populate</span>({ <span class="hljs-attr">path</span>: <span class="hljs-string">&quot;followers following&quot;</span>, <span class="hljs-attr">options</span>: { <span class="hljs-attr">_recursed</span>: <span class="hljs-literal">true</span> } });
+  <span class="hljs-title function_">next</span>();
 });
 </code></pre>
 <p>Alternatively, you can check out the <a href="http://npmjs.com/package/mongoose-autopopulate">mongoose-autopopulate plugin</a>.</p>

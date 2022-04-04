@@ -653,7 +653,7 @@ string keys. For example, in the below schema, <code>members</code> is a map fro
 </code></pre>
 <p>This map has a <code>ref</code>, which means you can use <code>populate()</code> to populate all the ObjectIds
 in the map. Suppose you have the below <code>band</code> document:</p>
-<pre><code><span class="hljs-keyword">const</span> person1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Vince Neil&#x27;</span> });
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> person1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Vince Neil&#x27;</span> });
 <span class="hljs-keyword">const</span> person2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Mick Mars&#x27;</span> });
 
 <span class="hljs-keyword">const</span> band = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Band</span>({

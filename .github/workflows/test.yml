@@ -74,3 +74,31 @@ jobs:
 
       - name: Typings
         run: npm run test-tsd
+  
+  coverage:
+    runs-on: ubuntu-20.04
+    name: Coverage
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm install
+      - name: Setup
+        run: |
+          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.2.tgz
+          tar xf mongodb-linux-x86_64-ubuntu2004-5.0.2.tgz
+          mkdir -p ./data/db/27017 ./data/db/27000
+          printf "\n--timeout 8000" >> ./test/mocha.opts
+          ./mongodb-linux-x86_64-ubuntu2004-5.0.2/bin/mongod --setParameter ttlMonitorSleepSecs=1 --fork --dbpath ./data/db/27017 --syslog --port 27017
+          sleep 2
+          mongod --version
+          echo `pwd`/mongodb-linux-x86_64-ubuntu2004-5.0.2/bin >> $GITHUB_PATH
+      - name: test with coverage
+        run: npm run test-coverage
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: coverage

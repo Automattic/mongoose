@@ -1,0 +1,21 @@
+name: Benchmark
+on:
+  push:
+
+jobs:
+  typescript:
+    runs-on: ubuntu-20.04
+    name: TypeScript
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - run: npm install
+
+      - run: node ./benchmarks/typescript
+        env:
+          DB_URL: ${{ secrets.DB_URL }}

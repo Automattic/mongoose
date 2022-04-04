@@ -52,9 +52,18 @@ declare module 'mongoose' {
  * @param {T} T A generic type to be checked.
  * @returns true if {@link T} is Record OR false if {@link T} is of any type.
  */
-type IsItRecordAndNotAny<T> = IsTAny<T> extends true ? false : T extends Record<any, any> ? true : false;
+type IsItRecordAndNotAny<T> = IfEquals<T, any, false, T extends Record<any, any> ? true : false>;
 
-type IsTAny<T> = keyof any extends keyof T ? (unknown extends T ? true : false) : false;
+/**
+ * @summary Checks if two types are identical.
+ * @param {T} T The first type to be compared with {@link U}.
+ * @param {U} U The seconde type to be compared with {@link T}.
+ * @param {Y} Y A type to be returned if {@link T} &  {@link U} are identical.
+ * @param {N} N A type to be returned if {@link T} &  {@link U} are not identical.
+ */
+type IfEquals<T, U, Y = true, N = false> =
+    (<G>() => G extends T ? 1 : 0) extends
+    (<G>() => G extends U ? 1 : 0) ? Y : N;
 
 /**
  * @summary Required path base type.
@@ -131,8 +140,7 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
  * @returns Number, "Number" or "number" will be resolved to string type.
  */
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}> =
-  IsTAny<PathValueType> extends true ? Schema.Types.Mixed:
-    PathValueType extends (infer Item)[] ? ResolvePathType<Item>[] :
+    PathValueType extends (infer Item)[] ? IfEquals<Item, never, Schema.Types.Mixed, ResolvePathType<Item>>[] :
       PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? PathEnumOrString<Options['enum']> :
         PathValueType extends NumberConstructor | 'number' | 'Number' | typeof Schema.Types.Number ? number :
           PathValueType extends DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date ? Date :

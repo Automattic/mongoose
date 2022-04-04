@@ -1,6 +1,5 @@
 import { Schema, Document, SchemaDefinition, Model, Types, InferSchemaType, SchemaType, Query, HydratedDocument } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
-import { IsTAny } from '../../types/inferschematype';
 
 enum Genre {
   Action,
@@ -376,6 +375,7 @@ export function autoTypedSchema() {
     array2?: Schema.Types.Mixed[];
     array3?: Schema.Types.Mixed[];
     array4?: Schema.Types.Mixed[];
+    array5?: Schema.Types.Mixed[];
   };
 
   const TestSchema = new Schema({
@@ -408,10 +408,11 @@ export function autoTypedSchema() {
     customSchema: Int8,
     map1: { type: Map, of: String },
     map2: { type: Map, of: Number },
-    array1: { type: [String] },
-    array2: { type: Array },
-    array3: { type: [Schema.Types.Mixed] },
-    array4: { type: [{}] }
+    array1: [String],
+    array2: Array,
+    array3: [Schema.Types.Mixed],
+    array4: [{}],
+    array5: []
   });
 
   type InferredTestSchemaType = InferSchemaType<typeof TestSchema>;

@@ -265,3 +265,14 @@ async function gh11306(): Promise<void> {
   expectType<any[]>(await MyModel.distinct('name'));
   expectType<string[]>(await MyModel.distinct<string>('name'));
 }
+
+async function gh11602(): Promise<void> {
+  const updateResult = await Model.findOneAndUpdate(query, { $inc: { occurence: 1 } }, {
+    upsert: true,
+    returnDocument: 'after',
+    rawResult: true
+  });
+  expectError(updateResult.lastErrorObject?.modifiedCount);
+  expectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
+}

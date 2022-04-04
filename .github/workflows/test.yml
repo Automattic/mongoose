@@ -2,6 +2,9 @@ name: Test
 on:
     pull_request:
     push:
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -19,10 +22,10 @@ jobs:
             mongo: 5.0.2
     name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongo }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # v3
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
         with:
           node-version: ${{ matrix.node }}
 
@@ -44,10 +47,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Linter
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # v3
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
         with:
           node-version: 14
 
@@ -60,10 +63,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Typescript Types
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # v3
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
         with:
           node-version: 12
 
@@ -71,3 +74,31 @@ jobs:
 
       - name: Typings
         run: npm run test-tsd
+  
+  coverage:
+    runs-on: ubuntu-20.04
+    name: Coverage
+    steps:
+      - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # v3
+      - name: Setup node
+        uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
+        with:
+          node-version: 16
+      - run: npm install
+      - name: Setup
+        run: |
+          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.2.tgz
+          tar xf mongodb-linux-x86_64-ubuntu2004-5.0.2.tgz
+          mkdir -p ./data/db/27017 ./data/db/27000
+          printf "\n--timeout 8000" >> ./test/mocha.opts
+          ./mongodb-linux-x86_64-ubuntu2004-5.0.2/bin/mongod --setParameter ttlMonitorSleepSecs=1 --fork --dbpath ./data/db/27017 --syslog --port 27017
+          sleep 2
+          mongod --version
+          echo `pwd`/mongodb-linux-x86_64-ubuntu2004-5.0.2/bin >> $GITHUB_PATH
+      - name: test with coverage
+        run: npm run test-coverage
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: coverage

@@ -543,7 +543,7 @@ describe('versioning', function() {
     assert.equal(err.name, 'VersionError');
   });
 
-  it('throws VersionError when saving with no changes and optimistic concurrency is false (gh-11295)', async function() {
+  it('throws VersionError when saving with no changes and optimistic concurrency is true (gh-11295)', async function() {
     const robotSchema = new mongoose.Schema({
       name: String
     }, { optimisticConcurrency: true });

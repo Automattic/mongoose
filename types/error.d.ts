@@ -1,5 +1,3 @@
-import mongodb = require('mongodb');
-
 declare module 'mongoose' {
 
   class NativeError extends global.Error { }
@@ -30,7 +28,7 @@ declare module 'mongoose' {
       }
       export class SyncIndexesError extends MongooseError {
         name: 'SyncIndexesError';
-        errors?: Record<string, mongodb.MongoServerError>;
+        errors?: Record<string, MongoDBMongoServerError>;
 
         constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
       }

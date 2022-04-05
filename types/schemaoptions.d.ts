@@ -1,5 +1,3 @@
-import mongodb = require('mongodb');
-
 declare module 'mongoose' {
 
   interface SchemaTimestampsConfig {
@@ -38,10 +36,10 @@ declare module 'mongoose' {
      */
     capped?: boolean | number | { size?: number; max?: number; autoIndexId?: boolean; };
     /** Sets a default collation for every query and aggregation. */
-    collation?: mongodb.CollationOptions;
+    collation?: MongoDBCollationOptions;
 
     /** The timeseries option to use when creating the model's collection. */
-    timeseries?: mongodb.TimeSeriesCollectionOptions;
+    timeseries?: MongoDBTimeSeriesCollectionOptions;
 
     /** The number of seconds after which a document in a timeseries collection expires. */
     expireAfterSeconds?: number;

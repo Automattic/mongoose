@@ -1,4 +1,3 @@
-import mongodb = require('mongodb');
 import events = require('events');
 
 declare module 'mongoose' {
@@ -23,7 +22,7 @@ declare module 'mongoose' {
   /** Expose connection states for user-land */
   export const STATES: typeof ConnectionStates;
 
-  interface ConnectOptions extends mongodb.MongoClientOptions {
+  interface ConnectOptions extends MongoDBMongoClientOptions {
     /** Set to false to [disable buffering](http://mongoosejs.com/docs/faq.html#callback_never_executes) on all models associated with this connection. */
     bufferCommands?: boolean;
     /** The name of the database you want to use. If not provided, Mongoose uses the database name from connection string. */
@@ -48,7 +47,7 @@ declare module 'mongoose' {
     close(force?: boolean): Promise<void>;
 
     /** Retrieves a collection, creating it if not cached. */
-    collection<T extends AnyObject = AnyObject>(name: string, options?: mongodb.CreateCollectionOptions): Collection<T>;
+    collection<T extends AnyObject = AnyObject>(name: string, options?: MongoDBCreateCollectionOptions): Collection<T>;
 
     /** A hash of the collections associated with this connection */
     readonly collections: { [index: string]: Collection };
@@ -57,16 +56,16 @@ declare module 'mongoose' {
     readonly config: any;
 
     /** The mongodb.Db instance, set when the connection is opened */
-    readonly db: mongodb.Db;
+    readonly db: MongoDBDb;
 
     /**
        * Helper for `createCollection()`. Will explicitly create the given collection
        * with specified options. Used to create [capped collections](https://docs.mongodb.com/manual/core/capped-collections/)
        * and [views](https://docs.mongodb.com/manual/core/views/) from mongoose.
        */
-    createCollection<T extends AnyObject = AnyObject>(name: string, options: mongodb.CreateCollectionOptions, callback: Callback<mongodb.Collection<T>>): void;
-    createCollection<T extends AnyObject = AnyObject>(name: string, callback: Callback<mongodb.Collection<T>>): void;
-    createCollection<T extends AnyObject = AnyObject>(name: string, options?: mongodb.CreateCollectionOptions): Promise<mongodb.Collection<T>>;
+    createCollection<T extends AnyObject = AnyObject>(name: string, options: MongoDBCreateCollectionOptions, callback: Callback<MongoDBCollection<T>>): void;
+    createCollection<T extends AnyObject = AnyObject>(name: string, callback: Callback<MongoDBCollection<T>>): void;
+    createCollection<T extends AnyObject = AnyObject>(name: string, options?: MongoDBCreateCollectionOptions): Promise<MongoDBCollection<T>>;
 
     /**
        * Removes the model named `name` from this connection, if it exists. You can
@@ -96,7 +95,7 @@ declare module 'mongoose' {
        * Returns the [MongoDB driver `MongoClient`](http://mongodb.github.io/node-mongodb-native/3.5/api/MongoClient.html) instance
        * that this connection uses to talk to MongoDB.
        */
-    getClient(): mongodb.MongoClient;
+    getClient(): MongoDBMongoClient;
 
     /**
        * The host name portion of the URI. If multiple hosts, such as a replica set,
@@ -171,7 +170,7 @@ declare module 'mongoose' {
        * that this connection uses to talk to MongoDB. This is useful if you already have a MongoClient instance, and want to
        * reuse it.
        */
-    setClient(client: mongodb.MongoClient): this;
+    setClient(client: MongoDBMongoClient): this;
 
     /**
        * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
@@ -206,7 +205,7 @@ declare module 'mongoose' {
     readonly user: string;
 
     /** Watches the entire underlying database for changes. Similar to [`Model.watch()`](/docs/api/model.html#model_Model.watch). */
-    watch<ResultType = any>(pipeline?: Array<any>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
+    watch<ResultType = any>(pipeline?: Array<any>, options?: MongoDBChangeStreamOptions): MongoDBChangeStream<ResultType>;
   }
 
 }

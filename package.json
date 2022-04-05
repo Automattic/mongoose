@@ -21,7 +21,7 @@
   "dependencies": {
     "bson": "^4.2.2",
     "kareem": "2.3.5",
-    "mongodb": "4.3.1",
+    "mongodb": "4.5.0",
     "mpath": "0.8.4",
     "mquery": "4.0.2",
     "ms": "2.1.3",

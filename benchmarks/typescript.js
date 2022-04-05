@@ -63,7 +63,7 @@ async function run() {
       memoryUsed,
       checkTime,
       totalTime,
-      tsProjectDirectory: tsProjectDirectory
+      testName: tsProjectDirectory
     });
   }
 

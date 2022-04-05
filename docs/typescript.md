@@ -17,21 +17,21 @@ To get started with Mongoose in TypeScript, you need to:
 import { Schema, model, connect } from 'mongoose';
 
 // 1. Create an interface representing a document in MongoDB.
-interface IUser {
+interface User {
   name: string;
   email: string;
   avatar?: string;
 }
 
 // 2. Create a Schema corresponding to the document interface.
-const userSchema = new Schema<IUser>({
+const userSchema = new Schema<User>({
   name: { type: String, required: true },
   email: { type: String, required: true },
   avatar: String
 });
 
 // 3. Create a Model.
-const User = model<IUser>('User', userSchema);
+const UserModel = model<User>('User', userSchema);
 
 run().catch(err => console.log(err));
 
@@ -39,7 +39,7 @@ async function run() {
   // 4. Connect to MongoDB
   await connect('mongodb://localhost:27017/test');
 
-  const user = new User({
+  const user = UserModel.create({
     name: 'Bill',
     email: 'bill@initech.com',
     avatar: 'https://i.imgur.com/dM7Thhn.png'
@@ -53,14 +53,14 @@ async function run() {
 You as the developer are responsible for ensuring that your document interface lines up with your Mongoose schema.
 For example, Mongoose won't report an error if `email` is `required` in your Mongoose schema but optional in your document interface.
 
-The `User()` constructor returns an instance of `HydratedDocument<IUser>`.
-`IUser` is a _document interface_, it represents the raw object structure that `IUser` objects look like in MongoDB.
-`HydratedDocument<IUser>` represents a hydrated Mongoose document, with methods, virtuals, and other Mongoose-specific features.
+The `UserModel.create()` constructor returns an instance of `HydratedDocument<User>`.
+`User` is a _document interface_, it represents the raw object structure that `User` objects look like in MongoDB.
+`HydratedDocument<User>` represents a hydrated Mongoose document, with methods, virtuals, and other Mongoose-specific features.
 
 ```ts
 import { HydratedDocument } from 'mongoose';
 
-const user: HydratedDocument<IUser> = new User({
+const user: HydratedDocument<User> = UserModel.create({
   name: 'Bill',
   email: 'bill@initech.com',
   avatar: 'https://i.imgur.com/dM7Thhn.png'
@@ -75,7 +75,7 @@ To define a property of type `ObjectId`, you should use `Types.ObjectId` in the 
 import { Schema, Types } from 'mongoose';
 
 // 1. Create an interface representing a document in MongoDB.
-interface IUser {
+interface User {
   name: string;
   email: string;
   // Use `Types.ObjectId` in document interface...
@@ -83,7 +83,7 @@ interface IUser {
 }
 
 // 2. Create a Schema corresponding to the document interface.
-const userSchema = new Schema<IUser>({
+const userSchema = new Schema<User>({
   name: { type: String, required: true },
   email: { type: String, required: true },
   // And `Schema.Types.ObjectId` in the schema definition.
@@ -103,7 +103,7 @@ Many Mongoose TypeScript codebases use the below approach.
 ```typescript
 import { Document, Schema, model, connect } from 'mongoose';
 
-interface IUser extends Document {
+interface User extends Document {
   name: string;
   email: string;
   avatar?: string;

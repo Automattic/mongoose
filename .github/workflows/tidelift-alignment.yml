@@ -1,6 +1,8 @@
 name: Tidelift Alignment
 on:
   push:
+    paths:
+      - 'package.json'
   schedule:
     - cron: '0 0 * * *'  # every day at midnight
 

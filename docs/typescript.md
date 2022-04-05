@@ -31,7 +31,7 @@ const userSchema = new Schema<User>({
 });
 
 // 3. Create a Model.
-const UserModel = model<User>('User', userSchema);
+const User = model<User>('User', userSchema);
 
 run().catch(err => console.log(err));
 

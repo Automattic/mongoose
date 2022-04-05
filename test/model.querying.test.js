@@ -2399,6 +2399,17 @@ describe('model: querying:', function() {
       });
     });
 
+    it('removes the __v property if versionKey: false is set (gh-8934)', async function() {
+      const title = 'Wooooot ' + random();
+      await BlogPostB.create({ title });
+      const foundPost = await BlogPostB.find({ title }).lean({ versionKey: false });
+      assert.ok(!('__v' in foundPost));
+      const anotherFoundPost = await BlogPostB.findOne({ title }).lean({ versionKey: false });
+      assert.ok(!('__v' in anotherFoundPost));
+      const updateFoundPost = await BlogPostB.findOneAndUpdate({ title: title }, { title: 'Woooot' }).lean({ versionKey: false });
+      assert.ok(!('__v' in updateFoundPost));
+    });
+
     it('findOne', function(done) {
       const title = 'Wooooot ' + random();
 

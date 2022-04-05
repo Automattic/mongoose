@@ -31,7 +31,7 @@ jobs:
 
       - run: npm install
 
-      - name: Lint JS-Filess
+      - name: Lint JS-Files
         run: npm run lint-js
 
   test:

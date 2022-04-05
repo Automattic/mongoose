@@ -66,13 +66,20 @@ async function persist(results) {
 
   await mongoose.connect(process.env.DB_URL);
 
-  const BenchmarkResult = mongoose.model('BenchmarkResult', mongoose.Schema({
+  const benchmarkResultsSchema = mongoose.Schema({
     githash: { type: String, required: true },
     benchmarkName: { type: String, required: true },
     results: 'Mixed'
-  }, { timestamps: true }), 'BenchmarkResult');
+  }, { timestamps: true });
 
-  await BenchmarkResult.findOneAndUpdate(
+  benchmarkResultsSchema.index({ githash: 1 }, { unique: true });
+
+
+  const BenchmarkResult = mongoose.model('BenchmarkResult', benchmarkResultsSchema, 'BenchmarkResult');
+
+  await BenchmarkResult.syncIndexes();
+
+  await BenchmarkResult.updateOne(
     { githash: process.env.GITHUB_SHA, benchmarkName: 'TypeScript' },
     { results },
     { upsert: true }

@@ -193,7 +193,7 @@ await User.findOneAndUpdate({}, { name: 'test' });
 
 You'll see the below output from Mongoose debug mode:
 
-```
+```no-highlight
 Mongoose: users.findOneAndUpdate({}, { '$setOnInsert': { createdAt: new Date("Sun, 27 Feb 2022 00:26:27 GMT") }, '$set': { updatedAt: new Date("Sun, 27 Feb 2022 00:26:27 GMT"), name: 'test' }}, {...})
 ```
 

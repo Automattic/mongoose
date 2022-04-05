@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "mongoose": ["../../../"]
+    }
+  },
+  "esModuleInterop": true,
+  "outDir": "typescript",
+  "strictNullChecks": true,
+  "include": [
+    "./*.ts",
+    "../../../index.d.ts"
+  ]
+}

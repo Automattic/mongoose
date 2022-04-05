@@ -292,7 +292,7 @@ The underlying MongoDB driver uses a process known as [server selection](https:/
 If the MongoDB driver can't find a server to send an operation to after `serverSelectionTimeoutMS`,
 you'll get the below error:
 
-```
+```no-highlight
 MongoTimeoutError: Server selection timed out after 30000 ms
 ```
 

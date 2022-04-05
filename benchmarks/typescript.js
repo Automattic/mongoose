@@ -1,14 +1,10 @@
 'use strict';
 
 const { exec } = require('child_process');
+const fs = require('fs/promises');
 const mongoose = require('../');
 
 const numIterations = 10;
-
-let instantiations = 0;
-let memoryUsed = 0;
-let checkTime = 0;
-let totalTime = 0;
 
 run().catch(err => {
   console.error(err);
@@ -16,44 +12,52 @@ run().catch(err => {
 });
 
 async function run() {
-  for (let i = 0; i < numIterations; ++i) {
-    console.log(`${i}...`);
-    const { stdout } = await new Promise((resolve, reject) => {
-      exec('../../../node_modules/.bin/tsc --extendedDiagnostics', { cwd: `${__dirname}/typescript/simple` }, (err, stdout, stderr) => {
-        if (err) {
-          console.error(err);
-          console.error(stdout);
-          console.error(stderr);
-          return reject(err);
-        }
+  const tsProjectsDirectories = await fs.readdir('benchmarks/typescript');
 
-        resolve({ stdout });
-      });
+  for (const tsProjectDirectory of tsProjectsDirectories) {
+    let instantiations = 0;
+    let memoryUsed = 0;
+    let checkTime = 0;
+    let totalTime = 0;
+
+    for (let i = 0; i < numIterations; ++i) {
+      console.log(`${i}...`);
+
+      const { stdout } = await execPromise(
+        '../../../node_modules/.bin/tsc --extendedDiagnostics',
+        { cwd: `${__dirname}/benchmarks/typescript/${tsProjectDirectory}` }
+      );
+
+      const lines = stdout.split('\n');
+
+      const _instantiations = +lines.find(line => line.startsWith('Instantiations:')).match(/\d+/)[0];
+      const _memoryUsed = +lines.find(line => line.startsWith('Memory used:')).match(/\d+/)[0];
+      const _checkTime = +lines.find(line => line.startsWith('Check time:')).match(/\d+(\.\d+)?/)[0];
+      const _totalTime = +lines.find(line => line.startsWith('Total time:')).match(/\d+(\.\d+)?/)[0];
+
+      instantiations += _instantiations;
+      memoryUsed += _memoryUsed;
+      checkTime += _checkTime;
+      totalTime += _totalTime;
+    }
+
+    instantiations /= numIterations;
+    memoryUsed /= numIterations;
+    checkTime /= numIterations;
+    totalTime /= numIterations;
+    console.log(instantiations);
+    console.log(memoryUsed);
+    console.log(checkTime);
+    console.log(totalTime);
+
+    await persist({
+      instantiations,
+      memoryUsed,
+      checkTime,
+      totalTime,
+      benchmarkName: `TypeScript/${tsProjectDirectory}`
     });
-
-    const lines = stdout.split('\n');
-
-    const _instantiations = +lines.find(line => line.startsWith('Instantiations:')).match(/\d+/)[0];
-    const _memoryUsed = +lines.find(line => line.startsWith('Memory used:')).match(/\d+/)[0];
-    const _checkTime = +lines.find(line => line.startsWith('Check time:')).match(/\d+(\.\d+)?/)[0];
-    const _totalTime = +lines.find(line => line.startsWith('Total time:')).match(/\d+(\.\d+)?/)[0];
-
-    instantiations += _instantiations;
-    memoryUsed += _memoryUsed;
-    checkTime += _checkTime;
-    totalTime += _totalTime;
   }
-
-  instantiations /= numIterations;
-  memoryUsed /= numIterations;
-  checkTime /= numIterations;
-  totalTime /= numIterations;
-  console.log(instantiations);
-  console.log(memoryUsed);
-  console.log(checkTime);
-  console.log(totalTime);
-
-  await persist({ instantiations, memoryUsed, checkTime, totalTime });
 }
 
 async function persist(results) {
@@ -80,10 +84,27 @@ async function persist(results) {
   await BenchmarkResult.syncIndexes();
 
   await BenchmarkResult.updateOne(
-    { githash: process.env.GITHUB_SHA, benchmarkName: 'TypeScript' },
+    { githash: process.env.GITHUB_SHA, benchmarkName: results.benchmarkName },
     { results },
     { upsert: true }
   );
 
   await mongoose.disconnect();
+}
+
+
+function execPromise(command, options) {
+  return new Promise(function(resolve, reject) {
+    exec(command, options, (error, stdout, stderr) => {
+      if (error) {
+        console.error(error);
+        console.error(stdout);
+        console.error(stderr);
+        reject(error);
+        return;
+      }
+
+      resolve({ stdout });
+    });
+  });
 }

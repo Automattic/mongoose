@@ -1,6 +1,13 @@
 name: Benchmark
 on:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'types/**'
+      - 'benchmarks/typescript/**'
   push:
+    branches:
+      - master
     paths:
       - 'package.json'
       - 'types/**'

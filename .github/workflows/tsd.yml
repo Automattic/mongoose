@@ -1,6 +1,13 @@
 name: Typescript Types
 on:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'types/**'
+      - 'test/types/**'
   push:
+    branches:
+      - master
     paths:
       - 'package.json'
       - 'types/**'

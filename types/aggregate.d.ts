@@ -2,6 +2,70 @@ import mongodb = require('mongodb');
 
 declare module 'mongoose' {
 
+  interface AggregateOptions {
+    /**
+     * If true, the MongoDB server will use the hard drive to store data during this aggregation.
+     */
+    allowDiskUse?: boolean;
+    /**
+     * Applicable only if you specify the $out or $merge aggregation stages.
+     *
+     * Enables db.collection.aggregate() to bypass document validation during the operation. This lets you insert documents that do not meet the validation requirements.
+     */
+    bypassDocumentValidation?: boolean;
+    /**
+     * The BSON-serializer will check if keys are valid
+     */
+    collation?: mongodb.CollationOptions;
+    /**
+     * Users can specify an arbitrary string to help trace the operation through the database profiler, currentOp, and logs.
+     */
+    comment?: string;
+    /**
+     *  Specifies the initial batch size for the cursor. The value of the cursor field is a document with the field batchSize.
+     */
+    cursor?: { batchSize?: number; };
+    /**
+     * Specifies to return the information on the processing of the pipeline. See Return Information on Aggregation Pipeline Operation for an example.
+     *
+     * Not available in multi-document transactions.
+     */
+    explain?: mongodb.ExplainVerbosityLike;
+    /**
+     * The index to use for the aggregation. The index is on the initial collection/view against which the aggregation is run.
+     */
+    hint?: string | AnyObject;
+    /**
+     * Specifies a document with a list of variables. This allows you to improve command readability by separating the variables from the query text.
+     */
+    let?: AnyObject;
+    /**
+     * Specifies a time limit in milliseconds for processing operations on a cursor. If you do not specify a value for maxTimeMS, operations will not time out. A value of 0 explicitly specifies the default unbounded behavior.
+     *
+     * @see https://docs.mongodb.com/manual/reference/operator/meta/maxTimeMS/
+     */
+    maxTimeMS?: number;
+    /**
+     * Return BSON filled buffers from operations.
+     */
+    raw?: boolean;
+    /**
+     * Specifies the read concern.
+     */
+    readConcern?: mongodb.ReadConcernLike;
+    /**
+     * The preferred read preference.
+     */
+    readPreference?: mongodb.ReadPreferenceLike;
+    /** The ClientSession for this aggregation */
+    session?: mongodb.ClientSession;
+    /**
+     * Specifies the write concern.
+     */
+    writeConcern?: mongodb.WriteConcern;
+    [key: string]: any;
+  }
+
   class Aggregate<R> {
     /**
      * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js
@@ -9,6 +73,8 @@ declare module 'mongoose' {
      * will call it for you.
      */
     [Symbol.asyncIterator](): AsyncIterableIterator<Unpacked<R>>;
+
+    options: AggregateOptions;
 
     /**
      * Sets an option on this aggregation. This function will be deprecated in a
@@ -53,8 +119,8 @@ declare module 'mongoose' {
     exec(): Promise<R>;
 
     /** Execute the aggregation with explain */
-    explain(verbosity: mongodb.ExplainVerbosity, callback: Callback<AnyObject>): void;
-    explain(verbosity: mongodb.ExplainVerbosity): Promise<AnyObject>;
+    explain(verbosity: mongodb.ExplainVerbosityLike, callback: Callback<AnyObject>): void;
+    explain(verbosity: mongodb.ExplainVerbosityLike): Promise<AnyObject>;
     explain(callback: Callback<AnyObject>): void;
     explain(): Promise<AnyObject>;
 
@@ -104,7 +170,7 @@ declare module 'mongoose' {
     project(arg: PipelineStage.Project['$project']): this;
 
     /** Sets the readPreference option for the aggregation query. */
-    read(pref: string | mongodb.ReadPreferenceMode): this;
+    read(pref: mongodb.ReadPreferenceLike): this;
 
     /** Sets the readConcern level for the aggregation query. */
     readConcern(level: string): this;
@@ -122,7 +188,7 @@ declare module 'mongoose' {
     search(options: PipelineStage.Search['$search']): this;
 
     /** Lets you set arbitrary options, for middlewares or plugins. */
-    option(value: Record<string, unknown>): this;
+    option(value: AggregateOptions): this;
 
     /** Appends new custom $sample operator to this aggregate pipeline. */
     sample(arg: PipelineStage.Sample['$sample']['size']): this;

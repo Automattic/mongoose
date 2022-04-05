@@ -1,10 +1,5 @@
 name: Typescript Types
 on:
-  pull_request:
-    paths:
-      - 'package.json'
-      - 'types/**'
-      - 'test/types/**'
   push:
     paths:
       - 'package.json'

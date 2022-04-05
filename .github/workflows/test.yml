@@ -1,11 +1,5 @@
 name: Test
 on:
-  pull_request:
-    paths:
-      - 'package.json'
-      - 'index.js'
-      - 'lib/**'
-      - 'test/**.js'
   push:
     paths:
       - 'package.json'

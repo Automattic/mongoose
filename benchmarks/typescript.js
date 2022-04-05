@@ -14,8 +14,11 @@ run().catch(err => {
 
 async function run() {
   if (process.env.DB_URL) {
-    await mongoose.connect();
+    await mongoose.connect(process.env.DB_URL);
   }
+
+
+  const results = [];
 
   const tsProjectsDirectories = await fs.readdir('benchmarks/typescript');
 
@@ -55,15 +58,16 @@ async function run() {
     console.log(`${tsProjectDirectory} memory used:`, memoryUsed);
     console.log(`${tsProjectDirectory} check time:`, checkTime);
     console.log(`${tsProjectDirectory} total time:`, totalTime);
-
-    await persist({
+    results.push({
       instantiations,
       memoryUsed,
       checkTime,
       totalTime,
-      benchmarkName: `TypeScript/${tsProjectDirectory}`
+      tsProjectDirectory: tsProjectDirectory
     });
   }
+
+  await persist(results);
 
   await mongoose.disconnect();
 }
@@ -78,7 +82,7 @@ async function persist(results) {
 
   const BenchmarkResult = getBenchmarkResult();
   await BenchmarkResult.updateOne(
-    { githash: process.env.GITHUB_SHA, benchmarkName: results.benchmarkName },
+    { githash: process.env.GITHUB_SHA, benchmarkName: 'TypeScript' },
     { results },
     { upsert: true }
   );

@@ -39,7 +39,7 @@ async function run() {
   // 4. Connect to MongoDB
   await connect('mongodb://localhost:27017/test');
 
-  const user = UserModel.create({
+  const user = new User({
     name: 'Bill',
     email: 'bill@initech.com',
     avatar: 'https://i.imgur.com/dM7Thhn.png'
@@ -53,14 +53,14 @@ async function run() {
 You as the developer are responsible for ensuring that your document interface lines up with your Mongoose schema.
 For example, Mongoose won't report an error if `email` is `required` in your Mongoose schema but optional in your document interface.
 
-The `UserModel.create()` constructor returns an instance of `HydratedDocument<User>`.
+The `User()` constructor returns an instance of `HydratedDocument<User>`.
 `User` is a _document interface_, it represents the raw object structure that `User` objects look like in MongoDB.
 `HydratedDocument<User>` represents a hydrated Mongoose document, with methods, virtuals, and other Mongoose-specific features.
 
 ```ts
 import { HydratedDocument } from 'mongoose';
 
-const user: HydratedDocument<User> = UserModel.create({
+const user: HydratedDocument<User> = new User({
   name: 'Bill',
   email: 'bill@initech.com',
   avatar: 'https://i.imgur.com/dM7Thhn.png'

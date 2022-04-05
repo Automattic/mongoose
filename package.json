@@ -63,7 +63,7 @@
     "lib": "./lib/mongoose"
   },
   "scripts": {
-    "lint": "eslint .",
+    "lint": "npm run lint-ts && npm run lint-js",
     "lint-js": "eslint . --ext .js",
     "lint-ts": "eslint . --ext .ts",
     "build-browser": "node build-browser.js",

@@ -178,9 +178,9 @@ declare module 'mongoose' {
        * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
        * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
        */
-    startSession(options: mongodb.ClientSessionOptions | undefined | null, callback: Callback<mongodb.ClientSession>): void;
-    startSession(callback: Callback<mongodb.ClientSession>): void;
-    startSession(options?: mongodb.ClientSessionOptions): Promise<mongodb.ClientSession>;
+    startSession(options: MongoDBClientSessionOptions | undefined | null, callback: Callback<MongoDBClientSession>): void;
+    startSession(callback: Callback<MongoDBClientSession>): void;
+    startSession(options?: MongoDBClientSessionOptions): Promise<MongoDBClientSession>;
 
     /**
        * Makes the indexes in MongoDB match the indexes defined in every model's
@@ -197,7 +197,7 @@ declare module 'mongoose' {
        * async function executes successfully and attempt to retry if
        * there was a retryable error.
        */
-    transaction<U = any>(fn: (session: mongodb.ClientSession) => Promise<U>): Promise<U>;
+    transaction<U = any>(fn: (session: MongoDBClientSession) => Promise<U>): Promise<U>;
 
     /** Switches to a different database using the same connection pool. */
     useDb(name: string, options?: { useCache?: boolean, noListener?: boolean }): Connection;

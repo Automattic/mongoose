@@ -159,13 +159,16 @@ declare module 'mongoose' {
   /** Sets mongoose options */
   export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): typeof mongoose;
 
+  export type MongoDBClientSession = mongodb.ClientSession;
+  export type MongoDBClientSessionOptions = mongodb.ClientSessionOptions;
+
   /**
    * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
    * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
    * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
    */
-  export function startSession(options?: mongodb.ClientSessionOptions): Promise<mongodb.ClientSession>;
-  export function startSession(options: mongodb.ClientSessionOptions, cb: Callback<mongodb.ClientSession>): void;
+  export function startSession(options: MongoDBClientSessionOptions, cb: Callback<MongoDBClientSession>): void;
+  export function startSession(options?: MongoDBClientSessionOptions): Promise<MongoDBClientSession>;
 
   /** The Mongoose version */
   export const version: string;
@@ -175,8 +178,6 @@ declare module 'mongoose' {
 
   type Mongoose = typeof mongoose;
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface ClientSession extends mongodb.ClientSession { }
 
   /*
    * section collection.js
@@ -434,7 +435,7 @@ declare module 'mongoose' {
      * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
      * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
      * */
-    startSession(options?: mongodb.ClientSessionOptions, cb?: Callback<mongodb.ClientSession>): Promise<mongodb.ClientSession>;
+    startSession(options?: MongoDBClientSessionOptions, cb?: Callback<MongoDBClientSession>): Promise<MongoDBClientSession>;
 
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(callback?: CallbackWithoutResult): Promise<void>;
@@ -585,7 +586,7 @@ declare module 'mongoose' {
      */
     sanitizeFilter?: boolean;
     /** The session associated with this query. */
-    session?: mongodb.ClientSession;
+    session?: MongoDBClientSession;
     setDefaultsOnInsert?: boolean;
     skip?: number;
     snapshot?: any;
@@ -616,7 +617,7 @@ declare module 'mongoose' {
     checkKeys?: boolean;
     j?: boolean;
     safe?: boolean | WriteConcern;
-    session?: ClientSession | null;
+    session?: MongoDBClientSession | null;
     timestamps?: boolean;
     validateBeforeSave?: boolean;
     validateModifiedOnly?: boolean;
@@ -639,7 +640,7 @@ declare module 'mongoose' {
     rawResult?: boolean;
     ordered?: boolean;
     lean?: boolean;
-    session?: mongodb.ClientSession;
+    session?: MongoDBClientSession;
     populate?: string | string[] | PopulateOptions | PopulateOptions[];
   }
 
@@ -1828,7 +1829,7 @@ declare module 'mongoose' {
      * associated with this query. Sessions are how you mark a query as part of a
      * [transaction](/docs/transactions.html).
      */
-    session(session: mongodb.ClientSession | null): this;
+    session(session: MongoDBClientSession | null): this;
 
     /**
      * Adds a `$set` to this query's update without changing the operation.
@@ -2242,7 +2243,7 @@ declare module 'mongoose' {
     sample(size: number): this;
 
     /** Sets the session for this aggregation. Useful for [transactions](/docs/transactions.html). */
-    session(session: mongodb.ClientSession | null): this;
+    session(session: MongoDBClientSession | null): this;
 
     /**
      * Appends a new $skip operator to this aggregate pipeline.

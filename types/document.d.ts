@@ -1,5 +1,3 @@
-import mongodb = require('mongodb');
-
 declare module 'mongoose' {
 
   /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
@@ -60,7 +58,7 @@ declare module 'mongoose' {
      * automatically set `session` if you `save()` a doc that you got from a
      * query with an associated session.
      */
-    $session(session?: mongodb.ClientSession | null): mongodb.ClientSession | null;
+    $session(session?: MongoDBClientSession | null): MongoDBClientSession | null;
 
     /** Alias for `set()`, used internally to avoid conflicts */
     $set(path: string, val: any, type: any, options?: any): this;

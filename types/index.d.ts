@@ -1,3 +1,4 @@
+/// <reference path="./mongodb.d.ts" />
 /// <reference path="./connection.d.ts" />
 /// <reference path="./cursor.d.ts" />
 /// <reference path="./document.d.ts" />
@@ -158,9 +159,6 @@ declare module 'mongoose' {
 
   /** Sets mongoose options */
   export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): typeof mongoose;
-
-  export type MongoDBClientSession = mongodb.ClientSession;
-  export type MongoDBClientSessionOptions = mongodb.ClientSessionOptions;
 
   /**
    * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)

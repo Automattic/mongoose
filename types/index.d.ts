@@ -248,7 +248,11 @@ declare module 'mongoose' {
 
   interface ModifyResult<T> {
     value: Require_id<T> | null;
-    lastErrorObject?: mongodb.Document;
+    /** see https://www.mongodb.com/docs/manual/reference/command/findAndModify/#lasterrorobject */
+    lastErrorObject?: {
+      updatedExisting?: boolean;
+      upserted?: mongodb.ObjectId;
+    };
     ok: 0 | 1;
   }
 
@@ -750,8 +754,6 @@ declare module 'mongoose' {
 
   type SchemaPreOptions = { document?: boolean, query?: boolean };
   type SchemaPostOptions = { document?: boolean, query?: boolean };
-
-  type ExtractVirtuals<M> = M extends Model<any, any, any, infer TVirtuals> ? TVirtuals : {};
 
   type IndexDirection = 1 | -1 | '2d' | '2dsphere' | 'geoHaystack' | 'hashed' | 'text';
   type IndexDefinition = Record<string, IndexDirection>;

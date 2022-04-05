@@ -134,4 +134,58 @@ describe('eachAsync()', function() {
 
     return eachAsync(next, fn, { batchSize, parallel });
   });
+
+  it('executes all documents and aggregates errors if continueOnError set (gh-6355)', async() => {
+    const max = 3;
+    let numCalled = 0;
+    function next(cb) {
+      setImmediate(() => {
+        if (++numCalled > max) {
+          return cb(null, null);
+        }
+        cb(null, { num: numCalled });
+      });
+    }
+
+    function fn(doc) {
+      return doc.num % 2 === 1 ? Promise.reject(new Error(`Doc number ${doc.num}`)) : null;
+    }
+
+    const err = await eachAsync(next, fn, { continueOnError: true }).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'EachAsyncMultiError');
+    assert.ok(err.message.includes('Doc number 1'));
+    assert.ok(err.message.includes('Doc number 3'));
+    assert.equal(err.errors.length, 2);
+    assert.equal(err.errors[0].message, 'Doc number 1');
+    assert.equal(err.errors[1].message, 'Doc number 3');
+  });
+
+  it('returns aggregated error fetching documents with continueOnError (gh-6355)', async() => {
+    const max = 3;
+    let numCalled = 0;
+    function next(cb) {
+      setImmediate(() => {
+        if (++numCalled > max) {
+          return cb(null, null);
+        }
+        if (numCalled % 2 === 1) {
+          return cb(new Error(`Fetching doc ${numCalled}`));
+        }
+        cb(null, { num: numCalled });
+      });
+    }
+
+    function fn() {
+      return null;
+    }
+
+    const err = await eachAsync(next, fn, { continueOnError: true }).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'EachAsyncMultiError', err);
+    assert.ok(err.message.includes('Fetching doc 1'));
+    assert.equal(err.errors.length, 1);
+    assert.equal(err.errors[0].message, 'Fetching doc 1');
+    assert.equal(numCalled, 1);
+  });
 });

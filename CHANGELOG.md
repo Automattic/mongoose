@@ -1,3 +1,9 @@
+6.2.10 / 2022-04-04
+===================
+ * fix(types): improve lastErrorObject typing for rawResults #11602 [simllll](https://github.com/simllll)
+ * docs(typescript): add note about deprecating extends Document #11619 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: consistent syntax highlighting with upgraded highlight.js #11579 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 6.2.9 / 2022-03-28
 ==================
  * perf(document+model): make a few small optimizations #11380

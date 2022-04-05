@@ -7278,7 +7278,7 @@ describe('Model', function() {
     Model.events.on('error', err => { called.push(err); });
 
 
-    await Model.findOne({ _id: 'notanid' }).catch(() => {});
+    await Model.findOne({ _id: 'Not a valid ObjectId' }).catch(() => {});
     assert.equal(called.length, 1);
     assert.equal(called[0].name, 'CastError');
 

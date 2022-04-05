@@ -763,7 +763,7 @@ const Band = mongoose.model('Band', bandSchema);
 This map has a `ref`, which means you can use `populate()` to populate all the ObjectIds
 in the map. Suppose you have the below `band` document:
 
-```
+```javascript
 const person1 = new Person({ name: 'Vince Neil' });
 const person2 = new Person({ name: 'Mick Mars' });
 

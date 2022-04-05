@@ -37,8 +37,14 @@ const renderer = {
   }
 };
 markdown.setOptions({
-  highlight: function(code) {
-    return highlight.highlight('JavaScript', code).value;
+  highlight: function(code, language) {
+    if (!language) {
+      language = 'javascript';
+    }
+    if (language === 'no-highlight') {
+      return code;
+    }
+    return highlight.highlight(code, { language }).value;
   }
 });
 markdown.use({ renderer });

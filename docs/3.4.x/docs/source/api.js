@@ -207,7 +207,7 @@ function fix (str) {
     }
 
     return $1
-          + hl.highlight(code[1], code[2]).value.trim()
+          + hl.highlight(code[2], { language: code[1] }).value.trim()
           + $3;
   });
 }

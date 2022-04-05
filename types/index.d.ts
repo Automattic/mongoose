@@ -2032,7 +2032,7 @@ declare module 'mongoose' {
   }
 
   type ProjectionElementType = number | string;
-  export type ProjectionType<T> = { [P in keyof T]?: ProjectionElementType } | string;
+  export type ProjectionType<T> = { [P in keyof T]?: ProjectionElementType } | AnyObject | string;
 
   export type QuerySelector<T> = {
     // Comparison

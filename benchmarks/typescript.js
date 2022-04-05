@@ -8,10 +8,15 @@ const numIterations = 10;
 
 run().catch(err => {
   console.error(err);
+  mongoose.disconnect();
   process.exit(-1);
 });
 
 async function run() {
+  if (process.env.DB_URL) {
+    await mongoose.connect();
+  }
+
   const tsProjectsDirectories = await fs.readdir('benchmarks/typescript');
 
   for (const tsProjectDirectory of tsProjectsDirectories) {
@@ -45,10 +50,11 @@ async function run() {
     memoryUsed /= numIterations;
     checkTime /= numIterations;
     totalTime /= numIterations;
-    console.log(instantiations);
-    console.log(memoryUsed);
-    console.log(checkTime);
-    console.log(totalTime);
+
+    console.log(`${tsProjectDirectory} instantiations:`, instantiations);
+    console.log(`${tsProjectDirectory} memory used:`, memoryUsed);
+    console.log(`${tsProjectDirectory} check time:`, checkTime);
+    console.log(`${tsProjectDirectory} total time:`, totalTime);
 
     await persist({
       instantiations,
@@ -58,6 +64,8 @@ async function run() {
       benchmarkName: `TypeScript/${tsProjectDirectory}`
     });
   }
+
+  await mongoose.disconnect();
 }
 
 async function persist(results) {
@@ -68,7 +76,18 @@ async function persist(results) {
     return;
   }
 
-  await mongoose.connect(process.env.DB_URL);
+  const BenchmarkResult = getBenchmarkResult();
+  await BenchmarkResult.updateOne(
+    { githash: process.env.GITHUB_SHA, benchmarkName: results.benchmarkName },
+    { results },
+    { upsert: true }
+  );
+}
+
+async function getBenchmarkResult() {
+  if (mongoose.models.BenchmarkResult) {
+    return BenchmarkResult;
+  }
 
   const benchmarkResultsSchema = mongoose.Schema({
     githash: { type: String, required: true },
@@ -82,16 +101,8 @@ async function persist(results) {
   const BenchmarkResult = mongoose.model('BenchmarkResult', benchmarkResultsSchema, 'BenchmarkResult');
 
   await BenchmarkResult.syncIndexes();
-
-  await BenchmarkResult.updateOne(
-    { githash: process.env.GITHUB_SHA, benchmarkName: results.benchmarkName },
-    { results },
-    { upsert: true }
-  );
-
-  await mongoose.disconnect();
+  return BenchmarkResult;
 }
-
 
 function execPromise(command, options) {
   return new Promise(function(resolve, reject) {

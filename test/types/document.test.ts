@@ -1,7 +1,7 @@
 import { Schema, model, Model, Document, Types } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
-import { M0_0aAutoTypedSchemaType } from './schema.test';
+import { AutoTypedSchemaType } from './schema.test';
 
 const Drink = model('Drink', new Schema({
   name: String
@@ -185,20 +185,17 @@ async function gh11598() {
   doc.populate('favoritDrink', undefined, model('temp', new Schema()));
 }
 
-function m0_0aDocument() {
+function autoTypedDocument() {
   const AutoTypedModel = autoTypedModel();
   const AutoTypeModelInstance = new AutoTypedModel({ unExistProperty: 1, description: 2 });
 
-  expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
-  expectType<M0_0aAutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
-  expectType<M0_0aAutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
+  expectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
+  expectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
+  expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
   expectType<number>(AutoTypeModelInstance.unExistProperty);
   expectType<number>(AutoTypeModelInstance.description);
 
-  /* -------------------------------------------------------------------------- */
-  /*                           Document-Methods-tests                           */
-  /* -------------------------------------------------------------------------- */
-
-  expectType<ReturnType<M0_0aAutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
+  // Document-Methods-tests
+  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
 
 }

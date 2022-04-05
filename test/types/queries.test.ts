@@ -2,7 +2,7 @@ import { HydratedDocument, Schema, model, Document, Types, Query, Model, QueryWi
 import { ObjectId } from 'mongodb';
 import { expectError, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
-import { M0_0aAutoTypedSchemaType } from './schema.test';
+import { AutoTypedSchemaType } from './schema.test';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;

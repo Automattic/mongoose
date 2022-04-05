@@ -461,19 +461,19 @@ export function autoTypedSchema() {
   }, {
     statics: {
       staticFn() {
-        expectType<Model<M0_0aAutoTypedSchemaType['schema']>>(this);
+        expectType<Model<AutoTypedSchemaType['schema']>>(this);
         return 'Returned from staticFn' as const;
       }
     },
     methods: {
       instanceFn() {
-        expectType<HydratedDocument<M0_0aAutoTypedSchemaType['schema']>>(this);
+        expectType<HydratedDocument<AutoTypedSchemaType['schema']>>(this);
         return 'Returned from DocumentInstanceFn' as const;
       }
     },
     query: {
       byUserName(userName) {
-        expectAssignable<Query<unknown, M0_0aAutoTypedSchemaType['schema']>>(this);
+        expectAssignable<Query<unknown, AutoTypedSchemaType['schema']>>(this);
         return this.where({ userName });
       }
     }
@@ -481,14 +481,14 @@ export function autoTypedSchema() {
 
   type InferredSchemaType = InferSchemaType<typeof AutoTypedSchema>;
 
-  expectType<M0_0aAutoTypedSchemaType['schema']>({} as InferredSchemaType);
+  expectType<AutoTypedSchemaType['schema']>({} as InferredSchemaType);
 
-  expectError<M0_0aAutoTypedSchemaType['schema'] & { doesNotExist: boolean; }>({} as InferredSchemaType);
+  expectError<AutoTypedSchemaType['schema'] & { doesNotExist: boolean; }>({} as InferredSchemaType);
 
   return AutoTypedSchema;
 }
 
-export type M0_0aAutoTypedSchemaType = {
+export type AutoTypedSchemaType = {
   schema: {
     userName: string;
     description?: string;

@@ -3981,7 +3981,9 @@ describe('Query', function() {
     Model.create({ userName: 'test' }, function(error) {
       assert.ifError(error);
       Model.find().byUserName('test').exec(function(error, docs) {
-        assert.ifError(error);
+        if (error instanceof Error) {
+          return done(error);
+        }
         assert.equal(docs.length, 1);
         assert.equal(docs[0].userName, 'test');
         done();

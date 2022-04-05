@@ -1,6 +1,6 @@
 import { Schema, Document, Model, Types, connection, model } from 'mongoose';
 import { expectError, expectType } from 'tsd';
-import { M0_0aAutoTypedSchemaType, autoTypedSchema } from './schema.test';
+import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -242,31 +242,26 @@ export function autoTypedModel() {
   const AutoTypedModel = model('AutoTypeModel', AutoTypedSchema);
 
   (async() => {
-  /* -------------------------------------------------------------------------- */
-  /*                            Model-functions-test                            */
-  /* -------------------------------------------------------------------------- */
+  // Model-functions-test
   // Create should works with arbitrary objects.
     const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' });
     expectType<string>(randomObject.unExistKey);
-    expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(randomObject.userName);
+    expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
 
     const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });
-    expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
-    expectType<M0_0aAutoTypedSchemaType['schema']['description']>(testDoc1.description);
+    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
+    expectType<AutoTypedSchemaType['schema']['description']>(testDoc1.description);
 
     const testDoc2 = await AutoTypedModel.insertMany([{ userName: 'M0_0a' }]);
-    expectType<M0_0aAutoTypedSchemaType['schema']['userName']>(testDoc2[0].userName);
-    expectType<M0_0aAutoTypedSchemaType['schema']['description'] | undefined>(testDoc2[0]?.description);
+    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc2[0].userName);
+    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc2[0]?.description);
 
     const testDoc3 = await AutoTypedModel.findOne({ userName: 'M0_0a' });
-    expectType<M0_0aAutoTypedSchemaType['schema']['userName'] | undefined>(testDoc3?.userName);
-    expectType<M0_0aAutoTypedSchemaType['schema']['description'] | undefined>(testDoc3?.description);
+    expectType<AutoTypedSchemaType['schema']['userName'] | undefined>(testDoc3?.userName);
+    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc3?.description);
 
-    /* -------------------------------------------------------------------------- */
-    /*                      Model-statics-functions-test                          */
-    /* -------------------------------------------------------------------------- */
-
-    expectType<ReturnType<M0_0aAutoTypedSchemaType['statics']['staticFn']>>(AutoTypedModel.staticFn());
+    // Model-statics-functions-test
+    expectType<ReturnType<AutoTypedSchemaType['statics']['staticFn']>>(AutoTypedModel.staticFn());
 
   })();
   return AutoTypedModel;

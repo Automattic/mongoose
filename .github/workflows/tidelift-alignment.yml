@@ -1,5 +1,8 @@
 name: Tidelift Alignment
 on:
+  pull_request:
+    paths:
+      - 'package.json'
   push:
     paths:
       - 'package.json'

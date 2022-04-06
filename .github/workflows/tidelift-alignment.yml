@@ -10,6 +10,8 @@ on:
       - 'package.json'
   schedule:
     - cron: '0 0 * * *'  # every day at midnight
+permissions:
+  contents: read
 
 jobs:
   build:

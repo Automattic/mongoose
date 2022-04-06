@@ -1,8 +1,6 @@
 name: Tidelift Alignment
 on:
   push:
-    branches:
-      - master
     paths:
       - 'package.json'
   schedule:

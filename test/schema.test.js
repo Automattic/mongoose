@@ -2732,13 +2732,22 @@ describe('schema', function() {
     const foundUser = await User.findOne({ _id: user._id });
     assert.ok(Array.isArray(foundUser.data));
   });
-  it('sets an _applyDiscriminators property on the schema gh-7971-p2', async() => {
+  it('sets an _applyDiscriminators property on the schema and add discriminator to appropriate model gh-7971-p2', async() => {
     const eventSchema = new mongoose.Schema({ message: String },
       { discriminatorKey: 'kind', _id: false });
     const batchSchema = new mongoose.Schema({ name: String });
     batchSchema.discriminator(eventSchema);
-    console.log(batchSchema._applyDiscriminators);
+    console.log('discrim set on batchschema')
     assert(batchSchema._applyDiscriminators);
+    const parentSchema = new mongoose.Schema({ sub: batchSchema });
+    console.log('schema set for parent schema')
+    const Parent = db.model('Parent', parentSchema);
+    console.log('model created for parent')
+    const parent = await Parent.create({
+      name: 'Sub Test',
+      message: 'I hope I worked!'
+    });
+    assert(parent.message);
     const Batch = db.model('Batch', batchSchema);
     const batch = await Batch.create({
       name: 'Test Testerson',

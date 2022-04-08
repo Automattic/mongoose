@@ -2092,8 +2092,14 @@ declare module 'mongoose' {
 
   type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
+  type _WithoutFunctions<T extends {}> = {
+    [K in keyof T]: [0] extends [1 & T[K]] ? K : // keep any
+      T[K] extends Function ? never : K;
+  };
+  type NonFunctionKeyof<T extends {}> = _WithoutFunctions<T>[keyof T];
+
   export type _LeanDocument<T> = {
-    [K in keyof T]: LeanDocumentElement<T[K]>;
+    [K in NonFunctionKeyof<T>]: LeanDocumentElement<T[K]>;
   };
 
   // Keep this a separate type, to ensure that T is a naked type.

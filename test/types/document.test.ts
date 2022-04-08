@@ -1,7 +1,18 @@
-import { Schema, model, Model, Document, Error, Types } from 'mongoose';
+import { Schema, model, Model, Document, Types } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
-const schema: Schema = new Schema({ name: { type: 'String', required: true }, address: new Schema({ city: { type: String, required: true } }) });
+const Drink = model('Drink', new Schema({
+  name: String
+}));
+
+const schema: Schema = new Schema({
+  name: { type: 'String', required: true },
+  address: new Schema({ city: { type: String, required: true } }),
+  favoritDrink: {
+    type: Schema.Types.ObjectId,
+    ref: Drink
+  }
+});
 
 interface ITestBase {
   name?: string;
@@ -164,4 +175,9 @@ function gh11435() {
   ItemSchema.pre('validate', function preValidate() {
     expectType<Model<unknown>>(this.model('Item1'));
   });
+}
+
+async function gh11598() {
+  const doc = await Test.findOne();
+  doc?.populate('favoritDrink', undefined, model('temp', new Schema()));
 }

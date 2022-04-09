@@ -2093,7 +2093,15 @@ declare module 'mongoose' {
         T extends Types.Subdocument ? LeanSubdocument<T> : // subdocs
           LeanDocument<T>; // Documents and everything else
 
-  type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
+  // Used only when collapsing lean arrays for ts performance reasons:
+  type LeanTypeOrArray<T> = T extends unknown[] ? LeanArray<T> : LeanType<T>;
+
+  type LeanArray<T extends unknown[]> =
+  // By checking if it extends Types.Array we can get the original base type before collapsing down,
+  // rather than trying to manually remove the old types. This matches both Array and DocumentArray
+    T extends Types.Array<infer U> ? LeanTypeOrArray<U>[] :
+      // If it isn't a custom mongoose type we fall back to "do our best"
+      T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
   type _WithoutFunctions<T extends {}> = {
     [K in keyof T]: [0] extends [1 & T[K]] ? K : // keep any

@@ -2084,10 +2084,13 @@ declare module 'mongoose' {
   type TreatAsPrimitives = actualPrimitives |
   NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
 
+  // This will -- when possible -- extract the original type of the subdocument in question
+  type LeanSubdocument<T> = T extends (Types.Subdocument<Require_id<T>['_id']> & infer U) ? LeanDocument<U> : Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'>;
+
   type LeanType<T> =
     0 extends (1 & T) ? T : // any
       T extends TreatAsPrimitives ? T : // primitives
-        T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> : // subdocs
+        T extends Types.Subdocument ? LeanSubdocument<T> : // subdocs
           LeanDocument<T>; // Documents and everything else
 
   type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];

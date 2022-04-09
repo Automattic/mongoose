@@ -1482,6 +1482,26 @@ declare module 'mongoose' {
 
   type ProjectionFields<DocType> = { [Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any } & Record<string, any>;
 
+  type _QueryManyForModel<T, ResultDoc, TQueryHelpers = {}> =
+    QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
+  type _QueryOneForModel<T, ResultDoc, TQueryHelpers = {}> =
+    QueryWithHelpers<ResultDoc, ResultDoc, TQueryHelpers, T>;
+
+  /**
+   * Helper type for getting a find Query type for a given Model (return of Model.find)
+   */
+  type QueryForModel<T extends Model<any>> =
+    T extends Model<infer MT, infer TQueryHelpers, infer TMethodsAndOverrides, infer TVirtuals> ?
+      _QueryManyForModel<MT, HydratedDocument<MT, TMethodsAndOverrides, TVirtuals>, TQueryHelpers>
+      : never;
+  /**
+   * Helper type for getting a findOne Query type for a given Model (return of Model.findOne)
+   */
+  type QueryOneForModel<T extends Model<any>> =
+  T extends Model<infer MT, infer TQueryHelpers, infer TMethodsAndOverrides, infer TVirtuals> ?
+    _QueryOneForModel<MT, HydratedDocument<MT, TMethodsAndOverrides, TVirtuals>, TQueryHelpers>
+    : never;
+
   class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
     _mongooseOptions: MongooseQueryOptions;
 
@@ -1583,7 +1603,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     elemMatch(val: Function | any): this;
-    elemMatch(path: string, val: Function | any): this;
+    elemMatch<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$elemMatch']): this;
 
     /**
      * Gets/sets the error flag on this query. If this flag is not null or
@@ -1600,7 +1620,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$exists` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     exists(val: boolean): this;
-    exists(path: string, val: boolean): this;
+    exists<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$exists']): this;
 
     /**
      * Sets the [`explain` option](https://docs.mongodb.com/manual/reference/method/cursor.explain/),
@@ -1680,18 +1700,18 @@ declare module 'mongoose' {
 
     /** Specifies a `$gt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gt(val: number): this;
-    gt(path: string, val: number): this;
+    gte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gt']): this;
 
     /** Specifies a `$gte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gte(val: number): this;
-    gte(path: string, val: number): this;
+    gte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gte']): this;
 
     /** Sets query hints. */
     hint(val: any): this;
 
     /** Specifies an `$in` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     in(val: Array<any>): this;
-    in(path: string, val: Array<any>): this;
+    in<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$in']): this;
 
     /** Declares an intersects query for `geometry()`. */
     intersects(arg?: any): this;
@@ -1707,11 +1727,11 @@ declare module 'mongoose' {
 
     /** Specifies a `$lt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     lt(val: number): this;
-    lt(path: string, val: number): this;
+    lt<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$lt']): this;
 
     /** Specifies a `$lte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     lte(val: number): this;
-    lte(path: string, val: number): this;
+    lte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$lte']): this;
 
     /**
      * Runs a function `fn` and treats the return value of `fn` as the new value
@@ -1738,7 +1758,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$mod` condition, filters documents for documents whose `path` property is a number that is equal to `remainder` modulo `divisor`. */
     mod(val: Array<number>): this;
-    mod(path: string, val: Array<number>): this;
+    mod<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$mod']): this;
 
     /** The model this query was created from */
     model: typeof Model;
@@ -1751,15 +1771,15 @@ declare module 'mongoose' {
 
     /** Specifies a `$ne` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     ne(val: any): this;
-    ne(path: string, val: any): this;
+    ne<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$ne']): this;
 
     /** Specifies a `$near` or `$nearSphere` condition */
     near(val: any): this;
-    near(path: string, val: any): this;
+    near<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$near']): this;
 
     /** Specifies an `$nin` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     nin(val: Array<any>): this;
-    nin(path: string, val: Array<any>): this;
+    nin<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$nin']): this;
 
     /** Specifies arguments for an `$nor` condition. */
     nor(array: Array<FilterQuery<DocType>>): this;
@@ -1795,7 +1815,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$regex` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     regex(val: string | RegExp): this;
-    regex(path: string, val: string | RegExp): this;
+    regex<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$regex']): this;
 
     /**
      * Declare and/or execute this query as a remove() operation. `remove()` is
@@ -1848,7 +1868,7 @@ declare module 'mongoose' {
 
     /** Specifies an `$size` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     size(val: number): this;
-    size(path: string, val: number): this;
+    size<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$size']): this;
 
     /** Specifies the number of documents to skip. */
     skip(val: number): this;
@@ -2107,10 +2127,10 @@ declare module 'mongoose' {
     [K in keyof T]: [0] extends [1 & T[K]] ? K : // keep any
       T[K] extends Function ? never : K;
   };
-  type NonFunctionKeyof<T extends {}> = _WithoutFunctions<T>[keyof T];
+  type StripFunctions<T extends {}> = Pick<T, _WithoutFunctions<T>[keyof T]>;
 
   export type _LeanDocument<T> = {
-    [K in NonFunctionKeyof<T>]: LeanDocumentElement<T[K]>;
+    [K in keyof T]: LeanDocumentElement<T[K]>;
   };
 
   // Keep this a separate type, to ensure that T is a naked type.

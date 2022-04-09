@@ -2106,9 +2106,10 @@ declare module 'mongoose' {
   // This way, the conditional type is distributive over union types.
   // This is required for PopulatedDoc.
   type LeanDocumentElement<T> =
-    T extends unknown[] ? LeanArray<T> : // Array
-      T extends Document ? LeanDocument<T> : // Subdocument
-        T;
+    0 extends (1 & T) ? T :// any
+      T extends unknown[] ? LeanArray<T> : // Array
+        T extends Document ? LeanDocument<T> : // Subdocument
+          T;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 

@@ -2129,7 +2129,8 @@ declare module 'mongoose' {
    * Plain old JavaScript object documents (POJO).
    * @see https://mongoosejs.com/docs/tutorials/lean.html
    */
-  export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
+  export type LeanDocument<T> = T extends mongoose.HydratedDocument<infer DocType, infer MethodsOverrides, infer TVirtuals> ? _LeanDocument<StripFunctions<DocType>> :
+    Omit<_LeanDocument<StripFunctions<T>>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :

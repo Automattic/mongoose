@@ -1,5 +1,7 @@
 'use strict';
 
+const sinon = require('sinon');
+
 const start = require('./common');
 
 const assert = require('assert');
@@ -947,6 +949,75 @@ describe('mongoose module:', function() {
 
       schema.clearIndexes();
       assert.equal(schema.indexes().length, 0);
+    });
+      
+    describe('global `allowDiskUse` (gh-11478)', () => {
+      this.afterEach(() => sinon.restore());
+
+      it('is `undefined` by default', async() => {
+        // Arrange
+        const m = new mongoose.Mongoose();
+
+        const db = await m.connect(start.uri);
+
+        const userSchema = new m.Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+
+        const nativeAggregateSpy = sinon.spy(User.collection, 'aggregate');
+
+        // Act
+        await User.aggregate([{ $match: {} }]);
+
+        // Assert
+        const optionsSentToMongo = nativeAggregateSpy.args[0][1];
+        assert.strictEqual(optionsSentToMongo.allowDiskUse, undefined);
+      });
+
+      it('works when set to `true` and no option provided', async() => {
+        // Arrange
+        const m = new mongoose.Mongoose();
+        m.set('allowDiskUse', true);
+
+        const db = await m.connect(start.uri);
+
+        const userSchema = new m.Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+        const nativeAggregateSpy = sinon.spy(User.collection, 'aggregate');
+
+        // Act
+        await User.aggregate([{ $match: {} }]);
+
+        // Assert
+        const optionsSentToMongo = nativeAggregateSpy.args[0][1];
+        assert.strictEqual(optionsSentToMongo.allowDiskUse, true);
+      });
+      it('can be overridden by a specific query', async() => {
+        // Arrange
+        const m = new mongoose.Mongoose();
+        m.set('allowDiskUse', true);
+
+        const db = await m.connect(start.uri);
+
+        const userSchema = new m.Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+        const nativeAggregateSpy = sinon.spy(User.collection, 'aggregate');
+
+        // Act
+        await User.aggregate([{ $match: {} }]).allowDiskUse(false);
+
+        // Assert
+        const optionsSentToMongo = nativeAggregateSpy.args[0][1];
+        assert.equal(optionsSentToMongo.allowDiskUse, false);
+      });
     });
   });
 });

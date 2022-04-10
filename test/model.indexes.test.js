@@ -623,7 +623,6 @@ describe('model', function() {
       ]);
     });
     it('should prevent collation on text indexes (gh-10044)', async function() {
-
       const userSchema = new mongoose.Schema({ username: String }, {
         collation: {
           locale: 'en',

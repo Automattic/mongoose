@@ -17,7 +17,8 @@ async function run() {
       // Set the expiry job in MongoDB to run every second
       {
         port: 27017,
-        args: ['--setParameter', 'ttlMonitorSleepSecs=1'] }
+        args: ['--setParameter', 'ttlMonitorSleepSecs=1']
+      }
     ],
     dbName: 'mongoose_test',
     replSet: {

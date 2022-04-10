@@ -911,8 +911,8 @@ describe('mongoose module:', function() {
       const m = new mongoose.Mongoose();
       assert.deepEqual(await m.syncIndexes(), {});
     });
-    it('Allows for the removal of indexes via string or object (gh-11547)', async function() {
 
+    it('Allows for the removal of indexes via string or object (gh-11547)', async function() {
       const schema = new Schema({
         title: String,
         weight: Number,
@@ -921,19 +921,32 @@ describe('mongoose module:', function() {
         location: String
       });
 
-      schema.index({ title: 1 });
+      schema.index({ title: 1 }, { name: 'title index' });
       schema.index({ weight: 1 });
       schema.index({ age: 1, name: 1 });
       schema.index({ location: 1 });
       assert.equal(schema._indexes.length, 4);
-      const startingIndexes = JSON.parse(JSON.stringify(schema._indexes));
-      schema.removeIndex('title');
-      schema.removeIndex({ weight: 1 });
+
+      schema.removeIndex('title index');
+      assert.equal(schema.indexes().length, 3);
+      assert.deepStrictEqual(
+        schema.indexes().map(i => i[0]),
+        [{ weight: 1 }, { age: 1, name: 1 }, { location: 1 }]
+      );
+
       schema.removeIndex({ age: 1, name: 1 });
-      assert.equal(schema._indexes.length, 1);
-      assert.notDeepStrictEqual(startingIndexes, schema._indexes);
+      assert.equal(schema.indexes().length, 2);
+      assert.deepStrictEqual(
+        schema.indexes().map(i => i[0]),
+        [{ weight: 1 }, { location: 1 }]
+      );
+
+      schema.removeIndex({ weight: 1 });
+      assert.equal(schema.indexes().length, 1);
+      assert.deepStrictEqual(schema.indexes().map(i => i[0]), [{ location: 1 }]);
+
       schema.clearIndexes();
-      assert.equal(schema._indexes.length, 0);
+      assert.equal(schema.indexes().length, 0);
     });
   });
 });

@@ -781,6 +781,9 @@ declare module 'mongoose' {
      */
     childSchemas: { schema: Schema, model: any }[];
 
+    /** Removes all indexes on this schema */
+    clearIndexes(): this;
+
     /** Returns a copy of this schema */
     clone<T = this>(): T;
 
@@ -879,6 +882,9 @@ declare module 'mongoose' {
 
     /** Removes the given `path` (or [`paths`]). */
     remove(paths: string | Array<string>): this;
+
+    /** Removes index by name or index spec */
+    remove(index: string | AnyObject): this;
 
     /** Returns an Array of path strings that are required by this schema. */
     requiredPaths(invalidate?: boolean): string[];

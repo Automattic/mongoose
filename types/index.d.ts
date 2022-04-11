@@ -2123,12 +2123,6 @@ declare module 'mongoose' {
       // If it isn't a custom mongoose type we fall back to "do our best"
       T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
-  type _WithoutFunctions<T extends {}> = {
-    [K in keyof T]: [0] extends [1 & T[K]] ? K : // keep any
-      T[K] extends Function ? never : K;
-  };
-  type StripFunctions<T extends {}> = Pick<T, _WithoutFunctions<T>[keyof T]>;
-
   export type _LeanDocument<T> = {
     [K in keyof T]: LeanDocumentElement<T[K]>;
   };
@@ -2149,8 +2143,8 @@ declare module 'mongoose' {
    * Plain old JavaScript object documents (POJO).
    * @see https://mongoosejs.com/docs/tutorials/lean.html
    */
-  export type LeanDocument<T> = T extends mongoose.HydratedDocument<infer DocType, infer MethodsOverrides, infer TVirtuals> ? _LeanDocument<StripFunctions<DocType>> :
-    Omit<_LeanDocument<StripFunctions<T>>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
+  export type LeanDocument<T> = T extends mongoose.HydratedDocument<infer DocType, infer MethodsOverrides, infer TVirtuals> ? _LeanDocument<DocType> :
+    Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :

@@ -2138,12 +2138,38 @@ declare module 'mongoose' {
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 
+  // Helpers to simplify checks
+  type IfAny<IFTYPE, THENTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : IFTYPE;
+  type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
+
+  // tests for these two types are located in test/types/lean.test.ts
+  export type DocTypeFromUnion<T> = T extends (Document<infer T1, infer T2, infer T3> & infer U) ?
+    [U] extends [Document<T1, T2, T3> & infer U] ? IfUnknown<IfAny<U, false>, false> : false : false;
+
+  export type DocTypeFromGeneric<T> = T extends Document<infer IdType, infer TQueryHelpers, infer DocType> ?
+    IfUnknown<IfAny<DocType, false>, false> : false;
+
+  /**
+   * Helper to choose the best option between two type helpers
+   */
+  export type _pickObject<T1, T2, Fallback> = T1 extends false ? T2 extends false ? Fallback : T2 : T1;
+
+  /**
+   * There may be a better way to do this, but the goal is to return the DocType if it can be infered
+   * and if not to return a type which is easily identified as "not valid" so we fall back to
+   * "strip out known things added by extending Document"
+   * There are three basic ways to mix in Document -- "Document & T", "Document<ObjId, mixins, T>",
+   * and "T extends Document". In the last case there is no type without Document mixins, so we can only
+   * strip things out. In the other two cases we can infer the type, so we should
+   */
+  export type BaseDocumentType<T> = _pickObject<DocTypeFromUnion<T>, DocTypeFromGeneric<T>, false>;
+
   /**
    * Documents returned from queries with the lean option enabled.
    * Plain old JavaScript object documents (POJO).
    * @see https://mongoosejs.com/docs/tutorials/lean.html
    */
-  export type LeanDocument<T> = T extends mongoose.HydratedDocument<infer DocType, infer MethodsOverrides, infer TVirtuals> ? _LeanDocument<DocType> :
+  export type LeanDocument<T> = BaseDocumentType<T> extends Document ? _LeanDocument<BaseDocumentType<T>> :
     Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :

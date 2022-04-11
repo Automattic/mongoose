@@ -222,13 +222,11 @@ declare module 'mongoose' {
     set(value: any): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON(options: ToObjectOptions & { flattenMaps: false }): LeanDocument<DocType>;
-    toJSON(options?: ToObjectOptions): FlattenMaps<LeanDocument<DocType>>;
-    toJSON<T = FlattenMaps<DocType>>(options?: ToObjectOptions): T;
+    toJSON<T = DocType>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<LeanDocument<T>>;
+    toJSON<T = DocType>(options: ToObjectOptions & { flattenMaps: false }): LeanDocument<T>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject(options?: ToObjectOptions): LeanDocument<DocType>;
-    toObject<T = DocType>(options?: ToObjectOptions): T;
+    toObject<T = DocType>(options?: ToObjectOptions): LeanDocument<T>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string): void;

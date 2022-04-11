@@ -2735,24 +2735,29 @@ describe('schema', function() {
   it('sets an _applyDiscriminators property on the schema and add discriminator to appropriate model gh-7971-p2', async() => {
     const eventSchema = new mongoose.Schema({ message: String },
       { discriminatorKey: 'kind', _id: false });
-    const batchSchema = new mongoose.Schema({ name: String });
-    batchSchema.discriminator(eventSchema);
-    console.log('discrim set on batchschema')
+    const batchSchema = new mongoose.Schema({ name: String }, { discriminatorKey: 'kind' });
+    batchSchema.discriminator('event', eventSchema);
     assert(batchSchema._applyDiscriminators);
-    const parentSchema = new mongoose.Schema({ sub: batchSchema });
-    console.log('schema set for parent schema')
-    const Parent = db.model('Parent', parentSchema);
-    console.log('model created for parent')
-    const parent = await Parent.create({
-      name: 'Sub Test',
-      message: 'I hope I worked!'
+    const arraySchema = new mongoose.Schema({ array: [batchSchema] });
+    const arrayModel = db.model('array', arraySchema);
+    const array = await arrayModel.create({
+      array: [{ name: 'Array Test', message: 'Please work', kind: 'event' }]
     });
-    assert(parent.message);
+    console.log(array);
+    assert(array.array[0].message);
+    const parentSchema = new mongoose.Schema({ sub: batchSchema });
+    const Parent = db.model('Parent', parentSchema);
+    const parent = await Parent.create({
+      sub: { name: 'Sub Test', message: 'I hope I worked!', kind: 'event' }
+    });
+    assert(parent.sub.message);
     const Batch = db.model('Batch', batchSchema);
     const batch = await Batch.create({
       name: 'Test Testerson',
-      message: 'Hello World!'
+      message: 'Hello World!',
+      kind: 'event'
     });
+    console.log('batch', batch, batch.message);
     assert(batch.message);
   });
 });

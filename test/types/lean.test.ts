@@ -24,14 +24,18 @@ schema.method('testMethod', () => 42);
 const Test = model<ITest>('Test', schema);
 
 void async function main() {
-  const doc: ITest = await Test.findOne().orFail();
+  const doc = await Test.findOne().orFail();
 
   doc.subdoc = new Subdoc({ name: 'test' });
   doc.id = 'Hello';
 
   doc.testMethod();
 
-  const pojo = doc.toObject();
+  // Because ITest extends Document there is no good way for toObject
+  // to infer the type which doesn't add a high probability of a circular
+  // reference, so it must be specified here or else ITest above could be changed
+  // to `extends Document<number, {}, ITestBase>`
+  const pojo = doc.toObject<ITestBase>();
   expectError(await pojo.save());
 
   const _doc: ITestBase = await Test.findOne().orFail().lean();

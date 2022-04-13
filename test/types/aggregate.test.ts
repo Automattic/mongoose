@@ -24,6 +24,10 @@ async function run() {
   const res2: Array<ITest> = await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]);
   console.log(res2[0].name);
 
+  expectType<number | undefined>(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.maxTimeMS);
+  expectType<boolean | undefined>(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.allowDiskUse);
+  Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).option({ maxTimeMS: 222 });
+
   await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).cursor().eachAsync(async(res) => {
     console.log(res);
   });

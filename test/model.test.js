@@ -8460,6 +8460,35 @@ describe('Model', function() {
     assert.equal(doc.filling, 'cherry');
     assert.equal(doc.hoursToMake, null);
   });
+
+  it('sets index collation based on schema collation (gh-7621)', async function() {
+    let testSchema = new Schema(
+      { name: { type: String, index: true } }
+    );
+    let Test = db.model('Test', testSchema);
+
+    await Test.init();
+
+    let indexes = await Test.collection.listIndexes().toArray();
+    assert.strictEqual(indexes.length, 2);
+    assert.deepEqual(indexes[1].key, { name: 1 });
+    assert.equal(indexes[1].collation, undefined);
+
+    db.deleteModel(/Test/);
+    testSchema = new Schema(
+      { name: { type: String, index: true } },
+      { collation: { locale: 'en' }, autoIndex: false }
+    );
+    Test = db.model('Test', testSchema);
+
+    await Test.init();
+    await Test.syncIndexes();
+
+    indexes = await Test.collection.listIndexes().toArray();
+    assert.strictEqual(indexes.length, 2);
+    assert.deepEqual(indexes[1].key, { name: 1 });
+    assert.strictEqual(indexes[1].collation.locale, 'en');
+  });
 });
 
 

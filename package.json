@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "6.2.10",
+  "version": "6.2.11",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -64,6 +64,8 @@
   },
   "scripts": {
     "lint": "eslint .",
+    "lint-js": "eslint . --ext .js",
+    "lint-ts": "eslint . --ext .ts",
     "build-browser": "node build-browser.js",
     "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",

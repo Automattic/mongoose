@@ -11,7 +11,7 @@ interface Parent {
   name?: string
 }
 const ParentModel = model<Parent>('Parent', new Schema({
-  child: { type: 'ObjectId', ref: 'Child' },
+  child: { type: Types.ObjectId, ref: 'Child' },
   name: String
 }));
 
@@ -45,7 +45,7 @@ interface PopulatedParent {
   child: Child | null;
 }
 const ParentModel = model<Parent>('Parent', new Schema({
-  child: { type: 'ObjectId', ref: 'Child' },
+  child: { type: Types.ObjectId, ref: 'Child' },
   name: String
 }));
 const childSchema: Schema = new Schema({ name: String });

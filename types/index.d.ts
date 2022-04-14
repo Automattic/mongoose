@@ -2023,7 +2023,7 @@ declare module 'mongoose' {
    * { age: { $gte: 30 } }
    * ```
    */
-  export type FilterQuery<T> = _FilterQuery<T>;
+  export type FilterQuery<T> = _FilterQuery<StripFunctions<T>>;
 
   type AddToSetOperators<Type> = {
     $each: Type;

@@ -950,7 +950,7 @@ describe('mongoose module:', function() {
       schema.clearIndexes();
       assert.equal(schema.indexes().length, 0);
     });
-      
+
     describe('global `allowDiskUse` (gh-11478)', () => {
       this.afterEach(() => sinon.restore());
 

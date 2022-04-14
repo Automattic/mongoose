@@ -1937,6 +1937,10 @@ declare module 'mongoose' {
     wtimeout(ms: number): this;
   }
 
+  // per https://www.mongodb.com/docs/manual/reference/operator/query/type/ 'number' is a valid alias
+  export type BSONTypeAlias = mongodb.BSONTypeAlias | 'number';
+  export type BSONType = mongodb.BSONType;
+
   export type QuerySelector<T> = {
     // Comparison
     $eq?: T;
@@ -1955,7 +1959,7 @@ declare module 'mongoose' {
      * including documents where the field value is null.
      */
     $exists?: boolean;
-    $type?: string | number;
+    $type?: BSONTypeAlias | BSONType;
     // Evaluation
     $expr?: any;
     $jsonSchema?: any;

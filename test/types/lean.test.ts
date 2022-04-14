@@ -38,7 +38,7 @@ void async function main() {
   const pojo = doc.toObject<ITestBase>();
   expectError(await pojo.save());
 
-  const _doc: ITestBase = await Test.findOne().orFail().lean();
+  const _doc = await Test.findOne().orFail().lean();
   expectError(await _doc.save());
 
   expectError(_doc.testMethod());

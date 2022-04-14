@@ -2164,13 +2164,21 @@ declare module 'mongoose' {
    */
   export type BaseDocumentType<T> = _pickObject<DocTypeFromUnion<T>, DocTypeFromGeneric<T>, false>;
 
+  type _FunctionPropertyNames<T> = {
+    [K in keyof T]: 0 extends (1 & T[K]) ? never : (T[K] extends Function ? K : never)
+  };
+  type FunctionPropertyNames<T> = _FunctionPropertyNames<T>[keyof T];
+  // There are cases where keyof T ends up being never for reasons that I don't understand, but this
+  // keeps it from producing an empty object in those cases
+  type StripFunctions<T> = (keyof T) extends never ? T : Omit<T, FunctionPropertyNames<T>>;
+
   /**
    * Documents returned from queries with the lean option enabled.
    * Plain old JavaScript object documents (POJO).
    * @see https://mongoosejs.com/docs/tutorials/lean.html
    */
-  export type LeanDocument<T> = BaseDocumentType<T> extends Document ? _LeanDocument<BaseDocumentType<T>> :
-    Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
+  export type LeanDocument<T> = BaseDocumentType<T> extends Document ? _LeanDocument<StripFunctions<BaseDocumentType<T>>> :
+    Omit<StripFunctions<_LeanDocument<T>>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :

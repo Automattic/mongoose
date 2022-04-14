@@ -32,7 +32,7 @@ the `Story` model. All `_id`s we store here must be document `_id`s from
 the `Story` model.
 
 **Note**: `ObjectId`, `Number`, `String`, and `Buffer` are valid for use
-as refs. However, you should use `ObjectId` unless you are an advanced
+as refs. However, you shouldn't use `ObjectId` unless you are an advanced
 user and have a good reason for doing so.
 
 <ul class="toc">

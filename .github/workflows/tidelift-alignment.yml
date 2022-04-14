@@ -1,6 +1,11 @@
 name: Tidelift Alignment
 on:
+  pull_request:
+    paths:
+      - 'package.json'
   push:
+    paths:
+      - 'package.json'
   schedule:
     - cron: '0 0 * * *'  # every day at midnight
 

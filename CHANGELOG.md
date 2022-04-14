@@ -1,3 +1,14 @@
+6.2.11 / 2022-04-13
+===================
+ * fix(document): handle validation with triply nested document arrays #11564
+ * fix(query): skip applying string schema setters on $regex #11426
+ * fix: skip findOneAndReplace() validation if runValidators = false #11559
+ * fix(model): correctly handle schema-level collations in syncIndexes() #7621
+ * fix(types): correct populate query return type with lean #11560 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+ * fix(types): allow using { type: Mixed } as schema type definition for any path #10900
+ * docs: fix example on Schema.prototype.post() #11648 [EmilienLeroy](https://github.com/EmilienLeroy)
+ * docs: fix typo in methods/index.js #11651 [eltociear](https://github.com/eltociear)
+
 6.2.10 / 2022-04-04
 ===================
  * fix(types): improve lastErrorObject typing for rawResults #11602 [simllll](https://github.com/simllll)

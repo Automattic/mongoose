@@ -1009,7 +1009,8 @@ declare module 'mongoose' {
   Function[] |
   SchemaDefinition<T> |
   SchemaDefinition<Unpacked<T>>[] |
-    typeof SchemaTypes.Mixed;
+    typeof Schema.Types.Mixed |
+  MixedSchemaTypeOptions;
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
@@ -1023,6 +1024,10 @@ declare module 'mongoose' {
   type SchemaValidator<T> = RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T> | ValidateOpts<T>[];
 
   type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;
+
+  class MixedSchemaTypeOptions extends SchemaTypeOptions<Schema.Types.Mixed> {
+    type: typeof Schema.Types.Mixed;
+  }
 
   export class SchemaTypeOptions<T> {
     type?:
@@ -1061,7 +1066,7 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: ExtractMongooseArray<T> | ((this: any, doc: any) => Partial<ExtractMongooseArray<T>>);
+    default?: T extends Schema.Types.Mixed ? ({} | ((this: any, doc: any) => any)) : (ExtractMongooseArray<T> | ((this: any, doc: any) => Partial<ExtractMongooseArray<T>>));
 
     /**
      * The model that `populate()` should use if populating this path.

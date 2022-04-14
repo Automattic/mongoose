@@ -105,25 +105,6 @@ describe('types.document', function() {
     assert.equal(b.work, 'good flam');
   });
 
-  it('cached _ids', function() {
-    const Movie = db.model('Movie', MovieSchema);
-    const m = new Movie();
-
-    assert.equal(m.id, m.$__._id);
-    const old = m.id;
-    m._id = new mongoose.Types.ObjectId();
-    assert.equal(m.id, m.$__._id);
-    assert.strictEqual(true, old !== m.$__._id);
-
-    const m2 = new Movie();
-    delete m2._doc._id;
-    m2.init({ _id: new mongoose.Types.ObjectId() });
-    assert.equal(m2.id, m2.$__._id);
-    assert.strictEqual(true, m.$__._id !== m2.$__._id);
-    assert.strictEqual(true, m.id !== m2.id);
-    assert.strictEqual(true, m.$__._id !== m2.$__._id);
-  });
-
   it('Subdocument#remove (gh-531)', async function() {
     const Movie = db.model('Movie', MovieSchema);
 

@@ -3,6 +3,12 @@ import stream = require('stream');
 declare module 'mongoose' {
   type CursorFlag = 'tailable' | 'oplogReplay' | 'noCursorTimeout' | 'awaitData' | 'partial';
 
+  interface EachAsyncOptions {
+    parallel?: number;
+    batchSize?: number;
+    continueOnError?: boolean;
+  }
+
   class Cursor<DocType = any, Options = never> extends stream.Readable {
     [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
 
@@ -25,10 +31,10 @@ declare module 'mongoose' {
      * will wait for the promise to resolve before iterating on to the next one.
      * Returns a promise that resolves when done.
      */
-    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }, callback: CallbackWithoutResult): void;
-    eachAsync(fn: (doc: DocType) => any, options: { parallel?: number }, callback: CallbackWithoutResult): void;
-    eachAsync(fn: (doc: DocType[]) => any, options: { parallel?: number, batchSize: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType[]) => any, options: EachAsyncOptions & { batchSize: number }, callback: CallbackWithoutResult): void;
+    eachAsync(fn: (doc: DocType) => any, options: EachAsyncOptions, callback: CallbackWithoutResult): void;
+    eachAsync(fn: (doc: DocType[]) => any, options: EachAsyncOptions & { batchSize: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType) => any, options?: EachAsyncOptions): Promise<void>;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved

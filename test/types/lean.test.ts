@@ -1,5 +1,5 @@
 import { Schema, model, Document, LeanDocument, Types, BaseDocumentType, DocTypeFromUnion, DocTypeFromGeneric } from 'mongoose';
-import { expectError, expectNotType, expectType } from 'tsd';
+import { expectError, expectType } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
@@ -109,11 +109,23 @@ async function gh11118(): Promise<void> {
   }
 }
 
-async function getBaseDocumentType(): Promise<void> {
+/**
+ * These tests were adding during a refactor
+ * which had the following goals:
+ * * Re-enable intelligent / useful types for
+ *   FilterQuery
+ * * Strip functions from LeanDocument types and FilterQuery
+ *   without causing issues with generic types
+ * * Reduce likelihood of "recursion possibly infinite" errors
+ */
+async function generalTests(): Promise<void> {
   interface User {
     name: string;
     email: string;
     avatar?: string;
+    mixed?: any;
+
+    doSomething(): void;
   }
 
   type UserDocUnion = User & Document<Types.ObjectId>;
@@ -142,6 +154,10 @@ async function getBaseDocumentType(): Promise<void> {
 
   type baseDocFromGeneric = BaseDocumentType<UserDocGeneric>;
   expectType<User>({} as baseDocFromGeneric);
+
+  type leanUserDoc = LeanDocument<User>;
+  const docTest: leanUserDoc = {} as any;
+  expectError(docTest.doSomething());
 }
 
 async function getBaseDocumentTypeFromModel(): Promise<void> {

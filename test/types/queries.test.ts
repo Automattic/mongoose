@@ -1,6 +1,6 @@
-import { HydratedDocument, Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc, FilterQuery, UpdateQuery } from 'mongoose';
+import { HydratedDocument, Schema, Condition, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc, FilterQuery, UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
-import { expectError, expectType } from 'tsd';
+import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
@@ -141,9 +141,34 @@ function testGenericQuery(): void {
   interface CommonInterface<T> extends Document {
     something: string;
     content: T;
+    stuff: number[];
+    someFunction(): boolean;
   }
 
   async function findSomething<T>(model: Model<CommonInterface<T>>): Promise<CommonInterface<T>> {
+    const findQuery: FilterQuery<CommonInterface<T>> = {};
+    findQuery.something = 'lookup';
+
+    let findQuery2: FilterQuery<CommonInterface<T>>;
+    // This is really strange; it has to do with how typescript understands generics,
+    // but at least as of when this was written this causes an error:
+    expectError(findQuery2 = { something: 'lookup' });
+    // But this will work
+    findQuery2 = { something: 'lookup' as any };
+
+    // As will this
+    findQuery2.something = 'lookup';
+
+    return model.findOne(findQuery).orFail().exec();
+  }
+  async function findSomething2<T extends Model<CommonInterface<any>>>(model: T) {
+    // In this function type hints about CommonInterface work
+    // const q: FilterQuery<InstanceType<T>> = {
+    //   something: 23
+    // };
+    expectError(model.findOne({ something: 32 }).orFail().exec());
+    model.findOne({ something: /test/ }).orFail().exec();
+
     return model.findOne({ something: 'test' }).orFail().exec();
   }
 }
@@ -275,4 +300,53 @@ async function gh11602(): Promise<void> {
   expectError(updateResult.lastErrorObject?.modifiedCount);
   expectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
   expectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
+}
+
+async function testFilterQuery() {
+  interface Test2 {
+    name?: string;
+    age?: number;
+    parent?: Types.ObjectId;
+    child?: Child,
+    tags?: string[];
+    docs?: ISubdoc[];
+    endDate?: Date;
+  }
+
+  interface Subdoc2 {
+    myId?: Types.ObjectId;
+    id?: number;
+    tags?: string[];
+  }
+
+  const schema = new Schema<Test2>({}); // pretend this works :-P
+  const MyModel = model('Test2', schema);
+
+  type Test2Document = InstanceType<typeof MyModel>;
+
+  const query: FilterQuery<Test2Document> = {};
+
+  expectAssignable<typeof query.name>('');
+  expectAssignable<typeof query.name>(new RegExp(''));
+  expectAssignable<typeof query.age>(42);
+  expectNotAssignable<typeof query.age>("42");
+  expectNotAssignable<typeof query.age>({age: 42});
+  expectNotAssignable<typeof query.age>(null);
+
+  expectAssignable<typeof query.parent>('6259f56a91bd20d8ab6a650b');
+  expectAssignable<typeof query.parent>(new Types.ObjectId());
+
+  expectNotAssignable<typeof query.endDate>(new Types.ObjectId());
+  expectAssignable<typeof query.endDate>(new Date());
+  expectAssignable<typeof query.endDate>(1650063612220);
+  expectNotAssignable<typeof query.endDate>('1650063612220');
+
+  expectAssignable<typeof query.docs>([]);
+  expectAssignable<typeof query.docs>({ $elemMatch: { myId: new Types.ObjectId(), id: 23, tags: [''] } });
+
+  expectAssignable<Condition<Types.ObjectId>>(new Types.ObjectId());
+  expectAssignable<Condition<Types.ObjectId>>('6259f56a91bd20d8ab6a650b');
+
+  expectAssignable<Condition<Date>>(new Date());
+  expectAssignable<Condition<Date>>(Date.now());
 }

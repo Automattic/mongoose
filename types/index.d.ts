@@ -1941,16 +1941,16 @@ declare module 'mongoose' {
   export type BSONTypeAlias = mongodb.BSONTypeAlias | 'number';
   export type BSONType = mongodb.BSONType;
 
-  export type QuerySelector<T> = {
+  export type QuerySelector<T> = LoosenType<T> extends infer LooseType ? {
     // Comparison
-    $eq?: T;
-    $gt?: T;
-    $gte?: T;
-    $in?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
-    $lt?: T;
-    $lte?: T;
-    $ne?: T;
-    $nin?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
+    $eq?: LooseType;
+    $gt?: LooseType;
+    $gte?: LooseType;
+    $in?: [T] extends AnyArray<any> ? Unpacked<LooseType>[] : LooseType[];
+    $lt?: LooseType;
+    $lte?: LooseType;
+    $ne?: LooseType;
+    $nin?: [T] extends AnyArray<any> ? Unpacked<LooseType>[] : LooseType[];
     // Logical
     $not?: T extends string ? QuerySelector<T> | RegExp : QuerySelector<T>;
     // Element
@@ -1983,7 +1983,7 @@ declare module 'mongoose' {
     $bitsAllSet?: number | mongodb.Binary | number[];
     $bitsAnyClear?: number | mongodb.Binary | number[];
     $bitsAnySet?: number | mongodb.Binary | number[];
-  };
+  } : Impossible;
 
   export type RootQuerySelector<T> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/query/and/#op._S_and */
@@ -2008,7 +2008,24 @@ declare module 'mongoose' {
     [key: string]: any;
   };
 
-  type ApplyBasicQueryCasting<T> = T | T[] | any;
+  export interface ObjectIdLike {
+    toHexString(): string;
+  }
+  type Impossible = never;
+
+  type LoosenType<R> = R extends infer T ?
+    [T] extends [string] ? T | RegExp :
+      [T] extends [ObjectIdLike] ? T | ObjectIdLike | { _id: ObjectIdLike | string } | string :
+        [T] extends [globalThis.Date] ? T | number :
+          [T] extends [unknown[]] ? LoosenType<T[number]> | LoosenType<T[number]>[] :
+            T :
+    Impossible;
+
+  type LoosenObjectType<T extends AnyObject> = {
+    [P in keyof T]: LoosenType<T[P]>;
+  };
+
+  type ApplyBasicQueryCasting<T> = LoosenType<T> | LoosenType<T>[];
   type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
   type _FilterQuery<T> = {
@@ -2023,7 +2040,7 @@ declare module 'mongoose' {
    * { age: { $gte: 30 } }
    * ```
    */
-  export type FilterQuery<T> = _FilterQuery<StripFunctions<T>>;
+  export type FilterQuery<T> = _FilterQuery<LeanDocument<T>>;
 
   type AddToSetOperators<Type> = {
     $each: Type;
@@ -2127,8 +2144,15 @@ declare module 'mongoose' {
       // If it isn't a custom mongoose type we fall back to "do our best"
       T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
+  type isFunction<T> = [0] extends [(1 & T)] ? false : [T] extends [Function] ? true : false;
+
+  // Not currently needed, but leaving it in for reference
+  // type StripFunctions<T> = keyof T extends never ? T : {
+  //   [K in keyof T as isFunction<T[K]> extends true ? never : K]: T[K];
+  // };
+
   export type _LeanDocument<T> = {
-    [K in keyof T]: LeanDocumentElement<T[K]>;
+    [K in keyof T as isFunction<T[K]> extends true ? never : K]: LeanDocumentElement<T[K]>;
   };
 
   // Keep this a separate type, to ensure that T is a naked type.
@@ -2147,8 +2171,8 @@ declare module 'mongoose' {
   type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
 
   // tests for these two types are located in test/types/lean.test.ts
-  export type DocTypeFromUnion<T> = T extends (Document<infer T1, infer T2, infer T3> & infer U) ?
-    [U] extends [Document<T1, T2, T3> & infer U] ? IfUnknown<IfAny<U, false>, false> : false : false;
+  export type DocTypeFromUnion<T> = T extends (Document<infer T1, infer T2, any> & infer U) ?
+    [U] extends [Document<T1, T2, any> & infer V] ? IfUnknown<IfAny<V, false>, false> : false : false;
 
   export type DocTypeFromGeneric<T> = T extends Document<infer IdType, infer TQueryHelpers, infer DocType> ?
     IfUnknown<IfAny<DocType, false>, false> : false;
@@ -2168,21 +2192,15 @@ declare module 'mongoose' {
    */
   export type BaseDocumentType<T> = _pickObject<DocTypeFromUnion<T>, DocTypeFromGeneric<T>, false>;
 
-  type _FunctionPropertyNames<T> = {
-    [K in keyof T]: 0 extends (1 & T[K]) ? never : (T[K] extends Function ? K : never)
-  };
-  type FunctionPropertyNames<T> = _FunctionPropertyNames<T>[keyof T];
-  // There are cases where keyof T ends up being never for reasons that I don't understand, but this
-  // keeps it from producing an empty object in those cases
-  type StripFunctions<T> = (keyof T) extends never ? T : Omit<T, FunctionPropertyNames<T>>;
-
   /**
    * Documents returned from queries with the lean option enabled.
    * Plain old JavaScript object documents (POJO).
    * @see https://mongoosejs.com/docs/tutorials/lean.html
    */
-  export type LeanDocument<T> = BaseDocumentType<T> extends Document ? _LeanDocument<StripFunctions<BaseDocumentType<T>>> :
-    Omit<StripFunctions<_LeanDocument<T>>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
+  export type LeanDocument<T> = T extends infer R ?
+    BaseDocumentType<R> extends Document ? _LeanDocument<BaseDocumentType<R>> :
+      Omit<_LeanDocument<R>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'> :
+    Impossible;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :

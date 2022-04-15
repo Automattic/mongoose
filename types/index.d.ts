@@ -34,11 +34,13 @@ declare module 'mongoose' {
    */
   export type Mixed = Schema.Types.Mixed;
 
+  type Mongoose = typeof mongoose;
+
   /**
    * Mongoose constructor. The exports object of the `mongoose` module is an instance of this
    * class. Most apps will only use this one instance.
    */
-  export const Mongoose: new (options?: MongooseOptions | null) => typeof mongoose;
+  export const Mongoose: new (options?: MongooseOptions | null) => Mongoose;
 
   /**
    * The Mongoose Number [SchemaType](/docs/schematypes.html). Used for
@@ -105,7 +107,7 @@ declare module 'mongoose' {
    * You can use this function to clean up any models you created in your tests to
    * prevent OverwriteModelErrors.
    */
-  export function deleteModel(name: string | RegExp): typeof mongoose;
+  export function deleteModel(name: string | RegExp): Mongoose;
 
   export function disconnect(): Promise<void>;
   export function disconnect(cb: CallbackWithoutResult): void;
@@ -152,13 +154,13 @@ declare module 'mongoose' {
   export function now(): NativeDate;
 
   /** Declares a global plugin executed on all Schemas. */
-  export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): typeof mongoose;
+  export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): Mongoose;
 
   /** Getter/setter around function for pluralizing collection names. */
   export function pluralize(fn?: ((str: string) => string) | null): ((str: string) => string) | null;
 
   /** Sets mongoose options */
-  export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): typeof mongoose;
+  export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): Mongoose;
 
   /**
    * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
@@ -173,8 +175,6 @@ declare module 'mongoose' {
 
   export type CastError = Error.CastError;
   export type SyncIndexesError = Error.SyncIndexesError;
-
-  type Mongoose = typeof mongoose;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface ClientSession extends mongodb.ClientSession { }
@@ -265,7 +265,7 @@ declare module 'mongoose' {
     aggregate<R = any>(pipeline: PipelineStage[], cb: Function): Aggregate<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
-    base: typeof mongoose;
+    base: Mongoose;
 
     /**
      * If this is a discriminator model, `baseModelName` is the name of

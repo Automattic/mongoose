@@ -13,7 +13,6 @@ run().catch(err => {
 });
 
 async function run() {
-  console.log(process.env.DB_URL?.split(' '));
   if (process.env.DB_URL) {
     await mongoose.connect(process.env.DB_URL);
   }

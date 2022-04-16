@@ -8,6 +8,7 @@ const start = require('./common');
 
 const mongoose = start.mongoose;
 const assert = require('assert');
+const sinon = require('sinon');
 const Schema = mongoose.Schema;
 const Document = mongoose.Document;
 const VirtualType = mongoose.VirtualType;
@@ -1435,38 +1436,43 @@ describe('schema', function() {
 
   describe('property names', function() {
     describe('reserved keys are log a warning (gh-9010)', () => {
-      [
+      this.afterEach(() => sinon.restore());
+      const reservedProperties = [
         'emit', 'listeners', 'on', 'removeListener', /* 'collection', */ // TODO: add `collection`
         'errors', 'get', 'init', 'isModified', 'isNew', 'populated',
         'remove', 'save', 'toObject', 'validate'
-      ].forEach((reservedProperty) => {
-        it(`\`${reservedProperty}\` when used as a schema path logs a warning`, async() => {
-          const waitForWarning = new Promise(resolve => {
-            process.once('warning', warning => resolve(warning.message));
-          });
+      ];
 
+      for (const reservedProperty of reservedProperties) {
+        it(`\`${reservedProperty}\` when used as a schema path logs a warning`, async() => {
+          // Arrange
+          const emitWarningStub = sinon.stub(process, 'emitWarning').returns();
+
+          // Act
           new Schema({ [reservedProperty]: String });
-          const lastWarnMessage = await waitForWarning;
+
+          // Assert
+          const lastWarnMessage = emitWarningStub.args[0][0];
           assert.ok(lastWarnMessage.includes(`\`${reservedProperty}\` is a reserved schema pathname`), lastWarnMessage);
         });
 
         it(`\`${reservedProperty}\` when used as a schema path doesn't log a warning if \`supressReservedKeysWarning\` is true`, async() => {
+          // Arrange
+          const emitWarningStub = sinon.stub(process, 'emitWarning').returns();
+
+
+          // Act
           new Schema(
             { [reservedProperty]: String },
             { supressReservedKeysWarning: true }
           );
 
-          let lastWarning = null;
-          const listener = warning => { lastWarning = warning.message; };
-          process.once('warning', listener);
+          const lastWarnMessage = emitWarningStub.args[0] && emitWarningStub.args[0][0];
 
-          setImmediate(() => {
-            assert.strictEqual(lastWarning, null);
-            process.removeListener('warning', listener);
-          });
+          // Assert
+          assert.strictEqual(lastWarnMessage, undefined);
         });
-
-      });
+      }
     });
 
 
@@ -2725,5 +2731,36 @@ describe('schema', function() {
 
     const foundUser = await User.findOne({ _id: user._id });
     assert.ok(Array.isArray(foundUser.data));
+  });
+
+  it('sets an _applyDiscriminators property on the schema and add discriminator to appropriate model (gh-7971)', async() => {
+    const eventSchema = new mongoose.Schema({ message: String },
+      { discriminatorKey: 'kind' });
+    const batchSchema = new mongoose.Schema({ name: String }, { discriminatorKey: 'kind' });
+    batchSchema.discriminator('event', eventSchema);
+    assert(batchSchema._applyDiscriminators);
+    assert.ok(!eventSchema._applyDiscriminators);
+
+    const arraySchema = new mongoose.Schema({ array: [batchSchema] });
+    const arrayModel = db.model('array', arraySchema);
+    const array = await arrayModel.create({
+      array: [{ name: 'Array Test', message: 'Please work', kind: 'event' }]
+    });
+    assert(array.array[0].message);
+
+    const parentSchema = new mongoose.Schema({ sub: batchSchema });
+    const Parent = db.model('Parent', parentSchema);
+    const parent = await Parent.create({
+      sub: { name: 'Sub Test', message: 'I hope I worked!', kind: 'event' }
+    });
+    assert(parent.sub.message);
+
+    const Batch = db.model('Batch', batchSchema);
+    const batch = await Batch.create({
+      name: 'Test Testerson',
+      message: 'Hello World!',
+      kind: 'event'
+    });
+    assert(batch.message);
   });
 });

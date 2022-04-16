@@ -68,12 +68,14 @@ Test.find({ tags: { $in: ['test'] } }).exec();
 // Implicit `$in`
 Test.find({ name: ['Test1', 'Test2'] }).exec();
 
-Test.find({ name: 'test' }, (err: Error, docs: ITest[]) => {
+Test.find({ name: 'test' }, (err: Error | null, docs: ITest[]) => {
   console.log(!!err, docs[0].age);
 });
 
-Test.findOne({ name: 'test' }, (err: Error, doc: ITest) => {
-  console.log(!!err, doc.age);
+Test.findOne({ name: 'test' }, (err: Error | null, doc: ITest | null) => {
+  if (doc != null) {
+    console.log(!!err, doc.age);
+  }
 });
 
 Test.find({ name: { $gte: 'Test' } }, null, { collation: { locale: 'en-us' } }).exec().

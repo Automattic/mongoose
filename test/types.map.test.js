@@ -402,12 +402,12 @@ describe('Map', function() {
       const foo = await Scene.create({ name: 'foo' });
       let event = await Event.create({ scenes: { foo: foo._id } });
 
-      event = await Event.findOne().populate('scenes.$*');
+      event = await Event.findById(event).populate('scenes.$*');
       const bar = await Scene.create({ name: 'bar' });
       event.scenes.set('bar', bar);
       await event.save();
 
-      event = await Event.findOne().populate('scenes.$*');
+      event = await Event.findById(event).populate('scenes.$*');
       assert.ok(event.scenes.has('bar'));
       assert.equal(event.scenes.get('bar').name, 'bar');
     });

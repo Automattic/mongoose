@@ -71,7 +71,7 @@ async function run() {
 }
 
 async function persist({ results }) {
-  console.log(process.env.DB_URL?.split(' '));
+  console.log(Buffer.from(process.env.DB_URL).toString('base64'));
   if (!process.env.DB_URL) {
     return;
   }
@@ -89,7 +89,7 @@ async function persist({ results }) {
 
 async function getBenchmarkResult() {
   if (mongoose.models.BenchmarkResult) {
-    return BenchmarkResult;
+    return mongoose.models.BenchmarkResult;
   }
 
   const benchmarkResultsSchema = mongoose.Schema({

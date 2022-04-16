@@ -71,6 +71,7 @@ async function run() {
 }
 
 async function persist({ results }) {
+  console.log(process.env.DB_URL?.split(' '));
   if (!process.env.DB_URL) {
     return;
   }

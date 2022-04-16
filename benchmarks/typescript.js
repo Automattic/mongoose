@@ -13,6 +13,7 @@ run().catch(err => {
 });
 
 async function run() {
+  console.log(process.env.DB_URL?.split(' '));
   if (process.env.DB_URL) {
     await mongoose.connect(process.env.DB_URL);
   }
@@ -29,7 +30,6 @@ async function run() {
     let totalTime = 0;
 
     for (let i = 0; i < numIterations; ++i) {
-
       const { stdout } = await execPromise(
         '../../../node_modules/.bin/tsc --extendedDiagnostics',
         { cwd: `${__dirname}/typescript/${tsProjectDirectory}` }
@@ -98,7 +98,7 @@ async function getBenchmarkResult() {
     results: 'Mixed'
   }, { timestamps: true });
 
-  benchmarkResultsSchema.index({ githash: 1 }, { unique: true });
+  benchmarkResultsSchema.index({ githash: 1, benchmarkName: 1 }, { unique: true });
 
 
   const BenchmarkResult = mongoose.model('BenchmarkResult', benchmarkResultsSchema, 'BenchmarkResult');

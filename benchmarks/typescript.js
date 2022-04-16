@@ -77,7 +77,7 @@ async function persist({ results }) {
     return;
   }
 
-  const BenchmarkResult = getBenchmarkResult();
+  const BenchmarkResult = await getBenchmarkResult();
   await BenchmarkResult.updateOne(
     { githash: process.env.GITHUB_SHA, benchmarkName: 'TypeScript' },
     { results },
@@ -85,10 +85,9 @@ async function persist({ results }) {
   );
 }
 
-let _BenchmarkResult;
 async function getBenchmarkResult() {
-  if (_BenchmarkResult) {
-    return _BenchmarkResult;
+  if (mongoose.models.BenchmarkResult) {
+    return mongoose.models.BenchmarkResult;
   }
 
   const benchmarkResultsSchema = mongoose.Schema({
@@ -101,7 +100,6 @@ async function getBenchmarkResult() {
 
 
   const BenchmarkResult = mongoose.model('BenchmarkResult', benchmarkResultsSchema, 'BenchmarkResult');
-  _BenchmarkResult = BenchmarkResult;
 
   await BenchmarkResult.syncIndexes();
   return BenchmarkResult;

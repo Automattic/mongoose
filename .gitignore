@@ -7,6 +7,7 @@ benchmarks/benchmarks
 benchmarks/benchmarks2
 benchmarks/benchmarks3
 benchmarks/v8.log
+benchmarks/typescript/**/*.js
 .DS_Store
 docs/*.json
 docs/source/_docs

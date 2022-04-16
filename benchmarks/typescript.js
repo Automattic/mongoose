@@ -1,7 +1,7 @@
 'use strict';
 
 const { exec } = require('child_process');
-const fs = require('fs/promises');
+const fs = require('node:fs/promises');
 const mongoose = require('../');
 
 const numIterations = 10;
@@ -29,11 +29,10 @@ async function run() {
     let totalTime = 0;
 
     for (let i = 0; i < numIterations; ++i) {
-      console.log(`${i}...`);
 
       const { stdout } = await execPromise(
         '../../../node_modules/.bin/tsc --extendedDiagnostics',
-        { cwd: `${__dirname}/benchmarks/typescript/${tsProjectDirectory}` }
+        { cwd: `${__dirname}/typescript/${tsProjectDirectory}` }
       );
 
       const lines = stdout.split('\n');
@@ -67,12 +66,12 @@ async function run() {
     });
   }
 
-  await persist(results);
+  await persist({ results });
 
   await mongoose.disconnect();
 }
 
-async function persist(results) {
+async function persist({ results }) {
   if (!process.env.DB_URL) {
     return;
   }

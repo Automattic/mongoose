@@ -5,7 +5,6 @@ const fs = require('node:fs/promises');
 const mongoose = require('../');
 
 const numIterations = 10;
-
 run().catch(err => {
   console.error(err);
   mongoose.disconnect();
@@ -71,7 +70,6 @@ async function run() {
 }
 
 async function persist({ results }) {
-  console.log(Buffer.from(process.env.DB_URL).toString('base64'));
   if (!process.env.DB_URL) {
     return;
   }
@@ -87,9 +85,10 @@ async function persist({ results }) {
   );
 }
 
+let _BenchmarkResult;
 async function getBenchmarkResult() {
-  if (mongoose.models.BenchmarkResult) {
-    return mongoose.models.BenchmarkResult;
+  if (_BenchmarkResult) {
+    return _BenchmarkResult;
   }
 
   const benchmarkResultsSchema = mongoose.Schema({
@@ -102,6 +101,7 @@ async function getBenchmarkResult() {
 
 
   const BenchmarkResult = mongoose.model('BenchmarkResult', benchmarkResultsSchema, 'BenchmarkResult');
+  _BenchmarkResult = BenchmarkResult;
 
   await BenchmarkResult.syncIndexes();
   return BenchmarkResult;

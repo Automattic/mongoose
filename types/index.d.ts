@@ -975,13 +975,13 @@ declare module 'mongoose' {
     virtual<T = HydratedDocument<DocType, TInstanceMethods>>(
       name: string,
       options?: VirtualTypeOptions<T, DocType>
-    ): VirtualType;
+    ): VirtualType<T>;
 
     /** Object of currently defined virtuals on this schema */
     virtuals: any;
 
     /** Returns the virtual type with the given `name`. */
-    virtualpath(name: string): VirtualType | null;
+    virtualpath<T = HydratedDocument<DocType, TInstanceMethods>>(name: string): VirtualType<T> | null;
   }
 
   type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;
@@ -1296,7 +1296,7 @@ declare module 'mongoose' {
     [extra: string]: any;
   }
 
-  class VirtualType {
+  class VirtualType<HydratedDocType> {
     /** Applies getters to `value`. */
     applyGetters(value: any, doc: Document): any;
 
@@ -1304,10 +1304,10 @@ declare module 'mongoose' {
     applySetters(value: any, doc: Document): any;
 
     /** Adds a custom getter to this virtual. */
-    get(fn: Function): this;
+    get<T = HydratedDocType>(fn: (this: T, value: any, virtualType: VirtualType<T>, doc: T) => any): this;
 
     /** Adds a custom setter to this virtual. */
-    set(fn: Function): this;
+    set<T = HydratedDocType>(fn: (this: T, value: any, virtualType: VirtualType<T>, doc: T) => void): this;
   }
 
   namespace Schema {

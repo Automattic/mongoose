@@ -9,6 +9,7 @@ const start = require('./common');
 const Promise = require('bluebird');
 const Q = require('q');
 const assert = require('assert');
+const sinon = require('sinon');
 const mongodb = require('mongodb');
 const MongooseError = require('../lib/error/index');
 
@@ -357,6 +358,26 @@ describe('connections:', function() {
 
       // Force close
       db.close(true);
+    });
+  });
+
+  it('close connection and remove it permanantly', (done) => {
+    const opts = {};
+    const conn = mongoose.createConnection(start.uri, opts);
+    const MongoClient = mongodb.MongoClient;
+    sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
+      callback();
+    })
+
+    const db = conn.useDb('test-db')
+
+    const totalConn = mongoose.connections.length
+    console.log("Total open connections before close are --> ", totalConn)
+
+    conn.close(false, true, ()=> {
+      console.log("Total open connections after close are --> ", mongoose.connections.length)
+      assert.equal(mongoose.connections.length, totalConn-1)
+      done();
     });
   });
 

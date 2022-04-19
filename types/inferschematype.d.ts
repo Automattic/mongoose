@@ -23,9 +23,7 @@ declare module 'mongoose' {
    * // result
    * type UserType = {userName?: string}
    */
-  type InferSchemaType<SchemaType> = SchemaType extends Schema<infer EnforcedDocType>
-    ? IsItRecordAndNotAny<EnforcedDocType> extends true ? EnforcedDocType : ObtainSchemaGeneric<SchemaType, 'DocType'>
-    : unknown;
+  type InferSchemaType<SchemaType> = ObtainSchemaGeneric<SchemaType, 'DocType'> ;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.
@@ -84,7 +82,7 @@ type PathWithTypePropertyBaseType<TypeKey extends TypeKeyBaseType> = { [k in Typ
  * @returns required paths keys of document definition.
  */
 type RequiredPathKeys<T> = {
-  [K in keyof T]: T[K] extends RequiredPathBaseType ? K : never;
+  [K in keyof T]: T[K] extends RequiredPathBaseType ? IfEquals<T[K], any, never, K> : never;
 }[keyof T];
 
 /**
@@ -140,16 +138,17 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
  * @returns Number, "Number" or "number" will be resolved to string type.
  */
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}> =
-    PathValueType extends (infer Item)[] ? IfEquals<Item, never, Schema.Types.Mixed, ResolvePathType<Item>>[] :
-      PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? PathEnumOrString<Options['enum']> :
-        PathValueType extends NumberConstructor | 'number' | 'Number' | typeof Schema.Types.Number ? number :
-          PathValueType extends DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date ? Date :
-            PathValueType extends BufferConstructor | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
-              PathValueType extends BooleanConstructor | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean ? boolean :
-                PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Schema.Types.ObjectId :
-                  PathValueType extends ObjectConstructor | typeof Schema.Types.Mixed ? Schema.Types.Mixed :
-                    PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
-                      PathValueType extends ArrayConstructor ? Schema.Types.Mixed[] :
-                        keyof PathValueType extends keyof {} ? Schema.Types.Mixed :
+  PathValueType extends (infer Item)[] ? IfEquals<Item, never, any, ResolvePathType<Item>>[] :
+    PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? PathEnumOrString<Options['enum']> :
+      PathValueType extends NumberConstructor | 'number' | 'Number' | typeof Schema.Types.Number ? number :
+        PathValueType extends DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date ? Date :
+          PathValueType extends BufferConstructor | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
+            PathValueType extends BooleanConstructor | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean ? boolean :
+              PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Schema.Types.ObjectId :
+                PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
+                  PathValueType extends ArrayConstructor ? any[] :
+                    PathValueType extends typeof Schema.Types.Mixed ? any:
+                      IfEquals<PathValueType, ObjectConstructor> extends true ? any:
+                        IfEquals<PathValueType, {}> extends true ? any:
                           PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
                             unknown;

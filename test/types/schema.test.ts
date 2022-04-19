@@ -362,9 +362,9 @@ export function autoTypedSchema() {
     boolean2?: boolean;
     boolean3?: boolean;
     boolean4?: boolean;
-    mixed1?: Schema.Types.Mixed;
-    mixed2?: Schema.Types.Mixed;
-    mixed3?: Schema.Types.Mixed;
+    mixed1?: any;
+    mixed2?: any;
+    mixed3?: any;
     objectId1?: Schema.Types.ObjectId;
     objectId2?: Schema.Types.ObjectId;
     objectId3?: Schema.Types.ObjectId;
@@ -372,10 +372,10 @@ export function autoTypedSchema() {
     map1?: Map<string, string>;
     map2?: Map<string, number>;
     array1?: string[];
-    array2?: Schema.Types.Mixed[];
-    array3?: Schema.Types.Mixed[];
-    array4?: Schema.Types.Mixed[];
-    array5?: Schema.Types.Mixed[];
+    array2?: any[];
+    array3?: any[];
+    array4?: any[];
+    array5?: any[];
   };
 
   const TestSchema = new Schema({

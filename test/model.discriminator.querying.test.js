@@ -318,7 +318,7 @@ describe('model', function() {
     });
 
     describe('findOne', function() {
-      it('when selecting `select: false` field (gh-4629)', async function() {
+      it('when selecting `select: false` field (gh-4629) (gh-11546)', async function() {
         const s = new SecretEvent({ name: 'test', secret: 'test2' });
         await s.save();
 

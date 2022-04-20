@@ -183,7 +183,7 @@ declare module 'mongoose' {
    * section collection.js
    * http://mongoosejs.com/docs/api.html#collection-js
    */
-  interface CollectionBase<T> extends mongodb.Collection<T> {
+  interface CollectionBase<T extends mongodb.Document> extends mongodb.Collection<T> {
     /*
       * Abstract methods. Some of these are already defined on the
       * mongodb.Collection interface so they've been commented out.
@@ -205,7 +205,7 @@ declare module 'mongoose' {
    * http://mongoosejs.com/docs/api.html#drivers-node-mongodb-native-collection-js
    */
   let Collection: Collection;
-  interface Collection<T = AnyObject> extends CollectionBase<T> {
+  interface Collection<T extends mongodb.Document = mongodb.Document> extends CollectionBase<T> {
     /**
      * Collection constructor
      * @param name name of the collection
@@ -317,8 +317,8 @@ declare module 'mongoose' {
      * mongoose will not create the collection for the model until any documents are
      * created. Use this method to create the collection explicitly.
      */
-    createCollection<T>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>): Promise<mongodb.Collection<T>>;
-    createCollection<T>(options: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'> | null, callback: Callback<mongodb.Collection<T>>): void;
+    createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>): Promise<mongodb.Collection<T>>;
+    createCollection<T extends mongodb.Document>(options: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'> | null, callback: Callback<mongodb.Collection<T>>): void;
 
     /**
      * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
@@ -467,7 +467,7 @@ declare module 'mongoose' {
     validate(optional: any, pathsToValidate: string[], callback?: CallbackWithoutResult): Promise<void>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://docs.mongodb.com/manual/changeStreams/). */
-    watch<ResultType = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
+    watch<ResultType extends mongodb.Document = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
 
     /** Adds a `$where` clause to this query */
     $where(argument: string | Function): QueryWithHelpers<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;

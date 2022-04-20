@@ -1,3 +1,25 @@
+6.3.0 / 2022-04-14
+==================
+ * fix: upgrade mongodb driver -> 4.5.0 #11623 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(schema): allow defining discriminators on schema and in schema definition #7971 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(base): add option to set allowDiskUse globally #11554 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(schema): add `removeIndex()` and `clearIndex()` #11547 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(cursor): add `continueOnError` option to allow executing `eachAsync()` on all docs even if error occurs #6355
+ * feat(query): add `versionKey` option to `lean()` for removing version key from lean docs #8934 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(types): create new ProjectionType type for select(), find(), etc. #11437
+ * chore: use webpack 5 for browser build #11584 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+6.2.11 / 2022-04-13
+===================
+ * fix(document): handle validation with triply nested document arrays #11564
+ * fix(query): skip applying string schema setters on $regex #11426
+ * fix: skip findOneAndReplace() validation if runValidators = false #11559
+ * fix(model): correctly handle schema-level collations in syncIndexes() #7621
+ * fix(types): correct populate query return type with lean #11560 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+ * fix(types): allow using { type: Mixed } as schema type definition for any path #10900
+ * docs: fix example on Schema.prototype.post() #11648 [EmilienLeroy](https://github.com/EmilienLeroy)
+ * docs: fix typo in methods/index.js #11651 [eltociear](https://github.com/eltociear)
+
 6.2.10 / 2022-04-04
 ===================
  * fix(types): improve lastErrorObject typing for rawResults #11602 [simllll](https://github.com/simllll)

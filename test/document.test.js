@@ -11238,4 +11238,49 @@ describe('document', function() {
     assert.equal(doc.name, 'test');
     assert.equal(doc.mix.val, 'foo');
   });
+
+  it('correctly validates deeply nested document arrays (gh-11564)', async function() {
+    const testSchemaSub3 = new mongoose.Schema({
+      name: {
+        type: String,
+        required: true
+      }
+    });
+
+    const testSchemaSub2 = new mongoose.Schema({
+      name: {
+        type: String,
+        required: true
+      },
+      list: [testSchemaSub3]
+    });
+
+    const testSchemaSub1 = new mongoose.Schema({
+      name: {
+        type: String,
+        required: true
+      },
+      list: [testSchemaSub2]
+    });
+
+    const testSchema = new mongoose.Schema({
+      name: String,
+      list: [testSchemaSub1]
+    });
+
+    const testModel = db.model('Test', testSchema);
+
+    await testModel.create({
+      name: 'lvl1',
+      list: [{
+        name: 'lvl2',
+        list: [{
+          name: 'lvl3'
+          // list: [{
+          //   name: 'lvl4'
+          // }]
+        }]
+      }]
+    });
+  });
 });

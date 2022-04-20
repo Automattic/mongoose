@@ -7238,7 +7238,6 @@ describe('model: populate:', function() {
       });
 
       it('document, and subdocuments are not lean by default', async function() {
-
         const user = await db.model('User').findOne().populate({
           path: 'roomId',
           populate: {
@@ -7252,7 +7251,6 @@ describe('model: populate:', function() {
       });
 
       it('.lean() makes query result, and all populated fields lean', async function() {
-
         const user = await db.model('User').findOne().
           populate({
             path: 'roomId',

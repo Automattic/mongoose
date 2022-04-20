@@ -1,6 +1,5 @@
-import mongodb = require('mongodb');
-
 declare module 'mongoose' {
+  import mongodb = require('mongodb');
 
   interface SchemaTimestampsConfig {
     createdAt?: boolean | string;

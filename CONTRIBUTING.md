@@ -42,7 +42,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
   - or to execute a single test `npm test -- -g 'some regexp that matches the test description'`
   - any mocha flags can be specified with `-- <mocha flags here>`
   - For example, you can use `npm test -- -R spec` to use the spec reporter, rather than the dot reporter (by default, the test output looks like a bunch of dots)
-- execute `npm run test-tsd` to run the typescript tests
+  - execute `npm run test-tsd` to run the typescript tests
 
 ### Documentation
 

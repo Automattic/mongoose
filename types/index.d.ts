@@ -205,7 +205,7 @@ declare module 'mongoose' {
    * http://mongoosejs.com/docs/api.html#drivers-node-mongodb-native-collection-js
    */
   let Collection: Collection;
-  interface Collection<T extends AnyObject = AnyObject> extends CollectionBase<T> {
+  interface Collection<T extends mongodb.Document = mongodb.Document> extends CollectionBase<T> {
     /**
      * Collection constructor
      * @param name name of the collection

@@ -981,13 +981,13 @@ declare module 'mongoose' {
     virtualpath<T = HydratedDocument<DocType, TInstanceMethods>>(name: string): VirtualType<T> | null;
   }
 
-  type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;
-  type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String;
-  type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean;
-  type DateSchemaDefinition = typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date;
-  type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId;
+  export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;
+  export type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String;
+  export type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean;
+  export type DateSchemaDefinition = typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date;
+  export type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId;
 
-  type SchemaDefinitionWithBuiltInClass<T> = T extends number
+  export type SchemaDefinitionWithBuiltInClass<T> = T extends number
     ? NumberSchemaDefinition
     : T extends string
       ? StringSchemaDefinition
@@ -997,7 +997,7 @@ declare module 'mongoose' {
           ? DateSchemaDefinition
           : (Function | string);
 
-  type SchemaDefinitionProperty<T = undefined> = SchemaDefinitionWithBuiltInClass<T> |
+  export type SchemaDefinitionProperty<T = undefined> = SchemaDefinitionWithBuiltInClass<T> |
   SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
   Schema<any, any, any> |
@@ -2040,7 +2040,7 @@ declare module 'mongoose' {
     wtimeout(ms: number): this;
   }
 
-  type ProjectionElementType = number | string;
+  export type ProjectionElementType = number | string;
   export type ProjectionType<T> = { [P in keyof T]?: ProjectionElementType } | AnyObject | string;
 
   export type QuerySelector<T> = {
@@ -2194,8 +2194,7 @@ declare module 'mongoose' {
   };
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
-  export type TreatAsPrimitives = actualPrimitives |
-  NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
+  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
 
   export type LeanType<T> =
     0 extends (1 & T) ? T : // any
@@ -2329,7 +2328,7 @@ declare module 'mongoose' {
     continueOnError?: boolean
   }
   export type ConnectionSyncIndexesResult = Record<string, OneCollectionSyncIndexesResult>;
-  type OneCollectionSyncIndexesResult = Array<string> & mongodb.MongoServerError;
+  export type OneCollectionSyncIndexesResult = Array<string> & mongodb.MongoServerError;
   export type Callback<T = any> = (error: CallbackError, result: T) => void;
 
   export type CallbackWithoutResult = (error: CallbackError) => void;

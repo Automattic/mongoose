@@ -49,6 +49,9 @@ declare module 'mongoose' {
     /** Marks a path as valid, removing existing validation errors. */
     $markValid(path: string): void;
 
+    /** Returns the model with the given name on this document's associated connection. */
+    $model<ModelType = Model<unknown>>(name: string): ModelType;
+
     /**
      * A string containing the current operation that Mongoose is executing
      * on this document. Can be `null`, `'save'`, `'validate'`, or `'remove'`.
@@ -168,9 +171,6 @@ declare module 'mongoose' {
 
     /** The name of the model */
     modelName: string;
-
-    /** Returns the model with the given name on this document's associated connection. */
-    model<ModelType = Model<unknown>>(name: string): ModelType;
 
     /**
      * Overwrite all values in this document with the values of `obj`, except

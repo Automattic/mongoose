@@ -197,7 +197,7 @@ declare module 'mongoose' {
        * async function executes successfully and attempt to retry if
        * there was a retryable error.
        */
-    transaction<U = any>(fn: (session: mongodb.ClientSession) => Promise<U>): Promise<U>;
+    transaction(fn: (session: mongodb.ClientSession) => Promise<any>): Promise<void>;
 
     /** Switches to a different database using the same connection pool. */
     useDb(name: string, options?: { useCache?: boolean, noListener?: boolean }): Connection;
@@ -206,7 +206,7 @@ declare module 'mongoose' {
     readonly user: string;
 
     /** Watches the entire underlying database for changes. Similar to [`Model.watch()`](/docs/api/model.html#model_Model.watch). */
-    watch<ResultType = any>(pipeline?: Array<any>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
+    watch<ResultType extends mongodb.Document = any>(pipeline?: Array<any>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
   }
 
 }

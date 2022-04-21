@@ -39,6 +39,16 @@ personSchema.virtual('fullName')
     this.lastName = splittedName[1];
   });
 
+personSchema.virtual('fullNameAlt')
+  .get(function() {
+    return `${this.firstName} ${this.lastName}`;
+  })
+  .set(function(value) {
+    const splittedName = value.split(' ');
+    this.firstName = splittedName[0];
+    this.lastName = splittedName[1];
+  });
+
 // Populated virtuals
 petSchema.virtual('owner', {
   ref: 'Person',

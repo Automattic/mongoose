@@ -789,6 +789,8 @@ declare module 'mongoose' {
     model?: string | Model<any>;
     /** optional query options like sort, limit, etc */
     options?: any;
+    /** correct limit on populated array */
+    perDocumentLimit?: number;
     /** optional boolean, set to `false` to allow populating paths that aren't in the schema */
     strictPopulate?: boolean;
     /** deep populate */

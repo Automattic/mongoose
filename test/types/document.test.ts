@@ -178,6 +178,6 @@ function gh11435() {
 }
 
 async function gh11598() {
-  const doc = await Test.findOne();
-  doc?.populate('favoritDrink', undefined, model('temp', new Schema()));
+  const doc = await Test.findOne().orFail();
+  doc.populate('favoritDrink', undefined, model('temp', new Schema()));
 }

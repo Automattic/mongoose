@@ -9485,6 +9485,45 @@ describe('model: populate:', function() {
       });
     });
 
+    it('recursive virtuals with `populate` option (gh-11700)', async function() {
+      const InteractionSchema = new Schema({
+        title: String,
+        parent: {
+          type: mongoose.ObjectId,
+          ref: 'Interaction'
+        }
+      });
+
+      InteractionSchema.virtual('next', {
+        ref: 'Interaction',
+        localField: '_id',
+        foreignField: 'parent',
+        justOne: true,
+        options: {
+          populate: 'next'
+        }
+      });
+
+      const Interaction = db.model('Interaction', InteractionSchema);
+
+      const interactionA = new Interaction({ title: 'first interaction' });
+      await interactionA.save();
+
+      const interactionB = new Interaction({ title: 'second interaction', parent: interactionA._id });
+      await interactionB.save();
+
+      const interactionC = new Interaction({ title: 'third interaction', parent: interactionB._id });
+      await interactionC.save();
+
+      const interaction = await Interaction.findOne({ parent: null }).populate('next');
+
+      assert.equal(interaction.title, interactionA.title);
+      assert.notEqual(interaction.next, undefined);
+      assert.equal(interaction.next.title, interactionB.title);
+      assert.notEqual(interaction.next.next, undefined);
+      assert.equal(interaction.next.next.title, interactionC.title);
+    });
+
     it('no-op if populating on a document array with no ref (gh-8946)', async function() {
       const teamSchema = Schema({
         members: [{ user: { type: ObjectId, ref: 'User' } }]

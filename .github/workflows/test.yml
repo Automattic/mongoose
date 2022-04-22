@@ -54,7 +54,6 @@ jobs:
             mongo: 5.0.2
         exclude:
           - os: ubuntu-18.04
-            mongo: 4.0.2
             node: 18
     name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongo }}
     steps:

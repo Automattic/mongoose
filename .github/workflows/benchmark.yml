@@ -2,7 +2,7 @@ name: Benchmark
 on:
   pull_request:
     paths:
-      - 'workflows/benchmark.yml'
+      - '.github/workflows/benchmark.yml'
       - 'package.json'
       - 'types/**'
       - 'benchmarks/typescript/**'
@@ -11,6 +11,7 @@ on:
     branches:
       - master
     paths:
+      - '.github/workflows/benchmark.yml'
       - 'package.json'
       - 'types/**'
       - 'benchmarks/typescript/**'

@@ -2,7 +2,7 @@ name: Test
 on:
   pull_request:
     paths:
-      - 'workflows/test.yml'
+      - '.github/workflows/test.yml'
       - 'package.json'
       - 'index.js'
       - 'lib/**'
@@ -11,6 +11,7 @@ on:
     branches:
       - master
     paths:
+      - '.github/workflows/test.yml'
       - 'package.json'
       - 'index.js'
       - 'lib/**'

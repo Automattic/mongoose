@@ -155,6 +155,12 @@ const MyModel = mongoose.model('Ticket', mySchema);
 
 Then Mongoose will create the model for your __tickets__ collection, not your __ticket__ collection.
 
+To prevent this behavior additional third argument can be passed to mongoose.model method, that will create the model with exact name whatever passed as 3rd argument, not the plural version.
+
+```js
+const MyModel = mongoose.model('Ticket', mySchema, 'Ticket');
+```
+
 Once we have our model, we can then instantiate it, and save it:
 
 ```js

@@ -2,6 +2,7 @@ name: Typescript Types
 on:
   pull_request:
     paths:
+      - 'workflows/tsd.yml'
       - 'package.json'
       - 'types/**'
       - 'test/types/**'

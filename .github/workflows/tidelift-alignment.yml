@@ -2,6 +2,7 @@ name: Tidelift Alignment
 on:
   pull_request:
     paths:
+      - 'workflows/tidelift-alignment.yml'
       - 'package.json'
   push:
     paths:

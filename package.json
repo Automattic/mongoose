@@ -120,6 +120,7 @@
       "allowSyntheticDefaultImports": true,
       "strictPropertyInitialization": false,
       "noImplicitAny": false,
+      "strictNullChecks": true,
       "module": "commonjs",
       "target": "ES2017"
     }

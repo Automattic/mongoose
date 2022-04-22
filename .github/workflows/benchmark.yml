@@ -2,6 +2,7 @@ name: Benchmark
 on:
   pull_request:
     paths:
+      - 'workflows/benchmark.yml'
       - 'package.json'
       - 'types/**'
       - 'benchmarks/typescript/**'

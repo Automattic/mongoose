@@ -1,15 +1,9 @@
 name: Tidelift Alignment
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/tidelift-alignment.yml'
-      - 'package.json'
   push:
     paths:
       - '.github/workflows/tidelift-alignment.yml'
       - 'package.json'
-  schedule:
-    - cron: '0 0 * * *'  # every day at midnight
 
 jobs:
   build:

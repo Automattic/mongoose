@@ -91,7 +91,7 @@ jobs:
           node-version: 16
       - run: npm install
       - name: Test
-        run: env START_REPLICA_SET=1 npm test
+        run: npm run test-rs
 
   coverage:
     needs:

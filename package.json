@@ -35,7 +35,7 @@
     "acquit": "1.2.1",
     "acquit-ignore": "0.2.0",
     "acquit-require": "0.1.1",
-    "assert-browserify": "npm:assert@^2.0.0",
+    "assert-browserify": "2.0.0",
     "axios": "0.26.1",
     "babel-loader": "8.2.4",
     "benchmark": "2.1.4",
@@ -120,6 +120,7 @@
       "allowSyntheticDefaultImports": true,
       "strictPropertyInitialization": false,
       "noImplicitAny": false,
+      "strictNullChecks": true,
       "module": "commonjs",
       "target": "ES2017"
     }

@@ -193,8 +193,8 @@ declare module 'mongoose' {
     /** Populates document references. */
     populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this & Paths>;
     populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this & Paths>): void;
-    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<unknown>, match?: AnyObject, options?: PopulateOptions): Promise<this & Paths>;
-    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<unknown>, match?: AnyObject, options?: PopulateOptions, callback?: Callback<this & Paths>): void;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<this & Paths>;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions, callback?: Callback<this & Paths>): void;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;

@@ -4,6 +4,5 @@
     "paths": {
       "mongoose" : ["./types/index.d.ts"]
     }
-  },
-  "include": ["types/*"]
+  }
 }

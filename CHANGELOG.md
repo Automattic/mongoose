@@ -1,3 +1,20 @@
+6.3.1 / 2022-04-21
+==================
+ * perf: improve perf of key order #11639 [Uzlopak](https://github.com/Uzlopak)
+ * fix(timestamps): set createdAt when creating new single nested subdocuments #11603
+ * fix: improve CastError message when throwing StrictModeError #11506
+ * fix: upgrade bson to match mongodb@4.5 #11676
+ * fix(populate): avoid populating single nested subdocs underneath arrays if there's no `ref` #11538
+ * fix: handle { capped: number } in schema definition with `createCollection()` #11539
+ * fix: call markModified before setting changes in Array and in DocumentArray methods #11660 [josegl](https://github.com/josegl)
+ * fix: only allow using minus path to remove auto-selected discriminatorKey from projection #11546
+ * fix(types): set context on virtual getters/setters by default #11543
+ * fix(types): correct return type for Connection.prototype.transaction #9919
+ * fix(types): allow model as document interface key when using `extends Document` #11629
+ * docs: improve populate typing #11690 [onichandame](https://github.com/onichandame)
+ * docs: add information regarding typings-tests #11691 [Uzlopak](https://github.com/Uzlopak)
+ * docs: fix jsdoc for mongoose.createConnection #11693 [Uzlopak](https://github.com/Uzlopak)
+
 6.3.0 / 2022-04-14
 ==================
  * fix: upgrade mongodb driver -> 4.5.0 #11623 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

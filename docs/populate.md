@@ -339,6 +339,8 @@ But, if you have a good reason to want an array of child pointers, you
 can `push()` documents onto the array as shown below.
 
 ```javascript
+story1.save()
+
 author.stories.push(story1);
 author.save(callback);
 ```

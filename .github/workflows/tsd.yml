@@ -2,6 +2,7 @@ name: Typescript Types
 on:
   pull_request:
     paths:
+      - '.github/workflows/tsd.yml'
       - 'package.json'
       - 'types/**'
       - 'test/types/**'
@@ -9,6 +10,7 @@ on:
     branches:
       - master
     paths:
+      - '.github/workflows/tsd.yml'
       - 'package.json'
       - 'types/**'
       - 'test/types/**'

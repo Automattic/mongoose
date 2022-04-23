@@ -367,17 +367,56 @@ describe('connections:', function() {
     const MongoClient = mongodb.MongoClient;
     sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
       callback();
-    })
+    });
 
-    const db = conn.useDb('test-db')
+    conn.useDb('test-db');
 
-    const totalConn = mongoose.connections.length
-    console.log("Total open connections before close are --> ", totalConn)
+    const totalConn = mongoose.connections.length;
+    console.log('Total open connections before close are --> ', totalConn);
 
-    conn.close(false, true, ()=> {
-      console.log("Total open connections after close are --> ", mongoose.connections.length)
-      assert.equal(mongoose.connections.length, totalConn-1)
+    conn.close(false, true, () => {
+      console.log('Total open connections after close are --> ', mongoose.connections.length);
+      assert.equal(mongoose.connections.length, totalConn - 1);
       done();
+    });
+  });
+
+  it('verify that attempt to re-open closedAndCleaned connection throws error, via promise', (done) => {
+    const opts = {};
+    const conn = mongoose.createConnection(start.uri, opts);
+    const MongoClient = mongodb.MongoClient;
+    sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
+      callback();
+    });
+
+    conn.useDb('test-db');
+
+    conn.close(false, true, async() => {
+      try {
+        await conn.openUri(start.uri);
+      } catch (error) {
+        assert.equal(error.message, 'Connection has been closed and cleaned already, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
+        done();
+      }
+    });
+  });
+
+  it('verify that attempt to re-open closedAndCleaned connection throws error, via callback', (done) => {
+    const opts = {};
+    const conn = mongoose.createConnection(start.uri, opts);
+    const MongoClient = mongodb.MongoClient;
+    sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
+      callback();
+    });
+
+    conn.useDb('test-db');
+
+    conn.close(false, true, () => {
+      conn.openUri(start.uri, function(error, result) {
+        assert.equal(result, undefined);
+        assert.equal(error, 'Connection has been closed and cleaned already, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
+        done();
+      });
     });
   });
 

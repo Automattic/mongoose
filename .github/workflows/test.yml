@@ -2,6 +2,7 @@ name: Test
 on:
   pull_request:
     paths:
+      - '.github/workflows/test.yml'
       - 'package.json'
       - 'index.js'
       - 'lib/**'
@@ -10,6 +11,7 @@ on:
     branches:
       - master
     paths:
+      - '.github/workflows/test.yml'
       - 'package.json'
       - 'index.js'
       - 'lib/**'
@@ -41,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [12, 14, 16, 17]
+        node: [12, 14, 16, 18]
         os: [ubuntu-18.04, ubuntu-20.04]
         include:
           - os: ubuntu-18.04
@@ -50,6 +52,9 @@ jobs:
           - os: ubuntu-20.04
             mongo-os: ubuntu2004
             mongo: 5.0.2
+        exclude:
+          - os: ubuntu-18.04
+            node: 18
     name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongo }}
     steps:
       - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # v3
@@ -73,9 +78,24 @@ jobs:
           echo `pwd`/mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin >> $GITHUB_PATH
       - run: npm test
 
-  coverage:
+  test-replica-sets:
     needs:
       - test
+    runs-on: ubuntu-latest
+    name: Replica Set tests
+    steps:
+      - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # v3
+      - name: Setup node
+        uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
+        with:
+          node-version: 16
+      - run: npm install
+      - name: Test
+        run: npm run test-rs
+
+  coverage:
+    needs:
+      - test-replica-sets
     runs-on: ubuntu-20.04
     name: Coverage
     steps:
@@ -102,15 +122,3 @@ jobs:
         with:
           name: coverage
           path: coverage
-  test-replica-sets:
-    runs-on: ubuntu-latest
-    name: Replica Set tests
-    steps:
-      - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # v3
-      - name: Setup node
-        uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
-        with:
-          node-version: 16
-      - run: npm install
-      - name: Test
-        run: env START_REPLICA_SET=1 npm test

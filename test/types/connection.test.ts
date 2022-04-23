@@ -58,7 +58,7 @@ expectType<mongodb.Db>(conn.db);
 expectType<mongodb.MongoClient>(conn.getClient());
 expectType<Connection>(conn.setClient(new mongodb.MongoClient('mongodb://localhost:27017/test')));
 
-expectType<Promise<string>>(conn.transaction<string>(async(res) => {
+expectType<Promise<void>>(conn.transaction(async(res) => {
   expectType<mongodb.ClientSession>(res);
   return 'a';
 }));

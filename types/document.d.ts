@@ -49,6 +49,9 @@ declare module 'mongoose' {
     /** Marks a path as valid, removing existing validation errors. */
     $markValid(path: string): void;
 
+    /** Returns the model with the given name on this document's associated connection. */
+    $model<ModelType = Model<unknown>>(name: string): ModelType;
+
     /**
      * A string containing the current operation that Mongoose is executing
      * on this document. Can be `null`, `'save'`, `'validate'`, or `'remove'`.
@@ -169,9 +172,6 @@ declare module 'mongoose' {
     /** The name of the model */
     modelName: string;
 
-    /** Returns the model with the given name on this document's associated connection. */
-    model<ModelType = Model<unknown>>(name: string): ModelType;
-
     /**
      * Overwrite all values in this document with the values of `obj`, except
      * for immutable properties. Behaves similarly to `set()`, except for it
@@ -186,10 +186,10 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /** Populates document references. */
-    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this & Paths>): void;
-    populate<Paths = {}>(path: string, names: string, callback: Callback<this & Paths>): void;
-    populate<Paths = {}>(path: string, names: string): Promise<this & Paths>;
     populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this & Paths>;
+    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this & Paths>): void;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<unknown>, match?: AnyObject, options?: PopulateOptions): Promise<this & Paths>;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<unknown>, match?: AnyObject, options?: PopulateOptions, callback?: Callback<this & Paths>): void;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;

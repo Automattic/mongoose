@@ -75,7 +75,7 @@ creates collections if you use the [`autoCreate` option](/docs/guide.html#autoCr
 If you disable buffering, you should also disable the `autoCreate`
 option and use [`createCollection()`](/docs/api/model.html#model_Model.createCollection)
 to create [capped collections](/docs/guide.html#capped) or
-[collections with collations](/docs/guide.html#collation).
+[collections with collations](/docs/guide.html#collation). In addition, if you diable buffering, you should disable the [`autoIndex` option](https://mongoosejs.com/docs/guide.html#autoIndex) and use [`createIndexes()`](https://mongoosejs.com/docs/api.html#model_Model.createIndexes) to create indices.
 
 ```javascript
 const schema = new Schema({
@@ -83,13 +83,15 @@ const schema = new Schema({
 }, {
   capped: { size: 1024 },
   bufferCommands: false,
-  autoCreate: false // disable `autoCreate` since `bufferCommands` is false
+  autoCreate: false, // disable `autoCreate` since `bufferCommands` is false
+  autoIndex: false // disable `autoIndex` since `bufferCommands` is false
 });
 
 const Model = mongoose.model('Test', schema);
 // Explicitly create the collection before using it
 // so the collection is capped.
 await Model.createCollection();
+await Model.createIndexes();
 ```
 
 <h3 id="error-handling"><a href="#error-handling">Error Handling</a></h3>

@@ -1,6 +1,7 @@
-import stream = require('stream');
-
 declare module 'mongoose' {
+
+  import stream = require('stream');
+
   type CursorFlag = 'tailable' | 'oplogReplay' | 'noCursorTimeout' | 'awaitData' | 'partial';
 
   interface EachAsyncOptions {

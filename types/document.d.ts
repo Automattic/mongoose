@@ -1,6 +1,5 @@
-import mongodb = require('mongodb');
-
 declare module 'mongoose' {
+  import mongodb = require('mongodb');
 
   /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
   type pathsToSkip = string[] | string;
@@ -242,6 +241,6 @@ declare module 'mongoose' {
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
     validateSync(options: { pathsToSkip?: pathsToSkip, [k: string]: any }): Error.ValidationError | null;
-    validateSync(pathsToValidate?: Array<string>, options?: AnyObject): Error.ValidationError | null;
+    validateSync(pathsToValidate?: pathsToValidate, options?: AnyObject): Error.ValidationError | null;
   }
 }

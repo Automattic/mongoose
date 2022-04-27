@@ -288,7 +288,7 @@ mongoose.<span class="hljs-property">connections</span>.<span class="hljs-proper
 <span class="method-type">&laquo;Number&raquo;</span> How long the MongoDB driver will wait before killing a socket due to inactivity <em>after initial connection</em>. A socket may be inactive because of either no activity or a long-running operation. This is set to <code>30000</code> by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds. This option is passed to <a href="https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback">Node.js <code>socket#setTimeout()</code> function</a> after the MongoDB driver successfully completes.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.family=0]
 <span class="method-type">&laquo;Number&raquo;</span> Passed transparently to <a href="https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback">Node.js&#39; <code>dns.lookup()</code></a> function. May be either <code>0</code>, <code>4</code>, or <code>6</code>. <code>4</code> means use IPv4 only, <code>6</code> means use IPv6 only, <code>0</code> means try both.</p>
-</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Connection&raquo;</span> the created Connection object. Connections are not thenable, so you can not `await mongoose.createConnection()`. To await use mongoose.createConnection(uri).asPromise() instead.</li></ul><div><p>Creates a Connection instance.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Connection&raquo;</span> the created Connection object. Connections are not thenable, so you can't do `await mongoose.createConnection()`. To await use mongoose.createConnection(uri).asPromise() instead.</li></ul><div><p>Creates a Connection instance.</p>
 <p>Each <code>connection</code> instance maps to a single database. This method is helpful when managing multiple db connections.</p>
 <p><em>Options passed take precedence over options included in connection strings.</em></p>
 <h4 id="example">
@@ -549,7 +549,7 @@ xhr.send(JSON.stringify({
   path: window.location.pathname,
   hostname: window.location.hostname,
   hash: window.location.hash
-}));</script><div id="jobs"><div class="button jobs-view-more"><a href="/docs/jobs">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript">(function (window, document) {
+}));</script><div id="jobs"><div class="job-listing"><a href="/jobs61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="button jobs-view-more"><a href="/docs/jobs">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript">(function (window, document) {
   var layout   = document.getElementById('layout'),
       menu     = document.getElementById('menu'),
       menuLink = document.getElementById('menuLink'),

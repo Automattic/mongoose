@@ -43,9 +43,6 @@ const webpackConfig = {
   },
   target: 'web',
   mode: 'production',
-  optimization: {
-    minimize: false
-  },
   plugins: [
     new webpack.DefinePlugin({
       process: '({env:{}})'

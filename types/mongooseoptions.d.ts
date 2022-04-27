@@ -1,6 +1,5 @@
-import stream = require('stream');
-
 declare module 'mongoose' {
+  import stream = require('stream');
 
   interface MongooseOptions {
     /**

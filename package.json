@@ -35,7 +35,7 @@
     "acquit": "1.2.1",
     "acquit-ignore": "0.2.0",
     "acquit-require": "0.1.1",
-    "assert-browserify": "npm:assert@^2.0.0",
+    "assert-browserify": "2.0.0",
     "axios": "0.26.1",
     "babel-loader": "8.2.4",
     "benchmark": "2.1.4",
@@ -51,7 +51,7 @@
     "marked": "4.0.12",
     "mocha": "9.2.2",
     "moment": "2.x",
-    "mongodb-memory-server": "8.3.0",
+    "mongodb-memory-server": "8.5.0",
     "nyc": "15.1.0",
     "pug": "3.0.2",
     "q": "1.5.1",
@@ -76,6 +76,7 @@
     "release-legacy": "git pull origin 5.x && git push origin 5.x --tags && npm publish --tag legacy",
     "mongo": "node ./tools/repl.js",
     "test": "mocha --exit ./test/*.test.js",
+    "test-rs": "START_REPLICA_SET=1 mocha --timeout 30000 --exit ./test/*.test.js",
     "test-tsd": "node ./test/types/check-types-filename && tsd",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
     "test-coverage": "nyc --reporter=html --reporter=text npm test"
@@ -119,6 +120,7 @@
       "allowSyntheticDefaultImports": true,
       "strictPropertyInitialization": false,
       "noImplicitAny": false,
+      "strictNullChecks": true,
       "module": "commonjs",
       "target": "ES2017"
     }

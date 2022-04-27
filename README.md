@@ -153,7 +153,7 @@ The first argument is the _singular_ name of the collection your model is for. *
 const MyModel = mongoose.model('Ticket', mySchema);
 ```
 
-Then Mongoose will create the model for your __tickets__ collection, not your __ticket__ collection.
+Then `MyModel` will use the __tickets__ collection, not the __ticket__ collection. For more details read the [model docs](https://mongoosejs.com/docs/api/mongoose.html#mongoose_Mongoose-model).
 
 Once we have our model, we can then instantiate it, and save it:
 

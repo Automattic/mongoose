@@ -1673,7 +1673,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     elemMatch(val: Function | any): this;
-    elemMatch(path: string, val: Function | any): this;
+    elemMatch<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$elemMatch']): this;
 
     /**
      * Gets/sets the error flag on this query. If this flag is not null or
@@ -1690,7 +1690,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$exists` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     exists(val: boolean): this;
-    exists(path: string, val: boolean): this;
+    exists<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$exists']): this;
 
     /**
      * Sets the [`explain` option](https://docs.mongodb.com/manual/reference/method/cursor.explain/),
@@ -1805,18 +1805,18 @@ declare module 'mongoose' {
 
     /** Specifies a `$gt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gt(val: number): this;
-    gt(path: string, val: number): this;
+    gte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gt']): this;
 
     /** Specifies a `$gte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gte(val: number): this;
-    gte(path: string, val: number): this;
+    gte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gte']): this;
 
     /** Sets query hints. */
     hint(val: any): this;
 
     /** Specifies an `$in` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     in(val: Array<any>): this;
-    in(path: string, val: Array<any>): this;
+    in<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$in']): this;
 
     /** Declares an intersects query for `geometry()`. */
     intersects(arg?: any): this;
@@ -1832,11 +1832,11 @@ declare module 'mongoose' {
 
     /** Specifies a `$lt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     lt(val: number): this;
-    lt(path: string, val: number): this;
+    lt<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$lt']): this;
 
     /** Specifies a `$lte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     lte(val: number): this;
-    lte(path: string, val: number): this;
+    lte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$lte']): this;
 
     /**
      * Runs a function `fn` and treats the return value of `fn` as the new value
@@ -1863,7 +1863,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$mod` condition, filters documents for documents whose `path` property is a number that is equal to `remainder` modulo `divisor`. */
     mod(val: Array<number>): this;
-    mod(path: string, val: Array<number>): this;
+    mod<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$mod']): this;
 
     /** The model this query was created from */
     model: typeof Model;
@@ -1876,15 +1876,15 @@ declare module 'mongoose' {
 
     /** Specifies a `$ne` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     ne(val: any): this;
-    ne(path: string, val: any): this;
+    ne<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$ne']): this;
 
     /** Specifies a `$near` or `$nearSphere` condition */
     near(val: any): this;
-    near(path: string, val: any): this;
+    near<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$near']): this;
 
     /** Specifies an `$nin` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     nin(val: Array<any>): this;
-    nin(path: string, val: Array<any>): this;
+    nin<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$nin']): this;
 
     /** Specifies arguments for an `$nor` condition. */
     nor(array: Array<FilterQuery<DocType>>): this;
@@ -1920,7 +1920,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$regex` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     regex(val: string | RegExp): this;
-    regex(path: string, val: string | RegExp): this;
+    regex<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$regex']): this;
 
     /**
      * Declare and/or execute this query as a remove() operation. `remove()` is
@@ -1973,7 +1973,7 @@ declare module 'mongoose' {
 
     /** Specifies an `$size` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     size(val: number): this;
-    size(path: string, val: number): this;
+    size<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$size']): this;
 
     /** Specifies the number of documents to skip. */
     skip(val: number): this;
@@ -2198,13 +2198,24 @@ declare module 'mongoose' {
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
 
+  // This will -- when possible -- extract the original type of the subdocument in question
+  type LeanSubdocument<T> = T extends (Types.Subdocument<Require_id<T>['_id']> & infer U) ? LeanDocument<U> : Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'>;
+
   export type LeanType<T> =
     0 extends (1 & T) ? T : // any
       T extends TreatAsPrimitives ? T : // primitives
-        T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> : // subdocs
+        T extends Types.Subdocument ? LeanSubdocument<T> : // subdocs
           LeanDocument<T>; // Documents and everything else
 
-  export type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
+  // Used only when collapsing lean arrays for ts performance reasons:
+  type LeanTypeOrArray<T> = T extends unknown[] ? LeanArray<T> : LeanType<T>;
+
+  export type LeanArray<T extends unknown[]> =
+  // By checking if it extends Types.Array we can get the original base type before collapsing down,
+  // rather than trying to manually remove the old types. This matches both Array and DocumentArray
+    T extends Types.Array<infer U> ? LeanTypeOrArray<U>[] :
+      // If it isn't a custom mongoose type we fall back to "do our best"
+      T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
   export type _LeanDocument<T> = {
     [K in keyof T]: LeanDocumentElement<T[K]>;
@@ -2214,18 +2225,46 @@ declare module 'mongoose' {
   // This way, the conditional type is distributive over union types.
   // This is required for PopulatedDoc.
   export type LeanDocumentElement<T> =
-    T extends unknown[] ? LeanArray<T> : // Array
-      T extends Document ? LeanDocument<T> : // Subdocument
-        T;
+    0 extends (1 & T) ? T :// any
+      T extends unknown[] ? LeanArray<T> : // Array
+        T extends Document ? LeanDocument<T> : // Subdocument
+          T;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
+
+  // Helpers to simplify checks
+  type IfAny<IFTYPE, THENTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : IFTYPE;
+  type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
+
+  // tests for these two types are located in test/types/lean.test.ts
+  export type DocTypeFromUnion<T> = T extends (Document<infer T1, infer T2, infer T3> & infer U) ?
+    [U] extends [Document<T1, T2, T3> & infer U] ? IfUnknown<IfAny<U, false>, false> : false : false;
+
+  export type DocTypeFromGeneric<T> = T extends Document<infer IdType, infer TQueryHelpers, infer DocType> ?
+    IfUnknown<IfAny<DocType, false>, false> : false;
+
+  /**
+   * Helper to choose the best option between two type helpers
+   */
+  export type _pickObject<T1, T2, Fallback> = T1 extends false ? T2 extends false ? Fallback : T2 : T1;
+
+  /**
+   * There may be a better way to do this, but the goal is to return the DocType if it can be infered
+   * and if not to return a type which is easily identified as "not valid" so we fall back to
+   * "strip out known things added by extending Document"
+   * There are three basic ways to mix in Document -- "Document & T", "Document<ObjId, mixins, T>",
+   * and "T extends Document". In the last case there is no type without Document mixins, so we can only
+   * strip things out. In the other two cases we can infer the type, so we should
+   */
+  export type BaseDocumentType<T> = _pickObject<DocTypeFromUnion<T>, DocTypeFromGeneric<T>, false>;
 
   /**
    * Documents returned from queries with the lean option enabled.
    * Plain old JavaScript object documents (POJO).
    * @see https://mongoosejs.com/docs/tutorials/lean.html
    */
-  export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
+  export type LeanDocument<T> = BaseDocumentType<T> extends Document ? _LeanDocument<BaseDocumentType<T>> :
+    Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :

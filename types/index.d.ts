@@ -2224,7 +2224,7 @@ declare module 'mongoose' {
   // Keep this a separate type, to ensure that T is a naked type.
   // This way, the conditional type is distributive over union types.
   // This is required for PopulatedDoc.
-  expport type LeanDocumentElement<T> =
+  export type LeanDocumentElement<T> =
     0 extends (1 & T) ? T :// any
       T extends unknown[] ? LeanArray<T> : // Array
         T extends Document ? LeanDocument<T> : // Subdocument

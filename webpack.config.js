@@ -48,7 +48,7 @@ const webpackConfig = {
       process: '({env:{}})'
     }),
     new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
+      Buffer: ['buffer', 'Buffer']
     })
   ]
 };

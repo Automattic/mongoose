@@ -120,7 +120,7 @@ declare module 'mongoose' {
     IndexManager &
     SessionStarter &
     ObtainSchemaGeneric<TSchema, 'TStaticMethods'> & {
-      new<DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<UnpackedIntersection<T, DocType>, TMethodsAndOverrides, TVirtuals>;
+      new<DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<Omit<T, keyof DocType> & DocType, TMethodsAndOverrides, TVirtuals>;
 
       aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
       aggregate<R = any>(pipeline: PipelineStage[], callback?: Callback<R[]>): Aggregate<Array<R>>;

@@ -1930,4 +1930,32 @@ describe('model', function() {
     assert.equal(updatedDoc.sheetOptions.location.id, 'inColumn');
     assert.equal(updatedDoc.sheetOptions.location.timeout, 2000);
   });
+
+  it('allows defining discriminator at the subSchema level in the subschema (gh-7971)', async function() {
+    const eventSchema = new Schema({ message: String },
+      { discriminatorKey: 'kind', _id: false });
+    const clickedSchema = new Schema({
+      element: {
+        type: String,
+        required: true
+      }
+    }, { _id: false });
+    const batchSchema = new Schema({ events: [eventSchema], mainEvent: { type: eventSchema, discriminators: { Clicked: clickedSchema } } });
+    const arraySchema = new Schema({ arrayEvent: [{ type: eventSchema, discriminators: { Clicked: clickedSchema } }] });
+    const Batch = db.model('Batch', batchSchema);
+    const Arrays = db.model('Array', arraySchema);
+
+    const batch = await Batch.create({
+      events: [{ message: 'Hello World' }],
+      mainEvent: { message: 'Goodbye', element: 'The Discriminator', kind: 'Clicked' }
+    });
+
+    assert(batch.mainEvent.element);
+
+    const array = await Arrays.create({
+      arrayEvent: [{ message: 'An array', element: 'with discriminators', kind: 'Clicked' }]
+    });
+
+    assert(array.arrayEvent[0].element);
+  });
 });

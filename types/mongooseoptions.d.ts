@@ -1,17 +1,22 @@
-import stream = require('stream');
-
 declare module 'mongoose' {
+  import stream = require('stream');
 
   interface MongooseOptions {
     /**
-     * Set to false to skip applying global plugins to child schemas.
+     * Set to `true` to set `allowDiskUse` to true to all aggregation operations by default.
+     *
+     * @default false
+     */
+    allowDiskUse?: boolean;
+    /**
+     * Set to `false` to skip applying global plugins to child schemas.
      *
      * @default true
      */
     applyPluginsToChildSchemas?: boolean;
 
     /**
-     * Set to true to apply global plugins to discriminator schemas.
+     * Set to `true` to apply global plugins to discriminator schemas.
      * This typically isn't necessary because plugins are applied to the base schema and
      * discriminators copy all middleware, methods, statics, and properties from the base schema.
      *
@@ -20,7 +25,7 @@ declare module 'mongoose' {
     applyPluginsToDiscriminators?: boolean;
 
     /**
-     * autoCreate is true by default unless readPreference is secondary or secondaryPreferred,
+     * autoCreate is `true` by default unless readPreference is secondary or secondaryPreferred,
      * which means Mongoose will attempt to create every model's underlying collection before
      * creating indexes. If readPreference is secondary or secondaryPreferred, Mongoose will
      * default to false for both autoCreate and autoIndex because both createCollection() and
@@ -29,7 +34,7 @@ declare module 'mongoose' {
     autoCreate?: boolean;
 
     /**
-     * Set to false to disable automatic index creation for all models associated with this Mongoose instance.
+     * Set to `false` to disable automatic index creation for all models associated with this Mongoose instance.
      *
      * @default true
      */

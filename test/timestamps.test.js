@@ -927,8 +927,44 @@ describe('timestamps', function() {
     assert.equal(church.events[0].users[1].email, 'test2@google.com');
     assert.ok(church.events[0].users[1].createdAt);
   });
-});
 
+  it('sets createdAt when creating new single nested subdoc (gh-11603)', async function() {
+    const childSchema = new mongoose.Schema(
+      { name: String },
+      { timestamps: { createdAt: 'created', updatedAt: false }, _id: false }
+    );
+
+    const testSchema = new mongoose.Schema({ child: childSchema, age: Number });
+
+    const Test = db.model('Test', testSchema);
+
+    await Test.create({ age: 10 });
+    await Test.findOneAndUpdate(
+      { child: { $exists: false } },
+      { $set: { child: { name: 'Update Creation' } } }
+    );
+
+    let updatedParent = await Test.findOne({ age: 10 });
+    assert.ok(updatedParent.child.created instanceof Date);
+
+    await Test.create({ age: 12 });
+    const parentToChange = await Test.findOne({ child: { $exists: false } });
+
+    parentToChange.child = { name: 'Save Creation' };
+    await parentToChange.save();
+
+    updatedParent = await Test.findOne({ age: 12 });
+    assert.ok(updatedParent.child.created instanceof Date);
+    const date = updatedParent.child.created;
+
+    updatedParent.child.name = 'test update';
+    await updatedParent.save();
+
+    updatedParent = await Test.findOne({ age: 12 });
+    assert.ok(updatedParent.child.created instanceof Date);
+    assert.strictEqual(updatedParent.child.created.valueOf(), date.valueOf());
+  });
+});
 
 async function delay(ms) {
   await new Promise((resolve) => setTimeout(resolve, ms));

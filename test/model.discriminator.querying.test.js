@@ -318,17 +318,19 @@ describe('model', function() {
     });
 
     describe('findOne', function() {
-      it('when selecting `select: false` field (gh-4629)', function(done) {
+      it('when selecting `select: false` field (gh-4629) (gh-11546)', async function() {
         const s = new SecretEvent({ name: 'test', secret: 'test2' });
-        s.save(function(error) {
-          assert.ifError(error);
-          SecretEvent.findById(s._id, '+secret', function(error, doc) {
-            assert.ifError(error);
-            assert.equal(doc.name, 'test');
-            assert.equal(doc.secret, 'test2');
-            done();
-          });
-        });
+        await s.save();
+
+        let doc = await SecretEvent.findById(s._id, '+secret');
+        assert.equal(doc.__t, 'Secret');
+        assert.equal(doc.name, 'test');
+        assert.equal(doc.secret, 'test2');
+
+        doc = await BaseEvent.findOne({ _id: s._id }, 'name -__t');
+        assert.strictEqual(doc.__t, undefined);
+        assert.equal(doc.name, 'test');
+        assert.strictEqual(doc.secret, undefined);
       });
 
       it('select: false in base schema (gh-5448)', async function() {

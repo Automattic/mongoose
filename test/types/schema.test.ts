@@ -307,3 +307,15 @@ function gh11435(): void {
 new Schema({}, { expires: '5 seconds' });
 expectError(new Schema({}, { expireAfterSeconds: '5 seconds' }));
 new Schema({}, { expireAfterSeconds: 5 });
+
+function gh10900(): void {
+  type TMenuStatus = Record<string, 'EXPANDED' | 'COLLAPSED'>[];
+
+  interface IUserProp {
+    menuStatus: TMenuStatus;
+  }
+
+  const patientSchema = new Schema<IUserProp>({
+    menuStatus: { type: Schema.Types.Mixed, default: {} }
+  });
+}

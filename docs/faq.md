@@ -20,7 +20,7 @@ hr {
 You can use Mongoose before connecting to MongoDB, but you must connect at some point. For example:
 
 ```javascript
-await mongoose.createConnection(mongodbUri);
+await mongoose.createConnection(mongodbUri).asPromise();
 
 const Test = mongoose.model('Test', schema);
 

@@ -2,16 +2,20 @@ name: Benchmark
 on:
   pull_request:
     paths:
+      - '.github/workflows/benchmark.yml'
       - 'package.json'
       - 'types/**'
       - 'benchmarks/typescript/**'
+      - 'benchmarks/typescript.js'
   push:
     branches:
       - master
     paths:
+      - '.github/workflows/benchmark.yml'
       - 'package.json'
       - 'types/**'
       - 'benchmarks/typescript/**'
+      - 'benchmarks/typescript.js'
 permissions:
   contents: read
 
@@ -25,7 +29,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
         with:
-          node-version: 14
+          node-version: 16
 
       - run: npm install
 

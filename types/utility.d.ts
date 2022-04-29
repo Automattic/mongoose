@@ -10,4 +10,7 @@ declare module 'mongoose' {
       ? T
       : Omit<T, keyof U> & U;
 
+  type MergeBOntoA<A, B> = Omit<A, keyof B> & B;
+
+
 }

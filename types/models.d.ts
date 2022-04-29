@@ -120,7 +120,7 @@ declare module 'mongoose' {
     IndexManager &
     SessionStarter &
     ObtainSchemaGeneric<TSchema, 'TStaticMethods'> & {
-      new<DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<Omit<T, keyof DocType> & DocType, TMethodsAndOverrides, TVirtuals>;
+      new<DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<MergeBOntoA<T, DocType>, TMethodsAndOverrides, TVirtuals>;
 
       aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
       aggregate<R = any>(pipeline: PipelineStage[], callback?: Callback<R[]>): Aggregate<Array<R>>;
@@ -164,11 +164,11 @@ declare module 'mongoose' {
       countDocuments(callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
       /** Creates a new document or documents */
-      create<DocContents = T>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>[]>;
-      create<DocContents = T>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>[]>): void;
-      create<DocContents = T>(doc: T | DocContents): Promise<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>>;
-      create<DocContents = T>(...docs: Array<T | DocContents>): Promise<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>[]>;
-      create<DocContents = T>(doc: T | DocContents, callback: Callback<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>>): void;
+      create<DocContents = T>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<MergeBOntoA<T, DocContents>, TMethodsAndOverrides, TVirtuals>[]>;
+      create<DocContents = T>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<MergeBOntoA<T, DocContents>, TMethodsAndOverrides, TVirtuals>[]>): void;
+      create<DocContents = T>(doc: DocContents | T): Promise<HydratedDocument<MergeBOntoA<T, DocContents>, TMethodsAndOverrides, TVirtuals>>;
+      create<DocContents = T>(...docs: Array<T | DocContents>): Promise<HydratedDocument<MergeBOntoA<T, DocContents>, TMethodsAndOverrides, TVirtuals>[]>;
+      create<DocContents = T>(doc: T | DocContents, callback: Callback<HydratedDocument<MergeBOntoA<T, DocContents>, TMethodsAndOverrides, TVirtuals>>): void;
 
       /**
      * Create the collection for this model. By default, if no indexes are specified,
@@ -257,12 +257,12 @@ declare module 'mongoose' {
       init(callback?: CallbackWithoutResult): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
 
       /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
-      insertMany<DocContents = T>(docs: Array<DocContents | T>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<UnpackedIntersection<DocContents, T>>>;
-      insertMany<DocContents = T>(docs: Array<DocContents | T>, options?: InsertManyOptions): Promise<Array<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>>>;
-      insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<UnpackedIntersection<DocContents, T>>>;
-      insertMany<DocContents = T>(doc: DocContents, options?: InsertManyOptions): Promise<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>[]>;
-      insertMany<DocContents = T>(doc: DocContents, options?: InsertManyOptions, callback?: Callback<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>[] | InsertManyResult<UnpackedIntersection<DocContents, T>>>): void;
-      insertMany<DocContents = T>(docs: Array<DocContents | T>, options?: InsertManyOptions, callback?: Callback<Array<HydratedDocument<UnpackedIntersection<DocContents, T>, TMethodsAndOverrides, TVirtuals>> | InsertManyResult<UnpackedIntersection<DocContents, T>>>): void;
+      insertMany<DocContents = T>(docs: Array<DocContents | T>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<MergeBOntoA<T, DocContents>>>;
+      insertMany<DocContents = T>(docs: Array<DocContents | T>, options?: InsertManyOptions): Promise<Array<HydratedDocument<MergeBOntoA<T, DocContents>, TMethodsAndOverrides, TVirtuals>>>;
+      insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult<MergeBOntoA<T, DocContents>>>;
+      insertMany<DocContents = T>(doc: DocContents, options?: InsertManyOptions): Promise<HydratedDocument<MergeBOntoA<T, DocContents>, TMethodsAndOverrides, TVirtuals>[]>;
+      insertMany<DocContents = T>(doc: DocContents, options?: InsertManyOptions, callback?: Callback<HydratedDocument<MergeBOntoA<T, DocContents>, TMethodsAndOverrides, TVirtuals>[] | InsertManyResult<MergeBOntoA<T, DocContents>>>): void;
+      insertMany<DocContents = T>(docs: Array<DocContents | T>, options?: InsertManyOptions, callback?: Callback<Array<HydratedDocument<MergeBOntoA<T, DocContents>, TMethodsAndOverrides, TVirtuals>> | InsertManyResult<MergeBOntoA<T, DocContents>>>): void;
 
       /** The name of the model */
       modelName: string;

@@ -9,7 +9,7 @@ interface ITest extends Document {
 
 const Test = model<ITest>('Test', schema);
 
-Test.create({ _id: '0'.repeat(24), name: 'test' }).then((doc: ITest) => console.log(doc.name));
+Test.create({ _id: new Types.ObjectId('0'.repeat(24)), name: 'test' }).then((doc: ITest) => console.log(doc.name));
 
 Test.create([{ name: 'test' }], { validateBeforeSave: false }).then((docs: ITest[]) => console.log(docs[0].name));
 

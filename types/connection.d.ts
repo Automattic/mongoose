@@ -1,7 +1,6 @@
-import mongodb = require('mongodb');
-import events = require('events');
-
 declare module 'mongoose' {
+  import mongodb = require('mongodb');
+  import events = require('events');
 
   /**
      * Connection ready state

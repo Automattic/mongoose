@@ -7,13 +7,12 @@
 /// <reference path="./pipelinestage.d.ts" />
 /// <reference path="./schemaoptions.d.ts" />
 
-import events = require('events');
-import mongodb = require('mongodb');
-import mongoose = require('mongoose');
+declare class NativeDate extends global.Date { }
 
 declare module 'mongoose' {
-
-  class NativeDate extends global.Date {}
+  import events = require('events');
+  import mongodb = require('mongodb');
+  import mongoose = require('mongoose');
 
   /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
   export type Date = Schema.Types.Date;
@@ -34,11 +33,13 @@ declare module 'mongoose' {
    */
   export type Mixed = Schema.Types.Mixed;
 
+  export type Mongoose = typeof mongoose;
+
   /**
    * Mongoose constructor. The exports object of the `mongoose` module is an instance of this
    * class. Most apps will only use this one instance.
    */
-  export const Mongoose: new (options?: MongooseOptions | null) => typeof mongoose;
+  export const Mongoose: new (options?: MongooseOptions | null) => Mongoose;
 
   /**
    * The Mongoose Number [SchemaType](/docs/schematypes.html). Used for
@@ -88,7 +89,7 @@ declare module 'mongoose' {
   /**
    * Can be extended to explicitly type specific models.
    */
-  interface Models {
+  export interface Models {
     [modelName: string]: Model<any>
   }
 
@@ -105,7 +106,7 @@ declare module 'mongoose' {
    * You can use this function to clean up any models you created in your tests to
    * prevent OverwriteModelErrors.
    */
-  export function deleteModel(name: string | RegExp): typeof mongoose;
+  export function deleteModel(name: string | RegExp): Mongoose;
 
   export function disconnect(): Promise<void>;
   export function disconnect(cb: CallbackWithoutResult): void;
@@ -114,7 +115,7 @@ declare module 'mongoose' {
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
   /* ! ignore */
-  type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
+  export type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
 
   /**
    * Returns true if Mongoose can cast the given value to an ObjectId, or
@@ -152,13 +153,13 @@ declare module 'mongoose' {
   export function now(): NativeDate;
 
   /** Declares a global plugin executed on all Schemas. */
-  export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): typeof mongoose;
+  export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): Mongoose;
 
   /** Getter/setter around function for pluralizing collection names. */
   export function pluralize(fn?: ((str: string) => string) | null): ((str: string) => string) | null;
 
   /** Sets mongoose options */
-  export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): typeof mongoose;
+  export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): Mongoose;
 
   /**
    * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
@@ -174,16 +175,13 @@ declare module 'mongoose' {
   export type CastError = Error.CastError;
   export type SyncIndexesError = Error.SyncIndexesError;
 
-  type Mongoose = typeof mongoose;
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface ClientSession extends mongodb.ClientSession { }
+  export type ClientSession = mongodb.ClientSession;
 
   /*
    * section collection.js
    * http://mongoosejs.com/docs/api.html#collection-js
    */
-  interface CollectionBase<T extends mongodb.Document> extends mongodb.Collection<T> {
+  export interface CollectionBase<T extends mongodb.Document> extends mongodb.Collection<T> {
     /*
       * Abstract methods. Some of these are already defined on the
       * mongodb.Collection interface so they've been commented out.
@@ -204,8 +202,8 @@ declare module 'mongoose' {
    * section drivers/node-mongodb-native/collection.js
    * http://mongoosejs.com/docs/api.html#drivers-node-mongodb-native-collection-js
    */
-  let Collection: Collection;
-  interface Collection<T extends mongodb.Document = mongodb.Document> extends CollectionBase<T> {
+  export let Collection: Collection;
+  export interface Collection<T extends mongodb.Document = mongodb.Document> extends CollectionBase<T> {
     /**
      * Collection constructor
      * @param name name of the collection
@@ -223,20 +221,19 @@ declare module 'mongoose' {
   }
 
   /** A list of paths to validate. If set, Mongoose will validate only the modified paths that are in the given list. */
-  type pathsToValidate = string[] | string;
+  export type pathsToValidate = string[] | string;
 
-  interface AcceptsDiscriminator {
+  export interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
     discriminator<D>(name: string | number, schema: Schema, value?: string | number | ObjectId): Model<D>;
     discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
-  type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
-  interface AnyObject {
+  export type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
+  export interface AnyObject {
     [k: string]: any
   }
-
-  type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
+  export type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
 
   export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
 
@@ -247,7 +244,7 @@ declare module 'mongoose' {
     toDrop: Array<any>
   }
 
-  interface ModifyResult<T> {
+  export interface ModifyResult<T> {
     value: Require_id<T> | null;
     /** see https://www.mongodb.com/docs/manual/reference/command/findAndModify/#lasterrorobject */
     lastErrorObject?: {
@@ -258,14 +255,14 @@ declare module 'mongoose' {
   }
 
   export const Model: Model<any>;
-  interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
-    new<DocType = AnyKeys<T> & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
+  export interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
+    new <DocType = AnyKeys<T> & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[], cb: Function): Aggregate<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
-    base: typeof mongoose;
+    base: Mongoose;
 
     /**
      * If this is a discriminator model, `baseModelName` is the name of
@@ -464,7 +461,7 @@ declare module 'mongoose' {
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(callback?: CallbackWithoutResult): Promise<void>;
     validate(optional: any, callback?: CallbackWithoutResult): Promise<void>;
-    validate(optional: any, pathsToValidate: string[], callback?: CallbackWithoutResult): Promise<void>;
+    validate(optional: any, pathsToValidate: pathsToValidate, callback?: CallbackWithoutResult): Promise<void>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://docs.mongodb.com/manual/changeStreams/). */
     watch<ResultType extends mongodb.Document = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
@@ -607,9 +604,9 @@ declare module 'mongoose' {
     where<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
   }
 
-  type UpdateWriteOpResult = mongodb.UpdateResult;
+  export type UpdateWriteOpResult = mongodb.UpdateResult;
 
-  interface QueryOptions<DocType = unknown> {
+  export interface QueryOptions<DocType = unknown> {
     arrayFilters?: { [key: string]: any }[];
     batchSize?: number;
     collation?: mongodb.CollationOptions;
@@ -684,9 +681,9 @@ declare module 'mongoose' {
     [other: string]: any;
   }
 
-  type MongooseQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, 'populate' | 'lean' | 'strict' | 'sanitizeProjection' | 'sanitizeFilter'>;
+  export type MongooseQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, 'populate' | 'lean' | 'strict' | 'sanitizeProjection' | 'sanitizeFilter'>;
 
-  interface SaveOptions {
+  export interface SaveOptions {
     checkKeys?: boolean;
     j?: boolean;
     safe?: boolean | WriteConcern;
@@ -698,17 +695,17 @@ declare module 'mongoose' {
     wtimeout?: number;
   }
 
-  interface WriteConcern {
+  export interface WriteConcern {
     j?: boolean;
     w?: number | 'majority' | TagSet;
     wtimeout?: number;
   }
 
-  interface TagSet {
+  export interface TagSet {
     [k: string]: string;
   }
 
-  interface InsertManyOptions {
+  export interface InsertManyOptions {
     limit?: number;
     rawResult?: boolean;
     ordered?: boolean;
@@ -717,15 +714,15 @@ declare module 'mongoose' {
     populate?: string | string[] | PopulateOptions | PopulateOptions[];
   }
 
-  type InferIdType<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
-  type InsertManyResult<T> = mongodb.InsertManyResult<T> & {
+  export type InferIdType<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
+  export type InsertManyResult<T> = mongodb.InsertManyResult<T> & {
     insertedIds: {
       [key: number]: InferIdType<T>;
     };
     mongoose?: { validationErrors?: Array<Error.CastError | Error.ValidatorError> };
   };
 
-  interface MapReduceOptions<T, Key, Val> {
+  export interface MapReduceOptions<T, Key, Val> {
     map: Function | string;
     reduce: (key: Key, vals: T[]) => Val;
     /** query filter object. */
@@ -767,7 +764,7 @@ declare module 'mongoose' {
     };
   }
 
-  interface GeoSearchOptions {
+  export interface GeoSearchOptions {
     /** x,y point to search for */
     near: number[];
     /** the maximum distance from the point near that a result can be */
@@ -778,7 +775,7 @@ declare module 'mongoose' {
     lean?: boolean;
   }
 
-  interface PopulateOptions {
+  export interface PopulateOptions {
     /** space delimited path(s) to populate */
     path: string;
     /** fields to select */
@@ -804,7 +801,7 @@ declare module 'mongoose' {
     transform?: (doc: any, id: any) => any;
   }
 
-  interface ToObjectOptions {
+  export interface ToObjectOptions {
     /** apply all getters (path and virtual getters) */
     getters?: boolean;
     /** apply virtual getters (can override getters option) */
@@ -825,21 +822,21 @@ declare module 'mongoose' {
     useProjection?: boolean;
   }
 
-  type MongooseDocumentMiddleware = 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init';
-  type MongooseQueryMiddleware = 'count' | 'deleteMany' | 'deleteOne' | 'distinct' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndUpdate' | 'remove' | 'update' | 'updateOne' | 'updateMany';
+  export type MongooseDocumentMiddleware = 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init';
+  export type MongooseQueryMiddleware = 'count' | 'deleteMany' | 'deleteOne' | 'distinct' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndUpdate' | 'remove' | 'update' | 'updateOne' | 'updateMany';
 
-  type SchemaPreOptions = { document?: boolean, query?: boolean };
-  type SchemaPostOptions = { document?: boolean, query?: boolean };
+  export type SchemaPreOptions = { document?: boolean, query?: boolean };
+  export type SchemaPostOptions = { document?: boolean, query?: boolean };
 
-  type IndexDirection = 1 | -1 | '2d' | '2dsphere' | 'geoHaystack' | 'hashed' | 'text';
-  type IndexDefinition = Record<string, IndexDirection>;
+  export type IndexDirection = 1 | -1 | '2d' | '2dsphere' | 'geoHaystack' | 'hashed' | 'text';
+  export type IndexDefinition = Record<string, IndexDirection>;
 
   export type PreMiddlewareFunction<ThisType = any> = (this: ThisType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
   export type PreSaveMiddlewareFunction<ThisType = any> = (this: ThisType, next: CallbackWithoutResultAndOptionalError, opts: SaveOptions) => void | Promise<void>;
   export type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
   export type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
 
-  class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}> extends events.EventEmitter {
+  export class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}> extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -986,13 +983,13 @@ declare module 'mongoose' {
     virtualpath<T = HydratedDocument<DocType, TInstanceMethods>>(name: string): VirtualType<T> | null;
   }
 
-  type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;
-  type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String;
-  type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean;
-  type DateSchemaDefinition = typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date;
-  type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId;
+  export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;
+  export type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String;
+  export type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean;
+  export type DateSchemaDefinition = typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date;
+  export type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId;
 
-  type SchemaDefinitionWithBuiltInClass<T> = T extends number
+  export type SchemaDefinitionWithBuiltInClass<T> = T extends number
     ? NumberSchemaDefinition
     : T extends string
       ? StringSchemaDefinition
@@ -1002,7 +999,7 @@ declare module 'mongoose' {
           ? DateSchemaDefinition
           : (Function | string);
 
-  type SchemaDefinitionProperty<T = undefined> = SchemaDefinitionWithBuiltInClass<T> |
+  export type SchemaDefinitionProperty<T = undefined> = SchemaDefinitionWithBuiltInClass<T> |
   SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
   Schema<any, any, any> |
@@ -1014,24 +1011,24 @@ declare module 'mongoose' {
     typeof Schema.Types.Mixed |
   MixedSchemaTypeOptions;
 
-  type SchemaDefinition<T = undefined> = T extends undefined
+  export type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
     : { [path in keyof T]?: SchemaDefinitionProperty<T[path]>; };
 
-  type Unpacked<T> = T extends (infer U)[] ?
+  export type Unpacked<T> = T extends (infer U)[] ?
     U :
     T extends ReadonlyArray<infer U> ? U : T;
 
-  type AnyArray<T> = T[] | ReadonlyArray<T>;
-  type SchemaValidator<T> = RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T> | ValidateOpts<T>[];
+  export type AnyArray<T> = T[] | ReadonlyArray<T>;
+  export type SchemaValidator<T> = RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T> | ValidateOpts<T>[];
 
-  type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;
+  export type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;
 
-  class MixedSchemaTypeOptions extends SchemaTypeOptions<Schema.Types.Mixed> {
+  export interface MixedSchemaTypeOptions extends SchemaTypeOptions<Schema.Types.Mixed> {
     type: typeof Schema.Types.Mixed;
   }
 
-  export class SchemaTypeOptions<T> {
+  export interface SchemaTypeOptions<T> {
     type?:
     T extends string ? StringSchemaDefinition :
       T extends number ? NumberSchemaDefinition :
@@ -1120,7 +1117,7 @@ declare module 'mongoose' {
     transform?: (this: any, val: T) => any;
 
     /** defines a custom getter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
-    get?: (value: T, doc?: this) => any;
+    get?: (value: any, doc?: this) => T;
 
     /** defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
     set?: (value: any, priorVal?: T, doc?: this) => any;
@@ -1178,22 +1175,22 @@ declare module 'mongoose' {
     | string
     | Buffer
     | undefined
-    | mongoose.Types.ObjectId
-    | mongoose.Types.Buffer
-    | typeof mongoose.Schema.Types.Number
-    | typeof mongoose.Schema.Types.String
-    | typeof mongoose.Schema.Types.Buffer
-    | typeof mongoose.Schema.Types.ObjectId;
+    | Types.ObjectId
+    | Types.Buffer
+    | typeof Schema.Types.Number
+    | typeof Schema.Types.String
+    | typeof Schema.Types.Buffer
+    | typeof Schema.Types.ObjectId;
 
   /**
    * Reference another Model
    */
   export type PopulatedDoc<
     PopulatedType,
-    RawId extends RefType = (PopulatedType extends { _id?: RefType; } ? NonNullable<PopulatedType['_id']> : mongoose.Types.ObjectId) | undefined
+    RawId extends RefType = (PopulatedType extends { _id?: RefType; } ? NonNullable<PopulatedType['_id']> : Types.ObjectId) | undefined
   > = PopulatedType | RawId;
 
-  interface IndexOptions extends mongodb.CreateIndexesOptions {
+  export interface IndexOptions extends mongodb.CreateIndexesOptions {
     /**
      * `expires` utilizes the `ms` module from [guille](https://github.com/guille/) allowing us to use a friendlier syntax:
      *
@@ -1218,37 +1215,37 @@ declare module 'mongoose' {
     weights?: AnyObject;
   }
 
-  interface ValidatorProps {
+  export interface ValidatorProps {
     path: string;
     value: any;
   }
 
-  interface ValidatorMessageFn {
+  export interface ValidatorMessageFn {
     (props: ValidatorProps): string;
   }
 
-  interface ValidateFn<T> {
+  export interface ValidateFn<T> {
     (value: T): boolean;
   }
 
-  interface LegacyAsyncValidateFn<T> {
+  export interface LegacyAsyncValidateFn<T> {
     (value: T, done: (result: boolean) => void): void;
   }
 
-  interface AsyncValidateFn<T> {
+  export interface AsyncValidateFn<T> {
     (value: any): Promise<boolean>;
   }
 
-  interface ValidateOpts<T> {
+  export interface ValidateOpts<T> {
     msg?: string;
     message?: string | ValidatorMessageFn;
     type?: string;
     validator: ValidateFn<T> | LegacyAsyncValidateFn<T> | AsyncValidateFn<T>;
   }
 
-  type InferId<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
+  export type InferId<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
 
-  interface VirtualTypeOptions<HydratedDocType = Document, DocType = unknown> {
+  export interface VirtualTypeOptions<HydratedDocType = Document, DocType = unknown> {
     /** If `ref` is not nullish, this becomes a populated virtual. */
     ref?: string | Function;
 
@@ -1298,7 +1295,7 @@ declare module 'mongoose' {
     [extra: string]: any;
   }
 
-  class VirtualType<HydratedDocType> {
+  export class VirtualType<HydratedDocType> {
     /** Applies getters to `value`. */
     applyGetters(value: any, doc: Document): any;
 
@@ -1312,7 +1309,7 @@ declare module 'mongoose' {
     set<T = HydratedDocType>(fn: (this: T, value: any, virtualType: VirtualType<T>, doc: T) => void): this;
   }
 
-  namespace Schema {
+  export namespace Schema {
     namespace Types {
       class Array extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
@@ -1461,7 +1458,7 @@ declare module 'mongoose' {
     }
   }
 
-  namespace Types {
+  export namespace Types {
     class Array<T> extends global.Array<T> {
       /** Pops the array atomically at most one time per document `save()`. */
       $pop(): T;
@@ -1559,19 +1556,19 @@ declare module 'mongoose' {
     }
   }
 
-  type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
+  export type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
 
-  type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType> = Query<ResultType, DocType, THelpers, RawDocType> & THelpers;
+  export type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType> = Query<ResultType, DocType, THelpers, RawDocType> & THelpers;
 
-  type UnpackedIntersection<T, U> = T extends null ? null : T extends (infer A)[]
+  export type UnpackedIntersection<T, U> = T extends null ? null : T extends (infer A)[]
     ? (Omit<A, keyof U> & U)[]
     : keyof U extends never
       ? T
       : Omit<T, keyof U> & U;
 
-  type ProjectionFields<DocType> = { [Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any } & Record<string, any>;
+  export type ProjectionFields<DocType> = { [Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any } & Record<string, any>;
 
-  class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
+  export class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
     _mongooseOptions: MongooseQueryOptions<DocType>;
 
     /**
@@ -1676,7 +1673,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     elemMatch(val: Function | any): this;
-    elemMatch(path: string, val: Function | any): this;
+    elemMatch<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$elemMatch']): this;
 
     /**
      * Gets/sets the error flag on this query. If this flag is not null or
@@ -1693,7 +1690,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$exists` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     exists(val: boolean): this;
-    exists(path: string, val: boolean): this;
+    exists<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$exists']): this;
 
     /**
      * Sets the [`explain` option](https://docs.mongodb.com/manual/reference/method/cursor.explain/),
@@ -1808,18 +1805,18 @@ declare module 'mongoose' {
 
     /** Specifies a `$gt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gt(val: number): this;
-    gt(path: string, val: number): this;
+    gte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gt']): this;
 
     /** Specifies a `$gte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gte(val: number): this;
-    gte(path: string, val: number): this;
+    gte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gte']): this;
 
     /** Sets query hints. */
     hint(val: any): this;
 
     /** Specifies an `$in` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     in(val: Array<any>): this;
-    in(path: string, val: Array<any>): this;
+    in<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$in']): this;
 
     /** Declares an intersects query for `geometry()`. */
     intersects(arg?: any): this;
@@ -1835,11 +1832,11 @@ declare module 'mongoose' {
 
     /** Specifies a `$lt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     lt(val: number): this;
-    lt(path: string, val: number): this;
+    lt<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$lt']): this;
 
     /** Specifies a `$lte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     lte(val: number): this;
-    lte(path: string, val: number): this;
+    lte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$lte']): this;
 
     /**
      * Runs a function `fn` and treats the return value of `fn` as the new value
@@ -1866,7 +1863,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$mod` condition, filters documents for documents whose `path` property is a number that is equal to `remainder` modulo `divisor`. */
     mod(val: Array<number>): this;
-    mod(path: string, val: Array<number>): this;
+    mod<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$mod']): this;
 
     /** The model this query was created from */
     model: typeof Model;
@@ -1879,15 +1876,15 @@ declare module 'mongoose' {
 
     /** Specifies a `$ne` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     ne(val: any): this;
-    ne(path: string, val: any): this;
+    ne<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$ne']): this;
 
     /** Specifies a `$near` or `$nearSphere` condition */
     near(val: any): this;
-    near(path: string, val: any): this;
+    near<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$near']): this;
 
     /** Specifies an `$nin` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     nin(val: Array<any>): this;
-    nin(path: string, val: Array<any>): this;
+    nin<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$nin']): this;
 
     /** Specifies arguments for an `$nor` condition. */
     nor(array: Array<FilterQuery<DocType>>): this;
@@ -1923,7 +1920,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$regex` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     regex(val: string | RegExp): this;
-    regex(path: string, val: string | RegExp): this;
+    regex<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$regex']): this;
 
     /**
      * Declare and/or execute this query as a remove() operation. `remove()` is
@@ -1976,7 +1973,7 @@ declare module 'mongoose' {
 
     /** Specifies an `$size` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     size(val: number): this;
-    size(path: string, val: number): this;
+    size<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$size']): this;
 
     /** Specifies the number of documents to skip. */
     skip(val: number): this;
@@ -2045,7 +2042,7 @@ declare module 'mongoose' {
     wtimeout(ms: number): this;
   }
 
-  type ProjectionElementType = number | string;
+  export type ProjectionElementType = number | string;
   export type ProjectionType<T> = { [P in keyof T]?: ProjectionElementType } | AnyObject | string;
 
   export type QuerySelector<T> = {
@@ -2115,10 +2112,10 @@ declare module 'mongoose' {
     [key: string]: any;
   };
 
-  type ApplyBasicQueryCasting<T> = T | T[] | any;
-  type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
+  export type ApplyBasicQueryCasting<T> = T | T[] | any;
+  export type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
-  type _FilterQuery<T> = {
+  export type _FilterQuery<T> = {
     [P in keyof T]?: Condition<T[P]>;
   } &
   RootQuerySelector<T>;
@@ -2132,20 +2129,7 @@ declare module 'mongoose' {
    */
   export type FilterQuery<T> = _FilterQuery<T>;
 
-  type AddToSetOperators<Type> = {
-    $each: Type;
-  };
-
-  type SortValues = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
-
-  type ArrayOperator<Type> = {
-    $each: Type;
-    $slice?: number;
-    $position?: number;
-    $sort?: SortValues | Record<string, SortValues>;
-  };
-
-  type NumericTypes = number | Decimal128 | mongodb.Double | mongodb.Int32 | mongodb.Long;
+  export type SortValues = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
@@ -2172,18 +2156,18 @@ declare module 'mongoose' {
     };
   };
 
-  type UpdateWithAggregationPipeline = UpdateAggregationStage[];
-  type UpdateAggregationStage = { $addFields: any } |
+  export type UpdateWithAggregationPipeline = UpdateAggregationStage[];
+  export type UpdateAggregationStage = { $addFields: any } |
   { $set: any } |
   { $project: any } |
   { $unset: any } |
   { $replaceRoot: any } |
   { $replaceWith: any };
 
-  type __UpdateDefProperty<T> =
+  export type __UpdateDefProperty<T> =
     [Extract<T, mongodb.ObjectId>] extends [never] ? T :
       T | string;
-  type _UpdateQueryDef<T> = {
+  export type _UpdateQueryDef<T> = {
     [K in keyof T]?: __UpdateDefProperty<T[K]>;
   };
 
@@ -2211,17 +2195,27 @@ declare module 'mongoose' {
         ? T[K] : FlattenMaps<T[K]>;
   };
 
-  type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
-  type TreatAsPrimitives = actualPrimitives |
-  NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
+  export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
+  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
 
-  type LeanType<T> =
+  // This will -- when possible -- extract the original type of the subdocument in question
+  type LeanSubdocument<T> = T extends (Types.Subdocument<Require_id<T>['_id']> & infer U) ? LeanDocument<U> : Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'>;
+
+  export type LeanType<T> =
     0 extends (1 & T) ? T : // any
       T extends TreatAsPrimitives ? T : // primitives
-        T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> : // subdocs
+        T extends Types.Subdocument ? LeanSubdocument<T> : // subdocs
           LeanDocument<T>; // Documents and everything else
 
-  type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
+  // Used only when collapsing lean arrays for ts performance reasons:
+  type LeanTypeOrArray<T> = T extends unknown[] ? LeanArray<T> : LeanType<T>;
+
+  export type LeanArray<T extends unknown[]> =
+  // By checking if it extends Types.Array we can get the original base type before collapsing down,
+  // rather than trying to manually remove the old types. This matches both Array and DocumentArray
+    T extends Types.Array<infer U> ? LeanTypeOrArray<U>[] :
+      // If it isn't a custom mongoose type we fall back to "do our best"
+      T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
   export type _LeanDocument<T> = {
     [K in keyof T]: LeanDocumentElement<T[K]>;
@@ -2230,19 +2224,47 @@ declare module 'mongoose' {
   // Keep this a separate type, to ensure that T is a naked type.
   // This way, the conditional type is distributive over union types.
   // This is required for PopulatedDoc.
-  type LeanDocumentElement<T> =
-    T extends unknown[] ? LeanArray<T> : // Array
-      T extends Document ? LeanDocument<T> : // Subdocument
-        T;
+  export type LeanDocumentElement<T> =
+    0 extends (1 & T) ? T :// any
+      T extends unknown[] ? LeanArray<T> : // Array
+        T extends Document ? LeanDocument<T> : // Subdocument
+          T;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
+
+  // Helpers to simplify checks
+  type IfAny<IFTYPE, THENTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : IFTYPE;
+  type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
+
+  // tests for these two types are located in test/types/lean.test.ts
+  export type DocTypeFromUnion<T> = T extends (Document<infer T1, infer T2, infer T3> & infer U) ?
+    [U] extends [Document<T1, T2, T3> & infer U] ? IfUnknown<IfAny<U, false>, false> : false : false;
+
+  export type DocTypeFromGeneric<T> = T extends Document<infer IdType, infer TQueryHelpers, infer DocType> ?
+    IfUnknown<IfAny<DocType, false>, false> : false;
+
+  /**
+   * Helper to choose the best option between two type helpers
+   */
+  export type _pickObject<T1, T2, Fallback> = T1 extends false ? T2 extends false ? Fallback : T2 : T1;
+
+  /**
+   * There may be a better way to do this, but the goal is to return the DocType if it can be infered
+   * and if not to return a type which is easily identified as "not valid" so we fall back to
+   * "strip out known things added by extending Document"
+   * There are three basic ways to mix in Document -- "Document & T", "Document<ObjId, mixins, T>",
+   * and "T extends Document". In the last case there is no type without Document mixins, so we can only
+   * strip things out. In the other two cases we can infer the type, so we should
+   */
+  export type BaseDocumentType<T> = _pickObject<DocTypeFromUnion<T>, DocTypeFromGeneric<T>, false>;
 
   /**
    * Documents returned from queries with the lean option enabled.
    * Plain old JavaScript object documents (POJO).
    * @see https://mongoosejs.com/docs/tutorials/lean.html
    */
-  export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
+  export type LeanDocument<T> = BaseDocumentType<T> extends Document ? _LeanDocument<BaseDocumentType<T>> :
+    Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :
@@ -2254,7 +2276,7 @@ declare module 'mongoose' {
       T extends Document ? RawDocType :
         T;
 
-  class SchemaType {
+  export class SchemaType<T = any> {
     /** SchemaType constructor */
     constructor(path: string, options?: AnyObject, instance?: string);
 
@@ -2270,7 +2292,7 @@ declare module 'mongoose' {
     static get(getter: (value: any) => any): void;
 
     /** The class that Mongoose uses internally to instantiate this SchemaType's `options` property. */
-    OptionsConstructor: typeof SchemaTypeOptions;
+    OptionsConstructor: SchemaTypeOptions<T>;
 
     /** Cast `val` to this schema type. Each class that inherits from schema type should implement this function. */
     cast(val: any, doc: Document<any>, init: boolean, prev?: any, options?: any): any;
@@ -2347,14 +2369,14 @@ declare module 'mongoose' {
     continueOnError?: boolean
   }
   export type ConnectionSyncIndexesResult = Record<string, OneCollectionSyncIndexesResult>;
-  type OneCollectionSyncIndexesResult = Array<string> & mongodb.MongoServerError;
-  type Callback<T = any> = (error: CallbackError, result: T) => void;
+  export type OneCollectionSyncIndexesResult = Array<string> & mongodb.MongoServerError;
+  export type Callback<T = any> = (error: CallbackError, result: T) => void;
 
-  type CallbackWithoutResult = (error: CallbackError) => void;
-  type CallbackWithoutResultAndOptionalError = (error?: CallbackError) => void;
+  export type CallbackWithoutResult = (error: CallbackError) => void;
+  export type CallbackWithoutResultAndOptionalError = (error?: CallbackError) => void;
 
   /* for ts-mongoose */
-  class mquery {}
-}
+  export class mquery { }
 
-export default mongoose;
+  export default mongoose;
+}

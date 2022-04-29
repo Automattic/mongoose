@@ -14,7 +14,10 @@ var Project = mongoose.model('Project', ProjectSchema);
 Project.find().where('stars').gt(1000).byName('mongoose');
 ```
 
-In TypeScript, Mongoose's `Model` takes 3 generic parameters:
+In TypeScript, Mongoose does support manually typed & auto typed Query Helpers.
+
+1- Manually typed:
+Mongoose's `Model` takes 3 generic parameters:
 
 1. The `DocType`
 2. a `TQueryHelpers` type
@@ -55,6 +58,34 @@ run().catch(err => console.log(err));
 async function run(): Promise<void> {
   await connect('mongodb://localhost:27017/test');
   
+  // Equivalent to `ProjectModel.find({ stars: { $gt: 1000 }, name: 'mongoose' })`
+  await ProjectModel.find().where('stars').gt(1000).byName('mongoose');
+}
+```
+
+2- Automatically typed:
+Mongoose V6.3.2 does support auto typed Query Helpers that it is supplied in schema options.
+Query Helpers functions can be defined as following:
+
+```typescript
+import { Schema, model } from 'mongoose';
+
+  const schema = new Schema({
+    name: { type: String, required: true },
+    stars: { type: Number, required: true }
+  }, {
+    query: {
+      byName(name) {
+        return this.find({ name: name });
+      }
+    }
+  });
+
+  const ProjectModel = model(
+    'Project',
+    schema
+  );
+
   // Equivalent to `ProjectModel.find({ stars: { $gt: 1000 }, name: 'mongoose' })`
   await ProjectModel.find().where('stars').gt(1000).byName('mongoose');
 }

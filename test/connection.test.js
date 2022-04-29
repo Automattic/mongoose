@@ -361,7 +361,7 @@ describe('connections:', function() {
     });
   });
 
-  it('close connection and remove it permanantly', (done) => {
+  it('destroy connection and remove it permanantly', (done) => {
     const opts = {};
     const conn = mongoose.createConnection(start.uri, opts);
     const MongoClient = mongodb.MongoClient;
@@ -374,7 +374,7 @@ describe('connections:', function() {
     const totalConn = mongoose.connections.length;
     console.log('Total open connections before close are --> ', totalConn);
 
-    conn.close(false, true, () => {
+    conn.destroy(() => {
       console.log('Total open connections after close are --> ', mongoose.connections.length);
       assert.equal(mongoose.connections.length, totalConn - 1);
       stub.restore();
@@ -382,7 +382,7 @@ describe('connections:', function() {
     });
   });
 
-  it('verify that attempt to re-open closedAndCleaned connection throws error, via promise', (done) => {
+  it('verify that attempt to re-open destroyed connection throws error, via promise', (done) => {
     const opts = {};
     const conn = mongoose.createConnection(start.uri, opts);
     const MongoClient = mongodb.MongoClient;
@@ -392,7 +392,7 @@ describe('connections:', function() {
 
     conn.useDb('test-db');
 
-    conn.close(false, true, async() => {
+    conn.destroy(async() => {
       try {
         await conn.openUri(start.uri);
       } catch (error) {
@@ -403,7 +403,7 @@ describe('connections:', function() {
     });
   });
 
-  it('verify that attempt to re-open closedAndCleaned connection throws error, via callback', (done) => {
+  it('verify that attempt to re-open destroyed connection throws error, via callback', (done) => {
     const opts = {};
     const conn = mongoose.createConnection(start.uri, opts);
     const MongoClient = mongodb.MongoClient;
@@ -413,7 +413,7 @@ describe('connections:', function() {
 
     conn.useDb('test-db');
 
-    conn.close(false, true, () => {
+    conn.destroy(() => {
       conn.openUri(start.uri, function(error, result) {
         assert.equal(result, undefined);
         assert.equal(error, 'Connection has been closed and cleaned already, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
@@ -1132,13 +1132,13 @@ describe('connections:', function() {
 
   describe('Connection#syncIndexes() (gh-10893) (gh-11039)', () => {
     let connection;
-    this.beforeEach(async() => {
-      const mongooseInstance = new mongoose.Mongoose();
-      connection = mongooseInstance.createConnection(start.uri);
-    });
-    this.afterEach(async() => {
-      await connection.dropDatabase();
-    });
+    // this.beforeEach(async() => {
+    //   const mongooseInstance = new mongoose.Mongoose();
+    //   connection = mongooseInstance.createConnection(start.uri);
+    // });
+    // this.afterEach(async() => {
+    //   await connection.dropDatabase();
+    // });
     it('Allows a syncIndexes option with connection mongoose.connection.syncIndexes (gh-10893)', async function() {
       const coll = 'tests2';
 

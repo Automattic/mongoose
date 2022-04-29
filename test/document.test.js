@@ -7445,11 +7445,20 @@ describe('document', function() {
     const schema = new mongoose.Schema({ nested: { schema: String } });
     const Model = db.model('Test', schema);
 
-
     await Model.collection.insertOne({ nested: { schema: 'test' } });
 
     const doc = await Model.findOne();
     assert.strictEqual(doc.nested.schema, 'test');
+  });
+
+  it('handles nested properties named `on` (gh-11656)', async function() {
+    const schema = new mongoose.Schema({ on: String }, { supressReservedKeysWarning: true });
+    const Model = db.model('Test', schema);
+
+    await Model.create({ on: 'test string' });
+
+    const doc = await Model.findOne();
+    assert.strictEqual(doc.on, 'test string');
   });
 
   describe('overwrite() (gh-7830)', function() {

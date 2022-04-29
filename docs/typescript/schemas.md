@@ -1,10 +1,14 @@
 # Schemas in TypeScript
 
 Mongoose [schemas](/docs/guide.html) are how you tell Mongoose what your documents look like.
-Mongoose schemas are separate from TypeScript interfaces, so you need to define both a _document interface_ and a _schema_.
+Mongoose schemas are separate from TypeScript interfaces, so you need to define both a _document interface_ and a _schema_ until V6.3.1.
+Mongoose supports auto typed schemas in V6.3.2 so you don't need to define a typescript interface anymore but you still able to do so.
+Mongoose released as well in V6.3.2 new TS utility `InferSchemaType` that helps to get the type of the auto typed schema document if it's needed.
+
+`Until mongoose V6.3.1:`
 
 ```typescript
-import { Schema } from 'mongoose';
+import { Schema } from "mongoose";
 
 // Document interface
 interface User {
@@ -17,8 +21,39 @@ interface User {
 const schema = new Schema<User>({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  avatar: String
+  avatar: String,
 });
+```
+
+`In mongoose V6.3.2:`
+
+```typescript
+import { Schema, InferSchemaType } from "mongoose";
+
+// Document interface
+// No needs to define TS interface any more.
+// interface User {
+//   name: string;
+//   email: string;
+//   avatar?: string;
+// }
+
+// Schema
+const schema = new Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  avatar: String,
+});
+
+type User = InferSchemaType<typeof schema>;
+// This will become: 
+// type User = {
+//   name: string;
+//   email: string;
+//   avatar?: string;
+// }
+
+
 ```
 
 By default, Mongoose does **not** check if your document interface lines up with your schema.
@@ -51,7 +86,7 @@ Mongoose wraps `DocType` in a Mongoose document for cases like the `this` parame
 For example:
 
 ```typescript
-schema.pre('save', function(): void {
+schema.pre("save", function (): void {
   console.log(this.name); // TypeScript knows that `this` is a `mongoose.Document & User` by default
 });
 ```
@@ -69,7 +104,7 @@ Mongoose checks to make sure that every path in your schema is defined in your d
 For example, the below code will fail to compile because `emaill` is a path in the schema, but not in the `DocType` interface.
 
 ```typescript
-import { Schema, Model } from 'mongoose';
+import { Schema, Model } from "mongoose";
 
 interface User {
   name: string;
@@ -82,7 +117,7 @@ interface User {
 const schema = new Schema<User>({
   name: { type: String, required: true },
   emaill: { type: String, required: true },
-  avatar: String
+  avatar: String,
 });
 ```
 
@@ -90,7 +125,7 @@ However, Mongoose does **not** check for paths that exist in the document interf
 For example, the below code compiles.
 
 ```typescript
-import { Schema, Model } from 'mongoose';
+import { Schema, Model } from "mongoose";
 
 interface User {
   name: string;
@@ -102,7 +137,7 @@ interface User {
 const schema = new Schema<User, Model<User>>({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  avatar: String
+  avatar: String,
 });
 ```
 
@@ -113,7 +148,7 @@ This is because Mongoose has numerous features that add paths to your schema tha
 When you define an array in a document interface, we recommend using Mongoose's `Types.Array` type for primitive arrays or `Types.DocumentArray` for arrays of documents.
 
 ```typescript
-import { Schema, Model, Types } from 'mongoose';
+import { Schema, Model, Types } from "mongoose";
 
 interface BlogPost {
   _id: Types.ObjectId;
@@ -121,13 +156,13 @@ interface BlogPost {
 }
 
 interface User {
-  tags: Types.Array<string>,
-  blogPosts: Types.DocumentArray<BlogPost>
+  tags: Types.Array<string>;
+  blogPosts: Types.DocumentArray<BlogPost>;
 }
 
 const schema = new Schema<User, Model<User>>({
   tags: [String],
-  blogPosts: [{ title: String }]
+  blogPosts: [{ title: String }],
 });
 ```
 
@@ -138,5 +173,5 @@ If you use `Types.DocumentArray` in the above case, you'll be able to `push()` a
 ```typescript
 const user = new User({ blogPosts: [] });
 
-user.blogPosts.push({ title: 'test' }); // Would not work if you did `blogPosts: BlogPost[]`
+user.blogPosts.push({ title: "test" }); // Would not work if you did `blogPosts: BlogPost[]`
 ```

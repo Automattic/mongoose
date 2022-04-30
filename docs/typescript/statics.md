@@ -24,7 +24,7 @@ const User = model<IUser, UserModel>("User", schema);
 const answer: number = User.myStaticMethod(); // 42
 ```
 
-Mongoose V6.3.2 does support auto typed static functions that it is supplied in schema options.
+Mongoose does support auto typed static functions that it is supplied in schema options.
 Statics functions can be defined as following:
 
 ```typescript

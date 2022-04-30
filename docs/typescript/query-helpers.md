@@ -64,7 +64,7 @@ async function run(): Promise<void> {
 ```
 
 2- Automatically typed:
-Mongoose V6.3.2 does support auto typed Query Helpers that it is supplied in schema options.
+Mongoose does support auto typed Query Helpers that it is supplied in schema options.
 Query Helpers functions can be defined as following:
 
 ```typescript

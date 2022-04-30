@@ -2,8 +2,8 @@
 
 Mongoose [schemas](/docs/guide.html) are how you tell Mongoose what your documents look like.
 Mongoose schemas are separate from TypeScript interfaces, so you need to define both a _document interface_ and a _schema_ until V6.3.1.
-Mongoose supports auto typed schemas in V6.3.2 so you don't need to define a typescript interface anymore but you still able to do so.
-Mongoose released as well in V6.3.2 new TS utility `InferSchemaType` that helps to get the type of the auto typed schema document if it's needed.
+Mongoose supports auto typed schemas now so you don't need to define a typescript interface anymore but you still able to do so.
+Mongoose released new TS utility `InferSchemaType` that helps to get the type of the auto typed schema document if it's needed.
 
 `Until mongoose V6.3.1:`
 
@@ -25,7 +25,7 @@ const schema = new Schema<User>({
 });
 ```
 
-`In mongoose V6.3.2:`
+`another approach:`
 
 ```typescript
 import { Schema, InferSchemaType } from "mongoose";

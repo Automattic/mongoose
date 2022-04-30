@@ -143,9 +143,18 @@ We may also define our own custom document instance methods.
 
 ```javascript
 // define a schema
-const animalSchema = new Schema({ name: String, type: String });
+const animalSchema = new Schema({ name: String, type: String },
+{
+  // Assign a function to the "methods" object of our animalSchema through schema options.
+  // this approach support auto typed instance methods then no need to create separate TS types. 
+  methods:{
+    findSimilarTypes(cb){
+      return mongoose.model('Animal').find({ type: this.type }, cb);
+    }
+  }
+});
 
-// assign a function to the "methods" object of our animalSchema
+// Or, assign a function to the "methods" object of our animalSchema
 animalSchema.methods.findSimilarTypes = function(cb) {
   return mongoose.model('Animal').find({ type: this.type }, cb);
 };
@@ -169,14 +178,28 @@ dog.findSimilarTypes((err, dogs) => {
 
 <h3 id="statics"><a href="#statics">Statics</a></h3>
 
-You can also add static functions to your model. There are two equivalent
+You can also add static functions to your model. There are three equivalent
 ways to add a static:
 
+- Add a function property to schema constructor second argument `statics`
 - Add a function property to `schema.statics`
 - Call the [`Schema#static()` function](/docs/api.html#schema_Schema-static)
 
 ```javascript
-// Assign a function to the "statics" object of our animalSchema
+
+// define a schema
+const animalSchema = new Schema({ name: String, type: String },
+{
+  // Assign a function to the "statics" object of our animalSchema through schema options.
+  // this approach support auto typed static methods then no need to create separate TS types. 
+  statics:{
+    findByName(name){
+      return this.find({ name: new RegExp(name, 'i') });
+    }
+  }
+});
+
+// Or, Assign a function to the "statics" object of our animalSchema
 animalSchema.statics.findByName = function(name) {
   return this.find({ name: new RegExp(name, 'i') });
 };
@@ -197,6 +220,20 @@ but for mongoose queries. Query helper methods let you extend mongoose's
 [chainable query builder API](./queries.html).
 
 ```javascript
+
+// define a schema
+const animalSchema = new Schema({ name: String, type: String },
+{
+  // Assign a function to the "query" object of our animalSchema through schema options.
+  // this approach support auto typed query helpers methods then no need to create separate TS types. 
+  statics:{
+    byName(name){
+      return this.where({ name: new RegExp(name, 'i') })
+    }
+  }
+});
+
+// Or, Assign a function to the "query" object of our animalSchema
 animalSchema.query.byName = function(name) {
   return this.where({ name: new RegExp(name, 'i') })
 };
@@ -409,6 +446,7 @@ Valid options:
 - [read](#read)
 - [writeConcern](#writeConcern)
 - [shardKey](#shardKey)
+- [statics](#statics)
 - [strict](#strict)
 - [strictQuery](#strictQuery)
 - [toJSON](#toJSON)
@@ -423,6 +461,8 @@ Valid options:
 - [skipVersioning](#skipVersioning)
 - [timestamps](#timestamps)
 - [storeSubdocValidationError](#storeSubdocValidationError)
+- [methods](#methods)
+- [query](#query-helpers)
 
 <h3 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h3>
 

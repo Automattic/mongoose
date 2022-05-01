@@ -8,7 +8,7 @@ Mongoose released new TS utility `InferSchemaType` that helps to get the type of
 `Until mongoose V6.3.1:`
 
 ```typescript
-import { Schema } from "mongoose";
+import { Schema } from 'mongoose';
 
 // Document interface
 interface User {
@@ -21,14 +21,14 @@ interface User {
 const schema = new Schema<User>({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  avatar: String,
+  avatar: String
 });
 ```
 
 `another approach:`
 
 ```typescript
-import { Schema, InferSchemaType } from "mongoose";
+import { Schema, InferSchemaType } from 'mongoose';
 
 // Document interface
 // No needs to define TS interface any more.
@@ -42,7 +42,7 @@ import { Schema, InferSchemaType } from "mongoose";
 const schema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  avatar: String,
+  avatar: String
 });
 
 type User = InferSchemaType<typeof schema>;
@@ -86,7 +86,7 @@ Mongoose wraps `DocType` in a Mongoose document for cases like the `this` parame
 For example:
 
 ```typescript
-schema.pre("save", function (): void {
+schema.pre('save', function (): void {
   console.log(this.name); // TypeScript knows that `this` is a `mongoose.Document & User` by default
 });
 ```
@@ -104,7 +104,7 @@ Mongoose checks to make sure that every path in your schema is defined in your d
 For example, the below code will fail to compile because `emaill` is a path in the schema, but not in the `DocType` interface.
 
 ```typescript
-import { Schema, Model } from "mongoose";
+import { Schema, Model } from 'mongoose';
 
 interface User {
   name: string;
@@ -117,7 +117,7 @@ interface User {
 const schema = new Schema<User>({
   name: { type: String, required: true },
   emaill: { type: String, required: true },
-  avatar: String,
+  avatar: String
 });
 ```
 
@@ -125,7 +125,7 @@ However, Mongoose does **not** check for paths that exist in the document interf
 For example, the below code compiles.
 
 ```typescript
-import { Schema, Model } from "mongoose";
+import { Schema, Model } from 'mongoose';
 
 interface User {
   name: string;
@@ -148,7 +148,7 @@ This is because Mongoose has numerous features that add paths to your schema tha
 When you define an array in a document interface, we recommend using Mongoose's `Types.Array` type for primitive arrays or `Types.DocumentArray` for arrays of documents.
 
 ```typescript
-import { Schema, Model, Types } from "mongoose";
+import { Schema, Model, Types } from 'mongoose';
 
 interface BlogPost {
   _id: Types.ObjectId;
@@ -173,5 +173,5 @@ If you use `Types.DocumentArray` in the above case, you'll be able to `push()` a
 ```typescript
 const user = new User({ blogPosts: [] });
 
-user.blogPosts.push({ title: "test" }); // Would not work if you did `blogPosts: BlogPost[]`
+user.blogPosts.push({ title: 'test' }); // Would not work if you did `blogPosts: BlogPost[]`
 ```

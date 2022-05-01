@@ -49,7 +49,7 @@
     "highlight.js": "11.5.0",
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",
-    "marked": "4.0.12",
+    "marked": "4.0.14",
     "mocha": "9.2.2",
     "moment": "2.x",
     "mongodb-memory-server": "8.5.0",

@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.17.8",
-    "@babel/preset-env": "7.16.11",
+    "@babel/preset-env": "7.17.10",
     "@typescript-eslint/eslint-plugin": "5.17.0",
     "@typescript-eslint/parser": "5.17.0",
     "acquit": "1.2.1",

@@ -1,5 +1,5 @@
-import { Schema, model, Document, LeanDocument, Types } from 'mongoose';
-import { expectError } from 'tsd';
+import { Schema, model, Document, LeanDocument, Types, BaseDocumentType, DocTypeFromUnion, DocTypeFromGeneric } from 'mongoose';
+import { expectError, expectNotType, expectType } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
@@ -24,14 +24,18 @@ schema.method('testMethod', () => 42);
 const Test = model<ITest>('Test', schema);
 
 void async function main() {
-  const doc: ITest = await Test.findOne().orFail();
+  const doc = await Test.findOne().orFail();
 
   doc.subdoc = new Subdoc({ name: 'test' });
   doc.id = 'Hello';
 
   doc.testMethod();
 
-  const pojo = doc.toObject();
+  // Because ITest extends Document there is no good way for toObject
+  // to infer the type which doesn't add a high probability of a circular
+  // reference, so it must be specified here or else ITest above could be changed
+  // to `extends Document<number, {}, ITestBase>`
+  const pojo = doc.toObject<ITestBase>();
   expectError(await pojo.save());
 
   const _doc: ITestBase = await Test.findOne().orFail().lean();
@@ -103,4 +107,58 @@ async function gh11118(): Promise<void> {
   for (const doc of docs) {
     const _id: Types.ObjectId = doc._id;
   }
+}
+
+async function getBaseDocumentType(): Promise<void> {
+  interface User {
+    name: string;
+    email: string;
+    avatar?: string;
+  }
+
+  type UserDocUnion = User & Document<Types.ObjectId>;
+  type UserDocGeneric = Document<Types.ObjectId, {}, User>;
+
+  // DocTypeFromUnion should correctly infer the User type from our unioned type
+  type fromUnion1 = DocTypeFromUnion<UserDocUnion>;
+  expectType<User>({} as fromUnion1);
+  // DocTypeFromUnion should give a "false" type if it isn't a unioned type
+  type fromUnion2 = DocTypeFromUnion<UserDocGeneric>;
+  expectType<false>({} as fromUnion2);
+  // DocTypeFromUnion should give a "false" type of it's an any
+  expectType<false>({} as DocTypeFromUnion<any>);
+
+  // DocTypeFromGeneric should correctly infer the User type from our Generic constructed type
+  type fromGeneric1 = DocTypeFromGeneric<UserDocGeneric>;
+  expectType<User>({} as fromGeneric1);
+  // DocTypeFromGeneric should give a "false" type if it's not a type made with Document<?, ?, DocType>
+  type fromGeneric2 = DocTypeFromGeneric<UserDocUnion>;
+  expectType<false>({} as fromGeneric2);
+  // DocTypeFromGeneric should give a "false" type of it's an any
+  expectType<false>({} as DocTypeFromGeneric<any>);
+
+  type baseDocFromUnion = BaseDocumentType<UserDocUnion>;
+  expectType<User>({} as baseDocFromUnion);
+
+  type baseDocFromGeneric = BaseDocumentType<UserDocGeneric>;
+  expectType<User>({} as baseDocFromGeneric);
+}
+
+async function getBaseDocumentTypeFromModel(): Promise<void> {
+  interface User {
+    name: string;
+    email: string;
+    avatar?: string;
+  }
+  const schema = new Schema<User>({});
+  const Model = model('UserBaseDocTypeFromModel', schema);
+  type UserDocType = InstanceType<typeof Model>;
+
+  type baseFromUserDocType = BaseDocumentType<UserDocType>;
+
+  expectType<User & { _id: Types.ObjectId }>({} as baseFromUserDocType);
+
+  const a: UserDocType = {} as any;
+
+  const b = a.toJSON();
 }

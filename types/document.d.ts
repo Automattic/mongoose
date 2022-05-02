@@ -4,6 +4,12 @@ declare module 'mongoose' {
   /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
   type pathsToSkip = string[] | string;
 
+  /**
+   * Generic types for Document:
+   * *  T - the type of _id
+   * *  TQueryHelpers - Object with any helpers that should be mixed into the Query type
+   * *  DocType - the type of the actual Document created
+   */
   class Document<T = any, TQueryHelpers = any, DocType = any> {
     constructor(doc?: any);
 
@@ -215,13 +221,11 @@ declare module 'mongoose' {
     set(value: any): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON(options: ToObjectOptions & { flattenMaps: false }): LeanDocument<this>;
-    toJSON(options?: ToObjectOptions): FlattenMaps<LeanDocument<this>>;
-    toJSON<T = FlattenMaps<DocType>>(options?: ToObjectOptions): T;
+    toJSON<T = DocType>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<LeanDocument<T>>;
+    toJSON<T = DocType>(options: ToObjectOptions & { flattenMaps: false }): LeanDocument<T>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject(options?: ToObjectOptions): LeanDocument<this>;
-    toObject<T = DocType>(options?: ToObjectOptions): T;
+    toObject<T = DocType>(options?: ToObjectOptions): LeanDocument<T>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string): void;

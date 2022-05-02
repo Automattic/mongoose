@@ -16,7 +16,7 @@
 For 6.x
 
 0. Change to the master branch
-1. execute `docs:prepare:publish:stable` (when this process completes you'll be on the gh-pages branch)
+1. execute `npm run docs:prepare:publish:stable` (when this process completes you'll be on the gh-pages branch)
 2. `git commit -a -m 'chore: website 6.x.x'`
 3. `git push origin gh-pages`
 

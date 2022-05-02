@@ -5,6 +5,8 @@ on:
       - '.github/workflows/documentation.yml'
       - 'package.json'
       - 'docs/**'
+      - 'lib'
+      - 'test'
       - 'website.js'
       - 'CHANGELOG.md'
   push:

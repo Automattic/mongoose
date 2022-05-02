@@ -10823,4 +10823,23 @@ describe('model: populate:', function() {
       assert.ok(err.message.includes('strictPopulate'), err.message);
     });
   });
+  it('should populate on a find call gh-11684', async function() {
+    const Cat = db.model('Cat', {
+      name: String,
+      friends: {
+        ref: 'Cat',
+        type: String
+      }
+    });
+
+
+    const friend = new Cat({ name: 'Garfield' });
+    await friend.save();
+
+    const myCat = new Cat({ name: 'Arlene', friends: friend._id });
+    await myCat.save();
+    const items = await Cat.find({}, null, { populate: 'friends' });
+    console.log('populated cats', ...items.map(cat => cat.friends).filter(friends => friends));
+    console.log(items[1].friends.name);
+  });
 });

@@ -37,4 +37,4 @@ jobs:
 
       - run: npm install
       - run: npm run docs:clean
-      - run: npm run docs:generate:html
+      - run: npm run docs:generate

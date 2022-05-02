@@ -16,12 +16,15 @@ on:
       - '.github/workflows/documentation.yml'
       - 'package.json'
       - 'docs/**'
+      - 'lib'
+      - 'test'
       - 'website.js'
+      - 'CHANGELOG.md'
 permissions:
   contents: read
 
 jobs:
-  typescript:
+  test-documentation:
     runs-on: ubuntu-20.04
     name: Test Generating Docs
     steps:

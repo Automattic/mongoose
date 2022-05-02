@@ -17,4 +17,4 @@ jobs:
           close-issue-message: "This issue was closed because it has been inactive for 14 days since being marked as stale."
           days-before-stale: 14
           days-before-close: 5
-          any-of-labels: can't reproduce,help,needs clarification,needs repro script
+          any-of-labels: can't reproduce,help,needs clarification

@@ -1805,7 +1805,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$gt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gt(val: number): this;
-    gte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gt']): this;
+    gt<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gt']): this;
 
     /** Specifies a `$gte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gte(val: number): this;

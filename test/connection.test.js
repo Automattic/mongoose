@@ -416,7 +416,7 @@ describe('connections:', function() {
     conn.destroy(() => {
       conn.openUri(start.uri, function(error, result) {
         assert.equal(result, undefined);
-        assert.equal(error, 'Connection has been closed and cleaned already, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
+        assert.equal(error, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
         stub.restore();
         done();
       });

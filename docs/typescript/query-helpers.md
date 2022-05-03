@@ -14,7 +14,7 @@ var Project = mongoose.model('Project', ProjectSchema);
 Project.find().where('stars').gt(1000).byName('mongoose');
 ```
 
-In TypeScript, Mongoose does support manually typed & auto typed Query Helpers.
+In TypeScript, Mongoose does support manually typed and automatically typed Query Helpers.
 
 1- Manually typed:
 Mongoose's `Model` takes 3 generic parameters:
@@ -64,7 +64,7 @@ async function run(): Promise<void> {
 ```
 
 2- Automatically typed:
-Mongoose does support auto typed Query Helpers that it is supplied in schema options.
+Mongoose does support auto typed Query Helpers that it are supplied in schema options.
 Query Helpers functions can be defined as following:
 
 ```typescript

@@ -146,7 +146,7 @@ We may also define our own custom document instance methods.
 const animalSchema = new Schema({ name: String, type: String },
 {
   // Assign a function to the "methods" object of our animalSchema through schema options.
-  // this approach support auto typed instance methods then no need to create separate TS types. 
+  // By following this approach, there is no need to create a separate TS type to define the type of the instance functions.
   methods:{
     findSimilarTypes(cb){
       return mongoose.model('Animal').find({ type: this.type }, cb);
@@ -181,7 +181,7 @@ dog.findSimilarTypes((err, dogs) => {
 You can also add static functions to your model. There are three equivalent
 ways to add a static:
 
-- Add a function property to schema constructor second argument `statics`
+- Add a function property to the second argument of the schema-constructor (`statics`)
 - Add a function property to `schema.statics`
 - Call the [`Schema#static()` function](/docs/api.html#schema_Schema-static)
 
@@ -191,7 +191,7 @@ ways to add a static:
 const animalSchema = new Schema({ name: String, type: String },
 {
   // Assign a function to the "statics" object of our animalSchema through schema options.
-  // this approach support auto typed static methods then no need to create separate TS types. 
+  // By following this approach, there is no need to create a separate TS type to define the type of the statics functions. 
   statics:{
     findByName(name){
       return this.find({ name: new RegExp(name, 'i') });
@@ -225,8 +225,8 @@ but for mongoose queries. Query helper methods let you extend mongoose's
 const animalSchema = new Schema({ name: String, type: String },
 {
   // Assign a function to the "query" object of our animalSchema through schema options.
-  // this approach support auto typed query helpers methods then no need to create separate TS types. 
-  statics:{
+  // By following this approach, there is no need to create a separate TS type to define the type of the query functions. 
+  query:{
     byName(name){
       return this.where({ name: new RegExp(name, 'i') })
     }

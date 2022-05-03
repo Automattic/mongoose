@@ -32,7 +32,6 @@ const webpackConfig = {
       }
     ]
   },
-
   resolve: {
     alias: {
       'bn.js': require.resolve('bn.js')

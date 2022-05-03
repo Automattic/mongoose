@@ -34,9 +34,12 @@ const webpackConfig = {
   },
 
   resolve: {
+    alias: {
+      'bn.js': require.resolve('bn.js')
+    },
     fallback: {
       assert: require.resolve('assert-browserify'),
-      buffer: require.resolve('buffer/'),
+      buffer: require.resolve('buffer'),
       crypto: require.resolve('crypto-browserify'),
       stream: require.resolve('stream-browserify')
     }

@@ -87,6 +87,18 @@ function gh10345() {
   })();
 }
 
+async function gh11761() {
+  const thingSchema = new Schema<{ name: string }>({
+    name: Schema.Types.String
+  });
+
+  const ThingModel = model('Thing', thingSchema);
+
+  const { _id, ...thing1 } = (await ThingModel.create({ name: 'thing1' })).toObject();
+
+  console.log({ _id, thing1 });
+}
+
 async function gh11118(): Promise<void> {
   interface User {
     name: string;

@@ -94,9 +94,23 @@ async function gh11761() {
 
   const ThingModel = model('Thing', thingSchema);
 
-  const { _id, ...thing1 } = (await ThingModel.create({ name: 'thing1' })).toObject();
+  {
+    // make sure _id has been added to the type
+    const { _id, ...thing1 } = (await ThingModel.create({ name: 'thing1' })).toObject();
+    expectType<Types.ObjectId>(_id);
 
-  console.log({ _id, thing1 });
+    console.log({ _id, thing1 });
+  }
+  // stretch goal, make sure lean works as well
+
+  const foundDoc = await ThingModel.findOne().lean().limit(1).exec();
+  {
+    if (!foundDoc) {
+      return; // Tell TS that it isn't null
+    }
+    const { _id, ...thing2 } = foundDoc;
+    expectType<Types.ObjectId>(foundDoc._id);
+  }
 }
 
 async function gh11118(): Promise<void> {

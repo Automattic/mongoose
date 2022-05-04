@@ -225,7 +225,7 @@ declare module 'mongoose' {
     toJSON<T = DocType>(options: ToObjectOptions & { flattenMaps: false }): LeanDocument<T>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject<T = DocType>(options?: ToObjectOptions): LeanDocument<T>;
+    toObject<T = DocType>(options?: ToObjectOptions): Require_id<LeanDocument<T>>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string): void;

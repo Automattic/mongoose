@@ -234,3 +234,15 @@ async function _11767() {
   // expectError(examFound2Obj.questions[0].populated);
   expectType<string[]>(examFound2Obj.questions[0].answers);
 }
+
+async function _11761() {
+  const thingSchema = new Schema<{ name: string }>({
+    name: Schema.Types.String
+  });
+
+  const ThingModel = model('Thing', thingSchema);
+
+  const { _id, name, id } = (await ThingModel.create({ name: 'Thing 1' })).toObject();
+  expectType<string>(name);
+  expectType<string | undefined>(id);
+}

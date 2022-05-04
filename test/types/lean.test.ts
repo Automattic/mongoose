@@ -1,5 +1,5 @@
-import { Schema, model, Document, LeanDocument, Types, BaseDocumentType, DocTypeFromUnion, DocTypeFromGeneric } from 'mongoose';
-import { expectError, expectNotType, expectType } from 'tsd';
+import { Schema, model, Document, LeanDocument, Types, DocTypeFromUnion, DocTypeFromGeneric, BaseDocumentType } from 'mongoose';
+import { expectError, expectType } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 

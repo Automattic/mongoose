@@ -1805,7 +1805,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$gt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gt(val: number): this;
-    gt<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gt']): this;
+    gte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gt']): this;
 
     /** Specifies a `$gte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gte(val: number): this;
@@ -2225,42 +2225,17 @@ declare module 'mongoose' {
   // This way, the conditional type is distributive over union types.
   // This is required for PopulatedDoc.
   export type LeanDocumentElement<T> =
-    0 extends (1 & T) ? T :// any
-      T extends unknown[] ? LeanArray<T> : // Array
-        T extends Document ? LeanDocument<T> : // Subdocument
-          T;
+  0 extends (1 & T) ? T :// any
+    T extends unknown[] ? LeanArray<T> : // Array
+      T extends Document ? LeanDocument<T> : // Subdocument
+        T;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 
-  // Helpers to simplify checks
-  type IfAny<IFTYPE, THENTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : IFTYPE;
-  type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
-
-  // tests for these two types are located in test/types/lean.test.ts
-  export type DocTypeFromUnion<T> = T extends (Document<infer T1, infer T2, infer T3> & infer U) ?
-    [U] extends [Document<T1, T2, T3> & infer U] ? IfUnknown<IfAny<U, false>, false> : false : false;
-
-  export type DocTypeFromGeneric<T> = T extends Document<infer IdType, infer TQueryHelpers, infer DocType> ?
-    IfUnknown<IfAny<DocType, false>, false> : false;
-
   /**
-   * Helper to choose the best option between two type helpers
+   * @summary Picks LeanDocumentBaseType from {@link Document}.
    */
-  export type _pickObject<T1, T2, Fallback> = T1 extends false ? T2 extends false ? Fallback : T2 : T1;
-
-  /**
-   * There may be a better way to do this, but the goal is to return the DocType if it can be infered
-   * and if not to return a type which is easily identified as "not valid" so we fall back to
-   * "strip out known things added by extending Document"
-   * There are three basic ways to mix in Document -- "Document & T", "Document<ObjId, mixins, T>",
-   * and "T extends Document". In the last case there is no type without Document mixins, so we can only
-   * strip things out. In the other two cases we can infer the type, so we should
-   */
-  export type BaseDocumentType<T> = _pickObject<DocTypeFromUnion<T>, DocTypeFromGeneric<T>, false>;
-
-  type InferLeanDocumentBaseType<T extends LeanDocumentBaseType, TBase extends LeanDocumentBaseType = Pick<T, keyof LeanDocumentBaseType>> = {
-    [K in keyof LeanDocumentBaseType]: 0 extends (TBase & 1) ? LeanDocumentBaseType[K] : PopulateAFromB<TBase, LeanDocumentBaseType>[K];
-  };
+  type InferLeanDocumentBaseType<T extends LeanDocumentBaseType> = Pick<T, keyof LeanDocumentBaseType>;
 
   /**
    * Documents returned from queries with the lean option enabled.
@@ -2275,8 +2250,8 @@ declare module 'mongoose' {
         T;
 
   export type LeanDocumentOrArrayWithRawType<T, RawDocType> = 0 extends (1 & T) ? T :
-    T extends unknown[] ? RawDocType[] :
-      T extends Document ? RawDocType :
+    T extends unknown[] ? LeanDocument<RawDocType>[] :
+      T extends Document ? LeanDocument<RawDocType> :
         T;
 
   export class SchemaType<T = any> {

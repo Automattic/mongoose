@@ -5,13 +5,22 @@ declare module 'mongoose' {
   /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
   type pathsToSkip = string[] | string;
 
+  /**
+   * @summary Lean document base type.
+   */
   interface LeanDocumentBaseType {
     _id?: Types.ObjectId;
     id?: string;
     __v?: number;
   }
 
-  type ResolveLeanDocumentBaseType<T extends Document, DocType> = IfEquals<DocType, any> extends true ? T : PopulateAFromB<DocType, LeanDocumentBaseType>;
+  /**
+   * @summary Utility helps to prepare an accurate Document type.
+   * @description It merge the type of the Document and SchemaDefinition "raw document" & make sure to have the correct type of LeanDocumentBaseType.
+   * @param {T} T Instance of {@link Document} class.
+   * @param {RawDocType} RawDocType Schema's raw document type.
+   */
+  type ResolveDocumentBaseType<T, RawDocType> = IfEquals<RawDocType, any> extends true ? T : PopulateAFromB<RawDocType, LeanDocumentBaseType>;
 
   /**
    * Generic types for Document:
@@ -230,11 +239,11 @@ declare module 'mongoose' {
     set(value: any): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON<T = LeanDocument<DocType>>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<T>;
-    toJSON<T = LeanDocument<DocType>>(options: ToObjectOptions & { flattenMaps: false }): T;
+    toJSON<T = DocType>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<LeanDocument<T>>;
+    toJSON<T = DocType>(options: ToObjectOptions & { flattenMaps: false }): LeanDocument<T>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject<T = DocType, R = ResolveLeanDocumentBaseType<this, T>>(options?: ToObjectOptions): LeanDocument<R>;
+    toObject<T = DocType>(options?: ToObjectOptions): LeanDocument<ResolveDocumentBaseType<this, T>>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string): void;

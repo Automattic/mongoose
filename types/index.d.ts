@@ -2272,8 +2272,8 @@ declare module 'mongoose' {
         T;
 
   export type LeanDocumentOrArrayWithRawType<T, RawDocType> = 0 extends (1 & T) ? T :
-    T extends unknown[] ? RawDocType[] :
-      T extends Document ? RawDocType :
+    T extends unknown[] ? LeanDocument<RawDocType>[] :
+      T extends Document ? LeanDocument<RawDocType> :
         T;
 
   export class SchemaType<T = any> {

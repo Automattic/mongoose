@@ -26,19 +26,20 @@ For example, the above code won't throw an error if `email` is optional in the d
 
 ## Generic parameters
 
-The Mongoose `Schema` class in TypeScript has 3 [generic parameters](https://www.typescriptlang.org/docs/handbook/2/generics.html):
+The Mongoose `Schema` class in TypeScript has 4 [generic parameters](https://www.typescriptlang.org/docs/handbook/2/generics.html):
 
 - `DocType` - An interface descibing how the data is saved in MongoDB
 - `M` - The Mongoose model type. Can be omitted if there are no query helpers or instance methods to be defined.
   - default: `Model<DocType, any, any>`
 - `TInstanceMethods` - An interface containing the methods for the schema.
   - default: `{}`
+- `TQueryHelpers` - An interface containing query helpers defined on the schema. Defaults to `{}`.
 
 <details>
   <summary>View TypeScript definition</summary>
     
   ```typescript
-  class Schema<DocType = any, M = Model<DocType, any, any>, TInstanceMethods = {}> extends events.EventEmitter {
+  class Schema<DocType = any, M = Model<DocType, any, any>, TInstanceMethods = {}, TQueryHelpers = {}> extends events.EventEmitter {
     // ...
   }
   ```
@@ -58,6 +59,8 @@ schema.pre('save', function(): void {
 The second generic param, `M`, is the model used with the schema. Mongoose uses the `M` type in model middleware defined in the schema.
 
 The third generic param, `TInstanceMethods` is used to add types for instance methods defined in the schema.
+
+The 4th param, `TQueryHelpers`, is used to add types for [chainable query helpers](/docs/typescript/query-helpers.html).
 
 ## Schema vs Interface fields
 

@@ -48,6 +48,18 @@ interface ITest extends Document {
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
+// Test subDoc id type overriding
+
+const testDoc = new Test({ docs: [{ id: 10 }] });
+
+if (testDoc?.docs?.[0]) {
+  const subDoc = testDoc?.docs[0];
+  expectType<number | undefined>(subDoc?.id);
+
+  const leanDoc = subDoc.toObject();
+  expectType<number | undefined>(leanDoc.id);
+}
+
 Test.find({}, {}, { populate: { path: 'child', model: ChildModel, match: true } }).exec().then((res: Array<ITest>) => console.log(res));
 
 Test.find().byName('test').byName('test2').orFail().exec().then(console.log);

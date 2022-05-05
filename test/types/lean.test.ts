@@ -97,7 +97,7 @@ async function gh11761() {
   {
     // make sure _id has been added to the type
     const { _id, ...thing1 } = (await ThingModel.create({ name: 'thing1' })).toObject();
-    expectType<Types.ObjectId>(_id);
+    expectType<Types.ObjectId | undefined>(_id);
 
     console.log({ _id, thing1 });
   }
@@ -131,7 +131,7 @@ async function gh11118(): Promise<void> {
   const docs = await UserModel.find().lean().exec();
 
   for (const doc of docs) {
-    const _id: Types.ObjectId = doc._id;
+    const _id: Types.ObjectId | undefined = doc._id;
   }
 }
 
@@ -242,7 +242,9 @@ async function _11761() {
 
   const ThingModel = model('Thing', thingSchema);
 
-  const { _id, name, id } = (await ThingModel.create({ name: 'Thing 1' })).toObject();
+  const { _id, name, id, __v } = (await ThingModel.create({ name: 'Thing 1' })).toObject();
   expectType<string>(name);
   expectType<string | undefined>(id);
+  expectType<Types.ObjectId | undefined>(_id);
+  expectType<number | undefined>(__v);
 }

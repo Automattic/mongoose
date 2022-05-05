@@ -2258,13 +2258,16 @@ declare module 'mongoose' {
    */
   export type BaseDocumentType<T> = _pickObject<DocTypeFromUnion<T>, DocTypeFromGeneric<T>, false>;
 
+  type InferLeanDocumentBaseType<T extends LeanDocumentBaseType, TBase extends LeanDocumentBaseType = Pick<T, keyof LeanDocumentBaseType>> = {
+    [K in keyof LeanDocumentBaseType]: 0 extends (TBase & 1) ? LeanDocumentBaseType[K] : PopulateAFromB<TBase, LeanDocumentBaseType>[K];
+  };
+
   /**
    * Documents returned from queries with the lean option enabled.
    * Plain old JavaScript object documents (POJO).
    * @see https://mongoosejs.com/docs/tutorials/lean.html
    */
-  export type LeanDocument<T> = BaseDocumentType<T> extends Document ? _LeanDocument<BaseDocumentType<T>> :
-    Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
+  export type LeanDocument<T> = _LeanDocument<Omit<T, keyof Document>> & InferLeanDocumentBaseType<T>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :
@@ -2272,8 +2275,8 @@ declare module 'mongoose' {
         T;
 
   export type LeanDocumentOrArrayWithRawType<T, RawDocType> = 0 extends (1 & T) ? T :
-    T extends unknown[] ? LeanDocument<RawDocType>[] :
-      T extends Document ? LeanDocument<RawDocType> :
+    T extends unknown[] ? RawDocType[] :
+      T extends Document ? RawDocType :
         T;
 
   export class SchemaType<T = any> {

@@ -1,8 +1,17 @@
+/// <reference path="./utilities.d.ts" />
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
   /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
   type pathsToSkip = string[] | string;
+
+  interface LeanDocumentBaseType {
+    _id?: Types.ObjectId;
+    id?: string;
+    __v?: number;
+  }
+
+  type ResolveLeanDocumentBaseType<T extends Document, DocType> = IfEquals<DocType, any> extends true ? T : PopulateAFromB<DocType, LeanDocumentBaseType>;
 
   /**
    * Generic types for Document:
@@ -131,7 +140,7 @@ declare module 'mongoose' {
      */
     getChanges(): UpdateQuery<this>;
 
-    /** The string version of this documents _id. */
+    /** The string "by default" version of this documents _id. */
     id?: any;
 
     /** Signal that we desire an increment of this documents version. */
@@ -225,7 +234,7 @@ declare module 'mongoose' {
     toJSON<T = LeanDocument<DocType>>(options: ToObjectOptions & { flattenMaps: false }): T;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject<T = LeanDocument<DocType>>(options?: ToObjectOptions): Require_id<T>;
+    toObject<T = DocType, R = ResolveLeanDocumentBaseType<this, T>>(options?: ToObjectOptions): LeanDocument<R>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string): void;

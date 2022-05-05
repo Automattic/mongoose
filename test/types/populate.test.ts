@@ -227,5 +227,4 @@ async function _11532() {
 
   if (!leanResult) return;
   expectType<string>(leanResult.child.name);
-  expectError(leanResult?.__v);
 }

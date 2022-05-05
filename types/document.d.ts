@@ -9,9 +9,8 @@ declare module 'mongoose' {
    * @summary Lean document base type.
    */
   interface LeanDocumentBaseType {
-    _id?: Types.ObjectId;
-    id?: string;
-    __v?: number;
+    _id: Types.ObjectId;
+    __v: number;
   }
 
   /**

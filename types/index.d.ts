@@ -1805,7 +1805,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$gt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gt(val: number): this;
-    gte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gt']): this;
+    gt<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gt']): this;
 
     /** Specifies a `$gte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gte(val: number): this;
@@ -1825,7 +1825,7 @@ declare module 'mongoose' {
     j(val: boolean | null): this;
 
     /** Sets the lean option. */
-    lean<LeanResultType = RawDocType extends Document ? LeanDocumentOrArray<ResultType> : LeanDocumentOrArrayWithRawType<ResultType, Require_id<RawDocType>>>(val?: boolean | any): QueryWithHelpers<LeanResultType, DocType, THelpers, RawDocType>;
+    lean<LeanResultType = RawDocType extends Document ? LeanDocumentOrArray<ResultType> : LeanDocumentOrArrayWithRawType<ResultType, RawDocType>>(val?: boolean | any): QueryWithHelpers<LeanResultType, DocType, THelpers, RawDocType>;
 
     /** Specifies the maximum number of documents the query will return. */
     limit(val: number): this;
@@ -2233,16 +2233,18 @@ declare module 'mongoose' {
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 
   /**
-   * @summary Picks LeanDocumentBaseType from {@link Document}.
+   * @summary Picks LeanDocumentBaseType from {@link Document} and keep its properties type consistent.
+   * @param {T} T {@link Document} type.
+   * @returns LeanDocumentBaseType.
    */
-  type InferLeanDocumentBaseType<T extends LeanDocumentBaseType> = Pick<T, keyof LeanDocumentBaseType>;
+  type InferLeanDocumentBaseType<T extends Partial<LeanDocumentBaseType>> = Pick<PopulateAFromB<T, LeanDocumentBaseType>, keyof LeanDocumentBaseType>;
 
   /**
    * Documents returned from queries with the lean option enabled.
    * Plain old JavaScript object documents (POJO).
    * @see https://mongoosejs.com/docs/tutorials/lean.html
    */
-  export type LeanDocument<T> = _LeanDocument<Omit<T, keyof Document>> & InferLeanDocumentBaseType<T>;
+  export type LeanDocument<T> = _LeanDocument<Omit<T, Exclude<keyof Document, 'id'>>> & Require_id<InferLeanDocumentBaseType<T>>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :

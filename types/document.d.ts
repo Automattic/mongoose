@@ -14,12 +14,27 @@ declare module 'mongoose' {
   }
 
   /**
-   * @summary Utility helps to prepare an accurate Document type.
-   * @description It merge the type of the Document and SchemaDefinition "raw document" & make sure to have the correct type of LeanDocumentBaseType.
-   * @param {T} T Instance of {@link Document} class.
-   * @param {RawDocType} RawDocType Schema's raw document type.
+   * @summary Helper that resolve the lean document returned by {@link Document.toObject} function.
+   * @param {T} Document Instance of {@link Document} class.
+   * @param {R} RawDocType Schema's raw document type.
+   * @param {O} Options of {@link Document.toObject}.
+   * @param {D} the default returned type. "Returns when {@link O Options} is not provided".
+   * @returns lean document.
    */
-  type ResolveDocumentBaseType<T, RawDocType> = IfEquals<RawDocType, any> extends true ? T : PopulateAFromB<RawDocType, LeanDocumentBaseType>;
+  type ResolveToObjectLeanDocument<T, R, O, D = LeanDocument<IfEquals<R, any> extends true ? T : R>> =/*  O extends ToObjectOptions ? ResolveLeanDocumentDependingOnToObjectOptions<D, O> : */ D;
+
+
+  /**
+   * @summary Helper that resolve the lean document returned by {@link Document.toObject} function.
+   * @param {T} LeanDocument of {@link Document} Instance.
+   * @param {O} Options is the first argument of {@link Document.toObject}.
+   * @returns lean document with some changes depending on {@link O Options} value.
+   */
+  type ResolveLeanDocumentDependingOnToObjectOptions<T, O extends ToObjectOptions> = {
+
+  };
+
+
 
   /**
    * Generic types for Document:
@@ -242,7 +257,7 @@ declare module 'mongoose' {
     toJSON<T = DocType>(options: ToObjectOptions & { flattenMaps: false }): LeanDocument<T>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject<T = DocType>(options?: ToObjectOptions): LeanDocument<ResolveDocumentBaseType<this, T>>;
+    toObject<T = DocType, O extends ToObjectOptions = {}>(options?: O): ResolveToObjectLeanDocument<this, T, O>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string): void;

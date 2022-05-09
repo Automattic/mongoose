@@ -1,3 +1,16 @@
+6.3.3 / 2022-05-09
+==================
+ * perf: avoid leaking memory when using populate() with QueryCursor because of reusing populate options with `_docs` #11641
+ * fix(types): add `_id` back for LeanDocument #11769 #11761 [taxilian](https://github.com/taxilian)
+ * fix(model): add skipValidation option for bulkWrite() to allow skipping validation for `insertOne` and `replaceOne` #11663
+ * fix(document): correctly $__reset() subdocuments that are under nested paths #11672
+ * fix(query): handle casting BSONRegExp instances as RegExps in queries #11597
+ * fix: correctly cast $not in $expr #11689
+ * perf: optimize size of browser bundle, use buffer v.5.7.1 package to match buffer package of mongodb in browser bundle #11765 [Uzlopak](https://github.com/Uzlopak)
+ * docs: Query.populate docs do not include using an array of strings for the path param #11768 #11641 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * chore: add GitHub workflow to close stale "can't reproduce", "help", "needs clarification" issues #11753 [Uzlopak](https://github.com/Uzlopak)
+ * chore: remove Makefile dependency for compiling docs #11751 [Uzlopak](https://github.com/Uzlopak)
+
 6.3.2 / 2022-05-02
 ==================
  * perf: avoid registering event listeners on subdocuments to reduce memory usage #11541

@@ -237,6 +237,10 @@ declare module 'mongoose' {
 
   export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
 
+  interface MongooseBulkWriteOptions {
+    skipValidation?: boolean;
+  }
+
   interface IndexesDiff {
     /** Indexes that would be created in mongodb. */
     toCreate: Array<any>
@@ -277,8 +281,8 @@ declare module 'mongoose' {
      * if you use `create()`) because with `bulkWrite()` there is only one network
      * round trip to the MongoDB server.
      */
-    bulkWrite(writes: Array<any>, options?: mongodb.BulkWriteOptions): Promise<mongodb.BulkWriteResult>;
-    bulkWrite(writes: Array<any>, options?: mongodb.BulkWriteOptions, cb?: Callback<mongodb.BulkWriteResult>): void;
+    bulkWrite(writes: Array<any>, options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions): Promise<mongodb.BulkWriteResult>;
+    bulkWrite(writes: Array<any>, options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions, cb?: Callback<mongodb.BulkWriteResult>): void;
 
     /**
      * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than
@@ -1805,7 +1809,7 @@ declare module 'mongoose' {
 
     /** Specifies a `$gt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gt(val: number): this;
-    gte<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gt']): this;
+    gt<KEY extends keyof FilterQuery<DocType>>(path: KEY, val: FilterQuery<DocType>[KEY]['$gt']): this;
 
     /** Specifies a `$gte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     gte(val: number): this;
@@ -2272,8 +2276,8 @@ declare module 'mongoose' {
         T;
 
   export type LeanDocumentOrArrayWithRawType<T, RawDocType> = 0 extends (1 & T) ? T :
-    T extends unknown[] ? RawDocType[] :
-      T extends Document ? RawDocType :
+    T extends unknown[] ? LeanDocument<RawDocType>[] :
+      T extends Document ? LeanDocument<RawDocType> :
         T;
 
   export class SchemaType<T = any> {

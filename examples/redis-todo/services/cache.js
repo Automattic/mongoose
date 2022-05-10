@@ -6,8 +6,7 @@ const util = require('util');
 
 // setting up redis server
 const client = redis.createClient();
-client.hget = util.promisify(client.hget);
-
+client.hGet = util.promisify(client.hGet);
 const exec = mongoose.Query.prototype.exec;
 
 mongoose.Query.prototype.cache = function(options = {}) {
@@ -26,7 +25,7 @@ mongoose.Query.prototype.exec = async function() {
   );
 
   // looking for cache
-  const cacheData = await client.hget(this.hashKey, key);
+  const cacheData = await client.hGet(this.hashKey, key);
   if (cacheData) {
     console.log('from redis');
     const doc = JSON.parse(cacheData);

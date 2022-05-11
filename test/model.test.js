@@ -6355,15 +6355,13 @@ describe('Model', function() {
 
         const Event = db.model('Event', eventSchema, collectionName);
 
-        const aEvent = Event.discriminator('AEvent', { aField: String });
-        const bEvent = Event.discriminator('BEvent', { bField: String });
+        Event.discriminator('AEvent', { aField: String });
+        Event.discriminator('BEvent', { bField: String });
 
         // Act
         await db.syncIndexes();
-        // console.log('AEVENT', await aEvent.syncIndexes());
-        // console.log('BEVENT', await bEvent.syncIndexes());
         const indexes = await Event.listIndexes();
-        // console.log('INDEXES', indexes)
+
         // Assert
         const actorIdIndex = indexes.find(index => index.name === 'actorId_1');
         assert.ok(actorIdIndex);

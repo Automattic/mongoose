@@ -2,7 +2,6 @@
 
 const mongoose = require('mongoose');
 const redis = require('redis');
-const util = require('util');
 
 // setting up redis server
 const client = redis.createClient();

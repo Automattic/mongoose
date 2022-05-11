@@ -3,6 +3,11 @@ description: Open an issue and request for individual help
 labels: ['help', 'help wanted']
 
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Before you submit an issue we recommend to read the [documentation](https://mongoosejs.com/docs/guide.html).
+
   - type: checkboxes
     id: prerequisites
     attributes:

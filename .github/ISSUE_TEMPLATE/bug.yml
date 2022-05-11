@@ -2,12 +2,6 @@ name: 🪲 Bug report
 description: Create a report to help us improve
 
 body:
-
-  - type: markdown
-    attributes:
-      value: |
-        Before you submit an issue we recommend to read the [documentation](https://mongoosejs.com/docs/guide.html).
-
   - type: checkboxes
     id: prerequisites
     attributes:

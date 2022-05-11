@@ -8503,6 +8503,24 @@ describe('Model', function() {
     assert.deepEqual(indexes[1].key, { name: 1 });
     assert.strictEqual(indexes[1].collation.locale, 'en');
   });
+  it('prevents .$* from being put in projections by avoiding drilling down into maps (gh-11698)', async function() {
+    const subSchema = new Schema({
+      selected: { type: Number },
+      not_selected: { type: Number, select: false }
+    });
+
+    const testSchema = new Schema({
+      subdocument_mapping: {
+        type: Map,
+        of: subSchema
+      }
+    });
+
+
+    const Test = db.model('Test', testSchema);
+
+    assert.ok(await Test.find());
+  });
 });
 
 

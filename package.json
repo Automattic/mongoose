@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "6.3.2",
+  "version": "6.3.3",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -83,8 +83,8 @@
     "docs:merge:legacy": "git merge 5.x",
     "docs:test": "npm run docs:generate && npm run docs:generate:search",
     "docs:view": "node website.js && node static.js",
-    "docs:prepare:publish:stable": "npm run docs:checkout:gh-pages && docs:merge:stable && npm run docs:clean:stable && npm run docs:generate && npm run docs:generate:search",
-    "docs:prepare:publish:legacy": "npm run docs:checkout:legacy && docs:merge:legacy && npm run docs:clean:stable && npm run docs:generate && npm run docs:copy:tmp && docs:checkout:gh-pages && docs:copy:tmp:legacy",
+    "docs:prepare:publish:stable": "npm run docs:checkout:gh-pages && npm run docs:merge:stable && npm run docs:clean:stable && npm run docs:generate && npm run docs:generate:search",
+    "docs:prepare:publish:legacy": "npm run docs:checkout:legacy && npm run docs:merge:legacy && npm run docs:clean:stable && npm run docs:generate && npm run docs:copy:tmp && docs:checkout:gh-pages && docs:copy:tmp:legacy",
     "lint": "eslint .",
     "lint-js": "eslint . --ext .js",
     "lint-ts": "eslint . --ext .ts",

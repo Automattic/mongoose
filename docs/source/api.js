@@ -6,8 +6,6 @@
 
 const dox = require('dox');
 const fs = require('fs');
-const link = require('../helpers/linktype');
-const hl = require('highlight.js');
 const md = require('marked');
 
 const files = [
@@ -49,7 +47,7 @@ const out = module.exports.docs;
 
 const combinedFiles = [];
 for (const file of files) {
-  const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'));
+  const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'), { raw: true });
   comments.file = file;
   combinedFiles.push(comments);
 }
@@ -121,7 +119,7 @@ function parse() {
             ctx.string = `${data.name}.${ctx.name}()`;
             break;
           case 'return':
-            tag.description = tag.description ?
+            tag.return = tag.description ?
               md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
               '';
             ctx.return = tag;
@@ -177,7 +175,10 @@ function parse() {
       ctx.description = prop.description.full.
         replace(/<br \/>/ig, ' ').
         replace(/&gt;/ig, '>');
-      ctx.description = highlight(ctx.description);
+      if (ctx.description.includes('function capitalize')) {
+        console.log('\n\n-------\n\n', ctx);
+      }
+      ctx.description = md.parse(ctx.description);
 
       data.props.push(ctx);
     }
@@ -200,16 +201,4 @@ function parse() {
 
     out.push(data);
   }
-}
-
-function highlight(str) {
-  return str.replace(/(<pre><code>)([^<]+)(<\/code)/gm, function(_, $1, $2, $3) {
-    const code = /^(?:`{3}([^\n]+)\n)?([\s\S]*)/gm.exec($2);
-
-    if ('js' === code[1] || !code[1]) {
-      code[1] = 'javascript';
-    }
-
-    return $1 + hl.highlight(code[1], code[2]).value.trim() + $3;
-  });
 }

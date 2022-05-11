@@ -32,6 +32,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
     - `while (..) {`
     - `function(err) {`
 - Write tests and make sure they pass (tests are in the [test](https://github.com/Automattic/mongoose/tree/master/test) directory).
+- Write typings-tests if you modify the typescript-typings. (tests are in the [test/types](https://github.com/Automattic/mongoose/tree/master/test/types) directory).
 
 ### Running the tests
 - Open a terminal and navigate to the root of the project
@@ -41,6 +42,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
   - or to execute a single test `npm test -- -g 'some regexp that matches the test description'`
   - any mocha flags can be specified with `-- <mocha flags here>`
   - For example, you can use `npm test -- -R spec` to use the spec reporter, rather than the dot reporter (by default, the test output looks like a bunch of dots)
+  - execute `npm run test-tsd` to run the typescript tests
 
 ### Documentation
 
@@ -51,11 +53,9 @@ To contribute to the [guide](http://mongoosejs.com/docs/guide.html) or [quick st
 If you'd like to preview your documentation changes, first commit your changes to your local master branch, then execute:
 
 * `npm install`
-* `make docclean`
-* `make gendocs`
-* `node static.js`
+* `npm run docs:view`
 
-Visit `http://localhost:8089` and you should see the docs with your local changes. Make sure you `git reset --hard` before committing, because changes to `docs/*` should **not** be in PRs.
+Visit `http://localhost:8089` and you should see the docs with your local changes. Make sure you `npm run docs:clean` before committing, because automated generated files to `docs/*` should **not** be in PRs.
 
 ### Plugins website
 

@@ -133,7 +133,6 @@ describe('Virtuals', function() {
     // acquit:ignore:end
     // Will **not** find any results, because `domain` is not stored in
     // MongoDB.
-    mongoose.set('debug', true);
     const doc = await User.findOne({ domain: 'gmail.com' }, null, { strictQuery: false });
     doc; // undefined
     // acquit:ignore:start

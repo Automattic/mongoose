@@ -1,5 +1,7 @@
 'use strict';
 
+const sinon = require('sinon');
+
 const start = require('./common');
 
 const assert = require('assert');
@@ -773,7 +775,7 @@ describe('mongoose module:', function() {
 
     const movie = await Movie.create({ name: 'The Empire Strikes Back' });
     await Person.create({ name: 'Test1', favoriteMovie: movie._id });
-    assert.rejects(async() => {
+    await assert.rejects(async() => {
       await Person.findOne().populate({ path: 'favoriteGame' });
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
   });
@@ -788,7 +790,7 @@ describe('mongoose module:', function() {
     }));
     const movie = await Movie.create({ name: 'The Empire Strikes Back' });
     await Person.create({ name: 'Test1', favoriteMovie: movie._id });
-    assert.rejects(async() => {
+    await assert.rejects(async() => {
       await Person.findOne().populate({ path: 'favoriteGame', strictPopulate: true });
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
   });
@@ -910,6 +912,112 @@ describe('mongoose module:', function() {
     it('Allows a syncIndexes shorthand mongoose.syncIndexes (gh-10893)', async function() {
       const m = new mongoose.Mongoose();
       assert.deepEqual(await m.syncIndexes(), {});
+    });
+
+    it('Allows for the removal of indexes via string or object (gh-11547)', async function() {
+      const schema = new Schema({
+        title: String,
+        weight: Number,
+        age: Number,
+        name: String,
+        location: String
+      });
+
+      schema.index({ title: 1 }, { name: 'title index' });
+      schema.index({ weight: 1 });
+      schema.index({ age: 1, name: 1 });
+      schema.index({ location: 1 });
+      assert.equal(schema._indexes.length, 4);
+
+      schema.removeIndex('title index');
+      assert.equal(schema.indexes().length, 3);
+      assert.deepStrictEqual(
+        schema.indexes().map(i => i[0]),
+        [{ weight: 1 }, { age: 1, name: 1 }, { location: 1 }]
+      );
+
+      schema.removeIndex({ age: 1, name: 1 });
+      assert.equal(schema.indexes().length, 2);
+      assert.deepStrictEqual(
+        schema.indexes().map(i => i[0]),
+        [{ weight: 1 }, { location: 1 }]
+      );
+
+      schema.removeIndex({ weight: 1 });
+      assert.equal(schema.indexes().length, 1);
+      assert.deepStrictEqual(schema.indexes().map(i => i[0]), [{ location: 1 }]);
+
+      schema.clearIndexes();
+      assert.equal(schema.indexes().length, 0);
+    });
+
+    describe('global `allowDiskUse` (gh-11478)', () => {
+      this.afterEach(() => sinon.restore());
+
+      it('is `undefined` by default', async() => {
+        // Arrange
+        const m = new mongoose.Mongoose();
+
+        const db = await m.connect(start.uri);
+
+        const userSchema = new m.Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+
+        const nativeAggregateSpy = sinon.spy(User.collection, 'aggregate');
+
+        // Act
+        await User.aggregate([{ $match: {} }]);
+
+        // Assert
+        const optionsSentToMongo = nativeAggregateSpy.args[0][1];
+        assert.strictEqual(optionsSentToMongo.allowDiskUse, undefined);
+      });
+
+      it('works when set to `true` and no option provided', async() => {
+        // Arrange
+        const m = new mongoose.Mongoose();
+        m.set('allowDiskUse', true);
+
+        const db = await m.connect(start.uri);
+
+        const userSchema = new m.Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+        const nativeAggregateSpy = sinon.spy(User.collection, 'aggregate');
+
+        // Act
+        await User.aggregate([{ $match: {} }]);
+
+        // Assert
+        const optionsSentToMongo = nativeAggregateSpy.args[0][1];
+        assert.strictEqual(optionsSentToMongo.allowDiskUse, true);
+      });
+      it('can be overridden by a specific query', async() => {
+        // Arrange
+        const m = new mongoose.Mongoose();
+        m.set('allowDiskUse', true);
+
+        const db = await m.connect(start.uri);
+
+        const userSchema = new m.Schema({
+          name: String
+        });
+
+        const User = db.model('User', userSchema);
+        const nativeAggregateSpy = sinon.spy(User.collection, 'aggregate');
+
+        // Act
+        await User.aggregate([{ $match: {} }]).allowDiskUse(false);
+
+        // Assert
+        const optionsSentToMongo = nativeAggregateSpy.args[0][1];
+        assert.equal(optionsSentToMongo.allowDiskUse, false);
+      });
     });
   });
 });

@@ -5153,6 +5153,20 @@ describe('Model', function() {
             doc._id.toHexString());
         });
 
+        it('using next() and hasNext() (gh-11527)', async function() {
+          const MyModel = db.model('Test', new Schema({ name: String }));
+
+          const changeStream = await MyModel.watch();
+
+          const p = Promise.all([changeStream.next(), changeStream.hasNext()]);
+          const doc = await MyModel.create({ name: 'Ned Stark' });
+
+          const [changeData] = await p;
+          assert.equal(changeData.operationType, 'insert');
+          assert.equal(changeData.fullDocument._id.toHexString(),
+            doc._id.toHexString());
+        });
+
         it('respects discriminators (gh-11007)', async function() {
           const BaseModel = db.model('Test', new Schema({ name: String }));
           const ChildModel = BaseModel.discriminator('Test1', new Schema({ email: String }));
@@ -5196,7 +5210,7 @@ describe('Model', function() {
           const MyModel = db.model('Test', new Schema({}));
           const changeStream = MyModel.watch();
           const ready = new global.Promise(resolve => {
-            changeStream.once('ready', () => {
+            changeStream.once('data', () => {
               resolve(true);
             });
             setTimeout(resolve, 500, false);
@@ -6810,6 +6824,376 @@ describe('Model', function() {
       await Test.collection.drop().catch(() => {});
     });
 
+    it('createCollection() enforces expireAfterSeconds (gh-11229)', async function() {
+      this.timeout(10000);
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false
+      });
+
+      const Test = db.model('TestGH11229Var1', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection({ expireAfterSeconds: 5 });
+
+      await Test.insertMany([
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T00:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T04:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T16:00:00.000Z'),
+          temp: 16
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T20:00:00.000Z'),
+          temp: 15
+        }, {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T00:00:00.000Z'),
+          temp: 13
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T04:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T16:00:00.000Z'),
+          temp: 17
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T20:00:00.000Z'),
+          temp: 12
+        }
+      ]);
+
+      const beforeExpirationCount = await Test.count({});
+      assert.ok(beforeExpirationCount === 12);
+      await new Promise(resolve => setTimeout(resolve, 6000));
+      const afterExpirationCount = await Test.count({});
+      assert.ok(afterExpirationCount === 0);
+      await Test.collection.drop().catch(() => {});
+    });
+
+    it('createCollection() enforces expires (gh-11229)', async function() {
+      this.timeout(10000);
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false
+      });
+
+      const Test = db.model('TestGH11229Var2', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection({ expires: '5 seconds' });
+
+      await Test.insertMany([
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T00:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T04:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T16:00:00.000Z'),
+          temp: 16
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T20:00:00.000Z'),
+          temp: 15
+        }, {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T00:00:00.000Z'),
+          temp: 13
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T04:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T16:00:00.000Z'),
+          temp: 17
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T20:00:00.000Z'),
+          temp: 12
+        }
+      ]);
+
+      const beforeExpirationCount = await Test.count({});
+      assert.ok(beforeExpirationCount === 12);
+      await new Promise(resolve => setTimeout(resolve, 6000));
+      const afterExpirationCount = await Test.count({});
+      assert.ok(afterExpirationCount === 0);
+      await Test.collection.drop().catch(() => {});
+    });
+
+    it('createCollection() enforces expireAfterSeconds when set by Schema (gh-11229)', async function() {
+      this.timeout(10000);
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false,
+        expireAfterSeconds: 5
+      });
+
+      const Test = db.model('TestGH11229Var3', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection();
+
+      await Test.insertMany([
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T00:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T04:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T16:00:00.000Z'),
+          temp: 16
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T20:00:00.000Z'),
+          temp: 15
+        }, {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T00:00:00.000Z'),
+          temp: 13
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T04:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T16:00:00.000Z'),
+          temp: 17
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T20:00:00.000Z'),
+          temp: 12
+        }
+      ]);
+
+      const beforeExpirationCount = await Test.count({});
+      assert.ok(beforeExpirationCount === 12);
+      await new Promise(resolve => setTimeout(resolve, 6000));
+      const afterExpirationCount = await Test.count({});
+      assert.ok(afterExpirationCount === 0);
+      await Test.collection.drop().catch(() => {});
+    });
+
+    it('createCollection() enforces expires when set by Schema (gh-11229)', async function() {
+      this.timeout(10000);
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false,
+        expires: '5 seconds'
+      });
+
+      const Test = db.model('TestGH11229Var4', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection();
+
+      await Test.insertMany([
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T00:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T04:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T16:00:00.000Z'),
+          temp: 16
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T20:00:00.000Z'),
+          temp: 15
+        }, {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T00:00:00.000Z'),
+          temp: 13
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T04:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T16:00:00.000Z'),
+          temp: 17
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T20:00:00.000Z'),
+          temp: 12
+        }
+      ]);
+
+      const beforeExpirationCount = await Test.count({});
+      assert.ok(beforeExpirationCount === 12);
+      await new Promise(resolve => setTimeout(resolve, 6000));
+      const afterExpirationCount = await Test.count({});
+      assert.ok(afterExpirationCount === 0);
+      await Test.collection.drop().catch(() => {});
+    });
+
     it('createCollection() handles NamespaceExists errors (gh-9447)', async function() {
       const userSchema = new Schema({ name: String });
       const Model = db.model('User', userSchema);
@@ -6895,7 +7279,7 @@ describe('Model', function() {
     Model.events.on('error', err => { called.push(err); });
 
 
-    await Model.findOne({ _id: 'notanid' }).catch(() => {});
+    await Model.findOne({ _id: 'Not a valid ObjectId' }).catch(() => {});
     assert.equal(called.length, 1);
     assert.equal(called[0].name, 'CastError');
 
@@ -8089,6 +8473,53 @@ describe('Model', function() {
 
     assert.equal(doc.filling, 'cherry');
     assert.equal(doc.hoursToMake, null);
+  });
+
+  it('sets index collation based on schema collation (gh-7621)', async function() {
+    let testSchema = new Schema(
+      { name: { type: String, index: true } }
+    );
+    let Test = db.model('Test', testSchema);
+
+    await Test.init();
+
+    let indexes = await Test.collection.listIndexes().toArray();
+    assert.strictEqual(indexes.length, 2);
+    assert.deepEqual(indexes[1].key, { name: 1 });
+    assert.equal(indexes[1].collation, undefined);
+
+    db.deleteModel(/Test/);
+    testSchema = new Schema(
+      { name: { type: String, index: true } },
+      { collation: { locale: 'en' }, autoIndex: false }
+    );
+    Test = db.model('Test', testSchema);
+
+    await Test.init();
+    await Test.syncIndexes();
+
+    indexes = await Test.collection.listIndexes().toArray();
+    assert.strictEqual(indexes.length, 2);
+    assert.deepEqual(indexes[1].key, { name: 1 });
+    assert.strictEqual(indexes[1].collation.locale, 'en');
+  });
+  it('prevents .$* from being put in projections by avoiding drilling down into maps (gh-11698)', async function() {
+    const subSchema = new Schema({
+      selected: { type: Number },
+      not_selected: { type: Number, select: false }
+    });
+
+    const testSchema = new Schema({
+      subdocument_mapping: {
+        type: Map,
+        of: subSchema
+      }
+    });
+
+
+    const Test = db.model('Test', testSchema);
+
+    assert.ok(await Test.find());
   });
 });
 

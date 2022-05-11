@@ -20,7 +20,7 @@ const ParentModel = model<Parent>('Parent', new Schema({
   name: String
 }));
 
-ParentModel.findOne({}).populate('child').orFail().then((doc: Parent & Document) => {
+ParentModel.findOne({}).populate('child').orFail().then((doc: Parent & Document<ObjectId, {}, Parent>) => {
   const child = doc.child;
   if (child == null || child instanceof ObjectId) {
     throw new Error('should be populated');
@@ -119,7 +119,7 @@ function gh11014() {
 
   // Populate with `Paths` generic `{ child: Child }` to override `child` path
   ParentModel.find({})
-    .populate<{child: Child}>('child')
+    .populate<{ child: Child }>('child')
     .orFail()
     .then(parents => {
       parents.map(p => p.child.name);
@@ -161,24 +161,71 @@ function gh11503() {
     blocked: Boolean
   });
 
-  interface User {
+  interface IUser {
     friends: Types.ObjectId[];
   }
-  const UserSchema = new Schema<User>({
+  const userSchema = new Schema<IUser>({
     friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
   });
-  const Users = model<User>('friends', UserSchema);
+  const User = model<IUser>('friends', userSchema);
 
-  Users.findOne({}).populate('friends').then(user => {
-    expectType<Types.ObjectId | undefined>(user?.friends[0]);
+  User.findOne({}).populate('friends').then(user => {
+    if (!user) return;
+    expectType<Types.ObjectId>(user?.friends[0]);
     expectError(user?.friends[0].blocked);
     expectError(user?.friends.map(friend => friend.blocked));
   });
 
-  Users.findOne({}).populate<{friends: Friend[]}>('friends').then(user => {
+  User.findOne({}).populate<{ friends: Friend[] }>('friends').then(user => {
+    if (!user) return;
     expectAssignable<Friend>(user?.friends[0]);
     expectType<boolean>(user?.friends[0].blocked);
     const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
     expectType<boolean>(firstFriendBlockedValue?.blocked);
   });
+}
+
+
+function gh11544() {
+
+  interface IUser {
+    friends: Types.ObjectId[];
+  }
+  const userSchema = new Schema<IUser>({
+    friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
+  });
+  const User = model<IUser>('friends', userSchema);
+
+  User.findOne({}).populate({ path: 'friends', strictPopulate: false });
+  User.findOne({}).populate({ path: 'friends', strictPopulate: true });
+  User.findOne({}).populate({ path: 'friends', populate: { path: 'someNestedPath', strictPopulate: false } });
+}
+
+async function _11532() {
+  interface IParent {
+    name: string;
+    child: Types.ObjectId;
+  }
+  interface IChild {
+    name: string;
+  }
+
+  const parentSchema = new Schema(
+    {
+      name: { type: String, required: true },
+      child: { type: Schema.Types.ObjectId, ref: 'Child', required: true }
+    });
+
+  const parent = model<IParent>('Parent', parentSchema);
+
+  const populateQuery = parent.findOne().populate<{ child: IChild }>('child');
+  const populateResult = await populateQuery;
+  const leanResult = await populateQuery.lean();
+
+  if (!populateResult) return;
+  expectType<string>(populateResult.child.name);
+
+  if (!leanResult) return;
+  expectType<string>(leanResult.child.name);
+  expectError(leanResult?.__v);
 }

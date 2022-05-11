@@ -5,7 +5,7 @@ run().catch(error => {
   process.exit(-1);
 });
 
-async function run () {
+async function run() {
   const ReplSet = require('mongodb-memory-server').MongoMemoryReplSet;
 
   // Create new instance
@@ -15,20 +15,21 @@ async function run () {
     },
     instanceOpts: [
       // Set the expiry job in MongoDB to run every second
-      { 
+      {
         port: 27017,
-        args: ["--setParameter", "ttlMonitorSleepSecs=1"] },
+        args: ['--setParameter', 'ttlMonitorSleepSecs=1']
+      }
     ],
     dbName: 'mongoose_test',
     replSet: {
-      name: "rs0",
+      name: 'rs0',
       count: 2,
-      storageEngine: "wiredTiger",
-    },
+      storageEngine: 'wiredTiger'
+    }
   });
 
   await replSet.start();
   await replSet.waitUntilRunning();
-  console.log("MongoDB-ReplicaSet is now running.")
-  console.log(replSet.getUri("mongoose_test"));
+  console.log('MongoDB-ReplicaSet is now running.');
+  console.log(replSet.getUri('mongoose_test'));
 }

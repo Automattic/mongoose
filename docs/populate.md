@@ -339,6 +339,8 @@ But, if you have a good reason to want an array of child pointers, you
 can `push()` documents onto the array as shown below.
 
 ```javascript
+story1.save()
+
 author.stories.push(story1);
 author.save(callback);
 ```
@@ -491,7 +493,7 @@ storing comments. A user may comment on either a blog post or a product.
 ```javascript
 const commentSchema = new Schema({
   body: { type: String, required: true },
-  on: {
+  modelId: {
     type: Schema.Types.ObjectId,
     required: true,
     // Instead of a hardcoded model name in `ref`, `refPath` means Mongoose
@@ -763,7 +765,7 @@ const Band = mongoose.model('Band', bandSchema);
 This map has a `ref`, which means you can use `populate()` to populate all the ObjectIds
 in the map. Suppose you have the below `band` document:
 
-```
+```javascript
 const person1 = new Person({ name: 'Vince Neil' });
 const person2 = new Person({ name: 'Mick Mars' });
 

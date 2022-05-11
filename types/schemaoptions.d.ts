@@ -1,6 +1,5 @@
-import mongodb = require('mongodb');
-
 declare module 'mongoose' {
+  import mongodb = require('mongodb');
 
   interface SchemaTimestampsConfig {
     createdAt?: boolean | string;
@@ -42,6 +41,12 @@ declare module 'mongoose' {
 
     /** The timeseries option to use when creating the model's collection. */
     timeseries?: mongodb.TimeSeriesCollectionOptions;
+
+    /** The number of seconds after which a document in a timeseries collection expires. */
+    expireAfterSeconds?: number;
+
+    /** The time after which a document in a timeseries collection expires. */
+    expires?: number | string;
 
     /**
      * Mongoose by default produces a collection name by passing the model name to the utils.toCollectionName
@@ -158,7 +163,7 @@ declare module 'mongoose' {
      * incremented even if these paths are updated). DO NOT do this unless you know what you're doing.
      * For subdocuments, include this on the parent document using the fully qualified path.
      */
-    skipVersioning?: {[key: string]: boolean; };
+    skipVersioning?: { [key: string]: boolean; };
     /**
      * Validation errors in a single nested schema are reported
      * both on the child and on the parent schema.
@@ -178,6 +183,6 @@ declare module 'mongoose' {
      * You can suppress the warning by setting { supressReservedKeysWarning: true } schema options. Keep in mind that this
      * can break plugins that rely on these reserved names.
      */
-     supressReservedKeysWarning?: boolean
+    supressReservedKeysWarning?: boolean
   }
 }

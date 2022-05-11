@@ -1,10 +1,15 @@
-import mongodb = require('mongodb');
-
 declare module 'mongoose' {
+  import mongodb = require('mongodb');
 
   /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
   type pathsToSkip = string[] | string;
 
+  /**
+   * Generic types for Document:
+   * *  T - the type of _id
+   * *  TQueryHelpers - Object with any helpers that should be mixed into the Query type
+   * *  DocType - the type of the actual Document created
+   */
   class Document<T = any, TQueryHelpers = any, DocType = any> {
     constructor(doc?: any);
 
@@ -48,6 +53,9 @@ declare module 'mongoose' {
 
     /** Marks a path as valid, removing existing validation errors. */
     $markValid(path: string): void;
+
+    /** Returns the model with the given name on this document's associated connection. */
+    $model<ModelType = Model<unknown>>(name: string): ModelType;
 
     /**
      * A string containing the current operation that Mongoose is executing
@@ -183,10 +191,10 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /** Populates document references. */
-    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this & Paths>): void;
-    populate<Paths = {}>(path: string, names: string, callback: Callback<this & Paths>): void;
-    populate<Paths = {}>(path: string, names: string): Promise<this & Paths>;
     populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<this & Paths>;
+    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<this & Paths>): void;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<unknown>, match?: AnyObject, options?: PopulateOptions): Promise<this & Paths>;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<unknown>, match?: AnyObject, options?: PopulateOptions, callback?: Callback<this & Paths>): void;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
@@ -213,13 +221,11 @@ declare module 'mongoose' {
     set(value: any): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON(options: ToObjectOptions & { flattenMaps: false }): LeanDocument<this>;
-    toJSON(options?: ToObjectOptions): FlattenMaps<LeanDocument<this>>;
-    toJSON<T = FlattenMaps<DocType>>(options?: ToObjectOptions): T;
+    toJSON<T = LeanDocument<DocType>>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<T>;
+    toJSON<T = LeanDocument<DocType>>(options: ToObjectOptions & { flattenMaps: false }): T;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject(options?: ToObjectOptions): LeanDocument<this>;
-    toObject<T = DocType>(options?: ToObjectOptions): T;
+    toObject<T = LeanDocument<DocType>>(options?: ToObjectOptions): Require_id<T>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string): void;
@@ -239,6 +245,6 @@ declare module 'mongoose' {
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
     validateSync(options: { pathsToSkip?: pathsToSkip, [k: string]: any }): Error.ValidationError | null;
-    validateSync(pathsToValidate?: Array<string>, options?: AnyObject): Error.ValidationError | null;
+    validateSync(pathsToValidate?: pathsToValidate, options?: AnyObject): Error.ValidationError | null;
   }
 }

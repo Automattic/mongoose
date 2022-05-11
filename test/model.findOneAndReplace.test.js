@@ -355,7 +355,6 @@ describe('model: findOneAndReplace:', function() {
     const schema = new Schema({ name: String, age: Number });
     const Model = db.model('Test', schema);
 
-
     await Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, { upsert: true });
 
     const doc = await Model.findOne();
@@ -411,5 +410,27 @@ describe('model: findOneAndReplace:', function() {
       then(() => null, err => err);
 
     assert.ifError(err);
+  });
+
+  it('skips validation if `runValidators` === false (gh-11559)', async function() {
+    const testSchema = new Schema({
+      name: {
+        type: String,
+        required: true // you had a typo here
+      }
+    });
+    const Test = db.model('Test', testSchema);
+    const entry = await Test.create({
+      name: 'Test'
+    });
+
+    await Test.findOneAndReplace(
+      { name: 'Test' },
+      {}, // this part is key, I am trying to replace without required fields
+      { runValidators: false }
+    );
+
+    const doc = await Test.findById(entry);
+    assert.strictEqual(doc.name, undefined);
   });
 });

@@ -101,4 +101,11 @@ describe('castexpr', function() {
     res.$in[0] = res.$in[0].toBSON(); // So `deepStrictEqual()` doesn't complain about subdoc internals
     assert.deepStrictEqual(res, { $in: [{ prop: 42 }, '$docs'] });
   });
+
+  it('casts $not (gh-11689)', function() {
+    const testSchema = new Schema({ nums: [Number], docs: [new Schema({ prop: Number }, { _id: false })] });
+
+    const res = cast$expr({ $not: { $in: ['42', '$nums'] } }, testSchema);
+    assert.deepStrictEqual(res, { $not: { $in: [42, '$nums'] } });
+  });
 });

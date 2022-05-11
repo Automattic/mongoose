@@ -74,6 +74,9 @@ html(lang='en')
                   a.pure-menu-link(href="/docs/tutorials/ssl.html", class=outputUrl === '/docs/tutorials/ssl.html' ? 'selected' : '') SSL Connections
               li.pure-menu-item.sub-item
                 a.pure-menu-link(href="/docs/models.html", class=outputUrl === '/docs/models.html' ? 'selected' : '') Models
+              - if (['/docs/models', '/docs/change-streams'].some(path => outputUrl.startsWith(path)))
+                li.pure-menu-item.tertiary-item
+                  a.pure-menu-link(href="/docs/change-streams.html", class=outputUrl === '/docs/change-streams.html' ? 'selected' : '') Change Streams
               li.pure-menu-item.sub-item
                 a.pure-menu-link(href="/docs/documents.html", class=outputUrl === '/docs/documents.html' ? 'selected' : '') Documents
               li.pure-menu-item.sub-item
@@ -107,7 +110,7 @@ html(lang='en')
                 li.pure-menu-item.tertiary-item
                   a.pure-menu-link(href="/docs/typescript/schemas.html", class=outputUrl === '/docs/typescript/schemas.html' ? 'selected' : '') Schemas
                 li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href="/docs/typescript/statics.html", class=outputUrl === '/docs/typescript/statics.html' ? 'selected' : '') Statics
+                  a.pure-menu-link(href="/docs/typescript/statics-and-methods.html", class=outputUrl === '/docs/typescript/statics-and-methods.html' ? 'selected' : '') Statics
                 li.pure-menu-item.tertiary-item
                   a.pure-menu-link(href="/docs/typescript/query-helpers.html", class=outputUrl === '/docs/typescript/query-helpers.html' ? 'selected' : '') Query Helpers
                 li.pure-menu-item.tertiary-item

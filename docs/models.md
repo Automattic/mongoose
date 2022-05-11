@@ -142,7 +142,7 @@ async function run() {
 
 The output from the above [async function](http://thecodebarbarian.com/80-20-guide-to-async-await-in-node.js.html) will look like what you see below.
 
-```
+```no-highlight
 2018-05-11T15:05:35.467Z 'Inserting doc'
 2018-05-11T15:05:35.487Z 'Inserted doc'
 2018-05-11T15:05:35.491Z { _id: { _data: ... },

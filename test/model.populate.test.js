@@ -7238,7 +7238,6 @@ describe('model: populate:', function() {
       });
 
       it('document, and subdocuments are not lean by default', async function() {
-
         const user = await db.model('User').findOne().populate({
           path: 'roomId',
           populate: {
@@ -7252,7 +7251,6 @@ describe('model: populate:', function() {
       });
 
       it('.lean() makes query result, and all populated fields lean', async function() {
-
         const user = await db.model('User').findOne().
           populate({
             path: 'roomId',
@@ -9487,6 +9485,45 @@ describe('model: populate:', function() {
       });
     });
 
+    it('recursive virtuals with `populate` option (gh-11700)', async function() {
+      const InteractionSchema = new Schema({
+        title: String,
+        parent: {
+          type: mongoose.ObjectId,
+          ref: 'Interaction'
+        }
+      });
+
+      InteractionSchema.virtual('next', {
+        ref: 'Interaction',
+        localField: '_id',
+        foreignField: 'parent',
+        justOne: true,
+        options: {
+          populate: 'next'
+        }
+      });
+
+      const Interaction = db.model('Interaction', InteractionSchema);
+
+      const interactionA = new Interaction({ title: 'first interaction' });
+      await interactionA.save();
+
+      const interactionB = new Interaction({ title: 'second interaction', parent: interactionA._id });
+      await interactionB.save();
+
+      const interactionC = new Interaction({ title: 'third interaction', parent: interactionB._id });
+      await interactionC.save();
+
+      const interaction = await Interaction.findOne({ parent: null }).populate('next');
+
+      assert.equal(interaction.title, interactionA.title);
+      assert.notEqual(interaction.next, undefined);
+      assert.equal(interaction.next.title, interactionB.title);
+      assert.notEqual(interaction.next.next, undefined);
+      assert.equal(interaction.next.next.title, interactionC.title);
+    });
+
     it('no-op if populating on a document array with no ref (gh-8946)', async function() {
       const teamSchema = Schema({
         members: [{ user: { type: ObjectId, ref: 'User' } }]
@@ -10581,6 +10618,37 @@ describe('model: populate:', function() {
     fromDb = await BlogPost.findById(doc);
     assert.strictEqual(fromDb.author.email, undefined);
     assert.equal(fromDb.author.name, 'John Smithe');
+  });
+
+  it('no-op when populating a single nested subdoc underneath a doc array with no ref (gh-11538) (gh-10856)', async function() {
+    const userSchema = Schema({ _id: Number, name: String, email: String, friends: [{ type: Number, ref: 'User' }] });
+    const blogPostSchema = Schema({
+      title: String,
+      people: [{
+        author: {
+          type: new Schema({ _id: Number, name: String, friends: [{ type: Number, ref: 'User' }] })
+          // ref: 'User'
+        }
+      }]
+    });
+
+    const User = db.model('User', userSchema);
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+
+    await User.create({ _id: 2, name: 'Test', email: 'test@gmail.com' });
+    await User.create({ _id: 1, name: 'John Smith', email: 'test@gmail.com', friends: [2] });
+    await BlogPost.create({
+      title: 'Introduction to Mongoose',
+      people: [{
+        author: { _id: 1, name: 'John Smith', friends: [2] }
+      }]
+    });
+
+    const doc = await BlogPost.findOne().populate({
+      path: 'people',
+      populate: [{ path: 'author', populate: 'friends' }]
+    });
+    assert.strictEqual(doc.people[0].author.email, undefined);
   });
 
   it('supports ref on array containing subdocuments (gh-10856)', async function() {

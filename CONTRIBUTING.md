@@ -53,11 +53,9 @@ To contribute to the [guide](http://mongoosejs.com/docs/guide.html) or [quick st
 If you'd like to preview your documentation changes, first commit your changes to your local master branch, then execute:
 
 * `npm install`
-* `make docclean`
-* `make gendocs`
-* `node static.js`
+* `npm run docs:view`
 
-Visit `http://localhost:8089` and you should see the docs with your local changes. Make sure you `git reset --hard` before committing, because changes to `docs/*` should **not** be in PRs.
+Visit `http://localhost:8089` and you should see the docs with your local changes. Make sure you `npm run docs:clean` before committing, because automated generated files to `docs/*` should **not** be in PRs.
 
 ### Plugins website
 

@@ -6332,7 +6332,6 @@ describe('document', function() {
       });
       const Model = db.model('Test', schema);
 
-
       await Model.create({
         roles: [
           { name: 'admin' },
@@ -11285,11 +11284,45 @@ describe('document', function() {
         name: 'lvl2',
         list: [{
           name: 'lvl3'
-          // list: [{
-          //   name: 'lvl4'
-          // }]
         }]
       }]
     });
+  });
+
+  it('reruns validation when modifying a document array path under a nested path after save (gh-11672)', async function() {
+    const ChildSchema = new Schema({
+      price: {
+        type: Number,
+        validate: function(val) {
+          return val > 0;
+        }
+      }
+    });
+
+    const ParentSchema = new Schema({
+      rootField: { nestedSubdocArray: [ChildSchema] }
+    });
+    const Test = db.model('Test', ParentSchema);
+
+    const parentDoc = new Test({
+      rootField: {
+        nestedSubdocArray: [
+          {
+            price: 1
+          }
+        ]
+      }
+    });
+
+    await parentDoc.save();
+
+    // Now we try editing to an invalid value which should throw
+    parentDoc.rootField.nestedSubdocArray[0].price = -1;
+    const err = await parentDoc.save().then(() => null, err => err);
+
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    assert.ok(err.message.includes('failed for path'), err.message);
+    assert.ok(err.message.includes('value `-1`'), err.message);
   });
 });

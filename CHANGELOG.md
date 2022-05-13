@@ -1,3 +1,28 @@
+6.3.3 / 2022-05-09
+==================
+ * perf: avoid leaking memory when using populate() with QueryCursor because of reusing populate options with `_docs` #11641
+ * fix(types): add `_id` back for LeanDocument #11769 #11761 [taxilian](https://github.com/taxilian)
+ * fix(model): add skipValidation option for bulkWrite() to allow skipping validation for `insertOne` and `replaceOne` #11663
+ * fix(document): correctly $__reset() subdocuments that are under nested paths #11672
+ * fix(query): handle casting BSONRegExp instances as RegExps in queries #11597
+ * fix: correctly cast $not in $expr #11689
+ * perf: optimize size of browser bundle, use buffer v.5.7.1 package to match buffer package of mongodb in browser bundle #11765 [Uzlopak](https://github.com/Uzlopak)
+ * docs: Query.populate docs do not include using an array of strings for the path param #11768 #11641 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * chore: add GitHub workflow to close stale "can't reproduce", "help", "needs clarification" issues #11753 [Uzlopak](https://github.com/Uzlopak)
+ * chore: remove Makefile dependency for compiling docs #11751 [Uzlopak](https://github.com/Uzlopak)
+
+6.3.2 / 2022-05-02
+==================
+ * perf: avoid registering event listeners on subdocuments to reduce memory usage #11541
+ * fix(setDefaultsOnInsert): set default if sibling of nested path is $set #11668
+ * perf(document): remove unnecessary workaround for ignoring subpaths of arrays #11541
+ * fix(types): various fixes and improvements for types #11650 [taxilian](https://github.com/taxilian)
+ * fix(types): make mongoose typings work without esmModuleInterop true #11695 [Uzlopak](https://github.com/Uzlopak)
+ * fix(types): support populate(path, fields, model) syntax #11649 #11598 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+ * fix(types): correct SchemaTypeOptions.get function signature #11561
+ * fix: fix browser build for Webpack 5 #11717
+ * docs: improve readme #11705 [mahendrap1512](https://github.com/mahendrap1512)
+
 6.3.1 / 2022-04-21
 ==================
  * perf: improve perf of key order #11639 [Uzlopak](https://github.com/Uzlopak)

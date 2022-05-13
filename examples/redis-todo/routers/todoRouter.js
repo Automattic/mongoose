@@ -42,7 +42,7 @@ Router.post('/create', auth, clearCache, async function({ userId, body }, res) {
 Router.post('/update', auth, async function({ userId, body }, res) {
   try {
     const updatedTodo = await Todo.findOneAndUpdate({ $and: [{ userId }, { _id: body.todoId }] },
-      { ...body }, { new: true }
+      { ...body }, { new: true, sanitizeFilter: true }
     );
     if (!updatedTodo) return res.status(404).send({ msg: 'Todo not found' });
 

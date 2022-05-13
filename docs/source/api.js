@@ -6,8 +6,6 @@
 
 const dox = require('dox');
 const fs = require('fs');
-const link = require('../helpers/linktype');
-const hl = require('highlight.js');
 const md = require('marked');
 
 const files = [
@@ -203,16 +201,4 @@ function parse() {
 
     out.push(data);
   }
-}
-
-function highlight(str) {
-  return str.replace(/(<pre><code>)([^<]+)(<\/code)/gm, function(_, $1, $2, $3) {
-    const code = /^(?:`{3}([^\n]+)\n)?([\s\S]*)/gm.exec($2);
-
-    if ('js' === code[1] || !code[1]) {
-      code[1] = 'javascript';
-    }
-
-    return $1 + hl.highlight(code[2], { language: code[1] }).value.trim() + $3;
-  });
 }

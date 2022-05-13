@@ -3962,4 +3962,16 @@ describe('Query', function() {
     assert.equal(result.length, 1);
     assert.equal(result[0].name, '@foo.com');
   });
+  it('allows a transform option for lean on a query gh-10423', async function() {
+    const testSchema = new mongoose.Schema({
+      name: String
+    });
+    const Test = db.model('gh10423', testSchema);
+    await Test.create({name: 'foo'});
+    const result = await Test.findOne().lean({ transform: (doc, ret) => {
+      delete ret._id;
+      return ret;
+    }});
+    assert.equal(result._id, undefined);
+  });
 });

@@ -1132,13 +1132,13 @@ describe('connections:', function() {
 
   describe('Connection#syncIndexes() (gh-10893) (gh-11039)', () => {
     let connection;
-    // this.beforeEach(async() => {
-    //   const mongooseInstance = new mongoose.Mongoose();
-    //   connection = mongooseInstance.createConnection(start.uri);
-    // });
-    // this.afterEach(async() => {
-    //   await connection.dropDatabase();
-    // });
+    this.beforeEach(async() => {
+      const mongooseInstance = new mongoose.Mongoose();
+      connection = mongooseInstance.createConnection(start.uri);
+    });
+    this.afterEach(async() => {
+      await connection.dropDatabase();
+    });
     it('Allows a syncIndexes option with connection mongoose.connection.syncIndexes (gh-10893)', async function() {
       const coll = 'tests2';
 

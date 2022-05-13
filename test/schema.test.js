@@ -2767,7 +2767,7 @@ describe('schema', function() {
     const testSchema = new mongoose.Schema({
       on: String
     });
-    const Test = db.model('Test', testSchema)
+    const Test = db.model('gh11580', testSchema)
     await Test.create({
       on: 'Test'
     });

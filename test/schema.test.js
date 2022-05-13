@@ -2763,17 +2763,17 @@ describe('schema', function() {
     });
     assert(batch.message);
   });
-  it('can use on as a schema property (gh-11580)', async () => {
+  it('can use on as a schema property (gh-11580)', async() => {
     const testSchema = new mongoose.Schema({
       on: String
     });
-    const Test = db.model('gh11580', testSchema)
+    const Test = db.model('gh11580', testSchema);
     await Test.create({
       on: 'Test'
     });
-    const result = await Test.findOne()
+    const result = await Test.findOne();
     assert.ok(result);
     assert.ok(result.on);
 
-  })
+  });
 });

@@ -11350,4 +11350,27 @@ describe('document', function() {
     assert.strictEqual(doc.nested.count, undefined);
     assert.strictEqual(doc.nestedSchema.count, undefined);
   });
+
+  it('cleans modified subpaths when setting nested path under array to null when subpaths are modified (gh-11764)', async function() {
+    const Test = db.model('Test', new Schema({
+      list: [{
+        quantity: {
+          value: Number,
+          unit: String
+        }
+      }]
+    }));
+
+    let doc = await Test.create({ list: [{ quantity: { value: 1, unit: 'case' } }] });
+
+    doc = await Test.findById(doc);
+    doc.list[0].quantity.value = null;
+    doc.list[0].quantity.unit = null;
+    doc.list[0].quantity = null;
+
+    await doc.save();
+
+    doc = await Test.findById(doc);
+    assert.strictEqual(doc.list[0].toObject().quantity, null);
+  });
 });

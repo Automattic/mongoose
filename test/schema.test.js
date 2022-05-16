@@ -2763,6 +2763,7 @@ describe('schema', function() {
     });
     assert(batch.message);
   });
+
   it('can use on as a schema property (gh-11580)', async() => {
     const testSchema = new mongoose.Schema({
       on: String
@@ -2774,6 +2775,21 @@ describe('schema', function() {
     const result = await Test.findOne();
     assert.ok(result);
     assert.ok(result.on);
+  });
 
+  it('disallows using schemas with schema-level projections with map subdocuments (gh-11698)', async function() {
+    const subSchema = new Schema({
+      selected: { type: Number },
+      not_selected: { type: Number, select: false }
+    });
+
+    assert.throws(() => {
+      new Schema({
+        subdocument_mapping: {
+          type: Map,
+          of: subSchema
+        }
+      });
+    }, /Cannot use schema-level projections.*subdocument_mapping.not_selected/);
   });
 });

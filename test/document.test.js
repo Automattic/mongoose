@@ -11325,4 +11325,52 @@ describe('document', function() {
     assert.ok(err.message.includes('failed for path'), err.message);
     assert.ok(err.message.includes('value `-1`'), err.message);
   });
+
+  it('avoids setting nested paths to null when they are set to `undefined` (gh-11723)', async function() {
+    const nestedSchema = new mongoose.Schema({
+      count: Number
+    }, { _id: false });
+
+    const mySchema = new mongoose.Schema({
+      name: String,
+      nested: { count: Number },
+      nestedSchema: nestedSchema
+    }, { minimize: false });
+
+    const Test = db.model('Test', mySchema);
+
+    const instance1 = new Test({ name: 'test1', nested: { count: 1 }, nestedSchema: { count: 1 } });
+    await instance1.save();
+
+    const update = { nested: { count: undefined }, nestedSchema: { count: undefined } };
+    instance1.set(update);
+    await instance1.save();
+
+    const doc = await Test.findById(instance1);
+    assert.strictEqual(doc.nested.count, undefined);
+    assert.strictEqual(doc.nestedSchema.count, undefined);
+  });
+
+  it('cleans modified subpaths when setting nested path under array to null when subpaths are modified (gh-11764)', async function() {
+    const Test = db.model('Test', new Schema({
+      list: [{
+        quantity: {
+          value: Number,
+          unit: String
+        }
+      }]
+    }));
+
+    let doc = await Test.create({ list: [{ quantity: { value: 1, unit: 'case' } }] });
+
+    doc = await Test.findById(doc);
+    doc.list[0].quantity.value = null;
+    doc.list[0].quantity.unit = null;
+    doc.list[0].quantity = null;
+
+    await doc.save();
+
+    doc = await Test.findById(doc);
+    assert.strictEqual(doc.list[0].toObject().quantity, null);
+  });
 });

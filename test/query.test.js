@@ -3963,15 +3963,35 @@ describe('Query', function() {
     assert.equal(result[0].name, '@foo.com');
   });
   it('allows a transform option for lean on a query gh-10423', async function() {
+    const arraySchema = new mongoose.Schema({
+      sub: String
+    });
+    const subDoc = new mongoose.Schema({
+      nickName: String
+    });
     const testSchema = new mongoose.Schema({
-      name: String
+      name: String,
+      foo: [arraySchema],
+      otherName: subDoc
     });
     const Test = db.model('gh10423', testSchema);
-    await Test.create({name: 'foo'});
-    const result = await Test.findOne().lean({ transform: (doc, ret) => {
+    await Test.create({ name: 'foo', foo: [{ sub: 'Test' }, { sub: 'Testerson' }], otherName: { nickName: 'Bar' } });
+    /*
+    const result = await Test.find().lean({ transform: (doc, ret) => {
       delete ret._id;
       return ret;
-    }});
-    assert.equal(result._id, undefined);
+    } });
+    console.log('The result', result);
+    assert.equal(result[0]._id, undefined);
+    */
+    const single = await Test.findOne().lean({ transform: (doc, ret) => {
+      delete ret._id;
+      return ret;
+    } });
+    console.log('The single document', single);
+    assert.equal(single._id, undefined);
+    assert.equal(single.otherName._id, undefined);
+    assert.equal(single.foo[0]._id, undefined);
+    assert.equal(single.foo[0]._id, undefined);
   });
 });

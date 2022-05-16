@@ -5189,7 +5189,7 @@ describe('Model', function() {
         it('watch() before connecting (gh-5964)', async function() {
           const db = start();
 
-          const MyModel = db.model('Test', new Schema({ name: String }));
+          const MyModel = db.model('Test5964', new Schema({ name: String }));
 
           // Synchronous, before connection happens
           const changeStream = MyModel.watch();

@@ -3976,19 +3976,18 @@ describe('Query', function() {
     });
     const Test = db.model('gh10423', testSchema);
     await Test.create({ name: 'foo', foo: [{ sub: 'Test' }, { sub: 'Testerson' }], otherName: { nickName: 'Bar' } });
-    /*
     const result = await Test.find().lean({ transform: (doc, ret) => {
       delete ret._id;
       return ret;
     } });
-    console.log('The result', result);
     assert.equal(result[0]._id, undefined);
-    */
+    assert.equal(result[0].otherName._id, undefined);
+    assert.equal(result[0].foo[0]._id, undefined);
+    assert.equal(result[0].foo[1]._id, undefined);
     const single = await Test.findOne().lean({ transform: (doc, ret) => {
       delete ret._id;
       return ret;
     } });
-    console.log('The single document', single);
     assert.equal(single._id, undefined);
     assert.equal(single.otherName._id, undefined);
     assert.equal(single.foo[0]._id, undefined);

@@ -8505,7 +8505,7 @@ describe('Model', function() {
   });
 });
 
-describe('Check if statics function that is supplied in schema option is availabe', function() {
+describe('Check if static function that is supplied in schema option is available', function() {
   it('should give a static function back rather than undefined', function ModelJS() {
     const testSchema = new mongoose.Schema({}, { statics: { staticFn() { return 'Returned from staticFn'; } } });
     const TestModel = mongoose.model('TestModel', testSchema);

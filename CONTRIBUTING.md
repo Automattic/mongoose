@@ -43,7 +43,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
   - any mocha flags can be specified with `-- <mocha flags here>`
   - For example, you can use `npm test -- -R spec` to use the spec reporter, rather than the dot reporter (by default, the test output looks like a bunch of dots)
   - execute `npm run test-tsd` to run the typescript tests
-  - execute `npm run ts-benchmark` to run the typescript benchmark "performance test" for one singel time.
+  - execute `npm run ts-benchmark` to run the typescript benchmark "performance test" for a single time.
   - execute `npm run ts-benchmark-watch` to run the typescript benchmark "performance test" while watching changes on types folder. Note: Make sure to commit all changes before executing this command.
 
 ### Documentation

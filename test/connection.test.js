@@ -372,10 +372,8 @@ describe('connections:', function() {
     conn.useDb('test-db');
 
     const totalConn = mongoose.connections.length;
-    console.log('Total open connections before close are --> ', totalConn);
 
     conn.destroy(() => {
-      console.log('Total open connections after close are --> ', mongoose.connections.length);
       assert.equal(mongoose.connections.length, totalConn - 1);
       stub.restore();
       done();

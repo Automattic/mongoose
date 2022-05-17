@@ -38,6 +38,7 @@ expectType<void>(conn.dropCollection('some', () => {
 
 expectError(conn.deleteModel());
 expectType<Connection>(conn.deleteModel('something'));
+expectType<Connection>(conn.deleteModel(/.+/));
 
 expectType<Array<string>>(conn.modelNames());
 

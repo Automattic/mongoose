@@ -32,28 +32,10 @@ body:
   - type: input
     id: mongo-version
     attributes:
-      label: MongoDB version
+      label: MongoDB server version
       placeholder: 5.x
     validations:
       required: true
-
-  - type: dropdown
-    id: os
-    attributes:
-      label: Operating system
-      options:
-        - Linux
-        - macOS
-        - Windows
-    validations:
-      required: false
-
-  - type: input
-    id: os-version
-    attributes:
-      label: Operating system version (i.e. 20.04, 11.3, 10)
-    validations:
-      required: false
 
   - type: textarea
     id: description

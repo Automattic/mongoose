@@ -163,7 +163,7 @@ describe('discriminator docs', function() {
    * If a custom _id field is set on the base schema, that will always
    * override the discriminator's _id field, as shown below.
    */
-  it('Handling custom _id fields', function(done) {
+  it('Handling custom _id fields', function() {
     const options = { discriminatorKey: 'kind' };
 
     // Base schema has a custom String `_id` and a Date `time`...
@@ -187,17 +187,13 @@ describe('discriminator docs', function() {
     // the `_id` path.
     assert.strictEqual(typeof event1._id, 'string');
     assert.strictEqual(typeof event1.time, 'string');
-
-    // acquit:ignore:start
-    done();
-    // acquit:ignore:end
   });
 
   /**
    * When you use `Model.create()`, mongoose will pull the correct type from
    * the discriminator key for you.
    */
-  it('Using discriminators with `Model.create()`', function(done) {
+  it('Using discriminators with `Model.create()`', async function() {
     const Schema = mongoose.Schema;
     const shapeSchema = new Schema({
       name: String
@@ -210,22 +206,17 @@ describe('discriminator docs', function() {
     const Square = Shape.discriminator('Square',
       new Schema({ side: Number }));
 
-    const shapes = [
+    const shapes = await Shape.create([
       { name: 'Test' },
       { kind: 'Circle', radius: 5 },
       { kind: 'Square', side: 10 }
-    ];
-    Shape.create(shapes, function(error, shapes) {
-      assert.ifError(error);
-      assert.ok(shapes[0] instanceof Shape);
-      assert.ok(shapes[1] instanceof Circle);
-      assert.equal(shapes[1].radius, 5);
-      assert.ok(shapes[2] instanceof Square);
-      assert.equal(shapes[2].side, 10);
-      // acquit:ignore:start
-      done();
-      // acquit:ignore:end
-    });
+    ]);
+
+    assert.ok(shapes[0] instanceof Shape);
+    assert.ok(shapes[1] instanceof Circle);
+    assert.equal(shapes[1].radius, 5);
+    assert.ok(shapes[2] instanceof Square);
+    assert.equal(shapes[2].side, 10);
   });
 
   /**
@@ -239,7 +230,7 @@ describe('discriminator docs', function() {
    * schemas **before** you use them. You should **not** call `pre()` or
    * `post()` after calling `discriminator()`
    */
-  it('Embedded discriminators in arrays', function(done) {
+  it('Embedded discriminators in arrays', async function() {
     const eventSchema = new Schema({ message: String },
       { discriminatorKey: 'kind', _id: false });
 
@@ -271,37 +262,31 @@ describe('discriminator docs', function() {
     const Batch = db.model('EventBatch', batchSchema);
 
     // Create a new batch of events with different kinds
-    const batch = {
+    const doc = await Batch.create({
       events: [
         { kind: 'Clicked', element: '#hero', message: 'hello' },
         { kind: 'Purchased', product: 'action-figure-1', message: 'world' }
       ]
-    };
+    });
 
-    Batch.create(batch).
-      then(function(doc) {
-        assert.equal(doc.events.length, 2);
+    assert.equal(doc.events.length, 2);
 
-        assert.equal(doc.events[0].element, '#hero');
-        assert.equal(doc.events[0].message, 'hello');
-        assert.ok(doc.events[0] instanceof Clicked);
+    assert.equal(doc.events[0].element, '#hero');
+    assert.equal(doc.events[0].message, 'hello');
+    assert.ok(doc.events[0] instanceof Clicked);
 
-        assert.equal(doc.events[1].product, 'action-figure-1');
-        assert.equal(doc.events[1].message, 'world');
-        assert.ok(doc.events[1] instanceof Purchased);
+    assert.equal(doc.events[1].product, 'action-figure-1');
+    assert.equal(doc.events[1].message, 'world');
+    assert.ok(doc.events[1] instanceof Purchased);
 
-        doc.events.push({ kind: 'Purchased', product: 'action-figure-2' });
-        return doc.save();
-      }).
-      then(function(doc) {
-        assert.equal(doc.events.length, 3);
+    doc.events.push({ kind: 'Purchased', product: 'action-figure-2' });
 
-        assert.equal(doc.events[2].product, 'action-figure-2');
-        assert.ok(doc.events[2] instanceof Purchased);
+    await doc.save();
 
-        done();
-      }).
-      catch(done);
+    assert.equal(doc.events.length, 3);
+
+    assert.equal(doc.events[2].product, 'action-figure-2');
+    assert.ok(doc.events[2] instanceof Purchased);
   });
 
   /**
@@ -311,7 +296,7 @@ describe('discriminator docs', function() {
    * embedded discriminator.
    */
 
-  it('Recursive embedded discriminators in arrays', function(done) {
+  it('Recursive embedded discriminators in arrays', async function() {
     const singleEventSchema = new Schema({ message: String },
       { discriminatorKey: 'kind', _id: false });
 
@@ -331,37 +316,31 @@ describe('discriminator docs', function() {
     const Eventlist = db.model('EventList', eventListSchema);
 
     // Create a new batch of events with different kinds
-    const list = {
+    const doc = await Eventlist.create({
       events: [
         { kind: 'SubEvent', sub_events: [{ kind: 'SubEvent', sub_events: [], message: 'test1' }], message: 'hello' },
         { kind: 'SubEvent', sub_events: [{ kind: 'SubEvent', sub_events: [{ kind: 'SubEvent', sub_events: [], message: 'test3' }], message: 'test2' }], message: 'world' }
       ]
-    };
+    });
 
-    Eventlist.create(list).
-      then(function(doc) {
-        assert.equal(doc.events.length, 2);
+    assert.equal(doc.events.length, 2);
 
-        assert.equal(doc.events[0].sub_events[0].message, 'test1');
-        assert.equal(doc.events[0].message, 'hello');
-        assert.ok(doc.events[0].sub_events[0] instanceof SubEvent);
+    assert.equal(doc.events[0].sub_events[0].message, 'test1');
+    assert.equal(doc.events[0].message, 'hello');
+    assert.ok(doc.events[0].sub_events[0] instanceof SubEvent);
 
-        assert.equal(doc.events[1].sub_events[0].sub_events[0].message, 'test3');
-        assert.equal(doc.events[1].message, 'world');
-        assert.ok(doc.events[1].sub_events[0].sub_events[0] instanceof SubEvent);
+    assert.equal(doc.events[1].sub_events[0].sub_events[0].message, 'test3');
+    assert.equal(doc.events[1].message, 'world');
+    assert.ok(doc.events[1].sub_events[0].sub_events[0] instanceof SubEvent);
 
-        doc.events.push({ kind: 'SubEvent', sub_events: [{ kind: 'SubEvent', sub_events: [], message: 'test4' }], message: 'pushed' });
-        return doc.save();
-      }).
-      then(function(doc) {
-        assert.equal(doc.events.length, 3);
+    doc.events.push({ kind: 'SubEvent', sub_events: [{ kind: 'SubEvent', sub_events: [], message: 'test4' }], message: 'pushed' });
 
-        assert.equal(doc.events[2].message, 'pushed');
-        assert.ok(doc.events[2].sub_events[0] instanceof SubEvent);
+    await doc.save();
 
-        done();
-      }).
-      catch(done);
+    assert.equal(doc.events.length, 3);
+
+    assert.equal(doc.events[2].message, 'pushed');
+    assert.ok(doc.events[2].sub_events[0] instanceof SubEvent);
   });
 
   /**

@@ -291,7 +291,7 @@ If you were to `populate()` using the `limit` option, you
 would find that the 2nd story has 0 fans:
 
 ```javascript
-const stories = Story.find().populate({
+const stories = await Story.find().populate({
   path: 'fans',
   options: { limit: 2 }
 });

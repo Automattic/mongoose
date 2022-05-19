@@ -72,7 +72,7 @@ declare module 'mongoose' {
        * use this function to clean up any models you created in your tests to
        * prevent OverwriteModelErrors.
        */
-    deleteModel(name: string): this;
+    deleteModel(name: string | RegExp): this;
 
     /**
        * Helper for `dropCollection()`. Will delete the given collection, including

@@ -11,7 +11,7 @@ const childSchema: Schema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
 interface Parent {
-  child?: PopulatedDoc<Child & Document<ObjectId>>,
+  child: PopulatedDoc<Document<ObjectId> & Child>,
   name?: string
 }
 
@@ -20,7 +20,7 @@ const ParentModel = model<Parent>('Parent', new Schema({
   name: String
 }));
 
-ParentModel.findOne({}).populate('child').orFail().then((doc: Parent & Document<ObjectId, {}, Parent>) => {
+ParentModel.findOne({}).populate('child').orFail().then((doc: Document<ObjectId, {}, Parent> & Parent) => {
   const child = doc.child;
   if (child == null || child instanceof ObjectId) {
     throw new Error('should be populated');

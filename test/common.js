@@ -159,14 +159,10 @@ module.exports.mongodVersion = async function() {
   });
 };
 
-function dropDBs(done) {
-  const db = module.exports({ noErrorListener: true });
-  db.once('open', function() {
-    // drop the default test database
-    db.db.dropDatabase(function() {
-      done();
-    });
-  });
+async function dropDBs() {
+  const db = await module.exports({ noErrorListener: true }).asPromise();
+  await db.dropDatabase();
+  await db.close();
 }
 
 before(async function() {
@@ -186,17 +182,9 @@ before(async function() {
   }
 });
 
-before(function(done) {
-  this.timeout(60 * 1000);
-  dropDBs(done);
-});
+before(dropDBs);
 
-after(function(done) {
-  dropDBs(() => {});
-
-  // Give `dropDatabase()` some time to run
-  setTimeout(() => done(), 250);
-});
+after(dropDBs);
 
 beforeEach(function() {
   if (this.currentTest) {

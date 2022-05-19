@@ -28,7 +28,7 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.6.5",
-    "redis": "^2.8.0"
+    "redis": "^4.1.0"
   },
   "devDependencies": {
     "morgan": "^1.9.1",

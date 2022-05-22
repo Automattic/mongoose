@@ -1035,6 +1035,25 @@ describe('document', function() {
       assert.ok(posts[0].postedBy._id);
     });
 
+    it('handles infinite recursion (gh-11756)', function() {
+      const User = db.model('User', Schema({
+        name: { type: String, required: true },
+        posts: [{ type: mongoose.Types.ObjectId, ref: 'Post' }]
+      }));
+
+      const Post = db.model('Post', Schema({
+        creator: { type: Schema.Types.ObjectId, ref: 'User' }
+      }));
+
+      const user = new User({ name: 'Test', posts: [] });
+      const post = new Post({ creator: user });
+      user.posts.push(post);
+
+      const inspected = post.inspect();
+      assert.ok(inspected);
+      assert.equal(inspected.creator.posts[0].creator.name, 'Test');
+    });
+
     it('populate on nested path (gh-5703)', function() {
       const toySchema = new mongoose.Schema({ color: String });
       const Toy = db.model('Cat', toySchema);

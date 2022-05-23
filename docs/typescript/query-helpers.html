@@ -49,21 +49,23 @@ Below is an example of creating a <code>ProjectModel</code> with a <code>byName<
   <span class="hljs-attr">stars</span>: <span class="hljs-built_in">number</span>;
 }
 
-<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>&lt;<span class="hljs-title class_">Project</span>&gt;({
-  <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
-  <span class="hljs-attr">stars</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> }
-});
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">ProjectModelType</span> = <span class="hljs-title class_">Model</span>&lt;<span class="hljs-title class_">Project</span>, <span class="hljs-title class_">ProjectQueryHelpers</span>&gt;;
 <span class="hljs-comment">// Query helpers should return `Query&lt;any, Document&lt;DocType&gt;&gt; &amp; ProjectQueryHelpers`</span>
 <span class="hljs-comment">// to enable chaining.</span>
 <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ProjectQueryHelpers</span> {
   <span class="hljs-title function_">byName</span>(<span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>): <span class="hljs-title class_">Query</span>&lt;<span class="hljs-built_in">any</span>, <span class="hljs-title class_">Document</span>&lt;<span class="hljs-title class_">Project</span>&gt;&gt; &amp; <span class="hljs-title class_">ProjectQueryHelpers</span>;
 }
+
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>&lt;<span class="hljs-title class_">Project</span>, <span class="hljs-title class_">ProjectModelType</span>, {}, <span class="hljs-title class_">ProjectQueryHelpers</span>&gt;({
+  <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">stars</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> }
+});
 schema.<span class="hljs-property">query</span>.<span class="hljs-property">byName</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">name</span>): <span class="hljs-title class_">Query</span>&lt;<span class="hljs-built_in">any</span>, <span class="hljs-title class_">Document</span>&lt;<span class="hljs-title class_">Project</span>&gt;&gt; &amp; <span class="hljs-title class_">ProjectQueryHelpers</span> {
   <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">name</span>: name });
 };
 
 <span class="hljs-comment">// 2nd param to `model()` is the Model class to return.</span>
-<span class="hljs-keyword">const</span> <span class="hljs-title class_">ProjectModel</span> = model&lt;<span class="hljs-title class_">Project</span>, <span class="hljs-title class_">Model</span>&lt;<span class="hljs-title class_">Project</span>, <span class="hljs-title class_">ProjectQueryHelpers</span>&gt;&gt;(<span class="hljs-string">&#x27;Project&#x27;</span>, schema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">ProjectModel</span> = model&lt;<span class="hljs-title class_">Project</span>, <span class="hljs-title class_">ProjectModelType</span>&gt;(<span class="hljs-string">&#x27;Project&#x27;</span>, schema);
 
 <span class="hljs-title function_">run</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(err));
 

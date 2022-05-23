@@ -31,21 +31,23 @@ interface Project {
   stars: number;
 }
 
-const schema = new Schema<Project>({
-  name: { type: String, required: true },
-  stars: { type: Number, required: true }
-});
+type ProjectModelType = Model<Project, ProjectQueryHelpers>;
 // Query helpers should return `Query<any, Document<DocType>> & ProjectQueryHelpers`
 // to enable chaining.
 interface ProjectQueryHelpers {
   byName(name: string): Query<any, Document<Project>> & ProjectQueryHelpers;
 }
+
+const schema = new Schema<Project, ProjectModelType, {}, ProjectQueryHelpers>({
+  name: { type: String, required: true },
+  stars: { type: Number, required: true }
+});
 schema.query.byName = function(name): Query<any, Document<Project>> & ProjectQueryHelpers {
   return this.find({ name: name });
 };
 
 // 2nd param to `model()` is the Model class to return.
-const ProjectModel = model<Project, Model<Project, ProjectQueryHelpers>>('Project', schema);
+const ProjectModel = model<Project, ProjectModelType>('Project', schema);
 
 run().catch(err => console.log(err));
 

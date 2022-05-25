@@ -31,8 +31,9 @@ interface Project {
   stars: number;
 }
 
+type ProjectDocumentType = Document<any, any, Project> & Project;
 type ProjectModelType = Model<Project, ProjectQueryHelpers>;
-type ProjectQueryType = Query<any, Document<Project>, ProjectQueryHelpers> & ProjectQueryHelpers;
+type ProjectQueryType = Query<any, ProjectDocumentType, ProjectQueryHelpers> & ProjectQueryHelpers;
 
 // Query helpers should return `Query<any, Document<DocType>, ProjectQueryHelpers> & ProjectQueryHelpers`
 // to enable chaining.

@@ -1,3 +1,12 @@
+6.3.4 / 2022-05-19
+==================
+ * fix(schema): disallow using schemas with schema-level projection with map subdocuments #11698
+ * fix(document): avoid setting nested paths to null when they're undefined #11723
+ * fix: allow using comment with findOneAndUpdate(), count(), `distinct()` and `hint` with `findOneAndUpdate()` #11793
+ * fix(document): clean modified subpaths when setting nested path to null after modifying subpaths #11764
+ * fix(types): allow calling `deleteModel()` with RegExp in TypeScript #11812
+ * docs(typescript): add section on PopulatedDoc to TypeScript populate docs #11685
+
 6.3.3 / 2022-05-09
 ==================
  * perf: avoid leaking memory when using populate() with QueryCursor because of reusing populate options with `_docs` #11641

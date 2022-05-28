@@ -134,7 +134,7 @@ declare module 'mongoose' {
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
-    schema?: Schema<T, U, TQueryHelpers>,
+    schema?: Schema<T, U, {}, TQueryHelpers>,
     collection?: string,
     options?: CompileModelOptions
   ): U;
@@ -840,7 +840,7 @@ declare module 'mongoose' {
   export type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
   export type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
 
-  export class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}> extends events.EventEmitter {
+  export class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any> extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -981,7 +981,7 @@ declare module 'mongoose' {
     ): VirtualType<T>;
 
     /** Object of currently defined virtuals on this schema */
-    virtuals: any;
+    virtuals: TVirtuals;
 
     /** Returns the virtual type with the given `name`. */
     virtualpath<T = HydratedDocument<DocType, TInstanceMethods>>(name: string): VirtualType<T> | null;

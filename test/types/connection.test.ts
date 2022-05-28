@@ -38,6 +38,7 @@ expectType<void>(conn.dropCollection('some', () => {
 
 expectError(conn.deleteModel());
 expectType<Connection>(conn.deleteModel('something'));
+expectType<Connection>(conn.deleteModel(/.+/));
 
 expectType<Array<string>>(conn.modelNames());
 
@@ -62,6 +63,10 @@ expectType<Promise<void>>(conn.transaction(async(res) => {
   expectType<mongodb.ClientSession>(res);
   return 'a';
 }));
+expectType<Promise<void>>(conn.transaction(async(res) => {
+  expectType<mongodb.ClientSession>(res);
+  return 'a';
+}, { readConcern: 'majority' }));
 
 expectError(conn.user = 'invalid');
 expectError(conn.pass = 'invalid');

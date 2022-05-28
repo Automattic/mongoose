@@ -1,0 +1,63 @@
+name: 🦥 Performance issue
+description: Report a performance issue
+labels: ['performance']
+
+body:
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      options:
+      - label: I have written a descriptive issue title
+        required: true
+      - label: | 
+          I have searched existing issues to ensure the performance issue has not already been reported
+        required: true
+
+  - type: input
+    id: working-version
+    attributes:
+      label: Last performant version
+      placeholder: 1.x.x
+    validations:
+      required: true
+
+  - type: input
+    id: stopped-working-version
+    attributes:
+      label: Slowed down in version
+      placeholder: 2.x.x
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      placeholder: 14.x
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 🦥 Performance issue
+      description: A clear and concise description of what the performance issue is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: |
+        List of steps, sample code, or a link to code or a project that reproduces the behavior.
+        Make sure you place a stack trace inside a [code (```) block](https://docs.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks) to avoid linking unrelated issues.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.

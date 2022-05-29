@@ -150,9 +150,6 @@ declare module 'mongoose' {
   /** The Mongoose version */
   export const version: string;
 
-  export type CastError = Error.CastError;
-  export type SyncIndexesError = Error.SyncIndexesError;
-
   export type ClientSession = mongodb.ClientSession;
 
   /** A list of paths to validate. If set, Mongoose will validate only the modified paths that are in the given list. */

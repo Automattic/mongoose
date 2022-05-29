@@ -8,6 +8,7 @@
 /// <reference path="./helpers.d.ts" />
 /// <reference path="./mongooseoptions.d.ts" />
 /// <reference path="./pipelinestage.d.ts" />
+/// <reference path="./populate.d.ts" />
 /// <reference path="./schemaoptions.d.ts" />
 /// <reference path="./schematypeoptions.d.ts" />
 /// <reference path="./utility.d.ts" />
@@ -544,7 +545,8 @@ declare module 'mongoose' {
 
   export type UpdateWriteOpResult = mongodb.UpdateResult;
 
-  export interface QueryOptions<DocType = unknown> {
+  export interface QueryOptions<DocType = unknown> extends
+    PopulateOption {
     arrayFilters?: { [key: string]: any }[];
     batchSize?: number;
     collation?: mongodb.CollationOptions;
@@ -570,7 +572,6 @@ declare module 'mongoose' {
     new?: boolean;
     overwrite?: boolean;
     overwriteDiscriminatorKey?: boolean;
-    populate?: string | string[] | PopulateOptions | PopulateOptions[];
     projection?: ProjectionType<DocType>;
     /**
      * if true, returns the raw result from the MongoDB driver
@@ -643,13 +644,13 @@ declare module 'mongoose' {
     [k: string]: string;
   }
 
-  export interface InsertManyOptions {
+  export interface InsertManyOptions extends
+    PopulateOption {
     limit?: number;
     rawResult?: boolean;
     ordered?: boolean;
     lean?: boolean;
     session?: mongodb.ClientSession;
-    populate?: string | string[] | PopulateOptions | PopulateOptions[];
   }
 
   export type InferIdType<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
@@ -711,32 +712,6 @@ declare module 'mongoose' {
     limit?: number;
     /** return the raw object instead of the Mongoose Model */
     lean?: boolean;
-  }
-
-  export interface PopulateOptions {
-    /** space delimited path(s) to populate */
-    path: string;
-    /** fields to select */
-    select?: any;
-    /** query conditions to match */
-    match?: any;
-    /** optional model to use for population */
-    model?: string | Model<any>;
-    /** optional query options like sort, limit, etc */
-    options?: any;
-    /** correct limit on populated array */
-    perDocumentLimit?: number;
-    /** optional boolean, set to `false` to allow populating paths that aren't in the schema */
-    strictPopulate?: boolean;
-    /** deep populate */
-    populate?: string | PopulateOptions | (string | PopulateOptions)[];
-    /**
-     * If true Mongoose will always set `path` to an array, if false Mongoose will
-     * always set `path` to a document. Inferred from schema by default.
-     */
-    justOne?: boolean;
-    /** transform function to call on every populated doc */
-    transform?: (doc: any, id: any) => any;
   }
 
   export interface ToObjectOptions {
@@ -973,14 +948,6 @@ declare module 'mongoose' {
     | typeof Schema.Types.String
     | typeof Schema.Types.Buffer
     | typeof Schema.Types.ObjectId;
-
-  /**
-   * Reference another Model
-   */
-  export type PopulatedDoc<
-    PopulatedType,
-    RawId extends RefType = (PopulatedType extends { _id?: RefType; } ? NonNullable<PopulatedType['_id']> : Types.ObjectId) | undefined
-  > = PopulatedType | RawId;
 
   export interface IndexOptions extends mongodb.CreateIndexesOptions {
     /**

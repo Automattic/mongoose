@@ -10,6 +10,7 @@
 /// <reference path="./pipelinestage.d.ts" />
 /// <reference path="./schemaoptions.d.ts" />
 /// <reference path="./schematypeoptions.d.ts" />
+/// <reference path="./utility.d.ts" />
 
 declare class NativeDate extends global.Date { }
 
@@ -952,10 +953,6 @@ declare module 'mongoose' {
     ? { [path: string]: SchemaDefinitionProperty; }
     : { [path in keyof T]?: SchemaDefinitionProperty<T[path]>; };
 
-  export type Unpacked<T> = T extends (infer U)[] ?
-    U :
-    T extends ReadonlyArray<infer U> ? U : T;
-
   export type AnyArray<T> = T[] | ReadonlyArray<T>;
   export type SchemaValidator<T> = RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T> | ValidateOpts<T>[];
 
@@ -1354,12 +1351,6 @@ declare module 'mongoose' {
   export type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
 
   export type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType> = Query<ResultType, DocType, THelpers, RawDocType> & THelpers;
-
-  export type UnpackedIntersection<T, U> = T extends null ? null : T extends (infer A)[]
-    ? (Omit<A, keyof U> & U)[]
-    : keyof U extends never
-      ? T
-      : Omit<T, keyof U> & U;
 
   export type ProjectionFields<DocType> = { [Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any } & Record<string, any>;
 

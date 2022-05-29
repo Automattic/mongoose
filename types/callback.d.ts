@@ -1,5 +1,5 @@
 declare module 'mongoose' {
-  type CallbackError = typeof global.Error | null;
+  type CallbackError = NativeError | null;
 
   type Callback<T = any> = (error: CallbackError, result: T) => void;
 

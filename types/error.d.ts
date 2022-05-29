@@ -16,7 +16,10 @@ declare module 'mongoose' {
     static Messages: any;
   }
 
+  class Error extends MongooseError { }
+
   namespace Error {
+
     export class CastError extends MongooseError {
       name: 'CastError';
       stringValue: string;

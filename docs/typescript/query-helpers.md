@@ -24,28 +24,31 @@ The 2nd generic parameter, `TQueryHelpers`, should be an interface that contains
 Below is an example of creating a `ProjectModel` with a `byName` query helper.
 
 ```typescript
-import { Document, Model, Query, Schema, connect, model } from 'mongoose';
+import { HydratedDocument, Model, Query, Schema, model } from 'mongoose';
 
 interface Project {
   name: string;
   stars: number;
 }
 
-const schema = new Schema<Project>({
+type ProjectModelType = Model<Project, ProjectQueryHelpers>;
+// Query helpers should return `Query<any, Document<DocType>> & ProjectQueryHelpers`
+// to enable chaining.
+type ProjectModelQuery = Query<any, HydratedDocument<Project>, ProjectQueryHelpers> & ProjectQueryHelpers;
+interface ProjectQueryHelpers {
+  byName(this: ProjectModelQuery, name: string): ProjectModelQuery;
+}
+
+const schema = new Schema<Project, ProjectModelType, {}, ProjectQueryHelpers>({
   name: { type: String, required: true },
   stars: { type: Number, required: true }
 });
-// Query helpers should return `Query<any, Document<DocType>> & ProjectQueryHelpers`
-// to enable chaining.
-interface ProjectQueryHelpers {
-  byName(name: string): Query<any, Document<Project>> & ProjectQueryHelpers;
-}
-schema.query.byName = function(name): Query<any, Document<Project>> & ProjectQueryHelpers {
+schema.query.byName = function(name: string): ProjectModelQuery {
   return this.find({ name: name });
 };
 
 // 2nd param to `model()` is the Model class to return.
-const ProjectModel = model<Project, Model<Project, ProjectQueryHelpers>>('Project', schema);
+const ProjectModel = model<Project, ProjectModelType>('Project', schema);
 
 run().catch(err => console.log(err));
 

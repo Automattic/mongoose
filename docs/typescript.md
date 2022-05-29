@@ -129,4 +129,4 @@ However, before you do, please [open an issue on Mongoose's GitHub page](https:/
 
 ### Next Up
 
-Now that you've seen the basics of how to use Mongoose in TypeScript, let's take a look at [statics in TypeScript](/docs/typescript/statics.html).
+Now that you've seen the basics of how to use Mongoose in TypeScript, let's take a look at [statics in TypeScript](/docs/typescript/statics-and-methods.html).

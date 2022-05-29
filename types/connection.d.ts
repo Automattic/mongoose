@@ -72,7 +72,7 @@ declare module 'mongoose' {
        * use this function to clean up any models you created in your tests to
        * prevent OverwriteModelErrors.
        */
-    deleteModel(name: string): this;
+    deleteModel(name: string | RegExp): this;
 
     /**
        * Helper for `dropCollection()`. Will delete the given collection, including
@@ -196,7 +196,7 @@ declare module 'mongoose' {
        * async function executes successfully and attempt to retry if
        * there was a retryable error.
        */
-    transaction(fn: (session: mongodb.ClientSession) => Promise<any>): Promise<void>;
+    transaction(fn: (session: mongodb.ClientSession) => Promise<any>, options?: mongodb.TransactionOptions): Promise<void>;
 
     /** Switches to a different database using the same connection pool. */
     useDb(name: string, options?: { useCache?: boolean, noListener?: boolean }): Connection;

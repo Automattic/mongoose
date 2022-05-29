@@ -3,7 +3,8 @@ declare class NativeError extends global.Error { }
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
-  type CallbackError = NativeError | null;
+  type CastError = Error.CastError;
+  type SyncIndexesError = Error.SyncIndexesError;
 
   class MongooseError extends global.Error {
     constructor(msg: string);

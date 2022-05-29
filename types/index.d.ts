@@ -1,4 +1,5 @@
 /// <reference path="./aggregate.d.ts" />
+/// <reference path="./callback.d.ts" />
 /// <reference path="./collection.d.ts" />
 /// <reference path="./connection.d.ts" />
 /// <reference path="./cursor.d.ts" />
@@ -2164,10 +2165,6 @@ declare module 'mongoose' {
   }
   export type ConnectionSyncIndexesResult = Record<string, OneCollectionSyncIndexesResult>;
   export type OneCollectionSyncIndexesResult = Array<string> & mongodb.MongoServerError;
-  export type Callback<T = any> = (error: CallbackError, result: T) => void;
-
-  export type CallbackWithoutResult = (error: CallbackError) => void;
-  export type CallbackWithoutResultAndOptionalError = (error?: CallbackError) => void;
 
   /* for ts-mongoose */
   export class mquery { }

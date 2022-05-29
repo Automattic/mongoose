@@ -6,8 +6,6 @@ declare module 'mongoose' {
   type CastError = Error.CastError;
   type SyncIndexesError = Error.SyncIndexesError;
 
-  type CallbackError = NativeError | null;
-
   class MongooseError extends global.Error {
     constructor(msg: string);
 

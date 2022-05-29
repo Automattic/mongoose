@@ -3,6 +3,7 @@
 /// <reference path="./cursor.d.ts" />
 /// <reference path="./document.d.ts" />
 /// <reference path="./error.d.ts" />
+/// <reference path="./helpers.d.ts" />
 /// <reference path="./mongooseoptions.d.ts" />
 /// <reference path="./pipelinestage.d.ts" />
 /// <reference path="./schemaoptions.d.ts" />
@@ -69,17 +70,13 @@ declare module 'mongoose' {
   export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
 
   /**
-     * Makes the indexes in MongoDB match the indexes defined in every model's
-     * schema. This function will drop any indexes that are not defined in
-     * the model's schema except the `_id` index, and build any indexes that
-     * are in your schema but not in MongoDB.
-     */
+   * Makes the indexes in MongoDB match the indexes defined in every model's
+   * schema. This function will drop any indexes that are not defined in
+   * the model's schema except the `_id` index, and build any indexes that
+   * are in your schema but not in MongoDB.
+   */
   export function syncIndexes(options?: SyncIndexesOptions): Promise<ConnectionSyncIndexesResult>;
   export function syncIndexes(options: SyncIndexesOptions | null, callback: Callback<ConnectionSyncIndexesResult>): void;
-
-  /* Tells `sanitizeFilter()` to skip the given object when filtering out potential query selector injection attacks.
-   * Use this method when you have a known query selector that you want to use. */
-  export function trusted<T>(obj: T): T;
 
   /** The Mongoose module's default connection. Equivalent to `mongoose.connections[0]`, see [`connections`](#mongoose_Mongoose-connections). */
   export const connection: Connection;
@@ -118,20 +115,6 @@ declare module 'mongoose' {
   /* ! ignore */
   export type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
 
-  /**
-   * Returns true if Mongoose can cast the given value to an ObjectId, or
-   * false otherwise.
-   */
-  export function isValidObjectId(v: Types.ObjectId): true;
-  export function isValidObjectId(v: any): boolean;
-
-  /**
-   * Returns true if the given value is a Mongoose ObjectId (using `instanceof`) or if the
-   * given value is a 24 character hex string, which is the most commonly used string representation
-   * of an ObjectId.
-   */
-  export function isObjectIdOrHexString(v: any): boolean;
-
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
@@ -145,13 +128,6 @@ declare module 'mongoose' {
 
   /** The node-mongodb-native driver Mongoose uses. */
   export const mongo: typeof mongodb;
-
-  /**
-   * Mongoose uses this function to get the current time when setting
-   * [timestamps](/docs/guide.html#timestamps). You may stub out this function
-   * using a tool like [Sinon](https://www.npmjs.com/package/sinon) for testing.
-   */
-  export function now(): NativeDate;
 
   /** Declares a global plugin executed on all Schemas. */
   export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): Mongoose;

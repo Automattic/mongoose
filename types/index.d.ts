@@ -1,4 +1,5 @@
 /// <reference path="./aggregate.d.ts" />
+/// <reference path="./collection.d.ts" />
 /// <reference path="./connection.d.ts" />
 /// <reference path="./cursor.d.ts" />
 /// <reference path="./document.d.ts" />
@@ -153,49 +154,6 @@ declare module 'mongoose' {
   export type SyncIndexesError = Error.SyncIndexesError;
 
   export type ClientSession = mongodb.ClientSession;
-
-  /*
-   * section collection.js
-   * http://mongoosejs.com/docs/api.html#collection-js
-   */
-  export interface CollectionBase<T extends mongodb.Document> extends mongodb.Collection<T> {
-    /*
-      * Abstract methods. Some of these are already defined on the
-      * mongodb.Collection interface so they've been commented out.
-      */
-    ensureIndex(...args: any[]): any;
-    findAndModify(...args: any[]): any;
-    getIndexes(...args: any[]): any;
-
-    /** The collection name */
-    collectionName: string;
-    /** The Connection instance */
-    conn: Connection;
-    /** The collection name */
-    name: string;
-  }
-
-  /*
-   * section drivers/node-mongodb-native/collection.js
-   * http://mongoosejs.com/docs/api.html#drivers-node-mongodb-native-collection-js
-   */
-  export let Collection: Collection;
-  export interface Collection<T extends mongodb.Document = mongodb.Document> extends CollectionBase<T> {
-    /**
-     * Collection constructor
-     * @param name name of the collection
-     * @param conn A MongooseConnection instance
-     * @param opts optional collection options
-     */
-    // eslint-disable-next-line @typescript-eslint/no-misused-new
-    new(name: string, conn: Connection, opts?: any): Collection<T>;
-    /** Formatter for debug print args */
-    $format(arg: any): string;
-    /** Debug print helper */
-    $print(name: any, i: any, args: any[]): void;
-    /** Retrieves information about this collections indexes. */
-    getIndexes(): any;
-  }
 
   /** A list of paths to validate. If set, Mongoose will validate only the modified paths that are in the given list. */
   export type pathsToValidate = string[] | string;

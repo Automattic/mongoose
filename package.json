@@ -19,7 +19,7 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "mongodb": "4.5.0",
+    "mongodb": "4.5.0"
   },
   "dependencies": {
     "bson": "^4.6.2",

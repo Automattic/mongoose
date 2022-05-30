@@ -1835,6 +1835,60 @@ declare module 'mongoose' {
         in: Expression;
       }
     }
+
+    export interface AllElementsTrue {
+      /**
+       * Evaluates an array as a set and returns true if no element in the array is false. Otherwise, returns false. An
+       * empty array returns true.
+       */
+      $allElementsTrue: ArrayExpression;
+    }
+
+    export interface AnyElementsTrue {
+      /**
+       * Evaluates an array as a set and returns true if any of the elements are true and false otherwise. An empty
+       * array returns false.
+       */
+      $anyElementTrue: ArrayExpression;
+    }
+
+    export interface SetDifference {
+      /**
+       * Takes two sets and returns an array containing the elements that only exist in the first set; i.e. performs a 
+       * relative complement of the second set relative to the first.
+       */
+      $setDifference: [ArrayExpression, ArrayExpression];
+    }
+
+    export interface SetEquals {
+      /**
+       * Compares two or more arrays and returns true if they have the same distinct elements and false otherwise.
+       */
+      $setEquals: ArrayExpression[];
+    }
+
+    export interface SetIntersection {
+      /**
+       * Takes two or more arrays and returns an array that contains the elements that appear in every input array.
+       */
+      $setIntersection: ArrayExpression[];
+    }
+
+    export interface SetIsSubset {
+      /**
+       * Takes two arrays and returns true when the first array is a subset of the second, including when the first
+       * array equals the second array, and false otherwise.
+       */
+      $setIsSubset: [ArrayExpression, ArrayExpression];
+    }
+
+    export interface SetUnion {
+      /**
+       * Takes two or more arrays and returns an array containing the elements that appear in any input array.
+       */
+      $setUnion: ArrayExpression[];
+    }
+
   }
 
   type Path = string;
@@ -1868,6 +1922,7 @@ declare module 'mongoose' {
     ArrayExpressionOperatorReturningArray |
     StringExpressionOperatorReturningArray |
     ObjectExpressionOperatorReturningArray |
+    SetExpressionOperatorReturningArray |
     LiteralExpressionOperatorReturningAny;
 
   export type BooleanExpression =
@@ -1877,6 +1932,7 @@ declare module 'mongoose' {
     ArrayExpressionOperatorReturningAny |
     ComparisonExpressionOperatorReturningBoolean |
     StringExpressionOperatorReturningBoolean |
+    SetExpressionOperatorReturningBoolean |
     LiteralExpressionOperatorReturningAny;
 
   export type NumberExpression =
@@ -2061,6 +2117,26 @@ declare module 'mongoose' {
 
   export type VariableExpressionOperatorReturningAny =
     Expression.Let;
+
+  export type SetExpressionOperator =
+    Expression.AllElementsTrue |
+    Expression.AnyElementsTrue |
+    Expression.SetDifference |
+    Expression.SetEquals |
+    Expression.SetIntersection |
+    Expression.SetIsSubset |
+    Expression.SetUnion;
+
+  export type SetExpressionOperatorReturningBoolean =
+    Expression.AllElementsTrue |
+    Expression.AnyElementsTrue |
+    Expression.SetEquals |
+    Expression.SetIsSubset;
+
+  export type SetExpressionOperatorReturningArray =
+    Expression.SetDifference |
+    Expression.SetIntersection |
+    Expression.SetUnion;
 
   /**
    * Trigonometry expressions perform trigonometric operations on numbers.

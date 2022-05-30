@@ -2,16 +2,36 @@ declare module 'mongoose' {
   import mongodb = require('mongodb');
   import events = require('events');
 
+  /** The Mongoose module's default connection. Equivalent to `mongoose.connections[0]`, see [`connections`](#mongoose_Mongoose-connections). */
+  const connection: Connection;
+
+  /** An array containing all connections associated with this Mongoose instance. */
+  const connections: Connection[];
+
+  /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
+  function connect(uri: string, options: ConnectOptions, callback: CallbackWithoutResult): void;
+  function connect(uri: string, callback: CallbackWithoutResult): void;
+  function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
+
+  /** Creates a Connection instance. */
+  function createConnection(uri: string, options: ConnectOptions, callback: Callback<Connection>): void;
+  function createConnection(uri: string, callback: Callback<Connection>): void;
+  function createConnection(uri: string, options?: ConnectOptions): Connection;
+  function createConnection(): Connection;
+
+  function disconnect(callback: CallbackWithoutResult): void;
+  function disconnect(): Promise<void>;
+
   /**
-     * Connection ready state
-     *
-     * - 0 = disconnected
-     * - 1 = connected
-     * - 2 = connecting
-     * - 3 = disconnecting
-     * - 99 = uninitialized
-     */
-  export enum ConnectionStates {
+   * Connection ready state
+   *
+   * - 0 = disconnected
+   * - 1 = connected
+   * - 2 = connecting
+   * - 3 = disconnecting
+   * - 99 = uninitialized
+   */
+  enum ConnectionStates {
     disconnected = 0,
     connected = 1,
     connecting = 2,
@@ -20,7 +40,7 @@ declare module 'mongoose' {
   }
 
   /** Expose connection states for user-land */
-  export const STATES: typeof ConnectionStates;
+  const STATES: typeof ConnectionStates;
 
   interface ConnectOptions extends mongodb.MongoClientOptions {
     /** Set to false to [disable buffering](http://mongoosejs.com/docs/faq.html#callback_never_executes) on all models associated with this connection. */

@@ -33,17 +33,6 @@ declare module 'mongoose' {
   export let Promise: any;
   export const PromiseProvider: any;
 
-  /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
-  export function connect(uri: string, options: ConnectOptions, callback: CallbackWithoutResult): void;
-  export function connect(uri: string, callback: CallbackWithoutResult): void;
-  export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
-
-  /** The Mongoose module's default connection. Equivalent to `mongoose.connections[0]`, see [`connections`](#mongoose_Mongoose-connections). */
-  export const connection: Connection;
-
-  /** An array containing all connections associated with this Mongoose instance. */
-  export const connections: Connection[];
-
   /**
    * Can be extended to explicitly type specific models.
    */
@@ -54,20 +43,12 @@ declare module 'mongoose' {
   /** An array containing all models associated with this Mongoose instance. */
   export const models: Models;
 
-  /** Creates a Connection instance. */
-  export function createConnection(uri: string, options: ConnectOptions, callback: Callback<Connection>): void;
-  export function createConnection(uri: string, options?: ConnectOptions): Connection;
-  export function createConnection(): Connection;
-
   /**
    * Removes the model named `name` from the default connection, if it exists.
    * You can use this function to clean up any models you created in your tests to
    * prevent OverwriteModelErrors.
    */
   export function deleteModel(name: string | RegExp): Mongoose;
-
-  export function disconnect(): Promise<void>;
-  export function disconnect(cb: CallbackWithoutResult): void;
 
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];

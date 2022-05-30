@@ -212,3 +212,26 @@ function inheritance() {
 Project.createCollection({ expires: '5 seconds' });
 Project.createCollection({ expireAfterSeconds: 5 });
 expectError(Project.createCollection({ expireAfterSeconds: '5 seconds' }));
+
+function bulkWrite() {
+
+  const schema = new Schema({
+    str: { type: String, default: 'test' },
+    num: Number
+  });
+
+  const M = model('Test', schema);
+
+  const ops = [
+    {
+      updateOne: {
+        filter: { num: 0 },
+        update: {
+          $inc: { num: 1 }
+        },
+        upsert: true
+      }
+    }
+  ];
+  M.bulkWrite(ops);
+}

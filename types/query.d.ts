@@ -91,7 +91,8 @@ declare module 'mongoose' {
   };
 
   interface QueryOptions<DocType = unknown> extends
-    PopulateOption {
+    PopulateOption,
+    SessionOption {
     arrayFilters?: { [key: string]: any }[];
     batchSize?: number;
     collation?: mongodb.CollationOptions;
@@ -139,8 +140,6 @@ declare module 'mongoose' {
      * aren't explicitly allowed using `mongoose.trusted()`.
      */
     sanitizeFilter?: boolean;
-    /** The session associated with this query. */
-    session?: mongodb.ClientSession;
     setDefaultsOnInsert?: boolean;
     skip?: number;
     snapshot?: any;
@@ -165,7 +164,7 @@ declare module 'mongoose' {
     [other: string]: any;
   }
 
-  class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
+  class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> implements SessionOperation {
     _mongooseOptions: MongooseQueryOptions<DocType>;
 
     /**

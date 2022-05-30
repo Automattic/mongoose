@@ -8,6 +8,7 @@ const start = require('./common');
 
 const mongoose = start.mongoose;
 const assert = require('assert');
+const sinon = require('sinon');
 const Schema = mongoose.Schema;
 const Document = mongoose.Document;
 const VirtualType = mongoose.VirtualType;
@@ -424,7 +425,8 @@ describe('schema', function() {
 
     it('array of arrays', function(done) {
       const test = new Schema({
-        nums: [[Number]]
+        nums: [[Number]],
+        strings: [{ type: [String] }]
       });
       let nums = test.path('nums').cast([['1', '2']]);
       assert.equal(nums.length, 1);
@@ -443,6 +445,10 @@ describe('schema', function() {
         assert.ok(error.message.includes('Cast to [[Number]] failed'), error.message);
       }
       assert.ok(threw);
+
+      const strs = test.path('strings').cast('test');
+      assert.equal(strs.length, 1);
+      assert.deepEqual(strs[0].toObject(), ['test']);
 
       done();
     });
@@ -878,7 +884,7 @@ describe('schema', function() {
         done();
       });
 
-      it('with embedded discriminator (gh-6485)', function(done) {
+      it('with embedded discriminator (gh-6485)', function() {
         const eventSchema = new Schema({
           message: { type: String, index: true }
         }, { discriminatorKey: 'kind', _id: false });
@@ -902,14 +908,12 @@ describe('schema', function() {
           { 'events.element': 1 },
           { 'events.product': 1 }
         ]);
-
-        done();
       });
     });
   });
 
   describe('plugins', function() {
-    it('work', function(done) {
+    it('work', function() {
       const Tobi = new Schema();
       let called = false;
 
@@ -919,12 +923,11 @@ describe('schema', function() {
       });
 
       assert.equal(called, true);
-      done();
     });
   });
 
   describe('options', function() {
-    it('defaults are set', function(done) {
+    it('defaults are set', function() {
       const Tobi = new Schema();
 
       assert.equal(typeof Tobi.options, 'object');
@@ -936,7 +939,6 @@ describe('schema', function() {
       assert.equal(Tobi.options.shardKey, null);
       assert.equal(Tobi.options.read, null);
       assert.equal(Tobi.options._id, true);
-      done();
     });
 
     it('setting', function(done) {
@@ -1434,38 +1436,43 @@ describe('schema', function() {
 
   describe('property names', function() {
     describe('reserved keys are log a warning (gh-9010)', () => {
-      [
+      this.afterEach(() => sinon.restore());
+      const reservedProperties = [
         'emit', 'listeners', 'on', 'removeListener', /* 'collection', */ // TODO: add `collection`
         'errors', 'get', 'init', 'isModified', 'isNew', 'populated',
         'remove', 'save', 'toObject', 'validate'
-      ].forEach((reservedProperty) => {
-        it(`\`${reservedProperty}\` when used as a schema path logs a warning`, async() => {
-          const waitForWarning = new Promise(resolve => {
-            process.once('warning', warning => resolve(warning.message));
-          });
+      ];
 
+      for (const reservedProperty of reservedProperties) {
+        it(`\`${reservedProperty}\` when used as a schema path logs a warning`, async() => {
+          // Arrange
+          const emitWarningStub = sinon.stub(process, 'emitWarning').returns();
+
+          // Act
           new Schema({ [reservedProperty]: String });
-          const lastWarnMessage = await waitForWarning;
+
+          // Assert
+          const lastWarnMessage = emitWarningStub.args[0][0];
           assert.ok(lastWarnMessage.includes(`\`${reservedProperty}\` is a reserved schema pathname`), lastWarnMessage);
         });
 
         it(`\`${reservedProperty}\` when used as a schema path doesn't log a warning if \`supressReservedKeysWarning\` is true`, async() => {
+          // Arrange
+          const emitWarningStub = sinon.stub(process, 'emitWarning').returns();
+
+
+          // Act
           new Schema(
             { [reservedProperty]: String },
             { supressReservedKeysWarning: true }
           );
 
-          let lastWarning = null;
-          const listener = warning => { lastWarning = warning.message; };
-          process.once('warning', listener);
+          const lastWarnMessage = emitWarningStub.args[0] && emitWarningStub.args[0][0];
 
-          setImmediate(() => {
-            assert.strictEqual(lastWarning, null);
-            process.removeListener('warning', listener);
-          });
+          // Assert
+          assert.strictEqual(lastWarnMessage, undefined);
         });
-
-      });
+      }
     });
 
 
@@ -2712,5 +2719,64 @@ describe('schema', function() {
     assert.equal(schema.path('something').instance, 'Date');
     assert.equal(schema.path('somethingElse').instance, 'Date');
     delete Date.type;
+  });
+  it('setting path with `Mixed` type to an array after number (gh-11417)', async() => {
+    const userSchema = new Schema({ data: {} });
+    const User = db.model('User', userSchema);
+
+    const user = await User.create({ data: 2 });
+    user.set({ data: [] });
+    await user.save();
+    assert.ok(Array.isArray(user.data));
+
+    const foundUser = await User.findOne({ _id: user._id });
+    assert.ok(Array.isArray(foundUser.data));
+  });
+
+  it('sets an _applyDiscriminators property on the schema and add discriminator to appropriate model (gh-7971)', async() => {
+    const eventSchema = new mongoose.Schema({ message: String },
+      { discriminatorKey: 'kind' });
+    const batchSchema = new mongoose.Schema({ name: String }, { discriminatorKey: 'kind' });
+    batchSchema.discriminator('event', eventSchema);
+    assert(batchSchema._applyDiscriminators);
+    assert.ok(!eventSchema._applyDiscriminators);
+
+    const arraySchema = new mongoose.Schema({ array: [batchSchema] });
+    const arrayModel = db.model('array', arraySchema);
+    const array = await arrayModel.create({
+      array: [{ name: 'Array Test', message: 'Please work', kind: 'event' }]
+    });
+    assert(array.array[0].message);
+
+    const parentSchema = new mongoose.Schema({ sub: batchSchema });
+    const Parent = db.model('Parent', parentSchema);
+    const parent = await Parent.create({
+      sub: { name: 'Sub Test', message: 'I hope I worked!', kind: 'event' }
+    });
+    assert(parent.sub.message);
+
+    const Batch = db.model('Batch', batchSchema);
+    const batch = await Batch.create({
+      name: 'Test Testerson',
+      message: 'Hello World!',
+      kind: 'event'
+    });
+    assert(batch.message);
+  });
+
+  it('disallows using schemas with schema-level projections with map subdocuments (gh-11698)', async function() {
+    const subSchema = new Schema({
+      selected: { type: Number },
+      not_selected: { type: Number, select: false }
+    });
+
+    assert.throws(() => {
+      new Schema({
+        subdocument_mapping: {
+          type: Map,
+          of: subSchema
+        }
+      });
+    }, /Cannot use schema-level projections.*subdocument_mapping.not_selected/);
   });
 });

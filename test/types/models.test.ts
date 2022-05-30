@@ -1,4 +1,4 @@
-import { Schema, Document, Model, connection, model } from 'mongoose';
+import { Schema, Document, Model, Types, connection, model } from 'mongoose';
 import { expectError } from 'tsd';
 
 function conventionalSyntax(): void {
@@ -67,7 +67,7 @@ function tAndDocSyntax(): void {
   const bar = (SomeModel: Model<ITest & Document>) => console.log(SomeModel);
 }
 
-function insertManyTest() {
+async function insertManyTest() {
   interface ITest {
     foo: string;
   }
@@ -81,11 +81,16 @@ function insertManyTest() {
   Test.insertMany([{ foo: 'bar' }]).then(async res => {
     res.length;
   });
+
+  const res = await Test.insertMany([{ foo: 'bar' }], { rawResult: true });
+  const ids: Types.ObjectId[] = Object.values(res.insertedIds);
 }
 
 function schemaStaticsWithoutGenerics() {
   const UserSchema = new Schema({});
-  UserSchema.statics.static1 = function() { return ''; };
+  UserSchema.statics.static1 = function() {
+    return '';
+  };
 
   interface IUserDocument extends Document {
     instanceField: string;
@@ -202,4 +207,31 @@ function inheritance() {
       await this.findOneAndDelete({ installationId });
     }
   }
+}
+
+Project.createCollection({ expires: '5 seconds' });
+Project.createCollection({ expireAfterSeconds: 5 });
+expectError(Project.createCollection({ expireAfterSeconds: '5 seconds' }));
+
+function bulkWrite() {
+
+  const schema = new Schema({
+    str: { type: String, default: 'test' },
+    num: Number
+  });
+
+  const M = model('Test', schema);
+
+  const ops = [
+    {
+      updateOne: {
+        filter: { num: 0 },
+        update: {
+          $inc: { num: 1 }
+        },
+        upsert: true
+      }
+    }
+  ];
+  M.bulkWrite(ops);
 }

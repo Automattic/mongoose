@@ -5153,6 +5153,20 @@ describe('Model', function() {
             doc._id.toHexString());
         });
 
+        it('using next() and hasNext() (gh-11527)', async function() {
+          const MyModel = db.model('Test', new Schema({ name: String }));
+
+          const changeStream = await MyModel.watch();
+
+          const p = Promise.all([changeStream.next(), changeStream.hasNext()]);
+          const doc = await MyModel.create({ name: 'Ned Stark' });
+
+          const [changeData] = await p;
+          assert.equal(changeData.operationType, 'insert');
+          assert.equal(changeData.fullDocument._id.toHexString(),
+            doc._id.toHexString());
+        });
+
         it('respects discriminators (gh-11007)', async function() {
           const BaseModel = db.model('Test', new Schema({ name: String }));
           const ChildModel = BaseModel.discriminator('Test1', new Schema({ email: String }));
@@ -5175,7 +5189,7 @@ describe('Model', function() {
         it('watch() before connecting (gh-5964)', async function() {
           const db = start();
 
-          const MyModel = db.model('Test', new Schema({ name: String }));
+          const MyModel = db.model('Test5964', new Schema({ name: String }));
 
           // Synchronous, before connection happens
           const changeStream = MyModel.watch();
@@ -5196,7 +5210,7 @@ describe('Model', function() {
           const MyModel = db.model('Test', new Schema({}));
           const changeStream = MyModel.watch();
           const ready = new global.Promise(resolve => {
-            changeStream.once('ready', () => {
+            changeStream.once('data', () => {
               resolve(true);
             });
             setTimeout(resolve, 500, false);
@@ -6128,148 +6142,549 @@ describe('Model', function() {
         counter();
       });
     });
+    describe('Model.syncIndexes()', () => {
+      afterEach(() => db.dropDatabase());
+      it('adds indexes to the collection', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          { name: { type: String, index: true } },
+          { autoIndex: false }
+        );
+        const User = db.model('User', userSchema, collectionName);
 
-    it('syncIndexes() (gh-6281)', async function() {
-      this.timeout(10000);
+        // Act
+        await User.syncIndexes();
 
-
-      const coll = 'tests' + random();
-      let Model = db.model('Test', new Schema({
-        name: { type: String, index: true }
-      }, { autoIndex: false }), coll);
-      let dropped = await Model.syncIndexes();
-      assert.deepEqual(dropped, []);
-
-      let indexes = await Model.listIndexes();
-      assert.deepEqual(indexes.map(i => i.key), [
-        { _id: 1 },
-        { name: 1 }
-      ]);
-
-      // New model, same collection, index on different property
-      db.deleteModel(/Test/);
-      Model = db.model('Test', new Schema({
-        otherName: { type: String, index: true }
-      }, { autoIndex: false }), coll);
-
-      dropped = await Model.syncIndexes();
-      assert.deepEqual(dropped, ['name_1']);
-
-      indexes = await Model.listIndexes();
-      assert.deepEqual(indexes.map(i => i.key), [
-        { _id: 1 },
-        { otherName: 1 }
-      ]);
-
-      // New model, same collection, different options
-      db.deleteModel(/Test/);
-      Model = db.model('Test', new Schema({
-        otherName: { type: String, unique: true }
-      }, { autoIndex: false }), coll);
-
-      dropped = await Model.syncIndexes();
-      assert.deepEqual(dropped, ['otherName_1']);
-
-      indexes = await Model.listIndexes();
-      assert.deepEqual(indexes.map(i => i.key), [
-        { _id: 1 },
-        { otherName: 1 }
-      ]);
-
-      // Re-run syncIndexes(), shouldn't change anything
-      dropped = await Model.syncIndexes();
-      assert.deepEqual(dropped, []);
-
-      await Model.collection.drop();
-
-    });
-
-    it('syncIndexes() with different key order (gh-8135)', async function() {
-      this.timeout(10000);
-
-
-      const opts = { autoIndex: false };
-      let schema = new Schema({ name: String, age: Number }, opts);
-      schema.index({ name: 1, age: -1 });
-
-      const coll = 'tests' + random();
-      let M = db.model('Test', schema, coll);
-
-      let dropped = await M.syncIndexes();
-      assert.deepEqual(dropped, []);
-
-      const indexes = await M.listIndexes();
-      assert.deepEqual(indexes.map(i => i.key), [
-        { _id: 1 },
-        { name: 1, age: -1 }
-      ]);
-
-      // New model, same collection, different key order
-      schema = new Schema({ name: String, age: Number }, opts);
-      schema.index({ age: -1, name: 1 });
-      db.deleteModel(/Test/);
-      M = db.model('Test', schema, coll);
-
-      dropped = await M.syncIndexes();
-      assert.deepEqual(dropped, ['name_1_age_-1']);
-
-    });
-
-    it('syncIndexes() with different key order (gh-8559)', async function() {
-      this.timeout(5000);
-
-
-      await db.dropDatabase();
-
-      const opts = { autoIndex: false };
-      let schema = new Schema({ name: String, age: Number }, opts);
-      schema.index({ name: 1, _id: 1 });
-
-      let M = db.model('Test', schema);
-
-      let dropped = await M.syncIndexes();
-      assert.deepEqual(dropped, []);
-
-      // New model, same collection, different key order
-      schema = new Schema({ name: String, age: Number }, opts);
-      schema.index({ name: 1 });
-      db.deleteModel(/Test/);
-      M = db.model('Test', schema);
-
-      dropped = await M.syncIndexes();
-      assert.deepEqual(dropped, ['name_1__id_1']);
-
-    });
-
-    it('syncIndexes() allows overwriting `background` option (gh-8645)', async function() {
-      await db.dropDatabase();
-
-      const opts = { autoIndex: false };
-      const schema = new Schema({ name: String }, opts);
-      schema.index({ name: 1 }, { background: true });
-
-      const M = db.model('Test', schema);
-      await M.syncIndexes({ background: false });
-
-      const indexes = await M.listIndexes();
-      assert.deepEqual(indexes[1].key, { name: 1 });
-      assert.strictEqual(indexes[1].background, false);
-    });
-
-    it('should not drop a text index on .syncIndexes() call (gh-10850)', async function() {
-      const collation = { collation: { locale: 'simple' } };
-      const someSchema = new Schema({
-        title: String,
-        author: String
+        // Assert
+        const indexes = await User.listIndexes();
+        assert.deepStrictEqual(indexes.map(index => index.name), ['_id_', 'name_1']);
       });
-      someSchema.index({ title: 1, author: 'text' }, collation);
-      const M = db.model('Some', someSchema);
-      await M.init();
-      await M.syncIndexes();
-      assert(await M.syncIndexes(), []);
+
+      it('drops indexes that are not present in schema', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          {
+            name: { type: String, index: true },
+            age: Number
+          },
+          { autoIndex: false }
+        );
+        const User = db.model('User', userSchema, collectionName);
+        await User.collection.createIndex({ age: 1 });
+
+        // Act
+        const droppedIndexes = await User.syncIndexes();
+        const indexesAfterSync = await User.listIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedIndexes, ['age_1']);
+        assert.deepStrictEqual(indexesAfterSync.map(index => index.name), ['_id_', 'name_1']);
+      });
+
+      it('when two different models connect to the same collection, syncIndexes(...) respects the last call', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          {
+            name: { type: String, index: true },
+            age: Number
+          },
+          { autoIndex: false }
+        );
+        const User = db.model('User', userSchema, collectionName);
+
+        const orderSchema = new Schema(
+          {
+            totalPrice: { type: Number, index: true }
+          },
+          { autoIndex: false }
+        );
+        const Order = db.model('Order', orderSchema, collectionName);
+        await User.createCollection();
+
+        // Act
+        const userIndexesBeforeSync = await User.listIndexes();
+        await User.syncIndexes();
+        const orderIndexesBeforeSync = await Order.listIndexes();
+        const droppedOrderIndexes = await Order.syncIndexes();
+
+        // Assert
+        assert.deepStrictEqual(userIndexesBeforeSync.map(index => index.name), ['_id_']);
+
+        assert.deepStrictEqual(orderIndexesBeforeSync.map(index => index.name), ['_id_', 'name_1']);
+        assert.deepStrictEqual(droppedOrderIndexes, ['name_1']);
+      });
+
+      it('when two models have the same collection name, same field but different options, syncIndexes(...) respects the last call', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          {
+            customId: { type: String, index: true },
+            age: Number
+          },
+          { autoIndex: false }
+        );
+        const User = db.model('User', userSchema, collectionName);
+
+        const orderSchema = new Schema(
+          {
+            customId: { type: String, unique: true }
+          },
+          { autoIndex: false }
+        );
+        const Order = db.model('Order', orderSchema, collectionName);
+        await User.createCollection();
+
+        // Act
+        await User.syncIndexes();
+        const userIndexes = await User.listIndexes();
+        await Order.syncIndexes();
+        const orderIndexes = await Order.listIndexes();
+
+        // Assert
+        const userCustomIdIndex = userIndexes.find(index => index.key.customId === 1);
+        assert.strictEqual(userCustomIdIndex.unique, undefined);
+
+        const orderCustomIdIndex = orderIndexes.find(index => index.key.customId === 1);
+        assert.strictEqual(orderCustomIdIndex.unique, true);
+      });
+
+      it('when syncIndexes(...) is called twice with no changes on the model, the second call should not do anything', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          {
+            name: { type: String, index: true },
+            age: Number
+          },
+          { autoIndex: false }
+        );
+        const User = db.model('User', userSchema, collectionName);
+
+        // Act
+        await User.collection.createIndex({ age: 1 });
+        const droppedIndexesFromFirstSync = await User.syncIndexes();
+        const droppedIndexesFromSecondSync = await User.syncIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedIndexesFromFirstSync, ['age_1']);
+        assert.deepStrictEqual(droppedIndexesFromSecondSync, []);
+      });
+
+      it('when called with different key order, it treats different order as different indexes (gh-8135)', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          { name: String, age: Number },
+          { autoIndex: false }
+        );
+        userSchema.index({ name: 1, age: -1 });
+        const User = db.model('User', userSchema, collectionName);
+        await User.collection.createIndex({ age: -1, name: 1 });
+
+        // Act
+        const droppedIndexes = await User.syncIndexes();
+        const indexesAfterSync = await User.listIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedIndexes, ['age_-1_name_1']);
+
+        const compoundIndex = indexesAfterSync.find(index => index.key.name === 1 && index.key.age === -1);
+        assert.strictEqual(compoundIndex.name, 'name_1_age_-1');
+      });
+
+      it('syncIndexes(...) compound index including `_id` (gh-8559)', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          { name: String, age: Number },
+          { autoIndex: false }
+        );
+        userSchema.index({ name: 1 });
+        const User = db.model('User', userSchema, collectionName);
+        await User.collection.createIndex({ name: 1, _id: 1 });
+
+        // Act
+        const droppedIndexes = await User.syncIndexes();
+        const indexesAfterSync = await User.listIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedIndexes, ['name_1__id_1']);
+        assert.deepStrictEqual(
+          indexesAfterSync.map(index => index.name),
+          ['_id_', 'name_1']
+        );
+      });
+
+      it('syncIndexes() allows overwriting `background` option (gh-8645)', async function() {
+        const opts = { autoIndex: false };
+        const schema = new Schema({ name: String }, opts);
+        schema.index({ name: 1 }, { background: true });
+
+        const M = db.model('Test', schema);
+        await M.syncIndexes({ background: false });
+
+        const indexes = await M.listIndexes();
+        assert.deepEqual(indexes[1].key, { name: 1 });
+        assert.strictEqual(indexes[1].background, false);
+      });
+
+      it('should not drop a text index on .syncIndexes() call (gh-10850)', async function() {
+        const collation = { collation: { locale: 'simple' } };
+        const someSchema = new Schema({
+          title: String,
+          author: String
+        });
+        someSchema.index({ title: 1, author: 'text' }, collation);
+        const M = db.model('Some', someSchema);
+        await M.init();
+        await M.syncIndexes();
+        assert(await M.syncIndexes(), []);
+      });
+
+      it('adding discriminators should not drop the parent model\'s indexes', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+
+        const eventSchema = new Schema({
+          actorId: { type: Schema.Types.ObjectId, index: true }
+        }, { autoIndex: false });
+
+        const Event = db.model('Event', eventSchema, collectionName);
+
+        Event.discriminator('AEvent', { aField: String });
+        Event.discriminator('BEvent', { bField: String });
+
+        // Act
+        await db.syncIndexes();
+
+        const indexes = await Event.listIndexes();
+
+        // Assert
+        const actorIdIndex = indexes.find(index => index.name === 'actorId_1');
+        assert.ok(actorIdIndex);
+      });
+
+      it('syncing model with multiple discriminators works', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const eventSchema = new Schema(
+          { actorId: { type: Schema.Types.ObjectId } },
+          { autoIndex: false }
+        );
+        eventSchema.index({ actorId: 1 }, { unique: true });
+
+        const Event = db.model('Event', eventSchema, collectionName);
+
+        const clickEventSchema = new Schema(
+          {
+            clickedAt: Date,
+            productCategory: String
+          },
+          { autoIndex: false }
+        );
+        clickEventSchema.index(
+          { clickedAt: 1 },
+          { partialFilterExpression: { productCategory: 'Computers' } }
+        );
+        const ClickEvent = Event.discriminator('ClickEvent', clickEventSchema);
+
+        const buyEventSchema = new Schema(
+          {
+            boughtAt: String,
+            productPrice: Number
+          },
+          { autoIndex: false }
+        );
+        buyEventSchema.index(
+          { boughtAt: 1 },
+          {
+            unique: true,
+            partialFilterExpression: { productPrice: { $gt: 100 } }
+          }
+        );
+        const BuyEvent = Event.discriminator('BuyEvent', buyEventSchema);
+
+        // Act
+        const droppedByEvent = await Event.syncIndexes({ background: false });
+        const droppedByClickEvent = await ClickEvent.syncIndexes({ background: false });
+        const droppedByBuyEvent = await BuyEvent.syncIndexes({ background: false });
+
+        const eventIndexes = await Event.listIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedByEvent, []);
+        assert.deepStrictEqual(droppedByClickEvent, []);
+        assert.deepStrictEqual(droppedByBuyEvent, []);
+
+        assert.deepStrictEqual(
+          eventIndexes.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              unique: true,
+              key: { actorId: 1 }
+            },
+            {
+              key: { clickedAt: 1 },
+              partialFilterExpression: {
+                productCategory: 'Computers',
+                __t: 'ClickEvent'
+              }
+            },
+            {
+              unique: true,
+              key: { boughtAt: 1 },
+              partialFilterExpression: {
+                productPrice: { $gt: 100 },
+                __t: 'BuyEvent'
+              }
+            }
+          ]
+        );
+      });
+
+      it('syncing one discriminator\'s indexes should not drop the main model\'s indexes', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const eventSchema = new Schema(
+          { actorId: { type: Schema.Types.ObjectId } },
+          { autoIndex: false }
+        );
+        eventSchema.index({ actorId: 1 }, { unique: true });
+
+        const Event = db.model('Event', eventSchema, collectionName);
+
+        const clickEventSchema = new Schema(
+          {
+            clickedAt: Date,
+            productCategory: String
+          },
+          { autoIndex: false }
+        );
+        clickEventSchema.index(
+          { clickedAt: 1 },
+          { partialFilterExpression: { productCategory: 'Computers' } }
+        );
+        const ClickEvent = Event.discriminator('ClickEvent', clickEventSchema);
+
+        const buyEventSchema = new Schema(
+          {
+            boughtAt: String,
+            productPrice: Number
+          },
+          { autoIndex: false }
+        );
+        buyEventSchema.index(
+          { boughtAt: 1 },
+          {
+            unique: true,
+            partialFilterExpression: { productPrice: { $gt: 100 } }
+          }
+        );
+        Event.discriminator('BuyEvent', buyEventSchema);
+
+        // Act
+        const droppedByEvent = await Event.syncIndexes();
+        const droppedByClickEvent = await ClickEvent.syncIndexes();
+
+        const eventIndexes = await Event.listIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedByEvent, []);
+        assert.deepStrictEqual(droppedByClickEvent, []);
+
+        assert.deepStrictEqual(
+          eventIndexes.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              unique: true,
+              key: { actorId: 1 }
+            },
+            {
+              key: { clickedAt: 1 },
+              partialFilterExpression: {
+                productCategory: 'Computers',
+                __t: 'ClickEvent'
+              }
+            }
+          ]
+        );
+      });
+
+      it('syncing main model does not sync discrimator indexes', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const eventSchema = new Schema(
+          { actorId: { type: Schema.Types.ObjectId } },
+          { autoIndex: false }
+        );
+        eventSchema.index({ actorId: 1 }, { unique: true });
+
+        const Event = db.model('Event', eventSchema, collectionName);
+
+        const clickEventSchema = new Schema(
+          {
+            clickedAt: Date,
+            productCategory: String
+          },
+          { autoIndex: false }
+        );
+        clickEventSchema.index(
+          { clickedAt: 1 },
+          { partialFilterExpression: { productCategory: 'Computers' } }
+        );
+        const ClickEvent = Event.discriminator('ClickEvent', clickEventSchema);
+
+        const buyEventSchema = new Schema(
+          {
+            boughtAt: String,
+            productPrice: Number
+          },
+          { autoIndex: false }
+        );
+        buyEventSchema.index(
+          { boughtAt: 1 },
+          {
+            unique: true,
+            partialFilterExpression: { productPrice: { $gt: 100 } }
+          }
+        );
+        Event.discriminator('BuyEvent', buyEventSchema);
+
+        // Act
+        const droppedByEvent = await Event.syncIndexes();
+        const eventIndexesBeforeSyncingClickEvents = await Event.listIndexes();
+
+        const droppedByClickEvent = await ClickEvent.syncIndexes();
+        const eventIndexesAfterSyncingClickEvents = await ClickEvent.listIndexes();
+
+
+        // Assert
+        assert.deepStrictEqual(droppedByEvent, []);
+        assert.deepStrictEqual(droppedByClickEvent, []);
+
+        assert.deepStrictEqual(
+          eventIndexesBeforeSyncingClickEvents.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              unique: true,
+              key: { actorId: 1 }
+            }
+          ]
+        );
+
+        assert.deepStrictEqual(
+          eventIndexesAfterSyncingClickEvents.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              unique: true,
+              key: { actorId: 1 }
+            },
+            {
+              key: { clickedAt: 1 },
+              partialFilterExpression: {
+                productCategory: 'Computers',
+                __t: 'ClickEvent'
+              }
+            }
+          ]
+        );
+
+      });
+      it('syncing discriminator does not attempt to sync parent model\'s indexes', async() => {
+        // Arrange
+        const collectionName = generateRandomCollectionName();
+        const eventSchema = new Schema(
+          { actorId: { type: Schema.Types.ObjectId } },
+          { autoIndex: false }
+        );
+        eventSchema.index({ actorId: 1 }, { unique: true });
+
+        const Event = db.model('Event', eventSchema, collectionName);
+
+        const clickEventSchema = new Schema(
+          {
+            clickedAt: Date,
+            productCategory: String
+          },
+          { autoIndex: false }
+        );
+        clickEventSchema.index(
+          { clickedAt: 1 },
+          { partialFilterExpression: { productCategory: 'Computers' } }
+        );
+        const ClickEvent = Event.discriminator('ClickEvent', clickEventSchema);
+
+        const buyEventSchema = new Schema(
+          {
+            boughtAt: String,
+            productPrice: Number
+          },
+          { autoIndex: false }
+        );
+        buyEventSchema.index(
+          { boughtAt: 1 },
+          {
+            unique: true,
+            partialFilterExpression: { productPrice: { $gt: 100 } }
+          }
+        );
+        Event.discriminator('BuyEvent', buyEventSchema);
+
+        // Act
+
+        const droppedByClickEvent = await ClickEvent.syncIndexes();
+        const eventIndexesAfterSyncingClickEvents = await ClickEvent.listIndexes();
+
+        const droppedByEvent = await Event.syncIndexes();
+        const eventIndexesAfterSyncingEverything = await Event.listIndexes();
+
+        // Assert
+        assert.deepStrictEqual(droppedByClickEvent, []);
+        assert.deepStrictEqual(droppedByEvent, []);
+
+        assert.deepStrictEqual(
+          eventIndexesAfterSyncingClickEvents.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              key: { clickedAt: 1 },
+              partialFilterExpression: {
+                productCategory: 'Computers',
+                __t: 'ClickEvent'
+              }
+            }
+          ]
+        );
+        assert.deepStrictEqual(
+          eventIndexesAfterSyncingEverything.map(index => pick(index, ['key', 'unique', 'partialFilterExpression'])),
+          [
+            { key: { _id: 1 } },
+            {
+              key: { clickedAt: 1 },
+              partialFilterExpression: {
+                productCategory: 'Computers',
+                __t: 'ClickEvent'
+              }
+            },
+            {
+              unique: true,
+              key: { actorId: 1 }
+            }
+          ]
+        );
+
+      });
     });
 
-    it('using `new db.model()()` (gh-6698)', function(done) {
+    it('using `new db.model()()` (gh-6698)', function() {
       db.model('Test', new Schema({
         name: String
       }));
@@ -6277,11 +6692,9 @@ describe('Model', function() {
       assert.throws(function() {
         new db.model('Test')({ name: 'test' });
       }, /should not be run with `new`/);
-
-      done();
     });
 
-    it('throws if non-function passed as callback (gh-6640)', function(done) {
+    it('throws if non-function passed as callback (gh-6640)', function() {
       const Model = db.model('Test', new Schema({
         name: String
       }));
@@ -6291,8 +6704,6 @@ describe('Model', function() {
       assert.throws(function() {
         doc.save({}, {});
       }, /callback must be a function/i);
-
-      done();
     });
 
     it('Throws when saving same doc in parallel w/ promises (gh-6456)', function(done) {
@@ -6412,6 +6823,376 @@ describe('Model', function() {
       await Test.collection.drop().catch(() => {});
     });
 
+    it('createCollection() enforces expireAfterSeconds (gh-11229)', async function() {
+      this.timeout(10000);
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false
+      });
+
+      const Test = db.model('TestGH11229Var1', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection({ expireAfterSeconds: 5 });
+
+      await Test.insertMany([
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T00:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T04:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T16:00:00.000Z'),
+          temp: 16
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T20:00:00.000Z'),
+          temp: 15
+        }, {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T00:00:00.000Z'),
+          temp: 13
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T04:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T16:00:00.000Z'),
+          temp: 17
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T20:00:00.000Z'),
+          temp: 12
+        }
+      ]);
+
+      const beforeExpirationCount = await Test.count({});
+      assert.ok(beforeExpirationCount === 12);
+      await new Promise(resolve => setTimeout(resolve, 6000));
+      const afterExpirationCount = await Test.count({});
+      assert.ok(afterExpirationCount === 0);
+      await Test.collection.drop().catch(() => {});
+    });
+
+    it('createCollection() enforces expires (gh-11229)', async function() {
+      this.timeout(10000);
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false
+      });
+
+      const Test = db.model('TestGH11229Var2', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection({ expires: '5 seconds' });
+
+      await Test.insertMany([
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T00:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T04:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T16:00:00.000Z'),
+          temp: 16
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T20:00:00.000Z'),
+          temp: 15
+        }, {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T00:00:00.000Z'),
+          temp: 13
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T04:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T16:00:00.000Z'),
+          temp: 17
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T20:00:00.000Z'),
+          temp: 12
+        }
+      ]);
+
+      const beforeExpirationCount = await Test.count({});
+      assert.ok(beforeExpirationCount === 12);
+      await new Promise(resolve => setTimeout(resolve, 6000));
+      const afterExpirationCount = await Test.count({});
+      assert.ok(afterExpirationCount === 0);
+      await Test.collection.drop().catch(() => {});
+    });
+
+    it('createCollection() enforces expireAfterSeconds when set by Schema (gh-11229)', async function() {
+      this.timeout(10000);
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false,
+        expireAfterSeconds: 5
+      });
+
+      const Test = db.model('TestGH11229Var3', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection();
+
+      await Test.insertMany([
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T00:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T04:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T16:00:00.000Z'),
+          temp: 16
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T20:00:00.000Z'),
+          temp: 15
+        }, {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T00:00:00.000Z'),
+          temp: 13
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T04:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T16:00:00.000Z'),
+          temp: 17
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T20:00:00.000Z'),
+          temp: 12
+        }
+      ]);
+
+      const beforeExpirationCount = await Test.count({});
+      assert.ok(beforeExpirationCount === 12);
+      await new Promise(resolve => setTimeout(resolve, 6000));
+      const afterExpirationCount = await Test.count({});
+      assert.ok(afterExpirationCount === 0);
+      await Test.collection.drop().catch(() => {});
+    });
+
+    it('createCollection() enforces expires when set by Schema (gh-11229)', async function() {
+      this.timeout(10000);
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false,
+        expires: '5 seconds'
+      });
+
+      const Test = db.model('TestGH11229Var4', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection();
+
+      await Test.insertMany([
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T00:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T04:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T16:00:00.000Z'),
+          temp: 16
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-18T20:00:00.000Z'),
+          temp: 15
+        }, {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T00:00:00.000Z'),
+          temp: 13
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T04:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T08:00:00.000Z'),
+          temp: 11
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T12:00:00.000Z'),
+          temp: 12
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T16:00:00.000Z'),
+          temp: 17
+        },
+        {
+          metadata: { sensorId: 5578, type: 'temperature' },
+          timestamp: new Date('2021-05-19T20:00:00.000Z'),
+          temp: 12
+        }
+      ]);
+
+      const beforeExpirationCount = await Test.count({});
+      assert.ok(beforeExpirationCount === 12);
+      await new Promise(resolve => setTimeout(resolve, 6000));
+      const afterExpirationCount = await Test.count({});
+      assert.ok(afterExpirationCount === 0);
+      await Test.collection.drop().catch(() => {});
+    });
+
     it('createCollection() handles NamespaceExists errors (gh-9447)', async function() {
       const userSchema = new Schema({ name: String });
       const Model = db.model('User', userSchema);
@@ -6497,7 +7278,7 @@ describe('Model', function() {
     Model.events.on('error', err => { called.push(err); });
 
 
-    await Model.findOne({ _id: 'notanid' }).catch(() => {});
+    await Model.findOne({ _id: 'Not a valid ObjectId' }).catch(() => {});
     assert.equal(called.length, 1);
     assert.equal(called[0].name, 'CastError');
 
@@ -7693,6 +8474,35 @@ describe('Model', function() {
     assert.equal(doc.filling, 'cherry');
     assert.equal(doc.hoursToMake, null);
   });
+
+  it('sets index collation based on schema collation (gh-7621)', async function() {
+    let testSchema = new Schema(
+      { name: { type: String, index: true } }
+    );
+    let Test = db.model('Test', testSchema);
+
+    await Test.init();
+
+    let indexes = await Test.collection.listIndexes().toArray();
+    assert.strictEqual(indexes.length, 2);
+    assert.deepEqual(indexes[1].key, { name: 1 });
+    assert.equal(indexes[1].collation, undefined);
+
+    db.deleteModel(/Test/);
+    testSchema = new Schema(
+      { name: { type: String, index: true } },
+      { collation: { locale: 'en' }, autoIndex: false }
+    );
+    Test = db.model('Test', testSchema);
+
+    await Test.init();
+    await Test.syncIndexes();
+
+    indexes = await Test.collection.listIndexes().toArray();
+    assert.strictEqual(indexes.length, 2);
+    assert.deepEqual(indexes[1].key, { name: 1 });
+    assert.strictEqual(indexes[1].collation.locale, 'en');
+  });
 });
 
 
@@ -7704,4 +8514,18 @@ async function delay(ms) {
 
 function isLean(document) {
   return document != null && !(document instanceof mongoose.Document);
+}
+
+function generateRandomCollectionName() {
+  return 'mongoose_test_' + random();
+}
+
+function pick(obj, keys) {
+  const newObj = {};
+  for (const key of keys) {
+    if (obj[key] !== undefined) {
+      newObj[key] = obj[key];
+    }
+  }
+  return newObj;
 }

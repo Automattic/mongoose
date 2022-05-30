@@ -11,12 +11,14 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [The `asPromise()` Method for Connections](#the-aspromise-method-for-connections)
 * [`mongoose.connect()` Returns a Promise](#mongoose-connect-returns-a-promise)
 * [Duplicate Query Execution](#duplicate-query-execution)
+* [`Model.exists()` Returns a lean document instead of Boolean](#model-exists-returns-a-lean-document-instead-of-boolean)
 * [`strictQuery` is now equal to `strict` by default](#strictquery-is-removed-and-replaced-by-strict)
 * [MongoError is now MongoServerError](#mongoerror-is-now-mongoservererror)
+* [Simplified `isValidObjectId()` and separate `isObjectIdOrHexString()`](#simplified-isvalidobjectid-and-separate-isobjectidorhexstring)
 * [Clone Discriminator Schemas By Default](#clone-discriminator-schemas-by-default)
 * [Schema Defined Document Key Order](#schema-defined-document-key-order)
 * [`sanitizeFilter` and `trusted()`](#sanitizefilter-and-trusted)
-* [Removed `omitUndefined`](#removed-omitundefined)
+* [Removed `omitUndefined`: Mongoose now removes `undefined` keys in updates instead of setting them to `null`](#removed-omitundefined)
 * [Document Parameter to Default Functions](#document-parameter-to-default-functions)
 * [Arrays are Proxies](#arrays-are-proxies)
 * [`typePojoToMixed`](#typepojotomixed)
@@ -37,6 +39,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [Removed Validator `isAsync`](#removed-validator-isasync)
 * [Removed `safe`](#removed-safe)
 * [SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`](#schematype-set-parameters)
+* [No default model for `Query.prototype.populate()`](#no-default-model-for-query-prototype-populate)
 * [`toObject()` and `toJSON()` Use Nested Schema `minimize`](#toobject-and-tojson-use-nested-schema-minimize)
 * [TypeScript changes](#typescript-changes)
 
@@ -116,6 +119,17 @@ await q;
 await q.clone(); // Can `clone()` the query to allow executing the query again
 ```
 
+<h3 id="model-exists-returns-a-lean-document-instead-of-boolean"><a href="#model-exists-returns-a-lean-document-instead-of-boolean">Model.exists(...) now returns a lean document instead of boolean</a></h3>
+
+```js
+// in Mongoose 5.x, `existingUser` used to be a boolean
+// now `existingUser` will be either `{ _id: ObjectId(...) }` or `null`.
+const existingUser = await User.exists({ name: 'John' });
+if (existingUser) {
+  console.log(existingUser._id); 
+}
+```
+
 <h3 id="strictquery-is-removed-and-replaced-by-strict"><a href="#strictquery-is-removed-and-replaced-by-strict">`strictQuery` is now equal to `strict` by default</a></h3>
 
 ~Mongoose no longer supports a `strictQuery` option. You must now use `strict`.~
@@ -159,6 +173,31 @@ User.discriminator('author', authorSchema.clone());
 User.discriminator('author', authorSchema, { clone: false });
 ```
 
+<h3 id="simplified-isvalidobjectid-and-separate-isobjectidorhexstring"><a href="#simplified-isvalidobjectid-and-separate-isobjectidorhexstring">Simplified <code>isValidObjectId()</code> and separate <code>isObjectIdOrHexString()</code></a></h3>
+
+In Mongoose 5, `mongoose.isValidObjectId()` returned `false` for values like numbers, which was inconsistent with the MongoDB driver's `ObjectId.isValid()` function.
+Technically, any JavaScript number can be converted to a MongoDB ObjectId.
+
+In Mongoose 6, `mongoose.isValidObjectId()` is just a wrapper for `mongoose.Types.ObjectId.isValid()` for consistency.
+
+Mongoose 6.2.5 now includes a `mongoose.isObjectIdOrHexString()` function, which does a better job of capturing the more common use case for `isValidObjectId()`: is the given value an `ObjectId` instance or a 24 character hex string representing an `ObjectId`?
+
+```javascript
+// `isValidObjectId()` returns `true` for some surprising values, because these
+// values are _technically_ ObjectId representations
+mongoose.isValidObjectId(new mongoose.Types.ObjectId()); // true
+mongoose.isValidObjectId('0123456789ab'); // true
+mongoose.isValidObjectId(6); // true
+mongoose.isValidObjectId(new User({ name: 'test' })); // true
+
+// `isObjectIdOrHexString()` instead only returns `true` for ObjectIds and 24
+// character hex strings.
+mongoose.isObjectIdOrHexString(new mongoose.Types.ObjectId()); // true
+mongoose.isObjectIdOrHexString('62261a65d66c6be0a63c051f'); // true
+mongoose.isValidObjectId('0123456789ab'); // false
+mongoose.isValidObjectId(6); // false
+```
+
 <h3 id="schema-defined-document-key-order"><a href="#schema-defined-document-key-order">Schema Defined Document Key Order</a></h3>
 
 Mongoose now saves objects with keys in the order the keys are specified in the schema, not in the user-defined object. So whether `Object.keys(new User({ name: String, email: String }).toObject()` is `['name', 'email']` or `['email', 'name']` depends on the order `name` and `email` are defined in your schema.
@@ -200,14 +239,18 @@ To explicitly allow a query selector, use `mongoose.trusted()`:
 await Test.find({ username: 'val', pwd: mongoose.trusted({ $ne: null }) }).setOptions({ sanitizeFilter: true });
 ```
 
-<h3 id="removed-omitundefined"><a href="#removed-omitundefined">Removed `omitUndefined`</a></h3>
+<h3 id="removed-omitundefined"><a href="#removed-omitundefined">Removed `omitUndefined`: Mongoose now removes `undefined` keys in updates instead of setting them to `null`</a></h3>
 
 In Mongoose 5.x, setting a key to `undefined` in an update operation was equivalent to setting it to `null`.
 
 ```javascript
-const res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true });
+let res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true });
 
-res.name; // null
+res.name; // `null` in Mongoose 5.x
+
+// Equivalent to `findOneAndUpdate({}, {}, { new: true })` because `omitUndefined` will
+// remove `name: undefined`
+res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true, omitUndefined: true });
 ```
 
 Mongoose 5.x supported an `omitUndefined` option to strip out `undefined` keys.
@@ -217,6 +260,12 @@ In Mongoose 6.x, the `omitUndefined` option has been removed, and Mongoose will 
 // In Mongoose 6, equivalent to `findOneAndUpdate({}, {}, { new: true })` because Mongoose will
 // remove `name: undefined`
 const res = await Test.findOneAndUpdate({}, { $set: { name: undefined } }, { new: true });
+```
+
+The only workaround is to explicitly set properties to `null` in your updates:
+
+```javascript
+const res = await Test.findOneAndUpdate({}, { $set: { name: null } }, { new: true });
 ```
 
 <h3 id="document-parameter-to-default-functions"><a href="#document-parameter-to-default-functions">Document Parameter to Default Functions</a></h3>
@@ -411,6 +460,31 @@ const parent = new Schema({
   // Implicitly creates a new schema with the top-level schema's `minimize` option.
   child: { type: { thing: Schema.Types.Mixed } }
 }, { minimize: false });
+```
+
+<h3 id="no-default-model-for-query-prototype-populate"><a href="#no-default-model-for-query-prototype-populate">No default model for <code>Query.prototype.populate()</code></a></h3>
+
+In Mongoose 5, calling `populate()` on a mixed type or other path with no `ref` would fall back to using the query's model.
+
+```javascript
+const testSchema = new mongoose.Schema({
+  data: String,
+  parents: Array // Array of mixed
+});
+
+const Test = mongoose.model('Test', testSchema);
+
+// The below `populate()`...
+await Test.findOne().populate('parents');
+// Is a shorthand for the following populate in Mongoose 5
+await Test.findOne().populate({ path: 'parents', model: Test });
+```
+
+In Mongoose 6, populating a path with no `ref`, `refPath`, or `model` is a no-op.
+
+```javascript
+// The below `populate()` does nothing.
+await Test.findOne().populate('parents');
 ```
 
 ## TypeScript changes

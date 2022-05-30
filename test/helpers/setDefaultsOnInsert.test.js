@@ -72,4 +72,19 @@ describe('setDefaultsOnInsert', function() {
     assert.ok(!update.$setOnInsert['positions.$*']);
     assert.ok(update.$setOnInsert['positions'] instanceof Map);
   });
+
+  it('sets default if sibling of dotted path is $set (gh-11668)', async function() {
+    const schema = new Schema({
+      time: {
+        hit: { type: Number, default: 0 },
+        resolved: { type: Number, default: 42 }
+      }
+    });
+
+    const opts = { upsert: true };
+    let update = { $set: { 'time.hit': 100 } };
+    update = setDefaultsOnInsert({}, schema, update, opts);
+
+    assert.equal(update.$setOnInsert['time.resolved'], 42);
+  });
 });

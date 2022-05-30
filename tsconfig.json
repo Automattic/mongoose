@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
+    "strictNullChecks": true,
     "paths": {
       "mongoose" : ["./types/index.d.ts"]
     }
-  },
-  "strictNullChecks": true
+  }
 }

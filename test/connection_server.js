@@ -1,7 +1,6 @@
 'use strict';
 const child_process = require('child_process');
-const mkdirp = require('mkdirp');
-const rimraf = require('rimraf');
+const fs = require('fs/promises');
 
 // For starting/stopping mongod to test connections
 // Adapted from mongodb-topology-manager:
@@ -66,15 +65,8 @@ class Server {
   // Remove and recreate data directory
   purge() {
     const self = this;
-    return new Promise(function(resolve, reject) {
-      rimraf(self.dbpath, {}, function(err) {
-        if (err) reject(err);
-        mkdirp(self.dbpath, { recursive: true }, function(err) {
-          if (err) reject(err);
-          resolve();
-        });
-      });
-    });
+    return fs.rm(self.dbpath, { recursive: true, force: true })
+      .then(() => fs.mkdir(self.dbpath, { recursive: true }));
   }
 }
 module.exports = Server;

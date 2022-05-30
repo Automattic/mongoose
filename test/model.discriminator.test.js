@@ -312,7 +312,10 @@ describe('model', function() {
 
       it('does not inherit indexes', function() {
         assert.deepEqual(Person.schema.indexes(), [[{ name: 1 }, { background: true }]]);
-        assert.deepEqual(Employee.schema.indexes(), [[{ department: 1 }, { background: true }]]);
+        assert.deepEqual(
+          Employee.schema.indexes(),
+          [[{ department: 1 }, { background: true, partialFilterExpression: { __t: 'Employee' } }]]
+        );
       });
 
       it('gets options overridden by root options except toJSON and toObject', function() {
@@ -1867,6 +1870,7 @@ describe('model', function() {
     assert.equal(res.c.gc.gc11, 'eleventy');
     assert.equal(res.c.gc.gc12, 110);
   });
+
   it('Should allow reusing discriminators (gh-10931)', async function() {
     const options = { discriminatorKey: 'kind', overwriteModels: true };
     const eventSchema = new mongoose.Schema({ time: Date }, options);
@@ -1886,5 +1890,99 @@ describe('model', function() {
 
     const reUseEvent = new reUse({ time: Date.now(), url: 'test.com' });
     assert.ok(reUseEvent.url);
+  });
+
+  it('handles updating multiple properties nested underneath a discriminator (gh-11428)', async function() {
+    const StepSchema = new Schema({ url: String }, { discriminatorKey: 'type' });
+    const SheetReadOptionsSchema = new Schema({
+      location: {
+        id: String,
+        timeout: Number
+      }
+    });
+    const ClickSchema = new Schema(
+      [StepSchema, { sheetOptions: SheetReadOptionsSchema }],
+      { discriminatorKey: 'type' }
+    );
+
+    const Step = db.model('Step', StepSchema);
+
+    Step.discriminator('click', ClickSchema);
+
+    const doc = await Step.create({
+      type: 'click',
+      url: 'https://google.com',
+      sheetOptions: {
+        location: {
+          id: 'currentCell',
+          timeout: 1000
+        }
+      }
+    });
+
+    doc.set({
+      'sheetOptions.location.id': 'inColumn',
+      'sheetOptions.location.timeout': 2000
+    });
+    await doc.save();
+
+    const updatedDoc = await Step.findOne({ type: 'click', _id: doc._id });
+    assert.equal(updatedDoc.sheetOptions.location.id, 'inColumn');
+    assert.equal(updatedDoc.sheetOptions.location.timeout, 2000);
+  });
+
+  it('allows defining discriminator at the subSchema level in the subschema (gh-7971)', async function() {
+    const eventSchema = new Schema({ message: String },
+      { discriminatorKey: 'kind', _id: false });
+    const clickedSchema = new Schema({
+      element: {
+        type: String,
+        required: true
+      }
+    }, { _id: false });
+    const batchSchema = new Schema({ events: [eventSchema], mainEvent: { type: eventSchema, discriminators: { Clicked: clickedSchema } } });
+    const arraySchema = new Schema({ arrayEvent: [{ type: eventSchema, discriminators: { Clicked: clickedSchema } }] });
+    const Batch = db.model('Batch', batchSchema);
+    const Arrays = db.model('Array', arraySchema);
+
+    const batch = await Batch.create({
+      events: [{ message: 'Hello World' }],
+      mainEvent: { message: 'Goodbye', element: 'The Discriminator', kind: 'Clicked' }
+    });
+
+    assert(batch.mainEvent.element);
+
+    const array = await Arrays.create({
+      arrayEvent: [{ message: 'An array', element: 'with discriminators', kind: 'Clicked' }]
+    });
+
+    assert(array.arrayEvent[0].element);
+  });
+
+  it('handles discriminators on maps of subdocuments (gh-11720)', async function() {
+    const shapeSchema = Schema({ name: String }, { discriminatorKey: 'kind' });
+    const schema = Schema({ shape: { type: Map, of: shapeSchema } });
+
+    schema.path('shape.$*').discriminator('Circle', Schema({ radius: String }));
+    schema.path('shape.$*').discriminator('Square', Schema({ side: Number }));
+
+    const Test = db.model('Test', schema);
+
+    let doc = new Test({
+      shape: {
+        a: { kind: 'Circle', radius: 5 },
+        b: { kind: 'Square', side: 10 }
+      }
+    });
+
+    assert.strictEqual(doc.shape.get('a').radius, '5');
+    assert.strictEqual(doc.shape.get('b').side, 10);
+
+    await doc.save();
+
+    doc = await Test.findById(doc);
+
+    assert.strictEqual(doc.shape.get('a').radius, '5');
+    assert.strictEqual(doc.shape.get('b').side, 10);
   });
 });

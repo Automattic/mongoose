@@ -2399,6 +2399,17 @@ describe('model: querying:', function() {
       });
     });
 
+    it('removes the __v property if versionKey: false is set (gh-8934)', async function() {
+      const title = 'Wooooot ' + random();
+      await BlogPostB.create({ title });
+      const foundPost = await BlogPostB.find({ title }).lean({ versionKey: false });
+      assert.ok(!('__v' in foundPost));
+      const anotherFoundPost = await BlogPostB.findOne({ title }).lean({ versionKey: false });
+      assert.ok(!('__v' in anotherFoundPost));
+      const updateFoundPost = await BlogPostB.findOneAndUpdate({ title: title }, { title: 'Woooot' }).lean({ versionKey: false });
+      assert.ok(!('__v' in updateFoundPost));
+    });
+
     it('findOne', function(done) {
       const title = 'Wooooot ' + random();
 
@@ -2505,5 +2516,29 @@ describe('model: querying:', function() {
           });
       });
     });
+  });
+
+  it('does not apply string schema setters on $regex (gh-11426)', async function() {
+    const numbersOnlyRE = /[^\d]+/g;
+    const getOnlyNumbers = string => string.replace(numbersOnlyRE, '');
+
+    const testSchema = new Schema({
+      testProp: {
+        type: String,
+        required: true,
+        set: getOnlyNumbers
+      }
+    }, { strictQuery: false });
+
+    const Test = db.model('Test', testSchema);
+
+    await Test.collection.insertOne({ testProp: 'not numbers' });
+
+    const res = await Test.find({ testProp: /^not numbers$/ });
+    assert.equal(res.length, 1);
+    assert.equal(res[0].testProp, 'not numbers');
+
+    res[0].testProp = 'something else 42';
+    assert.strictEqual(res[0].testProp, '42');
   });
 });

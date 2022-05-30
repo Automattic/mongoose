@@ -865,10 +865,13 @@ describe('connections:', function() {
   });
 
   it('useDB inherits config from default connection (gh-8267)', async function() {
-    await mongoose.connect(start.uri, { sanitizeFilter: true });
+    const m = new mongoose.Mongoose();
+    await m.connect(start.uri, { sanitizeFilter: true });
 
-    const db2 = mongoose.connection.useDb('gh8267-1');
+    const db2 = m.connection.useDb('gh8267-1');
     assert.equal(db2.config.sanitizeFilter, true);
+
+    await m.disconnect();
   });
 
   it('allows setting client on a disconnected connection (gh-9164)', async function() {
@@ -949,9 +952,8 @@ describe('connections:', function() {
   describe('when connecting with a secondary read preference(gh-9374)', function() {
     describe('mongoose.connect', function() {
       it('forces autoIndex & autoCreate to be false if read preference is secondary or secondaryPreferred', async function() {
-        const secondaryURI = start.uri + '?readPreference=secondary';
         const m = new mongoose.Mongoose();
-        await m.connect(secondaryURI);
+        await m.connect(start.uri, { readPreference: 'secondary' });
 
         assert.strictEqual(m.connection.get('autoIndex'), false);
         assert.strictEqual(m.connection.get('autoCreate'), false);
@@ -963,9 +965,9 @@ describe('connections:', function() {
       });
 
       it('throws if options try to set autoIndex to true', function() {
-        const secondaryURI = start.uri + '/test_gh9374_1?readPreference=secondary';
         const opts = {
-          autoIndex: true
+          autoIndex: true,
+          readPreference: 'secondary'
         };
 
         const err = new MongooseError(
@@ -976,12 +978,12 @@ describe('connections:', function() {
         );
         const m = new mongoose.Mongoose();
 
-        assert.rejects(() => m.connect(secondaryURI, opts), err);
+        assert.rejects(() => m.connect(start.uri, opts), err);
       });
 
       it('throws if options.config.autoIndex is true, even if options.autoIndex is false', function() {
-        const secondaryURI = start.uri + '?readPreference=secondary';
         const opts = {
+          readPreference: 'secondary',
           autoIndex: false,
           config: {
             autoIndex: true
@@ -994,29 +996,26 @@ describe('connections:', function() {
                         'autoCreate, autoIndex'
         );
         const m = new mongoose.Mongoose();
-        assert.rejects(m.connect(secondaryURI, opts), err);
+        assert.rejects(m.connect(start.uri, opts), err);
       });
     });
 
     describe('mongoose.createConnection', function() {
       it('forces autoIndex & autoCreate to be false if read preference is secondary or secondaryPreferred (gh-9374)', function() {
-        const secondaryURI = start.uri + '?readPreference=secondary';
-        const secondaryPrefURI = start.uri + '?readPreference=secondaryPreferred';
-
-        const conn = new mongoose.createConnection(secondaryURI);
+        const conn = new mongoose.createConnection(start.uri, { readPreference: 'secondary' });
 
         assert.equal(conn.get('autoIndex'), false);
         assert.equal(conn.get('autoCreate'), false);
 
-        const conn2 = new mongoose.createConnection(secondaryPrefURI);
+        const conn2 = new mongoose.createConnection(start.uri, { readPreference: 'secondaryPreferred' });
 
         assert.equal(conn2.get('autoIndex'), false);
         assert.equal(conn2.get('autoCreate'), false);
       });
 
       it('throws if options try to set autoIndex to true', function() {
-        const secondaryURI = start.uri + '?readPreference=secondary';
         const opts = {
+          readPreference: 'secondary',
           autoIndex: true
         };
         const err = new MongooseError(
@@ -1027,14 +1026,14 @@ describe('connections:', function() {
         );
         const m = new mongoose.Mongoose();
         return assert.throws(
-          () => m.createConnection(secondaryURI, opts),
+          () => m.createConnection(start.uri, opts),
           err
         );
       });
 
       it('throws if options.config.autoIndex is true, even if options.autoIndex is false', function() {
-        const secondaryURI = start.uri + '?readPreference=secondary';
         const opts = {
+          readPreference: 'secondary',
           autoIndex: false,
           config: {
             autoIndex: true
@@ -1048,7 +1047,7 @@ describe('connections:', function() {
         );
 
         assert.throws(
-          () => mongoose.createConnection(secondaryURI, opts),
+          () => mongoose.createConnection(start.uri, opts),
           err
         );
       });

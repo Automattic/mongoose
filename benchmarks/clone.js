@@ -10,7 +10,7 @@ const DocSchema = new Schema({
 
 const SimpleSchema = new Schema({
   string: { type: String, required: true },
-  number: { type: Number, min: 10 },
+  number: { type: Number, min: 10 }
 });
 
 const AllSchema = new Schema({
@@ -28,7 +28,7 @@ const AllSchema = new Schema({
   buffers: [Buffer],
   objectids: [Schema.ObjectId],
   docs: {
-    type: [DocSchema], validate: function () {
+    type: [DocSchema], validate: function() {
       return true;
     }
   },
@@ -58,17 +58,17 @@ const a = new A({
 const Simple = mongoose.model('Simple', SimpleSchema);
 const simple = new Simple({
   string: 'hello world',
-  number: 444848484,
+  number: 444848484
 });
 
 new Benchmark.Suite()
-  .add('Simple', function () {
+  .add('Simple', function() {
     simple.toObject({ depopulate: true });
   })
-  .add('AllSchema', function () {
+  .add('AllSchema', function() {
     a.toObject({ depopulate: true });
   })
-  .on('cycle', function (evt) {
+  .on('cycle', function(evt) {
     if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
       console.log(String(evt.target));
     }

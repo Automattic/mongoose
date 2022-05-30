@@ -55,7 +55,7 @@ function run(label, fn) {
   while (i--) {
     a = fn();
     if (i % 2) {
-      a.toObject({depopulate: true});
+      a.toObject({ depopulate: true });
     } else {
       if (a._delta) {
         a._delta();
@@ -75,7 +75,6 @@ function run(label, fn) {
   res.heapUsed = used.heapUsed - started.heapUsed;
   log('change: ', res);
   a = res = used = time = started = start = total = i = null;
-  // console.error(((used.vsize - started.vsize) / 1048576)+' MB');
 }
 
 run('string', function() {
@@ -145,7 +144,7 @@ run('array of objectids', function() {
 });
 run('array of docs', function() {
   return new A({
-    docs: [{title: 'yo'}, {title: 'nowafasdi0fas asjkdfla fa'}]
+    docs: [{ title: 'yo' }, { title: 'nowafasdi0fas asjkdfla fa' }]
   });
 });
 

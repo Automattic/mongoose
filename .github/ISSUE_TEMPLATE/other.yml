@@ -1,0 +1,22 @@
+name: ❔ Other
+description: Open an issue that is not feature or bug related
+
+body:
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      options:
+      - label: I have written a descriptive issue title
+        required: true
+      - label: | 
+          I have searched existing issues to ensure the issue has not already been raised
+        required: true
+
+  - type: textarea
+    id: text
+    attributes:
+      label: Issue
+      description: |
+        Give as much detail as you can to help us understand.
+        Make sure you place example code inside a [code (```) block](https://docs.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks) to avoid linking unrelated issues.

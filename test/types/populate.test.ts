@@ -1,7 +1,7 @@
-import { Schema, model, Document, PopulatedDoc, Types } from 'mongoose';
+import { Schema, model, Document, PopulatedDoc, Types, HydratedDocument } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
-import { expectError } from 'tsd';
+import { expectAssignable, expectError, expectType } from 'tsd';
 
 interface Child {
   name: string;
@@ -11,7 +11,7 @@ const childSchema: Schema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
 interface Parent {
-  child?: PopulatedDoc<Child & Document<ObjectId>>,
+  child: PopulatedDoc<Document<ObjectId> & Child>,
   name?: string
 }
 
@@ -20,7 +20,7 @@ const ParentModel = model<Parent>('Parent', new Schema({
   name: String
 }));
 
-ParentModel.findOne({}).populate('child').orFail().then((doc: Parent & Document) => {
+ParentModel.findOne({}).populate('child').orFail().then((doc: Document<ObjectId, {}, Parent> & Parent) => {
   const child = doc.child;
   if (child == null || child instanceof ObjectId) {
     throw new Error('should be populated');
@@ -75,6 +75,8 @@ const Story = model<IStory>('Story', storySchema);
   await story.populate(['author']);
   await story.populate([{ path: 'fans' }]);
   await story.populate(['author', { path: 'fans' }]);
+
+  await Story.findOne().populate(['author']);
 })();
 
 async function documentDepopulate() {
@@ -117,9 +119,113 @@ function gh11014() {
 
   // Populate with `Paths` generic `{ child: Child }` to override `child` path
   ParentModel.find({})
-    .populate<{child: Child}>('child')
+    .populate<{ child: Child }>('child')
     .orFail()
     .then(parents => {
       parents.map(p => p.child.name);
     });
+}
+
+function gh11321(): void {
+  interface Parent {
+    child?: ObjectId,
+    name?: string
+  }
+
+  const parentSchema: Schema<Parent> = new Schema<Parent>({
+    child: { type: 'ObjectId', ref: 'Child' },
+    name: String
+  });
+
+  parentSchema.virtual('test', {
+    localField: (doc: HydratedDocument<Parent, {}>): string => {
+      if (typeof doc.name === 'string') {
+        return doc.name;
+      }
+      return 'foo';
+    },
+    foreignField: (doc: HydratedDocument<Parent, {}>): string => {
+      if (typeof doc.name === 'string') {
+        return doc.name;
+      }
+      return 'foo';
+    }
+  });
+}
+
+function gh11503() {
+  interface Friend {
+    blocked: boolean
+  }
+  const FriendSchema = new Schema<Friend>({
+    blocked: Boolean
+  });
+
+  interface IUser {
+    friends: Types.ObjectId[];
+  }
+  const userSchema = new Schema<IUser>({
+    friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
+  });
+  const User = model<IUser>('friends', userSchema);
+
+  User.findOne({}).populate('friends').then(user => {
+    if (!user) return;
+    expectType<Types.ObjectId>(user?.friends[0]);
+    expectError(user?.friends[0].blocked);
+    expectError(user?.friends.map(friend => friend.blocked));
+  });
+
+  User.findOne({}).populate<{ friends: Friend[] }>('friends').then(user => {
+    if (!user) return;
+    expectAssignable<Friend>(user?.friends[0]);
+    expectType<boolean>(user?.friends[0].blocked);
+    const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
+    expectType<boolean>(firstFriendBlockedValue?.blocked);
+  });
+}
+
+
+function gh11544() {
+
+  interface IUser {
+    friends: Types.ObjectId[];
+  }
+  const userSchema = new Schema<IUser>({
+    friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
+  });
+  const User = model<IUser>('friends', userSchema);
+
+  User.findOne({}).populate({ path: 'friends', strictPopulate: false });
+  User.findOne({}).populate({ path: 'friends', strictPopulate: true });
+  User.findOne({}).populate({ path: 'friends', populate: { path: 'someNestedPath', strictPopulate: false } });
+}
+
+async function _11532() {
+  interface IParent {
+    name: string;
+    child: Types.ObjectId;
+  }
+  interface IChild {
+    name: string;
+  }
+
+  const parentSchema = new Schema(
+    {
+      name: { type: String, required: true },
+      child: { type: Schema.Types.ObjectId, ref: 'Child', required: true }
+    });
+
+  const parent = model<IParent>('Parent', parentSchema);
+
+  const populateQuery = parent.findOne().populate<{ child: IChild }>('child');
+  const populateResult = await populateQuery;
+  const leanResult = await populateQuery.lean();
+
+  if (!populateResult) return;
+  expectType<string>(populateResult.child.name);
+
+  if (!leanResult) return;
+  expectType<string>(leanResult.child.name);
+  expectError(leanResult?.__v);
 }

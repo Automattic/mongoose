@@ -52,6 +52,7 @@ user and have a good reason for doing so.
   <li><a href="#dynamic-ref">Dynamic References via `refPath`</a></li>
   <li><a href="#populate-virtuals">Populate Virtuals</a></li>
   <li><a href="#count">Populate Virtuals: The Count Option</a></li>
+  <li><a href="#match">Populate Virtuals: The Match Option</a></li>
   <li><a href="#populating-maps">Populating Maps</a></li>
   <li><a href="#populate-middleware">Populate in Middleware</a></li>
   <li><a href="#populating-multiple-paths-middleware">Populating Multiple Paths in Middleware</a></li>
@@ -290,7 +291,7 @@ If you were to `populate()` using the `limit` option, you
 would find that the 2nd story has 0 fans:
 
 ```javascript
-const stories = Story.find().populate({
+const stories = await Story.find().populate({
   path: 'fans',
   options: { limit: 2 }
 });
@@ -338,6 +339,8 @@ But, if you have a good reason to want an array of child pointers, you
 can `push()` documents onto the array as shown below.
 
 ```javascript
+story1.save()
+
 author.stories.push(story1);
 author.save(callback);
 ```
@@ -490,7 +493,7 @@ storing comments. A user may comment on either a blog post or a product.
 ```javascript
 const commentSchema = new Schema({
   body: { type: String, required: true },
-  on: {
+  modelId: {
     type: Schema.Types.ObjectId,
     required: true,
     // Instead of a hardcoded model name in `ref`, `refPath` means Mongoose
@@ -701,6 +704,45 @@ const doc = await Band.findOne({ name: 'Motley Crue' }).
 doc.numMembers; // 2
 ```
 
+<h3 id="match"><a href="#match">Populate Virtuals: The Match Option</a></h3>
+
+Another option for Populate virtuals is `match`.
+This option adds an extra filter condition to the query Mongoose uses to `populate()`:
+
+```javascript
+// Same example as 'Populate Virtuals' section
+AuthorSchema.virtual('posts', {
+  ref: 'BlogPost',
+  localField: '_id',
+  foreignField: 'author',
+  match: { archived: false } // match option with basic query selector
+});
+
+const Author = mongoose.model('Author', AuthorSchema, 'Author');
+const BlogPost = mongoose.model('BlogPost', BlogPostSchema, 'BlogPost');
+
+// After population
+const author = await Author.findOne().populate('posts');
+
+author.posts // Array of not `archived` posts
+```
+
+You can also set the `match` option to a function.
+That allows configuring the `match` based on the document being populated.
+For example, suppose you only want to populate blog posts whose `tags` contain one of the author's `favoriteTags`.
+
+```javascript
+AuthorSchema.virtual('posts', {
+  ref: 'BlogPost',
+  localField: '_id',
+  foreignField: 'author',
+  // Add an additional filter `{ tags: author.favoriteTags }` to the populate query
+  // Mongoose calls the `match` function with the document being populated as the
+  // first argument.
+  match: author => ({ tags: author.favoriteTags })
+});
+```
+
 <h3 id="populating-maps"><a href="#populating-maps">Populating Maps</a></h3>
 
 [Maps](/docs/schematypes.html#maps) are a type that represents an object with arbitrary
@@ -723,7 +765,7 @@ const Band = mongoose.model('Band', bandSchema);
 This map has a `ref`, which means you can use `populate()` to populate all the ObjectIds
 in the map. Suppose you have the below `band` document:
 
-```
+```javascript
 const person1 = new Person({ name: 'Vince Neil' });
 const person2 = new Person({ name: 'Mick Mars' });
 
@@ -818,8 +860,8 @@ const userSchema = new Schema({
 })
 
 userSchema.pre('find', function (next) {
-    this.populate("followers following");
-    next();
+  this.populate("followers following");
+  next();
 });
 
 const User = mongoose.model('User', userSchema)
@@ -831,15 +873,11 @@ To avoid this, we have to add the `_recursed` option, so that our middleware wil
 
 ```javascript
 userSchema.pre('find', function (next) {
-    if (this.options._recursed) {
-      return next();
-    }
-    this.populate({ path: "followers following", options: { _recursed: true } });
-    next();
+  if (this.options._recursed) {
+    return next();
+  }
+  this.populate({ path: "followers following", options: { _recursed: true } });
+  next();
 });
 ```
 Alternatively, you can check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
-
-### Next Up
-
-Now that we've covered `populate()`, let's take a look at [discriminators](/docs/discriminators.html).

@@ -17,50 +17,50 @@ To get started with Mongoose in TypeScript, you need to:
 import { Schema, model, connect } from 'mongoose';
 
 // 1. Create an interface representing a document in MongoDB.
-interface User {
+interface IUser {
   name: string;
   email: string;
   avatar?: string;
 }
 
 // 2. Create a Schema corresponding to the document interface.
-const schema = new Schema<User>({
+const userSchema = new Schema<IUser>({
   name: { type: String, required: true },
   email: { type: String, required: true },
   avatar: String
 });
 
 // 3. Create a Model.
-const UserModel = model<User>('User', schema);
+const User = model<IUser>('User', userSchema);
 
 run().catch(err => console.log(err));
 
-async function run(): Promise<void> {
+async function run() {
   // 4. Connect to MongoDB
   await connect('mongodb://localhost:27017/test');
 
-  const doc = new UserModel({
+  const user = new User({
     name: 'Bill',
     email: 'bill@initech.com',
     avatar: 'https://i.imgur.com/dM7Thhn.png'
   });
-  await doc.save();
+  await user.save();
 
-  console.log(doc.email); // 'bill@initech.com'
+  console.log(user.email); // 'bill@initech.com'
 }
 ```
 
 You as the developer are responsible for ensuring that your document interface lines up with your Mongoose schema.
 For example, Mongoose won't report an error if `email` is `required` in your Mongoose schema but optional in your document interface.
 
-The `UserModel()` constructor returns an instance of `HydratedDocument<User>`.
-`User` is a _document interface_, it represents the raw object structure that `User` objects look like in MongoDB.
-`HydratedDocument<User>` represents a hydrated Mongoose document, with methods, virtuals, and other Mongoose-specific features.
+The `User()` constructor returns an instance of `HydratedDocument<IUser>`.
+`IUser` is a _document interface_, it represents the raw object structure that `IUser` objects look like in MongoDB.
+`HydratedDocument<IUser>` represents a hydrated Mongoose document, with methods, virtuals, and other Mongoose-specific features.
 
 ```ts
 import { HydratedDocument } from 'mongoose';
 
-const doc: HydratedDocument<User> = new UserModel({
+const user: HydratedDocument<IUser> = new User({
   name: 'Bill',
   email: 'bill@initech.com',
   avatar: 'https://i.imgur.com/dM7Thhn.png'
@@ -75,7 +75,7 @@ To define a property of type `ObjectId`, you should use `Types.ObjectId` in the 
 import { Schema, Types } from 'mongoose';
 
 // 1. Create an interface representing a document in MongoDB.
-interface User {
+interface IUser {
   name: string;
   email: string;
   // Use `Types.ObjectId` in document interface...
@@ -83,7 +83,7 @@ interface User {
 }
 
 // 2. Create a Schema corresponding to the document interface.
-const schema = new Schema<User>({
+const userSchema = new Schema<IUser>({
   name: { type: String, required: true },
   email: { type: String, required: true },
   // And `Schema.Types.ObjectId` in the schema definition.
@@ -96,12 +96,14 @@ That's because `Schema.Types.ObjectId` is a [class that inherits from SchemaType
 ### Using `extends Document`
 
 Alternatively, your document interface can extend Mongoose's `Document` class.
+
+We **strongly** recommend against using this approach, its support will be dropped in the next major version as it causes major performance issues.
 Many Mongoose TypeScript codebases use the below approach.
 
 ```typescript
 import { Document, Schema, model, connect } from 'mongoose';
 
-interface User extends Document {
+interface IUser extends Document {
   name: string;
   email: string;
   avatar?: string;
@@ -127,4 +129,4 @@ However, before you do, please [open an issue on Mongoose's GitHub page](https:/
 
 ### Next Up
 
-Now that you've seen the basics of how to use Mongoose in TypeScript, let's take a look at [statics in TypeScript](/docs/typescript/statics.html).
+Now that you've seen the basics of how to use Mongoose in TypeScript, let's take a look at [statics in TypeScript](/docs/typescript/statics-and-methods.html).

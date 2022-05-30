@@ -318,17 +318,19 @@ describe('model', function() {
     });
 
     describe('findOne', function() {
-      it('when selecting `select: false` field (gh-4629)', function(done) {
+      it('when selecting `select: false` field (gh-4629) (gh-11546)', async function() {
         const s = new SecretEvent({ name: 'test', secret: 'test2' });
-        s.save(function(error) {
-          assert.ifError(error);
-          SecretEvent.findById(s._id, '+secret', function(error, doc) {
-            assert.ifError(error);
-            assert.equal(doc.name, 'test');
-            assert.equal(doc.secret, 'test2');
-            done();
-          });
-        });
+        await s.save();
+
+        let doc = await SecretEvent.findById(s._id, '+secret');
+        assert.equal(doc.__t, 'Secret');
+        assert.equal(doc.name, 'test');
+        assert.equal(doc.secret, 'test2');
+
+        doc = await BaseEvent.findOne({ _id: s._id }, 'name -__t');
+        assert.strictEqual(doc.__t, undefined);
+        assert.equal(doc.name, 'test');
+        assert.strictEqual(doc.secret, undefined);
       });
 
       it('select: false in base schema (gh-5448)', async function() {
@@ -753,7 +755,7 @@ describe('model', function() {
         });
       });
 
-      it('updating type key (gh-5613)', function(done) {
+      it('updating discriminator key (gh-5613)', function(done) {
         function BaseSchema() {
           Schema.apply(this, arguments);
 
@@ -779,6 +781,34 @@ describe('model', function() {
             done();
           });
         });
+      });
+
+      it('disallows updating discriminator key using `$unset` (gh-11456)', async function() {
+        const options = { discriminatorKey: 'kind' };
+        const eventSchema = new Schema({ time: Date }, options);
+        db.deleteModel(/Event/);
+        const Event = db.model('Event', eventSchema);
+        const ClickedLinkEvent = Event.discriminator('ClickedLink',
+          new Schema({ url: String }, options));
+
+        const err = await ClickedLinkEvent.updateMany({}, { $unset: { kind: '' } }, { strict: 'throw' }).then(() => null, err => err);
+        assert.ok(err);
+        assert.ok(err.message.includes('discriminator key'), err.message);
+
+        await ClickedLinkEvent.create({
+          time: new Date(),
+          url: 'http://www.example.com'
+        });
+
+        let doc = await ClickedLinkEvent.findOneAndUpdate({}, { $unset: { kind: '' } }, { new: true }).lean();
+        assert.equal(doc.kind, 'ClickedLink');
+
+        doc = await ClickedLinkEvent.findOneAndUpdate(
+          {},
+          { $unset: { kind: '' } },
+          { new: true, overwriteDiscriminatorKey: true }
+        ).lean();
+        assert.equal(doc.kind, void 0);
       });
 
       it('reference in child schemas (gh-2719-2)', async function() {

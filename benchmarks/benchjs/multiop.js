@@ -54,7 +54,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       tags: [String],
       owners: [ObjectId],
       comments: [Comments],
-      def: {type: String, default: 'kandinsky'}
+      def: { type: String, default: 'kandinsky' }
     });
 
     const blogData = {
@@ -187,7 +187,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       fn: function(deferred) {
         let count = 150;
         for (let i = 0; i < 150; i++) {
-          User.findOne({_id: getNextmId()}, function(err) {
+          User.findOne({ _id: getNextmId() }, function(err) {
             if (err) {
               throw err;
             }
@@ -209,7 +209,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       fn: function(deferred) {
         let count = 150;
         for (let i = 0; i < 150; i++) {
-          user.findOne({_id: getNextdId()}, function(err) {
+          user.findOne({ _id: getNextdId() }, function(err) {
             if (err) {
               throw err;
             }
@@ -231,7 +231,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       fn: function(deferred) {
         let count = 150;
         for (let i = 0; i < 150; i++) {
-          BlogPost.findOne({_id: getNextbmId()}, function(err) {
+          BlogPost.findOne({ _id: getNextbmId() }, function(err) {
             if (err) {
               throw err;
             }
@@ -253,7 +253,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       fn: function(deferred) {
         let count = 150;
         for (let i = 0; i < 150; i++) {
-          blogpost.findOne({_id: getNextbdId()}, function(err) {
+          blogpost.findOne({ _id: getNextbdId() }, function(err) {
             if (err) {
               throw err;
             }
@@ -284,7 +284,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             --count || deferred.resolve();
           });
           if (i % 15 === 0) {
-            User.findOne({_id: getNextmId()}, function(err) {
+            User.findOne({ _id: getNextmId() }, function(err) {
               if (err) {
                 throw err;
               }
@@ -307,7 +307,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             --count || deferred.resolve();
           });
           if (i % 15 === 0) {
-            user.findOne({_id: getNextdId()}, function(err) {
+            user.findOne({ _id: getNextdId() }, function(err) {
               if (err) {
                 throw err;
               }
@@ -330,7 +330,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             --count || deferred.resolve();
           });
           if (i % 15 === 0) {
-            BlogPost.findOne({_id: getNextbmId()}, function(err) {
+            BlogPost.findOne({ _id: getNextbmId() }, function(err) {
               if (err) {
                 throw err;
               }
@@ -353,7 +353,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             --count || deferred.resolve();
           });
           if (i % 15 === 0) {
-            blogpost.findOne({_id: getNextbdId()}, function(err) {
+            blogpost.findOne({ _id: getNextbdId() }, function(err) {
               if (err) {
                 throw err;
               }
@@ -368,7 +368,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         let count = 150;
         let updates = 0;
         for (let i = 0; i < 150; i++) {
-          BlogPost.findOne({_id: getNextbmId()}, function(err, res) {
+          BlogPost.findOne({ _id: getNextbmId() }, function(err, res) {
             if (err) {
               throw err;
             }
@@ -404,7 +404,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         let count = 150;
         let updates = 0;
         for (let i = 0; i < 150; i++) {
-          blogpost.findOne({_id: getNextbdId()}, function(err, bp) {
+          blogpost.findOne({ _id: getNextbdId() }, function(err, bp) {
             if (err) {
               throw err;
             }
@@ -450,11 +450,11 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             out.ops = item.hz;
             outObj[item.name.replace(/\s/g, '')] = out;
           });
-          console.dir(outObj, {depth: null, colors: true});
+          console.dir(outObj, { depth: null, colors: true });
         }
       });
     function next() {
-      suite.run({async: true});
+      suite.run({ async: true });
     }
   });
 });

@@ -1,7 +1,20 @@
-import { Schema, model, Model, Document, SaveOptions, Query, Aggregate } from 'mongoose';
-import { expectError } from 'tsd';
+import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction } from 'mongoose';
+import { expectError, expectType, expectNotType } from 'tsd';
 
-const schema: Schema = new Schema({ name: { type: 'String' } });
+interface ITest extends Document {
+  name?: string;
+}
+
+const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(next, opts) {
+  this.$markValid('name');
+  if (opts.session) {
+    next();
+  } else {
+    next(new Error('Operation must be in Session.'));
+  }
+};
+
+const schema: Schema<ITest> = new Schema<ITest>({ name: { type: 'String' } });
 
 schema.pre<Query<any, any>>('find', async function() {
   console.log('Find', this.getFilter());
@@ -27,10 +40,6 @@ schema.pre('save', function(next, opts: SaveOptions) {
   console.log(opts.session);
   next();
 });
-
-interface ITest extends Document {
-  name?: string;
-}
 
 schema.pre('save', function(next) {
   console.log(this.name);
@@ -69,3 +78,22 @@ schema.pre<Model<ITest>>('insertMany', function(next, docs: Array<ITest>) {
 });
 
 const Test = model<ITest>('Test', schema);
+
+function gh11257(): void {
+  schema.pre('save', { document: true }, function() {
+    expectType<HydratedDocument<ITest>>(this);
+  });
+}
+
+function gh11480(): void {
+  type IUserSchema = {
+    name: string;
+  };
+
+  const UserSchema = new Schema<IUserSchema>({ name: { type: String } });
+
+  UserSchema.pre('save', function(next) {
+    expectNotType<any>(this);
+    next();
+  });
+}

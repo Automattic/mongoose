@@ -1,7 +1,18 @@
-import { Schema, model, Model, Document, Error, Types } from 'mongoose';
-import { expectError } from 'tsd';
+import { Schema, model, Model, Document, Types } from 'mongoose';
+import { expectError, expectType } from 'tsd';
 
-const schema: Schema = new Schema({ name: { type: 'String', required: true }, address: new Schema({ city: { type: String, required: true } }) });
+const Drink = model('Drink', new Schema({
+  name: String
+}));
+
+const schema: Schema = new Schema({
+  name: { type: 'String', required: true },
+  address: new Schema({ city: { type: String, required: true } }),
+  favoritDrink: {
+    type: Schema.Types.ObjectId,
+    ref: Drink
+  }
+});
 
 interface ITestBase {
   name?: string;
@@ -14,8 +25,15 @@ const Test = model<ITest>('Test', schema);
 void async function main() {
   const doc: ITest = await Test.findOne().orFail();
 
-  const p: Promise<ITest> = doc.remove();
-  await p;
+  expectType<Promise<ITest>>(doc.remove());
+  expectType<void>(doc.remove({}, (err, doc) => {
+    expectType<Error | null>(err);
+    expectType<any>(doc);
+  }));
+  expectType<void>(doc.remove((err, doc) => {
+    expectType<Error | null>(err);
+    expectType<any>(doc);
+  }));
 }();
 
 
@@ -23,7 +41,7 @@ void async function run() {
   const user = new Test({ name: {}, address: {} });
   const error = user.validateSync();
   if (error != null) {
-    const _error: Error.ValidationError = error.errors.address as Error.ValidationError;
+    const _error = error.errors.address;
   }
 }();
 
@@ -33,6 +51,17 @@ void async function run() {
   test.validate({ pathsToSkip: 'name age' });
   test.validateSync({ pathsToSkip: ['name', 'age'] });
   test.validateSync({ pathsToSkip: 'name age' });
+  test.validateSync({ pathsToSkip: 'name age', blub: 1 });
+  expectType<Promise<ITest & { _id: any; }>>(test.save());
+  expectType<Promise<ITest & { _id: any; }>>(test.save({}));
+  expectType<void>(test.save({}, (err, doc) => {
+    expectType<Error | null>(err);
+    expectType<ITest & { _id: any; }>(doc);
+  }));
+  expectType<void>(test.save((err, doc) => {
+    expectType<Error | null>(err);
+    expectType<ITest & { _id: any; }>(doc);
+  }));
 })();
 
 function gh10526<U extends ITest>(arg1: Model<U>) {
@@ -49,7 +78,7 @@ function testMethods(): void {
     fullName(): string;
   }
 
-  type User = Model<IUser, {}, IUserMethods>
+  type User = Model<IUser, {}, IUserMethods>;
 
   const schema = new Schema<IUser, User>({ first: String, last: String });
   schema.methods.fullName = function(): string {
@@ -58,22 +87,22 @@ function testMethods(): void {
   const UserModel = model<IUser, User>('User', schema);
 
   const doc = new UserModel({ first: 'test', last: 'test' });
-  doc.fullName().toUpperCase();
+  expectType<string>(doc.fullName());
 }
 
 function testRequiredId(): void {
   // gh-10657
-  interface Foo {
+  interface IFoo {
     _id: string;
     label: string;
   }
 
-  const FooSchema = new Schema<Foo, Model<Foo>, Foo>({
+  const FooSchema = new Schema<IFoo, Model<IFoo>, IFoo>({
     _id: String,
     label: { type: String }
   });
 
-  const Foo: Model<Foo> = model<Foo>('Foo', FooSchema);
+  const Foo: Model<IFoo> = model<IFoo>('Foo', FooSchema);
 
   type FooInput = {
     label: string;
@@ -114,7 +143,7 @@ async function gh11117(): Promise<void> {
     }
   ]);
   const json = items[0].toJSON();
-  const someDate: Date = json.someDate;
+  expectType<Date>(json.someDate);
 }
 
 function gh11085(): void {
@@ -135,4 +164,20 @@ function gh11085(): void {
   let _id: number;
   expectError(_id = newUser._id);
   const _id2: Types.ObjectId = newUser._id;
+}
+
+function gh11435() {
+  interface Item {
+    name: string;
+  }
+  const ItemSchema = new Schema<Item>({ name: String });
+
+  ItemSchema.pre('validate', function preValidate() {
+    expectType<Model<unknown>>(this.$model('Item1'));
+  });
+}
+
+async function gh11598() {
+  const doc = await Test.findOne().orFail();
+  doc.populate('favoritDrink', undefined, model('temp', new Schema()));
 }

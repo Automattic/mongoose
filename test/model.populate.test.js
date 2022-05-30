@@ -7238,7 +7238,6 @@ describe('model: populate:', function() {
       });
 
       it('document, and subdocuments are not lean by default', async function() {
-
         const user = await db.model('User').findOne().populate({
           path: 'roomId',
           populate: {
@@ -7252,7 +7251,6 @@ describe('model: populate:', function() {
       });
 
       it('.lean() makes query result, and all populated fields lean', async function() {
-
         const user = await db.model('User').findOne().
           populate({
             path: 'roomId',
@@ -8076,14 +8074,31 @@ describe('model: populate:', function() {
       const s2docs = await S2.create([{ s1: s1doc }, { s1: s1doc }]);
       await S3.create([{ s2: s2docs[0] }, { s2: s2docs[0] }, { s2: s2docs[1] }]);
 
-      const doc = await S1.findOne({}).populate({
+      let doc = await S1.findOne({}).populate({
         path: 's2',
         populate: {
           path: 'numS3'
         }
       });
-
       assert.deepEqual(doc.s2.map(s => s.numS3).sort(), [1, 2]);
+
+      await S3.deleteMany({ s2: s2docs[1] });
+      doc = await S1.findOne({}).populate({
+        path: 's2',
+        populate: {
+          path: 'numS3'
+        }
+      });
+      assert.deepEqual(doc.s2.map(s => s.numS3).sort(), [0, 2]);
+
+      await S3.deleteMany({});
+      doc = await S1.findOne({}).populate({
+        path: 's2',
+        populate: {
+          path: 'numS3'
+        }
+      });
+      assert.deepEqual(doc.s2.map(s => s.numS3).sort(), [0, 0]);
     });
 
     it('explicit model option overrides refPath (gh-7273)', async function() {
@@ -8551,6 +8566,54 @@ describe('model: populate:', function() {
       assert.equal(team.developers[0].ticketCount, 2);
       assert.equal(team.developers[1].ticketCount, 1);
       assert.equal(team.developers[2].ticketCount, 0);
+    });
+
+    it('returns an array when count on an array localField (gh-11307) (gh-7573)', async function() {
+      const CommentSchema = Schema({
+        content: String,
+        replies: [{ type: 'ObjectId', ref: 'Comment' }]
+      });
+      CommentSchema.virtual('reportReplyCount', {
+        ref: 'Report',
+        localField: 'replies',
+        foreignField: 'reportModel',
+        justOne: false,
+        count: true,
+        match: { reportType: 'Comment' }
+      });
+      const ReportSchema = Schema({
+        reportType: String,
+        reportModel: 'ObjectId'
+      });
+
+      const Comment = db.model('Comment', CommentSchema);
+      const Report = db.model('Report', ReportSchema);
+
+      const comment1 = await Comment.create({ content: 'comment1' });
+      const comment2 = await Comment.create({ content: 'comment2' });
+      const comment3 = await Comment.create({ content: 'comment3' });
+
+      comment1.replies = [comment2, comment3];
+      await comment1.save();
+      await Report.create([
+        { reportType: 'Comment', reportModel: comment2._id },
+        { reportType: 'Comment', reportModel: comment2._id },
+        { reportType: 'Comment', reportModel: comment3._id },
+        { reportType: 'Other', reportModel: comment3._id }
+      ]);
+
+      let doc;
+
+      doc = await Comment.findOne({ _id: comment1._id }).populate('reportReplyCount');
+      assert.deepStrictEqual(doc.reportReplyCount, [2, 1]);
+
+      await Report.deleteMany({ reportModel: comment3._id });
+      doc = await Comment.findOne({ _id: comment1._id }).populate('reportReplyCount');
+      assert.deepStrictEqual(doc.reportReplyCount, [2, 0]);
+
+      await Report.deleteMany({});
+      doc = await Comment.findOne({ _id: comment1._id }).populate('reportReplyCount');
+      assert.deepStrictEqual(doc.reportReplyCount, [0, 0]);
     });
 
     it('handles virtual populate of an embedded discriminator nested path (gh-6488) (gh-8173)', async function() {
@@ -9420,6 +9483,45 @@ describe('model: populate:', function() {
 
         assert.equal(user.post.name, 'Clean Code');
       });
+    });
+
+    it('recursive virtuals with `populate` option (gh-11700)', async function() {
+      const InteractionSchema = new Schema({
+        title: String,
+        parent: {
+          type: mongoose.ObjectId,
+          ref: 'Interaction'
+        }
+      });
+
+      InteractionSchema.virtual('next', {
+        ref: 'Interaction',
+        localField: '_id',
+        foreignField: 'parent',
+        justOne: true,
+        options: {
+          populate: 'next'
+        }
+      });
+
+      const Interaction = db.model('Interaction', InteractionSchema);
+
+      const interactionA = new Interaction({ title: 'first interaction' });
+      await interactionA.save();
+
+      const interactionB = new Interaction({ title: 'second interaction', parent: interactionA._id });
+      await interactionB.save();
+
+      const interactionC = new Interaction({ title: 'third interaction', parent: interactionB._id });
+      await interactionC.save();
+
+      const interaction = await Interaction.findOne({ parent: null }).populate('next');
+
+      assert.equal(interaction.title, interactionA.title);
+      assert.notEqual(interaction.next, undefined);
+      assert.equal(interaction.next.title, interactionB.title);
+      assert.notEqual(interaction.next.next, undefined);
+      assert.equal(interaction.next.next.title, interactionC.title);
     });
 
     it('no-op if populating on a document array with no ref (gh-8946)', async function() {
@@ -10493,16 +10595,60 @@ describe('model: populate:', function() {
 
     const doc = await BlogPost.findOne().populate('author');
     assert.equal(doc.author.email, 'test@gmail.com');
+    assert.equal(doc.toObject().author.name, 'John Smith');
     assert.equal(doc.toObject().author.email, 'test@gmail.com');
+    assert.equal(doc.toObject({ depopulate: true }).author.name, 'John Smith');
+    assert.strictEqual(doc.toObject({ depopulate: true }).author.email, undefined);
 
     doc.depopulate();
     assert.equal(doc.author.name, 'John Smith');
+    assert.strictEqual(doc.author.email, undefined);
 
     doc.author.name = 'John Smythe';
     await doc.save();
 
-    const fromDb = await BlogPost.findById(doc);
+    let fromDb = await BlogPost.findById(doc);
     assert.equal(fromDb.author.name, 'John Smythe');
+
+    await fromDb.populate('author');
+    fromDb.author = { _id: fromDb.author._id, name: 'John Smithe' };
+    assert.strictEqual(doc.author.email, undefined);
+    await fromDb.save();
+
+    fromDb = await BlogPost.findById(doc);
+    assert.strictEqual(fromDb.author.email, undefined);
+    assert.equal(fromDb.author.name, 'John Smithe');
+  });
+
+  it('no-op when populating a single nested subdoc underneath a doc array with no ref (gh-11538) (gh-10856)', async function() {
+    const userSchema = Schema({ _id: Number, name: String, email: String, friends: [{ type: Number, ref: 'User' }] });
+    const blogPostSchema = Schema({
+      title: String,
+      people: [{
+        author: {
+          type: new Schema({ _id: Number, name: String, friends: [{ type: Number, ref: 'User' }] })
+          // ref: 'User'
+        }
+      }]
+    });
+
+    const User = db.model('User', userSchema);
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+
+    await User.create({ _id: 2, name: 'Test', email: 'test@gmail.com' });
+    await User.create({ _id: 1, name: 'John Smith', email: 'test@gmail.com', friends: [2] });
+    await BlogPost.create({
+      title: 'Introduction to Mongoose',
+      people: [{
+        author: { _id: 1, name: 'John Smith', friends: [2] }
+      }]
+    });
+
+    const doc = await BlogPost.findOne().populate({
+      path: 'people',
+      populate: [{ path: 'author', populate: 'friends' }]
+    });
+    assert.strictEqual(doc.people[0].author.email, undefined);
   });
 
   it('supports ref on array containing subdocuments (gh-10856)', async function() {

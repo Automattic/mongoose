@@ -15,7 +15,7 @@ the `ssl` option defaults to `true` for connection strings that start with `mong
 If you try to connect to a MongoDB cluster that requires SSL without enabling the `ssl` option, `mongoose.connect()`
 will error out with the below error:
 
-```javascript
+```no-highlight
 MongooseServerSelectionError: connection <monitor> to 127.0.0.1:27017 closed
     at NativeConnection.Connection.openUri (/node_modules/mongoose/lib/connection.js:800:32)
     ...
@@ -40,7 +40,7 @@ SSL correctly, but there's some issue with the SSL certificate.
 
 For example, a common issue is the below error message:
 
-```
+```no-highlight
 MongooseServerSelectionError: unable to verify the first certificate
 ```
 
@@ -62,9 +62,33 @@ await mongoose.connect('mongodb://localhost:27017/test', {
 
 Another common issue is the below error message:
 
-```
+```no-highlight
 MongooseServerSelectionError: Hostname/IP does not match certificate's altnames: Host: hostname1. is not cert's CN: hostname2
 ```
 
 The SSL certificate's [common name](https://knowledge.digicert.com/solution/SO7239.html) **must** line up with the host name
 in your connection string. If the SSL certificate is for `hostname2.mydomain.com`, your connection string must connect to `hostname2.mydomain.com`, not any other hostname or IP address that may be equivalent to `hostname2.mydomain.com`. For replica sets, this also means that the SSL certificate's common name must line up with the [machine's `hostname`](/docs/connections.html#replicaset-hostnames).
+
+## X509 Auth
+
+If you're using [X509 authentication](https://www.mongodb.com/docs/drivers/node/current/fundamentals/authentication/mechanisms/#x.509), you should set the user name in the connection string, **not** the `connect()` options.
+
+```javascript
+// Do this:
+const username = 'myusername';
+await mongoose.connect(`mongodb://${encodeURIComponent(username)}@localhost:27017/test`, {
+  ssl: true,
+  sslValidate: true,
+  sslCA: `${__dirname}/rootCA.pem`,
+  authMechanism: 'MONGODB-X509'
+});
+
+// Not this:
+await mongoose.connect(`mongodb://localhost:27017/test`, {
+  ssl: true,
+  sslValidate: true,
+  sslCA: `${__dirname}/rootCA.pem`,
+  authMechanism: 'MONGODB-X509'.
+  auth: { username }
+});
+```

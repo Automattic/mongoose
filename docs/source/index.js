@@ -50,6 +50,7 @@ exports['docs/compatibility.md'] = {
   guide: true,
   markdown: true
 };
+exports['docs/timestamps.md'] = { title: 'Mongoose Timestamps', markdown: true };
 exports['docs/search.pug'] = { title: 'Search' };
 exports['docs/enterprise.md'] = { title: 'Mongoose for Enterprise', markdown: true };
 exports['docs/sponsors.pug'] = {
@@ -61,6 +62,7 @@ exports['docs/jobs.pug'] = {
   title: 'Mongoose MongoDB Jobs',
   jobs
 };
+exports['docs/change-streams.md'] = { title: 'MongoDB Change Streams in NodeJS with Mongoose', markdown: true };
 
 for (const props of Object.values(exports)) {
   props.jobs = jobs;

@@ -1,0 +1,6 @@
+name: "codeql config"
+
+languages: 
+  - 'javascript'
+paths:
+  - lib

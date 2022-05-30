@@ -2386,4 +2386,26 @@ describe('model: findOneAndUpdate:', function() {
     const res = await Parent.findOneAndUpdate({ _id: parent.id }, update, { new: true });
     assert.strictEqual(res.data.children.get('kenny').age, 1);
   });
+
+  it('handles validating deeply nested subdocuments (gh-11394)', async function() {
+    const userSchema = new Schema({
+      myId: Number,
+      address: {
+        _id: false,
+        type: {
+          city: new Schema({ zipCode: new Schema({ value: Number }) })
+        }
+      }
+    });
+
+    const User = db.model('User', userSchema);
+
+    const err = await User.findOneAndUpdate(
+      { myId: 1 },
+      { myId: 1, address: { city: { zipCode: { value: 1 } } } },
+      { runValidators: true }
+    ).then(() => null, err => err);
+
+    assert.ifError(err);
+  });
 });

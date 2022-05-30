@@ -1,0 +1,37 @@
+name: 🚀 Feature Proposal
+description: Submit a proposal for a new feature
+labels: ['enhancement', 'new feature']
+
+body:
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      options:
+      - label: I have written a descriptive issue title
+        required: true
+      - label: | 
+          I have searched existing issues to ensure the feature has not already been requested
+        required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 🚀 Feature Proposal
+      description: A clear and concise description of what the feature is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: The motivation for the proposal.
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example
+      description: |
+        An example for how this feature would be used.
+        Make sure you place example code inside a [code (```) block](https://docs.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks) to avoid linking unrelated issues.

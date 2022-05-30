@@ -1,5 +1,3 @@
-import { OlsonTimezoneCode } from './OlsonTimezoneCode';
-
 declare module 'mongoose' {
 
     /**
@@ -1894,7 +1892,7 @@ declare module 'mongoose' {
     export type TextExpressionOperator =
         Expression.Meta;
 
-    export type tzExpression = UTCOffset | OlsonTimezoneCode;
+    export type tzExpression = UTCOffset | StringExpressionOperatorReturningBoolean | string;
 
     type hh = '-00' | '-01' | '-02' | '-03' | '-04' | '-05' | '-06' | '-07' | '-08' | '-09' | '-10' | '-11' | '-12' |
         '+00' | '+01' | '+02' | '+03' | '+04' | '+05' | '+06' | '+07' | '+08' | '+09' | '+10' | '+11' | '+12' | '+13' | '+14';

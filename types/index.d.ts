@@ -14,6 +14,7 @@
 /// <reference path="./schemaoptions.d.ts" />
 /// <reference path="./schematype.d.ts" />
 /// <reference path="./utility.d.ts" />
+/// <reference path="./validation.d.ts" />
 
 declare class NativeDate extends global.Date { }
 
@@ -741,8 +742,6 @@ declare module 'mongoose' {
     : { [path in keyof T]?: SchemaDefinitionProperty<T[path]>; };
 
   export type AnyArray<T> = T[] | ReadonlyArray<T>;
-  export type SchemaValidator<T> = RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T> | ValidateOpts<T>[];
-
   export type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;
 
   export interface MixedSchemaTypeOptions extends SchemaTypeOptions<Schema.Types.Mixed> {
@@ -761,33 +760,6 @@ declare module 'mongoose' {
     | typeof Schema.Types.Buffer
     | typeof Schema.Types.ObjectId;
 
-  export interface ValidatorProps {
-    path: string;
-    value: any;
-  }
-
-  export interface ValidatorMessageFn {
-    (props: ValidatorProps): string;
-  }
-
-  export interface ValidateFn<T> {
-    (value: T): boolean;
-  }
-
-  export interface LegacyAsyncValidateFn<T> {
-    (value: T, done: (result: boolean) => void): void;
-  }
-
-  export interface AsyncValidateFn<T> {
-    (value: any): Promise<boolean>;
-  }
-
-  export interface ValidateOpts<T> {
-    msg?: string;
-    message?: string | ValidatorMessageFn;
-    type?: string;
-    validator: ValidateFn<T> | LegacyAsyncValidateFn<T> | AsyncValidateFn<T>;
-  }
 
   export type InferId<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
 

@@ -99,7 +99,7 @@ declare module 'mongoose' {
   /**
    * @deprecated
    */
-  type pathsToValidate = PathsToValidate;  
+  type pathsToValidate = PathsToValidate;
 
   interface SaveOptions extends
     SessionOption {

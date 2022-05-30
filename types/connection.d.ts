@@ -151,10 +151,6 @@ declare module 'mongoose' {
     /** The name of the database this connection points to. */
     readonly name: string;
 
-    startSession(options: mongodb.ClientSessionOptions | undefined | null, callback: Callback<mongodb.ClientSession>): void;
-    startSession(callback: Callback<mongodb.ClientSession>): void;
-    startSession(options?: mongodb.ClientSessionOptions): Promise<mongodb.ClientSession>;
-
     /** Opens the connection with a URI using `MongoClient.connect()`. */
     openUri(uri: string, options: ConnectOptions, callback: Callback<Connection>): Connection;
     openUri(uri: string, callback: Callback<Connection>): Connection;
@@ -201,7 +197,8 @@ declare module 'mongoose' {
      * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
      * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
      */
-    startSession(options: ClientSessionOptions, callback: Callback<ClientSession>): void;
+    startSession(options: ClientSessionOptions | undefined | null, callback: Callback<ClientSession>): void;
+    startSession(callback: Callback<ClientSession>): void;
     startSession(options?: ClientSessionOptions): Promise<ClientSession>;
 
     /**

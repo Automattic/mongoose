@@ -1749,7 +1749,7 @@ declare module 'mongoose' {
       /**
        * Matches a random selection of input documents. The number of documents selected approximates the sample
        * rate expressed as a percentage of the total number of documents.
-       * 
+       *
        * @version 4.4.2
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/sampleRate/#mongodb-expression-exp.-sampleRate
        */
@@ -1760,7 +1760,7 @@ declare module 'mongoose' {
 
       /**
        * Combines multiple documents into a single document.
-       * 
+       *
        * @version 3.6
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/mergeObjects/#mongodb-expression-exp.-mergeObjects
        */
@@ -1771,7 +1771,7 @@ declare module 'mongoose' {
 
       /**
        * Adds, updates, or removes a specified field in a document.
-       * 
+       *
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setField/#mongodb-expression-exp.-setField
        */
@@ -1797,7 +1797,7 @@ declare module 'mongoose' {
 
       /**
        * Removes a specified field in a document.
-       * 
+       *
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/unsetField/#mongodb-expression-exp.-unsetField
        */
@@ -1819,7 +1819,7 @@ declare module 'mongoose' {
 
       /**
        * Binds variables for use in the specified expression, and returns the result of the expression.
-       * 
+       *
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/let/#mongodb-expression-exp.-let
        */
@@ -1840,6 +1840,8 @@ declare module 'mongoose' {
       /**
        * Evaluates an array as a set and returns true if no element in the array is false. Otherwise, returns false. An
        * empty array returns true.
+       *
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/allElementsTrue/#mongodb-expression-exp.-allElementsTrue
        */
       $allElementsTrue: ArrayExpression;
     }
@@ -1848,14 +1850,18 @@ declare module 'mongoose' {
       /**
        * Evaluates an array as a set and returns true if any of the elements are true and false otherwise. An empty
        * array returns false.
+       *
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/anyElementsTrue/#mongodb-expression-exp.-anyElementsTrue
        */
       $anyElementTrue: ArrayExpression;
     }
 
     export interface SetDifference {
       /**
-       * Takes two sets and returns an array containing the elements that only exist in the first set; i.e. performs a 
+       * Takes two sets and returns an array containing the elements that only exist in the first set; i.e. performs a
        * relative complement of the second set relative to the first.
+       *
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setDifference/#mongodb-expression-exp.-setDifference
        */
       $setDifference: [ArrayExpression, ArrayExpression];
     }
@@ -1863,6 +1869,8 @@ declare module 'mongoose' {
     export interface SetEquals {
       /**
        * Compares two or more arrays and returns true if they have the same distinct elements and false otherwise.
+       *
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setEquals/#mongodb-expression-exp.-setEquals
        */
       $setEquals: ArrayExpression[];
     }
@@ -1870,6 +1878,8 @@ declare module 'mongoose' {
     export interface SetIntersection {
       /**
        * Takes two or more arrays and returns an array that contains the elements that appear in every input array.
+       *
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setIntersection/#mongodb-expression-exp.-setIntersection
        */
       $setIntersection: ArrayExpression[];
     }
@@ -1878,6 +1888,8 @@ declare module 'mongoose' {
       /**
        * Takes two arrays and returns true when the first array is a subset of the second, including when the first
        * array equals the second array, and false otherwise.
+       *
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setIsSubset/#mongodb-expression-exp.-setIsSubset
        */
       $setIsSubset: [ArrayExpression, ArrayExpression];
     }
@@ -1885,10 +1897,327 @@ declare module 'mongoose' {
     export interface SetUnion {
       /**
        * Takes two or more arrays and returns an array containing the elements that appear in any input array.
+       *
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setUnion/#mongodb-expression-exp.-setUnion
        */
       $setUnion: ArrayExpression[];
     }
 
+    export interface Accumulator {
+      /**
+       * Defines a custom accumulator operator. Accumulators are operators that maintain their state (e.g. totals,
+       * maximums, minimums, and related data) as documents progress through the pipeline. Use the $accumulator operator
+       * to execute your own JavaScript functions to implement behavior not supported by the MongoDB Query Language. See
+       * also $function.
+       *
+       * @version 4.4
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/accumulator/#mongodb-expression-exp.-accumulator
+       */
+      $accumulator: {
+        /**
+         * Function used to initialize the state. The init function receives its arguments from the initArgs array
+         * expression. You can specify the function definition as either BSON type Code or String.
+         */
+        init: CodeExpression;
+        /**
+         * Arguments passed to the init function.
+         */
+        initArgs?: ArrayExpression;
+        /**
+         * Function used to accumulate documents. The accumulate function receives its arguments from the current state
+         * and accumulateArgs array expression. The result of the accumulate function becomes the new state. You can
+         * specify the function definition as either BSON type Code or String.
+         */
+        accumulate: CodeExpression;
+        /**
+         * Arguments passed to the accumulate function. You can use accumulateArgs to specify what field value(s) to
+         * pass to the accumulate function.
+         */
+        accumulateArgs: ArrayExpression;
+        /**
+         * Function used to merge two internal states. merge must be either a String or Code BSON type. merge returns
+         * the combined result of the two merged states. For information on when the merge function is called, see Merge
+         * Two States with $merge.
+         */
+        merge: CodeExpression;
+        /**
+         * Function used to update the result of the accumulation.
+         */
+        finalize?: CodeExpression;
+        /**
+         * The language used in the $accumulator code.
+         */
+        lang: 'js';
+      }
+    }
+
+    export interface AddToSet {
+      /**
+       * Returns an array of all unique values that results from applying an expression to each document in a group.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/addToSet/#mongodb-expression-exp.-addToSet
+       */
+      $addToSet: ArrayExpression;
+    }
+
+    export interface Avg {
+      /**
+       * Returns the average value of the numeric values. $avg ignores non-numeric values.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/avg/#mongodb-expression-exp.-avg
+       */
+      $avg: ArrayExpression;
+    }
+
+    export interface Count {
+      /**
+       * Returns the number of documents in a group.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/count/#mongodb-expression-exp.-count
+       */
+      $count: Record<string | number | symbol, never>;
+    }
+
+    export interface CovariancePop {
+      /**
+       * Returns the population covariance of two numeric expressions that are evaluated using documents in the
+       * $setWindowFields stage window.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/covariancePop/#mongodb-expression-exp.-covariancePop
+       */
+      $covariancePop: [NumberExpression, NumberExpression];
+    }
+
+    export interface CovarianceSamp {
+      /**
+       * Returns the sample covariance of two numeric expressions that are evaluated using documents in the
+       * $setWindowFields stage window.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/covarianceSamp/#mongodb-expression-exp.-covarianceSamp
+       */
+      $covarianceSamp: [NumberExpression, NumberExpression];
+    }
+
+    export interface DenseRank {
+      /**
+       * Returns the document position (known as the rank) relative to other documents in the $setWindowFields stage
+       * partition.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/denseRank/#mongodb-expression-exp.-denseRank
+       */
+      $denseRank: Record<string | number | symbol, never>;
+    }
+
+    export interface Derivative {
+      /**
+       * Returns the average rate of change within the specified window, which is calculated using the:
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/derivative/#mongodb-expression-exp.-derivative
+       */
+      $derivative: {
+        /**
+         * Specifies the expression to evaluate. The expression must evaluate to a number.
+         */
+        input: NumberExpression;
+        /**
+         * A string that specifies the time unit.
+         */
+        unit?: DateUnit;
+      }
+    }
+
+    export interface DocumentNumber {
+      /**
+       * Returns the position of a document (known as the document number) in the $setWindowFields stage partition.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/documentNumber/#mongodb-expression-exp.-documentNumber
+       */
+      $documentNumber: Record<string | number | symbol, never>;
+    }
+
+    export interface ExpMovingAvg {
+      /**
+       * Returns the exponential moving average of numeric expressions applied to documents in a partition defined in
+       * the $setWindowFields stage.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/expMovingAvg/#mongodb-expression-exp.-expMovingAvg
+       */
+      $expMovingAvg: {
+        /**
+         * Specifies the expression to evaluate. Non-numeric expressions are ignored.
+         */
+        input: Expression;
+
+        /**
+         * An integer that specifies the number of historical documents that have a significant mathematical weight in
+         * the exponential moving average calculation, with the most recent documents contributing the most weight.
+         *
+         * You must specify either N or alpha. You cannot specify both.
+         */
+        N: NumberExpression;
+
+        /**
+         * A double that specifies the exponential decay value to use in the exponential moving average calculation. A
+         * higher alpha value assigns a lower mathematical significance to previous results from the calculation.
+         *
+         * You must specify either N or alpha. You cannot specify both.
+         */
+        alpha?: never;
+      } |
+      {
+        /**
+         * Specifies the expression to evaluate. Non-numeric expressions are ignored.
+         */
+        input: Expression;
+
+        /**
+         * An integer that specifies the number of historical documents that have a significant mathematical weight in
+         * the exponential moving average calculation, with the most recent documents contributing the most weight.
+         *
+         * You must specify either N or alpha. You cannot specify both.
+         */
+        N?: never;
+
+        /**
+         * A double that specifies the exponential decay value to use in the exponential moving average calculation. A
+         * higher alpha value assigns a lower mathematical significance to previous results from the calculation.
+         *
+         * You must specify either N or alpha. You cannot specify both.
+         */
+        alpha: NumberExpression;
+      }
+    }
+
+    export interface Integral {
+      /**
+       * Returns the approximation of the area under a curve, which is calculated using the trapezoidal rule where each
+       * set of adjacent documents form a trapezoid using the:
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/integral/#mongodb-expression-exp.-integral
+       */
+      $integral: {
+        /**
+         * Specifies the expression to evaluate. You must provide an expression that returns a number.
+         */
+        input: NumberExpression;
+
+        /**
+         * A string that specifies the time unit.
+         */
+        unit?: DateUnit;
+      }
+    }
+
+    export interface Max {
+      /**
+       * Returns the maximum value. $max compares both value and type, using the specified BSON comparison order for
+       * values of different types.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/max/#mongodb-expression-exp.-max
+       */
+      $max: Expression | Expression[];
+    }
+
+    export interface Min {
+      /**
+       * Returns the minimum value. $min compares both value and type, using the specified BSON comparison order for
+       * values of different types.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/min/#mongodb-expression-exp.-min
+       */
+      $min: Expression | Expression[];
+    }
+
+    export interface Push {
+      /**
+       * Returns an array of all values that result from applying an expression to documents.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/push/#mongodb-expression-exp.-push
+       */
+      $push: Expression;
+    }
+
+    export interface Rank {
+      /**
+       * Returns the document position (known as the rank) relative to other documents in the $setWindowFields stage
+       * partition.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/rank/#mongodb-expression-exp.-rank
+       */
+      $rank: Record<string | number | symbol, never>;
+    }
+
+    export interface Shift {
+      /**
+       * Returns the value from an expression applied to a document in a specified position relative to the current
+       * document in the $setWindowFields stage partition.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/shift/#mongodb-expression-exp.-shift
+       */
+      $shift: {
+        /**
+         * Specifies an expression to evaluate and return in the output.
+         */
+        output: Expression;
+        /**
+         * Specifies an integer with a numeric document position relative to the current document in the output.
+         */
+        by: number;
+        /**
+         * Specifies an optional default expression to evaluate if the document position is outside of the implicit
+         * $setWindowFields stage window. The implicit window contains all the documents in the partition.
+         */
+        default?: Expression;
+      }
+    }
+
+    export interface StdDevPop {
+      /**
+       * Calculates the population standard deviation of the input values. Use if the values encompass the entire
+       * population of data you want to represent and do not wish to generalize about a larger population. $stdDevPop
+       * ignores non-numeric values.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/stdDevPop/#mongodb-expression-exp.-stdDevPop
+       */
+      $stdDevPop: Expression;
+    }
+
+    export interface StdDevSamp {
+      /**
+       * Calculates the sample standard deviation of the input values. Use if the values encompass a sample of a
+       * population of data from which to generalize about the population. $stdDevSamp ignores non-numeric values.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/stdDevSamp/#mongodb-expression-exp.-stdDevSamp
+       */
+      $stdDevSamp: Expression;
+    }
+
+    export interface Sum {
+      /**
+       * Calculates and returns the collective sum of numeric values. $sum ignores non-numeric values.
+       *
+       * @version 5.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/Sum/#mongodb-expression-exp.-Sum
+       */
+      $sum: Expression | Expression[];
+    }
   }
 
   type Path = string;
@@ -1903,9 +2232,17 @@ declare module 'mongoose' {
     TextExpressionOperator |
     MiscellaneousExpressionOperator |
     TrigonometryExpressionOperator |
-    StringExpressionOperator;
+    LiteralExpressionOperator |
+    TextExpressionOperator |
+    StringExpressionOperator |
+    VariableExpressionOperator |
+    WindowOperator;
 
   export type NullExpression = null;
+
+  export type CodeExpression =
+    string |
+    Function;
 
   export type AnyExpression =
     ArrayExpression |
@@ -1923,7 +2260,9 @@ declare module 'mongoose' {
     StringExpressionOperatorReturningArray |
     ObjectExpressionOperatorReturningArray |
     SetExpressionOperatorReturningArray |
-    LiteralExpressionOperatorReturningAny;
+    LiteralExpressionOperatorReturningAny |
+    WindowOperatorReturningArray |
+    WindowOperatorReturningAny;
 
   export type BooleanExpression =
     boolean |
@@ -1944,7 +2283,11 @@ declare module 'mongoose' {
     TrigonometryExpressionOperator |
     MiscellaneousExpressionOperatorReturningNumber |
     StringExpressionOperatorReturningNumber |
-    LiteralExpressionOperatorReturningAny;
+    LiteralExpressionOperatorReturningAny |
+    ObjectExpressionOperator |
+    SetExpressionOperator |
+    WindowOperatorReturningNumber |
+    WindowOperatorReturningAny;
 
   export type ObjectExpression =
     Path |
@@ -2163,6 +2506,52 @@ declare module 'mongoose' {
 
   export type TextExpressionOperator =
     Expression.Meta;
+
+  export type WindowOperator =
+    Expression.AddToSet |
+    Expression.Avg |
+    Expression.Count |
+    Expression.CovariancePop |
+    Expression.CovarianceSamp |
+    Expression.DenseRank |
+    Expression.Derivative |
+    Expression.DocumentNumber |
+    Expression.ExpMovingAvg |
+    Expression.First |
+    Expression.Integral |
+    Expression.Last |
+    Expression.Max |
+    Expression.Min |
+    Expression.Push |
+    Expression.Rank |
+    Expression.Shift |
+    Expression.StdDevPop |
+    Expression.StdDevSamp |
+    Expression.Sum;
+
+  export type WindowOperatorReturningAny =
+    Expression.First |
+    Expression.Last |
+    Expression.Shift;
+
+  export type WindowOperatorReturningArray =
+    Expression.AddToSet |
+    Expression.Push
+
+  export type WindowOperatorReturningNumber =
+    Expression.Avg |
+    Expression.Count |
+    Expression.CovariancePop |
+    Expression.CovarianceSamp |
+    Expression.DenseRank |
+    Expression.DocumentNumber |
+    Expression.ExpMovingAvg |
+    Expression.Integral |
+    Expression.Max |
+    Expression.Min |
+    Expression.StdDevPop |
+    Expression.StdDevSamp |
+    Expression.Sum;
 
   export type tzExpression = UTCOffset | StringExpressionOperatorReturningBoolean | string;
 

@@ -13,6 +13,7 @@
 /// <reference path="./query.d.ts" />
 /// <reference path="./schemaoptions.d.ts" />
 /// <reference path="./schematypes.d.ts" />
+/// <reference path="./session.d.ts" />
 /// <reference path="./types.d.ts" />
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
@@ -81,18 +82,8 @@ declare module 'mongoose' {
   /** Sets mongoose options */
   export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): Mongoose;
 
-  /**
-   * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
-   * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
-   * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
-   */
-  export function startSession(options?: mongodb.ClientSessionOptions): Promise<mongodb.ClientSession>;
-  export function startSession(options: mongodb.ClientSessionOptions, cb: Callback<mongodb.ClientSession>): void;
-
   /** The Mongoose version */
   export const version: string;
-
-  export type ClientSession = mongodb.ClientSession;
 
   /** A list of paths to validate. If set, Mongoose will validate only the modified paths that are in the given list. */
   export type pathsToValidate = string[] | string;
@@ -128,7 +119,8 @@ declare module 'mongoose' {
   export interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}> extends
     NodeJS.EventEmitter,
     AcceptsDiscriminator,
-    ModelIndexOperations {
+    IndexManager,
+    SessionStarter {
     new <DocType = AnyKeys<T> & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
@@ -284,12 +276,6 @@ declare module 'mongoose' {
     populate(doc: any, options: PopulateOptions | Array<PopulateOptions> | string,
       callback?: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
 
-    /**
-     * Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
-     * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
-     * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
-     * */
-    startSession(options?: mongodb.ClientSessionOptions, cb?: Callback<mongodb.ClientSession>): Promise<mongodb.ClientSession>;
 
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(callback?: CallbackWithoutResult): Promise<void>;
@@ -439,11 +425,11 @@ declare module 'mongoose' {
 
   export type UpdateWriteOpResult = mongodb.UpdateResult;
 
-  export interface SaveOptions {
+  export interface SaveOptions extends
+    SessionOption {
     checkKeys?: boolean;
     j?: boolean;
     safe?: boolean | WriteConcern;
-    session?: ClientSession | null;
     timestamps?: boolean;
     validateBeforeSave?: boolean;
     validateModifiedOnly?: boolean;
@@ -462,12 +448,12 @@ declare module 'mongoose' {
   }
 
   export interface InsertManyOptions extends
-    PopulateOption {
+    PopulateOption,
+    SessionOption {
     limit?: number;
     rawResult?: boolean;
     ordered?: boolean;
     lean?: boolean;
-    session?: mongodb.ClientSession;
   }
 
   export type InferIdType<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;

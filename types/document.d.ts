@@ -68,7 +68,7 @@ declare module 'mongoose' {
      * automatically set `session` if you `save()` a doc that you got from a
      * query with an associated session.
      */
-    $session(session?: mongodb.ClientSession | null): mongodb.ClientSession | null;
+    $session(session?: ClientSession | null): ClientSession | null;
 
     /** Alias for `set()`, used internally to avoid conflicts */
     $set(path: string, val: any, type: any, options?: any): this;

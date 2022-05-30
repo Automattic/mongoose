@@ -10,7 +10,7 @@ declare module 'mongoose' {
   function syncIndexes(options?: SyncIndexesOptions): Promise<ConnectionSyncIndexesResult>;
   function syncIndexes(options: SyncIndexesOptions | null, callback: Callback<ConnectionSyncIndexesResult>): void;
 
-  interface ModelIndexOperations {
+  interface IndexManager {
     /**
      * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
      * function.

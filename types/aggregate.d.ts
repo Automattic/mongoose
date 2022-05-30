@@ -1,7 +1,8 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
-  interface AggregateOptions {
+  interface AggregateOptions extends
+    SessionOption {
     /**
      * If true, the MongoDB server will use the hard drive to store data during this aggregation.
      */
@@ -56,8 +57,6 @@ declare module 'mongoose' {
      * The preferred read preference.
      */
     readPreference?: mongodb.ReadPreferenceLike;
-    /** The ClientSession for this aggregation */
-    session?: mongodb.ClientSession;
     /**
      * Specifies the write concern.
      */
@@ -65,7 +64,7 @@ declare module 'mongoose' {
     [key: string]: any;
   }
 
-  class Aggregate<R> {
+  class Aggregate<R> implements SessionOperation {
     /**
      * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js
      * You do not need to call this function explicitly, the JavaScript runtime

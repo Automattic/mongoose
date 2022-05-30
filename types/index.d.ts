@@ -6,12 +6,13 @@
 /// <reference path="./document.d.ts" />
 /// <reference path="./error.d.ts" />
 /// <reference path="./helpers.d.ts" />
+/// <reference path="./indizes.d.ts" />
 /// <reference path="./mongooseoptions.d.ts" />
 /// <reference path="./pipelinestage.d.ts" />
 /// <reference path="./populate.d.ts" />
 /// <reference path="./query.d.ts" />
 /// <reference path="./schemaoptions.d.ts" />
-/// <reference path="./schematypeoptions.d.ts" />
+/// <reference path="./schematype.d.ts" />
 /// <reference path="./utility.d.ts" />
 
 declare class NativeDate extends global.Date { }
@@ -21,25 +22,6 @@ declare module 'mongoose' {
   import mongodb = require('mongodb');
   import mongoose = require('mongoose');
 
-  /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
-  export type Date = Schema.Types.Date;
-
-  /**
-   * The Mongoose Decimal128 [SchemaType](/docs/schematypes.html). Used for
-   * declaring paths in your schema that should be
-   * [128-bit decimal floating points](http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-decimal.html).
-   * Do not use this to create a new Decimal128 instance, use `mongoose.Types.Decimal128`
-   * instead.
-   */
-  export type Decimal128 = Schema.Types.Decimal128;
-
-  /**
-   * The Mongoose Mixed [SchemaType](/docs/schematypes.html). Used for
-   * declaring paths in your schema that Mongoose's change tracking, casting,
-   * and validation should ignore.
-   */
-  export type Mixed = Schema.Types.Mixed;
-
   export type Mongoose = typeof mongoose;
 
   /**
@@ -48,46 +30,8 @@ declare module 'mongoose' {
    */
   export const Mongoose: new (options?: MongooseOptions | null) => Mongoose;
 
-  /**
-   * The Mongoose Number [SchemaType](/docs/schematypes.html). Used for
-   * declaring paths in your schema that Mongoose should cast to numbers.
-   */
-  export type Number = Schema.Types.Number;
-
-  /**
-   * The Mongoose ObjectId [SchemaType](/docs/schematypes.html). Used for
-   * declaring paths in your schema that should be
-   * [MongoDB ObjectIds](https://docs.mongodb.com/manual/reference/method/ObjectId/).
-   * Do not use this to create a new ObjectId instance, use `mongoose.Types.ObjectId`
-   * instead.
-   */
-  export type ObjectId = Schema.Types.ObjectId;
-
   export let Promise: any;
   export const PromiseProvider: any;
-
-  /** The various Mongoose SchemaTypes. */
-  export const SchemaTypes: typeof Schema.Types;
-
-  /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
-  export function connect(uri: string, options: ConnectOptions, callback: CallbackWithoutResult): void;
-  export function connect(uri: string, callback: CallbackWithoutResult): void;
-  export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
-
-  /**
-   * Makes the indexes in MongoDB match the indexes defined in every model's
-   * schema. This function will drop any indexes that are not defined in
-   * the model's schema except the `_id` index, and build any indexes that
-   * are in your schema but not in MongoDB.
-   */
-  export function syncIndexes(options?: SyncIndexesOptions): Promise<ConnectionSyncIndexesResult>;
-  export function syncIndexes(options: SyncIndexesOptions | null, callback: Callback<ConnectionSyncIndexesResult>): void;
-
-  /** The Mongoose module's default connection. Equivalent to `mongoose.connections[0]`, see [`connections`](#mongoose_Mongoose-connections). */
-  export const connection: Connection;
-
-  /** An array containing all connections associated with this Mongoose instance. */
-  export const connections: Connection[];
 
   /**
    * Can be extended to explicitly type specific models.
@@ -99,20 +43,12 @@ declare module 'mongoose' {
   /** An array containing all models associated with this Mongoose instance. */
   export const models: Models;
 
-  /** Creates a Connection instance. */
-  export function createConnection(uri: string, options: ConnectOptions, callback: Callback<Connection>): void;
-  export function createConnection(uri: string, options?: ConnectOptions): Connection;
-  export function createConnection(): Connection;
-
   /**
    * Removes the model named `name` from the default connection, if it exists.
    * You can use this function to clean up any models you created in your tests to
    * prevent OverwriteModelErrors.
    */
   export function deleteModel(name: string | RegExp): Mongoose;
-
-  export function disconnect(): Promise<void>;
-  export function disconnect(cb: CallbackWithoutResult): void;
 
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
@@ -176,14 +112,6 @@ declare module 'mongoose' {
   interface MongooseBulkWriteOptions {
     skipValidation?: boolean;
   }
-
-  interface IndexesDiff {
-    /** Indexes that would be created in mongodb. */
-    toCreate: Array<any>
-    /** Indexes that would be dropped in mongodb. */
-    toDrop: Array<any>
-  }
-
   export interface ModifyResult<T> {
     value: Require_id<T> | null;
     /** see https://www.mongodb.com/docs/manual/reference/command/findAndModify/#lasterrorobject */
@@ -195,7 +123,10 @@ declare module 'mongoose' {
   }
 
   export const Model: Model<any>;
-  export interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
+  export interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}> extends
+    NodeJS.EventEmitter,
+    AcceptsDiscriminator,
+    ModelIndexOperations {
     new <DocType = AnyKeys<T> & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
@@ -257,13 +188,6 @@ declare module 'mongoose' {
     createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>): Promise<mongodb.Collection<T>>;
     createCollection<T extends mongodb.Document>(options: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'> | null, callback: Callback<mongodb.Collection<T>>): void;
 
-    /**
-     * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
-     * function.
-     */
-    createIndexes(callback?: CallbackWithoutResult): Promise<void>;
-    createIndexes(options?: any, callback?: CallbackWithoutResult): Promise<void>;
-
     /** Connection the model uses. */
     db: Connection;
 
@@ -284,13 +208,6 @@ declare module 'mongoose' {
     deleteOne(filter?: FilterQuery<T>, options?: QueryOptions<T>, callback?: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteResult, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
     deleteOne(filter: FilterQuery<T>, callback: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteResult, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
     deleteOne(callback: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteResult, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
-
-    /**
-     * Sends `createIndex` commands to mongo for each index declared in the schema.
-     * The `createIndex` commands are sent in series.
-     */
-    ensureIndexes(callback?: CallbackWithoutResult): Promise<void>;
-    ensureIndexes(options?: any, callback?: CallbackWithoutResult): Promise<void>;
 
     /**
      * Event emitter that reports any errors that occurred. Useful for global error
@@ -356,15 +273,6 @@ declare module 'mongoose' {
     insertMany(doc: AnyKeys<T> | AnyObject, options?: InsertManyOptions, callback?: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[] | InsertManyResult<T>>): void;
     insertMany(docs: Array<AnyKeys<T> | AnyObject>, options?: InsertManyOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>> | InsertManyResult<T>>): void;
 
-    /**
-     * Lists the indexes currently defined in MongoDB. This may or may not be
-     * the same as the indexes defined in your schema depending on whether you
-     * use the [`autoIndex` option](/docs/guide.html#autoIndex) and if you
-     * build indexes manually.
-     */
-    listIndexes(callback: Callback<Array<any>>): void;
-    listIndexes(): Promise<Array<any>>;
-
     /** The name of the model */
     modelName: string;
 
@@ -373,23 +281,6 @@ declare module 'mongoose' {
       callback?: Callback<(HydratedDocument<T, TMethodsAndOverrides, TVirtuals>)[]>): Promise<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>;
     populate(doc: any, options: PopulateOptions | Array<PopulateOptions> | string,
       callback?: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
-
-    /**
-     * Makes the indexes in MongoDB match the indexes defined in this model's
-     * schema. This function will drop any indexes that are not defined in
-     * the model's schema except the `_id` index, and build any indexes that
-     * are in your schema but not in MongoDB.
-     */
-    syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
-    syncIndexes(options: Record<string, unknown> | null, callback: Callback<Array<string>>): void;
-
-    /**
-     * Does a dry-run of Model.syncIndexes(), meaning that
-     * the result of this function would be the result of
-     * Model.syncIndexes().
-     */
-    diffIndexes(options?: Record<string, unknown>): Promise<IndexesDiff>
-    diffIndexes(options: Record<string, unknown> | null, callback: (err: CallbackError, diff: IndexesDiff) => void): void
 
     /**
      * Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
@@ -665,9 +556,6 @@ declare module 'mongoose' {
   export type SchemaPreOptions = { document?: boolean, query?: boolean };
   export type SchemaPostOptions = { document?: boolean, query?: boolean };
 
-  export type IndexDirection = 1 | -1 | '2d' | '2dsphere' | 'geoHaystack' | 'hashed' | 'text';
-  export type IndexDefinition = Record<string, IndexDirection>;
-
   export type PreMiddlewareFunction<ThisType = any> = (this: ThisType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
   export type PreSaveMiddlewareFunction<ThisType = any> = (this: ThisType, next: CallbackWithoutResultAndOptionalError, opts: SaveOptions) => void | Promise<void>;
   export type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
@@ -873,31 +761,6 @@ declare module 'mongoose' {
     | typeof Schema.Types.Buffer
     | typeof Schema.Types.ObjectId;
 
-  export interface IndexOptions extends mongodb.CreateIndexesOptions {
-    /**
-     * `expires` utilizes the `ms` module from [guille](https://github.com/guille/) allowing us to use a friendlier syntax:
-     *
-     * @example
-     * ```js
-     * const schema = new Schema({ prop1: Date });
-     *
-     * // expire in 24 hours
-     * schema.index({ prop1: 1 }, { expires: 60*60*24 })
-     *
-     * // expire in 24 hours
-     * schema.index({ prop1: 1 }, { expires: '24h' })
-     *
-     * // expire in 1.5 hours
-     * schema.index({ prop1: 1 }, { expires: '1.5h' })
-     *
-     * // expire in 7 days
-     * schema.index({ prop1: 1 }, { expires: '7d' })
-     * ```
-     */
-    expires?: number | string;
-    weights?: AnyObject;
-  }
-
   export interface ValidatorProps {
     path: string;
     value: any;
@@ -990,155 +853,6 @@ declare module 'mongoose' {
 
     /** Adds a custom setter to this virtual. */
     set<T = HydratedDocType>(fn: (this: T, value: any, virtualType: VirtualType<T>, doc: T) => void): this;
-  }
-
-  export namespace Schema {
-    namespace Types {
-      class Array extends SchemaType implements AcceptsDiscriminator {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-
-        static options: { castNonArrays: boolean; };
-
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
-        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-
-        /** The schematype embedded in this array */
-        caster?: SchemaType;
-
-        /**
-         * Adds an enum validator if this is an array of strings or numbers. Equivalent to
-         * `SchemaString.prototype.enum()` or `SchemaNumber.prototype.enum()`
-         */
-        enum(vals: string[] | number[]): this;
-      }
-
-      class Boolean extends SchemaType {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-
-        /** Configure which values get casted to `true`. */
-        static convertToTrue: Set<any>;
-
-        /** Configure which values get casted to `false`. */
-        static convertToFalse: Set<any>;
-      }
-
-      class Buffer extends SchemaType {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-
-        /**
-         * Sets the default [subtype](https://studio3t.com/whats-new/best-practices-uuid-mongodb/)
-         * for this buffer. You can find a [list of allowed subtypes here](http://api.mongodb.com/python/current/api/bson/binary.html).
-         */
-        subtype(subtype: number): this;
-      }
-
-      class Date extends SchemaType {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-
-        /** Declares a TTL index (rounded to the nearest second) for _Date_ types only. */
-        expires(when: number | string): this;
-
-        /** Sets a maximum date validator. */
-        max(value: NativeDate, message: string): this;
-
-        /** Sets a minimum date validator. */
-        min(value: NativeDate, message: string): this;
-      }
-
-      class Decimal128 extends SchemaType {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-      }
-
-      class DocumentArray extends SchemaType implements AcceptsDiscriminator {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-
-        static options: { castNonArrays: boolean; };
-
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
-        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-
-        /** The schema used for documents in this array */
-        schema: Schema;
-
-        /** The constructor used for subdocuments in this array */
-        caster?: typeof Types.Subdocument;
-      }
-
-      class Map extends SchemaType {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-      }
-
-      class Mixed extends SchemaType {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-      }
-
-      class Number extends SchemaType {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-
-        /** Sets a enum validator */
-        enum(vals: number[]): this;
-
-        /** Sets a maximum number validator. */
-        max(value: number, message: string): this;
-
-        /** Sets a minimum number validator. */
-        min(value: number, message: string): this;
-      }
-
-      class ObjectId extends SchemaType {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-
-        /** Adds an auto-generated ObjectId default if turnOn is true. */
-        auto(turnOn: boolean): this;
-      }
-
-      class Subdocument extends SchemaType implements AcceptsDiscriminator {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-
-        /** The document's schema */
-        schema: Schema;
-
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
-        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-      }
-
-      class String extends SchemaType {
-        /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
-
-        /** Adds an enum validator */
-        enum(vals: string[] | any): this;
-
-        /** Adds a lowercase [setter](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set). */
-        lowercase(shouldApply?: boolean): this;
-
-        /** Sets a regexp validator. */
-        match(value: RegExp, message: string): this;
-
-        /** Sets a maximum length validator. */
-        maxlength(value: number, message: string): this;
-
-        /** Sets a minimum length validator. */
-        minlength(value: number, message: string): this;
-
-        /** Adds a trim [setter](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set). */
-        trim(shouldTrim?: boolean): this;
-
-        /** Adds an uppercase [setter](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set). */
-        uppercase(shouldApply?: boolean): this;
-      }
-    }
   }
 
   export namespace Types {
@@ -1392,101 +1106,6 @@ declare module 'mongoose' {
     T extends unknown[] ? LeanDocument<RawDocType>[] :
       T extends Document ? LeanDocument<RawDocType> :
         T;
-
-  export class SchemaType<T = any> {
-    /** SchemaType constructor */
-    constructor(path: string, options?: AnyObject, instance?: string);
-
-    /** Get/set the function used to cast arbitrary values to this type. */
-    static cast(caster?: Function | boolean): Function;
-
-    static checkRequired(checkRequired?: (v: any) => boolean): (v: any) => boolean;
-
-    /** Sets a default option for this schema type. */
-    static set(option: string, value: any): void;
-
-    /** Attaches a getter for all instances of this schema type. */
-    static get(getter: (value: any) => any): void;
-
-    /** The class that Mongoose uses internally to instantiate this SchemaType's `options` property. */
-    OptionsConstructor: SchemaTypeOptions<T>;
-
-    /** Cast `val` to this schema type. Each class that inherits from schema type should implement this function. */
-    cast(val: any, doc: Document<any>, init: boolean, prev?: any, options?: any): any;
-
-    /** Sets a default value for this SchemaType. */
-    default(val: any): any;
-
-    /** Adds a getter to this schematype. */
-    get(fn: Function): this;
-
-    /**
-     * Defines this path as immutable. Mongoose prevents you from changing
-     * immutable paths unless the parent document has [`isNew: true`](/docs/api.html#document_Document-isNew).
-     */
-    immutable(bool: boolean): this;
-
-    /** Declares the index options for this schematype. */
-    index(options: any): this;
-
-    /** String representation of what type this is, like 'ObjectID' or 'Number' */
-    instance: string;
-
-    /** True if this SchemaType has a required validator. False otherwise. */
-    isRequired?: boolean;
-
-    /** The options this SchemaType was instantiated with */
-    options: AnyObject;
-
-    /** The path to this SchemaType in a Schema. */
-    path: string;
-
-    /**
-     * Set the model that this path refers to. This is the option that [populate](https://mongoosejs.com/docs/populate.html)
-     * looks at to determine the foreign collection it should query.
-     */
-    ref(ref: string | boolean | Model<any>): this;
-
-    /**
-     * Adds a required validator to this SchemaType. The validator gets added
-     * to the front of this SchemaType's validators array using unshift().
-     */
-    required(required: boolean, message?: string): this;
-
-    /** The schema this SchemaType instance is part of */
-    schema: Schema<any>;
-
-    /** Sets default select() behavior for this path. */
-    select(val: boolean): this;
-
-    /** Adds a setter to this schematype. */
-    set(fn: Function): this;
-
-    /** Declares a sparse index. */
-    sparse(bool: boolean): this;
-
-    /** Declares a full text index. */
-    text(bool: boolean): this;
-
-    /** Defines a custom function for transforming this path when converting a document to JSON. */
-    transform(fn: (value: any) => any): this;
-
-    /** Declares an unique index. */
-    unique(bool: boolean): this;
-
-    /** The validators that Mongoose should run to validate properties at this SchemaType's path. */
-    validators: { message?: string; type?: string; validator?: Function }[];
-
-    /** Adds validator(s) for this document path. */
-    validate(obj: RegExp | Function | any, errorMsg?: string,
-      type?: string): this;
-  }
-
-  export interface SyncIndexesOptions extends mongodb.CreateIndexesOptions {
-    continueOnError?: boolean
-  }
-  export type ConnectionSyncIndexesResult = Record<string, OneCollectionSyncIndexesResult>;
-  export type OneCollectionSyncIndexesResult = Array<string> & mongodb.MongoServerError;
 
   /* for ts-mongoose */
   export class mquery { }

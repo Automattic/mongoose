@@ -2386,22 +2386,25 @@ declare module 'mongoose' {
   type Path = string;
 
   export type Expression =
+    Path |
     ArithmeticExpressionOperator |
     ArrayExpressionOperator |
     BooleanExpressionOperator |
     ComparisonExpressionOperator |
     ConditionalExpressionOperator |
-    DateExpressionOperator |
-    TextExpressionOperator |
-    MiscellaneousExpressionOperator |
-    TrigonometryExpressionOperator |
-    LiteralExpressionOperator |
-    TextExpressionOperator |
-    StringExpressionOperator |
-    VariableExpressionOperator |
-    TypeExpressionOperator |
     CustomAggregationExpressionOperator |
+    DataSizeOperator |
+    DateExpressionOperator |
+    LiteralExpressionOperator |
+    MiscellaneousExpressionOperator |
+    ObjectExpressionOperator |
+    SetExpressionOperator |
+    StringExpressionOperator |
+    TextExpressionOperator |
+    TrigonometryExpressionOperator |
+    TypeExpressionOperator |
     Accumulators |
+    VariableExpressionOperator |
     WindowOperator;
 
   export type NullExpression = null;

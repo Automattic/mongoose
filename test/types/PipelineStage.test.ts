@@ -129,3 +129,95 @@ const unwind2: PipelineStage = { $unwind: { path: '$sizes' } };
 const unwind3: PipelineStage = { $unwind: { path: '$sizes', includeArrayIndex: 'arrayIndex' } };
 const unwind4: PipelineStage = { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } };
 const unwind5: PipelineStage = { $unwind: { path: '$sizes', preserveNullAndEmptyArrays: true } };
+
+const redact1: PipelineStage = {
+  $redact: {
+    $cond: {
+      if: { $gt: [{ $size: { $setIntersection: ['$tags', 'userAccess'] } }, 0] },
+      then: '$$DESCEND',
+      else: '$$PRUNE'
+    }
+  }
+};
+
+const redact2: PipelineStage = {
+  $redact: {
+    $cond: {
+      if: { $eq: ['$level', 5] },
+      then: '$$PRUNE',
+      else: '$$DESCEND'
+    }
+  }
+};
+const replaceRoot: PipelineStage = { $replaceRoot: { newRoot: { $mergeObjects: [{ dogs: 0, cats: 0, birds: 0, fish: 0 }, '$pets'] } } };
+
+const project1: PipelineStage = { $project: { contact: 1, 'contact.address.country': 1 } };
+const project2: PipelineStage = { $project: { 'contact.address.country': 1, contact: 1 } };
+const project3: PipelineStage = { $project: { author: { first: 0 }, lastModified: 0 } };
+const project4: PipelineStage = {
+  $project: {
+    title: 1,
+    'author.first': 1,
+    'author.last': 1,
+    'author.middle': {
+      $cond: {
+        if: { $eq: ['', '$author.middle'] },
+        then: '$$REMOVE',
+        else: '$author.middle'
+      }
+    }
+  }
+};
+const project5: PipelineStage = { $project: { 'stop.title': 1 } };
+const project6: PipelineStage = { $project: { stop: { title: 1 } } };
+const project7: PipelineStage = {
+  $project: {
+    title: 1,
+    isbn: {
+      prefix: { $substr: ['$isbn', 0, 3] },
+      group: { $substr: ['$isbn', 3, 2] },
+      publisher: { $substr: ['$isbn', 5, 4] },
+      title: { $substr: ['$isbn', 9, 3] },
+      checkDigit: { $substr: ['$isbn', 12, 1] }
+    },
+    lastName: '$author.last',
+    copiesSold: '$copies'
+  }
+};
+const project8: PipelineStage = { $project: { myArray: ['$x', '$y'] } };
+const project9: PipelineStage = { $project: { x: '$name.0', _id: 0 } };
+
+const sort1: PipelineStage = { $sort: { count: -1 } };
+const sortByCount1: PipelineStage = { $sortByCount: '$tags' };
+const sortByCount2: PipelineStage = { $sortByCount: { $mergeObjects: ['$employee', '$business'] } };
+
+const set1: PipelineStage = { $set: { 'specs.fuel_type': 'unleaded' } };
+const set2: PipelineStage = { $set: { cats: 20 } };
+const set3: PipelineStage = { $set: { _id: '$item', item: 'fruit' } };
+const set4: PipelineStage = { $set: { homework: { $concatArrays: ['$homework', [7]] } } };
+
+const merge1: PipelineStage = { $merge: { into: 'newDailySales201905', on: 'salesDate' } };
+const merge2: PipelineStage = { $merge: { into: 'newrestaurants', on: ['date', 'postcode'], whenMatched: 'replace', whenNotMatched: 'insert' } };
+const merge3: PipelineStage = { $merge: { into: { db: 'reporting', coll: 'budgets' }, on: '_id', whenMatched: 'replace', whenNotMatched: 'insert' } };
+const merge4: PipelineStage = { $merge: { into: { db: 'reporting', coll: 'orgArchive' }, on: ['dept', 'fiscal_year'], whenMatched: 'fail' } };
+const merge5: PipelineStage = { $merge: { into: 'quarterlyreport', on: '_id', whenMatched: 'merge', whenNotMatched: 'insert' } };
+const merge6: PipelineStage = {
+  $merge: {
+    into: 'monthlytotals',
+    on: '_id',
+    whenMatched: [
+      {
+        $addFields: {
+          thumbsup: { $add: ['$thumbsup', '$$new.thumbsup'] },
+          thumbsdown: { $add: ['$thumbsdown', '$$new.thumbsdown'] }
+        }
+      }],
+    whenNotMatched: 'insert'
+  }
+};
+
+const match1: PipelineStage = { $match: { $or: [{ score: { $gt: 70, $lt: 90 } }, { views: { $gte: 1000 } }] } };
+const match2: PipelineStage = { $match: { test: 'bla' } };
+const match3: PipelineStage = { $match: { test: { $or: [{ score: { $gt: 70, $lt: 90 } }, { views: { $gte: 1000 } }] } } };
+const match4: PipelineStage = { $match: { $and: [{ score: { $gt: 70, $lt: 90 } }, { views: { $gte: 1000 } }] } };
+const match5: PipelineStage = { $match: { test: { $and: [{ score: { $gt: 70, $lt: 90 } }, { views: { $gte: 1000 } }] } } };

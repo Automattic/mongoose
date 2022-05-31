@@ -971,7 +971,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/or/#mongodb-expression-exp.-or
        */
-      $or: Expression[];
+      $or: (Expression | Record<string, Expression>)[];
     }
 
     export interface Cmp {
@@ -980,7 +980,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cmp/#mongodb-expression-exp.-cmp
        */
-      $cmp: [Expression, Expression];
+      $cmp: [Record<string, AnyExpression> | Expression, Record<string, AnyExpression> | Expression];
     }
 
     export interface Eq {
@@ -989,7 +989,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/eq/#mongodb-expression-exp.-eq
        */
-      $eq: [Expression, Expression];
+      $eq: [AnyExpression, AnyExpression];
     }
 
     export interface Gt {
@@ -1763,7 +1763,7 @@ declare module 'mongoose' {
        * @version 3.6
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/mergeObjects/#mongodb-expression-exp.-mergeObjects
        */
-      $mergeObjects: ObjectExpression | ObjectExpression[]
+      $mergeObjects: ObjectExpression | ObjectExpression[] | ArrayExpression;
     }
 
     export interface SetField {
@@ -2146,7 +2146,7 @@ declare module 'mongoose' {
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/push/#mongodb-expression-exp.-push
        */
-      $push: Expression;
+      $push: Expression | Record<string, Expression>;
     }
 
     export interface Rank {
@@ -2215,7 +2215,7 @@ declare module 'mongoose' {
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#mongodb-expression-exp.-sum
        */
-      $sum: Expression | Expression[];
+      $sum: number | Expression | Expression[];
     }
 
     export interface Convert<K extends 'double' | 1 | 'string' | 2 | 'objectId' | 7 | 'bool' | 8 | 'date' | 9 | 'int' | 16 | 'long' | 18 | 'decimal' | 19 = 'double' | 1 | 'string' | 2 | 'objectId' | 7 | 'bool' | 8 | 'date' | 9 | 'int' | 16 | 'long' | 18 | 'decimal' | 19> {
@@ -2403,7 +2403,7 @@ declare module 'mongoose' {
     TextExpressionOperator |
     TrigonometryExpressionOperator |
     TypeExpressionOperator |
-    Accumulators |
+    AccumulatorOperator |
     VariableExpressionOperator |
     WindowOperator;
 
@@ -2462,6 +2462,7 @@ declare module 'mongoose' {
     number |
     Path |
     ArrayExpressionOperatorReturningAny |
+    ArrayExpressionOperatorReturningNumber |
     ArithmeticExpressionOperator |
     ComparisonExpressionOperatorReturningNumber |
     TrigonometryExpressionOperator |
@@ -2798,7 +2799,7 @@ declare module 'mongoose' {
   export type CustomAggregationExpressionOperatorReturningAny =
     Expression.Function;
 
-  export type Accumulators =
+  export type AccumulatorOperator =
     Expression.Accumulator |
     Expression.AddToSet |
     Expression.Avg |

@@ -123,12 +123,12 @@ declare module 'mongoose' {
   export type DiscriminatorModel<M, T> = T extends Model<infer T1, infer T2, infer T3, infer T4>
     ?
     M extends Model<infer M1, infer M2, infer M3, infer M4>
-      ? Model<M1 | T1, M2 | T2, M3 | T3, M4 | T4>
+      ? Model<Omit<M1, keyof T1> & T1, M2 | T2, M3 | T3, M4 | T4>
       : M
     : M;
 
   export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, T> = T extends Schema<infer T1, infer T2, infer T3, infer T4, infer T5>
-    ? Schema<T1 | DocType, DiscriminatorModel<T2, M>, T3 | TInstanceMethods, T4 | TQueryHelpers, T5 | TVirtuals>
+    ? Schema<Omit<DocType, keyof T1> & T1, DiscriminatorModel<T2, M>, T3 | TInstanceMethods, T4 | TQueryHelpers, T5 | TVirtuals>
     : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals>;
 
   export class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any> extends events.EventEmitter {

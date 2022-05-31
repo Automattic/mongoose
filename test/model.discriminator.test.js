@@ -1958,4 +1958,31 @@ describe('model', function() {
 
     assert(array.arrayEvent[0].element);
   });
+
+  it('handles discriminators on maps of subdocuments (gh-11720)', async function() {
+    const shapeSchema = Schema({ name: String }, { discriminatorKey: 'kind' });
+    const schema = Schema({ shape: { type: Map, of: shapeSchema } });
+
+    schema.path('shape.$*').discriminator('Circle', Schema({ radius: String }));
+    schema.path('shape.$*').discriminator('Square', Schema({ side: Number }));
+
+    const Test = db.model('Test', schema);
+
+    let doc = new Test({
+      shape: {
+        a: { kind: 'Circle', radius: 5 },
+        b: { kind: 'Square', side: 10 }
+      }
+    });
+
+    assert.strictEqual(doc.shape.get('a').radius, '5');
+    assert.strictEqual(doc.shape.get('b').side, 10);
+
+    await doc.save();
+
+    doc = await Test.findById(doc);
+
+    assert.strictEqual(doc.shape.get('a').radius, '5');
+    assert.strictEqual(doc.shape.get('b').side, 10);
+  });
 });

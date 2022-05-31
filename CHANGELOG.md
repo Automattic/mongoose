@@ -1,3 +1,17 @@
+6.3.5 / 2022-05-30
+==================
+ * fix(document): avoid infinite recursion when calling toObject() on self-referencing document #11756
+ * fix(document): avoid manually populating documents that are manually populated in another doc with different unpopulatedValue #11442
+ * fix(document): fix ObjectId conversion for external schemas #11841 [coyotte508](https://github.com/coyotte508)
+ * fix: fix codeql warnings #11817 [Uzlopak](https://github.com/Uzlopak)
+ * fix(types): allow passing TVirtuals to Schema class #11543
+ * fix(types): Type of Connection.transaction() #11825 [dwrss](https://github.com/dwrss)
+ * docs(typescript): add coverage for TypeScript query helpers #11709
+ * docs: fix documention of error handling #11844 [Uzlopak](https://github.com/Uzlopak)
+ * docs: typings mongoose.Error should reference to MongooseError #11850 [Uzlopak](https://github.com/Uzlopak)
+ * chore: improve issue templates #11794 [Uzlopak](https://github.com/Uzlopak)
+ * chore: use ts-benchmark instead of internal TS benchmarking #11798 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+
 6.3.4 / 2022-05-19
 ==================
  * fix(schema): disallow using schemas with schema-level projection with map subdocuments #11698

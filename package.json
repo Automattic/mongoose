@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "6.3.4",
+  "version": "6.3.5",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -61,6 +61,7 @@
     "serve-handler": "6.1.3",
     "sinon": "13.0.2",
     "stream-browserify": "3.0.0",
+    "ts-benchmark": "^1.0.2",
     "tsd": "0.20.0",
     "typescript": "4.6.4",
     "uuid": "8.3.2",
@@ -97,7 +98,9 @@
     "test-rs": "START_REPLICA_SET=1 mocha --timeout 30000 --exit ./test/*.test.js",
     "test-tsd": "node ./test/types/check-types-filename && tsd",
     "tdd": "mocha ./test/*.test.js ./test/typescript/main.test.js --inspect --watch --recursive --watch-files ./**/*.js",
-    "test-coverage": "nyc --reporter=html --reporter=text npm test"
+    "test-coverage": "nyc --reporter=html --reporter=text npm test",
+    "ts-benchmark": "ts-benchmark -p ./benchmarks/typescript/simple -f 17 18 29 32",
+    "ts-benchmark-watch": "ts-benchmark -p ./benchmarks/typescript/simple -w ./types -i -s -f 17 18 29 32 -b master"
   },
   "main": "./index.js",
   "types": "./types/index.d.ts",

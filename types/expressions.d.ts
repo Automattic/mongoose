@@ -310,7 +310,6 @@ declare module 'mongoose' {
       $radiansToDegrees: NumberExpression;
     }
 
-
     export interface Meta {
       /**
        * Access available per-document metadata related to the aggregation operation.
@@ -2214,9 +2213,128 @@ declare module 'mongoose' {
        * Calculates and returns the collective sum of numeric values. $sum ignores non-numeric values.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/Sum/#mongodb-expression-exp.-Sum
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#mongodb-expression-exp.-sum
        */
       $sum: Expression | Expression[];
+    }
+
+    export interface Convert<K extends 'double' | 1 | 'string' | 2 | 'objectId' | 7 | 'bool' | 8 | 'date' | 9 | 'int' | 16 | 'long' | 18 | 'decimal' | 19 = 'double' | 1 | 'string' | 2 | 'objectId' | 7 | 'bool' | 8 | 'date' | 9 | 'int' | 16 | 'long' | 18 | 'decimal' | 19> {
+      /**
+       * Checks if the specified expression resolves to one of the following numeric
+       * - Integer
+       * - Decimal
+       * - Double
+       * - Long
+       *
+       * @version 4.4
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/convert/#mongodb-expression-exp.-convert
+       */
+      $convert: {
+        input: Expression;
+        to: K;
+        onError?: Expression;
+        onNull?: Expression;
+      };
+    }
+
+    export interface IsNumber {
+      /**
+       * Checks if the specified expression resolves to one of the following numeric
+       * - Integer
+       * - Decimal
+       * - Double
+       * - Long
+       *
+       * @version 4.4
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/isNumber/#mongodb-expression-exp.-isNumber
+       */
+      $isNumber: Expression;
+    }
+
+    export interface ToBool {
+      /**
+       * Converts a value to a boolean.
+       *
+       * @version 4.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toBool/#mongodb-expression-exp.-toBool
+       */
+      $toBool: Expression;
+    }
+
+    export interface ToDecimal {
+      /**
+       * Converts a value to a decimal. If the value cannot be converted to a decimal, $toDecimal errors. If the value
+       * is null or missing, $toDecimal returns null.
+       *
+       * @version 4.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toDecimal/#mongodb-expression-exp.-toDecimal
+       */
+      $toDecimal: Expression;
+    }
+
+    export interface ToDouble {
+      /**
+       * Converts a value to a double. If the value cannot be converted to an double, $toDouble errors. If the value is
+       * null or missing, $toDouble returns null.
+       *
+       * @version 4.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toDouble/#mongodb-expression-exp.-toDouble
+       */
+      $toDouble: Expression;
+    }
+
+    export interface ToInt {
+      /**
+       * Converts a value to a long. If the value cannot be converted to a long, $toLong errors. If the value is null or
+       * missing, $toLong returns null.
+       *
+       * @version 4.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toInt/#mongodb-expression-exp.-toInt
+       */
+      $toInt: Expression;
+    }
+
+    export interface ToLong {
+      /**
+       * Converts a value to a long. If the value cannot be converted to a long, $toLong errors. If the value is null or
+       * missing, $toLong returns null.
+       *
+       * @version 4.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toLong/#mongodb-expression-exp.-toLong
+       */
+      $toLong: Expression;
+    }
+
+    export interface ToObjectId {
+      /**
+       * Converts a value to an ObjectId(). If the value cannot be converted to an ObjectId, $toObjectId errors. If the
+       * value is null or missing, $toObjectId returns null.
+       *
+       * @version 4.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toObjectId/#mongodb-expression-exp.-toObjectId
+       */
+      $toObjectId: Expression;
+    }
+
+    export interface ToString {
+      /**
+       * Converts a value to a string. If the value cannot be converted to a string, $toString errors. If the value is
+       * null or missing, $toString returns null.
+       *
+       * @version 4.0
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toString/#mongodb-expression-exp.-toString
+       */
+      $toString: Expression;
+    }
+
+    export interface Type {
+      /**
+       * Returns a string that specifies the BSON type of the argument.
+       *
+       * @version 3.4
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/type/#mongodb-expression-exp.-type
+       */
+      $type: Expression;
     }
   }
 
@@ -2236,6 +2354,7 @@ declare module 'mongoose' {
     TextExpressionOperator |
     StringExpressionOperator |
     VariableExpressionOperator |
+    TypeExpressionOperator |
     WindowOperator;
 
   export type NullExpression = null;
@@ -2250,7 +2369,11 @@ declare module 'mongoose' {
     NumberExpression |
     ObjectExpression |
     StringExpression |
-    DateExpression;
+    DateExpression |
+    ObjectIdExpression;
+
+  export type ObjectIdExpression =
+    TypeExpressionOperatorReturningObjectId;
 
   export type ArrayExpression<T = any> =
     T[] |
@@ -2272,7 +2395,8 @@ declare module 'mongoose' {
     ComparisonExpressionOperatorReturningBoolean |
     StringExpressionOperatorReturningBoolean |
     SetExpressionOperatorReturningBoolean |
-    LiteralExpressionOperatorReturningAny;
+    LiteralExpressionOperatorReturningAny |
+    TypeExpressionOperatorReturningBoolean;
 
   export type NumberExpression =
     number |
@@ -2287,7 +2411,8 @@ declare module 'mongoose' {
     ObjectExpressionOperator |
     SetExpressionOperator |
     WindowOperatorReturningNumber |
-    WindowOperatorReturningAny;
+    WindowOperatorReturningAny |
+    TypeExpressionOperatorReturningNumber;
 
   export type ObjectExpression =
     Path |
@@ -2303,12 +2428,14 @@ declare module 'mongoose' {
     DateExpressionOperatorReturningString |
     StringExpressionOperatorReturningString |
     LiteralExpressionReturningAny |
+    TypeExpressionOperatorReturningString |
     T;
 
   export type DateExpression =
     Path |
     NativeDate |
     DateExpressionOperatorReturningDate |
+    TypeExpressionOperatorReturningDate |
     LiteralExpressionReturningAny;
 
   export type ArithmeticExpressionOperator =
@@ -2552,6 +2679,45 @@ declare module 'mongoose' {
     Expression.StdDevPop |
     Expression.StdDevSamp |
     Expression.Sum;
+
+  export type TypeExpressionOperator =
+    Expression.Convert |
+    Expression.IsNumber |
+    Expression.ToBool |
+    Expression.ToDate |
+    Expression.ToDecimal |
+    Expression.ToDouble |
+    Expression.ToInt |
+    Expression.ToLong |
+    Expression.ToObjectId |
+    Expression.ToString |
+    Expression.Type;
+
+  export type TypeExpressionOperatorReturningNumber =
+    Expression.Convert<'double' | 1 | 'int' | 16 | 'long' | 18 | 'decimal' | 19> |
+    Expression.ToDecimal |
+    Expression.ToDouble |
+    Expression.ToInt |
+    Expression.ToLong;
+
+  export type TypeExpressionOperatorReturningBoolean =
+    Expression.Convert<'bool' | 8> |
+    Expression.IsNumber |
+    Expression.ToBool;
+
+
+  export type TypeExpressionOperatorReturningString =
+    Expression.Convert<'string' | 2> |
+    Expression.ToString |
+    Expression.Type;
+
+  export type TypeExpressionOperatorReturningObjectId =
+    Expression.Convert<'objectId' | 7> |
+    Expression.ToObjectId;
+
+  export type TypeExpressionOperatorReturningDate =
+    Expression.Convert<'date' | 9> |
+    Expression.ToDate;
 
   export type tzExpression = UTCOffset | StringExpressionOperatorReturningBoolean | string;
 

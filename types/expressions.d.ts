@@ -953,7 +953,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/and/#mongodb-expression-exp.-and
        */
-      $and: Expression[];
+      $and: (Expression | Record<string, Expression>)[];
     }
 
     export interface Not {
@@ -989,7 +989,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/eq/#mongodb-expression-exp.-eq
        */
-      $eq: [AnyExpression, AnyExpression];
+      $eq: AnyExpression | [AnyExpression, AnyExpression];
     }
 
     export interface Gt {
@@ -998,7 +998,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/gt/#mongodb-expression-exp.-gt
        */
-      $gt: [NumberExpression, NumberExpression];
+      $gt: NumberExpression |  [NumberExpression, NumberExpression];
     }
 
     export interface Gte {
@@ -1007,7 +1007,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/gte/#mongodb-expression-exp.-gte
        */
-      $gte: [NumberExpression, NumberExpression];
+      $gte: NumberExpression | [NumberExpression, NumberExpression];
     }
 
     export interface Lt {
@@ -1016,7 +1016,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/lt/#mongodb-expression-exp.-lt
        */
-      $lt: [NumberExpression, NumberExpression];
+      $lt: NumberExpression | [NumberExpression, NumberExpression];
     }
 
     export interface Lte {
@@ -1025,7 +1025,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/lte/#mongodb-expression-exp.-lte
        */
-      $lte: [NumberExpression, NumberExpression];
+      $lte: NumberExpression |  [NumberExpression, NumberExpression];
     }
 
     export interface Ne {
@@ -1034,7 +1034,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ne/#mongodb-expression-exp.-ne
        */
-      $ne: [Expression, Expression];
+      $ne: Expression | [Expression, Expression];
     }
 
     export interface Cond {
@@ -2475,7 +2475,8 @@ declare module 'mongoose' {
     WindowOperatorReturningAny |
     DataSizeOperatorReturningNumber |
     CustomAggregationExpressionOperatorReturningAny |
-    TypeExpressionOperatorReturningNumber;
+    TypeExpressionOperatorReturningNumber |
+    DateExpression;
 
   export type ObjectExpression =
     Path |

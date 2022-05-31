@@ -120,7 +120,7 @@ declare module 'mongoose' {
 
     export interface IndexStats {
       /** [`$indexStats` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/indexStats/) */
-      $indexStats: {}
+      $indexStats: Record<string | number | symbol, never>;
     }
 
     export interface Limit {
@@ -147,7 +147,7 @@ declare module 'mongoose' {
 
     export interface Match {
       /** [`$match` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/match/) */
-      $match: AnyObject
+      $match: Expression | Record<string, Expression>;
     }
 
     export interface Merge {

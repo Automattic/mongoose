@@ -132,7 +132,7 @@ const accumulator: Expression = {
 
 const toObjectId: Expression = { $toObjectId: '1234567890' };
 
-const type:Expression = { $type: '$a' };
+const type: Expression = { $type: '$a' };
 
 const binarySize: Expression = { $binarySize: '$binary' };
 
@@ -148,3 +148,15 @@ const functionExpr: Expression = {
     lang: 'js'
   }
 };
+
+const letExpr: Expression = {
+  $let: {
+    vars: {
+      total: { $add: ['$price', '$tax'] },
+      discounted: { $cond: { if: '$applyDiscount', then: 0.9, else: 1 } }
+    },
+    in: { $multiply: ['$$total', '$$discounted'] }
+  }
+};
+
+const toLong: Expression = { $toLong: '$qty' };

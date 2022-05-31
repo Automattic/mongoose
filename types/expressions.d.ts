@@ -1043,7 +1043,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cond/#mongodb-expression-exp.-cond
        */
-      $cond: { if: BooleanExpression, then: Expression, else: Expression } | [BooleanExpression, Expression, Expression];
+      $cond: { if: BooleanExpression, then: AnyExpression, else: AnyExpression } | [BooleanExpression, AnyExpression, AnyExpression];
     }
 
     export interface IfNull {
@@ -1623,7 +1623,7 @@ declare module 'mongoose' {
        * @alias {Expression.SubstrBytes}
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/substr/#mongodb-expression-exp.-substr
        */
-      $substr: [StringExpression, NumberExpression, NumberExpression];
+      $substr: [StringExpression, number, number];
     }
 
     export interface SubstrBytes {
@@ -1633,7 +1633,7 @@ declare module 'mongoose' {
        * @version 3.4
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/substrBytes/#mongodb-expression-exp.-substrBytes
        */
-      $substrBytes: [StringExpression, NumberExpression, NumberExpression];
+      $substrBytes: [StringExpression, number, number];
     }
 
     export interface SubstrCP {
@@ -1643,7 +1643,7 @@ declare module 'mongoose' {
        * @version 3.4
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/substrCP/#mongodb-expression-exp.-substrCP
        */
-      $substrCP: [StringExpression, NumberExpression, NumberExpression];
+      $substrCP: [StringExpression, number, number];
     }
 
     export interface ToLower {

@@ -186,6 +186,35 @@ const project7: PipelineStage = {
 };
 const project8: PipelineStage = { $project: { myArray: ['$x', '$y'] } };
 const project9: PipelineStage = { $project: { x: '$name.0', _id: 0 } };
+const project10: PipelineStage = { $project: { stdDev: { $stdDevPop: '$scores.score' } } };
+const project11: PipelineStage = {
+  $project:
+  {
+    item: 1,
+    comparisonResult: { $strcasecmp: ['$quarter', '13q4'] }
+  }
+};
+const project12: PipelineStage = {
+  $project: {
+    name: 1,
+    length: { $strLenBytes: '$name' }
+  }
+};
+const project13: PipelineStage = {
+  $project: {
+    name: 1,
+    length: { $strLenCP: '$name' }
+  }
+};
+
+const project14: PipelineStage = {
+  $project:
+  {
+    item: 1,
+    yearSubstring: { $substr: ['$quarter', 0, 2] },
+    quarterSubtring: { $substr: ['$quarter', 2, -1] }
+  }
+};
 
 const sort1: PipelineStage = { $sort: { count: -1 } };
 const sortByCount1: PipelineStage = { $sortByCount: '$tags' };
@@ -221,3 +250,62 @@ const match2: PipelineStage = { $match: { test: 'bla' } };
 const match3: PipelineStage = { $match: { test: { $or: [{ score: { $gt: 70, $lt: 90 } }, { views: { $gte: 1000 } }] } } };
 const match4: PipelineStage = { $match: { $and: [{ score: { $gt: 70, $lt: 90 } }, { views: { $gte: 1000 } }] } };
 const match5: PipelineStage = { $match: { test: { $and: [{ score: { $gt: 70, $lt: 90 } }, { views: { $gte: 1000 } }] } } };
+
+const addFields7: PipelineStage = { $addFields: { convertedQty: { $toLong: '$qty' } } };
+
+const setWindowFields1: PipelineStage = {
+  $setWindowFields: {
+    partitionBy: '$state',
+    sortBy: { orderDate: 1 },
+    output: {
+      stdDevPopQuantityForState: {
+        $stdDevPop: '$quantity',
+        window: {
+          documents: ['unbounded', 'current']
+        }
+      }
+    }
+  }
+};
+
+const setWindowFields2: PipelineStage = {
+  $setWindowFields: {
+    partitionBy: '$state',
+    sortBy: { orderDate: 1 },
+    output: {
+      stdDevSampQuantityForState: {
+        $stdDevSamp: '$quantity',
+        window: {
+          documents: ['unbounded', 'current']
+        }
+      }
+    }
+  }
+};
+
+const setWindowFields3: PipelineStage = {
+  $setWindowFields: {
+    partitionBy: '$stock',
+    sortBy: { date: 1 },
+    output: {
+      expMovingAvgForStock: {
+        $expMovingAvg: { input: '$price', N: 2 }
+      }
+    }
+  }
+};
+
+const setWindowFields4: PipelineStage = {
+  $setWindowFields: {
+    partitionBy: '$stock',
+    sortBy: { date: 1 },
+    output: {
+      expMovingAvgForStock: {
+        $expMovingAvg: { input: '$price', alpha: 0.75 }
+      }
+    }
+  }
+};
+
+const group1: PipelineStage = { $group: { _id: null, ageStdDev: { $stdDevSamp: '$age' } } };
+

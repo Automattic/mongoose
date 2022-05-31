@@ -2358,6 +2358,29 @@ declare module 'mongoose' {
       $bsonSize: NullExpression | ObjectExpression;
     }
 
+    export interface Function {
+      /**
+       * Defines a custom aggregation function or expression in JavaScript.
+       *
+       * @version 4.4
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/function/#mongodb-expression-exp.-function
+       */
+      $function: {
+        /**
+         * 	The function definition. You can specify the function definition as either BSON type Code or String.
+         */
+        body: CodeExpression;
+        /**
+         * Arguments passed to the function body. If the body function does not take an argument, you can specify an
+         * empty array [ ]
+         */
+        args: ArrayExpression;
+        /**
+         * The language used in the body. You must specify lang: "js".
+         */
+        lang: 'js'
+      };
+    }
   }
 
   type Path = string;
@@ -2377,6 +2400,8 @@ declare module 'mongoose' {
     StringExpressionOperator |
     VariableExpressionOperator |
     TypeExpressionOperator |
+    CustomAggregationExpressionOperator |
+    Accumulators |
     WindowOperator;
 
   export type NullExpression = null;
@@ -2388,6 +2413,9 @@ declare module 'mongoose' {
   export type BinaryExpression =
     Path;
 
+  export type FunctionExpression =
+    Expression.Function;
+
   export type AnyExpression =
     ArrayExpression |
     BooleanExpression |
@@ -2395,6 +2423,8 @@ declare module 'mongoose' {
     ObjectExpression |
     StringExpression |
     DateExpression |
+    BinaryExpression |
+    FunctionExpression |
     ObjectIdExpression;
 
   export type ObjectIdExpression =
@@ -2410,6 +2440,7 @@ declare module 'mongoose' {
     SetExpressionOperatorReturningArray |
     LiteralExpressionOperatorReturningAny |
     WindowOperatorReturningArray |
+    CustomAggregationExpressionOperatorReturningAny |
     WindowOperatorReturningAny;
 
   export type BooleanExpression =
@@ -2421,6 +2452,7 @@ declare module 'mongoose' {
     StringExpressionOperatorReturningBoolean |
     SetExpressionOperatorReturningBoolean |
     LiteralExpressionOperatorReturningAny |
+    CustomAggregationExpressionOperatorReturningAny |
     TypeExpressionOperatorReturningBoolean;
 
   export type NumberExpression =
@@ -2438,6 +2470,7 @@ declare module 'mongoose' {
     WindowOperatorReturningNumber |
     WindowOperatorReturningAny |
     DataSizeOperatorReturningNumber |
+    CustomAggregationExpressionOperatorReturningAny |
     TypeExpressionOperatorReturningNumber;
 
   export type ObjectExpression =
@@ -2446,6 +2479,7 @@ declare module 'mongoose' {
     DateExpressionOperatorReturningObject |
     StringExpressionOperatorReturningObject |
     ObjectExpressionOperatorReturningObject |
+    CustomAggregationExpressionOperatorReturningAny |
     LiteralExpressionOperatorReturningAny;
 
   export type StringExpression<T = string> =
@@ -2454,6 +2488,7 @@ declare module 'mongoose' {
     DateExpressionOperatorReturningString |
     StringExpressionOperatorReturningString |
     LiteralExpressionReturningAny |
+    CustomAggregationExpressionOperatorReturningAny |
     TypeExpressionOperatorReturningString |
     T;
 
@@ -2752,6 +2787,28 @@ declare module 'mongoose' {
   export type DataSizeOperatorReturningNumber =
     Expression.BinarySize |
     Expression.BsonSize;
+
+  export type CustomAggregationExpressionOperator =
+    Expression.Accumulator |
+    Expression.Function;
+
+  export type CustomAggregationExpressionOperatorReturningAny =
+    Expression.Function;
+
+  export type Accumulators =
+    Expression.Accumulator |
+    Expression.AddToSet |
+    Expression.Avg |
+    Expression.Count |
+    Expression.First |
+    Expression.Last |
+    Expression.Max |
+    Expression.MergeObjects |
+    Expression.Min |
+    Expression.Push |
+    Expression.StdDevPop |
+    Expression.StdDevSamp |
+    Expression.Sum;
 
   export type tzExpression = UTCOffset | StringExpressionOperatorReturningBoolean | string;
 

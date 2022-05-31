@@ -2336,6 +2336,28 @@ declare module 'mongoose' {
        */
       $type: Expression;
     }
+
+    export interface BinarySize {
+      /**
+       * Returns the size of a given string or binary data value's content in bytes.
+       *
+       * @version 4.4
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/binarySize/#mongodb-expression-exp.-binarySize
+       */
+      $binarySize: NullExpression | StringExpression | BinaryExpression;
+    }
+
+    export interface BsonSize {
+      /**
+       * Returns the size in bytes of a given document (i.e. bsontype Object) when encoded as BSON. You can use
+       * $bsonSize as an alternative to the Object.bsonSize() method.
+       *
+       * @version 4.4
+       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/bsonSize/#mongodb-expression-exp.-bsonSize
+       */
+      $bsonSize: NullExpression | ObjectExpression;
+    }
+
   }
 
   type Path = string;
@@ -2362,6 +2384,9 @@ declare module 'mongoose' {
   export type CodeExpression =
     string |
     Function;
+
+  export type BinaryExpression =
+    Path;
 
   export type AnyExpression =
     ArrayExpression |
@@ -2412,6 +2437,7 @@ declare module 'mongoose' {
     SetExpressionOperator |
     WindowOperatorReturningNumber |
     WindowOperatorReturningAny |
+    DataSizeOperatorReturningNumber |
     TypeExpressionOperatorReturningNumber;
 
   export type ObjectExpression =
@@ -2718,6 +2744,14 @@ declare module 'mongoose' {
   export type TypeExpressionOperatorReturningDate =
     Expression.Convert<'date' | 9> |
     Expression.ToDate;
+
+  export type DataSizeOperator =
+    Expression.BinarySize |
+    Expression.BsonSize;
+
+  export type DataSizeOperatorReturningNumber =
+    Expression.BinarySize |
+    Expression.BsonSize;
 
   export type tzExpression = UTCOffset | StringExpressionOperatorReturningBoolean | string;
 

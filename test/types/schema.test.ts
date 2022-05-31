@@ -325,4 +325,4 @@ const eventSchema = new Schema<{ message: string }>({ message: String }, { discr
 const batchSchema = new Schema<{ name: string }>({ name: String }, { discriminatorKey: 'kind' });
 const discriminatedSchema = batchSchema.discriminator('event', eventSchema);
 
-expectType<Schema<Omit<{ name: string }, "message"> & { message: string }>>(discriminatedSchema);
+expectType<Schema<Omit<{ name: string }, 'message'> & { message: string }>>(discriminatedSchema);

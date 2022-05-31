@@ -998,7 +998,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/gt/#mongodb-expression-exp.-gt
        */
-      $gt: NumberExpression |  [NumberExpression, NumberExpression];
+      $gt: NumberExpression | [NumberExpression, NumberExpression];
     }
 
     export interface Gte {
@@ -1025,7 +1025,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/lte/#mongodb-expression-exp.-lte
        */
-      $lte: NumberExpression |  [NumberExpression, NumberExpression];
+      $lte: NumberExpression | [NumberExpression, NumberExpression];
     }
 
     export interface Ne {

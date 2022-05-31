@@ -215,7 +215,7 @@ const project14: PipelineStage = {
     quarterSubtring: { $substr: ['$quarter', 2, -1] }
   }
 };
-const project15: PipelineStage = { $project: { item: 1, result: { $not: [{ $gt: ["$qty", 250] }] } } };
+const project15: PipelineStage = { $project: { item: 1, result: { $not: [{ $gt: ['$qty', 250] }] } } };
 
 const sort1: PipelineStage = { $sort: { count: -1 } };
 const sortByCount1: PipelineStage = { $sortByCount: '$tags' };
@@ -310,8 +310,8 @@ const setWindowFields4: PipelineStage = {
 const group1: PipelineStage = { $group: { _id: null, ageStdDev: { $stdDevSamp: '$age' } } };
 const group2: PipelineStage = {
   $group: {
-    _id: { x: "$x" },
-    y: { $first: "$y" }
+    _id: { x: '$x' },
+    y: { $first: '$y' }
   }
 };
 const group3: PipelineStage = {
@@ -323,31 +323,31 @@ const group3: PipelineStage = {
 const group4: PipelineStage = {
   $group:
   {
-    _id: "$item",
-    totalSaleAmount: { $sum: { $multiply: ["$price", "$quantity"] } }
+    _id: '$item',
+    totalSaleAmount: { $sum: { $multiply: ['$price', '$quantity'] } }
   }
 };
 const group5: PipelineStage = {
   $group: {
     _id: null,
-    totalSaleAmount: { $sum: { $multiply: ["$price", "$quantity"] } },
-    averageQuantity: { $avg: "$quantity" },
+    totalSaleAmount: { $sum: { $multiply: ['$price', '$quantity'] } },
+    averageQuantity: { $avg: '$quantity' },
     count: { $sum: 1 }
   }
 };
-const group6: PipelineStage = { $group: { _id: "$author", books: { $push: "$title" } } };
+const group6: PipelineStage = { $group: { _id: '$author', books: { $push: '$title' } } };
 
 const stages1: PipelineStage[] = [
   // First Stage
   {
-    $match: { "date": { $gte: new Date("2014-01-01"), $lt: new Date("2015-01-01") } }
+    $match: { date: { $gte: new Date('2014-01-01'), $lt: new Date('2015-01-01') } }
   },
   // Second Stage
   {
     $group: {
-      _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
-      totalSaleAmount: { $sum: { $multiply: ["$price", "$quantity"] } },
-      averageQuantity: { $avg: "$quantity" },
+      _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+      totalSaleAmount: { $sum: { $multiply: ['$price', '$quantity'] } },
+      averageQuantity: { $avg: '$quantity' },
       count: { $sum: 1 }
     }
   },
@@ -360,13 +360,13 @@ const stages1: PipelineStage[] = [
 const stages2: PipelineStage[] = [
   // First Stage
   {
-    $group: { _id: "$author", books: { $push: "$$ROOT" } }
+    $group: { _id: '$author', books: { $push: '$$ROOT' } }
   },
   // Second Stage
   {
     $addFields:
     {
-      totalCopies: { $sum: "$books.copies" }
+      totalCopies: { $sum: '$books.copies' }
     }
   }
 ];

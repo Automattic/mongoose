@@ -319,3 +319,26 @@ function gh10900(): void {
     menuStatus: { type: Schema.Types.Mixed, default: {} }
   });
 }
+
+
+function gh11828() {
+  interface IUser {
+    name: string;
+    age: number;
+    bornAt: Date;
+    isActive: boolean;
+  }
+
+  new Schema<IUser>({
+    name: { type: String, default: () => 'Hafez' },
+    age: { type: Number, default: () => 27 },
+    bornAt: { type: Date, default: () => new Date() },
+    isActive: {
+      type: Boolean,
+      default() {
+        return this.name === 'Hafez';
+      }
+    }
+  });
+
+}

@@ -7,7 +7,7 @@ const port = process.env.PORT
   : 8089;
 
 require('http').createServer(function(req, res) {
-  handler(req, res, { public: '.' }).catch(err => res.statusCode(500).send(err.message));
+  handler(req, res).catch(err => res.statusCode(500).send(err.message));
 }).listen(port);
 
 console.log(`now listening on http://localhost:${port}`);

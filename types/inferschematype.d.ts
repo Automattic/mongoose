@@ -145,10 +145,11 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
           PathValueType extends BufferConstructor | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
             PathValueType extends BooleanConstructor | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean ? boolean :
               PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Schema.Types.ObjectId :
-                PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
-                  PathValueType extends ArrayConstructor ? any[] :
-                    PathValueType extends typeof Schema.Types.Mixed ? any:
-                      IfEquals<PathValueType, ObjectConstructor> extends true ? any:
-                        IfEquals<PathValueType, {}> extends true ? any:
-                          PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                            unknown;
+                PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Schema.Types.Decimal128 :
+                  PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
+                    PathValueType extends ArrayConstructor ? any[] :
+                      PathValueType extends typeof Schema.Types.Mixed ? any:
+                        IfEquals<PathValueType, ObjectConstructor> extends true ? any:
+                          IfEquals<PathValueType, {}> extends true ? any:
+                            PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+                              unknown;

@@ -376,6 +376,9 @@ export function autoTypedSchema() {
     array3?: any[];
     array4?: any[];
     array5?: any[];
+    decimal1?: Schema.Types.Decimal128;
+    decimal2?: Schema.Types.Decimal128;
+    decimal3?: Schema.Types.Decimal128;
   };
 
   const TestSchema = new Schema({
@@ -412,7 +415,10 @@ export function autoTypedSchema() {
     array2: Array,
     array3: [Schema.Types.Mixed],
     array4: [{}],
-    array5: []
+    array5: [],
+    decimal1: Schema.Types.Decimal128,
+    decimal2: 'Decimal128',
+    decimal3: 'decimal128'
   });
 
   type InferredTestSchemaType = InferSchemaType<typeof TestSchema>;

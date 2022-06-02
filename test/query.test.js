@@ -3976,17 +3976,19 @@ describe('Query', function() {
     });
     const Test = db.model('gh10423', testSchema);
     await Test.create({ name: 'foo', foo: [{ sub: 'Test' }, { sub: 'Testerson' }], otherName: { nickName: 'Bar' } });
-    const result = await Test.find().lean({ transform: (doc, ret) => {
-      delete ret._id;
-      return ret;
+    const result = await Test.find().lean({ transform: (doc) => {
+      delete doc._id;
+      return doc;
     } });
-    assert.equal(result[0]._id, undefined);
+    // only OtherName and foo should have _id stripped
+    console.log(result[0])
+    assert(result[0]._id);
     assert.equal(result[0].otherName._id, undefined);
     assert.equal(result[0].foo[0]._id, undefined);
     assert.equal(result[0].foo[1]._id, undefined);
-    const single = await Test.findOne().lean({ transform: (doc, ret) => {
-      delete ret._id;
-      return ret;
+    const single = await Test.findOne().lean({ transform: (doc) => {
+      delete doc._id;
+      return doc;
     } });
     assert.equal(single._id, undefined);
     assert.equal(single.otherName._id, undefined);

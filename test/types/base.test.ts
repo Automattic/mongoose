@@ -44,5 +44,5 @@ function gh11478() {
 }
 
 function gh10139() {
-  mongoose.set('immutableCreatedAt', false);
+  mongoose.set('timestamps.createdAt.immutable', false);
 }

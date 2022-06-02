@@ -271,7 +271,7 @@ declare module 'mongoose' {
     namespace Types {
       class Array extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Array';
 
         static options: { castNonArrays: boolean; };
 
@@ -290,7 +290,7 @@ declare module 'mongoose' {
 
       class Boolean extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Boolean';
 
         /** Configure which values get casted to `true`. */
         static convertToTrue: Set<any>;
@@ -301,7 +301,7 @@ declare module 'mongoose' {
 
       class Buffer extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Buffer';
 
         /**
          * Sets the default [subtype](https://studio3t.com/whats-new/best-practices-uuid-mongodb/)
@@ -312,7 +312,7 @@ declare module 'mongoose' {
 
       class Date extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Date';
 
         /** Declares a TTL index (rounded to the nearest second) for _Date_ types only. */
         expires(when: number | string): this;
@@ -326,12 +326,12 @@ declare module 'mongoose' {
 
       class Decimal128 extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Decimal128';
       }
 
       class DocumentArray extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'DocumentArray';
 
         static options: { castNonArrays: boolean; };
 
@@ -347,17 +347,17 @@ declare module 'mongoose' {
 
       class Map extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Map';
       }
 
       class Mixed extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Mixed';
       }
 
       class Number extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Number';
 
         /** Sets a enum validator */
         enum(vals: number[]): this;
@@ -371,7 +371,7 @@ declare module 'mongoose' {
 
       class ObjectId extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'ObjectId';
 
         /** Adds an auto-generated ObjectId default if turnOn is true. */
         auto(turnOn: boolean): this;
@@ -390,7 +390,7 @@ declare module 'mongoose' {
 
       class String extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'String';
 
         /** Adds an enum validator */
         enum(vals: string[] | any): this;

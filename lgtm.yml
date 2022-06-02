@@ -1,0 +1,12 @@
+path_classifiers:
+  src:
+    - lib
+  types:
+    - types
+  test:
+    - test
+  docs:
+    - docs
+queries:
+  - exclude: "*"
+  - include: lib

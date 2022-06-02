@@ -1,0 +1,67 @@
+name: 🙋 Help
+description: Open an issue and request for individual help
+labels: ['help', 'help wanted']
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before you submit an issue we recommend to read the [documentation](https://mongoosejs.com/docs/guide.html).
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      options:
+      - label: I have written a descriptive issue title
+        required: true
+
+  - type: input
+    id: mongoose-version
+    attributes:
+      label: Mongoose version
+      placeholder: 6.x.x
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      placeholder: 14.x
+    validations:
+      required: true
+  
+  - type: input
+    id: mongo-version
+    attributes:
+      label: MongoDB version
+      placeholder: 5.x
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - macOS
+        - Windows
+    validations:
+      required: false
+
+  - type: input
+    id: os-version
+    attributes:
+      label: Operating system version (i.e. 20.04, 11.3, 10)
+    validations:
+      required: false
+
+  - type: textarea
+    id: text
+    attributes:
+      label: Issue
+      description: |
+        Give as much detail as you can to help us understand.
+        Make sure you place example code inside a [code (```) block](https://docs.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks) to avoid linking unrelated issues.

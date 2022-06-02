@@ -11392,4 +11392,66 @@ describe('document', function() {
     doc = await Test.findById(doc);
     assert.strictEqual(doc.list[0].toObject().quantity, null);
   });
+
+  it('avoids manually populating document that is manually populated in another doc with different unpopulatedValue (gh-11442) (gh-11008)', async function() {
+    const BarSchema = new Schema({
+      name: String,
+      more: String
+    });
+    const Bar = db.model('Bar', BarSchema);
+
+    // Denormalised Bar schema with just the name, for use on the Foo model
+    const BarNameSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Bar'
+      },
+      name: String
+    });
+
+    // Foo model, which contains denormalized bar data (just the name)
+    const FooSchema = new Schema({
+      something: String,
+      other: Number,
+      bar: {
+        type: BarNameSchema,
+        ref: 'Bar'
+      }
+    });
+    const Foo = db.model('Foo', FooSchema);
+
+    const Baz = db.model('Baz', new Schema({ bar: { type: 'ObjectId', ref: 'Bar' } }));
+
+    const bar = await Bar.create({
+      name: 'I am another Bar',
+      more: 'With even more data'
+    });
+    const foo = await Foo.create({
+      something: 'I am another Foo',
+      other: 4
+    });
+    foo.bar = bar;
+    const baz = await Baz.create({});
+    baz.bar = bar;
+
+    assert.ok(foo.populated('bar'));
+    assert.ok(!baz.populated('bar'));
+
+    let res = foo.toObject({ depopulate: true });
+    assert.strictEqual(res.bar._id.toString(), bar._id.toString());
+    assert.strictEqual(res.bar.name, 'I am another Bar');
+
+    res = baz.toObject({ depopulate: true });
+    assert.strictEqual(res.bar.toString(), bar._id.toString());
+
+    const bar2 = await Bar.create({
+      name: 'test2'
+    });
+    baz.bar = bar2;
+    assert.ok(baz.populated('bar'));
+
+    const baz2 = await Baz.create({});
+    baz2.bar = bar2;
+    assert.ok(baz.populated('bar'));
+  });
 });

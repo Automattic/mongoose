@@ -2729,7 +2729,7 @@ declare module 'mongoose' {
 
   export type WindowOperatorReturningArray =
     Expression.AddToSet |
-    Expression.Push
+    Expression.Push;
 
   export type WindowOperatorReturningNumber =
     Expression.Avg |
@@ -2818,7 +2818,7 @@ declare module 'mongoose' {
   export type tzExpression = UTCOffset | StringExpressionOperatorReturningBoolean | string;
 
   type hh = '-00' | '-01' | '-02' | '-03' | '-04' | '-05' | '-06' | '-07' | '-08' | '-09' | '-10' | '-11' | '-12' |
-    '+00' | '+01' | '+02' | '+03' | '+04' | '+05' | '+06' | '+07' | '+08' | '+09' | '+10' | '+11' | '+12' | '+13' | '+14';
+  '+00' | '+01' | '+02' | '+03' | '+04' | '+05' | '+06' | '+07' | '+08' | '+09' | '+10' | '+11' | '+12' | '+13' | '+14';
   type mm = '00' | '30' | '45';
 
   type UTCOffset = `${hh}` | `${hh}${mm}` | `${hh}:${mm}`;

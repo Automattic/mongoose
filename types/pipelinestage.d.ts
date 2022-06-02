@@ -221,14 +221,14 @@ declare module 'mongoose' {
         partitionBy?: any
         sortBy?: Record<string, 1 | -1>
         output: Record<
-          string,
-          WindowOperator & {
-            window?: {
-              documents?: [string | number, string | number]
-              range?: [string | number, string | number]
-              unit?: 'year' | 'quarter' | 'month' | 'week' | 'day' | 'hour' | 'minute' | 'second' | 'millisecond'
-            }
+        string,
+        WindowOperator & {
+          window?: {
+            documents?: [string | number, string | number]
+            range?: [string | number, string | number]
+            unit?: 'year' | 'quarter' | 'month' | 'week' | 'day' | 'hour' | 'minute' | 'second' | 'millisecond'
           }
+        }
         >
       }
     }

@@ -7,10 +7,9 @@ declare module 'mongoose' {
   type UnpackedIntersection<T, U> = T extends null ? null : T extends (infer A)[]
     ? (Omit<A, keyof U> & U)[]
     : keyof U extends never
-      ? T
-      : Omit<T, keyof U> & U;
+    ? T
+    : Omit<T, keyof U> & U;
 
-  type MergeBOntoA<A, B> = Omit<A, keyof B> & B;
-
+  type MergeType<A extends Record<number | string, any>, B extends Record<number | string, any>> = Omit<A, keyof B> & B;
 
 }

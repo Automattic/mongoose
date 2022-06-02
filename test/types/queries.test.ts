@@ -163,10 +163,10 @@ function testGenericQuery(): void {
 
 function eachAsync(): void {
   Test.find().cursor().eachAsync((doc) => {
-    expectType<(ITest & { _id: any; })>(doc);
+    expectType<(ITest & { _id: Types.ObjectId; })>(doc);
   });
   Test.find().cursor().eachAsync((docs) => {
-    expectType<(ITest & { _id: any; })[]>(docs);
+    expectType<(ITest & { _id: Types.ObjectId; })[]>(docs);
   }, { batchSize: 2 });
 }
 

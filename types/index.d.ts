@@ -67,7 +67,7 @@ declare module 'mongoose' {
     schema?: TSchema,
     collection?: string,
     options?: CompileModelOptions
-  ): Model<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema>;
+  ): Model<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
@@ -101,7 +101,15 @@ declare module 'mongoose' {
     [k: string]: any
   }
 
-  export type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
+  export type Require_id<T> = T extends { _id?: infer U } 
+    ? U extends any
+      ? (T & { _id: Types.ObjectId })
+      : T &  Required<{ _id: U }>
+    : T & { _id: Types.ObjectId };
+  
+  export type RequireOnlyTypedId<T> = T extends { _id?: infer U; } 
+  ? Required<{ _id: U }>
+  : { _id: Types.ObjectId };
 
   export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
 

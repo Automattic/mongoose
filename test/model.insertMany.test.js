@@ -12,24 +12,24 @@ const { Types } = require('../lib');
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
-describe('model.insertMany', function () {
+describe('model.insertMany', function() {
   let db;
 
-  before(function () {
+  before(function() {
     db = start();
 
     return db.createCollection('Test').catch(() => { });
   });
 
-  after(async function () {
+  after(async function() {
     await db.close();
   });
 
-  describe('insertMany', function () {
-    it('insertMany should not return hydrated Documents if lean is set to true', async function () {
+  describe('insertMany', function() {
+    it('insertMany should not return hydrated Documents if lean is set to true', async function() {
       const eventSchema = new Schema({
         _id: Schema.Types.ObjectId,
-        title: String,
+        title: String
       });
       const EventModel = db.model('Test', eventSchema);
       const test = await EventModel.insertMany(

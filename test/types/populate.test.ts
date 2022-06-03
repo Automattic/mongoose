@@ -229,3 +229,30 @@ async function _11532() {
   expectType<string>(leanResult.child.name);
   expectError(leanResult?.__v);
 }
+
+function gh11758() {
+  interface NestedChild {
+    name: string
+    _id: Types.ObjectId
+  }
+  const nestedChildSchema: Schema = new Schema({ name: String });
+
+  interface Parent {
+    nestedChild: Types.ObjectId
+    name?: string
+  }
+
+  const ParentModel = model<Parent>('Parent', new Schema({
+    nestedChild: { type: Schema.Types.ObjectId, ref: 'NestedChild' },
+    name: String
+  }));
+
+  const NestedChildModel = model<NestedChild>('NestedChild', nestedChildSchema);
+
+  const parent = new ParentModel({
+    nestedChild: new NestedChildModel({ name: 'test' }),
+    name: 'Parent'
+  }).$assertPopulated<{ nestedChild: NestedChild }>('nestedChild');
+
+  expectType<string>(parent.nestedChild.name);
+}

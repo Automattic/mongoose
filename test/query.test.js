@@ -3981,7 +3981,7 @@ describe('Query', function() {
       return doc;
     } });
     // only OtherName and foo should have _id stripped
-    console.log(result[0])
+    console.log(result[0]);
     assert(result[0]._id);
     assert.equal(result[0].otherName._id, undefined);
     assert.equal(result[0].foo[0]._id, undefined);

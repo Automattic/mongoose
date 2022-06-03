@@ -101,15 +101,15 @@ declare module 'mongoose' {
     [k: string]: any
   }
 
-  export type Require_id<T> = T extends { _id?: infer U } 
+  export type Require_id<T> = T extends { _id?: infer U }
     ? U extends any
       ? (T & { _id: Types.ObjectId })
-      : T &  Required<{ _id: U }>
+      : T & Required<{ _id: U }>
     : T & { _id: Types.ObjectId };
-  
-  export type RequireOnlyTypedId<T> = T extends { _id?: infer U; } 
-  ? Required<{ _id: U }>
-  : { _id: Types.ObjectId };
+
+  export type RequireOnlyTypedId<T> = T extends { _id?: infer U; }
+    ? Required<{ _id: U }>
+    : { _id: Types.ObjectId };
 
   export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
 

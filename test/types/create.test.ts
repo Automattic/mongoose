@@ -73,14 +73,14 @@ Test.insertMany([{ name: 'test' }], { rawResult: true }, (err, result) => {
   expectType<CallbackError>(err);
   expectType<boolean>(result.acknowledged);
   expectType<number>(result.insertedCount);
-  expectType<{[key: number]: Types.ObjectId;}>(result.insertedIds)
+  expectType<{ [key: number]: Types.ObjectId; }>(result.insertedIds);
 });
 
 Test.insertMany([{ name: 'test' }], { rawResult: true }, (err, result) => {
   expectType<CallbackError>(err);
   expectType<boolean>(result.acknowledged);
   expectType<number>(result.insertedCount);
-  expectType<{[key: number]: Types.ObjectId;}>(result.insertedIds)
+  expectType<{ [key: number]: Types.ObjectId; }>(result.insertedIds);
 });
 
 Test.insertMany([{ name: 'test' }], { lean: true }, (err, docs) => {
@@ -103,7 +103,7 @@ Test.insertMany({ _id: '000000000000000000000000', name: 'test' }, (err, docs) =
   expectType<boolean>(docs[0].isNew);
 });
 
-Test.insertMany({ _id: new Types.ObjectId('000000000000000000000000')}, (err, docs) => {
+Test.insertMany({ _id: new Types.ObjectId('000000000000000000000000') }, (err, docs) => {
   expectType<Types.ObjectId>(docs[0]._id);
   expectType<string | undefined>(docs[0].name);
   expectType<boolean>(docs[0].isNew);
@@ -136,13 +136,13 @@ Test.insertMany({ name: 'test' }, {}).then(docs => {
 Test.insertMany([{ name: 'test' }], { rawResult: true }).then(result => {
   expectType<boolean>(result.acknowledged);
   expectType<number>(result.insertedCount);
-  expectType<{[key: number]: Types.ObjectId;}>(result.insertedIds)
+  expectType<{ [key: number]: Types.ObjectId; }>(result.insertedIds);
 });
 
 Test.insertMany([{ name: 'test' }], { rawResult: true }).then(result => {
   expectType<boolean>(result.acknowledged);
   expectType<number>(result.insertedCount);
-  expectType<{[key: number]: Types.ObjectId;}>(result.insertedIds)
+  expectType<{ [key: number]: Types.ObjectId; }>(result.insertedIds);
 });
 
 Test.insertMany([{ name: 'test' }], { lean: true }).then(docs => {
@@ -181,7 +181,7 @@ Test.insertMany({ _id: new Types.ObjectId('000000000000000000000000'), name: 'te
   expectType<boolean>(docs[0].isNew);
 });
 
-(async () => {
+(async() => {
   const [t1] = await Test.create([{ name: 'test' }]);
   const [t2, t3, t4] = await Test.create({ name: 'test' }, { name: 'test' }, { name: 'test' });
   (await Test.create([{ name: 'test' }]))[0];

@@ -31,7 +31,7 @@ const handler = async(event) => {
       success_url: 'insert a url here',
       cancel_url: 'insert a url here'
     });
-    
+
     const order = await Order.create({
       items: event.body.products,
       total: event.body.total,

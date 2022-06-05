@@ -72,6 +72,12 @@ declare module 'mongoose' {
   /** Returns an array of model names created on this instance of Mongoose. */
   export function modelNames(): Array<string>;
 
+  /**
+   * Overwrites the current driver used by this Mongoose instance. A driver is a
+   * Mongoose-specific interface that defines functions like `find()`.
+   */
+  export function setDriver(driver: any): Mongoose;
+
   /** The node-mongodb-native driver Mongoose uses. */
   export const mongo: typeof mongodb;
 

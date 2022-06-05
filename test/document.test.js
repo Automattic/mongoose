@@ -11455,3 +11455,12 @@ describe('document', function() {
     assert.ok(baz.populated('bar'));
   });
 });
+
+describe('Check if instance function that is supplied in schema option is availabe', function() {
+  it('should give an instance function back rather than undefined', function ModelJS() {
+    const testSchema = new mongoose.Schema({}, { methods: { instanceFn() { return 'Returned from DocumentInstanceFn'; } } });
+    const TestModel = mongoose.model('TestModel', testSchema);
+    const TestDocument = new TestModel({});
+    assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
+  });
+});

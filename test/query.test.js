@@ -3962,6 +3962,36 @@ describe('Query', function() {
     assert.equal(result.length, 1);
     assert.equal(result[0].name, '@foo.com');
   });
+
+  it('should return query helper supplied in schema options query property instead of undefined', function(done) {
+    const Model = db.model('Test', new Schema({
+      userName: {
+        type: String,
+        required: [true, 'userName is required']
+      }
+    }, {
+      query: {
+        byUserName(userName) {
+          return this.where({ userName });
+        }
+      }
+    }));
+
+    Model.create({ userName: 'test' }, function(error) {
+      if (error instanceof Error) {
+        return done(error);
+      }
+      Model.find().byUserName('test').exec(function(error, docs) {
+        if (error instanceof Error) {
+          return done(error);
+        }
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].userName, 'test');
+        done();
+      });
+    });
+  });
+
   it('allows a transform option for lean on a query gh-10423', async function() {
     const arraySchema = new mongoose.Schema({
       sub: String

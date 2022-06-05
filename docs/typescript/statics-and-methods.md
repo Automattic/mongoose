@@ -65,6 +65,27 @@ const User = model<IUser, UserModel>('User', schema);
 const answer: number = User.myStaticMethod(); // 42
 ```
 
+Mongoose does support auto typed static functions now that it is supplied in schema options.
+Statics functions can be defined as following:
+
+```typescript
+import { Schema, model } from 'mongoose';
+
+const schema = new Schema(
+  { name: String },
+  {
+    statics: {
+      myStaticMethod() {
+        return 42;
+      },
+    },
+  }
+);
+
+const User = model('User', schema);
+
+const answer = User.myStaticMethod(); // 42
+```
 ## Both Methods and Statics
 
 Below is how you can define a model that has both methods and statics.

@@ -19,6 +19,7 @@
 /// <reference path="./types.d.ts" />
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
+/// <reference path="./inferschematype.d.ts" />
 
 declare class NativeDate extends global.Date { }
 
@@ -61,10 +62,18 @@ declare module 'mongoose' {
   /* ! ignore */
   export type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
 
+  export function model<TSchema extends Schema = any>(
+    name: string,
+    schema?: TSchema,
+    collection?: string,
+    options?: CompileModelOptions
+  ): Model<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
-    schema?: Schema<T, U, {}, TQueryHelpers>,
+    schema?: Schema<T, any, TQueryHelpers>,
     collection?: string,
     options?: CompileModelOptions
   ): U;
@@ -91,7 +100,16 @@ declare module 'mongoose' {
   export interface AnyObject {
     [k: string]: any
   }
-  export type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
+
+  export type Require_id<T> = T extends { _id?: infer U }
+    ? U extends any
+      ? (T & { _id: Types.ObjectId })
+      : T & Required<{ _id: U }>
+    : T & { _id: Types.ObjectId };
+
+  export type RequireOnlyTypedId<T> = T extends { _id?: infer U; }
+    ? Required<{ _id: U }>
+    : { _id: Types.ObjectId };
 
   export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
 
@@ -120,14 +138,18 @@ declare module 'mongoose' {
     useProjection?: boolean;
   }
 
-  export class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any> extends events.EventEmitter {
+  export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any,
+    TStaticMethods = {},
+    TPathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
+    DocType extends ObtainDocumentType<DocType, EnforcedDocType, TPathTypeKey> = ObtainDocumentType<any, EnforcedDocType, TPathTypeKey>>
+    extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<DocType>>, options?: SchemaOptions);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<TPathTypeKey, DocType, TInstanceMethods, TQueryHelpers, TStaticMethods>);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefinitionType<DocType>> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
 
     /**
      * Array of child schemas (from document arrays and single nested subdocs)
@@ -180,7 +202,7 @@ declare module 'mongoose' {
     methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] } & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<DocType>>;
+    obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>>;
 
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType>(path: string): ResultType;

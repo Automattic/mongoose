@@ -72,6 +72,7 @@ const Story = model<IStory>('Story', storySchema);
 
   await story.populate('author');
   await story.populate({ path: 'fans' });
+  await story.populate({ path: 'fans', model: Person });
   await story.populate(['author']);
   await story.populate([{ path: 'fans' }]);
   await story.populate(['author', { path: 'fans' }]);

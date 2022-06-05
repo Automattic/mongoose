@@ -3,7 +3,7 @@ declare module 'mongoose' {
 
   export interface AcceptsDiscriminator<B> {
     /** Adds a discriminator type. */
-    discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<B & D>;
+    discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<Omit<B, keyof D> & D>;
     discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 

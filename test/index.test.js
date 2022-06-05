@@ -1019,5 +1019,29 @@ describe('mongoose module:', function() {
         assert.equal(optionsSentToMongo.allowDiskUse, false);
       });
     });
+    describe('global `timestamps.createdAt.immutable` (gh-10139)', () => {
+      it('is `true` by default', () => {
+        // Arrange
+        const m = new mongoose.Mongoose();
+
+        // Act
+        const userSchema = new m.Schema({ name: String }, { timestamps: true });
+
+        // Assert
+        assert.equal(userSchema.path('createdAt').options.immutable, true);
+      });
+
+      it('can be overridden to `false`', () => {
+        // Arrange
+        const m = new mongoose.Mongoose();
+        m.set('timestamps.createdAt.immutable', false);
+
+        // Act
+        const userSchema = new m.Schema({ name: String }, { timestamps: true });
+
+        // Assert
+        assert.equal(userSchema.path('createdAt').options.immutable, false);
+      });
+    });
   });
 });

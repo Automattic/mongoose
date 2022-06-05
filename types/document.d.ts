@@ -19,6 +19,9 @@ declare module 'mongoose' {
     /** This documents __v. */
     __v?: any;
 
+    /** Assert that a given path or paths is populated. Throws an error if not populated. */
+    $assertPopulated<Paths = {}>(paths: string | string[]): Omit<this, keyof Paths> & Paths;
+
     /* Get all subdocs (by bfs) */
     $getAllSubdocs(): Document[];
 

@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
   productName: String,
-  productPrice: Number,
-  quantity: Number
+  productPrice: Number
 });
 
 const Product = mongoose.model('Product', productSchema);
@@ -12,7 +11,7 @@ const Product = mongoose.model('Product', productSchema);
 module.exports.Product = Product;
 
 const orderSchema = new mongoose.Schema({
-  items: [productSchema],
+  items: [{ productId: { type: mongoose.ObjectId, required: true, ref: 'Product' }, quantity: { type: Number, required: true } }],
   total: {
     type: Number,
     default: 0
@@ -87,42 +86,11 @@ const Order = mongoose.model('Order', orderSchema);
 module.exports.Order = Order;
 
 const cartSchema = new mongoose.Schema({
-  products: [productSchema],
-  orderId: { type: mongoose.Types.ObjectId, ref: 'Order' }
+  items: [{ productId: { type: mongoose.ObjectId, required: true, ref: 'Product' }, quantity: { type: Number, required: true } }],
+  orderId: { type: mongoose.ObjectId, ref: 'Order' }
 }, { timestamps: true });
 
 const Cart = mongoose.model('Cart', cartSchema);
 
 module.exports.Cart = Cart;
-
-async function run() {
-  await mongoose.connect('mongodb://localhost:27017/netlify');
-  await mongoose.connection.dropDatabase();
-
-  await Product.create({
-    productName: 'Netlify\'s First Flight',
-    productPrice: 2000,
-    quantity: 5
-  });
-
-  await Product.create({
-    productName: 'Netlify The Movie',
-    productPrice: 4000,
-    quantity: 5
-  });
-
-  await Product.create({
-    productName: 'Netlify vs The Internet',
-    productPrice: 6000,
-    quantity: 5
-  });
-
-  await Product.create({
-    productName: 'Netlify and The Wasp',
-    productPrice: 8000,
-    quantity: 5
-  });
-}
-
-run();
 

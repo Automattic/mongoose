@@ -1,0 +1,12 @@
+{
+    "dependencies": {
+        "stripe": "^9.6.0",
+        "mongoose": "^6.3.5"
+    },
+    "devDependencies": {
+        "mocha": "10.0.0"
+    },
+    "scripts": {
+        "test": "mocha --exit ./test/*.test.js"
+    }
+}

@@ -157,7 +157,7 @@ declare module 'mongoose' {
 
   type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
 
-  export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any,
+  export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {},
     TStaticMethods = {},
     TPathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
     DocType extends ObtainDocumentType<DocType, EnforcedDocType, TPathTypeKey> = ObtainDocumentType<any, EnforcedDocType, TPathTypeKey>>

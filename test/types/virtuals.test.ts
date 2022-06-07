@@ -1,5 +1,6 @@
 import { Document, Model, Schema, model } from 'mongoose';
 import { expectType } from 'tsd';
+import { autoTypedModel } from './models.test';
 
 interface IPerson {
   _id: number;
@@ -85,4 +86,10 @@ function gh11543() {
   });
 
   expectType<PetVirtuals>(personSchema.virtuals);
+}
+
+function autoTypedVirtuals() {
+  const AutoTypedModel = autoTypedModel();
+  const doc = new AutoTypedModel();
+  expectType<string>(doc.domain);
 }

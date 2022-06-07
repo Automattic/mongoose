@@ -567,6 +567,9 @@ export type AutoTypedSchemaType = {
   methods: {
     instanceFn: () => 'Returned from DocumentInstanceFn'
   },
+  virtuals: {
+    domain: string
+  }
 };
 
 // discriminator

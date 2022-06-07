@@ -212,9 +212,6 @@ declare module 'mongoose' {
     /**
      * Virtual paths.
      */
-    virtuals?: Record<any, {
-      get?: (this: Document<any, any, DocType> & DocType) => unknown;
-      set?: (this: Document<any, any, DocType> & DocType, ...args: any) => unknown;
-    }> | TVirtuals,
+    virtuals?: VirtualsSchemaOptionsPropertyType<DocType, TVirtuals>,
   }
 }

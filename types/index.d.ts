@@ -21,6 +21,7 @@
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
 /// <reference path="./inferschematype.d.ts" />
+/// <reference path="./virtuals.d.ts" />
 
 declare class NativeDate extends global.Date { }
 

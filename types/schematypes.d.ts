@@ -126,7 +126,7 @@ declare module 'mongoose' {
     transform?: (this: any, val: T) => any;
 
     /** defines a custom getter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
-    get?: (value: any, doc?: this) => T;
+    get?: (value: any, doc?: this) => T | undefined;
 
     /** defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
     set?: (value: any, priorVal?: T, doc?: this) => any;

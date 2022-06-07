@@ -530,7 +530,8 @@ export function autoTypedSchema() {
         },
         set() {
           expectType<Document<any, any, AutoTypedSchemaType['schema']> & AutoTypedSchemaType['schema']>(this);
-        }
+        },
+        options: {}
       }
     }
   });

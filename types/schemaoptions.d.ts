@@ -10,7 +10,7 @@ declare module 'mongoose' {
   type TypeKeyBaseType = string;
 
   type DefaultTypeKey = 'type';
-  interface SchemaOptions<PathTypeKey extends TypeKeyBaseType = DefaultTypeKey, DocType = unknown, InstanceMethods = {}, QueryHelpers = {}, TVirtuals = {}, StaticMethods = {}> {
+  interface SchemaOptions<PathTypeKey extends TypeKeyBaseType = DefaultTypeKey, DocType = unknown, TInstanceMethods = {}, QueryHelpers = {}, TVirtuals = {}, TStaticMethods = {}> {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
      * calling Model.createIndexes() after you successfully connect to MongoDB. If you want to disable
@@ -191,12 +191,12 @@ declare module 'mongoose' {
     /**
      * Model Statics methods.
      */
-    statics?: Record<any, (this: Model<DocType>, ...args: any) => unknown> | StaticMethods,
+    statics?: Record<any, (this: Model<DocType>, ...args: any) => unknown> | TStaticMethods,
 
     /**
      * Document instance methods.
      */
-    methods?: Record<any, (this: HydratedDocument<DocType>, ...args: any) => unknown> | InstanceMethods,
+    methods?: Record<any, (this: HydratedDocument<DocType>, ...args: any) => unknown> | TInstanceMethods,
 
     /**
      * Query helper functions.
@@ -212,6 +212,6 @@ declare module 'mongoose' {
     /**
      * Virtual paths.
      */
-    virtuals?: VirtualsSchemaOptionsPropertyType<DocType, TVirtuals>,
+    virtuals?: VirtualsSchemaOptionsPropertyType<DocType, TVirtuals, TInstanceMethods>,
   }
 }

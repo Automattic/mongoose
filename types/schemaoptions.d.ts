@@ -10,7 +10,7 @@ declare module 'mongoose' {
   type TypeKeyBaseType = string;
 
   type DefaultTypeKey = 'type';
-  interface SchemaOptions<PathTypeKey extends TypeKeyBaseType = DefaultTypeKey, DocType = unknown, InstanceMethods = {}, QueryHelpers = {}, StaticMethods = {}, virtuals = {}> {
+  interface SchemaOptions<PathTypeKey extends TypeKeyBaseType = DefaultTypeKey, DocType = unknown, InstanceMethods = {}, QueryHelpers = {}, TVirtuals = {}, StaticMethods = {}> {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
      * calling Model.createIndexes() after you successfully connect to MongoDB. If you want to disable
@@ -199,7 +199,7 @@ declare module 'mongoose' {
     methods?: Record<any, (this: HydratedDocument<DocType>, ...args: any) => unknown> | InstanceMethods,
 
     /**
-     * Query helper functions
+     * Query helper functions.
      */
     query?: Record<any, <T extends QueryWithHelpers<unknown, DocType>>(this: T, ...args: any) => T> | QueryHelpers,
 
@@ -208,5 +208,13 @@ declare module 'mongoose' {
      * @default true
      */
     castNonArrays?: boolean;
+
+    /**
+     * Virtual paths.
+     */
+    virtuals?: Record<any, {
+      get?: (this: Document<any, any, DocType> & DocType) => unknown;
+      set?: (this: Document<any, any, DocType> & DocType, ...args: any) => unknown;
+    }> | TVirtuals,
   }
 }

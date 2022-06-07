@@ -465,6 +465,10 @@ export function autoTypedSchema() {
       type: String,
       required: [true, 'userName is required']
     },
+    email: {
+      type: String,
+      required: [true, 'email is required']
+    },
     description: String,
     nested: new Schema({
       age: {
@@ -517,6 +521,17 @@ export function autoTypedSchema() {
         expectAssignable<Query<unknown, AutoTypedSchemaType['schema']>>(this);
         return this.where({ userName });
       }
+    },
+    virtuals: {
+      domain: {
+        get() {
+          expectType<Document<any, any, AutoTypedSchemaType['schema']> & AutoTypedSchemaType['schema']>(this);
+          return this.email.slice(this.email.indexOf('@') + 1);
+        },
+        set() {
+          expectType<Document<any, any, AutoTypedSchemaType['schema']> & AutoTypedSchemaType['schema']>(this);
+        }
+      }
     }
   });
 
@@ -532,6 +547,7 @@ export function autoTypedSchema() {
 export type AutoTypedSchemaType = {
   schema: {
     userName: string;
+    email: string;
     description?: string;
     nested?: {
       age: number;

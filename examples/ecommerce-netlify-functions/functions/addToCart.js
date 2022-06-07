@@ -1,6 +1,6 @@
 'use strict';
 
-const { Cart } = require('../../models');
+const { Cart } = require('../models');
 
 const handler = async(event) => {
   try {

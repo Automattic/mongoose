@@ -76,10 +76,7 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  trackingNumber: {
-    type: String
-  }
-});
+}, { optimisticConcurrency: true });
 
 const Order = mongoose.model('Order', orderSchema);
 

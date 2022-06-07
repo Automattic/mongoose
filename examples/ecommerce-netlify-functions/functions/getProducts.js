@@ -1,11 +1,11 @@
 'use strict';
 
-const { Product } = require('../../models');
+const { Product } = require('../models');
 
 const handler = async(event) => {
   try {
-    const Products = await Product.find();
-    return { statusCode: 200, body: Products };
+    const products = await Product.find();
+    return { statusCode: 200, body: products };
   } catch (error) {
     return { statusCode: 500, body: error.toString() };
   }

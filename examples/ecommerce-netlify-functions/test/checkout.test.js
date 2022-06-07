@@ -2,13 +2,13 @@
 
 const { describe, it, before, after } = require('mocha');
 const assert = require('assert');
-const { handler: getCart } = require('../functions/getCart');
 const { handler: addToCart } = require('../functions/addToCart');
+const { handler: checkout } = require('../functions/checkout');
 const mongoose = require('mongoose');
 
 
 
-describe('Get the cart given an id', function() {
+describe('Add to Cart', function() {
   before(async() => {
     await mongoose.connect('mongodb://localhost:27017/netlify');
   });
@@ -16,11 +16,8 @@ describe('Get the cart given an id', function() {
   after(async() => {
     await mongoose.disconnect();
   });
-  it('Should create a cart and then find the cart.', async function() {
+  it('Should do a successfult checkout run', async function() {
     const params = {
-      queryStringParameters: {
-        cartId: null
-      },
       body: {
         cartId: null,
         product: [
@@ -32,8 +29,6 @@ describe('Get the cart given an id', function() {
     const result = await addToCart(params);
     assert(result.body);
     assert(result.body.items.length);
-    params.queryStringParameters.cartId = result.body._id;
-    const findCart = await getCart(params);
-    assert.equal(findCart.statusCode, 200);
+    params.body.cartId = result.body._id;
   });
 });

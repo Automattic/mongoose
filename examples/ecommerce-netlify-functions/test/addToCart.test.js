@@ -2,7 +2,7 @@
 
 const { describe, it, before, after } = require('mocha');
 const assert = require('assert');
-const { handler: addToCart } = require('../functions/addToCart/addToCart');
+const { handler: addToCart } = require('../functions/addToCart');
 const mongoose = require('mongoose');
 
 

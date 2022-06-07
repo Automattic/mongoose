@@ -2,7 +2,7 @@
 
 const { describe, it, before, after } = require('mocha');
 const assert = require('assert');
-const { handler: getProducts } = require('../functions/getProducts/getProducts');
+const { handler: getProducts } = require('../functions/getProducts');
 const mongoose = require('mongoose');
 
 describe('Products', function() {

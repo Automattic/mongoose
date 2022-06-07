@@ -1,41 +1,39 @@
 'use strict';
-const stripe = require('stripe')('insert your stripe key here');
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 
-const { Cart, Order } = require('../../models');
+const { Cart, Order, Product } = require('../models');
 
 const handler = async(event) => {
   try {
     const stripeProducts = { line_items: [] };
+    const total = 0;
     for (let i = 0; i < event.body.products.length; i++) {
+      const product = await Product.findOne({_id: event.body.products[i].productId});
       stripeProducts.line_items.push({
         price_data: {
           currency: 'usd',
           product_data: {
-            name: event.body.products[i].name
+            name: product.productName
           },
-          unit_amount: event.body.products[i].productPrice,
+          unit_amount: product.productPrice,
         },
-        quantity: event.body.quantity
+        quantity: event.body.products[i].quantity
       });
+      total = total + (product.productPrice * event.body.products[i].quantity);
     }
+    const salesTax = total * .06;
     const session = await stripe.checkout.sessions.create({
-      line_items: [{
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: event.body.products
-          }
-        }
-      }],
+      line_items: stripeProducts.line_items,
       mode: 'payment',
       success_url: 'insert a url here',
       cancel_url: 'insert a url here'
     });
-
+    const orders = await Order.find();
+    const orderNumber = orders.length ? orders.length + 1 : 1;
     const order = await Order.create({
       items: event.body.products,
-      total: event.body.total,
-      orderNumber: event.body.orderNumber,
+      total: total,
+      orderNumber: orderNumber,
       name: event.body.name,
       email: event.body.email,
       address1: event.body.address1,
@@ -45,12 +43,12 @@ const handler = async(event) => {
       location: { lat: event.body.lat, lng: event.body.lng },
       shipping: event.body.shipping,
       paymentMethod: { id: event.body.paymentMethod.id, brand: event.body.paymentMethod.brand, last4: event.body.paymentMethod.last4 },
-      trackingNumber: event.body.trackingNumber
+      salesTax: salesTax
     });
     const cart = await Cart.findOne({ _id: event.body.cartId });
     cart.orderId = order._id;
     await cart.save();
-    return { statusCode: 500, body: { order: order, cart: cart }, headers: { Location: session.url } };
+    return { statusCode: 200, body: { order: order, cart: cart }, headers: { Location: session.url } };
   } catch (error) {
     return { statusCode: 500, body: error.toString() };
   }

@@ -1,6 +1,6 @@
 'use strict';
 
-const { Cart } = require('../../models');
+const { Cart } = require('../models');
 
 const handler = async(event) => {
   try {
@@ -8,6 +8,9 @@ const handler = async(event) => {
     const index = cart.items.findIndex((item) =>
       item.productId == event.body.product.productId
     );
+    if (index == -1) {
+      return { statusCode: 500, body: 'Product not found' };
+    }
     if (event.body.product.quantity) {
       cart.items[index].quantity -= event.body.product.quantity;
       await cart.save();

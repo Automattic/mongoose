@@ -2,8 +2,8 @@
 
 const { describe, it, before, after } = require('mocha');
 const assert = require('assert');
-const { handler: addToCart } = require('../functions/addToCart/addToCart');
-const { handler: removeFromCart } = require('../functions/removeFromCart/removeFromCart');
+const { handler: addToCart } = require('../functions/addToCart');
+const { handler: removeFromCart } = require('../functions/removeFromCart');
 const mongoose = require('mongoose');
 
 

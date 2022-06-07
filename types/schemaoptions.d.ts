@@ -212,6 +212,6 @@ declare module 'mongoose' {
     /**
      * Virtual paths.
      */
-    virtuals?: VirtualsSchemaOptionsPropertyType<DocType, TVirtuals, TInstanceMethods>,
+    virtuals?: SchemaOptionsVirtualsPropertyType<DocType, TVirtuals, TInstanceMethods>,
   }
 }

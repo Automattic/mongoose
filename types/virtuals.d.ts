@@ -1,13 +1,16 @@
 /// <reference path="./utility.d.ts" />
 
 declare module 'mongoose' {
-    type VirtualPathFunctions<DocType = {}, PathType = unknown, TInstanceMethods = {}> = {
-      get?: (this: Document<any, any, DocType> & DocType) => PathType;
-      set?: (this: Document<any, any, DocType> & DocType, ...args: any) => unknown;
+    type VirtualPathFunctions<DocType = {}, PathValueType = unknown, TInstanceMethods = {}> = {
+      get?: TVirtualPathFN<DocType, PathValueType, TInstanceMethods, PathValueType>;
+      set?: TVirtualPathFN<DocType, PathValueType, TInstanceMethods, void>;
       options?: VirtualTypeOptions<HydratedDocument<DocType, TInstanceMethods>, DocType>;
     };
 
-    type VirtualsSchemaOptionsPropertyType<DocType = any, virtualPaths = Record<any, unknown>, TInstanceMethods = {}> = {
-      [K in keyof virtualPaths]: VirtualPathFunctions<IsItRecordAndNotAny<DocType> extends true ? DocType : any, virtualPaths[K], TInstanceMethods>
+  type TVirtualPathFN<DocType = {}, PathType = unknown, TInstanceMethods = {}, TReturn = unknown> =
+    <T = HydratedDocument<DocType, TInstanceMethods>>(this: Document<any, any, DocType> & DocType, value: PathType, virtual: VirtualType<T>, doc: Document<any, any, DocType> & DocType) => TReturn;
+
+    type SchemaOptionsVirtualsPropertyType<DocType = any, VirtualPaths = Record<any, unknown>, TInstanceMethods = {}> = {
+      [K in keyof VirtualPaths]: VirtualPathFunctions<IsItRecordAndNotAny<DocType> extends true ? DocType : any, VirtualPaths[K], TInstanceMethods>
     };
 }

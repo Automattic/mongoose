@@ -269,17 +269,17 @@ declare module 'mongoose' {
 
   namespace Schema {
     namespace Types {
-      class Array extends SchemaType implements AcceptsDiscriminator {
+      class Array<B = any> extends SchemaType<B> implements AcceptsDiscriminator<B> {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Array';
 
         static options: { castNonArrays: boolean; };
 
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<Omit<B, keyof D> & D>;
 
         /** The schematype embedded in this array */
-        caster?: SchemaType;
+        caster?: SchemaType<B>;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -329,17 +329,17 @@ declare module 'mongoose' {
         static schemaName: 'Decimal128';
       }
 
-      class DocumentArray extends SchemaType implements AcceptsDiscriminator {
+      class DocumentArray<B = any> extends SchemaType<B> implements AcceptsDiscriminator<B> {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'DocumentArray';
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<Omit<B, keyof D> & D>;
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
-        schema: Schema;
+        schema: Schema<B>;
 
         /** The constructor used for subdocuments in this array */
         caster?: typeof Types.Subdocument;
@@ -377,15 +377,15 @@ declare module 'mongoose' {
         auto(turnOn: boolean): this;
       }
 
-      class Subdocument extends SchemaType implements AcceptsDiscriminator {
+      class Subdocument<B = any> extends SchemaType<B> implements AcceptsDiscriminator<B> {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
         /** The document's schema */
-        schema: Schema;
+        schema: Schema<B>;
 
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<Omit<B, keyof D> & D>;
       }
 
       class String extends SchemaType {

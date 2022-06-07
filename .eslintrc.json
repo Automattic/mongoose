@@ -38,7 +38,7 @@
       "@typescript-eslint/object-curly-spacing": ["error", "always"],
       "@typescript-eslint/semi": "error",
       "@typescript-eslint/space-before-function-paren": ["error", "never"],
-      "@typescript-eslint/space-infix-ops": "error"
+      "@typescript-eslint/space-infix-ops": "off"
     }
   }],
   "plugins": [

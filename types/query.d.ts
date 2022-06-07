@@ -579,7 +579,7 @@ declare module 'mongoose' {
     snapshot(val?: boolean): this;
 
     /** Sets the sort order. If an object is passed, values allowed are `asc`, `desc`, `ascending`, `descending`, `1`, and `-1`. */
-    sort(arg: string | { [key: string]: SortOrder }): this;
+    sort(arg?: string | { [key: string]: SortOrder | { $meta: 'textScore' } } | undefined | null): this;
 
     /** Sets the tailable option (for use with capped collections). */
     tailable(bool?: boolean, opts?: {

@@ -120,6 +120,17 @@ declare module 'mongoose' {
     useProjection?: boolean;
   }
 
+  export type DiscriminatorModel<M, T> = T extends Model<infer T1, infer T2, infer T3, infer T4>
+    ?
+    M extends Model<infer M1, infer M2, infer M3, infer M4>
+      ? Model<Omit<M1, keyof T1> & T1, M2 | T2, M3 | T3, M4 | T4>
+      : M
+    : M;
+
+  export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, T> = T extends Schema<infer T1, infer T2, infer T3, infer T4, infer T5>
+    ? Schema<Omit<DocType, keyof T1> & T1, DiscriminatorModel<T2, M>, T3 | TInstanceMethods, T4 | TQueryHelpers, T5 | TVirtuals>
+    : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals>;
+
   export class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any> extends events.EventEmitter {
     /**
      * Create a new schema
@@ -141,6 +152,8 @@ declare module 'mongoose' {
 
     /** Returns a copy of this schema */
     clone<T = this>(): T;
+
+    discriminator<T extends Schema = Schema>(name: string, schema: T): DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, T>;
 
     /** Returns a new schema that has the picked `paths` from this schema. */
     pick<T = this>(paths: string[], options?: SchemaOptions): T;
@@ -474,10 +487,10 @@ declare module 'mongoose' {
   type LeanTypeOrArray<T> = T extends unknown[] ? LeanArray<T> : LeanType<T>;
 
   export type LeanArray<T extends unknown[]> =
-  // By checking if it extends Types.Array we can get the original base type before collapsing down,
-  // rather than trying to manually remove the old types. This matches both Array and DocumentArray
+    // By checking if it extends Types.Array we can get the original base type before collapsing down,
+    // rather than trying to manually remove the old types. This matches both Array and DocumentArray
     T extends Types.Array<infer U> ? LeanTypeOrArray<U>[] :
-      // If it isn't a custom mongoose type we fall back to "do our best"
+    // If it isn't a custom mongoose type we fall back to "do our best"
       T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
   export type _LeanDocument<T> = {

@@ -126,7 +126,7 @@ declare module 'mongoose' {
     transform?: (this: any, val: T) => any;
 
     /** defines a custom getter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
-    get?: (value: any, doc?: this) => T;
+    get?: (value: any, doc?: this) => T | undefined;
 
     /** defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
     set?: (value: any, priorVal?: T, doc?: this) => any;
@@ -269,17 +269,17 @@ declare module 'mongoose' {
 
   namespace Schema {
     namespace Types {
-      class Array extends SchemaType implements AcceptsDiscriminator {
+      class Array<B = any> extends SchemaType<B> implements AcceptsDiscriminator<B> {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Array';
 
         static options: { castNonArrays: boolean; };
 
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<Omit<B, keyof D> & D>;
 
         /** The schematype embedded in this array */
-        caster?: SchemaType;
+        caster?: SchemaType<B>;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -290,7 +290,7 @@ declare module 'mongoose' {
 
       class Boolean extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Boolean';
 
         /** Configure which values get casted to `true`. */
         static convertToTrue: Set<any>;
@@ -301,7 +301,7 @@ declare module 'mongoose' {
 
       class Buffer extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Buffer';
 
         /**
          * Sets the default [subtype](https://studio3t.com/whats-new/best-practices-uuid-mongodb/)
@@ -312,7 +312,7 @@ declare module 'mongoose' {
 
       class Date extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Date';
 
         /** Declares a TTL index (rounded to the nearest second) for _Date_ types only. */
         expires(when: number | string): this;
@@ -326,20 +326,20 @@ declare module 'mongoose' {
 
       class Decimal128 extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Decimal128';
       }
 
-      class DocumentArray extends SchemaType implements AcceptsDiscriminator {
+      class DocumentArray<B = any> extends SchemaType<B> implements AcceptsDiscriminator<B> {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'DocumentArray';
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<Omit<B, keyof D> & D>;
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
-        schema: Schema;
+        schema: Schema<B>;
 
         /** The constructor used for subdocuments in this array */
         caster?: typeof Types.Subdocument;
@@ -347,17 +347,17 @@ declare module 'mongoose' {
 
       class Map extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Map';
       }
 
       class Mixed extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Mixed';
       }
 
       class Number extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'Number';
 
         /** Sets a enum validator */
         enum(vals: number[]): this;
@@ -371,26 +371,26 @@ declare module 'mongoose' {
 
       class ObjectId extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'ObjectId';
 
         /** Adds an auto-generated ObjectId default if turnOn is true. */
         auto(turnOn: boolean): this;
       }
 
-      class Subdocument extends SchemaType implements AcceptsDiscriminator {
+      class Subdocument<B = any> extends SchemaType<B> implements AcceptsDiscriminator<B> {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
         /** The document's schema */
-        schema: Schema;
+        schema: Schema<B>;
 
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<Omit<B, keyof D> & D>;
       }
 
       class String extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
-        static schemaName: string;
+        static schemaName: 'String';
 
         /** Adds an enum validator */
         enum(vals: string[] | any): this;

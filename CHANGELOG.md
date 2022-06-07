@@ -1,3 +1,13 @@
+6.3.6 / 2022-06-07
+==================
+ * fix(update): apply timestamps to nested subdocs within $push and $addToSet #11775
+ * fix(document): use shallow clone instead of deep clone for `toObject()` options #11776
+ * fix: avoid checking for ObjectId with instanceof #11891 [noseworthy](https://github.com/noseworthy)
+ * fix(types): Allow sorting by text score #11893
+ * fix(types): allow schematype get() functions to return undefined #11561
+ * fix(types): add Schema.discriminator #11855 [Uzlopak](https://github.com/Uzlopak)
+ * fix(types): discriminator generic type not being passed to schema #11898 [GCastilho](https://github.com/GCastilho)
+
 6.3.5 / 2022-05-30
 ==================
  * fix(document): avoid infinite recursion when calling toObject() on self-referencing document #11756

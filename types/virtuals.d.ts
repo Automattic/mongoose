@@ -1,5 +1,3 @@
-/// <reference path="./utility.d.ts" />
-
 declare module 'mongoose' {
     type VirtualPathFunctions<DocType = {}, PathValueType = unknown, TInstanceMethods = {}> = {
       get?: TVirtualPathFN<DocType, PathValueType, TInstanceMethods, PathValueType>;

@@ -9,7 +9,9 @@ import {
   SchemaType,
   Query,
   HydratedDocument,
-  SchemaOptions
+  SchemaOptions,
+  InferDocType,
+  FlatRecord
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 
@@ -541,6 +543,10 @@ export function autoTypedSchema() {
   expectType<AutoTypedSchemaType['schema']>({} as InferredSchemaType);
 
   expectError<AutoTypedSchemaType['schema'] & { doesNotExist: boolean; }>({} as InferredSchemaType);
+
+  type InferredDocType = InferDocType<typeof AutoTypedSchema>;
+
+  expectType<FlatRecord<AutoTypedSchemaType['schema'] & AutoTypedSchemaType['virtuals']>>({} as InferredDocType);
 
   return AutoTypedSchema;
 }

@@ -5,6 +5,9 @@ on:
       - '.github/workflows/tidelift-alignment.yml'
       - 'package.json'
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Run Tidelift to ensure approved open source packages are in use

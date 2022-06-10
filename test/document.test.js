@@ -959,6 +959,25 @@ describe('document', function() {
 
       assert.ok(foundGroup.toJSON()._users[0].hello);
     });
+
+    it('jsonifying with undefined path', async function() {
+      const userSchema = new Schema({
+        name: String,
+        friends: [{
+          type: String,
+          transform(friendName) {
+            return `Hi, ${friendName}`;
+          },
+        }],
+      });
+      const User = db.model('User', userSchema);
+      const alice = await User.create({ name: 'Alic', friends: ['Bob', 'Jack'] });
+      const foundAlice = await User.findById(alice._id, { name: true });
+      assert.equal(foundAlice.friends, undefined);
+      const foundAlicJson = foundAlice.toJSON();
+      assert.equal(foundAlicJson.friends, undefined);
+      assert.equal(foundAlicJson.name, 'Alic');
+    });
   });
 
   describe('inspect', function() {

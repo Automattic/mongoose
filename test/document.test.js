@@ -967,8 +967,8 @@ describe('document', function() {
           type: String,
           transform(friendName) {
             return `Hi, ${friendName}`;
-          },
-        }],
+          }
+        }]
       });
       const User = db.model('User', userSchema);
       const alice = await User.create({ name: 'Alic', friends: ['Bob', 'Jack'] });

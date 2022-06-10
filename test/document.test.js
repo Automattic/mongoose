@@ -960,7 +960,7 @@ describe('document', function() {
       assert.ok(foundGroup.toJSON()._users[0].hello);
     });
 
-    it('jsonifying with undefined path', async function() {
+    it('jsonifying with undefined path (gh-11922)', async function() {
       const userSchema = new Schema({
         name: String,
         friends: [{

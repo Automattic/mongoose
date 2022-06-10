@@ -20,14 +20,13 @@ declare module 'mongoose' {
    * of an ObjectId.
    */
   function isObjectIdOrHexString(v: mongodb.ObjectId): true;
-  function isObjectIdOrHexString(v: string): boolean;
+  function isObjectIdOrHexString(v: mongodb.ObjectId | string): boolean;
   function isObjectIdOrHexString(v: any): false;
 
   /**
    * Returns true if Mongoose can cast the given value to an ObjectId, or
    * false otherwise.
    */
-  function isValidObjectId(v: mongodb.ObjectId): true;
-  function isValidObjectId(v: Types.ObjectId): true;
+  function isValidObjectId(v: mongodb.ObjectId | Types.ObjectId): true;
   function isValidObjectId(v: any): boolean;
 }

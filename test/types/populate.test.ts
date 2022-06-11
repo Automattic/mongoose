@@ -1,4 +1,4 @@
-import { Schema, model, Document, PopulatedDoc, Types, HydratedDocument } from 'mongoose';
+import mongoose, { Schema, model, Document, PopulatedDoc, Types, HydratedDocument, SchemaTypeOptions } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectType } from 'tsd';
@@ -205,6 +205,9 @@ function gh11862() {
     userType: string;
     friend: Types.ObjectId;
   }
+
+  const t: SchemaTypeOptions<mongoose.Types.ObjectId> = { type: 'ObjectId', refPath: 'userType' };
+
   const userSchema = new Schema<IUser>({
     userType: String,
     friend: { type: 'ObjectId', refPath: 'userType' }

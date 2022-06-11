@@ -37,6 +37,8 @@ declare module 'mongoose' {
   /** The various Mongoose SchemaTypes. */
   const SchemaTypes: typeof Schema.Types;
 
+  type DefaultType<T> = T extends Schema.Types.Mixed ? any : Partial<ExtractMongooseArray<T>>;
+
   class SchemaTypeOptions<T> {
     type?:
     T extends string ? StringSchemaDefinition :
@@ -74,7 +76,7 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: T extends Schema.Types.Mixed ? ({} | ((this: any, doc: any) => any)) : (ExtractMongooseArray<T> | ((this: any, doc: any) => Partial<ExtractMongooseArray<T>>));
+    default?: DefaultType<T> | ((this: any, doc: any) => DefaultType<T>) | null;
 
     /**
      * The model that `populate()` should use if populating this path.

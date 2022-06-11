@@ -84,6 +84,13 @@ declare module 'mongoose' {
     ref?: string | Model<any> | ((this: any, doc: any) => string | Model<any>);
 
     /**
+     * The path in the document that `populate()` should use to find the model
+     * to use.
+     */
+
+    refPath?: string | ((this: any, doc: any) => string);
+
+    /**
      * Whether to include or exclude this path by default when loading documents
      * using `find()`, `findOne()`, etc.
      */

@@ -187,7 +187,6 @@ function gh11503() {
 
 
 function gh11544() {
-
   interface IUser {
     friends: Types.ObjectId[];
   }
@@ -199,6 +198,20 @@ function gh11544() {
   User.findOne({}).populate({ path: 'friends', strictPopulate: false });
   User.findOne({}).populate({ path: 'friends', strictPopulate: true });
   User.findOne({}).populate({ path: 'friends', populate: { path: 'someNestedPath', strictPopulate: false } });
+}
+
+function gh11862() {
+  interface IUser {
+    userType: string;
+    friend: Types.ObjectId;
+  }
+  const userSchema = new Schema<IUser>({
+    userType: String,
+    friend: { type: 'ObjectId', refPath: 'userType' }
+  });
+  const User = model<IUser>('friends', userSchema);
+
+  User.findOne({}).populate('friend');
 }
 
 async function _11532() {

@@ -37,6 +37,8 @@ declare module 'mongoose' {
   /** The various Mongoose SchemaTypes. */
   const SchemaTypes: typeof Schema.Types;
 
+  type DefaultType<T> = T extends Schema.Types.Mixed ? any : Partial<ExtractMongooseArray<T>>;
+
   class SchemaTypeOptions<T> {
     type?:
     T extends string ? StringSchemaDefinition :
@@ -74,12 +76,19 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: T extends Schema.Types.Mixed ? ({} | ((this: any, doc: any) => any)) : (ExtractMongooseArray<T> | ((this: any, doc: any) => Partial<ExtractMongooseArray<T>>));
+    default?: DefaultType<T> | ((this: any, doc: any) => DefaultType<T>) | null;
 
     /**
      * The model that `populate()` should use if populating this path.
      */
     ref?: string | Model<any> | ((this: any, doc: any) => string | Model<any>);
+
+    /**
+     * The path in the document that `populate()` should use to find the model
+     * to use.
+     */
+
+    refPath?: string | ((this: any, doc: any) => string);
 
     /**
      * Whether to include or exclude this path by default when loading documents
@@ -126,7 +135,7 @@ declare module 'mongoose' {
     transform?: (this: any, val: T) => any;
 
     /** defines a custom getter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
-    get?: (value: any, doc?: this) => T;
+    get?: (value: any, doc?: this) => T | undefined;
 
     /** defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
     set?: (value: any, priorVal?: T, doc?: this) => any;

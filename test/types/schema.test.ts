@@ -1,4 +1,16 @@
-import { Schema, Document, SchemaDefinition, Model, Types, InferSchemaType, SchemaType, Query, HydratedDocument } from 'mongoose';
+import {
+  Schema,
+  Document,
+  SchemaDefinition,
+  SchemaDefinitionProperty,
+  SchemaTypeOptions,
+  Model,
+  Types,
+  InferSchemaType,
+  SchemaType,
+  Query,
+  HydratedDocument
+} from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 
 enum Genre {
@@ -78,7 +90,7 @@ movieSchema.index({ title: 1 }, { unique: true });
 interface IProfile {
   age: number;
 }
-interface ProfileDoc extends Document, IProfile {}
+interface ProfileDoc extends Document, IProfile { }
 const ProfileSchemaDef: SchemaDefinition<IProfile> = { age: Number };
 export const ProfileSchema = new Schema<ProfileDoc, Model<ProfileDoc>, ProfileDoc>(ProfileSchemaDef);
 
@@ -87,7 +99,7 @@ interface IUser {
   profile: ProfileDoc;
 }
 
-interface UserDoc extends Document, IUser {}
+interface UserDoc extends Document, IUser { }
 
 const ProfileSchemaDef2: SchemaDefinition<IProfile> = {
   age: Schema.Types.Number
@@ -512,3 +524,38 @@ export type AutoTypedSchemaType = {
     instanceFn: () => 'Returned from DocumentInstanceFn'
   },
 };
+
+// discriminator
+const eventSchema = new Schema<{ message: string }>({ message: String }, { discriminatorKey: 'kind' });
+const batchSchema = new Schema<{ name: string }>({ name: String }, { discriminatorKey: 'kind' });
+const discriminatedSchema = batchSchema.discriminator('event', eventSchema);
+
+expectType<Schema<Omit<{ name: string }, 'message'> & { message: string }>>(discriminatedSchema);
+
+function gh11828() {
+  interface IUser {
+    name: string;
+    age: number;
+    bornAt: Date;
+    isActive: boolean;
+  }
+
+  const t: SchemaTypeOptions<boolean> = {
+    type: Boolean,
+    default() {
+      return this.name === 'Hafez';
+    }
+  };
+
+  new Schema<IUser>({
+    name: { type: String, default: () => 'Hafez' },
+    age: { type: Number, default: () => 27 },
+    bornAt: { type: Date, default: () => new Date() },
+    isActive: {
+      type: Boolean,
+      default(): boolean {
+        return this.name === 'Hafez';
+      }
+    }
+  });
+}

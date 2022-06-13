@@ -1,3 +1,13 @@
+6.3.7 / 2022-06-13
+==================
+ * fix(schema+document): allow disabling _id on subdocuments by default #11541
+ * fix(update): respect global strictQuery option when casting array filters #11836
+ * perf(document): avoid unnecessarily creating new options object on every `$set` #11541
+ * fix: toJSON with undefined path #11922 [kerryChen95](https://github.com/kerryChen95)
+ * fix: add refPath to SchemaTypeOptions class #11862
+ * fix(types): handle boolean default functions #11828
+ * docs(populate): make path names in refPath section consistent #11724
+
 6.3.6 / 2022-06-07
 ==================
  * fix(update): apply timestamps to nested subdocs within $push and $addToSet #11775

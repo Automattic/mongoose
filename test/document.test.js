@@ -8365,7 +8365,6 @@ describe('document', function() {
     });
     const Organization = db.model('Test', organizationSchema);
 
-
     const org = new Organization();
     org.set('name', 'MongoDB');
 

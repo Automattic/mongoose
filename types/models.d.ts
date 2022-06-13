@@ -1,9 +1,9 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
-  export interface AcceptsDiscriminator<B> {
+  export interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
-    discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<Omit<B, keyof D> & D>;
+    discriminator<D>(name: string | number, schema: Schema, value?: string | number | ObjectId): Model<D>;
     discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
@@ -116,7 +116,7 @@ declare module 'mongoose' {
   const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}> extends
     NodeJS.EventEmitter,
-    AcceptsDiscriminator<T>,
+    AcceptsDiscriminator,
     IndexManager,
     SessionStarter {
     new <DocType = AnyKeys<T> & AnyObject>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;

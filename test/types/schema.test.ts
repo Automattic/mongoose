@@ -1,4 +1,4 @@
-import { Schema, Document, SchemaDefinition, Model, Types } from 'mongoose';
+import { Schema, Document, SchemaDefinition, SchemaDefinitionProperty, SchemaTypeOptions, Model, Types } from 'mongoose';
 import { expectType, expectError } from 'tsd';
 
 enum Genre {
@@ -326,3 +326,32 @@ const batchSchema = new Schema<{ name: string }>({ name: String }, { discriminat
 const discriminatedSchema = batchSchema.discriminator('event', eventSchema);
 
 expectType<Schema<Omit<{ name: string }, 'message'> & { message: string }>>(discriminatedSchema);
+
+function gh11828() {
+  interface IUser {
+    name: string;
+    age: number;
+    bornAt: Date;
+    isActive: boolean;
+  }
+
+  const t: SchemaTypeOptions<boolean> = {
+    type: Boolean,
+    default() {
+      return this.name === 'Hafez';
+    }
+  };
+
+  new Schema<IUser>({
+    name: { type: String, default: () => 'Hafez' },
+    age: { type: Number, default: () => 27 },
+    bornAt: { type: Date, default: () => new Date() },
+    isActive: {
+      type: Boolean,
+      default(): boolean {
+        return this.name === 'Hafez';
+      }
+    }
+  });
+
+}

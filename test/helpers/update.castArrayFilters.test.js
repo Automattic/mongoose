@@ -222,4 +222,43 @@ describe('castArrayFilters', function() {
 
     assert.strictEqual(q.options.arrayFilters[0].$or[0]['arr.id'], 12);
   });
+
+  it('respects global strictQuery option (gh-11836)', function() {
+    const schema = new Schema({
+      arr: [{
+        id: Number
+      }]
+    });
+    let q = new Query();
+    q.schema = schema;
+    q.model = { base: { options: { strictQuery: false } } };
+
+    let p = { 'arr.$[arr].id': 42 };
+    let opts = {
+      arrayFilters: [
+        { $or: [{ 'arr.notInSchema': '12' }] }
+      ]
+    };
+
+    q.updateOne({}, p, opts);
+    castArrayFilters(q);
+
+    assert.strictEqual(q.options.arrayFilters[0].$or[0]['arr.notInSchema'], '12');
+
+    q = new Query();
+    q.schema = schema;
+    q.model = { base: { options: { strictQuery: true } } };
+
+    p = { 'arr.$[arr].id': 42 };
+    opts = {
+      arrayFilters: [
+        { $or: [{ 'arr.notInSchema': '12' }] }
+      ]
+    };
+
+    q.updateOne({}, p, opts);
+    assert.throws(() => {
+      castArrayFilters(q);
+    }, /Could not find path "arr\.0\.notInSchema" in schema/);
+  });
 });

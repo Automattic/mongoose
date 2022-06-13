@@ -37,6 +37,8 @@ declare module 'mongoose' {
   /** The various Mongoose SchemaTypes. */
   const SchemaTypes: typeof Schema.Types;
 
+  type DefaultType<T> = T extends Schema.Types.Mixed ? any : Partial<ExtractMongooseArray<T>>;
+
   class SchemaTypeOptions<T> {
     type?:
     T extends string ? StringSchemaDefinition :
@@ -74,12 +76,19 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: T extends Schema.Types.Mixed ? ({} | ((this: any, doc: any) => any)) : (ExtractMongooseArray<T> | ((this: any, doc: any) => Partial<ExtractMongooseArray<T>>));
+    default?: DefaultType<T> | ((this: any, doc: any) => DefaultType<T>) | null;
 
     /**
      * The model that `populate()` should use if populating this path.
      */
     ref?: string | Model<any> | ((this: any, doc: any) => string | Model<any>);
+
+    /**
+     * The path in the document that `populate()` should use to find the model
+     * to use.
+     */
+
+    refPath?: string | ((this: any, doc: any) => string);
 
     /**
      * Whether to include or exclude this path by default when loading documents
@@ -269,17 +278,17 @@ declare module 'mongoose' {
 
   namespace Schema {
     namespace Types {
-      class Array<B = any> extends SchemaType<B> implements AcceptsDiscriminator<B> {
+      class Array extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Array';
 
         static options: { castNonArrays: boolean; };
 
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<Omit<B, keyof D> & D>;
+        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
 
         /** The schematype embedded in this array */
-        caster?: SchemaType<B>;
+        caster?: SchemaType;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -329,17 +338,17 @@ declare module 'mongoose' {
         static schemaName: 'Decimal128';
       }
 
-      class DocumentArray<B = any> extends SchemaType<B> implements AcceptsDiscriminator<B> {
+      class DocumentArray extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'DocumentArray';
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<Omit<B, keyof D> & D>;
+        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
-        schema: Schema<B>;
+        schema: Schema;
 
         /** The constructor used for subdocuments in this array */
         caster?: typeof Types.Subdocument;
@@ -377,15 +386,15 @@ declare module 'mongoose' {
         auto(turnOn: boolean): this;
       }
 
-      class Subdocument<B = any> extends SchemaType<B> implements AcceptsDiscriminator<B> {
+      class Subdocument extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
         /** The document's schema */
-        schema: Schema<B>;
+        schema: Schema;
 
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema<D>, value?: string | number | ObjectId): Model<Omit<B, keyof D> & D>;
+        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
       }
 
       class String extends SchemaType {

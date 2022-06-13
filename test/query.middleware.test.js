@@ -636,7 +636,6 @@ describe('query middleware', function() {
     });
     const Model = db.model('Test', schema);
 
-
     await Model.find();
     assert.equal(called, 1);
 
@@ -654,5 +653,39 @@ describe('query middleware', function() {
 
     await Model.aggregate([{ $match: { name: 'test' } }]);
     assert.equal(called, 3);
+  });
+
+  it('allows skipping the wrapped function with `skipMiddlewareFunction()` (gh-11426)', async function() {
+    const schema = Schema({ name: String });
+
+    schema.pre('updateOne', function(next) {
+      next(mongoose.skipMiddlewareFunction({ answer: 42 }));
+    });
+    const Test = db.model('Test', schema);
+
+    const { _id } = await Test.create({ name: 'test' });
+    const res = await Test.updateOne({ _id }, { name: 'changed' });
+    assert.equal(res.answer, 42);
+    assert.strictEqual(res.modifiedCount, undefined);
+
+    const doc = await Test.findById(_id);
+    assert.equal(doc.name, 'test');
+  });
+
+  it('allows overwriting result with `overwriteMiddlewareResult()` (gh-11426)', async function() {
+    const schema = Schema({ name: String });
+
+    schema.post('updateOne', function() {
+      return mongoose.overwriteMiddlewareResult({ answer: 42 });
+    });
+    const Test = db.model('Test', schema);
+
+    const { _id } = await Test.create({ name: 'test' });
+    const res = await Test.updateOne({ _id }, { name: 'changed' });
+    assert.equal(res.answer, 42);
+    assert.strictEqual(res.modifiedCount, undefined);
+
+    const doc = await Test.findById(_id);
+    assert.equal(doc.name, 'changed');
   });
 });

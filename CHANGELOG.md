@@ -1,3 +1,7 @@
+6.3.8 / 2022-06-13
+==================
+ * fix: revert 670b445b0fc perf optimizations that caused some test failures #11541
+
 6.3.7 / 2022-06-13
 ==================
  * fix(schema+document): allow disabling _id on subdocuments by default #11541

@@ -11,7 +11,11 @@ const Product = mongoose.model('Product', productSchema);
 module.exports.Product = Product;
 
 const orderSchema = new mongoose.Schema({
-  items: [{ productId: { type: mongoose.ObjectId, required: true, ref: 'Product' }, quantity: { type: Number, required: true } }],
+  items: [
+    { productId: { type: mongoose.ObjectId, required: true, ref: 'Product' },
+      quantity: { type: Number, required: true, validate: v => v > 0 }
+    }
+  ],
   total: {
     type: Number,
     default: 0
@@ -52,16 +56,6 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  location: new mongoose.Schema({
-    lat: {
-      type: Number,
-      required: true
-    },
-    lng: {
-      type: Number,
-      required: true
-    }
-  }, { _id: false }),
   shipping: {
     type: String,
     required: true,
@@ -71,11 +65,7 @@ const orderSchema = new mongoose.Schema({
     id: String,
     brand: String,
     last4: String
-  },
-  salesTax: {
-    type: Number,
-    default: 0
-  },
+  }
 }, { optimisticConcurrency: true });
 
 const Order = mongoose.model('Order', orderSchema);

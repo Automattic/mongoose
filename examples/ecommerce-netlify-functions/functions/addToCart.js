@@ -6,7 +6,7 @@ const handler = async(event) => {
   try {
     if (event.body.cartId) {
       // get the document containing the specified cartId
-      const cart = await Cart.findOne({ _id: event.body.cartId });
+      const cart = await Cart.findOne({ _id: event.body.cartId }).setOptions({ sanitizeFilter: true });
       for (const product of event.body.product) {
         const exists = cart.items.find(item =>
           item.productId.toString() === product.productId.toString()

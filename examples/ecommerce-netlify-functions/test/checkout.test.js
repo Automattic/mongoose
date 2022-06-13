@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 
 
 
-describe('Add to Cart', function() {
+describe('Checkout', function() {
   before(async() => {
     await mongoose.connect('mongodb://localhost:27017/netlify');
   });
@@ -16,7 +16,7 @@ describe('Add to Cart', function() {
   after(async() => {
     await mongoose.disconnect();
   });
-  it('Should do a successfult checkout run', async function() {
+  it('Should do a successful checkout run', async function() {
     const params = {
       body: {
         cartId: null,
@@ -30,5 +30,8 @@ describe('Add to Cart', function() {
     assert(result.body);
     assert(result.body.items.length);
     params.body.cartId = result.body._id;
+    const finish = await checkout(params);
+    assert(finish.body.order);
+    assert(finish.body.cart);
   });
 });

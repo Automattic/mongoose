@@ -11,7 +11,7 @@ const handler = async(event) => {
     if (index == -1) {
       return { statusCode: 500, body: 'Product not found' };
     }
-    if (event.body.product.quantity) {
+    if (event.body?.product?.quantity) {
       cart.items[index].quantity -= event.body.product.quantity;
       await cart.save();
     } else {

@@ -12,6 +12,7 @@ try {
 
 exports['index.pug'] = require('./home');
 exports['docs/api.pug'] = require('./api');
+exports['docs/prior.pug'] = require('./prior');
 
 exports['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, markdown: true };
 exports['docs/validation.md'] = { title: 'Validation', acquit: true, markdown: true };

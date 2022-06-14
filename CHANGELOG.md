@@ -1,3 +1,75 @@
+6.3.8 / 2022-06-13
+==================
+ * fix: revert 670b445b0fc perf optimizations that caused some test failures #11541
+
+6.3.7 / 2022-06-13
+==================
+ * fix(schema+document): allow disabling _id on subdocuments by default #11541
+ * fix(update): respect global strictQuery option when casting array filters #11836
+ * perf(document): avoid unnecessarily creating new options object on every `$set` #11541
+ * fix: toJSON with undefined path #11922 [kerryChen95](https://github.com/kerryChen95)
+ * fix: add refPath to SchemaTypeOptions class #11862
+ * fix(types): handle boolean default functions #11828
+ * docs(populate): make path names in refPath section consistent #11724
+
+6.3.6 / 2022-06-07
+==================
+ * fix(update): apply timestamps to nested subdocs within $push and $addToSet #11775
+ * fix(document): use shallow clone instead of deep clone for `toObject()` options #11776
+ * fix: avoid checking for ObjectId with instanceof #11891 [noseworthy](https://github.com/noseworthy)
+ * fix(types): Allow sorting by text score #11893
+ * fix(types): allow schematype get() functions to return undefined #11561
+ * fix(types): add Schema.discriminator #11855 [Uzlopak](https://github.com/Uzlopak)
+ * fix(types): discriminator generic type not being passed to schema #11898 [GCastilho](https://github.com/GCastilho)
+
+6.3.5 / 2022-05-30
+==================
+ * fix(document): avoid infinite recursion when calling toObject() on self-referencing document #11756
+ * fix(document): avoid manually populating documents that are manually populated in another doc with different unpopulatedValue #11442
+ * fix(document): fix ObjectId conversion for external schemas #11841 [coyotte508](https://github.com/coyotte508)
+ * fix: fix codeql warnings #11817 [Uzlopak](https://github.com/Uzlopak)
+ * fix(types): allow passing TVirtuals to Schema class #11543
+ * fix(types): Type of Connection.transaction() #11825 [dwrss](https://github.com/dwrss)
+ * docs(typescript): add coverage for TypeScript query helpers #11709
+ * docs: fix documention of error handling #11844 [Uzlopak](https://github.com/Uzlopak)
+ * docs: typings mongoose.Error should reference to MongooseError #11850 [Uzlopak](https://github.com/Uzlopak)
+ * chore: improve issue templates #11794 [Uzlopak](https://github.com/Uzlopak)
+ * chore: use ts-benchmark instead of internal TS benchmarking #11798 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+
+6.3.4 / 2022-05-19
+==================
+ * fix(schema): disallow using schemas with schema-level projection with map subdocuments #11698
+ * fix(document): avoid setting nested paths to null when they're undefined #11723
+ * fix: allow using comment with findOneAndUpdate(), count(), `distinct()` and `hint` with `findOneAndUpdate()` #11793
+ * fix(document): clean modified subpaths when setting nested path to null after modifying subpaths #11764
+ * fix(types): allow calling `deleteModel()` with RegExp in TypeScript #11812
+ * docs(typescript): add section on PopulatedDoc to TypeScript populate docs #11685
+
+6.3.3 / 2022-05-09
+==================
+ * perf: avoid leaking memory when using populate() with QueryCursor because of reusing populate options with `_docs` #11641
+ * fix(types): add `_id` back for LeanDocument #11769 #11761 [taxilian](https://github.com/taxilian)
+ * fix(model): add skipValidation option for bulkWrite() to allow skipping validation for `insertOne` and `replaceOne` #11663
+ * fix(document): correctly $__reset() subdocuments that are under nested paths #11672
+ * fix(query): handle casting BSONRegExp instances as RegExps in queries #11597
+ * fix: correctly cast $not in $expr #11689
+ * perf: optimize size of browser bundle, use buffer v.5.7.1 package to match buffer package of mongodb in browser bundle #11765 [Uzlopak](https://github.com/Uzlopak)
+ * docs: Query.populate docs do not include using an array of strings for the path param #11768 #11641 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * chore: add GitHub workflow to close stale "can't reproduce", "help", "needs clarification" issues #11753 [Uzlopak](https://github.com/Uzlopak)
+ * chore: remove Makefile dependency for compiling docs #11751 [Uzlopak](https://github.com/Uzlopak)
+
+6.3.2 / 2022-05-02
+==================
+ * perf: avoid registering event listeners on subdocuments to reduce memory usage #11541
+ * fix(setDefaultsOnInsert): set default if sibling of nested path is $set #11668
+ * perf(document): remove unnecessary workaround for ignoring subpaths of arrays #11541
+ * fix(types): various fixes and improvements for types #11650 [taxilian](https://github.com/taxilian)
+ * fix(types): make mongoose typings work without esmModuleInterop true #11695 [Uzlopak](https://github.com/Uzlopak)
+ * fix(types): support populate(path, fields, model) syntax #11649 #11598 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+ * fix(types): correct SchemaTypeOptions.get function signature #11561
+ * fix: fix browser build for Webpack 5 #11717
+ * docs: improve readme #11705 [mahendrap1512](https://github.com/mahendrap1512)
+
 6.3.1 / 2022-04-21
 ==================
  * perf: improve perf of key order #11639 [Uzlopak](https://github.com/Uzlopak)

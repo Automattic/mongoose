@@ -1,0 +1,21 @@
+name: "Close stale issues"
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+permissions:
+  issues: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: stale
+        uses: actions/stale@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: 'This issue is stale because it has been open 14 days with no activity. Remove stale label or comment or this will be closed in 5 days'
+          close-issue-message: "This issue was closed because it has been inactive for 19 days since being marked as stale."
+          days-before-stale: 14
+          days-before-close: 5
+          any-of-labels: can't reproduce,help,needs clarification

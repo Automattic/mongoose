@@ -137,6 +137,15 @@ const p1: Record<string, number> = Test.find().projection('age docs.id');
 const p2: Record<string, number> | null = Test.find().projection();
 const p3: null = Test.find().projection(null);
 
+// Sorting
+Test.find().sort();
+Test.find().sort('-name');
+Test.find().sort({ name: -1 });
+Test.find().sort({ name: 'ascending' });
+Test.find().sort(undefined);
+Test.find().sort(null);
+expectError(Test.find().sort({ name: 2 }));
+expectError(Test.find().sort({ name: 'invalidSortOrder' }));
 
 // Super generic query
 function testGenericQuery(): void {

@@ -43,6 +43,8 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
   - any mocha flags can be specified with `-- <mocha flags here>`
   - For example, you can use `npm test -- -R spec` to use the spec reporter, rather than the dot reporter (by default, the test output looks like a bunch of dots)
   - execute `npm run test-tsd` to run the typescript tests
+  - execute `npm run ts-benchmark` to run the typescript benchmark "performance test" for a single time.
+  - execute `npm run ts-benchmark-watch` to run the typescript benchmark "performance test" while watching changes on types folder. Note: Make sure to commit all changes before executing this command.
 
 ### Documentation
 
@@ -53,11 +55,9 @@ To contribute to the [guide](http://mongoosejs.com/docs/guide.html) or [quick st
 If you'd like to preview your documentation changes, first commit your changes to your local master branch, then execute:
 
 * `npm install`
-* `make docclean`
-* `make gendocs`
-* `node static.js`
+* `npm run docs:view`
 
-Visit `http://localhost:8089` and you should see the docs with your local changes. Make sure you `git reset --hard` before committing, because changes to `docs/*` should **not** be in PRs.
+Visit `http://localhost:8089` and you should see the docs with your local changes. Make sure you `npm run docs:clean` before committing, because automated generated files to `docs/*` should **not** be in PRs.
 
 ### Plugins website
 

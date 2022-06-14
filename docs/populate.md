@@ -291,7 +291,7 @@ If you were to `populate()` using the `limit` option, you
 would find that the 2nd story has 0 fans:
 
 ```javascript
-const stories = Story.find().populate({
+const stories = await Story.find().populate({
   path: 'fans',
   options: { limit: 2 }
 });
@@ -493,14 +493,14 @@ storing comments. A user may comment on either a blog post or a product.
 ```javascript
 const commentSchema = new Schema({
   body: { type: String, required: true },
-  modelId: {
+  doc: {
     type: Schema.Types.ObjectId,
     required: true,
     // Instead of a hardcoded model name in `ref`, `refPath` means Mongoose
     // will look at the `onModel` property to find the right model.
-    refPath: 'onModel'
+    refPath: 'docModel'
   },
-  onModel: {
+  docModel: {
     type: String,
     required: true,
     enum: ['BlogPost', 'Product']
@@ -512,10 +512,9 @@ const BlogPost = mongoose.model('BlogPost', new Schema({ title: String }));
 const Comment = mongoose.model('Comment', commentSchema);
 ```
 
-The `refPath` option is a more sophisticated alternative to `ref`. If `ref`
-is just a string, Mongoose will always query the same model to find the
-populated subdocs. With `refPath`, you can configure what model Mongoose
-uses for each document.
+The `refPath` option is a more sophisticated alternative to `ref`.
+If `ref` is a string, Mongoose will always query the same model to find the populated subdocs.
+With `refPath`, you can configure what model Mongoose uses for each document.
 
 ```javascript
 const book = await Product.create({ name: 'The Count of Monte Cristo' });
@@ -540,9 +539,7 @@ comments[0].doc.name; // "The Count of Monte Cristo"
 comments[1].doc.title; // "Top 10 French Novels"
 ```
 
-An alternative approach is to define separate `blogPost` and
-`product` properties on `commentSchema`, and then `populate()` on both
-properties.
+An alternative approach is to define separate `blogPost` and `product` properties on `commentSchema`, and then `populate()` on both properties.
 
 ```javascript
 const commentSchema = new Schema({

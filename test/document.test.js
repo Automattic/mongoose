@@ -959,6 +959,25 @@ describe('document', function() {
 
       assert.ok(foundGroup.toJSON()._users[0].hello);
     });
+
+    it('jsonifying with undefined path (gh-11922)', async function() {
+      const userSchema = new Schema({
+        name: String,
+        friends: [{
+          type: String,
+          transform(friendName) {
+            return `Hi, ${friendName}`;
+          }
+        }]
+      });
+      const User = db.model('User', userSchema);
+      const alice = await User.create({ name: 'Alic', friends: ['Bob', 'Jack'] });
+      const foundAlice = await User.findById(alice._id, { name: true });
+      assert.equal(foundAlice.friends, undefined);
+      const foundAlicJson = foundAlice.toJSON();
+      assert.equal(foundAlicJson.friends, undefined);
+      assert.equal(foundAlicJson.name, 'Alic');
+    });
   });
 
   describe('inspect', function() {
@@ -1033,6 +1052,25 @@ describe('document', function() {
 
       assert.equal(posts.length, 1);
       assert.ok(posts[0].postedBy._id);
+    });
+
+    it('handles infinite recursion (gh-11756)', function() {
+      const User = db.model('User', Schema({
+        name: { type: String, required: true },
+        posts: [{ type: mongoose.Types.ObjectId, ref: 'Post' }]
+      }));
+
+      const Post = db.model('Post', Schema({
+        creator: { type: Schema.Types.ObjectId, ref: 'User' }
+      }));
+
+      const user = new User({ name: 'Test', posts: [] });
+      const post = new Post({ creator: user });
+      user.posts.push(post);
+
+      const inspected = post.inspect();
+      assert.ok(inspected);
+      assert.equal(inspected.creator.posts[0].creator.name, 'Test');
     });
 
     it('populate on nested path (gh-5703)', function() {
@@ -6332,7 +6370,6 @@ describe('document', function() {
       });
       const Model = db.model('Test', schema);
 
-
       await Model.create({
         roles: [
           { name: 'admin' },
@@ -11285,11 +11322,155 @@ describe('document', function() {
         name: 'lvl2',
         list: [{
           name: 'lvl3'
-          // list: [{
-          //   name: 'lvl4'
-          // }]
         }]
       }]
     });
+  });
+
+  it('reruns validation when modifying a document array path under a nested path after save (gh-11672)', async function() {
+    const ChildSchema = new Schema({
+      price: {
+        type: Number,
+        validate: function(val) {
+          return val > 0;
+        }
+      }
+    });
+
+    const ParentSchema = new Schema({
+      rootField: { nestedSubdocArray: [ChildSchema] }
+    });
+    const Test = db.model('Test', ParentSchema);
+
+    const parentDoc = new Test({
+      rootField: {
+        nestedSubdocArray: [
+          {
+            price: 1
+          }
+        ]
+      }
+    });
+
+    await parentDoc.save();
+
+    // Now we try editing to an invalid value which should throw
+    parentDoc.rootField.nestedSubdocArray[0].price = -1;
+    const err = await parentDoc.save().then(() => null, err => err);
+
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    assert.ok(err.message.includes('failed for path'), err.message);
+    assert.ok(err.message.includes('value `-1`'), err.message);
+  });
+
+  it('avoids setting nested paths to null when they are set to `undefined` (gh-11723)', async function() {
+    const nestedSchema = new mongoose.Schema({
+      count: Number
+    }, { _id: false });
+
+    const mySchema = new mongoose.Schema({
+      name: String,
+      nested: { count: Number },
+      nestedSchema: nestedSchema
+    }, { minimize: false });
+
+    const Test = db.model('Test', mySchema);
+
+    const instance1 = new Test({ name: 'test1', nested: { count: 1 }, nestedSchema: { count: 1 } });
+    await instance1.save();
+
+    const update = { nested: { count: undefined }, nestedSchema: { count: undefined } };
+    instance1.set(update);
+    await instance1.save();
+
+    const doc = await Test.findById(instance1);
+    assert.strictEqual(doc.nested.count, undefined);
+    assert.strictEqual(doc.nestedSchema.count, undefined);
+  });
+
+  it('cleans modified subpaths when setting nested path under array to null when subpaths are modified (gh-11764)', async function() {
+    const Test = db.model('Test', new Schema({
+      list: [{
+        quantity: {
+          value: Number,
+          unit: String
+        }
+      }]
+    }));
+
+    let doc = await Test.create({ list: [{ quantity: { value: 1, unit: 'case' } }] });
+
+    doc = await Test.findById(doc);
+    doc.list[0].quantity.value = null;
+    doc.list[0].quantity.unit = null;
+    doc.list[0].quantity = null;
+
+    await doc.save();
+
+    doc = await Test.findById(doc);
+    assert.strictEqual(doc.list[0].toObject().quantity, null);
+  });
+
+  it('avoids manually populating document that is manually populated in another doc with different unpopulatedValue (gh-11442) (gh-11008)', async function() {
+    const BarSchema = new Schema({
+      name: String,
+      more: String
+    });
+    const Bar = db.model('Bar', BarSchema);
+
+    // Denormalised Bar schema with just the name, for use on the Foo model
+    const BarNameSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Bar'
+      },
+      name: String
+    });
+
+    // Foo model, which contains denormalized bar data (just the name)
+    const FooSchema = new Schema({
+      something: String,
+      other: Number,
+      bar: {
+        type: BarNameSchema,
+        ref: 'Bar'
+      }
+    });
+    const Foo = db.model('Foo', FooSchema);
+
+    const Baz = db.model('Baz', new Schema({ bar: { type: 'ObjectId', ref: 'Bar' } }));
+
+    const bar = await Bar.create({
+      name: 'I am another Bar',
+      more: 'With even more data'
+    });
+    const foo = await Foo.create({
+      something: 'I am another Foo',
+      other: 4
+    });
+    foo.bar = bar;
+    const baz = await Baz.create({});
+    baz.bar = bar;
+
+    assert.ok(foo.populated('bar'));
+    assert.ok(!baz.populated('bar'));
+
+    let res = foo.toObject({ depopulate: true });
+    assert.strictEqual(res.bar._id.toString(), bar._id.toString());
+    assert.strictEqual(res.bar.name, 'I am another Bar');
+
+    res = baz.toObject({ depopulate: true });
+    assert.strictEqual(res.bar.toString(), bar._id.toString());
+
+    const bar2 = await Bar.create({
+      name: 'test2'
+    });
+    baz.bar = bar2;
+    assert.ok(baz.populated('bar'));
+
+    const baz2 = await Baz.create({});
+    baz2.bar = bar2;
+    assert.ok(baz.populated('bar'));
   });
 });

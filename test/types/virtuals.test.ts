@@ -1,4 +1,5 @@
 import { Document, Model, Schema, model } from 'mongoose';
+import { expectType } from 'tsd';
 
 interface IPerson {
   _id: number;
@@ -13,6 +14,10 @@ interface IPet {
   isDeleted: boolean;
   ownerId: number;
 
+  owner: IPerson;
+}
+
+interface PetVirtuals {
   owner: IPerson;
 }
 
@@ -71,3 +76,13 @@ const Pet = model<IPet>('Pet', petSchema);
   const pet = await Pet.findOne().orFail().populate('owner');
   console.log(pet.owner.fullName); // John Wick
 })();
+
+function gh11543() {
+  const personSchema = new Schema<IPerson, Model<IPerson, {}, {}, PetVirtuals>, {}, {}, PetVirtuals>({
+    _id: { type: Number, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true }
+  });
+
+  expectType<PetVirtuals>(personSchema.virtuals);
+}

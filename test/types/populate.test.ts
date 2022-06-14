@@ -1,4 +1,4 @@
-import { Schema, model, Document, PopulatedDoc, Types, HydratedDocument } from 'mongoose';
+import mongoose, { Schema, model, Document, PopulatedDoc, Types, HydratedDocument, SchemaTypeOptions } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectType } from 'tsd';
@@ -11,7 +11,7 @@ const childSchema: Schema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
 interface Parent {
-  child?: PopulatedDoc<Child & Document<ObjectId>>,
+  child: PopulatedDoc<Document<ObjectId> & Child>,
   name?: string
 }
 
@@ -20,14 +20,14 @@ const ParentModel = model<Parent>('Parent', new Schema({
   name: String
 }));
 
-ParentModel.findOne({}).populate('child').orFail().then((doc: Parent & Document) => {
+ParentModel.findOne({}).populate('child').orFail().then((doc: Document<ObjectId, {}, Parent> & Parent) => {
   const child = doc.child;
   if (child == null || child instanceof ObjectId) {
     throw new Error('should be populated');
   } else {
     useChildDoc(child);
   }
-  const lean = doc.toObject<Parent>();
+  const lean = doc.toObject();
   const leanChild = lean.child;
   if (leanChild == null || leanChild instanceof ObjectId) {
     throw new Error('should be populated');
@@ -187,7 +187,6 @@ function gh11503() {
 
 
 function gh11544() {
-
   interface IUser {
     friends: Types.ObjectId[];
   }
@@ -199,6 +198,23 @@ function gh11544() {
   User.findOne({}).populate({ path: 'friends', strictPopulate: false });
   User.findOne({}).populate({ path: 'friends', strictPopulate: true });
   User.findOne({}).populate({ path: 'friends', populate: { path: 'someNestedPath', strictPopulate: false } });
+}
+
+function gh11862() {
+  interface IUser {
+    userType: string;
+    friend: Types.ObjectId;
+  }
+
+  const t: SchemaTypeOptions<mongoose.Types.ObjectId> = { type: 'ObjectId', refPath: 'userType' };
+
+  const userSchema = new Schema<IUser>({
+    userType: String,
+    friend: { type: 'ObjectId', refPath: 'userType' }
+  });
+  const User = model<IUser>('friends', userSchema);
+
+  User.findOne({}).populate('friend');
 }
 
 async function _11532() {

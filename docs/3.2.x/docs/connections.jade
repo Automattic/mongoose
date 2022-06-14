@@ -1,0 +1,65 @@
+extends layout
+
+block content
+  h2 Connections
+  :markdown
+    We may connect to MongoDB by utilizing the `mongoose.connect()` method.
+
+  :js
+    mongoose.connect('mongodb://localhost/myapp');
+
+  :markdown
+    This is the minimum needed to connect the `myapp` database running locally on the default port (27017). We may also specify several more parameters in the `uri` depending on your environment:
+
+  :js
+    mongoose.connect('mongodb://username:password@host:port/database');
+
+  h3 Options
+  :markdown
+    The `connect` method also accepts an `options` object which will be passed on to the underlying driver.
+
+  :js
+    mongoose.connect(uri, options);
+
+  :markdown
+    The following option keys are available:
+
+         db      - passed to the connection db instance
+         server  - passed to the connection server instance(s)
+         replset - passed to the connection ReplSet instance
+         user    - username for authentication (if not specified in uri)
+         pass    - password for authentication (if not specified in uri)
+
+    See the [driver](https://github.com/mongodb/node-mongodb-native) for more information about available options.
+
+    _Note: The server option `auto_reconnect` is defaulted to true._
+
+    _Note: The db option `forceServerObjectId` is set to false and cannot be overridden._
+
+  h3 ReplicaSet Connections
+  :markdown
+    The same method is used to connect to a replica set but instead of passing a single `uri` we pass a comma delimited list of `uri`s.
+
+  :js
+    mongoose.connect('mongodb://username:password@host:port/database,mongodb://username:password@host:port,mongodb://username:password@host:port' [, options]);
+
+  :markdown
+    _NOTE: The `database` need only be specified in one of the `uri`s._
+
+  h3 Multiple connections
+  :markdown
+    So far we've seen how to connect to MongoDB using Mongoose's default connection. At times we may need multiple connections open to Mongo, each with different read/write settings, or maybe just to different databases for example. In these cases we can utilize `mongoose.createConnection()` which accepts all the arguments already discussed and returns a fresh connection for you.
+
+  :js
+    var conn = mongoose.createConnection('uri,uri,uri...', options);
+
+  h3 Connection pools
+  :markdown
+    Each `connection`, whether created with `mongoose.connect` or `mongoose.createConnection` are all backed by an internal configurable connection pool defaulting to a size of 5. Adjust the pool size using your connection options:
+
+  :js
+    mongoose.createConnection(uri, { server: { poolSize: 10 }});
+
+  h3#next Next Up
+  :markdown
+    Now that we've covered `connections`, let's take a look at how we can break pieces of our functionality out into reusable and shareable [plugins](/docs/plugins.html).

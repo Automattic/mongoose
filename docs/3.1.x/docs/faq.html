@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose FAQ v3.1.2</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><style>hr {
+  display: block;
+  margin: 30px 0;
+}
+</style></head><body><a id="forkbanner" href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/learnboost/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/learnboost/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li></ul></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li></ul></li><li><a href="./models.html">models</a></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./contributing.html">contributing</a></li><li><a href="./migration.html">migrating from 2.x</a></li></ul></li><li class="api"><a href="./api.html">api docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/learnboost/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><h2>FAQ</h2><p><strong>Q</strong>. Why don&#39;t my changes to arrays get saved when I update an element directly?</p><pre><code class="javascript">doc.array[<span class="number">3</span>] = <span class="string">'changed'</span>;
+doc.save();</code></pre><p><strong>A</strong>. Mongoose doesn&#39;t create getters/setters for array indexes; without them mongoose never gets notified of the change and so doesn&#39;t know to persist the new value. The work-around is to first mark the path of the array modified before saving.</p><pre><code class="javascript">doc.markModified(<span class="string">'array'</span>);
+doc.save();</code></pre><hr><p><strong>Q</strong>. Why doesn&#39;t mongoose allow me to directly assign schemas to paths?</p><pre><code class="javascript"><span class="keyword">var</span> userSchema = <span class="keyword">new</span> Schema({ name: String });
+<span class="keyword">new</span> Schema({ user: userSchema })</code></pre><p><strong>A</strong>. Schemas have a one-to-one mapping with documents. Documents have <code>save</code> and <code>remove</code> methods along with their own <code>pre</code> and <code>post</code> hooks which would lead to code like the following:</p><pre><code class="javascript">doc.user.save();  <span class="comment">// ?</span>
+doc.user.remove();<span class="comment">// ?</span>
+doc.save()</code></pre><p>We&#39;ve felt that this api would be more confusing than helpful. The counter argument is that arrays of sub-documents already have this functionality, but at best this too leads to confusion (calling <code>save</code> on a sub-document is a no-op and exists only to support <code>pre</code> save hooks). In the future this is likely to be revisited.</p><hr><p><strong>Q</strong>. How can I enable debugging?</p>
+
+<p><strong>A</strong>. Set the <code>debug</code> option to <code>true</code>:</p><pre><code class="javascript">mongoose.set(<span class="string">'debug'</span>, <span class="literal">true</span>)</code></pre><hr><p><strong>Q</strong>. My <code>save()</code> callback never executes. What am I doing wrong?</p>
+
+<p><strong>A</strong>. All <code>collection</code> actions (insert, remove, queries, etc) are queued until the <code>connection</code> opens. It is likely that an error occurred while attempting to connect. Try adding an error handler to your connection.</p><pre><code class="javascript"><span class="comment">// if connecting on the default mongoose connection</span>
+mongoose.connect(..);
+mongoose.connection.on(<span class="string">'error'</span>, handleError);
+
+<span class="comment">// if connecting on a separate connection</span>
+<span class="keyword">var</span> conn = mongoose.createConnection(..);
+conn.on(<span class="string">'error'</span>, handleError);
+</code></pre><hr><p><strong>Something to add?</strong></p>
+
+<p>If you&#39;d like to contribute to this page, please <a href="https://github.com/learnboost/mongoose/tree/master/docs/faq.jade">visit it</a> on github and use the <a href="https://github.com/blog/844-forking-with-the-edit-button">Edit</a> button to send a pull request.</p><br></div></div><script>document.body.className = 'load';</script><script>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-1122274-9']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</script></body></html>

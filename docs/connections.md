@@ -243,7 +243,6 @@ connection may emit.
 * `error`: Emitted if an error occurs on a connection, like a `parseError` due to malformed data or a payload larger than [16MB](https://docs.mongodb.com/manual/reference/limits/#BSON-Document-Size).
 * `fullsetup`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to the primary and at least one secondary.
 * `all`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to all servers specified in your connection string.
-* `reconnectFailed`: Emitted when you're connected to a standalone server and Mongoose has run out of [`reconnectTries`](https://thecodebarbarian.com/managing-connections-with-the-mongodb-node-driver.html#handling-single-server-outages). The [MongoDB driver](http://npmjs.com/package/mongodb) will no longer attempt to reconnect after this event is emitted. This event will never be emitted if you're connected to a replica set.
 
 When you're connecting to a single MongoDB server (a "standalone"), Mongoose will emit 'disconnected' if it gets
 disconnected from the standalone server, and 'connected' if it successfully connects to the standalone. In a

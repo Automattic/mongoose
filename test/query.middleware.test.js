@@ -657,19 +657,22 @@ describe('query middleware', function() {
 
   it('allows skipping the wrapped function with `skipMiddlewareFunction()` (gh-11426)', async function() {
     const schema = Schema({ name: String });
+    const now = Date.now();
 
-    schema.pre('updateOne', function(next) {
-      next(mongoose.skipMiddlewareFunction({ answer: 42 }));
+    schema.pre('find', function(next) {
+      next(mongoose.skipMiddlewareFunction([{ name: 'from cache' }]));
+    });
+    schema.post('find', function(res) {
+      res.forEach(doc => {
+        doc.loadedAt = now;
+      });
     });
     const Test = db.model('Test', schema);
 
-    const { _id } = await Test.create({ name: 'test' });
-    const res = await Test.updateOne({ _id }, { name: 'changed' });
-    assert.equal(res.answer, 42);
-    assert.strictEqual(res.modifiedCount, undefined);
-
-    const doc = await Test.findById(_id);
-    assert.equal(doc.name, 'test');
+    const res = await Test.find();
+    assert.equal(res.length, 1);
+    assert.strictEqual(res[0].name, 'from cache');
+    assert.strictEqual(res[0].loadedAt, now);
   });
 
   it('allows overwriting result with `overwriteMiddlewareResult()` (gh-11426)', async function() {
@@ -678,12 +681,17 @@ describe('query middleware', function() {
     schema.post('updateOne', function() {
       return mongoose.overwriteMiddlewareResult({ answer: 42 });
     });
+    schema.post('updateOne', function(res) {
+      assert.strictEqual(res.answer, 42);
+      res.secondMiddlewareRan = true;
+    });
     const Test = db.model('Test', schema);
 
     const { _id } = await Test.create({ name: 'test' });
     const res = await Test.updateOne({ _id }, { name: 'changed' });
     assert.equal(res.answer, 42);
     assert.strictEqual(res.modifiedCount, undefined);
+    assert.strictEqual(res.secondMiddlewareRan, true);
 
     const doc = await Test.findById(_id);
     assert.equal(doc.name, 'changed');

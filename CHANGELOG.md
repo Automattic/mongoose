@@ -1,3 +1,27 @@
+6.3.8 / 2022-06-13
+==================
+ * fix: revert 670b445b0fc perf optimizations that caused some test failures #11541
+
+6.3.7 / 2022-06-13
+==================
+ * fix(schema+document): allow disabling _id on subdocuments by default #11541
+ * fix(update): respect global strictQuery option when casting array filters #11836
+ * perf(document): avoid unnecessarily creating new options object on every `$set` #11541
+ * fix: toJSON with undefined path #11922 [kerryChen95](https://github.com/kerryChen95)
+ * fix: add refPath to SchemaTypeOptions class #11862
+ * fix(types): handle boolean default functions #11828
+ * docs(populate): make path names in refPath section consistent #11724
+
+6.3.6 / 2022-06-07
+==================
+ * fix(update): apply timestamps to nested subdocs within $push and $addToSet #11775
+ * fix(document): use shallow clone instead of deep clone for `toObject()` options #11776
+ * fix: avoid checking for ObjectId with instanceof #11891 [noseworthy](https://github.com/noseworthy)
+ * fix(types): Allow sorting by text score #11893
+ * fix(types): allow schematype get() functions to return undefined #11561
+ * fix(types): add Schema.discriminator #11855 [Uzlopak](https://github.com/Uzlopak)
+ * fix(types): discriminator generic type not being passed to schema #11898 [GCastilho](https://github.com/GCastilho)
+
 6.3.5 / 2022-05-30
 ==================
  * fix(document): avoid infinite recursion when calling toObject() on self-referencing document #11756

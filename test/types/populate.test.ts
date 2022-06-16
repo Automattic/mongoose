@@ -1,4 +1,4 @@
-import { Schema, model, Document, PopulatedDoc, Types, HydratedDocument } from 'mongoose';
+import mongoose, { Schema, model, Document, PopulatedDoc, Types, HydratedDocument, SchemaTypeOptions } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectType } from 'tsd';
@@ -72,6 +72,7 @@ const Story = model<IStory>('Story', storySchema);
 
   await story.populate('author');
   await story.populate({ path: 'fans' });
+  await story.populate({ path: 'fans', model: Person });
   await story.populate(['author']);
   await story.populate([{ path: 'fans' }]);
   await story.populate(['author', { path: 'fans' }]);
@@ -187,7 +188,6 @@ function gh11503() {
 
 
 function gh11544() {
-
   interface IUser {
     friends: Types.ObjectId[];
   }
@@ -199,6 +199,23 @@ function gh11544() {
   User.findOne({}).populate({ path: 'friends', strictPopulate: false });
   User.findOne({}).populate({ path: 'friends', strictPopulate: true });
   User.findOne({}).populate({ path: 'friends', populate: { path: 'someNestedPath', strictPopulate: false } });
+}
+
+function gh11862() {
+  interface IUser {
+    userType: string;
+    friend: Types.ObjectId;
+  }
+
+  const t: SchemaTypeOptions<mongoose.Types.ObjectId> = { type: 'ObjectId', refPath: 'userType' };
+
+  const userSchema = new Schema<IUser>({
+    userType: String,
+    friend: { type: 'ObjectId', refPath: 'userType' }
+  });
+  const User = model<IUser>('friends', userSchema);
+
+  User.findOne({}).populate('friend');
 }
 
 async function _11532() {
@@ -253,4 +270,31 @@ async function gh11710() {
   // Populate with `Paths` generic `{ child: Child }` to override `child` path
   const doc = await ParentModel.findOne({}).populate<Pick<PopulatedParent, 'child'>>('child').orFail();
   expectType<Child | null>(doc.child);
+}
+
+function gh11758() {
+  interface NestedChild {
+    name: string
+    _id: Types.ObjectId
+  }
+  const nestedChildSchema: Schema = new Schema({ name: String });
+
+  interface Parent {
+    nestedChild: Types.ObjectId
+    name?: string
+  }
+
+  const ParentModel = model<Parent>('Parent', new Schema({
+    nestedChild: { type: Schema.Types.ObjectId, ref: 'NestedChild' },
+    name: String
+  }));
+
+  const NestedChildModel = model<NestedChild>('NestedChild', nestedChildSchema);
+
+  const parent = new ParentModel({
+    nestedChild: new NestedChildModel({ name: 'test' }),
+    name: 'Parent'
+  }).$assertPopulated<{ nestedChild: NestedChild }>('nestedChild');
+
+  expectType<string>(parent.nestedChild.name);
 }

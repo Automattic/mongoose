@@ -247,6 +247,31 @@ async function _11532() {
   expectError(leanResult?.__v);
 }
 
+async function gh11710() {
+
+  // `Parent` represents the object as it is stored in MongoDB
+  interface Parent {
+    child?: Types.ObjectId,
+    name?: string
+  }
+  interface Child {
+    name: string;
+  }
+  interface PopulatedParent {
+    child: Child | null;
+  }
+  const ParentModel = model<Parent>('Parent', new Schema({
+    child: { type: Schema.Types.ObjectId, ref: 'Child' },
+    name: String
+  }));
+  const childSchema: Schema = new Schema({ name: String });
+  const ChildModel = model<Child>('Child', childSchema);
+
+  // Populate with `Paths` generic `{ child: Child }` to override `child` path
+  const doc = await ParentModel.findOne({}).populate<Pick<PopulatedParent, 'child'>>('child').orFail();
+  expectType<Child | null>(doc.child);
+}
+
 function gh11758() {
   interface NestedChild {
     name: string

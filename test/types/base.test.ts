@@ -42,3 +42,7 @@ function gh11478() {
   mongoose.set('allowDiskUse', false);
   mongoose.set('allowDiskUse', true);
 }
+
+function gh10139() {
+  mongoose.set('timestamps.createdAt.immutable', false);
+}

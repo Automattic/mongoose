@@ -72,6 +72,7 @@ const Story = model<IStory>('Story', storySchema);
 
   await story.populate('author');
   await story.populate({ path: 'fans' });
+  await story.populate({ path: 'fans', model: Person });
   await story.populate(['author']);
   await story.populate([{ path: 'fans' }]);
   await story.populate(['author', { path: 'fans' }]);
@@ -244,4 +245,56 @@ async function _11532() {
   if (!leanResult) return;
   expectType<string>(leanResult.child.name);
   expectError(leanResult?.__v);
+}
+
+async function gh11710() {
+
+  // `Parent` represents the object as it is stored in MongoDB
+  interface Parent {
+    child?: Types.ObjectId,
+    name?: string
+  }
+  interface Child {
+    name: string;
+  }
+  interface PopulatedParent {
+    child: Child | null;
+  }
+  const ParentModel = model<Parent>('Parent', new Schema({
+    child: { type: Schema.Types.ObjectId, ref: 'Child' },
+    name: String
+  }));
+  const childSchema: Schema = new Schema({ name: String });
+  const ChildModel = model<Child>('Child', childSchema);
+
+  // Populate with `Paths` generic `{ child: Child }` to override `child` path
+  const doc = await ParentModel.findOne({}).populate<Pick<PopulatedParent, 'child'>>('child').orFail();
+  expectType<Child | null>(doc.child);
+}
+
+function gh11758() {
+  interface NestedChild {
+    name: string
+    _id: Types.ObjectId
+  }
+  const nestedChildSchema: Schema = new Schema({ name: String });
+
+  interface Parent {
+    nestedChild: Types.ObjectId
+    name?: string
+  }
+
+  const ParentModel = model<Parent>('Parent', new Schema({
+    nestedChild: { type: Schema.Types.ObjectId, ref: 'NestedChild' },
+    name: String
+  }));
+
+  const NestedChildModel = model<NestedChild>('NestedChild', nestedChildSchema);
+
+  const parent = new ParentModel({
+    nestedChild: new NestedChildModel({ name: 'test' }),
+    name: 'Parent'
+  }).$assertPopulated<{ nestedChild: NestedChild }>('nestedChild');
+
+  expectType<string>(parent.nestedChild.name);
 }

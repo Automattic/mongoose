@@ -1,3 +1,15 @@
+6.4.0 / 2022-06-17
+==================
+ * feat: upgrade mongodb driver -> 4.7.0 #11909 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(types+document): add $assertPopulated() for working with manually populated paths in TypeScript #11843
+ * feat(mongoose): add setDriver() function to allow overwriting driver in a more consistent way #11900
+ * feat(types): add helpers to infer schema type automatically #11563 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+ * feat: add `transform` option to `lean()` #10423 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(base): add support to set default immutable for createdAt globally #11888 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: make doValidate() on document array elements run validation on the whole subdoc #11902
+ * feat(types): add expression typings to Aggregate stages #11370 [Uzlopak](https://github.com/Uzlopak)
+ * fix: remove `on` from schema reserved keys #11580 [IslandRhythms](https://github.com/IslandRhythms)
+
 6.3.9 / 2022-06-17
 ==================
  * fix(document): handle nested paths underneath subdocuments when getting all subdocuments for pre save hooks #11917

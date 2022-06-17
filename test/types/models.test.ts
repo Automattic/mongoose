@@ -1,5 +1,7 @@
-import { Schema, Document, Model, Types, connection, model } from 'mongoose';
-import { expectError } from 'tsd';
+import { ObjectId } from 'bson';
+import { Schema, Document, Model, connection, model, Types } from 'mongoose';
+import { expectError, expectType } from 'tsd';
+import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -40,9 +42,7 @@ function rawDocSyntax(): void {
 
   const Test = connection.model<ITest, TestModel>('Test', TestSchema);
 
-  const bar = (SomeModel: Model<any, any, any>) => console.log(SomeModel);
-
-  bar(Test);
+  expectType<Model<ITest, {}, ITestMethods, {}>>(Test);
 
   const doc = new Test({ foo: '42' });
   console.log(doc.foo);
@@ -83,7 +83,7 @@ async function insertManyTest() {
   });
 
   const res = await Test.insertMany([{ foo: 'bar' }], { rawResult: true });
-  const ids: Types.ObjectId[] = Object.values(res.insertedIds);
+  expectType<ObjectId>(res.insertedIds[0]);
 }
 
 function schemaStaticsWithoutGenerics() {
@@ -139,13 +139,17 @@ async function gh10359() {
     lastName: string;
   }
 
-  async function foo<T extends Group>(model: Model<any>): Promise<T | null> {
-    const doc: T | null = await model.findOne({ groupId: 'test' }).lean().exec();
+  async function foo(model: Model<User, {}, {}, {}>) {
+    const doc = await model.findOne({ groupId: 'test' }).lean().exec();
+    expectType<string | undefined>(doc?.firstName);
+    expectType<string | undefined>(doc?.lastName);
+    expectType<Types.ObjectId | undefined>(doc?._id);
+    expectType<string | undefined>(doc?.groupId);
     return doc;
   }
 
   const UserModel = model<User>('gh10359', new Schema({ firstName: String, lastName: String, groupId: String }));
-  const u: User | null = await foo<User>(UserModel);
+  foo(UserModel);
 }
 
 const ExpiresSchema = new Schema({
@@ -234,4 +238,34 @@ function bulkWrite() {
     }
   ];
   M.bulkWrite(ops);
+}
+
+export function autoTypedModel() {
+  const AutoTypedSchema = autoTypedSchema();
+  const AutoTypedModel = model('AutoTypeModel', AutoTypedSchema);
+
+  (async() => {
+  // Model-functions-test
+  // Create should works with arbitrary objects.
+    const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' });
+    expectType<string>(randomObject.unExistKey);
+    expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
+
+    const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });
+    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
+    expectType<AutoTypedSchemaType['schema']['description']>(testDoc1.description);
+
+    const testDoc2 = await AutoTypedModel.insertMany([{ userName: 'M0_0a' }]);
+    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc2[0].userName);
+    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc2[0]?.description);
+
+    const testDoc3 = await AutoTypedModel.findOne({ userName: 'M0_0a' });
+    expectType<AutoTypedSchemaType['schema']['userName'] | undefined>(testDoc3?.userName);
+    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc3?.description);
+
+    // Model-statics-functions-test
+    expectType<ReturnType<AutoTypedSchemaType['statics']['staticFn']>>(AutoTypedModel.staticFn());
+
+  })();
+  return AutoTypedModel;
 }

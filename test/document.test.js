@@ -8365,7 +8365,6 @@ describe('document', function() {
     });
     const Organization = db.model('Test', organizationSchema);
 
-
     const org = new Organization();
     org.set('name', 'MongoDB');
 
@@ -11506,5 +11505,14 @@ describe('document', function() {
     assert.equal(subdocs.length, 2);
     assert.equal(subdocs[0].value, 'test');
     assert.ok(subdocs[1].nestedSettings);
+  });
+});
+
+describe('Check if instance function that is supplied in schema option is availabe', function() {
+  it('should give an instance function back rather than undefined', function ModelJS() {
+    const testSchema = new mongoose.Schema({}, { methods: { instanceFn() { return 'Returned from DocumentInstanceFn'; } } });
+    const TestModel = mongoose.model('TestModel', testSchema);
+    const TestDocument = new TestModel({});
+    assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
   });
 });

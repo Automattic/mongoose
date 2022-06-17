@@ -1,0 +1,326 @@
+html, body, #content {
+  height: 100%;
+}
+:target::before {
+  content: ">>> ";
+  color: #1371C9;
+  font-weight: bold;
+  font-size: 20px;
+}
+.module {
+  min-height: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+body {
+  background: #d8e2d8 url(/docs/images/square_bg.png) fixed;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+}
+a {
+  color: #800;
+  -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;
+  -webkit-transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+}
+a:hover {
+  opacity: 0.8;
+}
+#wrap {
+}
+h1 {
+  font-family: 'Helvetica Nueue', Helvetica, Arial, FreeSans, sans-serif;
+  text-rendering: geometricPrecision;
+}
+pre {
+  background: rgba(255,255,255,.8);
+  border: 1px solid #bbb;
+  padding:5px;
+  border-radius: 3px;
+  box-shadow: 1px 3px 6px #ddd;
+}
+code {
+  background: rgba(255,255,255,.8);
+  color: #333;
+  border-radius: 3px;
+  font-size: 13px;
+  font-family: Monaco;
+  /*text-shadow: 1px 2px 2px #555;*/
+}
+pre code {
+  border: 0 none;
+  padding: 1.2em;
+  overflow-x: auto;
+}
+h2 {
+  margin-top: 0;
+}
+h2 a {
+  font-size: 12px;
+  position: relative;
+  bottom: 3px;
+  font-weight: normal;
+}
+h3 { padding-top: 35px; }
+h3 code {
+  font-weight: normal;
+}
+hr {
+  display: none;
+  height: 1px;
+  border: 0 none;
+  padding: 0;
+  margin: 90px 0;
+  background: -webkit-gradient(linear, left top, right top, from(rgba(57, 172, 57, 0.0)), color-stop(0.5, rgba(57, 172, 57, 0.33)), to(rgba(57, 172, 57, 0.0)))
+}
+.doclinks hr {
+  margin: 10px 0;
+}
+li {
+  list-style: square;
+}
+#header {
+  padding-top: 22px;
+  padding-bottom: 25px;
+  text-transform: lowercase;
+}
+#header h1 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+#header h1 a {
+  text-decoration: none;
+}
+#header .mongoose {
+  font-size: 48px;
+  font-weight: 100;
+  color: #fff;
+  letter-spacing: -5px;
+}
+#links {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 210px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 15px 0 30px 20px;
+  border-right: 1px solid #ddd;
+  background: -webkit-gradient(linear, left top, right top, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;
+}
+#links .schematypes span {
+  display: none;
+}
+#content {
+  padding: 0;
+  margin: 0 0 0 230px;
+}
+#content .controls {
+  padding: 5px 15px 5px 10px;
+  position: fixed;
+  background: #fff;
+  border: 3px solid #eee;
+  border-radius: 0 0 12px 0;
+  border-width: 0 3px 3px 10px;
+  width: 100%;
+  bottom: 0;
+  opacity: 0.75;
+  -webkit-transition-property: opacity;
+  -webkit-transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+}
+#content .controls:hover {
+  opacity: .9;
+}
+#content p {
+  word-wrap: break-word;
+}
+#content > ul {
+  margin: 0;
+  padding: 0;
+}
+.private {
+  display: none;
+}
+.doclinks li.private a:before,
+.doclinks .module.private a:before,
+.doclinks item.private a:before {
+  content: "p";
+  background: #333;
+  color: #fff;
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: normal;
+  padding: 0 2px;
+  border-radius: 3px;
+  border: 1px solid #333;
+  display: inline-block;
+  margin-right: 5px;
+}
+#content .private h3:after {
+  content: "private";
+  background: #333;
+  color: #fff;
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: normal;
+  padding: 0 2px;
+  border-radius: 3px;
+  border: 1px solid #333;
+  display: inline-block;
+  margin-left: 5px;
+}
+.module {
+  list-style: none;
+  padding: 30px 0 0 30px;
+  border-color: #eee;
+  border-width: 9px 10px;
+  border-style: solid;
+  background-color: #fff;
+}
+.module > * {
+  max-width: 700px;
+}
+.item {
+  margin-bottom: 175px;
+}
+.item h3 a {
+  color: #333;
+  text-decoration: none;
+}
+.property h3 span {
+  color: #444;
+}
+.description {
+  margin-top: 25px;
+}
+.sourcecode {
+  display: none;
+}
+.showcode {
+  font-size: 12px;
+  cursor: pointer;
+  display: none;
+}
+.load .showcode {
+  display: block;
+}
+.types a {
+  text-decoration: none;
+}
+li.guide ul {
+  padding-left: 16px;
+}
+
+ul.inthewild {
+  margin: 30px 0 0 -30px;
+  padding: 0;
+  width: 125%;
+  max-width: 125%;
+}
+ul.inthewild li {
+  display: inline-block;
+  list-style: none;
+}
+ul.inthewild img {
+  width: 200px;
+}
+
+@media only screen and (device-width: 768px) {
+  ul.inthewild {
+    margin-left: 0px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  ul.inthewild {
+    margin-left: 0px;
+  }
+  ul.inthewild li {
+    margin: 5px;
+    border-width: 2px 2px 0 2px;
+    border-style: solid;
+    border-color: #eee;
+  }
+  ul.inthewild li img {
+    width: 140px;
+  }
+  h2 a {
+    white-space: nowrap;
+  }
+  #forkbanner { display: none }
+  #header .mongoose {
+    font-size: 65px;
+    text-align: center;
+  }
+  html, body, #content {
+    height: auto;
+  }
+  #links {
+    position: static;
+    width: auto;
+    border: 0 none;
+    border-right: 0 none;
+    border-bottom: 1px solid #ddd;
+    background: -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;
+    padding: 15px 0;
+  }
+  #links, #links ul, #links li { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+  #links ul { padding: 0 10px 0 0; }
+  #links li {
+    list-style: none;
+    display: inline-block;
+    width: 25%;
+    text-align: center;
+  }
+  #links .home, #links .support, #links .fork {
+    display: none;
+  }
+  .doclinks {
+    display: none;
+  }
+  #content { margin-left: 0; }
+  .module {
+    padding-left: 5px;
+    border-width: 3px;
+  }
+  #links li.guide {
+    display: block;
+    width: 390px;
+    margin-bottom: 15px;
+  }
+  #links li.guide > a {
+    display: none;
+  }
+  #links li ul li {
+    width: 44%;
+    text-align: left;
+  }
+  #links li ul li ul li {
+    width: 95%;
+  }
+  #links .plugins,
+  #links .changelog {
+    display: none;
+  }
+  #links .schematypes span {
+    display: inline;
+  }
+  #links .double {
+    width: 332px;
+  }
+  #links .double > ul {
+    display: inline;
+    float: right;
+  }
+  #links .double > ul li {
+    width: 155px;
+  }
+}

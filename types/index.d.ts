@@ -5,6 +5,7 @@
 /// <reference path="./cursor.d.ts" />
 /// <reference path="./document.d.ts" />
 /// <reference path="./error.d.ts" />
+/// <reference path="./expressions.d.ts" />
 /// <reference path="./helpers.d.ts" />
 /// <reference path="./middlewares.d.ts" />
 /// <reference path="./indizes.d.ts" />

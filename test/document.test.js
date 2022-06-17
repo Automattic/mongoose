@@ -11473,4 +11473,38 @@ describe('document', function() {
     baz2.bar = bar2;
     assert.ok(baz.populated('bar'));
   });
+
+  it('$getAllSubdocs gets document arrays underneath a nested path (gh-11917)', function() {
+    const nestedSettingsSchema = new Schema({
+      value: String,
+      active: Boolean
+    });
+
+    const userSettingsSchema = new Schema({
+      nestedSettings: {
+        settingsProps: [nestedSettingsSchema]
+      }
+    });
+
+    const userSchema = new Schema({
+      first_name: String,
+      last_name: String,
+      settings: userSettingsSchema
+    });
+
+    const User = db.model('User', userSchema);
+
+    const doc = new User({
+      settings: {
+        nestedSettings: {
+          settingsProps: [{ value: 'test', active: true }]
+        }
+      }
+    });
+
+    const subdocs = doc.$getAllSubdocs();
+    assert.equal(subdocs.length, 2);
+    assert.equal(subdocs[0].value, 'test');
+    assert.ok(subdocs[1].nestedSettings);
+  });
 });

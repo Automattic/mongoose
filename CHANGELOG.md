@@ -1,3 +1,9 @@
+6.3.9 / 2022-06-17
+==================
+ * fix(document): handle nested paths underneath subdocuments when getting all subdocuments for pre save hooks #11917
+ * fix(types): correct typing in post aggregate hooks #11924 [GCastilho](https://github.com/GCastilho)
+ * docs: remove connect-option reconnectTries and reconnectInterval #11930 [Uzlopak](https://github.com/Uzlopak)
+
 6.3.8 / 2022-06-13
 ==================
  * fix: revert 670b445b0fc perf optimizations that caused some test failures #11541

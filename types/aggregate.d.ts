@@ -1,6 +1,9 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
+  /** Extract generic type from Aggregate class */
+  type AggregateExtract<P> = P extends Aggregate<infer T> ? T : never;
+
   interface AggregateOptions extends
     SessionOption {
     /**

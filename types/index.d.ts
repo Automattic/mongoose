@@ -21,6 +21,7 @@
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
 /// <reference path="./inferschematype.d.ts" />
+/// <reference path="./mongodb-driver.d.ts"/>
 
 declare class NativeDate extends global.Date { }
 

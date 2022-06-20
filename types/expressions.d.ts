@@ -2391,7 +2391,7 @@ declare module 'mongoose' {
         *
         * @see https://www.mongodb.com/docs/manual/reference/operator/query/exists/
         */
-      $exists: boolean;
+      $exists: boolean | NullExpression;
     }
   }
 

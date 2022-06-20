@@ -152,8 +152,8 @@ html(lang='en')
         div.sponsors
           div
             each sponsor in opencollectiveSponsors
-              a(rel='sponsored', href=sponsor.website, alt=sponsor.alt)
-                img.sponsor(src=sponsor.image || null, style='height:50px')
+              a(rel='sponsored', href=sponsor.website)
+                img.sponsor(src=sponsor.image || null, style='height:50px', alt=sponsor.alt)
 
         <div class="sponsor">
           Sponsor <a href="https://opencollective.com/mongoose">Mongoose on OpenCollective</a>

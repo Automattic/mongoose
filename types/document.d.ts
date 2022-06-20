@@ -4,6 +4,12 @@ declare module 'mongoose' {
   /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
   type pathsToSkip = string[] | string;
 
+  interface DocumentSetOptions {
+    merge?: boolean;
+
+    [key: string]: any;
+  }
+
   /**
    * Generic types for Document:
    * *  T - the type of _id
@@ -74,8 +80,8 @@ declare module 'mongoose' {
     $session(session?: ClientSession | null): ClientSession | null;
 
     /** Alias for `set()`, used internally to avoid conflicts */
-    $set(path: string, val: any, type: any, options?: any): this;
-    $set(path: string, val: any, options?: any): this;
+    $set(path: string, val: any, type: any, options?: DocumentSetOptions): this;
+    $set(path: string, val: any, options?: DocumentSetOptions): this;
     $set(value: any): this;
 
     /** Set this property to add additional query filters when Mongoose saves this document and `isNew` is false. */

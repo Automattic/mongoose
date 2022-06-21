@@ -214,8 +214,7 @@ function find() {
   Project.find({}, undefined);
   Project.find({}, null);
   Project.find({}, { name: 1 });
-  Project.find({}, { name: 1 });
-  Project.find({}, { name: 1 });
+  Project.find({}, { name: 0 });
 
   // filter + callback
   Project.find({}, (error: CallbackError, result: IProject[]) => console.log(error, result));

@@ -3,7 +3,7 @@
 [Virtuals](/docs/tutorials/virtuals.html) are computed properties: you can access virtuals on hydrated Mongoose documents, but virtuals are **not** stored in MongoDB.
 Mongoose supports auto typed virtuals so you don't need to define additional typescript interface anymore but you are still able to do so.
 
-### 1- Auto types:
+### Automatically Inferred Types:
 
 To make mongoose able to infer virtuals type, You have to define them in schema constructor as following:
 
@@ -28,7 +28,7 @@ const schema = new Schema(
 );
 ```
 
-### 2- Manual types:
+### Set virtuals type manually:
 You shouldn't define virtuals in your TypeScript [document interface](/docs/typescript.html).
 Instead, you should define a separate interface for your virtuals, and pass this interface to `Model` and `Schema`.
 

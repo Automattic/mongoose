@@ -1,5 +1,5 @@
 import { ObjectId } from 'bson';
-import { Schema, Document, Model, connection, model, Types } from 'mongoose';
+import { Schema, Document, Model, connection, model, Types, CallbackError } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 
@@ -198,6 +198,39 @@ Project.exists({ name: 'Hello' }).then(result => {
 Project.exists({ name: 'Hello' }, (err, result) => {
   result?._id;
 });
+
+function find() {
+  // no args
+  Project.find();
+
+  // just filter
+  Project.find({});
+  Project.find({ name: 'Hello' });
+
+  // just callback
+  Project.find((error: CallbackError, result: IProject[]) => console.log(error, result));
+
+  // filter + projection
+  Project.find({}, undefined);
+  Project.find({}, null);
+  Project.find({}, { name: 1 });
+  Project.find({}, { name: 1 });
+  Project.find({}, { name: 1 });
+
+  // filter + callback
+  Project.find({}, (error: CallbackError, result: IProject[]) => console.log(error, result));
+  Project.find({ name: 'Hello' }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+
+  // filter + projection + options
+  Project.find({}, undefined, { limit: 5 });
+  Project.find({}, null, { limit: 5 });
+  Project.find({}, { name: 1 }, { limit: 5 });
+
+  // filter + projection + options + callback
+  Project.find({}, undefined, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+  Project.find({}, null, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+  Project.find({}, { name: 1 }, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+}
 
 function inheritance() {
   class InteractsWithDatabase extends Model {

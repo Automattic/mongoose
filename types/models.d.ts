@@ -315,21 +315,21 @@ declare module 'mongoose' {
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(
       filter: FilterQuery<T>,
-      projection: ProjectionType<T> | null,
-      options: QueryOptions<T> | null,
-      callback?: Callback<ResultDoc[]>
+      projection?: ProjectionType<T> | null | undefined,
+      options?: QueryOptions<T> | null | undefined,
+      callback?: Callback<ResultDoc[]> | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
     find<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(
       filter: FilterQuery<T>,
-      projection: ProjectionType<T> | null,
-      callback?: Callback<ResultDoc[]>
+      projection?: ProjectionType<T> | null | undefined,
+      callback?: Callback<ResultDoc[]> | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
     find<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(
       filter: FilterQuery<T>,
-      callback?: Callback<ResultDoc[]>
+      callback?: Callback<ResultDoc[]> | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
     find<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(
-      callback?: Callback<ResultDoc[]>
+      callback?: Callback<ResultDoc[]> | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */

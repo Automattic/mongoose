@@ -1,3 +1,5 @@
+import type { ObjectIdLike } from 'bson';
+
 declare module 'mongoose' {
 
   /**
@@ -1034,7 +1036,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ne/#mongodb-expression-exp.-ne
        */
-      $ne: Expression | [Expression, Expression];
+      $ne: Expression | [Expression, Expression] | null;
     }
 
     export interface Cond {
@@ -2381,9 +2383,20 @@ declare module 'mongoose' {
         lang: 'js'
       };
     }
+
+    export interface Exists {
+      /**
+        * When <boolean> is true, $exists matches the documents that contain the field, including documents where the field value is null.
+        * If <boolean> is false, the query returns only the documents that do not contain the field.
+        *
+        * @see https://www.mongodb.com/docs/manual/reference/operator/query/exists/
+        */
+      $exists: boolean | NullExpression;
+    }
   }
 
-  type Path = string;
+  type Path = string | ObjectIdLike;
+
 
   export type Expression =
     Path |
@@ -2428,7 +2441,8 @@ declare module 'mongoose' {
     DateExpression |
     BinaryExpression |
     FunctionExpression |
-    ObjectIdExpression;
+    ObjectIdExpression |
+    ConditionalExpressionOperator;
 
   export type ObjectIdExpression =
     TypeExpressionOperatorReturningObjectId;
@@ -2594,7 +2608,8 @@ declare module 'mongoose' {
   export type ConditionalExpressionOperator =
     Expression.Cond |
     Expression.IfNull |
-    Expression.Switch;
+    Expression.Switch |
+    Expression.Exists;
 
   export type StringExpressionOperator =
     StringExpressionOperatorReturningArray |

@@ -443,22 +443,20 @@ declare module 'mongoose' {
     $min?: AnyKeys<TSchema> & AnyObject;
     $max?: AnyKeys<TSchema> & AnyObject;
     $mul?: AnyKeys<TSchema> & AnyObject;
-    $rename?: { [key: string]: string };
+    $rename?: Record<string, string>;
     $set?: AnyKeys<TSchema> & AnyObject;
     $setOnInsert?: AnyKeys<TSchema> & AnyObject;
     $unset?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: AnyKeys<TSchema> & AnyObject;
+    $addToSet?: mongodb.SetFields<TSchema>;
     $pop?: AnyKeys<TSchema> & AnyObject;
-    $pull?: AnyKeys<TSchema> & AnyObject;
-    $push?: AnyKeys<TSchema> & AnyObject;
-    $pullAll?: AnyKeys<TSchema> & AnyObject;
+    $pull?: mongodb.PullOperator<TSchema>;
+    $push?: mongodb.PushOperator<TSchema>;
+    $pullAll?: mongodb.PullAllOperator<TSchema>;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
-    $bit?: {
-      [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
-    };
+    $bit?: Record<string, mongodb.NumericType>;
   };
 
   export type UpdateWithAggregationPipeline = UpdateAggregationStage[];

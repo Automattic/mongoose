@@ -1,7 +1,8 @@
 import { ObjectId } from 'bson';
-import { Schema, Document, Model, connection, model, Types, CallbackError } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { Schema, Document, Model, connection, model, Types, UpdateQuery, CallbackError } from 'mongoose';
+import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
+import { UpdateOneModel } from 'mongodb';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -300,4 +301,22 @@ export function autoTypedModel() {
 
   })();
   return AutoTypedModel;
+}
+
+function gh11911() {
+  interface IAnimal {
+    name?: string;
+  }
+
+  const animalSchema = new Schema<IAnimal>({
+    name: { type: String }
+  });
+
+  const Animal = model<IAnimal>('Animal', animalSchema);
+
+  const changes: UpdateQuery<IAnimal> = {};
+  expectAssignable<UpdateOneModel>({
+    filter: {},
+    update: changes
+  });
 }

@@ -9,9 +9,7 @@ import {
   SchemaType,
   Query,
   HydratedDocument,
-  SchemaOptions,
-  InferDocType,
-  FlatRecord
+  SchemaOptions
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 
@@ -467,10 +465,6 @@ export function autoTypedSchema() {
       type: String,
       required: [true, 'userName is required']
     },
-    email: {
-      type: String,
-      required: [true, 'email is required']
-    },
     description: String,
     nested: new Schema({
       age: {
@@ -523,18 +517,6 @@ export function autoTypedSchema() {
         expectAssignable<Query<unknown, AutoTypedSchemaType['schema']>>(this);
         return this.where({ userName });
       }
-    },
-    virtuals: {
-      domain: {
-        get() {
-          expectType<Document<any, any, AutoTypedSchemaType['schema']> & AutoTypedSchemaType['schema']>(this);
-          return this.email.slice(this.email.indexOf('@') + 1);
-        },
-        set() {
-          expectType<Document<any, any, AutoTypedSchemaType['schema']> & AutoTypedSchemaType['schema']>(this);
-        },
-        options: {}
-      }
     }
   });
 
@@ -544,17 +526,12 @@ export function autoTypedSchema() {
 
   expectError<AutoTypedSchemaType['schema'] & { doesNotExist: boolean; }>({} as InferredSchemaType);
 
-  type InferredDocType = InferDocType<typeof AutoTypedSchema>;
-
-  expectType<FlatRecord<AutoTypedSchemaType['schema'] & AutoTypedSchemaType['virtuals']>>({} as InferredDocType);
-
   return AutoTypedSchema;
 }
 
 export type AutoTypedSchemaType = {
   schema: {
     userName: string;
-    email: string;
     description?: string;
     nested?: {
       age: number;
@@ -573,9 +550,6 @@ export type AutoTypedSchemaType = {
   },
   methods: {
     instanceFn: () => 'Returned from DocumentInstanceFn'
-  },
-  virtuals: {
-    domain: string
   }
 };
 

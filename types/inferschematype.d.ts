@@ -46,11 +46,11 @@ declare module 'mongoose' {
    * @param {SchemaType} SchemaType A generic of schema type instance.
    * @example
    * const userSchema = new Schema({userName:String});
-   * type UserType = InferDocType<typeof userSchema>;
+   * type UserType = InferDocumentType<typeof userSchema>;
    * // result
    * type UserType = {userName?: string}
    */
-  type InferDocType<SchemaType> = FlatRecord<InferSchemaType<SchemaType> & ObtainSchemaGeneric<SchemaType, 'TVirtuals'>>;
+  type InferDocumentType<SchemaType> = FlatRecord<InferSchemaType<SchemaType> & ObtainSchemaGeneric<SchemaType, 'TVirtuals'>>;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.

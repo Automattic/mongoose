@@ -160,3 +160,7 @@ const letExpr: Expression = {
 };
 
 const toLong: Expression = { $toLong: '$qty' };
+
+const nullExpr: Expression = {
+  $ne: null
+};

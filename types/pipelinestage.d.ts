@@ -147,7 +147,7 @@ declare module 'mongoose' {
 
     export interface Match {
       /** [`$match` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/match/) */
-      $match: Expression | Record<string, Expression>;
+      $match: Expression | Record<string, Expression | null>;
     }
 
     export interface Merge {

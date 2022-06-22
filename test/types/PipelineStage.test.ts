@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import type { PipelineStage } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
@@ -367,6 +368,22 @@ const stages2: PipelineStage[] = [
     $addFields:
     {
       totalCopies: { $sum: '$books.copies' }
+    }
+  }
+];
+
+const stages3: PipelineStage[] = [
+  {
+    $addFields: {
+      a: { $ifNull: ['$a', 'foo'] }
+    }
+  },
+  {
+    $match: {
+      _id: new ObjectId('stringObjecId'),
+      a: { $exists: true },
+      b: null,
+      c: 'test'
     }
   }
 ];

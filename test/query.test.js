@@ -4023,4 +4023,27 @@ describe('Query', function() {
     assert.equal(single.foo[0]._id, undefined);
     assert.equal(single.foo[0]._id, undefined);
   });
+
+  it('skips applying default projections over slice projections (gh-11940)', async function() {
+    const commentSchema = new mongoose.Schema({
+      comment: String
+    });
+
+    const testSchema = new mongoose.Schema({
+      name: String,
+      comments: { type: [commentSchema], select: false }
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    const { _id } = await Test.create({
+      name: 'Test',
+      comments: [{ comment: 'test1' }, { comment: 'test2' }]
+    });
+
+    const doc = await Test.findById(_id).slice('comments', [1, 1]);
+    assert.equal(doc.comments.length, 1);
+    assert.equal(doc.comments[0].comment, 'test2');
+
+  });
 });

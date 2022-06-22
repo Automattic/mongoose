@@ -249,18 +249,18 @@ declare module 'mongoose' {
      * remove, except it deletes _every_ document that matches `filter` in the
      * collection, regardless of the value of `single`.
      */
-    deleteMany(filter?: FilterQuery<DocType>, options?: QueryOptions<DocType>, callback?: Callback): QueryWithHelpers<mongodb.DeleteResult, DocType, THelpers, RawDocType>;
-    deleteMany(filter: FilterQuery<DocType>, callback: Callback): QueryWithHelpers<mongodb.DeleteResult, DocType, THelpers, RawDocType>;
-    deleteMany(callback: Callback): QueryWithHelpers<mongodb.DeleteResult, DocType, THelpers, RawDocType>;
+    deleteMany(filter?: FilterQuery<DocType>, options?: QueryOptions<DocType>, callback?: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    deleteMany(filter: FilterQuery<DocType>, callback: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    deleteMany(callback: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
 
     /**
      * Declare and/or execute this query as a `deleteOne()` operation. Works like
      * remove, except it deletes at most one document regardless of the `single`
      * option.
      */
-    deleteOne(filter?: FilterQuery<DocType>, options?: QueryOptions<DocType>, callback?: Callback): QueryWithHelpers<mongodb.DeleteResult, DocType, THelpers, RawDocType>;
-    deleteOne(filter: FilterQuery<DocType>, callback: Callback): QueryWithHelpers<mongodb.DeleteResult, DocType, THelpers, RawDocType>;
-    deleteOne(callback: Callback): QueryWithHelpers<mongodb.DeleteResult, DocType, THelpers, RawDocType>;
+    deleteOne(filter?: FilterQuery<DocType>, options?: QueryOptions<DocType>, callback?: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    deleteOne(filter: FilterQuery<DocType>, callback: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    deleteOne(callback: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct<ReturnType = any>(field: string, filter?: FilterQuery<DocType>, callback?: Callback<number>): QueryWithHelpers<Array<ReturnType>, DocType, THelpers, RawDocType>;

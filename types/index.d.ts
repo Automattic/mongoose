@@ -244,11 +244,6 @@ declare module 'mongoose' {
     /** Defines a post hook for the model. */
     post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, T>): this;
     post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
-    post<T extends Query<any, any>>(method: 'findOneAndUpdate' | 'findOneAndRemove' | 'findOneAndDelete', fn: PostMiddlewareFunction<T, HydratedDocument<EnforcedDocType, TInstanceMethods> | ModifyResult<HydratedDocument<EnforcedDocType, TInstanceMethods>> | null> | EnforcedDocType | ModifyResult<EnforcedDocType | null> | null): this;
-    post<T extends Query<any, any>>(method: 'findOne', fn: PostMiddlewareFunction<T, HydratedDocument<EnforcedDocType, TInstanceMethods> | EnforcedDocType | null>): this;
-    post<T extends Query<any, any>>(method: 'find', fn: PostMiddlewareFunction<T, HydratedDocument<EnforcedDocType, TInstanceMethods>[] | EnforcedDocType[]>): this;
-    post<T extends Query<any, any>>(method: 'update' | 'updateOne' | 'updateMany', fn: PostMiddlewareFunction<T, UpdateWriteOpResult>): this;
-    post<T extends Query<any, any>>(method: 'remove' | 'deleteOne' | 'deleteMany', fn: PostMiddlewareFunction<T, mongodb.DeleteResult>): this;
     post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
     post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PostMiddlewareFunction<T, Array<AggregateExtract<T>>>): this;

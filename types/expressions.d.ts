@@ -1,5 +1,3 @@
-import type { ObjectIdLike } from 'bson';
-
 declare module 'mongoose' {
 
   /**
@@ -2383,19 +2381,9 @@ declare module 'mongoose' {
         lang: 'js'
       };
     }
-
-    export interface Exists {
-      /**
-        * When <boolean> is true, $exists matches the documents that contain the field, including documents where the field value is null.
-        * If <boolean> is false, the query returns only the documents that do not contain the field.
-        *
-        * @see https://www.mongodb.com/docs/manual/reference/operator/query/exists/
-        */
-      $exists: boolean | NullExpression;
-    }
   }
 
-  type Path = string | ObjectIdLike;
+  type Path = string;
 
 
   export type Expression =
@@ -2608,8 +2596,7 @@ declare module 'mongoose' {
   export type ConditionalExpressionOperator =
     Expression.Cond |
     Expression.IfNull |
-    Expression.Switch |
-    Expression.Exists;
+    Expression.Switch;
 
   export type StringExpressionOperator =
     StringExpressionOperatorReturningArray |

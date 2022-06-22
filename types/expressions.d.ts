@@ -2399,6 +2399,7 @@ declare module 'mongoose' {
 
 
   export type Expression =
+    RegExp |
     Path |
     ArithmeticExpressionOperator |
     ArrayExpressionOperator |

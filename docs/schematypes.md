@@ -723,3 +723,7 @@ including what validators it has and what the type is.
   <li><a href="https://masteringjs.io/tutorials/mongoose/schematype">An Introduction to Mongoose SchemaTypes</a></li>
   <li><a href="https://kb.objectrocket.com/mongo-db/mongoose-schema-types-1418">Mongoose Schema Types</a></li>
 </ul>
+
+### Next Up
+
+Now that we've covered `SchemaTypes`, let's take a look at [Connections](/docs/connections.md).

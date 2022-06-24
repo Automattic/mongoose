@@ -72,7 +72,7 @@ declare module 'mongoose' {
     destroy(force?: boolean): Promise<void>;
 
     /** Retrieves a collection, creating it if not cached. */
-    collection<T extends AnyObject = AnyObject>(name: string, options?: mongodb.CreateCollectionOptions): Collection<T>;
+    collection<T extends AnyObject = AnyObjectAnyId>(name: string, options?: mongodb.CreateCollectionOptions): Collection<T>;
 
     /** A hash of the collections associated with this connection */
     readonly collections: { [index: string]: Collection };
@@ -142,7 +142,7 @@ declare module 'mongoose' {
     readonly models: Readonly<{ [index: string]: Model<any> }>;
 
     /** Defines or retrieves a model. */
-    model<T, U, TQueryHelpers = {}>(
+    model<T, U extends Model<any>, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<T, U, TQueryHelpers>,
       collection?: string,

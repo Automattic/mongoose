@@ -1,4 +1,4 @@
-import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, Model } from 'mongoose';
+import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, Model, AnyObject, AnyObjectAnyId } from 'mongoose';
 import * as mongodb from 'mongodb';
 import { expectError, expectType } from 'tsd';
 
@@ -112,3 +112,9 @@ expectType<Connection>(conn.useDb('test'));
 expectType<Connection>(conn.useDb('test', {}));
 expectType<Connection>(conn.useDb('test', { noListener: true }));
 expectType<Connection>(conn.useDb('test', { useCache: true }));
+
+expectType<Promise<void>>(conn.model('test').ensureIndexes());
+expectType<Promise<mongodb.InsertManyResult<AnyObjectAnyId>>>(
+  conn.collection('test').insertMany([{ _id: 'string' }])
+);
+

@@ -192,8 +192,6 @@ function autoTypedDocument() {
   expectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
   expectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
   expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
-  expectType<number>(AutoTypeModelInstance.unExistProperty);
-  expectType<number>(AutoTypeModelInstance.description);
 
   // Document-Methods-tests
   expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());

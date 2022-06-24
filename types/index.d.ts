@@ -108,7 +108,7 @@ declare module 'mongoose' {
     [k: string]: any
   }
 
-  export type AnyObjectAnyId = AnyObject & { _id?: string | Types.ObjectId };
+  export type AnyObjectAnyId = AnyObject & { _id?: string | number | boolean | object };
 
   export type Require_id<T> = T extends { _id?: infer U }
     ? U extends any

@@ -192,10 +192,49 @@ function autoTypedDocument() {
   expectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
   expectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
   expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
-  expectType<number>(AutoTypeModelInstance.unExistProperty);
-  expectType<number>(AutoTypeModelInstance.description);
 
   // Document-Methods-tests
   expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
+
+}
+
+async function gh11960() {
+  type DocumentType<T> = Document<any> & T;
+  type SubDocumentType<T> = DocumentType<T> & Types.Subdocument;
+  type ArraySubDocumentType<T> = DocumentType<T> & Types.ArraySubdocument;
+
+  interface Nested {
+    dummy?: string;
+  }
+
+  interface Parent {
+    username?: string;
+    map?: Map<string, string>;
+    nested?: SubDocumentType<Nested>;
+    nestedArray?: ArraySubDocumentType<Nested>[];
+  }
+
+  const NestedSchema = new Schema({
+    dummy: { type: String }
+  });
+
+  const ParentSchema = new Schema({
+    username: { type: String },
+    map: { type: Map, of: String },
+    nested: { type: NestedSchema },
+    nestedArray: [{ type: NestedSchema }]
+  });
+
+  const ParentModel = model<DocumentType<Parent>>('Parent', ParentSchema);
+
+  const doc = new ParentModel({
+    username: 'user1',
+    map: { key1: 'value1', key2: 'value2' },
+    nested: { dummy: 'hello' },
+    nestedArray: [{ dummy: 'hello again' }]
+  });
+
+  expectType<Map<string, string> | undefined>(doc.map);
+  doc.nested!.parent();
 
 }

@@ -2,6 +2,8 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
+  class NativeBuffer extends Buffer {}
+
   namespace Types {
     class Array<T> extends global.Array<T> {
       /** Pops the array atomically at most one time per document `save()`. */
@@ -47,7 +49,7 @@ declare module 'mongoose' {
       unshift(...args: any[]): number;
     }
 
-    class Buffer extends global.Buffer {
+    class Buffer extends NativeBuffer {
       /** Sets the subtype option and marks the buffer modified. */
       subtype(subtype: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 128 | ToObjectOptions): void;
 

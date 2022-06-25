@@ -142,7 +142,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
     PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? PathEnumOrString<Options['enum']> :
       PathValueType extends NumberConstructor | 'number' | 'Number' | typeof Schema.Types.Number ? number :
         PathValueType extends DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date ? Date :
-          PathValueType extends BufferConstructor | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
+          PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
             PathValueType extends BooleanConstructor | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean ? boolean :
               PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Schema.Types.ObjectId :
                 PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Schema.Types.Decimal128 :

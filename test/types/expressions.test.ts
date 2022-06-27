@@ -164,3 +164,7 @@ const toLong: Expression = { $toLong: '$qty' };
 const nullExpr: Expression = {
   $ne: null
 };
+
+const nullNETupleExpr: Expression = {
+  $ne: ["$name", null]
+};

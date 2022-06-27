@@ -1,3 +1,19 @@
+6.4.1 / 2022-06-27
+==================
+ * fix(schema): allow 0 for numbers if required and ref both set #11912
+ * fix(query): skip applying default projections over slice projections #11940
+ * fix(types): handle arrays in ApplyBasicQueryCasting correctly #11964
+ * fix(types): fix $match typings #11969 [andreialecu](https://github.com/andreialecu)
+ * fix(types): avoid adding non-existent properties from model constructor for typegoose #11960
+ * fix(types): make Mongoose UpdateQuery compatible with MongoDB `UpdateFilter` #11911
+ * fix(types): simplify MergeType constraints #11978
+ * fix(types): correct references to Buffer for @types/node >= 16.0.0 < 16.6.0 #11963
+ * fix(types): re-add the possibility to pass undefined for projection in Model.find #11965 [ghost91-](https://github.com/ghost91-)
+ * fix(types): fix typo for indexes #11953 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document+types): document merge option #11913
+ * docs: update schematypes.md #11981 [korzio](https://github.com/korzio)
+ * docs: update validation.md #11982 [korzio](https://github.com/korzio)
+
 6.4.0 / 2022-06-17
 ==================
  * feat: upgrade mongodb driver -> 4.7.0 #11909 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

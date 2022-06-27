@@ -92,6 +92,11 @@ schema.pre<Model<ITest>>('insertMany', function(next, docs: Array<ITest>) {
   next();
 });
 
+schema.post<Query<ITest, ITest>>('findOneAndDelete', function(res, next) {
+  expectType<ITest>(res);
+  next();
+});
+
 const Test = model<ITest>('Test', schema);
 
 function gh11257(): void {

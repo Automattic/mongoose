@@ -10,6 +10,6 @@ declare module 'mongoose' {
       ? T
       : Omit<T, keyof U> & U;
 
-  type MergeType<A extends Record<number | string, any>, B extends Record<number | string, any>> = Omit<A, keyof B> & B;
+  type MergeType<A, B> = Omit<A, keyof B> & B;
 
 }

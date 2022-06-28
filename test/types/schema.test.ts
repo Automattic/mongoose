@@ -475,6 +475,17 @@ export function autoTypedSchema() {
         message: '{VALUE} is not supported'
       },
       required: true
+    },
+    friendID: {
+      type: Schema.Types.ObjectId
+    },
+    nestedArray: {
+      type: [
+        new Schema({
+          date: { type: Date, required: true },
+          messages: Number
+        })
+      ]
     }
   }, {
     statics: {
@@ -516,6 +527,11 @@ export type AutoTypedSchemaType = {
     },
     favoritDrink?: 'Tea' | 'Coffee',
     favoritColorMode: 'dark' | 'light'
+    friendID: Types.ObjectId;
+    nestedArray: Array<{
+      date: Date;
+      messages?: number;
+    }>
   }
   , statics: {
     staticFn: () => 'Returned from staticFn'

@@ -559,3 +559,13 @@ function gh11828() {
     }
   });
 }
+function gh11997() {
+  interface IUser {
+    name: string;
+  }
+
+  const userSchema = new Schema<IUser>({
+    name: { type: String, default: () => 'Hafez' }
+  });
+  userSchema.index({ name: 1 }, { weights: { name: 1 } });
+}

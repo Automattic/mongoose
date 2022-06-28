@@ -240,4 +240,18 @@ async function gh11960() {
     doc.nested!.parent();
     doc.nestedArray?.[0].parentArray();
   }
+
+  {
+    const doc = await ParentModel.create({
+      username: 'user1',
+      map: { key1: 'value1', key2: 'value2' },
+      nested: { dummy: 'hello' },
+      nestedArray: [{ dummy: 'hello again' }]
+    });
+
+    expectType<Document<any, any, any> & Parent & { _id: Types.ObjectId }>(doc);
+    expectType<Map<string, string> | undefined>(doc.map);
+    doc.nested!.parent();
+    doc.nestedArray?.[0].parentArray();
+  }
 }

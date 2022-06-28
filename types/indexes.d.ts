@@ -93,6 +93,6 @@ declare module 'mongoose' {
      * ```
      */
     expires?: number | string;
-    weights?: AnyObject;
+    weights?: Record<string, number>;
   }
 }

@@ -227,14 +227,17 @@ async function gh11960() {
 
   const ParentModel = model<DocumentType<Parent>>('Parent', ParentSchema);
 
-  const doc = new ParentModel({
-    username: 'user1',
-    map: { key1: 'value1', key2: 'value2' },
-    nested: { dummy: 'hello' },
-    nestedArray: [{ dummy: 'hello again' }]
-  });
+  {
+    const doc = new ParentModel({
+      username: 'user1',
+      map: { key1: 'value1', key2: 'value2' },
+      nested: { dummy: 'hello' },
+      nestedArray: [{ dummy: 'hello again' }]
+    });
 
-  expectType<Map<string, string> | undefined>(doc.map);
-  doc.nested!.parent();
-
+    expectType<Document<any, any, any> & Parent & { _id: Types.ObjectId }>(doc);
+    expectType<Map<string, string> | undefined>(doc.map);
+    doc.nested!.parent();
+    doc.nestedArray?.[0].parentArray();
+  }
 }

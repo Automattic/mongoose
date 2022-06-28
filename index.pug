@@ -152,7 +152,7 @@ html(lang='en')
         div.sponsors
           div
             each sponsor in opencollectiveSponsors
-              a(rel='sponsored', href=sponsor.website)
+              a(rel='sponsored', href=sponsor.website || sponsor.profile)
                 img.sponsor(src=sponsor.image || 'https://next-images.opencollective.com/_next/image?url=%2Fstatic%2Fimages%2Fopencollective-icon.png&w=96&q=75', style='height:50px', alt=sponsor.alt)
 
         <div class="sponsor">

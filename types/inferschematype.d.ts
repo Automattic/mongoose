@@ -1,4 +1,4 @@
-import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions, TypeKeyBaseType } from 'mongoose';
+import { Schema, Types, InferSchemaType, SchemaType, SchemaTypeOptions, TypeKeyBaseType } from 'mongoose';
 
 declare module 'mongoose' {
   /**
@@ -23,7 +23,7 @@ declare module 'mongoose' {
    * // result
    * type UserType = {userName?: string}
    */
-  type InferSchemaType<SchemaType> = ObtainSchemaGeneric<SchemaType, 'DocType'> ;
+  type InferSchemaType<SchemaType> = ObtainSchemaGeneric<SchemaType, 'DocType'>;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.
@@ -42,7 +42,7 @@ declare module 'mongoose' {
         TPathTypeKey: TPathTypeKey;
         DocType: DocType;
       }[alias]
-      : unknown;
+     : unknown;
 }
 /**
  * @summary Checks if a type is "Record" or "any".
@@ -74,7 +74,9 @@ type RequiredPathBaseType = { required: true | [true, string | undefined] };
  * @description It helps to check if a path is defined by TypeKey OR not.
  * @param {TypeKey} TypeKey A literal string refers to path type property key.
  */
-type PathWithTypePropertyBaseType<TypeKey extends TypeKeyBaseType> = { [k in TypeKey]: any };
+type PathWithTypePropertyBaseType<TypeKey extends TypeKeyBaseType, T = any> = {
+  [k in TypeKey]: T;
+};
 
 /**
  * @summary A Utility to obtain schema's required path keys.
@@ -120,10 +122,14 @@ type OptionalPaths<T> = {
  */
 type ObtainDocumentPathType<PathValueType, TypeKey extends TypeKeyBaseType> = PathValueType extends Schema<any>
   ? InferSchemaType<PathValueType>
+  : PathValueType extends PathWithTypePropertyBaseType<TypeKey, Schema<any>>
+  ? InferSchemaType<PathValueType[TypeKey]>
+  : PathValueType extends PathWithTypePropertyBaseType<TypeKey, Schema<any>[]>
+  ? InferSchemaType<PathValueType[TypeKey][number]>[]
   : ResolvePathType<
-  PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
-  PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {}
-  >;
+      PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
+      PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {}
+    >;
 
 /**
  * @param {T} T A generic refers to string path enums.
@@ -138,14 +144,14 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
  * @returns Number, "Number" or "number" will be resolved to string type.
  */
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}> =
-  PathValueType extends (infer Item)[] ? IfEquals<Item, never, any, ResolvePathType<Item>>[] :
+  PathValueType extends (infer Item)[] ? ResolvePathType<Item>[] :
     PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? PathEnumOrString<Options['enum']> :
       PathValueType extends NumberConstructor | 'number' | 'Number' | typeof Schema.Types.Number ? number :
         PathValueType extends DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date ? Date :
           PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
             PathValueType extends BooleanConstructor | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean ? boolean :
-              PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Schema.Types.ObjectId :
-                PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Schema.Types.Decimal128 :
+              PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Types.ObjectId :
+                PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
                   PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
                     PathValueType extends ArrayConstructor ? any[] :
                       PathValueType extends typeof Schema.Types.Mixed ? any:

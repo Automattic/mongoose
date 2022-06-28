@@ -130,9 +130,8 @@ type ObtainDocumentPathType<PathValueType, TypeKey extends TypeKeyBaseType> = Pa
   ? InferSchemaType<PathValueType>
   : PathValueType extends PathWithTypePropertyBaseType<TypeKey, Schema<any>>
   ? InferSchemaType<PathValueType[TypeKey]>
-  : PathValueType extends PathWithTypePropertyBaseType<TypeKey, Schema<any>[]>
-  ? InferSchemaType<PathValueType[TypeKey][number]>[]
   : ResolvePathType<
+      TypeKey,
       PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
       PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {}
     >;
@@ -149,8 +148,8 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
  * @param {Options} Options Document definition path options except path type.
  * @returns Number, "Number" or "number" will be resolved to string type.
  */
-type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}> =
-  PathValueType extends (infer Item)[] ? ResolvePathType<Item>[] :
+type ResolvePathType<TypeKey extends TypeKeyBaseType, PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}> =
+  PathValueType extends (infer Item)[] ? ObtainDocumentPathType<Item, TypeKey>[] :
     PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? PathEnumOrString<Options['enum']> :
       PathValueType extends NumberConstructor | 'number' | 'Number' | typeof Schema.Types.Number ? number :
         PathValueType extends DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date ? Date :
@@ -158,7 +157,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
             PathValueType extends BooleanConstructor | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean ? boolean :
               PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Types.ObjectId :
                 PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
-                  PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
+                  PathValueType extends MapConstructor ? Map<string, ResolvePathType<TypeKey, Options['of']>> :
                     PathValueType extends ArrayConstructor ? any[] :
                       PathValueType extends typeof Schema.Types.Mixed ? any:
                         IfEquals<PathValueType, ObjectConstructor> extends true ? any:

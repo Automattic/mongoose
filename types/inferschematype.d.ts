@@ -42,7 +42,7 @@ declare module 'mongoose' {
         TPathTypeKey: TPathTypeKey;
         DocType: DocType;
       }[alias]
-     : unknown;
+    : unknown;
 }
 /**
  * @summary Checks if a type is "Record" or "any".
@@ -84,9 +84,10 @@ type PathWithTypePropertyBaseType<TypeKey extends TypeKeyBaseType, T = any> = {
  * @returns required paths keys of document definition.
  */
 type RequiredPathKeys<T, TypeKey extends TypeKeyBaseType> = {
-  [K in keyof T]: T[K] extends RequiredPathBaseType
-    ? IfEquals<T[K], any, T[K] extends OptionalArray<TypeKey> ? never : K, K>
-    : never;
+  [K in keyof T]: T[K] extends RequiredPathBaseType ? IfEquals<T[K], any, never, K>
+    : T[K] extends PathWithTypePropertyBaseType<TypeKey, any[]>
+      ? T[K] extends { default: undefined } ? never : K
+      : never;
 }[keyof T];
 
 /**
@@ -104,12 +105,11 @@ type RequiredPaths<T, TypeKey extends TypeKeyBaseType> = {
  * @returns optional paths keys of document definition.
  */
 type OptionalPathKeys<T, TypeKey extends TypeKeyBaseType> = {
-  [K in keyof T]: T[K] extends RequiredPathBaseType ? never : K;
+  [K in keyof T]: T[K] extends RequiredPathBaseType ? never :
+    T[K] extends PathWithTypePropertyBaseType<TypeKey, any[]>
+      ? T[K] extends { default: undefined } ? K : never
+      : K;
 }[keyof T];
-
-type OptionalArray<TypeKey extends TypeKeyBaseType> = {
-  [k in TypeKey]: any[];
-} & { default: undefined };
 
 /**
  * @summary A Utility to obtain schema's optional paths.
@@ -159,8 +159,8 @@ type ResolvePathType<TypeKey extends TypeKeyBaseType, PathValueType, Options ext
                 PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
                   PathValueType extends MapConstructor ? Map<string, ResolvePathType<TypeKey, Options['of']>> :
                     PathValueType extends ArrayConstructor ? any[] :
-                      PathValueType extends typeof Schema.Types.Mixed ? any:
-                        IfEquals<PathValueType, ObjectConstructor> extends true ? any:
-                          IfEquals<PathValueType, {}> extends true ? any:
+                      PathValueType extends typeof Schema.Types.Mixed ? any :
+                        IfEquals<PathValueType, ObjectConstructor> extends true ? any :
+                          IfEquals<PathValueType, {}> extends true ? any :
                             PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
                               unknown;

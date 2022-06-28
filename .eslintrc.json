@@ -186,6 +186,7 @@
     "mocha-no-only/mocha-no-only": [
       "error"
     ],
-    "no-empty": "off"
+    "no-empty": "off",
+    "eol-last": "warn"
   }
 }

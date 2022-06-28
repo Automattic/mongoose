@@ -10,8 +10,8 @@ declare module 'mongoose' {
    */
   type ObtainDocumentType<DocDefinition, EnforcedDocType = any, TypeKey extends TypeKeyBaseType = DefaultTypeKey> =
     IsItRecordAndNotAny<EnforcedDocType> extends true ? EnforcedDocType : {
-      [K in keyof (RequiredPaths<DocDefinition> &
-      OptionalPaths<DocDefinition>)]: ObtainDocumentPathType<DocDefinition[K], TypeKey>;
+      [K in keyof (RequiredPaths<DocDefinition, TypeKey> &
+      OptionalPaths<DocDefinition, TypeKey>)]: ObtainDocumentPathType<DocDefinition[K], TypeKey>;
     };
 
   /**
@@ -83,8 +83,10 @@ type PathWithTypePropertyBaseType<TypeKey extends TypeKeyBaseType, T = any> = {
  * @param {T} T A generic refers to document definition.
  * @returns required paths keys of document definition.
  */
-type RequiredPathKeys<T> = {
-  [K in keyof T]: T[K] extends RequiredPathBaseType ? IfEquals<T[K], any, never, K> : never;
+type RequiredPathKeys<T, TypeKey extends TypeKeyBaseType> = {
+  [K in keyof T]: T[K] extends RequiredPathBaseType
+    ? IfEquals<T[K], any, T[K] extends OptionalArray<TypeKey> ? never : K, K>
+    : never;
 }[keyof T];
 
 /**
@@ -92,8 +94,8 @@ type RequiredPathKeys<T> = {
  * @param {T} T A generic refers to document definition.
  * @returns a record contains required paths with the corresponding type.
  */
-type RequiredPaths<T> = {
-  [K in RequiredPathKeys<T>]: T[K];
+type RequiredPaths<T, TypeKey extends TypeKeyBaseType> = {
+  [K in RequiredPathKeys<T, TypeKey>]: T[K];
 };
 
 /**
@@ -101,17 +103,21 @@ type RequiredPaths<T> = {
  * @param {T} T A generic refers to document definition.
  * @returns optional paths keys of document definition.
  */
-type OptionalPathKeys<T> = {
+type OptionalPathKeys<T, TypeKey extends TypeKeyBaseType> = {
   [K in keyof T]: T[K] extends RequiredPathBaseType ? never : K;
 }[keyof T];
+
+type OptionalArray<TypeKey extends TypeKeyBaseType> = {
+  [k in TypeKey]: any[];
+} & { default: undefined };
 
 /**
  * @summary A Utility to obtain schema's optional paths.
  * @param {T} T A generic refers to document definition.
  * @returns a record contains optional paths with the corresponding type.
  */
-type OptionalPaths<T> = {
-  [K in OptionalPathKeys<T>]?: T[K];
+type OptionalPaths<T, TypeKey extends TypeKeyBaseType> = {
+  [K in OptionalPathKeys<T, TypeKey>]?: T[K];
 };
 
 /**

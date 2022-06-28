@@ -527,7 +527,7 @@ export type AutoTypedSchemaType = {
     },
     favoritDrink?: 'Tea' | 'Coffee',
     favoritColorMode: 'dark' | 'light'
-    friendID: Types.ObjectId;
+    friendID?: Types.ObjectId;
     nestedArray: Array<{
       date: Date;
       messages?: number;

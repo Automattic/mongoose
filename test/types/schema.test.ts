@@ -374,8 +374,8 @@ export function autoTypedSchema() {
     boolean2?: boolean;
     boolean3?: boolean;
     boolean4?: boolean;
-    // mixed1?: any;
-    // mixed2?: any;
+    mixed1?: any;
+    mixed2?: any;
     mixed3?: any;
     objectId1?: Types.ObjectId;
     objectId2?: Types.ObjectId;
@@ -414,8 +414,8 @@ export function autoTypedSchema() {
     boolean2: 'Boolean',
     boolean3: 'boolean',
     boolean4: Schema.Types.Boolean,
-    // mixed1: Object,
-    // mixed2: {},
+    mixed1: Object,
+    mixed2: {},
     mixed3: Schema.Types.Mixed,
     objectId1: Schema.Types.ObjectId,
     objectId2: 'ObjectId',

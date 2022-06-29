@@ -160,8 +160,5 @@ type ResolvePathType<TypeKey extends TypeKeyBaseType, PathValueType, Options ext
                   PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
                     PathValueType extends MapConstructor ? Map<string, ResolvePathType<TypeKey, Options['of']>> :
                       PathValueType extends ArrayConstructor ? any[] :
-                        PathValueType extends typeof Schema.Types.Mixed ? any :
-                          IfEquals<PathValueType, ObjectConstructor> extends true ? any :
-                            IfEquals<PathValueType, {}> extends true ? any :
-                              PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                unknown;
+                        PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+                          unknown;

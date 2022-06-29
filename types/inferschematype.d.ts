@@ -42,7 +42,7 @@ declare module 'mongoose' {
         TPathTypeKey: TPathTypeKey;
         DocType: DocType;
       }[alias]
-    : unknown;
+      : unknown;
 }
 /**
  * @summary Checks if a type is "Record" or "any".
@@ -129,11 +129,11 @@ type OptionalPaths<T, TypeKey extends TypeKeyBaseType> = {
 type ObtainDocumentPathType<PathValueType, TypeKey extends TypeKeyBaseType> = PathValueType extends Schema<any>
   ? InferSchemaType<PathValueType>
   : PathValueType extends PathWithTypePropertyBaseType<TypeKey, Schema<any>>
-  ? InferSchemaType<PathValueType[TypeKey]>
-  : ResolvePathType<
-      TypeKey,
-      PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
-      PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {}
+    ? InferSchemaType<PathValueType[TypeKey]>
+    : ResolvePathType<
+    TypeKey,
+    PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
+    PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {}
     >;
 
 /**

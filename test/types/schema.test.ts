@@ -374,9 +374,9 @@ export function autoTypedSchema() {
     boolean2?: boolean;
     boolean3?: boolean;
     boolean4?: boolean;
-    mixed1?: any;
-    mixed2?: any;
-    mixed3?: any;
+    mixed1?: unknown;
+    mixed2?: unknown;
+    mixed3?: unknown;
     objectId1?: Types.ObjectId;
     objectId2?: Types.ObjectId;
     objectId3?: Types.ObjectId;

@@ -120,13 +120,13 @@ function parse() {
             ctx.static = true;
             // dont take "string" as "name" from here, because jsdoc definitions of "static" do not have parameters, also its defined elsewhere anyway
             // ctx.name = tag.string;
-            ctx.string = `${data.name}.${ctx.name}`;
+            ctx.string = `${ctx.constructor}.${ctx.name}`;
             break;
           case 'function':
             ctx.type = 'function';
             ctx.static = true;
             ctx.name = tag.string;
-            ctx.string = `${data.name}.${ctx.name}`;
+            ctx.string = `${ctx.constructor}.${ctx.name}`;
             // extra parameter to make function definitions independant of where "@function" is defined
             // like "@static" could have overwritten "ctx.string" again if defined after "@function"
             ctx.isFunction = true;

@@ -377,9 +377,9 @@ export function autoTypedSchema() {
     mixed1?: any;
     mixed2?: any;
     mixed3?: any;
-    objectId1?: Schema.Types.ObjectId;
-    objectId2?: Schema.Types.ObjectId;
-    objectId3?: Schema.Types.ObjectId;
+    objectId1?: Types.ObjectId;
+    objectId2?: Types.ObjectId;
+    objectId3?: Types.ObjectId;
     customSchema?: Int8;
     map1?: Map<string, string>;
     map2?: Map<string, number>;
@@ -388,9 +388,9 @@ export function autoTypedSchema() {
     array3?: any[];
     array4?: any[];
     array5?: any[];
-    decimal1?: Schema.Types.Decimal128;
-    decimal2?: Schema.Types.Decimal128;
-    decimal3?: Schema.Types.Decimal128;
+    decimal1?: Types.Decimal128;
+    decimal2?: Types.Decimal128;
+    decimal3?: Types.Decimal128;
   };
 
   const TestSchema = new Schema({
@@ -475,6 +475,17 @@ export function autoTypedSchema() {
         message: '{VALUE} is not supported'
       },
       required: true
+    },
+    friendID: {
+      type: Schema.Types.ObjectId
+    },
+    nestedArray: {
+      type: [
+        new Schema({
+          date: { type: Date, required: true },
+          messages: Number
+        })
+      ]
     }
   }, {
     statics: {
@@ -516,6 +527,11 @@ export type AutoTypedSchemaType = {
     },
     favoritDrink?: 'Tea' | 'Coffee',
     favoritColorMode: 'dark' | 'light'
+    friendID?: Types.ObjectId;
+    nestedArray: Array<{
+      date: Date;
+      messages?: number;
+    }>
   }
   , statics: {
     staticFn: () => 'Returned from staticFn'

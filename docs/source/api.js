@@ -94,7 +94,18 @@ function parse() {
             break;
           case 'property':
             ctx.type = 'property';
-            let str = tag.string;
+
+            // transform "tag" properties to how the way before tag 4.5
+            // in 4.4 something like "{Connection} connection" or "{Array} connections" was put out, now "tag" contains different properties
+            // which would look like "tag = { type: 'property', types: ['Connection'], name: 'connection' }"
+            // or "tag = { type: 'property', types: ['Array'], name: 'connections' }"
+            let str;
+            if (tag.name.length > 0) {
+              str = "{" + tag.types.join(' ') + "} " + tag.name;
+            } else {
+              str = tag.types.join(' ');
+            }
+            
             const match = str.match(/^{\w+}/);
             if (match != null) {
               ctx.type = match[0].substring(1, match[0].length - 1);

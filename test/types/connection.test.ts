@@ -1,4 +1,4 @@
-import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, Model, AnyObject, AnyObjectAnyId } from 'mongoose';
+import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, Model, AnyObjectAnyId } from 'mongoose';
 import * as mongodb from 'mongodb';
 import { expectError, expectType } from 'tsd';
 

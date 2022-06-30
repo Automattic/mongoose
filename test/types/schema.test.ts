@@ -388,6 +388,7 @@ export function autoTypedSchema() {
     array4: any[];
     array5: any[];
     array6: string[];
+    array7?: string[];
     decimal1?: Types.Decimal128;
     decimal2?: Types.Decimal128;
     decimal3?: Types.Decimal128;
@@ -429,6 +430,7 @@ export function autoTypedSchema() {
     array4: [{}],
     array5: [],
     array6: { type: [String] },
+    array7: { type: [String], default: undefined },
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
     decimal3: 'decimal128'

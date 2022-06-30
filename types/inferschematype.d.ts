@@ -1,4 +1,4 @@
-import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions, TypeKeyBaseType, Types, ObtainSchemaGeneric } from 'mongoose';
+import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions, TypeKeyBaseType, Types } from 'mongoose';
 
 declare module 'mongoose' {
   /**
@@ -64,12 +64,18 @@ type IfEquals<T, U, Y = true, N = false> =
     (<G>() => G extends U ? 1 : 0) ? Y : N;
 
 /**
- * @summary Required path base type.
- * @description It helps to check whereas if a path is required OR optional.
+ * @summary Checks if a document path is required or optional.
+ * @param {P} P Document path.
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
-
  */
-type RequiredPathBaseType<TypeKey extends TypeKeyBaseType> = { required: true | [true, string | undefined] }| ArrayConstructor | any[] | Record<TypeKey, ArrayConstructor | any[]>;
+type IsPathRequired<P, TypeKey extends TypeKeyBaseType> =
+  P extends { required: true | [true, string | undefined] } | ArrayConstructor | any[]
+    ? true
+    : P extends (Record<TypeKey, ArrayConstructor | any[]>)
+      ? P extends { default: undefined }
+        ? false
+        : true
+      : false;
 
 /**
  * @summary Path base type defined by using TypeKey
@@ -85,7 +91,7 @@ type PathWithTypePropertyBaseType<TypeKey extends TypeKeyBaseType> = { [k in Typ
  * @returns required paths keys of document definition.
  */
 type RequiredPathKeys<T, TypeKey extends TypeKeyBaseType> = {
-  [K in keyof T]: T[K] extends RequiredPathBaseType<TypeKey> ? IfEquals<T[K], any, never, K> : never;
+  [K in keyof T]: IsPathRequired<T[K], TypeKey> extends true ? IfEquals<T[K], any, never, K> : never;
 }[keyof T];
 
 /**
@@ -105,7 +111,7 @@ type RequiredPaths<T, TypeKey extends TypeKeyBaseType> = {
  * @returns optional paths keys of document definition.
  */
 type OptionalPathKeys<T, TypeKey extends TypeKeyBaseType> = {
-  [K in keyof T]: T[K] extends RequiredPathBaseType<TypeKey> ? never : K;
+  [K in keyof T]: IsPathRequired<T[K], TypeKey> extends true ? never : K;
 }[keyof T];
 
 /**

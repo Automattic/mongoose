@@ -2,7 +2,6 @@ import {
   Schema,
   Document,
   SchemaDefinition,
-  SchemaDefinitionProperty,
   SchemaTypeOptions,
   Model,
   Types,
@@ -383,11 +382,13 @@ export function autoTypedSchema() {
     customSchema?: Int8;
     map1?: Map<string, string>;
     map2?: Map<string, number>;
-    array1?: string[];
-    array2?: any[];
-    array3?: any[];
-    array4?: any[];
-    array5?: any[];
+    array1: string[];
+    array2: any[];
+    array3: any[];
+    array4: any[];
+    array5: any[];
+    array6: string[];
+    array7?: string[];
     decimal1?: Types.Decimal128;
     decimal2?: Types.Decimal128;
     decimal3?: Types.Decimal128;
@@ -428,6 +429,8 @@ export function autoTypedSchema() {
     array3: [Schema.Types.Mixed],
     array4: [{}],
     array5: [],
+    array6: { type: [String] },
+    array7: { type: [String], default: undefined },
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
     decimal3: 'decimal128'

@@ -101,16 +101,8 @@ function parse() {
           case 'property':
             ctx.type = 'property';
 
-            // transform "tag" properties to how the way before tag 4.5
-            // in 4.4 something like "{Connection} connection" or "{Array} connections" was put out, now "tag" contains different properties
-            // which would look like "tag = { type: 'property', types: ['Connection'], name: 'connection' }"
-            // or "tag = { type: 'property', types: ['Array'], name: 'connections' }"
-            let str;
-            if (tag.name.length > 0) {
-              str = "{" + tag.types.join(' ') + "} " + tag.name;
-            } else {
-              str = tag.types.join(' ');
-            }
+            // somewhere since 6.0 the "string" property came back, which was gone with 4.5
+            let str = tag.string;
             
             const match = str.match(/^{\w+}/);
             if (match != null) {
@@ -126,14 +118,18 @@ function parse() {
           case 'static':
             ctx.type = 'property';
             ctx.static = true;
-            ctx.name = tag.string;
+            // dont take "string" as "name" from here, because jsdoc definitions of "static" do not have parameters, also its defined elsewhere anyway
+            // ctx.name = tag.string;
             ctx.string = `${data.name}.${ctx.name}`;
             break;
           case 'function':
             ctx.type = 'function';
             ctx.static = true;
             ctx.name = tag.string;
-            ctx.string = `${data.name}.${ctx.name}()`;
+            ctx.string = `${data.name}.${ctx.name}`;
+            // extra parameter to make function definitions independant of where "@function" is defined
+            // like "@static" could have overwritten "ctx.string" again if defined after "@function"
+            ctx.isFunction = true;
             break;
           case 'return':
             tag.return = tag.description ?
@@ -174,6 +170,10 @@ function parse() {
             ctx.string = tag.string + '()';
             ctx.name = tag.string;
         }
+      }
+
+      if (ctx.isFunction && !ctx.string.endsWith("()")) {
+        ctx.string = ctx.string + "()";
       }
 
       if (/\.prototype[^.]/.test(ctx.string)) {

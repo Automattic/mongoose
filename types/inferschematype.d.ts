@@ -82,7 +82,7 @@ type PathWithTypePropertyBaseType<TypeKey extends TypeKeyBaseType> = { [k in Typ
  * @param {PathValueType} PathValueType The schema path
  * @param {TypeKey} TypeKey A literal string refers to path type property key.
  */
-type PathTypeDefinition<PathValueType, TypeKey extends TypeKeyBaseType> = PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType
+type PathTypeDefinition<PathValueType, TypeKey extends TypeKeyBaseType> = PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType;
 
 /**
  * @summary A Utility to obtain schema's required path keys.
@@ -104,8 +104,8 @@ type RequiredPathKeys<T, TypeKey extends TypeKeyBaseType> = {
  * @returns a record contains required paths with the corresponding type.
  */
 type RequiredPaths<T, TypeKey extends TypeKeyBaseType> = {
-  [K in RequiredPathKeys<T, TypeKey>]: T[K]
-}
+  [K in RequiredPathKeys<T, TypeKey>]: T[K];
+};
 
 /**
  * @summary A Utility to obtain schema's optional path keys.
@@ -137,9 +137,9 @@ type OptionalPaths<T, TypeKey extends TypeKeyBaseType> = {
  * @param {TypeKey} TypeKey A generic refers to document definition.
  */
 type ObtainDocumentPathType<PathValueType, TypeKey extends TypeKeyBaseType> = ResolvePathType<
-  TypeKey,
-  PathTypeDefinition<PathValueType, TypeKey>,
-  PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {}
+TypeKey,
+PathTypeDefinition<PathValueType, TypeKey>,
+PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {}
 >;
 
 /**

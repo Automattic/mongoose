@@ -8514,7 +8514,6 @@ describe('Check if static function that is supplied in schema option is availabl
 });
 
 
-
 async function delay(ms) {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }

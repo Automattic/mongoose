@@ -260,11 +260,13 @@ Defining indexes at the schema level is necessary when creating
 const animalSchema = new Schema({
   name: String,
   type: String,
-  tags: { type: [String], index: true } // field level
+  tags: { type: [String], index: true } // path level
 });
 
 animalSchema.index({ name: 1, type: -1 }); // schema level
 ```
+
+See [SchemaType#index()](./api.html#schematype_SchemaType-index) for other index options.
 
 When your application starts up, Mongoose automatically calls [`createIndex`](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each defined index in your schema.
 Mongoose will call `createIndex` for each index sequentially, and emit an 'index' event on the model when all the `createIndex` calls succeeded or when there was an error.

@@ -47,9 +47,15 @@ const out = module.exports.docs;
 
 const combinedFiles = [];
 for (const file of files) {
-  const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'), { raw: true });
-  comments.file = file;
-  combinedFiles.push(comments);
+  try {
+    const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'), { raw: true });
+    comments.file = file;
+    combinedFiles.push(comments);
+  } catch (err) {
+    // show log of which file has thrown a error for easier debugging
+    console.error("Error while trying to parseComments for ", file);
+    throw err;
+  }
 }
 
 parse();

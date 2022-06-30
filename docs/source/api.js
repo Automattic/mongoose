@@ -194,9 +194,6 @@ function parse() {
       ctx.description = prop.description.full.
         replace(/<br \/>/ig, ' ').
         replace(/&gt;/ig, '>');
-      if (ctx.description.includes('function capitalize')) {
-        console.log('\n\n-------\n\n', ctx);
-      }
       ctx.description = md.parse(ctx.description);
 
       data.props.push(ctx);

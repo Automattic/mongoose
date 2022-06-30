@@ -157,18 +157,20 @@ function parse() {
           case 'method':
             ctx.type = 'method';
             ctx.name = tag.string;
-            ctx.string = `${ctx.constructor}.prototype.${ctx.name}()`;
+            ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+            ctx.isFunction = true;
             break;
           case 'memberOf':
             ctx.constructor = tag.parent;
             ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
             if (ctx.type === 'method') {
-              ctx.string += '()';
+              ctx.isFunction = true;
             }
             break;
           case 'constructor':
-            ctx.string = tag.string + '()';
+            ctx.string = tag.string;
             ctx.name = tag.string;
+            ctx.isFunction = true;
         }
       }
 

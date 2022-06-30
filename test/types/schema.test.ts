@@ -9,7 +9,8 @@ import {
   InferSchemaType,
   SchemaType,
   Query,
-  HydratedDocument
+  HydratedDocument,
+  SchemaOptions
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 
@@ -559,6 +560,7 @@ function gh11828() {
     }
   });
 }
+
 function gh11997() {
   interface IUser {
     name: string;
@@ -568,4 +570,18 @@ function gh11997() {
     name: { type: String, default: () => 'Hafez' }
   });
   userSchema.index({ name: 1 }, { weights: { name: 1 } });
+}
+
+function gh12003() {
+  const baseSchemaOptions: SchemaOptions = {
+    versionKey: false
+  };
+
+  const BaseSchema = new Schema({
+    name: String
+  }, baseSchemaOptions);
+
+  type BaseSchemaType = InferSchemaType<typeof BaseSchema>;
+
+  expectType<{ name?: string }>({} as BaseSchemaType);
 }

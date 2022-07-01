@@ -2,7 +2,6 @@ import {
   Schema,
   Document,
   SchemaDefinition,
-  SchemaDefinitionProperty,
   SchemaTypeOptions,
   Model,
   Types,
@@ -359,14 +358,17 @@ export function autoTypedSchema() {
     string2?: string;
     string3?: string;
     string4?: string;
+    string5: string;
     number1?: number;
     number2?: number;
     number3?: number;
     number4?: number;
+    number5: number;
     date1?: Date;
     date2?: Date;
     date3?: Date;
     date4?: Date;
+    date5: Date;
     buffer1?: Buffer;
     buffer2?: Buffer;
     buffer3?: Buffer;
@@ -375,23 +377,26 @@ export function autoTypedSchema() {
     boolean2?: boolean;
     boolean3?: boolean;
     boolean4?: boolean;
+    boolean5: boolean;
     mixed1?: any;
     mixed2?: any;
     mixed3?: any;
-    objectId1?: Schema.Types.ObjectId;
-    objectId2?: Schema.Types.ObjectId;
-    objectId3?: Schema.Types.ObjectId;
+    objectId1?: Types.ObjectId;
+    objectId2?: Types.ObjectId;
+    objectId3?: Types.ObjectId;
     customSchema?: Int8;
     map1?: Map<string, string>;
     map2?: Map<string, number>;
-    array1?: string[];
-    array2?: any[];
-    array3?: any[];
-    array4?: any[];
-    array5?: any[];
-    decimal1?: Schema.Types.Decimal128;
-    decimal2?: Schema.Types.Decimal128;
-    decimal3?: Schema.Types.Decimal128;
+    array1: string[];
+    array2: any[];
+    array3: any[];
+    array4: any[];
+    array5: any[];
+    array6: string[];
+    array7?: string[];
+    decimal1?: Types.Decimal128;
+    decimal2?: Types.Decimal128;
+    decimal3?: Types.Decimal128;
   };
 
   const TestSchema = new Schema({
@@ -399,14 +404,17 @@ export function autoTypedSchema() {
     string2: 'String',
     string3: 'string',
     string4: Schema.Types.String,
+    string5: { type: String, default: 'ABCD' },
     number1: Number,
     number2: 'Number',
     number3: 'number',
     number4: Schema.Types.Number,
+    number5: { type: Number, default: 10 },
     date1: Date,
     date2: 'Date',
     date3: 'date',
     date4: Schema.Types.Date,
+    date5: { type: Date, default: new Date() },
     buffer1: Buffer,
     buffer2: 'Buffer',
     buffer3: 'buffer',
@@ -415,6 +423,7 @@ export function autoTypedSchema() {
     boolean2: 'Boolean',
     boolean3: 'boolean',
     boolean4: Schema.Types.Boolean,
+    boolean5: { type: Boolean, default: true },
     mixed1: Object,
     mixed2: {},
     mixed3: Schema.Types.Mixed,
@@ -429,6 +438,8 @@ export function autoTypedSchema() {
     array3: [Schema.Types.Mixed],
     array4: [{}],
     array5: [],
+    array6: { type: [String] },
+    array7: { type: [String], default: undefined },
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
     decimal3: 'decimal128'
@@ -476,6 +487,17 @@ export function autoTypedSchema() {
         message: '{VALUE} is not supported'
       },
       required: true
+    },
+    friendID: {
+      type: Schema.Types.ObjectId
+    },
+    nestedArray: {
+      type: [
+        new Schema({
+          date: { type: Date, required: true },
+          messages: Number
+        })
+      ]
     }
   }, {
     statics: {
@@ -517,6 +539,11 @@ export type AutoTypedSchemaType = {
     },
     favoritDrink?: 'Tea' | 'Coffee',
     favoritColorMode: 'dark' | 'light'
+    friendID?: Types.ObjectId;
+    nestedArray: Array<{
+      date: Date;
+      messages?: number;
+    }>
   }
   , statics: {
     staticFn: () => 'Returned from staticFn'

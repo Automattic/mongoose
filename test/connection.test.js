@@ -1074,6 +1074,13 @@ describe('connections:', function() {
         assert.equal(conn2.get('autoCreate'), false);
       });
 
+      it('keeps autoIndex & autoCreate as true by default if read preference is primaryPreferred (gh-9374)', function() {
+        const conn = new mongoose.createConnection(start.uri, { readPreference: 'primaryPreferred' });
+
+        assert.equal(conn.get('autoIndex'), undefined);
+        assert.equal(conn.get('autoCreate'), undefined);
+      });
+
       it('throws if options try to set autoIndex to true', function() {
         const opts = {
           readPreference: 'secondary',

@@ -1034,7 +1034,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ne/#mongodb-expression-exp.-ne
        */
-      $ne: Expression | [Expression, Expression] | null;
+      $ne: Expression | [Expression, Expression | NullExpression] | null;
     }
 
     export interface Cond {

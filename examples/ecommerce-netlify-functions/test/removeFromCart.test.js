@@ -11,6 +11,7 @@ const mongoose = require('mongoose');
 describe('Remove From Cart', function() {
   before(async() => {
     await mongoose.connect('mongodb://localhost:27017/netlify');
+    await mongoose.connection.dropDatabase();
   });
 
   after(async() => {

@@ -163,11 +163,11 @@ declare module 'mongoose' {
     countDocuments(callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a new document or documents */
-    create<DocContents = T>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = T>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>[]>): void;
-    create<DocContents = T>(doc: DocContents | T): Promise<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>>;
-    create<DocContents = T>(...docs: Array<T | DocContents>): Promise<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = T>(doc: T | DocContents, callback: Callback<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>>): void;
+    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
+    create<DocContents = AnyKeys<T>>(doc: DocContents | T): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
+    create<DocContents = AnyKeys<T>>(...docs: Array<T | DocContents>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = AnyKeys<T>>(doc: T | DocContents, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
 
     /**
    * Create the collection for this model. By default, if no indexes are specified,

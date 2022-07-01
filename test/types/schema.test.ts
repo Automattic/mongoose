@@ -357,14 +357,17 @@ export function autoTypedSchema() {
     string2?: string;
     string3?: string;
     string4?: string;
+    string5: string;
     number1?: number;
     number2?: number;
     number3?: number;
     number4?: number;
+    number5: number;
     date1?: Date;
     date2?: Date;
     date3?: Date;
     date4?: Date;
+    date5: Date;
     buffer1?: Buffer;
     buffer2?: Buffer;
     buffer3?: Buffer;
@@ -373,6 +376,7 @@ export function autoTypedSchema() {
     boolean2?: boolean;
     boolean3?: boolean;
     boolean4?: boolean;
+    boolean5: boolean;
     mixed1?: any;
     mixed2?: any;
     mixed3?: any;
@@ -399,14 +403,17 @@ export function autoTypedSchema() {
     string2: 'String',
     string3: 'string',
     string4: Schema.Types.String,
+    string5: { type: String, default: "ABCD" },
     number1: Number,
     number2: 'Number',
     number3: 'number',
     number4: Schema.Types.Number,
+    number5: { type: Number, default: 10 },
     date1: Date,
     date2: 'Date',
     date3: 'date',
     date4: Schema.Types.Date,
+    date5: { type: Date , default: new Date() },
     buffer1: Buffer,
     buffer2: 'Buffer',
     buffer3: 'buffer',
@@ -415,6 +422,7 @@ export function autoTypedSchema() {
     boolean2: 'Boolean',
     boolean3: 'boolean',
     boolean4: Schema.Types.Boolean,
+    boolean5: { type: Boolean , default: true },
     mixed1: Object,
     mixed2: {},
     mixed3: Schema.Types.Mixed,

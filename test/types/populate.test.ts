@@ -298,3 +298,28 @@ function gh11758() {
 
   expectType<string>(parent.nestedChild.name);
 }
+
+async function gh11955() {
+  // `Parent` represents the object as it is stored in MongoDB
+  interface Parent {
+    children?: Types.ObjectId[],
+    name?: string
+  }
+
+  const ParentModel = model<Parent>('Parent', new Schema({
+    children: [{ type: Schema.Types.ObjectId, ref: 'Child' }],
+    name: String
+  }));
+
+  interface Child {
+    name: string;
+  }
+  const childSchema: Schema = new Schema({ name: String });
+  model<Child>('Child', childSchema);
+
+  const parent = await ParentModel.findOne({}).exec();
+
+  const populatedParent = await parent!.populate<{ children: Child[] }>('child');
+
+  populatedParent.children.find(({ name }) => console.log(name));
+}

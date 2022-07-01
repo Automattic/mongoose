@@ -1,4 +1,4 @@
-import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions, TypeKeyBaseType, Types } from 'mongoose';
+import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions, TypeKeyBaseType, Types, SchemaDefinitionProperty } from 'mongoose';
 
 declare module 'mongoose' {
   /**
@@ -75,7 +75,11 @@ type IsPathRequired<P, TypeKey extends TypeKeyBaseType> =
       ? P extends { default: undefined }
         ? false
         : true
-      : false;
+    : P extends PathWithTypePropertyBaseType<TypeKey>
+      ? P extends { default: ResolvePathType<P[TypeKey]> }
+        ? true
+        : false
+    : false;
 
 /**
  * @summary Path base type defined by using TypeKey

@@ -1,7 +1,7 @@
 # Handling Subdocuments in TypeScript
 
 Subdocuments are tricky in TypeScript.
-By default, Mongoose treats object properties in document interfaces as _nested propertes_ rather than subdocuments.
+By default, Mongoose treats object properties in document interfaces as _nested properties_ rather than subdocuments.
 
 ```ts
 // Setup

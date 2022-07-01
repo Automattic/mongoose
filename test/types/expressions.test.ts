@@ -166,5 +166,5 @@ const nullExpr: Expression = {
 };
 
 const nullNETupleExpr: Expression = {
-  $ne: ["$name", null]
+  $ne: ['$name', null]
 };

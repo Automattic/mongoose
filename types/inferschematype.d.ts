@@ -1,4 +1,4 @@
-import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions, TypeKeyBaseType, Types, SchemaDefinitionProperty } from 'mongoose';
+import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions, TypeKeyBaseType, Types, NumberSchemaDefinition, StringSchemaDefinition, BooleanSchemaDefinition, DateSchemaDefinition } from 'mongoose';
 
 declare module 'mongoose' {
   /**
@@ -75,7 +75,7 @@ type IsPathRequired<P, TypeKey extends TypeKeyBaseType> =
       ? P extends { default: undefined }
         ? false
         : true
-    : P extends PathWithTypePropertyBaseType<TypeKey>
+    : P extends (Record<TypeKey, NumberSchemaDefinition | StringSchemaDefinition | BooleanSchemaDefinition | DateSchemaDefinition>)
       ? P extends { default: ResolvePathType<P[TypeKey]> }
         ? true
         : false
@@ -156,11 +156,11 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}> =
   PathValueType extends Schema ? InferSchemaType<PathValueType> :
     PathValueType extends (infer Item)[] ? IfEquals<Item, never, any, ResolvePathType<Item>>[] :
-      PathValueType extends StringConstructor | 'string' | 'String' | typeof Schema.Types.String ? PathEnumOrString<Options['enum']> :
-        PathValueType extends NumberConstructor | 'number' | 'Number' | typeof Schema.Types.Number ? number :
-          PathValueType extends DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date ? Date :
+      PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
+        PathValueType extends NumberSchemaDefinition ? number :
+          PathValueType extends DateSchemaDefinition ? Date :
             PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
-              PathValueType extends BooleanConstructor | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean ? boolean :
+              PathValueType extends BooleanSchemaDefinition ? boolean :
                 PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Types.ObjectId :
                   PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
                     PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :

@@ -5,6 +5,7 @@ const assert = require('assert');
 const { handler: addToCart } = require('../functions/addToCart');
 const { handler: removeFromCart } = require('../functions/removeFromCart');
 const mongoose = require('mongoose');
+const fixtures = require('./fixtures');
 
 
 
@@ -19,12 +20,14 @@ describe('Remove From Cart', function() {
   });
 
   it('Should create a cart and then it should remove the entire item from it.', async function() {
+    const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
+    .then((res) => res.products);
     const params = {
       body: {
         cartId: null,
         product: [
-          { productId: '629e5f3686d82fc73b95b396', quantity: 2 },
-          { productId: '629e5f3686d82fc73b95b398', quantity: 1 }
+          { productId: products[0]._id, quantity: 2 },
+          { productId: products[1]._id, quantity: 1 }
         ]
       }
     };
@@ -34,7 +37,9 @@ describe('Remove From Cart', function() {
     const newParams = {
       body: {
         cartId: result.body._id,
-        productId: '629e5f3686d82fc73b95b396'
+        product: {
+          productId: products[0]._id,
+        }
       }
     };
     const remove = await removeFromCart(newParams);
@@ -42,12 +47,14 @@ describe('Remove From Cart', function() {
   });
 
   it('Should create a cart and then it should reduce the quantity of an item from it.', async function() {
+    const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
+    .then((res) => res.products);
     const params = {
       body: {
         cartId: null,
         product: [
-          { productId: '629e5f3686d82fc73b95b396', quantity: 2 },
-          { productId: '629e5f3686d82fc73b95b398', quantity: 1 }
+          { productId: products[0]._id, quantity: 2 },
+          { productId: products[1]._id, quantity: 1 }
         ]
       }
     };
@@ -58,7 +65,7 @@ describe('Remove From Cart', function() {
       body: {
         cartId: result.body._id,
         product: {
-          productId: '629e5f3686d82fc73b95b396',
+          productId: products[0]._id,
           quantity: 1
         }
       }

@@ -5,7 +5,7 @@ const assert = require('assert');
 const { handler: addToCart } = require('../functions/addToCart');
 const { handler: checkout } = require('../functions/checkout');
 const mongoose = require('mongoose');
-
+const fixtures = require('./fixtures');
 
 
 describe('Checkout', function() {

@@ -6,7 +6,7 @@ const handler = async(event) => {
   try {
     const cart = await Cart.findOne({ _id: event.body.cartId });
     const index = cart.items.findIndex((item) =>
-      item.productId == event.body.product.productId
+      item.productId.toString() == event.body.product.productId.toString()
     );
     if (index == -1) {
       return { statusCode: 500, body: 'Product not found' };

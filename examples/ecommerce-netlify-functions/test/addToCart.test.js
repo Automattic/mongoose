@@ -4,6 +4,7 @@ const { describe, it, before, after } = require('mocha');
 const assert = require('assert');
 const { handler: addToCart } = require('../functions/addToCart');
 const mongoose = require('mongoose');
+const fixtures = require('../test/fixtures');
 
 
 
@@ -16,12 +17,14 @@ describe('Add to Cart', function() {
     await mongoose.disconnect();
   });
   it('Should create a cart and add a product to the cart.', async function() {
+    const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
+    .then((res) => res.products);
     const params = {
       body: {
         cartId: null,
         product: [
-          { productId: '629e5f3686d82fc73b95b396', quantity: 2 },
-          { productId: '629e5f3686d82fc73b95b398', quantity: 1 }
+          { productId: products[0]._id, quantity: 2 },
+          { productId: products[1]._id, quantity: 1 }
         ]
       }
     };
@@ -30,23 +33,20 @@ describe('Add to Cart', function() {
     assert(result.body.items.length);
   });
   it('Should find the cart and add to it.', async function() {
+    const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
+    .then((res) => res.products);
+    const cart = await fixtures.createCart({products: null});
     const params = {
       body: {
-        cartId: null,
+        cartId: cart._id,
         product: [
-          { productId: '629e5f3686d82fc73b95b396', quantity: 2 },
-          { productId: '629e5f3686d82fc73b95b398', quantity: 1 }
+          { productId: products[0]._id, quantity: 2 },
+          { productId: products[1]._id, quantity: 1 }
         ]
       }
     };
-    const result = await addToCart(params);
-    assert(result.body);
-    assert(result.body.items.length);
-    params.body.cartId = result.body._id;
     const findCart = await addToCart(params);
     assert(findCart.body);
-    assert.deepStrictEqual(findCart.body._id, result.body._id);
-    assert.equal(findCart.body.items[0].quantity, 4);
-    assert.equal(findCart.body.items[1].quantity, 2);
+    assert.equal(findCart.body.items.length, 2)
   });
 });

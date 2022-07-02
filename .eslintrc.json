@@ -187,6 +187,7 @@
       "error"
     ],
     "no-empty": "off",
-    "eol-last": "warn"
+    "eol-last": "warn",
+    "no-multiple-empty-lines": ["warn", { "max": 2 }]
   }
 }

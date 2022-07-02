@@ -630,3 +630,39 @@ function gh11987() {
   expectError(userSchema.path<'foo'>('name'));
   expectType<SchemaTypeOptions<string>>(userSchema.path<'name'>('name').OptionsConstructor);
 }
+
+function gh12030() {
+  const Schema1 = new Schema({
+    users: [
+      {
+        username: { type: String }
+      }
+    ]
+  });
+
+  // expectType<{ users: string[] }>({} as InferSchemaType<typeof Schema1>);
+
+  const Schema2 = new Schema({
+    createdAt: { type: Date, default: Date.now }
+  });
+
+  // expectType<{ createdAt: Date }>({} as InferSchemaType<typeof Schema2>);
+
+  const Schema3 = new Schema({
+    users: [
+      new Schema({
+        username: { type: String },
+        credit: { type: Number, default: 0 }
+      })
+    ]
+  });
+
+  // expectType<{ users: Types.DocumentArray<{ userName?: string, credit: number }> }>({} as InferSchemaType<typeof Schema3>);
+
+
+  const Schema4 = new Schema({
+    data: { type: { role: String }, default: {} }
+  });
+
+  // expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema4>);
+}

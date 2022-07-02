@@ -5,7 +5,7 @@ const schema: Schema = new Schema({ name: { type: 'String' } });
 
 interface ITest {
   _id?: Types.ObjectId;
-  name?: string;
+  name: string;
 }
 
 const Test = model<ITest>('Test', schema);
@@ -105,7 +105,7 @@ Test.insertMany({ _id: '000000000000000000000000', name: 'test' }, (err, docs) =
 
 Test.insertMany({ _id: new Types.ObjectId('000000000000000000000000') }, (err, docs) => {
   expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string | undefined>(docs[0].name);
+  expectType<string>(docs[0].name);
   expectType<boolean>(docs[0].isNew);
 });
 
@@ -153,13 +153,13 @@ Test.insertMany([{ name: 'test' }], { lean: true }).then(docs => {
 
 Test.insertMany([{ name: 'test' }], { lean: false }).then(docs => {
   expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string | undefined>(docs[0].name);
+  expectType<string>(docs[0].name);
   expectType<boolean>(docs[0].isNew);
 });
 
 Test.insertMany([{ name: 'test' }], { }).then(docs => {
   expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string | undefined>(docs[0].name);
+  expectType<string>(docs[0].name);
   expectType<boolean>(docs[0].isNew);
 });
 

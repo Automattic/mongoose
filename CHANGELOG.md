@@ -1,3 +1,12 @@
+6.4.2 / 2022-07-01
+==================
+ * fix: keep autoIndex & autoCreate as true by default if read preference is primaryPreferred #11976
+ * fix(types): improve inferred Schema Type to handle nested paths and ObjectIds #12007 [iammola](https://github.com/iammola)
+ * fix(types): avoid inferring doc type from param to create() #12001
+ * fix(types): make populate Paths generic consistently overwrite doc interface #11955
+ * fix(types): allow null at ne expression second parameter #11996 [jyeros](https://github.com/jyeros)
+ * fix(types): change index "weights" to be more explicit #11997 [hasezoey](https://github.com/hasezoey)
+
 6.4.1 / 2022-06-27
 ==================
  * fix(schema): allow 0 for numbers if required and ref both set #11912

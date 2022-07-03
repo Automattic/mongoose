@@ -174,7 +174,15 @@ function parse() {
             ctx.string = tag.string;
             ctx.name = tag.string;
             ctx.isFunction = true;
+            break;
+          case 'instance':
+            ctx.isInstance = true;
+            break;
         }
+      }
+
+      if (ctx.isInstance && ctx.static) {
+        console.warn(`Property "${ctx.name}" in "${ctx.constructor}" has both instance and static JSDOC markings (most likely both @instance and @static)! (File: "${props.file}")`);
       }
 
       if (ctx.isFunction && !ctx.string.endsWith("()")) {

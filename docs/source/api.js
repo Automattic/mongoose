@@ -63,6 +63,21 @@ for (const file of files) {
 
 parse();
 
+/**
+ * @typedef {Object} PropContext
+ * @property {boolean} [isStatic] Defines wheter the current property is a static property (not mutually exlusive with "isInstance")
+ * @property {boolean} [isInstance] Defines wheter the current property is a instance property (not mutually exlusive with "isStatic")
+ * @property {boolean} [isFunction] Defines wheter the current property is meant to be a function
+ * @property {string} [constructor] Defines the Constructor (or rather path) the current property is on
+ * @property {boolean} [constructorWasUndefined] Defined wheter the "constructor" property was defined by "dox", but was set to "undefined"
+ * @property {string} [type] Defines the type the property is meant to be
+ * @property {string} [name] Defines the current Properties name
+ * @property {Object} [return] The full object for a "@return" jsdoc tag
+ * @property {string} [string] Defines the full string the property will be listed as
+ * @property {string} [anchorId] Defines the Anchor ID to be used for linking
+ * @property {string} [description] Defines the Description the property will be listed with
+ */
+
 function parse() {
   for (const props of combinedFiles) {
     let name = props.file.
@@ -94,7 +109,8 @@ function parse() {
       if (prop.ignore || prop.isPrivate) {
         continue;
       }
-
+     
+      /** @type {PropContext} */
       const ctx = prop.ctx || {};
 
       // somehow in "dox", it is named "receiver" sometimes, not "constructor"

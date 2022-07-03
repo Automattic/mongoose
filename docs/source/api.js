@@ -199,15 +199,17 @@ function parse() {
         ctx.string = `${ctx.constructor}.${ctx.name}`;
       }
 
+      // add "()" to the end of the string if function
       if ((ctx.isFunction || ctx.type === "method") && !ctx.string.endsWith("()")) {
         ctx.string = ctx.string + "()";
       }
 
+      // fixing up "something.prototypemissingdot" to "something.prototype.missingdot"
       if (/\.prototype[^.]/.test(ctx.string)) {
         ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
       }
 
-      // Backwards compat
+      // Backwards compat anchors
       if (typeof ctx.constructor === 'string') {
         ctx.anchorId = `${ctx.constructor.toLowerCase()}_${ctx.constructor}-${ctx.name}`;
       } else if (typeof ctx.receiver === 'string') {

@@ -1043,7 +1043,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cond/#mongodb-expression-exp.-cond
        */
-      $cond: { if: BooleanExpression, then: AnyExpression, else: AnyExpression } | [BooleanExpression, AnyExpression, AnyExpression];
+      $cond: { if: BooleanExpression | ConditionalExpressionOperator, then: AnyExpression, else: AnyExpression } | [BooleanExpression, AnyExpression, AnyExpression];
     }
 
     export interface IfNull {
@@ -1957,7 +1957,7 @@ declare module 'mongoose' {
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/addToSet/#mongodb-expression-exp.-addToSet
        */
-      $addToSet: ArrayExpression;
+      $addToSet: Expression | Record<string, Expression>;
     }
 
     export interface Avg {
@@ -2406,7 +2406,8 @@ declare module 'mongoose' {
     TypeExpressionOperator |
     AccumulatorOperator |
     VariableExpressionOperator |
-    WindowOperator;
+    WindowOperator |
+    any;
 
   export type NullExpression = null;
 
@@ -2478,7 +2479,8 @@ declare module 'mongoose' {
     DataSizeOperatorReturningNumber |
     CustomAggregationExpressionOperatorReturningAny |
     TypeExpressionOperatorReturningNumber |
-    DateExpression;
+    DateExpression |
+    DateExpressionOperatorReturningNumber;
 
   export type ObjectExpression =
     Path |

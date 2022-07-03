@@ -212,7 +212,7 @@ declare module 'mongoose' {
 
     export interface Set {
       /** [`$set` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/set/) */
-      $set: Record<string, AnyExpression>
+      $set: Record<string, AnyExpression | any>
     }
 
     export interface SetWindowFields {

@@ -1,4 +1,4 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Document, Expression, PipelineStage, Types } from 'mongoose';
 import { expectType } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
@@ -60,4 +60,42 @@ async function run() {
   expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'desc' }));
   expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'descending' }));
   expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: { $meta: 'textScore' } }));
+}
+
+function gh12017_1() {
+  const a: Expression = { $subtract: [
+    { $dayOfWeek: new Date() } as Expression.DayOfWeek, // errors
+    2
+  ] };
+}
+
+function gh12017_2() {
+  const a: Expression.Reduce = {
+    $reduce: {
+      input: '$values',
+      initialValue: { depth: -1 }, // errors
+      in: {
+        depth: '$$this.depth' // errors
+      }
+    }
+  };
+
+  const b: Expression.Reduce = {
+    $reduce: {
+      input: '$values',
+      initialValue: 0,
+      in: { $add: ['$$value', '$$this'] }
+    }
+  };
+
+  const c: PipelineStage.Set = {
+    $set: {
+      child: {
+        foo: 'bar' // errors
+      },
+      friend: new Types.ObjectId()
+    }
+  };
+
+  const d: Expression.ToInt = { $toInt: 2.5 };
 }

@@ -165,6 +165,7 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
  * @summary Resolve path type by returning the corresponding type.
  * @param {PathValueType} PathValueType Document definition path type.
  * @param {Options} Options Document definition path options except path type.
+ * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  * @returns Number, "Number" or "number" will be resolved to string type.
  */
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends TypeKeyBaseType = DefaultTypeKey> =

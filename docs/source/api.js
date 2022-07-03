@@ -33,7 +33,10 @@ const files = [
   'lib/options/SchemaStringOptions.js',
   'lib/types/DocumentArray/methods/index.js',
   'lib/types/subdocument.js',
-  'lib/types/ArraySubdocument.js'
+  'lib/types/ArraySubdocument.js',
+  'lib/types/buffer.js',
+  'lib/types/decimal128.js',
+  'lib/types/map.js'
 ];
 
 module.exports = {

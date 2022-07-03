@@ -96,6 +96,19 @@ function parse() {
       }
 
       const ctx = prop.ctx || {};
+
+      // somehow in "dox", it is named "receiver" sometimes, not "constructor"
+      // this is used as a fall-back if the handling below does not overwrite it
+      if ("receiver" in ctx) {
+        ctx.constructor = ctx.receiver;
+        delete ctx.receiver;
+      }
+
+      // in some cases "dox" has "ctx.constructor" defined but set to "undefined", which will later be used for setting "ctx.string"
+      if ("constructor" in ctx && ctx.constructor === undefined) {
+        ctx.constructorWasUndefined = true;
+      }
+
       for (const tag of prop.tags) {
         switch (tag.type) {
           case 'receiver':
@@ -113,7 +126,6 @@ function parse() {
               str = str.replace(/^{\w+}\s*/, '');
             }
             ctx.name = str;
-            ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
             break;
           case 'type':
             ctx.type = Array.isArray(tag.types) ? tag.types.join('|') : tag.types;
@@ -123,13 +135,11 @@ function parse() {
             ctx.isStatic = true;
             // dont take "string" as "name" from here, because jsdoc definitions of "static" do not have parameters, also its defined elsewhere anyway
             // ctx.name = tag.string;
-            ctx.string = `${ctx.constructor}.${ctx.name}`;
             break;
           case 'function':
             ctx.type = 'function';
             ctx.isStatic = true;
             ctx.name = tag.string;
-            ctx.string = `${ctx.constructor}.${ctx.name}`;
             // extra parameter to make function definitions independant of where "@function" is defined
             // like "@static" could have overwritten "ctx.string" again if defined after "@function"
             ctx.isFunction = true;
@@ -160,12 +170,10 @@ function parse() {
           case 'method':
             ctx.type = 'method';
             ctx.name = tag.string;
-            ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
             ctx.isFunction = true;
             break;
           case 'memberOf':
             ctx.constructor = tag.parent;
-            ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
             if (ctx.type === 'method') {
               ctx.isFunction = true;
             }
@@ -183,6 +191,15 @@ function parse() {
 
       if (ctx.isInstance && ctx.isStatic) {
         console.warn(`Property "${ctx.name}" in "${ctx.constructor}" has both instance and static JSDOC markings (most likely both @instance and @static)! (File: "${props.file}")`);
+      }
+
+      // the following if-else-if statement is in this order, because there are more "instance" methods thans static
+      // the following condition will be true if "isInstance = true" or if "isInstance = false && isStatic = false" AND "ctx.string" are empty or not defined
+      // if "isStatic" and "isInstance" are falsy and "ctx.string" is not falsy, then rely on the "ctx.string" set by "dox"
+      if (ctx.isInstance || (!ctx.isStatic && !ctx.isInstance && (!ctx.string || ctx.constructorWasUndefined))) {
+        ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+      } else if (ctx.isStatic) {
+        ctx.string = `${ctx.constructor}.${ctx.name}`;
       }
 
       if (ctx.isFunction && !ctx.string.endsWith("()")) {

@@ -174,9 +174,6 @@ function parse() {
             break;
           case 'memberOf':
             ctx.constructor = tag.parent;
-            if (ctx.type === 'method') {
-              ctx.isFunction = true;
-            }
             break;
           case 'constructor':
             ctx.string = tag.string;
@@ -202,7 +199,7 @@ function parse() {
         ctx.string = `${ctx.constructor}.${ctx.name}`;
       }
 
-      if (ctx.isFunction && !ctx.string.endsWith("()")) {
+      if ((ctx.isFunction || ctx.type === "method") && !ctx.string.endsWith("()")) {
         ctx.string = ctx.string + "()";
       }
 

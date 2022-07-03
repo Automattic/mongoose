@@ -120,14 +120,14 @@ function parse() {
             break;
           case 'static':
             ctx.type = 'property';
-            ctx.static = true;
+            ctx.isStatic = true;
             // dont take "string" as "name" from here, because jsdoc definitions of "static" do not have parameters, also its defined elsewhere anyway
             // ctx.name = tag.string;
             ctx.string = `${ctx.constructor}.${ctx.name}`;
             break;
           case 'function':
             ctx.type = 'function';
-            ctx.static = true;
+            ctx.isStatic = true;
             ctx.name = tag.string;
             ctx.string = `${ctx.constructor}.${ctx.name}`;
             // extra parameter to make function definitions independant of where "@function" is defined
@@ -181,7 +181,7 @@ function parse() {
         }
       }
 
-      if (ctx.isInstance && ctx.static) {
+      if (ctx.isInstance && ctx.isStatic) {
         console.warn(`Property "${ctx.name}" in "${ctx.constructor}" has both instance and static JSDOC markings (most likely both @instance and @static)! (File: "${props.file}")`);
       }
 

@@ -665,4 +665,31 @@ function gh12030() {
   });
 
   // expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema4>);
+
+  const Schema5 = new Schema({
+    data: { type: { role: Object }, default: {} }
+  });
+
+  // expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema5>);
+
+  const Schema6 = new Schema({
+    track: {
+      backupCount: {
+        type: Number,
+        default: 0
+      },
+      count: {
+        type: Number,
+        default: 0
+      }
+    }
+  });
+
+  expectType<{
+    track?: {
+      backupCount: number;
+      count: number;
+    };
+  }>({} as InferSchemaType<typeof Schema6>);
+
 }

@@ -1,4 +1,17 @@
-import { Schema, InferSchemaType, SchemaType, SchemaTypeOptions, TypeKeyBaseType, Types, NumberSchemaDefinition, StringSchemaDefinition, BooleanSchemaDefinition, DateSchemaDefinition } from 'mongoose';
+import {
+  Schema,
+  InferSchemaType,
+  SchemaType,
+  SchemaTypeOptions,
+  TypeKeyBaseType,
+  Types,
+  NumberSchemaDefinition,
+  StringSchemaDefinition,
+  BooleanSchemaDefinition,
+  DateSchemaDefinition,
+  ObtainDocumentType,
+  DefaultTypeKey
+} from 'mongoose';
 
 declare module 'mongoose' {
   /**
@@ -138,7 +151,8 @@ type ObtainDocumentPathType<PathValueType, TypeKey extends TypeKeyBaseType> = Pa
   ? InferSchemaType<PathValueType>
   : ResolvePathType<
   PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
-  PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {}
+  PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {},
+  TypeKey
   >;
 
 /**
@@ -153,7 +167,7 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
  * @param {Options} Options Document definition path options except path type.
  * @returns Number, "Number" or "number" will be resolved to string type.
  */
-type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}> =
+type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends TypeKeyBaseType = DefaultTypeKey> =
   PathValueType extends Schema ? InferSchemaType<PathValueType> :
     PathValueType extends (infer Item)[] ? IfEquals<Item, never, any, ResolvePathType<Item>>[] :
       PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
@@ -169,5 +183,5 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                           IfEquals<PathValueType, ObjectConstructor> extends true ? any:
                             IfEquals<PathValueType, {}> extends true ? any:
                               PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                PathValueType extends {} ? PathValueType :
+                                PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, TypeKey> :
                                   unknown;

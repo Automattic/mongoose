@@ -640,7 +640,11 @@ function gh12030() {
     ]
   });
 
-  // expectType<{ users: string[] }>({} as InferSchemaType<typeof Schema1>);
+  expectType<{
+    users: {
+      username?: string
+    }[];
+  }>({} as InferSchemaType<typeof Schema1>);
 
   const Schema2 = new Schema({
     createdAt: { type: Date, default: Date.now }

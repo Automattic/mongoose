@@ -148,6 +148,12 @@ function parse() {
             tag.return = tag.description ?
               md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
               '';
+
+            // dox does not add "void" / "undefined" to types, so in the documentation it would result in a empty "«»"
+            if (tag.string.includes('void') || tag.string.includes('undefined')) {
+              tag.types.push("void");
+            }
+
             ctx.return = tag;
             break;
           case 'inherits':

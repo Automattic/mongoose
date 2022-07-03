@@ -76,6 +76,7 @@ parse();
  * @property {string} [string] Defines the full string the property will be listed as
  * @property {string} [anchorId] Defines the Anchor ID to be used for linking
  * @property {string} [description] Defines the Description the property will be listed with
+ * @property {string} [deprecated] Defines wheter the current Property is signaled as deprecated
  */
 
 function parse() {
@@ -204,6 +205,9 @@ function parse() {
             break;
           case 'instance':
             ctx.isInstance = true;
+            break;
+          case 'deprecated':
+            ctx.deprecated = true;
             break;
         }
       }

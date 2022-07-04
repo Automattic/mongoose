@@ -540,7 +540,7 @@ export type AutoTypedSchemaType = {
     favoritDrink?: 'Tea' | 'Coffee',
     favoritColorMode: 'dark' | 'light'
     friendID?: Types.ObjectId;
-    nestedArray: Array<{
+    nestedArray: Types.DocumentArray<{
       date: Date;
       messages?: number;
     }>
@@ -661,7 +661,12 @@ function gh12030() {
     ]
   });
 
-  // expectType<{ users: Types.DocumentArray<{ userName?: string, credit: number }> }>({} as InferSchemaType<typeof Schema3>);
+  expectType<{
+    users: Types.DocumentArray<{
+      credit: number;
+      username?: string;
+    }>;
+  }>({} as InferSchemaType<typeof Schema3>);
 
 
   const Schema4 = new Schema({
@@ -674,7 +679,7 @@ function gh12030() {
     data: { type: { role: Object }, default: {} }
   });
 
-  expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema5>);
+  expectType<{ data: { role?: any } }>({} as InferSchemaType<typeof Schema5>);
 
   const Schema6 = new Schema({
     track: {

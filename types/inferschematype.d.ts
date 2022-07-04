@@ -171,7 +171,7 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
  */
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends TypeKeyBaseType = DefaultTypeKey> =
   PathValueType extends Schema ? InferSchemaType<PathValueType> :
-    PathValueType extends (infer Item)[] ? IfEquals<Item, never, any, ResolvePathType<Item>>[] :
+    PathValueType extends (infer Item)[] ? IfEquals<Item, never, any[], Item extends Schema ? Types.DocumentArray<ResolvePathType<Item>> : ResolvePathType<Item>[]> :
       PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
         PathValueType extends NumberSchemaDefinition ? number :
           PathValueType extends DateSchemaDefinition ? Date :

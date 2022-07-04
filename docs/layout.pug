@@ -160,7 +160,7 @@ html(lang='en')
           div#jobs
             each job in jobs
               .job-listing
-                a(href='/jobs' + job._id)
+                a(href='/docs/jobs#' + job._id)
                   .company-logo
                     img(src=job.logo)
                   .description

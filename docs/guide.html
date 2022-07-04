@@ -241,17 +241,18 @@ animalSchema.<span class="hljs-property">query</span>.<span class="hljs-property
 <h3 id="indexes"><a href="#indexes">Indexes</a></h3>
 
 <p>MongoDB supports <a href="http://docs.mongodb.org/manual/indexes/">secondary indexes</a>.
-With mongoose, we define these indexes within our <code>Schema</code> <a href="./api.html#schematype_SchemaType-index">at</a> <a href="./api.html#schematype_SchemaType-unique">the</a> <a href="./api.html#schematype_SchemaType-sparse">path</a> <a href="./api.html#schema_date_SchemaDate-expires">level</a> or the <code>schema</code> level.
+With mongoose, we define these indexes within our <code>Schema</code> <a href="./api.html#schematype_SchemaType-index">at</a> <a href="./api.html#schematype_SchemaType-unique">the</a> <a href="./api.html#schematype_SchemaType-sparse">path</a> <a href="./api.html#schemadateoptions_SchemaDateOptions-expires">level</a> or the <code>schema</code> level.
 Defining indexes at the schema level is necessary when creating
 <a href="https://docs.mongodb.com/manual/core/index-compound/">compound indexes</a>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> animalSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
   <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
   <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
-  <span class="hljs-attr">tags</span>: { <span class="hljs-attr">type</span>: [<span class="hljs-title class_">String</span>], <span class="hljs-attr">index</span>: <span class="hljs-literal">true</span> } <span class="hljs-comment">// field level</span>
+  <span class="hljs-attr">tags</span>: { <span class="hljs-attr">type</span>: [<span class="hljs-title class_">String</span>], <span class="hljs-attr">index</span>: <span class="hljs-literal">true</span> } <span class="hljs-comment">// path level</span>
 });
 
 animalSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">name</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">type</span>: -<span class="hljs-number">1</span> }); <span class="hljs-comment">// schema level</span>
 </code></pre>
+<p>See <a href="./api.html#schematype_SchemaType-index">SchemaType#index()</a> for other index options.</p>
 <p>When your application starts up, Mongoose automatically calls <a href="https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex"><code>createIndex</code></a> for each defined index in your schema.
 Mongoose will call <code>createIndex</code> for each index sequentially, and emit an &#39;index&#39; event on the model when all the <code>createIndex</code> calls succeeded or when there was an error.
 While nice for development, it is recommended this behavior be disabled in production since index creation can cause a <a href="https://docs.mongodb.com/manual/core/index-creation/#index-build-impact-on-database-performance">significant performance impact</a>.
@@ -1154,15 +1155,7 @@ of use cases, including e-commerce, wikis, and appointment bookings.</p>
 <h3 id="next">Next Up</h3>
 
 <p>Now that we&#39;ve covered <code>Schemas</code>, let&#39;s take a look at <a href="/docs/schematypes.html">SchemaTypes</a>.</p>
-</div></div><script type="text/javascript">var xhr = new XMLHttpRequest();
-xhr.open('POST', 'https://g0a3nbw0xa.execute-api.us-east-1.amazonaws.com/prod/track', true);
-xhr.setRequestHeader('Content-Type', 'application/json');
-xhr.onreadystatechange = function() {};
-xhr.send(JSON.stringify({
-  path: window.location.pathname,
-  hostname: window.location.hostname,
-  hash: window.location.hash
-}));</script><div id="jobs"><div class="job-listing"><a href="/jobs61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/jobs62c0ad1b2273faa8279b01bb"><div class="company-logo"><img src="https://static.swissdevjobs.ch/logo-images/swissdev-jobs-logo.jpg"></div><div class="description"><div class="company">SwissDevJobs.ch</div><div class="title">Senior Full Stack Engineer</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/jobs62c0ad1b2273faa8279b01bc"><div class="company-logo"><img src="https://static.swissdevjobs.ch/logo-images/swissdev-jobs-logo.jpg"></div><div class="description"><div class="company">SwissDevJobs.ch</div><div class="title">Lead Backend Developer</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/jobs">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript">(function (window, document) {
+</div></div><div id="jobs"><div class="job-listing"><a href="/docs/jobs#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/jobs#62c1414b6a3e03359cc2fb6a"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">SwissDevJobs.ch</div><div class="title">Lead Backend Developer</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/jobs#62c1414b6a3e03359cc2fb69"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">SwissDevJobs.ch</div><div class="title">Senior Full Stack Engineer</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/jobs">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript">(function (window, document) {
   var layout   = document.getElementById('layout'),
       menu     = document.getElementById('menu'),
       menuLink = document.getElementById('menuLink'),

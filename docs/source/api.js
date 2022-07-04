@@ -162,8 +162,8 @@ function parse() {
             ctx.isFunction = true;
             break;
           case 'return':
-            tag.return = tag.description ?
-              md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
+            tag.description = tag.description ?
+              md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>\n?$/, '') :
               '';
 
             // dox does not add "void" / "undefined" to types, so in the documentation it would result in a empty "«»"

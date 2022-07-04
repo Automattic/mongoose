@@ -10,7 +10,8 @@ import {
   BooleanSchemaDefinition,
   DateSchemaDefinition,
   ObtainDocumentType,
-  DefaultTypeKey
+  DefaultTypeKey,
+  ObjectIdSchemaDefinition
 } from 'mongoose';
 
 declare module 'mongoose' {
@@ -166,7 +167,7 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
  * @param {PathValueType} PathValueType Document definition path type.
  * @param {Options} Options Document definition path options except path type.
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
- * @returns Number, "Number" or "number" will be resolved to string type.
+ * @returns Number, "Number" or "number" will be resolved to number type.
  */
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends TypeKeyBaseType = DefaultTypeKey> =
   PathValueType extends Schema ? InferSchemaType<PathValueType> :
@@ -176,7 +177,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
           PathValueType extends DateSchemaDefinition ? Date :
             PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
               PathValueType extends BooleanSchemaDefinition ? boolean :
-                PathValueType extends 'objectId' | 'ObjectId' | typeof Schema.Types.ObjectId ? Types.ObjectId :
+                PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId :
                   PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
                     PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
                       PathValueType extends ArrayConstructor ? any[] :

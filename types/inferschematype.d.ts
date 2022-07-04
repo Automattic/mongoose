@@ -89,9 +89,9 @@ type IsPathRequired<P, TypeKey extends TypeKeyBaseType> =
       ? P extends { default: undefined }
         ? false
         : true
-      : P extends (Record<TypeKey, NumberSchemaDefinition | StringSchemaDefinition | BooleanSchemaDefinition | DateSchemaDefinition>)
-        ? P extends { default: ResolvePathType<P[TypeKey]> }
-          ? true
+      : P extends (Record<TypeKey, any>)
+        ? P extends { default: any }
+          ? IfEquals<P['default'], undefined, false, true>
           : false
         : false;
 

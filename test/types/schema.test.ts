@@ -650,7 +650,7 @@ function gh12030() {
     createdAt: { type: Date, default: Date.now }
   });
 
-  // expectType<{ createdAt: Date }>({} as InferSchemaType<typeof Schema2>);
+  expectType<{ createdAt: Date }>({} as InferSchemaType<typeof Schema2>);
 
   const Schema3 = new Schema({
     users: [
@@ -668,13 +668,13 @@ function gh12030() {
     data: { type: { role: String }, default: {} }
   });
 
-  // expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema4>);
+  expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema4>);
 
   const Schema5 = new Schema({
     data: { type: { role: Object }, default: {} }
   });
 
-  // expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema5>);
+  expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema5>);
 
   const Schema6 = new Schema({
     track: {

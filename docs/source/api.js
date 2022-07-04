@@ -179,6 +179,10 @@ function parse() {
           case 'event':
           case 'param':
             ctx[tag.type] = (ctx[tag.type] || []);
+            // the following is required, because in newer "dox" version "null" is not included in "types" anymore, but a seperate property
+            if (tag.nullable) {
+              tag.types.push('null');
+            }
             if (tag.types) {
               tag.types = tag.types.join('|');
             }

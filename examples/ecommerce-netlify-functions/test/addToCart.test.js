@@ -23,7 +23,7 @@ describe('Add to Cart', function() {
     const params = {
       body: {
         cartId: null,
-        product: [
+        items: [
           { productId: products[0]._id, quantity: 2 },
           { productId: products[1]._id, quantity: 1 }
         ]
@@ -40,7 +40,7 @@ describe('Add to Cart', function() {
     const params = {
       body: {
         cartId: cart._id,
-        product: [
+        items: [
           { productId: products[0]._id, quantity: 2 },
           { productId: products[1]._id, quantity: 1 }
         ]

@@ -1,14 +1,19 @@
 'use strict';
-const stripe = require('stripe')(process.env.STRIPE_KEY);
+
+const config = require('../.config');
+const stripe = require('stripe')(config.stripeSecretKey);
 
 const { Cart, Order, Product } = require('../models');
 
 const handler = async(event) => {
   try {
+
+    const cart = await Cart.findOne({ _id: event.body.cartId });
+
     const stripeProducts = { line_items: [] };
     let total = 0;
-    for (let i = 0; i < event.body.product.length; i++) {
-      const product = await Product.findOne({ _id: event.body.product[i].productId });
+    for (let i = 0; i < cart.items.length; i++) {
+      const product = await Product.findOne({ _id: cart.items[i].productId });
       stripeProducts.line_items.push({
         price_data: {
           currency: 'usd',
@@ -17,9 +22,9 @@ const handler = async(event) => {
           },
           unit_amount: product.productPrice
         },
-        quantity: event.body.product[i].quantity
+        quantity: cart.items[i].quantity
       });
-      total = total + (product.productPrice * event.body.product[i].quantity);
+      total = total + (product.productPrice * cart.items[i].quantity);
     }
     const session = await stripe.checkout.sessions.create({
       line_items: stripeProducts.line_items,
@@ -47,10 +52,14 @@ const handler = async(event) => {
       shipping: event.body.shipping,
       paymentMethod: paymentMethod ? { id: paymentMethod.id, brand: paymentMethod.brand, last4: paymentMethod.last4 } : null
     });
-    const cart = await Cart.findOne({ _id: event.body.cartId });
+    
     cart.orderId = order._id;
     await cart.save();
-    return { statusCode: 200, body: { order: order, cart: cart }, headers: { Location: session.url } };
+    return {
+      statusCode: 200,
+      body: { order: order, cart: cart },
+      headers: { Location: session.url }
+    };
   } catch (error) {
     return { statusCode: 500, body: error.toString() };
   }

@@ -25,7 +25,7 @@ describe('Remove From Cart', function() {
     const params = {
       body: {
         cartId: null,
-        product: [
+        items: [
           { productId: products[0]._id, quantity: 2 },
           { productId: products[1]._id, quantity: 1 }
         ]
@@ -37,7 +37,7 @@ describe('Remove From Cart', function() {
     const newParams = {
       body: {
         cartId: result.body._id,
-        product: {
+        item: {
           productId: products[0]._id,
         }
       }
@@ -52,7 +52,7 @@ describe('Remove From Cart', function() {
     const params = {
       body: {
         cartId: null,
-        product: [
+        items: [
           { productId: products[0]._id, quantity: 2 },
           { productId: products[1]._id, quantity: 1 }
         ]
@@ -64,7 +64,7 @@ describe('Remove From Cart', function() {
     const newParams = {
       body: {
         cartId: result.body._id,
-        product: {
+        item: {
           productId: products[0]._id,
           quantity: 1
         }

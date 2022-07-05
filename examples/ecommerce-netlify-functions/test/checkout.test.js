@@ -35,7 +35,9 @@ describe('Checkout', function() {
     assert(result.body);
     assert(result.body.items.length);
     params.body.cartId = result.body._id;
-    const stub = sinon.stub(stripe, 'paymentIntents.retrieve').callsFake(() => Promise.resolve({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'}));
+    const stub = sinon.stub(stripe, 'paymentIntents').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
+    sinon.stub(stripe, 'paymentMethods').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
+    sinon.stub(stripe, 'checkout').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
     // stub.callsFake(() => Promise.resolve({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'}));
     // const stub = sinon.createStubInstance(stripe);
     // stub.paymentIntents.retrieve.returns({status: '200'})

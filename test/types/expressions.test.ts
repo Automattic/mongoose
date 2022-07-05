@@ -174,7 +174,15 @@ const addWithNull: Expression.Add = {
     '$price',
     { $ifNull: ['$tax', 0] }
   ]
-}
+};
+
+const condWithIn: Expression.Cond = {
+  $cond: {
+    if: { $in: [] },
+    then: '$foo',
+    else: '$bar'
+  }
+};
 
 const toLong: Expression = { $toLong: '$qty' };
 

@@ -1043,7 +1043,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cond/#mongodb-expression-exp.-cond
        */
-      $cond: { if: BooleanExpression | ConditionalExpressionOperator, then: AnyExpression, else: AnyExpression } | [BooleanExpression, AnyExpression, AnyExpression];
+      $cond: { if: Expression, then: AnyExpression, else: AnyExpression } | [BooleanExpression, AnyExpression, AnyExpression];
     }
 
     export interface IfNull {

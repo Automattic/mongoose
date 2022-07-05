@@ -11522,7 +11522,7 @@ describe('document', function() {
       {
         nested: {
           type: SubSubSchema,
-          required: false
+          required: false // <-- important
         }
       },
       { _id: false }

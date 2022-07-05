@@ -86,6 +86,8 @@ const topN: Expression.TopN = {
   }
 };
 
+const d: Expression.Avg = { $avg: { $subtract: [{ $ifNull: ['$end', new Date()] }, '$start'] } };
+
 const dateSubtract1: Expression = {
   $dateSubtract:
   {
@@ -166,6 +168,13 @@ const letExpr: Expression = {
     in: { $multiply: ['$$total', '$$discounted'] }
   }
 };
+
+const addWithNull: Expression.Add = {
+  $add: [
+    '$price',
+    { $ifNull: ['$tax', 0] }
+  ]
+}
 
 const toLong: Expression = { $toLong: '$qty' };
 

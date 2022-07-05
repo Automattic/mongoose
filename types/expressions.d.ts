@@ -32,7 +32,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/add/#mongodb-expression-exp.-add
        */
-      $add: (NumberExpression | DateExpression)[];
+      $add: Expression[];
     }
 
     export interface Ceil {
@@ -1967,7 +1967,7 @@ declare module 'mongoose' {
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/avg/#mongodb-expression-exp.-avg
        */
-      $avg: ArrayExpression;
+      $avg: Expression;
     }
 
     export interface Count {

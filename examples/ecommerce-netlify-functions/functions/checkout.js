@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../.config');
-const stripe = require('stripe')(config.stripeSecretKey);
+const stripe = require('../integrations/stripe')
 
 const { Cart, Order, Product } = require('../models');
 

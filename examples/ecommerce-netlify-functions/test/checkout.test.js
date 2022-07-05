@@ -7,8 +7,7 @@ const { handler: checkout } = require('../functions/checkout');
 const mongoose = require('mongoose');
 const fixtures = require('./fixtures');
 const sinon = require('sinon');
-const config = require('../.config');
-const stripe = require('stripe')(config.stripeSecretKey);
+const stripe = require('../integrations/stripe')
 
 describe('Checkout', function() {
   before(async() => {
@@ -35,14 +34,18 @@ describe('Checkout', function() {
     assert(result.body);
     assert(result.body.items.length);
     params.body.cartId = result.body._id;
-    const stub = sinon.stub(stripe, 'paymentIntents').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
-    sinon.stub(stripe, 'paymentMethods').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
-    sinon.stub(stripe, 'checkout').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
-    // stub.callsFake(() => Promise.resolve({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'}));
-    // const stub = sinon.createStubInstance(stripe);
-    // stub.paymentIntents.retrieve.returns({status: '200'})
+    sinon.stub(stripe.paymentIntents, 'retrieve').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
+    sinon.stub(stripe.paymentMethods, 'retrieve').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
+    sinon.stub(stripe.checkout.sessions, 'create').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
+    params.body.product = params.body.items;
+    params.body.name = 'Test Testerson';
+    params.body.email = 'test@localhost.com';
+    params.body.address1 = '12345 Syndey Street';
+    params.body.city = 'Miami';
+    params.body.state = 'Florida';
+    params.body.zip = '33145';
+    params.body.shipping = 'standard';
     const finish = await checkout(params);
-    console.log(finish);
     assert(finish.body.order);
     assert(finish.body.cart);
   });

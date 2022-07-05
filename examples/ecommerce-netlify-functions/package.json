@@ -1,6 +1,7 @@
 {
     "dependencies": {
         "mongoose": "^6.3.5",
+        "sinon": "^14.0.0",
         "stripe": "^9.6.0"
     },
     "devDependencies": {

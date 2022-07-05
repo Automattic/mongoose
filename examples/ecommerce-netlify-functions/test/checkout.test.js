@@ -6,7 +6,9 @@ const { handler: addToCart } = require('../functions/addToCart');
 const { handler: checkout } = require('../functions/checkout');
 const mongoose = require('mongoose');
 const fixtures = require('./fixtures');
-
+const sinon = require('sinon');
+const config = require('../.config');
+const stripe = require('stripe')(config.stripeSecretKey);
 
 describe('Checkout', function() {
   before(async() => {
@@ -18,12 +20,14 @@ describe('Checkout', function() {
     await mongoose.disconnect();
   });
   it('Should do a successful checkout run', async function() {
+    const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
+    .then((res) => res.products);
     const params = {
       body: {
         cartId: null,
-        product: [
-          { productId: '629e5f3686d82fc73b95b396', quantity: 2 },
-          { productId: '629e5f3686d82fc73b95b398', quantity: 1 }
+        items: [
+          { productId: products[0]._id, quantity: 2 },
+          { productId: products[1]._id, quantity: 1 }
         ]
       }
     };
@@ -31,7 +35,12 @@ describe('Checkout', function() {
     assert(result.body);
     assert(result.body.items.length);
     params.body.cartId = result.body._id;
+    const stub = sinon.stub(stripe, 'paymentIntents.retrieve').callsFake(() => Promise.resolve({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'}));
+    // stub.callsFake(() => Promise.resolve({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'}));
+    // const stub = sinon.createStubInstance(stripe);
+    // stub.paymentIntents.retrieve.returns({status: '200'})
     const finish = await checkout(params);
+    console.log(finish);
     assert(finish.body.order);
     assert(finish.body.cart);
   });

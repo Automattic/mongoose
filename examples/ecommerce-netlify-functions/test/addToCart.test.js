@@ -17,7 +17,7 @@ describe('Add to Cart', function() {
   after(async() => {
     await mongoose.disconnect();
   });
-  it('Should create a cart and add a product to the cart.', async function() {
+  it('Should create a cart and add a product to the cart', async function() {
     const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
     .then((res) => res.products);
     const params = {
@@ -30,10 +30,11 @@ describe('Add to Cart', function() {
       }
     };
     const result = await addToCart(params);
+    result.body = JSON.parse(result.body);
     assert(result.body);
     assert(result.body.items.length);
   });
-  it('Should find the cart and add to it.', async function() {
+  it('Should find the cart and add to the cart', async function() {
     const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
     .then((res) => res.products);
     const cart = await fixtures.createCart({products: null});
@@ -47,6 +48,7 @@ describe('Add to Cart', function() {
       }
     };
     const findCart = await addToCart(params);
+    findCart.body = JSON.parse(findCart.body)
     assert(findCart.body);
     assert.equal(findCart.body.items.length, 2)
   });

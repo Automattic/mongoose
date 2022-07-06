@@ -31,6 +31,7 @@ describe('Checkout', function() {
       }
     };
     const result = await addToCart(params);
+    result.body = JSON.parse(result.body);
     assert(result.body);
     assert(result.body.items.length);
     params.body.cartId = result.body._id;
@@ -46,6 +47,7 @@ describe('Checkout', function() {
     params.body.zip = '33145';
     params.body.shipping = 'standard';
     const finish = await checkout(params);
+    finish.body = JSON.parse(finish.body);
     assert(finish.body.order);
     assert(finish.body.cart);
   });

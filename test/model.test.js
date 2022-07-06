@@ -8512,6 +8512,10 @@ describe('Model', function() {
           type: String,
           default: 'John Smith'
         },
+        age: {
+          type: Number,
+          default: 29
+        },
         nestedName: {
           first: {
             type: String,
@@ -8520,6 +8524,10 @@ describe('Model', function() {
           last: {
             type: String,
             default: 'Smith'
+          },
+          middle: {
+            type: String,
+            default: ''
           }
         },
         subdoc: {
@@ -8541,12 +8549,74 @@ describe('Model', function() {
         }]
       }));
 
-      const obj = { docArr: [{}] };
+      const obj = { age: 31, nestedName: { middle: 'James' }, docArr: [{}] };
       Test.applyDefaults(obj);
 
       assert.deepStrictEqual(obj, {
         name: 'John Smith',
-        nestedName: { first: 'John', last: 'Smith' },
+        age: 31,
+        nestedName: { first: 'John', last: 'Smith', middle: 'James' },
+        subdoc: {
+          test: 'subdoc default'
+        },
+        docArr: [{
+          test: 'doc array default'
+        }]
+      });
+    });
+
+    it('applies defaults to documents', function() {
+      const Test = db.model('Test', mongoose.Schema({
+        _id: false,
+        name: {
+          type: String,
+          default: 'John Smith'
+        },
+        age: {
+          type: Number,
+          default: 29
+        },
+        nestedName: {
+          first: {
+            type: String,
+            default: 'John'
+          },
+          last: {
+            type: String,
+            default: 'Smith'
+          },
+          middle: {
+            type: String,
+            default: ''
+          }
+        },
+        subdoc: {
+          type: mongoose.Schema({
+            _id: false,
+            test: {
+              type: String,
+              default: 'subdoc default'
+            }
+          }),
+          default: () => ({})
+        },
+        docArr: [{
+          _id: false,
+          test: {
+            type: String,
+            default: 'doc array default'
+          }
+        }]
+      }));
+
+      const obj = { age: 31, nestedName: { middle: 'James' }, docArr: [{}] };
+      const doc = new Test(obj, null, { defaults: false });
+      Test.applyDefaults(doc);
+
+      assert.deepStrictEqual(doc.toObject(), {
+        name: 'John Smith',
+        age: 31,
+        nestedName: { first: 'John', last: 'Smith', middle: 'James' },
         subdoc: {
           test: 'subdoc default'
         },

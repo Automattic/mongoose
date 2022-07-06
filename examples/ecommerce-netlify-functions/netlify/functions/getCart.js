@@ -1,9 +1,11 @@
 'use strict';
 
-const { Cart } = require('../models');
+const { Cart } = require('../../models');
+const connect = require('../../index');
 
 const handler = async(event) => {
   try {
+    await connect();
     // get the document containing the specified cartId
     const cart = await Cart.
       findOne({ _id: event.queryStringParameters.cartId }).

@@ -1,10 +1,11 @@
 'use strict';
 
-const { Cart } = require('../models');
+const { Cart } = require('../../models');
+const connect = require('../../index');
 
 const handler = async(event) => {
   try {
-
+    await connect();
     const cart = await Cart.findOne({ _id: event.body.cartId });
     const index = cart.items.findIndex((item) =>
       item.productId.toString() == event.body.item.productId.toString()
@@ -22,7 +23,7 @@ const handler = async(event) => {
       cart.items.splice(index, 1);
       await cart.save();
     }
-    return { statusCode: 200, body: cart };
+    return { statusCode: 200, body: JSON.stringify(cart) };
   } catch (error) {
     console.log(error);
     return { statusCode: 500, body: error.toString() };

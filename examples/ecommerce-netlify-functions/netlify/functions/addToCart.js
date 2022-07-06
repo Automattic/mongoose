@@ -1,11 +1,11 @@
 'use strict';
 
-const { Cart, Product } = require('../models');
-
+const { Cart, Product } = require('../../models');
+const connect = require('../../index');
 
 const handler = async(event) => {
   try {
-    // event.body = JSON.parse(event.body || {});
+    await connect();
     const products = await Product.find();
     if (event.body.cartId) {
       // get the document containing the specified cartId
@@ -26,11 +26,11 @@ const handler = async(event) => {
       }
 
       await cart.save();
-      return { statusCode: 200, body: cart };
+      return { statusCode: 200, body: JSON.stringify(cart) };
     } else {
       // If no cartId, create a new cart
       const cart = await Cart.create({ items: event.body.items });
-      return { statusCode: 200, body: cart };
+      return { statusCode: 200, body: JSON.stringify(cart) };
     }
   } catch (error) {
     return { statusCode: 500, body: error.toString() };

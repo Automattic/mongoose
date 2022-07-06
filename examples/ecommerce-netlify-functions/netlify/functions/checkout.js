@@ -1,13 +1,13 @@
 'use strict';
 
-const config = require('../.config');
-const stripe = require('../integrations/stripe')
+const stripe = require('../../integrations/stripe')
 
-const { Cart, Order, Product } = require('../models');
+const { Cart, Order, Product } = require('../../models');
+const connect = require('../../index');
 
 const handler = async(event) => {
   try {
-
+    await connect();
     const cart = await Cart.findOne({ _id: event.body.cartId });
 
     const stripeProducts = { line_items: [] };
@@ -57,7 +57,7 @@ const handler = async(event) => {
     await cart.save();
     return {
       statusCode: 200,
-      body: { order: order, cart: cart },
+      body: JSON.stringify({ order: order, cart: cart }),
       headers: { Location: session.url }
     };
   } catch (error) {

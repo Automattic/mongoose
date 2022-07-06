@@ -2,8 +2,8 @@
 
 const { describe, it, before, after } = require('mocha');
 const assert = require('assert');
-const { handler: addToCart } = require('../functions/addToCart');
-const { handler: checkout } = require('../functions/checkout');
+const { handler: addToCart } = require('../netlify/functions/addToCart');
+const { handler: checkout } = require('../netlify/functions/checkout');
 const mongoose = require('mongoose');
 const fixtures = require('./fixtures');
 const sinon = require('sinon');

@@ -8503,6 +8503,59 @@ describe('Model', function() {
     assert.deepEqual(indexes[1].key, { name: 1 });
     assert.strictEqual(indexes[1].collation.locale, 'en');
   });
+
+  describe('Model.applyDefaults (gh-11945)', function() {
+    it('applies defaults to POJOs', function() {
+      const Test = db.model('Test', mongoose.Schema({
+        _id: false,
+        name: {
+          type: String,
+          default: 'John Smith'
+        },
+        nestedName: {
+          first: {
+            type: String,
+            default: 'John'
+          },
+          last: {
+            type: String,
+            default: 'Smith'
+          }
+        },
+        subdoc: {
+          type: mongoose.Schema({
+            _id: false,
+            test: {
+              type: String,
+              default: 'subdoc default'
+            }
+          }),
+          default: () => ({})
+        },
+        docArr: [{
+          _id: false,
+          test: {
+            type: String,
+            default: 'doc array default'
+          }
+        }]
+      }));
+
+      const obj = { docArr: [{}] };
+      Test.applyDefaults(obj);
+
+      assert.deepStrictEqual(obj, {
+        name: 'John Smith',
+        nestedName: { first: 'John', last: 'Smith' },
+        subdoc: {
+          test: 'subdoc default'
+        },
+        docArr: [{
+          test: 'doc array default'
+        }]
+      });
+    });
+  });
 });
 
 describe('Check if static function that is supplied in schema option is available', function() {

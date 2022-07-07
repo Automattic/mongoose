@@ -5,24 +5,25 @@ const connect = require('../../index');
 
 const handler = async(event) => {
   try {
+    event.body = JSON.parse(event.body || {});
     await connect();
     const products = await Product.find();
     if (event.body.cartId) {
       // get the document containing the specified cartId
       const cart = await Cart.findOne({ _id: event.body.cartId }).setOptions({ sanitizeFilter: true });
       for (const product of event.body.items) {
-        const exists = cart.items.find(item =>
-          item.productId.toString() === product.productId.toString()
-        );
-        if (!exists && products.find(p => item.productId === product.id.toString())) {
+        const exists = cart.items.find(item => item.productId.toString() === product.productId.toString());
+        if (!exists && products.find(p => product.productId.toString() === p._id.toString())) {
           cart.items.push(product);
+          await cart.save();
         } else {
           exists.quantity += product.quantity;
+          await cart.save();
         }
       }
 
       if (!cart.items.length) {
-        return { statusCode: 200, body: { cart: null } };
+        return { statusCode: 200, body: JSON.stringify({ cart: null }) };
       }
 
       await cart.save();

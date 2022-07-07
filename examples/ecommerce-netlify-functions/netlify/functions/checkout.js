@@ -7,6 +7,7 @@ const connect = require('../../index');
 
 const handler = async(event) => {
   try {
+    event.body = JSON.parse(event.body || {});
     await connect();
     const cart = await Cart.findOne({ _id: event.body.cartId });
 

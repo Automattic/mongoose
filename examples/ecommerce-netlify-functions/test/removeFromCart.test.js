@@ -31,6 +31,7 @@ describe('Remove From Cart', function() {
         ]
       }
     };
+    params.body = JSON.stringify(params.body);
     const result = await addToCart(params);
     result.body = JSON.parse(result.body);
     assert(result.body);
@@ -43,6 +44,7 @@ describe('Remove From Cart', function() {
         }
       }
     };
+    newParams.body = JSON.stringify(newParams.body);
     const remove = await removeFromCart(newParams);
     remove.body = JSON.parse(remove.body);
     assert.equal(remove.body.items.length, 1);
@@ -60,6 +62,7 @@ describe('Remove From Cart', function() {
         ]
       }
     };
+    params.body = JSON.stringify(params.body);
     const result = await addToCart(params);
     result.body = JSON.parse(result.body);
     assert(result.body);
@@ -73,6 +76,7 @@ describe('Remove From Cart', function() {
         }
       }
     };
+    newParams.body = JSON.stringify(newParams.body);
     const remove = await removeFromCart(newParams);
     remove.body = JSON.parse(remove.body);
     assert.equal(remove.body.items[0].quantity, 1);

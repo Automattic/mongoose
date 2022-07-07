@@ -30,6 +30,7 @@ describe('Checkout', function() {
         ]
       }
     };
+    params.body = JSON.stringify(params.body);
     const result = await addToCart(params);
     result.body = JSON.parse(result.body);
     assert(result.body);
@@ -46,6 +47,7 @@ describe('Checkout', function() {
     params.body.state = 'Florida';
     params.body.zip = '33145';
     params.body.shipping = 'standard';
+    params.body = JSON.stringify(params.body);
     const finish = await checkout(params);
     finish.body = JSON.parse(finish.body);
     assert(finish.body.order);

@@ -98,7 +98,7 @@
     "test-tsd": "node ./test/types/check-types-filename && tsd",
     "tdd": "mocha ./test/*.test.js --inspect --watch --recursive --watch-files ./**/*.{js,ts}",
     "test-coverage": "nyc --reporter=html --reporter=text npm test",
-    "ts-benchmark": "ts-benchmark -p ./benchmarks/typescript/simple -f 17 18 29 32",
+    "ts-benchmark": "node ./benchmarks/typescript.js",
     "ts-benchmark-watch": "ts-benchmark -p ./benchmarks/typescript/simple -w ./types -i -s -f 17 18 29 32 -b master"
   },
   "main": "./index.js",

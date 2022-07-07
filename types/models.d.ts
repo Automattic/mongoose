@@ -106,7 +106,7 @@ declare module 'mongoose' {
     checkKeys?: boolean;
     j?: boolean;
     safe?: boolean | WriteConcern;
-    timestamps?: boolean;
+    timestamps?: boolean | QueryTimestampsConfig;
     validateBeforeSave?: boolean;
     validateModifiedOnly?: boolean;
     w?: number | string;

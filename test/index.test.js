@@ -1087,7 +1087,7 @@ describe('mongoose module:', function() {
     });
   });
   describe('global id option', function() {
-    it('can diable the id virtual on schemas gh-11966', async function() {
+    it('can disable the id virtual on schemas gh-11966', async function() {
       const m = new mongoose.Mongoose();
       m.set('id', false);
 

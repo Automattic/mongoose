@@ -234,11 +234,6 @@ function parse() {
         ctx.string = ctx.string + "()";
       }
 
-      // fixing up "something.prototypemissingdot" to "something.prototype.missingdot"
-      if (/\.prototype[^.]/.test(ctx.string)) {
-        ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
-      }
-
       // Backwards compat anchors
       if (typeof ctx.constructor === 'string') {
         ctx.anchorId = `${ctx.constructor.toLowerCase()}_${ctx.constructor}-${ctx.name}`;

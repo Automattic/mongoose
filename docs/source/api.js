@@ -134,7 +134,7 @@ function parse() {
       for (const tag of prop.tags) {
         switch (tag.type) {
           case 'receiver':
-            ctx.constructor = tag.string;
+            console.warn(`Found "@receiver" tag in ${ctx.constructor} ${ctx.name}`);
             break;
           case 'property':
             ctx.type = 'property';

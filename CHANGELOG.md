@@ -1,3 +1,11 @@
+6.4.4 / 2022-07-08
+==================
+ * fix(types): allow using an object to configure timestamps #12061 [lantw44](https://github.com/lantw44)
+ * fix(types): support findOneAndReplace with rawResult #12062 [lantw44](https://github.com/lantw44)
+ * docs: upgrade API documentation parser #12078 #12072 #12071 #12024 [hasezoey](https://github.com/hasezoey)
+ * docs(document): add more info on $isNew #11990
+ * docs: add SchemaType doValidate() to docs #12068
+
 6.4.3 / 2022-07-05
 ==================
  * fix(document): handle validating deeply nested subdocuments underneath nested paths with required: false #12021

@@ -31,6 +31,6 @@ jobs:
 
       - run: npm install
 
-      - run: npx ts-benchmark -p ./benchmarks/typescript/simple -f 17/100000 18 29 32 -b master
+      - run: npx ts-benchmark -p ./benchmarks/typescript/simple -f 17/100000 18 29 32 -b master --colors
         env:
           DB_URL: ${{ secrets.DB_URL }}

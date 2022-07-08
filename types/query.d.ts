@@ -90,6 +90,11 @@ declare module 'mongoose' {
     [key: string]: any;
   };
 
+  interface QueryTimestampsConfig {
+    createdAt?: boolean;
+    updatedAt?: boolean;
+  }
+
   interface QueryOptions<DocType = unknown> extends
     PopulateOption,
     SessionOption {
@@ -157,7 +162,7 @@ declare module 'mongoose' {
      * skip timestamps for this update. Note that this allows you to overwrite
      * timestamps. Does nothing if schema-level timestamps are not set.
      */
-    timestamps?: boolean;
+    timestamps?: boolean | QueryTimestampsConfig;
     upsert?: boolean;
     writeConcern?: mongodb.WriteConcern;
 

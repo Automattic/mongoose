@@ -8456,13 +8456,11 @@ describe('Model', function() {
       }, { timestamps: true });
 
       const User = db.model('User', userSchema);
-      mongoose.set('debug', true);
       const userToUpdate = await User.create({ name: 'Hafez', createdAt: new Date('1994-12-04'), updatedAt: new Date('1994-12-04') });
       userToUpdate.name = 'John Doe';
 
       // Act
       await User.bulkSave([userToUpdate], { timestamps: false });
-      mongoose.set('debug', false);
 
       // Assert
       assert.deepStrictEqual(userToUpdate.createdAt, new Date('1994-12-04'));

@@ -32,7 +32,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/add/#mongodb-expression-exp.-add
        */
-      $add: (NumberExpression | DateExpression)[];
+      $add: Expression[];
     }
 
     export interface Ceil {
@@ -1043,7 +1043,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cond/#mongodb-expression-exp.-cond
        */
-      $cond: { if: BooleanExpression | ConditionalExpressionOperator, then: AnyExpression, else: AnyExpression } | [BooleanExpression, AnyExpression, AnyExpression];
+      $cond: { if: Expression, then: AnyExpression, else: AnyExpression } | [BooleanExpression, AnyExpression, AnyExpression];
     }
 
     export interface IfNull {
@@ -1967,7 +1967,7 @@ declare module 'mongoose' {
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/avg/#mongodb-expression-exp.-avg
        */
-      $avg: ArrayExpression;
+      $avg: Expression;
     }
 
     export interface Count {
@@ -2316,6 +2316,21 @@ declare module 'mongoose' {
       $toObjectId: Expression;
     }
 
+    export interface Top {
+      $top: {
+        sortBy: AnyObject,
+        output: Expression
+      };
+    }
+
+    export interface TopN {
+      $topN: {
+        n: Expression,
+        sortBy: AnyObject,
+        output: Expression
+      };
+    }
+
     export interface ToString {
       /**
        * Converts a value to a string. If the value cannot be converted to a string, $toString errors. If the value is
@@ -2407,6 +2422,8 @@ declare module 'mongoose' {
     AccumulatorOperator |
     VariableExpressionOperator |
     WindowOperator |
+    Expression.Top |
+    Expression.TopN |
     any;
 
   export type NullExpression = null;

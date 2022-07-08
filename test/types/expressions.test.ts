@@ -78,6 +78,16 @@ const timewithOffset430DateToString: Expression = { $dateToString: { format: '%H
 const minutesOffsetNYDateToString: Expression = { $dateToString: { format: '%Z', date: '$date', timezone: 'America/New_York' } };
 const minutesOffset430DateToString: Expression = { $dateToString: { format: '%Z', date: '$date', timezone: '+04:30' } };
 
+const topN: Expression.TopN = {
+  $topN: {
+    output: ['$playerId', '$score'],
+    sortBy: { score: 1 },
+    n: 3
+  }
+};
+
+const d: Expression.Avg = { $avg: { $subtract: [{ $ifNull: ['$end', new Date()] }, '$start'] } };
+
 const dateSubtract1: Expression = {
   $dateSubtract:
   {
@@ -156,6 +166,21 @@ const letExpr: Expression = {
       discounted: { $cond: { if: '$applyDiscount', then: 0.9, else: 1 } }
     },
     in: { $multiply: ['$$total', '$$discounted'] }
+  }
+};
+
+const addWithNull: Expression.Add = {
+  $add: [
+    '$price',
+    { $ifNull: ['$tax', 0] }
+  ]
+};
+
+const condWithIn: Expression.Cond = {
+  $cond: {
+    if: { $in: [] },
+    then: '$foo',
+    else: '$bar'
   }
 };
 

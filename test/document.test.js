@@ -11506,6 +11506,51 @@ describe('document', function() {
     assert.equal(subdocs[0].value, 'test');
     assert.ok(subdocs[1].nestedSettings);
   });
+
+  it('handles validation errors on deeply nested subdocuments underneath a nested path (gh-12021)', async function() {
+    const SubSubSchema = new mongoose.Schema(
+      {
+        from: {
+          type: mongoose.Schema.Types.String,
+          required: true
+        }
+      },
+      { _id: false }
+    );
+
+    const SubSchema = new mongoose.Schema(
+      {
+        nested: {
+          type: SubSubSchema,
+          required: false // <-- important
+        }
+      },
+      { _id: false }
+    );
+
+    const TestLeafSchema = new mongoose.Schema({
+      testProp: {
+        testSubProp: {
+          type: SubSchema,
+          required: true
+        }
+      }
+    });
+
+    const TestLeafModel = mongoose.model('test-leaf-model', TestLeafSchema);
+
+    const testModelInstance = new TestLeafModel({
+      testProp: {
+        testSubProp: {
+          nested: { from: null }
+        }
+      }
+    });
+
+    const err = await testModelInstance.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['testProp.testSubProp.nested.from']);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

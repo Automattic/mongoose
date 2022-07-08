@@ -52,3 +52,5 @@ index.html
 
 # yarn package-lock
 yarn.lock
+
+examples/ecommerce-netlify-functions/.netlify/state.json

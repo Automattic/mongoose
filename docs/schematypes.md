@@ -279,8 +279,9 @@ const schema2 = new Schema({
 
 <h5>Date</h5>
 
-* `min`: Date
-* `max`: Date
+* `min`: Date, creates a [validator](./validation.html) that checks if the value is greater than or equal to the given minimum.
+* `max`: Date, creates a [validator](./validation.html) that checks if the value is less than or equal to the given maximum.
+* `expires`: Number or String, creates a TTL index with the value expressed in seconds.
 
 <h5>ObjectId</h5>
 

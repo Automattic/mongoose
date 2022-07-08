@@ -64,7 +64,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       nData.likes = data.likes;
       nData.address = data.address;
       user.insertOne(nData, function (err, res) {
-        dIds.push(res.insertedIds);
+        dIds.push(res.insertedId);
         --count || next();
       });
     }

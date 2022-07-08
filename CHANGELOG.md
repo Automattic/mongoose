@@ -1,3 +1,13 @@
+6.4.3 / 2022-07-05
+==================
+ * fix(document): handle validating deeply nested subdocuments underneath nested paths with required: false #12021
+ * fix(types): infer schematype type from schema paths when calling `SchemaType.path()` #11987
+ * fix(types): add $top and $topN aggregation operators #12053
+ * fix(types): clean up a couple of issues with $add and $ifNull #12017
+ * fix(types): allow $cond with $in #12028
+ * docs: add path level descending index example in docs #12023 [MitchellCash](https://github.com/MitchellCash)
+ * docs: add Buffer, Decimal128, Map to docs #11971
+
 6.4.2 / 2022-07-01
 ==================
  * fix: keep autoIndex & autoCreate as true by default if read preference is primaryPreferred #11976

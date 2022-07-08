@@ -126,26 +126,29 @@ function parse() {
         ctx.constructorWasUndefined = true;
       }
 
+      // helper function to keep translating array types to string consistent
+      function convertTypesToString(types) {
+        return Array.isArray(types) ? types.join('|') : types
+      }
+
       for (const tag of prop.tags) {
         switch (tag.type) {
           case 'receiver':
-            ctx.constructor = tag.string;
+            console.warn(`Found "@receiver" tag in ${ctx.constructor} ${ctx.name}`);
             break;
           case 'property':
             ctx.type = 'property';
 
-            // somewhere since 6.0 the "string" property came back, which was gone with 4.5
-            let str = tag.string;
-            
-            const match = str.match(/^{\w+}/);
-            if (match != null) {
-              ctx.type = match[0].substring(1, match[0].length - 1);
-              str = str.replace(/^{\w+}\s*/, '');
+            // using "name" over "string" because "string" also contains the type and maybe other stuff
+            ctx.name = tag.name;
+            // only assign "type" if there are types
+            if (tag.types.length > 0) {
+              ctx.type = convertTypesToString(tag.types);
             }
-            ctx.name = str;
+
             break;
           case 'type':
-            ctx.type = Array.isArray(tag.types) ? tag.types.join('|') : tag.types;
+            ctx.type = convertTypesToString(tag.types);
             break;
           case 'static':
             ctx.type = 'property';
@@ -184,7 +187,7 @@ function parse() {
               tag.types.push('null');
             }
             if (tag.types) {
-              tag.types = tag.types.join('|');
+              tag.types = convertTypesToString(tag.types);
             }
             ctx[tag.type].push(tag);
             if (tag.name != null && tag.name.startsWith('[') && tag.name.endsWith(']') && tag.name.includes('.')) {

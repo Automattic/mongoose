@@ -8449,7 +8449,7 @@ describe('Model', function() {
       assert.ok(res);
     });
 
-    xit('accepts `timestamps: false` (gh-12059)', async() => {
+    it('accepts `timestamps: false` (gh-12059)', async() => {
       // Arrange
       const userSchema = new Schema({
         name: { type: String, minLength: 5 }

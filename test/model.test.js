@@ -8272,7 +8272,6 @@ describe('Model', function() {
 
     });
     it('throws an error on failure', async() => {
-
       const userSchema = new Schema({
         name: { type: String, unique: true }
       });
@@ -8292,8 +8291,8 @@ describe('Model', function() {
 
       const err = await User.bulkSave(users).then(() => null, err => err);
       assert.ok(err);
-
     });
+
     it('changes document state from `isNew` `false` to `true`', async() => {
 
       const userSchema = new Schema({

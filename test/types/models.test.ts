@@ -319,3 +319,22 @@ function gh11911() {
     update: changes
   });
 }
+
+
+function gh12059() {
+
+  interface IAnimal {
+    name?: string;
+  }
+
+  const animalSchema = new Schema<IAnimal>({
+    name: { type: String }
+  });
+
+  const Animal = model<IAnimal>('Animal', animalSchema);
+  const animal = new Animal();
+
+  Animal.bulkSave([animal], { timestamps: false });
+  Animal.bulkSave([animal], { timestamps: true });
+  Animal.bulkSave([animal], {});
+}

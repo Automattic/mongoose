@@ -8117,9 +8117,65 @@ describe('Model', function() {
 
       assert.equal(writeOperations.length, 3);
     });
-  });
 
-  describe('bulkSave() (gh-9673)', function() {
+    it('accepts `timestamps: false` (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const newUser = new User({ name: 'Hafez' });
+      const userToUpdate = await User.create({ name: 'Hafez' });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: false, skipValidation: true });
+
+      // Assert
+      const timestampsOptions = writeOperations.map(writeOperation => writeOperation.timestamps);
+      assert.deepEqual(timestampsOptions, [false, false]);
+    });
+    it('accepts `timestamps: true` (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const newUser = new User({ name: 'Hafez' });
+      const userToUpdate = await User.create({ name: 'Hafez' });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: true, skipValidation: true });
+
+      // Assert
+      const timestampsOptions = writeOperations.map(writeOperation => writeOperation.timestamps);
+      assert.deepEqual(timestampsOptions, [true, true]);
+    });
+    it('`timestamps` has `undefined` as default value (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const newUser = new User({ name: 'Hafez' });
+      const userToUpdate = await User.create({ name: 'Hafez' });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { skipValidation: true });
+
+      // Assert
+      const timestampsOptions = writeOperations.map(writeOperation => writeOperation.timestamps);
+      assert.deepEqual(timestampsOptions, [undefined, undefined]);
+    });
+  });
     it('saves new documents', async function() {
 
       const userSchema = new Schema({

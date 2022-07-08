@@ -40,6 +40,7 @@ for (const filename of files) {
         });
         const err = content.validateSync();
         if (err != null) {
+          console.log(content);
           throw err;
         }
         contents.push(content);

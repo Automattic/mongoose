@@ -8134,7 +8134,10 @@ describe('Model', function() {
       const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: false, skipValidation: true });
 
       // Assert
-      const timestampsOptions = writeOperations.map(writeOperation => writeOperation.timestamps);
+      const timestampsOptions = writeOperations.map(writeOperationContainer => {
+        const operationObject = writeOperationContainer.updateOne || writeOperationContainer.insertOne;
+        return operationObject.timestamps;
+      });
       assert.deepEqual(timestampsOptions, [false, false]);
     });
     it('accepts `timestamps: true` (gh-12059)', async() => {
@@ -8153,7 +8156,10 @@ describe('Model', function() {
       const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: true, skipValidation: true });
 
       // Assert
-      const timestampsOptions = writeOperations.map(writeOperation => writeOperation.timestamps);
+      const timestampsOptions = writeOperations.map(writeOperationContainer => {
+        const operationObject = writeOperationContainer.updateOne || writeOperationContainer.insertOne;
+        return operationObject.timestamps;
+      });
       assert.deepEqual(timestampsOptions, [true, true]);
     });
     it('`timestamps` has `undefined` as default value (gh-12059)', async() => {
@@ -8172,10 +8178,15 @@ describe('Model', function() {
       const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { skipValidation: true });
 
       // Assert
-      const timestampsOptions = writeOperations.map(writeOperation => writeOperation.timestamps);
+      const timestampsOptions = writeOperations.map(writeOperationContainer => {
+        const operationObject = writeOperationContainer.updateOne || writeOperationContainer.insertOne;
+        return operationObject.timestamps;
+      });
       assert.deepEqual(timestampsOptions, [undefined, undefined]);
     });
   });
+
+  describe('bulkSave() (gh-9673)', function() {
     it('saves new documents', async function() {
 
       const userSchema = new Schema({
@@ -8436,6 +8447,69 @@ describe('Model', function() {
       // !!! "TypeError: path.indexOf is not a function" occurs here
       const res = await model.bulkSave(entries);
       assert.ok(res);
+    });
+
+    xit('accepts `timestamps: false` (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      }, { timestamps: true });
+
+      const User = db.model('User', userSchema);
+      mongoose.set('debug', true);
+      const userToUpdate = await User.create({ name: 'Hafez', createdAt: new Date('1994-12-04'), updatedAt: new Date('1994-12-04') });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      await User.bulkSave([userToUpdate], { timestamps: false });
+      mongoose.set('debug', false);
+
+      // Assert
+      assert.deepStrictEqual(userToUpdate.createdAt, new Date('1994-12-04'));
+      assert.deepStrictEqual(userToUpdate.updatedAt, new Date('1994-12-04'));
+    });
+
+    it('accepts `timestamps: true` (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      }, { timestamps: true });
+
+      const User = db.model('User', userSchema);
+
+      const newUser = new User({ name: 'Hafez' });
+      const userToUpdate = await User.create({ name: 'Hafez' });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      await User.bulkSave([newUser, userToUpdate], { timestamps: true });
+
+      // Assert
+      assert.ok(newUser.createdAt);
+      assert.ok(newUser.updatedAt);
+      assert.ok(userToUpdate.createdAt);
+      assert.ok(userToUpdate.updatedAt);
+    });
+    it('`timestamps` has `undefined` as default value (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      }, { timestamps: true });
+
+      const User = db.model('User', userSchema);
+
+      const newUser = new User({ name: 'Hafez' });
+      const userToUpdate = await User.create({ name: 'Hafez' });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      await User.bulkSave([newUser, userToUpdate]);
+
+      // Assert
+      assert.ok(newUser.createdAt);
+      assert.ok(newUser.updatedAt);
+      assert.ok(userToUpdate.createdAt);
+      assert.ok(userToUpdate.updatedAt);
     });
   });
 

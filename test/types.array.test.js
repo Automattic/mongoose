@@ -1192,7 +1192,7 @@ describe('types array', function() {
       assert.ifError(doc.validateSync());
       assert.deepEqual(doc.arr.toObject(), ['good', 'foo']);
 
-      // test also having the property option set to false
+      // test also having the property option set
 
       const bothSchema = new Schema({ arr: { castNonArrays: true, type: [String] }, docArr: { castNonArrays: true, type: [{ name: String }] } });
       const bothModel = db.model('Test2', bothSchema);

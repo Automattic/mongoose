@@ -2448,7 +2448,8 @@ declare module 'mongoose' {
     BinaryExpression |
     FunctionExpression |
     ObjectIdExpression |
-    ConditionalExpressionOperator;
+    ConditionalExpressionOperator |
+    Expression.Let;
 
   export type ObjectIdExpression =
     TypeExpressionOperatorReturningObjectId;

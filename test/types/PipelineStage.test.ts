@@ -392,3 +392,12 @@ const stages3: PipelineStage[] = [
     }
   }
 ];
+
+
+const nestedAddFieldsExpr: PipelineStage.AddFields = {
+  $addFields: {
+    parent: {
+      nestedField: { $add: ['$a', '$b'] }
+    }
+  }
+};

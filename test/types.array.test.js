@@ -2151,4 +2151,30 @@ describe('types array', function() {
     assert.strictEqual(doc.arr[0], '42');
     assert.strictEqual(arr[0], 42);
   });
+
+  it('test "castNonArrays" property option', function() {
+    const Model = db.model('Test', new Schema({ x1: { castNonArrays: false, type: [String] }, x2: { castNonArrays: true, type: [String] }, x3: { type: [String] } }));
+
+    const string = 'hello';
+
+    // error testing
+    let doc = new Model({ x1: string });
+    const validateErrors = doc.validateSync().errors;
+    assert.ok(validateErrors);
+    assert.equal(validateErrors['x1'].name, 'CastError');
+
+    // good testing
+    doc = new Model({ x2: string });
+    assert.ifError(doc.validateSync());
+    doc.x2.push('foo');
+    assert.ifError(doc.validateSync());
+    assert.deepEqual(doc.x2.toObject(), ['hello', 'foo']);
+
+    // without option (default)
+    doc = new Model({ x3: string });
+    assert.ifError(doc.validateSync());
+    doc.x3.push('foo');
+    assert.ifError(doc.validateSync());
+    assert.deepEqual(doc.x3.toObject(), ['hello', 'foo']);
+  });
 });

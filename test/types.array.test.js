@@ -1192,6 +1192,21 @@ describe('types array', function() {
       assert.ifError(doc.validateSync());
       assert.deepEqual(doc.arr.toObject(), ['good', 'foo']);
 
+      // test also having the property option set to false
+
+      const bothSchema = new Schema({ arr: { castNonArrays: true, type: [String] }, docArr: { castNonArrays: true, type: [{ name: String }] } });
+      const bothModel = db.model('Test2', bothSchema);
+      let bothdoc = new bothModel({ arr: 'fail', docArr: { name: 'fail' } });
+      assert.ok(bothdoc.validateSync().errors);
+      assert.equal(bothdoc.validateSync().errors['arr'].name, 'CastError');
+      assert.equal(bothdoc.validateSync().errors['docArr'].name, 'CastError');
+
+      bothdoc = new bothModel({ arr: ['good'] });
+      assert.ifError(bothdoc.validateSync());
+      bothdoc.arr.push('foo');
+      assert.ifError(bothdoc.validateSync());
+      assert.deepEqual(bothdoc.arr.toObject(), ['good', 'foo']);
+
       return Promise.resolve();
     });
 

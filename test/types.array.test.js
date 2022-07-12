@@ -1194,12 +1194,11 @@ describe('types array', function() {
 
       // test also having the property option set
 
+      // the following should work because "castNonArrays" (property option) overwrites global
       const bothSchema = new Schema({ arr: { castNonArrays: true, type: [String] }, docArr: { castNonArrays: true, type: [{ name: String }] } });
       const bothModel = db.model('Test2', bothSchema);
       let bothdoc = new bothModel({ arr: 'fail', docArr: { name: 'fail' } });
-      assert.ok(bothdoc.validateSync().errors);
-      assert.equal(bothdoc.validateSync().errors['arr'].name, 'CastError');
-      assert.equal(bothdoc.validateSync().errors['docArr'].name, 'CastError');
+      assert.ifError(doc.validateSync());
 
       bothdoc = new bothModel({ arr: ['good'] });
       assert.ifError(bothdoc.validateSync());
@@ -2191,5 +2190,20 @@ describe('types array', function() {
     doc.x3.push('foo');
     assert.ifError(doc.validateSync());
     assert.deepEqual(doc.x3.toObject(), ['hello', 'foo']);
+  });
+
+  it('`castNonArrays` on specific paths takes precedence over global option', function() {
+    // Arrange
+    const m = new mongoose.Mongoose();
+    m.Schema.Types.Array.options.castNonArrays = false;
+
+    const userSchema = new Schema({ friendsNames: { type: [String], castNonArrays: true } });
+    const User = m.model('User', userSchema);
+
+    // Act
+    const user = new User({ friendsNames: 'Sam' });
+
+    // Assert
+    assert.ifError(user.validateSync());
   });
 });

@@ -51,8 +51,8 @@ declare module 'mongoose' {
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-    syncIndexes(options: mongodb.CreateIndexesOptions | null, callback: Callback<Array<string>>): void;
-    syncIndexes(options?: mongodb.CreateIndexesOptions): Promise<Array<string>>;
+    syncIndexes(options: SyncIndexesOptions | null, callback: Callback<Array<string>>): void;
+    syncIndexes(options?: SyncIndexesOptions): Promise<Array<string>>;
   }
 
   interface IndexesDiff {

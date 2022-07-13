@@ -319,3 +319,12 @@ function gh11911() {
     update: changes
   });
 }
+
+function gh12100() {
+  const schema = new Schema();
+
+  const Model = model('Model', schema);
+
+  Model.syncIndexes({ continueOnError: true, noResponse: true });
+  Model.syncIndexes({ continueOnError: false, noResponse: true });
+}

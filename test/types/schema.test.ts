@@ -429,7 +429,7 @@ export function autoTypedSchema() {
     mixed3: Schema.Types.Mixed,
     objectId1: Schema.Types.ObjectId,
     objectId2: 'ObjectId',
-    objectId3: 'objectId',
+    objectId3: 'ObjectID',
     customSchema: Int8,
     map1: { type: Map, of: String },
     map2: { type: Map, of: Number },
@@ -540,7 +540,7 @@ export type AutoTypedSchemaType = {
     favoritDrink?: 'Tea' | 'Coffee',
     favoritColorMode: 'dark' | 'light'
     friendID?: Types.ObjectId;
-    nestedArray: Array<{
+    nestedArray: Types.DocumentArray<{
       date: Date;
       messages?: number;
     }>
@@ -629,4 +629,76 @@ function gh11987() {
   expectType<SchemaType<string>>(userSchema.path<'name'>('name'));
   expectError(userSchema.path<'foo'>('name'));
   expectType<SchemaTypeOptions<string>>(userSchema.path<'name'>('name').OptionsConstructor);
+}
+
+function gh12030() {
+  const Schema1 = new Schema({
+    users: [
+      {
+        username: { type: String }
+      }
+    ]
+  });
+
+  expectType<{
+    users: {
+      username?: string
+    }[];
+  }>({} as InferSchemaType<typeof Schema1>);
+
+  const Schema2 = new Schema({
+    createdAt: { type: Date, default: Date.now }
+  });
+
+  expectType<{ createdAt: Date }>({} as InferSchemaType<typeof Schema2>);
+
+  const Schema3 = new Schema({
+    users: [
+      new Schema({
+        username: { type: String },
+        credit: { type: Number, default: 0 }
+      })
+    ]
+  });
+
+  expectType<{
+    users: Types.DocumentArray<{
+      credit: number;
+      username?: string;
+    }>;
+  }>({} as InferSchemaType<typeof Schema3>);
+
+
+  const Schema4 = new Schema({
+    data: { type: { role: String }, default: {} }
+  });
+
+  expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema4>);
+
+  const Schema5 = new Schema({
+    data: { type: { role: Object }, default: {} }
+  });
+
+  expectType<{ data: { role?: any } }>({} as InferSchemaType<typeof Schema5>);
+
+  const Schema6 = new Schema({
+    track: {
+      backupCount: {
+        type: Number,
+        default: 0
+      },
+      count: {
+        type: Number,
+        default: 0
+      }
+    }
+  });
+
+  expectType<{
+    track?: {
+      backupCount: number;
+      count: number;
+    };
+  }>({} as InferSchemaType<typeof Schema6>);
+
 }

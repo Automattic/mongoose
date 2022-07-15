@@ -8451,17 +8451,26 @@ describe('Model', function() {
     it('accepts `timestamps: false` (gh-12059)', async() => {
       // Arrange
       const userSchema = new Schema({
-        name: { type: String, minLength: 5 }
+        name: { type: String }
       }, { timestamps: true });
 
       const User = db.model('User', userSchema);
+      const newUser = new User({ name: 'Sam' });
+
       const userToUpdate = await User.create({ name: 'Hafez', createdAt: new Date('1994-12-04'), updatedAt: new Date('1994-12-04') });
       userToUpdate.name = 'John Doe';
 
       // Act
-      await User.bulkSave([userToUpdate], { timestamps: false });
+      await User.bulkSave([newUser, userToUpdate], { timestamps: false });
+
 
       // Assert
+      const createdUserPersistedInDB = await User.findOne({ _id: newUser._id });
+      assert.deepStrictEqual(newUser.createdAt, undefined);
+      assert.deepStrictEqual(newUser.updatedAt, undefined);
+
+      assert.deepStrictEqual(createdUserPersistedInDB.createdAt, undefined);
+      assert.deepStrictEqual(createdUserPersistedInDB.updatedAt, undefined);
       assert.deepStrictEqual(userToUpdate.createdAt, new Date('1994-12-04'));
       assert.deepStrictEqual(userToUpdate.updatedAt, new Date('1994-12-04'));
     });

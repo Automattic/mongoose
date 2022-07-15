@@ -392,3 +392,26 @@ const stages3: PipelineStage[] = [
     }
   }
 ];
+
+const stages4: PipelineStage[] = [
+  {
+    $addFields: {
+      usersCount: {
+        $let: {
+          vars: {
+            users: { $push: '$user' }
+          },
+          in: {
+            $reduce: {
+              input: '$users',
+              initialValue: 0,
+              in: {
+                $cond: { if: { $isArray: '$$this' }, then: { $size: '$$this' }, else: '$$this' }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+];

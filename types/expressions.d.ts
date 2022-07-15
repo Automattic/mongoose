@@ -1067,13 +1067,13 @@ declare module 'mongoose' {
          * - $case
          * - $then
          */
-        $branches: { $case: Expression, then: Expression }[];
+        branches: { case: Expression, then: Expression }[];
         /**
          * The path to take if no branch case expression evaluates to true.
          *
          * Although optional, if default is unspecified and no branch case evaluates to true, $switch returns an error.
          */
-        $default: Expression;
+        default: Expression;
       };
     }
 
@@ -2448,7 +2448,8 @@ declare module 'mongoose' {
     BinaryExpression |
     FunctionExpression |
     ObjectIdExpression |
-    ConditionalExpressionOperator;
+    ConditionalExpressionOperator |
+    Expression.Let;
 
   export type ObjectIdExpression =
     TypeExpressionOperatorReturningObjectId;

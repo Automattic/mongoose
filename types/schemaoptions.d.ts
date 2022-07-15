@@ -202,5 +202,11 @@ declare module 'mongoose' {
      * Query helper functions
      */
     query?: Record<any, <T extends QueryWithHelpers<unknown, DocType>>(this: T, ...args: any) => T> | QueryHelpers,
+
+    /**
+     * Set whether to cast non-array values to arrays.
+     * @default true
+     */
+    castNonArrays?: boolean;
   }
 }

@@ -321,8 +321,8 @@ function gh11911() {
 }
 
 
-function gh12059() {
 
+function gh12059() {
   interface IAnimal {
     name?: string;
   }
@@ -337,4 +337,13 @@ function gh12059() {
   Animal.bulkSave([animal], { timestamps: false });
   Animal.bulkSave([animal], { timestamps: true });
   Animal.bulkSave([animal], {});
+}
+
+function gh12100() {
+  const schema = new Schema();
+
+  const Model = model('Model', schema);
+
+  Model.syncIndexes({ continueOnError: true, noResponse: true });
+  Model.syncIndexes({ continueOnError: false, noResponse: true });
 }

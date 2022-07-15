@@ -2,20 +2,18 @@ name: Benchmark
 on:
   pull_request:
     paths:
-      - '.github/workflows/benchmark.yml'
-      - 'package.json'
-      - 'types/**'
-      - 'benchmarks/typescript/**'
-      - 'benchmarks/typescript.js'
+      - ".github/workflows/benchmark.yml"
+      - "package.json"
+      - "types/**"
+      - "benchmarks/typescript/**"
   push:
     branches:
       - master
     paths:
-      - '.github/workflows/benchmark.yml'
-      - 'package.json'
-      - 'types/**'
-      - 'benchmarks/typescript/**'
-      - 'benchmarks/typescript.js'
+      - ".github/workflows/benchmark.yml"
+      - "package.json"
+      - "types/**"
+      - "benchmarks/typescript/**"
 permissions:
   contents: read
 
@@ -33,6 +31,6 @@ jobs:
 
       - run: npm install
 
-      - run: node ./benchmarks/typescript
+      - run: npx ts-benchmark -p ./benchmarks/typescript/simple -f 17/100000 18 29 32 -b master -g --colors
         env:
           DB_URL: ${{ secrets.DB_URL }}

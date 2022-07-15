@@ -193,3 +193,13 @@ const nullExpr: Expression = {
 const nullNETupleExpr: Expression = {
   $ne: ['$name', null]
 };
+
+const switchExpr: Expression.Switch = {
+  $switch: {
+    branches: [
+      { case: { $eq: ['$name', 'Detlef'] }, then: 'Detlef' },
+      { case: { $eq: ['$name', 'John'] }, then: 'John' }
+    ],
+    default: 'Hello'
+  }
+};

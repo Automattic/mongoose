@@ -337,6 +337,7 @@ function gh12059() {
   Animal.bulkSave([animal], { timestamps: true });
   Animal.bulkSave([animal], {});
 }
+
 function gh12100() {
   const schema = new Schema();
 
@@ -344,5 +345,4 @@ function gh12100() {
 
   Model.syncIndexes({ continueOnError: true, noResponse: true });
   Model.syncIndexes({ continueOnError: false, noResponse: true });
-
 }

@@ -7,7 +7,10 @@ declare module 'mongoose' {
     currentTime?: () => (NativeDate | number);
   }
 
-  interface SchemaOptions {
+  type TypeKeyBaseType = string;
+
+  type DefaultTypeKey = 'type';
+  interface SchemaOptions<PathTypeKey extends TypeKeyBaseType = DefaultTypeKey, DocType = unknown, InstanceMethods = {}, QueryHelpers = {}, StaticMethods = {}, virtuals = {}> {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
      * calling Model.createIndexes() after you successfully connect to MongoDB. If you want to disable
@@ -136,7 +139,7 @@ declare module 'mongoose' {
      * type declaration. However, for applications like geoJSON, the 'type' property is important. If you want to
      * control which key mongoose uses to find type declarations, set the 'typeKey' schema option.
      */
-    typeKey?: string;
+    typeKey?: PathTypeKey;
 
     /**
      * By default, documents are automatically validated before they are saved to the database. This is to
@@ -183,6 +186,21 @@ declare module 'mongoose' {
      * You can suppress the warning by setting { supressReservedKeysWarning: true } schema options. Keep in mind that this
      * can break plugins that rely on these reserved names.
      */
-    supressReservedKeysWarning?: boolean
+    supressReservedKeysWarning?: boolean,
+
+    /**
+     * Model Statics methods.
+     */
+    statics?: Record<any, (this: Model<DocType>, ...args: any) => unknown> | StaticMethods,
+
+    /**
+     * Document instance methods.
+     */
+    methods?: Record<any, (this: HydratedDocument<DocType>, ...args: any) => unknown> | InstanceMethods,
+
+    /**
+     * Query helper functions
+     */
+    query?: Record<any, <T extends QueryWithHelpers<unknown, DocType>>(this: T, ...args: any) => T> | QueryHelpers,
   }
 }

@@ -1,6 +1,22 @@
-import { HydratedDocument, Schema, model, Document, Types, Query, Model, QueryWithHelpers, PopulatedDoc, FilterQuery, UpdateQuery } from 'mongoose';
+import {
+  HydratedDocument,
+  Schema,
+  model,
+  Document,
+  Types,
+  Query,
+  Model,
+  QueryWithHelpers,
+  PopulatedDoc,
+  FilterQuery,
+  UpdateQuery,
+  ApplyBasicQueryCasting,
+  QuerySelector
+} from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { expectError, expectType } from 'tsd';
+import { autoTypedModel } from './models.test';
+import { AutoTypedSchemaType } from './schema.test';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
@@ -161,10 +177,10 @@ function testGenericQuery(): void {
 
 function eachAsync(): void {
   Test.find().cursor().eachAsync((doc) => {
-    expectType<(ITest & { _id: any; })>(doc);
+    expectType<(ITest & { _id: Types.ObjectId; })>(doc);
   });
   Test.find().cursor().eachAsync((docs) => {
-    expectType<(ITest & { _id: any; })[]>(docs);
+    expectType<(ITest & { _id: Types.ObjectId; })[]>(docs);
   }, { batchSize: 2 });
 }
 
@@ -286,4 +302,28 @@ async function gh11602(): Promise<void> {
   expectError(updateResult.lastErrorObject?.modifiedCount);
   expectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
   expectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
+}
+
+function autoTypedQuery() {
+  const AutoTypedModel = autoTypedModel();
+  const query = AutoTypedModel.find();
+  expectType<typeof query>(AutoTypedModel.find().byUserName(''));
+}
+
+function gh11964() {
+  type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>; // redefined here because it's not exported by mongoose
+
+  type WithId<T extends object> = T & { id: string };
+
+  class Repository<T extends object> {
+    /* ... */
+
+    find(id: string) {
+      const idCondition: Condition<WithId<T>>['id'] = id; // error :(
+      const filter: FilterQuery<WithId<T>> = { id }; // error :(
+
+      /* ... */
+    }
+  }
+
 }

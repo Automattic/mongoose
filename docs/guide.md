@@ -143,9 +143,18 @@ We may also define our own custom document instance methods.
 
 ```javascript
 // define a schema
-const animalSchema = new Schema({ name: String, type: String });
+const animalSchema = new Schema({ name: String, type: String },
+{
+  // Assign a function to the "methods" object of our animalSchema through schema options.
+  // By following this approach, there is no need to create a separate TS type to define the type of the instance functions.
+  methods:{
+    findSimilarTypes(cb){
+      return mongoose.model('Animal').find({ type: this.type }, cb);
+    }
+  }
+});
 
-// assign a function to the "methods" object of our animalSchema
+// Or, assign a function to the "methods" object of our animalSchema
 animalSchema.methods.findSimilarTypes = function(cb) {
   return mongoose.model('Animal').find({ type: this.type }, cb);
 };
@@ -169,14 +178,28 @@ dog.findSimilarTypes((err, dogs) => {
 
 <h3 id="statics"><a href="#statics">Statics</a></h3>
 
-You can also add static functions to your model. There are two equivalent
+You can also add static functions to your model. There are three equivalent
 ways to add a static:
 
+- Add a function property to the second argument of the schema-constructor (`statics`)
 - Add a function property to `schema.statics`
 - Call the [`Schema#static()` function](/docs/api.html#schema_Schema-static)
 
 ```javascript
-// Assign a function to the "statics" object of our animalSchema
+
+// define a schema
+const animalSchema = new Schema({ name: String, type: String },
+{
+  // Assign a function to the "statics" object of our animalSchema through schema options.
+  // By following this approach, there is no need to create a separate TS type to define the type of the statics functions. 
+  statics:{
+    findByName(name){
+      return this.find({ name: new RegExp(name, 'i') });
+    }
+  }
+});
+
+// Or, Assign a function to the "statics" object of our animalSchema
 animalSchema.statics.findByName = function(name) {
   return this.find({ name: new RegExp(name, 'i') });
 };
@@ -197,6 +220,20 @@ but for mongoose queries. Query helper methods let you extend mongoose's
 [chainable query builder API](./queries.html).
 
 ```javascript
+
+// define a schema
+const animalSchema = new Schema({ name: String, type: String },
+{
+  // Assign a function to the "query" object of our animalSchema through schema options.
+  // By following this approach, there is no need to create a separate TS type to define the type of the query functions. 
+  query:{
+    byName(name){
+      return this.where({ name: new RegExp(name, 'i') })
+    }
+  }
+});
+
+// Or, Assign a function to the "query" object of our animalSchema
 animalSchema.query.byName = function(name) {
   return this.where({ name: new RegExp(name, 'i') })
 };
@@ -215,7 +252,7 @@ Animal.findOne().byName('fido').exec((err, animal) => {
 <h3 id="indexes"><a href="#indexes">Indexes</a></h3>
 
 MongoDB supports [secondary indexes](http://docs.mongodb.org/manual/indexes/).
-With mongoose, we define these indexes within our `Schema` [at](./api.html#schematype_SchemaType-index) [the](./api.html#schematype_SchemaType-unique) [path](./api.html#schematype_SchemaType-sparse) [level](./api.html#schema_date_SchemaDate-expires) or the `schema` level.
+With mongoose, we define these indexes within our `Schema` [at](./api.html#schematype_SchemaType-index) [the](./api.html#schematype_SchemaType-unique) [path](./api.html#schematype_SchemaType-sparse) [level](./api.html#schemadateoptions_SchemaDateOptions-expires) or the `schema` level.
 Defining indexes at the schema level is necessary when creating
 [compound indexes](https://docs.mongodb.com/manual/core/index-compound/).
 
@@ -223,11 +260,13 @@ Defining indexes at the schema level is necessary when creating
 const animalSchema = new Schema({
   name: String,
   type: String,
-  tags: { type: [String], index: true } // field level
+  tags: { type: [String], index: true } // path level
 });
 
 animalSchema.index({ name: 1, type: -1 }); // schema level
 ```
+
+See [SchemaType#index()](./api.html#schematype_SchemaType-index) for other index options.
 
 When your application starts up, Mongoose automatically calls [`createIndex`](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each defined index in your schema.
 Mongoose will call `createIndex` for each index sequentially, and emit an 'index' event on the model when all the `createIndex` calls succeeded or when there was an error.
@@ -409,6 +448,7 @@ Valid options:
 - [read](#read)
 - [writeConcern](#writeConcern)
 - [shardKey](#shardKey)
+- [statics](#statics)
 - [strict](#strict)
 - [strictQuery](#strictQuery)
 - [toJSON](#toJSON)
@@ -423,6 +463,8 @@ Valid options:
 - [skipVersioning](#skipVersioning)
 - [timestamps](#timestamps)
 - [storeSubdocValidationError](#storeSubdocValidationError)
+- [methods](#methods)
+- [query](#query-helpers)
 
 <h3 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h3>
 

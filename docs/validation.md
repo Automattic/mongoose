@@ -193,3 +193,7 @@ of the array.
 ```javascript
 [require:Update Validators Only Run For Some Operations]
 ```
+
+### Next Up
+
+Now that we've covered `Validation`, let's take a look at [Middleware](/docs/middleware.html).

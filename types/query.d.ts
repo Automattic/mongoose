@@ -1,7 +1,7 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
-  type ApplyBasicQueryCasting<T> = T | T[] | any;
+  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? U : any) | any;
   type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
   type _FilterQuery<T> = {
@@ -90,6 +90,11 @@ declare module 'mongoose' {
     [key: string]: any;
   };
 
+  interface QueryTimestampsConfig {
+    createdAt?: boolean;
+    updatedAt?: boolean;
+  }
+
   interface QueryOptions<DocType = unknown> extends
     PopulateOption,
     SessionOption {
@@ -157,7 +162,7 @@ declare module 'mongoose' {
      * skip timestamps for this update. Note that this allows you to overwrite
      * timestamps. Does nothing if schema-level timestamps are not set.
      */
-    timestamps?: boolean;
+    timestamps?: boolean | QueryTimestampsConfig;
     upsert?: boolean;
     writeConcern?: mongodb.WriteConcern;
 
@@ -579,7 +584,7 @@ declare module 'mongoose' {
     snapshot(val?: boolean): this;
 
     /** Sets the sort order. If an object is passed, values allowed are `asc`, `desc`, `ascending`, `descending`, `1`, and `-1`. */
-    sort(arg?: string | { [key: string]: SortOrder } | undefined | null): this;
+    sort(arg?: string | { [key: string]: SortOrder | { $meta: 'textScore' } } | undefined | null): this;
 
     /** Sets the tailable option (for use with capped collections). */
     tailable(bool?: boolean, opts?: {

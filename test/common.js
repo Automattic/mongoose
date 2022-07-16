@@ -84,6 +84,7 @@ module.exports = function(options) {
 
   const noErrorListener = !!options.noErrorListener;
   delete options.noErrorListener;
+  options.enableUtf8Validation = false;
 
   const conn = mongoose.createConnection(uri, options);
 

@@ -1,5 +1,17 @@
-import { Schema, Document, Model, Types, connection, model } from 'mongoose';
-import { expectError } from 'tsd';
+import { ObjectId } from 'bson';
+import {
+  Schema,
+  Document,
+  Model,
+  connection,
+  model,
+  Types,
+  UpdateQuery,
+  CallbackError
+} from 'mongoose';
+import { expectAssignable, expectError, expectType } from 'tsd';
+import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
+import { UpdateOneModel } from 'mongodb';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -40,9 +52,7 @@ function rawDocSyntax(): void {
 
   const Test = connection.model<ITest, TestModel>('Test', TestSchema);
 
-  const bar = (SomeModel: Model<any, any, any>) => console.log(SomeModel);
-
-  bar(Test);
+  expectType<Model<ITest, {}, ITestMethods, {}>>(Test);
 
   const doc = new Test({ foo: '42' });
   console.log(doc.foo);
@@ -83,7 +93,7 @@ async function insertManyTest() {
   });
 
   const res = await Test.insertMany([{ foo: 'bar' }], { rawResult: true });
-  const ids: Types.ObjectId[] = Object.values(res.insertedIds);
+  expectType<ObjectId>(res.insertedIds[0]);
 }
 
 function schemaStaticsWithoutGenerics() {
@@ -139,13 +149,17 @@ async function gh10359() {
     lastName: string;
   }
 
-  async function foo<T extends Group>(model: Model<any>): Promise<T | null> {
-    const doc: T | null = await model.findOne({ groupId: 'test' }).lean().exec();
+  async function foo(model: Model<User, {}, {}, {}>) {
+    const doc = await model.findOne({ groupId: 'test' }).lean().exec();
+    expectType<string | undefined>(doc?.firstName);
+    expectType<string | undefined>(doc?.lastName);
+    expectType<Types.ObjectId | undefined>(doc?._id);
+    expectType<string | undefined>(doc?.groupId);
     return doc;
   }
 
   const UserModel = model<User>('gh10359', new Schema({ firstName: String, lastName: String, groupId: String }));
-  const u: User | null = await foo<User>(UserModel);
+  foo(UserModel);
 }
 
 const ExpiresSchema = new Schema({
@@ -195,6 +209,38 @@ Project.exists({ name: 'Hello' }, (err, result) => {
   result?._id;
 });
 
+function find() {
+  // no args
+  Project.find();
+
+  // just filter
+  Project.find({});
+  Project.find({ name: 'Hello' });
+
+  // just callback
+  Project.find((error: CallbackError, result: IProject[]) => console.log(error, result));
+
+  // filter + projection
+  Project.find({}, undefined);
+  Project.find({}, null);
+  Project.find({}, { name: 1 });
+  Project.find({}, { name: 0 });
+
+  // filter + callback
+  Project.find({}, (error: CallbackError, result: IProject[]) => console.log(error, result));
+  Project.find({ name: 'Hello' }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+
+  // filter + projection + options
+  Project.find({}, undefined, { limit: 5 });
+  Project.find({}, null, { limit: 5 });
+  Project.find({}, { name: 1 }, { limit: 5 });
+
+  // filter + projection + options + callback
+  Project.find({}, undefined, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+  Project.find({}, null, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+  Project.find({}, { name: 1 }, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+}
+
 function inheritance() {
   class InteractsWithDatabase extends Model {
     async _update(): Promise<void> {
@@ -235,3 +281,67 @@ function bulkWrite() {
   ];
   M.bulkWrite(ops);
 }
+
+export function autoTypedModel() {
+  const AutoTypedSchema = autoTypedSchema();
+  const AutoTypedModel = model('AutoTypeModel', AutoTypedSchema);
+
+  (async() => {
+  // Model-functions-test
+  // Create should works with arbitrary objects.
+    const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' });
+    expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
+
+    const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });
+    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
+    expectType<AutoTypedSchemaType['schema']['description']>(testDoc1.description);
+
+    const testDoc2 = await AutoTypedModel.insertMany([{ userName: 'M0_0a' }]);
+    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc2[0].userName);
+    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc2[0]?.description);
+
+    const testDoc3 = await AutoTypedModel.findOne({ userName: 'M0_0a' });
+    expectType<AutoTypedSchemaType['schema']['userName'] | undefined>(testDoc3?.userName);
+    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc3?.description);
+
+    // Model-statics-functions-test
+    expectType<ReturnType<AutoTypedSchemaType['statics']['staticFn']>>(AutoTypedModel.staticFn());
+
+  })();
+  return AutoTypedModel;
+}
+
+function gh11911() {
+  interface IAnimal {
+    name?: string;
+  }
+
+  const animalSchema = new Schema<IAnimal>({
+    name: { type: String }
+  });
+
+  const Animal = model<IAnimal>('Animal', animalSchema);
+
+  const changes: UpdateQuery<IAnimal> = {};
+  expectAssignable<UpdateOneModel>({
+    filter: {},
+    update: changes
+  });
+}
+
+function gh12100() {
+  const schema = new Schema();
+
+  const Model = model('Model', schema);
+
+  Model.syncIndexes({ continueOnError: true, noResponse: true });
+  Model.syncIndexes({ continueOnError: false, noResponse: true });
+}
+
+(function gh12070() {
+  const schema_with_string_id = new Schema({ _id: String, nickname: String });
+  const TestModel = model('test', schema_with_string_id);
+  const obj = new TestModel();
+
+  expectType<string>(obj._id);
+})();

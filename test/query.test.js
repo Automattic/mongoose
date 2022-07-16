@@ -3962,4 +3962,88 @@ describe('Query', function() {
     assert.equal(result.length, 1);
     assert.equal(result[0].name, '@foo.com');
   });
+
+  it('should return query helper supplied in schema options query property instead of undefined', function(done) {
+    const Model = db.model('Test', new Schema({
+      userName: {
+        type: String,
+        required: [true, 'userName is required']
+      }
+    }, {
+      query: {
+        byUserName(userName) {
+          return this.where({ userName });
+        }
+      }
+    }));
+
+    Model.create({ userName: 'test' }, function(error) {
+      if (error instanceof Error) {
+        return done(error);
+      }
+      Model.find().byUserName('test').exec(function(error, docs) {
+        if (error instanceof Error) {
+          return done(error);
+        }
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].userName, 'test');
+        done();
+      });
+    });
+  });
+
+  it('allows a transform option for lean on a query gh-10423', async function() {
+    const arraySchema = new mongoose.Schema({
+      sub: String
+    });
+    const subDoc = new mongoose.Schema({
+      nickName: String
+    });
+    const testSchema = new mongoose.Schema({
+      name: String,
+      foo: [arraySchema],
+      otherName: subDoc
+    });
+    const Test = db.model('gh10423', testSchema);
+    await Test.create({ name: 'foo', foo: [{ sub: 'Test' }, { sub: 'Testerson' }], otherName: { nickName: 'Bar' } });
+    const result = await Test.find().lean({ transform: (doc) => {
+      delete doc._id;
+      return doc;
+    } });
+    assert(result[0]._id);
+    assert.equal(result[0].otherName._id, undefined);
+    assert.equal(result[0].foo[0]._id, undefined);
+    assert.equal(result[0].foo[1]._id, undefined);
+    const single = await Test.findOne().lean({ transform: (doc) => {
+      delete doc._id;
+      return doc;
+    } });
+    assert(single._id);
+    assert.equal(single.otherName._id, undefined);
+    assert.equal(single.foo[0]._id, undefined);
+    assert.equal(single.foo[0]._id, undefined);
+  });
+
+  it('skips applying default projections over slice projections (gh-11940)', async function() {
+    const commentSchema = new mongoose.Schema({
+      comment: String
+    });
+
+    const testSchema = new mongoose.Schema({
+      name: String,
+      comments: { type: [commentSchema], select: false }
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    const { _id } = await Test.create({
+      name: 'Test',
+      comments: [{ comment: 'test1' }, { comment: 'test2' }]
+    });
+
+    const doc = await Test.findById(_id).slice('comments', [1, 1]);
+    assert.equal(doc.comments.length, 1);
+    assert.equal(doc.comments[0].comment, 'test2');
+
+  });
 });

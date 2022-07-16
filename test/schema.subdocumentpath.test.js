@@ -181,4 +181,22 @@ describe('SubdocumentPath', function() {
 
     mongoose.Schema.Types.Subdocument.set('required', false);
   });
+
+  it('supports setting _id globally (gh-11541) (gh-8883)', function() {
+    mongoose.deleteModel(/Test/);
+    mongoose.Schema.Types.Subdocument.set('_id', false);
+
+    const Model = mongoose.model('Test', mongoose.Schema({
+      nested: mongoose.Schema({
+        test: String
+      })
+    }));
+
+    const doc = new Model({ nested: {} });
+
+    assert.ok(!doc.nested._id);
+
+    delete mongoose.Schema.Types.Subdocument.defaultOptions._id;
+    mongoose.Schema.Types.Subdocument.set('required', false);
+  });
 });

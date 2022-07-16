@@ -1838,7 +1838,6 @@ describe('model: querying:', function() {
     const [a, b, c, d] = await Test.create([docA, docB, docC, docD]);
 
 
-
     assert.equal(a.block.toString('utf8'), 'über');
     assert.equal(b.block.toString('utf8'), 'buffer shtuffs are neat');
     assert.equal(c.block.toString('utf8'), 'hello world');

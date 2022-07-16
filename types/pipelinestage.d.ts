@@ -3,82 +3,82 @@ declare module 'mongoose' {
      * [Stages reference](https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/#aggregation-pipeline-stages)
      */
   export type PipelineStage =
-      | PipelineStage.AddFields
-      | PipelineStage.Bucket
-      | PipelineStage.BucketAuto
-      | PipelineStage.CollStats
-      | PipelineStage.Count
-      | PipelineStage.Facet
-      | PipelineStage.GeoNear
-      | PipelineStage.GraphLookup
-      | PipelineStage.Group
-      | PipelineStage.IndexStats
-      | PipelineStage.Limit
-      | PipelineStage.ListSessions
-      | PipelineStage.Lookup
-      | PipelineStage.Match
-      | PipelineStage.Merge
-      | PipelineStage.Out
-      | PipelineStage.PlanCacheStats
-      | PipelineStage.Project
-      | PipelineStage.Redact
-      | PipelineStage.ReplaceRoot
-      | PipelineStage.ReplaceWith
-      | PipelineStage.Sample
-      | PipelineStage.Search
-      | PipelineStage.Set
-      | PipelineStage.SetWindowFields
-      | PipelineStage.Skip
-      | PipelineStage.Sort
-      | PipelineStage.SortByCount
-      | PipelineStage.UnionWith
-      | PipelineStage.Unset
-      | PipelineStage.Unwind;
+    | PipelineStage.AddFields
+    | PipelineStage.Bucket
+    | PipelineStage.BucketAuto
+    | PipelineStage.CollStats
+    | PipelineStage.Count
+    | PipelineStage.Facet
+    | PipelineStage.GeoNear
+    | PipelineStage.GraphLookup
+    | PipelineStage.Group
+    | PipelineStage.IndexStats
+    | PipelineStage.Limit
+    | PipelineStage.ListSessions
+    | PipelineStage.Lookup
+    | PipelineStage.Match
+    | PipelineStage.Merge
+    | PipelineStage.Out
+    | PipelineStage.PlanCacheStats
+    | PipelineStage.Project
+    | PipelineStage.Redact
+    | PipelineStage.ReplaceRoot
+    | PipelineStage.ReplaceWith
+    | PipelineStage.Sample
+    | PipelineStage.Search
+    | PipelineStage.Set
+    | PipelineStage.SetWindowFields
+    | PipelineStage.Skip
+    | PipelineStage.Sort
+    | PipelineStage.SortByCount
+    | PipelineStage.UnionWith
+    | PipelineStage.Unset
+    | PipelineStage.Unwind;
 
   export namespace PipelineStage {
     export interface AddFields {
       /** [`$addFields` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/) */
-      $addFields: Record<string, any>
+      $addFields: Record<string, AnyExpression>
     }
 
     export interface Bucket {
       /** [`$bucket` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/bucket/) */
       $bucket: {
-        groupBy: any
-        boundaries: any[]
+        groupBy: Expression;
+        boundaries: any[];
         default?: any
-        output?: Record<string, { [op in AccumulatorOperator]?: any }>
+        output?: Record<string, AccumulatorOperator>
       }
     }
 
     export interface BucketAuto {
       /** [`$bucketAuto` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/bucketAuto/) */
       $bucketAuto: {
-        groupBy: any
-        buckets: number
-        output?: Record<string, { [op in AccumulatorOperator]?: any }>
-        granularity?: 'R5' | 'R10' | 'R20' | 'R40' | 'R80' | '1-2-5' | 'E6' | 'E12' | 'E24' | 'E48' | 'E96' | 'E192' | 'POWERSOF2'
+        groupBy: Expression | Record<string, Expression>;
+        buckets: number;
+        output?: Record<string, AccumulatorOperator>;
+        granularity?: 'R5' | 'R10' | 'R20' | 'R40' | 'R80' | '1-2-5' | 'E6' | 'E12' | 'E24' | 'E48' | 'E96' | 'E192' | 'POWERSOF2';
       }
     }
 
     export interface CollStats {
       /** [`$collStats` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/collStats/) */
       $collStats: {
-        latencyStats?: { histograms?: boolean }
-        storageStats?: { scale?: number }
-        count?: {}
-        queryExecStats?: {}
+        latencyStats?: { histograms?: boolean };
+        storageStats?: { scale?: number };
+        count?: Record<string | number | symbol, never>;
+        queryExecStats?: Record<string | number | symbol, never>;
       }
     }
 
     export interface Count {
       /** [`$count` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/count/) */
-      $count: string
+      $count: string;
     }
 
     export interface Facet {
       /** [`$facet` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/facet/) */
-      $facet: Record<string, FacetPipelineStage[]>
+      $facet: Record<string, FacetPipelineStage[]>;
     }
 
     export type FacetPipelineStage = Exclude<PipelineStage, PipelineStage.CollStats | PipelineStage.Facet | PipelineStage.GeoNear | PipelineStage.IndexStats | PipelineStage.Out | PipelineStage.Merge | PipelineStage.PlanCacheStats>;
@@ -86,41 +86,41 @@ declare module 'mongoose' {
     export interface GeoNear {
       /** [`$geoNear` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/) */
       $geoNear: {
-        near: { type: 'Point'; coordinates: [number, number] } | [number, number]
-        distanceField: string
-        distanceMultiplier?: number
-        includeLocs?: string
-        key?: string
-        maxDistance?: number
-        minDistance?: number
-        query?: AnyObject
-        spherical?: boolean
-        uniqueDocs?: boolean
+        near: { type: 'Point'; coordinates: [number, number] } | [number, number];
+        distanceField: string;
+        distanceMultiplier?: number;
+        includeLocs?: string;
+        key?: string;
+        maxDistance?: number;
+        minDistance?: number;
+        query?: AnyObject;
+        spherical?: boolean;
+        uniqueDocs?: boolean;
       }
     }
 
     export interface GraphLookup {
       /** [`$graphLookup` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/graphLookup/) */
       $graphLookup: {
-        from: string
+        from: string;
         startWith: any
-        connectFromField: string
-        connectToField: string
-        as: string
-        maxDepth?: number
-        depthField?: string
-        restrictSearchWithMatch?: AnyObject
+        connectFromField: string;
+        connectToField: string;
+        as: string;
+        maxDepth?: number;
+        depthField?: string;
+        restrictSearchWithMatch?: AnyObject;
       }
     }
 
     export interface Group {
       /** [`$group` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/group) */
-      $group: { _id: any } | { [key: string]: { [op in AccumulatorOperator]?: any } }
+      $group: { _id: any } | { [key: string]: AccumulatorOperator }
     }
 
     export interface IndexStats {
       /** [`$indexStats` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/indexStats/) */
-      $indexStats: {}
+      $indexStats: Record<string | number | symbol, never>;
     }
 
     export interface Limit {
@@ -147,7 +147,7 @@ declare module 'mongoose' {
 
     export interface Match {
       /** [`$match` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/match/) */
-      $match: AnyObject
+      $match: FilterQuery<any>;
     }
 
     export interface Merge {
@@ -155,7 +155,7 @@ declare module 'mongoose' {
       $merge: {
         into: string | { db: string; coll: string }
         on?: string | string[]
-        let?: Record<string, any>
+        let?: Record<string, Expression>
         whenMatched?: 'replace' | 'keepExisting' | 'merge' | 'fail' | Extract<PipelineStage, PipelineStage.AddFields | PipelineStage.Set | PipelineStage.Project | PipelineStage.Unset | PipelineStage.ReplaceRoot | PipelineStage.ReplaceWith>[]
         whenNotMatched?: 'insert' | 'discard' | 'fail'
       }
@@ -168,27 +168,27 @@ declare module 'mongoose' {
 
     export interface PlanCacheStats {
       /** [`$planCacheStats` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/planCacheStats/) */
-      $planCacheStats: {}
+      $planCacheStats: Record<string | number | symbol, never>
     }
 
     export interface Project {
       /** [`$project` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/project/) */
-      $project: { [field: string]: any }
+      $project: { [field: string]: AnyExpression | Expression | Project['$project'] }
     }
 
     export interface Redact {
       /** [`$redact` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/redact/) */
-      $redact: any
+      $redact: Expression;
     }
 
     export interface ReplaceRoot {
       /** [`$replaceRoot` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/replaceRoot/) */
-      $replaceRoot: { newRoot: any }
+      $replaceRoot: { newRoot: AnyExpression }
     }
 
     export interface ReplaceWith {
       /** [`$replaceWith` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/replaceWith/) */
-      $replaceWith: any
+      $replaceWith: ObjectExpressionOperator;
     }
 
     export interface Sample {
@@ -206,13 +206,13 @@ declare module 'mongoose' {
           maxCharsToExamine?: number;
           maxNumPassages?: number;
         };
-        [key: string]: any;
+        [operator: string]: any;
       }
     }
 
     export interface Set {
       /** [`$set` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/set/) */
-      $set: Record<string, any>
+      $set: Record<string, AnyExpression | any>
     }
 
     export interface SetWindowFields {
@@ -222,7 +222,7 @@ declare module 'mongoose' {
         sortBy?: Record<string, 1 | -1>
         output: Record<
         string,
-        { [op in WindowOperator]?: any } & {
+        WindowOperator & {
           window?: {
             documents?: [string | number, string | number]
             range?: [string | number, string | number]
@@ -240,12 +240,12 @@ declare module 'mongoose' {
 
     export interface Sort {
       /** [`$sort` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/sort/) */
-      $sort: Record<string, 1 | -1 | { $meta: 'textScore' }>
+      $sort: Record<string, 1 | -1 | Expression.Meta>
     }
 
     export interface SortByCount {
       /** [`$sortByCount` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/sortByCount/) */
-      $sortByCount: any
+      $sortByCount: Expression;
     }
 
     export interface UnionWith {
@@ -264,9 +264,5 @@ declare module 'mongoose' {
       /** [`$unwind` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/) */
       $unwind: string | { path: string; includeArrayIndex?: string; preserveNullAndEmptyArrays?: boolean }
     }
-
-      type AccumulatorOperator = '$accumulator' | '$addToSet' | '$avg' | '$count' | '$first' | '$last' | '$max' | '$mergeObjects' | '$min' | '$push' | '$stdDevPop' | '$stdDevSamp' | '$sum';
-
-      type WindowOperator = '$addToSet' | '$avg' | '$count' | '$covariancePop' | '$covarianceSamp' | '$derivative' | '$expMovingAvg' | '$integral' | '$max' | '$min' | '$push' | '$stdDevSamp' | '$stdDevPop' | '$sum' | '$first' | '$last' | '$shift' | '$denseRank' | '$documentNumber' | '$rank';
   }
 }

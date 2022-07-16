@@ -959,6 +959,25 @@ describe('document', function() {
 
       assert.ok(foundGroup.toJSON()._users[0].hello);
     });
+
+    it('jsonifying with undefined path (gh-11922)', async function() {
+      const userSchema = new Schema({
+        name: String,
+        friends: [{
+          type: String,
+          transform(friendName) {
+            return `Hi, ${friendName}`;
+          }
+        }]
+      });
+      const User = db.model('User', userSchema);
+      const alice = await User.create({ name: 'Alic', friends: ['Bob', 'Jack'] });
+      const foundAlice = await User.findById(alice._id, { name: true });
+      assert.equal(foundAlice.friends, undefined);
+      const foundAlicJson = foundAlice.toJSON();
+      assert.equal(foundAlicJson.friends, undefined);
+      assert.equal(foundAlicJson.name, 'Alic');
+    });
   });
 
   describe('inspect', function() {
@@ -8346,7 +8365,6 @@ describe('document', function() {
     });
     const Organization = db.model('Test', organizationSchema);
 
-
     const org = new Organization();
     org.set('name', 'MongoDB');
 
@@ -11453,5 +11471,93 @@ describe('document', function() {
     const baz2 = await Baz.create({});
     baz2.bar = bar2;
     assert.ok(baz.populated('bar'));
+  });
+
+  it('$getAllSubdocs gets document arrays underneath a nested path (gh-11917)', function() {
+    const nestedSettingsSchema = new Schema({
+      value: String,
+      active: Boolean
+    });
+
+    const userSettingsSchema = new Schema({
+      nestedSettings: {
+        settingsProps: [nestedSettingsSchema]
+      }
+    });
+
+    const userSchema = new Schema({
+      first_name: String,
+      last_name: String,
+      settings: userSettingsSchema
+    });
+
+    const User = db.model('User', userSchema);
+
+    const doc = new User({
+      settings: {
+        nestedSettings: {
+          settingsProps: [{ value: 'test', active: true }]
+        }
+      }
+    });
+
+    const subdocs = doc.$getAllSubdocs();
+    assert.equal(subdocs.length, 2);
+    assert.equal(subdocs[0].value, 'test');
+    assert.ok(subdocs[1].nestedSettings);
+  });
+
+  it('handles validation errors on deeply nested subdocuments underneath a nested path (gh-12021)', async function() {
+    const SubSubSchema = new mongoose.Schema(
+      {
+        from: {
+          type: mongoose.Schema.Types.String,
+          required: true
+        }
+      },
+      { _id: false }
+    );
+
+    const SubSchema = new mongoose.Schema(
+      {
+        nested: {
+          type: SubSubSchema,
+          required: false // <-- important
+        }
+      },
+      { _id: false }
+    );
+
+    const TestLeafSchema = new mongoose.Schema({
+      testProp: {
+        testSubProp: {
+          type: SubSchema,
+          required: true
+        }
+      }
+    });
+
+    const TestLeafModel = mongoose.model('test-leaf-model', TestLeafSchema);
+
+    const testModelInstance = new TestLeafModel({
+      testProp: {
+        testSubProp: {
+          nested: { from: null }
+        }
+      }
+    });
+
+    const err = await testModelInstance.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['testProp.testSubProp.nested.from']);
+  });
+});
+
+describe('Check if instance function that is supplied in schema option is availabe', function() {
+  it('should give an instance function back rather than undefined', function ModelJS() {
+    const testSchema = new mongoose.Schema({}, { methods: { instanceFn() { return 'Returned from DocumentInstanceFn'; } } });
+    const TestModel = mongoose.model('TestModel', testSchema);
+    const TestDocument = new TestModel({});
+    assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
   });
 });

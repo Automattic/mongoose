@@ -32,6 +32,16 @@ schema.post<Aggregate<any>>('aggregate', async function(res: Array<any>) {
   console.log('Pipeline', this.pipeline(), res[0]);
 });
 
+schema.post<Aggregate<ITest>>('aggregate', function(res, next) {
+  expectType<ITest[]>(res);
+  next();
+});
+
+schema.post<Query<ITest, ITest>>('save', function(res, next) {
+  expectType<Query<ITest, ITest>>(res);
+  next();
+});
+
 schema.pre(['save', 'validate'], { query: false, document: true }, async function applyChanges() {
   await Test.findOne({});
 });
@@ -43,6 +53,11 @@ schema.pre('save', function(next, opts: SaveOptions) {
 
 schema.pre('save', function(next) {
   console.log(this.name);
+});
+
+schema.post<ITest>('save', function(res, next) {
+  expectType<ITest>(res);
+  next();
 });
 
 schema.post<ITest>('save', function() {
@@ -74,6 +89,11 @@ schema.pre<Model<ITest>>('insertMany', function(next, doc: ITest) {
 
 schema.pre<Model<ITest>>('insertMany', function(next, docs: Array<ITest>) {
   console.log(this.name, docs);
+  next();
+});
+
+schema.post<Query<ITest, ITest>>('findOneAndDelete', function(res, next) {
+  expectType<ITest>(res);
   next();
 });
 

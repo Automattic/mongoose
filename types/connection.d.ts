@@ -66,6 +66,11 @@ declare module 'mongoose' {
     close(callback: CallbackWithoutResult): void;
     close(force?: boolean): Promise<void>;
 
+    /** Closes and destroys the connection. Connection once destroyed cannot be reopened */
+    destroy(force: boolean, callback: CallbackWithoutResult): void;
+    destroy(callback: CallbackWithoutResult): void;
+    destroy(force?: boolean): Promise<void>;
+
     /** Retrieves a collection, creating it if not cached. */
     collection<T extends AnyObject = AnyObject>(name: string, options?: mongodb.CreateCollectionOptions): Collection<T>;
 

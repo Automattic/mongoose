@@ -5,9 +5,10 @@
 /// <reference path="./cursor.d.ts" />
 /// <reference path="./document.d.ts" />
 /// <reference path="./error.d.ts" />
+/// <reference path="./expressions.d.ts" />
 /// <reference path="./helpers.d.ts" />
 /// <reference path="./middlewares.d.ts" />
-/// <reference path="./indizes.d.ts" />
+/// <reference path="./indexes.d.ts" />
 /// <reference path="./models.d.ts" />
 /// <reference path="./mongooseoptions.d.ts" />
 /// <reference path="./pipelinestage.d.ts" />
@@ -19,6 +20,7 @@
 /// <reference path="./types.d.ts" />
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
+/// <reference path="./inferschematype.d.ts" />
 
 declare class NativeDate extends global.Date { }
 
@@ -61,16 +63,30 @@ declare module 'mongoose' {
   /* ! ignore */
   export type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
 
+  export function model<TSchema extends Schema = any>(
+    name: string,
+    schema?: TSchema,
+    collection?: string,
+    options?: CompileModelOptions
+  ): Model<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
-    schema?: Schema<T, U, {}, TQueryHelpers>,
+    schema?: Schema<T, any, TQueryHelpers>,
     collection?: string,
     options?: CompileModelOptions
   ): U;
 
   /** Returns an array of model names created on this instance of Mongoose. */
   export function modelNames(): Array<string>;
+
+  /**
+   * Overwrites the current driver used by this Mongoose instance. A driver is a
+   * Mongoose-specific interface that defines functions like `find()`.
+   */
+  export function setDriver(driver: any): Mongoose;
 
   /** The node-mongodb-native driver Mongoose uses. */
   export const mongo: typeof mongodb;
@@ -91,7 +107,14 @@ declare module 'mongoose' {
   export interface AnyObject {
     [k: string]: any
   }
-  export type Require_id<T> = T extends { _id?: any } ? (T & { _id: T['_id'] }) : (T & { _id: Types.ObjectId });
+
+  export type Require_id<T> = T extends { _id?: infer U }
+    ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
+    : T & { _id: Types.ObjectId };
+
+  export type RequireOnlyTypedId<T> = T extends { _id?: infer U; }
+    ? Required<{ _id: U }>
+    : { _id: Types.ObjectId };
 
   export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
 
@@ -120,14 +143,31 @@ declare module 'mongoose' {
     useProjection?: boolean;
   }
 
-  export class Schema<DocType = any, M = Model<DocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any> extends events.EventEmitter {
+  export type DiscriminatorModel<M, T> = T extends Model<infer T1, infer T2, infer T3, infer T4>
+    ?
+    M extends Model<infer M1, infer M2, infer M3, infer M4>
+      ? Model<Omit<M1, keyof T1> & T1, M2 | T2, M3 | T3, M4 | T4>
+      : M
+    : M;
+
+  export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, T> = T extends Schema<infer T1, infer T2, infer T3, infer T4, infer T5>
+    ? Schema<Omit<DocType, keyof T1> & T1, DiscriminatorModel<T2, M>, T3 | TInstanceMethods, T4 | TQueryHelpers, T5 | TVirtuals>
+    : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals>;
+
+  type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
+
+  export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any,
+    TStaticMethods = {},
+    TPathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
+    DocType extends ObtainDocumentType<DocType, EnforcedDocType, TPathTypeKey> = ObtainDocumentType<any, EnforcedDocType, TPathTypeKey>>
+    extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<DocType>>, options?: SchemaOptions);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<TPathTypeKey, FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods>);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefinitionType<DocType>> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
 
     /**
      * Array of child schemas (from document arrays and single nested subdocs)
@@ -141,6 +181,8 @@ declare module 'mongoose' {
 
     /** Returns a copy of this schema */
     clone<T = this>(): T;
+
+    discriminator<T extends Schema = Schema>(name: string, schema: T): DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, T>;
 
     /** Returns a new schema that has the picked `paths` from this schema. */
     pick<T = this>(paths: string[], options?: SchemaOptions): T;
@@ -180,9 +222,10 @@ declare module 'mongoose' {
     methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] } & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<DocType>>;
+    obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>>;
 
     /** Gets/sets schema paths. */
+    path<pathGeneric extends keyof EnforcedDocType>(path: pathGeneric): SchemaType<EnforcedDocType[pathGeneric]>;
     path<ResultType extends SchemaType = SchemaType>(path: string): ResultType;
     path(path: string, constructor: any): this;
 
@@ -198,14 +241,14 @@ declare module 'mongoose' {
     plugin(fn: (schema: Schema<DocType>, opts?: any) => void, opts?: any): this;
 
     /** Defines a post hook for the model. */
-    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T>): this;
-    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
-    post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PostMiddlewareFunction<T>): this;
-    post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
-    post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PostMiddlewareFunction<T, Array<any>>): this;
-    post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, Array<any>>): this;
-    post<T = M>(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<T>): this;
-    post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
+    post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
+    post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
+    post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PostMiddlewareFunction<T, Array<AggregateExtract<T>>>): this;
+    post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, Array<AggregateExtract<T>>>): this;
+    post<T = M>(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<T, T>): this;
+    post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
 
     post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
@@ -401,22 +444,20 @@ declare module 'mongoose' {
     $min?: AnyKeys<TSchema> & AnyObject;
     $max?: AnyKeys<TSchema> & AnyObject;
     $mul?: AnyKeys<TSchema> & AnyObject;
-    $rename?: { [key: string]: string };
+    $rename?: Record<string, string>;
     $set?: AnyKeys<TSchema> & AnyObject;
     $setOnInsert?: AnyKeys<TSchema> & AnyObject;
     $unset?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: AnyKeys<TSchema> & AnyObject;
+    $addToSet?: mongodb.SetFields<TSchema>;
     $pop?: AnyKeys<TSchema> & AnyObject;
-    $pull?: AnyKeys<TSchema> & AnyObject;
-    $push?: AnyKeys<TSchema> & AnyObject;
-    $pullAll?: AnyKeys<TSchema> & AnyObject;
+    $pull?: mongodb.PullOperator<TSchema>;
+    $push?: mongodb.PushOperator<TSchema>;
+    $pullAll?: mongodb.PullAllOperator<TSchema>;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
-    $bit?: {
-      [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
-    };
+    $bit?: Record<string, mongodb.NumericType>;
   };
 
   export type UpdateWithAggregationPipeline = UpdateAggregationStage[];
@@ -474,10 +515,10 @@ declare module 'mongoose' {
   type LeanTypeOrArray<T> = T extends unknown[] ? LeanArray<T> : LeanType<T>;
 
   export type LeanArray<T extends unknown[]> =
-  // By checking if it extends Types.Array we can get the original base type before collapsing down,
-  // rather than trying to manually remove the old types. This matches both Array and DocumentArray
+    // By checking if it extends Types.Array we can get the original base type before collapsing down,
+    // rather than trying to manually remove the old types. This matches both Array and DocumentArray
     T extends Types.Array<infer U> ? LeanTypeOrArray<U>[] :
-      // If it isn't a custom mongoose type we fall back to "do our best"
+    // If it isn't a custom mongoose type we fall back to "do our best"
       T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
   export type _LeanDocument<T> = {
@@ -496,7 +537,7 @@ declare module 'mongoose' {
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 
   // Helpers to simplify checks
-  type IfAny<IFTYPE, THENTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : IFTYPE;
+  type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : ELSETYPE;
   type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
 
   // tests for these two types are located in test/types/lean.test.ts

@@ -9,6 +9,7 @@ const start = require('./common');
 const Promise = require('bluebird');
 const Q = require('q');
 const assert = require('assert');
+const sinon = require('sinon');
 const mongodb = require('mongodb');
 const MongooseError = require('../lib/error/index');
 
@@ -357,6 +358,66 @@ describe('connections:', function() {
 
       // Force close
       db.close(true);
+    });
+  });
+
+  it('destroy connection and remove it permanantly', (done) => {
+    const opts = {};
+    const conn = mongoose.createConnection(start.uri, opts);
+    const MongoClient = mongodb.MongoClient;
+    const stub = sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
+      callback();
+    });
+
+    conn.useDb('test-db');
+
+    const totalConn = mongoose.connections.length;
+
+    conn.destroy(() => {
+      assert.equal(mongoose.connections.length, totalConn - 1);
+      stub.restore();
+      done();
+    });
+  });
+
+  it('verify that attempt to re-open destroyed connection throws error, via promise', (done) => {
+    const opts = {};
+    const conn = mongoose.createConnection(start.uri, opts);
+    const MongoClient = mongodb.MongoClient;
+    const stub = sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
+      callback();
+    });
+
+    conn.useDb('test-db');
+
+    conn.destroy(async() => {
+      try {
+        await conn.openUri(start.uri);
+      } catch (error) {
+        assert.equal(error.message, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
+        stub.restore();
+        done();
+      }
+    });
+  });
+
+  it('verify that attempt to re-open destroyed connection throws error, via callback', (done) => {
+    const opts = {};
+    const conn = mongoose.createConnection(start.uri, opts);
+    const MongoClient = mongodb.MongoClient;
+    const stub = sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
+      callback();
+    });
+
+    conn.useDb('test-db');
+
+    conn.destroy(() => {
+      conn.openUri(start.uri, function(error, result) {
+        assert.equal(result, undefined);
+        assert.equal(error, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
+        stub.restore();
+        done();
+      });
     });
   });
 
@@ -1011,6 +1072,13 @@ describe('connections:', function() {
 
         assert.equal(conn2.get('autoIndex'), false);
         assert.equal(conn2.get('autoCreate'), false);
+      });
+
+      it('keeps autoIndex & autoCreate as true by default if read preference is primaryPreferred (gh-9374)', function() {
+        const conn = new mongoose.createConnection(start.uri, { readPreference: 'primaryPreferred' });
+
+        assert.equal(conn.get('autoIndex'), undefined);
+        assert.equal(conn.get('autoCreate'), undefined);
       });
 
       it('throws if options try to set autoIndex to true', function() {

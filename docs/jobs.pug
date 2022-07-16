@@ -47,6 +47,10 @@ block content
       background-color: #eef0f1;
     }
 
+    .job.active {
+      background-color: #eef0f1;
+    }
+
     .job .at {
       color: #495057;
     }
@@ -76,11 +80,11 @@ block content
       display: none;
     }
 
-    input + label + div + .job-description {
+    input + div + div + .job-description {
       display: none;
     }
 
-    input:checked + label + div + .job-description {
+    input:checked + div + div + .job-description {
       display: block;
     }
 
@@ -96,17 +100,18 @@ block content
       cursor: pointer;
       margin-left: auto;
       margin-right: auto;
-      color: #495057;
+      color: white;
+      font-weight: bold;
     }
 
   div
     each job in jobs
-      .post.job
+      .post.job(id='job-' + job._id)
         .company-logo
           img(src=job.logo)
         label.description(for='checkbox-' + job._id)
           input(id='checkbox-' + job._id, type="checkbox")
-          label.title #{job.title}
+          div.title #{job.title}
           div.at
             span at
             span.company &nbsp;#{job.company}
@@ -117,6 +122,19 @@ block content
             a(href=job.url)
               div.apply Apply
 
+  script window.jobs = !{JSON.stringify(jobs)};
+  script.
+    (function() {
+      if (window.location.hash != null && window.location.hash.length > 1) {
+        const jobId = window.location.hash.replace(/^#/, '');
+        const job = window.jobs.find(job => job._id === jobId);
+        if (job != null) {
+          document.querySelector('#job-' + job._id).classList.add('active');
+          document.querySelector('#checkbox-' + job._id).checked = true;
+        }
+      }
+    })();
+  
   h2 Add Your Own
   div.
     Hiring Node.js and MongoDB developers?

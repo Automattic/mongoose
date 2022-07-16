@@ -1,7 +1,11 @@
 # Schemas in TypeScript
 
 Mongoose [schemas](/docs/guide.html) are how you tell Mongoose what your documents look like.
-Mongoose schemas are separate from TypeScript interfaces, so you need to define both a _document interface_ and a _schema_.
+Mongoose schemas are separate from TypeScript interfaces, so you need to define both a _document interface_ and a _schema_ until V6.3.1.
+Mongoose supports auto typed schemas so you don't need to define additional typescript interface anymore but you are still able to do so.
+Mongoose provides a `InferSchemaType`, which infers the type of the auto typed schema document when needed.
+
+`Until mongoose V6.3.1:`
 
 ```typescript
 import { Schema } from 'mongoose';
@@ -19,6 +23,37 @@ const schema = new Schema<User>({
   email: { type: String, required: true },
   avatar: String
 });
+```
+
+`another approach:`
+
+```typescript
+import { Schema, InferSchemaType } from 'mongoose';
+
+// Document interface
+// No need to define TS interface any more.
+// interface User {
+//   name: string;
+//   email: string;
+//   avatar?: string;
+// }
+
+// Schema
+const schema = new Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  avatar: String
+});
+
+type User = InferSchemaType<typeof schema>;
+// InferSchemaType will determine the type as follows: 
+// type User = {
+//   name: string;
+//   email: string;
+//   avatar?: string;
+// }
+
+
 ```
 
 By default, Mongoose does **not** check if your document interface lines up with your schema.
@@ -51,7 +86,7 @@ Mongoose wraps `DocType` in a Mongoose document for cases like the `this` parame
 For example:
 
 ```typescript
-schema.pre('save', function(): void {
+schema.pre('save', function (): void {
   console.log(this.name); // TypeScript knows that `this` is a `mongoose.Document & User` by default
 });
 ```
@@ -102,7 +137,7 @@ interface User {
 const schema = new Schema<User, Model<User>>({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  avatar: String
+  avatar: String,
 });
 ```
 
@@ -121,13 +156,13 @@ interface BlogPost {
 }
 
 interface User {
-  tags: Types.Array<string>,
-  blogPosts: Types.DocumentArray<BlogPost>
+  tags: Types.Array<string>;
+  blogPosts: Types.DocumentArray<BlogPost>;
 }
 
 const schema = new Schema<User, Model<User>>({
   tags: [String],
-  blogPosts: [{ title: String }]
+  blogPosts: [{ title: String }],
 });
 ```
 

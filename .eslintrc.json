@@ -4,43 +4,71 @@
   ],
   "ignorePatterns": [
     "docs",
+    "tools",
     "dist",
-    "test/files/*"
+    "website.js",
+    "test/files/*",
+    "benchmarks"
   ],
-  "overrides": [{
-    "files": [
-      "**/*.{ts,tsx}"
-    ],
-    "extends": [
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended"
-    ],
-    "plugins": [
-      "@typescript-eslint"
-    ],
-    "rules": {
-      "@typescript-eslint/triple-slash-reference": "off",
-      "spaced-comment": ["error", "always", {
-        "markers": ["/"]
-      }],
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/ban-types": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/indent": ["error", 2, {
-        "SwitchCase": 1
-      }],
-      "@typescript-eslint/prefer-optional-chain": "error",
-      "@typescript-eslint/brace-style": "error",
-      "@typescript-eslint/no-dupe-class-members": "error",
-      "@typescript-eslint/no-redeclare": "error",
-      "@typescript-eslint/type-annotation-spacing": "error",
-      "@typescript-eslint/object-curly-spacing": ["error", "always"],
-      "@typescript-eslint/semi": "error",
-      "@typescript-eslint/space-before-function-paren": ["error", "never"],
-      "@typescript-eslint/space-infix-ops": "off"
+  "overrides": [
+    {
+      "files": [
+        "**/*.{ts,tsx}"
+      ],
+      "extends": [
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+      ],
+      "plugins": [
+        "@typescript-eslint"
+      ],
+      "rules": {
+        "@typescript-eslint/triple-slash-reference": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "spaced-comment": [
+          "error",
+          "always",
+          {
+            "block": {
+              "markers": [
+                "!"
+              ],
+              "balanced": true
+            },
+            "markers": [
+              "/"
+            ]
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/ban-types": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/indent": [
+          "error",
+          2,
+          {
+            "SwitchCase": 1
+          }
+        ],
+        "@typescript-eslint/prefer-optional-chain": "error",
+        "@typescript-eslint/brace-style": "error",
+        "@typescript-eslint/no-dupe-class-members": "error",
+        "@typescript-eslint/no-redeclare": "error",
+        "@typescript-eslint/type-annotation-spacing": "error",
+        "@typescript-eslint/object-curly-spacing": [
+          "error",
+          "always"
+        ],
+        "@typescript-eslint/semi": "error",
+        "@typescript-eslint/space-before-function-paren": [
+          "error",
+          "never"
+        ],
+        "@typescript-eslint/space-infix-ops": "off"
+      }
     }
-  }],
+  ],
   "plugins": [
     "mocha-no-only"
   ],
@@ -158,6 +186,8 @@
     "mocha-no-only/mocha-no-only": [
       "error"
     ],
-    "no-empty": "off"
+    "no-empty": "off",
+    "eol-last": "warn",
+    "no-multiple-empty-lines": ["warn", { "max": 2 }]
   }
 }

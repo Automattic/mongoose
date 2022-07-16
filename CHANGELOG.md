@@ -1,3 +1,88 @@
+6.4.4 / 2022-07-08
+==================
+ * fix(types): allow using an object to configure timestamps #12061 [lantw44](https://github.com/lantw44)
+ * fix(types): support findOneAndReplace with rawResult #12062 [lantw44](https://github.com/lantw44)
+ * docs: upgrade API documentation parser #12078 #12072 #12071 #12024 [hasezoey](https://github.com/hasezoey)
+ * docs(document): add more info on $isNew #11990
+ * docs: add SchemaType doValidate() to docs #12068
+
+6.4.3 / 2022-07-05
+==================
+ * fix(document): handle validating deeply nested subdocuments underneath nested paths with required: false #12021
+ * fix(types): infer schematype type from schema paths when calling `SchemaType.path()` #11987
+ * fix(types): add $top and $topN aggregation operators #12053
+ * fix(types): clean up a couple of issues with $add and $ifNull #12017
+ * fix(types): allow $cond with $in #12028
+ * docs: add path level descending index example in docs #12023 [MitchellCash](https://github.com/MitchellCash)
+ * docs: add Buffer, Decimal128, Map to docs #11971
+
+6.4.2 / 2022-07-01
+==================
+ * fix: keep autoIndex & autoCreate as true by default if read preference is primaryPreferred #11976
+ * fix(types): improve inferred Schema Type to handle nested paths and ObjectIds #12007 [iammola](https://github.com/iammola)
+ * fix(types): avoid inferring doc type from param to create() #12001
+ * fix(types): make populate Paths generic consistently overwrite doc interface #11955
+ * fix(types): allow null at ne expression second parameter #11996 [jyeros](https://github.com/jyeros)
+ * fix(types): change index "weights" to be more explicit #11997 [hasezoey](https://github.com/hasezoey)
+
+6.4.1 / 2022-06-27
+==================
+ * fix(schema): allow 0 for numbers if required and ref both set #11912
+ * fix(query): skip applying default projections over slice projections #11940
+ * fix(types): handle arrays in ApplyBasicQueryCasting correctly #11964
+ * fix(types): fix $match typings #11969 [andreialecu](https://github.com/andreialecu)
+ * fix(types): avoid adding non-existent properties from model constructor for typegoose #11960
+ * fix(types): make Mongoose UpdateQuery compatible with MongoDB `UpdateFilter` #11911
+ * fix(types): simplify MergeType constraints #11978
+ * fix(types): correct references to Buffer for @types/node >= 16.0.0 < 16.6.0 #11963
+ * fix(types): re-add the possibility to pass undefined for projection in Model.find #11965 [ghost91-](https://github.com/ghost91-)
+ * fix(types): fix typo for indexes #11953 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document+types): document merge option #11913
+ * docs: update schematypes.md #11981 [korzio](https://github.com/korzio)
+ * docs: update validation.md #11982 [korzio](https://github.com/korzio)
+
+6.4.0 / 2022-06-17
+==================
+ * feat: upgrade mongodb driver -> 4.7.0 #11909 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(types+document): add $assertPopulated() for working with manually populated paths in TypeScript #11843
+ * feat(mongoose): add setDriver() function to allow overwriting driver in a more consistent way #11900
+ * feat(types): add helpers to infer schema type automatically #11563 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+ * feat: add `transform` option to `lean()` #10423 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(base): add support to set default immutable for createdAt globally #11888 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: make doValidate() on document array elements run validation on the whole subdoc #11902
+ * feat(types): add expression typings to Aggregate stages #11370 [Uzlopak](https://github.com/Uzlopak)
+ * fix: remove `on` from schema reserved keys #11580 [IslandRhythms](https://github.com/IslandRhythms)
+
+6.3.9 / 2022-06-17
+==================
+ * fix(document): handle nested paths underneath subdocuments when getting all subdocuments for pre save hooks #11917
+ * fix(types): correct typing in post aggregate hooks #11924 [GCastilho](https://github.com/GCastilho)
+ * docs: remove connect-option reconnectTries and reconnectInterval #11930 [Uzlopak](https://github.com/Uzlopak)
+
+6.3.8 / 2022-06-13
+==================
+ * fix: revert 670b445b0fc perf optimizations that caused some test failures #11541
+
+6.3.7 / 2022-06-13
+==================
+ * fix(schema+document): allow disabling _id on subdocuments by default #11541
+ * fix(update): respect global strictQuery option when casting array filters #11836
+ * perf(document): avoid unnecessarily creating new options object on every `$set` #11541
+ * fix: toJSON with undefined path #11922 [kerryChen95](https://github.com/kerryChen95)
+ * fix: add refPath to SchemaTypeOptions class #11862
+ * fix(types): handle boolean default functions #11828
+ * docs(populate): make path names in refPath section consistent #11724
+
+6.3.6 / 2022-06-07
+==================
+ * fix(update): apply timestamps to nested subdocs within $push and $addToSet #11775
+ * fix(document): use shallow clone instead of deep clone for `toObject()` options #11776
+ * fix: avoid checking for ObjectId with instanceof #11891 [noseworthy](https://github.com/noseworthy)
+ * fix(types): Allow sorting by text score #11893
+ * fix(types): allow schematype get() functions to return undefined #11561
+ * fix(types): add Schema.discriminator #11855 [Uzlopak](https://github.com/Uzlopak)
+ * fix(types): discriminator generic type not being passed to schema #11898 [GCastilho](https://github.com/GCastilho)
+
 6.3.5 / 2022-05-30
 ==================
  * fix(document): avoid infinite recursion when calling toObject() on self-referencing document #11756

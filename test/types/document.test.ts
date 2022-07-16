@@ -1,5 +1,7 @@
 import { Schema, model, Model, Document, Types } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { expectAssignable, expectError, expectType } from 'tsd';
+import { autoTypedModel } from './models.test';
+import { AutoTypedSchemaType } from './schema.test';
 
 const Drink = model('Drink', new Schema({
   name: String
@@ -52,15 +54,16 @@ void async function run() {
   test.validateSync({ pathsToSkip: ['name', 'age'] });
   test.validateSync({ pathsToSkip: 'name age' });
   test.validateSync({ pathsToSkip: 'name age', blub: 1 });
-  expectType<Promise<ITest & { _id: any; }>>(test.save());
-  expectType<Promise<ITest & { _id: any; }>>(test.save({}));
+  const x = test.save();
+  expectAssignable<Promise<ITest & { _id: any; }>>(test.save());
+  expectAssignable<Promise<ITest & { _id: any; }>>(test.save({}));
   expectType<void>(test.save({}, (err, doc) => {
     expectType<Error | null>(err);
-    expectType<ITest & { _id: any; }>(doc);
+    expectAssignable<ITest & { _id: any; }>(doc);
   }));
   expectType<void>(test.save((err, doc) => {
     expectType<Error | null>(err);
-    expectType<ITest & { _id: any; }>(doc);
+    expectAssignable<ITest & { _id: any; }>(doc);
   }));
 })();
 
@@ -180,4 +183,75 @@ function gh11435() {
 async function gh11598() {
   const doc = await Test.findOne().orFail();
   doc.populate('favoritDrink', undefined, model('temp', new Schema()));
+}
+
+function autoTypedDocument() {
+  const AutoTypedModel = autoTypedModel();
+  const AutoTypeModelInstance = new AutoTypedModel({ unExistProperty: 1, description: 2 });
+
+  expectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
+  expectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
+  expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
+
+  // Document-Methods-tests
+  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
+
+}
+
+async function gh11960() {
+  type DocumentType<T> = Document<any> & T;
+  type SubDocumentType<T> = DocumentType<T> & Types.Subdocument;
+  type ArraySubDocumentType<T> = DocumentType<T> & Types.ArraySubdocument;
+
+  interface Nested {
+    dummy?: string;
+  }
+
+  interface Parent {
+    username?: string;
+    map?: Map<string, string>;
+    nested?: SubDocumentType<Nested>;
+    nestedArray?: ArraySubDocumentType<Nested>[];
+  }
+
+  const NestedSchema = new Schema({
+    dummy: { type: String }
+  });
+
+  const ParentSchema = new Schema({
+    username: { type: String },
+    map: { type: Map, of: String },
+    nested: { type: NestedSchema },
+    nestedArray: [{ type: NestedSchema }]
+  });
+
+  const ParentModel = model<DocumentType<Parent>>('Parent', ParentSchema);
+
+  {
+    const doc = new ParentModel({
+      username: 'user1',
+      map: { key1: 'value1', key2: 'value2' },
+      nested: { dummy: 'hello' },
+      nestedArray: [{ dummy: 'hello again' }]
+    });
+
+    expectType<Document<any, any, any> & Parent & { _id: Types.ObjectId }>(doc);
+    expectType<Map<string, string> | undefined>(doc.map);
+    doc.nested!.parent();
+    doc.nestedArray?.[0].parentArray();
+  }
+
+  {
+    const doc = await ParentModel.create({
+      username: 'user1',
+      map: { key1: 'value1', key2: 'value2' },
+      nested: { dummy: 'hello' },
+      nestedArray: [{ dummy: 'hello again' }]
+    });
+
+    expectType<Document<any, any, any> & Parent & { _id: Types.ObjectId }>(doc);
+    expectType<Map<string, string> | undefined>(doc.map);
+    doc.nested!.parent();
+    doc.nestedArray?.[0].parentArray();
+  }
 }

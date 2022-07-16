@@ -2337,26 +2337,26 @@ describe('document', function() {
       const schema = new mongoose.Schema({
         topLevelField1: {
           nestedField1: String,
-          nestedField2: {type: String, default: 'defValue'}
+          nestedField2: { type: String, default: 'defValue' }
         },
-        topLevelField2: {type: String, default: 'defValue'}
-      })
+        topLevelField2: { type: String, default: 'defValue' }
+      });
 
       const Model = db.model('Test', schema);
-      
+
       const originalData = {
         topLevelField1: {
           nestedField1: 'provided'
         }
-      }
-      
-      const model = new Model(originalData);
+      };
+
+      new Model(originalData);
       assert.deepEqual(originalData, {
         topLevelField1: {
           nestedField1: 'provided'
         }
-      })
-    });  
+      });
+    });
   });
 
   describe('error processing (gh-2284)', async function() {

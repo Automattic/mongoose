@@ -3,7 +3,7 @@
 const stripe = require('../../integrations/stripe')
 
 const { Cart, Order, Product } = require('../../models');
-const connect = require('../../index');
+const connect = require('../../connect');
 
 const handler = async(event) => {
   try {

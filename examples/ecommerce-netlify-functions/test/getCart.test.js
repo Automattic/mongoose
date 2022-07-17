@@ -6,17 +6,7 @@ const { handler: getCart } = require('../netlify/functions/getCart');
 const fixtures = require('./fixtures');
 const mongoose = require('mongoose');
 
-
-
 describe('Get the cart given an id', function() {
-  before(async() => {
-    await mongoose.connect('mongodb://localhost:27017/netlify');
-    await mongoose.connection.dropDatabase();
-  });
-
-  after(async() => {
-    await mongoose.disconnect();
-  });
   it('Should create a cart and then find the cart.', async function() {
     const cart = await fixtures.createCart({ products: null });
     const params = {

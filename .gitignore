@@ -41,7 +41,7 @@ test/files/main.js
 
 package-lock.json
 
-.config*
+.config.js
 
 # Compiled docs
 docs/*.html

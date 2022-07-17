@@ -7,18 +7,7 @@ const { handler: removeFromCart } = require('../netlify/functions/removeFromCart
 const mongoose = require('mongoose');
 const fixtures = require('./fixtures');
 
-
-
 describe('Remove From Cart', function() {
-  before(async() => {
-    await mongoose.connect('mongodb://localhost:27017/netlify');
-    await mongoose.connection.dropDatabase();
-  });
-
-  after(async() => {
-    await mongoose.disconnect();
-  });
-
   it('Should create a cart and then it should remove the entire item from it.', async function() {
     const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
     .then((res) => res.products);
@@ -81,5 +70,4 @@ describe('Remove From Cart', function() {
     remove.body = JSON.parse(remove.body);
     assert.equal(remove.body.items[0].quantity, 1);
   });
-
 });

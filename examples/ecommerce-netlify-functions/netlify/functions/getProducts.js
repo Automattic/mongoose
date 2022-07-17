@@ -1,7 +1,7 @@
 'use strict';
 
 const { Product } = require('../../models');
-const connect = require('../../index');
+const connect = require('../../connect');
 
 const handler = async(event) => {
   try {

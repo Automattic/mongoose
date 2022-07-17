@@ -1,7 +1,7 @@
 'use strict';
 
 const { Cart, Product } = require('../../models');
-const connect = require('../../index');
+const connect = require('../../connect');
 
 const handler = async(event) => {
   try {
@@ -11,6 +11,11 @@ const handler = async(event) => {
     if (event.body.cartId) {
       // get the document containing the specified cartId
       const cart = await Cart.findOne({ _id: event.body.cartId }).setOptions({ sanitizeFilter: true });
+      
+      if (cart == null) {
+        return { statusCode: 404, body: JSON.stringify({ message: 'Cart not found' }) };
+      }
+      
       for (const product of event.body.items) {
         const exists = cart.items.find(item => item.productId.toString() === product.productId.toString());
         if (!exists && products.find(p => product.productId.toString() === p._id.toString())) {

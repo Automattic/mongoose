@@ -6,17 +6,7 @@ const { handler: addToCart } = require('../netlify/functions/addToCart');
 const mongoose = require('mongoose');
 const fixtures = require('../test/fixtures');
 
-
-
 describe('Add to Cart', function() {
-  before(async() => {
-    await mongoose.connect('mongodb://localhost:27017/netlify');
-    await mongoose.connection.dropDatabase();
-  });
-
-  after(async() => {
-    await mongoose.disconnect();
-  });
   it('Should create a cart and add a product to the cart', async function() {
     const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
     .then((res) => res.products);

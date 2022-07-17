@@ -10,14 +10,6 @@ const sinon = require('sinon');
 const stripe = require('../integrations/stripe')
 
 describe('Checkout', function() {
-  before(async() => {
-    await mongoose.connect('mongodb://localhost:27017/netlify');
-    await mongoose.connection.dropDatabase();
-  });
-
-  after(async() => {
-    await mongoose.disconnect();
-  });
   it('Should do a successful checkout run', async function() {
     const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
     .then((res) => res.products);

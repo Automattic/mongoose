@@ -415,3 +415,11 @@ const stages4: PipelineStage[] = [
     }
   }
 ];
+
+(function gh12096() {
+  const data: PipelineStage.AddFields = {
+    $addFields: {
+      name: { $meta: 'Bill' }
+    }
+  };
+})();

@@ -439,7 +439,7 @@ declare module 'mongoose' {
 
   type Mutable<T> = {
     -readonly [K in keyof T]: T[K];
-  }
+  };
 
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */

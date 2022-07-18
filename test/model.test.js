@@ -4346,6 +4346,58 @@ describe('Model', function() {
     await db.close();
   });
 
+  describe('insertMany()', function() {
+    it('with timestamps (gh-723)', function() {
+      const schema = new Schema({ name: String }, { timestamps: true });
+      const Movie = db.model('Movie', schema);
+      const start = Date.now();
+
+      const arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+      return Movie.insertMany(arr).
+        then(docs => {
+          assert.equal(docs.length, 2);
+          assert.ok(!docs[0].isNew);
+          assert.ok(!docs[1].isNew);
+          assert.ok(docs[0].createdAt.valueOf() >= start);
+          assert.ok(docs[1].createdAt.valueOf() >= start);
+        }).
+        then(() => Movie.find()).
+        then(docs => {
+          assert.equal(docs.length, 2);
+          assert.ok(docs[0].createdAt.valueOf() >= start);
+          assert.ok(docs[1].createdAt.valueOf() >= start);
+        });
+    });
+
+    it('insertMany() with nested timestamps (gh-12060)', async function() {
+      const childSchema = new Schema({ name: { type: String } }, {
+        _id: false,
+        timestamps: true
+      });
+
+      const parentSchema = new Schema({ child: childSchema }, {
+        timestamps: true
+      });
+
+      const Test = db.model('Test', parentSchema);
+
+      await Test.insertMany([{ child: { name: 'test' } }]);
+      let docs = await Test.find();
+
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].child.name, 'test');
+      assert.ok(docs[0].child.createdAt);
+      assert.ok(docs[0].child.updatedAt);
+
+      await Test.insertMany([{ child: { name: 'test2' } }], { timestamps: false });
+      docs = await Test.find({ 'child.name': 'test2' });
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].child.name, 'test2');
+      assert.ok(!docs[0].child.createdAt);
+      assert.ok(!docs[0].child.updatedAt);
+    });
+  });
+
   describe('bug fixes', function() {
     it('doesnt crash (gh-1920)', function(done) {
       const parentSchema = new Schema({
@@ -4636,28 +4688,6 @@ describe('Model', function() {
           done();
         });
       });
-    });
-
-    it('insertMany() with timestamps (gh-723)', function() {
-      const schema = new Schema({ name: String }, { timestamps: true });
-      const Movie = db.model('Movie', schema);
-      const start = Date.now();
-
-      const arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
-      return Movie.insertMany(arr).
-        then(docs => {
-          assert.equal(docs.length, 2);
-          assert.ok(!docs[0].isNew);
-          assert.ok(!docs[1].isNew);
-          assert.ok(docs[0].createdAt.valueOf() >= start);
-          assert.ok(docs[1].createdAt.valueOf() >= start);
-        }).
-        then(() => Movie.find()).
-        then(docs => {
-          assert.equal(docs.length, 2);
-          assert.ok(docs[0].createdAt.valueOf() >= start);
-          assert.ok(docs[1].createdAt.valueOf() >= start);
-        });
     });
 
     it('returns empty array if no documents (gh-8130)', function() {
@@ -8638,6 +8668,129 @@ describe('Model', function() {
     assert.strictEqual(indexes.length, 2);
     assert.deepEqual(indexes[1].key, { name: 1 });
     assert.strictEqual(indexes[1].collation.locale, 'en');
+  });
+
+  describe('Model.applyDefaults (gh-11945)', function() {
+    it('applies defaults to POJOs', function() {
+      const Test = db.model('Test', mongoose.Schema({
+        _id: false,
+        name: {
+          type: String,
+          default: 'John Smith'
+        },
+        age: {
+          type: Number,
+          default: 29
+        },
+        nestedName: {
+          first: {
+            type: String,
+            default: 'John'
+          },
+          last: {
+            type: String,
+            default: 'Smith'
+          },
+          middle: {
+            type: String,
+            default: ''
+          }
+        },
+        subdoc: {
+          type: mongoose.Schema({
+            _id: false,
+            test: {
+              type: String,
+              default: 'subdoc default'
+            }
+          }),
+          default: () => ({})
+        },
+        docArr: [{
+          _id: false,
+          test: {
+            type: String,
+            default: 'doc array default'
+          }
+        }]
+      }));
+
+      const obj = { age: 31, nestedName: { middle: 'James' }, docArr: [{}] };
+      Test.applyDefaults(obj);
+
+      assert.deepStrictEqual(obj, {
+        name: 'John Smith',
+        age: 31,
+        nestedName: { first: 'John', last: 'Smith', middle: 'James' },
+        subdoc: {
+          test: 'subdoc default'
+        },
+        docArr: [{
+          test: 'doc array default'
+        }]
+      });
+    });
+
+    it('applies defaults to documents', function() {
+      const Test = db.model('Test', mongoose.Schema({
+        _id: false,
+        name: {
+          type: String,
+          default: 'John Smith'
+        },
+        age: {
+          type: Number,
+          default: 29
+        },
+        nestedName: {
+          first: {
+            type: String,
+            default: 'John'
+          },
+          last: {
+            type: String,
+            default: 'Smith'
+          },
+          middle: {
+            type: String,
+            default: ''
+          }
+        },
+        subdoc: {
+          type: mongoose.Schema({
+            _id: false,
+            test: {
+              type: String,
+              default: 'subdoc default'
+            }
+          }),
+          default: () => ({})
+        },
+        docArr: [{
+          _id: false,
+          test: {
+            type: String,
+            default: 'doc array default'
+          }
+        }]
+      }));
+
+      const obj = { age: 31, nestedName: { middle: 'James' }, docArr: [{}] };
+      const doc = new Test(obj, null, { defaults: false });
+      Test.applyDefaults(doc);
+
+      assert.deepStrictEqual(doc.toObject(), {
+        name: 'John Smith',
+        age: 31,
+        nestedName: { first: 'John', last: 'Smith', middle: 'James' },
+        subdoc: {
+          test: 'subdoc default'
+        },
+        docArr: [{
+          test: 'doc array default'
+        }]
+      });
+    });
   });
 });
 

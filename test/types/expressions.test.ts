@@ -203,3 +203,17 @@ const switchExpr: Expression.Switch = {
     default: 'Hello'
   }
 };
+
+(function gh12058() {
+  const concat: Expression.ConcatArrays = {
+    $concatArrays: [
+      {
+        $cond: {
+          if: { $eq: ['foo', true] },
+          then: [1],
+          else: [2]
+        }
+      }
+    ]
+  };
+})();

@@ -8641,6 +8641,19 @@ describe('Model', function() {
     assert.equal(doc.hoursToMake, null);
   });
 
+  it('supports setters option for `hydrate()` (gh-11653)', function() {
+    const schema = Schema({
+      text: {
+        type: String,
+        set: v => v.toLowerCase()
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const doc = Test.hydrate({ text: 'FOOBAR' }, null, { setters: true });
+    assert.equal(doc.text, 'foobar');
+  });
+
   it('sets index collation based on schema collation (gh-7621)', async function() {
     let testSchema = new Schema(
       { name: { type: String, index: true } }

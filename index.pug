@@ -175,6 +175,9 @@ html(lang='en')
               <a rel="sponsored" href="https://helloclub.com/?source=Mongoose">
                 <img class="sponsor" src="https://codebarbarian-images.s3.amazonaws.com/logo-text-default.svg" style="height:100px">
               </a>
+              <a rel="sponsored" href="https://devitjobs.us/?utm_source=mongoose_main">
+                <img class="sponsor" src="https://codebarbarian-images.s3.amazonaws.com/devitUS-flat-rectangle-v4.png" style="height:100px">
+              </a>
             </div>
           </div>
 
@@ -183,8 +186,8 @@ html(lang='en')
         div.sponsors
           div
             each sponsor in opencollectiveSponsors
-              a(rel='sponsored', href=sponsor.website)
-                img.sponsor(src=sponsor.image || null, style='height:50px', alt=sponsor.alt)
+              a(rel='sponsored', href=sponsor.website || sponsor.profile)
+                img.sponsor(src=sponsor.image || 'https://next-images.opencollective.com/_next/image?url=%2Fstatic%2Fimages%2Fopencollective-icon.png&w=96&q=75', style='height:50px', alt=sponsor.alt)
 
         <div class="sponsor">
           Sponsor <a href="https://opencollective.com/mongoose">Mongoose on OpenCollective</a>

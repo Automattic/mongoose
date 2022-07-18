@@ -1,3 +1,46 @@
+6.4.4 / 2022-07-08
+==================
+ * fix(types): allow using an object to configure timestamps #12061 [lantw44](https://github.com/lantw44)
+ * fix(types): support findOneAndReplace with rawResult #12062 [lantw44](https://github.com/lantw44)
+ * docs: upgrade API documentation parser #12078 #12072 #12071 #12024 [hasezoey](https://github.com/hasezoey)
+ * docs(document): add more info on $isNew #11990
+ * docs: add SchemaType doValidate() to docs #12068
+
+6.4.3 / 2022-07-05
+==================
+ * fix(document): handle validating deeply nested subdocuments underneath nested paths with required: false #12021
+ * fix(types): infer schematype type from schema paths when calling `SchemaType.path()` #11987
+ * fix(types): add $top and $topN aggregation operators #12053
+ * fix(types): clean up a couple of issues with $add and $ifNull #12017
+ * fix(types): allow $cond with $in #12028
+ * docs: add path level descending index example in docs #12023 [MitchellCash](https://github.com/MitchellCash)
+ * docs: add Buffer, Decimal128, Map to docs #11971
+
+6.4.2 / 2022-07-01
+==================
+ * fix: keep autoIndex & autoCreate as true by default if read preference is primaryPreferred #11976
+ * fix(types): improve inferred Schema Type to handle nested paths and ObjectIds #12007 [iammola](https://github.com/iammola)
+ * fix(types): avoid inferring doc type from param to create() #12001
+ * fix(types): make populate Paths generic consistently overwrite doc interface #11955
+ * fix(types): allow null at ne expression second parameter #11996 [jyeros](https://github.com/jyeros)
+ * fix(types): change index "weights" to be more explicit #11997 [hasezoey](https://github.com/hasezoey)
+
+6.4.1 / 2022-06-27
+==================
+ * fix(schema): allow 0 for numbers if required and ref both set #11912
+ * fix(query): skip applying default projections over slice projections #11940
+ * fix(types): handle arrays in ApplyBasicQueryCasting correctly #11964
+ * fix(types): fix $match typings #11969 [andreialecu](https://github.com/andreialecu)
+ * fix(types): avoid adding non-existent properties from model constructor for typegoose #11960
+ * fix(types): make Mongoose UpdateQuery compatible with MongoDB `UpdateFilter` #11911
+ * fix(types): simplify MergeType constraints #11978
+ * fix(types): correct references to Buffer for @types/node >= 16.0.0 < 16.6.0 #11963
+ * fix(types): re-add the possibility to pass undefined for projection in Model.find #11965 [ghost91-](https://github.com/ghost91-)
+ * fix(types): fix typo for indexes #11953 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document+types): document merge option #11913
+ * docs: update schematypes.md #11981 [korzio](https://github.com/korzio)
+ * docs: update validation.md #11982 [korzio](https://github.com/korzio)
+
 6.4.0 / 2022-06-17
 ==================
  * feat: upgrade mongodb driver -> 4.7.0 #11909 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

@@ -281,7 +281,6 @@ export function autoTypedModel() {
   // Model-functions-test
   // Create should works with arbitrary objects.
     const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' });
-    expectType<string>(randomObject.unExistKey);
     expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
 
     const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });
@@ -319,4 +318,31 @@ function gh11911() {
     filter: {},
     update: changes
   });
+}
+
+
+function gh12059() {
+  interface IAnimal {
+    name?: string;
+  }
+
+  const animalSchema = new Schema<IAnimal>({
+    name: { type: String }
+  });
+
+  const Animal = model<IAnimal>('Animal', animalSchema);
+  const animal = new Animal();
+
+  Animal.bulkSave([animal], { timestamps: false });
+  Animal.bulkSave([animal], { timestamps: true });
+  Animal.bulkSave([animal], {});
+}
+
+function gh12100() {
+  const schema = new Schema();
+
+  const Model = model('Model', schema);
+
+  Model.syncIndexes({ continueOnError: true, noResponse: true });
+  Model.syncIndexes({ continueOnError: false, noResponse: true });
 }

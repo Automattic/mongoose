@@ -252,7 +252,7 @@ Animal.findOne().byName('fido').exec((err, animal) => {
 <h3 id="indexes"><a href="#indexes">Indexes</a></h3>
 
 MongoDB supports [secondary indexes](http://docs.mongodb.org/manual/indexes/).
-With mongoose, we define these indexes within our `Schema` [at](./api.html#schematype_SchemaType-index) [the](./api.html#schematype_SchemaType-unique) [path](./api.html#schematype_SchemaType-sparse) [level](./api.html#schema_date_SchemaDate-expires) or the `schema` level.
+With mongoose, we define these indexes within our `Schema` [at](./api.html#schematype_SchemaType-index) [the](./api.html#schematype_SchemaType-unique) [path](./api.html#schematype_SchemaType-sparse) [level](./api.html#schemadateoptions_SchemaDateOptions-expires) or the `schema` level.
 Defining indexes at the schema level is necessary when creating
 [compound indexes](https://docs.mongodb.com/manual/core/index-compound/).
 
@@ -260,11 +260,13 @@ Defining indexes at the schema level is necessary when creating
 const animalSchema = new Schema({
   name: String,
   type: String,
-  tags: { type: [String], index: true } // field level
+  tags: { type: [String], index: true } // path level
 });
 
 animalSchema.index({ name: 1, type: -1 }); // schema level
 ```
+
+See [SchemaType#index()](./api.html#schematype_SchemaType-index) for other index options.
 
 When your application starts up, Mongoose automatically calls [`createIndex`](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each defined index in your schema.
 Mongoose will call `createIndex` for each index sequentially, and emit an 'index' event on the model when all the `createIndex` calls succeeded or when there was an error.

@@ -11572,7 +11572,7 @@ describe('document', function() {
         doc2.counter = 1;
         await doc2.save();
 
-        doc.$inc('counter');
+        doc.$inc('counter', 1);
         await doc.save();
 
         const res = await Test.findById(doc);

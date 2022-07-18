@@ -1104,7 +1104,7 @@ declare module 'mongoose' {
        * @version 3.2
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/concatArrays/#mongodb-expression-exp.-concatArrays
        */
-      $concatArrays: ArrayExpression[];
+      $concatArrays: Expression[];
     }
 
     export interface Filter {
@@ -2449,7 +2449,7 @@ declare module 'mongoose' {
     FunctionExpression |
     ObjectIdExpression |
     ConditionalExpressionOperator |
-    Expression.Let;
+    any;
 
   export type ObjectIdExpression =
     TypeExpressionOperatorReturningObjectId;

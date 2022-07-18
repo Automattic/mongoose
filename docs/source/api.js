@@ -50,12 +50,34 @@ const out = module.exports.docs;
 
 const combinedFiles = [];
 for (const file of files) {
-  const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'), { raw: true });
-  comments.file = file;
-  combinedFiles.push(comments);
+  try {
+    const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'), { raw: true });
+    comments.file = file;
+    combinedFiles.push(comments);
+  } catch (err) {
+    // show log of which file has thrown a error for easier debugging
+    console.error("Error while trying to parseComments for ", file);
+    throw err;
+  }
 }
 
 parse();
+
+/**
+ * @typedef {Object} PropContext
+ * @property {boolean} [isStatic] Defines wheter the current property is a static property (not mutually exlusive with "isInstance")
+ * @property {boolean} [isInstance] Defines wheter the current property is a instance property (not mutually exlusive with "isStatic")
+ * @property {boolean} [isFunction] Defines wheter the current property is meant to be a function
+ * @property {string} [constructor] Defines the Constructor (or rather path) the current property is on
+ * @property {boolean} [constructorWasUndefined] Defined wheter the "constructor" property was defined by "dox", but was set to "undefined"
+ * @property {string} [type] Defines the type the property is meant to be
+ * @property {string} [name] Defines the current Properties name
+ * @property {Object} [return] The full object for a "@return" jsdoc tag
+ * @property {string} [string] Defines the full string the property will be listed as
+ * @property {string} [anchorId] Defines the Anchor ID to be used for linking
+ * @property {string} [description] Defines the Description the property will be listed with
+ * @property {string} [deprecated] Defines wheter the current Property is signaled as deprecated
+ */
 
 function parse() {
   for (const props of combinedFiles) {
@@ -88,43 +110,70 @@ function parse() {
       if (prop.ignore || prop.isPrivate) {
         continue;
       }
-
+     
+      /** @type {PropContext} */
       const ctx = prop.ctx || {};
+
+      // somehow in "dox", it is named "receiver" sometimes, not "constructor"
+      // this is used as a fall-back if the handling below does not overwrite it
+      if ("receiver" in ctx) {
+        ctx.constructor = ctx.receiver;
+        delete ctx.receiver;
+      }
+
+      // in some cases "dox" has "ctx.constructor" defined but set to "undefined", which will later be used for setting "ctx.string"
+      if ("constructor" in ctx && ctx.constructor === undefined) {
+        ctx.constructorWasUndefined = true;
+      }
+
+      // helper function to keep translating array types to string consistent
+      function convertTypesToString(types) {
+        return Array.isArray(types) ? types.join('|') : types
+      }
+
       for (const tag of prop.tags) {
         switch (tag.type) {
           case 'receiver':
-            ctx.constructor = tag.string;
+            console.warn(`Found "@receiver" tag in ${ctx.constructor} ${ctx.name}`);
             break;
           case 'property':
             ctx.type = 'property';
-            let str = tag.string;
-            const match = str.match(/^{\w+}/);
-            if (match != null) {
-              ctx.type = match[0].substring(1, match[0].length - 1);
-              str = str.replace(/^{\w+}\s*/, '');
+
+            // using "name" over "string" because "string" also contains the type and maybe other stuff
+            ctx.name = tag.name;
+            // only assign "type" if there are types
+            if (tag.types.length > 0) {
+              ctx.type = convertTypesToString(tag.types);
             }
-            ctx.name = str;
-            ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+
             break;
           case 'type':
-            ctx.type = Array.isArray(tag.types) ? tag.types.join('|') : tag.types;
+            ctx.type = convertTypesToString(tag.types);
             break;
           case 'static':
             ctx.type = 'property';
-            ctx.static = true;
-            ctx.name = tag.string;
-            ctx.string = `${data.name}.${ctx.name}`;
+            ctx.isStatic = true;
+            // dont take "string" as "name" from here, because jsdoc definitions of "static" do not have parameters, also its defined elsewhere anyway
+            // ctx.name = tag.string;
             break;
           case 'function':
             ctx.type = 'function';
-            ctx.static = true;
+            ctx.isStatic = true;
             ctx.name = tag.string;
-            ctx.string = `${data.name}.${ctx.name}()`;
+            // extra parameter to make function definitions independant of where "@function" is defined
+            // like "@static" could have overwritten "ctx.string" again if defined after "@function"
+            ctx.isFunction = true;
             break;
           case 'return':
-            tag.return = tag.description ?
-              md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
+            tag.description = tag.description ?
+              md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>\n?$/, '') :
               '';
+
+            // dox does not add "void" / "undefined" to types, so in the documentation it would result in a empty "«»"
+            if (tag.string.includes('void') || tag.string.includes('undefined')) {
+              tag.types.push("void");
+            }
+
             ctx.return = tag;
             break;
           case 'inherits':
@@ -133,8 +182,12 @@ function parse() {
           case 'event':
           case 'param':
             ctx[tag.type] = (ctx[tag.type] || []);
+            // the following is required, because in newer "dox" version "null" is not included in "types" anymore, but a seperate property
+            if (tag.nullable) {
+              tag.types.push('null');
+            }
             if (tag.types) {
-              tag.types = tag.types.join('|');
+              tag.types = convertTypesToString(tag.types);
             }
             ctx[tag.type].push(tag);
             if (tag.name != null && tag.name.startsWith('[') && tag.name.endsWith(']') && tag.name.includes('.')) {
@@ -147,26 +200,44 @@ function parse() {
           case 'method':
             ctx.type = 'method';
             ctx.name = tag.string;
-            ctx.string = `${ctx.constructor}.prototype.${ctx.name}()`;
+            ctx.isFunction = true;
             break;
           case 'memberOf':
             ctx.constructor = tag.parent;
-            ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
-            if (ctx.type === 'method') {
-              ctx.string += '()';
-            }
             break;
           case 'constructor':
-            ctx.string = tag.string + '()';
+            ctx.string = tag.string;
             ctx.name = tag.string;
+            ctx.isFunction = true;
+            break;
+          case 'instance':
+            ctx.isInstance = true;
+            break;
+          case 'deprecated':
+            ctx.deprecated = true;
+            break;
         }
       }
 
-      if (/\.prototype[^.]/.test(ctx.string)) {
-        ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+      if (ctx.isInstance && ctx.isStatic) {
+        console.warn(`Property "${ctx.name}" in "${ctx.constructor}" has both instance and static JSDOC markings (most likely both @instance and @static)! (File: "${props.file}")`);
       }
 
-      // Backwards compat
+      // the following if-else-if statement is in this order, because there are more "instance" methods thans static
+      // the following condition will be true if "isInstance = true" or if "isInstance = false && isStatic = false" AND "ctx.string" are empty or not defined
+      // if "isStatic" and "isInstance" are falsy and "ctx.string" is not falsy, then rely on the "ctx.string" set by "dox"
+      if (ctx.isInstance || (!ctx.isStatic && !ctx.isInstance && (!ctx.string || ctx.constructorWasUndefined))) {
+        ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+      } else if (ctx.isStatic) {
+        ctx.string = `${ctx.constructor}.${ctx.name}`;
+      }
+
+      // add "()" to the end of the string if function
+      if ((ctx.isFunction || ctx.type === "method") && !ctx.string.endsWith("()")) {
+        ctx.string = ctx.string + "()";
+      }
+
+      // Backwards compat anchors
       if (typeof ctx.constructor === 'string') {
         ctx.anchorId = `${ctx.constructor.toLowerCase()}_${ctx.constructor}-${ctx.name}`;
       } else if (typeof ctx.receiver === 'string') {
@@ -178,9 +249,6 @@ function parse() {
       ctx.description = prop.description.full.
         replace(/<br \/>/ig, ' ').
         replace(/&gt;/ig, '>');
-      if (ctx.description.includes('function capitalize')) {
-        console.log('\n\n-------\n\n', ctx);
-      }
       ctx.description = md.parse(ctx.description);
 
       data.props.push(ctx);

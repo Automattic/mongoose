@@ -30,7 +30,6 @@ a group of fields (e.g. dateRange.fromDate <= dateRange.toDate).
   <li><a href="#removing-subdocs">Removing Subdocs</a></li>
   <li><a href="#subdoc-parents">Parents of Subdocs</a></li>
   <li><a href="#altsyntaxarrays">Alternate declaration syntax for arrays</a></li>
-  <li><a href="#altsyntaxsingle">Alternate declaration syntax for single subdocuments</a></li>
 </ul>
 
 ### What is a Subdocument?
@@ -316,41 +315,6 @@ const parentSchema = new Schema({
 // Equivalent
 const parentSchema = new Schema({
   children: [new Schema({ name: 'string' })]
-});
-```
-
-<h4 id="altsyntaxsingle"><a href="#altsyntaxsingle">Alternate declaration syntax for single nested subdocuments</a></h4>
-
-Unlike document arrays, Mongoose 5 does not convert an objects in schemas
-into nested schemas. In the below example, `nested` is a _nested path_
-rather than a subdocument.
-
-```javascript
-const schema = new Schema({
-  nested: {
-    prop: String
-  }
-});
-```
-
-This leads to some surprising behavior when you attempt to define a
-nested path with validators or getters/setters.
-
-```javascript
-const schema = new Schema({
-  nested: {
-    // Do not do this! This makes `nested` a mixed path in Mongoose 5
-    type: { prop: String },
-    required: true
-  }
-});
-
-const schema = new Schema({
-  nested: {
-    // This works correctly
-    type: new Schema({ prop: String }),
-    required: true
-  }
 });
 ```
 

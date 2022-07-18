@@ -1,5 +1,14 @@
 import { ObjectId } from 'bson';
-import { Schema, Document, Model, connection, model, Types, UpdateQuery, CallbackError } from 'mongoose';
+import {
+  Schema,
+  Document,
+  Model,
+  connection,
+  model,
+  Types,
+  UpdateQuery,
+  CallbackError
+} from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 import { UpdateOneModel } from 'mongodb';
@@ -319,3 +328,20 @@ function gh11911() {
     update: changes
   });
 }
+
+function gh12100() {
+  const schema = new Schema();
+
+  const Model = model('Model', schema);
+
+  Model.syncIndexes({ continueOnError: true, noResponse: true });
+  Model.syncIndexes({ continueOnError: false, noResponse: true });
+}
+
+(function gh12070() {
+  const schema_with_string_id = new Schema({ _id: String, nickname: String });
+  const TestModel = model('test', schema_with_string_id);
+  const obj = new TestModel();
+
+  expectType<string>(obj._id);
+})();

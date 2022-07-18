@@ -8805,6 +8805,81 @@ describe('Model', function() {
       });
     });
   });
+
+  describe('castObject() (gh-11945)', function() {
+    it('casts values', function() {
+      const Test = db.model('Test', mongoose.Schema({
+        _id: false,
+        num: Number,
+        nested: {
+          num: Number
+        },
+        subdoc: {
+          type: mongoose.Schema({
+            _id: false,
+            num: Number
+          }),
+          default: () => ({})
+        },
+        docArr: [{
+          _id: false,
+          num: Number
+        }]
+      }));
+
+      const obj = {
+        num: '1',
+        nested: { num: '2' },
+        subdoc: { num: '3' },
+        docArr: [{ num: '4' }]
+      };
+      const ret = Test.castObject(obj);
+      assert.deepStrictEqual(ret, {
+        num: 1,
+        nested: { num: 2 },
+        subdoc: { num: 3 },
+        docArr: [{ num: 4 }]
+      });
+    });
+
+    it('throws if cannot cast', function() {
+      const Test = db.model('Test', mongoose.Schema({
+        _id: false,
+        num: Number,
+        nested: {
+          num: Number
+        },
+        subdoc: {
+          type: mongoose.Schema({
+            _id: false,
+            num: Number
+          })
+        },
+        docArr: [{
+          _id: false,
+          num: Number
+        }]
+      }));
+
+      const obj = {
+        num: 'foo',
+        nested: { num: 'bar' },
+        subdoc: { num: 'baz' },
+        docArr: [{ num: 'qux' }]
+      };
+      let error;
+      try {
+        Test.castObject(obj);
+      } catch (err) {
+        error = err;
+      }
+      assert.ok(error);
+      assert.equal(error.errors['num'].name, 'CastError');
+      assert.equal(error.errors['nested.num'].name, 'CastError');
+      assert.equal(error.errors['subdoc.num'].name, 'CastError');
+      assert.equal(error.errors['docArr.0.num'].name, 'CastError');
+    });
+  });
 });
 
 describe('Check if static function that is supplied in schema option is available', function() {

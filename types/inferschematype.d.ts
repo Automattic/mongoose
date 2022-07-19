@@ -41,18 +41,6 @@ declare module 'mongoose' {
   type InferSchemaType<SchemaType> = ObtainSchemaGeneric<SchemaType, 'DocType'>;
 
   /**
-   * @summary Obtains document plain doc type from Schema instance.
-   * @description Exactly like {@link InferSchemaType}, but it add virtual paths.
-   * @param {SchemaType} SchemaType A generic of schema type instance.
-   * @example
-   * const userSchema = new Schema({userName:String});
-   * type UserType = InferDocumentType<typeof userSchema>;
-   * // result
-   * type UserType = {userName?: string}
-   */
-  type InferDocumentType<SchemaType> = FlatRecord<InferSchemaType<SchemaType> & ObtainSchemaGeneric<SchemaType, 'TVirtuals'>>;
-
-  /**
    * @summary Obtains schema Generic type by using generic alias.
    * @param {TSchema} TSchema A generic of schema type instance.
    * @param {alias} alias Targeted generic alias.

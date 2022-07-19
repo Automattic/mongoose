@@ -5197,6 +5197,27 @@ describe('Model', function() {
             doc._id.toHexString());
         });
 
+        it('fullDocument (gh-11936)', async function() {
+          const MyModel = db.model('Test', new Schema({ name: String }));
+
+          const changeStream = await MyModel.watch([], {
+            fullDocument: 'updateLookup',
+            hydrate: true
+          });
+
+          const doc = await MyModel.create({ name: 'Ned Stark' });
+
+          const p = changeStream.next();
+          await MyModel.updateOne({ _id: doc._id }, { name: 'Tony Stark' });
+
+          const changeData = await p;
+          assert.equal(changeData.operationType, 'update');
+          assert.equal(changeData.fullDocument._id.toHexString(),
+            doc._id.toHexString());
+          assert.ok(changeData.fullDocument.$__);
+          assert.equal(changeData.fullDocument.get('name'), 'Tony Stark');
+        });
+
         it('respects discriminators (gh-11007)', async function() {
           const BaseModel = db.model('Test', new Schema({ name: String }));
           const ChildModel = BaseModel.discriminator('Test1', new Schema({ email: String }));

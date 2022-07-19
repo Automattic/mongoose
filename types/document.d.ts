@@ -44,6 +44,13 @@ declare module 'mongoose' {
     $getPopulatedDocs(): Document[];
 
     /**
+     * Increments the numeric value at `path` by the given `val`.
+     * When you call `save()` on this document, Mongoose will send a
+     * `$inc` as opposed to a `$set`.
+     */
+    $inc(path: string | string[], val?: number): this;
+
+    /**
      * Returns true if the given path is nullish or only contains empty objects.
      * Useful for determining whether this subdoc will get stripped out by the
      * [minimize option](/docs/guide.html#minimize).

@@ -1,7 +1,7 @@
 'use strict';
 
 const stripe = require('../../integrations/stripe')
-
+const config = require('../../.config');
 const { Cart, Order, Product } = require('../../models');
 const connect = require('../../connect');
 
@@ -19,19 +19,19 @@ const handler = async(event) => {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: product.productName
+            name: product.name
           },
-          unit_amount: product.productPrice
+          unit_amount: product.price
         },
         quantity: cart.items[i].quantity
       });
-      total = total + (product.productPrice * cart.items[i].quantity);
+      total = total + (product.price * cart.items[i].quantity);
     }
     const session = await stripe.checkout.sessions.create({
       line_items: stripeProducts.line_items,
       mode: 'payment',
-      success_url: 'insert a url here',
-      cancel_url: 'insert a url here'
+      success_url: config.success_url,
+      cancel_url: config.cancel_url
     });
     const intent = await stripe.paymentIntents.retrieve(session.payment_intent);
     if (intent.status !== 'succeeded') {

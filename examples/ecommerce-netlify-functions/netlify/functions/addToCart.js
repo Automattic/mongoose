@@ -15,10 +15,12 @@ const handler = async(event) => {
       if (cart == null) {
         return { statusCode: 404, body: JSON.stringify({ message: 'Cart not found' }) };
       }
-      
+      if(!Array.isArray(event.body.items)) {
+        return { statusCode: 500, body: JSON.stringify({ error: 'items is not an array' }) };
+      }
       for (const product of event.body.items) {
-        const exists = cart.items.find(item => item.productId.toString() === product.productId.toString());
-        if (!exists && products.find(p => product.productId.toString() === p._id.toString())) {
+        const exists = cart.items.find(item => item?.productId?.toString() === product?.productId?.toString());
+        if (!exists && products.find(p => product?.productId?.toString() === p?._id?.toString())) {
           cart.items.push(product);
           await cart.save();
         } else {

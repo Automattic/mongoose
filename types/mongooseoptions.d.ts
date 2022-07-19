@@ -79,6 +79,9 @@ declare module 'mongoose' {
     | stream.Writable
     | ((collectionName: string, methodName: string, ...methodArgs: any[]) => void);
 
+    /** Defaults to `true`. If `true`, adds a `id` virtual to all schemas by default. */
+    id?: boolean;
+
     /**
      * If `false`, it will change the `createdAt` field to be [`immutable: false`](https://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-immutable)
      * which means you can update the `createdAt`.

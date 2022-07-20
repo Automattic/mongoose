@@ -924,6 +924,19 @@ describe('schema', function() {
 
       assert.equal(called, true);
     });
+
+    it('options param (gh-12077)', function() {
+      const Tobi = new Schema();
+      let called = false;
+
+      Tobi.plugin(function(schema, opts) {
+        assert.equal(schema, Tobi);
+        assert.deepStrictEqual(opts, { answer: 42 });
+        called = true;
+      }, { answer: 42 });
+
+      assert.equal(called, true);
+    });
   });
 
   describe('options', function() {
@@ -2791,5 +2804,15 @@ describe('schema', function() {
         }
       });
     }, /Cannot use schema-level projections.*subdocument_mapping.not_selected/);
+  });
+
+  it('disallows setting special properties with `add()` or constructor (gh-12085)', async function() {
+    const maliciousPayload = '{"__proto__.toString": "Number"}';
+
+    assert.throws(() => {
+      mongoose.Schema(JSON.parse(maliciousPayload));
+    }, /__proto__/);
+
+    assert.ok({}.toString());
   });
 });

@@ -437,6 +437,10 @@ declare module 'mongoose' {
 
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
+  type Mutable<T> = {
+    -readonly [K in keyof T]: T[K];
+  };
+
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
     $currentDate?: AnyKeys<TSchema> & AnyObject;
@@ -450,10 +454,10 @@ declare module 'mongoose' {
     $unset?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: mongodb.SetFields<TSchema>;
+    $addToSet?: Mutable<mongodb.SetFields<TSchema>>;
     $pop?: AnyKeys<TSchema> & AnyObject;
-    $pull?: mongodb.PullOperator<TSchema>;
-    $push?: mongodb.PushOperator<TSchema>;
+    $pull?: Mutable<mongodb.PullOperator<TSchema>>;
+    $push?: Mutable<mongodb.PushOperator<TSchema>>;
     $pullAll?: mongodb.PullAllOperator<TSchema>;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */

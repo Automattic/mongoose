@@ -1086,4 +1086,22 @@ describe('mongoose module:', function() {
       assert.deepEqual(res.toObject(), { answer: 42 });
     });
   });
+  describe('global id option', function() {
+    it('can disable the id virtual on schemas gh-11966', async function() {
+      const m = new mongoose.Mongoose();
+      m.set('id', false);
+
+      const db = await m.connect(start.uri);
+
+      const schema = new m.Schema({ title: String });
+
+      const falseID = db.model('gh11966', schema);
+
+
+      const entry = await falseID.create({
+        title: 'The IDless master'
+      });
+      assert.equal(entry.id, undefined);
+    });
+  });
 });

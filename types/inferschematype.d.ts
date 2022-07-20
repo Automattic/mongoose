@@ -11,7 +11,8 @@ import {
   DateSchemaDefinition,
   ObtainDocumentType,
   DefaultTypeKey,
-  ObjectIdSchemaDefinition
+  ObjectIdSchemaDefinition,
+  IfEquals
 } from 'mongoose';
 
 declare module 'mongoose' {
@@ -37,7 +38,7 @@ declare module 'mongoose' {
    * // result
    * type UserType = {userName?: string}
    */
-  type InferSchemaType<SchemaType> = ObtainSchemaGeneric<SchemaType, 'DocType'> ;
+  type InferSchemaType<SchemaType> = ObtainSchemaGeneric<SchemaType, 'DocType'>;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.
@@ -58,24 +59,6 @@ declare module 'mongoose' {
       }[alias]
       : unknown;
 }
-/**
- * @summary Checks if a type is "Record" or "any".
- * @description It Helps to check if user has provided schema type "EnforcedDocType"
- * @param {T} T A generic type to be checked.
- * @returns true if {@link T} is Record OR false if {@link T} is of any type.
- */
-type IsItRecordAndNotAny<T> = IfEquals<T, any, false, T extends Record<any, any> ? true : false>;
-
-/**
- * @summary Checks if two types are identical.
- * @param {T} T The first type to be compared with {@link U}.
- * @param {U} U The seconde type to be compared with {@link T}.
- * @param {Y} Y A type to be returned if {@link T} &  {@link U} are identical.
- * @param {N} N A type to be returned if {@link T} &  {@link U} are not identical.
- */
-type IfEquals<T, U, Y = true, N = false> =
-    (<G>() => G extends T ? 1 : 0) extends
-    (<G>() => G extends U ? 1 : 0) ? Y : N;
 
 /**
  * @summary Checks if a document path is required or optional.

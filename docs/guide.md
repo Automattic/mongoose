@@ -341,6 +341,23 @@ And what if you want to do some extra processing on the name, like
 define a `fullName` property that won't get persisted to MongoDB.
 
 ```javascript
+// That can be done either by adding it to schema options:
+const personSchema = new Schema({
+  name: {
+    first: String,
+    last: String
+  }
+},{
+  virtuals:{
+    fullName:{
+      get() {
+        return this.name.first + ' ' + this.name.last;
+      }
+    }
+  }
+});
+
+// Or by using the virtual method as following:  
 personSchema.virtual('fullName').get(function() {
   return this.name.first + ' ' + this.name.last;
 });
@@ -363,6 +380,27 @@ You can also add a custom setter to your virtual that will let you set both
 first name and last name via the `fullName` virtual.
 
 ```javascript
+// Again that can be done either by adding it to schema options:
+const personSchema = new Schema({
+  name: {
+    first: String,
+    last: String
+  }
+},{
+  virtuals:{
+    fullName:{
+      get() {
+        return this.name.first + ' ' + this.name.last;
+      }
+      set(v) {
+        this.name.first = v.substr(0, v.indexOf(' '));
+        this.name.last = v.substr(v.indexOf(' ') + 1);
+      }
+    }
+  }
+});
+
+// Or by using the virtual method as following:
 personSchema.virtual('fullName').
   get(function() {
     return this.name.first + ' ' + this.name.last;

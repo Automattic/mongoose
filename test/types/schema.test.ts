@@ -550,7 +550,7 @@ export type AutoTypedSchemaType = {
   },
   methods: {
     instanceFn: () => 'Returned from DocumentInstanceFn'
-  },
+  }
 };
 
 // discriminator

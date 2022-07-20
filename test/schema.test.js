@@ -2815,7 +2815,7 @@ describe('schema', function() {
 
     assert.ok({}.toString());
   });
-  
+
   it('enable defining virtual paths by using schema constructor (gh-11908)', async function() {
     function get() {return this.email.slice(this.email.indexOf('@') + 1);}
     function set(v) { this.email = [this.email.slice(0, this.email.indexOf('@')), v].join('@');}

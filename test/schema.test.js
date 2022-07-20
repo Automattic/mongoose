@@ -924,6 +924,19 @@ describe('schema', function() {
 
       assert.equal(called, true);
     });
+
+    it('options param (gh-12077)', function() {
+      const Tobi = new Schema();
+      let called = false;
+
+      Tobi.plugin(function(schema, opts) {
+        assert.equal(schema, Tobi);
+        assert.deepStrictEqual(opts, { answer: 42 });
+        called = true;
+      }, { answer: 42 });
+
+      assert.equal(called, true);
+    });
   });
 
   describe('options', function() {

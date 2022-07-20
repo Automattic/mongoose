@@ -79,7 +79,10 @@ declare module 'mongoose' {
     | stream.Writable
     | ((collectionName: string, methodName: string, ...methodArgs: any[]) => void);
 
-    /** Defaults to `true`. If `true`, adds a `id` virtual to all schemas by default. */
+    /** 
+     * If `true`, adds a `id` virtual to all schemas unless overwritten on a per-schema basis. 
+     * @defaultValue true
+     */
     id?: boolean;
 
     /**

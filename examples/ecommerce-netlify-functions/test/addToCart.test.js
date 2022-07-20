@@ -8,8 +8,12 @@ const fixtures = require('../test/fixtures');
 
 describe('Add to Cart', function() {
   it('Should create a cart and add a product to the cart', async function() {
-    const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
-    .then((res) => res.products);
+    const products = await fixtures.createProducts({
+      product: [
+        { name: 'A Test Products', price: 500 },
+        { name: 'Another Test Product', price: 600 }
+      ]
+    }).then((res) => res.products);
     const params = {
       body: {
         cartId: null,

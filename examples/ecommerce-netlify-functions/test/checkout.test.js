@@ -11,8 +11,12 @@ const stripe = require('../integrations/stripe')
 
 describe('Checkout', function() {
   it('Should do a successful checkout run', async function() {
-    const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
-    .then((res) => res.products);
+    const products = await fixtures.createProducts({
+      product: [
+        { name: 'A Test Products', price: 500 },
+        { name: 'Another Test Product', price: 600 }
+      ]
+    }).then((res) => res.products);
     const params = {
       body: {
         cartId: null,

@@ -9,8 +9,12 @@ const fixtures = require('./fixtures');
 
 describe('Remove From Cart', function() {
   it('Should create a cart and then it should remove the entire item from it.', async function() {
-    const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
-    .then((res) => res.products);
+    const products = await fixtures.createProducts({
+      product: [
+        { name: 'A Test Products', price: 500 },
+        { name: 'Another Test Product', price: 600 }
+      ]
+    }).then((res) => res.products);
     const params = {
       body: {
         cartId: null,

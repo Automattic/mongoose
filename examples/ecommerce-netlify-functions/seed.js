@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 
 async function createProducts() {
   await mongoose.connect(config.mongodbUri);
+  await mongoose.connection.dropDatabase();
 
   await Product.create({
     name: 'iPhone 12',

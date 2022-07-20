@@ -8,8 +8,12 @@ const mongoose = require('mongoose');
 
 describe('Products', function() {
   it('Should get all products.', async function() {
-    await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
-    .then((res) => res.products);
+    await fixtures.createProducts({
+      product: [
+        { name: 'A Test Products', price: 500 },
+        { name: 'Another Test Product', price: 600 }
+      ]
+    }).then((res) => res.products);
     const result = await getProducts();
     assert(result);
   });

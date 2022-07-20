@@ -9,8 +9,8 @@
     "netlify-cli": "10.7.1"
   },
   "scripts": {
-    "seed": "env NODE_ENV=development node ./seed",
-    "start": "env NODE_ENV=development netlify dev",
+    "seed": "env NODE_ENV=local node ./seed",
+    "start": "env NODE_ENV=local netlify dev",
     "test": "env NODE_ENV=test mocha ./test/*.test.js"
   }
 }

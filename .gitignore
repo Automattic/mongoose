@@ -41,7 +41,7 @@ test/files/main.js
 
 package-lock.json
 
-.config*
+.config.js
 
 # Compiled docs allowed in gh-pages
 #docs/*.html
@@ -49,6 +49,9 @@ package-lock.json
 #docs/typescript/*.html
 #docs/api/*.html
 #index.html
+
+# Local Netlify folder
+.netlify
 
 # yarn package-lock
 yarn.lock

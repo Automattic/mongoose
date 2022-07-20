@@ -4006,22 +4006,28 @@ describe('Query', function() {
     });
     const Test = db.model('gh10423', testSchema);
     await Test.create({ name: 'foo', foo: [{ sub: 'Test' }, { sub: 'Testerson' }], otherName: { nickName: 'Bar' } });
-    const result = await Test.find().lean({ transform: (doc) => {
-      delete doc._id;
-      return doc;
-    } });
-    assert(result[0]._id);
-    assert.equal(result[0].otherName._id, undefined);
-    assert.equal(result[0].foo[0]._id, undefined);
-    assert.equal(result[0].foo[1]._id, undefined);
-    const single = await Test.findOne().lean({ transform: (doc) => {
-      delete doc._id;
-      return doc;
-    } });
-    assert(single._id);
-    assert.equal(single.otherName._id, undefined);
-    assert.equal(single.foo[0]._id, undefined);
-    assert.equal(single.foo[0]._id, undefined);
+
+    const result = await Test.find().lean({
+      transform: (doc) => {
+        delete doc._id;
+        return doc;
+      }
+    });
+    assert.strictEqual(result[0]._id, undefined);
+    assert.strictEqual(result[0].otherName._id, undefined);
+    assert.strictEqual(result[0].foo[0]._id, undefined);
+    assert.strictEqual(result[0].foo[1]._id, undefined);
+
+    const single = await Test.findOne().lean({
+      transform: (doc) => {
+        delete doc._id;
+        return doc;
+      }
+    });
+    assert.strictEqual(single._id, undefined);
+    assert.strictEqual(single.otherName._id, undefined);
+    assert.strictEqual(single.foo[0]._id, undefined);
+    assert.strictEqual(single.foo[0]._id, undefined);
   });
 
   it('skips applying default projections over slice projections (gh-11940)', async function() {

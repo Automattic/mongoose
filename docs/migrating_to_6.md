@@ -194,8 +194,8 @@ mongoose.isValidObjectId(new User({ name: 'test' })); // true
 // character hex strings.
 mongoose.isObjectIdOrHexString(new mongoose.Types.ObjectId()); // true
 mongoose.isObjectIdOrHexString('62261a65d66c6be0a63c051f'); // true
-mongoose.isValidObjectId('0123456789ab'); // false
-mongoose.isValidObjectId(6); // false
+mongoose.isObjectIdOrHexString('0123456789ab'); // false
+mongoose.isObjectIdOrHexString(6); // false
 ```
 
 <h3 id="schema-defined-document-key-order"><a href="#schema-defined-document-key-order">Schema Defined Document Key Order</a></h3>

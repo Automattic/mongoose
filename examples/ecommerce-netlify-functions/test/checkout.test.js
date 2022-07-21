@@ -7,7 +7,7 @@ const { handler: checkout } = require('../netlify/functions/checkout');
 const mongoose = require('mongoose');
 const fixtures = require('./fixtures');
 const sinon = require('sinon');
-const stripe = require('../integrations/stripe')
+const stripe = require('../integrations/stripe');
 
 describe('Checkout', function() {
   it('Should do a successful checkout run', async function() {
@@ -32,9 +32,9 @@ describe('Checkout', function() {
     assert(result.body);
     assert(result.body.items.length);
     params.body.cartId = result.body._id;
-    sinon.stub(stripe.paymentIntents, 'retrieve').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
-    sinon.stub(stripe.paymentMethods, 'retrieve').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
-    sinon.stub(stripe.checkout.sessions, 'create').returns({status: 'succeeded', id: '123', brand: 'visa', last4: '1234'});
+    sinon.stub(stripe.paymentIntents, 'retrieve').returns({ status: 'succeeded', id: '123', brand: 'visa', last4: '1234' });
+    sinon.stub(stripe.paymentMethods, 'retrieve').returns({ status: 'succeeded', id: '123', brand: 'visa', last4: '1234' });
+    sinon.stub(stripe.checkout.sessions, 'create').returns({ status: 'succeeded', id: '123', brand: 'visa', last4: '1234' });
     params.body.product = params.body.items;
     params.body.name = 'Test Testerson';
     params.body.email = 'test@localhost.com';

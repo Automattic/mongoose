@@ -1,6 +1,6 @@
 'use strict';
 
-const stripe = require('../../integrations/stripe')
+const stripe = require('../../integrations/stripe');
 const config = require('../../.config');
 const { Cart, Order, Product } = require('../../models');
 const connect = require('../../connect');
@@ -53,7 +53,7 @@ const handler = async(event) => {
       shipping: event.body.shipping,
       paymentMethod: paymentMethod ? { id: paymentMethod.id, brand: paymentMethod.brand, last4: paymentMethod.last4 } : null
     });
-    
+
     cart.orderId = order._id;
     await cart.save();
     return {

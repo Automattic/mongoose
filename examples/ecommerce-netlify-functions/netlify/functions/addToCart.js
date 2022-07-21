@@ -11,11 +11,11 @@ const handler = async(event) => {
     if (event.body.cartId) {
       // get the document containing the specified cartId
       const cart = await Cart.findOne({ _id: event.body.cartId }).setOptions({ sanitizeFilter: true });
-      
+
       if (cart == null) {
         return { statusCode: 404, body: JSON.stringify({ message: 'Cart not found' }) };
       }
-      if(!Array.isArray(event.body.items)) {
+      if (!Array.isArray(event.body.items)) {
         return { statusCode: 500, body: JSON.stringify({ error: 'items is not an array' }) };
       }
       for (const product of event.body.items) {

@@ -11,5 +11,5 @@ module.exports = async function connect() {
   }
   conn = mongoose.connection;
   await mongoose.connect(config.mongodbUri);
-  return conn;   
-}
+  return conn;
+};

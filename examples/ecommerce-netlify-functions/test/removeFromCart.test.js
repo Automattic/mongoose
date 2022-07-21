@@ -33,7 +33,7 @@ describe('Remove From Cart', function() {
       body: {
         cartId: result.body._id,
         item: {
-          productId: products[0]._id,
+          productId: products[0]._id
         }
       }
     };
@@ -44,8 +44,8 @@ describe('Remove From Cart', function() {
   });
 
   it('Should create a cart and then it should reduce the quantity of an item from it.', async function() {
-    const products = await fixtures.createProducts({product: [{ productName: 'A Test Products', productPrice: 500 }, {productName: 'Another Test Product', productPrice: 600 }]})
-    .then((res) => res.products);
+    const products = await fixtures.createProducts({ product: [{ productName: 'A Test Products', productPrice: 500 }, { productName: 'Another Test Product', productPrice: 600 }] })
+      .then((res) => res.products);
     const params = {
       body: {
         cartId: null,

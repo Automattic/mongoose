@@ -5,7 +5,7 @@ const createProducts = require('./createProducts');
 const createOrder = require('./createOrder');
 
 module.exports = {
-    createCart: createCart,
-    createProducts: createProducts,
-    createOrder: createOrder
-}
+  createCart: createCart,
+  createProducts: createProducts,
+  createOrder: createOrder
+};

@@ -7,9 +7,6 @@ declare module 'mongoose' {
     currentTime?: () => (NativeDate | number);
   }
 
-  type TypeKeyBaseType = string;
-
-  type DefaultTypeKey = 'type';
   interface SchemaOptions<DocType = unknown, TInstanceMethods = {}, QueryHelpers = {}, TStaticMethods = {}, TVirtuals = {}> {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
@@ -139,7 +136,7 @@ declare module 'mongoose' {
      * type declaration. However, for applications like geoJSON, the 'type' property is important. If you want to
      * control which key mongoose uses to find type declarations, set the 'typeKey' schema option.
      */
-    typeKey?: TypeKeyBaseType;
+    typeKey?: string;
 
     /**
      * By default, documents are automatically validated before they are saved to the database. This is to
@@ -186,22 +183,22 @@ declare module 'mongoose' {
      * You can suppress the warning by setting { supressReservedKeysWarning: true } schema options. Keep in mind that this
      * can break plugins that rely on these reserved names.
      */
-    supressReservedKeysWarning?: boolean,
+    supressReservedKeysWarning?: boolean;
 
     /**
      * Model Statics methods.
      */
-    statics?: Record<any, (this: Model<DocType>, ...args: any) => unknown> | TStaticMethods,
+    statics?: Record<any, (this: Model<DocType>, ...args: any) => unknown> | TStaticMethods;
 
     /**
      * Document instance methods.
      */
-    methods?: Record<any, (this: HydratedDocument<DocType>, ...args: any) => unknown> | TInstanceMethods,
+    methods?: Record<any, (this: HydratedDocument<DocType>, ...args: any) => unknown> | TInstanceMethods;
 
     /**
      * Query helper functions.
      */
-    query?: Record<any, <T extends QueryWithHelpers<unknown, DocType>>(this: T, ...args: any) => T> | QueryHelpers,
+    query?: Record<any, <T extends QueryWithHelpers<unknown, DocType>>(this: T, ...args: any) => T> | QueryHelpers;
 
     /**
      * Set whether to cast non-array values to arrays.
@@ -212,11 +209,14 @@ declare module 'mongoose' {
     /**
      * Virtual paths.
      */
-    virtuals?: SchemaOptionsVirtualsPropertyType<DocType, TVirtuals, TInstanceMethods>,
+    virtuals?: SchemaOptionsVirtualsPropertyType<DocType, TVirtuals, TInstanceMethods>;
   }
 
   interface DefaultSchemaOptions {
-    typeKey: 'type'
-    id: true
+    typeKey: 'type';
+    id: true;
+    _id: '_id';
+    timestamps: false;
+    versionKey: '__v'
   }
 }

@@ -10,7 +10,9 @@ import {
   Query,
   HydratedDocument,
   SchemaOptions,
-  ObtainSchemaGeneric
+  ObtainSchemaGeneric,
+  DefaultSchemaOptions,
+  FlatRecord
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 
@@ -692,14 +694,10 @@ function gh12030() {
 
 function gh12122() {
   const Test1 = new Schema({ test: String }, { typeKey: 'customTypeKey' });
-  expectType<{
+  expectType<FlatRecord<Omit<DefaultSchemaOptions, 'typeKey'> & {
     typeKey: 'customTypeKey';
-    id: true;
-  }>({} as ObtainSchemaGeneric<typeof Test1, 'TSchemaOptions'>);
+  }>>({} as ObtainSchemaGeneric<typeof Test1, 'TSchemaOptions'>);
 
   const Test2 = new Schema({ test: String }, {});
-  expectType<{
-    typeKey: 'type';
-    id: true;
-  }>({} as ObtainSchemaGeneric<typeof Test2, 'TSchemaOptions'>);
+  expectType<DefaultSchemaOptions>({} as ObtainSchemaGeneric<typeof Test2, 'TSchemaOptions'>);
 }

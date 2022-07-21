@@ -23,10 +23,10 @@ declare module 'mongoose' {
    * @param {EnforcedDocType} EnforcedDocType A generic type enforced by user "provided before schema constructor".
    * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
    */
-   type ObtainDocumentType<DocDefinition, EnforcedDocType = any, TypeKey extends TypeKeyBaseType = DefaultTypeKey> =
+   type ObtainDocumentType<DocDefinition, EnforcedDocType = any, TSchemaOptions extends Record<any, any> = DefaultSchemaOptions> =
    IsItRecordAndNotAny<EnforcedDocType> extends true ? EnforcedDocType : {
-     [K in keyof (RequiredPaths<DocDefinition, TypeKey> &
-     OptionalPaths<DocDefinition, TypeKey>)]: ObtainDocumentPathType<DocDefinition[K], TypeKey>;
+     [K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
+     OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)]: ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>;
    };
 
   /**
@@ -45,8 +45,8 @@ declare module 'mongoose' {
    * @param {TSchema} TSchema A generic of schema type instance.
    * @param {alias} alias Targeted generic alias.
    */
-  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TPathTypeKey' | 'DocType'> =
-    TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TStaticMethods, infer TPathTypeKey, infer DocType>
+  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TSchemaOptions' | 'DocType'> =
+    TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TStaticMethods, infer TSchemaOptions, infer DocType>
       ? {
         EnforcedDocType: EnforcedDocType;
         M: M;
@@ -54,11 +54,14 @@ declare module 'mongoose' {
         TQueryHelpers: TQueryHelpers;
         TVirtuals: TVirtuals;
         TStaticMethods: TStaticMethods;
-        TPathTypeKey: TPathTypeKey;
+        TSchemaOptions: TSchemaOptions;
         DocType: DocType;
       }[alias]
       : unknown;
+
+  type ResolveSchemaOptions<T> = Omit<MergeType<DefaultSchemaOptions, T>, 'statics' | 'methods' | 'query' | 'virtuals'>;
 }
+
 
 /**
  * @summary Checks if a document path is required or optional.
@@ -168,5 +171,5 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                           IfEquals<PathValueType, ObjectConstructor> extends true ? any:
                             IfEquals<PathValueType, {}> extends true ? any:
                               PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, TypeKey> :
+                                PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
                                   unknown;

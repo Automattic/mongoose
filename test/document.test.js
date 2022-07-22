@@ -8831,7 +8831,7 @@ describe('document', function() {
     assert.ok(!user.updatedAt);
   });
 
-  it('Sets default when passing undefined as value for a key in a nested subdoc (gh-9039)', async function() {
+  it('Sets default when passing undefined as value for a key in a nested subdoc (gh-12102) (gh-9039)', async function() {
     const Test = db.model('Test', {
       nested: {
         prop: {
@@ -8841,9 +8841,11 @@ describe('document', function() {
       }
     });
 
-
-    const doc = await Test.create({ nested: { prop: undefined } });
+    const obj = { nested: { prop: undefined } };
+    const doc = await Test.create(obj);
     assert.equal(doc.nested.prop, 'some default value');
+
+    assert.deepStrictEqual(obj, { nested: { prop: undefined } });
   });
 
   it('allows accessing $locals when initializing (gh-9098)', function() {
@@ -11505,6 +11507,51 @@ describe('document', function() {
     assert.equal(subdocs.length, 2);
     assert.equal(subdocs[0].value, 'test');
     assert.ok(subdocs[1].nestedSettings);
+  });
+
+  it('handles validation errors on deeply nested subdocuments underneath a nested path (gh-12021)', async function() {
+    const SubSubSchema = new mongoose.Schema(
+      {
+        from: {
+          type: mongoose.Schema.Types.String,
+          required: true
+        }
+      },
+      { _id: false }
+    );
+
+    const SubSchema = new mongoose.Schema(
+      {
+        nested: {
+          type: SubSubSchema,
+          required: false // <-- important
+        }
+      },
+      { _id: false }
+    );
+
+    const TestLeafSchema = new mongoose.Schema({
+      testProp: {
+        testSubProp: {
+          type: SubSchema,
+          required: true
+        }
+      }
+    });
+
+    const TestLeafModel = mongoose.model('test-leaf-model', TestLeafSchema);
+
+    const testModelInstance = new TestLeafModel({
+      testProp: {
+        testSubProp: {
+          nested: { from: null }
+        }
+      }
+    });
+
+    const err = await testModelInstance.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['testProp.testSubProp.nested.from']);
   });
 });
 

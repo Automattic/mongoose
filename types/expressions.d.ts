@@ -32,7 +32,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/add/#mongodb-expression-exp.-add
        */
-      $add: (NumberExpression | DateExpression)[];
+      $add: Expression[];
     }
 
     export interface Ceil {
@@ -1034,7 +1034,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ne/#mongodb-expression-exp.-ne
        */
-      $ne: Expression | [Expression, Expression];
+      $ne: Expression | [Expression, Expression | NullExpression] | null;
     }
 
     export interface Cond {
@@ -1043,7 +1043,7 @@ declare module 'mongoose' {
        *
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cond/#mongodb-expression-exp.-cond
        */
-      $cond: { if: BooleanExpression, then: AnyExpression, else: AnyExpression } | [BooleanExpression, AnyExpression, AnyExpression];
+      $cond: { if: Expression, then: AnyExpression, else: AnyExpression } | [BooleanExpression, AnyExpression, AnyExpression];
     }
 
     export interface IfNull {
@@ -1067,13 +1067,13 @@ declare module 'mongoose' {
          * - $case
          * - $then
          */
-        $branches: { $case: Expression, then: Expression }[];
+        branches: { case: Expression, then: Expression }[];
         /**
          * The path to take if no branch case expression evaluates to true.
          *
          * Although optional, if default is unspecified and no branch case evaluates to true, $switch returns an error.
          */
-        $default: Expression;
+        default: Expression;
       };
     }
 
@@ -1104,7 +1104,7 @@ declare module 'mongoose' {
        * @version 3.2
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/concatArrays/#mongodb-expression-exp.-concatArrays
        */
-      $concatArrays: ArrayExpression[];
+      $concatArrays: Expression[];
     }
 
     export interface Filter {
@@ -1957,7 +1957,7 @@ declare module 'mongoose' {
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/addToSet/#mongodb-expression-exp.-addToSet
        */
-      $addToSet: ArrayExpression;
+      $addToSet: Expression | Record<string, Expression>;
     }
 
     export interface Avg {
@@ -1967,7 +1967,7 @@ declare module 'mongoose' {
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/avg/#mongodb-expression-exp.-avg
        */
-      $avg: ArrayExpression;
+      $avg: Expression;
     }
 
     export interface Count {
@@ -2316,6 +2316,21 @@ declare module 'mongoose' {
       $toObjectId: Expression;
     }
 
+    export interface Top {
+      $top: {
+        sortBy: AnyObject,
+        output: Expression
+      };
+    }
+
+    export interface TopN {
+      $topN: {
+        n: Expression,
+        sortBy: AnyObject,
+        output: Expression
+      };
+    }
+
     export interface ToString {
       /**
        * Converts a value to a string. If the value cannot be converted to a string, $toString errors. If the value is
@@ -2385,6 +2400,7 @@ declare module 'mongoose' {
 
   type Path = string;
 
+
   export type Expression =
     Path |
     ArithmeticExpressionOperator |
@@ -2405,7 +2421,10 @@ declare module 'mongoose' {
     TypeExpressionOperator |
     AccumulatorOperator |
     VariableExpressionOperator |
-    WindowOperator;
+    WindowOperator |
+    Expression.Top |
+    Expression.TopN |
+    any;
 
   export type NullExpression = null;
 
@@ -2428,7 +2447,9 @@ declare module 'mongoose' {
     DateExpression |
     BinaryExpression |
     FunctionExpression |
-    ObjectIdExpression;
+    ObjectIdExpression |
+    ConditionalExpressionOperator |
+    any;
 
   export type ObjectIdExpression =
     TypeExpressionOperatorReturningObjectId;
@@ -2476,7 +2497,8 @@ declare module 'mongoose' {
     DataSizeOperatorReturningNumber |
     CustomAggregationExpressionOperatorReturningAny |
     TypeExpressionOperatorReturningNumber |
-    DateExpression;
+    DateExpression |
+    DateExpressionOperatorReturningNumber;
 
   export type ObjectExpression =
     Path |

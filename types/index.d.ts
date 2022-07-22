@@ -8,7 +8,7 @@
 /// <reference path="./expressions.d.ts" />
 /// <reference path="./helpers.d.ts" />
 /// <reference path="./middlewares.d.ts" />
-/// <reference path="./indizes.d.ts" />
+/// <reference path="./indexes.d.ts" />
 /// <reference path="./models.d.ts" />
 /// <reference path="./mongooseoptions.d.ts" />
 /// <reference path="./pipelinestage.d.ts" />
@@ -110,9 +110,7 @@ declare module 'mongoose' {
   }
 
   export type Require_id<T> = T extends { _id?: infer U }
-    ? U extends any
-      ? (T & { _id: Types.ObjectId })
-      : T & Required<{ _id: U }>
+    ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
   export type RequireOnlyTypedId<T> = T extends { _id?: infer U; }
@@ -157,6 +155,8 @@ declare module 'mongoose' {
     ? Schema<Omit<DocType, keyof T1> & T1, DiscriminatorModel<T2, M>, T3 | TInstanceMethods, T4 | TQueryHelpers, T5 | TVirtuals>
     : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals>;
 
+  type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
+
   export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any,
     TStaticMethods = {},
     TPathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
@@ -165,7 +165,7 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<TPathTypeKey, DocType, TInstanceMethods, TQueryHelpers, TStaticMethods>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<TPathTypeKey, FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods>);
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
@@ -226,6 +226,7 @@ declare module 'mongoose' {
     obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>>;
 
     /** Gets/sets schema paths. */
+    path<pathGeneric extends keyof EnforcedDocType>(path: pathGeneric): SchemaType<EnforcedDocType[pathGeneric]>;
     path<ResultType extends SchemaType = SchemaType>(path: string): ResultType;
     path(path: string, constructor: any): this;
 
@@ -243,8 +244,8 @@ declare module 'mongoose' {
     /** Defines a post hook for the model. */
     post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, T>): this;
     post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
-    post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PostMiddlewareFunction<T, T>): this;
-    post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
+    post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
+    post<T extends Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PostMiddlewareFunction<T, Array<AggregateExtract<T>>>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, Array<AggregateExtract<T>>>): this;
     post<T = M>(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<T, T>): this;
@@ -437,6 +438,10 @@ declare module 'mongoose' {
 
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
+  type Mutable<T> = {
+    -readonly [K in keyof T]: T[K];
+  };
+
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
     $currentDate?: AnyKeys<TSchema> & AnyObject;
@@ -444,22 +449,20 @@ declare module 'mongoose' {
     $min?: AnyKeys<TSchema> & AnyObject;
     $max?: AnyKeys<TSchema> & AnyObject;
     $mul?: AnyKeys<TSchema> & AnyObject;
-    $rename?: { [key: string]: string };
+    $rename?: Record<string, string>;
     $set?: AnyKeys<TSchema> & AnyObject;
     $setOnInsert?: AnyKeys<TSchema> & AnyObject;
     $unset?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: AnyKeys<TSchema> & AnyObject;
+    $addToSet?: Mutable<mongodb.SetFields<TSchema>>;
     $pop?: AnyKeys<TSchema> & AnyObject;
-    $pull?: AnyKeys<TSchema> & AnyObject;
-    $push?: AnyKeys<TSchema> & AnyObject;
-    $pullAll?: AnyKeys<TSchema> & AnyObject;
+    $pull?: Mutable<mongodb.PullOperator<TSchema>>;
+    $push?: Mutable<mongodb.PushOperator<TSchema>>;
+    $pullAll?: mongodb.PullAllOperator<TSchema>;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
-    $bit?: {
-      [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
-    };
+    $bit?: Record<string, mongodb.NumericType>;
   };
 
   export type UpdateWithAggregationPipeline = UpdateAggregationStage[];
@@ -539,7 +542,7 @@ declare module 'mongoose' {
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 
   // Helpers to simplify checks
-  type IfAny<IFTYPE, THENTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : IFTYPE;
+  type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : ELSETYPE;
   type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
 
   // tests for these two types are located in test/types/lean.test.ts

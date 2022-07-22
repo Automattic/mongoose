@@ -24,6 +24,7 @@
       ],
       "rules": {
         "@typescript-eslint/triple-slash-reference": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
         "spaced-comment": [
           "error",
           "always",
@@ -185,6 +186,8 @@
     "mocha-no-only/mocha-no-only": [
       "error"
     ],
-    "no-empty": "off"
+    "no-empty": "off",
+    "eol-last": "warn",
+    "no-multiple-empty-lines": ["warn", { "max": 2 }]
   }
 }

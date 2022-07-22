@@ -78,6 +78,16 @@ const timewithOffset430DateToString: Expression = { $dateToString: { format: '%H
 const minutesOffsetNYDateToString: Expression = { $dateToString: { format: '%Z', date: '$date', timezone: 'America/New_York' } };
 const minutesOffset430DateToString: Expression = { $dateToString: { format: '%Z', date: '$date', timezone: '+04:30' } };
 
+const topN: Expression.TopN = {
+  $topN: {
+    output: ['$playerId', '$score'],
+    sortBy: { score: 1 },
+    n: 3
+  }
+};
+
+const d: Expression.Avg = { $avg: { $subtract: [{ $ifNull: ['$end', new Date()] }, '$start'] } };
+
 const dateSubtract1: Expression = {
   $dateSubtract:
   {
@@ -159,4 +169,51 @@ const letExpr: Expression = {
   }
 };
 
+const addWithNull: Expression.Add = {
+  $add: [
+    '$price',
+    { $ifNull: ['$tax', 0] }
+  ]
+};
+
+const condWithIn: Expression.Cond = {
+  $cond: {
+    if: { $in: [] },
+    then: '$foo',
+    else: '$bar'
+  }
+};
+
 const toLong: Expression = { $toLong: '$qty' };
+
+const nullExpr: Expression = {
+  $ne: null
+};
+
+const nullNETupleExpr: Expression = {
+  $ne: ['$name', null]
+};
+
+const switchExpr: Expression.Switch = {
+  $switch: {
+    branches: [
+      { case: { $eq: ['$name', 'Detlef'] }, then: 'Detlef' },
+      { case: { $eq: ['$name', 'John'] }, then: 'John' }
+    ],
+    default: 'Hello'
+  }
+};
+
+(function gh12058() {
+  const concat: Expression.ConcatArrays = {
+    $concatArrays: [
+      {
+        $cond: {
+          if: { $eq: ['foo', true] },
+          then: [1],
+          else: [2]
+        }
+      }
+    ]
+  };
+})();

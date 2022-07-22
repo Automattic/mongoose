@@ -10,6 +10,13 @@ declare module 'mongoose' {
       ? T
       : Omit<T, keyof U> & U;
 
-  type MergeType<A extends Record<number | string, any>, B extends Record<number | string, any>> = Omit<A, keyof B> & B;
+  type MergeType<A, B> = Omit<A, keyof B> & B;
+
+  /**
+   * @summary Converts Unions to one record "object".
+   * @description It makes intellisense dialog box easier to read as a single object instead of showing that in multiple object unions.
+   * @param {T} T The type to be converted.
+   */
+   type FlatRecord<T> = { [K in keyof T]: T[K] };
 
 }

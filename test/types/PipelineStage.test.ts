@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import type { PipelineStage } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
@@ -251,6 +252,9 @@ const match2: PipelineStage = { $match: { test: 'bla' } };
 const match3: PipelineStage = { $match: { test: { $or: [{ score: { $gt: 70, $lt: 90 } }, { views: { $gte: 1000 } }] } } };
 const match4: PipelineStage = { $match: { $and: [{ score: { $gt: 70, $lt: 90 } }, { views: { $gte: 1000 } }] } };
 const match5: PipelineStage = { $match: { test: { $and: [{ score: { $gt: 70, $lt: 90 } }, { views: { $gte: 1000 } }] } } };
+const match6: PipelineStage = { $match: { test: true } };
+const match7: PipelineStage = { $match: { test: { $ne: true } } };
+
 const addFields7: PipelineStage = { $addFields: { convertedQty: { $toLong: '$qty' } } };
 
 const setWindowFields1: PipelineStage = {
@@ -370,3 +374,52 @@ const stages2: PipelineStage[] = [
     }
   }
 ];
+
+const stages3: PipelineStage[] = [
+  {
+    $addFields: {
+      a: { $ifNull: ['$a', 'foo'] }
+    }
+  },
+  {
+    $match: {
+      _id: new ObjectId('stringObjecId'),
+      a: { $exists: true },
+      b: null,
+      c: 'test',
+      d: { foo: true },
+      test: { $exists: true }
+    }
+  }
+];
+
+const stages4: PipelineStage[] = [
+  {
+    $addFields: {
+      usersCount: {
+        $let: {
+          vars: {
+            users: { $push: '$user' }
+          },
+          in: {
+            $reduce: {
+              input: '$users',
+              initialValue: 0,
+              in: {
+                $cond: { if: { $isArray: '$$this' }, then: { $size: '$$this' }, else: '$$this' }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+];
+
+(function gh12096() {
+  const data: PipelineStage.AddFields = {
+    $addFields: {
+      name: { $meta: 'Bill' }
+    }
+  };
+})();

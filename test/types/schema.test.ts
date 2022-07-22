@@ -2,14 +2,14 @@ import {
   Schema,
   Document,
   SchemaDefinition,
-  SchemaDefinitionProperty,
   SchemaTypeOptions,
   Model,
   Types,
   InferSchemaType,
   SchemaType,
   Query,
-  HydratedDocument
+  HydratedDocument,
+  SchemaOptions
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 
@@ -358,14 +358,17 @@ export function autoTypedSchema() {
     string2?: string;
     string3?: string;
     string4?: string;
+    string5: string;
     number1?: number;
     number2?: number;
     number3?: number;
     number4?: number;
+    number5: number;
     date1?: Date;
     date2?: Date;
     date3?: Date;
     date4?: Date;
+    date5: Date;
     buffer1?: Buffer;
     buffer2?: Buffer;
     buffer3?: Buffer;
@@ -374,23 +377,26 @@ export function autoTypedSchema() {
     boolean2?: boolean;
     boolean3?: boolean;
     boolean4?: boolean;
+    boolean5: boolean;
     mixed1?: any;
     mixed2?: any;
     mixed3?: any;
-    objectId1?: Schema.Types.ObjectId;
-    objectId2?: Schema.Types.ObjectId;
-    objectId3?: Schema.Types.ObjectId;
+    objectId1?: Types.ObjectId;
+    objectId2?: Types.ObjectId;
+    objectId3?: Types.ObjectId;
     customSchema?: Int8;
     map1?: Map<string, string>;
     map2?: Map<string, number>;
-    array1?: string[];
-    array2?: any[];
-    array3?: any[];
-    array4?: any[];
-    array5?: any[];
-    decimal1?: Schema.Types.Decimal128;
-    decimal2?: Schema.Types.Decimal128;
-    decimal3?: Schema.Types.Decimal128;
+    array1: string[];
+    array2: any[];
+    array3: any[];
+    array4: any[];
+    array5: any[];
+    array6: string[];
+    array7?: string[];
+    decimal1?: Types.Decimal128;
+    decimal2?: Types.Decimal128;
+    decimal3?: Types.Decimal128;
   };
 
   const TestSchema = new Schema({
@@ -398,14 +404,17 @@ export function autoTypedSchema() {
     string2: 'String',
     string3: 'string',
     string4: Schema.Types.String,
+    string5: { type: String, default: 'ABCD' },
     number1: Number,
     number2: 'Number',
     number3: 'number',
     number4: Schema.Types.Number,
+    number5: { type: Number, default: 10 },
     date1: Date,
     date2: 'Date',
     date3: 'date',
     date4: Schema.Types.Date,
+    date5: { type: Date, default: new Date() },
     buffer1: Buffer,
     buffer2: 'Buffer',
     buffer3: 'buffer',
@@ -414,12 +423,13 @@ export function autoTypedSchema() {
     boolean2: 'Boolean',
     boolean3: 'boolean',
     boolean4: Schema.Types.Boolean,
+    boolean5: { type: Boolean, default: true },
     mixed1: Object,
     mixed2: {},
     mixed3: Schema.Types.Mixed,
     objectId1: Schema.Types.ObjectId,
     objectId2: 'ObjectId',
-    objectId3: 'objectId',
+    objectId3: 'ObjectID',
     customSchema: Int8,
     map1: { type: Map, of: String },
     map2: { type: Map, of: Number },
@@ -428,6 +438,8 @@ export function autoTypedSchema() {
     array3: [Schema.Types.Mixed],
     array4: [{}],
     array5: [],
+    array6: { type: [String] },
+    array7: { type: [String], default: undefined },
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
     decimal3: 'decimal128'
@@ -475,6 +487,17 @@ export function autoTypedSchema() {
         message: '{VALUE} is not supported'
       },
       required: true
+    },
+    friendID: {
+      type: Schema.Types.ObjectId
+    },
+    nestedArray: {
+      type: [
+        new Schema({
+          date: { type: Date, required: true },
+          messages: Number
+        })
+      ]
     }
   }, {
     statics: {
@@ -516,6 +539,11 @@ export type AutoTypedSchemaType = {
     },
     favoritDrink?: 'Tea' | 'Coffee',
     favoritColorMode: 'dark' | 'light'
+    friendID?: Types.ObjectId;
+    nestedArray: Types.DocumentArray<{
+      date: Date;
+      messages?: number;
+    }>
   }
   , statics: {
     staticFn: () => 'Returned from staticFn'
@@ -558,4 +586,119 @@ function gh11828() {
       }
     }
   });
+}
+
+function gh11997() {
+  interface IUser {
+    name: string;
+  }
+
+  const userSchema = new Schema<IUser>({
+    name: { type: String, default: () => 'Hafez' }
+  });
+  userSchema.index({ name: 1 }, { weights: { name: 1 } });
+}
+
+function gh12003() {
+  const baseSchemaOptions: SchemaOptions = {
+    versionKey: false
+  };
+
+  const BaseSchema = new Schema({
+    name: String
+  }, baseSchemaOptions);
+
+  type BaseSchemaType = InferSchemaType<typeof BaseSchema>;
+
+  expectType<{ name?: string }>({} as BaseSchemaType);
+}
+
+function gh11987() {
+  interface IUser {
+    name: string;
+    email: string;
+    organization: Types.ObjectId;
+  }
+
+  const userSchema = new Schema<IUser>({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    organization: { type: Schema.Types.ObjectId, ref: 'Organization' }
+  });
+
+  expectType<SchemaType<string>>(userSchema.path<'name'>('name'));
+  expectError(userSchema.path<'foo'>('name'));
+  expectType<SchemaTypeOptions<string>>(userSchema.path<'name'>('name').OptionsConstructor);
+}
+
+function gh12030() {
+  const Schema1 = new Schema({
+    users: [
+      {
+        username: { type: String }
+      }
+    ]
+  });
+
+  expectType<{
+    users: {
+      username?: string
+    }[];
+  }>({} as InferSchemaType<typeof Schema1>);
+
+  const Schema2 = new Schema({
+    createdAt: { type: Date, default: Date.now }
+  });
+
+  expectType<{ createdAt: Date }>({} as InferSchemaType<typeof Schema2>);
+
+  const Schema3 = new Schema({
+    users: [
+      new Schema({
+        username: { type: String },
+        credit: { type: Number, default: 0 }
+      })
+    ]
+  });
+
+  expectType<{
+    users: Types.DocumentArray<{
+      credit: number;
+      username?: string;
+    }>;
+  }>({} as InferSchemaType<typeof Schema3>);
+
+
+  const Schema4 = new Schema({
+    data: { type: { role: String }, default: {} }
+  });
+
+  expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema4>);
+
+  const Schema5 = new Schema({
+    data: { type: { role: Object }, default: {} }
+  });
+
+  expectType<{ data: { role?: any } }>({} as InferSchemaType<typeof Schema5>);
+
+  const Schema6 = new Schema({
+    track: {
+      backupCount: {
+        type: Number,
+        default: 0
+      },
+      count: {
+        type: Number,
+        default: 0
+      }
+    }
+  });
+
+  expectType<{
+    track?: {
+      backupCount: number;
+      count: number;
+    };
+  }>({} as InferSchemaType<typeof Schema6>);
+
 }

@@ -1,7 +1,17 @@
 import { ObjectId } from 'bson';
-import { Schema, Document, Model, connection, model, Types } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import {
+  Schema,
+  Document,
+  Model,
+  connection,
+  model,
+  Types,
+  UpdateQuery,
+  CallbackError
+} from 'mongoose';
+import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
+import { UpdateOneModel } from 'mongodb';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -199,6 +209,38 @@ Project.exists({ name: 'Hello' }, (err, result) => {
   result?._id;
 });
 
+function find() {
+  // no args
+  Project.find();
+
+  // just filter
+  Project.find({});
+  Project.find({ name: 'Hello' });
+
+  // just callback
+  Project.find((error: CallbackError, result: IProject[]) => console.log(error, result));
+
+  // filter + projection
+  Project.find({}, undefined);
+  Project.find({}, null);
+  Project.find({}, { name: 1 });
+  Project.find({}, { name: 0 });
+
+  // filter + callback
+  Project.find({}, (error: CallbackError, result: IProject[]) => console.log(error, result));
+  Project.find({ name: 'Hello' }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+
+  // filter + projection + options
+  Project.find({}, undefined, { limit: 5 });
+  Project.find({}, null, { limit: 5 });
+  Project.find({}, { name: 1 }, { limit: 5 });
+
+  // filter + projection + options + callback
+  Project.find({}, undefined, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+  Project.find({}, null, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+  Project.find({}, { name: 1 }, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
+}
+
 function inheritance() {
   class InteractsWithDatabase extends Model {
     async _update(): Promise<void> {
@@ -248,7 +290,6 @@ export function autoTypedModel() {
   // Model-functions-test
   // Create should works with arbitrary objects.
     const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' });
-    expectType<string>(randomObject.unExistKey);
     expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
 
     const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });
@@ -269,3 +310,38 @@ export function autoTypedModel() {
   })();
   return AutoTypedModel;
 }
+
+function gh11911() {
+  interface IAnimal {
+    name?: string;
+  }
+
+  const animalSchema = new Schema<IAnimal>({
+    name: { type: String }
+  });
+
+  const Animal = model<IAnimal>('Animal', animalSchema);
+
+  const changes: UpdateQuery<IAnimal> = {};
+  expectAssignable<UpdateOneModel>({
+    filter: {},
+    update: changes
+  });
+}
+
+function gh12100() {
+  const schema = new Schema();
+
+  const Model = model('Model', schema);
+
+  Model.syncIndexes({ continueOnError: true, noResponse: true });
+  Model.syncIndexes({ continueOnError: false, noResponse: true });
+}
+
+(function gh12070() {
+  const schema_with_string_id = new Schema({ _id: String, nickname: String });
+  const TestModel = model('test', schema_with_string_id);
+  const obj = new TestModel();
+
+  expectType<string>(obj._id);
+})();

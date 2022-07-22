@@ -106,7 +106,7 @@ declare module 'mongoose' {
     checkKeys?: boolean;
     j?: boolean;
     safe?: boolean | WriteConcern;
-    timestamps?: boolean;
+    timestamps?: boolean | QueryTimestampsConfig;
     validateBeforeSave?: boolean;
     validateModifiedOnly?: boolean;
     w?: number | string;
@@ -119,7 +119,7 @@ declare module 'mongoose' {
     AcceptsDiscriminator,
     IndexManager,
     SessionStarter {
-    new <DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<MergeType<T, DocType>, TMethodsAndOverrides, TVirtuals> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+    new <DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[], callback?: Callback<R[]>): Aggregate<Array<R>>;
@@ -163,11 +163,11 @@ declare module 'mongoose' {
     countDocuments(callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a new document or documents */
-    create<DocContents = T>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = T>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>[]>): void;
-    create<DocContents = T>(doc: DocContents | T): Promise<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>>;
-    create<DocContents = T>(...docs: Array<T | DocContents>): Promise<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = T>(doc: T | DocContents, callback: Callback<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>>): void;
+    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
+    create<DocContents = AnyKeys<T>>(doc: DocContents | T): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
+    create<DocContents = AnyKeys<T>>(...docs: Array<T | DocContents>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = AnyKeys<T>>(doc: T | DocContents, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
 
     /**
    * Create the collection for this model. By default, if no indexes are specified,
@@ -315,21 +315,21 @@ declare module 'mongoose' {
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(
       filter: FilterQuery<T>,
-      projection: ProjectionType<T> | null,
-      options: QueryOptions<T> | null,
-      callback?: Callback<ResultDoc[]>
+      projection?: ProjectionType<T> | null | undefined,
+      options?: QueryOptions<T> | null | undefined,
+      callback?: Callback<ResultDoc[]> | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
     find<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(
       filter: FilterQuery<T>,
-      projection: ProjectionType<T> | null,
-      callback?: Callback<ResultDoc[]>
+      projection?: ProjectionType<T> | null | undefined,
+      callback?: Callback<ResultDoc[]> | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
     find<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(
       filter: FilterQuery<T>,
-      callback?: Callback<ResultDoc[]>
+      callback?: Callback<ResultDoc[]> | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
     find<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(
-      callback?: Callback<ResultDoc[]>
+      callback?: Callback<ResultDoc[]> | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
@@ -351,6 +351,7 @@ declare module 'mongoose' {
     findOneAndRemove<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(filter?: FilterQuery<T>, options?: QueryOptions<T> | null, callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
+    findOneAndReplace<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(filter: FilterQuery<T>, replacement: T | AnyObject, options: QueryOptions<T> & { rawResult: true }, callback?: (err: CallbackError, doc: any, res: any) => void): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, T>;
     findOneAndReplace<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(filter: FilterQuery<T>, replacement: T | AnyObject, options: QueryOptions<T> & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: ResultDoc, res: any) => void): QueryWithHelpers<ResultDoc, ResultDoc, TQueryHelpers, T>;
     findOneAndReplace<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(filter?: FilterQuery<T>, replacement?: T | AnyObject, options?: QueryOptions<T> | null, callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 

@@ -279,8 +279,9 @@ const schema2 = new Schema({
 
 <h5>Date</h5>
 
-* `min`: Date
-* `max`: Date
+* `min`: Date, creates a [validator](./validation.html) that checks if the value is greater than or equal to the given minimum.
+* `max`: Date, creates a [validator](./validation.html) that checks if the value is less than or equal to the given maximum.
+* `expires`: Number or String, creates a TTL index with the value expressed in seconds.
 
 <h5>ObjectId</h5>
 
@@ -723,3 +724,7 @@ including what validators it has and what the type is.
   <li><a href="https://masteringjs.io/tutorials/mongoose/schematype">An Introduction to Mongoose SchemaTypes</a></li>
   <li><a href="https://kb.objectrocket.com/mongo-db/mongoose-schema-types-1418">Mongoose Schema Types</a></li>
 </ul>
+
+### Next Up
+
+Now that we've covered `SchemaTypes`, let's take a look at [Connections](/docs/connections.md).

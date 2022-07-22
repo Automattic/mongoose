@@ -109,9 +109,7 @@ declare module 'mongoose' {
   }
 
   export type Require_id<T> = T extends { _id?: infer U }
-    ? U extends any
-      ? (T & { _id: Types.ObjectId })
-      : T & Required<{ _id: U }>
+    ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
   export type RequireOnlyTypedId<T> = T extends { _id?: infer U; }
@@ -439,6 +437,10 @@ declare module 'mongoose' {
 
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
+  type Mutable<T> = {
+    -readonly [K in keyof T]: T[K];
+  };
+
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
     $currentDate?: AnyKeys<TSchema> & AnyObject;
@@ -452,10 +454,10 @@ declare module 'mongoose' {
     $unset?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: mongodb.SetFields<TSchema>;
+    $addToSet?: Mutable<mongodb.SetFields<TSchema>>;
     $pop?: AnyKeys<TSchema> & AnyObject;
-    $pull?: mongodb.PullOperator<TSchema>;
-    $push?: mongodb.PushOperator<TSchema>;
+    $pull?: Mutable<mongodb.PullOperator<TSchema>>;
+    $push?: Mutable<mongodb.PushOperator<TSchema>>;
     $pullAll?: mongodb.PullAllOperator<TSchema>;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
@@ -539,7 +541,7 @@ declare module 'mongoose' {
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 
   // Helpers to simplify checks
-  type IfAny<IFTYPE, THENTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : IFTYPE;
+  type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : ELSETYPE;
   type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
 
   // tests for these two types are located in test/types/lean.test.ts

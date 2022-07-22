@@ -1,3 +1,33 @@
+6.4.6 / 2022-07-20
+==================
+ * fix(schema): disallow setting __proto__ when creating schema with dotted properties #12085
+ * fix(document): avoid mutating original object passed to $set() when applying defaults to nested properties #12102
+ * fix(query): apply lean transform option to top-level document #12093
+ * docs(migrating_to_6): correct example for `isObjectIdOrHexString()` #12123 [LokeshKanumoori](https://github.com/LokeshKanumoori)
+
+6.4.5 / 2022-07-18
+==================
+ * fix(model+timestamps): set timestamps on subdocuments in insertMany() #12060
+ * fix: correct isAtlas check #12110 [skrtheboss](https://github.com/skrtheboss)
+ * fix(types): fix various issues with auto typed schemas #12042 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+ * fix(types): allow any value for AddFields #12096
+ * fix(types): allow arbitrary expressions for ConcatArrays #12058
+ * fix(types): make $addToSet fields mutable to allow programatically constructing $addToSet #12091
+ * fix(types): add $let as a possible expression to $addFields #12087 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(types): fix $switch expression type #12088 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(types): correct options type for syncIndexes() #12101 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): avoid treating | undefined types as any in `Require_id` to better support `_id: String` with auto-typed schemas #12070
+ * docs: fix up various jsdoc issues #12086 [hasezoey](https://github.com/hasezoey)
+ * docs: add sanitizeFilter to mongoose.set() options #12112 [pathei-kosmos](https://github.com/pathei-kosmos)
+
+6.4.4 / 2022-07-08
+==================
+ * fix(types): allow using an object to configure timestamps #12061 [lantw44](https://github.com/lantw44)
+ * fix(types): support findOneAndReplace with rawResult #12062 [lantw44](https://github.com/lantw44)
+ * docs: upgrade API documentation parser #12078 #12072 #12071 #12024 [hasezoey](https://github.com/hasezoey)
+ * docs(document): add more info on $isNew #11990
+ * docs: add SchemaType doValidate() to docs #12068
+
 6.4.3 / 2022-07-05
 ==================
  * fix(document): handle validating deeply nested subdocuments underneath nested paths with required: false #12021

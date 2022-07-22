@@ -1067,13 +1067,13 @@ declare module 'mongoose' {
          * - $case
          * - $then
          */
-        $branches: { $case: Expression, then: Expression }[];
+        branches: { case: Expression, then: Expression }[];
         /**
          * The path to take if no branch case expression evaluates to true.
          *
          * Although optional, if default is unspecified and no branch case evaluates to true, $switch returns an error.
          */
-        $default: Expression;
+        default: Expression;
       };
     }
 
@@ -1104,7 +1104,7 @@ declare module 'mongoose' {
        * @version 3.2
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/concatArrays/#mongodb-expression-exp.-concatArrays
        */
-      $concatArrays: ArrayExpression[];
+      $concatArrays: Expression[];
     }
 
     export interface Filter {
@@ -2448,7 +2448,8 @@ declare module 'mongoose' {
     BinaryExpression |
     FunctionExpression |
     ObjectIdExpression |
-    ConditionalExpressionOperator;
+    ConditionalExpressionOperator |
+    any;
 
   export type ObjectIdExpression =
     TypeExpressionOperatorReturningObjectId;

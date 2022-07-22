@@ -41,7 +41,7 @@ test/files/main.js
 
 package-lock.json
 
-.config*
+.config.js
 
 # Compiled docs
 docs/*.html
@@ -49,4 +49,11 @@ docs/tutorials/*.html
 docs/typescript/*.html
 docs/api/*.html
 index.html
+
+# Local Netlify folder
+.netlify
+
+# yarn package-lock
+yarn.lock
+
 examples/ecommerce-netlify-functions/.netlify/state.json

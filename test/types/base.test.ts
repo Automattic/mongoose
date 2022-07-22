@@ -46,3 +46,8 @@ function gh11478() {
 function gh10139() {
   mongoose.set('timestamps.createdAt.immutable', false);
 }
+
+function gh12100() {
+  mongoose.syncIndexes({ continueOnError: true, noResponse: true });
+  mongoose.syncIndexes({ continueOnError: false, noResponse: true });
+}

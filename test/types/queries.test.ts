@@ -325,5 +325,19 @@ function gh11964() {
       /* ... */
     }
   }
+}
 
+function gh12091() {
+  interface IUser{
+    friendsNames: string[];
+  }
+  const userSchema = new Schema<IUser>({
+    friendsNames: [String]
+  });
+
+  const update: UpdateQuery<IUser> = { $addToSet: { friendsNames: 'John Doe' } };
+  if (!update?.$addToSet) {
+    return;
+  }
+  update.$addToSet.friendsNames = 'Jane Doe';
 }

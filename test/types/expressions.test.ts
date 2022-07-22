@@ -193,3 +193,27 @@ const nullExpr: Expression = {
 const nullNETupleExpr: Expression = {
   $ne: ['$name', null]
 };
+
+const switchExpr: Expression.Switch = {
+  $switch: {
+    branches: [
+      { case: { $eq: ['$name', 'Detlef'] }, then: 'Detlef' },
+      { case: { $eq: ['$name', 'John'] }, then: 'John' }
+    ],
+    default: 'Hello'
+  }
+};
+
+(function gh12058() {
+  const concat: Expression.ConcatArrays = {
+    $concatArrays: [
+      {
+        $cond: {
+          if: { $eq: ['foo', true] },
+          then: [1],
+          else: [2]
+        }
+      }
+    ]
+  };
+})();

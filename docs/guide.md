@@ -172,7 +172,7 @@ dog.findSimilarTypes((err, dogs) => {
 });
 ```
 
-* Overwriting a default mongoose document method may lead to unpredictable results. See [this](./api.html#schema_Schema.reserved) for more details.
+* Overwriting a default mongoose document method may lead to unpredictable results. See [this](./api.html#schema_Schema-reserved) for more details.
 * The example above uses the `Schema.methods` object directly to save an instance method. You can also use the `Schema.method()` helper as described [here](./api.html#schema_Schema-method).
 * Do **not** declare methods using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so your method will **not** have access to the document and the above examples will not work.
 
@@ -300,7 +300,7 @@ Animal.on('index', error => {
 });
 ```
 
-See also the [Model#ensureIndexes](./api.html#model_Model.ensureIndexes) method.
+See also the [Model#ensureIndexes](./api.html#model_Model-ensureIndexes) method.
 
 <h3 id="virtuals"><a href="#virtuals">Virtuals</a></h3>
 
@@ -468,9 +468,9 @@ Valid options:
 
 <h3 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h3>
 
-By default, Mongoose's [`init()` function](/docs/api.html#model_Model.init)
+By default, Mongoose's [`init()` function](/docs/api.html#model_Model-init)
 creates all the indexes defined in your model's schema by calling
-[`Model.createIndexes()`](/docs/api.html#model_Model.createIndexes)
+[`Model.createIndexes()`](/docs/api.html#model_Model-createIndexes)
 after you successfully connect to MongoDB. Creating indexes automatically is
 great for development and test environments. But index builds can also create
 significant load on your production database. If you want to manage indexes
@@ -561,7 +561,7 @@ new Schema({..}, { capped: { size: 1024, max: 1000, autoIndexId: true } });
 <h3 id="collection"><a href="#collection">option: collection</a></h3>
 
 Mongoose by default produces a collection name by passing the model name to
-the [utils.toCollectionName](./api.html#utils_exports.toCollectionName) method.
+the [utils.toCollectionName](./api.html#utils_exports-toCollectionName) method.
 This method pluralizes the name. Set this option if you need a different name
 for your collection.
 
@@ -613,7 +613,7 @@ console.log(p.id); // undefined
 
 Mongoose assigns each of your schemas an `_id` field by default if one
 is not passed into the [Schema](/docs/api.html#schema-js) constructor.
-The type assigned is an [ObjectId](/docs/api.html#schema_Schema.Types)
+The type assigned is an [ObjectId](/docs/api.html#schema_Schema-Types)
 to coincide with MongoDB's default behavior. If you don't want an `_id`
 added to your schema at all, you may disable it using this option.
 
@@ -1165,7 +1165,7 @@ await Thing.updateOne({}, { $set: { name: 'Test' } });
 await Thing.findOneAndUpdate({}, { $set: { name: 'Test2' } });
 
 // Mongoose also adds timestamps to bulkWrite() operations
-// See https://mongoosejs.com/docs/api.html#model_Model.bulkWrite
+// See https://mongoosejs.com/docs/api.html#model_Model-bulkWrite
 await Thing.bulkWrite([
   insertOne: {
     document: {

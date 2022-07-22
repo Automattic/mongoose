@@ -1,3 +1,10 @@
+6.4.6 / 2022-07-20
+==================
+ * fix(schema): disallow setting __proto__ when creating schema with dotted properties #12085
+ * fix(document): avoid mutating original object passed to $set() when applying defaults to nested properties #12102
+ * fix(query): apply lean transform option to top-level document #12093
+ * docs(migrating_to_6): correct example for `isObjectIdOrHexString()` #12123 [LokeshKanumoori](https://github.com/LokeshKanumoori)
+
 6.4.5 / 2022-07-18
 ==================
  * fix(model+timestamps): set timestamps on subdocuments in insertMany() #12060

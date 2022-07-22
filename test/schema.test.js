@@ -2806,6 +2806,18 @@ describe('schema', function() {
     }, /Cannot use schema-level projections.*subdocument_mapping.not_selected/);
   });
 
+  it('allows a lean option on schemas so that all documents are lean when running a query (gh-10090)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: String
+    }, { lean: true });
+    const Test = db.model('gh10090', testSchema);
+    await Test.create({
+      name: 'I am a lean doc, fast and small'
+    });
+    const entry = await Test.findOne();
+    assert.equal(entry instanceof mongoose.Document, false);
+  });
+
   it('disallows setting special properties with `add()` or constructor (gh-12085)', async function() {
     const maliciousPayload = '{"__proto__.toString": "Number"}';
 

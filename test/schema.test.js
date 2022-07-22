@@ -2827,4 +2827,44 @@ describe('schema', function() {
 
     assert.ok({}.toString());
   });
+
+  it('enable defining virtual paths by using schema constructor (gh-11908)', async function() {
+    function get() {return this.email.slice(this.email.indexOf('@') + 1);}
+    function set(v) { this.email = [this.email.slice(0, this.email.indexOf('@')), v].join('@');}
+    const options = {
+      getters: true
+    };
+
+    const definition = {
+      email: { type: String }
+    };
+    const TestSchema1 = new Schema(definition);
+    TestSchema1.virtual('domain', options).set(set).get(get);
+
+    const TestSchema2 = new Schema({
+      email: { type: String }
+    }, {
+      virtuals: {
+        domain: {
+          get,
+          set,
+          options
+        }
+      }
+    });
+
+    assert.deepEqual(TestSchema2.virtuals, TestSchema1.virtuals);
+
+    const doc1 = new (mongoose.model('schema1', TestSchema1))({ email: 'test@m0_0a.com' });
+    const doc2 = new (mongoose.model('schema2', TestSchema2))({ email: 'test@m0_0a.com' });
+
+    assert.equal(doc1.domain, doc2.domain);
+
+    const mongooseDomain = 'mongoose.com';
+    doc1.domain = mongooseDomain;
+    doc2.domain = mongooseDomain;
+
+    assert.equal(doc1.domain, mongooseDomain);
+    assert.equal(doc1.domain, doc2.domain);
+  });
 });

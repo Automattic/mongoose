@@ -21,6 +21,7 @@
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
 /// <reference path="./inferschematype.d.ts" />
+/// <reference path="./virtuals.d.ts" />
 
 declare class NativeDate extends global.Date { }
 
@@ -156,7 +157,7 @@ declare module 'mongoose' {
 
   type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
 
-  export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = any,
+  export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {},
     TStaticMethods = {},
     TPathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
     DocType extends ObtainDocumentType<DocType, EnforcedDocType, TPathTypeKey> = ObtainDocumentType<any, EnforcedDocType, TPathTypeKey>>
@@ -164,7 +165,7 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<TPathTypeKey, FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<TPathTypeKey, FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals>);
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;

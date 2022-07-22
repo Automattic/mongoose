@@ -8147,6 +8147,73 @@ describe('Model', function() {
 
       assert.equal(writeOperations.length, 3);
     });
+
+    it('accepts `timestamps: false` (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const newUser = new User({ name: 'Hafez' });
+      const userToUpdate = await User.create({ name: 'Hafez' });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: false, skipValidation: true });
+
+      // Assert
+      const timestampsOptions = writeOperations.map(writeOperationContainer => {
+        const operationObject = writeOperationContainer.updateOne || writeOperationContainer.insertOne;
+        return operationObject.timestamps;
+      });
+      assert.deepEqual(timestampsOptions, [false, false]);
+    });
+    it('accepts `timestamps: true` (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const newUser = new User({ name: 'Hafez' });
+      const userToUpdate = await User.create({ name: 'Hafez' });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: true, skipValidation: true });
+
+      // Assert
+      const timestampsOptions = writeOperations.map(writeOperationContainer => {
+        const operationObject = writeOperationContainer.updateOne || writeOperationContainer.insertOne;
+        return operationObject.timestamps;
+      });
+      assert.deepEqual(timestampsOptions, [true, true]);
+    });
+    it('`timestamps` has `undefined` as default value (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const newUser = new User({ name: 'Hafez' });
+      const userToUpdate = await User.create({ name: 'Hafez' });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { skipValidation: true });
+
+      // Assert
+      const timestampsOptions = writeOperations.map(writeOperationContainer => {
+        const operationObject = writeOperationContainer.updateOne || writeOperationContainer.insertOne;
+        return operationObject.timestamps;
+      });
+      assert.deepEqual(timestampsOptions, [undefined, undefined]);
+    });
   });
 
   describe('bulkSave() (gh-9673)', function() {
@@ -8235,7 +8302,6 @@ describe('Model', function() {
 
     });
     it('throws an error on failure', async() => {
-
       const userSchema = new Schema({
         name: { type: String, unique: true }
       });
@@ -8255,8 +8321,8 @@ describe('Model', function() {
 
       const err = await User.bulkSave(users).then(() => null, err => err);
       assert.ok(err);
-
     });
+
     it('changes document state from `isNew` `false` to `true`', async() => {
 
       const userSchema = new Schema({
@@ -8411,6 +8477,76 @@ describe('Model', function() {
       const res = await model.bulkSave(entries);
       assert.ok(res);
     });
+
+    it('accepts `timestamps: false` (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String }
+      }, { timestamps: true });
+
+      const User = db.model('User', userSchema);
+      const newUser = new User({ name: 'Sam' });
+
+      const userToUpdate = await User.create({ name: 'Hafez', createdAt: new Date('1994-12-04'), updatedAt: new Date('1994-12-04') });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      await User.bulkSave([newUser, userToUpdate], { timestamps: false });
+
+
+      // Assert
+      const createdUserPersistedInDB = await User.findOne({ _id: newUser._id });
+      assert.deepStrictEqual(newUser.createdAt, undefined);
+      assert.deepStrictEqual(newUser.updatedAt, undefined);
+
+      assert.deepStrictEqual(createdUserPersistedInDB.createdAt, undefined);
+      assert.deepStrictEqual(createdUserPersistedInDB.updatedAt, undefined);
+      assert.deepStrictEqual(userToUpdate.createdAt, new Date('1994-12-04'));
+      assert.deepStrictEqual(userToUpdate.updatedAt, new Date('1994-12-04'));
+    });
+
+    it('accepts `timestamps: true` (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      }, { timestamps: true });
+
+      const User = db.model('User', userSchema);
+
+      const newUser = new User({ name: 'Hafez' });
+      const userToUpdate = await User.create({ name: 'Hafez' });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      await User.bulkSave([newUser, userToUpdate], { timestamps: true });
+
+      // Assert
+      assert.ok(newUser.createdAt);
+      assert.ok(newUser.updatedAt);
+      assert.ok(userToUpdate.createdAt);
+      assert.ok(userToUpdate.updatedAt);
+    });
+    it('`timestamps` has `undefined` as default value (gh-12059)', async() => {
+      // Arrange
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      }, { timestamps: true });
+
+      const User = db.model('User', userSchema);
+
+      const newUser = new User({ name: 'Hafez' });
+      const userToUpdate = await User.create({ name: 'Hafez' });
+      userToUpdate.name = 'John Doe';
+
+      // Act
+      await User.bulkSave([newUser, userToUpdate]);
+
+      // Assert
+      assert.ok(newUser.createdAt);
+      assert.ok(newUser.updatedAt);
+      assert.ok(userToUpdate.createdAt);
+      assert.ok(userToUpdate.updatedAt);
+    });
   });
 
   describe('Setting the explain flag', function() {
@@ -8505,6 +8641,19 @@ describe('Model', function() {
     assert.equal(doc.hoursToMake, null);
   });
 
+  it('supports setters option for `hydrate()` (gh-11653)', function() {
+    const schema = Schema({
+      text: {
+        type: String,
+        set: v => v.toLowerCase()
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const doc = Test.hydrate({ text: 'FOOBAR' }, null, { setters: true });
+    assert.equal(doc.text, 'foobar');
+  });
+
   it('sets index collation based on schema collation (gh-7621)', async function() {
     let testSchema = new Schema(
       { name: { type: String, index: true } }
@@ -8532,6 +8681,129 @@ describe('Model', function() {
     assert.strictEqual(indexes.length, 2);
     assert.deepEqual(indexes[1].key, { name: 1 });
     assert.strictEqual(indexes[1].collation.locale, 'en');
+  });
+
+  describe('Model.applyDefaults (gh-11945)', function() {
+    it('applies defaults to POJOs', function() {
+      const Test = db.model('Test', mongoose.Schema({
+        _id: false,
+        name: {
+          type: String,
+          default: 'John Smith'
+        },
+        age: {
+          type: Number,
+          default: 29
+        },
+        nestedName: {
+          first: {
+            type: String,
+            default: 'John'
+          },
+          last: {
+            type: String,
+            default: 'Smith'
+          },
+          middle: {
+            type: String,
+            default: ''
+          }
+        },
+        subdoc: {
+          type: mongoose.Schema({
+            _id: false,
+            test: {
+              type: String,
+              default: 'subdoc default'
+            }
+          }),
+          default: () => ({})
+        },
+        docArr: [{
+          _id: false,
+          test: {
+            type: String,
+            default: 'doc array default'
+          }
+        }]
+      }));
+
+      const obj = { age: 31, nestedName: { middle: 'James' }, docArr: [{}] };
+      Test.applyDefaults(obj);
+
+      assert.deepStrictEqual(obj, {
+        name: 'John Smith',
+        age: 31,
+        nestedName: { first: 'John', last: 'Smith', middle: 'James' },
+        subdoc: {
+          test: 'subdoc default'
+        },
+        docArr: [{
+          test: 'doc array default'
+        }]
+      });
+    });
+
+    it('applies defaults to documents', function() {
+      const Test = db.model('Test', mongoose.Schema({
+        _id: false,
+        name: {
+          type: String,
+          default: 'John Smith'
+        },
+        age: {
+          type: Number,
+          default: 29
+        },
+        nestedName: {
+          first: {
+            type: String,
+            default: 'John'
+          },
+          last: {
+            type: String,
+            default: 'Smith'
+          },
+          middle: {
+            type: String,
+            default: ''
+          }
+        },
+        subdoc: {
+          type: mongoose.Schema({
+            _id: false,
+            test: {
+              type: String,
+              default: 'subdoc default'
+            }
+          }),
+          default: () => ({})
+        },
+        docArr: [{
+          _id: false,
+          test: {
+            type: String,
+            default: 'doc array default'
+          }
+        }]
+      }));
+
+      const obj = { age: 31, nestedName: { middle: 'James' }, docArr: [{}] };
+      const doc = new Test(obj, null, { defaults: false });
+      Test.applyDefaults(doc);
+
+      assert.deepStrictEqual(doc.toObject(), {
+        name: 'John Smith',
+        age: 31,
+        nestedName: { first: 'John', last: 'Smith', middle: 'James' },
+        subdoc: {
+          test: 'subdoc default'
+        },
+        docArr: [{
+          test: 'doc array default'
+        }]
+      });
+    });
   });
 });
 

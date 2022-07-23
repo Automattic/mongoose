@@ -75,5 +75,10 @@ block content
         h5 Inherits:
         ul
           li <span class="method-type">&laquo;#{prop.inherits}&raquo;</span>
+      if prop.see != null 
+        h5 See:
+        ul
+          each see in prop.see
+            li <span class="method-type"><a href="#{see.url}">#{see.text}</a></span>
       div
         | !{prop.description}  

@@ -51,7 +51,7 @@ block content
         a(href='#' + prop.anchorId)
           | #{prop.string}
       if prop.param != null
-        h5 Parameters
+        h5 Parameters:
         ul.params
           each param in prop.param
             - if (param.nested)

@@ -57,11 +57,11 @@ block content
             - if (param.nested)
               ul(style="margin-top: 0.5em")
                 li
-                  | #{param.name}
+                  | <code>#{param.name}</code>
                   | <span class="method-type">&laquo;#{param.types}&raquo;</span> !{param.description}
             - else
               li.param
-                | #{param.name}
+                | <code>#{param.name}</code>
                 | <span class="method-type">&laquo;#{param.types}&raquo;</span> !{param.description}
       if prop.return != null
         h5 Returns:

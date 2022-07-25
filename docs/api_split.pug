@@ -50,6 +50,8 @@ block content
       h3(id=prop.anchorId)
         a(href='#' + prop.anchorId)
           | #{prop.string}
+      if prop.deprecated 
+        <span class="deprecated">~DEPRECATED~</span>
       if prop.param != null
         h5 Parameters
         ul.params

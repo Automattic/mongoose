@@ -53,7 +53,7 @@ block content
       if prop.deprecated 
         <span class="deprecated">~DEPRECATED~</span>
       if prop.param != null
-        h5 Parameters
+        h5 Parameters:
         ul.params
           each param in prop.param
             - if (param.nested)
@@ -77,5 +77,10 @@ block content
         h5 Inherits:
         ul
           li <span class="method-type">&laquo;#{prop.inherits}&raquo;</span>
+      if prop.see != null 
+        h5 See:
+        ul
+          each see in prop.see
+            li <span class="method-type"><a href="#{see.url}">#{see.text}</a></span>
       div
         | !{prop.description}  

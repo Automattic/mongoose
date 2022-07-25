@@ -345,3 +345,16 @@ function gh12100() {
 
   expectType<string>(obj._id);
 })();
+
+(async function gh12094() {
+  const userSchema = new Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    avatar: String
+  });
+
+  const User = model('User', userSchema);
+
+  const doc = await User.exists({ name: 'Bill' }).orFail();
+  expectType<Types.ObjectId>(doc._id);
+})();

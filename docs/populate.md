@@ -407,8 +407,8 @@ person.populated('fans'); // Array of ObjectIds
 <h3 id="populate_multiple_documents"><a href="#populate_multiple_documents">Populating multiple existing documents</a></h3>
 
 If we have one or many mongoose documents or even plain objects
-(_like [mapReduce](./api.html#model_Model.mapReduce) output_), we may
-populate them using the [Model.populate()](./api.html#model_Model.populate)
+(_like [mapReduce](./api.html#model_Model-mapReduce) output_), we may
+populate them using the [Model.populate()](./api.html#model_Model-populate)
 method. This is what `Document#populate()`
 and `Query#populate()` use to populate documents.
 
@@ -475,7 +475,7 @@ This is known as a "cross-database populate," because it enables you to
 populate across MongoDB databases and even across MongoDB instances.
 
 If you don't have access to the model instance when defining your `eventSchema`,
-you can also pass [the model instance as an option to `populate()`](/docs/api/model.html#model_Model.populate).
+you can also pass [the model instance as an option to `populate()`](/docs/api/model.html#model_Model-populate).
 
 ```javascript
 const events = await Event.

@@ -1,3 +1,16 @@
+6.4.7 / 2022-07-25
+==================
+ * fix(virtualtype): use $locals for default virtual getter/setter rather than top-level doc #12124
+ * fix(document): call subdocument getters if child schema has getters: true #12105
+ * fix(schematype): actually always return "this" where specified #12141 [hasezoey](https://github.com/hasezoey)
+ * fix(types): correct return value for Model.exists() #12094
+ * docs(guides): add link to advanced schemas doc #12073
+ * docs: handle @see in jsdoc #12144 [hasezoey](https://github.com/hasezoey)
+ * docs: make use of the deprecated tag available in jsdoc for documentation #12080 [hasezoey](https://github.com/hasezoey)
+ * docs(api_split): add basic DEPRECATED output #12146 [hasezoey](https://github.com/hasezoey)
+ * docs: various jsdoc cleanup #12140 [hasezoey](https://github.com/hasezoey)
+ * docs(api_split.pug): add "code" to parameter name #12145 [hasezoey](https://github.com/hasezoey)
+
 6.4.6 / 2022-07-20
 ==================
  * fix(schema): disallow setting __proto__ when creating schema with dotted properties #12085

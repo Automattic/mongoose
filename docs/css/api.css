@@ -155,3 +155,7 @@ hr.separate-api {
   text-transform: uppercase;
   letter-spacing: .2px;
 }
+
+.deprecated {
+  color: #ff0000;
+}

@@ -229,7 +229,7 @@ declare module 'mongoose' {
     /** The username specified in the URI */
     readonly user: string;
 
-    /** Watches the entire underlying database for changes. Similar to [`Model.watch()`](/docs/api/model.html#model_Model.watch). */
+    /** Watches the entire underlying database for changes. Similar to [`Model.watch()`](/docs/api/model.html#model_Model-watch). */
     watch<ResultType extends mongodb.Document = any>(pipeline?: Array<any>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
   }
 

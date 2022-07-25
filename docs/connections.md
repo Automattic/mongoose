@@ -73,7 +73,7 @@ mongoose.set('bufferCommands', false);
 Note that buffering is also responsible for waiting until Mongoose
 creates collections if you use the [`autoCreate` option](/docs/guide.html#autoCreate).
 If you disable buffering, you should also disable the `autoCreate`
-option and use [`createCollection()`](/docs/api/model.html#model_Model.createCollection)
+option and use [`createCollection()`](/docs/api/model.html#model_Model-createCollection)
 to create [capped collections](/docs/guide.html#capped) or
 [collections with collations](/docs/guide.html#collation).
 

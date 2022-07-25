@@ -1,6 +1,6 @@
 # Query Casting
 
-The first parameter to [`Model.find()`](https://mongoosejs.com/docs/api.html#model_Model.find), [`Query#find()`](https://mongoosejs.com/docs/api.html#query_Query-find), [`Model.findOne()`](https://mongoosejs.com/docs/api.html#model_Model.findOne), etc. is called `filter`. In older content this parameter is sometimes called `query` or `conditions`. For example:
+The first parameter to [`Model.find()`](https://mongoosejs.com/docs/api.html#model_Model-find), [`Query#find()`](https://mongoosejs.com/docs/api.html#query_Query-find), [`Model.findOne()`](https://mongoosejs.com/docs/api.html#model_Model-findOne), etc. is called `filter`. In older content this parameter is sometimes called `query` or `conditions`. For example:
 
 ```javascript
 [require:Cast Tutorial.*get and set]

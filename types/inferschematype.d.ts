@@ -60,7 +60,7 @@ declare module 'mongoose' {
       : unknown;
 
   /**
-   * @summary Helper to obtain and resolve the schema options which are has an effect on schema type.
+   * @summary Helper to obtain and resolve the schema options which may affect schema type.
    * @param {T} T Schema option to be resolved.
    */
   type ResolveSchemaOptions<T> = Omit<MergeType<DefaultSchemaOptions, T>, 'statics' | 'methods' | 'query' | 'virtuals'>;

@@ -5426,8 +5426,29 @@ describe('document', function() {
 
       doc.toObject({ getters: false });
       assert.equal(called, 1);
+    });
 
-      return Promise.resolve();
+    it('calls subdocument getters if child schema has getters: true (gh-12105)', function() {
+      let called = 0;
+
+      const childSchema = new Schema({
+        _id: false,
+        value: {
+          type: String,
+          get: function(v) {
+            ++called;
+            return v.toUpperCase();
+          }
+        }
+      }, { toJSON: { getters: true } });
+      const schema = new Schema({ name: childSchema });
+      const Test = db.model('Test', schema);
+
+      const doc = new Test({ name: { value: 'John Smith' } });
+
+      const res = doc.toJSON();
+      assert.equal(called, 1);
+      assert.deepStrictEqual(res.name, { value: 'JOHN SMITH' });
     });
 
     it('setting doc array to array of top-level docs works (gh-5632)', function(done) {

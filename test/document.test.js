@@ -11574,6 +11574,34 @@ describe('document', function() {
     assert.ok(err);
     assert.ok(err.errors['testProp.testSubProp.nested.from']);
   });
+
+  it('supports virtuals named isValid (gh-12124) (gh-6262)', async function() {
+    const Schema = new mongoose.Schema({
+      test: String,
+      data: { sub: String }
+    });
+
+    Schema.virtual('isValid');
+
+    const Test = db.model('Test', Schema);
+    let doc = new Test();
+
+    assert.ok(doc.$isValid('test'));
+    await doc.save();
+
+    doc = await Test.findOne();
+
+    doc.set('isValid', true);
+    assert.ok(doc.$isValid('test'));
+
+    doc.set({ test: 'test' });
+    await doc.save();
+    assert.equal(doc.test, 'test');
+
+    doc.set({ data: { sub: 'sub' } });
+    await doc.save();
+    assert.equal(doc.data.sub, 'sub');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

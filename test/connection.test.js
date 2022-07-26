@@ -1135,6 +1135,72 @@ describe('connections:', function() {
     assert.deepStrictEqual(conn3.id, m.connection.id + 2);
   });
 
+  describe('Automatic init', function() {
+    it('re-runs init() if connecting after disconnecting (gh-12047)', async function() {
+      const conn = await mongoose.createConnection(start.uri).asPromise();
+
+      const Test = conn.model('Test', new Schema({ name: { type: String, index: true } }));
+      await Test.init();
+
+      let indexes = await Test.collection.listIndexes().toArray();
+      assert.equal(indexes.length, 2);
+      assert.equal(indexes[1].name, 'name_1');
+
+      await conn.db.dropCollection(Test.collection.collectionName);
+
+      const err = await Test.collection.listIndexes().toArray().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.codeName, 'NamespaceNotFound');
+
+      await conn.close();
+
+      await conn.openUri(start.uri);
+      assert.ok(Test.$init);
+      await Test.init();
+
+      indexes = await Test.collection.listIndexes().toArray();
+      assert.equal(indexes.length, 2);
+      assert.equal(indexes[1].name, 'name_1');
+    });
+
+    it('re-runs init() if running setClient() after disconnecting (gh-12047)', async function() {
+      const conn = await mongoose.createConnection(start.uri).asPromise();
+
+      const Test = conn.model('Test', new Schema({ name: { type: String, index: true } }));
+      await Test.init();
+
+      let indexes = await Test.collection.listIndexes().toArray();
+      assert.equal(indexes.length, 2);
+      assert.equal(indexes[1].name, 'name_1');
+
+      await conn.db.dropCollection(Test.collection.collectionName);
+
+      const err = await Test.collection.listIndexes().toArray().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.codeName, 'NamespaceNotFound');
+
+      await conn.close();
+
+      const client = await mongodb.MongoClient.connect(start.uri);
+
+      try {
+        conn.setClient(client);
+        assert.ok(Test.$init);
+        await Test.init();
+
+        indexes = await Test.collection.listIndexes().toArray();
+        assert.equal(indexes.length, 2);
+        assert.equal(indexes[1].name, 'name_1');
+
+        await client.close();
+      } catch (err) {
+        await client.close().catch(() => {});
+
+        throw err;
+      }
+    });
+  });
+
   describe('Connection#syncIndexes() (gh-10893) (gh-11039)', () => {
     let connection;
     this.beforeEach(async() => {

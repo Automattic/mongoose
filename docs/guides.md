@@ -28,6 +28,7 @@ integrating Mongoose with external tools and frameworks.
 * [Working with Dates](/docs/tutorials/dates.html)
 * [Custom Casting For Built-in Types](/docs/tutorials/custom-casting.html)
 * [Custom SchemaTypes](/docs/customschematypes.html)
+* [Advanced Schemas](/docs/advanced_schemas.html)
 
 ### Integrations
 

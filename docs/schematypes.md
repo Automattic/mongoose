@@ -467,7 +467,7 @@ console.log(new M({ b: 'nay' }).b); // false
 
 <h4 id="arrays">Arrays</h4>
 
-Mongoose supports arrays of [SchemaTypes](./api.html#schema_Schema.Types)
+Mongoose supports arrays of [SchemaTypes](./api.html#schema_Schema-Types)
 and arrays of [subdocuments](./subdocs.html). Arrays of SchemaTypes are
 also called _primitive arrays_, and arrays of subdocuments are also called
 _document arrays_.

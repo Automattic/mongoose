@@ -5,21 +5,21 @@ for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_del
 Each of these functions returns a
 [mongoose `Query` object](http://mongoosejs.com/docs/api.html#Query).
 
-- [`Model.deleteMany()`](/docs/api.html#model_Model.deleteMany)
-- [`Model.deleteOne()`](/docs/api.html#model_Model.deleteOne)
-- [`Model.find()`](/docs/api.html#model_Model.find)
-- [`Model.findById()`](/docs/api.html#model_Model.findById)
-- [`Model.findByIdAndDelete()`](/docs/api.html#model_Model.findByIdAndDelete)
-- [`Model.findByIdAndRemove()`](/docs/api.html#model_Model.findByIdAndRemove)
-- [`Model.findByIdAndUpdate()`](/docs/api.html#model_Model.findByIdAndUpdate)
-- [`Model.findOne()`](/docs/api.html#model_Model.findOne)
-- [`Model.findOneAndDelete()`](/docs/api.html#model_Model.findOneAndDelete)
-- [`Model.findOneAndRemove()`](/docs/api.html#model_Model.findOneAndRemove)
-- [`Model.findOneAndReplace()`](/docs/api.html#model_Model.findOneAndReplace)
-- [`Model.findOneAndUpdate()`](/docs/api.html#model_Model.findOneAndUpdate)
-- [`Model.replaceOne()`](/docs/api.html#model_Model.replaceOne)
-- [`Model.updateMany()`](/docs/api.html#model_Model.updateMany)
-- [`Model.updateOne()`](/docs/api.html#model_Model.updateOne)
+- [`Model.deleteMany()`](/docs/api.html#model_Model-deleteMany)
+- [`Model.deleteOne()`](/docs/api.html#model_Model-deleteOne)
+- [`Model.find()`](/docs/api.html#model_Model-find)
+- [`Model.findById()`](/docs/api.html#model_Model-findById)
+- [`Model.findByIdAndDelete()`](/docs/api.html#model_Model-findByIdAndDelete)
+- [`Model.findByIdAndRemove()`](/docs/api.html#model_Model-findByIdAndRemove)
+- [`Model.findByIdAndUpdate()`](/docs/api.html#model_Model-findByIdAndUpdate)
+- [`Model.findOne()`](/docs/api.html#model_Model-findOne)
+- [`Model.findOneAndDelete()`](/docs/api.html#model_Model-findOneAndDelete)
+- [`Model.findOneAndRemove()`](/docs/api.html#model_Model-findOneAndRemove)
+- [`Model.findOneAndReplace()`](/docs/api.html#model_Model-findOneAndReplace)
+- [`Model.findOneAndUpdate()`](/docs/api.html#model_Model-findOneAndUpdate)
+- [`Model.replaceOne()`](/docs/api.html#model_Model-replaceOne)
+- [`Model.updateMany()`](/docs/api.html#model_Model-updateMany)
+- [`Model.updateOne()`](/docs/api.html#model_Model-updateOne)
 
 A mongoose query can be executed in one of two ways. First, if you
 pass in a `callback` function, Mongoose will execute the query asynchronously
@@ -55,7 +55,7 @@ Mongoose executed the query and passed the results to `callback`. All callbacks 
 `callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result`
 will be null. If the query is successful, the `error` parameter will be null, and the `result` will be populated with the results of the query.
 
-Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern `callback(error, results)`. What `results` is depends on the operation: For `findOne()` it is a [potentially-null single document](./api.html#model_Model.findOne), `find()` a [list of documents](./api.html#model_Model.find), `count()` [the number of documents](./api.html#model_Model.count), `update()` the [number of documents affected](./api.html#model_Model.update), etc. The [API docs for Models](./api.html#model-js) provide more detail on what is passed to the callbacks.
+Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern `callback(error, results)`. What `results` is depends on the operation: For `findOne()` it is a [potentially-null single document](./api.html#model_Model-findOne), `find()` a [list of documents](./api.html#model_Model-find), `count()` [the number of documents](./api.html#model_Model-count), `update()` the [number of documents affected](./api.html#model_Model-update), etc. The [API docs for Models](./api.html#model-js) provide more detail on what is passed to the callbacks.
 
 Now let's look at what happens when no `callback` is passed:
 
@@ -212,7 +212,7 @@ However, just because you can use `aggregate()` doesn't mean you should.
 In general, you should use queries where possible, and only use `aggregate()`
 when you absolutely need to.
 
-Unlike query results, Mongoose does **not** [`hydrate()`](/docs/api/model.html#model_Model.hydrate)
+Unlike query results, Mongoose does **not** [`hydrate()`](/docs/api/model.html#model_Model-hydrate)
 aggregation results. Aggregation results are always POJOs, not Mongoose
 documents.
 

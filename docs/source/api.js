@@ -64,6 +64,12 @@ for (const file of files) {
 parse();
 
 /**
+ * @typedef {Object} SeeObject
+ * @property {String} text The text to display the link as
+ * @property {String} [url] The link the text should have as href
+ */
+
+/**
  * @typedef {Object} PropContext
  * @property {boolean} [isStatic] Defines wheter the current property is a static property (not mutually exlusive with "isInstance")
  * @property {boolean} [isInstance] Defines wheter the current property is a instance property (not mutually exlusive with "isStatic")
@@ -77,6 +83,7 @@ parse();
  * @property {string} [anchorId] Defines the Anchor ID to be used for linking
  * @property {string} [description] Defines the Description the property will be listed with
  * @property {string} [deprecated] Defines wheter the current Property is signaled as deprecated
+ * @property {SeeObject[]} [see] Defines all "@see" references
  */
 
 function parse() {
@@ -133,6 +140,40 @@ function parse() {
 
       for (const tag of prop.tags) {
         switch (tag.type) {
+          case 'see':
+            if (!Array.isArray(ctx.see)) {
+              ctx.see = [];
+            }
+
+            // for this type, it needs to be parsed from the string itself to support more than 1 word
+            // this is required because "@see" is kinda badly defined and mongoose uses a slightly customized way (longer text and different kinds of links)
+
+            // the following regex matches cases of:
+            // "External Links http://someurl.com/" -> "External Links"
+            // "External https://someurl.com/" -> "External"
+            // "Id href #some_Some-method" -> "Id href"
+            // "Local Absolute /docs/somewhere" -> "Local Absolute"
+            // "No Href" -> "No Href"
+            // "https://someurl.com" -> "" (fallback added)
+            // "Some#Method #something" -> "Some#Method"
+            // The remainder is simply taken by a call to "slice" (also the text is trimmed later)
+            const textMatches = /^(.*? (?=#|\/|(?:https?:)|$))/i.exec(tag.string);
+
+            let text;
+            if (textMatches === null || textMatches === undefined) {
+              // warn because this most likely is a badly defined "@see"
+              console.warn(`No Text Matches found in @see for "${ctx.constructor}.${ctx.name}"`)
+              break;
+            } else {
+              text = textMatches[1].trim();
+            }
+
+            const url = tag.string.slice(text.length).trim();
+            ctx.see.push({
+              text: text || 'No Description', // fallback text, so that the final text does not end up as a empty element that cannot be seen
+              url: url || undefined, // change to be "undefined" if text is empty or non-valid
+            });
+            break;
           case 'receiver':
             console.warn(`Found "@receiver" tag in ${ctx.constructor} ${ctx.name}`);
             break;

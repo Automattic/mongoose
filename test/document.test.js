@@ -5426,8 +5426,29 @@ describe('document', function() {
 
       doc.toObject({ getters: false });
       assert.equal(called, 1);
+    });
 
-      return Promise.resolve();
+    it('calls subdocument getters if child schema has getters: true (gh-12105)', function() {
+      let called = 0;
+
+      const childSchema = new Schema({
+        _id: false,
+        value: {
+          type: String,
+          get: function(v) {
+            ++called;
+            return v.toUpperCase();
+          }
+        }
+      }, { toJSON: { getters: true } });
+      const schema = new Schema({ name: childSchema });
+      const Test = db.model('Test', schema);
+
+      const doc = new Test({ name: { value: 'John Smith' } });
+
+      const res = doc.toJSON();
+      assert.equal(called, 1);
+      assert.deepStrictEqual(res.name, { value: 'JOHN SMITH' });
     });
 
     it('setting doc array to array of top-level docs works (gh-5632)', function(done) {
@@ -11748,6 +11769,34 @@ describe('document', function() {
       assert.ok(err);
       assert.equal(err.errors['prop'].name, 'CastError');
     });
+  });
+
+  it('supports virtuals named isValid (gh-12124) (gh-6262)', async function() {
+    const Schema = new mongoose.Schema({
+      test: String,
+      data: { sub: String }
+    });
+
+    Schema.virtual('isValid');
+
+    const Test = db.model('Test', Schema);
+    let doc = new Test();
+
+    assert.ok(doc.$isValid('test'));
+    await doc.save();
+
+    doc = await Test.findOne();
+
+    doc.set('isValid', true);
+    assert.ok(doc.$isValid('test'));
+
+    doc.set({ test: 'test' });
+    await doc.save();
+    assert.equal(doc.test, 'test');
+
+    doc.set({ data: { sub: 'sub' } });
+    await doc.save();
+    assert.equal(doc.data.sub, 'sub');
   });
 });
 

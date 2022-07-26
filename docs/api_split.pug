@@ -44,7 +44,7 @@ block content
       each prop in props
         li
           a(href='#' + prop.anchorId)
-            | #{prop.string}
+            | <code>#{prop.string}</code>
     each prop in props
       hr.separate-api-elements
       h3(id=prop.anchorId)

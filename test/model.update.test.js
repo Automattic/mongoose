@@ -1917,7 +1917,7 @@ describe('model: update:', function() {
       const opts = { new: true, runValidators: true };
       Model.findOneAndUpdate({}, update, opts, function(error) {
         assert.ok(error);
-        assert.ok(error.errors['children']);
+        assert.ok(error.errors['children.lastName']);
         done();
       });
     });
@@ -2383,9 +2383,9 @@ describe('model: update:', function() {
 
       Parent.update({}, { d: { d2: 'test' } }, { runValidators: true }, function(error) {
         assert.ok(error);
-        assert.ok(error.errors['d']);
-        assert.ok(error.errors['d'].message.indexOf('Path `d1` is required') !== -1,
-          error.errors['d'].message);
+        assert.ok(error.errors['d.d1']);
+        assert.ok(error.errors['d.d1'].message.indexOf('Path `d1` is required') !== -1,
+          error.errors['d.d1'].message);
         done();
       });
     });

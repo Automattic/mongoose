@@ -134,6 +134,9 @@ declare module 'mongoose' {
      */
     baseModelName: string | undefined;
 
+    /* Cast the given POJO to the model's schema */
+    castObject(obj: AnyObject): T;
+
     /**
      * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
      * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one

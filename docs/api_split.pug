@@ -49,7 +49,7 @@ block content
       hr.separate-api-elements
       h3(id=prop.anchorId)
         a(href='#' + prop.anchorId)
-          | #{prop.string}
+          | <code>#{prop.string}</code>
       if prop.deprecated 
         <span class="deprecated">~DEPRECATED~</span>
       if prop.param != null

@@ -1,3 +1,18 @@
+6.5.0 / 2022-07-26
+==================
+ * perf(document): avoid creating unnecessary empty objects when creating a state machine #11988
+ * feat: upgrade mongodb driver -> 4.8.1 #12103 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(model): allow passing timestamps option to Model.bulkSave(...) #12082 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(model): add castObject() function that casts a POJO to the model's schema #11945
+ * feat(document): add $inc() helper that increments numeric paths #12115
+ * feat(schema): add schema level lean option [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(schema): add global id option to disable id on schemas #12067 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(connection): re-run Model.init() if re-connecting after explicitly closing a connection #12130
+ * feat(model): add applyDefaults() helper that allows applying defaults to document or POJO #11945
+ * feat(model): allow calling hydrate() with { setters: true } #11653
+ * feat(model): add hydrate option to Model.watch() to automatically hydrate fullDocument #12121
+ * feat(types): add support for automatically typed virtuals in schemas #11908 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+
 6.4.7 / 2022-07-25
 ==================
  * fix(virtualtype): use $locals for default virtual getter/setter rather than top-level doc #12124

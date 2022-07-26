@@ -2806,6 +2806,18 @@ describe('schema', function() {
     }, /Cannot use schema-level projections.*subdocument_mapping.not_selected/);
   });
 
+  it('allows a lean option on schemas so that all documents are lean when running a query (gh-10090)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: String
+    }, { lean: true });
+    const Test = db.model('gh10090', testSchema);
+    await Test.create({
+      name: 'I am a lean doc, fast and small'
+    });
+    const entry = await Test.findOne();
+    assert.equal(entry instanceof mongoose.Document, false);
+  });
+
   it('disallows setting special properties with `add()` or constructor (gh-12085)', async function() {
     const maliciousPayload = '{"__proto__.toString": "Number"}';
 
@@ -2814,5 +2826,45 @@ describe('schema', function() {
     }, /__proto__/);
 
     assert.ok({}.toString());
+  });
+
+  it('enable defining virtual paths by using schema constructor (gh-11908)', async function() {
+    function get() {return this.email.slice(this.email.indexOf('@') + 1);}
+    function set(v) { this.email = [this.email.slice(0, this.email.indexOf('@')), v].join('@');}
+    const options = {
+      getters: true
+    };
+
+    const definition = {
+      email: { type: String }
+    };
+    const TestSchema1 = new Schema(definition);
+    TestSchema1.virtual('domain', options).set(set).get(get);
+
+    const TestSchema2 = new Schema({
+      email: { type: String }
+    }, {
+      virtuals: {
+        domain: {
+          get,
+          set,
+          options
+        }
+      }
+    });
+
+    assert.deepEqual(TestSchema2.virtuals, TestSchema1.virtuals);
+
+    const doc1 = new (mongoose.model('schema1', TestSchema1))({ email: 'test@m0_0a.com' });
+    const doc2 = new (mongoose.model('schema2', TestSchema2))({ email: 'test@m0_0a.com' });
+
+    assert.equal(doc1.domain, doc2.domain);
+
+    const mongooseDomain = 'mongoose.com';
+    doc1.domain = mongooseDomain;
+    doc2.domain = mongooseDomain;
+
+    assert.equal(doc1.domain, mongooseDomain);
+    assert.equal(doc1.domain, doc2.domain);
   });
 });

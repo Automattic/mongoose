@@ -119,7 +119,8 @@ declare module 'mongoose' {
     AcceptsDiscriminator,
     IndexManager,
     SessionStarter {
-    new <DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+    new <DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides,
+    IfEquals<TVirtuals, {}, ObtainSchemaGeneric<TSchema, 'TVirtuals'>, TVirtuals>> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[], callback?: Callback<R[]>): Aggregate<Array<R>>;
@@ -128,28 +129,31 @@ declare module 'mongoose' {
     base: Mongoose;
 
     /**
-   * If this is a discriminator model, `baseModelName` is the name of
-   * the base model.
-   */
+     * If this is a discriminator model, `baseModelName` is the name of
+     * the base model.
+     */
     baseModelName: string | undefined;
 
+    /* Cast the given POJO to the model's schema */
+    castObject(obj: AnyObject): T;
+
     /**
-   * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
-   * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one
-   * command. This is faster than sending multiple independent operations (e.g.
-   * if you use `create()`) because with `bulkWrite()` there is only one network
-   * round trip to the MongoDB server.
-   */
+     * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
+     * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one
+     * command. This is faster than sending multiple independent operations (e.g.
+     * if you use `create()`) because with `bulkWrite()` there is only one network
+     * round trip to the MongoDB server.
+     */
     bulkWrite(writes: Array<mongodb.AnyBulkWriteOperation>, options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions, callback: Callback<mongodb.BulkWriteResult>): void;
     bulkWrite(writes: Array<mongodb.AnyBulkWriteOperation>, callback: Callback<mongodb.BulkWriteResult>): void;
     bulkWrite(writes: Array<mongodb.AnyBulkWriteOperation>, options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions): Promise<mongodb.BulkWriteResult>;
 
     /**
-   * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than
-   * sending multiple `save()` calls because with `bulkSave()` there is only one
-   * network round trip to the MongoDB server.
-   */
-    bulkSave(documents: Array<Document>, options?: mongodb.BulkWriteOptions): Promise<mongodb.BulkWriteResult>;
+     * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than
+     * sending multiple `save()` calls because with `bulkSave()` there is only one
+     * network round trip to the MongoDB server.
+     */
+    bulkSave(documents: Array<Document>, options?: mongodb.BulkWriteOptions & { timestamps?: boolean }): Promise<mongodb.BulkWriteResult>;
 
     /** Collection the model uses. */
     collection: Collection;
@@ -170,10 +174,10 @@ declare module 'mongoose' {
     create<DocContents = AnyKeys<T>>(doc: T | DocContents, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
 
     /**
-   * Create the collection for this model. By default, if no indexes are specified,
-   * mongoose will not create the collection for the model until any documents are
-   * created. Use this method to create the collection explicitly.
-   */
+     * Create the collection for this model. By default, if no indexes are specified,
+     * mongoose will not create the collection for the model until any documents are
+     * created. Use this method to create the collection explicitly.
+     */
     createCollection<T extends mongodb.Document>(options: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'> | null, callback: Callback<mongodb.Collection<T>>): void;
     createCollection<T extends mongodb.Document>(callback: Callback<mongodb.Collection<T>>): void;
     createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>): Promise<mongodb.Collection<T>>;
@@ -182,34 +186,34 @@ declare module 'mongoose' {
     db: Connection;
 
     /**
-   * Deletes all of the documents that match `conditions` from the collection.
-   * Behaves like `remove()`, but deletes all documents that match `conditions`
-   * regardless of the `single` option.
-   */
+     * Deletes all of the documents that match `conditions` from the collection.
+     * Behaves like `remove()`, but deletes all documents that match `conditions`
+     * regardless of the `single` option.
+     */
     deleteMany(filter?: FilterQuery<T>, options?: QueryOptions<T>, callback?: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteResult, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
     deleteMany(filter: FilterQuery<T>, callback: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteResult, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
     deleteMany(callback: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteResult, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
     /**
-   * Deletes the first document that matches `conditions` from the collection.
-   * Behaves like `remove()`, but deletes at most one document regardless of the
-   * `single` option.
-   */
+     * Deletes the first document that matches `conditions` from the collection.
+     * Behaves like `remove()`, but deletes at most one document regardless of the
+     * `single` option.
+     */
     deleteOne(filter?: FilterQuery<T>, options?: QueryOptions<T>, callback?: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteResult, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
     deleteOne(filter: FilterQuery<T>, callback: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteResult, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
     deleteOne(callback: CallbackWithoutResult): QueryWithHelpers<mongodb.DeleteResult, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
     /**
-   * Event emitter that reports any errors that occurred. Useful for global error
-   * handling.
-   */
+     * Event emitter that reports any errors that occurred. Useful for global error
+     * handling.
+     */
     events: NodeJS.EventEmitter;
 
     /**
-   * Finds a single document by its _id field. `findById(id)` is almost*
-   * equivalent to `findOne({ _id: id })`. If you want to query by a document's
-   * `_id`, use `findById()` instead of `findOne()`.
-   */
+     * Finds a single document by its _id field. `findById(id)` is almost*
+     * equivalent to `findOne({ _id: id })`. If you want to query by a document's
+     * `_id`, use `findById()` instead of `findOne()`.
+     */
     findById<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(
       id: any,
       projection?: ProjectionType<T> | null,
@@ -240,19 +244,19 @@ declare module 'mongoose' {
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, T>;
 
     /**
-   * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
-   * The document returned has no paths marked as modified initially.
-   */
-    hydrate(obj: any): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
+     * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
+     * The document returned has no paths marked as modified initially.
+     */
+    hydrate(obj: any, projection?: AnyObject, options?: { setters?: boolean }): HydratedDocument<T, TMethodsAndOverrides, TVirtuals>;
 
     /**
-   * This function is responsible for building [indexes](https://docs.mongodb.com/manual/indexes/),
-   * unless [`autoIndex`](http://mongoosejs.com/docs/guide.html#autoIndex) is turned off.
-   * Mongoose calls this function automatically when a model is created using
-   * [`mongoose.model()`](/docs/api.html#mongoose_Mongoose-model) or
-   * [`connection.model()`](/docs/api.html#connection_Connection-model), so you
-   * don't need to call it.
-   */
+     * This function is responsible for building [indexes](https://docs.mongodb.com/manual/indexes/),
+     * unless [`autoIndex`](http://mongoosejs.com/docs/guide.html#autoIndex) is turned off.
+     * Mongoose calls this function automatically when a model is created using
+     * [`mongoose.model()`](/docs/api.html#mongoose_Mongoose-model) or
+     * [`connection.model()`](/docs/api.html#connection_Connection-model), so you
+     * don't need to call it.
+     */
     init(callback?: CallbackWithoutResult): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
@@ -288,7 +292,7 @@ declare module 'mongoose' {
     validate(optional: any, pathsToValidate: PathsToValidate, callback?: CallbackWithoutResult): Promise<void>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://docs.mongodb.com/manual/changeStreams/). */
-    watch<ResultType extends mongodb.Document = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
+    watch<ResultType extends mongodb.Document = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean }): mongodb.ChangeStream<ResultType>;
 
     /** Adds a `$where` clause to this query */
     $where(argument: string | Function): QueryWithHelpers<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;

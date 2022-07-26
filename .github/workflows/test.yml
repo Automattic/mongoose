@@ -8,8 +8,6 @@ on:
       - 'lib/**'
       - 'test/**.js'
   push:
-    branches:
-      - master
     paths:
       - '.github/workflows/test.yml'
       - 'package.json'

@@ -964,6 +964,37 @@ describe('timestamps', function() {
     assert.ok(updatedParent.child.created instanceof Date);
     assert.strictEqual(updatedParent.child.created.valueOf(), date.valueOf());
   });
+
+  it('sets timestamps on sub-schema if parent schema does not have timestamps: true (gh-12119)', async function() {
+    // `timestamps` option set to true on deepest sub document
+    const ConditionSchema = new mongoose.Schema({
+      kind: String,
+      amount: Number
+    }, { timestamps: true });
+
+    // no `timestamps` option defined
+    const ProfileSchema = new mongoose.Schema({
+      conditions: [ConditionSchema]
+    });
+
+    const UserSchema = new mongoose.Schema({
+      name: String,
+      profile: {
+        type: ProfileSchema
+      }
+    }, { timestamps: true });
+
+    const User = db.model('User', UserSchema);
+
+    const res = await User.findOneAndUpdate(
+      { name: 'test' },
+      { $set: { profile: { conditions: [{ kind: 'price', amount: 10 }] } } },
+      { upsert: true, returnDocument: 'after' }
+    );
+
+    assert.ok(res.profile.conditions[0].createdAt);
+    assert.ok(res.profile.conditions[0].updatedAt);
+  });
 });
 
 async function delay(ms) {

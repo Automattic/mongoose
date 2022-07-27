@@ -17,7 +17,7 @@ declare module 'mongoose' {
    * @description It makes intellisense dialog box easier to read as a single object instead of showing that in multiple object unions.
    * @param {T} T The type to be converted.
    */
-   type FlatRecord<T> = { [K in keyof T]: T[K] };
+   type FlatRecord<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
 
    /**
  * @summary Checks if a type is "Record" or "any".

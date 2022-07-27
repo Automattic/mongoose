@@ -147,12 +147,12 @@ declare module 'mongoose' {
   export type DiscriminatorModel<M, T> = T extends Model<infer T1, infer T2, infer T3, infer T4>
     ?
     M extends Model<infer M1, infer M2, infer M3, infer M4>
-      ? Model<Omit<M1, keyof T1> & T1, M2 | T2, M3 | T3, M4 | T4>
+      ? Model<FlatRecord<Omit<M1, keyof T1> & T1>, M2 | T2, M3 | T3, M4 | T4>
       : M
     : M;
 
-  export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, T> = T extends Schema<infer T1, infer T2, infer T3, infer T4, infer T5>
-    ? Schema<Omit<DocType, keyof T1> & T1, DiscriminatorModel<T2, M>, T3 | TInstanceMethods, T4 | TQueryHelpers, T5 | TVirtuals>
+  export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, T> = T extends Schema<any, any, infer T3, infer T4, infer T5, any, any, infer TDocType>
+    ? Schema<FlatRecord<Omit<DocType, keyof TDocType> & TDocType>, DiscriminatorModel<Model<TDocType>, M>, T3 | TInstanceMethods, T4 | TQueryHelpers, T5 | TVirtuals>
     : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals>;
 
   type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
@@ -160,7 +160,7 @@ declare module 'mongoose' {
   export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {},
     TStaticMethods = {},
     TSchemaOptions extends ResolveSchemaOptions<TSchemaOptions> = DefaultSchemaOptions,
-    DocType extends ObtainDocumentType<DocType, EnforcedDocType, TSchemaOptions> = ObtainDocumentType<any, EnforcedDocType, TSchemaOptions>>
+    DocType extends ApplySchemaOptions<ObtainDocumentType<DocType, EnforcedDocType, TSchemaOptions>, TSchemaOptions> = ApplySchemaOptions<ObtainDocumentType<any, EnforcedDocType, TSchemaOptions>, TSchemaOptions>>
     extends events.EventEmitter {
     /**
      * Create a new schema

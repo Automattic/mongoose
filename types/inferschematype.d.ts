@@ -12,7 +12,8 @@ import {
   ObjectIdSchemaDefinition,
   IfEquals,
   SchemaOptions,
-  DefaultSchemaOptions
+  DefaultSchemaOptions,
+  MergeType
 } from 'mongoose';
 
 declare module 'mongoose' {
@@ -64,8 +65,14 @@ declare module 'mongoose' {
    * @param {T} T Schema option to be resolved.
    */
   type ResolveSchemaOptions<T> = Omit<MergeType<DefaultSchemaOptions, T>, 'statics' | 'methods' | 'query' | 'virtuals'>;
+
+  type ApplySchemaOptions<T, O = DefaultSchemaOptions> = FlatRecord<Resolve_timestamps<T, O>>;
 }
 
+
+type Resolve_timestamps<T, O> = O extends { timestamps: false }
+  ? T
+  : T extends { timestamps: any } ? T : MergeType<T, { createdAt: Date ;updatedAt: Date }>;
 
 /**
  * @summary Checks if a document path is required or optional.
@@ -138,7 +145,7 @@ type OptionalPaths<T, TypeKey extends string > = {
  * @param {PathValueType} PathValueType Document definition path type.
  * @param {TypeKey} TypeKey A generic refers to document definition.
  */
-type ObtainDocumentPathType<PathValueType, TypeKey extends string > = PathValueType extends Schema<any>
+type ObtainDocumentPathType<PathValueType, TypeKey extends string > = PathValueType extends Schema
   ? InferSchemaType<PathValueType>
   : ResolvePathType<
   PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,

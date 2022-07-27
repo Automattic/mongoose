@@ -12,7 +12,8 @@ import {
   SchemaOptions,
   ObtainSchemaGeneric,
   DefaultSchemaOptions,
-  FlatRecord
+  FlatRecord,
+  ApplySchemaOptions
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 
@@ -356,7 +357,7 @@ export function autoTypedSchema() {
     }
   }
 
-  type TestSchemaType = {
+  type TestSchemaType = ApplySchemaOptions<{
     string1?: string;
     string2?: string;
     string3?: string;
@@ -400,7 +401,7 @@ export function autoTypedSchema() {
     decimal1?: Types.Decimal128;
     decimal2?: Types.Decimal128;
     decimal3?: Types.Decimal128;
-  };
+  }>;
 
   const TestSchema = new Schema({
     string1: String,
@@ -533,21 +534,21 @@ export function autoTypedSchema() {
 }
 
 export type AutoTypedSchemaType = {
-  schema: {
+  schema: ApplySchemaOptions<{
     userName: string;
     description?: string;
-    nested?: {
+    nested?: ApplySchemaOptions<{
       age: number;
       hobby?: string
-    },
+    }>,
     favoritDrink?: 'Tea' | 'Coffee',
     favoritColorMode: 'dark' | 'light'
     friendID?: Types.ObjectId;
-    nestedArray: Types.DocumentArray<{
+    nestedArray: Types.DocumentArray<ApplySchemaOptions<{
       date: Date;
       messages?: number;
-    }>
-  }
+    }>>
+  }>
   , statics: {
     staticFn: () => 'Returned from staticFn'
   },
@@ -561,7 +562,7 @@ const eventSchema = new Schema<{ message: string }>({ message: String }, { discr
 const batchSchema = new Schema<{ name: string }>({ name: String }, { discriminatorKey: 'kind' });
 const discriminatedSchema = batchSchema.discriminator('event', eventSchema);
 
-expectType<Schema<Omit<{ name: string }, 'message'> & { message: string }>>(discriminatedSchema);
+expectType<Schema<ApplySchemaOptions<{ name: string } & { message: string }>>>(discriminatedSchema);
 
 function gh11828() {
   interface IUser {
@@ -629,17 +630,17 @@ function gh12030() {
     ]
   });
 
-  expectType<{
+  expectType<ApplySchemaOptions<{
     users: {
       username?: string
     }[];
-  }>({} as InferSchemaType<typeof Schema1>);
+  }>>({} as InferSchemaType<typeof Schema1>);
 
   const Schema2 = new Schema({
     createdAt: { type: Date, default: Date.now }
   });
 
-  expectType<{ createdAt: Date }>({} as InferSchemaType<typeof Schema2>);
+  expectType<ApplySchemaOptions<{ createdAt: Date }>>({} as InferSchemaType<typeof Schema2>);
 
   const Schema3 = new Schema({
     users: [
@@ -650,25 +651,27 @@ function gh12030() {
     ]
   });
 
-  expectType<{
-    users: Types.DocumentArray<{
+  expectType<ApplySchemaOptions<{
+    users: Types.DocumentArray<ApplySchemaOptions<{
       credit: number;
       username?: string;
-    }>;
-  }>({} as InferSchemaType<typeof Schema3>);
+    }>>;
+  }>>({} as InferSchemaType<typeof Schema3>);
 
 
   const Schema4 = new Schema({
     data: { type: { role: String }, default: {} }
   });
 
-  expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema4>);
+  expectType<ApplySchemaOptions<{ data: { role?: string } }>>({} as InferSchemaType<typeof Schema4>);
 
   const Schema5 = new Schema({
     data: { type: { role: Object }, default: {} }
   });
 
-  expectType<{ data: { role?: any } }>({} as InferSchemaType<typeof Schema5>);
+  expectType<ApplySchemaOptions<{
+    data: { role?: any }
+  }>>({} as InferSchemaType<typeof Schema5>);
 
   const Schema6 = new Schema({
     track: {
@@ -683,12 +686,12 @@ function gh12030() {
     }
   });
 
-  expectType<{
+  expectType<ApplySchemaOptions<{
     track?: {
       backupCount: number;
       count: number;
     };
-  }>({} as InferSchemaType<typeof Schema6>);
+  }>>({} as InferSchemaType<typeof Schema6>);
 
 }
 
@@ -700,4 +703,7 @@ function gh12122() {
 
   const Test2 = new Schema({ test: String }, {});
   expectType<DefaultSchemaOptions>({} as ObtainSchemaGeneric<typeof Test2, 'TSchemaOptions'>);
+
+  const Test3 = new Schema({ test: String }, { timestamps: true });
+  expectType<{ test?: string; createdAt: Date; updatedAt: Date; }>({} as InferSchemaType<typeof Test3>);
 }

@@ -75,7 +75,7 @@ declare module 'mongoose' {
 
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
-    schema?: Schema<T, any, TQueryHelpers>,
+    schema?: Schema<T, U, any, TQueryHelpers, any, any>,
     collection?: string,
     options?: CompileModelOptions
   ): U;

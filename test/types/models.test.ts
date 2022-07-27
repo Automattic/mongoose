@@ -7,7 +7,9 @@ import {
   model,
   Types,
   UpdateQuery,
-  CallbackError
+  CallbackError,
+  HydratedDocument,
+  Query
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -345,6 +347,45 @@ function gh12059() {
   Animal.bulkSave([animal], { timestamps: false });
   Animal.bulkSave([animal], { timestamps: true });
   Animal.bulkSave([animal], {});
+}
+
+function schemaInstanceMethodsAndQueryHelpers() {
+  type UserModelQuery = Query<any, HydratedDocument<User>, UserQueryHelpers> & UserQueryHelpers;
+  interface UserQueryHelpers {
+    byName(this: UserModelQuery, name: string): this
+  }
+  interface User {
+    name: string;
+  }
+  interface UserInstanceMethods {
+    doSomething(this: HydratedDocument<User>): string;
+  }
+  interface UserStaticMethods {
+    findByName(name: string): Promise<HydratedDocument<User>>;
+  }
+  type UserModel = Model<User, UserQueryHelpers, UserInstanceMethods> & UserStaticMethods;
+
+  const userSchema = new Schema<User, UserModel, UserInstanceMethods, UserQueryHelpers, any, UserStaticMethods>({
+    name: String
+  }, {
+    statics: {
+      findByName(name: string) {
+        return model('User').findOne({ name }).orFail();
+      }
+    },
+    methods: {
+      doSomething() {
+        return 'test';
+      }
+    },
+    query: {
+      byName(this: UserModelQuery, name: string) {
+        return this.where({ name });
+      }
+    }
+  });
+
+  const TestModel = model<User, UserModel, UserQueryHelpers>('User', userSchema);
 }
 
 function gh12100() {

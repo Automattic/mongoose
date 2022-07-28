@@ -282,6 +282,33 @@ function bulkWrite() {
   M.bulkWrite(ops);
 }
 
+function bulkWriteAddToSet() {
+  const schema = new Schema({
+    arr: [String]
+  });
+
+  const M = model('Test', schema);
+
+  const ops = [
+    {
+      updateOne: {
+        filter: {
+          arr: {
+            $nin: ['abc']
+          }
+        },
+        update: {
+          $addToSet: {
+            arr: 'abc'
+          }
+        }
+      }
+    }
+  ];
+
+  return M.bulkWrite(ops);
+}
+
 export function autoTypedModel() {
   const AutoTypedSchema = autoTypedSchema();
   const AutoTypedModel = model('AutoTypeModel', AutoTypedSchema);

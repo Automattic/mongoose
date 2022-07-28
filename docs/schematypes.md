@@ -727,4 +727,4 @@ including what validators it has and what the type is.
 
 ### Next Up
 
-Now that we've covered `SchemaTypes`, let's take a look at [Connections](/docs/connections.md).
+Now that we've covered `SchemaTypes`, let's take a look at [Connections](/docs/connections.html).

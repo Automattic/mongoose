@@ -429,7 +429,7 @@ export function autoTypedSchema() {
     mixed3: Schema.Types.Mixed,
     objectId1: Schema.Types.ObjectId,
     objectId2: 'ObjectId',
-    objectId3: 'ObjectID',
+    objectId3: 'objectId',
     customSchema: Int8,
     map1: { type: Map, of: String },
     map2: { type: Map, of: Number },

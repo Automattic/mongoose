@@ -101,7 +101,7 @@ The 4th param, `TQueryHelpers`, is used to add types for [chainable query helper
 
 Mongoose checks to make sure that every path in your schema is defined in your document interface.
 
-For example, the below code will fail to compile because `emaill` is a path in the schema, but not in the `DocType` interface.
+For example, the below code will fail to compile because `email` is a path in the schema, but not in the `DocType` interface.
 
 ```typescript
 import { Schema, Model } from 'mongoose';

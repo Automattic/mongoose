@@ -1,7 +1,10 @@
 # Further Reading
 
 <style>
-  img { width: auto; }
+  img {
+    width: auto;
+    border: none;
+  }
 
   .pluralsight-link {
     float: left;
@@ -30,9 +33,9 @@ on this page to make sure it is high quality.
 ## Video Courses
 
 <a href="//pluralsight.pxf.io/c/1321469/432943/7490" class="pluralsight-link">
-  <img src="//a.impactradius-go.com/display-ad/7490-432943" border="0" alt="" width="180" height="95"/>
+  <img src="//a.impactradius-go.com/display-ad/7490-432943" alt="" width="180" height="95"/>
 </a>
-<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" border="0" />
+<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" />
 
 <a class="pluralsight-title" href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fapi-design-nodejs-express-mongo%2Ftable-of-contents">
   API Design in Node.js Featuring Express & Mongo
@@ -46,7 +49,7 @@ a serial entrepreneur and former instructor at [Hack Reactor](https://www.hackre
 <br><br>
 
 <a href="https://thinkster.io/tutorials/node-json-api" class="pluralsight-link" style="padding:20px">
-  <img src="https://pbs.twimg.com/profile_images/819400302864412676/6x2g2XtJ_400x400.jpg" border="0" alt="" style="width: 140px" />
+  <img src="https://pbs.twimg.com/profile_images/819400302864412676/6x2g2XtJ_400x400.jpg" alt="" style="width: 140px" />
 </a>
   
 <a class="pluralsight-title" href="https://thinkster.io/tutorials/node-json-api">
@@ -66,9 +69,9 @@ RESTful API with Express and Mongoose from scratch.
 <br><br>
 
 <a href="//pluralsight.pxf.io/c/1321469/432943/7490" class="pluralsight-link">
-  <img src="//a.impactradius-go.com/display-ad/7490-432943" border="0" alt="" width="180" height="95"/>
+  <img src="//a.impactradius-go.com/display-ad/7490-432943" alt="" width="180" height="95"/>
 </a>
-<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" border="0" />
+<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" />
 
 <a class="pluralsight-title" href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fmongoose-for-nodejs-mongodb%2Ftable-of-contents">
   Introduction to Mongoose for Node.js and MongoDB
@@ -85,9 +88,9 @@ resource for beginners looking to get started.
 <br><br>
 
 <a href="//pluralsight.pxf.io/c/1321469/432943/7490" class="pluralsight-link">
-  <img src="//a.impactradius-go.com/display-ad/7490-432943" border="0" alt="" width="180" height="95"/>
+  <img src="//a.impactradius-go.com/display-ad/7490-432943" alt="" width="180" height="95"/>
 </a>
-<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" border="0" />
+<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" />
 
 <a class="pluralsight-title" href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fnode-js-express-rest-web-services%2Ftable-of-contents">
   RESTful Web Services with Node.js and Express
@@ -104,9 +107,9 @@ between _API Design_ and _Introduction to Mongoose_. It focuses more on
 <br><br>
 
 <a href="//pluralsight.pxf.io/c/1321469/432943/7490" class="pluralsight-link">
-  <img src="//a.impactradius-go.com/display-ad/7490-432943" border="0" alt="" width="180" height="95"/>
+  <img src="//a.impactradius-go.com/display-ad/7490-432943" alt="" width="180" height="95"/>
 </a>
-<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" border="0" />
+<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" />
 
 <a class="pluralsight-title" href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fbuilding-business-applications-vuejs%2Ftable-of-contents">
   Building Business Applications with Vue.js and MongoDB
@@ -124,9 +127,9 @@ learn about frontend dev.
 <br><br>
 
 <a href="//pluralsight.pxf.io/c/1321469/432943/7490" class="pluralsight-link">
-  <img src="//a.impactradius-go.com/display-ad/7490-432943" border="0" alt="" width="180" height="95"/>
+  <img src="//a.impactradius-go.com/display-ad/7490-432943" alt="" width="180" height="95"/>
 </a>
-<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" border="0" />
+<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" />
 
 <a class="pluralsight-title" href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fmongoosejs-moving-forward%2Ftable-of-contents">
   Moving Forward with Mongoose.js

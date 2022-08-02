@@ -45,7 +45,7 @@
     "dox": "0.9.1",
     "eslint": "8.19.0",
     "eslint-plugin-mocha-no-only": "1.1.1",
-    "highlight.js": "11.5.1",
+    "highlight.js": "11.6.0",
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",
     "marked": "4.0.17",

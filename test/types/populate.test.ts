@@ -323,3 +323,17 @@ async function gh11955() {
 
   populatedParent.children.find(({ name }) => console.log(name));
 }
+
+function gh12136() {
+  type ChildDocument = Child & Document;
+  type ParentDocument = Parent & Document;
+
+  class Child {
+    parent: PopulatedDoc<ParentDocument>;
+  }
+
+  class Parent {
+    child: PopulatedDoc<ChildDocument>;
+  }
+
+}

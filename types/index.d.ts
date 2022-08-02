@@ -459,7 +459,7 @@ declare module 'mongoose' {
     $pop?: AnyKeys<TSchema> & AnyObject;
     $pull?: Mutable<mongodb.PullOperator<TSchema>>;
     $push?: Mutable<mongodb.PushOperator<TSchema>>;
-    $pullAll?: mongodb.PullAllOperator<TSchema>;
+    $pullAll?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: Record<string, mongodb.NumericType>;

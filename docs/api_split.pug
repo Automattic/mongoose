@@ -77,7 +77,7 @@ block content
         h5 Inherits:
         ul
           li <span class="method-type">&laquo;#{prop.inherits}&raquo;</span>
-      if prop.see != null 
+      if prop.see != null && prop.see.length > 0
         h5 See:
         ul
           each see in prop.see

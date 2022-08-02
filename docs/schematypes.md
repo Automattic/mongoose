@@ -9,14 +9,6 @@ SchemaTypes handle definition of path
 [queries](./api.html#query-js),
 and other general characteristics for Mongoose document properties.
 
-<ul class="toc">
-  <li><a href="#what-is-a-schema-type">What is a SchemaType?</a></li>
-  <li><a href="#schematype-options">SchemaType Options</a></li>
-  <li><a href="#customtypes">Creating Custom Types</a></li>
-  <li><a href="#path">The `schema.path()` Function</a></li>
-  <li><a href="#further-reading">Further Reading</a></li>
-</ul>
-
 * [What is a SchemaType?](#what-is-a-schematype)
 * [The `type` Key](#type-key)
 * [SchemaType Options](#schematype-options)
@@ -24,6 +16,7 @@ and other general characteristics for Mongoose document properties.
 * [Getters](#getters)
 * [Custom Types](#customtypes)
 * [The `schema.path()` Function](#path)
+* [Further Reading](#further-reading)
 
 <h3 id="what-is-a-schematype"><a href="#what-is-a-schematype">What is a SchemaType?</a></h3>
 

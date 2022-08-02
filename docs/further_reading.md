@@ -193,7 +193,7 @@ concepts in SQL.
 <div style="clear: both"></div>
 
 <a class="pluralsight-link" style="padding: 20px" href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose">
-  <img src="https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png" style="width: 140px">
+  <img src="https://developer.mozilla.org/mdn-social-share.cd6c4a5a.png" style="width: 140px">
 </a>
 
 <a class="pluralsight-title" href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose">

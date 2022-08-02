@@ -110,7 +110,7 @@ m.map = new Map([['key', 'value']]);
 m.save(callback);
 ```
 
-<h3 id="type-key"><a href="#type-key">The `type` Key</a></h3>
+<h3 id="type-key"><a href="#type-key">The <code>type</code> Key</a></h3>
 
 `type` is a special property in Mongoose schemas. When Mongoose finds
 a nested property named `type` in your schema, Mongoose assumes that

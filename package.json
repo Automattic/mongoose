@@ -30,7 +30,7 @@
   "devDependencies": {
     "@babel/core": "7.18.6",
     "@typescript-eslint/eslint-plugin": "5.32.0",
-    "@typescript-eslint/parser": "5.30.3",
+    "@typescript-eslint/parser": "5.32.0",
     "acquit": "1.2.1",
     "acquit-ignore": "0.2.0",
     "acquit-require": "0.1.1",

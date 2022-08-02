@@ -217,3 +217,7 @@ const switchExpr: Expression.Switch = {
     ]
   };
 })();
+
+(function gh12149() {
+  const count: Expression.Count = { $count: '$value' };
+})();

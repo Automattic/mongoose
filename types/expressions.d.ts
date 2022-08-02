@@ -1977,7 +1977,7 @@ declare module 'mongoose' {
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/count/#mongodb-expression-exp.-count
        */
-      $count: Record<string | number | symbol, never>;
+      $count: Record<string | number | symbol, never> | Path;
     }
 
     export interface CovariancePop {

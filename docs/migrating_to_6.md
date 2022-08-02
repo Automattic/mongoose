@@ -1,5 +1,11 @@
 ## Migrating from 5.x to 6.x
 
+<style>
+  ul > li {
+    padding: 4px 0px;
+  }
+</style>
+
 There are several [backwards-breaking changes](https://github.com/Automattic/mongoose/blob/master/CHANGELOG.md)
 you should be aware of when migrating from Mongoose 5.x to Mongoose 6.x.
 

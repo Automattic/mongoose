@@ -1,4 +1,4 @@
-## Further Reading
+# Further Reading
 
 <style>
   img { width: auto; }
@@ -23,9 +23,9 @@ Mongoose maintainers. We've gone through every course, book, and article
 on this page to make sure it is high quality.
 
 - [Further Reading](#further-reading)
-- [Video Courses](#video-courses)
-- [Books](#books)
-- [Blog Posts](#blog-posts)
+  - [Video Courses](#video-courses)
+  - [Books](#books)
+  - [Blog Posts](#blog-posts)
 
 ## Video Courses
 

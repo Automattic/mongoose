@@ -22,9 +22,10 @@ This page has a list of video courses, books, and blog posts curated by
 Mongoose maintainers. We've gone through every course, book, and article
 on this page to make sure it is high quality.
 
-* [Video Courses](#video-courses)
-* [Books](#books)
-* [Blog Posts](#blog-posts)
+- [Further Reading](#further-reading)
+- [Video Courses](#video-courses)
+- [Books](#books)
+- [Blog Posts](#blog-posts)
 
 ## Video Courses
 
@@ -32,7 +33,7 @@ on this page to make sure it is high quality.
   <img src="//a.impactradius-go.com/display-ad/7490-432943" border="0" alt="" width="180" height="95"/>
 </a>
 <img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" border="0" />
-    
+
 <a class="pluralsight-title" href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fapi-design-nodejs-express-mongo%2Ftable-of-contents">
   API Design in Node.js Featuring Express & Mongo
 </a>
@@ -97,7 +98,7 @@ resource for beginners looking to get started.
 Looking for a course to take you from zero to Express + Mongoose
 REST API fast? This is the one. This course is halfway
 between _API Design_ and _Introduction to Mongoose_. It focuses more on
-[Express](http://expressjs.com/), but also doesn't go into as much detail as _API Design_. 
+[Express](http://expressjs.com/), but also doesn't go into as much detail as _API Design_.
 
 <div style="clear: both"></div>
 <br><br>

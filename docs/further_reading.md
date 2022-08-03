@@ -1,7 +1,10 @@
-## Further Reading
+# Further Reading
 
 <style>
-  img { width: auto; }
+  img {
+    width: auto;
+    border: none;
+  }
 
   .pluralsight-link {
     float: left;
@@ -15,6 +18,15 @@
   p {
     line-height: 1.5em;
   }
+
+  hr {
+    clear: both;
+  }
+
+  div.clear {
+    clear: both;
+    padding: 6px 0px;
+  }
 </style>
 
 There's a lot of great content out there to learn more about Mongoose.
@@ -22,17 +34,20 @@ This page has a list of video courses, books, and blog posts curated by
 Mongoose maintainers. We've gone through every course, book, and article
 on this page to make sure it is high quality.
 
-* [Video Courses](#video-courses)
-* [Books](#books)
-* [Blog Posts](#blog-posts)
+- [Further Reading](#further-reading)
+  - [Video Courses](#video-courses)
+  - [Books](#books)
+  - [Blog Posts](#blog-posts)
+
+<div class="clear"></div>
 
 ## Video Courses
 
 <a href="//pluralsight.pxf.io/c/1321469/432943/7490" class="pluralsight-link">
-  <img src="//a.impactradius-go.com/display-ad/7490-432943" border="0" alt="" width="180" height="95"/>
+  <img src="//a.impactradius-go.com/display-ad/7490-432943" alt="" width="180" height="95"/>
 </a>
-<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" border="0" />
-    
+<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" />
+
 <a class="pluralsight-title" href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fapi-design-nodejs-express-mongo%2Ftable-of-contents">
   API Design in Node.js Featuring Express & Mongo
 </a>
@@ -41,18 +56,15 @@ This course is a great introduction to building a RESTful API with [Express](htt
 and Mongoose. The instructor is [Scott Moss](https://frontendmasters.com/teachers/scott-moss/),
 a serial entrepreneur and former instructor at [Hack Reactor](https://www.hackreactor.com/), San Francisco's number one coding bootcamp.
 
-<div style="clear: both"></div>
-<br><br>
+<hr/>
 
 <a href="https://thinkster.io/tutorials/node-json-api" class="pluralsight-link" style="padding:20px">
-  <img src="https://pbs.twimg.com/profile_images/819400302864412676/6x2g2XtJ_400x400.jpg" border="0" alt="" style="width: 140px" />
+  <img src="https://pbs.twimg.com/profile_images/819400302864412676/6x2g2XtJ_400x400.jpg" alt="" style="width: 140px" />
 </a>
   
 <a class="pluralsight-title" href="https://thinkster.io/tutorials/node-json-api">
   Building a Production Ready Node.js JSON API
 </a>
-
-<br><br>
 
 [Thinkster](https://thinkster.io/) has created a full stack web
 development course for just about every backend and frontend framework
@@ -61,57 +73,48 @@ and Django, or with Angular and Rails? Thinkster has a course for that.
 The Node.js tutorial walks you through building a production-ready
 RESTful API with Express and Mongoose from scratch.
 
-<div style="clear: both"></div>
-<br><br>
+<hr/>
 
 <a href="//pluralsight.pxf.io/c/1321469/432943/7490" class="pluralsight-link">
-  <img src="//a.impactradius-go.com/display-ad/7490-432943" border="0" alt="" width="180" height="95"/>
+  <img src="//a.impactradius-go.com/display-ad/7490-432943" alt="" width="180" height="95"/>
 </a>
-<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" border="0" />
+<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" />
 
 <a class="pluralsight-title" href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fmongoose-for-nodejs-mongodb%2Ftable-of-contents">
   Introduction to Mongoose for Node.js and MongoDB
 </a>
-
-<br><br>
 
 Know someone who wants to get started building Node.js apps but doesn't have
 a lot of software development experience?
 This course is more beginner-friendly than _API Design_ and is a great
 resource for beginners looking to get started.
 
-<div style="clear: both"></div>
-<br><br>
+<hr/>
 
 <a href="//pluralsight.pxf.io/c/1321469/432943/7490" class="pluralsight-link">
-  <img src="//a.impactradius-go.com/display-ad/7490-432943" border="0" alt="" width="180" height="95"/>
+  <img src="//a.impactradius-go.com/display-ad/7490-432943" alt="" width="180" height="95"/>
 </a>
-<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" border="0" />
+<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" />
 
 <a class="pluralsight-title" href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fnode-js-express-rest-web-services%2Ftable-of-contents">
   RESTful Web Services with Node.js and Express
 </a>
 
-<br><br>
-
 Looking for a course to take you from zero to Express + Mongoose
 REST API fast? This is the one. This course is halfway
 between _API Design_ and _Introduction to Mongoose_. It focuses more on
-[Express](http://expressjs.com/), but also doesn't go into as much detail as _API Design_. 
+[Express](http://expressjs.com/), but also doesn't go into as much detail as _API Design_.
 
-<div style="clear: both"></div>
-<br><br>
+<hr/>
 
 <a href="//pluralsight.pxf.io/c/1321469/432943/7490" class="pluralsight-link">
-  <img src="//a.impactradius-go.com/display-ad/7490-432943" border="0" alt="" width="180" height="95"/>
+  <img src="//a.impactradius-go.com/display-ad/7490-432943" alt="" width="180" height="95"/>
 </a>
-<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" border="0" />
+<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" />
 
 <a class="pluralsight-title" href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fbuilding-business-applications-vuejs%2Ftable-of-contents">
   Building Business Applications with Vue.js and MongoDB
 </a>
-
-<br><br>
 
 This course walks you through building a full-stack web application using
 the [VENoM Stack](https://medium.com/@audretschjames/venom-stack-docker-setup-for-local-development-457093761ad1).
@@ -119,25 +122,22 @@ Try this course if you're a [Vue.js](https://vuejs.org/) expert looking to
 expand into backend engineering or an experienced MongoDB dev looking to
 learn about frontend dev.
 
-<div style="clear: both"></div>
-<br><br>
+<hr/>
 
 <a href="//pluralsight.pxf.io/c/1321469/432943/7490" class="pluralsight-link">
-  <img src="//a.impactradius-go.com/display-ad/7490-432943" border="0" alt="" width="180" height="95"/>
+  <img src="//a.impactradius-go.com/display-ad/7490-432943" alt="" width="180" height="95"/>
 </a>
-<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" border="0" />
+<img height="0" width="0" src="//pluralsight.pxf.io/i/1321469/432943/7490" style="position:absolute;visibility:hidden;" />
 
 <a class="pluralsight-title" href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fmongoosejs-moving-forward%2Ftable-of-contents">
   Moving Forward with Mongoose.js
 </a>
 
-<br><br>
-
 Stuck maintaining a legacy codebase on Mongoose 3.x? This course will
 give you a detailed overview of the [breaking changes and new features in Mongoose 4.x](https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes),
 so you can upgrade with confidence.
 
-<div style="clear: both"></div>
+<div class="clear"></div>
 
 ## Books
 
@@ -154,7 +154,7 @@ _Mongoose for Application Development_ has stood the test of time. This
 book does an excellent job summarizing the core ideas that make Mongoose so
 powerful. Just sub out callbacks for promises.
 
-<div style="clear: both"></div>
+<hr/>
 
 <a class="pluralsight-link" href="https://bit.ly/mongodb-schema-design">
   <img src="https://s3.amazonaws.com/codebarbarian-images/schemadesign.jpg" style="width: 180px">
@@ -174,7 +174,7 @@ how to structure MongoDB schemas for an e-commerce store, a category tree, or a
 blog that can support hundreds of millions of requests per day, this is
 the book for you.
 
-<div style="clear: both"></div>
+<div class="clear"></div>
 
 ## Blog Posts
 
@@ -190,10 +190,10 @@ Coming from an SQL background and having trouble understanding Mongoose and Mong
 This article explains the core concepts of Mongoose with references to similar
 concepts in SQL.
 
-<div style="clear: both"></div>
+<hr/>
 
 <a class="pluralsight-link" style="padding: 20px" href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose">
-  <img src="https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png" style="width: 140px">
+  <img src="https://developer.mozilla.org/mdn-social-share.cd6c4a5a.png" style="width: 140px">
 </a>
 
 <a class="pluralsight-title" href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose">
@@ -204,5 +204,3 @@ Virtually every JavaScript developer has read MDN docs. They're usually one
 of the top 3 results when you Google "javascript startswith" or any other
 core JavaScript function. This tutorial provides an overview of Mongoose
 in MDN's standard style and tone.
-
-<div style="clear: both"></div>

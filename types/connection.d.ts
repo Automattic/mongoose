@@ -144,7 +144,7 @@ declare module 'mongoose' {
     /** Defines or retrieves a model. */
     model<T, U, TQueryHelpers = {}>(
       name: string,
-      schema?: Schema<T, U, TQueryHelpers>,
+      schema?: Schema<T, any, any, TQueryHelpers, any, any>,
       collection?: string,
       options?: CompileModelOptions
     ): U;

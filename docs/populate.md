@@ -801,7 +801,7 @@ const librarySchema = new Schema({
     })
   }
 });
-const Library = mongoose.model('Library, librarySchema');
+const Library = mongoose.model('Library', librarySchema);
 ```
 
 You can `populate()` every book's author by populating `books.$*.author`:

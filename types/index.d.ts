@@ -75,7 +75,7 @@ declare module 'mongoose' {
 
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
-    schema?: Schema<T, any, TQueryHelpers>,
+    schema?: Schema<T, any, any, TQueryHelpers, any, any>,
     collection?: string,
     options?: CompileModelOptions
   ): U;
@@ -156,6 +156,8 @@ declare module 'mongoose' {
     : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals>;
 
   type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
+
+  type PluginFunction<DocType> = (schema: Schema<DocType>, opts?: any) => void;
 
   export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {},
     TStaticMethods = {},
@@ -239,7 +241,7 @@ declare module 'mongoose' {
     pathType(path: string): string;
 
     /** Registers a plugin for this schema. */
-    plugin(fn: (schema: Schema<DocType>, opts?: any) => void, opts?: any): this;
+    plugin<PFunc extends PluginFunction<DocType>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
 
     /** Defines a post hook for the model. */
     post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, T>): this;
@@ -457,9 +459,9 @@ declare module 'mongoose' {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
     $addToSet?: Mutable<mongodb.SetFields<TSchema>>;
     $pop?: AnyKeys<TSchema> & AnyObject;
-    $pull?: Mutable<mongodb.PullOperator<TSchema>>;
-    $push?: Mutable<mongodb.PushOperator<TSchema>>;
-    $pullAll?: mongodb.PullAllOperator<TSchema>;
+    $pull?: AnyKeys<TSchema> & AnyObject;
+    $push?: AnyKeys<TSchema> & AnyObject;
+    $pullAll?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: Record<string, mongodb.NumericType>;
@@ -507,24 +509,14 @@ declare module 'mongoose' {
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
 
-  // This will -- when possible -- extract the original type of the subdocument in question
-  type LeanSubdocument<T> = T extends (Types.Subdocument<Require_id<T>['_id']> & infer U) ? LeanDocument<U> : Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'>;
-
   export type LeanType<T> =
     0 extends (1 & T) ? T : // any
       T extends TreatAsPrimitives ? T : // primitives
-        T extends Types.Subdocument ? LeanSubdocument<T> : // subdocs
+        T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> :
           LeanDocument<T>; // Documents and everything else
 
-  // Used only when collapsing lean arrays for ts performance reasons:
-  type LeanTypeOrArray<T> = T extends unknown[] ? LeanArray<T> : LeanType<T>;
 
-  export type LeanArray<T extends unknown[]> =
-    // By checking if it extends Types.Array we can get the original base type before collapsing down,
-    // rather than trying to manually remove the old types. This matches both Array and DocumentArray
-    T extends Types.Array<infer U> ? LeanTypeOrArray<U>[] :
-    // If it isn't a custom mongoose type we fall back to "do our best"
-      T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
+  export type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
   export type _LeanDocument<T> = {
     [K in keyof T]: LeanDocumentElement<T[K]>;
@@ -534,10 +526,9 @@ declare module 'mongoose' {
   // This way, the conditional type is distributive over union types.
   // This is required for PopulatedDoc.
   export type LeanDocumentElement<T> =
-    0 extends (1 & T) ? T :// any
-      T extends unknown[] ? LeanArray<T> : // Array
-        T extends Document ? LeanDocument<T> : // Subdocument
-          T;
+    T extends unknown[] ? LeanArray<T> : // Array
+      T extends Document ? LeanDocument<T> : // Subdocument
+        T;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 
@@ -572,8 +563,7 @@ declare module 'mongoose' {
    * Plain old JavaScript object documents (POJO).
    * @see https://mongoosejs.com/docs/tutorials/lean.html
    */
-  export type LeanDocument<T> = BaseDocumentType<T> extends Document ? _LeanDocument<BaseDocumentType<T>> :
-    Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
+  export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :

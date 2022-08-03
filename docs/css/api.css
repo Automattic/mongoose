@@ -32,6 +32,10 @@
   font-size: 0.66em;
 }
 
+.nav-item-sub > li {
+  padding: 2px 0px;
+}
+
 .api-nav ul {
   margin-top: 0.25em;
   padding-left: 1em;

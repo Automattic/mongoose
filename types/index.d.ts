@@ -457,8 +457,8 @@ declare module 'mongoose' {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
     $addToSet?: Mutable<mongodb.SetFields<TSchema>>;
     $pop?: AnyKeys<TSchema> & AnyObject;
-    $pull?: Mutable<mongodb.PullOperator<TSchema>>;
-    $push?: Mutable<mongodb.PushOperator<TSchema>>;
+    $pull?: AnyKeys<TSchema> & AnyObject;
+    $push?: AnyKeys<TSchema> & AnyObject;
     $pullAll?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */

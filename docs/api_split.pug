@@ -33,7 +33,7 @@ block content
                 each prop in item.props
                   li
                     a(href='#' + prop.anchorId)
-                      | #{prop.string}
+                      | <code>#{prop.string}</code>
             - else
               div.nav-item-title
                 a(href=item.name.toLowerCase() + '.html')

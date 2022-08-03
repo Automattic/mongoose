@@ -1,4 +1,4 @@
-import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction } from 'mongoose';
+import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction, ApplySchemaOptions } from 'mongoose';
 import { expectError, expectType, expectNotType } from 'tsd';
 
 interface ITest extends Document {
@@ -101,7 +101,7 @@ const Test = model<ITest>('Test', schema);
 
 function gh11257(): void {
   schema.pre('save', { document: true }, function() {
-    expectType<HydratedDocument<ITest>>(this);
+    expectType<HydratedDocument<ApplySchemaOptions<ITest>>>(this);
   });
 }
 

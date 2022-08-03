@@ -1,4 +1,4 @@
-import { Schema, model, Document, LeanDocument, Types, BaseDocumentType, DocTypeFromUnion, DocTypeFromGeneric } from 'mongoose';
+import { Schema, model, Document, LeanDocument, Types, BaseDocumentType, DocTypeFromUnion, DocTypeFromGeneric, ApplySchemaOptions } from 'mongoose';
 import { expectError, expectNotType, expectType } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
@@ -171,11 +171,14 @@ async function getBaseDocumentType(): Promise<void> {
 }
 
 async function getBaseDocumentTypeFromModel(): Promise<void> {
-  interface User {
+  interface UserBase {
     name: string;
     email: string;
     avatar?: string;
   }
+
+  type User = ApplySchemaOptions<UserBase>;
+
   const schema = new Schema<User>({});
   const Model = model('UserBaseDocTypeFromModel', schema);
   type UserDocType = InstanceType<typeof Model>;

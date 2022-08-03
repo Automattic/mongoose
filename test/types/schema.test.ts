@@ -705,5 +705,5 @@ function gh12122() {
   expectType<DefaultSchemaOptions>({} as ObtainSchemaGeneric<typeof Test2, 'TSchemaOptions'>);
 
   const Test3 = new Schema({ test: String }, { timestamps: true });
-  expectType<{ test?: string; createdAt: Date; updatedAt: Date; }>({} as InferSchemaType<typeof Test3>);
+  expectType<{ __v: string; test?: string; createdAt: Date; updatedAt: Date; }>({} as InferSchemaType<typeof Test3>);
 }

@@ -1,3 +1,18 @@
+6.5.1 / 2022-08-03
+==================
+ * fix(timestamps): set timestamps on child schema when child schema has timestamps: true but parent schema does not #12119
+ * fix(schema+timestamps): handle insertMany() with timestamps and discriminators #12150
+ * fix(model+query): handle populate with lean transform that deletes _id #12143
+ * fix(types): allow $pull with _id #12142
+ * fix(types): add schema plugin option inference #12196 [hasezoey](https://github.com/hasezoey)
+ * fix(types): pass type to mongodb bulk write operation #12167 [emiljanitzek](https://github.com/emiljanitzek)
+ * fix(types): map correct generics from model to schema #12125 [emiljanitzek](https://github.com/emiljanitzek)
+ * fix(types): avoid baffling circular reference when using PopulatedDoc with a bidirectional reference #12136
+ * fix(types): allow using path with $count #12149
+ * docs(compatibility): change to use a table #12200 [hasezoey](https://github.com/hasezoey)
+ * docs(api_split.pug): add "code" to sidebar entries #12153 [hasezoey](https://github.com/hasezoey)
+ * docs: add "code" to Headers (and index list) #12152 [hasezoey](https://github.com/hasezoey)
+
 6.5.0 / 2022-07-26
 ==================
  * perf(document): avoid creating unnecessary empty objects when creating a state machine #11988

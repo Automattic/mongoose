@@ -1,0 +1,37 @@
+name: TypeScript Benchmark "auto-typed-mongoose"
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/benchmark.yml"
+      - "package.json"
+      - "types/**"
+      - "benchmarks/typescript/**"
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/benchmark.yml"
+      - "package.json"
+      - "types/**"
+      - "benchmarks/typescript/**"
+permissions:
+  contents: read
+
+jobs:
+  typescript:
+    runs-on: ubuntu-20.04
+    name: Benchmark TypeScript Types
+    steps:
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          fetch-depth: 0
+      - name: Setup node
+        uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93 # v3.4.1
+        with:
+          node-version: 16
+
+      - run: npm install
+
+      - run: npx ts-benchmark -p ./benchmarks/typescript/auto-typed -f 17/100000 18 29 32 -b master -g -t --colors
+        env:
+          DB_URL: ${{ secrets.DB_URL }}

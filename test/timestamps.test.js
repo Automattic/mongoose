@@ -995,6 +995,41 @@ describe('timestamps', function() {
     assert.ok(res.profile.conditions[0].createdAt);
     assert.ok(res.profile.conditions[0].updatedAt);
   });
+
+  it('works with insertMany() and embedded discriminators (gh-12150)', async function() {
+    const AssetSchema = new Schema({ url: String, size: String }, { timestamps: true });
+    const HeaderSectionSchema = new Schema({
+      title: String,
+      image: AssetSchema
+    });
+
+    // Abstract section
+    const BaseSectionSchema = new Schema({
+      isVisible: Boolean
+    }, { discriminatorKey: 'kind' });
+
+    // Main Schema
+    const PageSchema = new Schema({
+      sections: [BaseSectionSchema] // Same error without the array "sections: BaseSectionSchema"
+    }, { timestamps: true });
+
+    const sections = PageSchema.path('sections');
+    sections.discriminator('header', HeaderSectionSchema);
+
+    const Test = db.model('Test', PageSchema);
+
+    await Test.insertMany([{
+      sections: {
+        isVisible: true,
+        kind: 'header',
+        title: 'h1'
+      }
+    }]);
+
+    const doc = await Test.findOne();
+    assert.equal(doc.sections.length, 1);
+    assert.equal(doc.sections[0].title, 'h1');
+  });
 });
 
 async function delay(ms) {

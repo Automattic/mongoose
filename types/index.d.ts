@@ -157,6 +157,8 @@ declare module 'mongoose' {
 
   type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
 
+  type PluginFunction<DocType> = (schema: Schema<DocType>, opts?: any) => void;
+
   export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {},
     TStaticMethods = {},
     TPathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
@@ -239,7 +241,7 @@ declare module 'mongoose' {
     pathType(path: string): string;
 
     /** Registers a plugin for this schema. */
-    plugin(fn: (schema: Schema<DocType>, opts?: any) => void, opts?: any): this;
+    plugin<PFunc extends PluginFunction<DocType>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
 
     /** Defines a post hook for the model. */
     post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, T>): this;

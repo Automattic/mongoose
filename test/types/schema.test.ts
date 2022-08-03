@@ -702,3 +702,38 @@ function gh12030() {
   }>({} as InferSchemaType<typeof Schema6>);
 
 }
+
+function pluginOptions() {
+  interface SomePluginOptions {
+    option1?: string;
+    option2: number;
+  }
+
+  function pluginFunction(schema: Schema<any>, options: SomePluginOptions) {
+    return; // empty function, to satisfy lint option
+  }
+
+  const schema = new Schema({});
+  expectType<Schema<any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
+
+  // could not add strict tests that the parameters are inferred correctly, because i dont know how this would be done in tsd
+
+  // test basic inferrence
+  expectError(schema.plugin(pluginFunction, {})); // should error because "option2" is not optional
+  schema.plugin(pluginFunction, { option2: 0 });
+  schema.plugin(pluginFunction, { option1: 'string', option2: 1 });
+  expectError(schema.plugin(pluginFunction, { option1: 'string' })); // should error because "option2" is not optional
+  expectError(schema.plugin(pluginFunction, { option2: 'string' })); // should error because "option2" type is "number"
+  expectError(schema.plugin(pluginFunction, { option1: 0 })); // should error because "option1" type is "string"
+
+  // test plugins without options defined
+  function pluginFunction2(schema: Schema<any>) {
+    return; // empty function, to satisfy lint option
+  }
+  schema.plugin(pluginFunction2);
+  expectError(schema.plugin(pluginFunction2, {})); // should error because no options argument is defined
+
+  // test overwriting options
+  schema.plugin<any, SomePluginOptions>(pluginFunction2, { option2: 0 });
+  expectError(schema.plugin<any, SomePluginOptions>(pluginFunction2, {})); // should error because "option2" is not optional
+}

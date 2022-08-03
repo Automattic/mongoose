@@ -13,7 +13,8 @@ import {
   IfEquals,
   SchemaOptions,
   DefaultSchemaOptions,
-  MergeType
+  MergeType,
+  FlatRecord
 } from 'mongoose';
 
 declare module 'mongoose' {
@@ -86,7 +87,9 @@ type Resolve_id<T, O> = T extends { _id: any }
 
 type Resolve__v<T, O extends Record<any, any>> = O extends { versionKey: false }
   ? T
-  : MergeType<T, { [T in (O extends { versionKey: true } ? DefaultSchemaOptions['versionKey'] : O['versionKey'])]: string }>;
+  : MergeType<T, {
+    [K in (O extends { versionKey: infer VersionKey } ? VersionKey : DefaultSchemaOptions['versionKey'])]: string
+  }>;
 
 /**
  * @summary Checks if a document path is required or optional.

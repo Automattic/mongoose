@@ -118,5 +118,7 @@ function autoTypedVirtuals() {
   const doc = new TestModel();
   expectType<string>(doc.domain);
 
+  expectType<string>(doc.id);
+
   expectType<FlatRecord<AutoTypedSchemaType & VirtualsType >>({} as InferredDocType);
 }

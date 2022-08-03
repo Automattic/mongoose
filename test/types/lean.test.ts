@@ -1,4 +1,4 @@
-import { Schema, model, Document, LeanDocument, Types, BaseDocumentType, DocTypeFromUnion, DocTypeFromGeneric, ApplySchemaOptions } from 'mongoose';
+import { Schema, model, Document, LeanDocument, Types, BaseDocumentType, DocTypeFromUnion, DocTypeFromGeneric, ApplySchemaOptions, FlatRecord } from 'mongoose';
 import { expectError, expectNotType, expectType } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
@@ -185,7 +185,7 @@ async function getBaseDocumentTypeFromModel(): Promise<void> {
 
   type baseFromUserDocType = BaseDocumentType<UserDocType>;
 
-  expectType<User & { _id: Types.ObjectId }>({} as baseFromUserDocType);
+  expectType<ApplySchemaOptions<User & { _id: Types.ObjectId }, undefined, 'virtuals'>>({} as FlatRecord<baseFromUserDocType>);
 
   const a: UserDocType = {} as any;
 

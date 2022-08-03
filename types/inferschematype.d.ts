@@ -66,12 +66,11 @@ declare module 'mongoose' {
    */
   type ResolveSchemaOptions<T> = Omit<MergeType<DefaultSchemaOptions, T>, 'statics' | 'methods' | 'query' | 'virtuals'>;
 
-  type ApplySchemaOptions<T, O extends Record<any, any>= DefaultSchemaOptions, P extends 'paths' | 'virtuals' = 'paths'> = FlatRecord<(P extends 'paths'
-    ? ResolveTimestamps<Resolve__v<T, O>, O>
+  type ApplySchemaOptions<T, O = DefaultSchemaOptions, P extends 'paths' | 'virtuals' = 'paths'> = FlatRecord<(P extends 'paths'
+    ? ResolveTimestamps<Resolve__v<T, O extends Record<any, any> ? O : {} >, O>
     : ResolveId<T, O>
   )>;
 }
-
 
 type ResolveTimestamps<T, O> = O extends { timestamps: false }
   ? T

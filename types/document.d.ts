@@ -22,8 +22,8 @@ declare module 'mongoose' {
     /** This documents _id. */
     _id?: T;
 
-    /** This documents __v. */
-    __v?: any;
+    /** This documents __v. It's a string by default. */
+    __v?: unknown;
 
     /** Assert that a given path or paths is populated. Throws an error if not populated. */
     $assertPopulated<Paths = {}>(paths: string | string[]): Omit<DocType, keyof Paths> & Paths;
@@ -148,7 +148,7 @@ declare module 'mongoose' {
     getChanges(): UpdateQuery<this>;
 
     /** The string version of this documents _id. */
-    id?: any;
+    id?: unknown;
 
     /** Signal that we desire an increment of this documents version. */
     increment(): this;

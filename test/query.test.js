@@ -3992,7 +3992,7 @@ describe('Query', function() {
     });
   });
 
-  it('allows a transform option for lean on a query gh-10423', async function() {
+  it('allows a transform option for lean on a query (gh-10423)', async function() {
     const arraySchema = new mongoose.Schema({
       sub: String
     });
@@ -4004,7 +4004,7 @@ describe('Query', function() {
       foo: [arraySchema],
       otherName: subDoc
     });
-    const Test = db.model('gh10423', testSchema);
+    const Test = db.model('Test', testSchema);
     await Test.create({ name: 'foo', foo: [{ sub: 'Test' }, { sub: 'Testerson' }], otherName: { nickName: 'Bar' } });
 
     const result = await Test.find().lean({
@@ -4028,6 +4028,40 @@ describe('Query', function() {
     assert.strictEqual(single.otherName._id, undefined);
     assert.strictEqual(single.foo[0]._id, undefined);
     assert.strictEqual(single.foo[0]._id, undefined);
+  });
+
+  it('handles a lean transform that deletes _id with populate (gh-12143) (gh-10423)', async function() {
+    const testSchema = Schema({
+      name: String,
+      user: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+      }
+    });
+
+    const userSchema = Schema({
+      name: String
+    });
+
+    const Test = db.model('Test', testSchema);
+    const User = db.model('User', userSchema);
+
+    const user = await User.create({ name: 'John Smith' });
+    let test = await Test.create({ name: 'test', user });
+
+    test = await Test.findById(test).populate('user').lean({
+      transform: (doc) => {
+        delete doc._id;
+        delete doc.__v;
+        return doc;
+      }
+    });
+
+    assert.ok(test);
+    assert.deepStrictEqual(test, {
+      name: 'test',
+      user: { name: 'John Smith' }
+    });
   });
 
   it('skips applying default projections over slice projections (gh-11940)', async function() {

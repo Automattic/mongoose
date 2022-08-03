@@ -215,7 +215,7 @@ declare module 'mongoose' {
   interface DefaultSchemaOptions {
     typeKey: 'type';
     id: true;
-    _id: '_id';
+    _id: true;
     timestamps: false;
     versionKey: '__v'
   }

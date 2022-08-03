@@ -66,13 +66,24 @@ declare module 'mongoose' {
    */
   type ResolveSchemaOptions<T> = Omit<MergeType<DefaultSchemaOptions, T>, 'statics' | 'methods' | 'query' | 'virtuals'>;
 
-  type ApplySchemaOptions<T, O = DefaultSchemaOptions> = FlatRecord<Resolve_timestamps<T, O>>;
+  type ApplySchemaOptions<T, O = DefaultSchemaOptions, P extends 'paths' | 'virtuals' = 'paths'> = FlatRecord<(P extends 'paths'
+    ? ResolveTimestamps<T, O>
+    : ResolveId<T, O>
+  )>;
 }
 
 
-type Resolve_timestamps<T, O> = O extends { timestamps: false }
+type ResolveTimestamps<T, O> = O extends { timestamps: false }
   ? T
-  : T extends { timestamps: any } ? T : MergeType<T, { createdAt: Date ;updatedAt: Date }>;
+  : T extends { timestamps: any } ? T : MergeType<T, { createdAt: Date; updatedAt: Date }>;
+
+type ResolveId<T, O> = O extends { id: false }
+  ? T
+  : T extends { id: any } ? T : MergeType<T, { id: string }>;
+
+type Resolve_id<T, O> = T extends { _id: any }
+  ? T
+  : O extends { _id: false } ? T : MergeType<T, { _id: Types.ObjectId }>;
 
 /**
  * @summary Checks if a document path is required or optional.

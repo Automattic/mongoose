@@ -284,8 +284,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<T extends {}, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
+        discriminator<D extends {}>(name: string | number, schema: Schema, value?: string): Model<D>;
 
         /** The schematype embedded in this array */
         caster?: SchemaType;
@@ -344,8 +344,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
-        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
+        discriminator<D extends {}>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<T extends {}, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
         schema: Schema;
@@ -393,8 +393,8 @@ declare module 'mongoose' {
         /** The document's schema */
         schema: Schema;
 
-        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<T extends {}, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
+        discriminator<D extends {}>(name: string | number, schema: Schema, value?: string): Model<D>;
       }
 
       class String extends SchemaType {

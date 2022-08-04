@@ -71,9 +71,9 @@ declare module 'mongoose' {
     options?: CompileModelOptions
   ): Model<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
-  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+  export function model<T extends {}>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
-  export function model<T, U, TQueryHelpers = {}>(
+  export function model<T extends {}, U, TQueryHelpers = {}>(
     name: string,
     schema?: Schema<T, any, any, TQueryHelpers, any, any>,
     collection?: string,
@@ -151,15 +151,15 @@ declare module 'mongoose' {
       : M
     : M;
 
-  export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, T> = T extends Schema<infer T1, infer T2, infer T3, infer T4, infer T5>
+  export type DiscriminatorSchema<DocType extends {}, M, TInstanceMethods, TQueryHelpers, TVirtuals, T> = T extends Schema<infer T1, infer T2, infer T3, infer T4, infer T5>
     ? Schema<Omit<DocType, keyof T1> & T1, DiscriminatorModel<T2, M>, T3 | TInstanceMethods, T4 | TQueryHelpers, T5 | TVirtuals>
     : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals>;
 
   type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
 
-  type PluginFunction<DocType> = (schema: Schema<DocType>, opts?: any) => void;
+  type PluginFunction<DocType extends {}> = (schema: Schema<DocType>, opts?: any) => void;
 
-  export class Schema<EnforcedDocType = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {},
+  export class Schema<EnforcedDocType extends {} = any, M = Model<EnforcedDocType, any, any, any>, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {},
     TStaticMethods = {},
     TPathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
     DocType extends ObtainDocumentType<DocType, EnforcedDocType, TPathTypeKey> = ObtainDocumentType<any, EnforcedDocType, TPathTypeKey>>

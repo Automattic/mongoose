@@ -3,8 +3,8 @@ declare module 'mongoose' {
 
   export interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
-    discriminator<D>(name: string | number, schema: Schema, value?: string | number | ObjectId): Model<D>;
-    discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
+    discriminator<D extends {}>(name: string | number, schema: Schema, value?: string | number | ObjectId): Model<D>;
+    discriminator<T extends {}, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
   }
 
   interface MongooseBulkWriteOptions {
@@ -114,7 +114,7 @@ declare module 'mongoose' {
   }
 
   const Model: Model<any>;
-  interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> extends
+  interface Model<T extends {}, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> extends
     NodeJS.EventEmitter,
     AcceptsDiscriminator,
     IndexManager,

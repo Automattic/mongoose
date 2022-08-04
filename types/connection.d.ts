@@ -142,13 +142,13 @@ declare module 'mongoose' {
     readonly models: Readonly<{ [index: string]: Model<any> }>;
 
     /** Defines or retrieves a model. */
-    model<T, U, TQueryHelpers = {}>(
+    model<T extends {}, U, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<T, any, any, TQueryHelpers, any, any>,
       collection?: string,
       options?: CompileModelOptions
     ): U;
-    model<T>(name: string, schema?: Schema<T>, collection?: string, options?: CompileModelOptions): Model<T>;
+    model<T extends {}>(name: string, schema?: Schema<T>, collection?: string, options?: CompileModelOptions): Model<T>;
 
     /** Returns an array of model names created on this connection. */
     modelNames(): Array<string>;

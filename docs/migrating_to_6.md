@@ -96,7 +96,7 @@ await mongoose.connect('mongodb://localhost:27017/test', {
 });
 ```
 
-<h3 id="the-aspromise-method-for-connections"><a href="#the-aspromise-method-for-connections">The `asPromise()` Method for Connections</a></h3>
+<h3 id="the-aspromise-method-for-connections"><a href="#the-aspromise-method-for-connections">The <code>asPromise()</code> Method for Connections</a></h3>
 
 Mongoose connections are no longer [thenable](https://masteringjs.io/tutorials/fundamentals/thenable). This means that `await mongoose.createConnection(uri)` **no longer waits for Mongoose to connect**. Use `mongoose.createConnection(uri).asPromise()` instead. See [#8810](https://github.com/Automattic/mongoose/issues/8810).
 
@@ -108,7 +108,7 @@ await mongoose.createConnection(uri);
 await mongoose.createConnection(uri).asPromise();
 ```
 
-<h3 id="mongoose-connect-returns-a-promise"><a href="#mongoose-connect-returns-a-promise">`mongoose.connect()` Returns a Promise</a></h3>
+<h3 id="mongoose-connect-returns-a-promise"><a href="#mongoose-connect-returns-a-promise"><code>mongoose.connect()</code> Returns a Promise</a></h3>
 
 The `mongoose.connect()` function now always returns a promise, **not** a Mongoose instance.
 
@@ -136,7 +136,7 @@ if (existingUser) {
 }
 ```
 
-<h3 id="strictquery-is-removed-and-replaced-by-strict"><a href="#strictquery-is-removed-and-replaced-by-strict">`strictQuery` is now equal to `strict` by default</a></h3>
+<h3 id="strictquery-is-removed-and-replaced-by-strict"><a href="#strictquery-is-removed-and-replaced-by-strict"><code>strictQuery</code> is now equal to <code>strict</code> by default</a></h3>
 
 ~Mongoose no longer supports a `strictQuery` option. You must now use `strict`.~
 As of Mongoose 6.0.10, we brought back the `strictQuery` option.
@@ -228,7 +228,7 @@ const doc = new Test({
 assert.deepEqual(Object.keys(doc.toObject().profile.name), ['first', 'last']);
 ```
 
-<h3 id="sanitizefilter-and-trusted"><a href="#sanitizefilter-and-trusted">`sanitizeFilter` and `trusted()`</a></h3>
+<h3 id="sanitizefilter-and-trusted"><a href="#sanitizefilter-and-trusted"><code>sanitizeFilter</code> and <code>trusted()</code></a></h3>
 
 Mongoose 6 introduces a new `sanitizeFilter` option to globals and queries that defends against [query selector injection attacks](https://thecodebarbarian.com/2014/09/04/defending-against-query-selector-injection-attacks.html). If you enable `sanitizeFilter`, Mongoose will wrap any object in the query filter in a `$eq`:
 
@@ -245,7 +245,7 @@ To explicitly allow a query selector, use `mongoose.trusted()`:
 await Test.find({ username: 'val', pwd: mongoose.trusted({ $ne: null }) }).setOptions({ sanitizeFilter: true });
 ```
 
-<h3 id="removed-omitundefined"><a href="#removed-omitundefined">Removed `omitUndefined`: Mongoose now removes `undefined` keys in updates instead of setting them to `null`</a></h3>
+<h3 id="removed-omitundefined"><a href="#removed-omitundefined">Removed <code>omitUndefined</code>: Mongoose now removes <code>undefined</code> keys in updates instead of setting them to <code>null</code></a></h3>
 
 In Mongoose 5.x, setting a key to `undefined` in an update operation was equivalent to setting it to `null`.
 
@@ -303,7 +303,7 @@ post.tags[0] = 'javascript';
 await post.save(); // Works, no need for `markModified()`!
 ```
 
-<h3 id="typepojotomixed"><a href="#typepojotomixed">`typePojoToMixed`</a></h3>
+<h3 id="typepojotomixed"><a href="#typepojotomixed"><code>typePojoToMixed</code></a></h3>
 
 Schema paths declared with `type: { name: String }` become single nested subdocs in Mongoose 6, as opposed to Mixed in Mongoose 5. This removes the need for the `typePojoToMixed` option. See [gh-7181](https://github.com/Automattic/mongoose/issues/7181).
 
@@ -315,11 +315,11 @@ const schema = new Schema({
 });
 ```
 
-<h3 id="strictpopulate"><a href="#strictpopulate">`strictPopulate()`</a></h3>
+<h3 id="strictpopulate"><a href="#strictpopulate"><code>strictPopulate()</code></a></h3>
 
 Mongoose now throws an error if you `populate()` a path that isn't defined in your schema. This is only for cases when we can infer the local schema, like when you use `Query#populate()`, **not** when you call `Model.populate()` on a POJO. See [gh-5124](https://github.com/Automattic/mongoose/issues/5124).
 
-<h3 id="subdocument-ref-function-context"><a href="#subdocument-ref-function-context">Subdocument `ref` Function Context</a></h3>
+<h3 id="subdocument-ref-function-context"><a href="#subdocument-ref-function-context">Subdocument <code>ref</code> Function Context</a></h3>
 
 When populating a subdocument with a function `ref` or `refPath`, `this` is now the subdocument being populated, not the top-level document. See [#8469](https://github.com/Automattic/mongoose/issues/8469).
 
@@ -351,11 +351,11 @@ Single nested subdocs have been renamed to "subdocument paths". So `SchemaSingle
 
 `Aggregate#cursor()` now returns an AggregationCursor instance to be consistent with `Query#cursor()`. You no longer need to do `Model.aggregate(pipeline).cursor().exec()` to get an aggregation cursor, just `Model.aggregate(pipeline).cursor()`.
 
-<h3 id="autocreate-defaults-to-true"><a href="#autocreate-defaults-to-true">`autoCreate` Defaults to `true`</a></h3>
+<h3 id="autocreate-defaults-to-true"><a href="#autocreate-defaults-to-true"><code>autoCreate</code> Defaults to <code>true</code></a></h3>
 
 `autoCreate` is `true` by default **unless** readPreference is secondary or secondaryPreferred, which means Mongoose will attempt to create every model's underlying collection before creating indexes. If readPreference is secondary or secondaryPreferred, Mongoose will default to `false` for both `autoCreate` and `autoIndex` because both `createCollection()` and `createIndex()` will fail when connected to a secondary.
 
-<h3 id="no-more-context-query"><a href="#no-more-context-query">No More `context: 'query'`</a></h3>
+<h3 id="no-more-context-query"><a href="#no-more-context-query">No More <code>context: 'query'</code></a></h3>
 
 The `context` option for queries has been removed. Now Mongoose always uses `context = 'query'`.
 
@@ -369,7 +369,7 @@ When connected to a replica set, connections now emit 'disconnected' when connec
 
 However, Mongoose 6 does **not** buffer commands while a connection is disconnected. So you can still successfully execute commands like queries with `readPreference = 'secondary'`, even if the Mongoose connection is in the disconnected state.
 
-<h3 id="removed-execpopulate"><a href="#removed-execpopulate">Removed `execPopulate()`</a></h3>
+<h3 id="removed-execpopulate"><a href="#removed-execpopulate">Removed <code>execPopulate()</code></a></h3>
 
 `Document#populate()` now returns a promise and is now no longer chainable.
 
@@ -379,7 +379,7 @@ However, Mongoose 6 does **not** buffer commands while a connection is disconnec
   await doc.populate([{path: 'path1', select: 'select1'}, {path: 'path2', select: 'select2'}]);
   ```
 
-<h3 id="create-with-empty-array"><a href="#create-with-empty-array">`create()` with Empty Array</a></h3>
+<h3 id="create-with-empty-array"><a href="#create-with-empty-array"><code>create()</code> with Empty Array</a></h3>
 
 `await Model.create([])` in v6.0 returns an empty array when provided an empty array, in v5.0 it used to return `undefined`. If any of your code is checking whether the output is `undefined` or not, you need to modify it with the assumption that `await Model.create(...)` will always return an array if provided an array.
 
@@ -387,7 +387,7 @@ However, Mongoose 6 does **not** buffer commands while a connection is disconnec
 
 `doc.set({ child: { age: 21 } })` now works the same whether `child` is a nested path or a subdocument: Mongoose will overwrite the value of `child`. In Mongoose 5, this operation would merge `child` if `child` was a nested path.
 
-<h3 id="objectid-valueof"><a href="#objectid-valueof">ObjectId `valueOf()`</a></h3>
+<h3 id="objectid-valueof"><a href="#objectid-valueof">ObjectId <code>valueOf()</code></a></h3>
 
 Mongoose now adds a `valueOf()` function to ObjectIds. This means you can now use `==` to compare an ObjectId against a string.
 
@@ -397,19 +397,19 @@ const a = ObjectId('6143b55ac9a762738b15d4f0');
 a == '6143b55ac9a762738b15d4f0'; // true
 ```
 
-<h3 id="immutable-createdat"><a href="#immutable-createdat">Immutable `createdAt`</a></h3>
+<h3 id="immutable-createdat"><a href="#immutable-createdat">Immutable <code>createdAt</code></a></h3>
 
 If you set `timestamps: true`, Mongoose will now make the `createdAt` property `immutable`. See [gh-10139](https://github.com/Automattic/mongoose/issues/10139)
 
-<h3 id="removed-validator-isasync"><a href="#removed-validator-isasync">Removed Validator `isAsync`</a></h3>
+<h3 id="removed-validator-isasync"><a href="#removed-validator-isasync">Removed Validator <code>isAsync</code></a></h3>
 
 `isAsync` is no longer an option for `validate`. Use an `async function` instead.
 
-<h3 id="removed-safe"><a href="#removed-safe">Removed `safe`</a></h3>
+<h3 id="removed-safe"><a href="#removed-safe">Removed <code>safe</code></a></h3>
 
 `safe` is no longer an option for schemas, queries, or `save()`. Use `writeConcern` instead.
 
-<h3 id="schematype-set-parameters"><a href="#schematype-set-parameters">SchemaType `set` parameters</a></h3>
+<h3 id="schematype-set-parameters"><a href="#schematype-set-parameters">SchemaType <code>set</code> parameters</a></h3>
 
 Mongoose now calls setter functions with `priorValue` as the 2nd parameter, rather than `schemaType` in Mongoose 5.
 
@@ -437,7 +437,7 @@ const user = new User({ name: 'Robert Martin' });
 console.log(user.name); // 'robert martin'
 ```
 
-<h3 id="toobject-and-tojson-use-nested-schema-minimize"><a href="#toobject-and-tojson-use-nested-schema-minimize">`toObject()` and `toJSON()` Use Nested Schema `minimize`</a></h3>
+<h3 id="toobject-and-tojson-use-nested-schema-minimize"><a href="#toobject-and-tojson-use-nested-schema-minimize"><code>toObject()</code> and <code>toJSON()</code> Use Nested Schema <code>minimize</code></a></h3>
 
 This change was technically released with 5.10.5, but [caused issues for users migrating from 5.9.x to 6.x](https://github.com/Automattic/mongoose/issues/10827).
 In Mongoose `< 5.10.5`, `toObject()` and `toJSON()` would use the top-level schema's `minimize` option by default.

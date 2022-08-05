@@ -9,7 +9,6 @@ const pug = require('pug');
 const pkg = require('./package');
 const linktype = require('./docs/helpers/linktype');
 const href = require('./docs/helpers/href');
-const klass = require('./docs/helpers/klass');
 const transform = require('acquit-require');
 
 let jobs = [];
@@ -139,7 +138,6 @@ function pugify(filename, options, newfile) {
   options.package = pkg;
   options.linktype = linktype;
   options.href = href;
-  options.klass = klass;
 
   const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
     filename.replace(process.cwd(), '');

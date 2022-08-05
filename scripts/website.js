@@ -6,17 +6,21 @@ const acquit = require('acquit');
 const fs = require('fs');
 const path = require('path');
 const pug = require('pug');
-const pkg = require('./package');
+const pkg = require('../package.json');
 const transform = require('acquit-require');
+
+// using "__dirname" and ".." to have a consistent CWD, this script should not be runnable, even when not being in the root of the project
+// also a consistent root path so that it is easy to change later when the script should be moved
+const cwd = path.resolve(__dirname, '..');
 
 let jobs = [];
 try {
-  jobs = require('./docs/data/jobs.json');
+  jobs = require('../docs/data/jobs.json');
 } catch (err) {}
 
 let opencollectiveSponsors = [];
 try {
-  opencollectiveSponsors = require('./docs/data/opencollective.json');
+  opencollectiveSponsors = require('../docs/data/opencollective.json');
 } catch (err) {}
 
 require('acquit-ignore')();
@@ -46,32 +50,34 @@ markdown.setOptions({
 });
 markdown.use({ renderer });
 
+const testPath = path.resolve(cwd, 'test')
+
 const tests = [
-  ...acquit.parse(fs.readFileSync('./test/geojson.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/transactions.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/schema.alias.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/model.middleware.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/date.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/lean.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/cast.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/findoneandupdate.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/custom-casting.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/getters-setters.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/virtuals.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/defaults.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/discriminators.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/promises.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/schematypes.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/validation.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/schemas.test.js').toString())
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'geojson.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/transactions.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'schema.alias.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'model.middleware.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/date.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/lean.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/cast.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/findoneandupdate.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/custom-casting.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/getters-setters.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/virtuals.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/defaults.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/discriminators.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/promises.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schematypes.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/validation.test.js')).toString()),
+  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schemas.test.js')).toString())
 ];
 
 function getVersion() {
-  return require('./package.json').version;
+  return require('../package.json').version;
 }
 
 function getLatestLegacyVersion(startsWith) {
-  const hist = fs.readFileSync('./CHANGELOG.md', 'utf8').replace(/\r/g, '\n').split('\n');
+  const hist = fs.readFileSync(path.join(cwd, 'CHANGELOG.md'), 'utf8').replace(/\r/g, '\n').split('\n');
 
   for (const rawLine of hist) {
     const line = (rawLine || '').trim();
@@ -95,11 +101,11 @@ pkg.latest38x = getLatestLegacyVersion('3.8');
 
 // Create api dir if it doesn't already exist
 try {
-  fs.mkdirSync('./docs/api');
+  fs.mkdirSync(path.join(cwd, './docs/api'));
 } catch (err) {} // eslint-disable-line no-empty
 
-require('./docs/splitApiDocs');
-const filemap = Object.assign({}, require('./docs/source'), require('./docs/tutorials'), require('./docs/typescript'));
+require('../docs/splitApiDocs');
+const filemap = Object.assign({}, require('../docs/source'), require('../docs/tutorials'), require('../docs/typescript'));
 const files = Object.keys(filemap);
 
 const wrapMarkdown = (md, baseLayout) => `
@@ -136,10 +142,10 @@ function pugify(filename, options, newfile) {
   options.package = pkg;
 
   const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
-    filename.replace(process.cwd(), '');
+    filename.replace(cwd, '');
   options.editLink = options.editLink || _editLink;
 
-  let contents = fs.readFileSync(filename).toString();
+  let contents = fs.readFileSync(path.resolve(cwd, filename)).toString();
 
   if (options.acquit) {
     contents = transform(contents, tests);
@@ -148,7 +154,7 @@ function pugify(filename, options, newfile) {
     const lines = contents.split('\n');
     lines.splice(2, 0, cpc);
     contents = lines.join('\n');
-    contents = wrapMarkdown(contents, path.relative(path.dirname(filename), path.join(__dirname, 'docs/layout')));
+    contents = wrapMarkdown(contents, path.relative(path.dirname(filename), path.join(cwd, 'docs/layout')));
     newfile = filename.replace('.md', '.html');
   }
 
@@ -164,7 +170,7 @@ function pugify(filename, options, newfile) {
   };
 
   newfile = newfile || filename.replace('.pug', '.html');
-  options.outputUrl = newfile.replace(process.cwd(), '');
+  options.outputUrl = newfile.replace(cwd, '');
   options.jobs = jobs;
 
   options.opencollectiveSponsors = opencollectiveSponsors;
@@ -186,7 +192,7 @@ function pugify(filename, options, newfile) {
 }
 
 files.forEach(function(file) {
-  const filename = __dirname + '/' + file;
+  const filename = path.join(cwd, file);
   pugify(filename, filemap[file]);
 
   if (process.argv[2] === '--watch') {

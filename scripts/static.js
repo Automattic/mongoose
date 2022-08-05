@@ -7,7 +7,8 @@ const port = process.env.PORT
   : 8089;
 
 require('http').createServer(function(req, res) {
-  handler(req, res).catch(err => res.statusCode(500).send(err.message));
+  // using "rewrites", because the current script file is in a different directly that what should be served
+  handler(req, res, { rewrites: [{ source: '.', destination: '..' }] }).catch(err => res.statusCode(500).send(err.message));
 }).listen(port);
 
 console.log(`now listening on http://localhost:${port}`);

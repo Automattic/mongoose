@@ -13,6 +13,8 @@ const transform = require('acquit-require');
 // also a consistent root path so that it is easy to change later when the script should be moved
 const cwd = path.resolve(__dirname, '..');
 
+const isMain = require.main === module;
+
 let jobs = [];
 try {
   jobs = require('../docs/data/jobs.json');
@@ -27,6 +29,7 @@ require('acquit-ignore')();
 
 const { marked: markdown } = require('marked');
 const highlight = require('highlight.js');
+const { promisify } = require("util");
 const renderer = {
   heading: function(text, level, raw, slugger) {
     const slug = slugger.slug(raw);
@@ -137,7 +140,8 @@ const cpc = `
 </div>
 `;
 
-function pugify(filename, options, newfile) {
+async function pugify(filename, options) {
+  let newfile = undefined;
   options = options || {};
   options.package = pkg;
 
@@ -171,31 +175,53 @@ function pugify(filename, options, newfile) {
 
   options.opencollectiveSponsors = opencollectiveSponsors;
 
-  pug.render(contents, options, function(err, str) {
-    if (err) {
-      console.error(err.stack);
-      return;
-    }
+  const str = await promisify(pug.render)(contents, options).catch(console.error);
 
-    fs.writeFile(newfile, str, function(err) {
-      if (err) {
-        console.error('could not write', err.stack);
-      } else {
-        console.log('%s : rendered ', new Date(), newfile);
+  if (typeof str !== "string") {
+    return;
+  }
+  
+  await fs.promises.writeFile(newfile, str).catch((err) => {
+    console.error('could not write', err.stack);
+  }).then(() => {
+    console.log('%s : rendered ', new Date(), newfile);
+  });
+}
+
+// extra function to start watching for file-changes, without having to call this file directly with "watch"
+function startWatch() {
+  files.forEach((file) => {
+    const filepath = path.resolve(cwd, file);
+    fs.watchFile(filepath, { interval: 1000 }, (cur, prev) => {
+      if (cur.mtime > prev.mtime) {
+        pugify(filepath, filemap[file]);
       }
     });
   });
 }
 
-files.forEach(function(file) {
-  const filename = path.join(cwd, file);
-  pugify(filename, filemap[file]);
+async function pugifyAllFiles() {
+  await Promise.all(files.map(async (file) => {
+    const filename = path.join(cwd, file);
+    await pugify(filename, filemap[file]);
+  
+    // only enable watch if main module AND having argument "--watch"
+    if (isMain && process.argv[2] === '--watch') {
+      fs.watchFile(filename, { interval: 1000 }, function(cur, prev) {
+        if (cur.mtime > prev.mtime) {
+          pugify(filename, filemap[file]);
+        }
+      });
+    }
+  }));
+}
 
-  if (process.argv[2] === '--watch') {
-    fs.watchFile(filename, { interval: 1000 }, function(cur, prev) {
-      if (cur.mtime > prev.mtime) {
-        pugify(filename, filemap[file]);
-      }
-    });
-  }
-});
+exports.default = pugify;
+exports.pugify = pugify;
+exports.startWatch = startWatch;
+exports.pugifyAllFiles = pugifyAllFiles;
+
+// only run the following code if this file is the main module / entry file
+if (isMain) {
+   pugifyAllFiles();
+}

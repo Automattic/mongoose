@@ -158,10 +158,6 @@ function pugify(filename, options, newfile) {
     newfile = filename.replace('.md', '.html');
   }
 
-  options.marked = markdown;
-  options.markedCode = function(v) {
-    return markdown.parse('```javascript\n' + v + '\n```');
-  };
   options.filename = filename;
   options.filters = {
     markdown: function(block) {

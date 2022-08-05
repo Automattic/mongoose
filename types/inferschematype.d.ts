@@ -13,8 +13,7 @@ import {
   IfEquals,
   SchemaOptions,
   DefaultSchemaOptions,
-  MergeType,
-  FlatRecord
+  MergeType
 } from 'mongoose';
 
 declare module 'mongoose' {
@@ -162,7 +161,7 @@ type OptionalPaths<T, TypeKey extends string > = {
  * @param {PathValueType} PathValueType Document definition path type.
  * @param {TypeKey} TypeKey A generic refers to document definition.
  */
-type ObtainDocumentPathType<PathValueType, TypeKey extends string > = PathValueType extends Schema
+type ObtainDocumentPathType<PathValueType, TypeKey extends string > = IfExtends<PathValueType, Schema> extends true
   ? InferSchemaType<PathValueType>
   : ResolvePathType<
   PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
@@ -184,7 +183,7 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
  * @returns Number, "Number" or "number" will be resolved to number type.
  */
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends SchemaOptions['typeKey'] = DefaultSchemaOptions['typeKey']> =
-  PathValueType extends Schema ? InferSchemaType<PathValueType> :
+  IfExtends<PathValueType, Schema> extends true ? InferSchemaType<PathValueType> :
     PathValueType extends (infer Item)[] ? IfEquals<Item, never, any[], Item extends Schema ? Types.DocumentArray<ResolvePathType<Item>> : ResolvePathType<Item>[]> :
       PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
         PathValueType extends NumberSchemaDefinition ? number :

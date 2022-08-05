@@ -37,5 +37,10 @@ type IsItRecordAndNotAny<T> = IfEquals<T, any, false, T extends Record<any, any>
 type IfEquals<T, U, Y = true, N = false> =
     (<G>() => G extends T ? 1 : 0) extends
     (<G>() => G extends U ? 1 : 0) ? Y : N;
-
 }
+
+type IfExtends<T, E, Y = true, N = false> = T extends infer IT
+  ? IT extends E
+    ? Y
+    : N
+  : never;

@@ -2,6 +2,7 @@ extends layout
 
 append style
   link(rel="stylesheet", href="/docs/css/api.css")
+  script(src="/docs/js/api-bold-current-nav.js")
 
 block content
   h1 API Docs
@@ -64,30 +65,3 @@ block content
           li <span class="method-type">&laquo;#{prop.type}&raquo;</span>
       div
         | !{prop.description}
-
-  script(type="text/javascript").
-    var headers = document.querySelectorAll('.item-header');
-    var navItems = document.querySelectorAll('.nav-item .nav-item-title');
-    var navSubs = document.querySelectorAll('.nav-item-sub');
-    var cur = '';
-    window.addEventListener('scroll', function() {
-      var scrollY = window.scrollY;
-      var highlight = headers[0];
-      for (var i = 0; i < headers.length; ++i) {
-        if (headers[i].offsetTop > scrollY) {
-          break;
-        }
-        highlight = headers[i];
-      }
-      if (highlight.id !== cur) {
-        cur = highlight.id;
-        for (var j = 0; j < navItems.length; ++j) {
-          navItems[j].style.fontWeight = '';
-        }
-        for (j = 0; j < navSubs.length; ++j) {
-          navSubs[j].style.display = 'none';
-        }
-        document.querySelector('#nav-' + highlight.id + ' .nav-item-title').style.fontWeight = 'bold';
-        document.querySelector('#nav-' + highlight.id + ' .nav-item-sub').style.display = 'block';
-      }
-    });

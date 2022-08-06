@@ -13,7 +13,8 @@ import {
   IfEquals,
   SchemaOptions,
   DefaultSchemaOptions,
-  MergeType
+  MergeType,
+  FlatRecord
 } from 'mongoose';
 
 declare module 'mongoose' {
@@ -67,7 +68,7 @@ declare module 'mongoose' {
   type ResolveSchemaOptions<T> = Omit<MergeType<DefaultSchemaOptions, T>, 'statics' | 'methods' | 'query' | 'virtuals'>;
 
   type ApplySchemaOptions<T, O = DefaultSchemaOptions, P extends 'paths' | 'virtuals' = 'paths'> = FlatRecord<(P extends 'paths'
-    ? ResolveTimestamps<Resolve__v<T, O extends Record<any, any> ? O : {} >, O>
+    ? ResolveTimestamps<Resolve__v<Resolve_id<T, O>, O extends Record<any, any> ? O : {} >, O>
     : ResolveId<T, O>
   )>;
 }
@@ -80,7 +81,7 @@ type ResolveId<T, O> = O extends { id: false }
   ? T
   : T extends { id: any } ? T : MergeType<T, { id: string }>;
 
-type Resolve_id<T, O> = T extends { _id: any }
+type Resolve_id<T, O> = Record<keyof T, any> extends { _id: any }
   ? T
   : O extends { _id: false } ? T : MergeType<T, { _id: Types.ObjectId }>;
 
@@ -92,21 +93,23 @@ type Resolve__v<T, O extends Record<any, any>> = O extends { versionKey: false }
 
 /**
  * @summary Checks if a document path is required or optional.
- * @param {P} P Document path.
+ * @param {P} P Document path definition.
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
+ * @param {N} N Document path name.
  */
-type IsPathRequired<P, TypeKey extends string> =
-  P extends { required: true | [true, string | undefined] } | ArrayConstructor | any[]
-    ? true
-    : P extends (Record<TypeKey, ArrayConstructor | any[]>)
-      ? P extends { default: undefined }
-        ? false
-        : true
-      : P extends (Record<TypeKey, any>)
-        ? P extends { default: any }
-          ? IfEquals<P['default'], undefined, false, true>
-          : false
-        : false;
+type IsPathRequired<P, TypeKey extends string, N = unknown> =
+  N extends '_id' ? true :
+    P extends { required: true | [true, string | undefined] } | ArrayConstructor | any[]
+      ? true
+      : P extends (Record<TypeKey, ArrayConstructor | any[]>)
+        ? P extends { default: undefined }
+          ? false
+          : true
+        : P extends (Record<TypeKey, any>)
+          ? P extends { default: any }
+            ? IfEquals<P['default'], undefined, false, true>
+            : false
+          : false;
 
 /**
  * @summary Path base type defined by using TypeKey
@@ -122,7 +125,7 @@ type PathWithTypePropertyBaseType<TypeKey extends string> = { [k in TypeKey]: an
  * @returns required paths keys of document definition.
  */
 type RequiredPathKeys<T, TypeKey extends string> = {
-  [K in keyof T]: IsPathRequired<T[K], TypeKey> extends true ? IfEquals<T[K], any, never, K> : never;
+  [K in keyof T]: IsPathRequired<T[K], TypeKey, K> extends true ? IfEquals<T[K], any, never, K> : never;
 }[keyof T];
 
 /**
@@ -142,7 +145,7 @@ type RequiredPaths<T, TypeKey extends string> = {
  * @returns optional paths keys of document definition.
  */
 type OptionalPathKeys<T, TypeKey extends string> = {
-  [K in keyof T]: IsPathRequired<T[K], TypeKey> extends true ? never : K;
+  [K in keyof T]: IsPathRequired<T[K], TypeKey, K> extends true ? never : K;
 }[keyof T];
 
 /**
@@ -198,5 +201,5 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                           IfEquals<PathValueType, ObjectConstructor> extends true ? any:
                             IfEquals<PathValueType, {}> extends true ? any:
                               PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
+                                PathValueType extends Record<string, any> ? IfEquals<PathValueType, Types.ObjectId, Types.ObjectId, ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }>> :
                                   unknown;

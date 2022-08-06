@@ -706,8 +706,28 @@ function gh12122() {
 
   const Test3 = new Schema({ test: String }, { timestamps: true });
 
-  expectType<ApplySchemaOptions<{ test?: string; }, { timestamps: true }>>({} as InferSchemaType<typeof Test3>);
+  expectType<{
+    _id: Types.ObjectId;
+    __v: string;
+    test?: string | undefined;
+    createdAt: Date;
+    updatedAt: Date;
+  }>({} as InferSchemaType<typeof Test3>);
 
   const Test4 = new Schema({ test: String }, { timestamps: true, versionKey: 'version' });
-  expectType<ApplySchemaOptions<{ test?: string; }, { timestamps: true, versionKey: 'version' }>>({} as InferSchemaType<typeof Test4>);
+  expectType<{
+    _id: Types.ObjectId;
+    version: string;
+    test?: string | undefined;
+    createdAt: Date;
+    updatedAt: Date;
+  }>({} as InferSchemaType<typeof Test4>);
+
+  const Test5 = new Schema({ _id: String, name: String });
+
+  expectType<{
+    _id: string;
+    __v: string;
+    name?: string | undefined;
+  }>({} as InferSchemaType<typeof Test5>);
 }

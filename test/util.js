@@ -15,28 +15,21 @@ exports.clearTestData = function clearTestData(db) {
     return;
   }
 
-  const arr = [];
-
-  for (const model of Object.keys(db.models)) {
+  const promises = Object.keys(db.models).map(model => {
     const Model = db.models[model];
     if (Model.baseModelName != null) {
       // Skip discriminators
-      continue;
+      return null;
     }
-    // Avoid dropping collections, because dropping collections has historically been
-    // painfully slow on the WiredTiger storage engine
-    arr.push(db.models[model].deleteMany({}).catch(err => {
-      if (err.message === 'Time-series deletes are not enabled') {
-        // Can't empty out a timeseries collection using `deleteMany()`, see:
-        // https://docs.mongodb.com/manual/core/timeseries/timeseries-limitations/#updates-and-deletes
-        return db.models[model].collection.drop();
+    return db.models[model].collection.drop().catch(err => {
+      if (err.codeName === 'NamespaceNotFound') {
+        return;
       }
       throw err;
-    }));
-    arr.push(db.models[model].collection.dropIndexes().catch(() => {}));
-  }
+    });
+  });
 
-  return Promise.all(arr);
+  return Promise.all(promises);
 };
 
 exports.stopRemainingOps = function stopRemainingOps(db) {

@@ -677,6 +677,7 @@ describe('aggregate: ', function() {
         sort('sal').
         exec(function(err, docs) {
           assert.ifError(err);
+          assert.ok(docs && docs.length > 0);
           assert.equal(docs[0].sal, 14000);
         });
     });

@@ -7074,10 +7074,10 @@ describe('Model', function() {
       ]);
 
       const beforeExpirationCount = await Test.count({});
-      assert.ok(beforeExpirationCount === 12);
-      await new Promise(resolve => setTimeout(resolve, 6000));
+      assert.equal(beforeExpirationCount, 12);
+      await new Promise(resolve => setTimeout(resolve, 8000));
       const afterExpirationCount = await Test.count({});
-      assert.ok(afterExpirationCount === 0);
+      assert.equal(afterExpirationCount, 0);
       await Test.collection.drop().catch(() => {});
     });
 

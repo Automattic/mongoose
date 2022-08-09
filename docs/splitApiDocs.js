@@ -2,7 +2,7 @@
 
 const api = require('./source/api');
 const fs = require('fs');
-const jade = require('pug');
+const pug = require('pug');
 const pkg = require('../package.json');
 
 let jobs = [];
@@ -22,7 +22,7 @@ api.docs.forEach(file => {
     jobs
   });
 
-  const html = jade.renderFile('./docs/api_split.pug', options);
+  const html = pug.renderFile('./docs/api_split.pug', options);
   console.log('Write', file.name);
   fs.writeFileSync(`./docs/api/${file.name.toLowerCase()}.html`, html);
 });

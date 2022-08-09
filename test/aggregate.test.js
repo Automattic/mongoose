@@ -670,9 +670,9 @@ describe('aggregate: ', function() {
     it('sort', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      const docs = await aggregate.sort('sal').
+      const docs = await aggregate.sort('sal');
 
-        assert.equal(docs[0].sal, 14000);
+      assert.equal(docs[0].sal, 14000);
     });
 
     it('graphLookup', async function() {

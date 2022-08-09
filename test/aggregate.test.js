@@ -74,11 +74,11 @@ async function onlyTestAtOrAbove(semver, ctx) {
 describe('aggregate: ', function() {
   let db;
 
-  before(function() {
+  before(function startConnection() {
     db = start();
   });
 
-  after(async function() {
+  after(async function closeConnection() {
     await db.close();
   });
 

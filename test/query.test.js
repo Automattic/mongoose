@@ -2625,35 +2625,23 @@ describe('Query', function() {
   describe('handles falsy and object projections with defaults (gh-3256)', function() {
     let MyModel;
 
-    before(function(done) {
+    before(function() {
       const PersonSchema = new Schema({
         name: String,
         lastName: String,
-        dependents: [String]
+        dependents: [String],
+        salary: { type: Number, default: 25000 }
       });
 
       db.deleteModel(/Person/);
-      const m = db.model('Person', PersonSchema);
+      MyModel = db.model('Person', PersonSchema);
+    });
 
-      const obj = {
+    beforeEach(async function() {
+      await MyModel.collection.insertOne({
         name: 'John',
         lastName: 'Doe',
         dependents: ['Jake', 'Jill', 'Jane']
-      };
-      m.create(obj, function(error) {
-        assert.ifError(error);
-
-        const PersonSchema = new Schema({
-          name: String,
-          lastName: String,
-          dependents: [String],
-          salary: { type: Number, default: 25000 }
-        });
-
-        db.deleteModel(/Person/);
-        MyModel = db.model('Person', PersonSchema);
-
-        done();
       });
     });
 

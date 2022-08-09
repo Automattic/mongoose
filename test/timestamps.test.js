@@ -552,7 +552,7 @@ describe('timestamps', function() {
     let CatSchema;
     let Cat;
 
-    before(function() {
+    beforeEach(function() {
       CatSchema = new Schema({
         name: String,
         hobby: String

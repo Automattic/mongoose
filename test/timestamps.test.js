@@ -741,10 +741,6 @@ describe('timestamps', function() {
         });
       });
     });
-
-    after(function() {
-      return Cat.deleteMany({});
-    });
   });
 
   it('timestamps with number types (gh-3957)', async function() {

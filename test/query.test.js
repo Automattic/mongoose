@@ -4086,4 +4086,24 @@ describe('Query', function() {
     assert.equal(doc.comments[0].comment, 'test2');
 
   });
+
+  describe('set()', function() {
+    it('overwrites top-level keys if setting to undefined (gh-12155)', function() {
+      const testSchema = new mongoose.Schema({
+        key: String,
+        prop: String
+      });
+      const Test = db.model('Test', testSchema);
+
+      const query = Test.findOneAndUpdate({}, { key: '', prop: 'foo' });
+
+      query.set('key', undefined);
+      const update = query.getUpdate();
+
+      assert.deepEqual(update, {
+        $set: { key: undefined },
+        prop: 'foo'
+      });
+    });
+  });
 });

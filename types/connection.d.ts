@@ -142,6 +142,12 @@ declare module 'mongoose' {
     readonly models: Readonly<{ [index: string]: Model<any> }>;
 
     /** Defines or retrieves a model. */
+    model<TSchema extends Schema = any>(
+      name: string,
+      schema?: TSchema,
+      collection?: string,
+      options?: CompileModelOptions
+    ): Model<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<T, any, any, TQueryHelpers, any, any>,

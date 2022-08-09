@@ -28,7 +28,7 @@
 }
 
 .api-nav .nav-item-sub {
-  display: none;
+  display: block;
   font-size: 0.66em;
 }
 
@@ -48,6 +48,10 @@
 
 .item-header-wrap {
   position: relative;
+}
+
+.api-content {
+  margin-top: 3em;
 }
 
 @media (max-width: 1785px) {

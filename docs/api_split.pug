@@ -4,15 +4,6 @@ append style
   link(rel="stylesheet", href="/docs/css/api.css")
   script(src="/docs/js/api-bold-current-nav.js")
 
-  style.
-    .api-nav .nav-item-sub {
-      display: block !important;
-    }
-
-    .api-content {
-      margin-top: 3em;
-    }
-
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
@@ -78,7 +69,7 @@ block content
         h5 Inherits:
         ul
           li <span class="method-type">&laquo;#{prop.inherits}&raquo;</span>
-      if prop.see != null 
+      if prop.see != null && prop.see.length > 0
         h5 See:
         ul
           each see in prop.see

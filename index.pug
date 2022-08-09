@@ -189,12 +189,10 @@ html(lang='en')
               a(rel='sponsored', href=sponsor.website || sponsor.profile)
                 img.sponsor(src=sponsor.image || 'https://next-images.opencollective.com/_next/image?url=%2Fstatic%2Fimages%2Fopencollective-icon.png&w=96&q=75', style='height:50px', alt=sponsor.alt)
 
-        <div class="sponsor">
-          Sponsor <a href="https://opencollective.com/mongoose">Mongoose on OpenCollective</a>
-          to get your company's logo above!
-        </div>
+        div.sponsors
+          :markdown
+            Sponsor [Mongoose on OpenCollective](https://opencollective.com/mongoose) to get your company's logo above!
 
     p#footer Licensed under MIT.
     script.
       document.body.className = 'load';
-    include docs/includes/track

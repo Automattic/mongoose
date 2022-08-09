@@ -7,7 +7,7 @@ to documents as stored in MongoDB. Each document is an instance of its
 <ul class="toc">
   <li><a href="#documents-vs-models">Documents vs Models</a></li>
   <li><a href="#retrieving">Retrieving</a></li>
-  <li><a href="#updating-using-save">Updating Using `save()`</a></li>
+  <li><a href="#updating-using-save">Updating Using <code>save()<code></a></li>
   <li><a href="#updating-using-queries">Updating Using Queries</a></li>
   <li><a href="#validating">Validating</a></li>
   <li><a href="#overwriting">Overwriting</a></li>

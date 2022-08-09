@@ -150,7 +150,7 @@ declare module 'mongoose' {
     ): Model<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
-      schema?: Schema<T, any, any, TQueryHelpers, any, any>,
+      schema?: Schema<T, U, any, TQueryHelpers, any, any>,
       collection?: string,
       options?: CompileModelOptions
     ): U;

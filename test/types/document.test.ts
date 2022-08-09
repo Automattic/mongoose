@@ -1,6 +1,7 @@
 import { Schema, model, Model, Document, Types } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
+import { autoTypedModelConnection } from './connection.test';
 import { AutoTypedSchemaType } from './schema.test';
 
 const Drink = model('Drink', new Schema({
@@ -187,6 +188,19 @@ async function gh11598() {
 
 function autoTypedDocument() {
   const AutoTypedModel = autoTypedModel();
+  const AutoTypeModelInstance = new AutoTypedModel({ unExistProperty: 1, description: 2 });
+
+  expectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
+  expectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
+  expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
+
+  // Document-Methods-tests
+  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
+
+}
+
+function autoTypedDocumentConnection() {
+  const AutoTypedModel = autoTypedModelConnection();
   const AutoTypeModelInstance = new AutoTypedModel({ unExistProperty: 1, description: 2 });
 
   expectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);

@@ -659,26 +659,20 @@ describe('aggregate: ', function() {
       assert.ok(threw);
     });
 
-    it('match', function() {
+    it('match', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      return aggregate.
-        match({ sal: { $gt: 15000 } }).
-        exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs.length, 1);
-        });
+      const docs = await aggregate.match({ sal: { $gt: 15000 } });
+
+      assert.equal(docs.length, 1);
     });
 
-    it('sort', function() {
+    it('sort', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      return aggregate.
-        sort('sal').
-        exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs[0].sal, 14000);
-        });
+      const docs = await aggregate.sort('sal').
+
+        assert.equal(docs[0].sal, 14000);
     });
 
     it('graphLookup', async function() {
@@ -752,21 +746,20 @@ describe('aggregate: ', function() {
       ]);
     });
 
-    it('complex pipeline', function() {
+    it('complex pipeline', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      return aggregate.
+      const docs = await aggregate.
         match({ sal: { $lt: 16000 } }).
         unwind('customers').
         project({ emp: '$name', cust: '$customers' }).
         sort('-cust').
         skip(2).
-        exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs.length, 1);
-          assert.equal(docs[0].cust, 'Gary');
-          assert.equal(docs[0].emp, 'Bob');
-        });
+        exec();
+
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].cust, 'Gary');
+      assert.equal(docs[0].emp, 'Bob');
     });
 
     it('pipeline() (gh-5825)', function() {

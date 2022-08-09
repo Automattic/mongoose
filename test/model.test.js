@@ -4031,7 +4031,7 @@ describe('Model', function() {
         loc: loc
       });
 
-
+      await Person.init();
       await Person.createIndexes();
 
       await p.save();
@@ -4057,7 +4057,7 @@ describe('Model', function() {
         name: 'Jimmy Page'
       });
 
-
+      await Person.init();
       await Person.createIndexes();
 
       await p.save();
@@ -4088,8 +4088,13 @@ describe('Model', function() {
 
       p.nested.tag = 'guitarist';
 
-
-      await Person.collection.drop();
+      await Person.collection.drop().catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
+      await Person.createCollection();
       await Person.createIndexes();
 
       await p.save();
@@ -4139,8 +4144,12 @@ describe('Model', function() {
         name: 'Jimmy Page'
       });
 
-
-      await Person.collection.drop();
+      await Person.collection.drop().catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
       await Person.createIndexes();
 
       await p.save();
@@ -4174,7 +4183,12 @@ describe('Model', function() {
       });
 
 
-      await Person.collection.drop();
+      await Person.collection.drop().catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
       await Person.createIndexes();
 
       let err;
@@ -4201,8 +4215,12 @@ describe('Model', function() {
         name: 'Jimmy Page'
       });
 
-
-      await Person.collection.drop();
+      await Person.collection.drop().catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
       await Person.createIndexes();
 
       await p.save();
@@ -4229,7 +4247,12 @@ describe('Model', function() {
       });
 
 
-      await Person.collection.drop();
+      await Person.collection.drop().catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
       await Person.createIndexes();
 
       await p.save();

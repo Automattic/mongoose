@@ -11,25 +11,7 @@ exports.random = function() {
 };
 
 exports.clearTestData = function clearTestData(db) {
-  if (db.models == null) {
-    return;
-  }
-
-  const promises = Object.keys(db.models).map(model => {
-    const Model = db.models[model];
-    if (Model.baseModelName != null) {
-      // Skip discriminators
-      return null;
-    }
-    return db.models[model].collection.drop().catch(err => {
-      if (err.codeName === 'NamespaceNotFound') {
-        return;
-      }
-      throw err;
-    });
-  });
-
-  return Promise.all(promises);
+  return db.dropDatabase();
 };
 
 exports.stopRemainingOps = function stopRemainingOps(db) {

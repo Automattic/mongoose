@@ -7006,79 +7006,16 @@ describe('Model', function() {
         autoCreate: false
       });
 
-      const Test = db.model('TestGH11229Var2', schema);
+      const Test = db.model('TestGH11229Var2', schema, 'TestGH11229Var2');
 
       await Test.collection.drop().catch(() => {});
       await Test.createCollection({ expires: '5 seconds' });
 
-      await Test.insertMany([
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 16
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 15
-        }, {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 13
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 17
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: Date.now() + 500,
-          temp: 12
-        }
-      ]);
-
-      const beforeExpirationCount = await Test.count({});
-      assert.equal(beforeExpirationCount, 12);
-      await new Promise(resolve => setTimeout(resolve, 8000));
-      const afterExpirationCount = await Test.count({});
-      assert.equal(afterExpirationCount, 0);
-      await Test.collection.drop().catch(() => {});
+      const collectionInfo = await Test.db.db.listCollections().toArray().
+        then(collections => collections.find(coll => coll.name === 'TestGH11229Var2'));
+      assert.ok(collectionInfo);
+      assert.equal(collectionInfo.options.expireAfterSeconds, 5);
+      assert.ok(collectionInfo.options.timeseries);
     });
 
     it('createCollection() enforces expireAfterSeconds when set by Schema (gh-11229)', async function() {

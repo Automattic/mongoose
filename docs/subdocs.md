@@ -245,7 +245,7 @@ const newdoc = parent.children.create({ name: 'Aaron' });
 
 ### Removing Subdocs
 
-Each subdocument has it's own
+Each subdocument has its own
 [remove](./api.html#types_embedded_EmbeddedDocument-remove) method. For
 an array subdocument, this is equivalent to calling `.pull()` on the
 subdocument. For a single nested subdocument, `remove()` is equivalent

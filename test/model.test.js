@@ -8509,7 +8509,7 @@ describe('Model', function() {
         { name: 't4', timestamp: Date.now() }
       ];
 
-      model.insertMany(tests, {
+      await model.insertMany(tests, {
         ordered: false
       });
       const entries = await model.find({});
@@ -8517,7 +8517,6 @@ describe('Model', function() {
         p.timestamp = Date.now();
       }
 
-      // !!! "TypeError: path.indexOf is not a function" occurs here
       const res = await model.bulkSave(entries);
       assert.ok(res);
     });

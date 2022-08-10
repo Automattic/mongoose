@@ -348,11 +348,6 @@ describe('model', function() {
       });
 
       describe('global autoIndexes (gh-1875)', function() {
-        beforeEach(() => {
-          const Test = db.model('Test', Schema({}));
-          return Test.collection.dropIndexes();
-        });
-
         beforeEach(() => db.deleteModel(/Test/));
 
         it('will create indexes as a default', async function() {

@@ -74,11 +74,11 @@ async function onlyTestAtOrAbove(semver, ctx) {
 describe('aggregate: ', function() {
   let db;
 
-  before(function() {
+  before(function startConnection() {
     db = start();
   });
 
-  after(async function() {
+  after(async function closeConnection() {
     await db.close();
   });
 
@@ -659,26 +659,20 @@ describe('aggregate: ', function() {
       assert.ok(threw);
     });
 
-    it('match', function() {
+    it('match', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      return aggregate.
-        match({ sal: { $gt: 15000 } }).
-        exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs.length, 1);
-        });
+      const docs = await aggregate.match({ sal: { $gt: 15000 } });
+
+      assert.equal(docs.length, 1);
     });
 
-    it('sort', function() {
+    it('sort', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      return aggregate.
-        sort('sal').
-        exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs[0].sal, 14000);
-        });
+      const docs = await aggregate.sort('sal');
+
+      assert.equal(docs[0].sal, 14000);
     });
 
     it('graphLookup', async function() {
@@ -752,21 +746,20 @@ describe('aggregate: ', function() {
       ]);
     });
 
-    it('complex pipeline', function() {
+    it('complex pipeline', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 
-      return aggregate.
+      const docs = await aggregate.
         match({ sal: { $lt: 16000 } }).
         unwind('customers').
         project({ emp: '$name', cust: '$customers' }).
         sort('-cust').
         skip(2).
-        exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs.length, 1);
-          assert.equal(docs[0].cust, 'Gary');
-          assert.equal(docs[0].emp, 'Bob');
-        });
+        exec();
+
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].cust, 'Gary');
+      assert.equal(docs[0].emp, 'Bob');
     });
 
     it('pipeline() (gh-5825)', function() {
@@ -1153,7 +1146,7 @@ describe('aggregate: ', function() {
     await MyModel.aggregate([{ $sort: { name: 1 } }]).
       cursor().
       eachAsync(checkDoc, { parallel: 2 }).then(function() {
-        assert.ok(Date.now() - startedAt[1] >= 100, Date.now() - startedAt[1]);
+        assert.ok(Date.now() - startedAt[1] >= 75, Date.now() - startedAt[1]);
         assert.equal(startedAt.length, 2);
         assert.ok(startedAt[1] - startedAt[0] < 50, `${startedAt[1] - startedAt[0]}`);
         assert.deepEqual(names.sort(), expectedNames);

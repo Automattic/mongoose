@@ -4031,7 +4031,7 @@ describe('Model', function() {
         loc: loc
       });
 
-
+      await Person.init();
       await Person.createIndexes();
 
       await p.save();
@@ -4057,7 +4057,7 @@ describe('Model', function() {
         name: 'Jimmy Page'
       });
 
-
+      await Person.init();
       await Person.createIndexes();
 
       await p.save();
@@ -4088,8 +4088,13 @@ describe('Model', function() {
 
       p.nested.tag = 'guitarist';
 
-
-      await Person.collection.drop();
+      await Person.collection.drop().catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
+      await Person.createCollection();
       await Person.createIndexes();
 
       await p.save();
@@ -4139,8 +4144,12 @@ describe('Model', function() {
         name: 'Jimmy Page'
       });
 
-
-      await Person.collection.drop();
+      await Person.collection.drop().catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
       await Person.createIndexes();
 
       await p.save();
@@ -4174,7 +4183,12 @@ describe('Model', function() {
       });
 
 
-      await Person.collection.drop();
+      await Person.collection.drop().catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
       await Person.createIndexes();
 
       let err;
@@ -4201,8 +4215,12 @@ describe('Model', function() {
         name: 'Jimmy Page'
       });
 
-
-      await Person.collection.drop();
+      await Person.collection.drop().catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
       await Person.createIndexes();
 
       await p.save();
@@ -4229,7 +4247,12 @@ describe('Model', function() {
       });
 
 
-      await Person.collection.drop();
+      await Person.collection.drop().catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
       await Person.createIndexes();
 
       await p.save();
@@ -6983,79 +7006,16 @@ describe('Model', function() {
         autoCreate: false
       });
 
-      const Test = db.model('TestGH11229Var2', schema);
+      const Test = db.model('TestGH11229Var2', schema, 'TestGH11229Var2');
 
       await Test.collection.drop().catch(() => {});
       await Test.createCollection({ expires: '5 seconds' });
 
-      await Test.insertMany([
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T00:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T04:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T08:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T12:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T16:00:00.000Z'),
-          temp: 16
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T20:00:00.000Z'),
-          temp: 15
-        }, {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T00:00:00.000Z'),
-          temp: 13
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T04:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T08:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T12:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T16:00:00.000Z'),
-          temp: 17
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T20:00:00.000Z'),
-          temp: 12
-        }
-      ]);
-
-      const beforeExpirationCount = await Test.count({});
-      assert.ok(beforeExpirationCount === 12);
-      await new Promise(resolve => setTimeout(resolve, 6000));
-      const afterExpirationCount = await Test.count({});
-      assert.ok(afterExpirationCount === 0);
-      await Test.collection.drop().catch(() => {});
+      const collectionInfo = await Test.db.db.listCollections().toArray().
+        then(collections => collections.find(coll => coll.name === 'TestGH11229Var2'));
+      assert.ok(collectionInfo);
+      assert.equal(collectionInfo.options.expireAfterSeconds, 5);
+      assert.ok(collectionInfo.options.timeseries);
     });
 
     it('createCollection() enforces expireAfterSeconds when set by Schema (gh-11229)', async function() {
@@ -8486,7 +8446,7 @@ describe('Model', function() {
         { name: 't4', timestamp: Date.now() }
       ];
 
-      model.insertMany(tests, {
+      await model.insertMany(tests, {
         ordered: false
       });
       const entries = await model.find({});
@@ -8494,7 +8454,6 @@ describe('Model', function() {
         p.timestamp = Date.now();
       }
 
-      // !!! "TypeError: path.indexOf is not a function" occurs here
       const res = await model.bulkSave(entries);
       assert.ok(res);
     });

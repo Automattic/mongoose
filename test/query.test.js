@@ -2625,35 +2625,23 @@ describe('Query', function() {
   describe('handles falsy and object projections with defaults (gh-3256)', function() {
     let MyModel;
 
-    before(function(done) {
+    before(function() {
       const PersonSchema = new Schema({
         name: String,
         lastName: String,
-        dependents: [String]
+        dependents: [String],
+        salary: { type: Number, default: 25000 }
       });
 
       db.deleteModel(/Person/);
-      const m = db.model('Person', PersonSchema);
+      MyModel = db.model('Person', PersonSchema);
+    });
 
-      const obj = {
+    beforeEach(async function() {
+      await MyModel.collection.insertOne({
         name: 'John',
         lastName: 'Doe',
         dependents: ['Jake', 'Jill', 'Jane']
-      };
-      m.create(obj, function(error) {
-        assert.ifError(error);
-
-        const PersonSchema = new Schema({
-          name: String,
-          lastName: String,
-          dependents: [String],
-          salary: { type: Number, default: 25000 }
-        });
-
-        db.deleteModel(/Person/);
-        MyModel = db.model('Person', PersonSchema);
-
-        done();
       });
     });
 
@@ -4085,5 +4073,25 @@ describe('Query', function() {
     assert.equal(doc.comments.length, 1);
     assert.equal(doc.comments[0].comment, 'test2');
 
+  });
+
+  describe('set()', function() {
+    it('overwrites top-level keys if setting to undefined (gh-12155)', function() {
+      const testSchema = new mongoose.Schema({
+        key: String,
+        prop: String
+      });
+      const Test = db.model('Test', testSchema);
+
+      const query = Test.findOneAndUpdate({}, { key: '', prop: 'foo' });
+
+      query.set('key', undefined);
+      const update = query.getUpdate();
+
+      assert.deepEqual(update, {
+        $set: { key: undefined },
+        prop: 'foo'
+      });
+    });
   });
 });

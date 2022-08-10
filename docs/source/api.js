@@ -159,16 +159,20 @@ function parse() {
             // The remainder is simply taken by a call to "slice" (also the text is trimmed later)
             const textMatches = /^(.*? (?=#|\/|(?:https?:)|$))/i.exec(tag.string);
 
-            let text;
+            let text = undefined;
+            let url = undefined;
             if (textMatches === null || textMatches === undefined) {
               // warn because this most likely is a badly defined "@see"
               console.warn(`No Text Matches found in @see for "${ctx.constructor}.${ctx.name}"`)
-              break;
+
+              // if no text is found, add text as url and use the url itself as the text
+              url = tag.string;
+              text = tag.string;
             } else {
               text = textMatches[1].trim();
+              url = tag.string.slice(text.length).trim();
             }
 
-            const url = tag.string.slice(text.length).trim();
             ctx.see.push({
               text: text || 'No Description', // fallback text, so that the final text does not end up as a empty element that cannot be seen
               url: url || undefined, // change to be "undefined" if text is empty or non-valid

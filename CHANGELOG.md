@@ -1,3 +1,16 @@
+6.5.2 / 2022-08-09
+==================
+ * fix(aggregate): avoid throwing error when disconnecting with change stream open #12201 [ramos-ph](https://github.com/ramos-ph)
+ * fix(query): overwrite top-level key if using Query.prototype.set() to set to undefined #12155
+ * fix(query): shallow clone options before modifying #12176
+ * fix(types): auto schema type inference on `Connection.prototype.model()` #12240 [hasezoey](https://github.com/hasezoey)
+ * fix(types): better typescript support for schema plugins #12139 [emiljanitzek](https://github.com/emiljanitzek)
+ * fix(types): make bulkWrite() type param optional #12221 #12212
+ * docs: misc cleanup #12199 [hasezoey](https://github.com/hasezoey)
+ * docs: highlight current top-most visible header in navbar #12222 [hasezoey](https://github.com/hasezoey)
+ * docs(populate): improve examples for Document.prototype.populate() #12111
+ * docs(middleware): clarify document vs model in middleware docs #12113
+
 6.5.1 / 2022-08-03
 ==================
  * fix(timestamps): set timestamps on child schema when child schema has timestamps: true but parent schema does not #12119

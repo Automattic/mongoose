@@ -72,10 +72,11 @@ async function run() {
   const jobs = await Job.find().select({ logo: 1, company: 1, title: 1, location: 1, description: 1, url: 1  });
   fs.writeFileSync(`${__dirname}/data/jobs.json`, JSON.stringify(jobs, null, '  '));
 
-  const poralOpts = { headers: { authorization: `Basic ${config.poralToken}` } };
-  const opencollectiveSponsors = await axios.post(opencollectiveUrl, {}, poralOpts).
-    then(res => axios.post(`${poralHost}${res.headers.location}`, {}, poralOpts)).
+  const opencollectiveSponsors = await axios.get('https://opencollective.com/mongoose/members.json').
     then(res => res.data).
+    then(sponsors => {
+      return sponsors.filter(result => result.tier == 'sponsor' && result.isActive);
+    }).
     catch(() => null);
 
   for (const sponsor of opencollectiveSponsors) {

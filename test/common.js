@@ -114,7 +114,8 @@ module.exports = function(options) {
   return conn;
 };
 
-function getUri(env, default_uri, db) {
+function getUri(default_uri, db) {
+  const env = process.env.START_REPLICA_SET ? process.env.MONGOOSE_REPLSET_URI : process.env.MONGOOSE_TEST_URI;
   const use = env ? env : default_uri;
   const lastIndex = use.lastIndexOf('/');
   // use length if lastIndex is 9 or lower, because that would mean it found the last character of "mongodb://"
@@ -134,13 +135,18 @@ const databases = module.exports.databases = [
  * testing uri
  */
 
-module.exports.uri = getUri(process.env.MONGOOSE_TEST_URI, 'mongodb://127.0.0.1:27017/', databases[0]);
+// the following has to be done, otherwise mocha will evaluate this before running the global-setup, where it becomes the default
+Object.defineProperty(module.exports, 'uri', {
+  get: () => getUri('mongodb://127.0.0.1:27017/', databases[0])
+});
 
 /**
  * testing uri for 2nd db
  */
 
-module.exports.uri2 = getUri(process.env.MONGOOSE_TEST_URI, 'mongodb://127.0.0.1:27017/', databases[1]);
+Object.defineProperty(module.exports, 'uri2', {
+  get: () => getUri('mongodb://127.0.0.1:27017/', databases[1])
+});
 
 /**
  * expose mongoose
@@ -177,27 +183,29 @@ module.exports.mongodVersion = async function() {
 };
 
 async function dropDBs() {
+  this.timeout(60000);
+
   const db = await module.exports({ noErrorListener: true }).asPromise();
   await db.dropDatabase();
   await db.close();
 }
 
-before(async function() {
-  this.timeout(60000);
-  if (process.env.START_REPLICA_SET) {
-    const uri = await startReplicaSet();
+// before(async function() {
+//   this.timeout(60000);
+//   if (process.env.START_REPLICA_SET) {
+//     const uri = await startReplicaSet();
 
-    module.exports.uri = uri;
-    module.exports.uri2 = uri.replace(databases[0], databases[1]);
+//     module.exports.uri = uri;
+//     module.exports.uri2 = uri.replace(databases[0], databases[1]);
 
-    process.env.REPLICA_SET = 'rs0';
+//     process.env.REPLICA_SET = 'rs0';
 
-    const conn = mongoose.createConnection(uri);
-    await conn.asPromise();
-    await conn.db.collection('test').findOne();
-    await conn.close();
-  }
-});
+//     const conn = mongoose.createConnection(uri);
+//     await conn.asPromise();
+//     await conn.db.collection('test').findOne();
+//     await conn.close();
+//   }
+// });
 
 before(dropDBs);
 
@@ -224,33 +232,33 @@ process.on('unhandledRejection', function(error, promise) {
   throw error;
 });
 
-async function startReplicaSet() {
-  const ReplSet = require('mongodb-memory-server').MongoMemoryReplSet;
+// async function startReplicaSet() {
+//   const ReplSet = require('mongodb-memory-server').MongoMemoryReplSet;
 
-  // Create new instance
-  const replSet = new ReplSet({
-    binary: {
-      version: '5.0.4'
-    },
-    instanceOpts: [
-      // Set the expiry job in MongoDB to run every second
-      {
-        port: 27017,
-        args: ['--setParameter', 'ttlMonitorSleepSecs=1']
-      }
-    ],
-    dbName: databases[0],
-    replSet: {
-      name: 'rs0',
-      count: 2,
-      storageEngine: 'wiredTiger'
-    }
-  });
+//   // Create new instance
+//   const replSet = new ReplSet({
+//     binary: {
+//       version: '5.0.4'
+//     },
+//     instanceOpts: [
+//       // Set the expiry job in MongoDB to run every second
+//       {
+//         port: 27017,
+//         args: ['--setParameter', 'ttlMonitorSleepSecs=1']
+//       }
+//     ],
+//     dbName: databases[0],
+//     replSet: {
+//       name: 'rs0',
+//       count: 2,
+//       storageEngine: 'wiredTiger'
+//     }
+//   });
 
-  await replSet.start();
-  await replSet.waitUntilRunning();
+//   await replSet.start();
+//   await replSet.waitUntilRunning();
 
-  await new Promise(resolve => setTimeout(resolve, 10000));
+//   await new Promise(resolve => setTimeout(resolve, 10000));
 
-  return replSet.getUri(databases[0]);
-}
+//   return replSet.getUri(databases[0]);
+// }

@@ -48,6 +48,9 @@ jobs:
           - os: ubuntu-20.04
             mongo-os: ubuntu2004
             mongo: 5.0.2
+          - os: ubuntu-20.04
+            mongo-os: ubuntu2004
+            mongo: 6.0.0
         exclude:
           - os: ubuntu-18.04
             node: 18

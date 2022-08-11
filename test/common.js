@@ -114,17 +114,24 @@ module.exports = function(options) {
   return conn;
 };
 
+function getUri(env, default_uri, db) {
+  const use = env ? env : default_uri;
+  const lastIndex = use.lastIndexOf('/');
+  // use length if lastIndex is 9 or lower, because that would mean it found the last character of "mongodb://"
+  return use.slice(0, lastIndex <= 9 ? use.length : lastIndex) + `/${db}`;
+}
+
 /*!
  * testing uri
  */
 
-module.exports.uri = process.env.MONGOOSE_TEST_URI || 'mongodb://127.0.0.1:27017/mongoose_test';
+module.exports.uri = getUri(process.env.MONGOOSE_TEST_URI, 'mongodb://127.0.0.1:27017/', 'mongoose_test');
 
 /*!
  * testing uri for 2nd db
  */
 
-module.exports.uri2 = 'mongodb://127.0.0.1:27017/mongoose_test_2';
+module.exports.uri2 = getUri(process.env.MONGOOSE_TEST_URI, 'mongodb://127.0.0.1:27017/', 'mongoose_test_2');
 
 /**
  * expose mongoose

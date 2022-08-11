@@ -40,21 +40,19 @@ jobs:
       fail-fast: false
       matrix:
         node: [12, 14, 16, 18]
-        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-20.04]
+        os: [ubuntu-18.04, ubuntu-20.04]
+        mongodb: [4.0.2, 5.0.2, 6.0.0]
         include:
           - os: ubuntu-18.04
-            mongo-os: ubuntu1804
-            mongo: 4.0.2
+            mongodb-os: ubuntu1804
           - os: ubuntu-20.04
-            mongo-os: ubuntu2004
-            mongo: 5.0.2
-          - os: ubuntu-20.04
-            mongo-os: ubuntu2004
-            mongo: 6.0.0
+            mongodb-os: ubuntu2004
         exclude:
           - os: ubuntu-18.04
             node: 18
-    name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongo }}
+          - os: ubuntu-18.04
+            mongodb: 6.0.0
+    name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }}
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
 
@@ -67,14 +65,14 @@ jobs:
 
       - name: Setup
         run: |
-          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}.tgz
-          tar xf mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}.tgz
+          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}.tgz
+          tar xf mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}.tgz
           mkdir -p ./data/db/27017 ./data/db/27000
           printf "\n--timeout 8000" >> ./test/mocha.opts
-          ./mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin/mongod --setParameter ttlMonitorSleepSecs=1 --fork --dbpath ./data/db/27017 --syslog --port 27017
+          ./mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}/bin/mongod --setParameter ttlMonitorSleepSecs=1 --fork --dbpath ./data/db/27017 --syslog --port 27017
           sleep 2
           mongod --version
-          echo `pwd`/mongodb-linux-x86_64-${{ matrix.mongo-os }}-${{ matrix.mongo }}/bin >> $GITHUB_PATH
+          echo `pwd`/mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}/bin >> $GITHUB_PATH
       - run: npm test
 
   test-replica-sets:

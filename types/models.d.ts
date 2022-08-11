@@ -113,6 +113,8 @@ declare module 'mongoose' {
     wtimeout?: number;
   }
 
+  interface RemoveOptions extends SessionOption, Omit<mongodb.DeleteOptions, 'session'> {}
+
   const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> extends
     NodeJS.EventEmitter,
@@ -392,6 +394,7 @@ declare module 'mongoose' {
     ): Promise<any>;
 
     remove<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(filter?: any, callback?: CallbackWithoutResult): QueryWithHelpers<any, ResultDoc, TQueryHelpers, T>;
+    remove<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(filter?: any, options?: RemoveOptions, callback?: CallbackWithoutResult): QueryWithHelpers<any, ResultDoc, TQueryHelpers, T>;
 
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
     replaceOne<ResultDoc = HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>(

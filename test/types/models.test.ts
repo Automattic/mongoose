@@ -444,3 +444,9 @@ function gh12100() {
   const doc = await User.exists({ name: 'Bill' }).orFail();
   expectType<Types.ObjectId>(doc._id);
 })();
+
+function modelRemoveOptions() {
+  const cmodel = model('Test', new Schema());
+
+  cmodel.remove({}, {});
+}

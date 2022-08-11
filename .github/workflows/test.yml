@@ -54,7 +54,7 @@ jobs:
             mongodb: 6.0.0
           - os: ubuntu-20.04 # exclude because there are no <4.4 mongodb builds for 2004
             mongodb: 4.0.2
-    name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }}
+    name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }} OS ${{ matrix.os }}
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
 

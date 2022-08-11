@@ -15,7 +15,6 @@ const MongooseError = require('../lib/error/index');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
-const uri = start.uri;
 
 /**
  * Test.
@@ -26,7 +25,7 @@ describe('connections:', function() {
 
   describe('openUri (gh-5304)', function() {
     it('with mongoose.createConnection()', function() {
-      const conn = mongoose.createConnection('mongodb://127.0.0.1/mongoosetest');
+      const conn = mongoose.createConnection(start.uri.slice(0, start.uri.lastIndexOf('/')) + '/mongoosetest');
       assert.equal(conn.constructor.name, 'NativeConnection');
 
       const Test = conn.model('Test', new Schema({ name: String }));
@@ -37,8 +36,10 @@ describe('connections:', function() {
       return conn.asPromise().
         then(function(conn) {
           assert.equal(conn.constructor.name, 'NativeConnection');
-          assert.equal(conn.host, '127.0.0.1');
-          assert.equal(conn.port, 27017);
+          const match = /mongodb:\/\/([\d.]+)(?::(\d+))?\/(\w+)/i.exec(start.uri);
+          assert.ok(match);
+          assert.equal(conn.host, match[1]);
+          assert.equal(conn.port, parseInt(match[2]));
           assert.equal(conn.name, 'mongoosetest');
 
           return findPromise;
@@ -57,7 +58,7 @@ describe('connections:', function() {
     });
 
     it('with autoCreate (gh-6489)', async function() {
-      const conn = await mongoose.createConnection(uri, {
+      const conn = await mongoose.createConnection(start.uri, {
         // autoCreate: true
       }).asPromise();
 
@@ -81,7 +82,7 @@ describe('connections:', function() {
     });
 
     it('with autoCreate = false (gh-8814)', async function() {
-      const conn = await mongoose.createConnection(uri, {
+      const conn = await mongoose.createConnection(start.uri, {
         autoCreate: false
       }).asPromise();
 
@@ -96,7 +97,7 @@ describe('connections:', function() {
     });
 
     it('autoCreate when collection already exists does not fail (gh-7122)', async function() {
-      const conn = await mongoose.createConnection(uri).asPromise();
+      const conn = await mongoose.createConnection(start.uri).asPromise();
 
       const schema = new mongoose.Schema({
         name: {
@@ -484,7 +485,7 @@ describe('connections:', function() {
   });
 
   it('uses default database in uri if options.dbName is not provided', function() {
-    return mongoose.createConnection('mongodb://127.0.0.1:27017/default-db-name').
+    return mongoose.createConnection(start.uri.slice(0, start.uri.lastIndexOf('/')) + '/default-db-name').
       asPromise().
       then(db => {
         assert.equal(db.name, 'default-db-name');

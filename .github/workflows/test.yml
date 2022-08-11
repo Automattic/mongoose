@@ -70,7 +70,7 @@ jobs:
           wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}.tgz
           tar xf mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}.tgz
           mkdir -p ./data/db/27017 ./data/db/27000
-          printf "\n--timeout 8000" >> ./test/mocha.opts
+          printf "\ntimeout: 8000" >> ./.mocharc.yml
           ./mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}/bin/mongod --setParameter ttlMonitorSleepSecs=1 --fork --dbpath ./data/db/27017 --syslog --port 27017
           sleep 2
           mongod --version
@@ -109,7 +109,7 @@ jobs:
           wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.2.tgz
           tar xf mongodb-linux-x86_64-ubuntu2004-5.0.2.tgz
           mkdir -p ./data/db/27017 ./data/db/27000
-          printf "\n--timeout 8000" >> ./test/mocha.opts
+          printf "\ntimeout: 8000" >> ./.mocharc.yml
           ./mongodb-linux-x86_64-ubuntu2004-5.0.2/bin/mongod --setParameter ttlMonitorSleepSecs=1 --fork --dbpath ./data/db/27017 --syslog --port 27017
           sleep 2
           mongod --version

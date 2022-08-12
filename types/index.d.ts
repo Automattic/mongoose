@@ -62,7 +62,10 @@ declare module 'mongoose' {
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
   /* ! ignore */
-  export type CompileModelOptions = { overwriteModels?: boolean, connection?: Connection };
+  export type CompileModelOptions = {
+    overwriteModels?: boolean,
+    connection?: Connection
+  };
 
   export function model<TSchema extends Schema = any>(
     name: string,
@@ -112,10 +115,6 @@ declare module 'mongoose' {
   export type Require_id<T> = T extends { _id?: infer U }
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
-
-  export type RequireOnlyTypedId<T> = T extends { _id?: infer U; }
-    ? Required<{ _id: U }>
-    : { _id: Types.ObjectId };
 
   export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
 
@@ -515,7 +514,6 @@ declare module 'mongoose' {
       T extends TreatAsPrimitives ? T : // primitives
         T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> :
           LeanDocument<T>; // Documents and everything else
-
 
   export type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 

@@ -260,21 +260,21 @@ declare module 'mongoose' {
     init(callback?: CallbackWithoutResult): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
-    insertMany<DocContents = T>(docs: Array<DocContents | T>, options: InsertManyOptions & { lean: true; }, callback: Callback<Array<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>>>): void;
+    insertMany<DocContents = T>(docs: Array<DocContents | T>, options: InsertManyOptions & { lean: true; }, callback: Callback<Array<MergeType<MergeType<T, DocContents>, Require_id<T>>>>): void;
     insertMany<DocContents = T>(docs: Array<DocContents | T>, options: InsertManyOptions & { rawResult: true; }, callback: Callback<mongodb.InsertManyResult<T>>): void;
-    insertMany<DocContents = T>(docs: Array<DocContents | T>, callback: Callback<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>>>): void;
-    insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions & { lean: true; }, callback: Callback<Array<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>>>): void;
+    insertMany<DocContents = T>(docs: Array<DocContents | T>, callback: Callback<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, Require_id<T>>, TMethodsAndOverrides, TVirtuals>>>): void;
+    insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions & { lean: true; }, callback: Callback<Array<MergeType<MergeType<T, DocContents>, Require_id<T>>>>): void;
     insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions & { rawResult: true; }, callback: Callback<mongodb.InsertManyResult<T>>): void;
-    insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions & { lean?: false | undefined }, callback: Callback<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>>>): void;
-    insertMany<DocContents = T>(doc: DocContents, callback: Callback<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>>>): void;
+    insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions & { lean?: false | undefined }, callback: Callback<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, Require_id<T>>, TMethodsAndOverrides, TVirtuals>>>): void;
+    insertMany<DocContents = T>(doc: DocContents, callback: Callback<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, Require_id<T>>, TMethodsAndOverrides, TVirtuals>>>): void;
 
-    insertMany<DocContents = T>(docs: Array<DocContents | T>, options: InsertManyOptions & { lean: true; }): Promise<Array<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>>>;
+    insertMany<DocContents = T>(docs: Array<DocContents | T>, options: InsertManyOptions & { lean: true; }): Promise<Array<MergeType<MergeType<T, DocContents>, Require_id<T>>>>;
     insertMany<DocContents = T>(docs: Array<DocContents | T>, options: InsertManyOptions & { rawResult: true; }): Promise<mongodb.InsertManyResult<T>>;
-    insertMany<DocContents = T>(docs: Array<DocContents | T>): Promise<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>>>;
-    insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions & { lean: true; }): Promise<Array<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>>>;
+    insertMany<DocContents = T>(docs: Array<DocContents | T>): Promise<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, Require_id<T>>, TMethodsAndOverrides, TVirtuals>>>;
+    insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions & { lean: true; }): Promise<Array<MergeType<MergeType<T, DocContents>, Require_id<T>>>>;
     insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions & { rawResult: true; }): Promise<mongodb.InsertManyResult<T>>;
-    insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions): Promise<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>>>;
-    insertMany<DocContents = T>(doc: DocContents): Promise<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, RequireOnlyTypedId<T>>, TMethodsAndOverrides, TVirtuals>>>;
+    insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions): Promise<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, Require_id<T>>, TMethodsAndOverrides, TVirtuals>>>;
+    insertMany<DocContents = T>(doc: DocContents): Promise<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, Require_id<T>>, TMethodsAndOverrides, TVirtuals>>>;
 
     /** The name of the model */
     modelName: string;

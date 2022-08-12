@@ -452,10 +452,6 @@ declare module 'mongoose' {
 
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
-  type Mutable<T> = {
-    -readonly [K in keyof T]: T[K];
-  };
-
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
     $currentDate?: AnyKeys<TSchema> & AnyObject;
@@ -469,7 +465,7 @@ declare module 'mongoose' {
     $unset?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
-    $addToSet?: Mutable<mongodb.SetFields<TSchema>>;
+    $addToSet?: AnyKeys<TSchema> & AnyObject;
     $pop?: AnyKeys<TSchema> & AnyObject;
     $pull?: AnyKeys<TSchema> & AnyObject;
     $push?: AnyKeys<TSchema> & AnyObject;
@@ -487,13 +483,6 @@ declare module 'mongoose' {
   { $replaceRoot: any } |
   { $replaceWith: any };
 
-  export type __UpdateDefProperty<T> =
-    [Extract<T, mongodb.ObjectId>] extends [never] ? T :
-      T | string;
-  export type _UpdateQueryDef<T> = {
-    [K in keyof T]?: __UpdateDefProperty<T[K]>;
-  };
-
   /**
    * Update query command to perform on the document
    * @example
@@ -501,7 +490,7 @@ declare module 'mongoose' {
    * { age: 30 }
    * ```
    */
-  export type UpdateQuery<T> = _UpdateQuery<_UpdateQueryDef<T>> & AnyObject;
+  export type UpdateQuery<T> = _UpdateQuery<T> & AnyObject;
 
   export type DocumentDefinition<T> = {
     [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:

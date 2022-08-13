@@ -1,6 +1,8 @@
 'use strict';
 
-const handler = require('serve-handler');
+const express = require('express');
+const app = express();
+
 const website = require('./website');
 
 const port = process.env.PORT
@@ -12,13 +14,11 @@ async function main() {
   // start watching for file changes and re-compile them, so that they can be served directly
   website.startWatch();
 
-  require('http').createServer(function(req, res) {
-  // using "rewrites", because the current script file is in a different directly that what should be served
-    handler(req, res, { rewrites: [{ source: '.', destination: '..' }] }).catch(err => res.statusCode(500).send(err.message));
-  }).listen(port);
+  app.use('/', express.static(website.cwd));
 
-  console.log(`now listening on http://localhost:${port}`);
-
+  app.listen(port, () => {
+    console.log(`now listening on http://localhost:${port}`);
+  });
 }
 
 main();

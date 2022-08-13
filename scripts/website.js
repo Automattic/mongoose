@@ -198,15 +198,22 @@ function startWatch() {
       }
     });
   });
+
+  fs.watchFile(path.join(cwd, 'docs/layout.pug'), { interval: 1000 }, (cur, prev) => {
+    if (cur.mtime > prev.mtime) {
+      console.log('docs/layout.pug modified, reloading all files');
+      pugifyAllFiles(true);
+    }
+  });
 }
 
-async function pugifyAllFiles() {
+async function pugifyAllFiles(noWatch) {
   await Promise.all(files.map(async (file) => {
     const filename = path.join(cwd, file);
     await pugify(filename, filemap[file]);
   
     // only enable watch if main module AND having argument "--watch"
-    if (isMain && process.argv[2] === '--watch') {
+    if (!noWatch && isMain && process.argv[2] === '--watch') {
       fs.watchFile(filename, { interval: 1000 }, function(cur, prev) {
         if (cur.mtime > prev.mtime) {
           pugify(filename, filemap[file]);

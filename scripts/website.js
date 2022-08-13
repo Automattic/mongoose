@@ -220,6 +220,7 @@ exports.default = pugify;
 exports.pugify = pugify;
 exports.startWatch = startWatch;
 exports.pugifyAllFiles = pugifyAllFiles;
+exports.cwd = cwd;
 
 // only run the following code if this file is the main module / entry file
 if (isMain) {

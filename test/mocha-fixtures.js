@@ -1,7 +1,6 @@
 'use strict';
 
 const mms = require('mongodb-memory-server');
-const mmsresolve = require('mongodb-memory-server-core/lib/util/resolveConfig');
 
 /*
  * Default MMS mongodb version is used, unless MONGOMS_VERSION is set (which is set with the matrix in test.yml for CI)
@@ -14,21 +13,25 @@ let mongoinstance;
 let mongorreplset;
 
 // decide wheter to start a in-memory or not
-const startMemory = !mmsresolve.envToBool(process.env.CI) && !process.env.MONGOOSE_TEST_URI;
+const startMemoryInstance = !process.env.MONGOOSE_TEST_URI;
+const startMemoryReplset = !process.env.MONGOOSE_REPLSET_URI;
 
 module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
   let instanceuri;
   let replseturi;
-  if (startMemory) { // Config to decided if an mongodb-memory-server instance should be used
+  if (startMemoryInstance) { // Config to decided if an mongodb-memory-server instance should be used
     // it's needed in global space, because we don't want to create a new instance every test-suite
     mongoinstance = await mms.MongoMemoryServer.create({ instance: { args: ['--setParameter', 'ttlMonitorSleepSecs=1'] } });
     const uri = mongoinstance.getUri();
     instanceuri = uri.slice(0, uri.lastIndexOf('/'));
+  } else {
+    instanceuri = process.env.MONGOOSE_TEST_URI;
+  }
 
+  if (startMemoryReplset) {
     mongorreplset = await mms.MongoMemoryReplSet.create({ replSet: { count: '3', args: ['--setParameter', 'ttlMonitorSleepSecs=1'] } }); // using 3 because even numbers can lead to vote problems
     replseturi = mongorreplset.getUri();
   } else {
-    instanceuri = process.env.MONGOOSE_TEST_URI;
     replseturi = '';
   }
 
@@ -43,5 +46,8 @@ module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
 module.exports.mochaGlobalTeardown = async function mochaGlobalTeardown() {
   if (mongoinstance) { // Config to decided if an mongodb-memory-server instance should be used
     await mongoinstance.stop();
+  }
+  if (mongorreplset) {
+    await mongorreplset.stop();
   }
 };

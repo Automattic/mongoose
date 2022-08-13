@@ -8,12 +8,12 @@ const assert = require('assert');
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
-describe('SchemaUUIDv1', function() {
+describe('SchemaUUID', function() {
   let Model;
   let db;
 
   before(async function() {
-    const schema = new Schema({ x: { type: mongoose.Schema.Types.UUIDv1 } });
+    const schema = new Schema({ x: { type: mongoose.Schema.Types.UUID } });
     mongoose.deleteModel(/Test/);
     Model = mongoose.model('Test', schema);
     db = await start();

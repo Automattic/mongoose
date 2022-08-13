@@ -211,16 +211,13 @@ async function pugifyAllFiles(noWatch) {
   await Promise.all(files.map(async (file) => {
     const filename = path.join(cwd, file);
     await pugify(filename, filemap[file]);
-  
-    // only enable watch if main module AND having argument "--watch"
-    if (!noWatch && isMain && process.argv[2] === '--watch') {
-      fs.watchFile(filename, { interval: 1000 }, function(cur, prev) {
-        if (cur.mtime > prev.mtime) {
-          pugify(filename, filemap[file]);
-        }
-      });
-    }
   }));
+
+  // enable watch after all files have been done once, and not in the loop to use less-code
+  // only enable watch if main module AND having argument "--watch"
+  if (!noWatch && isMain && process.argv[2] === '--watch') {
+    startWatch();
+  }
 }
 
 exports.default = pugify;

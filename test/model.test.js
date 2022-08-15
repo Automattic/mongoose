@@ -6713,7 +6713,6 @@ describe('Model', function() {
         Event.discriminator('BuyEvent', buyEventSchema);
 
         // Act
-
         const droppedByClickEvent = await ClickEvent.syncIndexes();
         const eventIndexesAfterSyncingClickEvents = await ClickEvent.listIndexes();
 
@@ -6756,7 +6755,7 @@ describe('Model', function() {
         );
 
       });
-      it('creates indexes only when they do not exist on the mongodb server (gh-12250)', async() => {
+      xit('creates indexes only when they do not exist on the mongodb server (gh-12250)', async() => {
         const userSchema = new Schema({
           name: { type: String }
         }, { autoIndex: false });

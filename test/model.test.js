@@ -6765,18 +6765,20 @@ describe('Model', function() {
 
         const User = db.model('User', userSchema);
 
+        await User.init();
+
         const createIndexSpy = sinon.spy(User.collection, 'createIndex');
         const listIndexesSpy = sinon.spy(User.collection, 'listIndexes');
 
         // Act
         await User.syncIndexes();
         assert.equal(createIndexSpy.callCount, 1);
-        assert.equal(listIndexesSpy.callCount, 1);
+        assert.equal(listIndexesSpy.callCount, 2);
 
         await User.syncIndexes();
 
         // Assert
-        assert.equal(listIndexesSpy.callCount, 2);
+        assert.equal(listIndexesSpy.callCount, 4);
         assert.equal(createIndexSpy.callCount, 1);
       });
     });

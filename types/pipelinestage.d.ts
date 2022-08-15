@@ -141,7 +141,7 @@ declare module 'mongoose' {
         localField?: string
         foreignField?: string
         let?: Record<string, any>
-        pipeline?: Exclude<PipelineStage, PipelineStage.Merge | PipelineStage.Out | PipelineStage.Search>[]
+        pipeline?: Exclude<PipelineStage, PipelineStage.Merge | PipelineStage.Out>[]
       }
     }
 

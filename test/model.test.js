@@ -3,7 +3,7 @@
 /**
  * Test dependencies.
  */
-
+const sinon = require('sinon');
 const start = require('./common');
 
 const assert = require('assert');
@@ -6755,6 +6755,29 @@ describe('Model', function() {
           ]
         );
 
+      });
+      it('creates indexes only when they do not exist on the mongodb server (gh-12250)', async() => {
+        const userSchema = new Schema({
+          name: { type: String }
+        }, { autoIndex: false });
+
+        userSchema.index({ name: 1 });
+
+        const User = db.model('User', userSchema);
+
+        const createIndexSpy = sinon.spy(User.collection, 'createIndex');
+        const listIndexesSpy = sinon.spy(User.collection, 'listIndexes');
+
+        // Act
+        await User.syncIndexes();
+        assert.equal(createIndexSpy.callCount, 1);
+        assert.equal(listIndexesSpy.callCount, 1);
+
+        await User.syncIndexes();
+
+        // Assert
+        assert.equal(listIndexesSpy.callCount, 2);
+        assert.equal(createIndexSpy.callCount, 1);
       });
     });
 

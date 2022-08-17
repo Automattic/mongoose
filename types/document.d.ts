@@ -164,7 +164,7 @@ declare module 'mongoose' {
     invalidate(path: string, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
 
     /** Returns true if `path` was directly set and modified, else false. */
-    isDirectModified(path: string): boolean;
+    isDirectModified(path: string | Array<string>): boolean;
 
     /** Checks if `path` was explicitly selected. If no projection, always returns true. */
     isDirectSelected(path: string): boolean;

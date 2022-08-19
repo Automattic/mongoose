@@ -158,7 +158,7 @@ story.author._id; // ObjectId, because Mongoose adds a special getter
 Mongoose populate doesn't behave like conventional
 [SQL joins](https://www.w3schools.com/sql/sql_join.asp). When there's no
 document, `story.author` will be `null`. This is analogous to a
-[left join](https://www.w3schools.com/sql/sql_join_left.asp) in SQL.
+[left join](https://www.w3schools.com/sql/sql_join_left.asp) in [SQL](https://www.scaler.com/topics/sql/).
 
 ```javascript
 await Person.deleteMany({ name: 'Ian Fleming' });

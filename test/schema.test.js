@@ -2682,4 +2682,14 @@ describe('schema', function() {
     assert.equal(TestSchema.path('testprop.$*').instance, 'Number');
     assert.equal(TestSchema.path('testprop.$*').options.ref, 'OtherModel');
   });
+
+  it('disallows setting special properties with `add()` or constructor (gh-12085)', function() {
+    const maliciousPayload = '{"__proto__.toString": "Number"}';
+
+    assert.throws(() => {
+      mongoose.Schema(JSON.parse(maliciousPayload));
+    }, /__proto__/);
+
+    assert.ok({}.toString());
+  });
 });

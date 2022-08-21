@@ -22,6 +22,10 @@ jobs:
         run: npm install -g npm@3
         if: ${{ matrix.node <= 5 }}
 
+      - name: Upgrade Node 7 npm
+        run: npm install -g npm@6
+        if: ${{ matrix.node == 7 }}
+
       - run: npm install
 
       - name: Setup

@@ -447,6 +447,12 @@ function gh12100() {
 })();
 
 
+function modelRemoveOptions() {
+  const cmodel = model('Test', new Schema());
+
+  cmodel.remove({}, {});
+}
+
 async function gh12286() {
   interface IUser{
     name: string;

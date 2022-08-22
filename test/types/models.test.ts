@@ -458,5 +458,5 @@ async function gh12286() {
   const User = model<IUser>('User', schema);
 
   const user = await User.findById('0'.repeat(24), { name: 1 }).lean();
-  expectType<LeanDocument<IUser & { _id: ObjectId; }> | null>(user);
+  expectType<string | undefined>(user?.name);
 }

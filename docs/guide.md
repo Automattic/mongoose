@@ -147,8 +147,8 @@ const animalSchema = new Schema({ name: String, type: String },
 {
   // Assign a function to the "methods" object of our animalSchema through schema options.
   // By following this approach, there is no need to create a separate TS type to define the type of the instance functions.
-  methods:{
-    findSimilarTypes(cb){
+  methods: {
+    findSimilarTypes(cb) {
       return mongoose.model('Animal').find({ type: this.type }, cb);
     }
   }
@@ -192,8 +192,8 @@ const animalSchema = new Schema({ name: String, type: String },
 {
   // Assign a function to the "statics" object of our animalSchema through schema options.
   // By following this approach, there is no need to create a separate TS type to define the type of the statics functions. 
-  statics:{
-    findByName(name){
+  statics: {
+    findByName(name) {
       return this.find({ name: new RegExp(name, 'i') });
     }
   }
@@ -347,9 +347,9 @@ const personSchema = new Schema({
     first: String,
     last: String
   }
-},{
-  virtuals:{
-    fullName:{
+}, {
+  virtuals: {
+    fullName: {
       get() {
         return this.name.first + ' ' + this.name.last;
       }
@@ -386,9 +386,9 @@ const personSchema = new Schema({
     first: String,
     last: String
   }
-},{
-  virtuals:{
-    fullName:{
+}, {
+  virtuals: {
+    fullName: {
       get() {
         return this.name.first + ' ' + this.name.last;
       }
@@ -404,7 +404,7 @@ const personSchema = new Schema({
 personSchema.virtual('fullName').
   get(function() {
     return this.name.first + ' ' + this.name.last;
-    }).
+  }).
   set(function(v) {
     this.name.first = v.substr(0, v.indexOf(' '));
     this.name.last = v.substr(v.indexOf(' ') + 1);

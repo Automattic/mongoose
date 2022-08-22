@@ -368,6 +368,23 @@ declare module 'mongoose' {
       callback?: (err: CallbackError, doc: DocType | null, res: ModifyResult<DocType>) => void
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
+    /** Declares the query a findById operation. When executed, the document with the given `_id` is passed to the callback. */
+    findById(
+      id: mongodb.ObjectId | any,
+      projection?: ProjectionType<DocType> | null,
+      options?: QueryOptions<DocType> | null,
+      callback?: Callback<DocType | null>
+    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
+    findById(
+      id: mongodb.ObjectId | any,
+      projection?: ProjectionType<DocType> | null,
+      callback?: Callback<DocType | null>
+    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
+    findById(
+      id: mongodb.ObjectId | any,
+      callback?: Callback<DocType | null>
+    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
+
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions<DocType> | null, callback?: (err: CallbackError, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 

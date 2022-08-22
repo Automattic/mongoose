@@ -28,10 +28,7 @@ declare module 'mongoose' {
      *  Specifies the initial batch size for the cursor. The value of the cursor field is a document with the field batchSize.
      */
     cursor?: { batchSize?: number; };
-    /**
-     * Creates new documents in a sequence of documents where certain values in a field are missing.
-     */
-    densify?: { field?: string, partitionByFields?: [string], range?: { step?: number, unit?: string, bounds?: [number] | string } };
+
     /**
      * Specifies to return the information on the processing of the pipeline. See Return Information on Aggregation Pipeline Operation for an example.
      *
@@ -114,12 +111,14 @@ declare module 'mongoose' {
     /** Appends a new $count operator to this aggregate pipeline. */
     count(fieldName: PipelineStage.Count['$count']): this;
 
+    /** Appends a new $densify operator to this aggregate pipeline */
+    densify(arg: PipelineStage.Densify['$densify']): this;
+
     /**
      * Sets the cursor option for the aggregation query (ignored for < 2.6.0).
      */
     cursor<DocType = any>(options?: Record<string, unknown>): Cursor<DocType>;
 
-    densify(field: string, partitionByFields: [string], range: { bounds: [number] | string, unit: string, step: number }): this;
 
     /** Executes the aggregate pipeline on the currently bound Model. */
     exec(callback: Callback<R>): void;

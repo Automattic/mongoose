@@ -1,3 +1,8 @@
+5.13.15 / 2022-08-22
+====================
+ * fix: backport fix for CVE-2022-2564 #12281 [shubanker](https://github.com/shubanker)
+ * docs: fix broken link from findandmodify method deprecation #11366 [laissonsilveira](https://github.com/laissonsilveira)
+
 5.13.14 / 2021-12-27
 ====================
  * fix(timestamps): avoid setting createdAt on documents that already exist but dont have createdAt #11024

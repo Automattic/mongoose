@@ -99,3 +99,35 @@ function gh12017_2() {
 
   const d: Expression.ToInt = { $toInt: 2.5 };
 }
+
+
+function gh12311() {
+  const densifyWithDates: PipelineStage.Densify = {
+    $densify: {
+      field: 'timestamp',
+      range: {
+        step: 1,
+        unit: 'hour',
+        bounds: [new Date('2022-01-01'), new Date('2022-12-31')]
+      }
+    }
+  };
+  const densifyWithNumbers: PipelineStage.Densify = {
+    $densify: {
+      field: 'age',
+      range: {
+        step: 1,
+        bounds: [30, 90]
+      }
+    }
+  };
+  const densifyWithFullBounds: PipelineStage.Densify = {
+    $densify: {
+      field: 'age',
+      range: {
+        step: 1,
+        bounds: 'full'
+      }
+    }
+  };
+}

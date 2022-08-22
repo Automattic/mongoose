@@ -9,6 +9,7 @@ import {
   UpdateQuery,
   CallbackError,
   HydratedDocument,
+  LeanDocument,
   Query
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
@@ -457,5 +458,5 @@ async function gh12286() {
   const User = model<IUser>('User', schema);
 
   const user = await User.findById('0'.repeat(24), { name: 1 }).lean();
-  expectType<IUser | null>(user);
+  expectType<LeanDocument<IUser & { _id: ObjectId; }> | null>(user);
 }

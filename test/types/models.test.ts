@@ -444,3 +444,18 @@ function gh12100() {
   const doc = await User.exists({ name: 'Bill' }).orFail();
   expectType<Types.ObjectId>(doc._id);
 })();
+
+
+async function gh12286() {
+  interface IUser{
+    name: string;
+  }
+  const schema = new Schema<IUser>({
+    name: { type: String, required: true }
+  });
+
+  const User = model<IUser>('User', schema);
+
+  const user = await User.findById('0'.repeat(24), { name: 1 }).lean();
+  expectType<IUser | null>(user);
+}

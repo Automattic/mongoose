@@ -34,16 +34,12 @@ describe('SchemaUUID', function() {
     assert.ifError(doc.validateSync());
     assert.ok(typeof doc.x === 'string');
     assert.strictEqual(doc.x, '09190f70-3d30-11e5-8814-0f4df9a59c41');
-    console.log('1');
     await doc.save();
-    console.log('2');
 
     const query = Model.findOne({ x: '09190f70-3d30-11e5-8814-0f4df9a59c41' });
     assert.ok(query._conditions.x instanceof mongoose.Types.Buffer.Binary);
-    console.log('3');
 
     const res = await query;
-    console.log('4');
     assert.ifError(res.validateSync());
     assert.ok(typeof res.x === 'string');
     assert.strictEqual(res.x, '09190f70-3d30-11e5-8814-0f4df9a59c41');

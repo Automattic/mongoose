@@ -9,6 +9,7 @@ import {
   UpdateQuery,
   CallbackError,
   HydratedDocument,
+  LeanDocument,
   Query
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
@@ -444,3 +445,24 @@ function gh12100() {
   const doc = await User.exists({ name: 'Bill' }).orFail();
   expectType<Types.ObjectId>(doc._id);
 })();
+
+
+function modelRemoveOptions() {
+  const cmodel = model('Test', new Schema());
+
+  cmodel.remove({}, {});
+}
+
+async function gh12286() {
+  interface IUser{
+    name: string;
+  }
+  const schema = new Schema<IUser>({
+    name: { type: String, required: true }
+  });
+
+  const User = model<IUser>('User', schema);
+
+  const user = await User.findById('0'.repeat(24), { name: 1 }).lean();
+  expectType<string | undefined>(user?.name);
+}

@@ -1,3 +1,8 @@
+5.13.15 / 2022-08-22
+====================
+ * fix: backport fix for CVE-2022-2564 #12281 [shubanker](https://github.com/shubanker)
+ * docs: fix broken link from findandmodify method deprecation #11366 [laissonsilveira](https://github.com/laissonsilveira)
+
 6.5.2 / 2022-08-09
 ==================
  * fix(aggregate): avoid throwing error when disconnecting with change stream open #12201 [ramos-ph](https://github.com/ramos-ph)

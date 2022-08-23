@@ -1,4 +1,4 @@
-import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, Model, connection } from 'mongoose';
+import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, Model, connection, HydratedDocument, Query } from 'mongoose';
 import * as mongodb from 'mongodb';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -141,4 +141,43 @@ export function autoTypedModelConnection() {
 
   })();
   return AutoTypedModel;
+}
+
+function schemaInstanceMethodsAndQueryHelpersOnConnection() {
+  type UserModelQuery = Query<any, HydratedDocument<User>, UserQueryHelpers> & UserQueryHelpers;
+  interface UserQueryHelpers {
+    byName(this: UserModelQuery, name: string): this
+  }
+  interface User {
+    name: string;
+  }
+  interface UserInstanceMethods {
+    doSomething(this: HydratedDocument<User>): string;
+  }
+  interface UserStaticMethods {
+    findByName(name: string): Promise<HydratedDocument<User>>;
+  }
+  type UserModel = Model<User, UserQueryHelpers, UserInstanceMethods> & UserStaticMethods;
+
+  const userSchema = new Schema<User, UserModel, UserInstanceMethods, UserQueryHelpers, any, UserStaticMethods>({
+    name: String
+  }, {
+    statics: {
+      findByName(name: string) {
+        return connection.model('User').findOne({ name }).orFail();
+      }
+    },
+    methods: {
+      doSomething() {
+        return 'test';
+      }
+    },
+    query: {
+      byName(this: UserModelQuery, name: string) {
+        return this.where({ name });
+      }
+    }
+  });
+
+  const TestModel = connection.model<User, UserModel, UserQueryHelpers>('User', userSchema);
 }

@@ -423,3 +423,21 @@ const stages4: PipelineStage[] = [
     }
   };
 })();
+
+
+function gh12269() {
+  const lookup: PipelineStage.Lookup = {
+    $lookup: {
+      as: 'user',
+      from: 'users',
+      pipeline: [{
+        $search: {
+          index: 'users',
+          highlight: {
+            path: 'user.highlighted'
+          }
+        }
+      }]
+    }
+  };
+}

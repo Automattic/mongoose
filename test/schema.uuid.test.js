@@ -10,20 +10,22 @@ const Schema = mongoose.Schema;
 
 describe('SchemaUUID', function() {
   let Model;
+  let TestSchema;
   let db;
 
   before(async function() {
-    const schema = new Schema({ x: { type: mongoose.Schema.Types.UUID } });
-    mongoose.deleteModel(/Test/);
-    Model = mongoose.model('Test', schema);
-    db = await start();
+    TestSchema = new Schema({ x: { type: mongoose.Schema.Types.UUID } });
+    db = await start().asPromise();
   });
 
   after(async function() {
     await db.close();
   });
 
-  beforeEach(() => db.deleteModel(/.*/));
+  beforeEach(async() => {
+    await db.deleteModel(/.*/);
+    Model = db.model('Test', TestSchema);
+  });
   afterEach(() => util.clearTestData(db));
   afterEach(() => util.stopRemainingOps(db));
 

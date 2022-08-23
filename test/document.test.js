@@ -11771,7 +11771,7 @@ describe('document', function() {
     });
   });
 
-  it('supports virtuals named isValid (gh-12124) (gh-6262)', async function() {
+  it('supports virtuals named `isValid` (gh-12124) (gh-6262)', async function() {
     const Schema = new mongoose.Schema({
       test: String,
       data: { sub: String }
@@ -11797,6 +11797,37 @@ describe('document', function() {
     doc.set({ data: { sub: 'sub' } });
     await doc.save();
     assert.equal(doc.data.sub, 'sub');
+  });
+
+  it('handles maps when applying defaults to nested paths (gh-12220)', async function() {
+    const nestedSchema = new mongoose.Schema({
+      1: {
+        type: Number,
+        default: 0
+      }
+    });
+
+    const topSchema = new mongoose.Schema({
+      nestedPath1: {
+        mapOfSchema: {
+          type: Map,
+          of: nestedSchema
+        }
+      }
+    });
+
+    const Test = db.model('Test', topSchema);
+
+    const data = {
+      nestedPath1: {
+        mapOfSchema: {
+          // 2022: { 1: 0 }, // this data does not affect the error
+        }
+      }
+    };
+    const doc = await Test.create(data);
+
+    assert.ok(doc.nestedPath1.mapOfSchema);
   });
 });
 

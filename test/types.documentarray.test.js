@@ -29,7 +29,7 @@ function TestDoc(schema) {
    * Inherits from ArraySubdocument.
    */
 
-  Object.setPrototypeOf(Subdocument.prototype, ArraySubdocument.prototype);
+  Subdocument.prototype.__proto__ = ArraySubdocument.prototype;
 
   /**
    * Set schema.

@@ -22,7 +22,7 @@ describe('sharding', function() {
       this.$__schema = mockSchema;
       this.$__ = {};
     };
-    Object.setPrototypeOf(Stub.prototype, mongoose.Document.prototype);
+    Stub.prototype.__proto__ = mongoose.Document.prototype;
     const d = new Stub();
     const currentTime = new Date();
     d._doc = { date: currentTime };

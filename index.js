@@ -26,10 +26,7 @@ module.exports.model = mongoose.model;
 module.exports.deleteModel = mongoose.deleteModel;
 module.exports.modelNames = mongoose.modelNames;
 module.exports.plugin = mongoose.plugin;
-// module.exports.connection = mongoose.connection;
 module.exports.connections = mongoose.connections;
-// module.exports.Collection = mongoose.Collection;
-// module.exports.Connection = mongoose.Connection;
 module.exports.version = mongoose.version;
 module.exports.Mongoose = mongoose.Mongoose;
 module.exports.Schema = mongoose.Schema;
@@ -59,3 +56,8 @@ module.exports.sanitizeFilter = mongoose.sanitizeFilter;
 module.exports.trusted = mongoose.trusted;
 module.exports.skipMiddlewareFunction = mongoose.skipMiddlewareFunction;
 module.exports.overwriteMiddlewareResult = mongoose.overwriteMiddlewareResult;
+
+// The following properties are not exported using ESM because `setDriver()` can mutate these
+// module.exports.connection = mongoose.connection;
+// module.exports.Collection = mongoose.Collection;
+// module.exports.Connection = mongoose.Connection;

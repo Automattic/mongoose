@@ -6467,7 +6467,7 @@ describe('model: populate:', function() {
             return Log.find({}).
               populate({
                 path: 'activity',
-                populate: { path: 'postedBy' }
+                populate: 'postedBy'
               }).
               sort({ seq: -1 });
           }).

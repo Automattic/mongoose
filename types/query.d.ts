@@ -271,7 +271,7 @@ declare module 'mongoose' {
     distinct<ReturnType = any>(field: string, filter?: FilterQuery<DocType>, callback?: Callback<number>): QueryWithHelpers<Array<ReturnType>, DocType, THelpers, RawDocType>;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    elemMatch<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$elemMatch']): this;
+    elemMatch<K = string>(path: K, val: any): this;
     elemMatch(val: Function | any): this;
 
     /**
@@ -288,7 +288,7 @@ declare module 'mongoose' {
     estimatedDocumentCount(options?: QueryOptions<DocType>, callback?: Callback<number>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
 
     /** Specifies a `$exists` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    exists<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$exists']): this;
+    exists<K = string>(path: K, val: boolean): this;
     exists(val: boolean): this;
 
     /**
@@ -368,6 +368,23 @@ declare module 'mongoose' {
       callback?: (err: CallbackError, doc: DocType | null, res: ModifyResult<DocType>) => void
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
+    /** Declares the query a findById operation. When executed, the document with the given `_id` is passed to the callback. */
+    findById(
+      id: mongodb.ObjectId | any,
+      projection?: ProjectionType<DocType> | null,
+      options?: QueryOptions<DocType> | null,
+      callback?: Callback<DocType | null>
+    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
+    findById(
+      id: mongodb.ObjectId | any,
+      projection?: ProjectionType<DocType> | null,
+      callback?: Callback<DocType | null>
+    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
+    findById(
+      id: mongodb.ObjectId | any,
+      callback?: Callback<DocType | null>
+    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
+
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions<DocType> | null, callback?: (err: CallbackError, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
@@ -403,18 +420,18 @@ declare module 'mongoose' {
     getUpdate(): UpdateQuery<DocType> | UpdateWithAggregationPipeline | null;
 
     /** Specifies a `$gt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    gt<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$gt']): this;
+    gt<K = string>(path: K, val: any): this;
     gt(val: number): this;
 
     /** Specifies a `$gte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    gte<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$gte']): this;
+    gte<K = string>(path: K, val: any): this;
     gte(val: number): this;
 
     /** Sets query hints. */
     hint(val: any): this;
 
     /** Specifies an `$in` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    in<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$in']): this;
+    in<K = string>(path: K, val: any[]): this;
     in(val: Array<any>): this;
 
     /** Declares an intersects query for `geometry()`. */
@@ -430,11 +447,11 @@ declare module 'mongoose' {
     limit(val: number): this;
 
     /** Specifies a `$lt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    lt<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$lt']): this;
+    lt<K = string>(path: K, val: any): this;
     lt(val: number): this;
 
     /** Specifies a `$lte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    lte<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$lte']): this;
+    lte<K = string>(path: K, val: any): this;
     lte(val: number): this;
 
     /**
@@ -461,7 +478,7 @@ declare module 'mongoose' {
     merge(source: Query<any, any> | FilterQuery<DocType>): this;
 
     /** Specifies a `$mod` condition, filters documents for documents whose `path` property is a number that is equal to `remainder` modulo `divisor`. */
-    mod<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$mod']): this;
+    mod<K = string>(path: K, val: number): this;
     mod(val: Array<number>): this;
 
     /** The model this query was created from */
@@ -474,15 +491,15 @@ declare module 'mongoose' {
     mongooseOptions(val?: MongooseQueryOptions): MongooseQueryOptions;
 
     /** Specifies a `$ne` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    ne<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$ne']): this;
+    ne<K = string>(path: K, val: any): this;
     ne(val: any): this;
 
     /** Specifies a `$near` or `$nearSphere` condition */
-    near<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$near']): this;
+    near<K = string>(path: K, val: any): this;
     near(val: any): this;
 
     /** Specifies an `$nin` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    nin<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$nin']): this;
+    nin<K = string>(path: K, val: any[]): this;
     nin(val: Array<any>): this;
 
     /** Specifies arguments for an `$nor` condition. */
@@ -518,7 +535,7 @@ declare module 'mongoose' {
     readConcern(level: string): this;
 
     /** Specifies a `$regex` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    regex<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$regex']): this;
+    regex<K = string>(path: K, val: RegExp): this;
     regex(val: string | RegExp): this;
 
     /**
@@ -570,7 +587,7 @@ declare module 'mongoose' {
     setUpdate(update: UpdateQuery<DocType> | UpdateWithAggregationPipeline): void;
 
     /** Specifies an `$size` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    size<K extends keyof FilterQuery<DocType>>(path: K, val: FilterQuery<DocType>[K]['$size']): this;
+    size<K = string>(path: K, val: number): this;
     size(val: number): this;
 
     /** Specifies the number of documents to skip. */
@@ -599,7 +616,7 @@ declare module 'mongoose' {
     then: Promise<ResultType>['then'];
 
     /** Converts this query to a customized, reusable query constructor with all arguments and options retained. */
-    toConstructor(): new (...args: any[]) => QueryWithHelpers<ResultType, DocType, THelpers, RawDocType>;
+    toConstructor(): typeof this;
 
     /** Declare and/or execute this query as an update() operation. */
     update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions<DocType> | null, callback?: Callback<UpdateWriteOpResult>): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType>;

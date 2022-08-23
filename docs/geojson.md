@@ -6,10 +6,6 @@
   });
 </script>
 
-<div class="native-inline">
-  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
-</div>
-
 [GeoJSON](http://geojson.org/) is a format for storing geographic points and
 polygons. [MongoDB has excellent support for geospatial queries](http://thecodebarbarian.com/80-20-guide-to-mongodb-geospatial-queries)
 on GeoJSON objects. Let's take a look at how you can use Mongoose to store

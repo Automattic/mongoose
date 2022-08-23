@@ -37,7 +37,6 @@ describe('SchemaUUID', function() {
     await doc.save();
 
     const query = Model.findOne({ x: '09190f70-3d30-11e5-8814-0f4df9a59c41' });
-    console.log('query conditions', query._conditions);
     assert.ok(typeof query._conditions.x === 'string');
 
     const res = await query;

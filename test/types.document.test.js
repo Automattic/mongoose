@@ -33,7 +33,7 @@ describe('types.document', function() {
       mongoose.Document.call(this, {});
     }
     Dummy = _Dummy;
-    Object.setPrototypeOf(Dummy.prototype, mongoose.Document.prototype);
+    Dummy.prototype.__proto__ = mongoose.Document.prototype;
     Dummy.prototype.$__setSchema(new Schema());
 
     function _Subdocument() {
@@ -43,7 +43,7 @@ describe('types.document', function() {
     }
     Subdocument = _Subdocument;
 
-    Object.setPrototypeOf(Subdocument.prototype, ArraySubdocument.prototype);
+    Subdocument.prototype.__proto__ = ArraySubdocument.prototype;
 
     for (const i in EventEmitter.prototype) {
       Subdocument[i] = EventEmitter.prototype[i];

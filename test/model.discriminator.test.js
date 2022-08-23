@@ -96,6 +96,8 @@ describe('model', function() {
       const employee = new Employee();
       assert.ok(employee instanceof Person);
       assert.ok(employee instanceof Employee);
+      assert.strictEqual(employee.__proto__.constructor, Employee);
+      assert.strictEqual(employee.__proto__.__proto__.constructor, Person);
     });
 
     it('can define static and instance methods', function() {

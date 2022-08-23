@@ -30,7 +30,7 @@ function TestDocument() {
  * Inherits from Document.
  */
 
-Object.setPrototypeOf(TestDocument.prototype, Document.prototype);
+TestDocument.prototype.__proto__ = Document.prototype;
 
 /**
  * Set a dummy schema to simulate compilation.

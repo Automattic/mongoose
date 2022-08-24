@@ -11820,9 +11820,7 @@ describe('document', function() {
 
     const data = {
       nestedPath1: {
-        mapOfSchema: {
-          // 2022: { 1: 0 }, // this data does not affect the error
-        }
+        mapOfSchema: {}
       }
     };
     const doc = await Test.create(data);

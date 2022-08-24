@@ -16,7 +16,7 @@ describe('SchemaUUID', function() {
   let db;
 
   before(async function() {
-    TestSchema = new Schema({ x: { type: mongoose.Schema.Types.UUID } });
+    TestSchema = new Schema({ x: { type: mongoose.Schema.Types.UUID }, y: [{ type: mongoose.Schema.Types.UUID }] });
     db = await start().asPromise();
   });
 
@@ -61,5 +61,33 @@ describe('SchemaUUID', function() {
     const errors = res.errors;
     assert.strictEqual(Object.keys(errors).length, 1);
     assert.ok(errors.x instanceof mongoose.Error.CastError);
+  });
+
+  it('should work with $in and $nin', async function() {
+    const doc1 = new Model({ y: ['f8010af3-bc2c-45e6-85c6-caa30c4a7d34', 'c6f59133-4f84-45a8-bc1d-8f172803e4fe', 'df1309e0-58c5-427a-b22f-6c0fc445ccc0'] });
+    const doc2 = new Model({ y: ['13d51406-cd06-4fc2-93d1-4fad9b3eecd7', 'f004416b-e02a-4212-ac77-2d3fcf04898b', '5b544b71-8988-422b-a4df-bf691939fe4e'] });
+
+    await doc1.save();
+    await doc2.save();
+
+    // test $in
+    const foundDocIn = await Model.find({ y: { $in: ['f8010af3-bc2c-45e6-85c6-caa30c4a7d34'] } });
+    assert.ok(foundDocIn);
+    assert.strictEqual(foundDocIn.length, 1);
+    assert.ok(foundDocIn[0].y);
+    assert.strictEqual(foundDocIn[0].y.length, 3);
+    assert.strictEqual(foundDocIn[0].y[0], 'f8010af3-bc2c-45e6-85c6-caa30c4a7d34');
+    assert.strictEqual(foundDocIn[0].y[1], 'c6f59133-4f84-45a8-bc1d-8f172803e4fe');
+    assert.strictEqual(foundDocIn[0].y[2], 'df1309e0-58c5-427a-b22f-6c0fc445ccc0');
+
+    // test $nin
+    const foundDocNin = await Model.find({ y: { $nin: ['f8010af3-bc2c-45e6-85c6-caa30c4a7d34'] } });
+    assert.ok(foundDocNin);
+    assert.strictEqual(foundDocNin.length, 1);
+    assert.ok(foundDocNin[0].y);
+    assert.strictEqual(foundDocNin[0].y.length, 3);
+    assert.strictEqual(foundDocNin[0].y[0], '13d51406-cd06-4fc2-93d1-4fad9b3eecd7');
+    assert.strictEqual(foundDocNin[0].y[1], 'f004416b-e02a-4212-ac77-2d3fcf04898b');
+    assert.strictEqual(foundDocNin[0].y[2], '5b544b71-8988-422b-a4df-bf691939fe4e');
   });
 });

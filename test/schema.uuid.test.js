@@ -63,7 +63,7 @@ describe('SchemaUUID', function() {
     assert.ok(errors.x instanceof mongoose.Error.CastError);
   });
 
-  it('should work with $in and $nin', async function() {
+  it('should work with $in and $nin and $all', async function() {
     const doc1 = new Model({ y: ['f8010af3-bc2c-45e6-85c6-caa30c4a7d34', 'c6f59133-4f84-45a8-bc1d-8f172803e4fe', 'df1309e0-58c5-427a-b22f-6c0fc445ccc0'] });
     const doc2 = new Model({ y: ['13d51406-cd06-4fc2-93d1-4fad9b3eecd7', 'f004416b-e02a-4212-ac77-2d3fcf04898b', '5b544b71-8988-422b-a4df-bf691939fe4e'] });
 
@@ -89,5 +89,15 @@ describe('SchemaUUID', function() {
     assert.strictEqual(foundDocNin[0].y[0], '13d51406-cd06-4fc2-93d1-4fad9b3eecd7');
     assert.strictEqual(foundDocNin[0].y[1], 'f004416b-e02a-4212-ac77-2d3fcf04898b');
     assert.strictEqual(foundDocNin[0].y[2], '5b544b71-8988-422b-a4df-bf691939fe4e');
+
+    // test for $all
+    const foundDocAll = await Model.find({ y: { $all: ['13d51406-cd06-4fc2-93d1-4fad9b3eecd7', 'f004416b-e02a-4212-ac77-2d3fcf04898b'] } });
+    assert.ok(foundDocAll);
+    assert.strictEqual(foundDocAll.length, 1);
+    assert.ok(foundDocAll[0].y);
+    assert.strictEqual(foundDocAll[0].y.length, 3);
+    assert.strictEqual(foundDocAll[0].y[0], '13d51406-cd06-4fc2-93d1-4fad9b3eecd7');
+    assert.strictEqual(foundDocAll[0].y[1], 'f004416b-e02a-4212-ac77-2d3fcf04898b');
+    assert.strictEqual(foundDocAll[0].y[2], '5b544b71-8988-422b-a4df-bf691939fe4e');
   });
 });

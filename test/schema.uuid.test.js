@@ -3,6 +3,8 @@
 const start = require('./common');
 const util = require('./util');
 
+const bson = require('bson');
+
 const assert = require('assert');
 
 const mongoose = start.mongoose;
@@ -43,6 +45,13 @@ describe('SchemaUUID', function() {
     assert.ifError(res.validateSync());
     assert.ok(typeof res.x === 'string');
     assert.strictEqual(res.x, '09190f70-3d30-11e5-8814-0f4df9a59c41');
+
+    // check that the data is actually a buffer in the database with the correct subtype
+    const col = db.client.db(db.name).collection(Model.collection.name);
+    const rawDoc = await col.findOne({ x: new bson.Binary(Buffer.from('09190f703d3011e588140f4df9a59c41', 'hex'), 4) });
+    assert.ok(rawDoc);
+    assert.ok(rawDoc.x instanceof bson.Binary);
+    assert.strictEqual(rawDoc.x.sub_type, 4);
   });
 
   it('should throw error in case of invalid string', function() {

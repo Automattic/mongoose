@@ -269,3 +269,19 @@ async function gh11960() {
     doc.nestedArray?.[0].parentArray();
   }
 }
+
+function gh12290() {
+  interface IUser{
+    name: string;
+    age: number;
+  }
+  const schema = new Schema<IUser>({
+    name: String,
+    age: Number
+  });
+  const User = model<IUser>('User', schema);
+  const user = new User({ name: 'John', age: 30 });
+  user.isDirectModified(['name', 'age']);
+  user.isDirectModified('name age');
+  user.isDirectModified('name');
+}

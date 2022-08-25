@@ -8887,7 +8887,7 @@ describe('Model', function() {
       };
       const ret = Test.castObject(obj, { ignoreCastErrors: true });
       assert.ok(ret);
-    })
+    });
   });
 });
 

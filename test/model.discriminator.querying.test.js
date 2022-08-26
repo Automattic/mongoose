@@ -315,6 +315,29 @@ describe('model', function() {
       it('discriminator model only finds documents of its type when fields selection set as empty object', function(done) {
         checkDiscriminatorModelsFindDocumentsOfItsType({}, done);
       });
+
+      describe('using nested discriminators with `strictQuery = true`', function() {
+        it('only finds the related documents (gh-12318)', async function() {
+          const BaseDocumentSchema = new BaseSchema({ source: { type: String } }, { discriminatorKey: 'type' });
+          const InternalDocumentSchema = new BaseSchema({ source: { type: String } });
+          const ExternalDocumentSchema = new BaseSchema({ source: { type: String }, url: { type: String } });
+          const DocumentSchema = new BaseSchema({ source: BaseDocumentSchema });
+
+          DocumentSchema.path('source').discriminator('internal', InternalDocumentSchema);
+          DocumentSchema.path('source').discriminator('external', ExternalDocumentSchema);
+
+          const DocumentModel = db.model('Document', DocumentSchema);
+          await DocumentModel.create({ source: { type: 'internal' } });
+          await DocumentModel.create({ source: { type: 'external', url: 'url' } });
+
+          const doc = await DocumentModel.find();
+          assert.strictEqual(doc.length, 2);
+
+          const doc2 = await DocumentModel.find({ 'source.url': 'url' });
+          assert.strictEqual(doc2.length, 1);
+          assert.strictEqual(doc2[0].source.type, 'external');
+        });
+      });
     });
 
     describe('findOne', function() {

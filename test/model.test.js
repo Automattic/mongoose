@@ -8882,11 +8882,11 @@ describe('Model', function() {
       const obj = {
         num: 'not a number',
         nested: { num: '2' },
-        subdoc: { num: '3' },
+        subdoc: { num: 'not a number' },
         docArr: [{ num: '4' }]
       };
       const ret = Test.castObject(obj, { ignoreCastErrors: true });
-      assert.ok(ret);
+      assert.deepStrictEqual(ret, { nested: { num: 2 }, docArr: [{ num: 4 }] });
     });
   });
 });

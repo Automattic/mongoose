@@ -466,3 +466,16 @@ async function gh12286() {
   const user = await User.findById('0'.repeat(24), { name: 1 }).lean();
   expectType<string | undefined>(user?.name);
 }
+
+
+function gh12332() {
+  interface IUser{
+    age: number
+  }
+  const schema = new Schema<IUser>({ age: Number });
+
+  const User = model<IUser>('User', schema);
+
+  User.castObject({ age: '19' });
+  User.castObject({ age: '19' }, { ignoreCastErrors: true });
+}

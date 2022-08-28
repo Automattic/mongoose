@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const mongoose = require('../');
+const mongoose = require('../index');
 const Collection = mongoose.Collection;
 const assert = require('assert');
 

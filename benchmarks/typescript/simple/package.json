@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "mongoose": "file:../../../mongoose.tgz"
+    "mongoose": "file:../../../mongoose.tgz",
+    "typescript": "4.8.x"
   }
 }

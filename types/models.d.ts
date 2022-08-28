@@ -1,6 +1,7 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
+  
   export interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
     discriminator<D>(name: string | number, schema: Schema, value?: string | number | ObjectId): Model<D>;

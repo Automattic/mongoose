@@ -1,3 +1,21 @@
+6.5.3 / 2022-08-24
+==================
+ * fix(document): handle maps when applying defaults to nested paths #12322
+ * fix(schema): make ArraySubdocuments apply _id defaults on init #12264
+ * fix(populate): handle specifying recursive populate as a string with discriminators #12266
+ * perf(types): remove extends Query in Schema.pre() and Schema.post(), loosen `discriminator()` generic #10349
+ * perf(types): some more micro-optimizations re: #10349, remove extra type checking on $ne, etc.
+ * fix(types): infer schema on `connection.model()` #12298 #12125 [hasezoey](https://github.com/hasezoey)
+ * fix(types): add missing `findById()` type definitions #12309 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): allow $search in $lookup pipeline stages for MongoDB v6.x support #12278 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(types): add parameter "options" to "Model.remove" #12258 [hasezoey](https://github.com/hasezoey)
+ * fix(types): sync single-generic-no-constraint "model" between "index.d.ts" and "connection.d.ts" #12299 [hasezoey](https://github.com/hasezoey)
+ * fix(types): update isDirectModified typing #12290 [gabrielDonnantuoni](https://github.com/gabrielDonnantuoni)
+ * docs: update links on api docs #12293 [eatmoarrice](https://github.com/eatmoarrice)
+ * docs: add note about language_override option #12310 [IslandRhythms](https://github.com/IslandRhythms)
+ * docs(document): add "String[]" to Document.depopulate as jsdoc parameter type #12300 [hasezoey](https://github.com/hasezoey)
+ * docs: update Node.js EventEmitter url #12303 [rainrisa](https://github.com/rainrisa)
+
 5.13.15 / 2022-08-22
 ====================
  * fix: backport fix for CVE-2022-2564 #12281 [shubanker](https://github.com/shubanker)

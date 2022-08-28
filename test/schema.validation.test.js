@@ -106,6 +106,7 @@ describe('schema', function() {
     });
 
     it('string regexp', function(done) {
+      let remaining = 10;
       const Test = new Schema({
         simple: { type: String, match: /[a-z]/ }
       });
@@ -114,6 +115,7 @@ describe('schema', function() {
 
       Test.path('simple').doValidate('az', function(err) {
         assert.ifError(err);
+        --remaining || done();
       });
 
       Test.path('simple').match(/[0-9]/);
@@ -121,30 +123,37 @@ describe('schema', function() {
 
       Test.path('simple').doValidate('12', function(err) {
         assert.ok(err instanceof ValidatorError);
+        --remaining || done();
       });
 
       Test.path('simple').doValidate('a12', function(err) {
         assert.ifError(err);
+        --remaining || done();
       });
 
       Test.path('simple').doValidate('', function(err) {
         assert.ifError(err);
+        --remaining || done();
       });
       Test.path('simple').doValidate(null, function(err) {
         assert.ifError(err);
+        --remaining || done();
       });
       Test.path('simple').doValidate(undefined, function(err) {
         assert.ifError(err);
+        --remaining || done();
       });
       Test.path('simple').validators = [];
       Test.path('simple').match(/[1-9]/);
       Test.path('simple').doValidate(0, function(err) {
         assert.ok(err instanceof ValidatorError);
+        --remaining || done();
       });
 
       Test.path('simple').match(null);
       Test.path('simple').doValidate(0, function(err) {
         assert.ok(err instanceof ValidatorError);
+        --remaining || done();
       });
 
       done();
@@ -193,6 +202,7 @@ describe('schema', function() {
       });
 
       it('number min and max', function(done) {
+        let remaining = 4;
         const Tobi = new Schema({
           friends: { type: Number, max: 15, min: 5 }
         });
@@ -201,6 +211,7 @@ describe('schema', function() {
 
         Tobi.path('friends').doValidate(10, function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
 
         Tobi.path('friends').doValidate(100, function(err) {
@@ -208,29 +219,32 @@ describe('schema', function() {
           assert.equal(err.path, 'friends');
           assert.equal(err.kind, 'max');
           assert.equal(err.value, 100);
+          --remaining || done();
         });
 
         Tobi.path('friends').doValidate(1, function(err) {
           assert.ok(err instanceof ValidatorError);
           assert.equal(err.path, 'friends');
           assert.equal(err.kind, 'min');
+          --remaining || done();
         });
 
         // null is allowed
         Tobi.path('friends').doValidate(null, function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
 
         Tobi.path('friends').min();
         Tobi.path('friends').max();
 
         assert.equal(Tobi.path('friends').validators.length, 0);
-        done();
       });
     });
 
     describe('required', function() {
       it('string required', function(done) {
+        let remaining = 4;
         const Test = new Schema({
           simple: String
         });
@@ -240,24 +254,27 @@ describe('schema', function() {
 
         Test.path('simple').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Test.path('simple').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Test.path('simple').doValidate('', function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Test.path('simple').doValidate('woot', function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
-
-        done();
       });
 
       it('string conditional required', function(done) {
+        let remaining = 8;
         const Test = new Schema({
           simple: String
         });
@@ -272,79 +289,89 @@ describe('schema', function() {
 
         Test.path('simple').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Test.path('simple').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Test.path('simple').doValidate('', function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Test.path('simple').doValidate('woot', function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
 
         required = false;
 
         Test.path('simple').doValidate(null, function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
 
         Test.path('simple').doValidate(undefined, function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
 
         Test.path('simple').doValidate('', function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
 
         Test.path('simple').doValidate('woot', function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
-
-        done();
       });
 
       it('number required', function(done) {
+        let remaining = 3;
         const Edwald = new Schema({
           friends: { type: Number, required: true }
         });
 
         Edwald.path('friends').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Edwald.path('friends').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Edwald.path('friends').doValidate(0, function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
-
-        done();
       });
 
       it('date required', function(done) {
+        let remaining = 3;
         const Loki = new Schema({
           birth_date: { type: Date, required: true }
         });
 
         Loki.path('birth_date').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Loki.path('birth_date').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Loki.path('birth_date').doValidate(new Date(), function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
-
-        done();
       });
 
       it('date not empty string (gh-3132)', function(done) {
@@ -359,22 +386,25 @@ describe('schema', function() {
       });
 
       it('objectid required', function(done) {
+        let remaining = 3;
         const Loki = new Schema({
           owner: { type: ObjectId, required: true }
         });
 
         Loki.path('owner').doValidate(new DocumentObjectId(), function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
 
         Loki.path('owner').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Loki.path('owner').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
-        done();
       });
 
       it('array required', function(done) {

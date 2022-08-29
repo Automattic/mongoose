@@ -8,10 +8,14 @@ import {
   InferSchemaType,
   SchemaType,
   Query,
+  model,
   HydratedDocument,
-  SchemaOptions
+  SchemaOptions,
+  ObtainDocumentType,
+  ObtainSchemaGeneric
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
+import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
 
 enum Genre {
   Action,
@@ -640,6 +644,28 @@ function gh12030() {
     ]
   });
 
+  type A = ResolvePathType<[
+    {
+      username: { type: String }
+    }
+  ]>;
+  expectType<{
+    username?: string
+  }[]>({} as A);
+
+  type B = ObtainDocumentType<{
+    users: [
+      {
+        username: { type: String }
+      }
+    ]
+  }>;
+  expectType<{
+    users: {
+      username?: string
+    }[];
+  }>({} as B);
+
   expectType<{
     users: {
       username?: string
@@ -736,4 +762,37 @@ function pluginOptions() {
   // test overwriting options
   schema.plugin<any, SomePluginOptions>(pluginFunction2, { option2: 0 });
   expectError(schema.plugin<any, SomePluginOptions>(pluginFunction2, {})); // should error because "option2" is not optional
+}
+
+function gh12205() {
+  const campaignSchema = new Schema(
+    {
+      client: {
+        type: new Types.ObjectId(),
+        required: true
+      }
+    },
+    { timestamps: true }
+  );
+
+  const Campaign = model('Campaign', campaignSchema);
+  const doc = new Campaign();
+  expectType<Types.ObjectId>(doc.client);
+
+  type ICampaign = InferSchemaType<typeof campaignSchema>;
+  expectType<{ client: Types.ObjectId }>({} as ICampaign);
+
+  expectType<'type'>({} as ObtainSchemaGeneric<typeof campaignSchema, 'TPathTypeKey'>);
+
+  type A = ObtainDocumentType<{ client: { type: Schema.Types.ObjectId, required: true } }>;
+  expectType<{ client: Types.ObjectId }>({} as A);
+
+  type Foo = ObtainDocumentPathType<{ type: Schema.Types.ObjectId, required: true }, 'type'>;
+  expectType<Types.ObjectId>({} as Foo);
+
+  type Bar = ResolvePathType<Schema.Types.ObjectId, { required: true }>;
+  expectType<Types.ObjectId>({} as Bar);
+
+  /* type Baz = Schema.Types.ObjectId extends typeof Schema.Types.ObjectId ? string : number;
+  expectType<string>({} as Baz); */
 }

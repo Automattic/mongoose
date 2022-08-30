@@ -25,7 +25,7 @@ describe('connections:', function() {
 
   describe('openUri (gh-5304)', function() {
     it('with mongoose.createConnection()', function() {
-      const conn = mongoose.createConnection(start.uri.slice(0, start.uri.lastIndexOf('/')) + '/mongoosetest');
+      const conn = mongoose.createConnection(start.uri.slice(0, start.uri.lastIndexOf('/')) + '/' + start.databases[0]);
       assert.equal(conn.constructor.name, 'NativeConnection');
 
       const Test = conn.model('Test', new Schema({ name: String }));
@@ -40,7 +40,7 @@ describe('connections:', function() {
           assert.ok(match);
           assert.equal(conn.host, match[1]);
           assert.equal(conn.port, parseInt(match[2]));
-          assert.equal(conn.name, 'mongoosetest');
+          assert.equal(conn.name, start.databases[0]);
 
           return findPromise;
         }).

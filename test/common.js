@@ -121,17 +121,26 @@ function getUri(env, default_uri, db) {
   return use.slice(0, lastIndex <= 9 ? use.length : lastIndex) + `/${db}`;
 }
 
+/**
+ * Testing Databases, used for consistency
+ */
+
+const databases = module.exports.databases = [
+  'mongoose_test',
+  'mongoose_test_2'
+];
+
 /*!
  * testing uri
  */
 
-module.exports.uri = getUri(process.env.MONGOOSE_TEST_URI, 'mongodb://127.0.0.1:27017/', 'mongoose_test');
+module.exports.uri = getUri(process.env.MONGOOSE_TEST_URI, 'mongodb://127.0.0.1:27017/', databases[0]);
 
 /*!
  * testing uri for 2nd db
  */
 
-module.exports.uri2 = getUri(process.env.MONGOOSE_TEST_URI, 'mongodb://127.0.0.1:27017/', 'mongoose_test_2');
+module.exports.uri2 = getUri(process.env.MONGOOSE_TEST_URI, 'mongodb://127.0.0.1:27017/', databases[1]);
 
 /**
  * expose mongoose

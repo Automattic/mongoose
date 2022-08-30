@@ -1453,4 +1453,16 @@ describe('connections:', function() {
     });
   });
 
+  it('model() works with 1 argument and overwriteModels set to true (gh-12359)', function() {
+    const m = new mongoose.Mongoose();
+    m.set('overwriteModels', true);
+
+    const Test = m.model('Test', new Schema({ name: String }));
+
+    assert.equal(m.model('Test'), Test);
+
+    const Test2 = m.connection.model('Test2', new Schema({ name: String }));
+
+    assert.equal(m.connection.model('Test2'), Test2);
+  });
 });

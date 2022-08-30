@@ -130,13 +130,13 @@ const databases = module.exports.databases = [
   'mongoose_test_2'
 ];
 
-/*!
+/**
  * testing uri
  */
 
 module.exports.uri = getUri(process.env.MONGOOSE_TEST_URI, 'mongodb://127.0.0.1:27017/', databases[0]);
 
-/*!
+/**
  * testing uri for 2nd db
  */
 

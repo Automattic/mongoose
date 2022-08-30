@@ -5,7 +5,7 @@ const Todo = require('../db/models/todoModel');
 const auth = require('../middleware/auth');
 const clearCache = require('../middleware/clearCache');
 
-/* @private
+/* @api private
  * @func: fetch all user todos
  * @input: user id
  * @return: todos
@@ -19,7 +19,7 @@ Router.get('/all', auth, async function({ userId }, res) {
   }
 });
 
-/* @private
+/* @api private
  * @func: create todo
  * @input: todo data, userid
  * @return: todo
@@ -38,7 +38,7 @@ Router.post('/create', auth, clearCache, async function({ userId, body }, res) {
   }
 });
 
-/* @private
+/* @api private
  * @func: update todo
  * @input: todo data, todoId, userid
  * @return: updated todo
@@ -57,7 +57,7 @@ Router.post('/update', auth, async function({ userId, body }, res) {
   }
 });
 
-/* @private
+/* @api private
  * @func: delete todo
  * @input: todoId, userid
  */

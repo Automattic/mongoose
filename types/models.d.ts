@@ -402,7 +402,7 @@ declare module 'mongoose' {
       replacement?: T | AnyObject,
       options?: QueryOptions<T> | null,
       callback?: Callback
-    ): QueryWithHelpers<any, ResultDoc, TQueryHelpers, T>;
+    ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, T>;
 
     /** Schema the model uses. */
     schema: Schema<T>;

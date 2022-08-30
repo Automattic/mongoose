@@ -1,3 +1,15 @@
+6.5.4 / 2022-08-30
+==================
+ * fix(document): allow calling $assertPopulated() with values to better support manual population #12233
+ * fix(connection+mongoose): better handling for calling model() with 1 argument #12359
+ * fix(model): allow defining discriminator virtuals and methods using schema options #12326
+ * fix(types): fix MongooseQueryMiddleware missing "findOneAndReplace" and "replaceOne" #12330 #12329 [Jule-](https://github.com/Jule-) [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): fix replaceOne return type #12351 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): use this for return type from $assertPopulated() #12234
+ * docs: highlight how to connect using auth in README #12354 [AntonyOnScript](https://github.com/AntonyOnScript)
+ * docs: improve jsdoc comments for private methods #12337 [hasezoey](https://github.com/hasezoey)
+ * docs: fix minor typo in compatibility table header #12355 [skyme5](https://github.com/skyme5)
+
 6.5.3 / 2022-08-24
 ==================
  * fix(document): handle maps when applying defaults to nested paths #12322

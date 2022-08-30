@@ -130,6 +130,34 @@ describe('model', function() {
       assert.equal(Boss.notStaticMethod, undefined);
     });
 
+    it('can define virtuals and methods using schema options (gh-12246)', function() {
+      const baseSchema = new mongoose.Schema({
+        name: String
+      }, {
+        virtuals: {
+          virtualA: {
+            get: () => 'virtualA'
+          }
+        }
+      });
+
+      const discriminatorSchema = new mongoose.Schema({
+        prop: String
+      }, {
+        virtuals: {
+          virtualB: {
+            get: () => 'virtualB'
+          }
+        }
+      });
+      const BaseModel = db.model('Test', baseSchema);
+      const DiscriminatorModel = BaseModel.discriminator('Test1', discriminatorSchema);
+
+      const doc = new DiscriminatorModel();
+      assert.equal(doc.virtualA, 'virtualA');
+      assert.equal(doc.virtualB, 'virtualB');
+    });
+
     it('sets schema root discriminator mapping', function(done) {
       assert.deepEqual(Person.schema.discriminatorMapping, { key: '__t', value: null, isRoot: true });
       done();

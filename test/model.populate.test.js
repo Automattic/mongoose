@@ -26,6 +26,7 @@ describe('model: populate:', function() {
   let commentSchema;
   let blogPostSchema;
   let db;
+  let db2;
 
   before(function() {
     userSchema = new Schema({
@@ -63,11 +64,23 @@ describe('model: populate:', function() {
 
   after(async function() {
     await db.close();
+
+    if (db2) {
+      await db2.close();
+    }
   });
 
   beforeEach(() => db.deleteModel(/.*/));
-  afterEach(() => util.clearTestData(db));
-  afterEach(() => require('./util').stopRemainingOps(db));
+  afterEach(async() => {
+    return Promise.allSettled([util.clearTestData(db), db2 ? util.clearTestData(db2) : Promise.resolve()]);
+  });
+  afterEach(() => {
+    require('./util').stopRemainingOps(db);
+
+    if (db2) {
+      require('./util').stopRemainingOps(db2);
+    }
+  });
 
   it('populating array of object', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
@@ -317,8 +330,7 @@ describe('model: populate:', function() {
   });
 
   it('across DBs', function(done) {
-    const db = start();
-    const db2 = db.useDb('mongoose_test2');
+    db2 = db.useDb(start.databases[1]);
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db2.model('User', userSchema);
 
@@ -337,13 +349,9 @@ describe('model: populate:', function() {
           .findById(post._id)
           .populate({ path: '_creator', select: 'name', model: User })
           .exec(function(err, post) {
-            db2.db.dropDatabase(function() {
-              db.close();
-              db2.close();
-              assert.ifError(err);
-              assert.ok(post._creator.name === 'Guillermo');
-              done();
-            });
+            assert.ifError(err);
+            assert.ok(post._creator.name === 'Guillermo');
+            done();
           });
       });
     });
@@ -6661,7 +6669,6 @@ describe('model: populate:', function() {
 
     describe('populates an array of objects', function() {
       it('subpopulates array w/ space separated path (gh-6284)', async function() {
-        const db = start();
         const houseSchema = new Schema({ location: String });
         const citySchema = new Schema({ name: String });
         const districtSchema = new Schema({ name: String });
@@ -8372,8 +8379,7 @@ describe('model: populate:', function() {
     });
 
     it('supports cross-db populate with refPath (gh-6520)', async function() {
-
-      const db2 = await mongoose.createConnection(start.uri2).asPromise();
+      db2 = await mongoose.createConnection(start.uri2).asPromise();
 
       const bookSchema = new Schema({ title: String });
       const movieSchema = new Schema({ title: String });
@@ -10724,7 +10730,7 @@ describe('model: populate:', function() {
 
     const User = db.model('User', UserSchema);
 
-    const conn2 = db.useDb('mongoose-test2');
+    const conn2 = db.useDb(start.databases[1]);
     const Test = conn2.model('Test', TestSchema);
 
     await Test.deleteMany({});

@@ -10724,7 +10724,7 @@ describe('model: populate:', function() {
 
     const User = db.model('User', UserSchema);
 
-    const conn2 = db.useDb('mongoose-test2');
+    const conn2 = db.useDb(start.databases[1]);
     const Test = conn2.model('Test', TestSchema);
 
     await Test.deleteMany({});

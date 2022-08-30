@@ -6985,7 +6985,7 @@ describe('Model', function() {
       assert.ok(beforeExpirationCount === 12);
       await new Promise(resolve => setTimeout(resolve, 6000));
       const afterExpirationCount = await Test.count({});
-      assert.ok(afterExpirationCount === 0);
+      assert.equal(afterExpirationCount, 0);
       await Test.collection.drop().catch(() => {});
     });
 
@@ -7107,7 +7107,7 @@ describe('Model', function() {
       assert.ok(beforeExpirationCount === 12);
       await new Promise(resolve => setTimeout(resolve, 6000));
       const afterExpirationCount = await Test.count({});
-      assert.ok(afterExpirationCount === 0);
+      assert.equal(afterExpirationCount, 0);
       await Test.collection.drop().catch(() => {});
     });
 
@@ -7200,7 +7200,7 @@ describe('Model', function() {
       assert.ok(beforeExpirationCount === 12);
       await new Promise(resolve => setTimeout(resolve, 6000));
       const afterExpirationCount = await Test.count({});
-      assert.ok(afterExpirationCount === 0);
+      assert.equal(afterExpirationCount, 0);
       await Test.collection.drop().catch(() => {});
     });
 

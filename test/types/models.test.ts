@@ -478,6 +478,6 @@ async function gh12347() {
 
   const User = model<IUser>('User', schema);
 
-  const user = await User.replaceOne({}, {});
-  expectType<UpdateWriteOpResult>(user);
+  const replaceOneResult = await User.replaceOne({}, {});
+  expectType<UpdateWriteOpResult>(replaceOneResult);
 }

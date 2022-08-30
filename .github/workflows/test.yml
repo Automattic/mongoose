@@ -47,6 +47,10 @@ jobs:
             mongodb-os: ubuntu1804
           - os: ubuntu-20.04
             mongodb-os: ubuntu2004
+          - os: ubuntu-20.04
+            mongodb: 5.0.2
+            node: 16
+            coverage: true
         exclude:
           - os: ubuntu-18.04 # exclude because nodejs 18 requires higher GLIBC
             node: 18
@@ -77,13 +81,13 @@ jobs:
           echo `pwd`/mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}/bin >> $GITHUB_PATH
       - name: NPM Test without Coverage
         run: npm test
-        if: matrix.node != 16
+        if: matrix.coverage != true
       - name: NPM Test with Coverage
-        run: npm test-coverage
-        if: matrix.node == 16
+        run: npm run test-coverage
+        if: matrix.coverage == true
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
-        if: matrix.node == 16
+        if: matrix.coverage == true
         with:
           name: coverage
           path: coverage

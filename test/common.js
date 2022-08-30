@@ -188,7 +188,7 @@ before(async function() {
     const uri = await startReplicaSet();
 
     module.exports.uri = uri;
-    module.exports.uri2 = uri.replace('mongoose_test', 'mongoose_test2');
+    module.exports.uri2 = uri.replace(databases[0], databases[1]);
 
     process.env.REPLICA_SET = 'rs0';
 
@@ -239,7 +239,7 @@ async function startReplicaSet() {
         args: ['--setParameter', 'ttlMonitorSleepSecs=1']
       }
     ],
-    dbName: 'mongoose_test',
+    dbName: databases[0],
     replSet: {
       name: 'rs0',
       count: 2,
@@ -252,5 +252,5 @@ async function startReplicaSet() {
 
   await new Promise(resolve => setTimeout(resolve, 10000));
 
-  return replSet.getUri('mongoose_test');
+  return replSet.getUri(databases[0]);
 }

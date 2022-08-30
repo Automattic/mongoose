@@ -11754,7 +11754,7 @@ describe('document', function() {
         assert.equal(res.docArr[0].counter, 1);
       });
       it('Splice call registers path modification', async function() {
-        await Test.create({ docArr: [{ counter: 0 }, { counter: 2 }, { counter: 3 }, { counter: 4}] });
+        await Test.create({ docArr: [{ counter: 0 }, { counter: 2 }, { counter: 3 }, { counter: 4 }] });
         const doc = await Test.findOne();
         doc.docArr.splice(1, 0, { counter: 1 });
         assert.equal(doc.isModified('docArr'), true);

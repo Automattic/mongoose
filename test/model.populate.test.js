@@ -349,11 +349,9 @@ describe('model: populate:', function() {
           .findById(post._id)
           .populate({ path: '_creator', select: 'name', model: User })
           .exec(function(err, post) {
-            db2.db.dropDatabase(function() {
-              assert.ifError(err);
-              assert.ok(post._creator.name === 'Guillermo');
-              done();
-            });
+            assert.ifError(err);
+            assert.ok(post._creator.name === 'Guillermo');
+            done();
           });
       });
     });

@@ -47,7 +47,7 @@ jobs:
             mongodb-os: ubuntu1804
           - os: ubuntu-20.04
             mongodb-os: ubuntu2004
-          - os: ubuntu-20.04
+          - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
             mongodb: 5.0.2
             node: 16
             coverage: true

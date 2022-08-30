@@ -480,4 +480,4 @@ async function gh12347() {
 
   const user = await User.replaceOne({}, {});
   expectType<UpdateWriteOpResult>(user);
-};
+}

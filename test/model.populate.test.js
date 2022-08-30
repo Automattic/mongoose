@@ -317,7 +317,6 @@ describe('model: populate:', function() {
   });
 
   it('across DBs', function(done) {
-    const db = start();
     const db2 = db.useDb('mongoose_test2');
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db2.model('User', userSchema);
@@ -338,8 +337,6 @@ describe('model: populate:', function() {
           .populate({ path: '_creator', select: 'name', model: User })
           .exec(function(err, post) {
             db2.db.dropDatabase(function() {
-              db.close();
-              db2.close();
               assert.ifError(err);
               assert.ok(post._creator.name === 'Guillermo');
               done();
@@ -6661,7 +6658,6 @@ describe('model: populate:', function() {
 
     describe('populates an array of objects', function() {
       it('subpopulates array w/ space separated path (gh-6284)', async function() {
-        const db = start();
         const houseSchema = new Schema({ location: String });
         const citySchema = new Schema({ name: String });
         const districtSchema = new Schema({ name: String });

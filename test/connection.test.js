@@ -36,7 +36,8 @@ describe('connections:', function() {
       return conn.asPromise().
         then(function(conn) {
           assert.equal(conn.constructor.name, 'NativeConnection');
-          const match = /mongodb:\/\/([\d.]+)(?::(\d+))?\/(\w+)/i.exec(start.uri);
+          // the regex below extract the first ip & port, because the created connection's properties only have the first anyway as "host" and "port"
+          const match = /mongodb:\/\/([\d.]+)(?::(\d+))?(?:,[\d.]+(?::\d+)?)*\/(\w+)/i.exec(start.uri);
           assert.ok(match);
           assert.equal(conn.host, match[1]);
           assert.equal(conn.port, parseInt(match[2]));

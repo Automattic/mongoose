@@ -317,7 +317,7 @@ describe('model: populate:', function() {
   });
 
   it('across DBs', function(done) {
-    const db2 = db.useDb('mongoose_test2');
+    const db2 = db.useDb(start.databases[1]);
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db2.model('User', userSchema);
 

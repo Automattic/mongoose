@@ -2,7 +2,7 @@
 
 Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment. Mongoose supports both promises and callbacks.
 
-[![Slack Status](https://img.shields.io/badge/slack-mongoosejsteam-34D058.svg?logo=slack )](https://mongoosejsteam.slack.com)
+[![Slack Status](https://img.shields.io/badge/slack-mongoosejsteam-34D058.svg?logo=slack)](https://mongoosejsteam.slack.com)
 [![Build Status](https://github.com/Automattic/mongoose/workflows/Test/badge.svg)](https://github.com/Automattic/mongoose)
 [![NPM version](https://badge.fury.io/js/mongoose.svg)](http://badge.fury.io/js/mongoose)
 
@@ -16,11 +16,11 @@ Mongoose 6.0.0 was released on August 24, 2021. You can find more details on [ba
 
 ## Support
 
-  - [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
-  - [Bug Reports](https://github.com/Automattic/mongoose/issues/)
-  - [Mongoose Slack Channel](http://slack.mongoosejs.io/)
-  - [Help Forum](http://groups.google.com/group/mongoose-orm)
-  - [MongoDB Support](https://docs.mongodb.org/manual/support/)
+- [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
+- [Bug Reports](https://github.com/Automattic/mongoose/issues/)
+- [Mongoose Slack Channel](http://slack.mongoosejs.io/)
+- [Help Forum](http://groups.google.com/group/mongoose-orm)
+- [MongoDB Support](https://docs.mongodb.org/manual/support/)
 
 ## Plugins
 
@@ -77,6 +77,12 @@ Once connected, the `open` event is fired on the `Connection` instance. If you'r
 
 **Note:** _If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed._
 
+If `localhost` use
+
+```js
+await mongoose.connect('mongodb://0.0.0.0:27017/my_database');
+```
+
 **Important!** Mongoose buffers all the commands until it's connected to the database. This means that you don't have to wait until it connects to MongoDB in order to define models, run queries, etc.
 
 ### Defining a Model
@@ -91,22 +97,22 @@ const BlogPost = new Schema({
   author: ObjectId,
   title: String,
   body: String,
-  date: Date
+  date: Date,
 });
 ```
 
 Aside from defining the structure of your documents and the types of data you're storing, a Schema handles the definition of:
 
-* [Validators](http://mongoosejs.com/docs/validation.html) (async and sync)
-* [Defaults](http://mongoosejs.com/docs/api.html#schematype_SchemaType-default)
-* [Getters](http://mongoosejs.com/docs/api.html#schematype_SchemaType-get)
-* [Setters](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set)
-* [Indexes](http://mongoosejs.com/docs/guide.html#indexes)
-* [Middleware](http://mongoosejs.com/docs/middleware.html)
-* [Methods](http://mongoosejs.com/docs/guide.html#methods) definition
-* [Statics](http://mongoosejs.com/docs/guide.html#statics) definition
-* [Plugins](http://mongoosejs.com/docs/plugins.html)
-* [pseudo-JOINs](http://mongoosejs.com/docs/populate.html)
+- [Validators](http://mongoosejs.com/docs/validation.html) (async and sync)
+- [Defaults](http://mongoosejs.com/docs/api.html#schematype_SchemaType-default)
+- [Getters](http://mongoosejs.com/docs/api.html#schematype_SchemaType-get)
+- [Setters](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set)
+- [Indexes](http://mongoosejs.com/docs/guide.html#indexes)
+- [Middleware](http://mongoosejs.com/docs/middleware.html)
+- [Methods](http://mongoosejs.com/docs/guide.html#methods) definition
+- [Statics](http://mongoosejs.com/docs/guide.html#statics) definition
+- [Plugins](http://mongoosejs.com/docs/plugins.html)
+- [pseudo-JOINs](http://mongoosejs.com/docs/populate.html)
 
 The following example shows some of these features:
 
@@ -116,7 +122,7 @@ const Comment = new Schema({
   age: { type: Number, min: 18, index: true },
   bio: { type: String, match: /[a-z]/ },
   date: { type: Date, default: Date.now },
-  buff: Buffer
+  buff: Buffer,
 });
 
 // a setter
@@ -153,7 +159,7 @@ The first argument is the _singular_ name of the collection your model is for. *
 const MyModel = mongoose.model('Ticket', mySchema);
 ```
 
-Then `MyModel` will use the __tickets__ collection, not the __ticket__ collection. For more details read the [model docs](https://mongoosejs.com/docs/api/mongoose.html#mongoose_Mongoose-model).
+Then `MyModel` will use the **tickets** collection, not the **ticket** collection. For more details read the [model docs](https://mongoosejs.com/docs/api/mongoose.html#mongoose_Mongoose-model).
 
 Once we have our model, we can then instantiate it, and save it:
 
@@ -187,7 +193,7 @@ For more details check out [the docs](http://mongoosejs.com/docs/queries.html).
 ```js
 const conn = mongoose.createConnection('your connection string');
 const MyModel = conn.model('ModelName', schema);
-const m = new MyModel;
+const m = new MyModel();
 m.save(); // works
 ```
 
@@ -196,7 +202,7 @@ vs
 ```js
 const conn = mongoose.createConnection('your connection string');
 const MyModel = mongoose.model('ModelName', schema);
-const m = new MyModel;
+const m = new MyModel();
 m.save(); // does not work b/c the default connection object was never connected
 ```
 
@@ -239,7 +245,6 @@ BlogPost.findById(myId, function (err, post) {
 ```
 
 Embedded documents enjoy all the same features as your models. Defaults, validators, middleware. Whenever an error occurs, it's bubbled to the `save()` error callback, so error handling is a snap!
-
 
 ### Middleware
 
@@ -294,16 +299,16 @@ new Schema({
   broken: { type: Boolean },
   asset: {
     name: String,
-    type: String // uh oh, it broke. asset will be interpreted as String
-  }
+    type: String, // uh oh, it broke. asset will be interpreted as String
+  },
 });
 
 new Schema({
   works: { type: Boolean },
   asset: {
     name: String,
-    type: { type: String } // works. asset is an object with a type property
-  }
+    type: { type: String }, // works. asset is an object with a type property
+  },
 });
 ```
 

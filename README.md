@@ -77,7 +77,7 @@ Once connected, the `open` event is fired on the `Connection` instance. If you'r
 
 **Note:** _If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed._
 
-If `localhost` use
+If `localhost` fails, use
 
 ```js
 await mongoose.connect('mongodb://0.0.0.0:27017/my_database');

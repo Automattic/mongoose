@@ -29,7 +29,7 @@ module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
   }
 
   if (startMemoryReplset) {
-    mongorreplset = await mms.MongoMemoryReplSet.create({ replSet: { count: '3', args: ['--setParameter', 'ttlMonitorSleepSecs=1'] } }); // using 3 because even numbers can lead to vote problems
+    mongorreplset = await mms.MongoMemoryReplSet.create({ replSet: { count: 3, args: ['--setParameter', 'ttlMonitorSleepSecs=1'] } }); // using 3 because even numbers can lead to vote problems
     replseturi = mongorreplset.getUri();
   } else {
     replseturi = '';

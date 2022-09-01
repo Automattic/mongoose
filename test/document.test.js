@@ -12262,6 +12262,74 @@ describe('document', function() {
     const test2 = {};
     assert.strictEqual(test2.constructor.polluted, undefined);
     assert.strictEqual(Object.polluted, undefined);
+
+  });
+
+  it('validateSync executes error hook and ignores async function (gh-4885)', function(done) {
+    let asyncCalled = false;
+    let errorHookCalled = false;
+    let normalHookCalled = false;
+
+    const schema = new Schema({
+      prop: Boolean
+    });
+
+    schema.post('validate', async function() { asyncCalled = true; });
+    schema.post('validate', () => { normalHookCalled = true; throw new Error('test error for error hook'); });
+    schema.post('validate', function(err, doc, next) {
+      errorHookCalled = true;
+      next();
+    });
+
+    const model = db.model('test', schema);
+
+    const doc = new model({ prop: true });
+    doc.validateSync();
+
+    // schema.path('prop').doValidateSync(true);
+
+    assert.strictEqual(normalHookCalled, true);
+    assert.strictEqual(asyncCalled, false);
+    assert.strictEqual(errorHookCalled, true);
+    done();
+  });
+
+  it('validateSync executes error hook and ignores returned Promises (gh-4885)', function(done) {
+    let asyncCalled = false;
+    let asyncCompleted = false;
+    let errorHookCalled = false;
+    let normalHookCalled = false;
+
+    const schema = new Schema({
+      prop: Boolean
+    });
+
+    schema.post('validate', function() {
+      asyncCalled = true;
+      return new Promise((res) => setTimeout(() => {
+        asyncCompleted = true;
+        return res();
+      }, 1000));
+    });
+    schema.post('validate', () => { normalHookCalled = true; throw new Error('test error for error hook'); });
+    schema.post('validate', function(err, doc, next) {
+      errorHookCalled = true;
+      assert.ok(err);
+      next();
+    });
+
+    // schema.path('prop').doValidateSync(true);
+
+    const model = db.model('test', schema);
+
+    const doc = new model({ prop: true });
+    doc.validateSync();
+
+    assert.strictEqual(normalHookCalled, true);
+    assert.strictEqual(asyncCalled, true);
+    assert.strictEqual(asyncCompleted, false);
+    assert.strictEqual(errorHookCalled, true);
+    done();
   });
 });
 
@@ -12273,4 +12341,3 @@ describe('Check if instance function that is supplied in schema option is availa
     assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
   });
 });
-

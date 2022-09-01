@@ -70,6 +70,13 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Load MongoDB binary cache
+        id: cache-mongodb-binaries
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ matrix.os }}-${{ matrix.mongodb }}
+
       - run: npm install
 
       # - name: Setup

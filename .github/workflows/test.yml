@@ -102,7 +102,7 @@ jobs:
         with:
           node-version: 16
       - name: Setup Deno
-        uses: actions/setup-deno #v1
+        uses: denoland/setup-deno@v1
         with:
           deno-version: v1.25.x
       - run: npm install

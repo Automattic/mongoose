@@ -564,6 +564,44 @@ describe('schema', function() {
           done();
         }, { a: 'b' });
       });
+
+      it('doValidateSync should ignore async function and script waiting for promises (gh-4885)', function(done) {
+        let asyncCalled = false;
+        let normalCalled = false;
+        let promiseCalled = false;
+        let promiseCompleted = false;
+
+        const schema = new Schema({
+          prop: {
+            type: Boolean,
+            validate: [
+              {
+                validator: async() => { asyncCalled = true; }
+              },
+              {
+                validator: () => { normalCalled = true; }
+              },
+              {
+                validator: () => {
+                  promiseCalled = true;
+                  return new Promise((res) => setTimeout(() => {
+                    promiseCompleted = true;
+                    return res();
+                  }, 1000));
+                }
+              }
+            ]
+          }
+        });
+
+        schema.path('prop').doValidateSync(true);
+
+        assert.strictEqual(asyncCalled, false);
+        assert.strictEqual(normalCalled, true);
+        assert.strictEqual(promiseCalled, true);
+        assert.strictEqual(promiseCompleted, false);
+        done();
+      });
     });
 
     describe('messages', function() {

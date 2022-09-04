@@ -27,7 +27,7 @@ function TestDocument() {
  * Inherits from Document.
  */
 
-TestDocument.prototype.__proto__ = Document.prototype;
+Object.setPrototypeOf(TestDocument.prototype, Document.prototype);
 
 for (const i in EventEmitter.prototype) {
   TestDocument[i] = EventEmitter.prototype[i];

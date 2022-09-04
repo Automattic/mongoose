@@ -64,6 +64,20 @@ for (const file of files) {
 parse();
 
 /**
+ * @typedef {Object} TagObject
+ * @property {String} name The Processed name of the Tag (already includes all processing)
+ * @property {String} description The Description of this Tag
+ * @property {Boolean} optional Defines wheter the Tag is optional or not (already included in `name`)
+ * @property {Boolean} nullable Defines wheter the Tag is nullable (dox does not add "null" by default)
+ * @property {Boolean} nonNullable Unknown (invert of `nullable`?)
+ * @property {Boolean} variable Defines wheter the type is spreadable ("...Type")
+ * @property {String[]} types Collection of all types this Tag has
+ * @property {String} type The Type of the Tag
+ * @property {String} string The full string of types plus name plus description (unused in mongoose)
+ * @property {String} typesDescription Processed `types` into markdown code (unused in mongoose)
+ */
+
+/**
  * @typedef {Object} SeeObject
  * @property {String} text The text to display the link as
  * @property {String} [url] The link the text should have as href
@@ -78,12 +92,14 @@ parse();
  * @property {boolean} [constructorWasUndefined] Defined wheter the "constructor" property was defined by "dox", but was set to "undefined"
  * @property {string} [type] Defines the type the property is meant to be
  * @property {string} [name] Defines the current Properties name
- * @property {Object} [return] The full object for a "@return" jsdoc tag
+ * @property {TagObject} [return] The full object for a "@return" jsdoc tag
  * @property {string} [string] Defines the full string the property will be listed as
  * @property {string} [anchorId] Defines the Anchor ID to be used for linking
  * @property {string} [description] Defines the Description the property will be listed with
  * @property {string} [deprecated] Defines wheter the current Property is signaled as deprecated
  * @property {SeeObject[]} [see] Defines all "@see" references
+ * @property {TagObject[]} [param] Defines all "@param" references
+ * @property {String} [inherits] Defines the string for "@inherits"
  */
 
 function parse() {
@@ -138,7 +154,10 @@ function parse() {
         return Array.isArray(types) ? types.join('|') : types
       }
 
-      for (const tag of prop.tags) {
+      for (const __tag of prop.tags) {
+        // the following has been done, because otherwise no type could be applied for intellisense
+        /** @type {TagObject} */
+        const tag = __tag;
         switch (tag.type) {
           case 'see':
             if (!Array.isArray(ctx.see)) {
@@ -237,6 +256,13 @@ function parse() {
             ctx[tag.type].push(tag);
             if (tag.name != null && tag.name.startsWith('[') && tag.name.endsWith(']') && tag.name.includes('.')) {
               tag.nested = true;
+            }
+            if (tag.variable) {
+              if (tag.name.startsWith('[')) {
+                tag.name = '[...' + tag.name.slice(1);
+              } else {
+                tag.name = '...' + tag.name;
+              }
             }
             tag.description = tag.description ?
               md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :

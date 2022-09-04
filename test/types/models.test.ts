@@ -10,7 +10,8 @@ import {
   CallbackError,
   HydratedDocument,
   LeanDocument,
-  Query
+  Query,
+  UpdateWriteOpResult
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -478,4 +479,18 @@ function gh12332() {
 
   User.castObject({ age: '19' });
   User.castObject({ age: '19' }, { ignoreCastErrors: true });
+}
+
+async function gh12347() {
+  interface IUser{
+    name: string;
+  }
+  const schema = new Schema<IUser>({
+    name: { type: String, required: true }
+  });
+
+  const User = model<IUser>('User', schema);
+
+  const replaceOneResult = await User.replaceOne({}, {});
+  expectType<UpdateWriteOpResult>(replaceOneResult);
 }

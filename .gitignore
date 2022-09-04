@@ -56,4 +56,8 @@ index.html
 # yarn package-lock
 yarn.lock
 
+# npm pack output
+mongoose.tgz
+mongoose-*.tgz
+
 examples/ecommerce-netlify-functions/.netlify/state.json

@@ -12,7 +12,7 @@ declare module 'mongoose' {
 
   interface IndexManager {
     /**
-     * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
+     * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#createIndex)
      * function.
      */
     createIndexes(options: mongodb.CreateIndexesOptions, callback: CallbackWithoutResult): void;

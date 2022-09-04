@@ -91,6 +91,23 @@ jobs:
         with:
           name: coverage
           path: coverage
+  
+  test-deno:
+    runs-on: ubuntu-latest
+    name: Deno tests
+    steps:
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+      - name: Setup node
+        uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93 # v3.4.1
+        with:
+          node-version: 16
+      - name: Setup Deno
+        uses: actions/setup-deno #v1
+        with:
+          deno-version: v1.25.x
+      - run: npm install
+      - name: Run Deno tests
+        run: npm run test-deno
 
   test-replica-sets:
     needs:

@@ -2339,6 +2339,13 @@ describe('Query', function() {
       });
 
       it('throw on sync exceptions in callbacks (gh-6178)', function(done) {
+        // Deno doesn't support 'uncaughtException', so there's no way to test this in Deno
+        // without starting a separate process.
+        // See: https://stackoverflow.com/questions/64871554/deno-how-to-handle-exceptions
+        if (typeof Deno !== 'undefined') {
+          return this.skip();
+        }
+
         const schema = new Schema({});
         const Test = db.model('Test', schema);
 

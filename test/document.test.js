@@ -11833,6 +11833,23 @@ describe('document', function() {
 
     assert.ok(doc.nestedPath1.mapOfSchema);
   });
+
+  it('works if passing class that extends Document to `loadClass()` (gh-12254)', async function() {
+    const DownloadJobSchema = new mongoose.Schema({ test: String });
+
+    class B extends mongoose.Document {}
+
+    B.prototype.foo = 'bar';
+
+    DownloadJobSchema.loadClass(B);
+
+    const Test = db.model('Test', DownloadJobSchema);
+
+    const { _id } = await Test.create({ test: 'value' });
+    const doc = await Test.findById(_id);
+    assert.ok(doc);
+    assert.equal(doc.test, 'value');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

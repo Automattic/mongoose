@@ -19,7 +19,7 @@ const mocha = new Mocha({
 const testDir = 'test';
 const files = fs.readdirSync(testDir);
 
-const ignoreFiles = new Set(['browser.test.js', 'connection.test.js', 'index.test.js']);
+const ignoreFiles = new Set(['browser.test.js']);
 
 for (const file of files) {
   if (!file.endsWith('.test.js') || ignoreFiles.has(file)) {

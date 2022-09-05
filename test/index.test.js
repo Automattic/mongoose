@@ -845,6 +845,11 @@ describe('mongoose module:', function() {
     });
 
     it('connect with url doesnt cause unhandled rejection (gh-6997)', async function() {
+      if (typeof Deno !== 'undefined') {
+        // In Deno dns throws an uncatchable error here.
+        return this.skip();
+      }
+
       const m = new mongoose.Mongoose();
       const _options = Object.assign({}, options, { serverSelectionTimeoutMS: 100 });
       const error = await m.connect('mongodb://doesnotexist:27009/test', _options).then(() => null, err => err);

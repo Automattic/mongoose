@@ -30,4 +30,5 @@ for (const file of files) {
 
 mocha.run(function(failures) {
   process.exitCode = failures ? 1 : 0;  // exit with non-zero status if there were failures
+  process.exit(process.exitCode);
 });

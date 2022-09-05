@@ -3478,7 +3478,6 @@ describe('Query', function() {
     const userSchema = Schema({ token: String });
     const User = db.model('Test', userSchema);
 
-
     const original = await User.create({ token: 'rightToken' });
     let doc = await User.findOne({ token: 'wrongToken', _bsontype: 'a' });
     assert.ok(!doc);

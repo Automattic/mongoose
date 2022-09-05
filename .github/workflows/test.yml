@@ -115,6 +115,7 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.25.x
+      - run: deno --version
       - run: npm install
       - name: Run Deno tests
         run: npm run test-deno

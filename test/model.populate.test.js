@@ -3713,7 +3713,7 @@ describe('model: populate:', function() {
       assert.deepEqual(arr, ['Shaq', 'Kobe', 'Horry']);
     });
 
-    it('deep populate array -> array (gh-3954)', function(done) {
+    it('deep populate array -> array (gh-3954)', async function() {
       const personSchema = new Schema({
         name: { type: String }
       });
@@ -3731,56 +3731,42 @@ describe('model: populate:', function() {
       const Team = db.model('Team', teamSchema);
       const Game = db.model('Test', gameSchema);
 
-      const people = [
+      const people = await Person.create([
         { name: 'Shaq' },
         { name: 'Kobe' },
         { name: 'Horry' },
         { name: 'Duncan' },
         { name: 'Robinson' },
         { name: 'Johnson' }
-      ];
+      ]);
 
-      Person.create(people, function(error, people) {
-        assert.ifError(error);
-        const lakers = {
-          name: 'Lakers',
-          members: [people[0]._id, people[1]._id, people[2]._id]
-        };
-        const spurs = {
-          name: 'Spurs',
-          members: [people[3]._id, people[4]._id, people[5]._id]
-        };
-        const teams = [lakers, spurs];
-        Team.create(teams, function(error, teams) {
-          assert.ifError(error);
-          const game = {
-            teams: [teams[0]._id, teams[1]._id]
-          };
-          Game.create(game, function(error, game) {
-            assert.ifError(error);
-            test(game._id);
-          });
-        });
+      const lakers = {
+        name: 'Lakers',
+        members: [people[0]._id, people[1]._id, people[2]._id]
+      };
+      const spurs = {
+        name: 'Spurs',
+        members: [people[3]._id, people[4]._id, people[5]._id]
+      };
+      const teams = await Team.create([lakers, spurs]);
+
+      const game = {
+        teams: [teams[0]._id, teams[1]._id]
+      };
+      const { _id } = await Game.create(game);
+
+      const doc = await Game.findById(_id).populate({
+        path: 'teams',
+        select: 'name members',
+        populate: { path: 'members', select: 'name' }
       });
-
-      function test(id) {
-        const query = Game.findById(id).populate({
-          path: 'teams',
-          select: 'name members',
-          populate: { path: 'members', select: 'name' }
-        });
-        query.exec(function(error, doc) {
-          assert.ifError(error);
-          const players = doc.toObject().teams[0].members.
-            concat(doc.toObject().teams[1].members);
-          const arr = players.map(function(v) {
-            return v.name;
-          });
-          assert.deepEqual(arr,
-            ['Shaq', 'Kobe', 'Horry', 'Duncan', 'Robinson', 'Johnson']);
-          done();
-        });
-      }
+      const players = doc.toObject().teams[0].members.
+        concat(doc.toObject().teams[1].members);
+      const arr = players.map(function(v) {
+        return v.name;
+      });
+      assert.deepEqual(arr,
+        ['Shaq', 'Kobe', 'Horry', 'Duncan', 'Robinson', 'Johnson']);
     });
 
     it('4 level population (gh-3973)', async function() {
@@ -3834,7 +3820,7 @@ describe('model: populate:', function() {
       assert.equal(obj.level2[0].level3[0].level4[0].name, 'level 4');
     });
 
-    it('deep populate two paths (gh-3974)', function(done) {
+    it('deep populate two paths (gh-3974)', async function() {
       const level3Schema = new Schema({
         name: { type: String }
       });
@@ -3854,42 +3840,34 @@ describe('model: populate:', function() {
       const level2 = db.model('Test1', level2Schema);
       const level1 = db.model('Test2', level1Schema);
 
-      const l3 = [
+      let l3 = [
         { name: 'level 3/1' },
         { name: 'level 3/2' }
       ];
-      level3.create(l3, function(error, l3) {
-        assert.ifError(error);
-        const l2 = [
-          { name: 'level 2', level31: l3[0]._id, level32: l3[1]._id }
-        ];
-        level2.create(l2, function(error, l2) {
-          assert.ifError(error);
-          const l1 = [{ name: 'level 1', level2: l2[0]._id }];
-          level1.create(l1, function(error, l1) {
-            assert.ifError(error);
-            level1.findById(l1[0]._id).
-              populate({
-                path: 'level2',
-                populate: [{
-                  path: 'level31'
-                }]
-              }).
-              populate({
-                path: 'level2',
-                populate: [{
-                  path: 'level32'
-                }]
-              }).
-              exec(function(error, obj) {
-                assert.ifError(error);
-                assert.equal(obj.level2[0].level31[0].name, 'level 3/1');
-                assert.equal(obj.level2[0].level32[0].name, 'level 3/2');
-                done();
-              });
-          });
+      l3 = await level3.create(l3);
+
+      const l2 = await level2.create([
+        { name: 'level 2', level31: l3[0]._id, level32: l3[1]._id }
+      ]);
+
+      const l1 = await level1.create([{ name: 'level 1', level2: l2[0]._id }]);
+
+      const obj = await level1.findById(l1[0]._id).
+        populate({
+          path: 'level2',
+          populate: [{
+            path: 'level31'
+          }]
+        }).
+        populate({
+          path: 'level2',
+          populate: [{
+            path: 'level32'
+          }]
         });
-      });
+
+      assert.equal(obj.level2[0].level31[0].name, 'level 3/1');
+      assert.equal(obj.level2[0].level32[0].name, 'level 3/2');
     });
 
     it('out-of-order discriminators (gh-4073)', function() {

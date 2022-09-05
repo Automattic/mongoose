@@ -271,6 +271,7 @@ describe('connections:', function() {
     });
 
     it('allows passing a schema', function() {
+      mongoose.deleteModel(/Test/);
       const MyModel = mongoose.model('Test', new Schema({
         name: String
       }));

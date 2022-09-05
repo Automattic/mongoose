@@ -885,7 +885,7 @@ describe('connections:', function() {
     return Model.create({ name: 'test' });
   });
 
-  it('throws a MongooseServerSelectionError on server selection timeout (gh-8451)', () => {
+  it('throws a MongooseServerSelectionError on server selection timeout (gh-8451)', function() {
     if (typeof Deno !== 'undefined') {
       // In Deno dns throws an uncatchable error here.
       return this.skip();

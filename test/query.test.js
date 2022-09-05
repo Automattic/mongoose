@@ -3475,7 +3475,7 @@ describe('Query', function() {
   });
 
   it('query with top-level _bsontype (gh-8222) (gh-8268)', async function() {
-    const userSchema = Schema({ token: String });
+    const userSchema = Schema({ token: String }, { strictQuery: true });
     const User = db.model('Test', userSchema);
 
     const original = await User.create({ token: 'rightToken' });

@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const mocha = new Mocha({
+  timeout: 8000,
   ...(args.g ? { fgrep: '' + args.g } : {})
 });
 

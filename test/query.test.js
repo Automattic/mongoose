@@ -3479,7 +3479,10 @@ describe('Query', function() {
     const User = db.model('Test', userSchema);
 
     const original = await User.create({ token: 'rightToken' });
-    let doc = await User.findOne({ token: 'wrongToken', _bsontype: 'a' });
+
+    let doc = await User.findOne({ token: 'wrongToken', _bsontype: 'a' }).catch(err => {
+      console.log('Caught', err, err instanceof Error);
+    });
     assert.ok(!doc);
 
     doc = await User.findOne(original._id);

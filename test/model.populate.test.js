@@ -3783,7 +3783,7 @@ describe('model: populate:', function() {
       }
     });
 
-    it('4 level population (gh-3973)', function(done) {
+    it('4 level population (gh-3973)', async function() {
       const level4Schema = new Schema({
         name: { type: String }
       });
@@ -3809,36 +3809,29 @@ describe('model: populate:', function() {
       const level1 = db.model('Test', level1Schema);
 
       const l4docs = [{ name: 'level 4' }];
+      const l4 = await level4.create(l4docs);
 
-      level4.create(l4docs, function(error, l4) {
-        assert.ifError(error);
-        const l3docs = [{ name: 'level 3', level4: l4[0]._id }];
-        level3.create(l3docs, function(error, l3) {
-          assert.ifError(error);
-          const l2docs = [{ name: 'level 2', level3: l3[0]._id }];
-          level2.create(l2docs, function(error, l2) {
-            assert.ifError(error);
-            const l1docs = [{ name: 'level 1', level2: l2[0]._id }];
-            level1.create(l1docs, function(error, l1) {
-              assert.ifError(error);
-              const opts = {
-                path: 'level2',
-                populate: {
-                  path: 'level3',
-                  populate: {
-                    path: 'level4'
-                  }
-                }
-              };
-              level1.findById(l1[0]._id).populate(opts).exec(function(error, obj) {
-                assert.ifError(error);
-                assert.equal(obj.level2[0].level3[0].level4[0].name, 'level 4');
-                done();
-              });
-            });
-          });
-        });
-      });
+      const l3docs = [{ name: 'level 3', level4: l4[0]._id }];
+      const l3 = await level3.create(l3docs);
+
+      const l2docs = [{ name: 'level 2', level3: l3[0]._id }];
+      const l2 = await level2.create(l2docs);
+
+      const l1docs = [{ name: 'level 1', level2: l2[0]._id }];
+      const l1 = await level1.create(l1docs);
+
+      const opts = {
+        path: 'level2',
+        populate: {
+          path: 'level3',
+          populate: {
+            path: 'level4'
+          }
+        }
+      };
+
+      const obj = await level1.findById(l1[0]._id).populate(opts).exec();
+      assert.equal(obj.level2[0].level3[0].level4[0].name, 'level 4');
     });
 
     it('deep populate two paths (gh-3974)', function(done) {

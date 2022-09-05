@@ -1160,7 +1160,7 @@ describe('types array', function() {
     });
   });
 
-  describe.skip('options', function() {
+  describe('options', function() {
     let arrOptions;
     let docArrOptions;
 
@@ -2166,7 +2166,7 @@ describe('types array', function() {
     assert.strictEqual(arr[0], 42);
   });
 
-  it.skip('test "castNonArrays" property option', function() {
+  it('test "castNonArrays" property option', function() {
     const Model = db.model('Test', new Schema({ x1: { castNonArrays: false, type: [String] }, x2: { castNonArrays: true, type: [String] }, x3: { type: [String] } }));
 
     const string = 'hello';
@@ -2206,6 +2206,6 @@ describe('types array', function() {
     // Assert
     assert.ifError(user.validateSync());
 
-    delete m.Schema.Types.Array.options.castNonArrays;
+    m.Schema.Types.Array.options.castNonArrays = true;
   });
 });

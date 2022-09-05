@@ -3800,9 +3800,9 @@ describe('model: populate:', function() {
       const l3docs = [{ name: 'level 3', level4: l4[0]._id }];
       const l3 = await level3.create(l3docs).catch(err => {
         console.log(err);
-        console.log(err?.errors);
-        console.log(err?.errors?.level4);
-        console.log(err?.errors?.level4?.reason);
+        console.log(err.errors);
+        console.log(err.errors.level4);
+        console.log(err.errors.level4.reason);
         throw err;
       });
 

@@ -6898,7 +6898,6 @@ describe('Model', function() {
     });
 
     it('createCollection() enforces expireAfterSeconds (gh-11229)', async function() {
-      this.timeout(10000);
       const version = await start.mongodVersion();
       if (version[0] < 5) {
         this.skip();
@@ -6915,6 +6914,118 @@ describe('Model', function() {
       });
 
       const Test = db.model('TestGH11229Var1', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection({ expireAfterSeconds: 5 });
+
+      const collOptions = await Test.collection.options();
+      assert.ok(collOptions);
+      assert.equal(collOptions.expireAfterSeconds, 5);
+      assert.ok(collOptions.timeseries);
+    });
+
+    it('createCollection() enforces expires (gh-11229)', async function() {
+      this.timeout(10000);
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false
+      });
+
+      const Test = db.model('TestGH11229Var2', schema, 'TestGH11229Var2');
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection({ expires: '5 seconds' });
+
+      const collOptions = await Test.collection.options();
+      assert.ok(collOptions);
+      assert.equal(collOptions.expireAfterSeconds, 5);
+      assert.ok(collOptions.timeseries);
+    });
+
+    it('createCollection() enforces expireAfterSeconds when set by Schema (gh-11229)', async function() {
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false,
+        expireAfterSeconds: 5
+      });
+
+      const Test = db.model('TestGH11229Var3', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection();
+
+      const collOptions = await Test.collection.options();
+      assert.ok(collOptions);
+      assert.equal(collOptions.expireAfterSeconds, 5);
+      assert.ok(collOptions.timeseries);
+    });
+
+    it('createCollection() enforces expires when set by Schema (gh-11229)', async function() {
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false,
+        expires: '5 seconds'
+      });
+
+      const Test = db.model('TestGH11229Var4', schema);
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection();
+
+      const collOptions = await Test.collection.options();
+      assert.ok(collOptions);
+      assert.equal(collOptions.expireAfterSeconds, 5);
+      assert.ok(collOptions.timeseries);
+    });
+
+    it('mongodb actually removes expired documents (gh-11229)', async function() {
+      this.timeout(1000 * 80); // 80 seconds, see later comments on why
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        timeseries: {
+          timeField: 'timestamp',
+          metaField: 'metadata',
+          granularity: 'hours'
+        },
+        autoCreate: false
+      });
+
+      const Test = db.model('TestMongoDBExpireRemoval', schema);
 
       await Test.collection.drop().catch(() => {});
       await Test.createCollection({ expireAfterSeconds: 5 });
@@ -6983,225 +7094,30 @@ describe('Model', function() {
 
       const beforeExpirationCount = await Test.count({});
       assert.ok(beforeExpirationCount === 12);
-      await new Promise(resolve => setTimeout(resolve, 6000));
-      const afterExpirationCount = await Test.count({});
-      assert.equal(afterExpirationCount, 0);
-      await Test.collection.drop().catch(() => {});
-    });
 
-    it('createCollection() enforces expires (gh-11229)', async function() {
-      this.timeout(10000);
-      const version = await start.mongodVersion();
-      if (version[0] < 5) {
-        this.skip();
-        return;
-      }
+      let intervalid;
 
-      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
-        timeseries: {
-          timeField: 'timestamp',
-          metaField: 'metadata',
-          granularity: 'hours'
-        },
-        autoCreate: false
-      });
+      await Promise.race([
+        // wait for 61 seconds, because mongodb's removal routine runs every 60 seconds, so it may be VERY flakey otherwise
+        // under heavy load it is still not guranteed to actually run
+        // see https://www.mongodb.com/docs/manual/core/timeseries/timeseries-automatic-removal/#timing-of-delete-operations
+        new Promise(resolve => setTimeout(resolve, 1000 * 61)), // 61 seconds
 
-      const Test = db.model('TestGH11229Var2', schema, 'TestGH11229Var2');
-
-      await Test.collection.drop().catch(() => {});
-      await Test.createCollection({ expires: '5 seconds' });
-
-      const collectionInfo = await Test.db.db.listCollections().toArray().
-        then(collections => collections.find(coll => coll.name === 'TestGH11229Var2'));
-      assert.ok(collectionInfo);
-      assert.equal(collectionInfo.options.expireAfterSeconds, 5);
-      assert.ok(collectionInfo.options.timeseries);
-    });
-
-    it('createCollection() enforces expireAfterSeconds when set by Schema (gh-11229)', async function() {
-      this.timeout(10000);
-      const version = await start.mongodVersion();
-      if (version[0] < 5) {
-        this.skip();
-        return;
-      }
-
-      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
-        timeseries: {
-          timeField: 'timestamp',
-          metaField: 'metadata',
-          granularity: 'hours'
-        },
-        autoCreate: false,
-        expireAfterSeconds: 5
-      });
-
-      const Test = db.model('TestGH11229Var3', schema);
-
-      await Test.collection.drop().catch(() => {});
-      await Test.createCollection();
-
-      await Test.insertMany([
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T00:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T04:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T08:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T12:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T16:00:00.000Z'),
-          temp: 16
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T20:00:00.000Z'),
-          temp: 15
-        }, {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T00:00:00.000Z'),
-          temp: 13
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T04:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T08:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T12:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T16:00:00.000Z'),
-          temp: 17
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T20:00:00.000Z'),
-          temp: 12
-        }
+        // in case it happens faster, to reduce test time
+        new Promise(resolve => {
+          intervalid = setInterval(async() => {
+            const count = await Test.count({});
+            if (count === 0) {
+              resolve();
+            }
+          }, 1000); // every 1 second
+        })
       ]);
 
-      const beforeExpirationCount = await Test.count({});
-      assert.ok(beforeExpirationCount === 12);
-      await new Promise(resolve => setTimeout(resolve, 6000));
+      clearInterval(intervalid);
+
       const afterExpirationCount = await Test.count({});
       assert.equal(afterExpirationCount, 0);
-      await Test.collection.drop().catch(() => {});
-    });
-
-    it('createCollection() enforces expires when set by Schema (gh-11229)', async function() {
-      this.timeout(10000);
-      const version = await start.mongodVersion();
-      if (version[0] < 5) {
-        this.skip();
-        return;
-      }
-
-      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
-        timeseries: {
-          timeField: 'timestamp',
-          metaField: 'metadata',
-          granularity: 'hours'
-        },
-        autoCreate: false,
-        expires: '5 seconds'
-      });
-
-      const Test = db.model('TestGH11229Var4', schema);
-
-      await Test.collection.drop().catch(() => {});
-      await Test.createCollection();
-
-      await Test.insertMany([
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T00:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T04:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T08:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T12:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T16:00:00.000Z'),
-          temp: 16
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T20:00:00.000Z'),
-          temp: 15
-        }, {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T00:00:00.000Z'),
-          temp: 13
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T04:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T08:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T12:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T16:00:00.000Z'),
-          temp: 17
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T20:00:00.000Z'),
-          temp: 12
-        }
-      ]);
-
-      const beforeExpirationCount = await Test.count({});
-      assert.ok(beforeExpirationCount === 12);
-      await new Promise(resolve => setTimeout(resolve, 6000));
-      const afterExpirationCount = await Test.count({});
-      assert.equal(afterExpirationCount, 0);
-      await Test.collection.drop().catch(() => {});
     });
 
     it('createCollection() handles NamespaceExists errors (gh-9447)', async function() {

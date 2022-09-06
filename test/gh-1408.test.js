@@ -14,7 +14,7 @@ const Schema = mongoose.Schema;
 
 describe('documents should not be converted to _id (gh-1408)', function() {
   it('if an embedded doc', async function() {
-    this.timeout(process.env.TRAVIS ? 8000 : 4500);
+    this.timeout(4500);
 
     const db = start();
 

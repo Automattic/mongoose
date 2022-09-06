@@ -87,7 +87,7 @@ describe('Model', function() {
   afterEach(() => util.clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it('can be created using _id as embedded document', function(done) {
+  it('can be created using _id as embedded document', async function() {
     const Test = db.model('Test', Schema({
       _id: { first_name: String, age: Number },
       last_name: String,
@@ -106,24 +106,20 @@ describe('Model', function() {
       }
     });
 
-    t.save(function(err) {
-      assert.ifError(err);
-      Test.findOne({}, function(err, doc) {
-        assert.ifError(err);
+    await t.save();
 
-        assert.ok('last_name' in doc);
-        assert.ok('_id' in doc);
-        assert.ok('first_name' in doc._id);
-        assert.equal(doc._id.first_name, 'Daniel');
-        assert.ok('age' in doc._id);
-        assert.equal(doc._id.age, 21);
+    const doc = await Test.findOne();
 
-        assert.ok('doc_embed' in doc);
-        assert.ok('some' in doc.doc_embed);
-        assert.equal(doc.doc_embed.some, 'a');
-        done();
-      });
-    });
+    assert.ok('last_name' in doc);
+    assert.ok('_id' in doc);
+    assert.ok('first_name' in doc._id);
+    assert.equal(doc._id.first_name, 'Daniel');
+    assert.ok('age' in doc._id);
+    assert.equal(doc._id.age, 21);
+
+    assert.ok('doc_embed' in doc);
+    assert.ok('some' in doc.doc_embed);
+    assert.equal(doc.doc_embed.some, 'a');
   });
 
   describe('constructor', function() {
@@ -5999,7 +5995,7 @@ describe('Model', function() {
 
     it.skip('save() with wtimeout defined in schema (gh-6862)', function(done) {
       // If you want to test this, setup replica set with 1 primary up and 1 secondary down
-      this.timeout(process.env.TRAVIS ? 9000 : 5500);
+      this.timeout(5500);
       const schema = new Schema({
         name: String
       }, {
@@ -6026,7 +6022,7 @@ describe('Model', function() {
 
     it.skip('save with wtimeout in options (gh_6862)', function(done) {
       // If you want to test this, setup replica set with 1 primary up and 1 secondary down
-      this.timeout(process.env.TRAVIS ? 9000 : 5500);
+      this.timeout(5500);
       const schema = new Schema({
         name: String
       });

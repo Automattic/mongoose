@@ -1651,7 +1651,7 @@ describe('model: querying:', function() {
     });
 
     it('with Dates', function(done) {
-      this.timeout(process.env.TRAVIS ? 8000 : 4500);
+      this.timeout(4500);
       const SSchema = new Schema({ d: Date });
       const PSchema = new Schema({ sub: [SSchema] });
 

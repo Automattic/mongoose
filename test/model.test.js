@@ -8875,6 +8875,7 @@ describe('Model', function() {
     const { _id } = await Test.create({ test: 'value' });
     const doc = await Test.findById(_id);
     assert.ok(doc);
+    assert.equal(doc.foo, 'bar');
     assert.equal(doc.test, 'value');
   });
 });

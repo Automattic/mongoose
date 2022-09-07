@@ -8772,6 +8772,24 @@ describe('Model', function() {
       assert.equal(error.errors['docArr.0.num'].name, 'CastError');
     });
   });
+
+  it('works if passing class that extends Document to `loadClass()` (gh-12254)', async function() {
+    const DownloadJobSchema = new mongoose.Schema({ test: String });
+
+    class B extends mongoose.Document {
+      get foo() { return 'bar'; }
+    }
+
+    DownloadJobSchema.loadClass(B);
+
+    const Test = db.model('Test', DownloadJobSchema);
+
+    const { _id } = await Test.create({ test: 'value' });
+    const doc = await Test.findById(_id);
+    assert.ok(doc);
+    assert.equal(doc.foo, 'bar');
+    assert.equal(doc.test, 'value');
+  });
 });
 
 describe('Check if static function that is supplied in schema option is available', function() {

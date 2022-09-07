@@ -8864,9 +8864,9 @@ describe('Model', function() {
   it('works if passing class that extends Document to `loadClass()` (gh-12254)', async function() {
     const DownloadJobSchema = new mongoose.Schema({ test: String });
 
-    class B extends mongoose.Document {}
-
-    B.prototype.foo = 'bar';
+    class B extends mongoose.Document {
+      get foo() { return 'bar'; }
+    }
 
     DownloadJobSchema.loadClass(B);
 

@@ -7,7 +7,6 @@ updates:
   open-pull-requests-limit: 100
   target-branch: master
   ignore:
-    - dependency-name: "dox"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

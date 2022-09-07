@@ -1,3 +1,13 @@
+6.5.5 / 2022-09-07
+==================
+ * fix(setDefaultsOnInsert): avoid applying defaults on insert if nested property set #12279
+ * fix(model): make applyHooks() and applyMethods() handle case where custom method is set to Mongoose implementation #12254
+ * fix(types): add string "ascending" and "descending" index-directions #10269
+ * docs: upgrade dox to 1.0.0 #12403 [hasezoey](https://github.com/hasezoey)
+ * docs: update old mongodb nodejs driver documentation urls #12387 [hasezoey](https://github.com/hasezoey)
+ * docs: update JSDOC ... (spread) definition #12388 [hasezoey](https://github.com/hasezoey)
+ * refactor(model): allow optionally passing indexes to createIndexes and cleanIndexes #12280 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 6.5.4 / 2022-08-30
 ==================
  * fix(document): allow calling $assertPopulated() with values to better support manual population #12233

@@ -1476,7 +1476,7 @@ describe('document', function() {
     });
 
     it('validator should run only once per sub-doc gh-1743', async function() {
-      this.timeout(process.env.TRAVIS ? 8000 : 4500);
+      this.timeout(4500);
 
       let count = 0;
       const db = start();

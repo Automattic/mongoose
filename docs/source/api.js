@@ -99,7 +99,7 @@ parse();
  * @property {string} [deprecated] Defines wheter the current Property is signaled as deprecated
  * @property {SeeObject[]} [see] Defines all "@see" references
  * @property {TagObject[]} [param] Defines all "@param" references
- * @property {String} [inherits] Defines the string for "@inherits"
+ * @property {SeeObject} [inherits] Defines the string for "@inherits"
  */
 
 function parse() {
@@ -167,35 +167,7 @@ function parse() {
             // for this type, it needs to be parsed from the string itself to support more than 1 word
             // this is required because "@see" is kinda badly defined and mongoose uses a slightly customized way (longer text and different kinds of links)
 
-            // the following regex matches cases of:
-            // "External Links http://someurl.com/" -> "External Links"
-            // "External https://someurl.com/" -> "External"
-            // "Id href #some_Some-method" -> "Id href"
-            // "Local Absolute /docs/somewhere" -> "Local Absolute"
-            // "No Href" -> "No Href"
-            // "https://someurl.com" -> "" (fallback added)
-            // "Some#Method #something" -> "Some#Method"
-            // The remainder is simply taken by a call to "slice" (also the text is trimmed later)
-            const textMatches = /^(.*? (?=#|\/|(?:https?:)|$))/i.exec(tag.string);
-
-            let text = undefined;
-            let url = undefined;
-            if (textMatches === null || textMatches === undefined) {
-              // warn because this most likely is a badly defined "@see"
-              console.warn(`No Text Matches found in @see for "${ctx.constructor}.${ctx.name}"`)
-
-              // if no text is found, add text as url and use the url itself as the text
-              url = tag.string;
-              text = tag.string;
-            } else {
-              text = textMatches[1].trim();
-              url = tag.string.slice(text.length).trim();
-            }
-
-            ctx.see.push({
-              text: text || 'No Description', // fallback text, so that the final text does not end up as a empty element that cannot be seen
-              url: url || undefined, // change to be "undefined" if text is empty or non-valid
-            });
+            ctx.see.push(extractTextUrlFromTag(tag, ctx, true));
             break;
           case 'receiver':
             console.warn(`Found "@receiver" tag in ${ctx.constructor} ${ctx.name}`);
@@ -241,7 +213,7 @@ function parse() {
             ctx.return = tag;
             break;
           case 'inherits':
-            ctx[tag.type] = tag.string;
+            ctx.inherits = extractTextUrlFromTag(tag, ctx);
             break;
           case 'event':
           case 'param':
@@ -343,4 +315,45 @@ function parse() {
 
     out.push(data);
   }
+}
+
+/**
+ * Extract the Text and Url from a description if any
+ * @param {Tag} tag The tag to process the resulting object from
+ * @param {PropContext} ctx The current ctx for warnings
+ * @param {Boolean} warnOnMissingUrl Warn if the url is missing, false by default
+ * @returns {{ text: string, url: string }}
+ */
+function extractTextUrlFromTag(tag, ctx, warnOnMissingUrl = false) {
+  // the following regex matches cases of:
+  // "External Links http://someurl.com/" -> "External Links"
+  // "External https://someurl.com/" -> "External"
+  // "Id href #some_Some-method" -> "Id href"
+  // "Local Absolute /docs/somewhere" -> "Local Absolute"
+  // "No Href" -> "No Href"
+  // "https://someurl.com" -> "" (fallback added)
+  // "Some#Method #something" -> "Some#Method"
+  // The remainder is simply taken by a call to "slice" (also the text is trimmed later)
+  const textMatches = /^(.*? (?=#|\/|(?:https?:)|$))/i.exec(tag.string);
+
+  let text = undefined;
+  let url = undefined;
+  if (textMatches === null || textMatches === undefined) {
+    if (warnOnMissingUrl) {
+      // warn for the cases where URL should be defined (like in "@see")
+      console.warn(`No Text Matches found in tag for "${ctx.constructor}.${ctx.name}"`)
+    }
+
+    // if no text is found, add text as url and use the url itself as the text
+    url = tag.string;
+    text = tag.string;
+  } else {
+    text = textMatches[1].trim();
+    url = tag.string.slice(text.length).trim();
+  }
+
+  return {
+    text: text || 'No Description', // fallback text, so that the final text does not end up as a empty element that cannot be seen
+    url: url || undefined, // change to be "undefined" if text is empty or non-valid
+  };
 }

@@ -203,17 +203,6 @@ before(dropDBs);
 
 after(dropDBs);
 
-beforeEach(function() {
-  if (this.currentTest) {
-    global.CURRENT_TEST = this.currentTest.title;
-    if (this.currentTest.parent.title) {
-      global.CURRENT_TEST = this.currentTest.parent.title + global.CURRENT_TEST;
-    }
-  } else {
-    global.CURRENT_TEST = 'N/A';
-  }
-});
-
 process.on('unhandledRejection', function(error, promise) {
   if (error.$expected) {
     return;

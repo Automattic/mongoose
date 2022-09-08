@@ -76,6 +76,19 @@ declare module 'mongoose' {
       $count: string;
     }
 
+    export interface Densify{
+      /** [`$densify` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/densify/) */
+      $densify: {
+        field: string,
+        partitionByFields?: string[],
+        range: {
+          step: number,
+          unit?: 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year',
+          bounds: number[] | globalThis.Date[] | 'full' | 'partition'
+        }
+      }
+    }
+
     export interface Facet {
       /** [`$facet` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/facet/) */
       $facet: Record<string, FacetPipelineStage[]>;

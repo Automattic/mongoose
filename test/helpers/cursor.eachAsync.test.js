@@ -188,4 +188,38 @@ describe('eachAsync()', function() {
     assert.equal(err.errors[0].message, 'Fetching doc 1');
     assert.equal(numCalled, 1);
   });
+
+  it('using AbortSignal (gh-12173)', async function() {
+    if (typeof AbortController === 'undefined') {
+      return this.skip();
+    }
+
+    const ac = new AbortController();
+    const signal = ac.signal;
+
+    let numCalled = 0;
+    const abortAfter = 2;
+    let numNextCalls = 0;
+    let numFnCalls = 0;
+    function next(cb) {
+      ++numNextCalls;
+      setImmediate(() => {
+        if (numCalled++ === abortAfter) {
+          ac.abort();
+
+          return setImmediate(() => {
+            cb(null, { num: numCalled });
+          });
+        }
+
+        cb(null, { num: numCalled });
+      });
+    }
+
+    await eachAsync(next, () => ++numFnCalls, { signal });
+
+    assert.equal(numNextCalls, 3);
+    assert.equal(numCalled, 3);
+    assert.equal(numFnCalls, 2);
+  });
 });

@@ -6,7 +6,6 @@ updates:
     interval: "monthly"
   open-pull-requests-limit: 100
   target-branch: master
-  ignore:
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

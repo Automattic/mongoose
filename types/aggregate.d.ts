@@ -69,7 +69,7 @@ declare module 'mongoose' {
 
   class Aggregate<R> implements SessionOperation {
     /**
-     * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js
+     * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js)
      * You do not need to call this function explicitly, the JavaScript runtime
      * will call it for you.
      */

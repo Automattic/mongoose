@@ -8795,6 +8795,35 @@ describe('Model', function() {
       assert.equal(error.errors['subdoc.num'].name, 'CastError');
       assert.equal(error.errors['docArr.0.num'].name, 'CastError');
     });
+    it('should not throw an error if `ignoreCastErrors` is set (gh-12156)', function() {
+      const Test = db.model('Test', mongoose.Schema({
+        _id: false,
+        num: Number,
+        nested: {
+          num: Number
+        },
+        subdoc: {
+          type: mongoose.Schema({
+            _id: false,
+            num: Number
+          }),
+          default: () => ({})
+        },
+        docArr: [{
+          _id: false,
+          num: Number
+        }]
+      }));
+
+      const obj = {
+        num: 'not a number',
+        nested: { num: '2' },
+        subdoc: { num: 'not a number' },
+        docArr: [{ num: '4' }]
+      };
+      const ret = Test.castObject(obj, { ignoreCastErrors: true });
+      assert.deepStrictEqual(ret, { nested: { num: 2 }, docArr: [{ num: 4 }] });
+    });
   });
 
   it('works if passing class that extends Document to `loadClass()` (gh-12254)', async function() {

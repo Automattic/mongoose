@@ -1,3 +1,12 @@
+6.6.0 / 2022-09-08
+==================
+ * feat: upgrade mongodb driver -> 4.9.1 #12370 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat: re-export default Mongoose instance properties for ESM named imports support #12256
+ * feat(model): add option to skip invalid fields with castObject() #12156 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat: use setPrototypeOf() instead of __proto__ to allow running on Deno #12315
+ * feat(QueryCursor): add support for AbortSignal on eachAsync() #12323
+ * feat(types): add types for new $densify operator #12118 [IslandRhythms](https://github.com/IslandRhythms)
+
 6.5.5 / 2022-09-07
 ==================
  * fix(setDefaultsOnInsert): avoid applying defaults on insert if nested property set #12279

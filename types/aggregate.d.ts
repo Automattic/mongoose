@@ -28,6 +28,7 @@ declare module 'mongoose' {
      *  Specifies the initial batch size for the cursor. The value of the cursor field is a document with the field batchSize.
      */
     cursor?: { batchSize?: number; };
+
     /**
      * Specifies to return the information on the processing of the pipeline. See Return Information on Aggregation Pipeline Operation for an example.
      *
@@ -69,7 +70,7 @@ declare module 'mongoose' {
 
   class Aggregate<R> implements SessionOperation {
     /**
-     * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js
+     * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js)
      * You do not need to call this function explicitly, the JavaScript runtime
      * will call it for you.
      */
@@ -110,10 +111,14 @@ declare module 'mongoose' {
     /** Appends a new $count operator to this aggregate pipeline. */
     count(fieldName: PipelineStage.Count['$count']): this;
 
+    /** Appends a new $densify operator to this aggregate pipeline */
+    densify(arg: PipelineStage.Densify['$densify']): this;
+
     /**
      * Sets the cursor option for the aggregation query
      */
     cursor<DocType = any>(options?: Record<string, unknown>): Cursor<DocType>;
+
 
     /** Executes the aggregate pipeline on the currently bound Model. */
     exec(callback: Callback<R>): void;

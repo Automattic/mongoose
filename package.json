@@ -28,7 +28,7 @@
     "sift": "16.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.18.13",
+    "@babel/core": "7.19.0",
     "@typescript-eslint/eslint-plugin": "5.36.2",
     "@typescript-eslint/parser": "5.36.2",
     "acquit": "1.2.1",

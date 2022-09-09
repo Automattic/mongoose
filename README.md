@@ -98,9 +98,9 @@ const BlogPost = new Schema({
 Aside from defining the structure of your documents and the types of data you're storing, a Schema handles the definition of:
 
 * [Validators](http://mongoosejs.com/docs/validation.html) (async and sync)
-* [Defaults](http://mongoosejs.com/docs/api.html#schematype_SchemaType-default)
-* [Getters](http://mongoosejs.com/docs/api.html#schematype_SchemaType-get)
-* [Setters](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set)
+* [Defaults](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-default)
+* [Getters](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-get)
+* [Setters](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set)
 * [Indexes](http://mongoosejs.com/docs/guide.html#indexes)
 * [Middleware](http://mongoosejs.com/docs/middleware.html)
 * [Methods](http://mongoosejs.com/docs/guide.html#methods) definition
@@ -316,7 +316,7 @@ return a cursor.
 
 ## API Docs
 
-Find the API docs [here](http://mongoosejs.com/docs/api.html), generated using [dox](https://github.com/tj/dox)
+Find the API docs [here](http://mongoosejs.com/docs/api/mongoose.html), generated using [dox](https://github.com/tj/dox)
 and [acquit](https://github.com/vkarpov15/acquit).
 
 ## Related Projects

@@ -1,12 +1,12 @@
 <h2 id="schematypes"><a href="#schematypes">SchemaTypes</a></h2>
 
 SchemaTypes handle definition of path
-[defaults](./api.html#schematype_SchemaType-default),
-[validation](./api.html#schematype_SchemaType-validate),
+[defaults](./api/schematype.html#schematype_SchemaType-default),
+[validation](./api/schematype.html#schematype_SchemaType-validate),
 [getters](#getters),
-[setters](./api.html#schematype_SchemaType-set),
-[field selection defaults](./api.html#schematype_SchemaType-select) for
-[queries](./api.html#query-js),
+[setters](./api/schematype.html#schematype_SchemaType-set),
+[field selection defaults](./api/schematype.html#schematype_SchemaType-select) for
+[queries](./api/query-js.html#query-js),
 and other general characteristics for Mongoose document properties.
 
 * [What is a SchemaType?](#what-is-a-schematype)
@@ -50,7 +50,7 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 - [Mixed](#mixed)
 - [ObjectId](#objectids)
 - [Array](#arrays)
-- [Decimal128](./api.html#mongoose_Mongoose-Decimal128)
+- [Decimal128](./api/mongoose.html#mongoose_Mongoose-Decimal128)
 - [Map](#maps)
 - [Schema](#schemas)
 
@@ -460,7 +460,7 @@ console.log(new M({ b: 'nay' }).b); // false
 
 <h4 id="arrays">Arrays</h4>
 
-Mongoose supports arrays of [SchemaTypes](./api.html#schema_Schema-Types)
+Mongoose supports arrays of [SchemaTypes](./api/schema.html#schema_Schema-Types)
 and arrays of [subdocuments](./subdocs.html). Arrays of SchemaTypes are
 also called _primitive arrays_, and arrays of subdocuments are also called
 _document arrays_.

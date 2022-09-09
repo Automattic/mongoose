@@ -235,9 +235,9 @@ connection may emit.
 * `connecting`: Emitted when Mongoose starts making its initial connection to the MongoDB server
 * `connected`: Emitted when Mongoose successfully makes its initial connection to the MongoDB server, or when Mongoose reconnects after losing connectivity. May be emitted multiple times if Mongoose loses connectivity.
 * `open`: Emitted after `'connected'` and `onOpen` is executed on all of this connection's models.
-* `disconnecting`: Your app called [`Connection#close()`](api.html#connection_Connection-close) to disconnect from MongoDB
+* `disconnecting`: Your app called [`Connection#close()`](api/connection.html#connection_Connection-close) to disconnect from MongoDB
 * `disconnected`: Emitted when Mongoose lost connection to the MongoDB server. This event may be due to your code explicitly closing the connection, the database server crashing, or network connectivity issues.
-* `close`: Emitted after [`Connection#close()`](api.html#connection_Connection-close) successfully closes the connection. If you call `conn.close()`, you'll get both a 'disconnected' event and a 'close' event.
+* `close`: Emitted after [`Connection#close()`](api/connection.html#connection_Connection-close) successfully closes the connection. If you call `conn.close()`, you'll get both a 'disconnected' event and a 'close' event.
 * `reconnected`: Emitted if Mongoose lost connectivity to MongoDB and successfully reconnected. Mongoose attempts to [automatically reconnect](https://thecodebarbarian.com/managing-connections-with-the-mongodb-node-driver.html) when it loses connection to the database.
 * `error`: Emitted if an error occurs on a connection, like a `parseError` due to malformed data or a payload larger than [16MB](https://docs.mongodb.com/manual/reference/limits/#BSON-Document-Size).
 * `fullsetup`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to the primary and at least one secondary.
@@ -379,8 +379,8 @@ The `mongoose.createConnection()` function takes the same arguments as
 const conn = mongoose.createConnection('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]', options);
 ```
 
-This [connection](./api.html#connection_Connection) object is then used to
-create and retrieve [models](./api.html#model_Model). Models are
+This [connection](./api/connection.html#connection_Connection) object is then used to
+create and retrieve [models](./api/model.html#model_Model). Models are
 **always** scoped to a single connection.
 
 ```javascript

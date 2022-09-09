@@ -264,8 +264,8 @@ declare module 'mongoose' {
      * This function is responsible for building [indexes](https://docs.mongodb.com/manual/indexes/),
      * unless [`autoIndex`](http://mongoosejs.com/docs/guide.html#autoIndex) is turned off.
      * Mongoose calls this function automatically when a model is created using
-     * [`mongoose.model()`](/docs/api.html#mongoose_Mongoose-model) or
-     * [`connection.model()`](/docs/api.html#connection_Connection-model), so you
+     * [`mongoose.model()`](/docs/api/mongoose.html#mongoose_Mongoose-model) or
+     * [`connection.model()`](/docs/api/connection.html#connection_Connection-model), so you
      * don't need to call it.
      */
     init(callback?: CallbackWithoutResult): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;

@@ -829,6 +829,9 @@ describe('types array', function() {
         colors: [{
           _id: false,
           hex: { type: String, default: '#ffffff' },
+          properties: {
+            hue: { type: Number, default: 0 }
+          },
           name: String
         }]
       });

@@ -822,6 +822,30 @@ describe('types array', function() {
         });
       });
     });
+
+    it('avoids adding default paths to query filter (gh-12294)', async function() {
+      const catschema = new Schema({
+        name: String,
+        colors: [{
+          _id: false,
+          hex: { type: String, default: '#ffffff' },
+          name: String
+        }]
+      });
+      const Cat = db.model('Test', catschema);
+
+      const cat = new Cat({});
+      cat.init({
+        name: 'Garfield',
+        colors: [{ name: 'Orange' }]
+      });
+
+      cat.colors.pull({ name: 'Orange' });
+      assert.deepStrictEqual(cat.colors.$__getAtomics(), [[
+        '$pull',
+        { $or: [{ name: 'Orange' }] }
+      ]]);
+    });
   });
 
   describe('$pop()', function() {

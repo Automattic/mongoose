@@ -1,3 +1,4 @@
+import { PipelineStage } from 'mongoose';
 import type { Expression } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
@@ -220,4 +221,22 @@ const switchExpr: Expression.Switch = {
 
 (function gh12149() {
   const count: Expression.Count = { $count: '$value' };
+})();
+
+(function gh12417() {
+  const query: PipelineStage[] = [
+    {
+      $group: {
+        group: {
+          $topN: {
+            output: ['$field'],
+            sortBy: {
+              field: -1.0
+            },
+            n: 7.0
+          }
+        }
+      }
+    }
+  ];
 })();

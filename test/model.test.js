@@ -8846,7 +8846,7 @@ describe('Model', function() {
 
   describe('Check if static function that is supplied in schema option is available', function() {
     it('should give a static function back rather than undefined', function() {
-      const testSchema = new db.Schema({}, { statics: { staticFn() { return 'Returned from staticFn'; } } });
+      const testSchema = new Schema({}, { statics: { staticFn() { return 'Returned from staticFn'; } } });
       const TestModel = db.model('TestModel', testSchema);
       assert.equal(TestModel.staticFn(), 'Returned from staticFn');
     });

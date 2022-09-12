@@ -118,8 +118,11 @@ function getUri(default_uri, db) {
   const env = process.env.START_REPLICA_SET ? process.env.MONGOOSE_REPLSET_URI : process.env.MONGOOSE_TEST_URI;
   const use = env ? env : default_uri;
   const lastIndex = use.lastIndexOf('/');
+  const dbQueryString = use.slice(lastIndex);
+  const queryIndex = dbQueryString.indexOf('?');
+  const query = queryIndex === -1 ? '' : '?' + dbQueryString.slice(queryIndex + 1);
   // use length if lastIndex is 9 or lower, because that would mean it found the last character of "mongodb://"
-  return use.slice(0, lastIndex <= 9 ? use.length : lastIndex) + `/${db}`;
+  return use.slice(0, lastIndex <= 9 ? use.length : lastIndex) + `/${db}` + query;
 }
 
 /**

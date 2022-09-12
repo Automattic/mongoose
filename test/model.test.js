@@ -6213,7 +6213,6 @@ describe('Model', function() {
       });
     });
     describe('Model.syncIndexes()', () => {
-      afterEach(() => db.dropDatabase());
       it('adds indexes to the collection', async() => {
         // Arrange
         const collectionName = generateRandomCollectionName();

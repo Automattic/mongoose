@@ -2835,7 +2835,8 @@ declare module 'mongoose' {
     Expression.Push |
     Expression.StdDevPop |
     Expression.StdDevSamp |
-    Expression.Sum;
+    Expression.Sum |
+    Expression.TopN;
 
   export type tzExpression = UTCOffset | StringExpressionOperatorReturningBoolean | string;
 

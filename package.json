@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "6.6.0",
+  "version": "6.6.1",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -28,9 +28,9 @@
     "sift": "16.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.18.13",
-    "@typescript-eslint/eslint-plugin": "5.36.1",
-    "@typescript-eslint/parser": "5.36.1",
+    "@babel/core": "7.19.0",
+    "@typescript-eslint/eslint-plugin": "5.36.2",
+    "@typescript-eslint/parser": "5.36.2",
     "acquit": "1.2.1",
     "acquit-ignore": "0.2.0",
     "acquit-require": "0.1.1",
@@ -62,8 +62,8 @@
     "stream-browserify": "3.0.0",
     "ts-benchmark": "^1.1.10",
     "tsd": "0.23.0",
-    "typescript": "4.8.2",
-    "uuid": "8.3.2",
+    "typescript": "4.8.3",
+    "uuid": "9.0.0",
     "webpack": "5.74.0"
   },
   "directories": {

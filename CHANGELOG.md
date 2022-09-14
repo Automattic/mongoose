@@ -1,3 +1,11 @@
+6.6.1 / 2022-09-14
+==================
+ * fix: correctly apply defaults after subdoc init #12328
+ * fix(array): avoid using default _id when using pull() #12294
+ * fix: allow null values inside $expr objects #12429 [MartinDrost](https://github.com/MartinDrost)
+ * fix(query): use correct Query constructor when cloning query #12418
+ * docs(website): remove setting "latest38x" which is not used anywhere #12396 [hasezoey](https://github.com/hasezoey)
+
 6.6.0 / 2022-09-08
 ==================
  * feat: upgrade mongodb driver -> 4.9.1 #12370 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

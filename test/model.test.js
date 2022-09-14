@@ -6213,7 +6213,6 @@ describe('Model', function() {
       });
     });
     describe('Model.syncIndexes()', () => {
-      afterEach(() => db.dropDatabase());
       it('adds indexes to the collection', async() => {
         // Arrange
         const collectionName = generateRandomCollectionName();
@@ -8843,13 +8842,13 @@ describe('Model', function() {
     assert.equal(doc.foo, 'bar');
     assert.equal(doc.test, 'value');
   });
-});
 
-describe('Check if static function that is supplied in schema option is available', function() {
-  it('should give a static function back rather than undefined', function ModelJS() {
-    const testSchema = new mongoose.Schema({}, { statics: { staticFn() { return 'Returned from staticFn'; } } });
-    const TestModel = mongoose.model('TestModel', testSchema);
-    assert.equal(TestModel.staticFn(), 'Returned from staticFn');
+  describe('Check if static function that is supplied in schema option is available', function() {
+    it('should give a static function back rather than undefined', function() {
+      const testSchema = new Schema({}, { statics: { staticFn() { return 'Returned from staticFn'; } } });
+      const TestModel = db.model('TestModel', testSchema);
+      assert.equal(TestModel.staticFn(), 'Returned from staticFn');
+    });
   });
 });
 

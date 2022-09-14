@@ -11833,6 +11833,37 @@ describe('document', function() {
 
     assert.ok(doc.nestedPath1.mapOfSchema);
   });
+
+  it('correct context for default functions in subdocuments with init (gh-12328)', async function() {
+    let called = 0;
+
+    const subSchema = new mongoose.Schema({
+      propertyA: { type: String },
+      propertyB: {
+        type: String,
+        default: function() {
+          ++called;
+          return this.propertyA;
+        }
+      }
+    });
+
+    const testSchema = new mongoose.Schema(
+      {
+        name: String,
+        sub: { type: subSchema, default: () => ({}) }
+      }
+    );
+
+    const Test = db.model('Test', testSchema);
+
+    await Test.collection.insertOne({ name: 'test', sub: { propertyA: 'foo' } });
+    assert.strictEqual(called, 0);
+
+    const doc = await Test.findOne({ name: 'test' });
+    assert.strictEqual(doc.sub.propertyB, 'foo');
+    assert.strictEqual(called, 1);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

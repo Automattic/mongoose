@@ -11835,11 +11835,17 @@ describe('document', function() {
   });
 
   it('correct context for default functions in subdocuments with init (gh-12328)', async function() {
+    let called = 0;
+
     const subSchema = new mongoose.Schema({
       propertyA: { type: String },
-      propertyB: { type: String, default: function() {
-        return this.propertyA;
-      } }
+      propertyB: {
+        type: String,
+        default: function() {
+          ++called;
+          return this.propertyA;
+        }
+      }
     });
 
     const testSchema = new mongoose.Schema(
@@ -11852,8 +11858,11 @@ describe('document', function() {
     const Test = db.model('Test', testSchema);
 
     await Test.collection.insertOne({ name: 'test', sub: { propertyA: 'foo' } });
+    assert.strictEqual(called, 0);
+
     const doc = await Test.findOne({ name: 'test' });
     assert.strictEqual(doc.sub.propertyB, 'foo');
+    assert.strictEqual(called, 1);
   });
 });
 

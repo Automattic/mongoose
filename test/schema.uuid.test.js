@@ -100,4 +100,9 @@ describe('SchemaUUID', function() {
     assert.strictEqual(foundDocAll[0].y[1], 'f004416b-e02a-4212-ac77-2d3fcf04898b');
     assert.strictEqual(foundDocAll[0].y[2], '5b544b71-8988-422b-a4df-bf691939fe4e');
   });
+
+  // the following are TODOs based on SchemaUUID.prototype.$conditionalHandlers which are not tested yet
+  it('should work with $bits* operators');
+  it('should work with $all operator');
+  it('should work with $lt, $lte, $gt, $gte operators');
 });

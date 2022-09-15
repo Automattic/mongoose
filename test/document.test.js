@@ -38,7 +38,7 @@ function TestDocument() {
  * Inherits from Document.
  */
 
-TestDocument.prototype.__proto__ = Document.prototype;
+Object.setPrototypeOf(TestDocument.prototype, Document.prototype);
 
 for (const i in EventEmitter.prototype) {
   TestDocument[i] = EventEmitter.prototype[i];
@@ -1476,7 +1476,7 @@ describe('document', function() {
     });
 
     it('validator should run only once per sub-doc gh-1743', async function() {
-      this.timeout(process.env.TRAVIS ? 8000 : 4500);
+      this.timeout(4500);
 
       let count = 0;
       const db = start();
@@ -11753,6 +11753,12 @@ describe('document', function() {
         const res = await Test.findById(doc);
         assert.equal(res.docArr[0].counter, 1);
       });
+      it('Splice call registers path modification', async function() {
+        await Test.create({ docArr: [{ counter: 0 }, { counter: 2 }, { counter: 3 }, { counter: 4 }] });
+        const doc = await Test.findOne();
+        doc.docArr.splice(1, 0, { counter: 1 });
+        assert.equal(doc.isModified('docArr'), true);
+      });
     });
 
     it('stores CastError if trying to $inc a non-numeric path', async function() {
@@ -11771,7 +11777,7 @@ describe('document', function() {
     });
   });
 
-  it('supports virtuals named isValid (gh-12124) (gh-6262)', async function() {
+  it('supports virtuals named `isValid` (gh-12124) (gh-6262)', async function() {
     const Schema = new mongoose.Schema({
       test: String,
       data: { sub: String }
@@ -11797,6 +11803,66 @@ describe('document', function() {
     doc.set({ data: { sub: 'sub' } });
     await doc.save();
     assert.equal(doc.data.sub, 'sub');
+  });
+
+  it('handles maps when applying defaults to nested paths (gh-12220)', async function() {
+    const nestedSchema = new mongoose.Schema({
+      1: {
+        type: Number,
+        default: 0
+      }
+    });
+
+    const topSchema = new mongoose.Schema({
+      nestedPath1: {
+        mapOfSchema: {
+          type: Map,
+          of: nestedSchema
+        }
+      }
+    });
+
+    const Test = db.model('Test', topSchema);
+
+    const data = {
+      nestedPath1: {
+        mapOfSchema: {}
+      }
+    };
+    const doc = await Test.create(data);
+
+    assert.ok(doc.nestedPath1.mapOfSchema);
+  });
+
+  it('correct context for default functions in subdocuments with init (gh-12328)', async function() {
+    let called = 0;
+
+    const subSchema = new mongoose.Schema({
+      propertyA: { type: String },
+      propertyB: {
+        type: String,
+        default: function() {
+          ++called;
+          return this.propertyA;
+        }
+      }
+    });
+
+    const testSchema = new mongoose.Schema(
+      {
+        name: String,
+        sub: { type: subSchema, default: () => ({}) }
+      }
+    );
+
+    const Test = db.model('Test', testSchema);
+
+    await Test.collection.insertOne({ name: 'test', sub: { propertyA: 'foo' } });
+    assert.strictEqual(called, 0);
+
+    const doc = await Test.findOne({ name: 'test' });
+    assert.strictEqual(doc.sub.propertyB, 'foo');
+    assert.strictEqual(called, 1);
   });
 });
 

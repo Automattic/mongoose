@@ -1,3 +1,60 @@
+6.6.1 / 2022-09-14
+==================
+ * fix: correctly apply defaults after subdoc init #12328
+ * fix(array): avoid using default _id when using pull() #12294
+ * fix: allow null values inside $expr objects #12429 [MartinDrost](https://github.com/MartinDrost)
+ * fix(query): use correct Query constructor when cloning query #12418
+ * docs(website): remove setting "latest38x" which is not used anywhere #12396 [hasezoey](https://github.com/hasezoey)
+
+6.6.0 / 2022-09-08
+==================
+ * feat: upgrade mongodb driver -> 4.9.1 #12370 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat: re-export default Mongoose instance properties for ESM named imports support #12256
+ * feat(model): add option to skip invalid fields with castObject() #12156 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat: use setPrototypeOf() instead of __proto__ to allow running on Deno #12315
+ * feat(QueryCursor): add support for AbortSignal on eachAsync() #12323
+ * feat(types): add types for new $densify operator #12118 [IslandRhythms](https://github.com/IslandRhythms)
+
+6.5.5 / 2022-09-07
+==================
+ * fix(setDefaultsOnInsert): avoid applying defaults on insert if nested property set #12279
+ * fix(model): make applyHooks() and applyMethods() handle case where custom method is set to Mongoose implementation #12254
+ * fix(types): add string "ascending" and "descending" index-directions #10269
+ * docs: upgrade dox to 1.0.0 #12403 [hasezoey](https://github.com/hasezoey)
+ * docs: update old mongodb nodejs driver documentation urls #12387 [hasezoey](https://github.com/hasezoey)
+ * docs: update JSDOC ... (spread) definition #12388 [hasezoey](https://github.com/hasezoey)
+ * refactor(model): allow optionally passing indexes to createIndexes and cleanIndexes #12280 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+6.5.4 / 2022-08-30
+==================
+ * fix(document): allow calling $assertPopulated() with values to better support manual population #12233
+ * fix(connection+mongoose): better handling for calling model() with 1 argument #12359
+ * fix(model): allow defining discriminator virtuals and methods using schema options #12326
+ * fix(types): fix MongooseQueryMiddleware missing "findOneAndReplace" and "replaceOne" #12330 #12329 [Jule-](https://github.com/Jule-) [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): fix replaceOne return type #12351 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): use this for return type from $assertPopulated() #12234
+ * docs: highlight how to connect using auth in README #12354 [AntonyOnScript](https://github.com/AntonyOnScript)
+ * docs: improve jsdoc comments for private methods #12337 [hasezoey](https://github.com/hasezoey)
+ * docs: fix minor typo in compatibility table header #12355 [skyme5](https://github.com/skyme5)
+
+6.5.3 / 2022-08-24
+==================
+ * fix(document): handle maps when applying defaults to nested paths #12322
+ * fix(schema): make ArraySubdocuments apply _id defaults on init #12264
+ * fix(populate): handle specifying recursive populate as a string with discriminators #12266
+ * perf(types): remove extends Query in Schema.pre() and Schema.post(), loosen `discriminator()` generic #10349
+ * perf(types): some more micro-optimizations re: #10349, remove extra type checking on $ne, etc.
+ * fix(types): infer schema on `connection.model()` #12298 #12125 [hasezoey](https://github.com/hasezoey)
+ * fix(types): add missing `findById()` type definitions #12309 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): allow $search in $lookup pipeline stages for MongoDB v6.x support #12278 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(types): add parameter "options" to "Model.remove" #12258 [hasezoey](https://github.com/hasezoey)
+ * fix(types): sync single-generic-no-constraint "model" between "index.d.ts" and "connection.d.ts" #12299 [hasezoey](https://github.com/hasezoey)
+ * fix(types): update isDirectModified typing #12290 [gabrielDonnantuoni](https://github.com/gabrielDonnantuoni)
+ * docs: update links on api docs #12293 [eatmoarrice](https://github.com/eatmoarrice)
+ * docs: add note about language_override option #12310 [IslandRhythms](https://github.com/IslandRhythms)
+ * docs(document): add "String[]" to Document.depopulate as jsdoc parameter type #12300 [hasezoey](https://github.com/hasezoey)
+ * docs: update Node.js EventEmitter url #12303 [rainrisa](https://github.com/rainrisa)
+
 5.13.15 / 2022-08-22
 ====================
  * fix: backport fix for CVE-2022-2564 #12281 [shubanker](https://github.com/shubanker)

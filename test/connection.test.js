@@ -15,7 +15,6 @@ const MongooseError = require('../lib/error/index');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
-const uri = start.uri;
 
 /**
  * Test.
@@ -26,7 +25,7 @@ describe('connections:', function() {
 
   describe('openUri (gh-5304)', function() {
     it('with mongoose.createConnection()', function() {
-      const conn = mongoose.createConnection('mongodb://127.0.0.1/mongoosetest');
+      const conn = mongoose.createConnection(start.uri.slice(0, start.uri.lastIndexOf('/')) + '/' + start.databases[0]);
       assert.equal(conn.constructor.name, 'NativeConnection');
 
       const Test = conn.model('Test', new Schema({ name: String }));
@@ -37,9 +36,12 @@ describe('connections:', function() {
       return conn.asPromise().
         then(function(conn) {
           assert.equal(conn.constructor.name, 'NativeConnection');
-          assert.equal(conn.host, '127.0.0.1');
-          assert.equal(conn.port, 27017);
-          assert.equal(conn.name, 'mongoosetest');
+          // the regex below extract the first ip & port, because the created connection's properties only have the first anyway as "host" and "port"
+          const match = /mongodb:\/\/([\d.]+)(?::(\d+))?(?:,[\d.]+(?::\d+)?)*\/(\w+)/i.exec(start.uri);
+          assert.ok(match);
+          assert.equal(conn.host, match[1]);
+          assert.equal(conn.port, parseInt(match[2]));
+          assert.equal(conn.name, start.databases[0]);
 
           return findPromise;
         }).
@@ -57,7 +59,7 @@ describe('connections:', function() {
     });
 
     it('with autoCreate (gh-6489)', async function() {
-      const conn = await mongoose.createConnection(uri, {
+      const conn = await mongoose.createConnection(start.uri, {
         // autoCreate: true
       }).asPromise();
 
@@ -81,7 +83,7 @@ describe('connections:', function() {
     });
 
     it('with autoCreate = false (gh-8814)', async function() {
-      const conn = await mongoose.createConnection(uri, {
+      const conn = await mongoose.createConnection(start.uri, {
         autoCreate: false
       }).asPromise();
 
@@ -96,7 +98,7 @@ describe('connections:', function() {
     });
 
     it('autoCreate when collection already exists does not fail (gh-7122)', async function() {
-      const conn = await mongoose.createConnection(uri).asPromise();
+      const conn = await mongoose.createConnection(start.uri).asPromise();
 
       const schema = new mongoose.Schema({
         name: {
@@ -484,7 +486,7 @@ describe('connections:', function() {
   });
 
   it('uses default database in uri if options.dbName is not provided', function() {
-    return mongoose.createConnection('mongodb://127.0.0.1:27017/default-db-name').
+    return mongoose.createConnection(start.uri.slice(0, start.uri.lastIndexOf('/')) + '/default-db-name').
       asPromise().
       then(db => {
         assert.equal(db.name, 'default-db-name');
@@ -560,7 +562,7 @@ describe('connections:', function() {
 
     it('saves correctly', async function() {
       const db = start();
-      const db2 = db.useDb('mongoose-test-2');
+      const db2 = db.useDb(start.databases[1]);
 
       const schema = new Schema({
         body: String,
@@ -595,7 +597,7 @@ describe('connections:', function() {
 
     it('emits connecting events on both', async function() {
       const db = mongoose.createConnection();
-      const db2 = db.useDb('mongoose-test-2');
+      const db2 = db.useDb(start.databases[1]);
       let hit = false;
 
       db2.on('connecting', async function() {
@@ -617,7 +619,7 @@ describe('connections:', function() {
 
     it('emits connected events on both', function() {
       const db = mongoose.createConnection();
-      const db2 = db.useDb('mongoose-test-2');
+      const db2 = db.useDb(start.databases[1]);
       let hit = false;
 
       db2.on('connected', function() {
@@ -638,7 +640,7 @@ describe('connections:', function() {
 
     it('emits open events on both', function() {
       const db = mongoose.createConnection();
-      const db2 = db.useDb('mongoose-test-2');
+      const db2 = db.useDb(start.databases[1]);
       let hit = false;
       db2.on('open', function() {
         hit && close();
@@ -658,7 +660,7 @@ describe('connections:', function() {
 
     it('emits disconnecting events on both, closing initial db', function(done) {
       const db = mongoose.createConnection();
-      const db2 = db.useDb('mongoose-test-2');
+      const db2 = db.useDb(start.databases[1]);
       let hit = false;
       db2.on('disconnecting', function() {
         hit && done();
@@ -676,7 +678,7 @@ describe('connections:', function() {
 
     it('emits disconnecting events on both, closing secondary db', function(done) {
       const db = mongoose.createConnection();
-      const db2 = db.useDb('mongoose-test-2');
+      const db2 = db.useDb(start.databases[1]);
       let hit = false;
       db2.on('disconnecting', function() {
         hit && done();
@@ -694,7 +696,7 @@ describe('connections:', function() {
 
     it('emits disconnected events on both, closing initial db', function(done) {
       const db = mongoose.createConnection();
-      const db2 = db.useDb('mongoose-test-2');
+      const db2 = db.useDb(start.databases[1]);
       let hit = false;
       db2.on('disconnected', function() {
         hit && done();
@@ -712,7 +714,7 @@ describe('connections:', function() {
 
     it('emits disconnected events on both, closing secondary db', function(done) {
       const db = mongoose.createConnection();
-      const db2 = db.useDb('mongoose-test-2');
+      const db2 = db.useDb(start.databases[1]);
       let hit = false;
       db2.on('disconnected', function() {
         hit && done();
@@ -730,7 +732,7 @@ describe('connections:', function() {
 
     it('closes correctly for all dbs, closing initial db', async function() {
       const db = await start({ noErrorListener: true }).asPromise();
-      const db2 = db.useDb('mongoose-test-2');
+      const db2 = db.useDb(start.databases[1]);
 
       const p = new Promise(resolve => {
         db2.on('close', function() {
@@ -743,7 +745,7 @@ describe('connections:', function() {
 
     it('handles re-opening base connection (gh-11240)', async function() {
       const db = await start().asPromise();
-      const db2 = db.useDb('mongoose-test-2');
+      const db2 = db.useDb(start.databases[1]);
 
       await db.close();
 
@@ -753,7 +755,7 @@ describe('connections:', function() {
 
     it('closes correctly for all dbs, closing secondary db', function(done) {
       const db = start();
-      const db2 = db.useDb('mongoose-test-2');
+      const db2 = db.useDb(start.databases[1]);
 
       db.on('disconnected', function() {
         done();
@@ -763,8 +765,8 @@ describe('connections:', function() {
 
     it('cache connections to the same db', function() {
       const db = start();
-      const db2 = db.useDb('mongoose-test-2', { useCache: true });
-      const db3 = db.useDb('mongoose-test-2', { useCache: true });
+      const db2 = db.useDb(start.databases[1], { useCache: true });
+      const db3 = db.useDb(start.databases[1], { useCache: true });
 
       assert.strictEqual(db2, db3);
       db.close();
@@ -1451,4 +1453,16 @@ describe('connections:', function() {
     });
   });
 
+  it('model() works with 1 argument and overwriteModels set to true (gh-12359)', function() {
+    const m = new mongoose.Mongoose();
+    m.set('overwriteModels', true);
+
+    const Test = m.model('Test', new Schema({ name: String }));
+
+    assert.equal(m.model('Test'), Test);
+
+    const Test2 = m.connection.model('Test2', new Schema({ name: String }));
+
+    assert.equal(m.connection.model('Test2'), Test2);
+  });
 });

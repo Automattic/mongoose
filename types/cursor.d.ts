@@ -14,7 +14,7 @@ declare module 'mongoose' {
     [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
 
     /**
-     * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
+     * Adds a [cursor flag](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html#addCursorFlag).
      * Useful for setting the `noCursorTimeout` and `tailable` flags.
      */
     addCursorFlag(flag: CursorFlag, value: boolean): this;

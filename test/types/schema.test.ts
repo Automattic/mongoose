@@ -85,6 +85,10 @@ movieSchema.index({ title: 'text' }, {
 });
 movieSchema.index({ rating: -1 });
 movieSchema.index({ title: 1 }, { unique: true });
+movieSchema.index({ tile: 'ascending' });
+movieSchema.index({ tile: 'asc' });
+movieSchema.index({ tile: 'descending' });
+movieSchema.index({ tile: 'desc' });
 
 // Using `SchemaDefinition`
 interface IProfile {

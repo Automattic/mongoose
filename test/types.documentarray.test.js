@@ -29,7 +29,7 @@ function TestDoc(schema) {
    * Inherits from ArraySubdocument.
    */
 
-  Subdocument.prototype.__proto__ = ArraySubdocument.prototype;
+  Object.setPrototypeOf(Subdocument.prototype, ArraySubdocument.prototype);
 
   /**
    * Set schema.
@@ -747,5 +747,19 @@ describe('types.documentarray', function() {
 
     doc.arr.push(subdoc);
     await doc.validate();
+  });
+
+  it('applies _id default (gh-12264)', function() {
+    mongoose.deleteModel(/Test/);
+    const nestedArraySchema = Schema({
+      subDocArray: [{ name: String }]
+    });
+
+    const Model = db.model('Test', nestedArraySchema);
+    const doc = new Model().init({
+      subDocArray: [{ name: 'foo' }]
+    });
+
+    assert.ok(doc.subDocArray[0]._id instanceof mongoose.Types.ObjectId);
   });
 });

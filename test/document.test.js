@@ -11864,6 +11864,18 @@ describe('document', function() {
     assert.strictEqual(doc.sub.propertyB, 'foo');
     assert.strictEqual(called, 1);
   });
+
+  it('If the field does not exist, $inc should create it and set is value to the specified one (gh-12435)', async function() {
+    const schema = new mongoose.Schema({
+      count: Number
+    });
+    const Model = db.model('IncTest', schema);
+    const doc = new Model({ });
+    await doc.save();
+    doc.$inc('count', 1);
+    await doc.save();
+    assert.strictEqual(doc.count, 1);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

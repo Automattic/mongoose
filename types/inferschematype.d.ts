@@ -161,7 +161,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
             PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
               PathValueType extends BooleanSchemaDefinition ? boolean :
                 PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId :
-                  PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
+                  PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 | Schema.Types.Decimal128 ? Types.Decimal128 :
                     PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
                       PathValueType extends ArrayConstructor ? any[] :
                         PathValueType extends typeof Schema.Types.Mixed ? any:

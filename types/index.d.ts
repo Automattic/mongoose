@@ -323,11 +323,11 @@ declare module 'mongoose' {
     virtualpath<T = HydratedDocument<DocType, TInstanceMethods>>(name: string): VirtualType<T> | null;
   }
 
-  export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;
-  export type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String;
-  export type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean;
-  export type DateSchemaDefinition = typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date;
-  export type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId;
+  export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number | Number;
+  export type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String | String;
+  export type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean | Boolean;
+  export type DateSchemaDefinition = typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date | Date;
+  export type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId | Schema.Types.ObjectId;
 
   export type SchemaDefinitionWithBuiltInClass<T> = T extends number
     ? NumberSchemaDefinition

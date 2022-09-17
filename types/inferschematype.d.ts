@@ -69,7 +69,7 @@ type IsPathRequired<P, TypeKey extends TypeKeyBaseType> =
   P extends { required: true | [true, string | undefined] } | ArrayConstructor | any[]
     ? true
     : P extends (Record<TypeKey, ArrayConstructor | any[]>)
-      ? P extends { default: undefined }
+      ? P extends { default: undefined } | { required: false }
         ? false
         : true
       : P extends (Record<TypeKey, any>)

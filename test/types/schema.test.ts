@@ -741,3 +741,32 @@ function pluginOptions() {
   schema.plugin<any, SomePluginOptions>(pluginFunction2, { option2: 0 });
   expectError(schema.plugin<any, SomePluginOptions>(pluginFunction2, {})); // should error because "option2" is not optional
 }
+
+function gh12420() {
+  const TestSchema = new Schema(
+    {
+      comments: { type: [String], required: false },
+      reference: {
+        type: [
+          {
+            type: { type: String, required: false },
+            value: { type: String, required: false }
+          }
+        ],
+        required: false
+      }
+    },
+    {
+      collection: 'tests',
+      timestamps: false
+    }
+  );
+
+  expectType<{
+    comments?: string[],
+    reference?: {
+      type?: string,
+      value?: string
+    }[]
+  }>({} as InferSchemaType<typeof TestSchema>);
+}

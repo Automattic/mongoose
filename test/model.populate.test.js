@@ -7350,7 +7350,7 @@ describe('model: populate:', function() {
 
       clickedSchema.virtual('users_$', {
         ref: function(doc) {
-          return doc.events[0].users[0].refKey;
+          return doc.users[0].refKey;
         },
         localField: 'users.ID',
         foreignField: 'employeeId'
@@ -7414,7 +7414,7 @@ describe('model: populate:', function() {
 
       clickedSchema.virtual('users_$', {
         ref: function(doc) {
-          const refKeys = doc.events[0].users.map(user => user.refKey);
+          const refKeys = doc.users.map(user => user.refKey);
           return refKeys;
         },
         localField: 'users.ID',
@@ -7436,6 +7436,15 @@ describe('model: populate:', function() {
               { ID: 1, refKey: 'User' },
               { ID: 2, refKey: 'Author' }
             ]
+          },
+          {
+            kind: 'Clicked',
+            element: '#hero',
+            message: 'hello',
+            users: [
+              { ID: 2, refKey: 'Author' },
+              { ID: 1, refKey: 'User' }
+            ]
           }
         ]
       };
@@ -7447,6 +7456,8 @@ describe('model: populate:', function() {
       const doc = await Batch.findOne({}).populate('events.users_$');
       assert.strictEqual(doc.events[0].users_$[0].name, 'Test name');
       assert.strictEqual(doc.events[0].users_$[1].name, 'Author Name');
+      assert.strictEqual(doc.events[1].users_$[0].name, 'Author Name');
+      assert.strictEqual(doc.events[1].users_$[1].name, 'Test name');
     });
 
     it('uses getter if one is defined on the localField (gh-6618)', async function() {
@@ -10827,6 +10838,186 @@ describe('model: populate:', function() {
         then(() => null, err => err);
       assert.ok(err);
       assert.ok(err.message.includes('strictPopulate'), err.message);
+    });
+  });
+
+  describe('dynamic virtual populate on nested schema (gh-12363)', function() {
+    const referredSchemaA = new Schema({
+      name: String,
+    });
+
+    const referredSchemaB = new Schema({
+      name: String,
+    });
+
+    const nestedSchema = new Schema({
+      name: String,
+      refType: String,
+      refId: Schema.Types.ObjectId,
+      refName: String,
+    }, {
+      virtuals: {
+        dynRef: {
+          options: {
+            ref: doc => doc.refType,
+            localField: 'refId',
+            foreignField: '_id',
+            justOne: true,
+          }
+        },
+        refPath: {
+          options: {
+            refPath: 'refType',
+            localField: 'refId',
+            foreignField: '_id',
+            justOne: true,
+          }
+        },
+        dynRefFields: {
+          options: {
+            refPath: 'refType',
+            localField: doc => doc.refName ? 'refName' : 'refId',
+            foreignField: doc => doc.refName ? 'name' : '_id',
+            justOne: true,
+          }
+        },
+        dynMatch: {
+          options: {
+            ref: doc => doc.refType,
+            localField: 'refId',
+            foreignField: '_id',
+            match: doc => ({ name: doc.refName }),
+            justOne: true,
+          }
+        },
+        dynRefMultiLocalField: {
+          options: {
+            ref: doc => doc.refType,
+            localField: doc => ['refName', 'refId'],
+            foreignField: ['name', '_id'],
+            justOne: true,
+          }
+        }
+      }
+    });
+
+    it('populate virtual on sub-document', async function() {
+      const ReferredA = db.model('ReferredA', referredSchemaA);
+      const ReferredB = db.model('ReferredB', referredSchemaB);
+      const referredA1 = await ReferredA.create({ name: 'referredA1' });
+      const referredB1 = await ReferredB.create({ name: 'referredB1' });
+
+      const NestedTest = db.model('NestedTest', new Schema({
+        nested: nestedSchema,
+      }));
+      const nestedTest1 = new NestedTest({
+        nested: {
+          refType: 'ReferredA',
+          refId: referredA1._id,
+        }
+      });
+      await nestedTest1.populate('nested.dynRef');
+      await nestedTest1.populate('nested.refPath');
+      await nestedTest1.populate('nested.dynRefFields');
+      assert.equal(nestedTest1.nested.dynRef.name, referredA1.name);
+      assert.equal(nestedTest1.nested.refPath.name, referredA1.name);
+      assert.equal(nestedTest1.nested.dynRefFields.name, referredA1.name);
+
+      const nestedTest2 = new NestedTest({
+        nested: {
+          refType: 'ReferredB',
+          refId: referredB1._id,
+          refName: referredB1.name,
+        }
+      });
+      await nestedTest2.populate(['nested.dynRef', 'nested.refPath', 'nested.dynMatch', 'nested.dynRefMultiLocalField']);
+      assert.equal(nestedTest2.nested.dynRef.name, referredB1.name);
+      assert.equal(nestedTest2.nested.refPath.name, referredB1.name);
+      assert.equal(nestedTest2.nested.dynMatch.name, referredB1.name);
+      assert.equal(nestedTest2.nested.dynRefMultiLocalField.name, referredB1.name);
+
+      const nestedTest3 = new NestedTest({});
+      await nestedTest3.populate('nested.dynRef');
+      assert.equal(nestedTest3.nested?.dynRef, undefined);
+    });
+
+    it('populate virtual on sub-document array', async function() {
+      const ReferredA = db.model('ReferredA', referredSchemaA);
+      const ReferredB = db.model('ReferredB', referredSchemaB);
+      const referredA1 = await ReferredA.create({ name: 'referredA1' });
+      const referredB1 = await ReferredB.create({ name: 'referredB1' });
+
+      const NestedTest = db.model('NestedTest', new Schema({
+        nested: [nestedSchema],
+      }));
+      const nestedTest1 = new NestedTest({
+        nested: [{
+          refType: 'ReferredA',
+          refId: referredA1._id,
+        }, {
+          refType: 'ReferredA',
+          refId: referredA1._id,
+          refName: referredA1.name,
+        }, {
+          refType: 'ReferredB',
+          refId: referredB1._id,
+          refName: referredB1.name,
+        }]
+      });
+      await nestedTest1.populate([
+        'nested.dynRef',
+        'nested.refPath',
+      ]);
+      assert.equal(nestedTest1.nested[0].dynRef.name, referredA1.name);
+      assert.equal(nestedTest1.nested[0].refPath.name, referredA1.name);
+      assert.equal(nestedTest1.nested[1].dynRef.name, referredA1.name);
+      assert.equal(nestedTest1.nested[1].refPath.name, referredA1.name);
+      assert.equal(nestedTest1.nested[2].dynRef.name, referredB1.name);
+      assert.equal(nestedTest1.nested[2].refPath.name, referredB1.name);
+    });
+
+    it('populate virtual on deeply nested sub-document', async function() {
+      const ReferredA = db.model('ReferredA', referredSchemaA);
+      const ReferredB = db.model('ReferredB', referredSchemaB);
+      const referredA1 = await ReferredA.create({ name: 'referredA1' });
+      const referredA2 = await ReferredA.create({ name: 'referredA2' });
+      const referredB1 = await ReferredB.create({ name: 'referredB1' });
+
+      const NestedTest = db.model('NestedTest', new Schema({
+        nested1: [new Schema({
+          nested2: nestedSchema,
+        })],
+      }));
+      const nestedTest1 = new NestedTest({
+        nested1: [{
+          nested2: {
+            refType: 'ReferredA',
+            refId: referredA1._id,
+          }
+        }, {
+          nested2: {
+            refType: 'ReferredA',
+            refId: referredA2._id,
+            refName: referredA2.name,
+          }
+        }, {
+          nested2: {
+            refType: 'ReferredB',
+            refId: referredB1._id,
+            refName: referredB1.name,
+          }
+        }]
+      });
+      await nestedTest1.populate([
+        'nested1.nested2.dynRef',
+        'nested1.nested2.refPath',
+      ]);
+      assert.equal(nestedTest1.nested1[0].nested2.dynRef.name, referredA1.name);
+      assert.equal(nestedTest1.nested1[0].nested2.refPath.name, referredA1.name);
+      assert.equal(nestedTest1.nested1[1].nested2.dynRef.name, referredA2.name);
+      assert.equal(nestedTest1.nested1[1].nested2.refPath.name, referredA2.name);
+      assert.equal(nestedTest1.nested1[2].nested2.dynRef.name, referredB1.name);
+      assert.equal(nestedTest1.nested1[2].nested2.refPath.name, referredB1.name);
     });
   });
 });

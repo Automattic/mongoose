@@ -10843,18 +10843,18 @@ describe('model: populate:', function() {
 
   describe('dynamic virtual populate on nested schema (gh-12363)', function() {
     const referredSchemaA = new Schema({
-      name: String,
+      name: String
     });
 
     const referredSchemaB = new Schema({
-      name: String,
+      name: String
     });
 
     const nestedSchema = new Schema({
       name: String,
       refType: String,
       refId: Schema.Types.ObjectId,
-      refName: String,
+      refName: String
     }, {
       virtuals: {
         dynRef: {
@@ -10862,7 +10862,7 @@ describe('model: populate:', function() {
             ref: doc => doc.refType,
             localField: 'refId',
             foreignField: '_id',
-            justOne: true,
+            justOne: true
           }
         },
         refPath: {
@@ -10870,7 +10870,7 @@ describe('model: populate:', function() {
             refPath: 'refType',
             localField: 'refId',
             foreignField: '_id',
-            justOne: true,
+            justOne: true
           }
         },
         dynRefFields: {
@@ -10878,7 +10878,7 @@ describe('model: populate:', function() {
             refPath: 'refType',
             localField: doc => doc.refName ? 'refName' : 'refId',
             foreignField: doc => doc.refName ? 'name' : '_id',
-            justOne: true,
+            justOne: true
           }
         },
         dynMatch: {
@@ -10887,15 +10887,15 @@ describe('model: populate:', function() {
             localField: 'refId',
             foreignField: '_id',
             match: doc => ({ name: doc.refName }),
-            justOne: true,
+            justOne: true
           }
         },
         dynRefMultiLocalField: {
           options: {
             ref: doc => doc.refType,
-            localField: doc => ['refName', 'refId'],
+            localField: () => ['refName', 'refId'],
             foreignField: ['name', '_id'],
-            justOne: true,
+            justOne: true
           }
         }
       }
@@ -10908,12 +10908,12 @@ describe('model: populate:', function() {
       const referredB1 = await ReferredB.create({ name: 'referredB1' });
 
       const NestedTest = db.model('NestedTest', new Schema({
-        nested: nestedSchema,
+        nested: nestedSchema
       }));
       const nestedTest1 = new NestedTest({
         nested: {
           refType: 'ReferredA',
-          refId: referredA1._id,
+          refId: referredA1._id
         }
       });
       await nestedTest1.populate('nested.dynRef');
@@ -10927,7 +10927,7 @@ describe('model: populate:', function() {
         nested: {
           refType: 'ReferredB',
           refId: referredB1._id,
-          refName: referredB1.name,
+          refName: referredB1.name
         }
       });
       await nestedTest2.populate(['nested.dynRef', 'nested.refPath', 'nested.dynMatch', 'nested.dynRefMultiLocalField']);
@@ -10938,7 +10938,7 @@ describe('model: populate:', function() {
 
       const nestedTest3 = new NestedTest({});
       await nestedTest3.populate('nested.dynRef');
-      assert.equal(nestedTest3.nested?.dynRef, undefined);
+      assert.equal(nestedTest3.nested, undefined);
     });
 
     it('populate virtual on sub-document array', async function() {
@@ -10948,25 +10948,25 @@ describe('model: populate:', function() {
       const referredB1 = await ReferredB.create({ name: 'referredB1' });
 
       const NestedTest = db.model('NestedTest', new Schema({
-        nested: [nestedSchema],
+        nested: [nestedSchema]
       }));
       const nestedTest1 = new NestedTest({
         nested: [{
           refType: 'ReferredA',
-          refId: referredA1._id,
+          refId: referredA1._id
         }, {
           refType: 'ReferredA',
           refId: referredA1._id,
-          refName: referredA1.name,
+          refName: referredA1.name
         }, {
           refType: 'ReferredB',
           refId: referredB1._id,
-          refName: referredB1.name,
+          refName: referredB1.name
         }]
       });
       await nestedTest1.populate([
         'nested.dynRef',
-        'nested.refPath',
+        'nested.refPath'
       ]);
       assert.equal(nestedTest1.nested[0].dynRef.name, referredA1.name);
       assert.equal(nestedTest1.nested[0].refPath.name, referredA1.name);
@@ -10985,32 +10985,32 @@ describe('model: populate:', function() {
 
       const NestedTest = db.model('NestedTest', new Schema({
         nested1: [new Schema({
-          nested2: nestedSchema,
-        })],
+          nested2: nestedSchema
+        })]
       }));
       const nestedTest1 = new NestedTest({
         nested1: [{
           nested2: {
             refType: 'ReferredA',
-            refId: referredA1._id,
+            refId: referredA1._id
           }
         }, {
           nested2: {
             refType: 'ReferredA',
             refId: referredA2._id,
-            refName: referredA2.name,
+            refName: referredA2.name
           }
         }, {
           nested2: {
             refType: 'ReferredB',
             refId: referredB1._id,
-            refName: referredB1.name,
+            refName: referredB1.name
           }
         }]
       });
       await nestedTest1.populate([
         'nested1.nested2.dynRef',
-        'nested1.nested2.refPath',
+        'nested1.nested2.refPath'
       ]);
       assert.equal(nestedTest1.nested1[0].nested2.dynRef.name, referredA1.name);
       assert.equal(nestedTest1.nested1[0].nested2.refPath.name, referredA1.name);

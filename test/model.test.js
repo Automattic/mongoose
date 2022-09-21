@@ -8830,17 +8830,78 @@ describe('Model', function() {
 
     class B extends mongoose.Document {
       get foo() { return 'bar'; }
+
+      bar() { return 'baz'; }
     }
 
     DownloadJobSchema.loadClass(B);
 
-    const Test = db.model('Test', DownloadJobSchema);
+    let Test = db.model('Test', DownloadJobSchema);
 
     const { _id } = await Test.create({ test: 'value' });
-    const doc = await Test.findById(_id);
+    let doc = await Test.findById(_id);
     assert.ok(doc);
     assert.equal(doc.foo, 'bar');
     assert.equal(doc.test, 'value');
+    assert.equal(doc.bar(), 'baz');
+
+    db.deleteModel(/Test/);
+    Test = db.model('Test', { job: DownloadJobSchema });
+
+    await Test.deleteMany({});
+    await Test.create({ _id, job: { test: 'value' } });
+    doc = await Test.findById(_id);
+    assert.ok(doc);
+    assert.equal(doc.job.foo, 'bar');
+    assert.equal(doc.job.test, 'value');
+    assert.equal(doc.job.bar(), 'baz');
+  });
+
+  it('handles shared schema methods (gh-12423)', async function() {
+    const sharedSubSchema = new mongoose.Schema({
+      name: {
+        type: String
+      }
+    });
+
+    sharedSubSchema.methods.sharedSubSchemaMethod = function() {
+      return 'test';
+    };
+
+    const mainDocumentSchema = new mongoose.Schema({
+      subdocuments: {
+        type: [sharedSubSchema],
+        required: true
+      }
+    });
+    const Test1 = db.model('Test1', mainDocumentSchema);
+
+    const secondaryDocumentSchema = new mongoose.Schema({
+      subdocuments: {
+        type: [sharedSubSchema],
+        required: true
+      }
+    });
+    const Test2 = db.model('Test2', secondaryDocumentSchema);
+
+    const mainDoc = await Test1.create({
+      subdocuments: [
+        {
+          name: 'one'
+        }
+      ]
+    });
+
+    const secondaryDoc = await Test2.create({
+      subdocuments: [
+        {
+          name: 'secondary'
+        }
+      ]
+    });
+
+    assert.strictEqual(mainDoc.subdocuments[0].sharedSubSchemaMethod(), 'test');
+    assert.strictEqual(secondaryDoc.subdocuments[0].sharedSubSchemaMethod(), 'test');
   });
 
   describe('Check if static function that is supplied in schema option is available', function() {

@@ -380,7 +380,7 @@ describe('validation docs', function() {
     // acquit:ignore:end
   });
 
-  it('Global SchemaType Validation', async function() {
+  it('Global SchemaType Validation rray', async function() {
     // Add a custom validator to all strings
     mongoose.Schema.Types.String.set('validate', v => v == null || v > 0);
 
@@ -388,6 +388,9 @@ describe('validation docs', function() {
       name: String,
       email: String
     });
+    // acquit:ignore:start
+    db.deleteModel(/User/);
+    // acquit:ignore:end
     const User = db.model('User', userSchema);
 
     const user = new User({ name: '', email: '' });

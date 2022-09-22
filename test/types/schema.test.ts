@@ -741,3 +741,14 @@ function pluginOptions() {
   schema.plugin<any, SomePluginOptions>(pluginFunction2, { option2: 0 });
   expectError(schema.plugin<any, SomePluginOptions>(pluginFunction2, {})); // should error because "option2" is not optional
 }
+
+function gh12242() {
+  const dbExample = new Schema(
+    {
+      active: { type: Number, enum: [0, 1] as const, required: true }
+    }
+  );
+
+  type Example = InferSchemaType<typeof dbExample>;
+  expectType<0 | 1>({} as Example['active']);
+}

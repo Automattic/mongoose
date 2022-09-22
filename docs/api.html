@@ -3029,9 +3029,9 @@ the given <code>filter</code>, and <code>null</code> otherwise.</p>
 <p>Mongoose casts the <code>filter</code> to match the model&#39;s schema before the command is sent.
 See our <a href="/docs/tutorials/query_casting.html">query casting tutorial</a> for
 more information on how Mongoose casts <code>filter</code>.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-comment">// find all documents</span>
@@ -3120,9 +3120,9 @@ In other words, <code>findByIdAndDelete(id)</code> is a shorthand for
 <ul>
 <li><code>findOneAndRemove()</code></li>
 </ul>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findByIdAndRemove</span>(id, options, callback) <span class="hljs-comment">// executes</span>
@@ -3172,9 +3172,9 @@ callback. The query executes if <code>callback</code> is passed.</p>
 <ul>
 <li><code>findOneAndUpdate()</code></li>
 </ul>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findByIdAndUpdate</span>(id, update, options, callback) <span class="hljs-comment">// executes</span>
@@ -3189,8 +3189,8 @@ A.<span class="hljs-title function_">findByIdAndUpdate</span>()                 
       </a>
     </h4>
 <p>All top level update keys which are not <code>atomic</code> operation names are treated as set operations:</p>
-<h4 id="example">
-      <a href="#example">
+<h4 id="example-1">
+      <a href="#example-1">
         Example:
       </a>
     </h4>
@@ -3199,7 +3199,8 @@ A.<span class="hljs-title function_">findByIdAndUpdate</span>()                 
 <span class="hljs-comment">// is sent as</span>
 <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findByIdAndUpdate</span>(id, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;jason bourne&#x27;</span> }}, options, callback)
 </code></pre>
-<p>This helps prevent accidentally overwriting your document with <code>{ name: &#39;jason bourne&#39; }</code>.</p>
+<p>This helps prevent accidentally overwriting your document with <code>{ name: &#39;jason bourne&#39; }</code>.
+To prevent this behaviour, see the <code>overwrite</code> option</p>
 <h4 id="note-1">
       <a href="#note-1">
         Note:
@@ -3269,9 +3270,9 @@ an arbitrary document. If you&#39;re querying by <code>_id</code>, use <code>fin
 as opposed to a <code>findOneAndDelete()</code> command. For most mongoose use cases,
 this distinction is purely pedantic. You should use <code>findOneAndDelete()</code>
 unless you have a good reason not to.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndDelete</span>(conditions, options, callback) <span class="hljs-comment">// executes</span>
@@ -3313,9 +3314,9 @@ doc.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;ja
 <ul>
 <li><code>findOneAndRemove()</code></li>
 </ul>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndRemove</span>(conditions, options, callback) <span class="hljs-comment">// executes</span>
@@ -3367,9 +3368,9 @@ returned doc to the callback.</p>
 <ul>
 <li><code>findOneAndReplace()</code></li>
 </ul>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement, options, callback) <span class="hljs-comment">// executes</span>
@@ -3415,9 +3416,9 @@ A.<span class="hljs-title function_">findOneAndReplace</span>()                 
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Issues a mongodb findAndModify update command.</p>
 <p>Finds a matching document, updates it according to the <code>update</code> arg, passing any <code>options</code>, and returns the found document (if any) to the callback. The query executes if <code>callback</code> is passed else a Query object is returned.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndUpdate</span>(conditions, update, options, callback) <span class="hljs-comment">// executes</span>
@@ -3432,8 +3433,8 @@ A.<span class="hljs-title function_">findOneAndUpdate</span>()                  
       </a>
     </h4>
 <p>All top level update keys which are not <code>atomic</code> operation names are treated as set operations:</p>
-<h4 id="example">
-      <a href="#example">
+<h4 id="example-1">
+      <a href="#example-1">
         Example:
       </a>
     </h4>
@@ -3443,7 +3444,8 @@ A.<span class="hljs-title function_">findOneAndUpdate</span>()                  
 <span class="hljs-comment">// is sent as</span>
 <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findOneAndUpdate</span>(query, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;jason bourne&#x27;</span> }}, options, callback)
 </code></pre>
-<p>This helps prevent accidentally overwriting your document with <code>{ name: &#39;jason bourne&#39; }</code>.</p>
+<p>This helps prevent accidentally overwriting your document with <code>{ name: &#39;jason bourne&#39; }</code>.
+To prevent this behaviour, see the <code>overwrite</code> option</p>
 <h4 id="note-1">
       <a href="#note-1">
         Note:
@@ -3680,9 +3682,9 @@ promise.<span class="hljs-title function_">then</span>(<span class="hljs-keyword
 <li>justOne: optional boolean, if true Mongoose will always set <code>path</code> to an array. Inferred from schema by default.</li>
 <li>strictPopulate: optional boolean, set to <code>false</code> to allow populating paths that aren&#39;t in the schema.</li>
 </ul>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">Dog</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Dog&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">breed</span>: <span class="hljs-title class_">String</span> }));
@@ -3972,9 +3974,9 @@ for more information.</p>
 <li><code>update()</code></li>
 </ul>
 <p>This method is deprecated. See <a href="../deprecations.html#update">Deprecation Warnings</a> for details.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-title class_">MyModel</span>.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">age</span>: { <span class="hljs-attr">$gt</span>: <span class="hljs-number">18</span> } }, { <span class="hljs-attr">oldEnough</span>: <span class="hljs-literal">true</span> }, fn);
@@ -4012,8 +4014,8 @@ res.<span class="hljs-property">nModified</span>;
       </a>
     </h4>
 <p>All top level keys which are not <code>atomic</code> operation names are treated as set operations:</p>
-<h4 id="example">
-      <a href="#example">
+<h4 id="example-1">
+      <a href="#example-1">
         Example:
       </a>
     </h4>
@@ -4677,9 +4679,9 @@ is equivalent to <code>Model.find().estimatedDocumentCount()</code></p>
 <span class="method-type">&laquo;String|Function&raquo;</span> </li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> optional params depend on the function being called</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-keyword">const</span> promise = query.<span class="hljs-title function_">exec</span>();
@@ -4813,9 +4815,9 @@ unless you have a good reason not to.</p>
   <span class="hljs-comment">// doc: the document before updates are applied if `new: false`, or after updates if `new = true`</span>
 }
 </code></pre>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndDelete</span>(conditions, options, callback) <span class="hljs-comment">// executes</span>
@@ -4862,9 +4864,9 @@ the callback. Executes if <code>callback</code> is passed.</p>
   <span class="hljs-comment">// doc: the document before updates are applied if `new: false`, or after updates if `new = true`</span>
 }
 </code></pre>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndRemove</span>(conditions, options, callback) <span class="hljs-comment">// executes</span>
@@ -4924,9 +4926,9 @@ to the callback. Executes if <code>callback</code> is passed.</p>
   <span class="hljs-comment">// doc: the document before updates are applied if `new: false`, or after updates if `new = true`</span>
 }
 </code></pre>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement, options, callback); <span class="hljs-comment">// executes</span>
@@ -4994,9 +4996,9 @@ document (if any) to the callback. The query executes if
   <span class="hljs-comment">// doc: the document before updates are applied if `new: false`, or after updates if `new = true`</span>
 }
 </code></pre>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>query.<span class="hljs-title function_">findOneAndUpdate</span>(conditions, update, options, callback) <span class="hljs-comment">// executes</span>
@@ -6527,9 +6529,9 @@ support async iterators.</p>
 <span class="method-type">&laquo;Object&raquo;</span> field specification</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $addFields operator to this aggregate pipeline.
 Requires MongoDB v3.4+ to work</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-comment">// adding new fields based on existing fields</span>
@@ -6557,9 +6559,9 @@ aggregate.<span class="hljs-title function_">addFields</span>({ <span class="hlj
 </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-append"><a href="#aggregate_Aggregate-append">Aggregate.prototype.append()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">...ops
 <span class="method-type">&laquo;Object|Array[Object]&raquo;</span> operator(s) to append. Can either be a spread of objects or a single parameter of a object array.</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new operators to this aggregate pipeline</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">append</span>({ <span class="hljs-attr">$project</span>: { <span class="hljs-attr">field</span>: <span class="hljs-number">1</span> }}, { <span class="hljs-attr">$limit</span>: <span class="hljs-number">2</span> });
@@ -6586,9 +6588,9 @@ Compatible with <code>await</code>.</p>
 </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-count"><a href="#aggregate_Aggregate-count">Aggregate.prototype.count()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fieldName
 <span class="method-type">&laquo;String&raquo;</span> The name of the output field which has the count as its value. It must be a non-empty string, must not start with $ and must not contain the . character.</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $count operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">count</span>(<span class="hljs-string">&quot;userCount&quot;</span>);
@@ -6614,9 +6616,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
 </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-densify"><a href="#aggregate_Aggregate-densify">Aggregate.prototype.densify()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
 <span class="method-type">&laquo;Object&raquo;</span> $densify operator contents</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $densify operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code> aggregate.<span class="hljs-title function_">densify</span>({
@@ -6670,9 +6672,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
 <span class="method-type">&laquo;Object&raquo;</span> to $graphLookup as described in the above link</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new custom $graphLookup operator(s) to this aggregate pipeline, performing a recursive search on a collection.</p>
 <p>Note that graphLookup can only consume at most 100MB of memory, and does not allow disk use even if <code>{ allowDiskUse: true }</code> is specified.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code> <span class="hljs-comment">// Suppose we have a collection of courses, where a document might look like `{ _id: 0, name: &#x27;Calculus&#x27;, prerequisite: &#x27;Trigonometry&#x27;}` and `{ _id: 0, name: &#x27;Trigonometry&#x27;, prerequisite: &#x27;Algebra&#x27; }`</span>
@@ -6681,9 +6683,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
 </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-group"><a href="#aggregate_Aggregate-group">Aggregate.prototype.group()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
 <span class="method-type">&laquo;Object&raquo;</span> $group operator contents</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new custom $group operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">group</span>({ <span class="hljs-attr">_id</span>: <span class="hljs-string">&quot;$department&quot;</span> });
@@ -6701,9 +6703,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
 </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-limit"><a href="#aggregate_Aggregate-limit">Aggregate.prototype.limit()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">num
 <span class="method-type">&laquo;Number&raquo;</span> maximum number of records to pass to the next stage</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $limit operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">limit</span>(<span class="hljs-number">10</span>);
@@ -6711,9 +6713,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
 </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-lookup"><a href="#aggregate_Aggregate-lookup">Aggregate.prototype.lookup()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
 <span class="method-type">&laquo;Object&raquo;</span> to $lookup as described in the above link</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new custom $lookup operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">lookup</span>({ <span class="hljs-attr">from</span>: <span class="hljs-string">&#x27;users&#x27;</span>, <span class="hljs-attr">localField</span>: <span class="hljs-string">&#x27;userId&#x27;</span>, <span class="hljs-attr">foreignField</span>: <span class="hljs-string">&#x27;_id&#x27;</span>, <span class="hljs-attr">as</span>: <span class="hljs-string">&#x27;users&#x27;</span> });
@@ -6721,9 +6723,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
 </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-match"><a href="#aggregate_Aggregate-match">Aggregate.prototype.match()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
 <span class="method-type">&laquo;Object&raquo;</span> $match operator contents</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new custom $match operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">match</span>({ <span class="hljs-attr">department</span>: { <span class="hljs-attr">$in</span>: [ <span class="hljs-string">&quot;sales&quot;</span>, <span class="hljs-string">&quot;engineering&quot;</span> ] } });
@@ -6751,9 +6753,9 @@ aggregate.<span class="hljs-title function_">model</span>() === <span class="hlj
       </a>
     </h4>
 <p><strong>MUST</strong> be used as the first operator in the pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">near</span>({
@@ -6816,9 +6818,9 @@ Supported options are:</p>
 <span class="method-type">&laquo;Object|String&raquo;</span> field specification</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $project operator to this aggregate pipeline.</p>
 <p>Mongoose query <a href="#query_Query-select">selection syntax</a> is also supported.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-comment">// include a, include b, exclude _id</span>
@@ -6893,9 +6895,9 @@ If <code>thenExpr</code> or <code>elseExpr</code> is string, make sure it starts
 <p>Note that the <code>$replaceRoot</code> operator requires field strings to start with &#39;$&#39;.
 If you are passing in a string Mongoose will prepend &#39;$&#39; if the specified field doesn&#39;t start &#39;$&#39;.
 If you are passing in an object the strings in your expression will not be altered.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">replaceRoot</span>(<span class="hljs-string">&quot;user&quot;</span>);
@@ -6905,9 +6907,9 @@ aggregate.<span class="hljs-title function_">replaceRoot</span>({ <span class="h
 </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-sample"><a href="#aggregate_Aggregate-sample">Aggregate.prototype.sample()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">size
 <span class="method-type">&laquo;Number&raquo;</span> number of random documents to pick</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new custom $sample operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">sample</span>(<span class="hljs-number">3</span>); <span class="hljs-comment">// Add a pipeline that picks 3 random documents</span>
@@ -6944,9 +6946,9 @@ aggregate.<span class="hljs-title function_">replaceRoot</span>({ <span class="h
 </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-skip"><a href="#aggregate_Aggregate-skip">Aggregate.prototype.skip()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">num
 <span class="method-type">&laquo;Number&raquo;</span> number of records to skip before next stage</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $skip operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">skip</span>(<span class="hljs-number">10</span>);
@@ -6955,9 +6957,9 @@ aggregate.<span class="hljs-title function_">replaceRoot</span>({ <span class="h
 <span class="method-type">&laquo;Object|String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</li></ul><div><p>Appends a new $sort operator to this aggregate pipeline.</p>
 <p>If an object is passed, values allowed are <code>asc</code>, <code>desc</code>, <code>ascending</code>, <code>descending</code>, <code>1</code>, and <code>-1</code>.</p>
 <p>If a string is passed, it must be a space delimited list of path names. The sort order of each path is ascending unless the path name is prefixed with <code>-</code> which will be treated as descending.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-comment">// these are equivalent</span>
@@ -6969,9 +6971,9 @@ aggregate.<span class="hljs-title function_">sort</span>(<span class="hljs-strin
 or a pipeline object.</p>
 <p>Note that the <code>$sortByCount</code> operator requires the new root to start with &#39;$&#39;.
 Mongoose will prepend &#39;$&#39; if the specified field name doesn&#39;t start with &#39;$&#39;.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">sortByCount</span>(<span class="hljs-string">&#x27;users&#x27;</span>);
@@ -6993,9 +6995,9 @@ Compatible with <code>await</code>.</p>
 </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-unionWith"><a href="#aggregate_Aggregate-unionWith">Aggregate.prototype.unionWith()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
 <span class="method-type">&laquo;Object&raquo;</span> to $unionWith query as described in the above link</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new $unionWith operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">unionWith</span>({ <span class="hljs-attr">coll</span>: <span class="hljs-string">&#x27;users&#x27;</span>, <span class="hljs-attr">pipeline</span>: [ { <span class="hljs-attr">$match</span>: { <span class="hljs-attr">_id</span>: <span class="hljs-number">1</span> } } ] });
@@ -7005,9 +7007,9 @@ Compatible with <code>await</code>.</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new custom $unwind operator(s) to this aggregate pipeline.</p>
 <p>Note that the <code>$unwind</code> operator requires the path name to start with &#39;$&#39;.
 Mongoose will prepend &#39;$&#39; if the specified field doesn&#39;t start &#39;$&#39;.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">unwind</span>(<span class="hljs-string">&quot;tags&quot;</span>);
@@ -7478,7 +7480,7 @@ document or query.</p>
 <p>Suppose you are implementing user registration for a website. Users provide
 an email and password, which gets saved to mongodb. The email is a string
 that you will want to normalize to lower case, in order to avoid one email
-having more than one account -- e.g., otherwise, <a href="mailto:&#x61;&#118;&#x65;&#x6e;&#x75;&#x65;&#x40;&#113;&#x2e;&#99;&#111;&#x6d;">&#x61;&#118;&#x65;&#x6e;&#x75;&#x65;&#x40;&#113;&#x2e;&#99;&#111;&#x6d;</a> can be registered for 2 accounts via <a href="mailto:&#97;&#118;&#101;&#x6e;&#117;&#x65;&#64;&#113;&#x2e;&#99;&#111;&#109;">&#97;&#118;&#101;&#x6e;&#117;&#x65;&#64;&#113;&#x2e;&#99;&#111;&#109;</a> and <a href="mailto:&#x41;&#118;&#69;&#110;&#85;&#101;&#x40;&#x51;&#46;&#x43;&#x6f;&#x4d;">&#x41;&#118;&#69;&#110;&#85;&#101;&#x40;&#x51;&#46;&#x43;&#x6f;&#x4d;</a>.</p>
+having more than one account -- e.g., otherwise, <a href="mailto:&#x61;&#x76;&#x65;&#110;&#117;&#x65;&#64;&#113;&#46;&#99;&#111;&#109;">&#x61;&#x76;&#x65;&#110;&#117;&#x65;&#64;&#113;&#46;&#99;&#111;&#109;</a> can be registered for 2 accounts via <a href="mailto:&#97;&#118;&#101;&#110;&#117;&#x65;&#x40;&#x71;&#46;&#x63;&#111;&#x6d;">&#97;&#118;&#101;&#110;&#117;&#x65;&#x40;&#x71;&#46;&#x63;&#111;&#x6d;</a> and <a href="mailto:&#x41;&#x76;&#69;&#x6e;&#85;&#x65;&#64;&#81;&#x2e;&#x43;&#x6f;&#77;">&#x41;&#x76;&#69;&#x6e;&#85;&#x65;&#64;&#81;&#x2e;&#x43;&#x6f;&#77;</a>.</p>
 <p>You can set up email lower case normalization easily via a Mongoose setter.</p>
 <pre><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">toLower</span>(<span class="hljs-params">v</span>) {
   <span class="hljs-keyword">return</span> v.<span class="hljs-title function_">toLowerCase</span>();
@@ -7609,9 +7611,9 @@ s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27
 must return <code>Boolean</code>. Returning <code>false</code> or throwing an error means
 validation failed.</p>
 <p>The error message argument is optional. If not passed, the <a href="#error_messages_MongooseError-messages">default generic error message template</a> will be used.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-comment">// make sure every value is equal to &quot;something&quot;</span>

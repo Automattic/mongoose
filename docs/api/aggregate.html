@@ -71,9 +71,9 @@ support async iterators.</p>
 <span class="method-type">&laquo;Object&raquo;</span> field specification</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/">$addFields</a></span></li></ul><div><p>Appends a new $addFields operator to this aggregate pipeline.
 Requires MongoDB v3.4+ to work</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-comment">// adding new fields based on existing fields</span>
@@ -101,9 +101,9 @@ aggregate.<span class="hljs-title function_">addFields</span>({ <span class="hlj
   </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-append"><a href="#aggregate_Aggregate-append"><code>Aggregate.prototype.append()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>...ops</code>
 <span class="method-type">&laquo;Object|Array[Object]&raquo;</span> operator(s) to append. Can either be a spread of objects or a single parameter of a object array.</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new operators to this aggregate pipeline</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">append</span>({ <span class="hljs-attr">$project</span>: { <span class="hljs-attr">field</span>: <span class="hljs-number">1</span> }}, { <span class="hljs-attr">$limit</span>: <span class="hljs-number">2</span> });
@@ -130,9 +130,9 @@ Compatible with <code>await</code>.</p>
   </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-count"><a href="#aggregate_Aggregate-count"><code>Aggregate.prototype.count()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fieldName</code>
 <span class="method-type">&laquo;String&raquo;</span> The name of the output field which has the count as its value. It must be a non-empty string, must not start with $ and must not contain the . character.</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/aggregation/count">$count</a></span></li></ul><div><p>Appends a new $count operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">count</span>(<span class="hljs-string">&quot;userCount&quot;</span>);
@@ -158,9 +158,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
   </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-densify"><a href="#aggregate_Aggregate-densify"><code>Aggregate.prototype.densify()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>arg</code>
 <span class="method-type">&laquo;Object&raquo;</span> $densify operator contents</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/aggregation/densify/">$densify</a></span></li></ul><div><p>Appends a new $densify operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code> aggregate.<span class="hljs-title function_">densify</span>({
@@ -214,9 +214,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
 <span class="method-type">&laquo;Object&raquo;</span> to $graphLookup as described in the above link</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/operator/aggregation/graphLookup/#pipe._S_graphLookup">$graphLookup</a></span></li></ul><div><p>Appends new custom $graphLookup operator(s) to this aggregate pipeline, performing a recursive search on a collection.</p>
 <p>Note that graphLookup can only consume at most 100MB of memory, and does not allow disk use even if <code>{ allowDiskUse: true }</code> is specified.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code> <span class="hljs-comment">// Suppose we have a collection of courses, where a document might look like `{ _id: 0, name: &#x27;Calculus&#x27;, prerequisite: &#x27;Trigonometry&#x27;}` and `{ _id: 0, name: &#x27;Trigonometry&#x27;, prerequisite: &#x27;Algebra&#x27; }`</span>
@@ -225,9 +225,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
   </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-group"><a href="#aggregate_Aggregate-group"><code>Aggregate.prototype.group()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>arg</code>
 <span class="method-type">&laquo;Object&raquo;</span> $group operator contents</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/aggregation/group/">$group</a></span></li></ul><div><p>Appends a new custom $group operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">group</span>({ <span class="hljs-attr">_id</span>: <span class="hljs-string">&quot;$department&quot;</span> });
@@ -245,9 +245,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
   </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-limit"><a href="#aggregate_Aggregate-limit"><code>Aggregate.prototype.limit()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>num</code>
 <span class="method-type">&laquo;Number&raquo;</span> maximum number of records to pass to the next stage</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/aggregation/limit/">$limit</a></span></li></ul><div><p>Appends a new $limit operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">limit</span>(<span class="hljs-number">10</span>);
@@ -255,9 +255,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
   </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-lookup"><a href="#aggregate_Aggregate-lookup"><code>Aggregate.prototype.lookup()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>options</code>
 <span class="method-type">&laquo;Object&raquo;</span> to $lookup as described in the above link</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/aggregation/lookup/#pipe._S_lookup">$lookup</a></span></li></ul><div><p>Appends new custom $lookup operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">lookup</span>({ <span class="hljs-attr">from</span>: <span class="hljs-string">&#x27;users&#x27;</span>, <span class="hljs-attr">localField</span>: <span class="hljs-string">&#x27;userId&#x27;</span>, <span class="hljs-attr">foreignField</span>: <span class="hljs-string">&#x27;_id&#x27;</span>, <span class="hljs-attr">as</span>: <span class="hljs-string">&#x27;users&#x27;</span> });
@@ -265,9 +265,9 @@ cursor.<span class="hljs-title function_">eachAsync</span>(<span class="hljs-key
   </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-match"><a href="#aggregate_Aggregate-match"><code>Aggregate.prototype.match()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>arg</code>
 <span class="method-type">&laquo;Object&raquo;</span> $match operator contents</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/aggregation/match/">$match</a></span></li></ul><div><p>Appends a new custom $match operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">match</span>({ <span class="hljs-attr">department</span>: { <span class="hljs-attr">$in</span>: [ <span class="hljs-string">&quot;sales&quot;</span>, <span class="hljs-string">&quot;engineering&quot;</span> ] } });
@@ -295,9 +295,9 @@ aggregate.<span class="hljs-title function_">model</span>() === <span class="hlj
       </a>
     </h4>
 <p><strong>MUST</strong> be used as the first operator in the pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">near</span>({
@@ -360,9 +360,9 @@ Supported options are:</p>
 <span class="method-type">&laquo;Object|String&raquo;</span> field specification</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/aggregation/project/">projection</a></span></li></ul><div><p>Appends a new $project operator to this aggregate pipeline.</p>
 <p>Mongoose query <a href="#query_Query-select">selection syntax</a> is also supported.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-comment">// include a, include b, exclude _id</span>
@@ -437,9 +437,9 @@ If <code>thenExpr</code> or <code>elseExpr</code> is string, make sure it starts
 <p>Note that the <code>$replaceRoot</code> operator requires field strings to start with &#39;$&#39;.
 If you are passing in a string Mongoose will prepend &#39;$&#39; if the specified field doesn&#39;t start &#39;$&#39;.
 If you are passing in an object the strings in your expression will not be altered.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">replaceRoot</span>(<span class="hljs-string">&quot;user&quot;</span>);
@@ -449,9 +449,9 @@ aggregate.<span class="hljs-title function_">replaceRoot</span>({ <span class="h
   </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-sample"><a href="#aggregate_Aggregate-sample"><code>Aggregate.prototype.sample()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>size</code>
 <span class="method-type">&laquo;Number&raquo;</span> number of random documents to pick</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/aggregation/sample/#pipe._S_sample">$sample</a></span></li></ul><div><p>Appends new custom $sample operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">sample</span>(<span class="hljs-number">3</span>); <span class="hljs-comment">// Add a pipeline that picks 3 random documents</span>
@@ -488,9 +488,9 @@ aggregate.<span class="hljs-title function_">replaceRoot</span>({ <span class="h
   </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-skip"><a href="#aggregate_Aggregate-skip"><code>Aggregate.prototype.skip()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>num</code>
 <span class="method-type">&laquo;Number&raquo;</span> number of records to skip before next stage</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/aggregation/skip/">$skip</a></span></li></ul><div><p>Appends a new $skip operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">skip</span>(<span class="hljs-number">10</span>);
@@ -499,9 +499,9 @@ aggregate.<span class="hljs-title function_">replaceRoot</span>({ <span class="h
 <span class="method-type">&laquo;Object|String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/aggregation/sort/">$sort</a></span></li></ul><div><p>Appends a new $sort operator to this aggregate pipeline.</p>
 <p>If an object is passed, values allowed are <code>asc</code>, <code>desc</code>, <code>ascending</code>, <code>descending</code>, <code>1</code>, and <code>-1</code>.</p>
 <p>If a string is passed, it must be a space delimited list of path names. The sort order of each path is ascending unless the path name is prefixed with <code>-</code> which will be treated as descending.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-comment">// these are equivalent</span>
@@ -513,9 +513,9 @@ aggregate.<span class="hljs-title function_">sort</span>(<span class="hljs-strin
 or a pipeline object.</p>
 <p>Note that the <code>$sortByCount</code> operator requires the new root to start with &#39;$&#39;.
 Mongoose will prepend &#39;$&#39; if the specified field name doesn&#39;t start with &#39;$&#39;.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">sortByCount</span>(<span class="hljs-string">&#x27;users&#x27;</span>);
@@ -537,9 +537,9 @@ Compatible with <code>await</code>.</p>
   </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-unionWith"><a href="#aggregate_Aggregate-unionWith"><code>Aggregate.prototype.unionWith()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>options</code>
 <span class="method-type">&laquo;Object&raquo;</span> to $unionWith query as described in the above link</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith">$unionWith</a></span></li></ul><div><p>Appends new $unionWith operator to this aggregate pipeline.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">unionWith</span>({ <span class="hljs-attr">coll</span>: <span class="hljs-string">&#x27;users&#x27;</span>, <span class="hljs-attr">pipeline</span>: [ { <span class="hljs-attr">$match</span>: { <span class="hljs-attr">_id</span>: <span class="hljs-number">1</span> } } ] });
@@ -549,9 +549,9 @@ Compatible with <code>await</code>.</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/aggregation/unwind/">$unwind</a></span></li></ul><div><p>Appends new custom $unwind operator(s) to this aggregate pipeline.</p>
 <p>Note that the <code>$unwind</code> operator requires the path name to start with &#39;$&#39;.
 Mongoose will prepend &#39;$&#39; if the specified field doesn&#39;t start &#39;$&#39;.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>aggregate.<span class="hljs-title function_">unwind</span>(<span class="hljs-string">&quot;tags&quot;</span>);

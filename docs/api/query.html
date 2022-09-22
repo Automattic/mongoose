@@ -517,9 +517,9 @@ is equivalent to <code>Model.find().estimatedDocumentCount()</code></p>
 <span class="method-type">&laquo;String|Function&raquo;</span> </li><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> optional params depend on the function being called</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-keyword">const</span> promise = query.<span class="hljs-title function_">exec</span>();
@@ -653,9 +653,9 @@ unless you have a good reason not to.</p>
   <span class="hljs-comment">// doc: the document before updates are applied if `new: false`, or after updates if `new = true`</span>
 }
 </code></pre>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndDelete</span>(conditions, options, callback) <span class="hljs-comment">// executes</span>
@@ -702,9 +702,9 @@ the callback. Executes if <code>callback</code> is passed.</p>
   <span class="hljs-comment">// doc: the document before updates are applied if `new: false`, or after updates if `new = true`</span>
 }
 </code></pre>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndRemove</span>(conditions, options, callback) <span class="hljs-comment">// executes</span>
@@ -764,9 +764,9 @@ to the callback. Executes if <code>callback</code> is passed.</p>
   <span class="hljs-comment">// doc: the document before updates are applied if `new: false`, or after updates if `new = true`</span>
 }
 </code></pre>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement, options, callback); <span class="hljs-comment">// executes</span>
@@ -834,9 +834,9 @@ document (if any) to the callback. The query executes if
   <span class="hljs-comment">// doc: the document before updates are applied if `new: false`, or after updates if `new = true`</span>
 }
 </code></pre>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>query.<span class="hljs-title function_">findOneAndUpdate</span>(conditions, update, options, callback) <span class="hljs-comment">// executes</span>

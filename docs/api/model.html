@@ -543,9 +543,9 @@ the given <code>filter</code>, and <code>null</code> otherwise.</p>
 <p>Mongoose casts the <code>filter</code> to match the model&#39;s schema before the command is sent.
 See our <a href="/docs/tutorials/query_casting.html">query casting tutorial</a> for
 more information on how Mongoose casts <code>filter</code>.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-comment">// find all documents</span>
@@ -634,9 +634,9 @@ In other words, <code>findByIdAndDelete(id)</code> is a shorthand for
 <ul>
 <li><code>findOneAndRemove()</code></li>
 </ul>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findByIdAndRemove</span>(id, options, callback) <span class="hljs-comment">// executes</span>
@@ -686,9 +686,9 @@ callback. The query executes if <code>callback</code> is passed.</p>
 <ul>
 <li><code>findOneAndUpdate()</code></li>
 </ul>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findByIdAndUpdate</span>(id, update, options, callback) <span class="hljs-comment">// executes</span>
@@ -703,8 +703,8 @@ A.<span class="hljs-title function_">findByIdAndUpdate</span>()                 
       </a>
     </h4>
 <p>All top level update keys which are not <code>atomic</code> operation names are treated as set operations:</p>
-<h4 id="example">
-      <a href="#example">
+<h4 id="example-1">
+      <a href="#example-1">
         Example:
       </a>
     </h4>
@@ -713,7 +713,8 @@ A.<span class="hljs-title function_">findByIdAndUpdate</span>()                 
 <span class="hljs-comment">// is sent as</span>
 <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findByIdAndUpdate</span>(id, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;jason bourne&#x27;</span> }}, options, callback)
 </code></pre>
-<p>This helps prevent accidentally overwriting your document with <code>{ name: &#39;jason bourne&#39; }</code>.</p>
+<p>This helps prevent accidentally overwriting your document with <code>{ name: &#39;jason bourne&#39; }</code>.
+To prevent this behaviour, see the <code>overwrite</code> option</p>
 <h4 id="note-1">
       <a href="#note-1">
         Note:
@@ -783,9 +784,9 @@ an arbitrary document. If you&#39;re querying by <code>_id</code>, use <code>fin
 as opposed to a <code>findOneAndDelete()</code> command. For most mongoose use cases,
 this distinction is purely pedantic. You should use <code>findOneAndDelete()</code>
 unless you have a good reason not to.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndDelete</span>(conditions, options, callback) <span class="hljs-comment">// executes</span>
@@ -827,9 +828,9 @@ doc.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;ja
 <ul>
 <li><code>findOneAndRemove()</code></li>
 </ul>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndRemove</span>(conditions, options, callback) <span class="hljs-comment">// executes</span>
@@ -881,9 +882,9 @@ returned doc to the callback.</p>
 <ul>
 <li><code>findOneAndReplace()</code></li>
 </ul>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement, options, callback) <span class="hljs-comment">// executes</span>
@@ -929,9 +930,9 @@ A.<span class="hljs-title function_">findOneAndReplace</span>()                 
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/tutorials/findoneandupdate.html">Tutorial</a></span></li><li><span class="method-type"><a href="https://www.mongodb.org/display/DOCS/findAndModify+Command">mongodb</a></span></li></ul><div><p>Issues a mongodb findAndModify update command.</p>
 <p>Finds a matching document, updates it according to the <code>update</code> arg, passing any <code>options</code>, and returns the found document (if any) to the callback. The query executes if <code>callback</code> is passed else a Query object is returned.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndUpdate</span>(conditions, update, options, callback) <span class="hljs-comment">// executes</span>
@@ -946,8 +947,8 @@ A.<span class="hljs-title function_">findOneAndUpdate</span>()                  
       </a>
     </h4>
 <p>All top level update keys which are not <code>atomic</code> operation names are treated as set operations:</p>
-<h4 id="example">
-      <a href="#example">
+<h4 id="example-1">
+      <a href="#example-1">
         Example:
       </a>
     </h4>
@@ -957,7 +958,8 @@ A.<span class="hljs-title function_">findOneAndUpdate</span>()                  
 <span class="hljs-comment">// is sent as</span>
 <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findOneAndUpdate</span>(query, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;jason bourne&#x27;</span> }}, options, callback)
 </code></pre>
-<p>This helps prevent accidentally overwriting your document with <code>{ name: &#39;jason bourne&#39; }</code>.</p>
+<p>This helps prevent accidentally overwriting your document with <code>{ name: &#39;jason bourne&#39; }</code>.
+To prevent this behaviour, see the <code>overwrite</code> option</p>
 <h4 id="note-1">
       <a href="#note-1">
         Note:
@@ -1194,9 +1196,9 @@ promise.<span class="hljs-title function_">then</span>(<span class="hljs-keyword
 <li>justOne: optional boolean, if true Mongoose will always set <code>path</code> to an array. Inferred from schema by default.</li>
 <li>strictPopulate: optional boolean, set to <code>false</code> to allow populating paths that aren&#39;t in the schema.</li>
 </ul>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">Dog</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Dog&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">breed</span>: <span class="hljs-title class_">String</span> }));
@@ -1486,9 +1488,9 @@ for more information.</p>
 <li><code>update()</code></li>
 </ul>
 <p>This method is deprecated. See <a href="../deprecations.html#update">Deprecation Warnings</a> for details.</p>
-<h4 id="examples">
-      <a href="#examples">
-        Examples:
+<h4 id="example">
+      <a href="#example">
+        Example:
       </a>
     </h4>
 <pre><code><span class="hljs-title class_">MyModel</span>.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">age</span>: { <span class="hljs-attr">$gt</span>: <span class="hljs-number">18</span> } }, { <span class="hljs-attr">oldEnough</span>: <span class="hljs-literal">true</span> }, fn);
@@ -1526,8 +1528,8 @@ res.<span class="hljs-property">nModified</span>;
       </a>
     </h4>
 <p>All top level keys which are not <code>atomic</code> operation names are treated as set operations:</p>
-<h4 id="example">
-      <a href="#example">
+<h4 id="example-1">
+      <a href="#example-1">
         Example:
       </a>
     </h4>

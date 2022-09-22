@@ -54,7 +54,7 @@ module.exports.mongo = mongoose.mongo;
 module.exports.mquery = mongoose.mquery;
 module.exports.sanitizeFilter = mongoose.sanitizeFilter;
 module.exports.trusted = mongoose.trusted;
-module.exports.skipMiddelwareFunction = mongoose.skipMiddlewareFunction;
+module.exports.skipMiddlewareFunction = mongoose.skipMiddlewareFunction;
 module.exports.overwriteMiddlewareResult = mongoose.overwriteMiddlewareResult;
 
 // The following properties are not exported using ESM because `setDriver()` can mutate these

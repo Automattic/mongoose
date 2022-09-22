@@ -103,6 +103,7 @@ declare module 'mongoose' {
 
   /** Sets mongoose options */
   export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): Mongoose;
+  export function set(options: { [K in keyof MongooseOptions]: MongooseOptions[K] }): Mongoose;
 
   /** The Mongoose version */
   export const version: string;

@@ -118,6 +118,12 @@ declare module 'mongoose' {
 
   export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
 
+  export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
+  InferSchemaType<TSchema>,
+  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>
+  >;
+
   export interface TagSet {
     [k: string]: string;
   }

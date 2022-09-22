@@ -58,6 +58,12 @@ declare module 'mongoose' {
    */
   export function deleteModel(name: string | RegExp): Mongoose;
 
+  /**
+   * Sanitizes query filters against query selector injection attacks by wrapping
+   * any nested objects that have a property whose name starts with `$` in a `$eq`.
+   */
+  export function sanitizeFilter(filter: FilterQuery<any>): FilterQuery<any>;
+
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
@@ -106,6 +112,8 @@ declare module 'mongoose' {
 
   /** The Mongoose version */
   export const version: string;
+
+
 
   export type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
   export interface AnyObject {

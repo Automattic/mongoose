@@ -380,6 +380,30 @@ describe('validation docs', function() {
     // acquit:ignore:end
   });
 
+  it('Global SchemaType Validation', async function() {
+    // Add a custom validator to all strings
+    mongoose.Schema.Types.String.set('validate', v => v == null || v > 0);
+
+    const userSchema = new Schema({
+      name: String,
+      email: String
+    });
+    const User = db.model('User', userSchema);
+
+    const user = new User({ name: '', email: '' });
+
+    const err = await user.validate().then(() => null, err => err);
+    err.errors['name']; // ValidatorError
+    err.errors['email']; // ValidatorError
+    // acquit:ignore:start
+    assert.ok(err);
+    assert.equal(err.errors['name'].name, 'ValidatorError');
+    assert.equal(err.errors['email'].name, 'ValidatorError');
+
+    delete mongoose.Schema.Types.String.defaultOptions;
+    // acquit:ignore:end
+  });
+
   /**
    * Defining validators on nested objects in mongoose is tricky, because
    * nested objects are not fully fledged paths.
@@ -501,42 +525,6 @@ describe('validation docs', function() {
     // because `this` is **not** the document being updated when using
     // update validators
     assert.ok(error);
-  });
-
-  /**
-   * The `context` option lets you set the value of `this` in update validators
-   * to the underlying query.
-   */
-
-  it('The `context` option', async function() {
-    // acquit:ignore:start
-    const toySchema = new Schema({
-      color: String,
-      name: String
-    });
-    // acquit:ignore:end
-    toySchema.path('color').validate(function(value) {
-      // When running update validators, `this` refers to the query object.
-      if (this.getUpdate().$set.name.toLowerCase().indexOf('red') !== -1) {
-        return value === 'red';
-      }
-      return true;
-    });
-
-    const Toy = db.model('Figure', toySchema);
-
-    const update = { color: 'blue', name: 'Red Power Ranger' };
-    // Note the context option
-    const opts = { runValidators: true, context: 'query' };
-
-    let error;
-    try {
-      await Toy.updateOne({}, update, opts);
-    } catch (err) {
-      error = err;
-    }
-
-    assert.ok(error.errors['color']);
   });
 
   /**

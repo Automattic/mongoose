@@ -152,7 +152,7 @@ declare module 'mongoose' {
 
   export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods, DisSchema> =
     DisSchema extends Schema<infer DisSchemaEDocType, infer DisSchemaM, infer DisSchemaInstanceMethods, infer DisSchemaQueryhelpers, infer DisSchemaVirtuals, infer DisSchemaStatics>
-      ? Schema<Omit<DocType, keyof DisSchemaEDocType> & DisSchemaEDocType, DiscriminatorModel<DisSchemaM, M>, DisSchemaInstanceMethods | TInstanceMethods, DisSchemaQueryhelpers | TQueryHelpers, DisSchemaVirtuals | TVirtuals, DisSchemaStatics | TStaticMethods>
+      ? Schema<Omit<DocType, keyof DisSchemaEDocType> & DisSchemaEDocType, DiscriminatorModel<DisSchemaM, M>, DisSchemaInstanceMethods | TInstanceMethods, DisSchemaQueryhelpers | TQueryHelpers, DisSchemaVirtuals | TVirtuals, DisSchemaStatics & TStaticMethods>
       : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>;
 
   type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;

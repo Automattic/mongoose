@@ -38,6 +38,12 @@ function pluginStatics(schema: Schema<Test, TestModel, any, TestQueryHelpers, an
   });
 }
 
+function pluginGeneric(schema: Schema): void {
+  schema.static('test', function() {
+    return 0;
+  });
+}
+
 type Test = { firstName: string; lastName: string };
 type TestVirtuals = {
   fullName: string;
@@ -63,6 +69,7 @@ testSchema.plugin(pluginVirtuals);
 testSchema.plugin(pluginQueryHelpers);
 testSchema.plugin(pluginMethods);
 testSchema.plugin(pluginStatics);
+testSchema.plugin(pluginGeneric);
 
 const Foo = connection.model<Test, TestModel, TestQueryHelpers>('Test', testSchema);
 

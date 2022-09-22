@@ -158,11 +158,11 @@ declare module 'mongoose' {
 
   type PluginFunction<
     DocType,
-    M = Model<DocType, any, any, any>,
-    TInstanceMethods = {},
-    TQueryHelpers = {},
-    TVirtuals = {},
-    TStaticMethods = {}> = (schema: Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
+    M,
+    TInstanceMethods,
+    TQueryHelpers,
+    TVirtuals,
+    TStaticMethods> = (schema: Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
 
   export class Schema<
     EnforcedDocType = any,

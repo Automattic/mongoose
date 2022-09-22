@@ -707,6 +707,36 @@ function gh12030() {
 
 }
 
+function gh12450() {
+  const ObjectIdSchema = new Schema({
+    user: { type: Schema.Types.ObjectId }
+  });
+
+  expectType<{
+    user?: Types.ObjectId;
+  }>({} as InferSchemaType<typeof ObjectIdSchema>);
+
+  const Schema2 = new Schema({
+    createdAt: { type: Date, required: true },
+    decimalValue: { type: Schema.Types.Decimal128, required: true }
+  });
+
+  type A = InferSchemaType<typeof Schema2>;
+
+  // Understand why required breaks the type
+  expectType<{ createdAt: Date, decimalValue: Types.Decimal128 }>({} as InferSchemaType<typeof Schema2>);
+
+  const Schema3 = new Schema({
+    createdAt: { type: Date },
+    decimalValue: { type: Schema.Types.Decimal128 }
+  });
+
+  type U = InferSchemaType<typeof Schema3>;
+
+  expectType<{ createdAt?: Date, decimalValue?: Types.Decimal128 }>({} as InferSchemaType<typeof Schema3>);
+
+}
+
 function pluginOptions() {
   interface SomePluginOptions {
     option1?: string;

@@ -155,13 +155,13 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends TypeKeyBaseType = DefaultTypeKey> =
   PathValueType extends Schema ? InferSchemaType<PathValueType> :
     PathValueType extends (infer Item)[] ? IfEquals<Item, never, any[], Item extends Schema ? Types.DocumentArray<ResolvePathType<Item>> : ResolvePathType<Item>[]> :
-      PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
-        PathValueType extends NumberSchemaDefinition ? Options['enum'] extends ReadonlyArray<any> ? Options['enum'][number] : number :
-          PathValueType extends DateSchemaDefinition ? Date :
-            PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
-              PathValueType extends BooleanSchemaDefinition ? boolean :
-                PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId :
-                  PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 | Schema.Types.Decimal128 ? Types.Decimal128 :
+      PathValueType extends NumberSchemaDefinition ? Options['enum'] extends ReadonlyArray<any> ? Options['enum'][number] : number :
+        PathValueType extends DateSchemaDefinition ? Date :
+          PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
+            PathValueType extends BooleanSchemaDefinition ? boolean :
+              PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId :
+                PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 | Schema.Types.Decimal128 ? Types.Decimal128 :
+                  PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
                     PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
                       PathValueType extends ArrayConstructor ? any[] :
                         PathValueType extends typeof Schema.Types.Mixed ? any:

@@ -1102,4 +1102,71 @@ describe('mongoose module:', function() {
       assert.equal(entry.id, undefined);
     });
   });
+
+  describe('set()', function() {
+    let m;
+
+    beforeEach(() => {
+      m = new mongoose.Mongoose();
+    });
+
+    it('should be able to set a option through set with (key, value)', function() {
+      // also test the getter behavior of the function
+      assert.strictEqual(m.options['debug'], undefined);
+      assert.strictEqual(m.set('debug'), undefined);
+      m.set('debug', true);
+
+      assert.strictEqual(m.options['debug'], true);
+      assert.strictEqual(m.set('debug'), true);
+    });
+
+    it('should be able to set a option through a object with {key: value}', function() {
+      assert.strictEqual(m.options['debug'], undefined);
+      m.set({ debug: true });
+
+      assert.strictEqual(m.options['debug'], true);
+    });
+
+    it('should throw a single error when using a invalid key', function() {
+      try {
+        m.set('invalid', true);
+        assert.fail('Expected .set to throw');
+      } catch (err) {
+        assert.ok(err instanceof Error);
+        assert.strictEqual(err.message, '`invalid` is an invalid option.');
+      }
+    });
+
+    it('should throw a a array of errors when using multiple invalid keys', function() {
+      try {
+        m.set({
+          invalid1: true,
+          invalid2: true
+        });
+        assert.fail('Expected .set to throw');
+      } catch (err) {
+        assert.ok(err instanceof Array);
+        assert.strictEqual(err.length, 2);
+        assert.ok(err[0] instanceof Error);
+        assert.strictEqual(err[0].message, '`invalid1` is an invalid option.');
+        assert.ok(err[1] instanceof Error);
+        assert.strictEqual(err[1].message, '`invalid2` is an invalid option.');
+      }
+    });
+
+    it('should apply all values, even if there are errors', function() {
+      assert.strictEqual(m.options['debug'], undefined);
+      try {
+        m.set({
+          invalid: true,
+          debug: true
+        });
+        assert.fail('Expected .set to throw');
+      } catch (err) {
+        assert.ok(err instanceof Error);
+        assert.strictEqual(err.message, '`invalid` is an invalid option.');
+        assert.strictEqual(m.options['debug'], true);
+      }
+    });
+  });
 });

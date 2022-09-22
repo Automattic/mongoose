@@ -1168,5 +1168,15 @@ describe('mongoose module:', function() {
         assert.strictEqual(m.options['debug'], true);
       }
     });
+
+    it('should throw a single error when using a invalid key when getting', function() {
+      try {
+        m.set('invalid');
+        assert.fail('Expected .set to throw');
+      } catch (err) {
+        assert.ok(err instanceof Error);
+        assert.strictEqual(err.message, '`invalid` is an invalid option.');
+      }
+    });
   });
 });

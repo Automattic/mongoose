@@ -564,6 +564,17 @@ const discriminatedSchema = batchSchema.discriminator('event', eventSchema);
 
 expectType<Schema<Omit<{ name: string }, 'message'> & { message: string }>>(discriminatedSchema);
 
+// discriminator statics
+const eventSchema2 = new Schema({ message: String }, { discriminatorKey: 'kind', statics: { static1: function() {
+  return 0;
+} } });
+const batchSchema2 = new Schema({ name: String }, { discriminatorKey: 'kind', statics: { static2: function() {
+  return 1;
+} } });
+const discriminatedSchema2 = batchSchema2.discriminator('event', eventSchema2);
+
+expectAssignable<Schema<Omit<{ name: string }, 'message'> & { message: string }, Model<any>, {}, {}, {}, { static1(): number; static2(): number; }>>(discriminatedSchema2);
+
 function gh11828() {
   interface IUser {
     name: string;

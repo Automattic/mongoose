@@ -113,8 +113,6 @@ declare module 'mongoose' {
   /** The Mongoose version */
   export const version: string;
 
-
-
   export type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
   export interface AnyObject {
     [k: string]: any

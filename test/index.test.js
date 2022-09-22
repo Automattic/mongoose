@@ -11,6 +11,7 @@ const { EventEmitter } = require('events');
 
 const collection = 'blogposts_' + random();
 
+const SetOptionError = require('../lib/error/setOptionError');
 const mongoose = start.mongoose;
 const Mongoose = mongoose.Mongoose;
 const Schema = mongoose.Schema;
@@ -500,16 +501,13 @@ describe('mongoose module:', function() {
   });
 
   it('throws an error on setting invalid options (gh-6899)', function() {
-    let threw = false;
     try {
       mongoose.set('someInvalidOption', true);
+      assert.fail('Expected mongoose.set to throw');
     }
     catch (err) {
-      assert.equal(err.message, '`someInvalidOption` is an invalid option.');
-      threw = true;
-    }
-    finally {
-      assert.equal(threw, true);
+      assert.ok(err instanceof SetOptionError);
+      assert.equal(err.message, 'someInvalidOption: "someInvalidOption" is not a valid option to set');
     }
   });
 
@@ -1132,12 +1130,13 @@ describe('mongoose module:', function() {
         m.set('invalid', true);
         assert.fail('Expected .set to throw');
       } catch (err) {
-        assert.ok(err instanceof Error);
-        assert.strictEqual(err.message, '`invalid` is an invalid option.');
+        assert.ok(err instanceof SetOptionError);
+        assert.strictEqual(Object.keys(err.errors).length, 1);
+        assert.strictEqual(err.message, 'invalid: "invalid" is not a valid option to set');
       }
     });
 
-    it('should throw a a array of errors when using multiple invalid keys', function() {
+    it('should throw a error with many errors when using multiple invalid keys', function() {
       try {
         m.set({
           invalid1: true,
@@ -1145,12 +1144,13 @@ describe('mongoose module:', function() {
         });
         assert.fail('Expected .set to throw');
       } catch (err) {
-        assert.ok(err instanceof Array);
-        assert.strictEqual(err.length, 2);
-        assert.ok(err[0] instanceof Error);
-        assert.strictEqual(err[0].message, '`invalid1` is an invalid option.');
-        assert.ok(err[1] instanceof Error);
-        assert.strictEqual(err[1].message, '`invalid2` is an invalid option.');
+        assert.ok(err instanceof SetOptionError);
+        assert.strictEqual(Object.keys(err.errors).length, 2);
+        assert.strictEqual(err.message, 'invalid1: "invalid1" is not a valid option to set, invalid2: "invalid2" is not a valid option to set');
+        assert.ok(err.errors['invalid1'] instanceof SetOptionError.SetOptionInnerError);
+        assert.strictEqual(err.errors['invalid1'].message, '"invalid1" is not a valid option to set');
+        assert.ok(err.errors['invalid2'] instanceof SetOptionError.SetOptionInnerError);
+        assert.strictEqual(err.errors['invalid2'].message, '"invalid2" is not a valid option to set');
       }
     });
 
@@ -1163,8 +1163,9 @@ describe('mongoose module:', function() {
         });
         assert.fail('Expected .set to throw');
       } catch (err) {
-        assert.ok(err instanceof Error);
-        assert.strictEqual(err.message, '`invalid` is an invalid option.');
+        assert.ok(err instanceof SetOptionError);
+        assert.ok(err.errors['invalid'] instanceof SetOptionError.SetOptionInnerError);
+        assert.strictEqual(err.message, 'invalid: "invalid" is not a valid option to set');
         assert.strictEqual(m.options['debug'], true);
       }
     });
@@ -1174,8 +1175,9 @@ describe('mongoose module:', function() {
         m.set('invalid');
         assert.fail('Expected .set to throw');
       } catch (err) {
-        assert.ok(err instanceof Error);
-        assert.strictEqual(err.message, '`invalid` is an invalid option.');
+        assert.ok(err instanceof SetOptionError);
+        assert.ok(err.errors['invalid'] instanceof SetOptionError.SetOptionInnerError);
+        assert.strictEqual(err.message, 'invalid: "invalid" is not a valid option to set');
       }
     });
   });

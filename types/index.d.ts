@@ -62,7 +62,7 @@ declare module 'mongoose' {
    * Sanitizes query filters against query selector injection attacks by wrapping
    * any nested objects that have a property whose name starts with `$` in a `$eq`.
    */
-  export function sanitizeFilter(filter: FilterQuery<any>): FilterQuery<any>;
+  export function sanitizeFilter(filter: FilterQuery<T>): FilterQuery<T>;
 
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];

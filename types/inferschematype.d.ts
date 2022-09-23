@@ -38,7 +38,16 @@ declare module 'mongoose' {
    * // result
    * type UserType = {userName?: string}
    */
-  type InferSchemaType<SchemaType> = ObtainSchemaGeneric<SchemaType, 'DocType'>;
+  type InferSchemaType<SchemaType> = ObtainDocType<SchemaType>; // "ObtainDocType" is used over "ObtainSchemaGeneric", because "ObtainSchemaGeneric" would return a modified result;
+
+  /**
+   * @summary Obtains the "DocType" generic of a Schema, has to be used because with "ObtainSchemaGeneric" it would return a modified type
+   * @param {TSchema} TSchema A generic of schema type instance
+   */
+  type ObtainDocType<TSchema> =
+    TSchema extends Schema<any, any, any, any, any, any, any, infer DocType>
+      ? DocType
+      : unknown;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.

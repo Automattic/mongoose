@@ -721,7 +721,6 @@ function gh12450() {
     decimalValue: { type: Schema.Types.Decimal128, required: true }
   });
 
-  // Understand why required on Schema.Types.Decimal128 breaks the type
   expectType<{ createdAt: Date, decimalValue: Types.Decimal128 }>({} as InferSchemaType<typeof Schema2>);
 
   const Schema3 = new Schema({

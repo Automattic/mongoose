@@ -29,14 +29,14 @@ module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
 
   if (startMemoryInstance) { // Config to decided if an mongodb-memory-server instance should be used
     // it's needed in global space, because we don't want to create a new instance every test-suite
-    mongoinstance = await mms.MongoMemoryServer.create({ instance: { args: ['--setParameter', 'ttlMonitorSleepSecs=1'] } });
+    mongoinstance = await mms.MongoMemoryServer.create({ instance: { args: ['--setParameter', 'ttlMonitorSleepSecs=1'], storageEngine: 'wiredTiger' } });
     instanceuri = mongoinstance.getUri();
   } else {
     instanceuri = process.env.MONGOOSE_TEST_URI;
   }
 
   if (startMemoryReplset) {
-    mongorreplset = await mms.MongoMemoryReplSet.create({ replSet: { count: 3, args: ['--setParameter', 'ttlMonitorSleepSecs=1'] } }); // using 3 because even numbers can lead to vote problems
+    mongorreplset = await mms.MongoMemoryReplSet.create({ replSet: { count: 3, args: ['--setParameter', 'ttlMonitorSleepSecs=1'], storageEngine: 'wiredTiger' } }); // using 3 because even numbers can lead to vote problems
     replseturi = mongorreplset.getUri();
   } else {
     replseturi = '';

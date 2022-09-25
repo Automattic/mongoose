@@ -43,10 +43,6 @@ jobs:
         os: [ubuntu-18.04, ubuntu-20.04]
         mongodb: [4.0.28, 5.0.8, 6.0.0]
         include:
-          # - os: ubuntu-18.04
-          #   mongodb-os: ubuntu1804
-          # - os: ubuntu-20.04
-          #   mongodb-os: ubuntu2004
           - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
             mongodb: 5.0.11
             node: 16

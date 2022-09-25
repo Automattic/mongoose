@@ -717,7 +717,6 @@ describe('mongoose module:', function() {
 
     it('with replica set', async function() {
       const mong = new Mongoose();
-      // const start.uri = process.env.MONGOOSE_SET_TEST_URI;
 
       if (!start.uri) {
         return this.skip();

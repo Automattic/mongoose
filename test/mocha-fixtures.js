@@ -44,10 +44,6 @@ module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
 
   process.env.MONGOOSE_TEST_URI = instanceuri;
   process.env.MONGOOSE_REPLSET_URI = replseturi;
-
-  // The following is to make sure the database is clean before an test starts
-  // const client = new mongodb.MongoClient(finaluri);
-  // await client.connect();
 };
 
 module.exports.mochaGlobalTeardown = async function mochaGlobalTeardown() {

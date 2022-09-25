@@ -193,23 +193,6 @@ async function dropDBs() {
   await db.close();
 }
 
-// before(async function() {
-//   this.timeout(60000);
-//   if (process.env.START_REPLICA_SET) {
-//     const uri = await startReplicaSet();
-
-//     module.exports.uri = uri;
-//     module.exports.uri2 = uri.replace(databases[0], databases[1]);
-
-//     process.env.REPLICA_SET = 'rs0';
-
-//     const conn = mongoose.createConnection(uri);
-//     await conn.asPromise();
-//     await conn.db.collection('test').findOne();
-//     await conn.close();
-//   }
-// });
-
 before(dropDBs);
 
 after(dropDBs);
@@ -223,34 +206,3 @@ process.on('unhandledRejection', function(error, promise) {
   }
   throw error;
 });
-
-// async function startReplicaSet() {
-//   const ReplSet = require('mongodb-memory-server').MongoMemoryReplSet;
-
-//   // Create new instance
-//   const replSet = new ReplSet({
-//     binary: {
-//       version: '5.0.4'
-//     },
-//     instanceOpts: [
-//       // Set the expiry job in MongoDB to run every second
-//       {
-//         port: 27017,
-//         args: ['--setParameter', 'ttlMonitorSleepSecs=1']
-//       }
-//     ],
-//     dbName: databases[0],
-//     replSet: {
-//       name: 'rs0',
-//       count: 2,
-//       storageEngine: 'wiredTiger'
-//     }
-//   });
-
-//   await replSet.start();
-//   await replSet.waitUntilRunning();
-
-//   await new Promise(resolve => setTimeout(resolve, 10000));
-
-//   return replSet.getUri(databases[0]);
-// }

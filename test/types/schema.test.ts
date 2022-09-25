@@ -85,6 +85,10 @@ movieSchema.index({ title: 'text' }, {
 });
 movieSchema.index({ rating: -1 });
 movieSchema.index({ title: 1 }, { unique: true });
+movieSchema.index({ tile: 'ascending' });
+movieSchema.index({ tile: 'asc' });
+movieSchema.index({ tile: 'descending' });
+movieSchema.index({ tile: 'desc' });
 
 // Using `SchemaDefinition`
 interface IProfile {
@@ -736,4 +740,15 @@ function pluginOptions() {
   // test overwriting options
   schema.plugin<any, SomePluginOptions>(pluginFunction2, { option2: 0 });
   expectError(schema.plugin<any, SomePluginOptions>(pluginFunction2, {})); // should error because "option2" is not optional
+}
+
+function gh12242() {
+  const dbExample = new Schema(
+    {
+      active: { type: Number, enum: [0, 1] as const, required: true }
+    }
+  );
+
+  type Example = InferSchemaType<typeof dbExample>;
+  expectType<0 | 1>({} as Example['active']);
 }

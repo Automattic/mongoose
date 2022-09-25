@@ -137,7 +137,7 @@ declare module 'mongoose' {
     baseModelName: string | undefined;
 
     /* Cast the given POJO to the model's schema */
-    castObject(obj: AnyObject): T;
+    castObject(obj: AnyObject, options?: { ignoreCastErrors?: boolean }): T;
 
     /**
      * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,

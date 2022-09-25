@@ -370,6 +370,25 @@ describe('aggregate: ', function() {
     });
   });
 
+  describe('densify', function() {
+    it('works', function() {
+      const aggregate = new Aggregate();
+      const obj = {
+        field: 'timestamp',
+        range: {
+          step: 1,
+          unit: 'hour',
+          bounds: [new Date('2021-05-18T00:00:00.000Z'), new Date('2021-05-18T08:00:00.000Z')]
+        }
+      };
+
+      aggregate.densify(obj);
+
+      assert.equal(aggregate._pipeline.length, 1);
+      assert.deepEqual(aggregate._pipeline[0].$densify, obj);
+    });
+  });
+
   describe('model()', function() {
     it('works', function() {
       const aggregate = new Aggregate();
@@ -1216,4 +1235,5 @@ describe('aggregate: ', function() {
       assert.equal(foundDocs[2].name, 'Andrew');
     });
   });
+
 });

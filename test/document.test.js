@@ -38,7 +38,7 @@ function TestDocument() {
  * Inherits from Document.
  */
 
-TestDocument.prototype.__proto__ = Document.prototype;
+Object.setPrototypeOf(TestDocument.prototype, Document.prototype);
 
 for (const i in EventEmitter.prototype) {
   TestDocument[i] = EventEmitter.prototype[i];
@@ -1476,7 +1476,7 @@ describe('document', function() {
     });
 
     it('validator should run only once per sub-doc gh-1743', async function() {
-      this.timeout(process.env.TRAVIS ? 8000 : 4500);
+      this.timeout(4500);
 
       let count = 0;
       const db = start();
@@ -11832,6 +11832,54 @@ describe('document', function() {
     const doc = await Test.create(data);
 
     assert.ok(doc.nestedPath1.mapOfSchema);
+  });
+
+  it('correct context for default functions in subdocuments with init (gh-12328)', async function() {
+    let called = 0;
+
+    const subSchema = new mongoose.Schema({
+      propertyA: { type: String },
+      propertyB: {
+        type: String,
+        default: function() {
+          ++called;
+          return this.propertyA;
+        }
+      }
+    });
+
+    const testSchema = new mongoose.Schema(
+      {
+        name: String,
+        sub: { type: subSchema, default: () => ({}) }
+      }
+    );
+
+    const Test = db.model('Test', testSchema);
+
+    await Test.collection.insertOne({ name: 'test', sub: { propertyA: 'foo' } });
+    assert.strictEqual(called, 0);
+
+    const doc = await Test.findOne({ name: 'test' });
+    assert.strictEqual(doc.sub.propertyB, 'foo');
+    assert.strictEqual(called, 1);
+  });
+
+  it('If the field does not exist, $inc should create it and set is value to the specified one (gh-12435)', async function() {
+    const schema = new mongoose.Schema({
+      name: String,
+      count: Number
+    });
+    const Model = db.model('IncTest', schema);
+    const doc = new Model({ name: 'Test' });
+    await doc.save();
+    doc.$inc('count', 1);
+    await doc.save();
+
+    assert.strictEqual(doc.count, 1);
+
+    const addedDoc = await Model.findOne({ name: 'Test' });
+    assert.strictEqual(addedDoc.count, 1);
   });
 });
 

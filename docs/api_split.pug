@@ -68,7 +68,7 @@ block content
       if prop.inherits != null
         h5 Inherits:
         ul
-          li <span class="method-type">&laquo;#{prop.inherits}&raquo;</span>
+          li <span class="method-type"><a href="#{prop.inherits.url}">&laquo;#{prop.inherits.text}&raquo;</a></span>
       if prop.see != null && prop.see.length > 0
         h5 See:
         ul

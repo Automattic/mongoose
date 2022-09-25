@@ -3562,7 +3562,8 @@ describe('Query', function() {
     let Model;
 
     beforeEach(function() {
-      Model = db.model('Test', Schema({ name: String, age: Number }));
+      const schema = new Schema({ name: String, age: Number });
+      Model = db.model('Test', schema);
 
       return Model.create([
         { name: 'Jean-Luc Picard', age: 59 },
@@ -3571,7 +3572,6 @@ describe('Query', function() {
     });
 
     it('with findOne', async function() {
-
       const q = Model.findOne({ age: 29 });
       const q2 = q.clone();
 
@@ -3589,7 +3589,6 @@ describe('Query', function() {
     });
 
     it('with deleteOne', async function() {
-
       const q = Model.deleteOne({ age: 29 });
 
       await q;
@@ -3603,7 +3602,6 @@ describe('Query', function() {
     });
 
     it('with updateOne', async function() {
-
       const q = Model.updateOne({ name: 'Will Riker' }, { name: 'Thomas Riker' });
 
       await q;
@@ -3627,6 +3625,22 @@ describe('Query', function() {
       assert.deepEqual(q2._distinct, 'name');
       await q2;
       assert.deepEqual(res.sort(), ['Jean-Luc Picard', 'Will Riker']);
+    });
+
+    it('with hooks (gh-12365)', async function() {
+      db.deleteModel('Test');
+
+      const schema = new Schema({ name: String, age: Number });
+      let called = 0;
+      schema.pre('find', () => ++called);
+      Model = db.model('Test', schema);
+
+      assert.strictEqual(called, 0);
+
+      const res = await Model.find().clone();
+      assert.strictEqual(called, 1);
+      assert.equal(res.length, 2);
+      assert.deepEqual(res.map(doc => doc.name).sort(), ['Jean-Luc Picard', 'Will Riker']);
     });
   });
 
@@ -4093,5 +4107,29 @@ describe('Query', function() {
         prop: 'foo'
       });
     });
+  });
+
+  it('select: false is ignored for type Map (gh-12445)', async function() {
+    const testSchema = new mongoose.Schema({
+      select: {
+        type: Map,
+        of: Object
+      },
+      doNotSelect: {
+        type: Map,
+        of: Object,
+        select: false
+      }
+    });
+
+    const Test = db.model('Test', testSchema);
+    await Test.create({
+      select: { key: { some: 'value' } },
+      doNotSelect: { otherKey: { someOther: 'value' } }
+    });
+
+    const item = await Test.findOne();
+    assert.equal(item.get('select.key.some'), 'value');
+    assert.equal(item.doNotSelect, undefined);
   });
 });

@@ -33,7 +33,7 @@ function TestDocument() {
  * Inherits from Document.
  */
 
-TestDocument.prototype.__proto__ = Document.prototype;
+Object.setPrototypeOf(TestDocument.prototype, Document.prototype);
 
 /**
  * Test.

@@ -380,7 +380,7 @@ describe('validation docs', function() {
     // acquit:ignore:end
   });
 
-  it('Global SchemaType Validation rray', async function() {
+  it('Global SchemaType Validation', async function() {
     // Add a custom validator to all strings
     mongoose.Schema.Types.String.set('validate', v => v == null || v > 0);
 

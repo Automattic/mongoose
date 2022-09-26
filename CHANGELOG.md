@@ -1,3 +1,15 @@
+6.6.2 / 2022-09-26
+==================
+ * fix(model): avoid deleting shared schema methods in fix for #12254 #12423
+ * fix(document): set $inc default value in case field has not been specified on the document #12435 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(query): handle `select: false` on map paths in query results #12467 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): add HydratedDocumentFromSchema to make it easier to pull inferred hydrated doc type #12464 #12319
+ * fix(types): add sanitizeFilter to types #12465 [zrosenbauer](https://github.com/zrosenbauer)
+ * fix(types): infer number enum types from schema if using enum: [0, 1] as const #12463 #12242
+ * docs(validation): add section on global schematype validation, clean up other issues #12430
+ * docs: add clarification about overwrite flag in model.js #12447 [Tzvika-m](https://github.com/Tzvika-m)
+ * docs: change to consistent "Example:" for jsdoc comments #12432 [hasezoey](https://github.com/hasezoey)
+
 6.6.1 / 2022-09-14
 ==================
  * fix: correctly apply defaults after subdoc init #12328

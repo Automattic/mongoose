@@ -58,6 +58,12 @@ declare module 'mongoose' {
    */
   export function deleteModel(name: string | RegExp): Mongoose;
 
+  /**
+   * Sanitizes query filters against query selector injection attacks by wrapping
+   * any nested objects that have a property whose name starts with `$` in a `$eq`.
+   */
+  export function sanitizeFilter<T>(filter: FilterQuery<T>): FilterQuery<T>;
+
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
@@ -117,6 +123,12 @@ declare module 'mongoose' {
     : T & { _id: Types.ObjectId };
 
   export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
+
+  export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
+  InferSchemaType<TSchema>,
+  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>
+  >;
 
   export interface TagSet {
     [k: string]: string;

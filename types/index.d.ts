@@ -116,8 +116,13 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
+  /** Type representing hydrated Mongoose documents, like the return value from `await Model.findOne()` */
   export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
 
+  /**
+   * Type representing hydrated Mongoose documents, like the return value from `await Model.findOne()`.
+   * Equivalent to `HydratedDocument`, except inferred from a Schema rather than multiple generics.
+   * */
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,
   ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,

@@ -28,8 +28,12 @@
 }
 
 .api-nav .nav-item-sub {
-  display: none;
+  display: block;
   font-size: 0.66em;
+}
+
+.nav-item-sub > li {
+  padding: 2px 0px;
 }
 
 .api-nav ul {
@@ -44,6 +48,10 @@
 
 .item-header-wrap {
   position: relative;
+}
+
+.api-content {
+  margin-top: 3em;
 }
 
 @media (max-width: 1785px) {
@@ -154,4 +162,8 @@ hr.separate-api {
   padding: 8px 10px;
   text-transform: uppercase;
   letter-spacing: .2px;
+}
+
+.deprecated {
+  color: #ff0000;
 }

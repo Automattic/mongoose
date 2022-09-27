@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const mongoose = require('../');
+const mongoose = require('../index');
 const Collection = mongoose.Collection;
 const assert = require('assert');
 
@@ -114,17 +114,33 @@ module.exports = function(options) {
   return conn;
 };
 
-/*!
+function getUri(env, default_uri, db) {
+  const use = env ? env : default_uri;
+  const lastIndex = use.lastIndexOf('/');
+  // use length if lastIndex is 9 or lower, because that would mean it found the last character of "mongodb://"
+  return use.slice(0, lastIndex <= 9 ? use.length : lastIndex) + `/${db}`;
+}
+
+/**
+ * Testing Databases, used for consistency
+ */
+
+const databases = module.exports.databases = [
+  'mongoose_test',
+  'mongoose_test_2'
+];
+
+/**
  * testing uri
  */
 
-module.exports.uri = process.env.MONGOOSE_TEST_URI || 'mongodb://127.0.0.1:27017/mongoose_test';
+module.exports.uri = getUri(process.env.MONGOOSE_TEST_URI, 'mongodb://127.0.0.1:27017/', databases[0]);
 
-/*!
+/**
  * testing uri for 2nd db
  */
 
-module.exports.uri2 = 'mongodb://127.0.0.1:27017/mongoose_test_2';
+module.exports.uri2 = getUri(process.env.MONGOOSE_TEST_URI, 'mongodb://127.0.0.1:27017/', databases[1]);
 
 /**
  * expose mongoose
@@ -172,7 +188,7 @@ before(async function() {
     const uri = await startReplicaSet();
 
     module.exports.uri = uri;
-    module.exports.uri2 = uri.replace('mongoose_test', 'mongoose_test2');
+    module.exports.uri2 = uri.replace(databases[0], databases[1]);
 
     process.env.REPLICA_SET = 'rs0';
 
@@ -186,17 +202,6 @@ before(async function() {
 before(dropDBs);
 
 after(dropDBs);
-
-beforeEach(function() {
-  if (this.currentTest) {
-    global.CURRENT_TEST = this.currentTest.title;
-    if (this.currentTest.parent.title) {
-      global.CURRENT_TEST = this.currentTest.parent.title + global.CURRENT_TEST;
-    }
-  } else {
-    global.CURRENT_TEST = 'N/A';
-  }
-});
 
 process.on('unhandledRejection', function(error, promise) {
   if (error.$expected) {
@@ -223,7 +228,7 @@ async function startReplicaSet() {
         args: ['--setParameter', 'ttlMonitorSleepSecs=1']
       }
     ],
-    dbName: 'mongoose_test',
+    dbName: databases[0],
     replSet: {
       name: 'rs0',
       count: 2,
@@ -236,5 +241,5 @@ async function startReplicaSet() {
 
   await new Promise(resolve => setTimeout(resolve, 10000));
 
-  return replSet.getUri('mongoose_test');
+  return replSet.getUri(databases[0]);
 }

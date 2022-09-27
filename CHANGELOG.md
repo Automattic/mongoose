@@ -1,3 +1,133 @@
+6.6.2 / 2022-09-26
+==================
+ * fix(model): avoid deleting shared schema methods in fix for #12254 #12423
+ * fix(document): set $inc default value in case field has not been specified on the document #12435 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(query): handle `select: false` on map paths in query results #12467 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): add HydratedDocumentFromSchema to make it easier to pull inferred hydrated doc type #12464 #12319
+ * fix(types): add sanitizeFilter to types #12465 [zrosenbauer](https://github.com/zrosenbauer)
+ * fix(types): infer number enum types from schema if using enum: [0, 1] as const #12463 #12242
+ * docs(validation): add section on global schematype validation, clean up other issues #12430
+ * docs: add clarification about overwrite flag in model.js #12447 [Tzvika-m](https://github.com/Tzvika-m)
+ * docs: change to consistent "Example:" for jsdoc comments #12432 [hasezoey](https://github.com/hasezoey)
+
+6.6.1 / 2022-09-14
+==================
+ * fix: correctly apply defaults after subdoc init #12328
+ * fix(array): avoid using default _id when using pull() #12294
+ * fix: allow null values inside $expr objects #12429 [MartinDrost](https://github.com/MartinDrost)
+ * fix(query): use correct Query constructor when cloning query #12418
+ * docs(website): remove setting "latest38x" which is not used anywhere #12396 [hasezoey](https://github.com/hasezoey)
+
+6.6.0 / 2022-09-08
+==================
+ * feat: upgrade mongodb driver -> 4.9.1 #12370 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat: re-export default Mongoose instance properties for ESM named imports support #12256
+ * feat(model): add option to skip invalid fields with castObject() #12156 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat: use setPrototypeOf() instead of __proto__ to allow running on Deno #12315
+ * feat(QueryCursor): add support for AbortSignal on eachAsync() #12323
+ * feat(types): add types for new $densify operator #12118 [IslandRhythms](https://github.com/IslandRhythms)
+
+6.5.5 / 2022-09-07
+==================
+ * fix(setDefaultsOnInsert): avoid applying defaults on insert if nested property set #12279
+ * fix(model): make applyHooks() and applyMethods() handle case where custom method is set to Mongoose implementation #12254
+ * fix(types): add string "ascending" and "descending" index-directions #10269
+ * docs: upgrade dox to 1.0.0 #12403 [hasezoey](https://github.com/hasezoey)
+ * docs: update old mongodb nodejs driver documentation urls #12387 [hasezoey](https://github.com/hasezoey)
+ * docs: update JSDOC ... (spread) definition #12388 [hasezoey](https://github.com/hasezoey)
+ * refactor(model): allow optionally passing indexes to createIndexes and cleanIndexes #12280 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+6.5.4 / 2022-08-30
+==================
+ * fix(document): allow calling $assertPopulated() with values to better support manual population #12233
+ * fix(connection+mongoose): better handling for calling model() with 1 argument #12359
+ * fix(model): allow defining discriminator virtuals and methods using schema options #12326
+ * fix(types): fix MongooseQueryMiddleware missing "findOneAndReplace" and "replaceOne" #12330 #12329 [Jule-](https://github.com/Jule-) [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): fix replaceOne return type #12351 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): use this for return type from $assertPopulated() #12234
+ * docs: highlight how to connect using auth in README #12354 [AntonyOnScript](https://github.com/AntonyOnScript)
+ * docs: improve jsdoc comments for private methods #12337 [hasezoey](https://github.com/hasezoey)
+ * docs: fix minor typo in compatibility table header #12355 [skyme5](https://github.com/skyme5)
+
+6.5.3 / 2022-08-24
+==================
+ * fix(document): handle maps when applying defaults to nested paths #12322
+ * fix(schema): make ArraySubdocuments apply _id defaults on init #12264
+ * fix(populate): handle specifying recursive populate as a string with discriminators #12266
+ * perf(types): remove extends Query in Schema.pre() and Schema.post(), loosen `discriminator()` generic #10349
+ * perf(types): some more micro-optimizations re: #10349, remove extra type checking on $ne, etc.
+ * fix(types): infer schema on `connection.model()` #12298 #12125 [hasezoey](https://github.com/hasezoey)
+ * fix(types): add missing `findById()` type definitions #12309 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): allow $search in $lookup pipeline stages for MongoDB v6.x support #12278 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(types): add parameter "options" to "Model.remove" #12258 [hasezoey](https://github.com/hasezoey)
+ * fix(types): sync single-generic-no-constraint "model" between "index.d.ts" and "connection.d.ts" #12299 [hasezoey](https://github.com/hasezoey)
+ * fix(types): update isDirectModified typing #12290 [gabrielDonnantuoni](https://github.com/gabrielDonnantuoni)
+ * docs: update links on api docs #12293 [eatmoarrice](https://github.com/eatmoarrice)
+ * docs: add note about language_override option #12310 [IslandRhythms](https://github.com/IslandRhythms)
+ * docs(document): add "String[]" to Document.depopulate as jsdoc parameter type #12300 [hasezoey](https://github.com/hasezoey)
+ * docs: update Node.js EventEmitter url #12303 [rainrisa](https://github.com/rainrisa)
+
+5.13.15 / 2022-08-22
+====================
+ * fix: backport fix for CVE-2022-2564 #12281 [shubanker](https://github.com/shubanker)
+ * docs: fix broken link from findandmodify method deprecation #11366 [laissonsilveira](https://github.com/laissonsilveira)
+
+6.5.2 / 2022-08-09
+==================
+ * fix(aggregate): avoid throwing error when disconnecting with change stream open #12201 [ramos-ph](https://github.com/ramos-ph)
+ * fix(query): overwrite top-level key if using Query.prototype.set() to set to undefined #12155
+ * fix(query): shallow clone options before modifying #12176
+ * fix(types): auto schema type inference on `Connection.prototype.model()` #12240 [hasezoey](https://github.com/hasezoey)
+ * fix(types): better typescript support for schema plugins #12139 [emiljanitzek](https://github.com/emiljanitzek)
+ * fix(types): make bulkWrite() type param optional #12221 #12212
+ * docs: misc cleanup #12199 [hasezoey](https://github.com/hasezoey)
+ * docs: highlight current top-most visible header in navbar #12222 [hasezoey](https://github.com/hasezoey)
+ * docs(populate): improve examples for Document.prototype.populate() #12111
+ * docs(middleware): clarify document vs model in middleware docs #12113
+
+6.5.1 / 2022-08-03
+==================
+ * fix(timestamps): set timestamps on child schema when child schema has timestamps: true but parent schema does not #12119
+ * fix(schema+timestamps): handle insertMany() with timestamps and discriminators #12150
+ * fix(model+query): handle populate with lean transform that deletes _id #12143
+ * fix(types): allow $pull with _id #12142
+ * fix(types): add schema plugin option inference #12196 [hasezoey](https://github.com/hasezoey)
+ * fix(types): pass type to mongodb bulk write operation #12167 [emiljanitzek](https://github.com/emiljanitzek)
+ * fix(types): map correct generics from model to schema #12125 [emiljanitzek](https://github.com/emiljanitzek)
+ * fix(types): avoid baffling circular reference when using PopulatedDoc with a bidirectional reference #12136
+ * fix(types): allow using path with $count #12149
+ * docs(compatibility): change to use a table #12200 [hasezoey](https://github.com/hasezoey)
+ * docs(api_split.pug): add "code" to sidebar entries #12153 [hasezoey](https://github.com/hasezoey)
+ * docs: add "code" to Headers (and index list) #12152 [hasezoey](https://github.com/hasezoey)
+
+6.5.0 / 2022-07-26
+==================
+ * perf(document): avoid creating unnecessary empty objects when creating a state machine #11988
+ * feat: upgrade mongodb driver -> 4.8.1 #12103 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(model): allow passing timestamps option to Model.bulkSave(...) #12082 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(model): add castObject() function that casts a POJO to the model's schema #11945
+ * feat(document): add $inc() helper that increments numeric paths #12115
+ * feat(schema): add schema level lean option [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(schema): add global id option to disable id on schemas #12067 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(connection): re-run Model.init() if re-connecting after explicitly closing a connection #12130
+ * feat(model): add applyDefaults() helper that allows applying defaults to document or POJO #11945
+ * feat(model): allow calling hydrate() with { setters: true } #11653
+ * feat(model): add hydrate option to Model.watch() to automatically hydrate fullDocument #12121
+ * feat(types): add support for automatically typed virtuals in schemas #11908 [mohammad0-0ahmad](https://github.com/mohammad0-0ahmad)
+
+6.4.7 / 2022-07-25
+==================
+ * fix(virtualtype): use $locals for default virtual getter/setter rather than top-level doc #12124
+ * fix(document): call subdocument getters if child schema has getters: true #12105
+ * fix(schematype): actually always return "this" where specified #12141 [hasezoey](https://github.com/hasezoey)
+ * fix(types): correct return value for Model.exists() #12094
+ * docs(guides): add link to advanced schemas doc #12073
+ * docs: handle @see in jsdoc #12144 [hasezoey](https://github.com/hasezoey)
+ * docs: make use of the deprecated tag available in jsdoc for documentation #12080 [hasezoey](https://github.com/hasezoey)
+ * docs(api_split): add basic DEPRECATED output #12146 [hasezoey](https://github.com/hasezoey)
+ * docs: various jsdoc cleanup #12140 [hasezoey](https://github.com/hasezoey)
+ * docs(api_split.pug): add "code" to parameter name #12145 [hasezoey](https://github.com/hasezoey)
+
 6.4.6 / 2022-07-20
 ==================
  * fix(schema): disallow setting __proto__ when creating schema with dotted properties #12085

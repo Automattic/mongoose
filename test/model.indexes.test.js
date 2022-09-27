@@ -348,11 +348,6 @@ describe('model', function() {
       });
 
       describe('global autoIndexes (gh-1875)', function() {
-        beforeEach(() => {
-          const Test = db.model('Test', Schema({}));
-          return Test.collection.dropIndexes();
-        });
-
         beforeEach(() => db.deleteModel(/Test/));
 
         it('will create indexes as a default', async function() {
@@ -638,8 +633,8 @@ describe('model', function() {
       assert.ok(!indexes[1].collation);
       await User.collection.drop();
     });
-    it('should do a dryRun feat-10316', async function() {
 
+    it('should do a dryRun feat-10316', async function() {
       const userSchema = new mongoose.Schema({ username: String }, { password: String }, { email: String });
       const User = db.model('Upson', userSchema);
       await User.collection.createIndex({ age: 1 });

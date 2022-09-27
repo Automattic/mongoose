@@ -28,6 +28,7 @@ declare module 'mongoose' {
      *  Specifies the initial batch size for the cursor. The value of the cursor field is a document with the field batchSize.
      */
     cursor?: { batchSize?: number; };
+
     /**
      * Specifies to return the information on the processing of the pipeline. See Return Information on Aggregation Pipeline Operation for an example.
      *
@@ -69,7 +70,7 @@ declare module 'mongoose' {
 
   class Aggregate<R> implements SessionOperation {
     /**
-     * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js
+     * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js)
      * You do not need to call this function explicitly, the JavaScript runtime
      * will call it for you.
      */
@@ -91,7 +92,7 @@ declare module 'mongoose' {
      */
     addFields(arg: PipelineStage.AddFields['$addFields']): this;
 
-    /** Sets the allowDiskUse option for the aggregation query (ignored for < 2.6.0) */
+    /** Sets the allowDiskUse option for the aggregation query */
     allowDiskUse(value: boolean): this;
 
     /** Appends new operators to this aggregate pipeline */
@@ -110,10 +111,14 @@ declare module 'mongoose' {
     /** Appends a new $count operator to this aggregate pipeline. */
     count(fieldName: PipelineStage.Count['$count']): this;
 
+    /** Appends a new $densify operator to this aggregate pipeline */
+    densify(arg: PipelineStage.Densify['$densify']): this;
+
     /**
-     * Sets the cursor option for the aggregation query (ignored for < 2.6.0).
+     * Sets the cursor option for the aggregation query
      */
     cursor<DocType = any>(options?: Record<string, unknown>): Cursor<DocType>;
+
 
     /** Executes the aggregate pipeline on the currently bound Model. */
     exec(callback: Callback<R>): void;
@@ -134,7 +139,7 @@ declare module 'mongoose' {
     /** Appends new custom $group operator to this aggregate pipeline. */
     group(arg: PipelineStage.Group['$group']): this;
 
-    /** Sets the hint option for the aggregation query (ignored for < 3.6.0) */
+    /** Sets the hint option for the aggregation query */
     hint(value: Record<string, unknown> | string): this;
 
     /**

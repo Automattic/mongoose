@@ -10,7 +10,7 @@ declare module 'mongoose' {
   type TypeKeyBaseType = string;
 
   type DefaultTypeKey = 'type';
-  interface SchemaOptions<PathTypeKey extends TypeKeyBaseType = DefaultTypeKey, DocType = unknown, InstanceMethods = {}, QueryHelpers = {}, StaticMethods = {}, virtuals = {}> {
+  interface SchemaOptions<PathTypeKey extends TypeKeyBaseType = DefaultTypeKey, DocType = unknown, TInstanceMethods = {}, QueryHelpers = {}, TStaticMethods = {}, TVirtuals = {}> {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
      * calling Model.createIndexes() after you successfully connect to MongoDB. If you want to disable
@@ -191,16 +191,27 @@ declare module 'mongoose' {
     /**
      * Model Statics methods.
      */
-    statics?: Record<any, (this: Model<DocType>, ...args: any) => unknown> | StaticMethods,
+    statics?: Record<any, (this: Model<DocType>, ...args: any) => unknown> | TStaticMethods,
 
     /**
      * Document instance methods.
      */
-    methods?: Record<any, (this: HydratedDocument<DocType>, ...args: any) => unknown> | InstanceMethods,
+    methods?: Record<any, (this: HydratedDocument<DocType>, ...args: any) => unknown> | TInstanceMethods,
 
     /**
-     * Query helper functions
+     * Query helper functions.
      */
     query?: Record<any, <T extends QueryWithHelpers<unknown, DocType>>(this: T, ...args: any) => T> | QueryHelpers,
+
+    /**
+     * Set whether to cast non-array values to arrays.
+     * @default true
+     */
+    castNonArrays?: boolean;
+
+    /**
+     * Virtual paths.
+     */
+    virtuals?: SchemaOptionsVirtualsPropertyType<DocType, TVirtuals, TInstanceMethods>,
   }
 }

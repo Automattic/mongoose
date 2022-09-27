@@ -38,7 +38,7 @@ function TestDocument() {
  * Inherits from Document.
  */
 
-TestDocument.prototype.__proto__ = Document.prototype;
+Object.setPrototypeOf(TestDocument.prototype, Document.prototype);
 
 for (const i in EventEmitter.prototype) {
   TestDocument[i] = EventEmitter.prototype[i];
@@ -1476,7 +1476,7 @@ describe('document', function() {
     });
 
     it('validator should run only once per sub-doc gh-1743', async function() {
-      this.timeout(process.env.TRAVIS ? 8000 : 4500);
+      this.timeout(4500);
 
       let count = 0;
       const db = start();
@@ -5426,8 +5426,29 @@ describe('document', function() {
 
       doc.toObject({ getters: false });
       assert.equal(called, 1);
+    });
 
-      return Promise.resolve();
+    it('calls subdocument getters if child schema has getters: true (gh-12105)', function() {
+      let called = 0;
+
+      const childSchema = new Schema({
+        _id: false,
+        value: {
+          type: String,
+          get: function(v) {
+            ++called;
+            return v.toUpperCase();
+          }
+        }
+      }, { toJSON: { getters: true } });
+      const schema = new Schema({ name: childSchema });
+      const Test = db.model('Test', schema);
+
+      const doc = new Test({ name: { value: 'John Smith' } });
+
+      const res = doc.toJSON();
+      assert.equal(called, 1);
+      assert.deepStrictEqual(res.name, { value: 'JOHN SMITH' });
     });
 
     it('setting doc array to array of top-level docs works (gh-5632)', function(done) {
@@ -11552,6 +11573,313 @@ describe('document', function() {
     const err = await testModelInstance.validate().then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.errors['testProp.testSubProp.nested.from']);
+  });
+
+  describe('$inc (gh-11915)', function() {
+    describe('top-level path', function() {
+      let Test;
+
+      beforeEach(function() {
+        const schema = new Schema({
+          counter: Number
+        });
+        Test = db.model('Test', schema);
+      });
+
+      it('sends a $inc command for a given path', async function() {
+        await Test.create({ counter: 0 });
+        const doc = await Test.findOne();
+        assert.strictEqual(doc.counter, 0);
+        const doc2 = await Test.findOne();
+
+        doc2.counter = 1;
+        await doc2.save();
+
+        doc.$inc('counter', 1);
+        await doc.save();
+
+        const res = await Test.findById(doc);
+        assert.equal(res.counter, 2);
+      });
+
+      it('works as a $set if the document is new', async function() {
+        const doc = new Test({ counter: 0 });
+        doc.$inc('counter', 2);
+        assert.equal(doc.counter, 2);
+
+        await doc.save();
+
+        const res = await Test.findById(doc);
+        assert.equal(res.counter, 2);
+      });
+
+      it('treats as a $set if set after $inc', async function() {
+        await Test.create({ counter: 0 });
+        const doc = await Test.findOne();
+
+        doc.$inc('counter', 2);
+        doc.counter = 5;
+        assert.deepStrictEqual(doc.getChanges(), { $set: { counter: 5 } });
+        await doc.save();
+
+        const res = await Test.findOne();
+        assert.equal(res.counter, 5);
+      });
+
+      it('tries to cast to number', async function() {
+        await Test.create({ counter: 0 });
+        const doc = await Test.findOne();
+
+        doc.$inc('counter', '2');
+        assert.deepStrictEqual(doc.getChanges(), { $inc: { counter: 2 } });
+        await doc.save();
+
+        const res = await Test.findOne();
+        assert.equal(res.counter, 2);
+      });
+
+      it('stores CastError if can\'t convert to number', async function() {
+        await Test.create({ counter: 0 });
+        const doc = await Test.findOne();
+
+        doc.$inc('counter', 'foobar');
+        const err = await doc.save().then(() => null, err => err);
+        assert.ok(err);
+        assert.equal(err.errors['counter'].name, 'CastError');
+      });
+    });
+
+    describe('nested paths', function() {
+      let Test;
+
+      beforeEach(function() {
+        const schema = new Schema({
+          nested: {
+            counter: Number
+          }
+        });
+        Test = db.model('Test', schema);
+      });
+
+      it('handles nested paths', async function() {
+        await Test.create({ nested: { counter: 0 } });
+        const doc = await Test.findOne();
+
+        doc.$inc('nested.counter', 2);
+        await doc.save();
+
+        const res = await Test.findById(doc);
+        assert.equal(res.nested.counter, 2);
+      });
+
+      it('treats as $set if overwriting nested path', async function() {
+        await Test.create({ nested: { counter: 0 } });
+        const doc = await Test.findOne();
+
+        doc.$inc('nested.counter', 2);
+        doc.nested.counter += 3;
+        await doc.save();
+
+        const res = await Test.findById(doc);
+        assert.equal(res.nested.counter, 5);
+      });
+    });
+
+    describe('subdocuments', function() {
+      let Test;
+
+      beforeEach(function() {
+        const schema = new Schema({
+          subdoc: new Schema({
+            counter: Number
+          })
+        });
+        Test = db.model('Test', schema);
+      });
+
+      it('handles paths underneath subdocuments', async function() {
+        await Test.create({ subdoc: { counter: 0 } });
+        const doc = await Test.findOne();
+
+        doc.$inc('subdoc.counter', 2);
+        await doc.save();
+
+        const res = await Test.findById(doc);
+        assert.equal(res.subdoc.counter, 2);
+      });
+
+      it('treats as a $set if setting subdocument after $inc', async function() {
+        await Test.create({ subdoc: { counter: 0 } });
+        const doc = await Test.findOne();
+
+        doc.$inc('subdoc.counter', 2);
+        doc.subdoc = { counter: 5 };
+        await doc.save();
+
+        const res = await Test.findById(doc);
+        assert.equal(res.subdoc.counter, 5);
+      });
+    });
+
+    describe('document array', function() {
+      let Test;
+
+      beforeEach(function() {
+        const schema = new Schema({
+          docArr: [{ counter: Number }]
+        });
+        Test = db.model('Test', schema);
+      });
+
+      it('handles paths underneath subdocuments', async function() {
+        await Test.create({ docArr: [{ counter: 0 }] });
+        const doc = await Test.findOne();
+
+        doc.docArr[0].$inc('counter');
+        await doc.save();
+
+        const res = await Test.findById(doc);
+        assert.equal(res.docArr[0].counter, 1);
+      });
+
+      it('works on pushed subdocs', async function() {
+        await Test.create({ docArr: [] });
+        const doc = await Test.findOne();
+
+        doc.docArr.push({ counter: 0 });
+        doc.docArr[0].$inc('counter');
+        await doc.save();
+
+        const res = await Test.findById(doc);
+        assert.equal(res.docArr[0].counter, 1);
+      });
+      it('Splice call registers path modification', async function() {
+        await Test.create({ docArr: [{ counter: 0 }, { counter: 2 }, { counter: 3 }, { counter: 4 }] });
+        const doc = await Test.findOne();
+        doc.docArr.splice(1, 0, { counter: 1 });
+        assert.equal(doc.isModified('docArr'), true);
+      });
+    });
+
+    it('stores CastError if trying to $inc a non-numeric path', async function() {
+      const schema = new Schema({
+        prop: String
+      });
+      const Test = db.model('Test', schema);
+
+      await Test.create({ prop: '' });
+      const doc = await Test.findOne();
+
+      doc.$inc('prop', 2);
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.errors['prop'].name, 'CastError');
+    });
+  });
+
+  it('supports virtuals named `isValid` (gh-12124) (gh-6262)', async function() {
+    const Schema = new mongoose.Schema({
+      test: String,
+      data: { sub: String }
+    });
+
+    Schema.virtual('isValid');
+
+    const Test = db.model('Test', Schema);
+    let doc = new Test();
+
+    assert.ok(doc.$isValid('test'));
+    await doc.save();
+
+    doc = await Test.findOne();
+
+    doc.set('isValid', true);
+    assert.ok(doc.$isValid('test'));
+
+    doc.set({ test: 'test' });
+    await doc.save();
+    assert.equal(doc.test, 'test');
+
+    doc.set({ data: { sub: 'sub' } });
+    await doc.save();
+    assert.equal(doc.data.sub, 'sub');
+  });
+
+  it('handles maps when applying defaults to nested paths (gh-12220)', async function() {
+    const nestedSchema = new mongoose.Schema({
+      1: {
+        type: Number,
+        default: 0
+      }
+    });
+
+    const topSchema = new mongoose.Schema({
+      nestedPath1: {
+        mapOfSchema: {
+          type: Map,
+          of: nestedSchema
+        }
+      }
+    });
+
+    const Test = db.model('Test', topSchema);
+
+    const data = {
+      nestedPath1: {
+        mapOfSchema: {}
+      }
+    };
+    const doc = await Test.create(data);
+
+    assert.ok(doc.nestedPath1.mapOfSchema);
+  });
+
+  it('correct context for default functions in subdocuments with init (gh-12328)', async function() {
+    let called = 0;
+
+    const subSchema = new mongoose.Schema({
+      propertyA: { type: String },
+      propertyB: {
+        type: String,
+        default: function() {
+          ++called;
+          return this.propertyA;
+        }
+      }
+    });
+
+    const testSchema = new mongoose.Schema(
+      {
+        name: String,
+        sub: { type: subSchema, default: () => ({}) }
+      }
+    );
+
+    const Test = db.model('Test', testSchema);
+
+    await Test.collection.insertOne({ name: 'test', sub: { propertyA: 'foo' } });
+    assert.strictEqual(called, 0);
+
+    const doc = await Test.findOne({ name: 'test' });
+    assert.strictEqual(doc.sub.propertyB, 'foo');
+    assert.strictEqual(called, 1);
+  });
+
+  it('If the field does not exist, $inc should create it and set is value to the specified one (gh-12435)', async function() {
+    const schema = new mongoose.Schema({
+      name: String,
+      count: Number
+    });
+    const Model = db.model('IncTest', schema);
+    const doc = new Model({ name: 'Test' });
+    await doc.save();
+    doc.$inc('count', 1);
+    await doc.save();
+
+    assert.strictEqual(doc.count, 1);
+
+    const addedDoc = await Model.findOne({ name: 'Test' });
+    assert.strictEqual(addedDoc.count, 1);
   });
 });
 

@@ -64,6 +64,26 @@ for (const file of files) {
 parse();
 
 /**
+ * @typedef {Object} TagObject
+ * @property {String} name The Processed name of the Tag (already includes all processing)
+ * @property {String} description The Description of this Tag
+ * @property {Boolean} optional Defines wheter the Tag is optional or not (already included in `name`)
+ * @property {Boolean} nullable Defines wheter the Tag is nullable (dox does not add "null" by default)
+ * @property {Boolean} nonNullable Unknown (invert of `nullable`?)
+ * @property {Boolean} variable Defines wheter the type is spreadable ("...Type")
+ * @property {String[]} types Collection of all types this Tag has
+ * @property {String} type The Type of the Tag
+ * @property {String} string The full string of types plus name plus description (unused in mongoose)
+ * @property {String} typesDescription Processed `types` into markdown code (unused in mongoose)
+ */
+
+/**
+ * @typedef {Object} SeeObject
+ * @property {String} text The text to display the link as
+ * @property {String} [url] The link the text should have as href
+ */
+
+/**
  * @typedef {Object} PropContext
  * @property {boolean} [isStatic] Defines wheter the current property is a static property (not mutually exlusive with "isInstance")
  * @property {boolean} [isInstance] Defines wheter the current property is a instance property (not mutually exlusive with "isStatic")
@@ -72,11 +92,14 @@ parse();
  * @property {boolean} [constructorWasUndefined] Defined wheter the "constructor" property was defined by "dox", but was set to "undefined"
  * @property {string} [type] Defines the type the property is meant to be
  * @property {string} [name] Defines the current Properties name
- * @property {Object} [return] The full object for a "@return" jsdoc tag
+ * @property {TagObject} [return] The full object for a "@return" jsdoc tag
  * @property {string} [string] Defines the full string the property will be listed as
  * @property {string} [anchorId] Defines the Anchor ID to be used for linking
  * @property {string} [description] Defines the Description the property will be listed with
  * @property {string} [deprecated] Defines wheter the current Property is signaled as deprecated
+ * @property {SeeObject[]} [see] Defines all "@see" references
+ * @property {TagObject[]} [param] Defines all "@param" references
+ * @property {SeeObject} [inherits] Defines the string for "@inherits"
  */
 
 function parse() {
@@ -131,8 +154,21 @@ function parse() {
         return Array.isArray(types) ? types.join('|') : types
       }
 
-      for (const tag of prop.tags) {
+      for (const __tag of prop.tags) {
+        // the following has been done, because otherwise no type could be applied for intellisense
+        /** @type {TagObject} */
+        const tag = __tag;
         switch (tag.type) {
+          case 'see':
+            if (!Array.isArray(ctx.see)) {
+              ctx.see = [];
+            }
+
+            // for this type, it needs to be parsed from the string itself to support more than 1 word
+            // this is required because "@see" is kinda badly defined and mongoose uses a slightly customized way (longer text and different kinds of links)
+
+            ctx.see.push(extractTextUrlFromTag(tag, ctx, true));
+            break;
           case 'receiver':
             console.warn(`Found "@receiver" tag in ${ctx.constructor} ${ctx.name}`);
             break;
@@ -177,7 +213,7 @@ function parse() {
             ctx.return = tag;
             break;
           case 'inherits':
-            ctx[tag.type] = tag.string;
+            ctx.inherits = extractTextUrlFromTag(tag, ctx);
             break;
           case 'event':
           case 'param':
@@ -192,6 +228,13 @@ function parse() {
             ctx[tag.type].push(tag);
             if (tag.name != null && tag.name.startsWith('[') && tag.name.endsWith(']') && tag.name.includes('.')) {
               tag.nested = true;
+            }
+            if (tag.variable) {
+              if (tag.name.startsWith('[')) {
+                tag.name = '[...' + tag.name.slice(1);
+              } else {
+                tag.name = '...' + tag.name;
+              }
             }
             tag.description = tag.description ?
               md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
@@ -272,4 +315,45 @@ function parse() {
 
     out.push(data);
   }
+}
+
+/**
+ * Extract the Text and Url from a description if any
+ * @param {Tag} tag The tag to process the resulting object from
+ * @param {PropContext} ctx The current ctx for warnings
+ * @param {Boolean} warnOnMissingUrl Warn if the url is missing, false by default
+ * @returns {{ text: string, url: string }}
+ */
+function extractTextUrlFromTag(tag, ctx, warnOnMissingUrl = false) {
+  // the following regex matches cases of:
+  // "External Links http://someurl.com/" -> "External Links"
+  // "External https://someurl.com/" -> "External"
+  // "Id href #some_Some-method" -> "Id href"
+  // "Local Absolute /docs/somewhere" -> "Local Absolute"
+  // "No Href" -> "No Href"
+  // "https://someurl.com" -> "" (fallback added)
+  // "Some#Method #something" -> "Some#Method"
+  // The remainder is simply taken by a call to "slice" (also the text is trimmed later)
+  const textMatches = /^(.*? (?=#|\/|(?:https?:)|$))/i.exec(tag.string);
+
+  let text = undefined;
+  let url = undefined;
+  if (textMatches === null || textMatches === undefined) {
+    if (warnOnMissingUrl) {
+      // warn for the cases where URL should be defined (like in "@see")
+      console.warn(`No Text Matches found in tag for "${ctx.constructor}.${ctx.name}"`)
+    }
+
+    // if no text is found, add text as url and use the url itself as the text
+    url = tag.string;
+    text = tag.string;
+  } else {
+    text = textMatches[1].trim();
+    url = tag.string.slice(text.length).trim();
+  }
+
+  return {
+    text: text || 'No Description', // fallback text, so that the final text does not end up as a empty element that cannot be seen
+    url: url || undefined, // change to be "undefined" if text is empty or non-valid
+  };
 }

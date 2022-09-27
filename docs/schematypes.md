@@ -9,14 +9,6 @@ SchemaTypes handle definition of path
 [queries](./api.html#query-js),
 and other general characteristics for Mongoose document properties.
 
-<ul class="toc">
-  <li><a href="#what-is-a-schema-type">What is a SchemaType?</a></li>
-  <li><a href="#schematype-options">SchemaType Options</a></li>
-  <li><a href="#customtypes">Creating Custom Types</a></li>
-  <li><a href="#path">The `schema.path()` Function</a></li>
-  <li><a href="#further-reading">Further Reading</a></li>
-</ul>
-
 * [What is a SchemaType?](#what-is-a-schematype)
 * [The `type` Key](#type-key)
 * [SchemaType Options](#schematype-options)
@@ -24,6 +16,7 @@ and other general characteristics for Mongoose document properties.
 * [Getters](#getters)
 * [Custom Types](#customtypes)
 * [The `schema.path()` Function](#path)
+* [Further Reading](#further-reading)
 
 <h3 id="what-is-a-schematype"><a href="#what-is-a-schematype">What is a SchemaType?</a></h3>
 
@@ -117,7 +110,7 @@ m.map = new Map([['key', 'value']]);
 m.save(callback);
 ```
 
-<h3 id="type-key"><a href="#type-key">The `type` Key</a></h3>
+<h3 id="type-key"><a href="#type-key">The <code>type</code> Key</a></h3>
 
 `type` is a special property in Mongoose schemas. When Mongoose finds
 a nested property named `type` in your schema, Mongoose assumes that
@@ -467,7 +460,7 @@ console.log(new M({ b: 'nay' }).b); // false
 
 <h4 id="arrays">Arrays</h4>
 
-Mongoose supports arrays of [SchemaTypes](./api.html#schema_Schema.Types)
+Mongoose supports arrays of [SchemaTypes](./api.html#schema_Schema-Types)
 and arrays of [subdocuments](./subdocs.html). Arrays of SchemaTypes are
 also called _primitive arrays_, and arrays of subdocuments are also called
 _document arrays_.
@@ -727,4 +720,4 @@ including what validators it has and what the type is.
 
 ### Next Up
 
-Now that we've covered `SchemaTypes`, let's take a look at [Connections](/docs/connections.md).
+Now that we've covered `SchemaTypes`, let's take a look at [Connections](/docs/connections.html).

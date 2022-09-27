@@ -117,7 +117,7 @@ declare module 'mongoose' {
     get(key: string): any;
 
     /**
-     * Returns the [MongoDB driver `MongoClient`](http://mongodb.github.io/node-mongodb-native/3.5/api/MongoClient.html) instance
+     * Returns the [MongoDB driver `MongoClient`](https://mongodb.github.io/node-mongodb-native/4.9/classes/MongoClient.html) instance
      * that this connection uses to talk to MongoDB.
      */
     getClient(): mongodb.MongoClient;
@@ -142,13 +142,19 @@ declare module 'mongoose' {
     readonly models: Readonly<{ [index: string]: Model<any> }>;
 
     /** Defines or retrieves a model. */
+    model<TSchema extends Schema = any>(
+      name: string,
+      schema?: TSchema,
+      collection?: string,
+      options?: CompileModelOptions
+    ): Model<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
-      schema?: Schema<T, U, TQueryHelpers>,
+      schema?: Schema<T, any, any, TQueryHelpers, any, any>,
       collection?: string,
       options?: CompileModelOptions
     ): U;
-    model<T>(name: string, schema?: Schema<T>, collection?: string, options?: CompileModelOptions): Model<T>;
+    model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
     /** Returns an array of model names created on this connection. */
     modelNames(): Array<string>;
@@ -191,7 +197,7 @@ declare module 'mongoose' {
     set(key: string, value: any): any;
 
     /**
-     * Set the [MongoDB driver `MongoClient`](http://mongodb.github.io/node-mongodb-native/3.5/api/MongoClient.html) instance
+     * Set the [MongoDB driver `MongoClient`](https://mongodb.github.io/node-mongodb-native/4.9/classes/MongoClient.html) instance
      * that this connection uses to talk to MongoDB. This is useful if you already have a MongoClient instance, and want to
      * reuse it.
      */
@@ -229,7 +235,7 @@ declare module 'mongoose' {
     /** The username specified in the URI */
     readonly user: string;
 
-    /** Watches the entire underlying database for changes. Similar to [`Model.watch()`](/docs/api/model.html#model_Model.watch). */
+    /** Watches the entire underlying database for changes. Similar to [`Model.watch()`](/docs/api/model.html#model_Model-watch). */
     watch<ResultType extends mongodb.Document = any>(pipeline?: Array<any>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
   }
 

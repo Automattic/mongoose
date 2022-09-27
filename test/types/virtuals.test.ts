@@ -1,4 +1,4 @@
-import { Document, Model, Schema, model } from 'mongoose';
+import { Document, Model, Schema, model, InferSchemaType, FlatRecord, ObtainSchemaGeneric } from 'mongoose';
 import { expectType } from 'tsd';
 
 interface IPerson {
@@ -85,4 +85,38 @@ function gh11543() {
   });
 
   expectType<PetVirtuals>(personSchema.virtuals);
+}
+
+function autoTypedVirtuals() {
+  type AutoTypedSchemaType = InferSchemaType<typeof testSchema>;
+  type VirtualsType = { domain: string };
+  type InferredDocType = FlatRecord<AutoTypedSchemaType & ObtainSchemaGeneric<typeof testSchema, 'TVirtuals'>>;
+
+  const testSchema = new Schema({
+    email: {
+      type: String,
+      required: [true, 'email is required']
+    }
+  }, {
+    virtuals: {
+      domain: {
+        get() {
+          expectType<Document<any, any, { email: string }> & AutoTypedSchemaType>(this);
+          return this.email.slice(this.email.indexOf('@') + 1);
+        },
+        set() {
+          expectType<Document<any, any, AutoTypedSchemaType> & AutoTypedSchemaType>(this);
+        },
+        options: {}
+      }
+    }
+  });
+
+
+  const TestModel = model('AutoTypedVirtuals', testSchema);
+
+  const doc = new TestModel();
+  expectType<string>(doc.domain);
+
+  expectType<FlatRecord<AutoTypedSchemaType & VirtualsType >>({} as InferredDocType);
 }

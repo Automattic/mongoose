@@ -1977,7 +1977,7 @@ declare module 'mongoose' {
        * @version 5.0
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/count/#mongodb-expression-exp.-count
        */
-      $count: Record<string | number | symbol, never>;
+      $count: Record<string | number | symbol, never> | Path;
     }
 
     export interface CovariancePop {
@@ -2835,7 +2835,8 @@ declare module 'mongoose' {
     Expression.Push |
     Expression.StdDevPop |
     Expression.StdDevSamp |
-    Expression.Sum;
+    Expression.Sum |
+    Expression.TopN;
 
   export type tzExpression = UTCOffset | StringExpressionOperatorReturningBoolean | string;
 

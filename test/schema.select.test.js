@@ -133,7 +133,7 @@ describe('schema select option', function() {
     describe('works', function() {
       describe('for inclusions', function() {
         let s;
-        before(function(done) {
+        beforeEach(function(done) {
           S.create({ thin: true, name: 'the included', docs: [{ name: 'test', bool: true }] }, function(err, s_) {
             assert.ifError(err);
             s = s_;
@@ -205,7 +205,7 @@ describe('schema select option', function() {
 
       describe('for exclusions', function() {
         let e;
-        before(function(done) {
+        beforeEach(function(done) {
           E.create({ thin: true, name: 'the excluded', docs: [{ name: 'test', bool: true }] }, function(err, e_) {
             e = e_;
             assert.ifError(err);

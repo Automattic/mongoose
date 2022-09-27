@@ -1,6 +1,7 @@
 import { Schema, model, Model, Document, Types } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
+import { autoTypedModelConnection } from './connection.test';
 import { AutoTypedSchemaType } from './schema.test';
 
 const Drink = model('Drink', new Schema({
@@ -198,6 +199,19 @@ function autoTypedDocument() {
 
 }
 
+function autoTypedDocumentConnection() {
+  const AutoTypedModel = autoTypedModelConnection();
+  const AutoTypeModelInstance = new AutoTypedModel({ unExistProperty: 1, description: 2 });
+
+  expectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
+  expectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
+  expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
+
+  // Document-Methods-tests
+  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
+
+}
+
 async function gh11960() {
   type DocumentType<T> = Document<any> & T;
   type SubDocumentType<T> = DocumentType<T> & Types.Subdocument;
@@ -254,4 +268,20 @@ async function gh11960() {
     doc.nested!.parent();
     doc.nestedArray?.[0].parentArray();
   }
+}
+
+function gh12290() {
+  interface IUser{
+    name: string;
+    age: number;
+  }
+  const schema = new Schema<IUser>({
+    name: String,
+    age: Number
+  });
+  const User = model<IUser>('User', schema);
+  const user = new User({ name: 'John', age: 30 });
+  user.isDirectModified(['name', 'age']);
+  user.isDirectModified('name age');
+  user.isDirectModified('name');
 }

@@ -272,7 +272,7 @@ async function gh11710() {
   expectType<Child | null>(doc.child);
 }
 
-function gh11758() {
+async function gh11758() {
   interface NestedChild {
     name: string
     _id: Types.ObjectId
@@ -297,6 +297,8 @@ function gh11758() {
   }).$assertPopulated<{ nestedChild: NestedChild }>('nestedChild');
 
   expectType<string>(parent.nestedChild.name);
+
+  await parent.save();
 }
 
 async function gh11955() {
@@ -322,4 +324,18 @@ async function gh11955() {
   const populatedParent = await parent!.populate<{ children: Child[] }>('child');
 
   populatedParent.children.find(({ name }) => console.log(name));
+}
+
+function gh12136() {
+  type ChildDocument = Child & Document;
+  type ParentDocument = Parent & Document;
+
+  class Child {
+    parent: PopulatedDoc<ParentDocument>;
+  }
+
+  class Parent {
+    child: PopulatedDoc<ChildDocument>;
+  }
+
 }

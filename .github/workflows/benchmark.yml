@@ -1,4 +1,4 @@
-name: Benchmark
+name: TypeScript Benchmark
 on:
   pull_request:
     paths:
@@ -23,7 +23,8 @@ jobs:
     name: Benchmark TypeScript Types
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
-
+        with:
+          fetch-depth: 0
       - name: Setup node
         uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93 # v3.4.1
         with:
@@ -31,6 +32,12 @@ jobs:
 
       - run: npm install
 
-      - run: npx ts-benchmark -p ./benchmarks/typescript/simple -f 17/100000 18 29 32 -b master -g --colors
+      - run: node ./scripts/create-tarball.js
+
+      - run: npm install
+        working-directory: benchmarks/typescript/simple
+
+      - run: npx ts-benchmark -p ./ -f 17/100000 18 29 32 -b master -g -t --colors
+        working-directory: benchmarks/typescript/simple
         env:
           DB_URL: ${{ secrets.DB_URL }}

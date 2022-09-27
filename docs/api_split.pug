@@ -2,15 +2,7 @@ extends layout
 
 append style
   link(rel="stylesheet", href="/docs/css/api.css")
-
-  style.
-    .api-nav .nav-item-sub {
-      display: block !important;
-    }
-
-    .api-content {
-      margin-top: 3em;
-    }
+  script(src="/docs/js/api-bold-current-nav.js")
 
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
@@ -33,7 +25,7 @@ block content
                 each prop in item.props
                   li
                     a(href='#' + prop.anchorId)
-                      | #{prop.string}
+                      | <code>#{prop.string}</code>
             - else
               div.nav-item-title
                 a(href=item.name.toLowerCase() + '.html')
@@ -44,24 +36,26 @@ block content
       each prop in props
         li
           a(href='#' + prop.anchorId)
-            | #{prop.string}
+            | <code>#{prop.string}</code>
     each prop in props
       hr.separate-api-elements
       h3(id=prop.anchorId)
         a(href='#' + prop.anchorId)
-          | #{prop.string}
+          | <code>#{prop.string}</code>
+      if prop.deprecated 
+        <span class="deprecated">~DEPRECATED~</span>
       if prop.param != null
-        h5 Parameters
+        h5 Parameters:
         ul.params
           each param in prop.param
             - if (param.nested)
               ul(style="margin-top: 0.5em")
                 li
-                  | #{param.name}
+                  | <code>#{param.name}</code>
                   | <span class="method-type">&laquo;#{param.types}&raquo;</span> !{param.description}
             - else
               li.param
-                | #{param.name}
+                | <code>#{param.name}</code>
                 | <span class="method-type">&laquo;#{param.types}&raquo;</span> !{param.description}
       if prop.return != null
         h5 Returns:
@@ -74,6 +68,11 @@ block content
       if prop.inherits != null
         h5 Inherits:
         ul
-          li <span class="method-type">&laquo;#{prop.inherits}&raquo;</span>
+          li <span class="method-type"><a href="#{prop.inherits.url}">&laquo;#{prop.inherits.text}&raquo;</a></span>
+      if prop.see != null && prop.see.length > 0
+        h5 See:
+        ul
+          each see in prop.see
+            li <span class="method-type"><a href="#{see.url}">#{see.text}</a></span>
       div
         | !{prop.description}  

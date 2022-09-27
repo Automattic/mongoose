@@ -822,6 +822,56 @@ describe('types array', function() {
         });
       });
     });
+
+    it('avoids adding default paths to query filter (gh-12294)', async function() {
+      const catschema = new Schema({
+        name: String,
+        colors: [{
+          _id: false,
+          hex: { type: String, default: '#ffffff' },
+          properties: {
+            hue: { type: Number, default: 0 }
+          },
+          name: String
+        }]
+      });
+      const Cat = db.model('Test', catschema);
+
+      const cat = new Cat({});
+      cat.init({
+        name: 'Garfield',
+        colors: [{ name: 'Orange' }]
+      });
+
+      cat.colors.pull({ name: 'Orange' });
+      assert.deepStrictEqual(cat.colors.$__getAtomics(), [[
+        '$pull',
+        { $or: [{ name: 'Orange' }] }
+      ]]);
+    });
+
+    it('avoids adding default paths to query filter with _id (gh-12294)', async function() {
+      const catschema = new Schema({
+        name: String,
+        colors: [{
+          hex: { type: String, default: '#ffffff' },
+          name: String
+        }]
+      });
+      const Cat = db.model('Test', catschema);
+
+      const cat = new Cat({});
+      cat.init({
+        name: 'Garfield',
+        colors: [{ name: 'Orange' }]
+      });
+
+      cat.colors.pull({ name: 'Orange' });
+      assert.deepStrictEqual(cat.colors.$__getAtomics(), [[
+        '$pull',
+        { $or: [{ name: 'Orange' }] }
+      ]]);
+    });
   });
 
   describe('$pop()', function() {
@@ -1191,6 +1241,20 @@ describe('types array', function() {
       doc.arr.push('foo');
       assert.ifError(doc.validateSync());
       assert.deepEqual(doc.arr.toObject(), ['good', 'foo']);
+
+      // test also having the property option set
+
+      // the following should work because "castNonArrays" (property option) overwrites global
+      const bothSchema = new Schema({ arr: { castNonArrays: true, type: [String] }, docArr: { castNonArrays: true, type: [{ name: String }] } });
+      const bothModel = db.model('Test2', bothSchema);
+      let bothdoc = new bothModel({ arr: 'fail', docArr: { name: 'fail' } });
+      assert.ifError(doc.validateSync());
+
+      bothdoc = new bothModel({ arr: ['good'] });
+      assert.ifError(bothdoc.validateSync());
+      bothdoc.arr.push('foo');
+      assert.ifError(bothdoc.validateSync());
+      assert.deepEqual(bothdoc.arr.toObject(), ['good', 'foo']);
 
       return Promise.resolve();
     });
@@ -2150,5 +2214,46 @@ describe('types array', function() {
 
     assert.strictEqual(doc.arr[0], '42');
     assert.strictEqual(arr[0], 42);
+  });
+
+  it('test "castNonArrays" property option', function() {
+    const Model = db.model('Test', new Schema({ x1: { castNonArrays: false, type: [String] }, x2: { castNonArrays: true, type: [String] }, x3: { type: [String] } }));
+
+    const string = 'hello';
+
+    // error testing
+    let doc = new Model({ x1: string });
+    const validateErrors = doc.validateSync().errors;
+    assert.ok(validateErrors);
+    assert.equal(validateErrors['x1'].name, 'CastError');
+
+    // good testing
+    doc = new Model({ x2: string });
+    assert.ifError(doc.validateSync());
+    doc.x2.push('foo');
+    assert.ifError(doc.validateSync());
+    assert.deepEqual(doc.x2.toObject(), ['hello', 'foo']);
+
+    // without option (default)
+    doc = new Model({ x3: string });
+    assert.ifError(doc.validateSync());
+    doc.x3.push('foo');
+    assert.ifError(doc.validateSync());
+    assert.deepEqual(doc.x3.toObject(), ['hello', 'foo']);
+  });
+
+  it('`castNonArrays` on specific paths takes precedence over global option', function() {
+    // Arrange
+    const m = new mongoose.Mongoose();
+    m.Schema.Types.Array.options.castNonArrays = false;
+
+    const userSchema = new Schema({ friendsNames: { type: [String], castNonArrays: true } });
+    const User = m.model('User', userSchema);
+
+    // Act
+    const user = new User({ friendsNames: 'Sam' });
+
+    // Assert
+    assert.ifError(user.validateSync());
   });
 });

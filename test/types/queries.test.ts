@@ -341,3 +341,16 @@ function gh12091() {
   }
   update.$addToSet.friendsNames = 'Jane Doe';
 }
+
+function gh12142() {
+  const schema = new Schema({ name: String, comments: [{ text: String }] });
+
+  const Test = model('Test', schema);
+
+  Test.updateOne(
+    { _id: new Types.ObjectId() },
+    {
+      $pull: { comments: new Types.ObjectId() }
+    }
+  );
+}

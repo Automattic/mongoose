@@ -7,7 +7,12 @@ import {
   model,
   Types,
   UpdateQuery,
-  CallbackError
+  CallbackError,
+  HydratedDocument,
+  HydratedDocumentFromSchema,
+  LeanDocument,
+  Query,
+  UpdateWriteOpResult
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -282,6 +287,33 @@ function bulkWrite() {
   M.bulkWrite(ops);
 }
 
+function bulkWriteAddToSet() {
+  const schema = new Schema({
+    arr: [String]
+  });
+
+  const M = model('Test', schema);
+
+  const ops = [
+    {
+      updateOne: {
+        filter: {
+          arr: {
+            $nin: ['abc']
+          }
+        },
+        update: {
+          $addToSet: {
+            arr: 'abc'
+          }
+        }
+      }
+    }
+  ];
+
+  return M.bulkWrite(ops);
+}
+
 export function autoTypedModel() {
   const AutoTypedSchema = autoTypedSchema();
   const AutoTypedModel = model('AutoTypeModel', AutoTypedSchema);
@@ -329,6 +361,63 @@ function gh11911() {
   });
 }
 
+
+function gh12059() {
+  interface IAnimal {
+    name?: string;
+  }
+
+  const animalSchema = new Schema<IAnimal>({
+    name: { type: String }
+  });
+
+  const Animal = model<IAnimal>('Animal', animalSchema);
+  const animal = new Animal();
+
+  Animal.bulkSave([animal], { timestamps: false });
+  Animal.bulkSave([animal], { timestamps: true });
+  Animal.bulkSave([animal], {});
+}
+
+function schemaInstanceMethodsAndQueryHelpers() {
+  type UserModelQuery = Query<any, HydratedDocument<User>, UserQueryHelpers> & UserQueryHelpers;
+  interface UserQueryHelpers {
+    byName(this: UserModelQuery, name: string): this
+  }
+  interface User {
+    name: string;
+  }
+  interface UserInstanceMethods {
+    doSomething(this: HydratedDocument<User>): string;
+  }
+  interface UserStaticMethods {
+    findByName(name: string): Promise<HydratedDocument<User>>;
+  }
+  type UserModel = Model<User, UserQueryHelpers, UserInstanceMethods> & UserStaticMethods;
+
+  const userSchema = new Schema<User, UserModel, UserInstanceMethods, UserQueryHelpers, any, UserStaticMethods>({
+    name: String
+  }, {
+    statics: {
+      findByName(name: string) {
+        return model('User').findOne({ name }).orFail();
+      }
+    },
+    methods: {
+      doSomething() {
+        return 'test';
+      }
+    },
+    query: {
+      byName(this: UserModelQuery, name: string) {
+        return this.where({ name });
+      }
+    }
+  });
+
+  const TestModel = model<User, UserModel, UserQueryHelpers>('User', userSchema);
+}
+
 function gh12100() {
   const schema = new Schema();
 
@@ -345,3 +434,89 @@ function gh12100() {
 
   expectType<string>(obj._id);
 })();
+
+(async function gh12094() {
+  const userSchema = new Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    avatar: String
+  });
+
+  const User = model('User', userSchema);
+
+  const doc = await User.exists({ name: 'Bill' }).orFail();
+  expectType<Types.ObjectId>(doc._id);
+})();
+
+
+function modelRemoveOptions() {
+  const cmodel = model('Test', new Schema());
+
+  cmodel.remove({}, {});
+}
+
+async function gh12286() {
+  interface IUser{
+    name: string;
+  }
+  const schema = new Schema<IUser>({
+    name: { type: String, required: true }
+  });
+
+  const User = model<IUser>('User', schema);
+
+  const user = await User.findById('0'.repeat(24), { name: 1 }).lean();
+  expectType<string | undefined>(user?.name);
+}
+
+
+function gh12332() {
+  interface IUser{
+    age: number
+  }
+  const schema = new Schema<IUser>({ age: Number });
+
+  const User = model<IUser>('User', schema);
+
+  User.castObject({ age: '19' });
+  User.castObject({ age: '19' }, { ignoreCastErrors: true });
+}
+
+async function gh12347() {
+  interface IUser{
+    name: string;
+  }
+  const schema = new Schema<IUser>({
+    name: { type: String, required: true }
+  });
+
+  const User = model<IUser>('User', schema);
+
+  const replaceOneResult = await User.replaceOne({}, {});
+  expectType<UpdateWriteOpResult>(replaceOneResult);
+}
+
+async function gh12319() {
+  const projectSchema = new Schema(
+    {
+      name: {
+        type: String,
+        required: true
+      }
+    },
+    {
+      methods: {
+        async doSomething() {
+        }
+      }
+    }
+  );
+
+  const ProjectModel = model('Project', projectSchema);
+
+  type ProjectModelHydratedDoc = HydratedDocumentFromSchema<
+    typeof projectSchema
+  >;
+
+  expectType<ProjectModelHydratedDoc>(await ProjectModel.findOne().orFail());
+}

@@ -2625,35 +2625,23 @@ describe('Query', function() {
   describe('handles falsy and object projections with defaults (gh-3256)', function() {
     let MyModel;
 
-    before(function(done) {
+    before(function() {
       const PersonSchema = new Schema({
         name: String,
         lastName: String,
-        dependents: [String]
+        dependents: [String],
+        salary: { type: Number, default: 25000 }
       });
 
       db.deleteModel(/Person/);
-      const m = db.model('Person', PersonSchema);
+      MyModel = db.model('Person', PersonSchema);
+    });
 
-      const obj = {
+    beforeEach(async function() {
+      await MyModel.collection.insertOne({
         name: 'John',
         lastName: 'Doe',
         dependents: ['Jake', 'Jill', 'Jane']
-      };
-      m.create(obj, function(error) {
-        assert.ifError(error);
-
-        const PersonSchema = new Schema({
-          name: String,
-          lastName: String,
-          dependents: [String],
-          salary: { type: Number, default: 25000 }
-        });
-
-        db.deleteModel(/Person/);
-        MyModel = db.model('Person', PersonSchema);
-
-        done();
       });
     });
 
@@ -3574,7 +3562,8 @@ describe('Query', function() {
     let Model;
 
     beforeEach(function() {
-      Model = db.model('Test', Schema({ name: String, age: Number }));
+      const schema = new Schema({ name: String, age: Number });
+      Model = db.model('Test', schema);
 
       return Model.create([
         { name: 'Jean-Luc Picard', age: 59 },
@@ -3583,7 +3572,6 @@ describe('Query', function() {
     });
 
     it('with findOne', async function() {
-
       const q = Model.findOne({ age: 29 });
       const q2 = q.clone();
 
@@ -3601,7 +3589,6 @@ describe('Query', function() {
     });
 
     it('with deleteOne', async function() {
-
       const q = Model.deleteOne({ age: 29 });
 
       await q;
@@ -3615,7 +3602,6 @@ describe('Query', function() {
     });
 
     it('with updateOne', async function() {
-
       const q = Model.updateOne({ name: 'Will Riker' }, { name: 'Thomas Riker' });
 
       await q;
@@ -3639,6 +3625,22 @@ describe('Query', function() {
       assert.deepEqual(q2._distinct, 'name');
       await q2;
       assert.deepEqual(res.sort(), ['Jean-Luc Picard', 'Will Riker']);
+    });
+
+    it('with hooks (gh-12365)', async function() {
+      db.deleteModel('Test');
+
+      const schema = new Schema({ name: String, age: Number });
+      let called = 0;
+      schema.pre('find', () => ++called);
+      Model = db.model('Test', schema);
+
+      assert.strictEqual(called, 0);
+
+      const res = await Model.find().clone();
+      assert.strictEqual(called, 1);
+      assert.equal(res.length, 2);
+      assert.deepEqual(res.map(doc => doc.name).sort(), ['Jean-Luc Picard', 'Will Riker']);
     });
   });
 
@@ -3992,7 +3994,7 @@ describe('Query', function() {
     });
   });
 
-  it('allows a transform option for lean on a query gh-10423', async function() {
+  it('allows a transform option for lean on a query (gh-10423)', async function() {
     const arraySchema = new mongoose.Schema({
       sub: String
     });
@@ -4004,7 +4006,7 @@ describe('Query', function() {
       foo: [arraySchema],
       otherName: subDoc
     });
-    const Test = db.model('gh10423', testSchema);
+    const Test = db.model('Test', testSchema);
     await Test.create({ name: 'foo', foo: [{ sub: 'Test' }, { sub: 'Testerson' }], otherName: { nickName: 'Bar' } });
 
     const result = await Test.find().lean({
@@ -4030,6 +4032,40 @@ describe('Query', function() {
     assert.strictEqual(single.foo[0]._id, undefined);
   });
 
+  it('handles a lean transform that deletes _id with populate (gh-12143) (gh-10423)', async function() {
+    const testSchema = Schema({
+      name: String,
+      user: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+      }
+    });
+
+    const userSchema = Schema({
+      name: String
+    });
+
+    const Test = db.model('Test', testSchema);
+    const User = db.model('User', userSchema);
+
+    const user = await User.create({ name: 'John Smith' });
+    let test = await Test.create({ name: 'test', user });
+
+    test = await Test.findById(test).populate('user').lean({
+      transform: (doc) => {
+        delete doc._id;
+        delete doc.__v;
+        return doc;
+      }
+    });
+
+    assert.ok(test);
+    assert.deepStrictEqual(test, {
+      name: 'test',
+      user: { name: 'John Smith' }
+    });
+  });
+
   it('skips applying default projections over slice projections (gh-11940)', async function() {
     const commentSchema = new mongoose.Schema({
       comment: String
@@ -4051,5 +4087,49 @@ describe('Query', function() {
     assert.equal(doc.comments.length, 1);
     assert.equal(doc.comments[0].comment, 'test2');
 
+  });
+
+  describe('set()', function() {
+    it('overwrites top-level keys if setting to undefined (gh-12155)', function() {
+      const testSchema = new mongoose.Schema({
+        key: String,
+        prop: String
+      });
+      const Test = db.model('Test', testSchema);
+
+      const query = Test.findOneAndUpdate({}, { key: '', prop: 'foo' });
+
+      query.set('key', undefined);
+      const update = query.getUpdate();
+
+      assert.deepEqual(update, {
+        $set: { key: undefined },
+        prop: 'foo'
+      });
+    });
+  });
+
+  it('select: false is ignored for type Map (gh-12445)', async function() {
+    const testSchema = new mongoose.Schema({
+      select: {
+        type: Map,
+        of: Object
+      },
+      doNotSelect: {
+        type: Map,
+        of: Object,
+        select: false
+      }
+    });
+
+    const Test = db.model('Test', testSchema);
+    await Test.create({
+      select: { key: { some: 'value' } },
+      doNotSelect: { otherKey: { someOther: 'value' } }
+    });
+
+    const item = await Test.findOne();
+    assert.equal(item.get('select.key.some'), 'value');
+    assert.equal(item.doNotSelect, undefined);
   });
 });

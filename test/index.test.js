@@ -15,8 +15,6 @@ const mongoose = start.mongoose;
 const Mongoose = mongoose.Mongoose;
 const Schema = mongoose.Schema;
 
-const uri = start.uri;
-
 const options = {};
 
 describe('mongoose module:', function() {
@@ -25,7 +23,7 @@ describe('mongoose module:', function() {
       const goose = new Mongoose();
       const db = goose.connection;
 
-      await goose.connect(process.env.MONGOOSE_TEST_URI || uri, options);
+      await goose.connect(start.uri, options);
       await db.close();
     });
 
@@ -33,7 +31,7 @@ describe('mongoose module:', function() {
       const goose = new Mongoose();
       const db = goose.connection;
 
-      await goose.connect(process.env.MONGOOSE_TEST_URI || uri, options);
+      await goose.connect(start.uri, options);
 
       await db.close();
     });
@@ -85,7 +83,7 @@ describe('mongoose module:', function() {
     const User = mongoose.model('User', new Schema({ name: String }));
 
 
-    await mongoose.connect(uri);
+    await mongoose.connect(start.uri);
     await User.findOne();
     assert.equal(written.length, 1);
     assert.ok(written[0].startsWith('users.findOne('));
@@ -190,7 +188,7 @@ describe('mongoose module:', function() {
       name: { type: String, required: true }
     }));
 
-    await mongoose.connect(uri, options);
+    await mongoose.connect(start.uri, options);
 
     const err = await M.updateOne({}, { name: null }).then(() => null, err => err);
     assert.ok(err.errors['name']);
@@ -472,7 +470,7 @@ describe('mongoose module:', function() {
     const M = mongoose.model('gh6728', schema);
 
 
-    await mongoose.connect(uri);
+    await mongoose.connect(start.uri);
 
     const doc = new M({ name: 'foo' });
 
@@ -525,7 +523,7 @@ describe('mongoose module:', function() {
         let disconnections = 0;
         let pending = 4;
 
-        mong.connect(process.env.MONGOOSE_TEST_URI || uri, options);
+        mong.connect(start.uri, options);
         const db = mong.connection;
 
         function cb() {
@@ -548,7 +546,7 @@ describe('mongoose module:', function() {
         const events = [];
         mong.events.on('createConnection', conn => events.push(conn));
 
-        const db2 = mong.createConnection(process.env.MONGOOSE_TEST_URI || uri, options);
+        const db2 = mong.createConnection(start.uri, options);
 
         assert.equal(events.length, 1);
         assert.equal(events[0], db2);
@@ -570,7 +568,7 @@ describe('mongoose module:', function() {
     it('with callback', function(done) {
       const mong = new Mongoose();
 
-      mong.connect(process.env.MONGOOSE_TEST_URI || uri, options);
+      mong.connect(start.uri, options);
 
       mong.connection.on('open', function() {
         mong.disconnect(function() {
@@ -582,7 +580,7 @@ describe('mongoose module:', function() {
     it('with promise (gh-3790)', function(done) {
       const _mongoose = new Mongoose();
 
-      _mongoose.connect(process.env.MONGOOSE_TEST_URI || uri, options);
+      _mongoose.connect(start.uri, options);
 
       _mongoose.connection.on('open', function() {
         _mongoose.disconnect().then(function() { done(); });
@@ -712,7 +710,7 @@ describe('mongoose module:', function() {
     it('with single mongod', async function() {
       const mong = new Mongoose();
 
-      await mong.connect(uri, options);
+      await mong.connect(start.uri, options);
 
       await mong.connection.close();
     });
@@ -1084,6 +1082,24 @@ describe('mongoose module:', function() {
 
       const res = await Test.findOne();
       assert.deepEqual(res.toObject(), { answer: 42 });
+    });
+  });
+  describe('global id option', function() {
+    it('can disable the id virtual on schemas gh-11966', async function() {
+      const m = new mongoose.Mongoose();
+      m.set('id', false);
+
+      const db = await m.connect(start.uri);
+
+      const schema = new m.Schema({ title: String });
+
+      const falseID = db.model('gh11966', schema);
+
+
+      const entry = await falseID.create({
+        title: 'The IDless master'
+      });
+      assert.equal(entry.id, undefined);
     });
   });
 });

@@ -552,7 +552,7 @@ describe('timestamps', function() {
     let CatSchema;
     let Cat;
 
-    before(function() {
+    beforeEach(function() {
       CatSchema = new Schema({
         name: String,
         hobby: String
@@ -740,10 +740,6 @@ describe('timestamps', function() {
           });
         });
       });
-    });
-
-    after(function() {
-      return Cat.deleteMany({});
     });
   });
 
@@ -963,6 +959,72 @@ describe('timestamps', function() {
     updatedParent = await Test.findOne({ age: 12 });
     assert.ok(updatedParent.child.created instanceof Date);
     assert.strictEqual(updatedParent.child.created.valueOf(), date.valueOf());
+  });
+
+  it('sets timestamps on sub-schema if parent schema does not have timestamps: true (gh-12119)', async function() {
+    // `timestamps` option set to true on deepest sub document
+    const ConditionSchema = new mongoose.Schema({
+      kind: String,
+      amount: Number
+    }, { timestamps: true });
+
+    // no `timestamps` option defined
+    const ProfileSchema = new mongoose.Schema({
+      conditions: [ConditionSchema]
+    });
+
+    const UserSchema = new mongoose.Schema({
+      name: String,
+      profile: {
+        type: ProfileSchema
+      }
+    }, { timestamps: true });
+
+    const User = db.model('User', UserSchema);
+
+    const res = await User.findOneAndUpdate(
+      { name: 'test' },
+      { $set: { profile: { conditions: [{ kind: 'price', amount: 10 }] } } },
+      { upsert: true, returnDocument: 'after' }
+    );
+
+    assert.ok(res.profile.conditions[0].createdAt);
+    assert.ok(res.profile.conditions[0].updatedAt);
+  });
+
+  it('works with insertMany() and embedded discriminators (gh-12150)', async function() {
+    const AssetSchema = new Schema({ url: String, size: String }, { timestamps: true });
+    const HeaderSectionSchema = new Schema({
+      title: String,
+      image: AssetSchema
+    });
+
+    // Abstract section
+    const BaseSectionSchema = new Schema({
+      isVisible: Boolean
+    }, { discriminatorKey: 'kind' });
+
+    // Main Schema
+    const PageSchema = new Schema({
+      sections: [BaseSectionSchema] // Same error without the array "sections: BaseSectionSchema"
+    }, { timestamps: true });
+
+    const sections = PageSchema.path('sections');
+    sections.discriminator('header', HeaderSectionSchema);
+
+    const Test = db.model('Test', PageSchema);
+
+    await Test.insertMany([{
+      sections: {
+        isVisible: true,
+        kind: 'header',
+        title: 'h1'
+      }
+    }]);
+
+    const doc = await Test.findOne();
+    assert.equal(doc.sections.length, 1);
+    assert.equal(doc.sections[0].title, 'h1');
   });
 });
 

@@ -26,7 +26,7 @@ declare module 'mongoose' {
     __v?: any;
 
     /** Assert that a given path or paths is populated. Throws an error if not populated. */
-    $assertPopulated<Paths = {}>(paths: string | string[]): Omit<this, keyof Paths> & Paths;
+    $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): Omit<this, keyof Paths> & Paths;
 
     /* Get all subdocs (by bfs) */
     $getAllSubdocs(): Document[];
@@ -42,6 +42,13 @@ declare module 'mongoose' {
 
     /** Returns an array of all populated documents associated with the query */
     $getPopulatedDocs(): Document[];
+
+    /**
+     * Increments the numeric value at `path` by the given `val`.
+     * When you call `save()` on this document, Mongoose will send a
+     * `$inc` as opposed to a `$set`.
+     */
+    $inc(path: string | string[], val?: number): this;
 
     /**
      * Returns true if the given path is nullish or only contains empty objects.
@@ -157,7 +164,7 @@ declare module 'mongoose' {
     invalidate(path: string, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
 
     /** Returns true if `path` was directly set and modified, else false. */
-    isDirectModified(path: string): boolean;
+    isDirectModified(path: string | Array<string>): boolean;
 
     /** Checks if `path` was explicitly selected. If no projection, always returns true. */
     isDirectSelected(path: string): boolean;

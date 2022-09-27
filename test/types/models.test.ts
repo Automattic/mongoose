@@ -12,7 +12,8 @@ import {
   HydratedDocumentFromSchema,
   LeanDocument,
   Query,
-  UpdateWriteOpResult
+  UpdateWriteOpResult,
+  InferSchemaType
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -312,6 +313,33 @@ function bulkWriteAddToSet() {
   ];
 
   return M.bulkWrite(ops);
+}
+
+async function gh12277() {
+  type DocumentType<T> = Document<any, any, T> & T;
+
+  interface BaseModelClassDoc {
+    firstname: string;
+  }
+
+  const baseModelClassSchema = new Schema({
+    firstname: String
+  });
+
+  const BaseModel = model<DocumentType<BaseModelClassDoc>>('test', baseModelClassSchema);
+
+  await BaseModel.bulkWrite([
+    {
+      updateOne: {
+        update: {
+          firstname: 'test'
+        },
+        filter: {
+          firstname: 'asdsd'
+        }
+      }
+    }
+  ]);
 }
 
 export function autoTypedModel() {

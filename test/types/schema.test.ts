@@ -564,6 +564,17 @@ const discriminatedSchema = batchSchema.discriminator('event', eventSchema);
 
 expectType<Schema<Omit<{ name: string }, 'message'> & { message: string }>>(discriminatedSchema);
 
+// discriminator statics
+const eventSchema2 = new Schema({ message: String }, { discriminatorKey: 'kind', statics: { static1: function() {
+  return 0;
+} } });
+const batchSchema2 = new Schema({ name: String }, { discriminatorKey: 'kind', statics: { static2: function() {
+  return 1;
+} } });
+const discriminatedSchema2 = batchSchema2.discriminator('event', eventSchema2);
+
+expectAssignable<Schema<Omit<{ name: string }, 'message'> & { message: string }, Model<any>, {}, {}, {}, { static1(): number; static2(): number; }>>(discriminatedSchema2);
+
 function gh11828() {
   interface IUser {
     name: string;
@@ -740,4 +751,15 @@ function pluginOptions() {
   // test overwriting options
   schema.plugin<any, SomePluginOptions>(pluginFunction2, { option2: 0 });
   expectError(schema.plugin<any, SomePluginOptions>(pluginFunction2, {})); // should error because "option2" is not optional
+}
+
+function gh12242() {
+  const dbExample = new Schema(
+    {
+      active: { type: Number, enum: [0, 1] as const, required: true }
+    }
+  );
+
+  type Example = InferSchemaType<typeof dbExample>;
+  expectType<0 | 1>({} as Example['active']);
 }

@@ -15,6 +15,20 @@ Before we get into the specifics of validation syntax, please keep the following
 [require:Validation$]
 ```
 
+- [Built-in Validators](#built-in-validators)
+- [Custom Error Messages](#custom-error-messages)
+- [The `unique` Option is Not a Validator](#the-unique-option-is-not-a-validator)
+- [Custom Validators](#custom-validators)
+- [Async Custom Validators](#async-custom-validators)
+- [Validation Errors](#validation-errors)
+- [Cast Errors](#cast-errors)
+- [Global SchemaType Validation](#global-schematype-validation)
+- [Required Validators On Nested Objects](#required-validators-on-nested-objects)
+- [Update Validators](#update-validators)
+- [Update Validators and `this`](#update-validators-and-this)
+- [Update Validators Only Run On Updated Paths](#update-validators-only-run-on-updated-paths)
+- [Update Validators Only Run For Some Operations](#update-validators-only-run-for-some-operations)
+
 ### Built-in Validators
 
 Mongoose has several built-in validators.
@@ -107,6 +121,15 @@ fails. That means your custom validators may assume `v` is `null`,
 [require:Cast Errors]
 ```
 
+### Global SchemaType Validation
+
+In addition to defining custom validators on individual schema paths, you can also configure a custom validator to run on every instance of a given `SchemaType`.
+For example, the following code demonstrates how to make empty string `''` an invalid value for _all_ string paths.
+
+```javascript
+[require:Global SchemaType Validation]
+```
+
 ### Required Validators On Nested Objects
 
 Defining validators on nested objects in mongoose is tricky, because
@@ -148,15 +171,6 @@ not defined.
 [require:Update Validators and `this`]
 ```
 
-### The `context` option
-
-The `context` option lets you set the value of `this` in update validators
-to the underlying query.
-
-```javascript
-[require:The `context` option]
-```
-
 ### Update Validators Only Run On Updated Paths
 
 The other key difference is that update validators only run on the paths
@@ -178,10 +192,10 @@ following update operators:
 
 - `$set`
 - `$unset`
-- `$push` (>= 4.8.0)
-- `$addToSet` (>= 4.8.0)
-- `$pull` (>= 4.12.0)
-- `$pullAll` (>= 4.12.0)
+- `$push`
+- `$addToSet`
+- `$pull`
+- `$pullAll`
 
 For instance, the below update will succeed, regardless of the value of
 `number`, because update validators ignore `$inc`.

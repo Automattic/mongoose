@@ -9,6 +9,7 @@ import {
   UpdateQuery,
   CallbackError,
   HydratedDocument,
+  HydratedDocumentFromSchema,
   LeanDocument,
   Query,
   UpdateWriteOpResult
@@ -493,4 +494,29 @@ async function gh12347() {
 
   const replaceOneResult = await User.replaceOne({}, {});
   expectType<UpdateWriteOpResult>(replaceOneResult);
+}
+
+async function gh12319() {
+  const projectSchema = new Schema(
+    {
+      name: {
+        type: String,
+        required: true
+      }
+    },
+    {
+      methods: {
+        async doSomething() {
+        }
+      }
+    }
+  );
+
+  const ProjectModel = model('Project', projectSchema);
+
+  type ProjectModelHydratedDoc = HydratedDocumentFromSchema<
+    typeof projectSchema
+  >;
+
+  expectType<ProjectModelHydratedDoc>(await ProjectModel.findOne().orFail());
 }

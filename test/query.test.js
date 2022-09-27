@@ -4108,4 +4108,28 @@ describe('Query', function() {
       });
     });
   });
+
+  it('select: false is ignored for type Map (gh-12445)', async function() {
+    const testSchema = new mongoose.Schema({
+      select: {
+        type: Map,
+        of: Object
+      },
+      doNotSelect: {
+        type: Map,
+        of: Object,
+        select: false
+      }
+    });
+
+    const Test = db.model('Test', testSchema);
+    await Test.create({
+      select: { key: { some: 'value' } },
+      doNotSelect: { otherKey: { someOther: 'value' } }
+    });
+
+    const item = await Test.findOne();
+    assert.equal(item.get('select.key.some'), 'value');
+    assert.equal(item.doNotSelect, undefined);
+  });
 });

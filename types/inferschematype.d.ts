@@ -156,7 +156,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
   PathValueType extends Schema ? InferSchemaType<PathValueType> :
     PathValueType extends (infer Item)[] ? IfEquals<Item, never, any[], Item extends Schema ? Types.DocumentArray<ResolvePathType<Item>> : ResolvePathType<Item>[]> :
       PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
-        PathValueType extends NumberSchemaDefinition ? number :
+        PathValueType extends NumberSchemaDefinition ? Options['enum'] extends ReadonlyArray<any> ? Options['enum'][number] : number :
           PathValueType extends DateSchemaDefinition ? Date :
             PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
               PathValueType extends BooleanSchemaDefinition ? boolean :

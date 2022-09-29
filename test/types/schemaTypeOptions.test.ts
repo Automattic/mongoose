@@ -14,7 +14,7 @@ import {
   ObjectIdSchemaDefinition,
   StringSchemaDefinition
 } from 'mongoose';
-import { expectType } from 'tsd';
+import { expectError, expectType } from 'tsd';
 
 (new SchemaTypeOptions<boolean>()) instanceof SchemaTypeOptions;
 
@@ -31,3 +31,25 @@ expectType<AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string>
 expectType<AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number>> | undefined>(new SchemaTypeOptions<number[]>().type);
 expectType<AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean>> | undefined>(new SchemaTypeOptions<boolean[]>().type);
 expectType<(Function | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<Function> | Function | AnyArray<Function>) | undefined>(new SchemaTypeOptions<Function>().type);
+
+function index() {
+  new SchemaTypeOptions<string>().index = true;
+  new SchemaTypeOptions<string>().index = false;
+  new SchemaTypeOptions<string>().index = 1;
+  new SchemaTypeOptions<string>().index = -1;
+  new SchemaTypeOptions<string>().index = 'text';
+  new SchemaTypeOptions<string>().index = '2d';
+  new SchemaTypeOptions<string>().index = 'geoHaystack';
+  new SchemaTypeOptions<string>().index = 'hashed';
+  new SchemaTypeOptions<string>().index = 'ascending';
+  new SchemaTypeOptions<string>().index = 'asc';
+  new SchemaTypeOptions<string>().index = 'descending';
+  new SchemaTypeOptions<string>().index = 'desc';
+
+  expectError<SchemaTypeOptions<string>['index']>(''); // test empty string value
+  expectError<SchemaTypeOptions<string>['index']>('invalid'); // test invalid string value
+  expectError<SchemaTypeOptions<string>['index']>(0); // test invalid number
+  expectError<SchemaTypeOptions<string>['index']>(2); // test invalid number
+  expectError<SchemaTypeOptions<string>['index']>(-2); // test invalid number
+  expectError<SchemaTypeOptions<string>['index']>(new Date()); // test invalid type
+}

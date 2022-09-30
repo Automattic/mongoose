@@ -89,6 +89,16 @@ movieSchema.index({ tile: 'ascending' });
 movieSchema.index({ tile: 'asc' });
 movieSchema.index({ tile: 'descending' });
 movieSchema.index({ tile: 'desc' });
+movieSchema.index({ tile: 'hashed' });
+movieSchema.index({ tile: 'geoHaystack' });
+
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: 2 }); // test invalid number
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: -2 }); // test invalid number
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: '' }); // test empty string
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: 'invalid' }); // test invalid string
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: new Date() }); // test invalid type
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: true }); // test that booleans are not allowed
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: false }); // test that booleans are not allowed
 
 // Using `SchemaDefinition`
 interface IProfile {

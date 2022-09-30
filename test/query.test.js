@@ -4132,4 +4132,20 @@ describe('Query', function() {
     assert.equal(item.get('select.key.some'), 'value');
     assert.equal(item.doNotSelect, undefined);
   });
+
+  it('treats ObjectId as object with `_id` for `merge()` (gh-12325)', async function() {
+    const testSchema = new mongoose.Schema({ name: String });
+    const Test = db.model('Test', testSchema);
+    const _id = new mongoose.Types.ObjectId();
+
+    let q = Test.find(_id);
+
+    assert.ok(q.getFilter()._id instanceof mongoose.Types.ObjectId);
+    assert.equal(q.getFilter()._id.toHexString(), _id.toHexString());
+
+    q = Test.findOne(_id);
+
+    assert.ok(q.getFilter()._id instanceof mongoose.Types.ObjectId);
+    assert.equal(q.getFilter()._id.toHexString(), _id.toHexString());
+  });
 });

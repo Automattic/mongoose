@@ -1027,7 +1027,7 @@ describe('timestamps', function() {
     assert.equal(doc.sections[0].title, 'h1');
   });
 
-  it('findOneAndUpdate creates subdocuments with timestamps in reverse order', async function() {
+  it('findOneAndUpdate creates subdocuments with timestamps in correct order (gh-12475)', async function() {
     const testSchema = new Schema(
       {
         uuid: String,
@@ -1046,8 +1046,8 @@ describe('timestamps', function() {
     }, { upsert: true, new: true, runValidators: true });
 
     for (const address of newItem.addresses) {
-      const expected = `{"location":"${address.location}","_id":"${address._id}","createdAt":"${address.createdAt.toISOString()}","updatedAt":"${address.updatedAt.toISOString()}"}`;
-      assert.equal(JSON.stringify(address), expected);
+      const keys = Object.keys(address.toObject());
+      assert.deepStrictEqual(keys, ['location', '_id', 'createdAt', 'updatedAt']);
     }
   });
 });

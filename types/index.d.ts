@@ -162,19 +162,20 @@ declare module 'mongoose' {
       : M
     : M;
 
-  export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, T> = T extends Schema<infer T1, infer T2, infer T3, infer T4, infer T5>
-    ? Schema<Omit<DocType, keyof T1> & T1, DiscriminatorModel<T2, M>, T3 | TInstanceMethods, T4 | TQueryHelpers, T5 | TVirtuals>
-    : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals>;
+  export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods, DisSchema> =
+    DisSchema extends Schema<infer DisSchemaEDocType, infer DisSchemaM, infer DisSchemaInstanceMethods, infer DisSchemaQueryhelpers, infer DisSchemaVirtuals, infer DisSchemaStatics>
+      ? Schema<Omit<DocType, keyof DisSchemaEDocType> & DisSchemaEDocType, DiscriminatorModel<DisSchemaM, M>, DisSchemaInstanceMethods | TInstanceMethods, DisSchemaQueryhelpers | TQueryHelpers, DisSchemaVirtuals | TVirtuals, DisSchemaStatics & TStaticMethods>
+      : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>;
 
   type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
 
   type PluginFunction<
     DocType,
-    M = Model<DocType, any, any, any>,
-    TInstanceMethods = {},
-    TQueryHelpers = {},
-    TVirtuals = {},
-    TStaticMethods = {}> = (schema: Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
+    M,
+    TInstanceMethods,
+    TQueryHelpers,
+    TVirtuals,
+    TStaticMethods> = (schema: Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
 
   export class Schema<
     EnforcedDocType = any,
@@ -207,7 +208,7 @@ declare module 'mongoose' {
     /** Returns a copy of this schema */
     clone<T = this>(): T;
 
-    discriminator<T = Schema>(name: string, schema: T): DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, T>;
+    discriminator<DisSchema = Schema>(name: string, schema: DisSchema): DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods, DisSchema>;
 
     /** Returns a new schema that has the picked `paths` from this schema. */
     pick<T = this>(paths: string[], options?: SchemaOptions): T;
@@ -263,7 +264,7 @@ declare module 'mongoose' {
     pathType(path: string): string;
 
     /** Registers a plugin for this schema. */
-    plugin<PFunc extends PluginFunction<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
+    plugin<PFunc extends PluginFunction<DocType, M, any, any, any, any>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
 
     /** Defines a post hook for the model. */
     post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, T>): this;

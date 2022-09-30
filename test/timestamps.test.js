@@ -1026,6 +1026,30 @@ describe('timestamps', function() {
     assert.equal(doc.sections.length, 1);
     assert.equal(doc.sections[0].title, 'h1');
   });
+
+  it('findOneAndUpdate creates subdocuments with timestamps in correct order (gh-12475)', async function() {
+    const testSchema = new Schema(
+      {
+        uuid: String,
+        addresses: [new Schema({ location: String }, { timestamps: true })]
+      },
+      { timestamps: true }
+    );
+
+    const Test = db.model('Test', testSchema);
+
+    const item = new Test({ uuid: '123', addresses: [{ location: 'earth' }] });
+    await item.save();
+
+    const newItem = await Test.findOneAndUpdate({ uuid: '123' }, {
+      uuid: '456', $push: { addresses: { location: 'earth' } }
+    }, { upsert: true, new: true, runValidators: true });
+
+    for (const address of newItem.addresses) {
+      const keys = Object.keys(address.toObject());
+      assert.deepStrictEqual(keys, ['location', '_id', 'createdAt', 'updatedAt']);
+    }
+  });
 });
 
 async function delay(ms) {

@@ -62,7 +62,7 @@ declare module 'mongoose' {
     toDrop: Array<any>
   }
 
-  type IndexDirection = 1 | -1 | '2d' | '2dsphere' | 'geoHaystack' | 'hashed' | 'text';
+  type IndexDirection = 1 | -1 | '2d' | '2dsphere' | 'geoHaystack' | 'hashed' | 'text' | 'ascending' | 'asc' | 'descending' | 'desc';
   type IndexDefinition = Record<string, IndexDirection>;
 
   interface SyncIndexesOptions extends mongodb.CreateIndexesOptions {

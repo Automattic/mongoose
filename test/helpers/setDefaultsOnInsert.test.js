@@ -87,4 +87,25 @@ describe('setDefaultsOnInsert', function() {
 
     assert.equal(update.$setOnInsert['time.resolved'], 42);
   });
+
+  it('skips default if parent is $set (gh-12279)', function() {
+    const SubscriptionsConfigSchema = Schema({
+      hasPaidSubscription: { type: Boolean, required: true },
+      hasPastDueInvoice: { type: Boolean, required: true }
+    });
+
+    const CustomerSchema = Schema({
+      subscriptionsConfig: {
+        type: SubscriptionsConfigSchema,
+        required: true,
+        default: { hasPaidSubscription: false, hasPastDueInvoice: false }
+      }
+    });
+
+    const opts = {};
+    let update = { $set: { 'subscriptionsConfig.hasPaidSubscription': 100 } };
+    update = setDefaultsOnInsert({}, CustomerSchema, update, opts);
+
+    assert.ok(!update.$setOnInsert);
+  });
 });

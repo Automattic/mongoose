@@ -70,7 +70,7 @@ declare module 'mongoose' {
 
   class Aggregate<R> implements SessionOperation {
     /**
-     * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js
+     * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js)
      * You do not need to call this function explicitly, the JavaScript runtime
      * will call it for you.
      */
@@ -92,7 +92,7 @@ declare module 'mongoose' {
      */
     addFields(arg: PipelineStage.AddFields['$addFields']): this;
 
-    /** Sets the allowDiskUse option for the aggregation query (ignored for < 2.6.0) */
+    /** Sets the allowDiskUse option for the aggregation query */
     allowDiskUse(value: boolean): this;
 
     /** Appends new operators to this aggregate pipeline */
@@ -115,7 +115,7 @@ declare module 'mongoose' {
     densify(arg: PipelineStage.Densify['$densify']): this;
 
     /**
-     * Sets the cursor option for the aggregation query (ignored for < 2.6.0).
+     * Sets the cursor option for the aggregation query
      */
     cursor<DocType = any>(options?: Record<string, unknown>): Cursor<DocType>;
 
@@ -139,7 +139,7 @@ declare module 'mongoose' {
     /** Appends new custom $group operator to this aggregate pipeline. */
     group(arg: PipelineStage.Group['$group']): this;
 
-    /** Sets the hint option for the aggregation query (ignored for < 3.6.0) */
+    /** Sets the hint option for the aggregation query */
     hint(value: Record<string, unknown> | string): this;
 
     /**

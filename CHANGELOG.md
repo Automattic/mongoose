@@ -1,3 +1,51 @@
+6.6.3 / 2022-09-30
+==================
+ * fix(query): treat findOne(_id) as equivalent to findOne({ _id }) #12485 #12325
+ * fix(timestamps): findOneAndUpdate creates subdocs with timestamps in reverse order #12484 #12475 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): make schema.plugin() more flexible for schemas that don't define any generics #12486 #12454
+ * fix(types): add "array of array key-value pairs" as a argument option for "query.sort()" #12483 #12434 [hasezoey](https://github.com/hasezoey)
+ * fix(types): remove unused defaults in "PluginFunction" #12459 [hasezoey](https://github.com/hasezoey)
+ * fix(types): update DiscriminatorSchema to have better names and combine statics #12460 [hasezoey](https://github.com/hasezoey)
+
+6.6.2 / 2022-09-26
+==================
+ * fix(model): avoid deleting shared schema methods in fix for #12254 #12423
+ * fix(document): set $inc default value in case field has not been specified on the document #12435 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(query): handle `select: false` on map paths in query results #12467 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): add HydratedDocumentFromSchema to make it easier to pull inferred hydrated doc type #12464 #12319
+ * fix(types): add sanitizeFilter to types #12465 [zrosenbauer](https://github.com/zrosenbauer)
+ * fix(types): infer number enum types from schema if using enum: [0, 1] as const #12463 #12242
+ * docs(validation): add section on global schematype validation, clean up other issues #12430
+ * docs: add clarification about overwrite flag in model.js #12447 [Tzvika-m](https://github.com/Tzvika-m)
+ * docs: change to consistent "Example:" for jsdoc comments #12432 [hasezoey](https://github.com/hasezoey)
+
+6.6.1 / 2022-09-14
+==================
+ * fix: correctly apply defaults after subdoc init #12328
+ * fix(array): avoid using default _id when using pull() #12294
+ * fix: allow null values inside $expr objects #12429 [MartinDrost](https://github.com/MartinDrost)
+ * fix(query): use correct Query constructor when cloning query #12418
+ * docs(website): remove setting "latest38x" which is not used anywhere #12396 [hasezoey](https://github.com/hasezoey)
+
+6.6.0 / 2022-09-08
+==================
+ * feat: upgrade mongodb driver -> 4.9.1 #12370 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat: re-export default Mongoose instance properties for ESM named imports support #12256
+ * feat(model): add option to skip invalid fields with castObject() #12156 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat: use setPrototypeOf() instead of __proto__ to allow running on Deno #12315
+ * feat(QueryCursor): add support for AbortSignal on eachAsync() #12323
+ * feat(types): add types for new $densify operator #12118 [IslandRhythms](https://github.com/IslandRhythms)
+
+6.5.5 / 2022-09-07
+==================
+ * fix(setDefaultsOnInsert): avoid applying defaults on insert if nested property set #12279
+ * fix(model): make applyHooks() and applyMethods() handle case where custom method is set to Mongoose implementation #12254
+ * fix(types): add string "ascending" and "descending" index-directions #10269
+ * docs: upgrade dox to 1.0.0 #12403 [hasezoey](https://github.com/hasezoey)
+ * docs: update old mongodb nodejs driver documentation urls #12387 [hasezoey](https://github.com/hasezoey)
+ * docs: update JSDOC ... (spread) definition #12388 [hasezoey](https://github.com/hasezoey)
+ * refactor(model): allow optionally passing indexes to createIndexes and cleanIndexes #12280 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 6.5.4 / 2022-08-30
 ==================
  * fix(document): allow calling $assertPopulated() with values to better support manual population #12233

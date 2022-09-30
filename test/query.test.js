@@ -4138,7 +4138,12 @@ describe('Query', function() {
     const Test = db.model('Test', testSchema);
     const _id = new mongoose.Types.ObjectId();
 
-    const q = Test.find(_id);
+    let q = Test.find(_id);
+
+    assert.ok(q.getFilter()._id instanceof mongoose.Types.ObjectId);
+    assert.equal(q.getFilter()._id.toHexString(), _id.toHexString());
+
+    q = Test.findOne(_id);
 
     assert.ok(q.getFilter()._id instanceof mongoose.Types.ObjectId);
     assert.equal(q.getFilter()._id.toHexString(), _id.toHexString());

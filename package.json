@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.19.0",
-    "@typescript-eslint/eslint-plugin": "5.36.2",
+    "@typescript-eslint/eslint-plugin": "5.38.1",
     "@typescript-eslint/parser": "5.36.2",
     "acquit": "1.2.1",
     "acquit-ignore": "0.2.0",

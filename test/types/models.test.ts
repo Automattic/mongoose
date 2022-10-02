@@ -9,8 +9,10 @@ import {
   UpdateQuery,
   CallbackError,
   HydratedDocument,
+  HydratedDocumentFromSchema,
   LeanDocument,
-  Query
+  Query,
+  UpdateWriteOpResult
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -465,4 +467,63 @@ async function gh12286() {
 
   const user = await User.findById('0'.repeat(24), { name: 1 }).lean();
   expectType<string | undefined>(user?.name);
+}
+
+
+function gh12332() {
+  interface IUser{
+    age: number
+  }
+  const schema = new Schema<IUser>({ age: Number });
+
+  const User = model<IUser>('User', schema);
+
+  User.castObject({ age: '19' });
+  User.castObject({ age: '19' }, { ignoreCastErrors: true });
+}
+
+async function gh12347() {
+  interface IUser{
+    name: string;
+  }
+  const schema = new Schema<IUser>({
+    name: { type: String, required: true }
+  });
+
+  const User = model<IUser>('User', schema);
+
+  const replaceOneResult = await User.replaceOne({}, {});
+  expectType<UpdateWriteOpResult>(replaceOneResult);
+}
+
+async function gh12319() {
+  const projectSchema = new Schema(
+    {
+      name: {
+        type: String,
+        required: true
+      }
+    },
+    {
+      methods: {
+        async doSomething() {
+        }
+      }
+    }
+  );
+
+  const ProjectModel = model('Project', projectSchema);
+
+  type ProjectModelHydratedDoc = HydratedDocumentFromSchema<
+    typeof projectSchema
+  >;
+
+  expectType<ProjectModelHydratedDoc>(await ProjectModel.findOne().orFail());
+}
+
+function findWithId() {
+  const id = new Types.ObjectId();
+  const TestModel = model('test', new Schema({}));
+  TestModel.find(id);
+  TestModel.findOne(id);
 }

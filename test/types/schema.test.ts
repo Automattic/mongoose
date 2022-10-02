@@ -89,6 +89,20 @@ movieSchema.index({ title: 'text' }, {
 });
 movieSchema.index({ rating: -1 });
 movieSchema.index({ title: 1 }, { unique: true });
+movieSchema.index({ tile: 'ascending' });
+movieSchema.index({ tile: 'asc' });
+movieSchema.index({ tile: 'descending' });
+movieSchema.index({ tile: 'desc' });
+movieSchema.index({ tile: 'hashed' });
+movieSchema.index({ tile: 'geoHaystack' });
+
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: 2 }); // test invalid number
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: -2 }); // test invalid number
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: '' }); // test empty string
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: 'invalid' }); // test invalid string
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: new Date() }); // test invalid type
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: true }); // test that booleans are not allowed
+expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: false }); // test that booleans are not allowed
 
 // Using `SchemaDefinition`
 interface IProfile {
@@ -564,6 +578,17 @@ const discriminatedSchema = batchSchema.discriminator('event', eventSchema);
 
 expectType<Schema<Omit<{ name: string }, 'message'> & { message: string }>>(discriminatedSchema);
 
+// discriminator statics
+const eventSchema2 = new Schema({ message: String }, { discriminatorKey: 'kind', statics: { static1: function() {
+  return 0;
+} } });
+const batchSchema2 = new Schema({ name: String }, { discriminatorKey: 'kind', statics: { static2: function() {
+  return 1;
+} } });
+const discriminatedSchema2 = batchSchema2.discriminator('event', eventSchema2);
+
+expectAssignable<Schema<Omit<{ name: string }, 'message'> & { message: string }, Model<any>, {}, {}, {}, { static1(): number; static2(): number; }>>(discriminatedSchema2);
+
 function gh11828() {
   interface IUser {
     name: string;
@@ -827,5 +852,15 @@ function gh12450() {
   });
 
   expectType<{ createdAt?: Date, decimalValue?: Types.Decimal128 }>({} as InferSchemaType<typeof Schema4>);
+}
 
+function gh12242() {
+  const dbExample = new Schema(
+    {
+      active: { type: Number, enum: [0, 1] as const, required: true }
+    }
+  );
+
+  type Example = InferSchemaType<typeof dbExample>;
+  expectType<0 | 1>({} as Example['active']);
 }

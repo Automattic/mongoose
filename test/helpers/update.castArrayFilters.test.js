@@ -2,6 +2,7 @@
 
 const Query = require('../../lib/query');
 const Schema = require('../../lib/schema');
+const Types = require('../../lib/types');
 const assert = require('assert');
 const castArrayFilters = require('../../lib/helpers/update/castArrayFilters');
 
@@ -231,7 +232,7 @@ describe('castArrayFilters', function() {
     });
     let q = new Query();
     q.schema = schema;
-    q.model = { base: { options: { strictQuery: false } } };
+    q.model = { base: { Types, options: { strictQuery: false } } };
 
     let p = { 'arr.$[arr].id': 42 };
     let opts = {
@@ -247,7 +248,7 @@ describe('castArrayFilters', function() {
 
     q = new Query();
     q.schema = schema;
-    q.model = { base: { options: { strictQuery: true } } };
+    q.model = { base: { Types, options: { strictQuery: true } } };
 
     p = { 'arr.$[arr].id': 42 };
     opts = {

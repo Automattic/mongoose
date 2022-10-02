@@ -117,7 +117,7 @@ declare module 'mongoose' {
     get(key: string): any;
 
     /**
-     * Returns the [MongoDB driver `MongoClient`](http://mongodb.github.io/node-mongodb-native/3.5/api/MongoClient.html) instance
+     * Returns the [MongoDB driver `MongoClient`](https://mongodb.github.io/node-mongodb-native/4.9/classes/MongoClient.html) instance
      * that this connection uses to talk to MongoDB.
      */
     getClient(): mongodb.MongoClient;
@@ -197,7 +197,7 @@ declare module 'mongoose' {
     set(key: string, value: any): any;
 
     /**
-     * Set the [MongoDB driver `MongoClient`](http://mongodb.github.io/node-mongodb-native/3.5/api/MongoClient.html) instance
+     * Set the [MongoDB driver `MongoClient`](https://mongodb.github.io/node-mongodb-native/4.9/classes/MongoClient.html) instance
      * that this connection uses to talk to MongoDB. This is useful if you already have a MongoClient instance, and want to
      * reuse it.
      */

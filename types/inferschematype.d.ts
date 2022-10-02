@@ -158,7 +158,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
       PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
         IfEquals<PathValueType, Schema.Types.String> extends true ? PathEnumOrString<Options['enum']> :
           IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']> :
-            PathValueType extends NumberSchemaDefinition ? number :
+            PathValueType extends NumberSchemaDefinition ? Options['enum'] extends ReadonlyArray<any> ? Options['enum'][number] : number :
               IfEquals<PathValueType, Schema.Types.Number> extends true ? number :
                 PathValueType extends DateSchemaDefinition ? Date :
                   IfEquals<PathValueType, Schema.Types.Date> extends true ? Date :

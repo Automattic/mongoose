@@ -633,8 +633,8 @@ describe('model', function() {
       assert.ok(!indexes[1].collation);
       await User.collection.drop();
     });
-    it('should do a dryRun feat-10316', async function() {
 
+    it('should do a dryRun feat-10316', async function() {
       const userSchema = new mongoose.Schema({ username: String }, { password: String }, { email: String });
       const User = db.model('Upson', userSchema);
       await User.collection.createIndex({ age: 1 });

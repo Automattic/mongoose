@@ -57,7 +57,7 @@ Router.post('/login', async function({ body }, res) {
   }
 });
 
-/* @private
+/* @api private
  * @func: edit user
  * @input: username, name or password
  * @return: edited user
@@ -82,7 +82,7 @@ Router.post('/update', auth, async function({ userId, body }, res) {
   }
 });
 
-/* @private
+/* @api private
  * @func: delete user
  */
 Router.delete('/delete', auth, async function({ userId }, res) {

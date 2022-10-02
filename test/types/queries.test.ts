@@ -160,8 +160,13 @@ Test.find().sort({ name: -1 });
 Test.find().sort({ name: 'ascending' });
 Test.find().sort(undefined);
 Test.find().sort(null);
+Test.find().sort([['key', 'ascending']]);
+Test.find().sort([['key1', 'ascending'], ['key2', 'descending']]);
 expectError(Test.find().sort({ name: 2 }));
 expectError(Test.find().sort({ name: 'invalidSortOrder' }));
+expectError(Test.find().sort([['key', 'invalid']]));
+expectError(Test.find().sort([['key', false]]));
+expectError(Test.find().sort(['invalid']));
 
 // Super generic query
 function testGenericQuery(): void {

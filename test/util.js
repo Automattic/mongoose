@@ -1,9 +1,7 @@
 'use strict';
 
-/*!
+/**
  * Generates a random string
- *
- * @api private
  */
 
 exports.random = function() {

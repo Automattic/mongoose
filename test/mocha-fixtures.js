@@ -12,7 +12,7 @@ let mongoinstance;
 // a replset-instance for running repl-set tests
 let mongorreplset;
 
-// decide wheter to start a in-memory or not
+// decide wheter to start a instance or not
 const startMemoryInstance = !process.env.MONGOOSE_TEST_URI;
 const startMemoryReplset = !process.env.MONGOOSE_REPLSET_URI;
 
@@ -24,11 +24,11 @@ module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
 
   // set some options when running in a CI
   if (process.env.CI) {
+    // this option is also set in the github-ci tests.yml, but this is just to ensure it is in any CI
     process.env.MONGOMS_PREFER_GLOBAL_PATH = '1'; // set MMS to use "~/.cache/mongodb-binaries" even when the path does not yet exist
   }
 
-  if (startMemoryInstance) { // Config to decided if an mongodb-memory-server instance should be used
-    // it's needed in global space, because we don't want to create a new instance every test-suite
+  if (startMemoryInstance) {
     mongoinstance = await mms.MongoMemoryServer.create({ instance: { args: ['--setParameter', 'ttlMonitorSleepSecs=1'], storageEngine: 'wiredTiger' } });
     instanceuri = mongoinstance.getUri();
   } else {
@@ -39,7 +39,7 @@ module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
     mongorreplset = await mms.MongoMemoryReplSet.create({ replSet: { count: 3, args: ['--setParameter', 'ttlMonitorSleepSecs=1'], storageEngine: 'wiredTiger' } }); // using 3 because even numbers can lead to vote problems
     replseturi = mongorreplset.getUri();
   } else {
-    replseturi = '';
+    replseturi = process.env.MONGOOSE_REPLSET_URI;
   }
 
   process.env.MONGOOSE_TEST_URI = instanceuri;
@@ -47,7 +47,7 @@ module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
 };
 
 module.exports.mochaGlobalTeardown = async function mochaGlobalTeardown() {
-  if (mongoinstance) { // Config to decided if an mongodb-memory-server instance should be used
+  if (mongoinstance) {
     await mongoinstance.stop();
   }
   if (mongorreplset) {

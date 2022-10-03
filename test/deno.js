@@ -29,7 +29,9 @@ const mocha = new Mocha({
 });
 
 const testDir = 'test';
-const files = fs.readdirSync(testDir);
+const files = fs.readdirSync(testDir).
+  concat(fs.readdirSync(path.join(testDir, 'docs')).map(file => path.join('docs', file))).
+  concat(fs.readdirSync(path.join(testDir, 'helpers')).map(file => path.join('helpers', file)));
 
 const ignoreFiles = new Set(['browser.test.js']);
 

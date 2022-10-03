@@ -548,3 +548,10 @@ async function gh12319() {
 
   expectType<ProjectModelHydratedDoc>(await ProjectModel.findOne().orFail());
 }
+
+function findWithId() {
+  const id = new Types.ObjectId();
+  const TestModel = model('test', new Schema({}));
+  TestModel.find(id);
+  TestModel.findOne(id);
+}

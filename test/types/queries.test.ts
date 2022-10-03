@@ -160,8 +160,13 @@ Test.find().sort({ name: -1 });
 Test.find().sort({ name: 'ascending' });
 Test.find().sort(undefined);
 Test.find().sort(null);
+Test.find().sort([['key', 'ascending']]);
+Test.find().sort([['key1', 'ascending'], ['key2', 'descending']]);
 expectError(Test.find().sort({ name: 2 }));
 expectError(Test.find().sort({ name: 'invalidSortOrder' }));
+expectError(Test.find().sort([['key', 'invalid']]));
+expectError(Test.find().sort([['key', false]]));
+expectError(Test.find().sort(['invalid']));
 
 // Super generic query
 function testGenericQuery(): void {
@@ -352,5 +357,68 @@ function gh12142() {
     {
       $pull: { comments: new Types.ObjectId() }
     }
+  );
+}
+
+async function gh12342_manual() {
+  interface Project {
+    name?: string, stars?: number
+  }
+
+  interface ProjectQueryHelpers {
+    byName(name: string): QueryWithHelpers<
+    HydratedDocument<Project>[],
+    HydratedDocument<Project>,
+    ProjectQueryHelpers
+    >
+  }
+
+  type ProjectModelType = Model<Project, ProjectQueryHelpers>;
+
+  const ProjectSchema = new Schema<
+  Project,
+  Model<Project, ProjectQueryHelpers>,
+  {},
+  ProjectQueryHelpers
+  >({
+    name: String,
+    stars: Number
+  });
+
+  ProjectSchema.query.byName = function byName(
+    this: QueryWithHelpers<any, HydratedDocument<Project>, ProjectQueryHelpers>,
+    name: string
+  ) {
+    return this.find({ name: name });
+  };
+
+  // 2nd param to `model()` is the Model class to return.
+  const ProjectModel = model<Project, ProjectModelType>('Project', schema);
+
+  expectType<HydratedDocument<Project>[]>(
+    await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
+  );
+}
+
+async function gh12342_auto() {
+  interface Project {
+    name?: string, stars?: number
+  }
+
+  const ProjectSchema = new Schema({
+    name: String,
+    stars: Number
+  }, {
+    query: {
+      byName(name: string) {
+        return this.find({ name });
+      }
+    }
+  });
+
+  const ProjectModel = model('Project', ProjectSchema);
+
+  expectType<HydratedDocument<Project>[]>(
+    await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
   );
 }

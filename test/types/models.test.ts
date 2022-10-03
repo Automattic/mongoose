@@ -10,10 +10,8 @@ import {
   CallbackError,
   HydratedDocument,
   HydratedDocumentFromSchema,
-  LeanDocument,
   Query,
-  UpdateWriteOpResult,
-  InferSchemaType
+  UpdateWriteOpResult
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';

@@ -1,3 +1,12 @@
+6.6.3 / 2022-09-30
+==================
+ * fix(query): treat findOne(_id) as equivalent to findOne({ _id }) #12485 #12325
+ * fix(timestamps): findOneAndUpdate creates subdocs with timestamps in reverse order #12484 #12475 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): make schema.plugin() more flexible for schemas that don't define any generics #12486 #12454
+ * fix(types): add "array of array key-value pairs" as a argument option for "query.sort()" #12483 #12434 [hasezoey](https://github.com/hasezoey)
+ * fix(types): remove unused defaults in "PluginFunction" #12459 [hasezoey](https://github.com/hasezoey)
+ * fix(types): update DiscriminatorSchema to have better names and combine statics #12460 [hasezoey](https://github.com/hasezoey)
+
 6.6.2 / 2022-09-26
 ==================
  * fix(model): avoid deleting shared schema methods in fix for #12254 #12423

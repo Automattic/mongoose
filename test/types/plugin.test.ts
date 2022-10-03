@@ -59,10 +59,17 @@ const testSchema = new Schema<Test, TestModel, TestInstanceMethods, TestQueryHel
   lastName: { type: String, required: true }
 });
 
+function pluginGeneric(schema: Schema): void {
+  schema.static('test', function() {
+    return 0;
+  });
+}
+
 testSchema.plugin(pluginVirtuals);
 testSchema.plugin(pluginQueryHelpers);
 testSchema.plugin(pluginMethods);
 testSchema.plugin(pluginStatics);
+testSchema.plugin(pluginGeneric);
 
 const Foo = connection.model<Test, TestModel, TestQueryHelpers>('Test', testSchema);
 

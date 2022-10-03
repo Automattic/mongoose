@@ -2868,6 +2868,7 @@ describe('schema', function() {
     assert.equal(doc1.domain, doc2.domain);
   });
 
+
   it('alias (gh-12368)', function() {
     const schema = new Schema({ name: String });
 
@@ -2880,5 +2881,23 @@ describe('schema', function() {
     assert.equal(schema.aliases['name2'], 'name');
     assert.ok(schema.virtuals['name1']);
     assert.ok(schema.virtuals['name2']);
+  });
+
+  it('allows defining ObjectIds and Decimal128s using Types.* (gh-12205)', function() {
+    const schema = new Schema({
+      testId: mongoose.Types.ObjectId,
+      testId2: {
+        type: mongoose.Types.ObjectId
+      },
+      num: mongoose.Types.Decimal128,
+      num2: {
+        type: mongoose.Types.Decimal128
+      }
+    });
+
+    assert.equal(schema.path('testId').instance, 'ObjectID');
+    assert.equal(schema.path('testId2').instance, 'ObjectID');
+    assert.equal(schema.path('num').instance, 'Decimal128');
+    assert.equal(schema.path('num2').instance, 'Decimal128');
   });
 });

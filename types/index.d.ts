@@ -109,6 +109,7 @@ declare module 'mongoose' {
 
   /** Sets mongoose options */
   export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): Mongoose;
+  export function set(options: { [K in keyof MongooseOptions]: MongooseOptions[K] }): Mongoose;
 
   /** The Mongoose version */
   export const version: string;
@@ -264,7 +265,7 @@ declare module 'mongoose' {
     pathType(path: string): string;
 
     /** Registers a plugin for this schema. */
-    plugin<PFunc extends PluginFunction<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
+    plugin<PFunc extends PluginFunction<DocType, M, any, any, any, any>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
 
     /** Defines a post hook for the model. */
     post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, T>): this;

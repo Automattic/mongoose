@@ -11881,6 +11881,24 @@ describe('document', function() {
     const addedDoc = await Model.findOne({ name: 'Test' });
     assert.strictEqual(addedDoc.count, 1);
   });
+
+  it('avoids overwriting array if saving with no changes with array deselected (gh-12414)', async function() {
+    const schema = new mongoose.Schema({
+      name: String,
+      tags: [String]
+    });
+    const Test = db.model('Test', schema);
+
+    const { _id } = await Test.create({ name: 'Mongoose', tags: ['mongodb'] });
+
+    const doc = await Test.findById(_id).select('name');
+    assert.deepStrictEqual(doc.getChanges(), {});
+    await doc.save();
+
+    const rawDoc = await Test.collection.findOne({ _id });
+    assert.ok(rawDoc);
+    assert.deepStrictEqual(rawDoc.tags, ['mongodb']);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

@@ -41,14 +41,10 @@ jobs:
       matrix:
         node: [12, 14, 16, 18]
         os: [ubuntu-18.04, ubuntu-20.04]
-        mongodb: [4.0.2, 5.0.2, 6.0.0]
+        mongodb: [4.0.28, 5.0.8, 6.0.0]
         include:
-          - os: ubuntu-18.04
-            mongodb-os: ubuntu1804
-          - os: ubuntu-20.04
-            mongodb-os: ubuntu2004
           - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
-            mongodb: 5.0.2
+            mongodb: 5.0.11
             node: 16
             coverage: true
         exclude:
@@ -59,6 +55,9 @@ jobs:
           - os: ubuntu-20.04 # exclude because there are no <4.4 mongodb builds for 2004
             mongodb: 4.0.2
     name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }} OS ${{ matrix.os }}
+    env:
+      MONGOMS_VERSION: ${{ matrix.mongodb }}
+      MONGOMS_PREFER_GLOBAL_PATH: 1
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
 
@@ -67,18 +66,14 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - run: npm install
+      - name: Load MongoDB binary cache
+        id: cache-mongodb-binaries
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ matrix.os }}-${{ matrix.mongodb }}
 
-      - name: Setup
-        run: |
-          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}.tgz
-          tar xf mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}.tgz
-          mkdir -p ./data/db/27017 ./data/db/27000
-          printf "\ntimeout: 8000" >> ./.mocharc.yml
-          ./mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}/bin/mongod --setParameter ttlMonitorSleepSecs=1 --fork --dbpath ./data/db/27017 --syslog --port 27017
-          sleep 2
-          mongod --version
-          echo `pwd`/mongodb-linux-x86_64-${{ matrix.mongodb-os }}-${{ matrix.mongodb }}/bin >> $GITHUB_PATH
+      - run: npm install
       - name: NPM Test without Coverage
         run: npm test
         if: matrix.coverage != true

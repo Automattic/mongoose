@@ -2,10 +2,22 @@
 
 import { createRequire } from "https://deno.land/std/node/module.ts";
 
+// Workaround for Mocha getting terminal width, which currently requires `--unstable`
+Object.defineProperty(process.stdout, 'getWindowSize', {
+  value: function() {
+    return [75, 40];
+  }
+});
+
 import { parse } from "https://deno.land/std/flags/mod.ts"
 const args = parse(Deno.args);
 
 const require = createRequire(import.meta.url);
+
+// Workaround for MongoDB getting the current os release, which currently requires `--unstable`
+require('os').release = function() {
+  return 'deno test';
+};
 
 const Mocha = require('mocha');
 const fs = require('fs');

@@ -715,13 +715,12 @@ describe('mongoose module:', function() {
 
     it('with replica set', async function() {
       const mong = new Mongoose();
-      const uri = process.env.MONGOOSE_SET_TEST_URI;
 
-      if (!uri) {
-        return;
+      if (!start.uri) {
+        return this.skip();
       }
 
-      await mong.connect(uri, options);
+      await mong.connect(start.uri, options);
 
       await mong.connection.close();
     });

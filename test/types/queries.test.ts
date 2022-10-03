@@ -359,3 +359,66 @@ function gh12142() {
     }
   );
 }
+
+async function gh12342_manual() {
+  interface Project {
+    name?: string, stars?: number
+  }
+
+  interface ProjectQueryHelpers {
+    byName(name: string): QueryWithHelpers<
+    HydratedDocument<Project>[],
+    HydratedDocument<Project>,
+    ProjectQueryHelpers
+    >
+  }
+
+  type ProjectModelType = Model<Project, ProjectQueryHelpers>;
+
+  const ProjectSchema = new Schema<
+  Project,
+  Model<Project, ProjectQueryHelpers>,
+  {},
+  ProjectQueryHelpers
+  >({
+    name: String,
+    stars: Number
+  });
+
+  ProjectSchema.query.byName = function byName(
+    this: QueryWithHelpers<any, HydratedDocument<Project>, ProjectQueryHelpers>,
+    name: string
+  ) {
+    return this.find({ name: name });
+  };
+
+  // 2nd param to `model()` is the Model class to return.
+  const ProjectModel = model<Project, ProjectModelType>('Project', schema);
+
+  expectType<HydratedDocument<Project>[]>(
+    await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
+  );
+}
+
+async function gh12342_auto() {
+  interface Project {
+    name?: string, stars?: number
+  }
+
+  const ProjectSchema = new Schema({
+    name: String,
+    stars: Number
+  }, {
+    query: {
+      byName(name: string) {
+        return this.find({ name });
+      }
+    }
+  });
+
+  const ProjectModel = model('Project', ProjectSchema);
+
+  expectType<HydratedDocument<Project>[]>(
+    await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
+  );
+}

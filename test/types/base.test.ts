@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { expectType } from 'tsd';
+import { expectError, expectType } from 'tsd';
 
 Object.values(mongoose.models).forEach(model => {
   model.modelName;
@@ -50,4 +50,13 @@ function gh10139() {
 function gh12100() {
   mongoose.syncIndexes({ continueOnError: true, noResponse: true });
   mongoose.syncIndexes({ continueOnError: false, noResponse: true });
+}
+
+function setAsObject() {
+  mongoose.set({
+    debug: true,
+    autoIndex: false
+  });
+
+  expectError(mongoose.set({ invalid: true }));
 }

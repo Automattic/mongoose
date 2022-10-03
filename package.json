@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "6.6.3",
+  "version": "6.6.4",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -28,9 +28,9 @@
     "sift": "16.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.19.0",
-    "@typescript-eslint/eslint-plugin": "5.36.2",
-    "@typescript-eslint/parser": "5.36.2",
+    "@babel/core": "7.19.3",
+    "@typescript-eslint/eslint-plugin": "5.38.1",
+    "@typescript-eslint/parser": "5.38.1",
     "acquit": "1.2.1",
     "acquit-ignore": "0.2.0",
     "acquit-require": "0.1.1",
@@ -43,13 +43,13 @@
     "cheerio": "1.0.0-rc.12",
     "crypto-browserify": "3.12.0",
     "dox": "1.0.0",
-    "eslint": "8.23.0",
+    "eslint": "8.24.0",
     "eslint-plugin-mocha-no-only": "1.1.1",
     "express": "^4.18.1",
     "highlight.js": "11.6.0",
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",
-    "marked": "4.1.0",
+    "marked": "4.1.1",
     "mkdirp": "^1.0.4",
     "mocha": "10.0.0",
     "moment": "2.x",
@@ -61,8 +61,8 @@
     "sinon": "14.0.0",
     "stream-browserify": "3.0.0",
     "ts-benchmark": "^1.1.10",
-    "tsd": "0.23.0",
-    "typescript": "4.8.3",
+    "tsd": "0.24.1",
+    "typescript": "4.8.4",
     "uuid": "9.0.0",
     "webpack": "5.74.0"
   },

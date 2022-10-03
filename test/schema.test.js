@@ -2868,21 +2868,6 @@ describe('schema', function() {
     assert.equal(doc1.domain, doc2.domain);
   });
 
-
-  it('alias (gh-12368)', function() {
-    const schema = new Schema({ name: String });
-
-    schema.alias('name', 'otherName');
-    assert.equal(schema.aliases['otherName'], 'name');
-    assert.ok(schema.virtuals['otherName']);
-
-    schema.alias('name', ['name1', 'name2']);
-    assert.equal(schema.aliases['name1'], 'name');
-    assert.equal(schema.aliases['name2'], 'name');
-    assert.ok(schema.virtuals['name1']);
-    assert.ok(schema.virtuals['name2']);
-  });
-
   it('allows defining ObjectIds and Decimal128s using Types.* (gh-12205)', function() {
     const schema = new Schema({
       testId: mongoose.Types.ObjectId,

@@ -57,7 +57,7 @@ declare module 'mongoose' {
                               T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T> | Function | AnyArray<Function>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
-    alias?: string;
+    alias?: string | string[];
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
     validate?: SchemaValidator<T> | AnyArray<SchemaValidator<T>>;

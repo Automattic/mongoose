@@ -1,3 +1,13 @@
+6.6.4 / 2022-10-03
+==================
+ * fix(model): avoid saving applied defaults if path is deselected #12506 #12414
+ * fix(types): correct DocType for auto typed query helpers #12342
+ * fix(types): avoid "excessively deep" type instantiation error when using bulkWrite() with type that extends from document #12277
+ * fix(types): avoid relying on typeof this, which isn't supported in TypeScript < 4.4 #12375
+ * docs(schema): correct example for Schema.prototype.discriminator() #12493
+ * docs(typescript): clean up query helpers examples #12342
+ * chore: use mongodb-memory-server for testing #12262 [hasezoey](https://github.com/hasezoey)
+
 6.6.3 / 2022-09-30
 ==================
  * fix(query): treat findOne(_id) as equivalent to findOne({ _id }) #12485 #12325

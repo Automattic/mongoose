@@ -12,7 +12,7 @@ let mongoinstance;
 // a replset-instance for running repl-set tests
 let mongorreplset;
 
-// decide whether to start an instance or not
+// decide whether to start MMS instances or use the existing URI's
 const startMemoryInstance = !process.env.MONGOOSE_TEST_URI;
 const startMemoryReplset = !process.env.MONGOOSE_REPLSET_URI;
 

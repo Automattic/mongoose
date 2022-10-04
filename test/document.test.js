@@ -11865,6 +11865,33 @@ describe('document', function() {
     assert.strictEqual(called, 1);
   });
 
+  it('applies defaults to pushed subdocs after initing document (gh-12515)', async function() {
+    const animalSchema = new Schema({ title: String });
+    const animalsSchema = new Schema({
+      species: [animalSchema],
+      totalAnimals: Number
+    });
+    const Userschema = new Schema({
+      animals: animalsSchema
+    });
+    const UserModel = db.model('User', Userschema);
+
+    const doc = new UserModel();
+    doc.animals = { totalAnimals: 1 };
+    doc.animals.species = [{ title: 'Lion' }];
+    await doc.save();
+    // once created we fetch it again
+    let user = await UserModel.findById(doc._id);
+
+    // add new animal
+    user.animals.species.push({ title: 'Elephant' });
+    await user.save();
+    assert.ok(user.animals.species[1]._id);
+    user = await UserModel.collection.findOne({ _id: user._id });
+
+    assert.ok(user.animals.species[1]._id);
+  });
+
   it('If the field does not exist, $inc should create it and set is value to the specified one (gh-12435)', async function() {
     const schema = new mongoose.Schema({
       name: String,

@@ -61,10 +61,19 @@ import mongoose from 'mongoose';
 Or, using [Deno's `createRequire()` for CommonJS support](https://deno.land/std@0.113.0/node/README.md?source=#commonjs-modules-loading) as follows.
 
 ```javascript
-import { createRequire } from 'https://deno.land/std/node/module.ts';
+import { createRequire } from "https://deno.land/std/node/module.ts";
 const require = createRequire(import.meta.url);
 
 const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost:27017/test')
+  .then(() => console.log('Connected!'));
+```
+
+You can then run the above script using the following.
+
+```
+deno run --allow-env --allow-read --allow-net mongoose-test.js
 ```
 
 ## Mongoose for Enterprise

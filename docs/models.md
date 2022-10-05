@@ -1,4 +1,4 @@
-## Models
+# Models
 
 [Models](./api.html#model-js) are fancy constructors compiled from
 `Schema` definitions. An instance of a model is called a
@@ -11,8 +11,9 @@ reading documents from the underlying MongoDB database.
 * [Deleting](#deleting)
 * [Updating](#updating)
 * [Change Streams](#change-streams)
+* [Views](#views)
 
-<h3 id="compiling"><a href="#compiling">Compiling your first model</a></h3>
+<h2 id="compiling"><a href="#compiling">Compiling your first model</a></h2>
 
 When you call `mongoose.model()` on a schema, Mongoose _compiles_ a model
 for you.
@@ -31,7 +32,7 @@ in the database.
 you've added everything you want to `schema`, including hooks,
 before calling `.model()`!
 
-### Constructing Documents
+## Constructing Documents
 
 An instance of a model is called a [document](./documents.html). Creating
 them and saving to the database is easy.
@@ -73,7 +74,7 @@ const connection = mongoose.createConnection('mongodb://localhost:27017/test');
 const Tank = connection.model('Tank', yourSchema);
 ```
 
-### Querying
+## Querying
 
 Finding documents is easy with Mongoose, which supports the [rich](http://www.mongodb.org/display/DOCS/Advanced+Queries) query syntax of MongoDB. Documents can be retrieved using a `model`'s [find](./api.html#model_Model-find), [findById](./api.html#model_Model-findById), [findOne](./api.html#model_Model-findOne), or [where](./api.html#model_Model-where) static methods.
 
@@ -83,7 +84,7 @@ Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
 
 See the chapter on [queries](./queries.html) for more details on how to use the [Query](./api.html#query-js) api.
 
-### Deleting
+## Deleting
 
 Models have static `deleteOne()` and `deleteMany()` functions
 for removing all documents matching the given `filter`.
@@ -95,7 +96,7 @@ Tank.deleteOne({ size: 'large' }, function (err) {
 });
 ```
 
-### Updating
+## Updating
 
 Each `model` has its own `update` method for modifying documents in the
 database without returning them to your application. See the
@@ -112,9 +113,7 @@ _If you want to update a single document in the db and return it to your
 application, use [findOneAndUpdate](./api.html#model_Model-findOneAndUpdate)
 instead._
 
-### Change Streams
-
-_New in MongoDB 3.6.0 and Mongoose 5.0.0_
+## Change Streams
 
 [Change streams](https://docs.mongodb.com/manual/changeStreams/) provide
 a way for you to listen to all inserts and updates going through your
@@ -154,10 +153,58 @@ The output from the above [async function](http://thecodebarbarian.com/80-20-gui
 
 You can read more about [change streams in mongoose in this blog post](http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-36-change-streams.html#change-streams-in-mongoose).
 
-### Yet more
+## Views
+
+[MongoDB Views](https://www.mongodb.com/docs/manual/core/views) are essentially read-only collections that contain data computed from other collections using [aggregations](./api/aggregate.html).
+In Mongoose, you should define a separate Model for each of your Views.
+You can also create a View using [`createCollection()`](./api/model.html#model_Model-createCollection).
+
+The following example shows how you can create a new `RedactedUser` View on a `User` Model that hides potentially sensitive information, like name and email.
+
+```javascript
+// Make sure to disable `autoCreate` and `autoIndex` for Views,
+// because you want to create the collection manually.
+const userSchema = new Schema({
+  name: String,
+  email: String,
+  roles: [String]
+}, { autoCreate: false, autoIndex: false });
+const User = mongoose.model('User', userSchema);
+
+const RedactedUser = mongoose.model('RedactedUser', userSchema);
+
+// First, create the User model's underlying collection...
+await User.createCollection();
+// Then create the `RedactedUser` model's underlying collection
+// as a View.
+await RedactedUser.createCollection({
+  viewOn: 'users', // Set `viewOn` to the collection name, **not** model name.
+  pipeline: [
+    {
+      $set: {
+        name: { $concat: [{ $substr: ['$name', 0, 3] }, '...'] },
+        email: { $concat: [{ $substr: ['$email', 0, 3] }, '...'] }
+      }
+    }
+  ]
+});
+
+await User.create([
+  { name: 'John Smith', email: 'john.smith@gmail.com', roles: ['user'] },
+  { name: 'Bill James', email: 'bill@acme.co', roles: ['user', 'admin'] }
+]);
+
+// [{ _id: ..., name: 'Bil...', email: 'bil...', roles: ['user', 'admin'] }]
+console.log(await RedactedUser.find({ roles: 'admin' }));
+```
+
+Note that Mongoose does **not** currently enforce that Views are read-only.
+If you attempt to `save()` a document from a View, you will get an error from the MongoDB server.
+
+## Yet more
 
 The [API docs](./api.html#model_Model) cover many additional methods available like [count](./api.html#model_Model-count), [mapReduce](./api.html#model_Model-mapReduce), [aggregate](./api.html#model_Model-aggregate), and [more](./api.html#model_Model-findOneAndRemove).
 
-### Next Up
+## Next Up
 
 Now that we've covered `Models`, let's take a look at [Documents](/docs/documents.html).

@@ -1,3 +1,13 @@
+6.6.5 / 2022-10-05
+==================
+ * fix(document): set defaults on subdocuments underneath init-ed single nested subdocument #12523 #12515
+ * fix: make Jest fake timers check more robust to other libs that overwrite time functions #12527 #12514
+ * fix(types): indicate that Schema.prototype.discriminator() returns this #12522 #12457
+ * fix(types): add "estimatedDocumentCount" and "countDocuments" as possible hooks #12519 #12516
+ * docs(models): add section on MongoDB Views #12526 #5694
+ * docs(subdocs): clarify that populated docs are not subdocs #12521 #12398
+ * docs(change-streams): remove unnecessary obsolete comment about needing to use mongodb driver change streams #12444
+
 6.6.4 / 2022-10-03
 ==================
  * fix(model): avoid saving applied defaults if path is deselected #12506 #12414

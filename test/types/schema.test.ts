@@ -570,9 +570,7 @@ export type AutoTypedSchemaType = {
 // discriminator
 const eventSchema = new Schema<{ message: string }>({ message: String }, { discriminatorKey: 'kind' });
 const batchSchema = new Schema<{ name: string }>({ name: String }, { discriminatorKey: 'kind' });
-const discriminatedSchema = batchSchema.discriminator('event', eventSchema);
-
-expectType<Schema<Omit<{ name: string }, 'message'> & { message: string }>>(discriminatedSchema);
+batchSchema.discriminator('event', eventSchema);
 
 // discriminator statics
 const eventSchema2 = new Schema({ message: String }, { discriminatorKey: 'kind', statics: { static1: function() {
@@ -581,9 +579,7 @@ const eventSchema2 = new Schema({ message: String }, { discriminatorKey: 'kind',
 const batchSchema2 = new Schema({ name: String }, { discriminatorKey: 'kind', statics: { static2: function() {
   return 1;
 } } });
-const discriminatedSchema2 = batchSchema2.discriminator('event', eventSchema2);
-
-expectAssignable<Schema<Omit<{ name: string }, 'message'> & { message: string }, Model<any>, {}, {}, {}, { static1(): number; static2(): number; }>>(discriminatedSchema2);
+batchSchema2.discriminator('event', eventSchema2);
 
 function gh11828() {
   interface IUser {

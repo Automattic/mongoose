@@ -159,4 +159,34 @@ describe('schema alias option', function() {
     done();
     // acquit:ignore:end
   });
+
+  it('array of aliases (gh-12368)', function() {
+    const productSchema = new Schema({
+      n: {
+        type: String,
+        alias: ['name', 'product_name']
+      }
+    });
+
+    const Product = db.model('Test', productSchema);
+    const doc = new Product({});
+
+    doc['product_name'] = 'Turbo Man';
+    assert.equal(doc.n, 'Turbo Man');
+    assert.equal(doc.name, 'Turbo Man');
+  });
+
+  it('alias() method (gh-12368)', function() {
+    const schema = new Schema({ name: String });
+
+    schema.alias('name', 'otherName');
+    assert.equal(schema.aliases['otherName'], 'name');
+    assert.ok(schema.virtuals['otherName']);
+
+    schema.alias('name', ['name1', 'name2']);
+    assert.equal(schema.aliases['name1'], 'name');
+    assert.equal(schema.aliases['name2'], 'name');
+    assert.ok(schema.virtuals['name1']);
+    assert.ok(schema.virtuals['name2']);
+  });
 });

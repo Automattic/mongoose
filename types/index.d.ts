@@ -197,6 +197,12 @@ declare module 'mongoose' {
     add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
 
     /**
+     * Add an alias for `path`. This means getting or setting the `alias`
+     * is equivalent to getting or setting the `path`.
+     */
+    alias(path: string, alias: string | string[]): this;
+
+    /**
      * Array of child schemas (from document arrays and single nested subdocs)
      * and their corresponding compiled models. Each element of the array is
      * an object with 2 properties: `schema` and `model`.

@@ -65,9 +65,7 @@ exports.handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false;
 
   await connectToDatabase();
-  
-  // Use MongoDB Node driver's `watch()` function, because Mongoose change streams
-  // don't support `next()` yet. See https://github.com/Automattic/mongoose/issues/11527
+
   const changeStream = await Country.watch([], { resumeAfter });
 
   // Change stream `next()` will wait forever if there are no changes. So make sure to

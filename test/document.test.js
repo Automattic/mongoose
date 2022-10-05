@@ -11886,9 +11886,11 @@ describe('document', function() {
     // add new animal
     user.animals.species.push({ title: 'Elephant' });
     await user.save();
+    assert.ok(user.animals.species[0]._id);
     assert.ok(user.animals.species[1]._id);
     user = await UserModel.collection.findOne({ _id: user._id });
 
+    assert.ok(user.animals.species[0]._id);
     assert.ok(user.animals.species[1]._id);
   });
 

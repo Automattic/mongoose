@@ -13,7 +13,7 @@ reading documents from the underlying MongoDB database.
 * [Change Streams](#change-streams)
 * [Views](#views)
 
-<h2 id="compiling"><a href="#compiling">Compiling your first model</a></h3>
+<h2 id="compiling"><a href="#compiling">Compiling your first model</a></h2>
 
 When you call `mongoose.model()` on a schema, Mongoose _compiles_ a model
 for you.

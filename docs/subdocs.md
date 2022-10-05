@@ -11,15 +11,31 @@ const childSchema = new Schema({ name: 'string' });
 const parentSchema = new Schema({
   // Array of subdocuments
   children: [childSchema],
-  // Single nested subdocuments. Caveat: single nested subdocs only work
-  // in mongoose >= 4.2.0
+  // Single nested subdocuments
   child: childSchema
 });
 ```
 
-Aside from code reuse, one important reason to use subdocuments is to create
-a path where there would otherwise not be one to allow for validation over
-a group of fields (e.g. dateRange.fromDate <= dateRange.toDate).
+Note that populated documents are **not** subdocuments in Mongoose.
+Subdocument data is embedded in the top-level document.
+Referenced documents are separate top-level documents.
+
+```javascript
+const childSchema = new Schema({ name: 'string' });
+const Child = mongoose.model('Child', childSchema);
+
+const parentSchema = new Schema({
+  child: {
+    type: mongoose.ObjectId,
+    ref: 'Child'
+  }
+});
+const Parent = mongoose.model('Parent', parentSchema);
+
+const doc = await Parent.findOne().populate('child');
+// NOT a subdocument. `doc.child` is a separate top-level document.
+doc.child;
+```
 
 <ul class="toc">
   <li><a href="#what-is-a-subdocument-">What is a Subdocument?</a></li>

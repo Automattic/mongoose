@@ -8,6 +8,7 @@ declare module 'mongoose' {
     | PipelineStage.BucketAuto
     | PipelineStage.CollStats
     | PipelineStage.Count
+    | PipelineStage.Densify
     | PipelineStage.Facet
     | PipelineStage.GeoNear
     | PipelineStage.GraphLookup

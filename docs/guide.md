@@ -744,9 +744,9 @@ The read option also allows us to specify _tag sets_. These tell the
 [driver](https://github.com/mongodb/node-mongodb-native/) from which members
 of the replica-set it should attempt to read. Read more about tag sets
 [here](http://docs.mongodb.org/manual/applications/replication/#tag-sets) and
-[here](http://mongodb.github.com/node-mongodb-native/driver-articles/anintroductionto1_1and2_2.html#read-preferences).
+[here](https://www.mongodb.com/docs/manual/core/read-preference).
 
-_NOTE: you may also specify the driver read pref [strategy](http://mongodb.github.com/node-mongodb-native/api-generated/replset.html?highlight=strategy)
+_NOTE: you may also specify the driver read preference [strategy](https://www.mongodb.com/docs/manual/core/read-preference/#read-preference-modes)
 option when connecting:_
 
 ```javascript

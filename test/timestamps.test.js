@@ -626,6 +626,20 @@ describe('timestamps', function() {
       assert.strictEqual(cat.updatedAt, old);
     });
 
+    it('can skip with `$timestamps(false)` (gh-12117)', async function() {
+      const cat = await Cat.findOne();
+      const old = cat.updatedAt;
+
+      await delay(10);
+
+      cat.hobby = 'fishing';
+
+      cat.$timestamps(false);
+      await cat.save();
+
+      assert.strictEqual(cat.updatedAt, old);
+    });
+
     it('should change updatedAt when findOneAndUpdate', function(done) {
       Cat.create({ name: 'test123' }, function(err) {
         assert.ifError(err);

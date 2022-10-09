@@ -202,7 +202,7 @@ declare module 'mongoose' {
 
     export interface ReplaceWith {
       /** [`$replaceWith` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/replaceWith/) */
-      $replaceWith: ObjectExpressionOperator;
+      $replaceWith: ObjectExpressionOperator | { [field: string]: Expression };
     }
 
     export interface Sample {

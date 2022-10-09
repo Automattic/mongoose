@@ -37,6 +37,14 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: typescript-version
+    attributes:
+      label: Typescript version (if applicable)
+      placeholder: 4.8.x
+    validations:
+      required: false
+
   - type: textarea
     id: description
     attributes:

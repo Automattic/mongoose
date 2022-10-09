@@ -1,10 +1,17 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
+  export interface DiscriminatorOptions {
+    value?: string | number | ObjectId;
+    clone?: boolean;
+    overwriteModels?: boolean;
+    mergeHooks?: boolean;
+  }
+
   export interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
-    discriminator<D>(name: string | number, schema: Schema, value?: string | number | ObjectId): Model<D>;
-    discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
+    discriminator<D>(name: string | number, schema: Schema, value?: string | number | ObjectId | DiscriminatorOptions): Model<D>;
+    discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId | DiscriminatorOptions): U;
   }
 
   interface MongooseBulkWriteOptions {

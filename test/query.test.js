@@ -4160,7 +4160,7 @@ describe('Query', function() {
     );
 
     const newItem = await Test.create({
-      name: 'Test',
+      name: 'Name',
       animals: { kind: 'Kind', world: 'World' }
     });
 
@@ -4168,7 +4168,7 @@ describe('Query', function() {
       newItem._id,
       {
         $set: {
-          name: 'Name',
+          name: 'Name2',
           animals: { kind: 'Kind2', world: 'World2' }
         }
       },
@@ -4190,5 +4190,49 @@ describe('Query', function() {
         }
       );
     }, { message: 'Can\'t modify discriminator key "kind" on discriminator model' });
+  });
+
+  it('avoid throwing error when modifying field with same name as nested discriminator key (gh-12517)', async function() {
+    const options = { discriminatorKey: 'animals.kind', strict: 'throw' };
+    const testSchema = new mongoose.Schema({ name: String, kind: String, animals: { kind: String, world: String } }, options);
+    const Test = db.model('Test', testSchema);
+
+    Test.discriminator(
+      'ClickedTest',
+      new mongoose.Schema({ url: String }, options)
+    );
+
+    const newItem = await Test.create({
+      name: 'Name',
+      kind: 'Kind',
+      animals: { world: 'World' }
+    });
+
+    const updatedItem = await Test.findByIdAndUpdate(
+      newItem._id,
+      {
+        $set: {
+          name: 'Name2',
+          kind: 'Kind2'
+        }
+      },
+      {
+        new: true
+      }
+    );
+
+    assert.equal(updatedItem.name, 'Name2');
+    assert.equal(updatedItem.kind, 'Kind2');
+
+    await assert.rejects(async() => {
+      await Test.findByIdAndUpdate(
+        newItem._id,
+        {
+          $set: {
+            animals: { kind: 'Kind2', world: 'World2' }
+          }
+        }
+      );
+    }, { message: 'Can\'t modify discriminator key "animals.kind" on discriminator model' });
   });
 });

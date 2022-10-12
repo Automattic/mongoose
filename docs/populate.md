@@ -459,7 +459,7 @@ const eventSchema = new Schema({
 const Event = db1.model('Event', eventSchema);
 ```
 
-In the above example, events and conversations are stored in separate MongoDB
+In the above example, events and conversations are stored in separate [MongoDB](https://www.interviewbit.com/mongodb-cheat-sheet/)
 databases. String `ref` will not work in this situation, because Mongoose
 assumes a string `ref` refers to a model name on the same connection. In
 the above example, the conversation model is registered on `db2`, not `db1`.

@@ -11928,6 +11928,20 @@ describe('document', function() {
     assert.ok(rawDoc);
     assert.deepStrictEqual(rawDoc.tags, ['mongodb']);
   });
+
+  it('$clone() (gh-11849)', async function() {
+    const schema = new mongoose.Schema({ name: String });
+    const Test = db.model('Test', schema);
+
+    const item = await Test.create({ name: 'Mongoose' });
+
+    const doc = await Test.findById(item._id);
+    const clonedDoc = doc.$clone();
+
+    assert.deepEqual(doc, clonedDoc);
+    assert.deepEqual(doc._doc, clonedDoc._doc);
+    assert.deepEqual(doc.$__, clonedDoc.$__);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

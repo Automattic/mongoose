@@ -654,8 +654,8 @@ to all queries derived from a model.</p>
 <a href="https://github.com/mongodb/node-mongodb-native/">driver</a> from which members
 of the replica-set it should attempt to read. Read more about tag sets
 <a href="http://docs.mongodb.org/manual/applications/replication/#tag-sets">here</a> and
-<a href="http://mongodb.github.com/node-mongodb-native/driver-articles/anintroductionto1_1and2_2.html#read-preferences">here</a>.</p>
-<p><em>NOTE: you may also specify the driver read pref <a href="http://mongodb.github.com/node-mongodb-native/api-generated/replset.html?highlight=strategy">strategy</a>
+<a href="https://www.mongodb.com/docs/manual/core/read-preference">here</a>.</p>
+<p><em>NOTE: you may also specify the driver read preference <a href="https://www.mongodb.com/docs/manual/core/read-preference/#read-preference-modes">strategy</a>
 option when connecting:</em></p>
 <pre><code class="language-javascript"><span class="hljs-comment">// pings the replset members periodically to track network latency</span>
 <span class="hljs-keyword">const</span> options = { <span class="hljs-attr">replset</span>: { <span class="hljs-attr">strategy</span>: <span class="hljs-string">&#x27;ping&#x27;</span> }};

@@ -18,6 +18,12 @@ const doc: IDiscriminatorTest = new Disc({ name: 'foo', email: 'hi' });
 doc.name = 'bar';
 doc.email = 'hello';
 
+const Disc2 = Base.discriminator<IDiscriminatorTest>(
+  'Disc2',
+  new Schema({ email: { type: String } }),
+  { value: 'test', mergeHooks: false }
+);
+
 function test(): void {
   enum CardType {
     Artifact = 'artifact',

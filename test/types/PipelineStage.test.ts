@@ -311,6 +311,85 @@ const setWindowFields4: PipelineStage = {
   }
 };
 
+const setWindowFieldsLinearFill: PipelineStage = {
+  $setWindowFields: {
+    partitionBy: '$stock',
+    sortBy: { date: 1 },
+    output: {
+      price: { $linearFill: '$price' }
+    }
+  }
+};
+
+const setWindowFieldsLocf: PipelineStage = {
+  $setWindowFields: {
+    partitionBy: '$stock',
+    sortBy: { date: 1 },
+    output: {
+      price: { $locf: '$price' }
+    }
+  }
+};
+
+const fillWithOutput: PipelineStage = {
+  $fill: {
+    output: {
+      bootsSold: { value: 0 }
+    }
+  }
+};
+
+const fillWithPartitionBy: PipelineStage = {
+  $fill: {
+    partitionBy: 'date',
+    output: {
+      bootsSold: { value: 0 }
+    }
+  }
+};
+
+const fillWithPartitionByFields: PipelineStage = {
+  $fill: {
+    partitionByFields: ['date'],
+    output: {
+      bootsSold: { value: 0 }
+    }
+  }
+};
+
+const fillWithSortBy: PipelineStage = {
+  $fill: {
+    sortBy: {
+      date: -1
+    },
+    output: {
+      bootsSold: { value: 0 }
+    }
+  }
+};
+
+const fillWithOutputMethodLinear: PipelineStage = {
+  $fill: {
+    sortBy: {
+      date: -1
+    },
+    output: {
+      bootsSold: { method: 'linear' }
+    }
+  }
+};
+
+const fillWithOutputMethodLocf: PipelineStage = {
+  $fill: {
+    sortBy: {
+      date: -1
+    },
+    output: {
+      bootsSold: { method: 'locf' }
+    }
+  }
+};
+
 const group1: PipelineStage = { $group: { _id: null, ageStdDev: { $stdDevSamp: '$age' } } };
 const group2: PipelineStage = {
   $group: {

@@ -389,6 +389,25 @@ describe('aggregate: ', function() {
     });
   });
 
+  describe('fill', function() {
+    it('works', function() {
+      const aggregate = new Aggregate();
+      const obj = {
+        output:
+          {
+            bootsSold: { value: 0 },
+            sandalsSold: { value: 0 },
+            sneakersSold: { value: 0 }
+          }
+      };
+
+      aggregate.fill(obj);
+
+      assert.equal(aggregate._pipeline.length, 1);
+      assert.deepEqual(aggregate._pipeline[0].$fill, obj);
+    });
+  });
+
   describe('model()', function() {
     it('works', function() {
       const aggregate = new Aggregate();

@@ -1127,6 +1127,16 @@ declare module 'mongoose' {
          * An expression that resolves to a boolean value used to determine if an element should be included in the output array. The expression references each element of the input array individually with the variable name specified in as.
          */
         cond: BooleanExpression;
+        /**
+         * A number expression that restricts the number of matching array elements that $filter returns. You cannot specify a limit less than 1. The matching array elements are returned in the order they appear in the input array.
+         *
+         * If the specified limit is greater than the number of matching array elements, $filter returns all matching array elements.
+         * If the limit is null, $filter returns all matching array elements.
+         *
+         * @version 5.2
+         * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/filter/#using-the-limit-field
+         */
+        limit?: NumberExpression;
       }
     }
 

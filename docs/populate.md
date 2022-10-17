@@ -56,7 +56,7 @@ user and have a good reason for doing so.
   <li><a href="#populating-maps">Populating Maps</a></li>
   <li><a href="#populate-middleware">Populate in Middleware</a></li>
   <li><a href="#populating-multiple-paths-middleware">Populating Multiple Paths in Middleware</a></li>
-  <li><a href="#transform">Manipulate populated objects</a></li>
+  <li><a href="#transform-populated-documents">Transform populated documents</a></li>
 </ul>
 
 <h3 id="saving-refs"><a href="#saving-refs">Saving refs</a></h3>
@@ -880,33 +880,22 @@ userSchema.pre('find', function (next) {
 ```
 Alternatively, you can check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
 
-<h3 id="transform"><a href="#transform">Manipulate populated objects</a></h3>
+<h3 id="transform-populated-documents"><a href="#transform-populated-documents">Transform populated documents</a></h3>
 
-We can manipulate populated objects using `transform`. This option lets you register a function with two arguments: the populated document, and the original id, used to populate the document. The function will be called on every populated document and will give us more control over the result of the `populate()` execution.
+You can manipulate populated documents using the `transform` option.
+If you specify a `transform` function, Mongoose will call this function on every populated document in the result wiwith two arguments: the populated document, and the original id used to populate the document.
+This gives you more control over the result of the `populate()` execution.
+It is especially useful when you're populating multiple documents.
 
 The [original motivation](https://github.com/Automattic/mongoose/issues/3775) for the `transform` option was to give the ability to leave the unpopulated `_id` if no document was found, instead of setting the value to `null`:
 
 ```javascript
-// Without `transform`
-doc = await Parent.findById(doc).populate([
-  'child',
-  // Set `retainNullValues` to true to keep `null` values
-  { path: 'children', options: { retainNullValues: true } }
-]);
-
-doc.child; // null
-doc.children; // [ null, { _id: 634d1a4ddb804d17d95d1c7f, name: 'Luke', __v: 0 } ]
-
 // With `transform`
 doc = await Parent.findById(doc).populate([
   {
     path: 'child',
+    // If `doc` is null, use the original id instead
     transform: (doc, id) => doc == null ? id : doc 
-  },
-  {
-    path: 'children',
-    options: { retainNullValues: true },
-    transform: (doc, id) => doc == null ? id : doc
   }
 ]);
 
@@ -914,7 +903,8 @@ doc.child; // 634d1a5744efe65ae09142f9
 doc.children; // [ 634d1a67ac15090a0ca6c0ea, { _id: 634d1a4ddb804d17d95d1c7f, name: 'Luke', __v: 0 } ]
 ```
 
-Further more, we can also use `transform` to flatten the returned documents:
+You can return any value from `transform()`.
+For example, you can use `transform()` to "flatten" populated documents as follows.
 
 ```javascript
 let doc = await Parent.create({ children: [ { name: 'Luke' }, { name: 'Leia' } ] });
@@ -925,4 +915,59 @@ doc = await Parent.findById(doc).populate([{
 }]);
 
 doc.children; // ['Luke', 'Leia']
+```
+
+Another use case for `transform()` is setting `$locals` values on populated documents to pass parameters to getters and virtuals.
+For example, suppose you want to set a language code on your document for internationalization purposes as follows.
+
+```javascript
+const internationalizedStringSchema = new Schema({
+  en: String,
+  es: String
+});
+
+const ingredientSchema = new Schema({
+  // Instead of setting `name` to just a string, set `name` to a map
+  // of language codes to strings.
+  name: {
+    type: internationalizedStringSchema,
+    // When you access `name`, pull the document's locale
+    get: function(value) {
+      return value[this.$locals.language || 'en'];
+    }
+  }
+});
+
+const recipeSchema = new Schema({
+  ingredients: [{ type: mongoose.ObjectId, ref: 'Ingredient' }]
+});
+
+const Ingredient = mongoose.model('Ingredient', ingredientSchema);
+const Recipe = mongoose.model('Recipe', recipeSchema);
+```
+
+You can set the language code on all populated exercises as follows:
+
+```javascript
+// Create some sample data
+const { _id } = await Ingredient.create({
+  name: {
+    en: 'Eggs',
+    es: 'Huevos'
+  }
+});
+await Recipe.create({ ingredients: [_id] });
+
+// Populate with setting `$locals.language` for internationalization
+const language = 'es';
+const recipes = await Recipe.find().populate({
+  path: 'ingredients',
+  transform: function(doc) {
+    doc.$locals.language = language;
+    return doc;
+  }
+});
+
+// Gets the ingredient's name in Spanish `name.es`
+recipes[0].ingredients[0].name; // 'Huevos'
 ```

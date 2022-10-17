@@ -56,6 +56,7 @@ user and have a good reason for doing so.
   <li><a href="#populating-maps">Populating Maps</a></li>
   <li><a href="#populate-middleware">Populate in Middleware</a></li>
   <li><a href="#populating-multiple-paths-middleware">Populating Multiple Paths in Middleware</a></li>
+  <li><a href="#transform">Manipulate populated objects</a></li>
 </ul>
 
 <h3 id="saving-refs"><a href="#saving-refs">Saving refs</a></h3>
@@ -878,3 +879,50 @@ userSchema.pre('find', function (next) {
 });
 ```
 Alternatively, you can check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
+
+<h3 id="transform"><a href="#transform">Manipulate populated objects</a></h3>
+
+We can manipulate populated objects using `transform`. This option lets you register a function with two arguments: the populated document, and the original id, used to populate the document. The function will be called on every populated document and will give us more control over the result of the `populate()` execution.
+
+The [original motivation](https://github.com/Automattic/mongoose/issues/3775) for the `transform` option was to give the ability to leave the unpopulated `_id` if no document was found, instead of setting the value to `null`:
+
+```javascript
+// Without `transform`
+doc = await Parent.findById(doc).populate([
+  'child',
+  // Set `retainNullValues` to true to keep `null` values
+  { path: 'children', options: { retainNullValues: true } }
+]);
+
+doc.child; // null
+doc.children; // [ null, { _id: 634d1a4ddb804d17d95d1c7f, name: 'Luke', __v: 0 } ]
+
+// With `transform`
+doc = await Parent.findById(doc).populate([
+  {
+    path: 'child',
+    transform: (doc, id) => doc == null ? id : doc 
+  },
+  {
+    path: 'children',
+    options: { retainNullValues: true },
+    transform: (doc, id) => doc == null ? id : doc
+  }
+]);
+
+doc.child; // 634d1a5744efe65ae09142f9
+doc.children; // [ 634d1a67ac15090a0ca6c0ea, { _id: 634d1a4ddb804d17d95d1c7f, name: 'Luke', __v: 0 } ]
+```
+
+Further more, we can also use `transform` to flatten the returned documents:
+
+```javascript
+let doc = await Parent.create({ children: [ { name: 'Luke' }, { name: 'Leia' } ] });
+
+doc = await Parent.findById(doc).populate([{
+  path: 'children',
+  transform: doc => doc == null ? null : doc.name
+}]);
+
+doc.children; // ['Luke', 'Leia']
+```

@@ -66,6 +66,7 @@ user and have a good reason for doing so.</p>
   <li><a href="#populating-maps">Populating Maps</a></li>
   <li><a href="#populate-middleware">Populate in Middleware</a></li>
   <li><a href="#populating-multiple-paths-middleware">Populating Multiple Paths in Middleware</a></li>
+  <li><a href="#transform-populated-documents">Transform populated documents</a></li>
 </ul>
 
 <h3 id="saving-refs"><a href="#saving-refs">Saving refs</a></h3>
@@ -737,4 +738,83 @@ userSchema.<span class="hljs-title function_">pre</span>(<span class="hljs-strin
 });
 </code></pre>
 <p>Alternatively, you can check out the <a href="http://npmjs.com/package/mongoose-autopopulate">mongoose-autopopulate plugin</a>.</p>
+<h3 id="transform-populated-documents"><a href="#transform-populated-documents">Transform populated documents</a></h3>
+
+<p>You can manipulate populated documents using the <code>transform</code> option.
+If you specify a <code>transform</code> function, Mongoose will call this function on every populated document in the result wiwith two arguments: the populated document, and the original id used to populate the document.
+This gives you more control over the result of the <code>populate()</code> execution.
+It is especially useful when you&#39;re populating multiple documents.</p>
+<p>The <a href="https://github.com/Automattic/mongoose/issues/3775">original motivation</a> for the <code>transform</code> option was to give the ability to leave the unpopulated <code>_id</code> if no document was found, instead of setting the value to <code>null</code>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// With `transform`</span>
+doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Parent</span>.<span class="hljs-title function_">findById</span>(doc).<span class="hljs-title function_">populate</span>([
+  {
+    <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;child&#x27;</span>,
+    <span class="hljs-comment">// If `doc` is null, use the original id instead</span>
+    <span class="hljs-attr">transform</span>: <span class="hljs-function">(<span class="hljs-params">doc, id</span>) =&gt;</span> doc == <span class="hljs-literal">null</span> ? id : doc 
+  }
+]);
+
+doc.<span class="hljs-property">child</span>; <span class="hljs-comment">// 634d1a5744efe65ae09142f9</span>
+doc.<span class="hljs-property">children</span>; <span class="hljs-comment">// [ 634d1a67ac15090a0ca6c0ea, { _id: 634d1a4ddb804d17d95d1c7f, name: &#x27;Luke&#x27;, __v: 0 } ]</span>
+</code></pre>
+<p>You can return any value from <code>transform()</code>.
+For example, you can use <code>transform()</code> to &quot;flatten&quot; populated documents as follows.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">let</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Parent</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">children</span>: [ { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Luke&#x27;</span> }, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Leia&#x27;</span> } ] });
+
+doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Parent</span>.<span class="hljs-title function_">findById</span>(doc).<span class="hljs-title function_">populate</span>([{
+  <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;children&#x27;</span>,
+  <span class="hljs-attr">transform</span>: <span class="hljs-function"><span class="hljs-params">doc</span> =&gt;</span> doc == <span class="hljs-literal">null</span> ? <span class="hljs-literal">null</span> : doc.<span class="hljs-property">name</span>
+}]);
+
+doc.<span class="hljs-property">children</span>; <span class="hljs-comment">// [&#x27;Luke&#x27;, &#x27;Leia&#x27;]</span>
+</code></pre>
+<p>Another use case for <code>transform()</code> is setting <code>$locals</code> values on populated documents to pass parameters to getters and virtuals.
+For example, suppose you want to set a language code on your document for internationalization purposes as follows.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> internationalizedStringSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">en</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">es</span>: <span class="hljs-title class_">String</span>
+});
+
+<span class="hljs-keyword">const</span> ingredientSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-comment">// Instead of setting `name` to just a string, set `name` to a map</span>
+  <span class="hljs-comment">// of language codes to strings.</span>
+  <span class="hljs-attr">name</span>: {
+    <span class="hljs-attr">type</span>: internationalizedStringSchema,
+    <span class="hljs-comment">// When you access `name`, pull the document&#x27;s locale</span>
+    <span class="hljs-attr">get</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) {
+      <span class="hljs-keyword">return</span> value[<span class="hljs-variable language_">this</span>.<span class="hljs-property">$locals</span>.<span class="hljs-property">language</span> || <span class="hljs-string">&#x27;en&#x27;</span>];
+    }
+  }
+});
+
+<span class="hljs-keyword">const</span> recipeSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">ingredients</span>: [{ <span class="hljs-attr">type</span>: mongoose.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-string">&#x27;Ingredient&#x27;</span> }]
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Ingredient</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Ingredient&#x27;</span>, ingredientSchema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Recipe</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Recipe&#x27;</span>, recipeSchema);
+</code></pre>
+<p>You can set the language code on all populated exercises as follows:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Create some sample data</span>
+<span class="hljs-keyword">const</span> { _id } = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Ingredient</span>.<span class="hljs-title function_">create</span>({
+  <span class="hljs-attr">name</span>: {
+    <span class="hljs-attr">en</span>: <span class="hljs-string">&#x27;Eggs&#x27;</span>,
+    <span class="hljs-attr">es</span>: <span class="hljs-string">&#x27;Huevos&#x27;</span>
+  }
+});
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Recipe</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">ingredients</span>: [_id] });
+
+<span class="hljs-comment">// Populate with setting `$locals.language` for internationalization</span>
+<span class="hljs-keyword">const</span> language = <span class="hljs-string">&#x27;es&#x27;</span>;
+<span class="hljs-keyword">const</span> recipes = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Recipe</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">populate</span>({
+  <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;ingredients&#x27;</span>,
+  <span class="hljs-attr">transform</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) {
+    doc.<span class="hljs-property">$locals</span>.<span class="hljs-property">language</span> = language;
+    <span class="hljs-keyword">return</span> doc;
+  }
+});
+
+<span class="hljs-comment">// Gets the ingredient&#x27;s name in Spanish `name.es`</span>
+recipes[<span class="hljs-number">0</span>].<span class="hljs-property">ingredients</span>[<span class="hljs-number">0</span>].<span class="hljs-property">name</span>; <span class="hljs-comment">// &#x27;Huevos&#x27;</span>
+</code></pre>
 </div></div><div id="jobs"><div class="job-listing"><a href="/docs/jobs#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/jobs#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/jobs#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/jobs">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/js/mobile-navbar-toggle.js"></script></div></body></html>

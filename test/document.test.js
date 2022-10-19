@@ -11930,17 +11930,55 @@ describe('document', function() {
   });
 
   it('$clone() (gh-11849)', async function() {
-    const schema = new mongoose.Schema({ name: String });
+    const schema = new mongoose.Schema({
+      name: {
+        type: String,
+        validate: {
+          validator: (v) => v !== 'Invalid'
+        }
+      }
+    });
     const Test = db.model('Test', schema);
 
-    const item = await Test.create({ name: 'Mongoose' });
+    const item = await Test.create({ name: 'Test' });
 
     const doc = await Test.findById(item._id);
     const clonedDoc = doc.$clone();
 
-    assert.deepEqual(doc, clonedDoc);
-    assert.deepEqual(doc._doc, clonedDoc._doc);
-    assert.deepEqual(doc.$__, clonedDoc.$__);
+    assert.deepEqual(clonedDoc, doc);
+    assert.deepEqual(clonedDoc._doc, doc._doc);
+    assert.deepEqual(clonedDoc.$__, doc.$__);
+
+    // Editing a field in the cloned doc does not effect
+    // the original doc
+    clonedDoc.name = 'Test 2';
+    assert.equal(doc.name, 'Test');
+    assert.equal(clonedDoc.name, 'Test 2');
+
+    // Saving the cloned doc does not effect `modifiedPaths`
+    // in the original doc
+    const modifiedPaths = doc.modifiedPaths;
+    await clonedDoc.save();
+    assert.deepEqual(doc.modifiedPaths, modifiedPaths);
+
+    // Cloning a doc with invalid field preserve the
+    // invalid field value
+    doc.name = 'Invalid';
+    await assert.rejects(async() => {
+      await doc.validate();
+    });
+    const invalidClonedDoc = doc.$clone();
+    doc.name = 'Test';
+    await assert.rejects(async() => {
+      await invalidClonedDoc.validate();
+    });
+
+    // Setting a session on the cloned doc does not
+    // affect the session in the original doc
+    const session = await Test.startSession();
+    clonedDoc.$session(session);
+    assert.strictEqual(doc.$session(), null);
+    assert.strictEqual(clonedDoc.$session(), session);
   });
 });
 

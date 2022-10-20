@@ -11928,6 +11928,26 @@ describe('document', function() {
     assert.ok(rawDoc);
     assert.deepStrictEqual(rawDoc.tags, ['mongodb']);
   });
+
+  it('can create document with document array and top-level key named `schema` (gh-12480)', async function() {
+    const AuthorSchema = new Schema({
+      fullName: { type: 'String', required: true }
+    });
+
+    const BookSchema = new Schema({
+      schema: { type: 'String', required: true },
+      title: { type: 'String', required: true },
+      authors: [AuthorSchema]
+    }, { supressReservedKeysWarning: true });
+
+    const Book = db.model('Book', BookSchema);
+
+    await Book.create({
+      schema: 'design',
+      authors: [{ fullName: 'Sourabh Bagrecha' }],
+      title: 'The power of JavaScript'
+    });
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

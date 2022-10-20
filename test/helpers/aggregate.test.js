@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const prepareDiscriminatorPipeline = require('../../lib/helpers/aggregate/prepareDiscriminatorPipeline');
 const stringifyFunctionOperators = require('../../lib/helpers/aggregate/stringifyFunctionOperators');
 
 describe('stringifyFunctionOperators', function() {
@@ -61,5 +62,34 @@ describe('stringifyFunctionOperators', function() {
     stringifyFunctionOperators(pipeline);
 
     assert.equal(typeof pipeline[0].$addFields.newField.$function.body, 'string');
+  });
+});
+
+describe('prepareDiscriminatorPipeline', function() {
+  it('handles case where initial $match includes the discriminator key (gh-12478)', function() {
+    const pipeline = [
+      {
+        $match: {
+          partition: 'Child',
+          $text: {
+            $search: 'test'
+          }
+        }
+      }
+    ];
+    const fakeSchema = { discriminatorMapping: { isRoot: false, key: 'partition', value: 'Child' } };
+
+    prepareDiscriminatorPipeline(pipeline, fakeSchema);
+
+    assert.deepStrictEqual(pipeline, [
+      {
+        $match: {
+          partition: 'Child',
+          $text: {
+            $search: 'test'
+          }
+        }
+      }
+    ]);
   });
 });

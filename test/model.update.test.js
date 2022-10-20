@@ -2023,6 +2023,37 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('handles $set on document array in discriminator with runValidators (gh-12518)', async function() {
+      const options = { discriminatorKey: 'kind', runValidators: true };
+
+      const countrySchema = new mongoose.Schema({ title: String }, options);
+      const areasSubSchema = new mongoose.Schema({ country: [countrySchema] }, options);
+      const WorldSchema = new mongoose.Schema({ areas: areasSubSchema }, options);
+
+      const World = db.model(
+        'World',
+        new mongoose.Schema({ title: String }, options)
+      );
+      const Earth = World.discriminator('Earth', WorldSchema);
+
+      const data = {
+        areas: {
+          country: [
+            {
+              title: 'titlec'
+            }
+          ]
+        }
+      };
+      await Earth.updateOne(
+        { _id: mongoose.Types.ObjectId() },
+        data,
+        {
+          runValidators: true
+        }
+      );
+    });
+
     it('single nested schema with geo (gh-4465)', function(done) {
       const addressSchema = new Schema({
         geo: { type: [Number], index: '2dsphere' }

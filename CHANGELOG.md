@@ -1,3 +1,18 @@
+6.6.6 / 2022-10-20
+==================
+ * fix(update): handle runValidators when using $set on a doc array in discriminator schema #12571 #12518
+ * fix(document): allow creating document with document array and top-level key named schema #12569 #12480
+ * fix(cast): make schema-level strictQuery override schema-level strict for query filters #12570 #12508
+ * fix(aggregate): avoid adding extra $match stage if user manually set discriminator key to correct value in first pipeline stage #12568 #12478
+ * fix: Throws error when updating a key name that match the discriminator key name on nested object #12534 #12517 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): add limit to $filter expression #12553 [raphael-papazikas](https://github.com/raphael-papazikas)
+ * fix(types): correct replaceWith type pipeline stage #12535 [FabioCingottini](https://github.com/FabioCingottini)
+ * fix(types): add missing densify type pipeline type #12533 [FabioCingottini](https://github.com/FabioCingottini)
+ * docs(populate): added transform option description #12560 #12551 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(connection): add sample to useDb() documentation #12541 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(guide): update broken read-preference links #12538 #12525 [hasezoey](https://github.com/hasezoey)
+ * chore: add TypeScript version field to issue template #12532 [hasezoey](https://github.com/hasezoey)
+
 6.6.5 / 2022-10-05
 ==================
  * fix(document): set defaults on subdocuments underneath init-ed single nested subdocument #12523 #12515

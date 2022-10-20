@@ -178,4 +178,19 @@ describe('cast: ', function() {
       roles: { $ne: 'super' }
     });
   });
+
+  it('uses schema-level strictQuery over schema-level strict (gh-12508)', function() {
+    const schema = new Schema({}, {
+      strict: 'throw',
+      strictQuery: false
+    });
+
+    const res = cast(schema, {
+      name: 'foo'
+    });
+
+    assert.deepEqual(res, {
+      name: 'foo'
+    });
+  });
 });

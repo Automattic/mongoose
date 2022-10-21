@@ -811,6 +811,34 @@ describe('model', function() {
         assert.equal(doc.kind, void 0);
       });
 
+      it('allows updating discriminator key using `overwriteDiscriminatorKey` with `strict: throw` (gh-12513)', async function() {
+        const options = { discriminatorKey: 'kind', strict: 'throw' };
+        const eventSchema = new Schema({ time: Date }, options);
+        db.deleteModel(/Event/);
+        const Event = db.model('Event', eventSchema);
+        const ClickedLinkEvent = Event.discriminator('ClickedLink',
+          new Schema({ url: String }, options));
+
+        await ClickedLinkEvent.create({
+          time: new Date(),
+          url: 'http://www.example.com'
+        });
+
+        let doc = await Event.findOneAndUpdate(
+          {},
+          { $set: { kind: 'foo' } },
+          { new: true, overwriteDiscriminatorKey: true }
+        ).lean();
+        assert.equal(doc.kind, 'foo');
+
+        doc = await Event.findOneAndUpdate(
+          {},
+          { kind: 'bar' },
+          { new: true, overwriteDiscriminatorKey: true }
+        ).lean();
+        assert.equal(doc.kind, 'bar');
+      });
+
       it('reference in child schemas (gh-2719-2)', async function() {
         function BaseSchema() {
           Schema.apply(this, arguments);

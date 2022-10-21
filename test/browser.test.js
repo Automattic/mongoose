@@ -20,6 +20,10 @@ describe('browser', function() {
     exec('node --eval "require(\'./lib/browser\')"', done);
   });
 
+  it('require() works in an environment where process.versions is an empty object (gh-5842)', function(done) {
+    exec('node --eval "Object.defineProperty(process, \'versions\', { value: {} }); require(\'./dist/browser.umd\')"', done);
+  });
+
   it('using schema (gh-7170)', function(done) {
     exec('node --eval "const mongoose = require(\'./lib/browser\'); new mongoose.Schema();"', done);
   });

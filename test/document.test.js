@@ -11954,22 +11954,28 @@ describe('document', function() {
     clonedDoc.name = 'Test 2';
     assert.equal(doc.name, 'Test');
     assert.equal(clonedDoc.name, 'Test 2');
+    assert.ok(!doc.$isModified('name'));
+    assert.ok(clonedDoc.$isModified('name'));
 
     // Saving the cloned doc does not effect `modifiedPaths`
     // in the original doc
-    const modifiedPaths = doc.modifiedPaths;
+    const modifiedPaths = [...doc.modifiedPaths()];
     await clonedDoc.save();
-    assert.deepEqual(doc.modifiedPaths, modifiedPaths);
+    assert.deepEqual(doc.modifiedPaths(), modifiedPaths);
 
     // Cloning a doc with invalid field preserve the
     // invalid field value
     doc.name = 'Invalid';
-    await assert.rejects(async() => {
+    await assert.rejects(async () => {
       await doc.validate();
     });
+
+    await clonedDoc.validate();
+
     const invalidClonedDoc = doc.$clone();
     doc.name = 'Test';
-    await assert.rejects(async() => {
+    await doc.validate();
+    await assert.rejects(async () => {
       await invalidClonedDoc.validate();
     });
 

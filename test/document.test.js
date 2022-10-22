@@ -11966,7 +11966,7 @@ describe('document', function() {
     // Cloning a doc with invalid field preserve the
     // invalid field value
     doc.name = 'Invalid';
-    await assert.rejects(async () => {
+    await assert.rejects(async() => {
       await doc.validate();
     });
 
@@ -11975,7 +11975,7 @@ describe('document', function() {
     const invalidClonedDoc = doc.$clone();
     doc.name = 'Test';
     await doc.validate();
-    await assert.rejects(async () => {
+    await assert.rejects(async() => {
       await invalidClonedDoc.validate();
     });
 
@@ -11986,7 +11986,7 @@ describe('document', function() {
     assert.strictEqual(doc.$session(), null);
     assert.strictEqual(clonedDoc.$session(), session);
   });
-    
+
   it('can create document with document array and top-level key named `schema` (gh-12480)', async function() {
     const AuthorSchema = new Schema({
       fullName: { type: 'String', required: true }

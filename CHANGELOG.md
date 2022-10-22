@@ -1,3 +1,8 @@
+6.6.7 / 2022-10-21
+==================
+ * fix: correct browser build and improve isAsyncFunction check for browser #12577 #12576 #12392
+ * fix(query): allow overwriting discriminator key with overwriteDiscriminatorKey if strict: 'throw' #12578 #12513
+
 6.6.6 / 2022-10-20
 ==================
  * fix(update): handle runValidators when using $set on a doc array in discriminator schema #12571 #12518

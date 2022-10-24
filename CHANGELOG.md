@@ -1,3 +1,13 @@
+6.7.0 / 2022-10-24
+==================
+ * feat: upgrade to mongodb driver 4.11.0 #12446
+ * feat: add UUID Schema Type (BSON Buffer SubType 4) #12268 #3208 [hasezoey](https://github.com/hasezoey)
+ * feat(aggregation): add $fill pipeline stage #12545 [raphael-papazikas](https://github.com/raphael-papazikas)
+ * feat(types+schema): allow defining schema paths using mongoose.Types.* to work around TS type inference issues #12352
+ * feat(schema): add alias() method that makes it easier to define multiple aliases for a given path #12368
+ * feat(model): add mergeHooks option to Model.discriminator() to avoid duplicate hooks #12542
+ * feat(document): add $timestamps() method to set timestamps for save(), bulkSave(), and insertMany() #12540
+
 6.6.7 / 2022-10-21
 ==================
  * fix: correct browser build and improve isAsyncFunction check for browser #12577 #12576 #12392

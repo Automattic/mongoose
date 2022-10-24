@@ -169,6 +169,7 @@ declare module 'mongoose' {
     countDocuments(callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a new document or documents */
+    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, options?: SaveOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
     create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
     create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
     create<DocContents = AnyKeys<T>>(doc: DocContents | T): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;

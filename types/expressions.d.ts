@@ -1190,6 +1190,26 @@ declare module 'mongoose' {
       $last: Expression;
     }
 
+    export interface LinearFill {
+      /**
+       * Fills null and missing fields in a window using linear interpolation based on surrounding field values.
+       *
+       * @version 5.3
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/linearFill
+       */
+      $linearFill: Expression
+    }
+
+    export interface Locf {
+      /**
+       * Last observation carried forward. Sets values for null and missing fields in a window to the last non-null value for the field.
+       *
+       * @version 5.2
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/locf
+       */
+      $locf: Expression
+    }
+
     export interface Map {
       /**
        * Applies a subexpression to each element of an array and returns the array of resulting values in order. Accepts named parameters.
@@ -2745,6 +2765,8 @@ declare module 'mongoose' {
     Expression.First |
     Expression.Integral |
     Expression.Last |
+    Expression.LinearFill |
+    Expression.Locf |
     Expression.Max |
     Expression.Min |
     Expression.Push |

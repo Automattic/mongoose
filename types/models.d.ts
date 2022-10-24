@@ -177,7 +177,8 @@ declare module 'mongoose' {
 
     /** Creates a new document or documents */
     create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
+    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, options?: SaveOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, callback: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>): void;
     create<DocContents = AnyKeys<T>>(doc: DocContents | T): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
     create<DocContents = AnyKeys<T>>(...docs: Array<T | DocContents>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
     create<DocContents = AnyKeys<T>>(doc: T | DocContents, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;

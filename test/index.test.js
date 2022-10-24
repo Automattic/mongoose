@@ -11,6 +11,7 @@ const { EventEmitter } = require('events');
 
 const collection = 'blogposts_' + random();
 
+const SetOptionError = require('../lib/error/setOptionError');
 const mongoose = start.mongoose;
 const Mongoose = mongoose.Mongoose;
 const Schema = mongoose.Schema;
@@ -500,16 +501,13 @@ describe('mongoose module:', function() {
   });
 
   it('throws an error on setting invalid options (gh-6899)', function() {
-    let threw = false;
     try {
       mongoose.set('someInvalidOption', true);
+      assert.fail('Expected mongoose.set to throw');
     }
     catch (err) {
-      assert.equal(err.message, '`someInvalidOption` is an invalid option.');
-      threw = true;
-    }
-    finally {
-      assert.equal(threw, true);
+      assert.ok(err instanceof SetOptionError);
+      assert.equal(err.message, 'someInvalidOption: "someInvalidOption" is not a valid option to set');
     }
   });
 
@@ -1099,6 +1097,87 @@ describe('mongoose module:', function() {
         title: 'The IDless master'
       });
       assert.equal(entry.id, undefined);
+    });
+  });
+
+  describe('set()', function() {
+    let m;
+
+    beforeEach(() => {
+      m = new mongoose.Mongoose();
+    });
+
+    it('should be able to set a option through set with (key, value)', function() {
+      // also test the getter behavior of the function
+      assert.strictEqual(m.options['debug'], undefined);
+      assert.strictEqual(m.set('debug'), undefined);
+      m.set('debug', true);
+
+      assert.strictEqual(m.options['debug'], true);
+      assert.strictEqual(m.set('debug'), true);
+    });
+
+    it('should be able to set a option through a object with {key: value}', function() {
+      assert.strictEqual(m.options['debug'], undefined);
+      m.set({ debug: true });
+
+      assert.strictEqual(m.options['debug'], true);
+    });
+
+    it('should throw a single error when using a invalid key', function() {
+      try {
+        m.set('invalid', true);
+        assert.fail('Expected .set to throw');
+      } catch (err) {
+        assert.ok(err instanceof SetOptionError);
+        assert.strictEqual(Object.keys(err.errors).length, 1);
+        assert.strictEqual(err.message, 'invalid: "invalid" is not a valid option to set');
+      }
+    });
+
+    it('should throw a error with many errors when using multiple invalid keys', function() {
+      try {
+        m.set({
+          invalid1: true,
+          invalid2: true
+        });
+        assert.fail('Expected .set to throw');
+      } catch (err) {
+        assert.ok(err instanceof SetOptionError);
+        assert.strictEqual(Object.keys(err.errors).length, 2);
+        assert.strictEqual(err.message, 'invalid1: "invalid1" is not a valid option to set, invalid2: "invalid2" is not a valid option to set');
+        assert.ok(err.errors['invalid1'] instanceof SetOptionError.SetOptionInnerError);
+        assert.strictEqual(err.errors['invalid1'].message, '"invalid1" is not a valid option to set');
+        assert.ok(err.errors['invalid2'] instanceof SetOptionError.SetOptionInnerError);
+        assert.strictEqual(err.errors['invalid2'].message, '"invalid2" is not a valid option to set');
+      }
+    });
+
+    it('should apply all values, even if there are errors', function() {
+      assert.strictEqual(m.options['debug'], undefined);
+      try {
+        m.set({
+          invalid: true,
+          debug: true
+        });
+        assert.fail('Expected .set to throw');
+      } catch (err) {
+        assert.ok(err instanceof SetOptionError);
+        assert.ok(err.errors['invalid'] instanceof SetOptionError.SetOptionInnerError);
+        assert.strictEqual(err.message, 'invalid: "invalid" is not a valid option to set');
+        assert.strictEqual(m.options['debug'], true);
+      }
+    });
+
+    it('should throw a single error when using a invalid key when getting', function() {
+      try {
+        m.set('invalid');
+        assert.fail('Expected .set to throw');
+      } catch (err) {
+        assert.ok(err instanceof SetOptionError);
+        assert.ok(err.errors['invalid'] instanceof SetOptionError.SetOptionInnerError);
+        assert.strictEqual(err.message, 'invalid: "invalid" is not a valid option to set');
+      }
     });
   });
 });

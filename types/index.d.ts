@@ -109,6 +109,7 @@ declare module 'mongoose' {
 
   /** Sets mongoose options */
   export function set<K extends keyof MongooseOptions>(key: K, value: MongooseOptions[K]): Mongoose;
+  export function set(options: { [K in keyof MongooseOptions]: MongooseOptions[K] }): Mongoose;
 
   /** The Mongoose version */
   export const version: string;
@@ -194,6 +195,12 @@ declare module 'mongoose' {
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
+
+    /**
+     * Add an alias for `path`. This means getting or setting the `alias`
+     * is equivalent to getting or setting the `path`.
+     */
+    alias(path: string, alias: string | string[]): this;
 
     /**
      * Array of child schemas (from document arrays and single nested subdocs)

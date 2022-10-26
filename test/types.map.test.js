@@ -1080,13 +1080,24 @@ describe('Map', function() {
       }
     }).save();
 
-    const query = UserModel.findById(_id);
-
+    // Using `.$*`
+    let query = UserModel.findById(_id);
     query.populate({
       path: 'addresses.$*'
     });
 
-    const doc = await query.exec();
+    let doc = await query.exec();
+    assert.ok(Array.isArray(doc.addresses.get('home')));
+    assert.equal(doc.addresses.get('home').length, 1);
+    assert.equal(doc.addresses.get('home')[0].city, 'London');
+
+    // Populating just one path in the map
+    query = UserModel.findById(_id);
+    query.populate({
+      path: 'addresses.home'
+    });
+
+    doc = await query.exec();
     assert.ok(Array.isArray(doc.addresses.get('home')));
     assert.equal(doc.addresses.get('home').length, 1);
     assert.equal(doc.addresses.get('home')[0].city, 'London');

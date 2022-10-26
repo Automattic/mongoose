@@ -1050,4 +1050,45 @@ describe('Map', function() {
     const res = doc.toObject({ flattenMaps: true });
     assert.equal(res.l1.l1key.l2.l2key.value, 'abc');
   });
+
+  it('handles populating map of arrays (gh-12494)', async function() {
+    const User = new mongoose.Schema({
+      name: String,
+      addresses: {
+        type: Map,
+        of: [{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Address'
+        }],
+        default: {}
+      }
+    });
+
+    const Address = new mongoose.Schema({
+      city: String
+    });
+
+    const UserModel = db.model('User', User);
+    const AddressModel = db.model('Address', Address);
+
+    const address = await new AddressModel({ city: 'London' }).save();
+
+    const { _id } = await new UserModel({
+      name: 'Name',
+      addresses: {
+        home: [address._id]
+      }
+    }).save();
+
+    const query = UserModel.findById(_id);
+
+    query.populate({
+      path: 'addresses.$*'
+    });
+
+    const doc = await query.exec();
+    assert.ok(Array.isArray(doc.addresses.get('home')));
+    assert.equal(doc.addresses.get('home').length, 1);
+    assert.equal(doc.addresses.get('home')[0].city, 'London');
+  });
 });

@@ -28,5 +28,6 @@ declare module 'mongoose' {
     message?: string | ValidatorMessageFn;
     type?: string;
     validator: ValidateFn<T> | LegacyAsyncValidateFn<T> | AsyncValidateFn<T>;
+    propsParameter?: boolean;
   }
 }

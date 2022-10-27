@@ -1073,12 +1073,12 @@ describe('Map', function() {
 
     const address = await AddressModel.create({ city: 'London' });
 
-    const { _id } = await new UserModel({
+    const { _id } = await UserModel.create({
       name: 'Name',
       addresses: {
         home: [address._id]
       }
-    }).save();
+    });
 
     // Using `.$*`
     let query = UserModel.findById(_id);

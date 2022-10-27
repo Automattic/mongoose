@@ -1071,7 +1071,7 @@ describe('Map', function() {
     const UserModel = db.model('User', User);
     const AddressModel = db.model('Address', Address);
 
-    const address = await new AddressModel({ city: 'London' }).save();
+    const address = await AddressModel.create({ city: 'London' });
 
     const { _id } = await new UserModel({
       name: 'Name',

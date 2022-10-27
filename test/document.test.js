@@ -11016,6 +11016,54 @@ describe('document', function() {
     assert.equal(foo.get('bar.another'), 2);
   });
 
+  it('populating subdocument refs underneath maps throws (gh-12494) (gh-10856)', async function() {
+    // Bar model, has a name property and some other properties that we are interested in
+    const BarSchema = new Schema({
+      name: String,
+      more: String,
+      another: Number
+    });
+    const Bar = db.model('Bar', BarSchema);
+
+    // Denormalised Bar schema with just the name, for use on the Foo model
+    const BarNameSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Bar'
+      },
+      name: String
+    });
+
+    // Foo model, which contains denormalized bar data (just the name)
+    const FooSchema = new Schema({
+      something: String,
+      other: Number,
+      map: {
+        type: Map,
+        of: {
+          type: BarNameSchema,
+          ref: 'Bar'
+        }
+      }
+    });
+    const Foo = db.model('Foo', FooSchema);
+
+    const bar = await Bar.create({
+      name: 'I am Bar',
+      more: 'With more data',
+      another: 2
+    });
+    const { _id } = await Foo.create({
+      something: 'I am Foo',
+      other: 1,
+      map: { test: bar }
+    });
+
+    const err = await Foo.findById(_id).populate('map').then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.message.includes('Cannot manually populate single nested subdoc underneath Map'), err.message);
+  });
+
   it('handles save with undefined nested doc under subdoc (gh-11110)', async function() {
     const testSchema = new Schema({
       level_1_array: [new Schema({

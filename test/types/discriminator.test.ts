@@ -21,7 +21,7 @@ doc.email = 'hello';
 const Disc2 = Base.discriminator<IDiscriminatorTest>(
   'Disc2',
   new Schema({ email: { type: String } }),
-  { value: 'test', mergeHooks: false }
+  { value: 'test', mergeHooks: false, mergePlugins: false }
 );
 
 function test(): void {

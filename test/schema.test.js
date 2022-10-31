@@ -2885,4 +2885,17 @@ describe('schema', function() {
     assert.equal(schema.path('num').instance, 'Decimal128');
     assert.equal(schema.path('num2').instance, 'Decimal128');
   });
+
+  it('_getSchema finds path underneath nested subdocument with map of mixed (gh-12530)', function() {
+    const schema = new Schema({
+      child: new Schema({
+        testMap: {
+          type: Map,
+          of: 'Mixed'
+        }
+      })
+    });
+
+    assert.equal(schema._getSchema('child.testMap.foo.bar').instance, 'Mixed');
+  });
 });

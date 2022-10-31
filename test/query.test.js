@@ -4133,6 +4133,34 @@ describe('Query', function() {
     assert.equal(item.doNotSelect, undefined);
   });
 
+  it('Map field with select: false is selected when explicitly requested (gh-12603)', async function() {
+    const testSchema = new mongoose.Schema({
+      title: String,
+      body: {
+        type: Map,
+        of: { en: String, pt: String },
+        select: false
+      }
+    });
+
+    const Test = db.model('Test', testSchema);
+    await Test.create({
+      title: 'test',
+      body: {
+        A: { en: 'en test A value', pt: 'pt test A value' },
+        B: { en: 'en test B value', pt: 'pt test B value' }
+      }
+    });
+
+    const item = await Test.findOne({}).select('+body');
+    assert.equal(item.title, 'test');
+    assert.equal(item.get('body.A.en'), 'en test A value');
+
+    const item2 = await Test.findOne({}).select('body');
+    assert.equal(item2.title, undefined);
+    assert.equal(item2.get('body.A.en'), 'en test A value');
+  });
+
   it('treats ObjectId as object with `_id` for `merge()` (gh-12325)', async function() {
     const testSchema = new mongoose.Schema({ name: String });
     const Test = db.model('Test', testSchema);

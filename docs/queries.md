@@ -3,23 +3,23 @@
 Mongoose [models](./models.html) provide several static helper functions
 for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
 Each of these functions returns a
-[mongoose `Query` object](http://mongoosejs.com/docs/api.html#Query).
+[mongoose `Query` object](../docs/api.html#Query).
 
-- [`Model.deleteMany()`](/docs/api.html#model_Model-deleteMany)
-- [`Model.deleteOne()`](/docs/api.html#model_Model-deleteOne)
-- [`Model.find()`](/docs/api.html#model_Model-find)
-- [`Model.findById()`](/docs/api.html#model_Model-findById)
-- [`Model.findByIdAndDelete()`](/docs/api.html#model_Model-findByIdAndDelete)
-- [`Model.findByIdAndRemove()`](/docs/api.html#model_Model-findByIdAndRemove)
-- [`Model.findByIdAndUpdate()`](/docs/api.html#model_Model-findByIdAndUpdate)
-- [`Model.findOne()`](/docs/api.html#model_Model-findOne)
-- [`Model.findOneAndDelete()`](/docs/api.html#model_Model-findOneAndDelete)
-- [`Model.findOneAndRemove()`](/docs/api.html#model_Model-findOneAndRemove)
-- [`Model.findOneAndReplace()`](/docs/api.html#model_Model-findOneAndReplace)
-- [`Model.findOneAndUpdate()`](/docs/api.html#model_Model-findOneAndUpdate)
-- [`Model.replaceOne()`](/docs/api.html#model_Model-replaceOne)
-- [`Model.updateMany()`](/docs/api.html#model_Model-updateMany)
-- [`Model.updateOne()`](/docs/api.html#model_Model-updateOne)
+- [`Model.deleteMany()`](../docs/api.html#model_Model-deleteMany)
+- [`Model.deleteOne()`](../docs/api.html#model_Model-deleteOne)
+- [`Model.find()`](../docs/api.html#model_Model-find)
+- [`Model.findById()`](../docs/api.html#model_Model-findById)
+- [`Model.findByIdAndDelete()`](../docs/api.html#model_Model-findByIdAndDelete)
+- [`Model.findByIdAndRemove()`](../docs/api.html#model_Model-findByIdAndRemove)
+- [`Model.findByIdAndUpdate()`](../docs/api.html#model_Model-findByIdAndUpdate)
+- [`Model.findOne()`](../docs/api.html#model_Model-findOne)
+- [`Model.findOneAndDelete()`](../docs/api.html#model_Model-findOneAndDelete)
+- [`Model.findOneAndRemove()`](../docs/api.html#model_Model-findOneAndRemove)
+- [`Model.findOneAndReplace()`](../docs/api.html#model_Model-findOneAndReplace)
+- [`Model.findOneAndUpdate()`](../docs/api.html#model_Model-findOneAndUpdate)
+- [`Model.replaceOne()`](../docs/api.html#model_Model-replaceOne)
+- [`Model.updateMany()`](../docs/api.html#model_Model-updateMany)
+- [`Model.updateOne()`](../docs/api.html#model_Model-updateOne)
 
 A mongoose query can be executed in one of two ways. First, if you
 pass in a `callback` function, Mongoose will execute the query asynchronously
@@ -200,7 +200,7 @@ of inactivity. You can read more about working around session idle timeouts in t
 
 <h3 id="versus-aggregation"><a href="#versus-aggregation">Versus Aggregation</a></h3>
 
-[Aggregation](https://mongoosejs.com/docs/api.html#aggregate_Aggregate) can
+[Aggregation](../docs/api.html#aggregate_Aggregate) can
 do many of the same things that queries can. For example, below is
 how you can use `aggregate()` to find docs where `name.last = 'Ghost'`:
 
@@ -212,7 +212,7 @@ However, just because you can use `aggregate()` doesn't mean you should.
 In general, you should use queries where possible, and only use `aggregate()`
 when you absolutely need to.
 
-Unlike query results, Mongoose does **not** [`hydrate()`](/docs/api/model.html#model_Model-hydrate)
+Unlike query results, Mongoose does **not** [`hydrate()`](../docs/api/model.html#model_Model-hydrate)
 aggregation results. Aggregation results are always POJOs, not Mongoose
 documents.
 
@@ -223,7 +223,7 @@ docs[0] instanceof mongoose.Document; // false
 ```
 
 Also, unlike query filters, Mongoose also doesn't
-[cast](/docs/tutorials/query_casting.html) aggregation pipelines. That means
+[cast](../docs/tutorials/query_casting.html) aggregation pipelines. That means
 you're responsible for ensuring the values you pass in to an aggregation
 pipeline have the correct type.
 
@@ -242,4 +242,4 @@ const aggRes = await Person.aggregate([{ $match: { _id: idString } }])
 
 <h3 id="next"><a href="#next">Next Up</a></h3>
 
-Now that we've covered `Queries`, let's take a look at [Validation](/docs/validation.html).
+Now that we've covered `Queries`, let's take a look at [Validation](../docs/validation.html).

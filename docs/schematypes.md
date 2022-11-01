@@ -209,7 +209,7 @@ types.
 * `set`: function, defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
 * `alias`: string, mongoose >= 4.10.0 only. Defines a [virtual](./guide.html#virtuals) with the given name that gets/sets this path.
 * `immutable`: boolean, defines path as immutable. Mongoose prevents you from changing immutable paths unless the parent document has `isNew: true`.
-* `transform`: function, Mongoose calls this function when you call [`Document#toJSON()`](/docs/api/document.html#document_Document-toJSON) function, including when you [`JSON.stringify()`](https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript) a document.
+* `transform`: function, Mongoose calls this function when you call [`Document#toJSON()`](../docs/api/document.html#document_Document-toJSON) function, including when you [`JSON.stringify()`](https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript) a document.
 
 ```javascript
 const numberSchema = new Schema({

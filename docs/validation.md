@@ -142,10 +142,10 @@ nested objects are not fully fledged paths.
 ### Update Validators
 
 In the above examples, you learned about document validation. Mongoose also
-supports validation for [`update()`](/docs/api.html#query_Query-update),
-[`updateOne()`](/docs/api.html#query_Query-updateOne),
-[`updateMany()`](/docs/api.html#query_Query-updateMany),
-and [`findOneAndUpdate()`](/docs/api.html#query_Query-findOneAndUpdate) operations.
+supports validation for [`update()`](../docs/api.html#query_Query-update),
+[`updateOne()`](../docs/api.html#query_Query-updateOne),
+[`updateMany()`](../docs/api.html#query_Query-updateMany),
+and [`findOneAndUpdate()`](../docs/api.html#query_Query-findOneAndUpdate) operations.
 Update validators are off by default - you need to specify
 the `runValidators` option.
 

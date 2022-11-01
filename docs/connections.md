@@ -71,11 +71,11 @@ mongoose.set('bufferCommands', false);
 ```
 
 Note that buffering is also responsible for waiting until Mongoose
-creates collections if you use the [`autoCreate` option](/docs/guide.html#autoCreate).
+creates collections if you use the [`autoCreate` option](../docs/guide.html#autoCreate).
 If you disable buffering, you should also disable the `autoCreate`
-option and use [`createCollection()`](/docs/api/model.html#model_Model-createCollection)
-to create [capped collections](/docs/guide.html#capped) or
-[collections with collations](/docs/guide.html#collation).
+option and use [`createCollection()`](../docs/api/model.html#model_Model-createCollection)
+to create [capped collections](../docs/guide.html#capped) or
+[collections with collations](../docs/guide.html#collation).
 
 ```javascript
 const schema = new Schema({
@@ -139,7 +139,7 @@ A full list of options can be found on the [MongoDB Node.js driver docs for `Mon
 Mongoose passes options to the driver without modification, modulo a few
 exceptions that are explained below.
 
-* `bufferCommands`    - This is a mongoose-specific option (not passed to the MongoDB driver) that disables [Mongoose's buffering mechanism](http://mongoosejs.com/docs/faq.html#callback_never_executes)
+* `bufferCommands`    - This is a mongoose-specific option (not passed to the MongoDB driver) that disables [Mongoose's buffering mechanism](../docs/faq.html#callback_never_executes)
 * `user`/`pass`       - The username and password for authentication. These options are Mongoose-specific, they are equivalent to the MongoDB driver's `auth.username` and `auth.password` options.
 * `autoIndex`         - By default, mongoose will automatically build indexes defined in your schema when it connects. This is great for development, but not ideal for large production deployments, because index builds can cause performance degradation. If you set `autoIndex` to false, mongoose will not automatically build indexes for **any** model associated with this connection.
 * `dbName`            - Specifies which database to connect to and overrides any database specified in the connection string. This is useful if you are unable to specify a default database in the connection string like with [some `mongodb+srv` syntax connections](https://stackoverflow.com/questions/48917591/fail-to-connect-mongoose-to-atlas/48917626#48917626).
@@ -460,4 +460,4 @@ mongoose.createConnection(uri);
 
 <h3 id="next">Next Up</h3>
 
-Now that we've covered connections, let's take a look at [models](/docs/models.html).
+Now that we've covered connections, let's take a look at [models](../docs/models.html).

@@ -396,7 +396,7 @@ Consider using a regex like `/^[a-f0-9]{24}$/` to test whether a string is exact
 
 **A**. In order to avoid executing a separate query for each document returned from the `find` query, Mongoose
 instead queries using (numDocuments * limit) as the limit. If you need the correct limit, you should use the
-[perDocumentLimit](/docs/populate.html#limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in
+[perDocumentLimit](../docs/populate.html#limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in
 mind that populate() will execute a separate query for each document.
 
 <hr id="duplicate-query" />

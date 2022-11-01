@@ -18,13 +18,13 @@ want the email's domain. For example, the domain portion of
 'test@gmail.com' is 'gmail.com'.
 
 Below is one way to implement the `domain` property using a virtual.
-You define virtuals on a schema using the [`Schema#virtual()` function](/docs/api/schema.html#schema_Schema-virtual).
+You define virtuals on a schema using the [`Schema#virtual()` function](../docs/api/schema.html#schema_Schema-virtual).
 
 ```javascript
 [require:Virtuals.*basic]
 ```
 
-The `Schema#virtual()` function returns a [`VirtualType` object](/docs/api/virtualtype.html). Unlike normal document properties,
+The `Schema#virtual()` function returns a [`VirtualType` object](../docs/api/virtualtype.html). Unlike normal document properties,
 virtuals do not have any underlying value and Mongoose does not do
 any type coercion on virtuals. However, virtuals do have
 [getters and setters](/docs/tutorials/getters-setters.html), which make 
@@ -69,7 +69,7 @@ console.log(doc.toObject({ virtuals: true }));
 Virtuals are properties on Mongoose documents. If you use the
 [lean option](/docs/tutorials/lean.html), that means your queries return POJOs
 rather than full Mongoose documents. That means no virtuals if you use
-[`lean()`](/docs/api/query.html#query_Query-lean).
+[`lean()`](../docs/api/query.html#query_Query-lean).
 
 ```javascript
 [require:Virtuals.*lean]

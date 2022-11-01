@@ -140,7 +140,7 @@ story.populated('author'); // undefined
 ```
 
 A common reason for checking whether a path is populated is getting the `author`
-id. However, for your convenience, Mongoose adds a [`_id` getter to ObjectId instances](/docs/api/mongoose.html#mongoose_Mongoose-set)
+id. However, for your convenience, Mongoose adds a [`_id` getter to ObjectId instances](../docs/api/mongoose.html#mongoose_Mongoose-set)
 so you can use `story.author._id` regardless of whether `author` is populated.
 
 ```javascript
@@ -476,7 +476,7 @@ This is known as a "cross-database populate," because it enables you to
 populate across MongoDB databases and even across MongoDB instances.
 
 If you don't have access to the model instance when defining your `eventSchema`,
-you can also pass [the model instance as an option to `populate()`](/docs/api/model.html#model_Model-populate).
+you can also pass [the model instance as an option to `populate()`](../docs/api/model.html#model_Model-populate).
 
 ```javascript
 const events = await Event.

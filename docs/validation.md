@@ -62,7 +62,7 @@ Mongoose replaces `{VALUE}` with the value being validated.
 
 A common gotcha for beginners is that the `unique` option for schemas
 is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://docs.mongodb.com/manual/core/index-unique/).
-See the [FAQ](/docs/faq.html) for more information.
+See the [FAQ](../docs/faq.html) for more information.
 
 ```javascript
 [require:The `unique` Option is Not a Validator]
@@ -210,4 +210,4 @@ of the array.
 
 ### Next Up
 
-Now that we've covered `Validation`, let's take a look at [Middleware](/docs/middleware.html).
+Now that we've covered `Validation`, let's take a look at [Middleware](../docs/middleware.html).

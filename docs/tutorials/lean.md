@@ -3,7 +3,7 @@
 The [lean option](../docs/api.html#query_Query-lean) tells Mongoose to skip
 [hydrating](../docs/api.html#model_Model-hydrate) the result documents. This
 makes queries faster and less memory intensive, but the result documents are
-plain old JavaScript objects (POJOs), **not** [Mongoose documents](/docs/documents.html).
+plain old JavaScript objects (POJOs), **not** [Mongoose documents](../docs/documents.html).
 In this tutorial, you'll learn more about the tradeoffs of using `lean()`.
 
 * [Using Lean](#using-lean)
@@ -54,7 +54,7 @@ and virtuals don't run if you enable `lean`.
 
 <h2 id="lean-and-populate"><a href="#lean-and-populate">Lean and Populate</a></h2>
 
-[Populate](/docs/populate.html) works with `lean()`. If you
+[Populate](../docs/populate.html) works with `lean()`. If you
 use both `populate()` and `lean()`, the `lean` option propagates to the
 populated documents as well. In the below example, both the top-level
 'Group' documents and the populated 'Person' documents will be lean.
@@ -63,7 +63,7 @@ populated documents as well. In the below example, both the top-level
 [require:Lean Tutorial.*conventional populate]
 ```
 
-[Virtual populate](/docs/populate.html#populate-virtuals) also works with lean.
+[Virtual populate](../docs/populate.html#populate-virtuals) also works with lean.
 
 ```javascript
 [require:Lean Tutorial.*virtual populate]
@@ -118,7 +118,7 @@ to add virtuals to your lean query results.
 
 ## Plugins
 
-Using `lean()` bypasses all Mongoose features, including [virtuals](/docs/tutorials/virtuals.html), [getters/setters](/docs/tutorials/getters-setters.html),
+Using `lean()` bypasses all Mongoose features, including [virtuals](../docs/tutorials/virtuals.html), [getters/setters](../docs/tutorials/getters-setters.html),
 and [defaults](../docs/api.html#schematype_SchemaType-default). If you want to
 use these features with `lean()`, you need to use the corresponding plugin:
 

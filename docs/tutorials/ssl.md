@@ -67,7 +67,7 @@ MongooseServerSelectionError: Hostname/IP does not match certificate's altnames:
 ```
 
 The SSL certificate's [common name](https://knowledge.digicert.com/solution/SO7239.html) **must** line up with the host name
-in your connection string. If the SSL certificate is for `hostname2.mydomain.com`, your connection string must connect to `hostname2.mydomain.com`, not any other hostname or IP address that may be equivalent to `hostname2.mydomain.com`. For replica sets, this also means that the SSL certificate's common name must line up with the [machine's `hostname`](/docs/connections.html#replicaset-hostnames).
+in your connection string. If the SSL certificate is for `hostname2.mydomain.com`, your connection string must connect to `hostname2.mydomain.com`, not any other hostname or IP address that may be equivalent to `hostname2.mydomain.com`. For replica sets, this also means that the SSL certificate's common name must line up with the [machine's `hostname`](../docs/connections.html#replicaset-hostnames).
 
 ## X509 Auth
 

@@ -51,7 +51,7 @@ The `Connection#transaction()` function informs Mongoose change tracking that th
 
 <h2 id="with-mongoose-documents-and-save"><a href="#with-mongoose-documents-and-save">With Mongoose Documents and <code>save()</code></a></h2>
 
-If you get a [Mongoose document](/docs/documents.html) from [`findOne()`](../docs/api.html#findone_findOne)
+If you get a [Mongoose document](../docs/documents.html) from [`findOne()`](../docs/api.html#findone_findOne)
 or [`find()`](../docs/api.html#find_find) using a session, the document will
 keep a reference to the session and use that session for [`save()`](../docs/api.html#document_Document-save).
 

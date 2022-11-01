@@ -127,7 +127,7 @@ const schema = new Schema({
 });
 ```
 
-As a consequence, [you need a little extra work to define a property named `type` in your schema](/docs/faq.html#type-key).
+As a consequence, [you need a little extra work to define a property named `type` in your schema](../docs/faq.html#type-key).
 For example, suppose you're building a stock portfolio app, and you
 want to store the asset's `type` (stock, bond, ETF, etc.). Naively,
 you might define your schema as shown below:
@@ -261,14 +261,14 @@ const schema2 = new Schema({
 * `enum`: Array, creates a [validator](./validation.html) that checks if the value is in the given array.
 * `minLength`: Number, creates a [validator](./validation.html) that checks if the value length is not less than the given number
 * `maxLength`: Number, creates a [validator](./validation.html) that checks if the value length is not greater than the given number
-* `populate`: Object, sets default [populate options](/docs/populate.html#query-conditions)
+* `populate`: Object, sets default [populate options](../docs/populate.html#query-conditions)
 
 <h5 id="number-validators">Number</h5>
 
 * `min`: Number, creates a [validator](./validation.html) that checks if the value is greater than or equal to the given minimum.
 * `max`: Number, creates a [validator](./validation.html) that checks if the value is less than or equal to the given maximum.
 * `enum`: Array, creates a [validator](./validation.html) that checks if the value is strictly equal to one of the values in the given array.
-* `populate`: Object, sets default [populate options](/docs/populate.html#query-conditions)
+* `populate`: Object, sets default [populate options](../docs/populate.html#query-conditions)
 
 <h5>Date</h5>
 
@@ -278,7 +278,7 @@ const schema2 = new Schema({
 
 <h5>ObjectId</h5>
 
-* `populate`: Object, sets default [populate options](/docs/populate.html#query-conditions)
+* `populate`: Object, sets default [populate options](../docs/populate.html#query-conditions)
 
 <h3 id="usage-notes"><a href="#usage-notes">Usage Notes</a></h3>
 
@@ -333,7 +333,7 @@ call it and assign the returned value to the path.
 The values `null` and `undefined` are not cast.
 
 NaN, strings that cast to NaN, arrays, and objects that don't have a `valueOf()` function
-will all result in a [CastError](/docs/validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated.
+will all result in a [CastError](../docs/validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated.
 
 <h4 id="dates">Dates</h4>
 
@@ -443,7 +443,7 @@ Mongoose casts the below values to `false`:
 * `'0'`
 * `'no'`
 
-Any other value causes a [CastError](/docs/validation.html#cast-errors).
+Any other value causes a [CastError](../docs/validation.html#cast-errors).
 You can modify what values Mongoose converts to true or false using the
 `convertToTrue` and `convertToFalse` properties, which are [JavaScript sets](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set).
 
@@ -566,7 +566,7 @@ Map types are stored as [BSON objects in MongoDB](https://en.wikipedia.org/wiki/
 Keys in a BSON object are ordered, so this means the [insertion order](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#Description)
 property of maps is maintained.
 
-Mongoose supports a special `$*` syntax to [populate](/docs/populate.html) all elements in a map.
+Mongoose supports a special `$*` syntax to [populate](../docs/populate.html) all elements in a map.
 For example, suppose your `socialMediaHandles` map contains a `ref`:
 
 ```javascript
@@ -720,4 +720,4 @@ including what validators it has and what the type is.
 
 ### Next Up
 
-Now that we've covered `SchemaTypes`, let's take a look at [Connections](/docs/connections.html).
+Now that we've covered `SchemaTypes`, let's take a look at [Connections](../docs/connections.html).

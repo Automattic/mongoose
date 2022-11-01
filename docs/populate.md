@@ -743,7 +743,7 @@ AuthorSchema.virtual('posts', {
 
 <h3 id="populating-maps"><a href="#populating-maps">Populating Maps</a></h3>
 
-[Maps](/docs/schematypes.html#maps) are a type that represents an object with arbitrary
+[Maps](../docs/schematypes.html#maps) are a type that represents an object with arbitrary
 string keys. For example, in the below schema, `members` is a map from strings to ObjectIds.
 
 ```javascript

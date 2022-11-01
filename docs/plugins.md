@@ -65,8 +65,8 @@ const Player = mongoose.model('Player', playerSchema);
 
 <h3 id="apply-plugins-before-compiling-models"><a href="#apply-plugins-before-compiling-models">Apply Plugins Before Compiling Models</a></h3>
 
-Because many plugins rely on [middleware](/docs/middleware.html), you should make sure to apply plugins **before**
-you call `mongoose.model()` or `conn.model()`. Otherwise, [any middleware the plugin registers won't get applied](/docs/middleware.html#defining).
+Because many plugins rely on [middleware](../docs/middleware.html), you should make sure to apply plugins **before**
+you call `mongoose.model()` or `conn.model()`. Otherwise, [any middleware the plugin registers won't get applied](../docs/middleware.html#defining).
 
 ```javascript
 // loadedAt.js
@@ -101,7 +101,7 @@ gameSchema.plugin(loadedAtPlugin);
 The Mongoose team maintains several plugins that add cool new features to
 Mongoose. Here's a couple:
 
-* [mongoose-autopopulate](http://plugins.mongoosejs.io/plugins/autopopulate): Always [`populate()`](/docs/populate.html) certain fields in your Mongoose schemas.
+* [mongoose-autopopulate](http://plugins.mongoosejs.io/plugins/autopopulate): Always [`populate()`](../docs/populate.html) certain fields in your Mongoose schemas.
 * [mongoose-lean-virtuals](http://plugins.mongoosejs.io/plugins/lean-virtuals): Attach virtuals to the results of Mongoose queries when using [`.lean()`](../docs/api.html#query_Query-lean).
 * [mongoose-cast-aggregation](https://www.npmjs.com/package/mongoose-cast-aggregation)
 

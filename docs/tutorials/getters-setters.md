@@ -1,6 +1,6 @@
 # Getters/Setters in Mongoose
 
-Mongoose getters and setters allow you to execute custom logic when getting or setting a property on a [Mongoose document](/docs/documents.html). Getters let you transform data in MongoDB into a more user friendly form, and setters let you transform user data before it gets to MongoDB.
+Mongoose getters and setters allow you to execute custom logic when getting or setting a property on a [Mongoose document](../docs/documents.html). Getters let you transform data in MongoDB into a more user friendly form, and setters let you transform user data before it gets to MongoDB.
 
 ## Getters
 

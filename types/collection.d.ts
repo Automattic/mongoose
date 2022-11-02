@@ -3,7 +3,6 @@ declare module 'mongoose' {
 
   /*
    * section collection.js
-   * http://mongoosejs.com/docs/api/collection-js.html#collection-js
    */
   interface CollectionBase<T extends mongodb.Document> extends mongodb.Collection<T> {
     /*
@@ -24,7 +23,6 @@ declare module 'mongoose' {
 
   /*
    * section drivers/node-mongodb-native/collection.js
-   * http://mongoosejs.com/docs/api/drivers-node-mongodb-native-collection-js.html#drivers-node-mongodb-native-collection-js
    */
   interface Collection<T extends mongodb.Document = mongodb.Document> extends CollectionBase<T> {
     /**

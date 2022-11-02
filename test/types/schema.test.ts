@@ -864,7 +864,7 @@ function gh12242() {
 function gh12431() {
   const testSchema = new Schema({
     testDate: { type: Date },
-    testDecimal: { type: Schema.Types.Decimal128 },
+    testDecimal: { type: Schema.Types.Decimal128 }
   });
 
   type Example = InferSchemaType<typeof testSchema>;

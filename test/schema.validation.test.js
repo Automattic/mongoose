@@ -1330,6 +1330,26 @@ describe('schema', function() {
       });
     });
 
+    it('Allows for doc to be passed as another parameter gh-12564', function(done) {
+      const s = mongoose.Schema({
+        n: {
+          type: String,
+          // required: true,
+          required: [true, function(properties, doc) {
+            return 'fail ' + properties.path + ' on doc ' + doc;
+          }]
+        },
+        field: String
+      });
+      const M = mongoose.model('gh6523-2', s);
+      const m = new M({ field: 'Yo' });
+
+      m.validate(function(error) {
+        assert.notEqual('fail n on doc undefined', error.errors['n'].message);
+        done();
+      });
+    });
+
     it('evaluate message function for required field gh6523', function(done) {
       const s = mongoose.Schema({
         n: {

@@ -192,6 +192,14 @@ projectSchema.post('save', function() {
   // this => IProject
 });
 
+projectSchema.pre('deleteOne', function() {
+  this.model;
+});
+
+projectSchema.post('deleteOne', function() {
+  this.model;
+});
+
 projectSchema.methods.myMethod = () => 10;
 
 projectSchema.statics.myStatic = () => 42;

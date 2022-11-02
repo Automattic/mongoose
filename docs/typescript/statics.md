@@ -1,6 +1,6 @@
 # Statics in TypeScript
 
-Mongoose [models](../docs/models.html) do **not** have an explicit generic parameter for [statics](../docs/guide.html#statics).
+Mongoose [models](../../docs/models.html) do **not** have an explicit generic parameter for [statics](../../docs/guide.html#statics).
 If your model has statics, we recommend creating an interface that [extends](https://www.typescriptlang.org/docs/handbook/interfaces.html) Mongoose's `Model` interface as shown below.
 
 ```typescript

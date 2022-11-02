@@ -31,7 +31,6 @@ See the [mongodb connection string spec](http://docs.mongodb.org/manual/referenc
   <li><a href="#mongos_connections">Multi-mongos support</a></li>
   <li><a href="#multiple_connections">Multiple connections</a></li>
   <li><a href="#connection_pools">Connection Pools</a></li>
-  <li><a href="#v5-changes">Option Changes in v5.x</a></li>
 </ul>
 
 <h3 id="buffering"><a href="#buffering">Operation Buffering</a></h3>

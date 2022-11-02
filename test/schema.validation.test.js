@@ -1341,7 +1341,7 @@ describe('schema', function() {
         },
         field: String
       });
-      const M = mongoose.model('gh6523-2', s);
+      const M = mongoose.model('gh-12564', s);
       const m = new M({ field: 'Yo' });
 
       m.validate(function(error) {

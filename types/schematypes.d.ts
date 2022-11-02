@@ -422,6 +422,11 @@ declare module 'mongoose' {
         /** Adds an uppercase [setter](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set). */
         uppercase(shouldApply?: boolean): this;
       }
+
+      class UUID extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'UUID';
+      }
     }
   }
 }

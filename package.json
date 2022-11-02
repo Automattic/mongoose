@@ -52,7 +52,7 @@
     "lodash.isequalwith": "4.4.0",
     "marked": "4.1.1",
     "mkdirp": "^1.0.4",
-    "mocha": "10.0.0",
+    "mocha": "10.1.0",
     "moment": "2.x",
     "mongodb-memory-server": "8.9.5",
     "ncp": "^2.0.0",

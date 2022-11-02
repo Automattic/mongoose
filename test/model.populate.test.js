@@ -10828,5 +10828,28 @@ describe('model: populate:', function() {
       assert.ok(err);
       assert.ok(err.message.includes('strictPopulate'), err.message);
     });
+    it('allows overwriting localField and foreignField when populating a virtual gh-6963', async function() {
+      const testSchema = Schema({ name: String }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
+      const userSchema = Schema({ name: String, field: { type: mongoose.Schema.Types.ObjectId, ref: 'Test' } });
+      testSchema.virtual('test', {
+        ref: 'gh6963-2',
+        localField: '_id',
+        foreignField: 'field'
+      });
+
+      const Test = db.model('gh6963', testSchema);
+      const User = db.model('gh6963-2', userSchema);
+
+      const entry = await Test.create({
+        name: 'Test'
+      });
+      await User.create({
+        name: 'User',
+        field: entry._id
+      });
+
+      const res = await Test.findOne().populate('test');
+      assert.equal(res.test.length, 1);
+    });
   });
 });

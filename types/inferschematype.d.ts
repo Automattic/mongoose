@@ -60,6 +60,12 @@ declare module 'mongoose' {
       : unknown;
 }
 
+type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined } ?
+  true :
+  PathType extends { default: (...args: any[]) => undefined } ?
+    true :
+    false;
+
 /**
  * @summary Checks if a document path is required or optional.
  * @param {P} P Document path.
@@ -69,7 +75,7 @@ type IsPathRequired<P, TypeKey extends TypeKeyBaseType = DefaultTypeKey> =
   P extends { required: true | [true, string | undefined] } | ArrayConstructor | any[]
     ? true
     : P extends (Record<TypeKey, ArrayConstructor | any[]>)
-      ? P extends { default: undefined }
+      ? IsPathDefaultUndefined<P> extends true
         ? false
         : true
       : P extends (Record<TypeKey, any>)

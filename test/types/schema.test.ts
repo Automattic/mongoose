@@ -870,3 +870,15 @@ function gh12431() {
   type Example = InferSchemaType<typeof testSchema>;
   expectType<{ testDate?: Date, testDecimal?: Types.Decimal128 }>({} as Example);
 }
+
+function gh12420() {
+  const TestSchema = new Schema(
+    {
+      comments: { type: [String], default: () => undefined }
+    }
+  );
+
+  expectType<{
+    comments?: string[]
+  }>({} as InferSchemaType<typeof TestSchema>);
+}

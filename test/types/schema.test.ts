@@ -412,6 +412,7 @@ export function autoTypedSchema() {
     array5: any[];
     array6: string[];
     array7?: string[];
+    array8?: string[];
     decimal1?: Types.Decimal128;
     decimal2?: Types.Decimal128;
     decimal3?: Types.Decimal128;
@@ -458,6 +459,7 @@ export function autoTypedSchema() {
     array5: [],
     array6: { type: [String] },
     array7: { type: [String], default: undefined },
+    array8: { type: [String], default: () => undefined },
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
     decimal3: 'decimal128'
@@ -859,4 +861,14 @@ function gh12242() {
 
   type Example = InferSchemaType<typeof dbExample>;
   expectType<0 | 1>({} as Example['active']);
+}
+
+function gh12431() {
+  const testSchema = new Schema({
+    testDate: { type: Date },
+    testDecimal: { type: Schema.Types.Decimal128 }
+  });
+
+  type Example = InferSchemaType<typeof testSchema>;
+  expectType<{ testDate?: Date, testDecimal?: Types.Decimal128 }>({} as Example);
 }

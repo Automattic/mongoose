@@ -1,6 +1,6 @@
 # Getters/Setters in Mongoose
 
-Mongoose getters and setters allow you to execute custom logic when getting or setting a property on a [Mongoose document](../docs/documents.html). Getters let you transform data in MongoDB into a more user friendly form, and setters let you transform user data before it gets to MongoDB.
+Mongoose getters and setters allow you to execute custom logic when getting or setting a property on a [Mongoose document](../../docs/documents.html). Getters let you transform data in MongoDB into a more user friendly form, and setters let you transform user data before it gets to MongoDB.
 
 ## Getters
 
@@ -37,7 +37,7 @@ const userSchema = new Schema({
 }, { toJSON: { getters: false } });
 ```
 
-To skip getters on a one-off basis, use [`user.get()` with the `getters` option set to `false`](../docs/api/document.html#document_Document-get) as shown below.
+To skip getters on a one-off basis, use [`user.get()` with the `getters` option set to `false`](../../docs/api/document.html#document_Document-get) as shown below.
 
 ```javascript
 [require:getters/setters.*getters.*skip]
@@ -53,7 +53,7 @@ make it easy to search without worrying about case. Below is an example
 [require:getters/setters.*setters.*basic]
 ```
 
-Mongoose also runs setters on update operations, like [`updateOne()`](../docs/api/query.html#query_Query-updateOne). Mongoose will
+Mongoose also runs setters on update operations, like [`updateOne()`](../../docs/api/query.html#query_Query-updateOne). Mongoose will
 [upsert a document](https://masteringjs.io/tutorials/mongoose/upsert) with a
 lowercased `email` in the below example.
 

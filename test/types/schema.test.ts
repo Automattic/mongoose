@@ -860,3 +860,13 @@ function gh12242() {
   type Example = InferSchemaType<typeof dbExample>;
   expectType<0 | 1>({} as Example['active']);
 }
+
+function gh12431() {
+  const testSchema = new Schema({
+    testDate: { type: Date },
+    testDecimal: { type: Schema.Types.Decimal128 },
+  });
+
+  type Example = InferSchemaType<typeof testSchema>;
+  expectType<{ testDate?: Date, testDecimal?: Types.Decimal128 }>({} as Example);
+}

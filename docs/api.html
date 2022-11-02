@@ -7559,7 +7559,7 @@ document or query.</p>
 <p>Suppose you are implementing user registration for a website. Users provide
 an email and password, which gets saved to mongodb. The email is a string
 that you will want to normalize to lower case, in order to avoid one email
-having more than one account -- e.g., otherwise, <a href="mailto:&#97;&#118;&#101;&#110;&#117;&#x65;&#64;&#x71;&#46;&#x63;&#x6f;&#109;">&#97;&#118;&#101;&#110;&#117;&#x65;&#64;&#x71;&#46;&#x63;&#x6f;&#109;</a> can be registered for 2 accounts via <a href="mailto:&#97;&#x76;&#x65;&#x6e;&#x75;&#x65;&#64;&#113;&#46;&#99;&#x6f;&#109;">&#97;&#x76;&#x65;&#x6e;&#x75;&#x65;&#64;&#113;&#46;&#99;&#x6f;&#109;</a> and <a href="mailto:&#65;&#x76;&#x45;&#x6e;&#x55;&#101;&#64;&#x51;&#x2e;&#x43;&#111;&#x4d;">&#65;&#x76;&#x45;&#x6e;&#x55;&#101;&#64;&#x51;&#x2e;&#x43;&#111;&#x4d;</a>.</p>
+having more than one account -- e.g., otherwise, <a href="mailto:&#97;&#118;&#x65;&#110;&#117;&#x65;&#64;&#113;&#x2e;&#x63;&#x6f;&#109;">&#97;&#118;&#x65;&#110;&#117;&#x65;&#64;&#113;&#x2e;&#x63;&#x6f;&#109;</a> can be registered for 2 accounts via <a href="mailto:&#x61;&#x76;&#x65;&#110;&#x75;&#101;&#64;&#113;&#x2e;&#99;&#111;&#x6d;">&#x61;&#x76;&#x65;&#110;&#x75;&#101;&#64;&#113;&#x2e;&#99;&#111;&#x6d;</a> and <a href="mailto:&#x41;&#x76;&#x45;&#110;&#85;&#101;&#64;&#x51;&#46;&#x43;&#x6f;&#77;">&#x41;&#x76;&#x45;&#110;&#85;&#101;&#64;&#x51;&#46;&#x43;&#x6f;&#77;</a>.</p>
 <p>You can set up email lower case normalization easily via a Mongoose setter.</p>
 <pre><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">toLower</span>(<span class="hljs-params">v</span>) {
   <span class="hljs-keyword">return</span> v.<span class="hljs-title function_">toLowerCase</span>();

@@ -1331,21 +1331,28 @@ describe('schema', function() {
     });
 
     it('Allows for doc to be passed as another parameter gh-12564', function(done) {
+      let document = '';
       const s = mongoose.Schema({
         n: {
           type: String,
-          // required: true,
-          required: [true, function(properties, doc) {
-            return 'fail ' + properties.path + ' on doc ' + doc;
-          }]
+          validate: {
+            validator: function(v) {
+              return v != null;
+            },
+            message: function(properties, doc) {
+              document = doc.toString();
+              return 'fail ' + properties.path + ' on doc ' + doc;
+            }
+          }
         },
         field: String
       });
       const M = mongoose.model('gh-12564', s);
-      const m = new M({ field: 'Yo' });
+      const m = new M({ n: null, field: 'Yo' });
 
       m.validate(function(error) {
-        assert.notEqual('fail n on doc undefined', error.errors['n'].message);
+        assert.equal(error.errors['n'].message.includes(document), true);
+        assert.equal('fail n on doc ' + document, error.errors['n'].message);
         done();
       });
     });

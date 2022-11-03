@@ -2054,7 +2054,7 @@ describe('model', function() {
       'Triangle',
       triangleSchema
     );
-    
+
     const squareSchema = Schema({ ...shapeDef, sides: { type: Number, enum: [4] } });
     squareSchema.plugin(myPlugin, { opts3: true });
     const Square = Shape.discriminator(

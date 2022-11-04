@@ -40,7 +40,7 @@ async function main() {
 
 For brevity, let's assume that all following code is within the `main()` function.
 
-With Mongoose, everything is derived from a [Schema](../docs/guide.html).
+With Mongoose, everything is derived from a [Schema](guide.html).
 Let's get a reference to it and define our kittens.
 
 ```javascript
@@ -49,7 +49,7 @@ const kittySchema = new mongoose.Schema({
 });
 ```
 
-So far so good. We've got a schema with one property, `name`, which will be a  `String`. The next step is compiling our schema into a [Model](../docs/models.html).
+So far so good. We've got a schema with one property, `name`, which will be a  `String`. The next step is compiling our schema into a [Model](models.html).
 
 ```javascript
 const Kitten = mongoose.model('Kitten', kittySchema);
@@ -88,7 +88,7 @@ fluffy.speak(); // "Meow name is fluffy"
 ```
 
 We have talking kittens! But we still haven't saved anything to MongoDB.
-Each document can be saved to the database by calling its [save](../docs/api.html#model_Model-save) method. The first argument to the callback will be an error if any occurred.
+Each document can be saved to the database by calling its [save](api.html#model_Model-save) method. The first argument to the callback will be an error if any occurred.
 
 ```javascript
 await fluffy.save();
@@ -96,7 +96,7 @@ fluffy.speak();
 ```
 
 Say time goes by and we want to display all the kittens we've seen.
-We can access all of the kitten documents through our Kitten [model](../docs/models.html).
+We can access all of the kitten documents through our Kitten [model](models.html).
 
 ```javascript
 const kittens = await Kitten.find();
@@ -104,7 +104,7 @@ console.log(kittens);
 ```
 
 We just logged all of the kittens in our db to the console.
-If we want to filter our kittens by name, Mongoose supports MongoDBs rich [querying](../docs/queries.html) syntax.
+If we want to filter our kittens by name, Mongoose supports MongoDBs rich [querying](queries.html) syntax.
 
 ```javascript
 await Kitten.find({ name: /^fluff/ });

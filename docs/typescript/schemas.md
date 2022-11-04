@@ -1,6 +1,6 @@
 # Schemas in TypeScript
 
-Mongoose [schemas](../../docs/guide.html) are how you tell Mongoose what your documents look like.
+Mongoose [schemas](../guide.html) are how you tell Mongoose what your documents look like.
 Mongoose schemas are separate from TypeScript interfaces, so you need to define both a _document interface_ and a _schema_ until V6.3.1.
 Mongoose supports auto typed schemas so you don't need to define additional typescript interface anymore but you are still able to do so.
 Mongoose provides a `InferSchemaType`, which infers the type of the auto typed schema document when needed.
@@ -95,7 +95,7 @@ The second generic param, `M`, is the model used with the schema. Mongoose uses 
 
 The third generic param, `TInstanceMethods` is used to add types for instance methods defined in the schema.
 
-The 4th param, `TQueryHelpers`, is used to add types for [chainable query helpers](../../docs/typescript/query-helpers.html).
+The 4th param, `TQueryHelpers`, is used to add types for [chainable query helpers](typescript/query-helpers.html).
 
 ## Schema vs Interface fields
 
@@ -141,7 +141,7 @@ const schema = new Schema<User, Model<User>>({
 });
 ```
 
-This is because Mongoose has numerous features that add paths to your schema that should be included in the `DocType` interface without you explicitly putting these paths in the `Schema()` constructor. For example, [timestamps](https://masteringjs.io/tutorials/mongoose/timestamps) and [plugins](../../docs/plugins.html).
+This is because Mongoose has numerous features that add paths to your schema that should be included in the `DocType` interface without you explicitly putting these paths in the `Schema()` constructor. For example, [timestamps](https://masteringjs.io/tutorials/mongoose/timestamps) and [plugins](../plugins.html).
 
 ## Arrays
 

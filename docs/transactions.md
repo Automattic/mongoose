@@ -12,8 +12,8 @@ If you haven't already, import mongoose:
 import mongoose from 'mongoose';
 ```
 
-To create a transaction, you first need to create a session using or [`Mongoose#startSession`](../docs/api/mongoose.html#mongoose_Mongoose-startSession)
-or [`Connection#startSession()`](../docs/api/connection.html#connection_Connection-startSession).
+To create a transaction, you first need to create a session using or [`Mongoose#startSession`](api/mongoose.html#mongoose_Mongoose-startSession)
+or [`Connection#startSession()`](api/connection.html#connection_Connection-startSession).
 
 ```javascript
 // Using Mongoose's default connection
@@ -51,11 +51,11 @@ The `Connection#transaction()` function informs Mongoose change tracking that th
 
 <h2 id="with-mongoose-documents-and-save"><a href="#with-mongoose-documents-and-save">With Mongoose Documents and <code>save()</code></a></h2>
 
-If you get a [Mongoose document](../docs/documents.html) from [`findOne()`](../docs/api.html#findone_findOne)
-or [`find()`](../docs/api.html#find_find) using a session, the document will
-keep a reference to the session and use that session for [`save()`](../docs/api.html#document_Document-save).
+If you get a [Mongoose document](documents.html) from [`findOne()`](api.html#findone_findOne)
+or [`find()`](api.html#find_find) using a session, the document will
+keep a reference to the session and use that session for [`save()`](api.html#document_Document-save).
 
-To get/set the session associated with a given document, use [`doc.$session()`](../docs/api.html#document_Document-$session).
+To get/set the session associated with a given document, use [`doc.$session()`](api.html#document_Document-$session).
 
 ```javascript
 [require:transactions.*save]
@@ -64,8 +64,8 @@ To get/set the session associated with a given document, use [`doc.$session()`](
 <h2 id="with-the-aggregation-framework"><a href="#with-the-aggregation-framework">With the Aggregation Framework</a></h2>
 
 The `Model.aggregate()` function also supports transactions. Mongoose
-aggregations have a [`session()` helper](../docs/api.html#aggregate_Aggregate-session)
-that sets the [`session` option](../docs/api.html#aggregate_Aggregate-option).
+aggregations have a [`session()` helper](api.html#aggregate_Aggregate-session)
+that sets the [`session` option](api.html#aggregate_Aggregate-option).
 Below is an example of executing an aggregation within a transaction.
 
 ```javascript

@@ -207,4 +207,4 @@ The [API docs](./api.html#model_Model) cover many additional methods available l
 
 ## Next Up
 
-Now that we've covered `Models`, let's take a look at [Documents](../docs/documents.html).
+Now that we've covered `Models`, let's take a look at [Documents](documents.html).

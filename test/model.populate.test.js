@@ -10883,8 +10883,21 @@ describe('model: populate:', function() {
       // should be empty because the original local field was _id and we created a doc with uuids
       const check = await Test.findOne({ _id: localEntry._id }).populate({ path: 'test' });
       assert.equal(check.test.length, 0);
- 
       // ============localFieldAndForeignField============
+      const bothEntry = await Test.create({ name: 'Both', uuid: mongoose.Types.ObjectId() });
+      const otherBothEntry = await Test.create({ name: 'Other Both', uuid: mongoose.Types.ObjectId() });
+      await User.create({
+        name: 'both user',
+        field: bothEntry.uuid,
+        change: otherBothEntry.uuid
+      });
+      const bothTest = await Test.findOne({ _id: otherBothEntry._id }).populate({ path: 'test', localField: 'uuid', foreignField: 'change' });
+      assert.equal(bothTest.test.length, 1);
+      const otherBothTest = await Test.findOne({ _id: bothEntry._id }).populate({ path: 'test', localField: 'uuid', foreignField: 'change' });
+      assert.equal(otherBothTest.test.length, 0);
+      const normal = await Test.findOne({ _id: otherBothEntry._id }).populate({ path: 'test' });
+      // should be empty because the original local field was _id and we created a doc with uuids
+      assert.equal(normal.test.length, 0);
     });
   });
 });

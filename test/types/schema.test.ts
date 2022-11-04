@@ -873,6 +873,29 @@ function gh12431() {
   expectType<{ testDate?: Date, testDecimal?: Types.Decimal128 }>({} as Example);
 }
 
+async function gh12593() {
+  const testSchema = new Schema({ x: { type: Schema.Types.UUID } });
+
+  type Example = InferSchemaType<typeof testSchema>;
+  expectType<{ x?: Buffer }>({} as Example);
+
+  const Test = model('Test', testSchema);
+
+  const doc = await Test.findOne({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' }).orFail();
+  expectType<Buffer | undefined>(doc.x);
+
+  const doc2 = new Test({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' });
+  expectType<Buffer | undefined>(doc2.x);
+
+  const doc3 = await Test.findOne({}).orFail().lean();
+  expectType<Buffer | undefined>(doc3.x);
+
+  const arrSchema = new Schema({ arr: [{ type: Schema.Types.UUID }] });
+
+  type ExampleArr = InferSchemaType<typeof arrSchema>;
+  expectType<{ arr: Buffer[] }>({} as ExampleArr);
+}
+
 function gh12562() {
   const emailRegExp = /@/;
   const userSchema = new Schema(

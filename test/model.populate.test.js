@@ -10829,8 +10829,8 @@ describe('model: populate:', function() {
       assert.ok(err.message.includes('strictPopulate'), err.message);
     });
     it('allows overwriting localField and foreignField when populating a virtual gh-6963', async function() {
-      const testSchema = Schema({ name: String }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
-      const userSchema = Schema({ name: String, field: { type: mongoose.Schema.Types.ObjectId, ref: 'Test' } });
+      const testSchema = Schema({ name: String, uuid: mongoose.Schema.Types.ObjectId }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
+      const userSchema = Schema({ name: String, field: { type: mongoose.Schema.Types.ObjectId, ref: 'gh6963' }, change: { type: mongoose.Schema.Types.ObjectId, ref: 'gh6963' } });
       testSchema.virtual('test', {
         ref: 'gh6963-2',
         localField: '_id',
@@ -10841,15 +10841,25 @@ describe('model: populate:', function() {
       const User = db.model('gh6963-2', userSchema);
 
       const entry = await Test.create({
-        name: 'Test'
+        name: 'Test',
+        uuid: mongoose.Types.ObjectId()
+      });
+      const otherEntry = await Test.create({
+        name: 'Other Test',
+        uuid: mongoose.Types.ObjectId()
       });
       await User.create({
         name: 'User',
-        field: entry._id
+        field: entry._id,
+        change: otherEntry._id
       });
-
-      const res = await Test.findOne().populate('test');
+      const res = await Test.findOne({ _id: otherEntry._id }).populate({ path: 'test', foreignField: 'change' });
+      const other = await Test.findOne({ _id: entry._id }).populate({ path: 'test', foreignField: 'change' });
       assert.equal(res.test.length, 1);
+      assert.equal(other.test.length, 0)
+      // make sure its not broken
+      const response = await Test.findOne({ _id: entry._id }).populate('test');
+      assert.equal(response.test.length, 1)
     });
   });
 });

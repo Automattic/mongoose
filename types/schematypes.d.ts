@@ -100,7 +100,7 @@ declare module 'mongoose' {
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will
      * build an index on this path when the model is compiled.
      */
-    index?: boolean | IndexDirection;
+    index?: boolean | IndexDirection | IndexOptions;
 
     /**
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose

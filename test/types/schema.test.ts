@@ -872,3 +872,28 @@ function gh12431() {
   type Example = InferSchemaType<typeof testSchema>;
   expectType<{ testDate?: Date, testDecimal?: Types.Decimal128 }>({} as Example);
 }
+
+function gh12562() {
+  const emailRegExp = /@/;
+  const userSchema = new Schema(
+    {
+      email: {
+        type: String,
+        trim: true,
+        validate: {
+          validator: (value: string) => emailRegExp.test(value),
+          message: 'Email is not valid'
+        },
+        index: { // uncomment the index object and for me trim was throwing an error
+          partialFilterExpression: {
+            email: {
+              $exists: true,
+              $ne: null
+            }
+          }
+        },
+        select: false
+      }
+    }
+  );
+}

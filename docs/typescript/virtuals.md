@@ -1,6 +1,6 @@
 # Virtuals in TypeScript
 
-[Virtuals](tutorials/virtuals.html) are computed properties: you can access virtuals on hydrated Mongoose documents, but virtuals are **not** stored in MongoDB.
+[Virtuals](../tutorials/virtuals.html) are computed properties: you can access virtuals on hydrated Mongoose documents, but virtuals are **not** stored in MongoDB.
 Mongoose supports auto typed virtuals so you don't need to define additional typescript interface anymore but you are still able to do so.
 
 ### Automatically Inferred Types:

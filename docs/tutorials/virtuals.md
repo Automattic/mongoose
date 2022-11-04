@@ -3,15 +3,13 @@
 In Mongoose, a virtual is a property that is **not** stored in MongoDB. 
 Virtuals are typically used for computed properties on documents.
 
-- [Mongoose Virtuals](#mongoose-virtuals)
-  - [Your First Virtual](#your-first-virtual)
-  - [Virtual Setters](#virtual-setters)
-  - [Virtuals in JSON](#virtuals-in-json)
-  - [Virtuals in `console.log()`](#virtuals-in-consolelog)
-  - [Virtuals with Lean](#virtuals-with-lean)
-  - [Limitations](#limitations)
-  - [Populate](#populate)
-  - [Further Reading](#further-reading)
+* [Your First Virtual](#your-first-virtual)
+* [Virtual Setters](#virtual-setters)
+* [Virtuals in JSON](#virtuals-in-json)
+* [Virtuals with Lean](#virtuals-with-lean)
+* [Limitations](#limitations)
+* [Populate](#populate)
+* [Further Reading](#further-reading)
 
 ## Your First Virtual
 

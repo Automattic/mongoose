@@ -95,7 +95,7 @@ The second generic param, `M`, is the model used with the schema. Mongoose uses 
 
 The third generic param, `TInstanceMethods` is used to add types for instance methods defined in the schema.
 
-The 4th param, `TQueryHelpers`, is used to add types for [chainable query helpers](typescript/query-helpers.html).
+The 4th param, `TQueryHelpers`, is `used to add types for [chainable query helpers](query-helpers.html).
 
 ## Schema vs Interface fields
 

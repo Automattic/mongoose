@@ -118,7 +118,7 @@ to add virtuals to your lean query results.
 
 ## Plugins
 
-Using `lean()` bypasses all Mongoose features, including [virtuals](../tutorials/virtuals.html), [getters/setters](../tutorials/getters-setters.html),
+Using `lean()` bypasses all Mongoose features, including [virtuals](virtuals.html), [getters/setters](getters-setters.html),
 and [defaults](../api.html#schematype_SchemaType-default). If you want to
 use these features with `lean()`, you need to use the corresponding plugin:
 

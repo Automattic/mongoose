@@ -3,13 +3,15 @@
 In Mongoose, a virtual is a property that is **not** stored in MongoDB. 
 Virtuals are typically used for computed properties on documents.
 
-* [Your First Virtual](#your-first-virtual)
-* [Virtual Setters](#virtual-setters)
-* [Virtuals in JSON](#virtuals-in-json)
-* [Virtuals with Lean](#virtuals-with-lean)
-* [Limitations](#limitations)
-* [Populate](#populate)
-* [Further Reading](#further-reading)
+- [Mongoose Virtuals](#mongoose-virtuals)
+  - [Your First Virtual](#your-first-virtual)
+  - [Virtual Setters](#virtual-setters)
+  - [Virtuals in JSON](#virtuals-in-json)
+  - [Virtuals in `console.log()`](#virtuals-in-consolelog)
+  - [Virtuals with Lean](#virtuals-with-lean)
+  - [Limitations](#limitations)
+  - [Populate](#populate)
+  - [Further Reading](#further-reading)
 
 ## Your First Virtual
 
@@ -27,13 +29,13 @@ You define virtuals on a schema using the [`Schema#virtual()` function](../api/s
 The `Schema#virtual()` function returns a [`VirtualType` object](../api/virtualtype.html). Unlike normal document properties,
 virtuals do not have any underlying value and Mongoose does not do
 any type coercion on virtuals. However, virtuals do have
-[getters and setters](../tutorials/getters-setters.html), which make 
+[getters and setters](getters-setters.html), which make
 them ideal for computed properties, like the `domain` example above.
 
 ## Virtual Setters
 
 You can also use virtuals to set multiple properties at once as an
-alternative to [custom setters on normal properties](../tutorials/getters-setters.html#setters). For example, suppose
+alternative to [custom setters on normal properties](getters-setters.html#setters). For example, suppose
 you have two string properties: `firstName` and `lastName`. You can
 create a virtual property `fullName` that lets you set both of
 these properties at once. The key detail is that, in virtual getters and
@@ -67,7 +69,7 @@ console.log(doc.toObject({ virtuals: true }));
 ## Virtuals with Lean
 
 Virtuals are properties on Mongoose documents. If you use the
-[lean option](../tutorials/lean.html), that means your queries return POJOs
+[lean option](lean.html), that means your queries return POJOs
 rather than full Mongoose documents. That means no virtuals if you use
 [`lean()`](../api/query.html#query_Query-lean).
 
@@ -90,7 +92,7 @@ based on Mongoose virtuals.
 ```
 
 If you want to query by a computed property, you should set the property using
-a [custom setter](../tutorials/getters-setters.html) or [pre save middleware](../middleware.html).
+a [custom setter](getters-setters.html) or [pre save middleware](../middleware.html).
 
 ## Populate
 

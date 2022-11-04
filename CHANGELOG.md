@@ -1,3 +1,15 @@
+6.7.1 / 2022-11-02
+==================
+ * fix(query): select Map field with select: false when explicitly requested #12616 #12603 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix: correctly find paths underneath single nested document with an array of mixed #12605 #12530
+ * fix(populate): better support for populating maps of arrays of refs #12601 #12494
+ * fix(types): add missing create constructor signature override type #12585 [naorpeled](https://github.com/naorpeled)
+ * fix(types): make array paths optional in inferred type of array default returns undefined #12649 #12420
+ * fix(types): improve ValidateOpts type #12606 [Freezystem](https://github.com/Freezystem)
+ * docs: add Lodash guide highlighting issues with cloneDeep() #12609
+ * docs: removed v5 link from v6 docs #12641 #12624 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: removed outdated connection example #12618 [lpizzinidev](https://github.com/lpizzinidev)
+
 6.7.0 / 2022-10-24
 ==================
  * feat: upgrade to mongodb driver 4.11.0 #12446

@@ -412,6 +412,7 @@ export function autoTypedSchema() {
     array5: any[];
     array6: string[];
     array7?: string[];
+    array8?: string[];
     decimal1?: Types.Decimal128;
     decimal2?: Types.Decimal128;
     decimal3?: Types.Decimal128;
@@ -458,6 +459,7 @@ export function autoTypedSchema() {
     array5: [],
     array6: { type: [String] },
     array7: { type: [String], default: undefined },
+    array8: { type: [String], default: () => undefined },
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
     decimal3: 'decimal128'
@@ -892,4 +894,29 @@ async function gh12593() {
 
   type ExampleArr = InferSchemaType<typeof arrSchema>;
   expectType<{ arr: Buffer[] }>({} as ExampleArr);
+}
+
+function gh12562() {
+  const emailRegExp = /@/;
+  const userSchema = new Schema(
+    {
+      email: {
+        type: String,
+        trim: true,
+        validate: {
+          validator: (value: string) => emailRegExp.test(value),
+          message: 'Email is not valid'
+        },
+        index: { // uncomment the index object and for me trim was throwing an error
+          partialFilterExpression: {
+            email: {
+              $exists: true,
+              $ne: null
+            }
+          }
+        },
+        select: false
+      }
+    }
+  );
 }

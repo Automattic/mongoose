@@ -10877,7 +10877,7 @@ describe('model: populate:', function() {
       });
 
       const localTest = await Test.findOne({ _id: localEntry._id }).populate({ path: 'test', localField: 'uuid' });
-      assert.equal(localTest.test.length, 1)
+      assert.equal(localTest.test.length, 1);
       const otherLocalTest = await Test.findOne({ _id: otherLocalEntry._id }).populate({ path: 'test', localField: 'uuid' });
       assert.equal(otherLocalTest.test.length, 0);
       // should be empty because the original local field was _id and we created a doc with uuids

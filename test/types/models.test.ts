@@ -566,4 +566,6 @@ function gh12573ModelAny() {
   const TestModel = model<any>('Test', new Schema({}));
   const doc = new TestModel();
   expectType<any>(doc);
+  const { fieldA } = doc;
+  expectType<any>(fieldA);
 }

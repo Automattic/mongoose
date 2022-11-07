@@ -6,6 +6,7 @@ declare module 'mongoose' {
     clone?: boolean;
     overwriteModels?: boolean;
     mergeHooks?: boolean;
+    mergePlugins?: boolean;
   }
 
   export interface AcceptsDiscriminator {

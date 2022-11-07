@@ -258,8 +258,8 @@ declare module 'mongoose' {
     obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>>;
 
     /** Gets/sets schema paths. */
+    path<ResultType extends SchemaType = SchemaType<any, HydratedDocument<DocType, TInstanceMethods>>>(path: string): ResultType;
     path<pathGeneric extends keyof EnforcedDocType>(path: pathGeneric): SchemaType<EnforcedDocType[pathGeneric]>;
-    path<ResultType extends SchemaType = SchemaType>(path: string): ResultType;
     path(path: string, constructor: any): this;
 
     /** Lists all paths and their type in the schema. */
@@ -551,7 +551,6 @@ declare module 'mongoose' {
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 
   // Helpers to simplify checks
-  type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : ELSETYPE;
   type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
 
   // tests for these two types are located in test/types/lean.test.ts

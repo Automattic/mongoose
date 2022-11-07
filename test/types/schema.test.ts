@@ -625,7 +625,7 @@ function gh11997() {
 }
 
 function gh12003() {
-  const baseSchemaOptions: SchemaOptions = {
+  const baseSchemaOptions = {
     versionKey: false
   };
 
@@ -634,6 +634,8 @@ function gh12003() {
   }, baseSchemaOptions);
 
   type BaseSchemaType = InferSchemaType<typeof BaseSchema>;
+
+  expectType<'type'>({} as ObtainSchemaGeneric<typeof BaseSchema, 'TSchemaOptions'>['typeKey']);
 
   expectType<{ name?: string }>({} as BaseSchemaType);
 }
@@ -792,8 +794,7 @@ function gh12205() {
         type: new Types.ObjectId(),
         required: true
       }
-    },
-    { timestamps: true }
+    }
   );
 
   const Campaign = model('Campaign', campaignSchema);
@@ -802,8 +803,6 @@ function gh12205() {
 
   type ICampaign = InferSchemaType<typeof campaignSchema>;
   expectType<{ client: Types.ObjectId }>({} as ICampaign);
-
-  expectType<'type'>({} as ObtainSchemaGeneric<typeof campaignSchema, 'TPathTypeKey'>);
 
   type A = ObtainDocumentType<{ client: { type: Schema.Types.ObjectId, required: true } }>;
   expectType<{ client: Types.ObjectId }>({} as A);
@@ -859,4 +858,13 @@ function gh12242() {
 
   type Example = InferSchemaType<typeof dbExample>;
   expectType<0 | 1>({} as Example['active']);
+}
+
+function testInferTimestamps() {
+  const schema = new Schema({
+    name: String
+  }, { timestamps: true });
+
+  type WithTimestamps = InferSchemaType<typeof schema>;
+  expectType<{ name?: string; createdAt: Date, updatedAt: Date }>({} as WithTimestamps);
 }

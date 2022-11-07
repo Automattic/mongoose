@@ -258,8 +258,8 @@ declare module 'mongoose' {
     obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>>;
 
     /** Gets/sets schema paths. */
+    path<ResultType extends SchemaType = SchemaType<any, HydratedDocument<DocType, TInstanceMethods>>>(path: string): ResultType;
     path<pathGeneric extends keyof EnforcedDocType>(path: pathGeneric): SchemaType<EnforcedDocType[pathGeneric]>;
-    path<ResultType extends SchemaType = SchemaType>(path: string): ResultType;
     path(path: string, constructor: any): this;
 
     /** Lists all paths and their type in the schema. */

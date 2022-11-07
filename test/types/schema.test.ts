@@ -920,3 +920,21 @@ function gh12562() {
     }
   );
 }
+
+function gh12590() {
+  const UserSchema = new Schema({
+    _password: String
+  });
+
+  type User = InferSchemaType<typeof UserSchema>;
+
+  expectType<SchemaType<User>>(UserSchema.path('hashed_password'));
+
+  UserSchema.path('hashed_password').validate(function(v) {
+    expectType<HydratedDocument<User>>(this);
+    if (this._password && this._password.length < 8) {
+      this.invalidate('password', 'Password must be at least 8 characters.');
+    }
+  });
+
+}

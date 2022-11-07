@@ -1,3 +1,12 @@
+6.7.2 / 2022-11-07
+==================
+ * fix(discriminator): skip copying base schema plugins if `applyPlugins == false` #12613 #12604 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): add UUID to types #12650 #12593
+ * fix(types): allow setting SchemaTypeOptions' index property to IndexOptions #12562
+ * fix(types): set this to doc type in SchemaType.prototype.validate() #12663 #12590
+ * fix(types): correct handling for model<any> #12659 #12573
+ * fix(types): pre hook with deleteOne should resolve this as Query #12642 #12622 [lpizzinidev](https://github.com/lpizzinidev)
+
 6.7.1 / 2022-11-02
 ==================
  * fix(query): select Map field with select: false when explicitly requested #12616 #12603 [lpizzinidev](https://github.com/lpizzinidev)

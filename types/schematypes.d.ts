@@ -188,7 +188,11 @@ declare module 'mongoose' {
     [other: string]: any;
   }
 
-  class SchemaType<T = any> {
+  interface Validator {
+    message?: string; type?: string; validator?: Function
+  }
+
+  class SchemaType<T = any, DocType = any> {
     /** SchemaType constructor */
     constructor(path: string, options?: AnyObject, instance?: string);
 
@@ -270,10 +274,10 @@ declare module 'mongoose' {
     unique(bool: boolean): this;
 
     /** The validators that Mongoose should run to validate properties at this SchemaType's path. */
-    validators: { message?: string; type?: string; validator?: Function }[];
+    validators: Validator[];
 
     /** Adds validator(s) for this document path. */
-    validate(obj: RegExp | Function | any, errorMsg?: string, type?: string): this;
+    validate(obj: RegExp | ((this: DocType, value: any, validatorProperties?: Validator) => any), errorMsg?: string, type?: string): this;
   }
 
   namespace Schema {

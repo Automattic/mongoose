@@ -70,6 +70,15 @@ describe('model', function() {
       });
     });
 
+    it('should have schema-defined indexes in toCreate when calling diffIndexes on model with no documents (gh-12676)', () => {
+      const MySchema = new Schema({
+        name: { type: String, index: true }
+      });
+
+      const MyModel = db.model('my-model', MySchema); // This collection should not exist in DB; no documents
+      return MyModel.diffIndexes().then((res) => assert.deepEqual(res.toCreate[0], { name: 1 }));
+    });
+
     it('of embedded documents', function(done) {
       const BlogPosts = new Schema({
         _id: { type: ObjectId, index: true },

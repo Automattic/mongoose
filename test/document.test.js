@@ -9191,7 +9191,6 @@ describe('document', function() {
 
     const Test = db.model('Test', schema);
 
-
     const foo = new Test({ bar: 'bar' });
     await foo.save();
     assert.ok(!foo.isModified('bar'));
@@ -12005,6 +12004,28 @@ describe('document', function() {
       authors: [{ fullName: 'Sourabh Bagrecha' }],
       title: 'The power of JavaScript'
     });
+  });
+
+  it('handles setting array to itself after saving and pushing a new value (gh-12656)', async function() {
+    const Test = db.model('Test', new Schema({
+      list: [{
+        a: Number
+      }]
+    }));
+    await Test.create({ list: [{ a: 1, b: 11 }] });
+
+    let doc = await Test.findOne();
+    doc.list.push({ a: 2 });
+    doc.list = [...doc.list]; // Same behavior if line replaced with: doc.list = [...doc.list]
+    await doc.save();
+
+    doc.list.push({ a: 3 });
+    doc.list = [...doc.list]; // Same behavior if line replaced with: doc.list = [...doc.list]
+    await doc.save();
+
+    doc = await Test.findOne();
+    assert.equal(doc.list.length, 3);
+    assert.deepStrictEqual(doc.list.map(el => el.a), [1, 2, 3]);
   });
 });
 

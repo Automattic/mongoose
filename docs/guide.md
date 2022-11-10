@@ -892,6 +892,15 @@ However, you can override this behavior globally:
 mongoose.set('strictQuery', false);
 ```
 
+In Mongoose 7, `strictQuery` default value will be switched back to `false`.
+You can prepare for the change by specifying:
+
+```javascript
+// Set `strictQuery` to `false`
+mongoose.set('strictQuery', false);
+```
+
+
 <h3 id="toJSON"><a href="#toJSON">option: toJSON</a></h3>
 
 Exactly the same as the [toObject](#toObject) option but only applies when

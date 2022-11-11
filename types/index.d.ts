@@ -295,8 +295,16 @@ declare module 'mongoose' {
     /** Defines a pre hook for the model. */
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', options: SchemaPreOptions, fn: PreSaveMiddlewareFunction<T>): this;
+    /**
+     * pre<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
+     * with different combinations of SchemaPreOptions.
+     */
+    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options:  { document: true, query: false }, fn: PreMiddlewareFunction<T>): this;
+    pre<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options:  { document: false, query: true }, fn: PreMiddlewareFunction<T>): this;
+    pre<T = never>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options:  { document: false, query: false }, fn: PreMiddlewareFunction<T>): this;
+    pre<T = Query<any, any>|HydratedDocument<DocType, TInstanceMethods>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options:  { document: true, query: true }, fn: PreMiddlewareFunction<T>): this;
+    
     pre<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
-    pre<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;

@@ -62,7 +62,7 @@ Mongoose replaces `{VALUE}` with the value being validated.
 
 A common gotcha for beginners is that the `unique` option for schemas
 is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://docs.mongodb.com/manual/core/index-unique/).
-See the [FAQ](/docs/faq.html) for more information.
+See the [FAQ](faq.html) for more information.
 
 ```javascript
 [require:The `unique` Option is Not a Validator]
@@ -142,10 +142,10 @@ nested objects are not fully fledged paths.
 ### Update Validators
 
 In the above examples, you learned about document validation. Mongoose also
-supports validation for [`update()`](/docs/api.html#query_Query-update),
-[`updateOne()`](/docs/api.html#query_Query-updateOne),
-[`updateMany()`](/docs/api.html#query_Query-updateMany),
-and [`findOneAndUpdate()`](/docs/api.html#query_Query-findOneAndUpdate) operations.
+supports validation for [`update()`](api.html#query_Query-update),
+[`updateOne()`](api.html#query_Query-updateOne),
+[`updateMany()`](api.html#query_Query-updateMany),
+and [`findOneAndUpdate()`](api.html#query_Query-findOneAndUpdate) operations.
 Update validators are off by default - you need to specify
 the `runValidators` option.
 
@@ -210,4 +210,4 @@ of the array.
 
 ### Next Up
 
-Now that we've covered `Validation`, let's take a look at [Middleware](/docs/middleware.html).
+Now that we've covered `Validation`, let's take a look at [Middleware](middleware.html).

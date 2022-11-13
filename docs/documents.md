@@ -140,7 +140,7 @@ Read the [validation](./validation.html) guide for more details.
 
 There are 2 different ways to overwrite a document (replacing all keys in the
 document). One way is to use the
-[`Document#overwrite()` function](/docs/api/document.html#document_Document-overwrite)
+[`Document#overwrite()` function](api/document.html#document_Document-overwrite)
 followed by `save()`.
 
 ```javascript
@@ -151,7 +151,7 @@ doc.overwrite({ name: 'Jean-Luc Picard' });
 await doc.save();
 ```
 
-The other way is to use [`Model.replaceOne()`](/docs/api/model.html#model_Model-replaceOne).
+The other way is to use [`Model.replaceOne()`](api/model.html#model_Model-replaceOne).
 
 ```javascript
 // Sets `name` and unsets all other properties
@@ -161,4 +161,4 @@ await Person.replaceOne({ _id }, { name: 'Jean-Luc Picard' });
 ### Next Up
 
 Now that we've covered Documents, let's take a look at
-[Subdocuments](/docs/subdocs.html).
+[Subdocuments](subdocs.html).

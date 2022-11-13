@@ -26,8 +26,8 @@ declare module 'mongoose' {
      /** deep populate */
      populate?: string | PopulateOptions | (string | PopulateOptions)[];
      /**
-     * If true Mongoose will always set `path` to a document or `null`.
-     * If false Mongoose will always set `path` to a potentially empty array.
+     * If true Mongoose will always set `path` to a document, or `null` if no document was found.
+     * If false Mongoose will always set `path` to an array, which will be empty if no documents are found.
      * Inferred from schema by default.
      */
      justOne?: boolean;

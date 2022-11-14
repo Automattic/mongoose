@@ -7,6 +7,7 @@ benchmarks/benchmarks
 benchmarks/benchmarks2
 benchmarks/benchmarks3
 benchmarks/v8.log
+benchmarks/typescript/**/*.js
 .DS_Store
 docs/*.json
 docs/source/_docs
@@ -40,7 +41,7 @@ test/files/main.js
 
 package-lock.json
 
-.config*
+.config.js
 
 # Compiled docs
 docs/*.html
@@ -48,3 +49,15 @@ docs/tutorials/*.html
 docs/typescript/*.html
 docs/api/*.html
 index.html
+
+# Local Netlify folder
+.netlify
+
+# yarn package-lock
+yarn.lock
+
+# npm pack output
+mongoose.tgz
+mongoose-*.tgz
+
+examples/ecommerce-netlify-functions/.netlify/state.json

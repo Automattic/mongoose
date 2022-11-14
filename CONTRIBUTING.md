@@ -59,6 +59,12 @@ If you'd like to preview your documentation changes, first commit your changes t
 
 Visit `http://localhost:8089` and you should see the docs with your local changes. Make sure you `npm run docs:clean` before committing, because automated generated files to `docs/*` should **not** be in PRs.
 
+#### Documentation Style Guidelines
+
+There are some guidelines to keep the style for the documentation consistent:
+
+- All links that refer to some other file in the mongoose documentation needs to be relative without a prefix unless required (use `guide.html` over `./guide.html` or `/docs/guide.html`)
+
 ### Plugins website
 
 The [plugins](http://plugins.mongoosejs.io/) site is also an [open source project](https://github.com/vkarpov15/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!

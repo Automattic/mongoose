@@ -1,7 +1,7 @@
 ## Schemas
 
 If you haven't yet done so, please take a minute to read the [quickstart](index.html) to get an idea of how Mongoose works.
-If you are migrating from 4.x to 5.x please take a moment to read the [migration guide](/docs/migrating_to_5.html).
+If you are migrating from 4.x to 5.x please take a moment to read the [migration guide](migrating_to_5.html).
 
 <ul class="toc">
   <li><a href="#definition">Defining your schema</a></li>
@@ -173,7 +173,7 @@ You can also add static functions to your model. There are two equivalent
 ways to add a static:
 
 - Add a function property to `schema.statics`
-- Call the [`Schema#static()` function](/docs/api.html#schema_Schema-static)
+- Call the [`Schema#static()` function](api.html#schema_Schema-static)
 
 ```javascript
   // Assign a function to the "statics" object of our animalSchema
@@ -370,7 +370,7 @@ console.log(person); // { n: 'Not Val' }
 ```
 
 You can also declare aliases on nested paths. It is easier to use nested
-schemas and [subdocuments](/docs/subdocs.html), but you can also declare
+schemas and [subdocuments](subdocs.html), but you can also declare
 nested path aliases inline as long as you use the full nested path
 `nested.myProp` as the alias.
 
@@ -412,7 +412,7 @@ Valid options:
 - [toJSON](#toJSON)
 - [toObject](#toObject)
 - [typeKey](#typeKey)
-- [typePojoToMixed](/docs/schematypes.html#mixed)
+- [typePojoToMixed](schematypes.html#mixed)
 - [useNestedStrict](#useNestedStrict)
 - [validateBeforeSave](#validateBeforeSave)
 - [versionKey](#versionKey)
@@ -425,9 +425,9 @@ Valid options:
 
 <h3 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h3>
 
-By default, Mongoose's [`init()` function](/docs/api.html#model_Model.init)
+By default, Mongoose's [`init()` function](api.html#model_Model.init)
 creates all the indexes defined in your model's schema by calling
-[`Model.createIndexes()`](/docs/api.html#model_Model.createIndexes)
+[`Model.createIndexes()`](api.html#model_Model.createIndexes)
 after you successfully connect to MongoDB. Creating indexes automatically is
 great for development and test environments. But index builds can also create
 significant load on your production database. If you want to manage indexes
@@ -440,7 +440,7 @@ Clock.ensureIndexes(callback);
 ```
 
 The `autoIndex` option is set to `true` by default. You can change this
-default by setting [`mongoose.set('autoIndex', false);`](/docs/api/mongoose.html#mongoose_Mongoose-set)
+default by setting [`mongoose.set('autoIndex', false);`](api/mongoose.html#mongoose_Mongoose-set)
 
 <h3 id="autoCreate"><a href="#autoCreate">option: autoCreate</a></h3>
 
@@ -465,7 +465,7 @@ const Clock = mongoose.model('Clock', schema);
 ```
 
 Unlike `autoIndex`, `autoCreate` is `false` by default. You can change this
-default by setting [`mongoose.set('autoCreate', true);`](/docs/api/mongoose.html#mongoose_Mongoose-set)
+default by setting [`mongoose.set('autoCreate', true);`](api/mongoose.html#mongoose_Mongoose-set)
 
 <h3 id="bufferCommands"><a href="#bufferCommands">option: bufferCommands</a></h3>
 
@@ -528,7 +528,7 @@ const dataSchema = new Schema({..}, { collection: 'data' });
 
 <h3 id="discriminatorKey"><a href="#discriminatorKey">option: discriminatorKey</a></h3>
 
-When you define a [discriminator](/docs/discriminators.html), Mongoose adds a path to your
+When you define a [discriminator](discriminators.html), Mongoose adds a path to your
 schema that stores which discriminator a document is an instance of. By default, Mongoose
 adds an `__t` path, but you can set `discriminatorKey` to overwrite this default.
 
@@ -569,8 +569,8 @@ console.log(p.id); // undefined
 <h3 id="_id"><a href="#_id">option: _id</a></h3>
 
 Mongoose assigns each of your schemas an `_id` field by default if one
-is not passed into the [Schema](/docs/api.html#schema-js) constructor.
-The type assigned is an [ObjectId](/docs/api.html#schema_Schema.Types)
+is not passed into the [Schema](api.html#schema-js) constructor.
+The type assigned is an [ObjectId](api.html#schema_Schema.Types)
 to coincide with MongoDB's default behavior. If you don't want an `_id`
 added to your schema at all, you may disable it using this option.
 
@@ -643,7 +643,7 @@ sam.$isEmpty('inventory'); // false
 
 <h3 id="read"><a href="#read">option: read</a></h3>
 
-Allows setting [query#read](/docs/api.html#query_Query-read) options at the
+Allows setting [query#read](api.html#query_Query-read) options at the
 schema level, providing us a way to apply default
 [ReadPreferences](http://docs.mongodb.org/manual/applications/replication/#replica-set-read-preference)
 to all queries derived from a model.
@@ -811,11 +811,11 @@ console.log(m.toJSON()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom
 console.log(JSON.stringify(m)); // { "_id": "504e0cd7dd992d9be2f20b6f", "name": "Max Headroom is my name" }
 ```
 
-To see all available `toJSON/toObject` options, read [this](/docs/api.html#document_Document-toObject).
+To see all available `toJSON/toObject` options, read [this](api.html#document_Document-toObject).
 
 <h3 id="toObject"><a href="#toObject">option: toObject</a></h3>
 
-Documents have a [toObject](/docs/api.html#document_Document-toObject) method
+Documents have a [toObject](api.html#document_Document-toObject) method
 which converts the mongoose document into a plain JavaScript object. This
 method accepts a few options. Instead of applying these options on a
 per-document basis, we may declare the options at the schema level and have
@@ -835,7 +835,7 @@ const m = new M({ name: 'Max Headroom' });
 console.log(m); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
 ```
 
-To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).
+To see all available `toObject` options, read [this](api.html#document_Document-toObject).
 
 <h3 id="typeKey"><a href="#typeKey">option: typeKey</a></h3>
 
@@ -935,7 +935,7 @@ const thing = new Thing({ name: 'no versioning please' });
 thing.save(); // { name: 'no versioning please' }
 ```
 
-Mongoose _only_ updates the version key when you use [`save()`](/docs/api.html#document_Document-save).
+Mongoose _only_ updates the version key when you use [`save()`](api.html#document_Document-save).
 If you use `update()`, `findOneAndUpdate()`, etc. Mongoose will **not**
 update the version key. As a workaround, you can use the below middleware.
 
@@ -1229,12 +1229,12 @@ new Parent({ child: {} }).validateSync().errors;
 
 <h3 id="es6-classes"><a href="#es6-classes">With ES6 Classes</a></h3>
 
-Schemas have a [`loadClass()` method](/docs/api/schema.html#schema_Schema-loadClass)
+Schemas have a [`loadClass()` method](api/schema.html#schema_Schema-loadClass)
 that you can use to create a Mongoose schema from an [ES6 class](https://thecodebarbarian.com/an-overview-of-es6-classes):
 
-* [ES6 class methods](https://masteringjs.io/tutorials/fundamentals/class#methods) become [Mongoose methods](/docs/guide.html#methods)
-* [ES6 class statics](https://masteringjs.io/tutorials/fundamentals/class#statics) become [Mongoose statics](/docs/guide.html#statics)
-* [ES6 getters and setters](https://masteringjs.io/tutorials/fundamentals/class#getterssetters) become [Mongoose virtuals](/docs/tutorials/virtuals.html)
+* [ES6 class methods](https://masteringjs.io/tutorials/fundamentals/class#methods) become [Mongoose methods](guide.html#methods)
+* [ES6 class statics](https://masteringjs.io/tutorials/fundamentals/class#statics) become [Mongoose statics](guide.html#statics)
+* [ES6 getters and setters](https://masteringjs.io/tutorials/fundamentals/class#getterssetters) become [Mongoose virtuals](tutorials/virtuals.html)
 
 Here's an example of using `loadClass()` to create a schema from an ES6 class:
 
@@ -1277,4 +1277,4 @@ of use cases, including e-commerce, wikis, and appointment bookings.
 
 <h3 id="next">Next Up</h3>
 
-Now that we've covered `Schemas`, let's take a look at [SchemaTypes](/docs/schematypes.html).
+Now that we've covered `Schemas`, let's take a look at [SchemaTypes](schematypes.html).

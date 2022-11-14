@@ -50,7 +50,7 @@ const citySchema = new mongoose.Schema({
 });
 ```
 
-Using [subdocuments](/docs/subdocs.html), you can define a common `pointSchema` and reuse it everywhere you want to store a GeoJSON point.
+Using [subdocuments](subdocs.html), you can define a common `pointSchema` and reuse it everywhere you want to store a GeoJSON point.
 
 ```javascript
 const pointSchema = new mongoose.Schema({
@@ -131,7 +131,7 @@ a polygon representing the state of Colorado using
 [require:geojson.*driver query]
 ```
 
-Mongoose also has a [`within()` helper](/docs/api.html#query_Query-within)
+Mongoose also has a [`within()` helper](api.html#query_Query-within)
 that's a shorthand for `$geoWithin`.
 
 ```javascript
@@ -148,7 +148,7 @@ a 2dsphere index on a GeoJSON point:
 [require:geojson.*index$]
 ```
 
-You can also define a geospatial index using the [`Schema#index()` function](/docs/api/schema.html#schema_Schema-index)
+You can also define a geospatial index using the [`Schema#index()` function](api/schema.html#schema_Schema-index)
 as shown below.
 
 ```javascript

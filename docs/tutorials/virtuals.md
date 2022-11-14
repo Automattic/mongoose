@@ -18,22 +18,22 @@ want the email's domain. For example, the domain portion of
 'test@gmail.com' is 'gmail.com'.
 
 Below is one way to implement the `domain` property using a virtual.
-You define virtuals on a schema using the [`Schema#virtual()` function](/docs/api/schema.html#schema_Schema-virtual).
+You define virtuals on a schema using the [`Schema#virtual()` function](../api/schema.html#schema_Schema-virtual).
 
 ```javascript
 [require:Virtuals.*basic]
 ```
 
-The `Schema#virtual()` function returns a [`VirtualType` object](/docs/api/virtualtype.html). Unlike normal document properties,
+The `Schema#virtual()` function returns a [`VirtualType` object](../api/virtualtype.html). Unlike normal document properties,
 virtuals do not have any underlying value and Mongoose does not do
 any type coercion on virtuals. However, virtuals do have
-[getters and setters](/docs/tutorials/getters-setters.html), which make 
+[getters and setters](getters-setters.html), which make 
 them ideal for computed properties, like the `domain` example above.
 
 ## Virtual Setters
 
 You can also use virtuals to set multiple properties at once as an
-alternative to [custom setters on normal properties](/docs/tutorials/getters-setters.html#setters). For example, suppose
+alternative to [custom setters on normal properties](getters-setters.html#setters). For example, suppose
 you have two string properties: `firstName` and `lastName`. You can
 create a virtual property `fullName` that lets you set both of
 these properties at once. The key detail is that, in virtual getters and
@@ -50,7 +50,7 @@ JSON. For example, if you pass a document to [Express'  `res.json()` function](h
 virtuals will **not** be included by default.
 
 To include virtuals in `res.json()`, you need to set the
-[`toJSON` schema option](/docs/guide.html#toJSON) to `{ virtuals: true }`.
+[`toJSON` schema option](../guide.html#toJSON) to `{ virtuals: true }`.
 
 ```javascript
 [require:Virtuals.*toJSON]
@@ -59,9 +59,9 @@ To include virtuals in `res.json()`, you need to set the
 ## Virtuals with Lean
 
 Virtuals are properties on Mongoose documents. If you use the
-[lean option](/docs/tutorials/lean.html), that means your queries return POJOs
+[lean option](lean.html), that means your queries return POJOs
 rather than full Mongoose documents. That means no virtuals if you use
-[`lean()`](/docs/api/query.html#query_Query-lean).
+[`lean()`](../api/query.html#query_Query-lean).
 
 ```javascript
 [require:Virtuals.*lean]
@@ -82,11 +82,11 @@ based on Mongoose virtuals.
 ```
 
 If you want to query by a computed property, you should set the property using
-a [custom setter](/docs/tutorials/getters-setters.html) or [pre save middleware](/docs/middleware.html).
+a [custom setter](getters-setters.html) or [pre save middleware](../middleware.html).
 
 ## Populate
 
-Mongoose also supports [populating virtuals](/docs/populate.html). A populated
+Mongoose also supports [populating virtuals](../populate.html). A populated
 virtual contains documents from another collection. To define a populated
 virtual, you need to specify:
 
@@ -99,8 +99,8 @@ virtual, you need to specify:
 
 ## Further Reading
 
-* [Virtuals in Mongoose Schemas](/docs/guide.html#virtuals)
-* [Populate Virtuals](/docs/populate.html#populate-virtuals)
+* [Virtuals in Mongoose Schemas](../guide.html#virtuals)
+* [Populate Virtuals](../populate.html#populate-virtuals)
 * [Mongoose Lean Virtuals plugin](https://plugins.mongoosejs.io/plugins/lean-virtuals)
 * [Getting Started With Mongoose Virtuals](https://masteringjs.io/tutorials/mongoose/virtuals)
 * [Understanding Virtuals in Mongoose](https://futurestud.io/tutorials/understanding-virtuals-in-mongoose)

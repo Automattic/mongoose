@@ -71,11 +71,11 @@ mongoose.set('bufferCommands', false);
 ```
 
 Note that buffering is also responsible for waiting until Mongoose
-creates collections if you use the [`autoCreate` option](/docs/guide.html#autoCreate).
+creates collections if you use the [`autoCreate` option](guide.html#autoCreate).
 If you disable buffering, you should also disable the `autoCreate`
-option and use [`createCollection()`](/docs/api/model.html#model_Model.createCollection)
-to create [capped collections](/docs/guide.html#capped) or
-[collections with collations](/docs/guide.html#collation).
+option and use [`createCollection()`](api/model.html#model_Model.createCollection)
+to create [capped collections](guide.html#capped) or
+[collections with collations](guide.html#collation).
 
 ```javascript
 const schema = new Schema({
@@ -149,7 +149,7 @@ Below are some of the options that are important for tuning Mongoose.
 * `useNewUrlParser`   - The underlying MongoDB driver has deprecated their current [connection string](https://docs.mongodb.com/manual/reference/connection-string/) parser. Because this is a major change, they added the `useNewUrlParser` flag to allow users to fall back to the old parser if they find a bug in the new parser. You should set `useNewUrlParser: true` unless that prevents you from connecting. Note that if you specify `useNewUrlParser: true`, you **must** specify a port in your connection string, like `mongodb://localhost:27017/dbname`. The new url parser does _not_ support connection strings that do not have a port, like `mongodb://localhost/dbname`.
 * `useCreateIndex`    - False by default. Set to `true` to make Mongoose's default index build use `createIndex()` instead of `ensureIndex()` to avoid deprecation warnings from the MongoDB driver.
 * `useFindAndModify`  - True by default. Set to `false` to make `findOneAndUpdate()` and `findOneAndRemove()` use native `findOneAndUpdate()` rather than `findAndModify()`.
-* `useUnifiedTopology`- False by default. Set to `true` to opt in to using [the MongoDB driver's new connection management engine](/docs/deprecations.html#useunifiedtopology). You should set this option to `true`, except for the unlikely case that it prevents you from maintaining a stable connection.
+* `useUnifiedTopology`- False by default. Set to `true` to opt in to using [the MongoDB driver's new connection management engine](deprecations.html#useunifiedtopology). You should set this option to `true`, except for the unlikely case that it prevents you from maintaining a stable connection.
 * `promiseLibrary`    - Sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html).
 * `poolSize`          - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `poolSize` is 5. Keep in mind that, as of MongoDB 3.4, MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See [Slow Trains in MongoDB and Node.js](http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs).
 * `socketTimeoutMS`   - How long the MongoDB driver will wait before killing a socket due to inactivity _after initial connection_. A socket may be inactive because of either no activity or a long-running operation. This is set to `30000` by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
@@ -157,7 +157,7 @@ Below are some of the options that are important for tuning Mongoose.
 * `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://docs.mongodb.com/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
 
 The following options are important for tuning Mongoose only if you are
-running **without** [the `useUnifiedTopology` option](/docs/deprecations.html#useunifiedtopology):
+running **without** [the `useUnifiedTopology` option](deprecations.html#useunifiedtopology):
 
 * `autoReconnect`     - The underlying MongoDB driver will automatically try to reconnect when it loses connection to MongoDB. Unless you are an extremely advanced user that wants to manage their own connection pool, do **not** set this option to `false`.
 * `reconnectTries`    - If you're connected to a single server or mongos proxy (as opposed to a replica set), the MongoDB driver will try to reconnect every `reconnectInterval` milliseconds for `reconnectTries` times, and give up afterward. When the driver gives up, the mongoose connection emits a `reconnectFailed` event. This option does nothing for replica set connections.
@@ -166,7 +166,7 @@ running **without** [the `useUnifiedTopology` option](/docs/deprecations.html#us
 * `connectTimeoutMS`  - How long the MongoDB driver will wait before killing a socket due to inactivity _during initial connection_. Defaults to 30000. This option is passed transparently to [Node.js' `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback).
 
 The following options are important for tuning Mongoose only if you are
-running **with** [the `useUnifiedTopology` option](/docs/deprecations.html#useunifiedtopology):
+running **with** [the `useUnifiedTopology` option](deprecations.html#useunifiedtopology):
 
 * `serverSelectionTimeoutMS` - With `useUnifiedTopology`, the MongoDB driver will try to find a server to send any given operation to, and keep retrying for `serverSelectionTimeoutMS` milliseconds. If not set, the MongoDB driver defaults to using `30000` (30 seconds).
 * `heartbeatFrequencyMS` - With `useUnifiedTopology`, the MongoDB driver sends a heartbeat every `heartbeatFrequencyMS` to check on the status of the connection. A heartbeat is subject to `serverSelectionTimeoutMS`, so the MongoDB driver will retry failed heartbeats for up to 30 seconds by default. Mongoose only emits a `'disconnected'` event after a heartbeat has failed, so you may want to decrease this setting to reduce the time between when your server goes down and when Mongoose emits `'disconnected'`. We recommend you do **not** set this setting below 1000, too many heartbeats can lead to performance degradation.
@@ -526,4 +526,4 @@ mongoose.connect(myUri, {
 
 <h3 id="next">Next Up</h3>
 
-Now that we've covered connections, let's take a look at [models](/docs/models.html).
+Now that we've covered connections, let's take a look at [models](models.html).

@@ -71,5 +71,5 @@ ES6-style promise constructor and mongoose will use it.
 </i>
 <br><br>
 <a href="http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=promises" style="margin-left: 100px">
-  <img src="/docs/images/asyncawait.png" style="width: 650px" />
+  <img src="images/asyncawait.png" style="width: 650px" />
 </a>

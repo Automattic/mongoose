@@ -145,7 +145,7 @@ console.log(doc2.child); // Prints 'MongooseDocument { undefined }'
 doc2.child.name = 'test'; // Works
 ```
 
-Secondly, in Mongoose 5, [`Document#set()`](/docs/api/document.html#document_Document-set)
+Secondly, in Mongoose 5, [`Document#set()`](api/document.html#document_Document-set)
 merges when you call it on a nested path, but overwrites when you call
 it on a subdocument.
 
@@ -370,7 +370,7 @@ const schema = new Schema({
 ```
 
 Surprisingly, declaring `nested` with an object `type` makes `nested`
-into a path of type [Mixed](/docs/schematypes.html#mixed). To instead
+into a path of type [Mixed](schematypes.html#mixed). To instead
 make Mongoose automatically convert `type: { prop: String }` into
 `type: new Schema({ prop: String })`, set the `typePojoToMixed` option
 to `false`.

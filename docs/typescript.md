@@ -9,9 +9,9 @@ This guide describes Mongoose's recommended approach to working with Mongoose in
 To get started with Mongoose in TypeScript, you need to: 
 
 1. Create an interface representing a document in MongoDB.
-2. Create a [Schema](/docs/guide.html) corresponding to the document interface.
+2. Create a [Schema](guide.html) corresponding to the document interface.
 3. Create a Model.
-4. [Connect to MongoDB](/docs/connections.html).
+4. [Connect to MongoDB](connections.html).
 
 ```typescript
 import { Schema, model, connect } from 'mongoose';
@@ -72,10 +72,10 @@ interface User extends Document {
 ```
 
 This approach works, but we recommend your document interface _not_ extend `Document`.
-Using `extends Document` makes it difficult for Mongoose to infer which properties are present on [query filters](/docs/queries.html), [lean documents](/docs/tutorials/lean.html), and other cases.
+Using `extends Document` makes it difficult for Mongoose to infer which properties are present on [query filters](queries.html), [lean documents](tutorials/lean.html), and other cases.
 
 We recommend your document interface contain the properties defined in your schema and line up with what your documents look like in MongoDB.
-Although you can add [instance methods](/docs/guide.html#methods) to your document interface, we do not recommend doing so.
+Although you can add [instance methods](guide.html#methods) to your document interface, we do not recommend doing so.
 
 ### Using Custom Bindings
 
@@ -90,4 +90,4 @@ However, before you do, please [open an issue on Mongoose's GitHub page](https:/
 
 ### Next Up
 
-Now that you've seen the basics of how to use Mongoose in TypeScript, let's take a look at [statics in TypeScript](/docs/typescript/statics.html).
+Now that you've seen the basics of how to use Mongoose in TypeScript, let's take a look at [statics in TypeScript](typescript/statics.html).

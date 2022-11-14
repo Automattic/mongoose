@@ -26,7 +26,7 @@ doc.save();
 them mongoose never gets notified of the change and so doesn't know to
 persist the new value. There are two workarounds:
 [`MongooseArray#set`](api.html#types_array_MongooseArray.set) or
-[`Document#markModified()`](/docs/api/document.html#document_Document-markModified).
+[`Document#markModified()`](api/document.html#document_Document-markModified).
 
 ```javascript
 // Saves changes successfully
@@ -141,7 +141,7 @@ is undefined on the underlying [POJO](guide.html#minimize).
 
 **A**. The only import syntax Mongoose supports is `import mongoose from 'mongoose'`.
 Syntaxes like `import * from 'mongoose'` or `import { model } from 'mongoose'` do **not** work.
-The global Mongoose object stores types, [global options](/docs/api.html#mongoose_Mongoose-set), and other important
+The global Mongoose object stores types, [global options](api.html#mongoose_Mongoose-set), and other important
 properties that Mongoose needs. When you do `import { model } from 'mongoose'`, the
 `this` value in `model()` is not the Mongoose global.
 
@@ -425,7 +425,7 @@ Consider using a regex like `/^[a-f0-9]{24}$/` to test whether a string is exact
 
 **A**. In order to avoid executing a separate query for each document returned from the `find` query, Mongoose
 instead queries using (numDocuments * limit) as the limit. If you need the correct limit, you should use the
-[perDocumentLimit](/docs/populate.html#limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in
+[perDocumentLimit](populate.html#limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in
 mind that populate() will execute a separate query for each document.
 
 <hr id="duplicate-query" />

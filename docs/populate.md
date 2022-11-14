@@ -137,7 +137,7 @@ story.populated('author'); // undefined
 ```
 
 A common reason for checking whether a path is populated is getting the `author`
-id. However, for your convenience, Mongoose adds a [`_id` getter to ObjectId instances](/docs/api/mongoose.html#mongoose_Mongoose-set)
+id. However, for your convenience, Mongoose adds a [`_id` getter to ObjectId instances](api/mongoose.html#mongoose_Mongoose-set)
 so you can use `story.author._id` regardless of whether `author` is populated.
 
 ```javascript
@@ -379,7 +379,7 @@ the array.
 If you have an existing mongoose document and want to populate some of its
 paths, you can use the
 [Document#populate()](api.html#document_Document-populate) method.
-Just make sure you call [`Document#execPopulate()`](/docs/api/document.html#document_Document-execPopulate)
+Just make sure you call [`Document#execPopulate()`](api/document.html#document_Document-execPopulate)
 to execute the `populate()`.
 
 ```javascript
@@ -474,7 +474,7 @@ This is known as a "cross-database populate," because it enables you to
 populate across MongoDB databases and even across MongoDB instances.
 
 If you don't have access to the model instance when defining your `eventSchema`,
-you can also pass [the model instance as an option to `populate()`](/docs/api/model.html#model_Model.populate).
+you can also pass [the model instance as an option to `populate()`](api/model.html#model_Model.populate).
 
 ```javascript
 const events = await Event.
@@ -709,7 +709,7 @@ doc.numMembers; // 2
 
 <h3 id="populating-maps"><a href="#populating-maps">Populating Maps</a></h3>
 
-[Maps](/docs/schematypes.html#maps) are a type that represents an object with arbitrary
+[Maps](schematypes.html#maps) are a type that represents an object with arbitrary
 string keys. For example, in the below schema, `members` is a map from strings to ObjectIds.
 
 ```javascript
@@ -813,4 +813,4 @@ MySchema.post('save', function(doc, next) {
 
 ### Next Up
 
-Now that we've covered `populate()`, let's take a look at [discriminators](/docs/discriminators.html).
+Now that we've covered `populate()`, let's take a look at [discriminators](discriminators.html).

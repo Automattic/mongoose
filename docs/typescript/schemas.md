@@ -1,6 +1,6 @@
 # Schemas in TypeScript
 
-Mongoose [schemas](/docs/guide.html) are how you tell Mongoose what your documents look like.
+Mongoose [schemas](../guide.html) are how you tell Mongoose what your documents look like.
 Mongoose schemas are separate from TypeScript interfaces, so you need to define both a _document interface_ and a _schema_.
 
 ```typescript
@@ -86,4 +86,4 @@ const schema = new Schema<User, Model<User>, User>({
 });
 ```
 
-This is because Mongoose has numerous features that add paths to your schema, like [timestamps](https://masteringjs.io/tutorials/mongoose/timestamps), [plugins](/docs/plugins.html), etc. without you explicitly putting these paths in the `Schema()` constructor.
+This is because Mongoose has numerous features that add paths to your schema, like [timestamps](https://masteringjs.io/tutorials/mongoose/timestamps), [plugins](../plugins.html), etc. without you explicitly putting these paths in the `Schema()` constructor.

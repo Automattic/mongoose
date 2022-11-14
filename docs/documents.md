@@ -1,8 +1,8 @@
 ## Documents
 
-Mongoose [documents](./api/document.html) represent a one-to-one mapping
+Mongoose [documents](api/document.html) represent a one-to-one mapping
 to documents as stored in MongoDB. Each document is an instance of its
-[Model](./models.html).
+[Model](models.html).
 
 <ul class="toc">
   <li><a href="#documents-vs-models">Documents vs Models</a></li>
@@ -134,7 +134,7 @@ await Person.updateOne({}, { age: 'bar' });
 await Person.updateOne({}, { age: -1 }, { runValidators: true });
 ```
 
-Read the [validation](./validation.html) guide for more details.
+Read the [validation](validation.html) guide for more details.
 
 <h2 id="overwriting"><a href="#overwriting">Overwriting</a></h2>
 

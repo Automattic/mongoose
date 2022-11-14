@@ -36,7 +36,7 @@ a group of fields (e.g. dateRange.fromDate <= dateRange.toDate).
 ### What is a Subdocument?
 
 Subdocuments are similar to normal documents. Nested schemas can have
-[middleware](./middleware.html), [custom validation logic](./validation.html),
+[middleware](middleware.html), [custom validation logic](validation.html),
 virtuals, and any other feature top-level schemas can use. The major
 difference is that subdocuments are
 not saved individually, they are saved whenever their top-level parent
@@ -53,7 +53,7 @@ parent.children[0].name = 'Matthew';
 parent.save(callback);
 ```
 
-Subdocuments have `save` and `validate` [middleware](./middleware.html)
+Subdocuments have `save` and `validate` [middleware](middleware.html)
 just like top-level documents. Calling `save()` on the parent document triggers
 the `save()` middleware for all its subdocuments, and the same for `validate()`
 middleware.
@@ -222,7 +222,7 @@ doc.child; // { age: 0 }
 ### Finding a Subdocument
 
 Each subdocument has an `_id` by default. Mongoose document arrays have a
-special [id](./api.html#types_documentarray_MongooseDocumentArray-id) method
+special [id](api.html#types_documentarray_MongooseDocumentArray-id) method
 for searching a document array to find a document with a given `_id`.
 ```javascript
 const doc = parent.children.id(_id);
@@ -231,9 +231,9 @@ const doc = parent.children.id(_id);
 ### Adding Subdocs to Arrays
 
 MongooseArray methods such as
-[push](./api.html#mongoosearray_MongooseArray-push),
-[unshift](./api.html#mongoosearray_MongooseArray-unshift),
-[addToSet](./api.html#mongoosearray_MongooseArray-addToSet),
+[push](api.html#mongoosearray_MongooseArray-push),
+[unshift](api.html#mongoosearray_MongooseArray-unshift),
+[addToSet](api.html#mongoosearray_MongooseArray-addToSet),
 and others cast arguments to their proper types transparently:
 ```javascript
 const Parent = mongoose.model('Parent');
@@ -252,7 +252,7 @@ parent.save(function (err) {
 ```
 
 Subdocs may also be created without adding them to the array by using the
-[create](./api.html#types_documentarray_MongooseDocumentArray.create)
+[create](api.html#types_documentarray_MongooseDocumentArray.create)
 method of MongooseArrays.
 
 ```javascript
@@ -262,7 +262,7 @@ const newdoc = parent.children.create({ name: 'Aaron' });
 ### Removing Subdocs
 
 Each subdocument has it's own
-[remove](./api.html#types_embedded_EmbeddedDocument-remove) method. For
+[remove](api.html#types_embedded_EmbeddedDocument-remove) method. For
 an array subdocument, this is equivalent to calling `.pull()` on the
 subdocument. For a single nested subdocument, `remove()` is equivalent
 to setting the subdocument to `null`.
@@ -389,4 +389,4 @@ const schema = new Schema({
 ### Next Up
 
 Now that we've covered Subdocuments, let's take a look at
-[querying](./queries.html).
+[querying](queries.html).

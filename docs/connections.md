@@ -61,7 +61,7 @@ setTimeout(function() {
 }, 60000);
 ```
 
-To disable buffering, turn off the [`bufferCommands` option on your schema](./guide.html#bufferCommands).
+To disable buffering, turn off the [`bufferCommands` option on your schema](guide.html#bufferCommands).
 If you have `bufferCommands` on and your connection is hanging, try turning
 `bufferCommands` off to see if you haven't opened a connection properly.
 You can also disable `bufferCommands` globally:
@@ -199,7 +199,7 @@ See [this page](http://mongodb.github.io/node-mongodb-native/3.1/reference/faq/)
 <h3 id="callback"><a href="#callback">Callback</a></h3>
 
 The `connect()` function also accepts a callback parameter and returns a
-[promise](./promises.html).
+[promise](promises.html).
 
 ```javascript
 mongoose.connect(uri, options, function(error) {
@@ -396,8 +396,8 @@ The `mongoose.createConnection()` function takes the same arguments as
 const conn = mongoose.createConnection('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]', options);
 ```
 
-This [connection](./api.html#connection_Connection) object is then used to
-create and retrieve [models](./api.html#model_Model). Models are
+This [connection](api.html#connection_Connection) object is then used to
+create and retrieve [models](api.html#model_Model). Models are
 **always** scoped to a single connection.
 
 ```javascript

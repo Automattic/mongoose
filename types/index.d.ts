@@ -293,22 +293,35 @@ declare module 'mongoose' {
     post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
 
     /** Defines a pre hook for the model. */
+    /* Specific case for save with PreSaveMiddlewareFunction */
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
+    /* Specific case for save with PreSaveMiddlewareFunction */
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', options: SchemaPreOptions, fn: PreSaveMiddlewareFunction<T>): this;
-    /**
-     * pre<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
-     * with different combinations of SchemaPreOptions.
-     */
-    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options:  { document: true, query: false }, fn: PreMiddlewareFunction<T>): this;
-    pre<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options:  { document: false, query: true }, fn: PreMiddlewareFunction<T>): this;
-    pre<T = never>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options:  { document: false, query: false }, fn: PreMiddlewareFunction<T>): this;
-    pre<T = Query<any, any>|HydratedDocument<DocType, TInstanceMethods>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options:  { document: true, query: true }, fn: PreMiddlewareFunction<T>): this;
-    
-    pre<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
-    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
-    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
+
+    /* Distinct document middleware methods, options not specified. */
+    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], fn: PreMiddlewareFunction<T>): this;
+    /* Distinct document middleware methods, options specified, this will always refer to the Document since the other case cannot happen. */
+    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
+    /* Distinct query middleware method, no option specified: this is set to the query. */
+    pre<T = Query<any, any>>(method: MongooseDistinctQueryMiddleware|MongooseDistinctQueryMiddleware[], fn: PreMiddlewareFunction<T>): this;
+    /* Distinct query middleware method, options specified, this will always refer to Query since the other case cannot happen. */
+    pre<T = Query<any, any>>(method: MongooseDistinctQueryMiddleware|MongooseDistinctQueryMiddleware[], options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
+
+    /* Query or document middleware method, option defines hook for document only: this refers to document */
+    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: true, query: false }, fn: PreMiddlewareFunction<T>): this;
+    /* Query or document middleware method, option defines hook for query only: this refers to query */
+    pre<T = Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: false, query: true }, fn: PreMiddlewareFunction<T>): this;
+    /* Query or document middleware method, option defines hook for both: this refers to union of document and query */
+    pre<T = HydratedDocument<DocType, TInstanceMethods>|Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: true, query: true }, fn: PreMiddlewareFunction<T>): this;
+    /* Query or document middleware method, option defines hook for neither of them: hook will never be called, this refers to never */
+    pre<T = never>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: false, query: false }, fn: PreMiddlewareFunction<T>): this;
+    /* Query or document middleware method, no option specified: this refers to union of document and query */
+    pre<T = HydratedDocument<DocType, TInstanceMethods>|Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
+
+    /* method aggregate */
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
+    /* method insertMany */
     pre<T = M>(method: 'insertMany' | RegExp, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
     pre<T = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
 

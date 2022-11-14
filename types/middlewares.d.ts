@@ -1,7 +1,10 @@
 declare module 'mongoose' {
 
-  type MongooseDocumentMiddleware = 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init';
-  type MongooseQueryMiddleware = 'count' | 'estimatedDocumentCount' | 'countDocuments' | 'deleteMany' | 'deleteOne' | 'distinct' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndReplace' | 'findOneAndUpdate' | 'remove' | 'replaceOne' | 'update' | 'updateOne' | 'updateMany';
+  type MongooseDistinctDocumentMiddleware = 'validate' | 'save' | 'init';
+  type MongooseDocumentMiddleware = MongooseDistinctDocumentMiddleware | 'remove' | 'updateOne' | 'deleteOne';
+  type MongooseDistinctQueryMiddleware = 'count' | 'estimatedDocumentCount' | 'countDocuments' | 'deleteMany' | 'distinct' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndReplace' | 'findOneAndUpdate' | 'replaceOne' | 'update' | 'updateMany';
+  type MongooseQueryMiddleware = MongooseDistinctQueryMiddleware | 'remove' | 'updateOne' | 'deleteOne';
+  type MongooseQueryOrDocumentMiddleware = MongooseQueryMiddleware| MongooseDocumentMiddleware;
 
   type MiddlewareOptions = { document?: boolean, query?: boolean };
   type SchemaPreOptions = MiddlewareOptions;

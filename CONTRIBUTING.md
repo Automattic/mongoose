@@ -35,6 +35,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 - Write typings-tests if you modify the typescript-typings. (tests are in the [test/types](https://github.com/Automattic/mongoose/tree/master/test/types) directory).
 
 ### Running the tests
+
 - Open a terminal and navigate to the root of the project
 - execute `npm install` to install the necessary dependencies
 - execute `npm run mongo` to start a MongoDB instance on port 27017. This step is optional, if you have already a database running on port 27017. To spin up a specific mongo version, you can do it by executing `npm run mongo -- {version}`. E.g. you want to spin up a mongo 4.2.2 server, you execute `npm run mongo -- 4.2.2`
@@ -69,21 +70,17 @@ There are some guidelines to keep the style for the documentation consistent:
 
 The [plugins](http://plugins.mongoosejs.io/) site is also an [open source project](https://github.com/vkarpov15/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!
 
-
 ## Financial contributions
 
 We also welcome financial contributions in full transparency on our [open collective](https://opencollective.com/mongoose).
 Anyone can file an expense. If the expense makes sense for the development of the community, it will be "merged" in the ledger of our open collective by the core contributors and the person who filed the expense will be reimbursed.
 
-
 ## Credits
-
 
 ### Contributors
 
 Thank you to all the people who have already contributed to mongoose!
 <a href="https://github.com/Automattic/mongoose/graphs/contributors"><img src="https://opencollective.com/mongoose/contributors.svg?width=890" /></a>
-
 
 ### Backers
 

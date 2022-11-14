@@ -200,7 +200,7 @@ of inactivity. You can read more about working around session idle timeouts in t
 
 <h3 id="versus-aggregation"><a href="#versus-aggregation">Versus Aggregation</a></h3>
 
-[Aggregation](https://mongoosejs.com/docs/api.html#aggregate_Aggregate) can
+[Aggregation](api.html#aggregate_Aggregate) can
 do many of the same things that queries can. For example, below is
 how you can use `aggregate()` to find docs where `name.last = 'Ghost'`:
 

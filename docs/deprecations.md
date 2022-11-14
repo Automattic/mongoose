@@ -101,7 +101,7 @@ behavior until Mongoose 6.0.
 
 <h2 id="ensureindex"><a href="#ensureindex"><code>ensureIndex()</code></a></h2>
 
-If you define [indexes in your Mongoose schemas](https://mongoosejs.com/docs/guide.html#indexes), you'll see the below
+If you define [indexes in your Mongoose schemas](guide.html#indexes), you'll see the below
 deprecation warning.
 
 ```

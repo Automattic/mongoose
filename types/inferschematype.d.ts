@@ -38,7 +38,7 @@ declare module 'mongoose' {
    * // result
    * type UserType = {userName?: string}
    */
-  type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
+  type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>>;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.

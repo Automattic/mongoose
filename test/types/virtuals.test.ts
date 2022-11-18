@@ -126,5 +126,10 @@ function autoTypedVirtuals() {
     }
   });
 
+  type TestDoc = InferSchemaType<typeof testSchema>;
+
+  const testDoc = { email: 'some email' } as TestDoc;
+  expectType<string>(testDoc.domain);
+
   expectType<FlatRecord<AutoTypedSchemaType & VirtualsType >>({} as InferredDocType);
 }

@@ -124,13 +124,13 @@ declare module 'mongoose' {
   interface RemoveOptions extends SessionOption, Omit<mongodb.DeleteOptions, 'session'> {}
 
   const Model: Model<any>;
-  interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> extends
+  interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, EnforcedVirtuals = {}, TSchema = any,
+    TVirtuals extends IfEquals<EnforcedVirtuals, {}, ObtainSchemaGeneric<TSchema, 'TVirtuals'>, EnforcedVirtuals> = IfEquals<EnforcedVirtuals, {}, ObtainSchemaGeneric<TSchema, 'TVirtuals'>, EnforcedVirtuals>> extends
     NodeJS.EventEmitter,
     AcceptsDiscriminator,
     IndexManager,
     SessionStarter {
-    new <DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides,
-    IfEquals<TVirtuals, {}, ObtainSchemaGeneric<TSchema, 'TVirtuals'>, TVirtuals>> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+    new <DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides, TVirtuals> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[], callback?: Callback<R[]>): Aggregate<Array<R>>;

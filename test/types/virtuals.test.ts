@@ -89,7 +89,7 @@ function gh11543() {
 
 function autoTypedVirtuals() {
   type AutoTypedSchemaType = InferSchemaType<typeof testSchema>;
-  type VirtualsType = { domain: string };
+  type SchemaWithoutVirtual = Omit<AutoTypedSchemaType, 'domain'>;
   type InferredDocType = FlatRecord<AutoTypedSchemaType & ObtainSchemaGeneric<typeof testSchema, 'TVirtuals'>>;
 
   const testSchema = new Schema({
@@ -101,11 +101,11 @@ function autoTypedVirtuals() {
     virtuals: {
       domain: {
         get() {
-          expectType<Document<any, any, { email: string }> & AutoTypedSchemaType>(this);
+          expectType<Document<any, any, { email: string }>>(this);
           return this.email.slice(this.email.indexOf('@') + 1);
         },
         set() {
-          expectType<Document<any, any, AutoTypedSchemaType> & AutoTypedSchemaType>(this);
+          expectType<Document<any, any, SchemaWithoutVirtual>>(this);
         },
         options: {}
       }
@@ -131,5 +131,5 @@ function autoTypedVirtuals() {
   const testDoc = { email: 'some email' } as TestDoc;
   expectType<string>(testDoc.domain);
 
-  expectType<FlatRecord<AutoTypedSchemaType & VirtualsType >>({} as InferredDocType);
+  expectType<FlatRecord<AutoTypedSchemaType>>({} as InferredDocType);
 }

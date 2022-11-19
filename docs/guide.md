@@ -898,7 +898,6 @@ You can prepare for the change by specifying:
 ```javascript
 // Set `strictQuery` to `false` to prepare for the change
 mongoose.set('strictQuery', false);
-
 // Set `strictQuery` to `true` to suppress the warning message
 mongoose.set('strictQuery', true);
 ```

@@ -75,13 +75,13 @@ describe('debug: shell', function() {
     // Disable global debug
     mongoose.set('debug', false);
     // `conn1` with active debug
-    const conn1 = mongoose.createConnection('mongodb://localhost:27017');
+    const conn1 = mongoose.createConnection(start.uri);
     conn1.set('debug', true);
     const testModel1 = conn1.model('Test', testSchema);
     await testModel1.create({ dob: new Date(), title: 'Connection 1' });
     const storedLog = lastLog;
     // `conn2` without debug
-    const conn2 = mongoose.createConnection('mongodb://localhost:27017');
+    const conn2 = mongoose.createConnection(start.uri);
     const testModel2 = conn2.model('Test', testSchema);
     await testModel2.create({ dob: new Date(), title: 'Connection 2' });
     // Last log should not have been overwritten

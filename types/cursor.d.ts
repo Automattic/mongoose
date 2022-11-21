@@ -27,6 +27,13 @@ declare module 'mongoose' {
     close(): Promise<void>;
 
     /**
+     * Rewind this cursor to its uninitialized state. Any options that are present on the cursor will
+     * remain in effect. Iterating this cursor will cause new queries to be sent to the server, even
+     * if the resultant data has already been retrieved by this cursor.
+     */
+    rewind(): this;
+
+    /**
      * Execute `fn` for every document(s) in the cursor. If batchSize is provided
      * `fn` will be executed for each batch of documents. If `fn` returns a promise,
      * will wait for the promise to resolve before iterating on to the next one.

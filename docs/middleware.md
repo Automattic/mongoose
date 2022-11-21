@@ -2,7 +2,7 @@
 
 Middleware (also called pre and post *hooks*) are functions which are passed
 control during execution of asynchronous functions. Middleware is specified
-on the schema level and is useful for writing [plugins](./plugins.html).
+on the schema level and is useful for writing [plugins](plugins.html).
 
 <ul class="toc">
   <li><a href="#types-of-middleware">Types of Middleware</a></li>
@@ -39,42 +39,42 @@ Query middleware is supported for the following Query functions.
 Query middleware executes when you call `exec()` or `then()` on a Query object, or `await` on a Query object.
 In query middleware functions, `this` refers to the query.
 
-* [count](./api.html#query_Query-count)
-* [countDocuments](./api/query.html#query_Query-countDocuments)
-* [deleteMany](./api.html#query_Query-deleteMany)
-* [deleteOne](./api.html#query_Query-deleteOne)
-* [estimatedDocumentCount](./api/query.html#query_Query-estimatedDocumentCount)
-* [find](./api.html#query_Query-find)
-* [findOne](./api.html#query_Query-findOne)
-* [findOneAndDelete](./api.html#query_Query-findOneAndDelete)
-* [findOneAndRemove](./api.html#query_Query-findOneAndRemove)
-* [findOneAndReplace](./api/query.html#query_Query-findOneAndReplace)
-* [findOneAndUpdate](./api.html#query_Query-findOneAndUpdate)
-* [remove](./api.html#model_Model-remove)
-* [replaceOne](./api/query.html#query_Query-replaceOne)
-* [update](./api.html#query_Query-update)
-* [updateOne](./api.html#query_Query-updateOne)
-* [updateMany](./api.html#query_Query-updateMany)
+* [count](api.html#query_Query-count)
+* [countDocuments](api/query.html#query_Query-countDocuments)
+* [deleteMany](api.html#query_Query-deleteMany)
+* [deleteOne](api.html#query_Query-deleteOne)
+* [estimatedDocumentCount](api/query.html#query_Query-estimatedDocumentCount)
+* [find](api.html#query_Query-find)
+* [findOne](api.html#query_Query-findOne)
+* [findOneAndDelete](api.html#query_Query-findOneAndDelete)
+* [findOneAndRemove](api.html#query_Query-findOneAndRemove)
+* [findOneAndReplace](api/query.html#query_Query-findOneAndReplace)
+* [findOneAndUpdate](api.html#query_Query-findOneAndUpdate)
+* [remove](api.html#model_Model-remove)
+* [replaceOne](api/query.html#query_Query-replaceOne)
+* [update](api.html#query_Query-update)
+* [updateOne](api.html#query_Query-updateOne)
+* [updateMany](api.html#query_Query-updateMany)
 
 Aggregate middleware is for `MyModel.aggregate()`.
 Aggregate middleware executes when you call `exec()` on an aggregate object.
-In aggregate middleware, `this` refers to the [aggregation object](./api.html#model_Model-aggregate).
+In aggregate middleware, `this` refers to the [aggregation object](api.html#model_Model-aggregate).
 
-* [aggregate](./api.html#model_Model-aggregate)
+* [aggregate](api.html#model_Model-aggregate)
 
 Model middleware is supported for the following model functions.
 Don't confuse model middleware and document middleware: model middleware hooks into _static_ functions on a `Model` class, document middleware hooks into _methods_ on a `Model` class.
 In model middleware functions, `this` refers to the model.
 
-* [insertMany](./api.html#model_Model-insertMany)
+* [insertMany](api.html#model_Model-insertMany)
 
 All middleware types support pre and post hooks.
 How pre and post hooks work is described in more detail below.
 
 **Note:** If you specify `schema.pre('remove')`, Mongoose will register this
-middleware for [`doc.remove()`](./api.html#model_Model-remove) by default. If you
-want your middleware to run on [`Query.remove()`](./api.html#query_Query-remove)
-use [`schema.pre('remove', { query: true, document: false }, fn)`](./api.html#schema_Schema-pre).
+middleware for [`doc.remove()`](api.html#model_Model-remove) by default. If you
+want your middleware to run on [`Query.remove()`](api.html#query_Query-remove)
+use [`schema.pre('remove', { query: true, document: false }, fn)`](api.html#schema_Schema-pre).
 
 **Note:** Unlike `schema.pre('remove')`, Mongoose registers `updateOne` and
 `deleteOne` middleware on `Query#updateOne()` and `Query#deleteOne()` by default.
@@ -83,7 +83,7 @@ This means that both `doc.updateOne()` and `Model.updateOne()` trigger
 `updateOne` or `deleteOne` middleware as document middleware, use
 `schema.pre('updateOne', { document: true, query: false })`.
 
-**Note:** The [`create()`](./api.html#model_Model-create) function fires `save()` hooks.
+**Note:** The [`create()`](api.html#model_Model-create) function fires `save()` hooks.
 
 <h3 id="pre"><a href="#pre">Pre</a></h3>
 
@@ -492,7 +492,7 @@ pipeline from middleware.
 
 Certain Mongoose hooks are synchronous, which means they do **not** support
 functions that return promises or receive a `next()` callback. Currently,
-only `init` hooks are synchronous, because the [`init()` function](./api.html#document_Document-init)
+only `init` hooks are synchronous, because the [`init()` function](api.html#document_Document-init)
 is synchronous. Below is an example of using pre and post init hooks.
 
 ```javascript

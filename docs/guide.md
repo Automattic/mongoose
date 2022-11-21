@@ -1,6 +1,6 @@
 ## Schemas
 
-If you haven't yet done so, please take a minute to read the [quickstart](./index.html) to get an idea of how Mongoose works.
+If you haven't yet done so, please take a minute to read the [quickstart](index.html) to get an idea of how Mongoose works.
 If you are migrating from 5.x to 6.x please take a moment to read the [migration guide](migrating_to_6.html).
 
 <ul class="toc">
@@ -43,12 +43,12 @@ const blogSchema = new Schema({
 ```
 
 If you want to add additional keys later, use the
-[Schema#add](./api.html#schema_Schema-add) method.
+[Schema#add](api.html#schema_Schema-add) method.
 
 Each key in our code `blogSchema` defines a property in our documents which
-will be cast to its associated [SchemaType](./api.html#schematype_SchemaType).
+will be cast to its associated [SchemaType](api.html#schematype_SchemaType).
 For example, we've defined a property `title` which will be cast to the
-[String](./api.html#schema-string-js) SchemaType and property `date`
+[String](api.html#schema-string-js) SchemaType and property `date`
 which will be cast to a `Date` SchemaType.
 
 Notice above that if a property only requires a type, it can be specified using
@@ -63,34 +63,34 @@ In these cases, Mongoose only creates actual schema paths for leaves
 in the tree. (like `meta.votes` and `meta.favs` above),
 and the branches do not have actual paths.  A side-effect of this is that `meta`
 above cannot have its own validation.  If validation is needed up the tree, a path
-needs to be created up the tree - see the [Subdocuments](./subdocs.html) section
-for more information on how to do this.  Also read the [Mixed](./schematypes.html)
+needs to be created up the tree - see the [Subdocuments](subdocs.html) section
+for more information on how to do this.  Also read the [Mixed](schematypes.html)
 subsection of the SchemaTypes guide for some gotchas.
 
 The permitted SchemaTypes are:
 
-* [String](./schematypes.html#strings)
-* [Number](./schematypes.html#numbers)
-* [Date](./schematypes.html#dates)
-* [Buffer](./schematypes.html#buffers)
-* [Boolean](./schematypes.html#booleans)
-* [Mixed](./schematypes.html#mixed)
-* [ObjectId](./schematypes.html#objectids)
-* [Array](./schematypes.html#arrays)
-* [Decimal128](./api.html#mongoose_Mongoose-Decimal128)
-* [Map](./schematypes.html#maps)
+* [String](schematypes.html#strings)
+* [Number](schematypes.html#numbers)
+* [Date](schematypes.html#dates)
+* [Buffer](schematypes.html#buffers)
+* [Boolean](schematypes.html#booleans)
+* [Mixed](schematypes.html#mixed)
+* [ObjectId](schematypes.html#objectids)
+* [Array](schematypes.html#arrays)
+* [Decimal128](api.html#mongoose_Mongoose-Decimal128)
+* [Map](schematypes.html#maps)
 
-Read more about [SchemaTypes here](./schematypes.html).
+Read more about [SchemaTypes here](schematypes.html).
 
 Schemas not only define the structure of your document and casting of
 properties, they also define document [instance methods](#methods),
 [static Model methods](#statics), [compound indexes](#indexes),
-and document lifecycle hooks called [middleware](./middleware.html).
+and document lifecycle hooks called [middleware](middleware.html).
 
 <h3 id="models"><a href="#models">Creating a model</a></h3>
 
 To use our schema definition, we need to convert our `blogSchema` into a
-[Model](./models.html) we can work with.
+[Model](models.html) we can work with.
 To do so, we pass it into `mongoose.model(modelName, schema)`:
 
 ```javascript
@@ -137,8 +137,8 @@ await doc.save(); // works
 
 <h3 id="methods"><a href="#methods">Instance methods</a></h3>
 
-Instances of `Models` are [documents](./documents.html). Documents have
-many of their own [built-in instance methods](./api/document.html).
+Instances of `Models` are [documents](documents.html). Documents have
+many of their own [built-in instance methods](api/document.html).
 We may also define our own custom document instance methods.
 
 ```javascript
@@ -172,8 +172,8 @@ dog.findSimilarTypes((err, dogs) => {
 });
 ```
 
-* Overwriting a default mongoose document method may lead to unpredictable results. See [this](./api.html#schema_Schema-reserved) for more details.
-* The example above uses the `Schema.methods` object directly to save an instance method. You can also use the `Schema.method()` helper as described [here](./api.html#schema_Schema-method).
+* Overwriting a default mongoose document method may lead to unpredictable results. See [this](api.html#schema_Schema-reserved) for more details.
+* The example above uses the `Schema.methods` object directly to save an instance method. You can also use the `Schema.method()` helper as described [here](api.html#schema_Schema-method).
 * Do **not** declare methods using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so your method will **not** have access to the document and the above examples will not work.
 
 <h3 id="statics"><a href="#statics">Statics</a></h3>
@@ -217,7 +217,7 @@ Do **not** declare statics using ES6 arrow functions (`=>`). Arrow functions [ex
 
 You can also add query helper functions, which are like instance methods
 but for mongoose queries. Query helper methods let you extend mongoose's
-[chainable query builder API](./queries.html).
+[chainable query builder API](queries.html).
 
 ```javascript
 
@@ -252,7 +252,7 @@ Animal.findOne().byName('fido').exec((err, animal) => {
 <h3 id="indexes"><a href="#indexes">Indexes</a></h3>
 
 MongoDB supports [secondary indexes](http://docs.mongodb.org/manual/indexes/).
-With mongoose, we define these indexes within our `Schema` [at](./api.html#schematype_SchemaType-index) [the](./api.html#schematype_SchemaType-unique) [path](./api.html#schematype_SchemaType-sparse) [level](./api.html#schemadateoptions_SchemaDateOptions-expires) or the `schema` level.
+With mongoose, we define these indexes within our `Schema` [at](api.html#schematype_SchemaType-index) [the](api.html#schematype_SchemaType-unique) [path](api.html#schematype_SchemaType-sparse) [level](api.html#schemadateoptions_SchemaDateOptions-expires) or the `schema` level.
 Defining indexes at the schema level is necessary when creating
 [compound indexes](https://docs.mongodb.com/manual/core/index-compound/).
 
@@ -266,7 +266,7 @@ const animalSchema = new Schema({
 animalSchema.index({ name: 1, type: -1 }); // schema level
 ```
 
-See [SchemaType#index()](./api.html#schematype_SchemaType-index) for other index options.
+See [SchemaType#index()](api.html#schematype_SchemaType-index) for other index options.
 
 When your application starts up, Mongoose automatically calls [`createIndex`](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each defined index in your schema.
 Mongoose will call `createIndex` for each index sequentially, and emit an 'index' event on the model when all the `createIndex` calls succeeded or when there was an error.
@@ -300,11 +300,11 @@ Animal.on('index', error => {
 });
 ```
 
-See also the [Model#ensureIndexes](./api.html#model_Model-ensureIndexes) method.
+See also the [Model#ensureIndexes](api.html#model_Model-ensureIndexes) method.
 
 <h3 id="virtuals"><a href="#virtuals">Virtuals</a></h3>
 
-[Virtuals](./api.html#schema_Schema-virtual) are document properties that
+[Virtuals](api.html#schema_Schema-virtual) are document properties that
 you can get and set but that do not get persisted to MongoDB. The getters
 are useful for formatting or combining fields, while setters are useful for
 de-composing a single value into multiple values for storage.
@@ -337,7 +337,7 @@ But [concatenating](https://masteringjs.io/tutorials/fundamentals/string-concat)
 last name every time can get cumbersome.
 And what if you want to do some extra processing on the name, like
 [removing diacritics](https://www.npmjs.com/package/diacritics)? A
-[virtual property getter](./api.html#virtualtype_VirtualType-get) lets you
+[virtual property getter](api.html#virtualtype_VirtualType-get) lets you
 define a `fullName` property that won't get persisted to MongoDB.
 
 ```javascript
@@ -374,7 +374,7 @@ If you use `toJSON()` or `toObject()` mongoose will *not* include virtuals
 by default. This includes the output of calling [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
 on a Mongoose document, because [`JSON.stringify()` calls `toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description).
 Pass `{ virtuals: true }` to either
-[`toObject()`](./api.html#document_Document-toObject) or [`toJSON()`](./api.html#document_Document-toJSON).
+[`toObject()`](api.html#document_Document-toObject) or [`toJSON()`](api.html#document_Document-toJSON).
 
 You can also add a custom setter to your virtual that will let you set both
 first name and last name via the `fullName` virtual.
@@ -599,7 +599,7 @@ new Schema({..}, { capped: { size: 1024, max: 1000, autoIndexId: true } });
 <h3 id="collection"><a href="#collection">option: collection</a></h3>
 
 Mongoose by default produces a collection name by passing the model name to
-the [utils.toCollectionName](./api.html#utils_exports-toCollectionName) method.
+the [utils.toCollectionName](api.html#utils_exports-toCollectionName) method.
 This method pluralizes the name. Set this option if you need a different name
 for your collection.
 
@@ -1180,7 +1180,7 @@ thing.save(); // version is not incremented
 <h3 id="timestamps"><a href="#timestamps">option: timestamps</a></h3>
 
 The `timestamps` option tells Mongoose to assign `createdAt` and `updatedAt` fields
-to your schema. The type assigned is [Date](./api.html#schema-date-js).
+to your schema. The type assigned is [Date](api.html#schema-date-js).
 
 By default, the names of the fields are `createdAt` and `updatedAt`. Customize
 the field names by setting `timestamps.createdAt` and `timestamps.updatedAt`.
@@ -1376,7 +1376,7 @@ console.log(schema.virtuals); // { myVirtual: VirtualType { ... } }
 
 <h3 id="plugins"><a href="#plugins">Pluggable</a></h3>
 
-Schemas are also [pluggable](./plugins.html) which allows us to package up reusable features into
+Schemas are also [pluggable](plugins.html) which allows us to package up reusable features into
 plugins that can be shared with the community or just between your projects.
 
 <h3 id="further-reading"><a href="#further-reading">Further Reading</a></h3>

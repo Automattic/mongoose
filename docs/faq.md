@@ -119,7 +119,7 @@ console.log(new Model());
 
 **A**. This is a performance optimization. These empty objects are not saved
 to the database, nor are they in the result `toObject()`, nor do they show
-up in `JSON.stringify()` output unless you turn off the [`minimize` option](./guide.html#minimize).
+up in `JSON.stringify()` output unless you turn off the [`minimize` option](guide.html#minimize).
 
 The reason for this behavior is that Mongoose's change detection
 and getters/setters are based on [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
@@ -128,11 +128,11 @@ the overhead of running `Object.defineProperty()` every time a document is creat
 mongoose defines properties on the `Model` prototype when the model is compiled.
 Because mongoose needs to define getters and setters for `nested.prop`, `nested`
 must always be defined as an object on a mongoose document, even if `nested`
-is undefined on the underlying [POJO](./guide.html#minimize).
+is undefined on the underlying [POJO](guide.html#minimize).
 
 <hr id="arrow-functions" />
 
-<a class="anchor" href="#arrow-functions">**Q**</a>. I'm using an arrow function for a [virtual](./guide.html#virtuals), [middleware](./middleware.html), [getter](./api.html#schematype_SchemaType-get)/[setter](./api.html#schematype_SchemaType-set), or [method](./guide.html#methods) and the value of `this` is wrong.
+<a class="anchor" href="#arrow-functions">**Q**</a>. I'm using an arrow function for a [virtual](guide.html#virtuals), [middleware](middleware.html), [getter](api.html#schematype_SchemaType-get)/[setter](api.html#schematype_SchemaType-set), or [method](guide.html#methods) and the value of `this` is wrong.
 
 **A**. Arrow functions [handle the `this` keyword much differently than conventional functions](https://masteringjs.io/tutorials/fundamentals/arrow#why-not-arrow-functions).
 Mongoose getters/setters depend on `this` to give you access to the document that you're writing to, but this functionality does not work with arrow functions. Do **not** use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.
@@ -225,7 +225,7 @@ new Schema({
 <a class="anchor" href="#model_functions_hanging">**Q**</a>. All function calls on my models hang, what am I doing wrong?
 
 **A**. By default, mongoose will buffer your function calls until it can
-connect to MongoDB. Read the [buffering section of the connection docs](./connections.html#buffering)
+connect to MongoDB. Read the [buffering section of the connection docs](connections.html#buffering)
 for more information.
 
 <hr id="enable_debugging" />
@@ -245,7 +245,7 @@ mongoose.set('debug', { color: false })
 mongoose.set('debug', { shell: true })
 ```
 
-For more debugging options (streams, callbacks), see the ['debug' option under `.set()`](./api.html#mongoose_Mongoose-set).
+For more debugging options (streams, callbacks), see the ['debug' option under `.set()`](api.html#mongoose_Mongoose-set).
 
 <hr id="callback_never_executes" />
 

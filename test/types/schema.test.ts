@@ -412,6 +412,7 @@ export function autoTypedSchema() {
     array5: any[];
     array6: string[];
     array7?: string[];
+    array8?: string[];
     decimal1?: Types.Decimal128;
     decimal2?: Types.Decimal128;
     decimal3?: Types.Decimal128;
@@ -458,6 +459,7 @@ export function autoTypedSchema() {
     array5: [],
     array6: { type: [String] },
     array7: { type: [String], default: undefined },
+    array8: { type: [String], default: () => undefined },
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
     decimal3: 'decimal128'
@@ -859,4 +861,80 @@ function gh12242() {
 
   type Example = InferSchemaType<typeof dbExample>;
   expectType<0 | 1>({} as Example['active']);
+}
+
+function gh12431() {
+  const testSchema = new Schema({
+    testDate: { type: Date },
+    testDecimal: { type: Schema.Types.Decimal128 }
+  });
+
+  type Example = InferSchemaType<typeof testSchema>;
+  expectType<{ testDate?: Date, testDecimal?: Types.Decimal128 }>({} as Example);
+}
+
+async function gh12593() {
+  const testSchema = new Schema({ x: { type: Schema.Types.UUID } });
+
+  type Example = InferSchemaType<typeof testSchema>;
+  expectType<{ x?: Buffer }>({} as Example);
+
+  const Test = model('Test', testSchema);
+
+  const doc = await Test.findOne({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' }).orFail();
+  expectType<Buffer | undefined>(doc.x);
+
+  const doc2 = new Test({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' });
+  expectType<Buffer | undefined>(doc2.x);
+
+  const doc3 = await Test.findOne({}).orFail().lean();
+  expectType<Buffer | undefined>(doc3.x);
+
+  const arrSchema = new Schema({ arr: [{ type: Schema.Types.UUID }] });
+
+  type ExampleArr = InferSchemaType<typeof arrSchema>;
+  expectType<{ arr: Buffer[] }>({} as ExampleArr);
+}
+
+function gh12562() {
+  const emailRegExp = /@/;
+  const userSchema = new Schema(
+    {
+      email: {
+        type: String,
+        trim: true,
+        validate: {
+          validator: (value: string) => emailRegExp.test(value),
+          message: 'Email is not valid'
+        },
+        index: { // uncomment the index object and for me trim was throwing an error
+          partialFilterExpression: {
+            email: {
+              $exists: true,
+              $ne: null
+            }
+          }
+        },
+        select: false
+      }
+    }
+  );
+}
+
+function gh12590() {
+  const UserSchema = new Schema({
+    _password: String
+  });
+
+  type User = InferSchemaType<typeof UserSchema>;
+
+  expectType<SchemaType<User>>(UserSchema.path('hashed_password'));
+
+  UserSchema.path('hashed_password').validate(function(v) {
+    expectType<HydratedDocument<User>>(this);
+    if (this._password && this._password.length < 8) {
+      this.invalidate('password', 'Password must be at least 8 characters.');
+    }
+  });
+
 }

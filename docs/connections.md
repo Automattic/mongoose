@@ -31,7 +31,6 @@ See the [mongodb connection string spec](http://docs.mongodb.org/manual/referenc
   <li><a href="#mongos_connections">Multi-mongos support</a></li>
   <li><a href="#multiple_connections">Multiple connections</a></li>
   <li><a href="#connection_pools">Connection Pools</a></li>
-  <li><a href="#v5-changes">Option Changes in v5.x</a></li>
 </ul>
 
 <h3 id="buffering"><a href="#buffering">Operation Buffering</a></h3>
@@ -61,7 +60,7 @@ setTimeout(function() {
 }, 60000);
 ```
 
-To disable buffering, turn off the [`bufferCommands` option on your schema](./guide.html#bufferCommands).
+To disable buffering, turn off the [`bufferCommands` option on your schema](guide.html#bufferCommands).
 If you have `bufferCommands` on and your connection is hanging, try turning
 `bufferCommands` off to see if you haven't opened a connection properly.
 You can also disable `bufferCommands` globally:
@@ -71,11 +70,11 @@ mongoose.set('bufferCommands', false);
 ```
 
 Note that buffering is also responsible for waiting until Mongoose
-creates collections if you use the [`autoCreate` option](/docs/guide.html#autoCreate).
+creates collections if you use the [`autoCreate` option](guide.html#autoCreate).
 If you disable buffering, you should also disable the `autoCreate`
-option and use [`createCollection()`](/docs/api/model.html#model_Model-createCollection)
-to create [capped collections](/docs/guide.html#capped) or
-[collections with collations](/docs/guide.html#collation).
+option and use [`createCollection()`](api/model.html#model_Model-createCollection)
+to create [capped collections](guide.html#capped) or
+[collections with collations](guide.html#collation).
 
 ```javascript
 const schema = new Schema({
@@ -139,7 +138,7 @@ A full list of options can be found on the [MongoDB Node.js driver docs for `Mon
 Mongoose passes options to the driver without modification, modulo a few
 exceptions that are explained below.
 
-* `bufferCommands`    - This is a mongoose-specific option (not passed to the MongoDB driver) that disables [Mongoose's buffering mechanism](http://mongoosejs.com/docs/faq.html#callback_never_executes)
+* `bufferCommands`    - This is a mongoose-specific option (not passed to the MongoDB driver) that disables [Mongoose's buffering mechanism](faq.html#callback_never_executes)
 * `user`/`pass`       - The username and password for authentication. These options are Mongoose-specific, they are equivalent to the MongoDB driver's `auth.username` and `auth.password` options.
 * `autoIndex`         - By default, mongoose will automatically build indexes defined in your schema when it connects. This is great for development, but not ideal for large production deployments, because index builds can cause performance degradation. If you set `autoIndex` to false, mongoose will not automatically build indexes for **any** model associated with this connection.
 * `dbName`            - Specifies which database to connect to and overrides any database specified in the connection string. This is useful if you are unable to specify a default database in the connection string like with [some `mongodb+srv` syntax connections](https://stackoverflow.com/questions/48917591/fail-to-connect-mongoose-to-atlas/48917626#48917626).
@@ -179,7 +178,7 @@ See [this page](http://mongodb.github.io/node-mongodb-native/3.1/reference/faq/)
 <h3 id="callback"><a href="#callback">Callback</a></h3>
 
 The `connect()` function also accepts a callback parameter and returns a
-[promise](./promises.html).
+[promise](promises.html).
 
 ```javascript
 mongoose.connect(uri, options, function(error) {
@@ -380,8 +379,8 @@ The `mongoose.createConnection()` function takes the same arguments as
 const conn = mongoose.createConnection('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]', options);
 ```
 
-This [connection](./api.html#connection_Connection) object is then used to
-create and retrieve [models](./api.html#model_Model). Models are
+This [connection](api.html#connection_Connection) object is then used to
+create and retrieve [models](api.html#model_Model). Models are
 **always** scoped to a single connection.
 
 ```javascript
@@ -460,4 +459,4 @@ mongoose.createConnection(uri);
 
 <h3 id="next">Next Up</h3>
 
-Now that we've covered connections, let's take a look at [models](/docs/models.html).
+Now that we've covered connections, let's take a look at [models](models.html).

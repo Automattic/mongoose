@@ -38,7 +38,7 @@ declare module 'mongoose' {
    * // result
    * type UserType = {userName?: string}
    */
-  type InferSchemaType<TSchema> = ObtainSchemaGeneric<TSchema, 'DocType'>;
+  type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.
@@ -60,6 +60,12 @@ declare module 'mongoose' {
       : unknown;
 }
 
+type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined } ?
+  true :
+  PathType extends { default: (...args: any[]) => undefined } ?
+    true :
+    false;
+
 /**
  * @summary Checks if a document path is required or optional.
  * @param {P} P Document path.
@@ -69,7 +75,7 @@ type IsPathRequired<P, TypeKey extends TypeKeyBaseType = DefaultTypeKey> =
   P extends { required: true | [true, string | undefined] } | ArrayConstructor | any[]
     ? true
     : P extends (Record<TypeKey, ArrayConstructor | any[]>)
-      ? P extends { default: undefined }
+      ? IsPathDefaultUndefined<P> extends true
         ? false
         : true
       : P extends (Record<TypeKey, any>)
@@ -171,11 +177,13 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                 PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
                                   IfEquals<PathValueType, Schema.Types.Decimal128> extends true ? Types.Decimal128 :
                                     IfEquals<PathValueType, Types.Decimal128> extends true ? Types.Decimal128 :
-                                      PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
-                                        PathValueType extends ArrayConstructor ? any[] :
-                                          PathValueType extends typeof Schema.Types.Mixed ? any:
-                                            IfEquals<PathValueType, ObjectConstructor> extends true ? any:
-                                              IfEquals<PathValueType, {}> extends true ? any:
-                                                PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                  PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, TypeKey> :
-                                                    unknown;
+                                      PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
+                                        IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
+                                          PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
+                                            PathValueType extends ArrayConstructor ? any[] :
+                                              PathValueType extends typeof Schema.Types.Mixed ? any:
+                                                IfEquals<PathValueType, ObjectConstructor> extends true ? any:
+                                                  IfEquals<PathValueType, {}> extends true ? any:
+                                                    PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+                                                      PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, TypeKey> :
+                                                        unknown;

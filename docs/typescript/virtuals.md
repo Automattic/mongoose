@@ -1,6 +1,6 @@
 # Virtuals in TypeScript
 
-[Virtuals](/docs/tutorials/virtuals.html) are computed properties: you can access virtuals on hydrated Mongoose documents, but virtuals are **not** stored in MongoDB.
+[Virtuals](../tutorials/virtuals.html) are computed properties: you can access virtuals on hydrated Mongoose documents, but virtuals are **not** stored in MongoDB.
 Mongoose supports auto typed virtuals so you don't need to define additional typescript interface anymore but you are still able to do so.
 
 ### Automatically Inferred Types:
@@ -29,7 +29,7 @@ const schema = new Schema(
 ```
 
 ### Set virtuals type manually:
-You shouldn't define virtuals in your TypeScript [document interface](/docs/typescript.html).
+You shouldn't define virtuals in your TypeScript [document interface](../typescript.html).
 Instead, you should define a separate interface for your virtuals, and pass this interface to `Model` and `Schema`.
 
 For example, suppose you have a `UserDoc` interface, and you want to define a `fullName` virtual.

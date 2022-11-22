@@ -190,9 +190,6 @@ declare module 'mongoose' {
     /** Returns the list of paths that have been modified. */
     modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;
 
-    /** The name of the model */
-    modelName: string;
-
     /**
      * Overwrite all values in this document with the values of `obj`, except
      * for immutable properties. Behaves similarly to `set()`, except for it

@@ -62,7 +62,7 @@ async function awaitUpdate() {
 }
 ```
 
-Note that the specific fulfillment values of different Mongoose methods vary, and may be affected by configuration. Please refer to the [API documentation](./api.html) for information about specific methods.
+Note that the specific fulfillment values of different Mongoose methods vary, and may be affected by configuration. Please refer to the [API documentation](api.html) for information about specific methods.
 
 ### Async Functions
 
@@ -108,7 +108,7 @@ Under the hood, [async/await is syntactic sugar](https://developer.mozilla.org/e
 Due to the surprisingly simple way promises are implemented in JavaScript, the keyword `await` will try to unwrap any object with a property whose key is the string ‘then’ and whose value is a function. 
 Such objects belong to a broader class of objects called [thenables](https://masteringjs.io/tutorials/fundamentals/thenable). 
 If the thenable being unwrapped is a genuine promise, e.g. an instance of the [Promise constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), we enjoy several guarantees about how the object’s ‘then’ function will behave. 
-However, Mongoose provides several static helper methods that return a different class of thenable object called a [Query](./queries.html)--and [Queries are not promises](./queries.html#queries-are-not-promises). 
+However, Mongoose provides several static helper methods that return a different class of thenable object called a [Query](queries.html)--and [Queries are not promises](queries.html#queries-are-not-promises). 
 Because Queries are also *thenables*, we can interact with a Query using async/await just as we would interact with a genuine promise, with one key difference: observing the fulfillment value of a genuine promise cannot under any circumstances change that value, but trying to re-observe the value of a Query may cause the Query to be re-executed.
 
 ```javascript
@@ -148,4 +148,4 @@ async function observeQuery() {
 
 You are most likely to accidentally re-execute queries in this way when mixing callbacks with async/await.
  This is never necessary and should be avoided.
- If you need a Query to return a fully-fledged promise instead of a thenable, you can use [Query#exec()](./api/query.html#query_Query-exec).
+ If you need a Query to return a fully-fledged promise instead of a thenable, you can use [Query#exec()](api/query.html#query_Query-exec).

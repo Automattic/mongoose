@@ -938,3 +938,22 @@ function gh12590() {
   });
 
 }
+
+function gh12611() {
+  const reusableFields = {
+    description: { type: String, required: true },
+    skills: { type: [Schema.Types.ObjectId], ref: "Skill", default: [] }
+  } as const;
+  
+  const firstSchema = new Schema({
+    ...reusableFields,
+    anotherField: String
+  });
+  
+  type Props = InferSchemaType<typeof firstSchema>;
+  expectType<{
+    description: string;
+    skills: Types.ObjectId[];
+    anotherField?: string;
+  }>({} as Props);
+}

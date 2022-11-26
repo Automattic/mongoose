@@ -1,3 +1,35 @@
+6.7.3 / 2022-11-22
+==================
+ * fix(document): handle setting array to itself after saving and pushing a new value #12672 #12656
+ * fix(types): update replaceWith pipeline stage #12715 [coyotte508](https://github.com/coyotte508)
+ * fix(types): remove incorrect modelName type definition #12682 #12669 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(schema): fix setupTimestamps for browser.umd #12683 [raphael-papazikas](https://github.com/raphael-papazikas)
+ * docs: correct justOne description #12686 #12599 [tianguangcn](https://github.com/tianguangcn)
+ * docs: make links more consistent #12690 #12645 [hasezoey](https://github.com/hasezoey)
+ * docs(document): explain that $isNew is false in post('save') hooks #12685 #11990
+ * docs: fixed line causing a "used before defined" linting error #12707 [sgpinkus](https://github.com/sgpinkus)
+
+6.7.2 / 2022-11-07
+==================
+ * fix(discriminator): skip copying base schema plugins if `applyPlugins == false` #12613 #12604 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): add UUID to types #12650 #12593
+ * fix(types): allow setting SchemaTypeOptions' index property to IndexOptions #12562
+ * fix(types): set this to doc type in SchemaType.prototype.validate() #12663 #12590
+ * fix(types): correct handling for model<any> #12659 #12573
+ * fix(types): pre hook with deleteOne should resolve this as Query #12642 #12622 [lpizzinidev](https://github.com/lpizzinidev)
+
+6.7.1 / 2022-11-02
+==================
+ * fix(query): select Map field with select: false when explicitly requested #12616 #12603 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix: correctly find paths underneath single nested document with an array of mixed #12605 #12530
+ * fix(populate): better support for populating maps of arrays of refs #12601 #12494
+ * fix(types): add missing create constructor signature override type #12585 [naorpeled](https://github.com/naorpeled)
+ * fix(types): make array paths optional in inferred type of array default returns undefined #12649 #12420
+ * fix(types): improve ValidateOpts type #12606 [Freezystem](https://github.com/Freezystem)
+ * docs: add Lodash guide highlighting issues with cloneDeep() #12609
+ * docs: removed v5 link from v6 docs #12641 #12624 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: removed outdated connection example #12618 [lpizzinidev](https://github.com/lpizzinidev)
+
 6.7.0 / 2022-10-24
 ==================
  * feat: upgrade to mongodb driver 4.11.0 #12446

@@ -100,7 +100,7 @@ declare module 'mongoose' {
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will
      * build an index on this path when the model is compiled.
      */
-    index?: boolean | IndexDirection;
+    index?: boolean | IndexDirection | IndexOptions;
 
     /**
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose
@@ -188,7 +188,11 @@ declare module 'mongoose' {
     [other: string]: any;
   }
 
-  class SchemaType<T = any> {
+  interface Validator {
+    message?: string; type?: string; validator?: Function
+  }
+
+  class SchemaType<T = any, DocType = any> {
     /** SchemaType constructor */
     constructor(path: string, options?: AnyObject, instance?: string);
 
@@ -270,10 +274,10 @@ declare module 'mongoose' {
     unique(bool: boolean): this;
 
     /** The validators that Mongoose should run to validate properties at this SchemaType's path. */
-    validators: { message?: string; type?: string; validator?: Function }[];
+    validators: Validator[];
 
     /** Adds validator(s) for this document path. */
-    validate(obj: RegExp | Function | any, errorMsg?: string, type?: string): this;
+    validate(obj: RegExp | ((this: DocType, value: any, validatorProperties?: Validator) => any), errorMsg?: string, type?: string): this;
   }
 
   namespace Schema {
@@ -421,6 +425,11 @@ declare module 'mongoose' {
 
         /** Adds an uppercase [setter](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set). */
         uppercase(shouldApply?: boolean): this;
+      }
+
+      class UUID extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'UUID';
       }
     }
   }

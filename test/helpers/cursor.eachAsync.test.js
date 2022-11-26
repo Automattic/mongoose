@@ -189,6 +189,30 @@ describe('eachAsync()', function() {
     assert.equal(numCalled, 1);
   });
 
+  it('avoids mutating document batch with parallel (gh-12652)', async() => {
+    const max = 100;
+    let numCalled = 0;
+    function next(cb) {
+      setImmediate(() => {
+        if (++numCalled > max) {
+          return cb(null, null);
+        }
+        cb(null, { num: numCalled });
+      });
+    }
+
+    let numDocsProcessed = 0;
+    async function fn(batch) {
+      numDocsProcessed += batch.length;
+      const length = batch.length;
+      await new Promise(resolve => setTimeout(resolve, 50));
+      assert.equal(batch.length, length);
+    }
+
+    await eachAsync(next, fn, { parallel: 7, batchSize: 10 });
+    assert.equal(numDocsProcessed, max);
+  });
+
   it('using AbortSignal (gh-12173)', async function() {
     if (typeof AbortController === 'undefined') {
       return this.skip();

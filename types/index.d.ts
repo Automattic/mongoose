@@ -187,7 +187,7 @@ declare module 'mongoose' {
     TStaticMethods = {},
     TSchemaOptions extends ResolveSchemaOptions<TSchemaOptions> = DefaultSchemaOptions,
     DocType extends ApplySchemaOptions<ObtainDocumentType<DocType, EnforcedDocType, TSchemaOptions>, TSchemaOptions> = ApplySchemaOptions<ObtainDocumentType<any, EnforcedDocType, TSchemaOptions>, TSchemaOptions>,
-    >
+  >
     extends events.EventEmitter {
     /**
      * Create a new schema

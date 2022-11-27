@@ -65,7 +65,7 @@ declare module 'mongoose' {
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
   type ResolveTimestamps<T, O> = O extends { timestamps: true }
-    ? { createdAt: Date; updatedAt: Date; } & T
+    ? { createdAt: NativeDate; updatedAt: NativeDate; } & T
     : T;
 }
 
@@ -195,5 +195,5 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                                   IfEquals<PathValueType, ObjectConstructor> extends true ? any:
                                                     IfEquals<PathValueType, {}> extends true ? any:
                                                       PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                        PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: 'TypeKey' }> :
+                                                        PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
                                                           unknown;

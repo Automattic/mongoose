@@ -401,7 +401,7 @@ declare module 'mongoose' {
     /** If `ref` is not nullish, this becomes a populated virtual. */
     ref?: string | Function;
 
-    /**  The local field to populate on if this is a populated virtual. */
+    /** The local field to populate on if this is a populated virtual. */
     localField?: string | ((this: HydratedDocType, doc: HydratedDocType) => string);
 
     /** The foreign field to populate on if this is a populated virtual. */

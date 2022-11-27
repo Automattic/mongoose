@@ -10828,6 +10828,7 @@ describe('model: populate:', function() {
       assert.ok(err);
       assert.ok(err.message.includes('strictPopulate'), err.message);
     });
+
     it('allows overwriting localField and foreignField when populating a virtual gh-6963', async function() {
       const testSchema = Schema({ name: String, uuid: 'ObjectId' }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
       const userSchema = Schema({ name: String, field: { type: mongoose.Schema.Types.ObjectId, ref: 'gh6963' }, change: { type: mongoose.Schema.Types.ObjectId, ref: 'gh6963' } });
@@ -10876,12 +10877,18 @@ describe('model: populate:', function() {
         change: otherLocalEntry.uuid
       });
 
-      const localTest = await Test.findOne({ _id: localEntry._id }).populate({ path: 'test', localField: 'uuid' });
+      const localTest = await Test.
+        findOne({ _id: localEntry._id }).
+        populate({ path: 'test', localField: 'uuid' });
       assert.equal(localTest.test.length, 1);
-      const otherLocalTest = await Test.findOne({ _id: otherLocalEntry._id }).populate({ path: 'test', localField: 'uuid' });
+      const otherLocalTest = await Test.
+        findOne({ _id: otherLocalEntry._id }).
+        populate({ path: 'test', localField: 'uuid' });
       assert.equal(otherLocalTest.test.length, 0);
       // should be empty because the original local field was _id and we created a doc with uuids
-      const check = await Test.findOne({ _id: localEntry._id }).populate({ path: 'test' });
+      const check = await Test.
+        findOne({ _id: localEntry._id }).
+        populate({ path: 'test' });
       assert.equal(check.test.length, 0);
       // ============localFieldAndForeignField============
       const bothEntry = await Test.create({ name: 'Both', uuid: mongoose.Types.ObjectId() });
@@ -10891,11 +10898,17 @@ describe('model: populate:', function() {
         field: bothEntry.uuid,
         change: otherBothEntry.uuid
       });
-      const bothTest = await Test.findOne({ _id: otherBothEntry._id }).populate({ path: 'test', localField: 'uuid', foreignField: 'change' });
+      const bothTest = await Test.
+        findOne({ _id: otherBothEntry._id }).
+        populate({ path: 'test', localField: 'uuid', foreignField: 'change' });
       assert.equal(bothTest.test.length, 1);
-      const otherBothTest = await Test.findOne({ _id: bothEntry._id }).populate({ path: 'test', localField: 'uuid', foreignField: 'change' });
+      const otherBothTest = await Test.
+        findOne({ _id: bothEntry._id }).
+        populate({ path: 'test', localField: 'uuid', foreignField: 'change' });
       assert.equal(otherBothTest.test.length, 0);
-      const normal = await Test.findOne({ _id: otherBothEntry._id }).populate({ path: 'test' });
+      const normal = await Test.
+        findOne({ _id: otherBothEntry._id }).
+        populate({ path: 'test' });
       // should be empty because the original local field was _id and we created a doc with uuids
       assert.equal(normal.test.length, 0);
     });

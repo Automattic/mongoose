@@ -192,6 +192,14 @@ projectSchema.post('save', function() {
   // this => IProject
 });
 
+projectSchema.pre('deleteOne', function() {
+  this.model;
+});
+
+projectSchema.post('deleteOne', function() {
+  this.model;
+});
+
 projectSchema.methods.myMethod = () => 10;
 
 projectSchema.statics.myStatic = () => 42;
@@ -552,4 +560,12 @@ function findWithId() {
   const TestModel = model('test', new Schema({}));
   TestModel.find(id);
   TestModel.findOne(id);
+}
+
+function gh12573ModelAny() {
+  const TestModel = model<any>('Test', new Schema({}));
+  const doc = new TestModel();
+  expectType<any>(doc);
+  const { fieldA } = doc;
+  expectType<any>(fieldA);
 }

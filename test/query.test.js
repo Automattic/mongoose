@@ -4133,6 +4133,34 @@ describe('Query', function() {
     assert.equal(item.doNotSelect, undefined);
   });
 
+  it('Map field with select: false is selected when explicitly requested (gh-12603)', async function() {
+    const testSchema = new mongoose.Schema({
+      title: String,
+      body: {
+        type: Map,
+        of: { en: String, pt: String },
+        select: false
+      }
+    });
+
+    const Test = db.model('Test', testSchema);
+    await Test.create({
+      title: 'test',
+      body: {
+        A: { en: 'en test A value', pt: 'pt test A value' },
+        B: { en: 'en test B value', pt: 'pt test B value' }
+      }
+    });
+
+    const item = await Test.findOne({}).select('+body');
+    assert.equal(item.title, 'test');
+    assert.equal(item.get('body.A.en'), 'en test A value');
+
+    const item2 = await Test.findOne({}).select('body');
+    assert.equal(item2.title, undefined);
+    assert.equal(item2.get('body.A.en'), 'en test A value');
+  });
+
   it('treats ObjectId as object with `_id` for `merge()` (gh-12325)', async function() {
     const testSchema = new mongoose.Schema({ name: String });
     const Test = db.model('Test', testSchema);
@@ -4234,5 +4262,48 @@ describe('Query', function() {
         }
       );
     }, { message: 'Can\'t modify discriminator key "animals.kind" on discriminator model' });
+  });
+
+  it('global strictQuery should work if applied after schema creation (gh-12703)', async() => {
+    const m = new mongoose.Mongoose();
+
+    await m.connect(start.uri);
+
+    const schema = new mongoose.Schema({ title: String });
+
+    const Test = m.model('test', schema);
+
+    m.set('strictQuery', false);
+
+    await Test.create({
+      title: 'chimichanga'
+    });
+    await Test.create({
+      title: 'burrito bowl'
+    });
+    await Test.create({
+      title: 'taco supreme'
+    });
+
+    const cond = {
+      $or: [
+        {
+          title: {
+            $regex: 'urri',
+            $options: 'i'
+          }
+        },
+        {
+          name: {
+            $regex: 'urri',
+            $options: 'i'
+          }
+        }
+      ]
+    };
+
+    const found = await Test.find(cond);
+    assert.strictEqual(found.length, 1);
+    assert.strictEqual(found[0].title, 'burrito bowl');
   });
 });

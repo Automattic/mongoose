@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 ```
 
-When you create a user [document](/docs/documents.html), Mongoose will cast
+When you create a user [document](../documents.html), Mongoose will cast
 the value to a [native JavaScript date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)
 using the [`Date()` constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#Syntax).
 
@@ -21,7 +21,7 @@ using the [`Date()` constructor](https://developer.mozilla.org/en-US/docs/Web/Ja
 [require:Date Tutorial.*Example 1.2]
 ```
 
-An invalid date will lead to a `CastError` when you [validate the document](/docs/validation.html).
+An invalid date will lead to a `CastError` when you [validate the document](../validation.html).
 
 ```javascript
 [require:Date Tutorial.*Example 1.3]

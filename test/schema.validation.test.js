@@ -1330,8 +1330,8 @@ describe('schema', function() {
       });
     });
 
-    it('Allows for doc to be passed as another parameter gh-12564', function(done) {
-      let document = '';
+    it('Allows for doc to be passed as another parameter (gh-12564)', function(done) {
+      let document = null;
       const s = mongoose.Schema({
         n: {
           type: String,
@@ -1340,8 +1340,8 @@ describe('schema', function() {
               return v != null;
             },
             message: function(properties, doc) {
-              document = doc.toString();
-              return 'fail ' + properties.path + ' on doc ' + doc;
+              document = doc;
+              return 'fail ' + properties.path + ' on doc ' + doc._id;
             }
           }
         },
@@ -1351,8 +1351,9 @@ describe('schema', function() {
       const m = new M({ n: null, field: 'Yo' });
 
       m.validate(function(error) {
-        assert.equal(error.errors['n'].message.includes(document), true);
-        assert.equal('fail n on doc ' + document, error.errors['n'].message);
+        assert.strictEqual(document, m);
+        assert.ok(error.errors['n'].message.includes(m._id));
+        assert.equal('fail n on doc ' + m._id, error.errors['n'].message);
         done();
       });
     });

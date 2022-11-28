@@ -1,12 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const start = require('../common');
-
 const modifiedPaths = require('../../lib/helpers/common').modifiedPaths;
-const mongoose = start.mongoose;
-const { Schema } = mongoose;
-
 
 describe('modifiedPaths, bad update value which has circular reference field', () => {
   it('update value can be null', function() {

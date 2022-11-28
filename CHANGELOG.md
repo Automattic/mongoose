@@ -1,3 +1,12 @@
+6.7.4 / 2022-11-28
+==================
+ * fix: allow setting global strictQuery after Schema creation #12717 #12703 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(cursor): make eachAsync() avoid modifying batch when mixing parallel and batchSize #12716
+ * fix(types): infer virtuals in query results #12727 #12702 #12684
+ * fix(types): correctly infer ReadonlyArray types in schema definitions #12720
+ * fix(types): avoid typeof Query with generics for TypeScript 4.6 support #12712 #12688
+ * chore: avoid bundling .tgz files when publishing #12725 [hasezoey](https://github.com/hasezoey)
+
 6.7.3 / 2022-11-22
 ==================
  * fix(document): handle setting array to itself after saving and pushing a new value #12672 #12656

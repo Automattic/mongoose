@@ -9,6 +9,10 @@ const { Schema } = mongoose;
 
 describe('modifiedPaths, bad update value which has circular reference field', () => {
 
+  it('update value can be null', function() {
+    modifiedPaths(null, 'path', null);
+  });
+
   it('values with obvious error', function() {
     const objA = {};
     objA.a = objA;

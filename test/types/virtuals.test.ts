@@ -87,7 +87,7 @@ function gh11543() {
   expectType<PetVirtuals>(personSchema.virtuals);
 }
 
-function autoTypedVirtuals() {
+async function autoTypedVirtuals() {
   type AutoTypedSchemaType = InferSchemaType<typeof testSchema>;
   type VirtualsType = { domain: string };
   type InferredDocType = FlatRecord<AutoTypedSchemaType & ObtainSchemaGeneric<typeof testSchema, 'TVirtuals'>>;
@@ -119,4 +119,7 @@ function autoTypedVirtuals() {
   expectType<string>(doc.domain);
 
   expectType<FlatRecord<AutoTypedSchemaType & VirtualsType >>({} as InferredDocType);
+
+  const doc2 = await TestModel.findOne().orFail();
+  expectType<string>(doc2.domain);
 }

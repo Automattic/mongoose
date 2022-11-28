@@ -179,7 +179,7 @@ describe('SubdocumentPath', function() {
     assert.ok(err);
     assert.ok(err.errors['nested']);
 
-    mongoose.Schema.Types.Subdocument.set('required', false);
+    delete mongoose.Schema.Types.Subdocument.defaultOptions.required;
   });
 
   it('supports setting _id globally (gh-11541) (gh-8883)', function() {
@@ -197,6 +197,5 @@ describe('SubdocumentPath', function() {
     assert.ok(!doc.nested._id);
 
     delete mongoose.Schema.Types.Subdocument.defaultOptions._id;
-    mongoose.Schema.Types.Subdocument.set('required', false);
   });
 });

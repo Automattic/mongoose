@@ -1,10 +1,11 @@
 # Mongoose
 
-Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment. Mongoose supports both promises and callbacks.
+Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment. Mongoose supports [Node.js](https://nodejs.org/en/) and [Deno](https://deno.land/) (alpha).
 
-[![Slack Status](https://img.shields.io/badge/slack-mongoosejsteam-34D058.svg?logo=slack )](https://mongoosejsteam.slack.com)
 [![Build Status](https://github.com/Automattic/mongoose/workflows/Test/badge.svg)](https://github.com/Automattic/mongoose)
 [![NPM version](https://badge.fury.io/js/mongoose.svg)](http://badge.fury.io/js/mongoose)
+[![Deno version](https://deno.land/badge/mongoose/version)](https://deno.land/x/mongoose)
+[![Deno popularity](https://deno.land/badge/mongoose/popularity)](https://deno.land/x/mongoose)
 
 [![npm](https://nodei.co/npm/mongoose.png)](https://www.npmjs.com/package/mongoose)
 
@@ -45,6 +46,8 @@ First install [Node.js](http://nodejs.org/) and [MongoDB](https://www.mongodb.or
 $ npm install mongoose
 ```
 
+Mongoose 6.8.0 also includes alpha support for [Deno](https://deno.land/).
+
 ## Importing
 
 ```javascript
@@ -53,6 +56,24 @@ const mongoose = require('mongoose');
 
 // Using ES6 imports
 import mongoose from 'mongoose';
+```
+
+Or, using [Deno's `createRequire()` for CommonJS support](https://deno.land/std@0.113.0/node/README.md?source=#commonjs-modules-loading) as follows.
+
+```javascript
+import { createRequire } from "https://deno.land/std/node/module.ts";
+const require = createRequire(import.meta.url);
+
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost:27017/test')
+  .then(() => console.log('Connected!'));
+```
+
+You can then run the above script using the following.
+
+```
+deno run --allow-net --allow-read --allow-sys --allow-env mongoose-test.js
 ```
 
 ## Mongoose for Enterprise

@@ -1178,6 +1178,11 @@ describe('schema', function() {
 
   describe('other contexts', function() {
     it('work', function(done) {
+      if (typeof Deno !== 'undefined') {
+        // Deno throws "Not implemented: Script.prototype.runInNewContext"
+        return this.skip();
+      }
+
       const str = 'code = {' +
         '  name: String' +
         ', arr1: Array ' +

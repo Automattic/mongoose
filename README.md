@@ -46,7 +46,7 @@ First install [Node.js](http://nodejs.org/) and [MongoDB](https://www.mongodb.or
 $ npm install mongoose
 ```
 
-Mongoose 6.7.0 also includes beta support for [Deno](https://deno.land/).
+Mongoose 6.8.0 also includes beta support for [Deno](https://deno.land/).
 
 ## Importing
 

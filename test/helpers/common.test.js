@@ -17,11 +17,7 @@ describe('modifiedPaths, bad update value which has circular reference field', (
     const objA = {};
     objA.a = objA;
 
-    try {
-      modifiedPaths(objA, 'path', null);
-    } catch (e) {
-      console.log(e);
-    }
+    assert.throws(() => modifiedPaths(objA, 'path', null), /circular reference/);
   });
 
   it('original error i made', async function() {
@@ -44,12 +40,7 @@ describe('modifiedPaths, bad update value which has circular reference field', (
       const doc = new Test2Model({ v: i });
       await doc.save();
     }
-
-    try {
-      // miss an `await` before `Test2Model.countDocuments()`
-      await Test1Model.updateOne({ n: 'x' }, { v: Test2Model.countDocuments() }, { upsert: true });
-    } catch (e) {
-      console.log(e);
-    }
+    
+    assert.rejects(() => Test1Model.updateOne({ n: 'x' }, { v: Test2Model.countDocuments() }, { upsert: true }), /circular reference/);
   });
 });

@@ -178,4 +178,18 @@ describe('getSchemaTypes', function() {
     assert.equal(schemaTypes.length, 1);
     assert.equal(schemaTypes[0].options.ref, 'Enemy');
   });
+
+  it('finds path underneath nested subdocument with map of mixed (gh-12530)', function() {
+    const schema = new Schema({
+      child: new Schema({
+        testMap: {
+          type: Map,
+          of: 'Mixed'
+        }
+      })
+    });
+
+    const schemaTypes = getSchemaTypes(null, schema, null, 'child.testMap.foo.bar');
+    assert.equal(schemaTypes.instance, 'Mixed');
+  });
 });

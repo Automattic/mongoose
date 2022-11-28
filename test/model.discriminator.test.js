@@ -2011,4 +2011,70 @@ describe('model', function() {
     assert.strictEqual(doc.shape.get('a').radius, '5');
     assert.strictEqual(doc.shape.get('b').side, 10);
   });
+
+  it('supports `mergeHooks` option to use the discriminator schema\'s hooks over the base schema\'s (gh-12472)', function() {
+    const shapeSchema = Schema({ name: String }, { discriminatorKey: 'kind' });
+    shapeSchema.plugin(myPlugin);
+
+    const Shape = db.model('Test', shapeSchema);
+
+    const triangleSchema = Schema({ sides: { type: Number, enum: [3] } });
+    triangleSchema.plugin(myPlugin);
+    const Triangle = Shape.discriminator(
+      'Triangle',
+      triangleSchema
+    );
+    const squareSchema = Schema({ sides: { type: Number, enum: [4] } });
+    squareSchema.plugin(myPlugin);
+    const Square = Shape.discriminator(
+      'Square',
+      squareSchema,
+      { mergeHooks: false }
+    );
+
+    assert.equal(Triangle.schema.s.hooks._pres.get('save').filter(hook => hook.fn.name === 'testHook12472').length, 2);
+    assert.equal(Square.schema.s.hooks._pres.get('save').filter(hook => hook.fn.name === 'testHook12472').length, 1);
+
+    function myPlugin(schema) {
+      schema.pre('save', function testHook12472() {});
+    }
+  });
+
+  it('supports `mergePlugins` option to use the discriminator schema\'s plugins over the base schema\'s (gh-12604)', function() {
+    let pluginTimes = 0;
+    const shapeDef = { name: String };
+    const shapeSchema = Schema(shapeDef, { discriminatorKey: 'kind' });
+    shapeSchema.plugin(myPlugin, { opts1: true });
+
+    const Shape = db.model('Test', shapeSchema);
+
+    const triangleSchema = Schema({ ...shapeDef, sides: { type: Number, enum: [3] } });
+    triangleSchema.plugin(myPlugin, { opts2: true });
+    const Triangle = Shape.discriminator(
+      'Triangle',
+      triangleSchema
+    );
+
+    const squareSchema = Schema({ ...shapeDef, sides: { type: Number, enum: [4] } });
+    squareSchema.plugin(myPlugin, { opts3: true });
+    const Square = Shape.discriminator(
+      'Square',
+      squareSchema,
+      { mergeHooks: false, mergePlugins: false }
+    );
+
+    assert.equal(Triangle.schema.s.hooks._pres.get('save').filter(hook => hook.fn.name === 'testHook12604').length, 2);
+    assert.equal(Square.schema.s.hooks._pres.get('save').filter(hook => hook.fn.name === 'testHook12604').length, 1);
+
+    const squareFilteredPlugins = Square.schema.plugins.filter((obj) => obj.fn.name === 'myPlugin');
+    assert.equal(squareFilteredPlugins.length, 1);
+    assert.equal(squareFilteredPlugins[0].opts['opts3'], true);
+
+    assert.equal(pluginTimes, 3);
+
+    function myPlugin(schema) {
+      pluginTimes += 1;
+      schema.pre('save', function testHook12604() {});
+    }
+  });
 });

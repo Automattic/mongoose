@@ -1127,6 +1127,16 @@ declare module 'mongoose' {
          * An expression that resolves to a boolean value used to determine if an element should be included in the output array. The expression references each element of the input array individually with the variable name specified in as.
          */
         cond: BooleanExpression;
+        /**
+         * A number expression that restricts the number of matching array elements that $filter returns. You cannot specify a limit less than 1. The matching array elements are returned in the order they appear in the input array.
+         *
+         * If the specified limit is greater than the number of matching array elements, $filter returns all matching array elements.
+         * If the limit is null, $filter returns all matching array elements.
+         *
+         * @version 5.2
+         * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/filter/#using-the-limit-field
+         */
+        limit?: NumberExpression;
       }
     }
 
@@ -1178,6 +1188,26 @@ declare module 'mongoose' {
        * @see https://docs.mongodb.com/manual/reference/operator/aggregation/last/#mongodb-expression-exp.-last
        */
       $last: Expression;
+    }
+
+    export interface LinearFill {
+      /**
+       * Fills null and missing fields in a window using linear interpolation based on surrounding field values.
+       *
+       * @version 5.3
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/linearFill
+       */
+      $linearFill: Expression
+    }
+
+    export interface Locf {
+      /**
+       * Last observation carried forward. Sets values for null and missing fields in a window to the last non-null value for the field.
+       *
+       * @version 5.2
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/locf
+       */
+      $locf: Expression
     }
 
     export interface Map {
@@ -2735,6 +2765,8 @@ declare module 'mongoose' {
     Expression.First |
     Expression.Integral |
     Expression.Last |
+    Expression.LinearFill |
+    Expression.Locf |
     Expression.Max |
     Expression.Min |
     Expression.Push |

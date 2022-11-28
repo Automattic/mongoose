@@ -9,7 +9,7 @@
 There are several [backwards-breaking changes](https://github.com/Automattic/mongoose/blob/master/CHANGELOG.md)
 you should be aware of when migrating from Mongoose 5.x to Mongoose 6.x.
 
-If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration guide](/docs/migrating_to_5.html) and upgrade to Mongoose 5.x first.
+If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration guide](migrating_to_5.html) and upgrade to Mongoose 5.x first.
 
 * [Version Requirements](#version-requirements)
 * [MongoDB Driver 4.0](#mongodb-driver-40)

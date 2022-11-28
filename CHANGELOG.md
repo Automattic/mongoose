@@ -1,3 +1,65 @@
+6.7.3 / 2022-11-22
+==================
+ * fix(document): handle setting array to itself after saving and pushing a new value #12672 #12656
+ * fix(types): update replaceWith pipeline stage #12715 [coyotte508](https://github.com/coyotte508)
+ * fix(types): remove incorrect modelName type definition #12682 #12669 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(schema): fix setupTimestamps for browser.umd #12683 [raphael-papazikas](https://github.com/raphael-papazikas)
+ * docs: correct justOne description #12686 #12599 [tianguangcn](https://github.com/tianguangcn)
+ * docs: make links more consistent #12690 #12645 [hasezoey](https://github.com/hasezoey)
+ * docs(document): explain that $isNew is false in post('save') hooks #12685 #11990
+ * docs: fixed line causing a "used before defined" linting error #12707 [sgpinkus](https://github.com/sgpinkus)
+
+6.7.2 / 2022-11-07
+==================
+ * fix(discriminator): skip copying base schema plugins if `applyPlugins == false` #12613 #12604 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): add UUID to types #12650 #12593
+ * fix(types): allow setting SchemaTypeOptions' index property to IndexOptions #12562
+ * fix(types): set this to doc type in SchemaType.prototype.validate() #12663 #12590
+ * fix(types): correct handling for model<any> #12659 #12573
+ * fix(types): pre hook with deleteOne should resolve this as Query #12642 #12622 [lpizzinidev](https://github.com/lpizzinidev)
+
+6.7.1 / 2022-11-02
+==================
+ * fix(query): select Map field with select: false when explicitly requested #12616 #12603 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix: correctly find paths underneath single nested document with an array of mixed #12605 #12530
+ * fix(populate): better support for populating maps of arrays of refs #12601 #12494
+ * fix(types): add missing create constructor signature override type #12585 [naorpeled](https://github.com/naorpeled)
+ * fix(types): make array paths optional in inferred type of array default returns undefined #12649 #12420
+ * fix(types): improve ValidateOpts type #12606 [Freezystem](https://github.com/Freezystem)
+ * docs: add Lodash guide highlighting issues with cloneDeep() #12609
+ * docs: removed v5 link from v6 docs #12641 #12624 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: removed outdated connection example #12618 [lpizzinidev](https://github.com/lpizzinidev)
+
+6.7.0 / 2022-10-24
+==================
+ * feat: upgrade to mongodb driver 4.11.0 #12446
+ * feat: add UUID Schema Type (BSON Buffer SubType 4) #12268 #3208 [hasezoey](https://github.com/hasezoey)
+ * feat(aggregation): add $fill pipeline stage #12545 [raphael-papazikas](https://github.com/raphael-papazikas)
+ * feat(types+schema): allow defining schema paths using mongoose.Types.* to work around TS type inference issues #12352
+ * feat(schema): add alias() method that makes it easier to define multiple aliases for a given path #12368
+ * feat(model): add mergeHooks option to Model.discriminator() to avoid duplicate hooks #12542
+ * feat(document): add $timestamps() method to set timestamps for save(), bulkSave(), and insertMany() #12540
+
+6.6.7 / 2022-10-21
+==================
+ * fix: correct browser build and improve isAsyncFunction check for browser #12577 #12576 #12392
+ * fix(query): allow overwriting discriminator key with overwriteDiscriminatorKey if strict: 'throw' #12578 #12513
+
+6.6.6 / 2022-10-20
+==================
+ * fix(update): handle runValidators when using $set on a doc array in discriminator schema #12571 #12518
+ * fix(document): allow creating document with document array and top-level key named schema #12569 #12480
+ * fix(cast): make schema-level strictQuery override schema-level strict for query filters #12570 #12508
+ * fix(aggregate): avoid adding extra $match stage if user manually set discriminator key to correct value in first pipeline stage #12568 #12478
+ * fix: Throws error when updating a key name that match the discriminator key name on nested object #12534 #12517 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): add limit to $filter expression #12553 [raphael-papazikas](https://github.com/raphael-papazikas)
+ * fix(types): correct replaceWith type pipeline stage #12535 [FabioCingottini](https://github.com/FabioCingottini)
+ * fix(types): add missing densify type pipeline type #12533 [FabioCingottini](https://github.com/FabioCingottini)
+ * docs(populate): added transform option description #12560 #12551 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(connection): add sample to useDb() documentation #12541 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(guide): update broken read-preference links #12538 #12525 [hasezoey](https://github.com/hasezoey)
+ * chore: add TypeScript version field to issue template #12532 [hasezoey](https://github.com/hasezoey)
+
 6.6.5 / 2022-10-05
 ==================
  * fix(document): set defaults on subdocuments underneath init-ed single nested subdocument #12523 #12515

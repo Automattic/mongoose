@@ -133,6 +133,9 @@ declare module 'mongoose' {
     /** Combines multiple aggregation pipelines. */
     facet(options: PipelineStage.Facet['$facet']): this;
 
+    /** Appends a new $fill operator to this aggregate pipeline */
+    fill(arg: PipelineStage.Fill['$fill']): this;
+
     /** Appends new custom $graphLookup operator(s) to this aggregate pipeline, performing a recursive search on a collection. */
     graphLookup(options: PipelineStage.GraphLookup['$graphLookup']): this;
 

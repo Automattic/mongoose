@@ -5,9 +5,6 @@ const config = require('../.config');
 const fs = require('fs');
 const mongoose = require('../');
 
-const poralHost = 'https://staging.poral.io';
-const opencollectiveUrl = `${poralHost}/invoke/${config.poralId}/generateSponsors`;
-
 run().catch(err => {
   console.error(err);
   process.exit(-1);
@@ -90,6 +87,12 @@ async function run() {
     if (override.alt != null) {
       sponsor.alt = override.alt;
     }
+  }
+
+  const additionalSponsors = await OpenCollectiveSponsor.find({}).
+    then(docs => docs.filter(doc => doc.openCollectiveId == null));
+  for (const sponsor of additionalSponsors) {
+    opencollectiveSponsors.push(sponsor);
   }
   
   if (opencollectiveSponsors != null) {

@@ -4388,6 +4388,23 @@ describe('Model', function() {
         });
     });
 
+    it('timestamps respect $timestamps() (gh-12117)', async function() {
+      const schema = new Schema({ name: String }, { timestamps: true });
+      const Movie = db.model('Movie', schema);
+      const start = Date.now();
+
+      const arr = [
+        new Movie({ name: 'Star Wars' }),
+        new Movie({ name: 'The Empire Strikes Back' })
+      ];
+      arr[1].$timestamps(false);
+
+      await Movie.insertMany(arr);
+      const docs = await Movie.find().sort({ name: 1 });
+      assert.ok(docs[0].createdAt.valueOf() >= start);
+      assert.ok(!docs[1].createdAt);
+    });
+
     it('insertMany() with nested timestamps (gh-12060)', async function() {
       const childSchema = new Schema({ name: { type: String } }, {
         _id: false,
@@ -8441,6 +8458,7 @@ describe('Model', function() {
       assert.ok(userToUpdate.createdAt);
       assert.ok(userToUpdate.updatedAt);
     });
+
     it('`timestamps` has `undefined` as default value (gh-12059)', async() => {
       // Arrange
       const userSchema = new Schema({
@@ -8461,6 +8479,27 @@ describe('Model', function() {
       assert.ok(newUser.updatedAt);
       assert.ok(userToUpdate.createdAt);
       assert.ok(userToUpdate.updatedAt);
+    });
+
+    it('respects `$timestamps()` (gh-12117)', async function() {
+      // Arrange
+      const userSchema = new Schema({ name: String }, { timestamps: true });
+
+      const User = db.model('User', userSchema);
+
+      const newUser1 = new User({ name: 'John' });
+      const newUser2 = new User({ name: 'Bill' });
+
+      newUser2.$timestamps(false);
+
+      // Act
+      await User.bulkSave([newUser1, newUser2]);
+
+      // Assert
+      assert.ok(newUser1.createdAt);
+      assert.ok(newUser1.updatedAt);
+      assert.ok(!newUser2.createdAt);
+      assert.ok(!newUser2.updatedAt);
     });
   });
 

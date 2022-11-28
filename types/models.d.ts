@@ -1,10 +1,18 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
+  export interface DiscriminatorOptions {
+    value?: string | number | ObjectId;
+    clone?: boolean;
+    overwriteModels?: boolean;
+    mergeHooks?: boolean;
+    mergePlugins?: boolean;
+  }
+
   export interface AcceptsDiscriminator {
     /** Adds a discriminator type. */
-    discriminator<D>(name: string | number, schema: Schema, value?: string | number | ObjectId): Model<D>;
-    discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId): U;
+    discriminator<D>(name: string | number, schema: Schema, value?: string | number | ObjectId | DiscriminatorOptions): Model<D>;
+    discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string | number | ObjectId | DiscriminatorOptions): U;
   }
 
   interface MongooseBulkWriteOptions {
@@ -170,7 +178,8 @@ declare module 'mongoose' {
 
     /** Creates a new document or documents */
     create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>): void;
+    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, options?: SaveOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, callback: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>): void;
     create<DocContents = AnyKeys<T>>(doc: DocContents | T): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
     create<DocContents = AnyKeys<T>>(...docs: Array<T | DocContents>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
     create<DocContents = AnyKeys<T>>(doc: T | DocContents, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;

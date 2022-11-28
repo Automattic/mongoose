@@ -4140,6 +4140,34 @@ describe('Query', function() {
     assert.equal(item.doNotSelect, undefined);
   });
 
+  it('Map field with select: false is selected when explicitly requested (gh-12603)', async function() {
+    const testSchema = new mongoose.Schema({
+      title: String,
+      body: {
+        type: Map,
+        of: { en: String, pt: String },
+        select: false
+      }
+    });
+
+    const Test = db.model('Test', testSchema);
+    await Test.create({
+      title: 'test',
+      body: {
+        A: { en: 'en test A value', pt: 'pt test A value' },
+        B: { en: 'en test B value', pt: 'pt test B value' }
+      }
+    });
+
+    const item = await Test.findOne({}).select('+body');
+    assert.equal(item.title, 'test');
+    assert.equal(item.get('body.A.en'), 'en test A value');
+
+    const item2 = await Test.findOne({}).select('body');
+    assert.equal(item2.title, undefined);
+    assert.equal(item2.get('body.A.en'), 'en test A value');
+  });
+
   it('treats ObjectId as object with `_id` for `merge()` (gh-12325)', async function() {
     const testSchema = new mongoose.Schema({ name: String });
     const Test = db.model('Test', testSchema);
@@ -4154,5 +4182,135 @@ describe('Query', function() {
 
     assert.ok(q.getFilter()._id instanceof mongoose.Types.ObjectId);
     assert.equal(q.getFilter()._id.toHexString(), _id.toHexString());
+  });
+
+  it('avoid throwing error when modifying nested field with same name as discriminator key (gh-12517)', async function() {
+    const options = { discriminatorKey: 'kind', strict: 'throw' };
+    const testSchema = new mongoose.Schema({ name: String, kind: String, animals: { kind: String, world: String } }, options);
+    const Test = db.model('Test', testSchema);
+
+    Test.discriminator(
+      'ClickedTest',
+      new mongoose.Schema({ url: String }, options)
+    );
+
+    const newItem = await Test.create({
+      name: 'Name',
+      animals: { kind: 'Kind', world: 'World' }
+    });
+
+    const updatedItem = await Test.findByIdAndUpdate(
+      newItem._id,
+      {
+        $set: {
+          name: 'Name2',
+          animals: { kind: 'Kind2', world: 'World2' }
+        }
+      },
+      {
+        new: true
+      }
+    );
+
+    assert.deepEqual(updatedItem.animals, { kind: 'Kind2', world: 'World2' });
+
+    await assert.rejects(async() => {
+      await Test.findByIdAndUpdate(
+        newItem._id,
+        {
+          $set: {
+            name: 'Name2',
+            kind: 'Kind2'
+          }
+        }
+      );
+    }, { message: 'Can\'t modify discriminator key "kind" on discriminator model' });
+  });
+
+  it('avoid throwing error when modifying field with same name as nested discriminator key (gh-12517)', async function() {
+    const options = { discriminatorKey: 'animals.kind', strict: 'throw' };
+    const testSchema = new mongoose.Schema({ name: String, kind: String, animals: { kind: String, world: String } }, options);
+    const Test = db.model('Test', testSchema);
+
+    Test.discriminator(
+      'ClickedTest',
+      new mongoose.Schema({ url: String }, options)
+    );
+
+    const newItem = await Test.create({
+      name: 'Name',
+      kind: 'Kind',
+      animals: { world: 'World' }
+    });
+
+    const updatedItem = await Test.findByIdAndUpdate(
+      newItem._id,
+      {
+        $set: {
+          name: 'Name2',
+          kind: 'Kind2'
+        }
+      },
+      {
+        new: true
+      }
+    );
+
+    assert.equal(updatedItem.name, 'Name2');
+    assert.equal(updatedItem.kind, 'Kind2');
+
+    await assert.rejects(async() => {
+      await Test.findByIdAndUpdate(
+        newItem._id,
+        {
+          $set: {
+            animals: { kind: 'Kind2', world: 'World2' }
+          }
+        }
+      );
+    }, { message: 'Can\'t modify discriminator key "animals.kind" on discriminator model' });
+  });
+
+  it('global strictQuery should work if applied after schema creation (gh-12703)', async() => {
+    const m = new mongoose.Mongoose();
+
+    await m.connect(start.uri);
+
+    const schema = new mongoose.Schema({ title: String });
+
+    const Test = m.model('test', schema);
+
+    m.set('strictQuery', false);
+
+    await Test.create({
+      title: 'chimichanga'
+    });
+    await Test.create({
+      title: 'burrito bowl'
+    });
+    await Test.create({
+      title: 'taco supreme'
+    });
+
+    const cond = {
+      $or: [
+        {
+          title: {
+            $regex: 'urri',
+            $options: 'i'
+          }
+        },
+        {
+          name: {
+            $regex: 'urri',
+            $options: 'i'
+          }
+        }
+      ]
+    };
+
+    const found = await Test.find(cond);
+    assert.strictEqual(found.length, 1);
+    assert.strictEqual(found[0].title, 'burrito bowl');
   });
 });

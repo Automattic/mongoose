@@ -205,6 +205,29 @@ const switchExpr: Expression.Switch = {
   }
 };
 
+const filterExprMinimumRequiredFields: Expression.Filter = {
+  $filter: {
+    input: '$items',
+    cond: { $gte: ['$$item.price', 100] }
+  }
+};
+
+const filterExprAs: Expression.Filter = {
+  $filter: {
+    input: '$items',
+    as: 'items',
+    cond: { $gte: ['$$item.price', 100] }
+  }
+};
+
+const filterLimit: Expression.Filter = {
+  $filter: {
+    input: '$items',
+    cond: { $gte: ['$$item.price', 100] },
+    limit: 5
+  }
+};
+
 (function gh12058() {
   const concat: Expression.ConcatArrays = {
     $concatArrays: [

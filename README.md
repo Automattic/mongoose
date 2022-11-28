@@ -73,7 +73,7 @@ mongoose.connect('mongodb://localhost:27017/test')
 You can then run the above script using the following.
 
 ```
-deno run --allow-env --allow-read --allow-net mongoose-test.js
+deno run --allow-net --allow-read --allow-sys --allow-env mongoose-test.js
 ```
 
 ## Mongoose for Enterprise

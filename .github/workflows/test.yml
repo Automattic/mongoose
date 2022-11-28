@@ -109,7 +109,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.27.x
+          deno-version: v1.28.x
       - run: deno --version
       - run: npm install
       - name: Run Deno tests

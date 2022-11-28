@@ -14,11 +14,6 @@ const args = parse(Deno.args);
 
 const require = createRequire(import.meta.url);
 
-// Workaround for MongoDB getting the current os release, which currently requires `--unstable`
-require('os').release = function() {
-  return 'deno test';
-};
-
 const Mocha = require('mocha');
 const fs = require('fs');
 const path = require('path');

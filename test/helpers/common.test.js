@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 const start = require('../common');
 
 const modifiedPaths = require('../../lib/helpers/common').modifiedPaths;

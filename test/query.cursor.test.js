@@ -27,13 +27,14 @@ describe('QueryCursor', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  beforeEach(function() {
+  beforeEach(async function() {
     const schema = new Schema({ name: String });
     schema.virtual('test').get(function() { return 'test'; });
 
     Model = db.model('Test', schema);
 
-    return Model.create({ name: 'Axl' }, { name: 'Slash' });
+    await Model.deleteMany({});
+    await Model.create({ name: 'Axl' }, { name: 'Slash' });
   });
 
   describe('#next()', function() {

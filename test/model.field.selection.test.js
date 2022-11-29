@@ -548,6 +548,13 @@ describe('model field selection', function() {
   });
 
   it('handles deselecting _id when other field has schema-level `select: false` (gh-12670)', async function() {
+    const version = await start.mongodVersion();
+    // Test fails with "Projection cannot have a mix of inclusion and exclusion."
+    // in MongoDB < 5
+    if (version[0] < 5) {
+      return this.skip();
+    }
+
     const schema = new mongoose.Schema({
       field1: {
         type: String,

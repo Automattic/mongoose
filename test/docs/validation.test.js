@@ -502,6 +502,8 @@ describe('validation docs', function() {
       // When running in `validate()` or `validateSync()`, the
       // validator can access the document using `this`.
       // Does **not** work with update validators.
+      // use this.get('name') to prevent this error
+      // if (this.name === undefined) this.name = this.get('name')
       if (this.name.toLowerCase().indexOf('red') !== -1) {
         return value !== 'red';
       }

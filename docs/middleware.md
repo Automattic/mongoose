@@ -85,6 +85,26 @@ This means that both `doc.updateOne()` and `Model.updateOne()` trigger
 
 **Note:** The [`create()`](api.html#model_Model-create) function fires `save()` hooks.
 
+**Note:** Query middlewares are not executed on subdocuments.
+
+```javascript
+const childSchema = new mongoose.Schema({
+  name: String
+});
+
+const mainSchema = new mongoose.Schema({
+  child: [childSchema]
+});
+
+mainSchema.pre('findOneAndUpdate', function () {
+   console.log('Middleware on parent document'); // Will be executed
+});
+
+childSchema.pre('findOneAndUpdate', function () {
+   console.log('Middleware on subdocument'); // Will not be executed
+});
+```
+
 <h3 id="pre"><a href="#pre">Pre</a></h3>
 
 Pre middleware functions are executed one after another, when each

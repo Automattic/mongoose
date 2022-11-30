@@ -163,9 +163,8 @@ caveats.
 There are a couple of key differences between update validators and
 document validators. In the color validation function below, `this` refers
 to the document being validated when using document validation.
-However, when running update validators, the document being updated
-may not be in the server's memory, so by default the value of `this` is
-not defined.
+However, when running update validators, `this` refers to the query object instead of the document.
+Because queries have a neat `.get()` function, you can get the updated value of the property you want.
 
 ```javascript
 [require:Update Validators and `this`]

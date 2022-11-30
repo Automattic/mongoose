@@ -496,7 +496,12 @@ declare module 'mongoose' {
     $pullAll?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
-    $bit?: Record<string, mongodb.NumericType>;
+    // Needs to be `AnyKeys` for now, because anything stricter makes us incompatible
+    // with the MongoDB Node driver's `UpdateFilter` interface (see gh-12595, gh-11911)
+    // and using the Node driver's `$bit` definition breaks because their `OnlyFieldsOfType`
+    // interface breaks on Mongoose Document class due to circular references.
+    // Re-evaluate this when we drop `extends Document` support in document interfaces.
+    $bit?: AnyKeys<TSchema>;
   };
 
   export type UpdateWithAggregationPipeline = UpdateAggregationStage[];

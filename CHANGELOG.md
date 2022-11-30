@@ -1,3 +1,11 @@
+6.7.5 / 2022-11-30
+==================
+ * fix(schema): copy indexes when calling add() with schema instance #12737 #12654
+ * fix(query): handle deselecting _id when another field has schema-level select: false #12736 #12670
+ * fix(types): support using UpdateQuery in bulkWrite() #12742 #12595
+ * docs(middleware): added note about execution policy on subdocuments #12735 #12694 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(validation): clarify context for update validators in validation docs #12738 #12655 [IslandRhythms](https://github.com/IslandRhythms)
+
 6.7.4 / 2022-11-28
 ==================
  * fix: allow setting global strictQuery after Schema creation #12717 #12703 [lpizzinidev](https://github.com/lpizzinidev)

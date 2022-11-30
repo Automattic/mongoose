@@ -78,7 +78,13 @@ declare module 'mongoose' {
     schema?: TSchema,
     collection?: string,
     options?: CompileModelOptions
-  ): Model<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+  ): Model<
+  InferSchemaType<TSchema>,
+  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+  ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+  TSchema
+  > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 

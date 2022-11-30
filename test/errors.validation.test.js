@@ -234,6 +234,8 @@ describe('ValidationError', function() {
 
   describe('when user code defines a r/o Error#toJSON', function() {
     it('should not fail', function(done) {
+      this.timeout(10000);
+
       const err = [];
       const child = require('child_process')
         .fork('./test/isolated/project-has-error.toJSON.js', ['--no-warnings'], { silent: true });

@@ -1,3 +1,23 @@
+6.7.4 / 2022-11-28
+==================
+ * fix: allow setting global strictQuery after Schema creation #12717 #12703 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(cursor): make eachAsync() avoid modifying batch when mixing parallel and batchSize #12716
+ * fix(types): infer virtuals in query results #12727 #12702 #12684
+ * fix(types): correctly infer ReadonlyArray types in schema definitions #12720
+ * fix(types): avoid typeof Query with generics for TypeScript 4.6 support #12712 #12688
+ * chore: avoid bundling .tgz files when publishing #12725 [hasezoey](https://github.com/hasezoey)
+
+6.7.3 / 2022-11-22
+==================
+ * fix(document): handle setting array to itself after saving and pushing a new value #12672 #12656
+ * fix(types): update replaceWith pipeline stage #12715 [coyotte508](https://github.com/coyotte508)
+ * fix(types): remove incorrect modelName type definition #12682 #12669 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(schema): fix setupTimestamps for browser.umd #12683 [raphael-papazikas](https://github.com/raphael-papazikas)
+ * docs: correct justOne description #12686 #12599 [tianguangcn](https://github.com/tianguangcn)
+ * docs: make links more consistent #12690 #12645 [hasezoey](https://github.com/hasezoey)
+ * docs(document): explain that $isNew is false in post('save') hooks #12685 #11990
+ * docs: fixed line causing a "used before defined" linting error #12707 [sgpinkus](https://github.com/sgpinkus)
+
 6.7.2 / 2022-11-07
 ==================
  * fix(discriminator): skip copying base schema plugins if `applyPlugins == false` #12613 #12604 [lpizzinidev](https://github.com/lpizzinidev)

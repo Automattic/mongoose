@@ -4263,4 +4263,47 @@ describe('Query', function() {
       );
     }, { message: 'Can\'t modify discriminator key "animals.kind" on discriminator model' });
   });
+
+  it('global strictQuery should work if applied after schema creation (gh-12703)', async() => {
+    const m = new mongoose.Mongoose();
+
+    await m.connect(start.uri);
+
+    const schema = new mongoose.Schema({ title: String });
+
+    const Test = m.model('test', schema);
+
+    m.set('strictQuery', false);
+
+    await Test.create({
+      title: 'chimichanga'
+    });
+    await Test.create({
+      title: 'burrito bowl'
+    });
+    await Test.create({
+      title: 'taco supreme'
+    });
+
+    const cond = {
+      $or: [
+        {
+          title: {
+            $regex: 'urri',
+            $options: 'i'
+          }
+        },
+        {
+          name: {
+            $regex: 'urri',
+            $options: 'i'
+          }
+        }
+      ]
+    };
+
+    const found = await Test.find(cond);
+    assert.strictEqual(found.length, 1);
+    assert.strictEqual(found[0].title, 'burrito bowl');
+  });
 });

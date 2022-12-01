@@ -224,6 +224,8 @@ describe('schematype', function() {
 
         // Assert
         assert.equal(schema.path('test').options.someRandomOption, true);
+
+        delete type.defaultOptions.someRandomOption;
       });
     });
   });

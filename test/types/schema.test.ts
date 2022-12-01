@@ -627,7 +627,7 @@ function gh11997() {
 }
 
 function gh12003() {
-  const baseSchemaOptions: SchemaOptions = {
+  const baseSchemaOptions = {
     versionKey: false
   };
 
@@ -636,6 +636,8 @@ function gh12003() {
   }, baseSchemaOptions);
 
   type BaseSchemaType = InferSchemaType<typeof BaseSchema>;
+
+  expectType<'type'>({} as ObtainSchemaGeneric<typeof BaseSchema, 'TSchemaOptions'>['typeKey']);
 
   expectType<{ name?: string }>({} as BaseSchemaType);
 }
@@ -794,8 +796,7 @@ function gh12205() {
         type: new Types.ObjectId(),
         required: true
       }
-    },
-    { timestamps: true }
+    }
   );
 
   const Campaign = model('Campaign', campaignSchema);
@@ -804,8 +805,6 @@ function gh12205() {
 
   type ICampaign = InferSchemaType<typeof campaignSchema>;
   expectType<{ client: Types.ObjectId }>({} as ICampaign);
-
-  expectType<'type'>({} as ObtainSchemaGeneric<typeof campaignSchema, 'TPathTypeKey'>);
 
   type A = ObtainDocumentType<{ client: { type: Schema.Types.ObjectId, required: true } }>;
   expectType<{ client: Types.ObjectId }>({} as A);
@@ -861,6 +860,19 @@ function gh12242() {
 
   type Example = InferSchemaType<typeof dbExample>;
   expectType<0 | 1>({} as Example['active']);
+}
+
+function testInferTimestamps() {
+  const schema = new Schema({
+    name: String
+  }, { timestamps: true });
+
+  type WithTimestamps = InferSchemaType<typeof schema>;
+  // For some reason, expectType<{ createdAt: Date, updatedAt: Date, name?: string }> throws
+  // an error "Parameter type { createdAt: Date; updatedAt: Date; name?: string | undefined; }
+  // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
+  // { name?: string | undefined; }"
+  expectType<{ createdAt: Date, updatedAt: Date } & { name?: string }>({} as WithTimestamps);
 }
 
 function gh12431() {

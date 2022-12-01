@@ -25,7 +25,7 @@ const Story = mongoose.model('Story', storySchema);
 const Person = mongoose.model('Person', personSchema);
 ```
 
-So far we've created two [Models](./models.html). Our `Person` model has
+So far we've created two [Models](models.html). Our `Person` model has
 its `stories` field set to an array of `ObjectId`s. The `ref` option is
 what tells Mongoose which model to use during population, in our case
 the `Story` model. All `_id`s we store here must be document `_id`s from
@@ -108,7 +108,7 @@ is replaced with the mongoose document returned from the database by
 performing a separate query before returning the results.
 
 Arrays of refs work the same way. Just call the
-[populate](./api/query.html#query_Query-populate) method on the query and an
+[populate](api/query.html#query_Query-populate) method on the query and an
 array of documents will be returned _in place_ of the original `_id`s.
 
 <h3 id="setting-populated-fields"><a href="#setting-populated-fields">Setting Populated Fields</a></h3>
@@ -187,7 +187,7 @@ story.authors; // `[]`
 
 What if we only want a few specific fields returned for the populated
 documents? This can be accomplished by passing the usual
-[field name syntax](./api/query.html#query_Query-select) as the second argument
+[field name syntax](api/query.html#query_Query-select) as the second argument
 to the populate method:
 
 ```javascript
@@ -372,10 +372,10 @@ Story.
 ```
 
 The documents returned from
-[query population](./api/query.html#query_Query-populate) become fully
+[query population](api/query.html#query_Query-populate) become fully
 functional, `remove`able, `save`able documents unless the
-[lean](./api/query.html#query_Query-lean) option is specified. Do not confuse
-them with [sub docs](./subdocs.html). Take caution when calling its
+[lean](api/query.html#query_Query-lean) option is specified. Do not confuse
+them with [sub docs](subdocs.html). Take caution when calling its
 remove method because you'll be removing it from the database, not just
 the array.
 
@@ -383,7 +383,7 @@ the array.
 
 If you have an existing mongoose document and want to populate some of its
 paths, you can use the
-[Document#populate()](./api/document.html#document_Document-populate) method.
+[Document#populate()](api/document.html#document_Document-populate) method.
 
 ```javascript
 const person = await Person.findOne({ name: 'Ian Fleming' });
@@ -408,8 +408,8 @@ person.populated('fans'); // Array of ObjectIds
 <h3 id="populate_multiple_documents"><a href="#populate_multiple_documents">Populating multiple existing documents</a></h3>
 
 If we have one or many mongoose documents or even plain objects
-(_like [mapReduce](./api/model.html#model_Model-mapReduce) output_), we may
-populate them using the [Model.populate()](./api/model.html#model_Model-populate)
+(_like [mapReduce](api/model.html#model_Model-mapReduce) output_), we may
+populate them using the [Model.populate()](api/model.html#model_Model-populate)
 method. This is what `Document#populate()`
 and `Query#populate()` use to populate documents.
 

@@ -26,7 +26,7 @@ app.get(function(req, res) {
 });
 ```
 
-To disable running getters when converting a document to JSON, set the [`toJSON.getters` option to `false` in your schema](https://mongoosejs.com/docs/guide.html#toJSON) as shown below.
+To disable running getters when converting a document to JSON, set the [`toJSON.getters` option to `false` in your schema](../guide.html#toJSON) as shown below.
 
 ```javascript
 const userSchema = new Schema({

@@ -1,12 +1,12 @@
 <h2 id="schematypes"><a href="#schematypes">SchemaTypes</a></h2>
 
 SchemaTypes handle definition of path
-[defaults](./api/schematype.html#schematype_SchemaType-default),
-[validation](./api/schematype.html#schematype_SchemaType-validate),
+[defaults](api/schematype.html#schematype_SchemaType-default),
+[validation](api/schematype.html#schematype_SchemaType-validate),
 [getters](#getters),
-[setters](./api/schematype.html#schematype_SchemaType-set),
-[field selection defaults](./api/schematype.html#schematype_SchemaType-select) for
-[queries](./api/query-js.html#query-js),
+[setters](api/schematype.html#schematype_SchemaType-set),
+[field selection defaults](api/schematype.html#schematype_SchemaType-select) for
+[queries](api/query-js.html#query-js),
 and other general characteristics for Mongoose document properties.
 
 * [What is a SchemaType?](#what-is-a-schematype)
@@ -50,7 +50,7 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 - [Mixed](#mixed)
 - [ObjectId](#objectids)
 - [Array](#arrays)
-- [Decimal128](./api/mongoose.html#mongoose_Mongoose-Decimal128)
+- [Decimal128](api/mongoose.html#mongoose_Mongoose-Decimal128)
 - [Map](#maps)
 - [Schema](#schemas)
 
@@ -201,13 +201,13 @@ types.
 
 <h5>All Schema Types</h5>
 
-* `required`: boolean or function, if true adds a [required validator](./validation.html#built-in-validators) for this property
+* `required`: boolean or function, if true adds a [required validator](validation.html#built-in-validators) for this property
 * `default`: Any or function, sets a default value for the path. If the value is a function, the return value of the function is used as the default.
 * `select`: boolean, specifies default [projections](https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/) for queries
-* `validate`: function, adds a [validator function](./validation.html#built-in-validators) for this property
+* `validate`: function, adds a [validator function](validation.html#built-in-validators) for this property
 * `get`: function, defines a custom getter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
 * `set`: function, defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
-* `alias`: string, mongoose >= 4.10.0 only. Defines a [virtual](./guide.html#virtuals) with the given name that gets/sets this path.
+* `alias`: string, mongoose >= 4.10.0 only. Defines a [virtual](guide.html#virtuals) with the given name that gets/sets this path.
 * `immutable`: boolean, defines path as immutable. Mongoose prevents you from changing immutable paths unless the parent document has `isNew: true`.
 * `transform`: function, Mongoose calls this function when you call [`Document#toJSON()`](api/document.html#document_Document-toJSON) function, including when you [`JSON.stringify()`](https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript) a document.
 
@@ -257,23 +257,23 @@ const schema2 = new Schema({
 * `lowercase`: boolean, whether to always call `.toLowerCase()` on the value
 * `uppercase`: boolean, whether to always call `.toUpperCase()` on the value
 * `trim`: boolean, whether to always call [`.trim()`](https://masteringjs.io/tutorials/fundamentals/trim-string) on the value
-* `match`: RegExp, creates a [validator](./validation.html) that checks if the value matches the given regular expression
-* `enum`: Array, creates a [validator](./validation.html) that checks if the value is in the given array.
-* `minLength`: Number, creates a [validator](./validation.html) that checks if the value length is not less than the given number
-* `maxLength`: Number, creates a [validator](./validation.html) that checks if the value length is not greater than the given number
+* `match`: RegExp, creates a [validator](validation.html) that checks if the value matches the given regular expression
+* `enum`: Array, creates a [validator](validation.html) that checks if the value is in the given array.
+* `minLength`: Number, creates a [validator](validation.html) that checks if the value length is not less than the given number
+* `maxLength`: Number, creates a [validator](validation.html) that checks if the value length is not greater than the given number
 * `populate`: Object, sets default [populate options](populate.html#query-conditions)
 
 <h5 id="number-validators">Number</h5>
 
-* `min`: Number, creates a [validator](./validation.html) that checks if the value is greater than or equal to the given minimum.
-* `max`: Number, creates a [validator](./validation.html) that checks if the value is less than or equal to the given maximum.
-* `enum`: Array, creates a [validator](./validation.html) that checks if the value is strictly equal to one of the values in the given array.
+* `min`: Number, creates a [validator](validation.html) that checks if the value is greater than or equal to the given minimum.
+* `max`: Number, creates a [validator](validation.html) that checks if the value is less than or equal to the given maximum.
+* `enum`: Array, creates a [validator](validation.html) that checks if the value is strictly equal to one of the values in the given array.
 * `populate`: Object, sets default [populate options](populate.html#query-conditions)
 
 <h5>Date</h5>
 
-* `min`: Date, creates a [validator](./validation.html) that checks if the value is greater than or equal to the given minimum.
-* `max`: Date, creates a [validator](./validation.html) that checks if the value is less than or equal to the given maximum.
+* `min`: Date, creates a [validator](validation.html) that checks if the value is greater than or equal to the given minimum.
+* `max`: Date, creates a [validator](validation.html) that checks if the value is less than or equal to the given maximum.
 * `expires`: Number or String, creates a TTL index with the value expressed in seconds.
 
 <h5>ObjectId</h5>
@@ -388,7 +388,7 @@ like, but Mongoose loses the ability to auto detect and save those changes.
 To tell Mongoose that the value of a Mixed type has changed, you need to
 call `doc.markModified(path)`, passing the path to the Mixed type you just changed.
 
-To avoid these side-effects, a [Subdocument](./subdocs.html) path may be used
+To avoid these side-effects, a [Subdocument](subdocs.html) path may be used
 instead.
 
 ```javascript
@@ -460,8 +460,8 @@ console.log(new M({ b: 'nay' }).b); // false
 
 <h4 id="arrays">Arrays</h4>
 
-Mongoose supports arrays of [SchemaTypes](./api/schema.html#schema_Schema-Types)
-and arrays of [subdocuments](./subdocs.html). Arrays of SchemaTypes are
+Mongoose supports arrays of [SchemaTypes](api/schema.html#schema_Schema-Types)
+and arrays of [subdocuments](subdocs.html). Arrays of SchemaTypes are
 also called _primitive arrays_, and arrays of subdocuments are also called
 _document arrays_.
 
@@ -656,7 +656,7 @@ schema.path('arr.0.url').get(v => `${root}${v}`);
 
 <h3 id="schemas"><a href="#schemas">Schemas</a></h3>
 
-To declare a path as another [schema](./guide.html#definition),
+To declare a path as another [schema](guide.html#definition),
 set `type` to the sub-schema's instance.
 
 To set a default value based on the sub-schema's shape, simply set a default value,

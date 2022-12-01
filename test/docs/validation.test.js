@@ -501,20 +501,24 @@ describe('validation docs', function() {
     toySchema.path('color').validate(function(value) {
       // When running in `validate()` or `validateSync()`, the
       // validator can access the document using `this`.
-      // Does **not** work with update validators.
-      if (this.name.toLowerCase().indexOf('red') !== -1) {
-        return value !== 'red';
+      // When running with update validators, `this` is the Query,
+      // **not** the document being updated!
+      // Queries have a `get()` method that lets you get the
+      // updated value.
+      if (this.get('name') && this.get('name').toLowerCase().indexOf('red') !== -1) {
+        return value === 'red';
       }
       return true;
     });
 
     const Toy = db.model('ActionFigure', toySchema);
 
-    const toy = new Toy({ color: 'red', name: 'Red Power Ranger' });
+    const toy = new Toy({ color: 'green', name: 'Red Power Ranger' });
+    // Validation failed: color: Validator failed for path `color` with value `green`
     let error = toy.validateSync();
     assert.ok(error.errors['color']);
 
-    const update = { color: 'red', name: 'Red Power Ranger' };
+    const update = { color: 'green', name: 'Red Power Ranger' };
     const opts = { runValidators: true };
 
     error = null;
@@ -523,10 +527,7 @@ describe('validation docs', function() {
     } catch (err) {
       error = err;
     }
-    // The update validator throws an error:
-    // "TypeError: Cannot read property 'toLowerCase' of undefined",
-    // because `this` is **not** the document being updated when using
-    // update validators
+    // Validation failed: color: Validator failed for path `color` with value `green`
     assert.ok(error);
   });
 

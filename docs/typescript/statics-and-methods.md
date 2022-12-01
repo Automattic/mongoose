@@ -112,7 +112,7 @@ const schema = new Schema<IUser, UserModel, IUserMethods>({
 });
 schema.static('createWithFullName', function createWithFullName(name: string) {
   const [firstName, lastName] = name.split(' ');
-  return User.create({ firstName, lastName });
+  return this.create({ firstName, lastName });
 });
 schema.method('fullName', function fullName(): string {
   return this.firstName + ' ' + this.lastName;

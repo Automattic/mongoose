@@ -1,6 +1,6 @@
 ## Queries
 
-Mongoose [models](./models.html) provide several static helper functions
+Mongoose [models](models.html) provide several static helper functions
 for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
 Each of these functions returns a
 [mongoose `Query` object](query.html#Query).
@@ -55,7 +55,9 @@ Mongoose executed the query and passed the results to `callback`. All callbacks 
 `callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result`
 will be null. If the query is successful, the `error` parameter will be null, and the `result` will be populated with the results of the query.
 
-Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern `callback(error, results)`. What `results` is depends on the operation: For `findOne()` it is a [potentially-null single document](./api/model.html#model_Model-findOne), `find()` a [list of documents](./api/model.html#model_Model-find), `count()` [the number of documents](./api/model.html#model_Model-count), `update()` the [number of documents affected](./api/model.html#model_Model-update), etc. The [API docs for Models](./api/model-js.html#model-js) provide more detail on what is passed to the callbacks.
+Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern `callback(error, results)`.
+What `results` is depends on the operation: For `findOne()` it is a [potentially-null single document](api/model.html#model_Model-findOne), `find()` a [list of documents](api/model.html#model_Model-find), `count()` [the number of documents](api/model.html#model_Model-count), `update()` the [number of documents affected](api/model.html#model_Model-update), etc.
+The [API docs for Models](api/model-js.html#model-js) provide more detail on what is passed to the callbacks.
 
 Now let's look at what happens when no `callback` is passed:
 
@@ -75,7 +77,7 @@ query.exec(function (err, person) {
 });
 ```
 
-In the above code, the `query` variable is of type [Query](./api/query-js.html#query-js).
+In the above code, the `query` variable is of type [Query](api/query-js.html#query-js).
 A `Query` enables you to build up a query using chaining syntax, rather than specifying a JSON object.
 The below 2 examples are equivalent.
 
@@ -105,7 +107,7 @@ Person.
   exec(callback);
 ```
 
-A full list of [Query helper functions can be found in the API docs](./api/query-js.html#query-js).
+A full list of [Query helper functions can be found in the API docs](api/query-js.html#query-js).
 
 <h3 id="queries-are-not-promises">
   <a href="#queries-are-not-promises">
@@ -156,16 +158,15 @@ await BlogPost.updateOne({ title: 'Introduction to Promises' }, update, (err, re
 <h3 id="refs"><a href="#refs">References to other documents</a></h3>
 
 There are no joins in MongoDB but sometimes we still want references to
-documents in other collections. This is where [population](./populate.html)
+documents in other collections. This is where [population](populate.html)
 comes in. Read more about how to include documents from other collections in
-your query results [here](./api/query.html#query_Query-populate).
+your query results [here](api/query.html#query_Query-populate).
 
 <h3 id="streaming"><a href="#streaming">Streaming</a></h3>
 
 You can [stream](http://nodejs.org/api/stream.html) query results from
 MongoDB. You need to call the
-[Query#cursor()](./api/query.html#query_Query-cursor) function to return an instance of
-[QueryCursor](./api/query.html#query_Query-cursor).
+[Query#cursor()](api/query.html#query_Query-cursor) function to return an instance of [QueryCursor](api/query.html#query_Query-cursor).
 
 ```javascript
 const cursor = Person.find({ occupation: /host/ }).cursor();

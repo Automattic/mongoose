@@ -1,12 +1,13 @@
 # Query Casting
 
-The first parameter to [`Model.find()`](https://mongoosejs.com/docs/api/model.html#model_Model-find), [`Query#find()`](https://mongoosejs.com/docs/api/query.html#query_Query-find), [`Model.findOne()`](https://mongoosejs.com/docs/api/model.html#model_Model-findOne), etc. is called `filter`. In older content this parameter is sometimes called `query` or `conditions`. For example:
+The first parameter to [`Model.find()`](../api/model.html#model_Model-find), [`Query#find()`](../api/query.html#query_Query-find), [`Model.findOne()`](../api/model.html#model_Model-findOne), etc. is called `filter`.
+In older content this parameter is sometimes called `query` or `conditions`. For example:
 
 ```javascript
 [require:Cast Tutorial.*get and set]
 ```
 
-When you execute the query using [`Query#exec()`](https://mongoosejs.com/docs/api/query.html#query_Query-exec) or [`Query#then()`](https://mongoosejs.com/docs/api/query.html#query_Query-then), Mongoose _casts_ the filter to match your schema.
+When you execute the query using [`Query#exec()`](../api/query.html#query_Query-exec) or [`Query#then()`](../api/query.html#query_Query-then), Mongoose _casts_ the filter to match your schema.
 
 ```javascript
 [require:Cast Tutorial.*cast values]
@@ -27,7 +28,7 @@ By default, Mongoose does **not** cast filter properties that aren't in your sch
 [require:Cast Tutorial.*not in schema]
 ```
 
-You can configure this behavior using the [`strictQuery` option for schemas](https://mongoosejs.com/docs/guide.html#strictQuery). This option is analogous to the [`strict` option](https://mongoosejs.com/docs/guide.html#strict). Setting `strictQuery` to `true` removes non-schema properties from the filter:
+You can configure this behavior using the [`strictQuery` option for schemas](../guide.html#strictQuery). This option is analogous to the [`strict` option](../guide.html#strict). Setting `strictQuery` to `true` removes non-schema properties from the filter:
 
 ```javascript
 [require:Cast Tutorial.*strictQuery true]

@@ -161,29 +161,30 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends TypeKeyBaseType = DefaultTypeKey> =
   PathValueType extends Schema ? InferSchemaType<PathValueType> :
     PathValueType extends (infer Item)[] ? IfEquals<Item, never, any[], Item extends Schema ? Types.DocumentArray<ObtainDocumentPathType<Item, TypeKey>> : ObtainDocumentPathType<Item, TypeKey>[]> :
-      PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
-        IfEquals<PathValueType, Schema.Types.String> extends true ? PathEnumOrString<Options['enum']> :
-          IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']> :
-            PathValueType extends NumberSchemaDefinition ? Options['enum'] extends ReadonlyArray<any> ? Options['enum'][number] : number :
-              IfEquals<PathValueType, Schema.Types.Number> extends true ? number :
-                PathValueType extends DateSchemaDefinition ? Date :
-                  IfEquals<PathValueType, Schema.Types.Date> extends true ? Date :
-                    PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
-                      PathValueType extends BooleanSchemaDefinition ? boolean :
-                        IfEquals<PathValueType, Schema.Types.Boolean> extends true ? boolean :
-                          PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId :
-                            IfEquals<PathValueType, Types.ObjectId> extends true ? Types.ObjectId :
-                              IfEquals<PathValueType, Schema.Types.ObjectId> extends true ? Types.ObjectId :
-                                PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
-                                  IfEquals<PathValueType, Schema.Types.Decimal128> extends true ? Types.Decimal128 :
-                                    IfEquals<PathValueType, Types.Decimal128> extends true ? Types.Decimal128 :
-                                      PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
-                                        IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
-                                          PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
-                                            PathValueType extends ArrayConstructor ? any[] :
-                                              PathValueType extends typeof Schema.Types.Mixed ? any:
-                                                IfEquals<PathValueType, ObjectConstructor> extends true ? any:
-                                                  IfEquals<PathValueType, {}> extends true ? any:
-                                                    PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                      PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, TypeKey> :
-                                                        unknown;
+      PathValueType extends ReadonlyArray<infer Item> ? IfEquals<Item, never, any[], Item extends Schema ? Types.DocumentArray<ObtainDocumentPathType<Item, TypeKey>> : ObtainDocumentPathType<Item, TypeKey>[]> :
+        PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
+          IfEquals<PathValueType, Schema.Types.String> extends true ? PathEnumOrString<Options['enum']> :
+            IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']> :
+              PathValueType extends NumberSchemaDefinition ? Options['enum'] extends ReadonlyArray<any> ? Options['enum'][number] : number :
+                IfEquals<PathValueType, Schema.Types.Number> extends true ? number :
+                  PathValueType extends DateSchemaDefinition ? Date :
+                    IfEquals<PathValueType, Schema.Types.Date> extends true ? Date :
+                      PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
+                        PathValueType extends BooleanSchemaDefinition ? boolean :
+                          IfEquals<PathValueType, Schema.Types.Boolean> extends true ? boolean :
+                            PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId :
+                              IfEquals<PathValueType, Types.ObjectId> extends true ? Types.ObjectId :
+                                IfEquals<PathValueType, Schema.Types.ObjectId> extends true ? Types.ObjectId :
+                                  PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
+                                    IfEquals<PathValueType, Schema.Types.Decimal128> extends true ? Types.Decimal128 :
+                                      IfEquals<PathValueType, Types.Decimal128> extends true ? Types.Decimal128 :
+                                        PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
+                                          IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
+                                            PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
+                                              PathValueType extends ArrayConstructor ? any[] :
+                                                PathValueType extends typeof Schema.Types.Mixed ? any:
+                                                  IfEquals<PathValueType, ObjectConstructor> extends true ? any:
+                                                    IfEquals<PathValueType, {}> extends true ? any:
+                                                      PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+                                                        PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, TypeKey> :
+                                                          unknown;

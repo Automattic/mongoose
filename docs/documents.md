@@ -15,9 +15,9 @@ to documents as stored in MongoDB. Each document is an instance of its
 
 <h2 id="documents-vs-models"><a href="#documents-vs-models">Documents vs Models</a></h2>
 
-[Document](api.html#Document) and [Model](api.html#Model) are distinct
+[Document](api/document.html#Document) and [Model](api/model.html#Model) are distinct
 classes in Mongoose. The Model class is a subclass of the Document class.
-When you use the [Model constructor](api.html#Model), you create a
+When you use the [Model constructor](api/model.html#Model), you create a
 new document.
 
 ```javascript
@@ -35,7 +35,7 @@ going through a model.
 
 <h2 id="retrieving"><a href="#retrieving">Retrieving</a></h2>
 
-When you load documents from MongoDB using model functions like [`findOne()`](api.html#model_Model-findOne),
+When you load documents from MongoDB using model functions like [`findOne()`](api/model.html#model_Model-findOne),
 you get a Mongoose document back.
 
 ```javascript
@@ -83,7 +83,7 @@ await doc.save(); // Throws DocumentNotFoundError
 
 <h2 id="updating-using-queries"><a href="#updating-using-queries">Updating Using Queries</a></h2>
 
-The [`save()`](api.html#model_Model-save) function is generally the right
+The [`save()`](api/model.html#model_Model-save) function is generally the right
 way to update a document with Mongoose. With `save()`, you get full
 [validation](validation.html) and [middleware](middleware.html).
 
@@ -104,7 +104,7 @@ first query for the document and then `save()` it._
 
 Documents are casted and validated before they are saved. Mongoose first casts
 values to the specified type and then validates them. Internally, Mongoose
-calls the document's [`validate()` method](api.html#document_Document-validate)
+calls the document's [`validate()` method](api/document.html#document_Document-validate)
 before saving.
 
 ```javascript

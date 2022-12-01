@@ -60,7 +60,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 
     // you can chain them together as well
     // a full list of methods can be found:
-    // http://mongoosejs.com/docs/api.html#query-js
+    // http://mongoosejs.com/docs/api/query.html
     query.where('age').gt(21);
 
     // finally, when ready to execute the query, call the exec() function

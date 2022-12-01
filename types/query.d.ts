@@ -650,7 +650,7 @@ declare module 'mongoose' {
     within(val?: any): this;
 
     /**
-     * If [`w > 1`](/docs/api.html#query_Query-w), the maximum amount of time to
+     * If [`w > 1`](/docs/api/query.html#query_Query-w), the maximum amount of time to
      * wait for this write to propagate through the replica set before this
      * operation fails. The default is `0`, which means no timeout.
      */

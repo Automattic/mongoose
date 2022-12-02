@@ -10,7 +10,7 @@ declare module 'mongoose' {
   type TypeKeyBaseType = string;
 
   type DefaultTypeKey = 'type';
-  interface SchemaOptions<PathTypeKey extends TypeKeyBaseType = DefaultTypeKey, DocType = unknown, TInstanceMethods = {}, QueryHelpers = {}, TStaticMethods = {}, TVirtuals = {}> {
+  interface SchemaOptions<DocType = unknown, TInstanceMethods = {}, QueryHelpers = {}, TStaticMethods = {}, TVirtuals = {}> {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
      * calling Model.createIndexes() after you successfully connect to MongoDB. If you want to disable
@@ -139,7 +139,7 @@ declare module 'mongoose' {
      * type declaration. However, for applications like geoJSON, the 'type' property is important. If you want to
      * control which key mongoose uses to find type declarations, set the 'typeKey' schema option.
      */
-    typeKey?: PathTypeKey;
+    typeKey?: string;
 
     /**
      * By default, documents are automatically validated before they are saved to the database. This is to
@@ -213,5 +213,13 @@ declare module 'mongoose' {
      * Virtual paths.
      */
     virtuals?: SchemaOptionsVirtualsPropertyType<DocType, TVirtuals, TInstanceMethods>,
+  }
+
+  interface DefaultSchemaOptions {
+    typeKey: 'type';
+    id: true;
+    _id: true;
+    timestamps: false;
+    versionKey: '__v'
   }
 }

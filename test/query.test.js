@@ -2339,6 +2339,13 @@ describe('Query', function() {
       });
 
       it('throw on sync exceptions in callbacks (gh-6178)', function(done) {
+        // Deno doesn't support 'uncaughtException', so there's no way to test this in Deno
+        // without starting a separate process.
+        // See: https://stackoverflow.com/questions/64871554/deno-how-to-handle-exceptions
+        if (typeof Deno !== 'undefined') {
+          return this.skip();
+        }
+
         const schema = new Schema({});
         const Test = db.model('Test', schema);
 
@@ -3468,11 +3475,11 @@ describe('Query', function() {
   });
 
   it('query with top-level _bsontype (gh-8222) (gh-8268)', async function() {
-    const userSchema = Schema({ token: String });
+    const userSchema = Schema({ token: String }, { strictQuery: true });
     const User = db.model('Test', userSchema);
 
-
     const original = await User.create({ token: 'rightToken' });
+
     let doc = await User.findOne({ token: 'wrongToken', _bsontype: 'a' });
     assert.ok(!doc);
 

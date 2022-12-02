@@ -1178,6 +1178,11 @@ describe('schema', function() {
 
   describe('other contexts', function() {
     it('work', function(done) {
+      if (typeof Deno !== 'undefined') {
+        // Deno throws "Not implemented: Script.prototype.runInNewContext"
+        return this.skip();
+      }
+
       const str = 'code = {' +
         '  name: String' +
         ', arr1: Array ' +
@@ -2404,6 +2409,16 @@ describe('schema', function() {
     assert.equal(TurboManSchema.path('color').instance, 'String');
     assert.equal(TurboManSchema.path('price').instance, 'Number');
     assert.equal(TurboManSchema.path('year').instance, 'Number');
+  });
+
+  it('copies indexes when calling add() with schema instance (gh-12654)', function() {
+    const ToySchema = Schema({ name: String });
+    ToySchema.index({ name: 1 });
+
+    const TurboManSchema = Schema();
+    TurboManSchema.add(ToySchema);
+
+    assert.deepStrictEqual(TurboManSchema.indexes(), [[{ name: 1 }, { background: true }]]);
   });
 
   describe('gh-8849', function() {

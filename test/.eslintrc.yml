@@ -3,3 +3,5 @@ env:
 rules:
   # In `document.test.js` we sometimes use self assignment to test setters
   no-self-assign: off
+ignorePatterns:
+  - deno.js

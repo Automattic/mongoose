@@ -4,18 +4,18 @@ declare module 'mongoose' {
   type MongooseQueryMiddleware = 'count' | 'estimatedDocumentCount' | 'countDocuments' | 'deleteMany' | 'deleteOne' | 'distinct' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndReplace' | 'findOneAndUpdate' | 'remove' | 'replaceOne' | 'update' | 'updateOne' | 'updateMany';
 
   type MiddlewareOptions = {
-    /** 
+    /**
       * Enable this Hook for the Document Methods
       * @default true
       */
     document?: boolean,
-    /** 
+    /**
       * Enable this Hook for the Query Methods
       * @default true
       */
     query?: boolean,
-    /** 
-      * Explicitly set this function to be a Error handler instead of based on how many arguments are used 
+    /**
+      * Explicitly set this function to be a Error handler instead of based on how many arguments are used
       * @default false
       */
     errorHandler?: boolean

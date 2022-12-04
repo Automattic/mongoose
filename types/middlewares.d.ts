@@ -1,10 +1,16 @@
 declare module 'mongoose' {
 
+  type MongooseQueryAndDocumentMiddleware = 'remove' | 'updateOne' | 'deleteOne';
+
   type MongooseDistinctDocumentMiddleware = 'validate' | 'save' | 'init';
-  type MongooseDocumentMiddleware = MongooseDistinctDocumentMiddleware | 'remove' | 'updateOne' | 'deleteOne';
+  type MongooseDefaultDocumentMiddleware = MongooseDistinctDocumentMiddleware | 'remove';
+  type MongooseDocumentMiddleware = MongooseDistinctDocumentMiddleware | MongooseQueryAndDocumentMiddleware;
+
   type MongooseDistinctQueryMiddleware = 'count' | 'estimatedDocumentCount' | 'countDocuments' | 'deleteMany' | 'distinct' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndReplace' | 'findOneAndUpdate' | 'replaceOne' | 'update' | 'updateMany';
-  type MongooseQueryMiddleware = MongooseDistinctQueryMiddleware | 'remove' | 'updateOne' | 'deleteOne';
-  type MongooseQueryOrDocumentMiddleware = MongooseQueryMiddleware| MongooseDocumentMiddleware;
+  type MongooseDefaultQueryMiddleware = MongooseDistinctQueryMiddleware | 'updateOne' | 'deleteOne';
+  type MongooseQueryMiddleware = MongooseDistinctQueryMiddleware | MongooseQueryAndDocumentMiddleware;
+
+  type MongooseQueryOrDocumentMiddleware = MongooseDistinctQueryMiddleware|MongooseDistinctDocumentMiddleware|MongooseQueryAndDocumentMiddleware;
 
   type MiddlewareOptions = { document?: boolean, query?: boolean };
   type SchemaPreOptions = MiddlewareOptions;

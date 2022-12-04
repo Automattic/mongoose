@@ -280,51 +280,63 @@ declare module 'mongoose' {
     plugin<PFunc extends PluginFunction<DocType, M, any, any, any, any>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
 
     /** Defines a post hook for the model. */
-    post<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
-    post<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
-    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, T>): this;
-    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
+    // PostMiddlewareFunction
+    // this = Document
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDefaultDocumentMiddleware|MongooseDefaultDocumentMiddleware[], fn: PostMiddlewareFunction<T, T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: true, query: false }, fn: PostMiddlewareFunction<T, T>): this;
+    // this = Query
+    post<T = Query<any, any>>(method: MongooseDefaultQueryMiddleware|MongooseDefaultQueryMiddleware[], fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
+    post<T = Query<any, any>>(method: MongooseDistinctQueryMiddleware|MongooseDistinctQueryMiddleware[], options: SchemaPostOptions, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
+    post<T = Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: false, query: true }, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
+    // this = Union of Document and Query, could be called with any of them
+    post<T = HydratedDocument<DocType, TInstanceMethods>|Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: true, query: true }, fn: PostMiddlewareFunction<T, T|QueryResultType<T>>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>|Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, T|QueryResultType<T>>): this;
+    // this = never since it never happens
+    post<T = never>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: false, query: false }, fn: PostMiddlewareFunction<never, never>): this;
+    // ErrorHandlingMiddlewareFunction
+    // this = Document
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDefaultDocumentMiddleware|MongooseDefaultDocumentMiddleware[], fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: true, query: false }, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    // this = Query
+    post<T = Query<any, any>>(method: MongooseDefaultQueryMiddleware|MongooseDefaultQueryMiddleware[], fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = Query<any, any>>(method: MongooseDistinctQueryMiddleware|MongooseDistinctQueryMiddleware[], options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: false, query: true }, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    // this = Union of Document and Query, could be called with any of them
+    post<T = HydratedDocument<DocType, TInstanceMethods>|Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: true, query: true }, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>|Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    // this = never since it never happens
+    post<T = never>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: false, query: false }, fn: ErrorHandlingMiddlewareFunction<T>): this;
+
+    // method aggregate and insertMany with PostMiddlewareFunction
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PostMiddlewareFunction<T, Array<AggregateExtract<T>>>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, Array<AggregateExtract<T>>>): this;
     post<T = M>(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<T, T>): this;
     post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
-
-    post<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
-    post<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
-    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
-    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    // method aggregate and insertMany with ErrorHandlingMiddlewareFunction
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
     post<T = M>(method: 'insertMany' | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
 
     /** Defines a pre hook for the model. */
-    /* Specific case for save with PreSaveMiddlewareFunction */
+    // this = Document
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
-    /* Specific case for save with PreSaveMiddlewareFunction */
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', options: SchemaPreOptions, fn: PreSaveMiddlewareFunction<T>): this;
-
-    /* Distinct document middleware methods, options not specified. */
-    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], fn: PreMiddlewareFunction<T>): this;
-    /* Distinct document middleware methods, options specified, this will always refer to the Document since the other case cannot happen. */
+    pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDefaultDocumentMiddleware|MongooseDefaultDocumentMiddleware[], fn: PreMiddlewareFunction<T>): this;
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
-    /* Distinct query middleware method, no option specified: this is set to the query. */
-    pre<T = Query<any, any>>(method: MongooseDistinctQueryMiddleware|MongooseDistinctQueryMiddleware[], fn: PreMiddlewareFunction<T>): this;
-    /* Distinct query middleware method, options specified, this will always refer to Query since the other case cannot happen. */
-    pre<T = Query<any, any>>(method: MongooseDistinctQueryMiddleware|MongooseDistinctQueryMiddleware[], options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
-
-    /* Query or document middleware method, option defines hook for document only: this refers to document */
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: true, query: false }, fn: PreMiddlewareFunction<T>): this;
-    /* Query or document middleware method, option defines hook for query only: this refers to query */
+    // this = Query
+    pre<T = Query<any, any>>(method: MongooseDefaultQueryMiddleware|MongooseDefaultQueryMiddleware[], fn: PreMiddlewareFunction<T>): this;
+    pre<T = Query<any, any>>(method: MongooseDistinctQueryMiddleware|MongooseDistinctQueryMiddleware[], options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T = Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: false, query: true }, fn: PreMiddlewareFunction<T>): this;
-    /* Query or document middleware method, option defines hook for both: this refers to union of document and query */
+    // this = Union of Document and Query, could be called with any of them
     pre<T = HydratedDocument<DocType, TInstanceMethods>|Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: true, query: true }, fn: PreMiddlewareFunction<T>): this;
-    /* Query or document middleware method, option defines hook for neither of them: hook will never be called, this refers to never */
-    pre<T = never>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: false, query: false }, fn: PreMiddlewareFunction<T>): this;
-    /* Query or document middleware method, no option specified: this refers to union of document and query */
     pre<T = HydratedDocument<DocType, TInstanceMethods>|Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
-
-    /* method aggregate */
+    // this = never since it never happens
+    pre<T = never>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: { document: false, query: false }, fn: PreMiddlewareFunction<T>): this;
+    // method aggregate
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     /* method insertMany */

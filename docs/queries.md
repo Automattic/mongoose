@@ -1,25 +1,25 @@
 ## Queries
 
-Mongoose [models](./models.html) provide several static helper functions
+Mongoose [models](models.html) provide several static helper functions
 for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
 Each of these functions returns a
-[mongoose `Query` object](http://mongoosejs.com/docs/api.html#Query).
+[mongoose `Query` object](api.html#Query).
 
-- [`Model.deleteMany()`](/docs/api.html#model_Model-deleteMany)
-- [`Model.deleteOne()`](/docs/api.html#model_Model-deleteOne)
-- [`Model.find()`](/docs/api.html#model_Model-find)
-- [`Model.findById()`](/docs/api.html#model_Model-findById)
-- [`Model.findByIdAndDelete()`](/docs/api.html#model_Model-findByIdAndDelete)
-- [`Model.findByIdAndRemove()`](/docs/api.html#model_Model-findByIdAndRemove)
-- [`Model.findByIdAndUpdate()`](/docs/api.html#model_Model-findByIdAndUpdate)
-- [`Model.findOne()`](/docs/api.html#model_Model-findOne)
-- [`Model.findOneAndDelete()`](/docs/api.html#model_Model-findOneAndDelete)
-- [`Model.findOneAndRemove()`](/docs/api.html#model_Model-findOneAndRemove)
-- [`Model.findOneAndReplace()`](/docs/api.html#model_Model-findOneAndReplace)
-- [`Model.findOneAndUpdate()`](/docs/api.html#model_Model-findOneAndUpdate)
-- [`Model.replaceOne()`](/docs/api.html#model_Model-replaceOne)
-- [`Model.updateMany()`](/docs/api.html#model_Model-updateMany)
-- [`Model.updateOne()`](/docs/api.html#model_Model-updateOne)
+- [`Model.deleteMany()`](api.html#model_Model-deleteMany)
+- [`Model.deleteOne()`](api.html#model_Model-deleteOne)
+- [`Model.find()`](api.html#model_Model-find)
+- [`Model.findById()`](api.html#model_Model-findById)
+- [`Model.findByIdAndDelete()`](api.html#model_Model-findByIdAndDelete)
+- [`Model.findByIdAndRemove()`](api.html#model_Model-findByIdAndRemove)
+- [`Model.findByIdAndUpdate()`](api.html#model_Model-findByIdAndUpdate)
+- [`Model.findOne()`](api.html#model_Model-findOne)
+- [`Model.findOneAndDelete()`](api.html#model_Model-findOneAndDelete)
+- [`Model.findOneAndRemove()`](api.html#model_Model-findOneAndRemove)
+- [`Model.findOneAndReplace()`](api.html#model_Model-findOneAndReplace)
+- [`Model.findOneAndUpdate()`](api.html#model_Model-findOneAndUpdate)
+- [`Model.replaceOne()`](api.html#model_Model-replaceOne)
+- [`Model.updateMany()`](api.html#model_Model-updateMany)
+- [`Model.updateOne()`](api.html#model_Model-updateOne)
 
 A mongoose query can be executed in one of two ways. First, if you
 pass in a `callback` function, Mongoose will execute the query asynchronously
@@ -55,7 +55,7 @@ Mongoose executed the query and passed the results to `callback`. All callbacks 
 `callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result`
 will be null. If the query is successful, the `error` parameter will be null, and the `result` will be populated with the results of the query.
 
-Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern `callback(error, results)`. What `results` is depends on the operation: For `findOne()` it is a [potentially-null single document](./api.html#model_Model-findOne), `find()` a [list of documents](./api.html#model_Model-find), `count()` [the number of documents](./api.html#model_Model-count), `update()` the [number of documents affected](./api.html#model_Model-update), etc. The [API docs for Models](./api.html#model-js) provide more detail on what is passed to the callbacks.
+Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern `callback(error, results)`. What `results` is depends on the operation: For `findOne()` it is a [potentially-null single document](api.html#model_Model-findOne), `find()` a [list of documents](api.html#model_Model-find), `count()` [the number of documents](api.html#model_Model-count), `update()` the [number of documents affected](api.html#model_Model-update), etc. The [API docs for Models](api.html#model-js) provide more detail on what is passed to the callbacks.
 
 Now let's look at what happens when no `callback` is passed:
 
@@ -75,7 +75,7 @@ query.exec(function (err, person) {
 });
 ```
 
-In the above code, the `query` variable is of type [Query](./api.html#query-js).
+In the above code, the `query` variable is of type [Query](api.html#query-js).
 A `Query` enables you to build up a query using chaining syntax, rather than specifying a JSON object.
 The below 2 examples are equivalent.
 
@@ -105,7 +105,7 @@ Person.
   exec(callback);
 ```
 
-A full list of [Query helper functions can be found in the API docs](./api.html#query-js).
+A full list of [Query helper functions can be found in the API docs](api.html#query-js).
 
 <h3 id="queries-are-not-promises">
   <a href="#queries-are-not-promises">
@@ -156,16 +156,16 @@ await BlogPost.updateOne({ title: 'Introduction to Promises' }, update, (err, re
 <h3 id="refs"><a href="#refs">References to other documents</a></h3>
 
 There are no joins in MongoDB but sometimes we still want references to
-documents in other collections. This is where [population](./populate.html)
+documents in other collections. This is where [population](populate.html)
 comes in. Read more about how to include documents from other collections in
-your query results [here](./api.html#query_Query-populate).
+your query results [here](api.html#query_Query-populate).
 
 <h3 id="streaming"><a href="#streaming">Streaming</a></h3>
 
 You can [stream](http://nodejs.org/api/stream.html) query results from
 MongoDB. You need to call the
-[Query#cursor()](./api.html#query_Query-cursor) function to return an instance of
-[QueryCursor](./api.html#query_Query-cursor).
+[Query#cursor()](api.html#query_Query-cursor) function to return an instance of
+[QueryCursor](api.html#query_Query-cursor).
 
 ```javascript
 const cursor = Person.find({ occupation: /host/ }).cursor();
@@ -200,7 +200,7 @@ of inactivity. You can read more about working around session idle timeouts in t
 
 <h3 id="versus-aggregation"><a href="#versus-aggregation">Versus Aggregation</a></h3>
 
-[Aggregation](https://mongoosejs.com/docs/api.html#aggregate_Aggregate) can
+[Aggregation](api.html#aggregate_Aggregate) can
 do many of the same things that queries can. For example, below is
 how you can use `aggregate()` to find docs where `name.last = 'Ghost'`:
 
@@ -212,7 +212,7 @@ However, just because you can use `aggregate()` doesn't mean you should.
 In general, you should use queries where possible, and only use `aggregate()`
 when you absolutely need to.
 
-Unlike query results, Mongoose does **not** [`hydrate()`](/docs/api/model.html#model_Model-hydrate)
+Unlike query results, Mongoose does **not** [`hydrate()`](api/model.html#model_Model-hydrate)
 aggregation results. Aggregation results are always POJOs, not Mongoose
 documents.
 
@@ -223,7 +223,7 @@ docs[0] instanceof mongoose.Document; // false
 ```
 
 Also, unlike query filters, Mongoose also doesn't
-[cast](/docs/tutorials/query_casting.html) aggregation pipelines. That means
+[cast](tutorials/query_casting.html) aggregation pipelines. That means
 you're responsible for ensuring the values you pass in to an aggregation
 pipeline have the correct type.
 
@@ -242,4 +242,4 @@ const aggRes = await Person.aggregate([{ $match: { _id: idString } }])
 
 <h3 id="next"><a href="#next">Next Up</a></h3>
 
-Now that we've covered `Queries`, let's take a look at [Validation](/docs/validation.html).
+Now that we've covered `Queries`, let's take a look at [Validation](validation.html).

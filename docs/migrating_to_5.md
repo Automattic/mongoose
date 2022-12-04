@@ -465,7 +465,7 @@ In Mongoose 5.x, the above code will correctly overwrite `'baseball'` with `{ $n
 </a></h3>
 
 Mongoose 5.x uses version 3.x of the [MongoDB Node.js driver](http://npmjs.com/package/mongodb). MongoDB driver 3.x changed the format of
-the result of [`bulkWrite()` calls](/docs/api.html#model_Model-bulkWrite) so there is no longer a top-level `nInserted`, `nModified`, etc. property. The new result object structure is [described here](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~BulkWriteOpResult).
+the result of [`bulkWrite()` calls](api.html#model_Model-bulkWrite) so there is no longer a top-level `nInserted`, `nModified`, etc. property. The new result object structure is [described here](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~BulkWriteOpResult).
 
 ```javascript
 const Model = mongoose.model('Test', new Schema({ name: String }));

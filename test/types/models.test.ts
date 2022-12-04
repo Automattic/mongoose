@@ -193,9 +193,7 @@ projectSchema.post('save', function() {
 });
 
 projectSchema.pre('deleteOne', function() {
-  if (this instanceof Query) {
-    this.model;
-  }
+  this.model;
 });
 
 projectSchema.post('deleteOne', function() {

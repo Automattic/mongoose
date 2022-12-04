@@ -62,7 +62,7 @@
     "sinon": "14.0.1",
     "stream-browserify": "3.0.0",
     "ts-benchmark": "^1.1.10",
-    "tsd": "0.24.1",
+    "tsd": "0.25.0",
     "typescript": "4.8.4",
     "uuid": "9.0.0",
     "webpack": "5.74.0"

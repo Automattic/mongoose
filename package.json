@@ -63,7 +63,7 @@
     "stream-browserify": "3.0.0",
     "ts-benchmark": "^1.1.10",
     "tsd": "0.25.0",
-    "typescript": "4.8.4",
+    "typescript": "4.9.3",
     "uuid": "9.0.0",
     "webpack": "5.75.0"
   },

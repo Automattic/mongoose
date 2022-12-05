@@ -127,7 +127,7 @@ a polygon representing the state of Colorado using
 [require:geojson.*driver query]
 ```
 
-Mongoose also has a [`within()` helper](api.html#query_Query-within)
+Mongoose also has a [`within()` helper](query.html#query_Query-within)
 that's a shorthand for `$geoWithin`.
 
 ```javascript

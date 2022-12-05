@@ -3713,7 +3713,7 @@ describe('model: populate:', function() {
       assert.deepEqual(arr, ['Shaq', 'Kobe', 'Horry']);
     });
 
-    it('deep populate array -> array (gh-3954)', function(done) {
+    it('deep populate array -> array (gh-3954)', async function() {
       const personSchema = new Schema({
         name: { type: String }
       });
@@ -3731,59 +3731,45 @@ describe('model: populate:', function() {
       const Team = db.model('Team', teamSchema);
       const Game = db.model('Test', gameSchema);
 
-      const people = [
+      const people = await Person.create([
         { name: 'Shaq' },
         { name: 'Kobe' },
         { name: 'Horry' },
         { name: 'Duncan' },
         { name: 'Robinson' },
         { name: 'Johnson' }
-      ];
+      ]);
 
-      Person.create(people, function(error, people) {
-        assert.ifError(error);
-        const lakers = {
-          name: 'Lakers',
-          members: [people[0]._id, people[1]._id, people[2]._id]
-        };
-        const spurs = {
-          name: 'Spurs',
-          members: [people[3]._id, people[4]._id, people[5]._id]
-        };
-        const teams = [lakers, spurs];
-        Team.create(teams, function(error, teams) {
-          assert.ifError(error);
-          const game = {
-            teams: [teams[0]._id, teams[1]._id]
-          };
-          Game.create(game, function(error, game) {
-            assert.ifError(error);
-            test(game._id);
-          });
-        });
+      const lakers = {
+        name: 'Lakers',
+        members: [people[0]._id, people[1]._id, people[2]._id]
+      };
+      const spurs = {
+        name: 'Spurs',
+        members: [people[3]._id, people[4]._id, people[5]._id]
+      };
+      const teams = await Team.create([lakers, spurs]);
+
+      const game = {
+        teams: [teams[0]._id, teams[1]._id]
+      };
+      const { _id } = await Game.create(game);
+
+      const doc = await Game.findById(_id).populate({
+        path: 'teams',
+        select: 'name members',
+        populate: { path: 'members', select: 'name' }
       });
-
-      function test(id) {
-        const query = Game.findById(id).populate({
-          path: 'teams',
-          select: 'name members',
-          populate: { path: 'members', select: 'name' }
-        });
-        query.exec(function(error, doc) {
-          assert.ifError(error);
-          const players = doc.toObject().teams[0].members.
-            concat(doc.toObject().teams[1].members);
-          const arr = players.map(function(v) {
-            return v.name;
-          });
-          assert.deepEqual(arr,
-            ['Shaq', 'Kobe', 'Horry', 'Duncan', 'Robinson', 'Johnson']);
-          done();
-        });
-      }
+      const players = doc.toObject().teams[0].members.
+        concat(doc.toObject().teams[1].members);
+      const arr = players.map(function(v) {
+        return v.name;
+      });
+      assert.deepEqual(arr,
+        ['Shaq', 'Kobe', 'Horry', 'Duncan', 'Robinson', 'Johnson']);
     });
 
-    it('4 level population (gh-3973)', function(done) {
+    it('4 level population (gh-3973)', async function() {
       const level4Schema = new Schema({
         name: { type: String }
       });
@@ -3809,39 +3795,35 @@ describe('model: populate:', function() {
       const level1 = db.model('Test', level1Schema);
 
       const l4docs = [{ name: 'level 4' }];
+      const l4 = await level4.create(l4docs);
 
-      level4.create(l4docs, function(error, l4) {
-        assert.ifError(error);
-        const l3docs = [{ name: 'level 3', level4: l4[0]._id }];
-        level3.create(l3docs, function(error, l3) {
-          assert.ifError(error);
-          const l2docs = [{ name: 'level 2', level3: l3[0]._id }];
-          level2.create(l2docs, function(error, l2) {
-            assert.ifError(error);
-            const l1docs = [{ name: 'level 1', level2: l2[0]._id }];
-            level1.create(l1docs, function(error, l1) {
-              assert.ifError(error);
-              const opts = {
-                path: 'level2',
-                populate: {
-                  path: 'level3',
-                  populate: {
-                    path: 'level4'
-                  }
-                }
-              };
-              level1.findById(l1[0]._id).populate(opts).exec(function(error, obj) {
-                assert.ifError(error);
-                assert.equal(obj.level2[0].level3[0].level4[0].name, 'level 4');
-                done();
-              });
-            });
-          });
-        });
+      const l3docs = [{ name: 'level 3', level4: l4[0]._id }];
+      const l3 = await level3.create(l3docs).catch(err => {
+        console.log(err);
+        throw err;
       });
+
+      const l2docs = [{ name: 'level 2', level3: l3[0]._id }];
+      const l2 = await level2.create(l2docs);
+
+      const l1docs = [{ name: 'level 1', level2: l2[0]._id }];
+      const l1 = await level1.create(l1docs);
+
+      const opts = {
+        path: 'level2',
+        populate: {
+          path: 'level3',
+          populate: {
+            path: 'level4'
+          }
+        }
+      };
+
+      const obj = await level1.findById(l1[0]._id).populate(opts).exec();
+      assert.equal(obj.level2[0].level3[0].level4[0].name, 'level 4');
     });
 
-    it('deep populate two paths (gh-3974)', function(done) {
+    it('deep populate two paths (gh-3974)', async function() {
       const level3Schema = new Schema({
         name: { type: String }
       });
@@ -3861,42 +3843,34 @@ describe('model: populate:', function() {
       const level2 = db.model('Test1', level2Schema);
       const level1 = db.model('Test2', level1Schema);
 
-      const l3 = [
+      let l3 = [
         { name: 'level 3/1' },
         { name: 'level 3/2' }
       ];
-      level3.create(l3, function(error, l3) {
-        assert.ifError(error);
-        const l2 = [
-          { name: 'level 2', level31: l3[0]._id, level32: l3[1]._id }
-        ];
-        level2.create(l2, function(error, l2) {
-          assert.ifError(error);
-          const l1 = [{ name: 'level 1', level2: l2[0]._id }];
-          level1.create(l1, function(error, l1) {
-            assert.ifError(error);
-            level1.findById(l1[0]._id).
-              populate({
-                path: 'level2',
-                populate: [{
-                  path: 'level31'
-                }]
-              }).
-              populate({
-                path: 'level2',
-                populate: [{
-                  path: 'level32'
-                }]
-              }).
-              exec(function(error, obj) {
-                assert.ifError(error);
-                assert.equal(obj.level2[0].level31[0].name, 'level 3/1');
-                assert.equal(obj.level2[0].level32[0].name, 'level 3/2');
-                done();
-              });
-          });
+      l3 = await level3.create(l3);
+
+      const l2 = await level2.create([
+        { name: 'level 2', level31: l3[0]._id, level32: l3[1]._id }
+      ]);
+
+      const l1 = await level1.create([{ name: 'level 1', level2: l2[0]._id }]);
+
+      const obj = await level1.findById(l1[0]._id).
+        populate({
+          path: 'level2',
+          populate: [{
+            path: 'level31'
+          }]
+        }).
+        populate({
+          path: 'level2',
+          populate: [{
+            path: 'level32'
+          }]
         });
-      });
+
+      assert.equal(obj.level2[0].level31[0].name, 'level 3/1');
+      assert.equal(obj.level2[0].level32[0].name, 'level 3/2');
     });
 
     it('out-of-order discriminators (gh-4073)', function() {
@@ -10827,6 +10801,90 @@ describe('model: populate:', function() {
         then(() => null, err => err);
       assert.ok(err);
       assert.ok(err.message.includes('strictPopulate'), err.message);
+    });
+
+    it('allows overwriting localField and foreignField when populating a virtual gh-6963', async function() {
+      const testSchema = Schema({ name: String, uuid: 'ObjectId' }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
+      const userSchema = Schema({ name: String, field: { type: mongoose.Schema.Types.ObjectId, ref: 'gh6963' }, change: { type: mongoose.Schema.Types.ObjectId, ref: 'gh6963' } });
+      testSchema.virtual('test', {
+        ref: 'gh6963-2',
+        localField: '_id',
+        foreignField: 'field'
+      });
+
+      const Test = db.model('gh6963', testSchema);
+      const User = db.model('gh6963-2', userSchema);
+
+      const entry = await Test.create({
+        name: 'Test',
+        uuid: mongoose.Types.ObjectId()
+      });
+      const otherEntry = await Test.create({
+        name: 'Other Test',
+        uuid: mongoose.Types.ObjectId()
+      });
+      await User.create({
+        name: 'User',
+        field: entry._id,
+        change: otherEntry._id
+      });
+      const res = await Test.findOne({ _id: otherEntry._id }).populate({ path: 'test', foreignField: 'change' });
+      const other = await Test.findOne({ _id: entry._id }).populate({ path: 'test', foreignField: 'change' });
+      assert.equal(res.test.length, 1);
+      assert.equal(other.test.length, 0);
+      // make sure its not broken
+      const response = await Test.findOne({ _id: entry._id }).populate('test');
+      assert.equal(response.test.length, 1);
+      // =================localField======================
+      const localEntry = await Test.create({
+        name: 'local test',
+        uuid: mongoose.Types.ObjectId()
+      });
+      const otherLocalEntry = await Test.create({
+        name: 'other local test',
+        uuid: mongoose.Types.ObjectId()
+      });
+
+      await User.create({
+        name: 'local user',
+        field: localEntry.uuid,
+        change: otherLocalEntry.uuid
+      });
+
+      const localTest = await Test.
+        findOne({ _id: localEntry._id }).
+        populate({ path: 'test', localField: 'uuid' });
+      assert.equal(localTest.test.length, 1);
+      const otherLocalTest = await Test.
+        findOne({ _id: otherLocalEntry._id }).
+        populate({ path: 'test', localField: 'uuid' });
+      assert.equal(otherLocalTest.test.length, 0);
+      // should be empty because the original local field was _id and we created a doc with uuids
+      const check = await Test.
+        findOne({ _id: localEntry._id }).
+        populate({ path: 'test' });
+      assert.equal(check.test.length, 0);
+      // ============localFieldAndForeignField============
+      const bothEntry = await Test.create({ name: 'Both', uuid: mongoose.Types.ObjectId() });
+      const otherBothEntry = await Test.create({ name: 'Other Both', uuid: mongoose.Types.ObjectId() });
+      await User.create({
+        name: 'both user',
+        field: bothEntry.uuid,
+        change: otherBothEntry.uuid
+      });
+      const bothTest = await Test.
+        findOne({ _id: otherBothEntry._id }).
+        populate({ path: 'test', localField: 'uuid', foreignField: 'change' });
+      assert.equal(bothTest.test.length, 1);
+      const otherBothTest = await Test.
+        findOne({ _id: bothEntry._id }).
+        populate({ path: 'test', localField: 'uuid', foreignField: 'change' });
+      assert.equal(otherBothTest.test.length, 0);
+      const normal = await Test.
+        findOne({ _id: otherBothEntry._id }).
+        populate({ path: 'test' });
+      // should be empty because the original local field was _id and we created a doc with uuids
+      assert.equal(normal.test.length, 0);
     });
   });
 });

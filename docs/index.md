@@ -88,7 +88,7 @@ fluffy.speak(); // "Meow name is fluffy"
 ```
 
 We have talking kittens! But we still haven't saved anything to MongoDB.
-Each document can be saved to the database by calling its [save](api.html#model_Model-save) method. The first argument to the callback will be an error if any occurred.
+Each document can be saved to the database by calling its [save](model.html#model_Model-save) method. The first argument to the callback will be an error if any occurred.
 
 ```javascript
 await fluffy.save();
@@ -115,4 +115,4 @@ with "fluff" and returns the result as an array of kittens to the callback.
 
 ### Congratulations
 
-That's the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the [guide](guide.html), or [API docs](api.html) for more.
+That's the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the [guide](guide.html), or [API docs](api/mongoose.html) for more.

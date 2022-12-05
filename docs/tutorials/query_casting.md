@@ -1,12 +1,13 @@
 # Query Casting
 
-The first parameter to [`Model.find()`](../api.html#model_Model-find), [`Query#find()`](../api.html#query_Query-find), [`Model.findOne()`](../api.html#model_Model-findOne), etc. is called `filter`. In older content this parameter is sometimes called `query` or `conditions`. For example:
+The first parameter to [`Model.find()`](../api/model.html#model_Model-find), [`Query#find()`](../api/query.html#query_Query-find), [`Model.findOne()`](../api/model.html#model_Model-findOne), etc. is called `filter`.
+In older content this parameter is sometimes called `query` or `conditions`. For example:
 
 ```javascript
 [require:Cast Tutorial.*get and set]
 ```
 
-When you execute the query using [`Query#exec()`](../api.html#query_Query-exec) or [`Query#then()`](../api.html#query_Query-then), Mongoose _casts_ the filter to match your schema.
+When you execute the query using [`Query#exec()`](../api/query.html#query_Query-exec) or [`Query#then()`](../api/query.html#query_Query-then), Mongoose _casts_ the filter to match your schema.
 
 ```javascript
 [require:Cast Tutorial.*cast values]

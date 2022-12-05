@@ -28,7 +28,7 @@ deleteMany, or bulkWrite instead.
 ```
 
 To remove this deprecation warning, replace any usage of `remove()` with
-`deleteMany()`, _unless_ you specify the [`single` option to `remove()`](api.html#model_Model-remove). The `single`
+`deleteMany()`, _unless_ you specify the [`single` option to `remove()`](model.html#model_Model-remove). The `single`
 option limited `remove()` to deleting at most one document, so you should
 replace `remove(filter, { single: true })` with `deleteOne(filter)`.
 
@@ -46,9 +46,9 @@ MyModel.deleteOne({ answer: 42 });
 
 <h2 id="update"><a href="#update"><code>update()</code></a></h2>
 
-Like `remove()`, the [`update()` function](api.html#model_Model-update) is deprecated in favor
-of the more explicit [`updateOne()`](api.html#model_Model-updateOne), [`updateMany()`](api.html#model_Model-updateMany), and [`replaceOne()`](api.html#model_Model-replaceOne) functions. You should replace
-`update()` with `updateOne()`, unless you use the [`multi` or `overwrite` options](api.html#model_Model-update).
+Like `remove()`, the [`update()` function](model.html#model_Model-update) is deprecated in favor
+of the more explicit [`updateOne()`](model.html#model_Model-updateOne), [`updateMany()`](model.html#model_Model-updateMany), and [`replaceOne()`](model.html#model_Model-replaceOne) functions. You should replace
+`update()` with `updateOne()`, unless you use the [`multi` or `overwrite` options](model.html#model_Model-update).
 
 ```
 collection.update is deprecated. Use updateOne, updateMany, or bulkWrite

@@ -62,7 +62,7 @@ async function awaitUpdate() {
 }
 ```
 
-Note that the specific fulfillment values of different Mongoose methods vary, and may be affected by configuration. Please refer to the [API documentation](api.html) for information about specific methods.
+Note that the specific fulfillment values of different Mongoose methods vary, and may be affected by configuration. Please refer to the [API documentation](api/mongoose.html.html) for information about specific methods.
 
 ### Async Functions
 
@@ -147,5 +147,5 @@ async function observeQuery() {
 ```
 
 You are most likely to accidentally re-execute queries in this way when mixing callbacks with async/await.
- This is never necessary and should be avoided.
- If you need a Query to return a fully-fledged promise instead of a thenable, you can use [Query#exec()](api/query.html#query_Query-exec).
+This is never necessary and should be avoided.
+If you need a Query to return a fully-fledged promise instead of a [thenable](https://masteringjs.io/tutorials/fundamentals/thenable), you can use [Query#exec()](api/query.html#query_Query-exec).

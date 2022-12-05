@@ -129,8 +129,16 @@ declare module 'mongoose' {
     AcceptsDiscriminator,
     IndexManager,
     SessionStarter {
-    new <DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<T, TMethodsAndOverrides,
-    IfEquals<TVirtuals, {}, ObtainSchemaGeneric<TSchema, 'TVirtuals'>, TVirtuals>> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+    new <DocType = T>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): HydratedDocument<
+    T,
+    TMethodsAndOverrides,
+    IfEquals<
+    TVirtuals,
+    {},
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    TVirtuals
+    >
+    > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[], callback?: Callback<R[]>): Aggregate<Array<R>>;
@@ -264,8 +272,8 @@ declare module 'mongoose' {
      * This function is responsible for building [indexes](https://docs.mongodb.com/manual/indexes/),
      * unless [`autoIndex`](http://mongoosejs.com/docs/guide.html#autoIndex) is turned off.
      * Mongoose calls this function automatically when a model is created using
-     * [`mongoose.model()`](/docs/api.html#mongoose_Mongoose-model) or
-     * [`connection.model()`](/docs/api.html#connection_Connection-model), so you
+     * [`mongoose.model()`](/docs/api/mongoose.html#mongoose_Mongoose-model) or
+     * [`connection.model()`](/docs/api/connection.html#connection_Connection-model), so you
      * don't need to call it.
      */
     init(callback?: CallbackWithoutResult): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;

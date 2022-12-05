@@ -26,7 +26,7 @@ declare module 'mongoose' {
       /**
        * Pulls items from the array atomically. Equality is determined by casting
        * the provided value to an embedded document and comparing using
-       * [the `Document.equals()` function.](./api.html#document_Document-equals)
+       * [the `Document.equals()` function.](./api/document.html#document_Document-equals)
        */
       pull(...args: any[]): this;
 

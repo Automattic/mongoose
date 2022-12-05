@@ -1,3 +1,17 @@
+6.8.0 / 2022-12-05
+==================
+ * feat: add alpha support for Deno #12397 #9056
+ * feat: add deprecation warning for default strictQuery #12666
+ * feat: upgrade to MongoDB driver 4.12.1
+ * feat(schema): add doc as second params to validation message function #12564 #12651 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(document): add $clone method #12549 #11849 [lpizzinidev](https://github.com/lpizzinidev)
+ * feat(populate): allow overriding `localField` and `foreignField` for virtual populate #12657 #6963 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(schema+types): add { errorHandler: true } option to Schema post() for better TypeScript support #12723 #12583
+ * feat(debug): allow setting debug on a per-connection basis #12704 #12700 [lpizzinidev](https://github.com/lpizzinidev)
+ * feat: add rewind function to QueryCursor #12710 [passabilities](https://github.com/passabilities)
+ * feat(types): infer timestamps option from schema #12731 #12069
+ * docs: change links to not link to api.html anymore #12644 [hasezoey](https://github.com/hasezoey)
+
 6.7.5 / 2022-11-30
 ==================
  * fix(schema): copy indexes when calling add() with schema instance #12737 #12654

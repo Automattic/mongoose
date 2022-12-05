@@ -135,3 +135,23 @@ function gh11480(): void {
     next();
   });
 }
+
+function gh12583() {
+  interface IUser {
+    name: string;
+    email: string;
+    avatar?: string;
+  }
+
+  const userSchema = new Schema<IUser>({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    avatar: String
+  });
+
+  userSchema.post('save', { errorHandler: true }, function(error, doc, next) {
+    expectType<Error>(error);
+    console.log(error.name);
+    console.log(doc.name);
+  });
+}

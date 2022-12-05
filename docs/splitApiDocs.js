@@ -19,7 +19,8 @@ api.docs.forEach(file => {
     package: pkg,
     docs: api.docs,
     outputUrl: `/docs/api/${file.name.toLowerCase()}.html`,
-    jobs
+    jobs,
+    title: file.name
   });
 
   const html = pug.renderFile('./docs/api_split.pug', options);

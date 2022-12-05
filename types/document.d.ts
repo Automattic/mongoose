@@ -220,7 +220,7 @@ declare module 'mongoose' {
     /** Sends a replaceOne command with this document `_id` as the query selector. */
     replaceOne(replacement?: AnyObject, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
 
-    /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
+    /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api/document.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api/document.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
     save(options: SaveOptions, callback: Callback<this>): void;
     save(callback: Callback<this>): void;
     save(options?: SaveOptions): Promise<this>;

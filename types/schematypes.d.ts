@@ -221,7 +221,7 @@ declare module 'mongoose' {
 
     /**
      * Defines this path as immutable. Mongoose prevents you from changing
-     * immutable paths unless the parent document has [`isNew: true`](/docs/api.html#document_Document-isNew).
+     * immutable paths unless the parent document has [`isNew: true`](/docs/api/document.html#document_Document-isNew).
      */
     immutable(bool: boolean): this;
 
@@ -408,7 +408,7 @@ declare module 'mongoose' {
         /** Adds an enum validator */
         enum(vals: string[] | any): this;
 
-        /** Adds a lowercase [setter](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set). */
+        /** Adds a lowercase [setter](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set). */
         lowercase(shouldApply?: boolean): this;
 
         /** Sets a regexp validator. */
@@ -420,10 +420,10 @@ declare module 'mongoose' {
         /** Sets a minimum length validator. */
         minlength(value: number, message: string): this;
 
-        /** Adds a trim [setter](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set). */
+        /** Adds a trim [setter](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set). */
         trim(shouldTrim?: boolean): this;
 
-        /** Adds an uppercase [setter](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set). */
+        /** Adds an uppercase [setter](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set). */
         uppercase(shouldApply?: boolean): this;
       }
 

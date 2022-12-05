@@ -191,13 +191,14 @@ declare module 'mongoose' {
     TQueryHelpers = {},
     TVirtuals = {},
     TStaticMethods = {},
-    TPathTypeKey extends TypeKeyBaseType = DefaultTypeKey,
-    DocType extends ObtainDocumentType<DocType, EnforcedDocType, TPathTypeKey> = ObtainDocumentType<any, EnforcedDocType, TPathTypeKey>>
+    TSchemaOptions extends ResolveSchemaOptions<TSchemaOptions> = DefaultSchemaOptions,
+    DocType extends ApplySchemaOptions<ObtainDocumentType<DocType, EnforcedDocType, TSchemaOptions>, TSchemaOptions> = ApplySchemaOptions<ObtainDocumentType<any, EnforcedDocType, TSchemaOptions>, TSchemaOptions>,
+  >
     extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<TPathTypeKey, FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals> | TSchemaOptions);
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
@@ -280,6 +281,11 @@ declare module 'mongoose' {
     plugin<PFunc extends PluginFunction<DocType, M, any, any, any, any>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
 
     /** Defines a post hook for the model. */
+    post<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T>): this;
+    post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T>): this;
+    post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T, Array<any>>): this;
+    post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T>): this;
+
     post<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
     post<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
     post<T = HydratedDocument<DocType, TInstanceMethods>>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: PostMiddlewareFunction<T, T>): this;
@@ -407,7 +413,7 @@ declare module 'mongoose' {
     /** If `ref` is not nullish, this becomes a populated virtual. */
     ref?: string | Function;
 
-    /**  The local field to populate on if this is a populated virtual. */
+    /** The local field to populate on if this is a populated virtual. */
     localField?: string | ((this: HydratedDocType, doc: HydratedDocType) => string);
 
     /** The foreign field to populate on if this is a populated virtual. */
@@ -560,9 +566,6 @@ declare module 'mongoose' {
         T;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
-
-  // Helpers to simplify checks
-  type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
 
   // tests for these two types are located in test/types/lean.test.ts
   export type DocTypeFromUnion<T> = T extends (Document<infer T1, infer T2, infer T3> & infer U) ?

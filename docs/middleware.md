@@ -39,42 +39,42 @@ Query middleware is supported for the following Query functions.
 Query middleware executes when you call `exec()` or `then()` on a Query object, or `await` on a Query object.
 In query middleware functions, `this` refers to the query.
 
-* [count](api.html#query_Query-count)
+* [count](api/query.html#query_Query-count)
 * [countDocuments](api/query.html#query_Query-countDocuments)
-* [deleteMany](api.html#query_Query-deleteMany)
-* [deleteOne](api.html#query_Query-deleteOne)
+* [deleteMany](api/query.html#query_Query-deleteMany)
+* [deleteOne](api/query.html#query_Query-deleteOne)
 * [estimatedDocumentCount](api/query.html#query_Query-estimatedDocumentCount)
-* [find](api.html#query_Query-find)
-* [findOne](api.html#query_Query-findOne)
-* [findOneAndDelete](api.html#query_Query-findOneAndDelete)
-* [findOneAndRemove](api.html#query_Query-findOneAndRemove)
+* [find](api/query.html#query_Query-find)
+* [findOne](api/query.html#query_Query-findOne)
+* [findOneAndDelete](api/query.html#query_Query-findOneAndDelete)
+* [findOneAndRemove](api/query.html#query_Query-findOneAndRemove)
 * [findOneAndReplace](api/query.html#query_Query-findOneAndReplace)
-* [findOneAndUpdate](api.html#query_Query-findOneAndUpdate)
-* [remove](api.html#model_Model-remove)
+* [findOneAndUpdate](api/query.html#query_Query-findOneAndUpdate)
+* [remove](api/model.html#model_Model-remove)
 * [replaceOne](api/query.html#query_Query-replaceOne)
-* [update](api.html#query_Query-update)
-* [updateOne](api.html#query_Query-updateOne)
-* [updateMany](api.html#query_Query-updateMany)
+* [update](api/query.html#query_Query-update)
+* [updateOne](api/query.html#query_Query-updateOne)
+* [updateMany](api/query.html#query_Query-updateMany)
 
 Aggregate middleware is for `MyModel.aggregate()`.
 Aggregate middleware executes when you call `exec()` on an aggregate object.
-In aggregate middleware, `this` refers to the [aggregation object](api.html#model_Model-aggregate).
+In aggregate middleware, `this` refers to the [aggregation object](api/model.html#model_Model-aggregate).
 
-* [aggregate](api.html#model_Model-aggregate)
+* [aggregate](api/model.html#model_Model-aggregate)
 
 Model middleware is supported for the following model functions.
 Don't confuse model middleware and document middleware: model middleware hooks into _static_ functions on a `Model` class, document middleware hooks into _methods_ on a `Model` class.
 In model middleware functions, `this` refers to the model.
 
-* [insertMany](api.html#model_Model-insertMany)
+* [insertMany](api/model.html#model_Model-insertMany)
 
 All middleware types support pre and post hooks.
 How pre and post hooks work is described in more detail below.
 
 **Note:** If you specify `schema.pre('remove')`, Mongoose will register this
-middleware for [`doc.remove()`](api.html#model_Model-remove) by default. If you
-want your middleware to run on [`Query.remove()`](api.html#query_Query-remove)
-use [`schema.pre('remove', { query: true, document: false }, fn)`](api.html#schema_Schema-pre).
+middleware for [`doc.remove()`](api/model.html#model_Model-remove) by default. If you
+want your middleware to run on [`Query.remove()`](api/query.html#query_Query-remove)
+use [`schema.pre('remove', { query: true, document: false }, fn)`](api/schema.html#schema_Schema-pre).
 
 **Note:** Unlike `schema.pre('remove')`, Mongoose registers `updateOne` and
 `deleteOne` middleware on `Query#updateOne()` and `Query#deleteOne()` by default.
@@ -83,7 +83,7 @@ This means that both `doc.updateOne()` and `Model.updateOne()` trigger
 `updateOne` or `deleteOne` middleware as document middleware, use
 `schema.pre('updateOne', { document: true, query: false })`.
 
-**Note:** The [`create()`](api.html#model_Model-create) function fires `save()` hooks.
+**Note:** The [`create()`](./api/model.html#model_Model-create) function fires `save()` hooks.
 
 **Note:** Query middlewares are not executed on subdocuments.
 
@@ -206,7 +206,7 @@ error `err1` and then throw an error `err2`, mongoose will report `err1`.
 
 <h3 id="post"><a href="#post">Post middleware</a></h3>
 
-[post](api.html#schema_Schema-post) middleware are executed _after_
+[post](schema.html#schema_Schema-post) middleware are executed _after_
 the hooked method and all of its `pre` middleware have completed.
 
 ```javascript
@@ -334,10 +334,10 @@ doc.remove();
 Model.remove();
 ```
 
-You can pass options to [`Schema.pre()`](api.html#schema_Schema-pre)
-and [`Schema.post()`](api.html#schema_Schema-post) to switch whether
-Mongoose calls your `remove()` hook for [`Document.remove()`](api.html#model_Model-remove)
-or [`Model.remove()`](api.html#model_Model-remove). Note here that you need to set both `document` and `query` properties in the passed object:
+You can pass options to [`Schema.pre()`](schema.html#schema_Schema-pre)
+and [`Schema.post()`](schema.html#schema_Schema-post) to switch whether
+Mongoose calls your `remove()` hook for [`Document.remove()`](model.html#model_Model-remove)
+or [`Model.remove()`](model.html#model_Model-remove). Note here that you need to set both `document` and `query` properties in the passed object:
 
 ```javascript
 // Only document middleware
@@ -488,12 +488,12 @@ function call will still error out.
 
 <h3 id="aggregate"><a href="#aggregate">Aggregation Hooks</a></h3>
 
-You can also define hooks for the [`Model.aggregate()` function](api.html#model_Model-aggregate).
-In aggregation middleware functions, `this` refers to the [Mongoose `Aggregate` object](api.html#Aggregate).
+You can also define hooks for the [`Model.aggregate()` function](api/model.html#model_Model-aggregate).
+In aggregation middleware functions, `this` refers to the [Mongoose `Aggregate` object](api/aggregate.html#Aggregate).
 For example, suppose you're implementing soft deletes on a `Customer` model
 by adding an `isDeleted` property. To make sure `aggregate()` calls only look
 at customers that aren't soft deleted, you can use the below middleware to
-add a [`$match` stage](api.html#aggregate_Aggregate-match) to the beginning
+add a [`$match` stage](api/aggregate.html#aggregate_Aggregate-match) to the beginning
 of each [aggregation pipeline](https://docs.mongodb.com/manual/core/aggregation-pipeline/).
 
 ```javascript
@@ -503,7 +503,7 @@ customerSchema.pre('aggregate', function() {
 });
 ```
 
-The [`Aggregate#pipeline()` function](api.html#aggregate_Aggregate-pipeline)
+The [`Aggregate#pipeline()` function](api/aggregate.html#aggregate_Aggregate-pipeline)
 lets you access the MongoDB aggregation pipeline that Mongoose will send to
 the MongoDB server. It is useful for adding stages to the beginning of the
 pipeline from middleware.
@@ -512,7 +512,7 @@ pipeline from middleware.
 
 Certain Mongoose hooks are synchronous, which means they do **not** support
 functions that return promises or receive a `next()` callback. Currently,
-only `init` hooks are synchronous, because the [`init()` function](api.html#document_Document-init)
+only `init` hooks are synchronous, because the [`init()` function](api/document.html#document_Document-init)
 is synchronous. Below is an example of using pre and post init hooks.
 
 ```javascript

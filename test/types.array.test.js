@@ -2255,5 +2255,7 @@ describe('types array', function() {
 
     // Assert
     assert.ifError(user.validateSync());
+
+    m.Schema.Types.Array.options.castNonArrays = true;
   });
 });

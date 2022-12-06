@@ -234,6 +234,10 @@ describe('ValidationError', function() {
 
   describe('when user code defines a r/o Error#toJSON', function() {
     it('should not fail', function(done) {
+      if (typeof Deno !== 'undefined') {
+        // Deno doesn't support child_process.fork
+        return this.skip();
+      }
       this.timeout(10000);
 
       const err = [];

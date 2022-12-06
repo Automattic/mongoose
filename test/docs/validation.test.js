@@ -27,9 +27,9 @@ describe('validation docs', function() {
    * - Validation is [middleware](./middleware.html). Mongoose registers validation as a `pre('save')` hook on every schema by default.
    * - You can disable automatic validation before save by setting the [validateBeforeSave](./guide.html#validateBeforeSave) option
    * - You can manually run validation using `doc.validate(callback)` or `doc.validateSync()`
-   * - You can manually mark a field as invalid (causing validation to fail) by using [`doc.invalidate(...)`](./api.html#document_Document-invalidate)
-   * - Validators are not run on undefined values. The only exception is the [`required` validator](./api.html#schematype_SchemaType-required).
-   * - Validation is asynchronously recursive; when you call [Model#save](./api.html#model_Model-save), sub-document validation is executed as well. If an error occurs, your [Model#save](./api.html#model_Model-save) callback receives it
+   * - You can manually mark a field as invalid (causing validation to fail) by using [`doc.invalidate(...)`](./api/document.html#document_Document-invalidate)
+   * - Validators are not run on undefined values. The only exception is the [`required` validator](./api/schematype.html#schematype_SchemaType-required).
+   * - Validation is asynchronously recursive; when you call [Model#save](./api/model.html#model_Model-save), sub-document validation is executed as well. If an error occurs, your [Model#save](./api/model.html#model_Model-save) callback receives it
    * - Validation is customizable
    */
 
@@ -63,7 +63,7 @@ describe('validation docs', function() {
   /**
    * Mongoose has several built-in validators.
    *
-   * - All [SchemaTypes](/docs/schematypes.html) have the built-in [required](./api.html#schematype_SchemaType-required) validator. The required validator uses the [SchemaType's `checkRequired()` function](./api.html#schematype_SchemaType-checkRequired) to determine if the value satisfies the required validator.
+   * - All [SchemaTypes](/docs/schematypes.html) have the built-in [required](./api/schematype.html#schematype_SchemaType-required) validator. The required validator uses the [SchemaType's `checkRequired()` function](./api/schematype.html#schematype_SchemaType-checkRequired) to determine if the value satisfies the required validator.
    * - [Numbers](/docs/schematypes.html#numbers) have [`min` and `max`](./schematypes.html#number-validators) validators.
    * - [Strings](/docs/schematypes.html#strings) have [`enum`, `match`, `minLength`, and `maxLength`](./schematypes.html#string-validators) validators.
    *
@@ -211,7 +211,7 @@ describe('validation docs', function() {
    *
    * Custom validation is declared by passing a validation function.
    * You can find detailed instructions on how to do this in the
-   * [`SchemaType#validate()` API docs](./api.html#schematype_SchemaType-validate).
+   * [`SchemaType#validate()` API docs](./api/schematype.html#schematype_SchemaType-validate).
    */
   it('Custom Validators', function() {
     const userSchema = new Schema({
@@ -293,7 +293,7 @@ describe('validation docs', function() {
   /**
    * Errors returned after failed validation contain an `errors` object
    * whose values are `ValidatorError` objects. Each
-   * [ValidatorError](./api.html#error-validation-js) has `kind`, `path`,
+   * [ValidatorError](./api/error-validation-js.html#error-validation-js) has `kind`, `path`,
    * `value`, and `message` properties.
    * A ValidatorError also may have a `reason` property. If an error was
    * thrown in the validator, this property will contain the error that was
@@ -447,10 +447,10 @@ describe('validation docs', function() {
 
   /**
    * In the above examples, you learned about document validation. Mongoose also
-   * supports validation for [`update()`](/docs/api.html#query_Query-update),
-   * [`updateOne()`](/docs/api.html#query_Query-updateOne),
-   * [`updateMany()`](/docs/api.html#query_Query-updateMany),
-   * and [`findOneAndUpdate()`](/docs/api.html#query_Query-findOneAndUpdate) operations.
+   * supports validation for [`update()`](/docs/api/query.html#query_Query-update),
+   * [`updateOne()`](/docs/api/query.html#query_Query-updateOne),
+   * [`updateMany()`](/docs/api/query.html#query_Query-updateMany),
+   * and [`findOneAndUpdate()`](/docs/api/query.html#query_Query-findOneAndUpdate) operations.
    * Update validators are off by default - you need to specify
    * the `runValidators` option.
    *

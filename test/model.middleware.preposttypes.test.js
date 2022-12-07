@@ -35,7 +35,7 @@ function getTypeName(obj) {
   }
 }
 
-describe('pre/post hooks, type of this', async function() {
+describe('pre/post hooks, type of this', function() {
   let db;
 
   before(function() {

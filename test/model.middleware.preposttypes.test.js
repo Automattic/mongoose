@@ -17,7 +17,25 @@ const UNION = 2;
 const NEVER = 3;
 const TYPE_TO_NAME = ['Query', 'Document', 'Document|Query', 'never'];
 
-describe('pre/post hooks, type of this', function() {
+function getTypeName(obj) {
+  if (typeof obj === 'object') {
+    if (obj instanceof mongoose.Query) {
+      return 'Query';
+    } else if (obj instanceof mongoose.Document) {
+      return 'Document';
+    } else {
+      try {
+        return this.constructor.name;
+      } catch (err) {
+        return 'unknown';
+      }
+    }
+  } else {
+    return typeof obj;
+  }
+}
+
+describe('pre/post hooks, type of this', async function() {
   let db;
 
   before(function() {
@@ -55,19 +73,8 @@ describe('pre/post hooks, type of this', function() {
 
         // the callback checking the type and registering the call
         const fn = function() {
-          let actThisType;
-          if (this instanceof mongoose.Query) {
-            actThisType = Query;
-          } else if (this instanceof mongoose.Document) {
-            actThisType = Document;
-          } else {
-            try {
-               actThisType = this.constructor.name;
-            } catch(err) {
-              actThisType = 'unknown';
-            }
-          }
-      
+          const actThisType = getTypeName(this);
+
           switch (expThisType) {
             case QUERY:
             case DOC:
@@ -78,16 +85,23 @@ describe('pre/post hooks, type of this', function() {
           const calledWith = signatures.get(hookSignature);
           calledWith.add(actThisType);
         };
+
+        const fnPost = function(res) {
+          fn.call(this);
+          const resType = getTypeName(res);
+          assert(resType !== 'Query', 'type of res in post middleware is not expected to be a Query');
+        };
+
         // register the hook
         if (options) {
           switch (hook) {
             case 'pre': schema.pre(method, options, fn); break;
-            case 'post': schema.post(method, options, fn); break;
+            case 'post': schema.post(method, options, fnPost); break;
           }
         } else {
           switch (hook) {
             case 'pre': schema.pre(method, fn); break;
-            case 'post': schema.post(method, fn); break;
+            case 'post': schema.post(method, fnPost); break;
           }
         }
       }

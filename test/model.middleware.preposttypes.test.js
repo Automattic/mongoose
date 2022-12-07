@@ -55,7 +55,19 @@ describe('pre/post hooks, type of this', function() {
 
         // the callback checking the type and registering the call
         const fn = function() {
-          const actThisType = (this instanceof mongoose.Query) ? 'Query' : (this instanceof mongoose.Document) ? 'Document' : this?.constructor?.name;
+          let actThisType;
+          if (this instanceof mongoose.Query) {
+            actThisType = Query;
+          } else if (this instanceof mongoose.Document) {
+            actThisType = Document;
+          } else {
+            try {
+               actThisType = this.constructor.name;
+            } catch(err) {
+              actThisType = 'unknown';
+            }
+          }
+      
           switch (expThisType) {
             case QUERY:
             case DOC:

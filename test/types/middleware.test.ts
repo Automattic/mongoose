@@ -117,12 +117,6 @@ schema.post<Query<ITest, ITest>>('findOneAndDelete', function(res, next) {
 
 const Test = model<ITest>('Test', schema);
 
-function gh11257(): void {
-  schema.pre('save', { document: true }, function() {
-    expectType<HydratedDocument<ITest>>(this);
-  });
-}
-
 function gh11480(): void {
   type IUserSchema = {
     name: string;
@@ -153,5 +147,31 @@ function gh12583() {
     expectType<Error>(error);
     console.log(error.name);
     console.log(doc.name);
+  });
+}
+
+function gh11257() {
+  interface User {
+    name: string;
+    email: string;
+    avatar?: string;
+  }
+
+  const schema = new Schema<User>({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    avatar: String
+  });
+
+  schema.pre('save', { document: true }, function() {
+    expectType<HydratedDocument<User>>(this);
+  });
+
+  schema.pre('updateOne', { document: true, query: false }, function() {
+    this.isNew;
+  });
+
+  schema.pre('updateOne', { document: false, query: true }, function() {
+    this.find();
   });
 }

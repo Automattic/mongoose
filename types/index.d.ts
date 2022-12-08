@@ -305,6 +305,16 @@ declare module 'mongoose' {
     post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
 
     /** Defines a pre hook for the model. */
+    pre<T = HydratedDocument<DocType, TInstanceMethods>>(
+      method: DocumentOrQueryMiddleware | DocumentOrQueryMiddleware[],
+      options: SchemaPreOptions & { document: true; query: false; },
+      fn: PreMiddlewareFunction<T>
+    ): this;
+    pre<T = Query<any, any>>(
+      method: DocumentOrQueryMiddleware | DocumentOrQueryMiddleware[],
+      options: SchemaPreOptions & { document: false; query: true; },
+      fn: PreMiddlewareFunction<T>
+    ): this;
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', options: SchemaPreOptions, fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;

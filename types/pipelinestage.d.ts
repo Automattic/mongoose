@@ -8,9 +8,7 @@ declare module 'mongoose' {
     | PipelineStage.BucketAuto
     | PipelineStage.CollStats
     | PipelineStage.Count
-    | PipelineStage.Densify
     | PipelineStage.Facet
-    | PipelineStage.Fill
     | PipelineStage.GeoNear
     | PipelineStage.GraphLookup
     | PipelineStage.Group
@@ -88,16 +86,6 @@ declare module 'mongoose' {
           unit?: 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year',
           bounds: number[] | globalThis.Date[] | 'full' | 'partition'
         }
-      }
-    }
-
-    export interface Fill {
-      /** [`$fill` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/fill/) */
-      $fill: {
-        partitionBy?: Expression,
-        partitionByFields?: string[],
-        sortBy?: Record<string, 1 | -1>,
-        output: Record<string, { value: Expression } | { method: 'linear' | 'locf' }>
       }
     }
 
@@ -213,7 +201,7 @@ declare module 'mongoose' {
 
     export interface ReplaceWith {
       /** [`$replaceWith` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/replaceWith/) */
-      $replaceWith: ObjectExpressionOperator | { [field: string]: Expression } | `$${string}`;
+      $replaceWith: ObjectExpressionOperator;
     }
 
     export interface Sample {

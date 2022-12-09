@@ -29,10 +29,10 @@ declare module 'mongoose' {
      [K in keyof (
        RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
        OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>
-      )]:
+     )]:
      IsPathRequired<DocDefinition[K], TSchemaOptions['typeKey']> extends true ?
-      ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>:
-      ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
+       ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>:
+       ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
    };
 
   /**

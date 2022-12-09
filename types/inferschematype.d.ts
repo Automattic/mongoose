@@ -26,8 +26,13 @@ declare module 'mongoose' {
    */
    type ObtainDocumentType<DocDefinition, EnforcedDocType = any, TSchemaOptions extends Record<any, any> = DefaultSchemaOptions> =
    IsItRecordAndNotAny<EnforcedDocType> extends true ? EnforcedDocType : {
-     [K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
-     OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)]: IsPathRequired<DocDefinition[K], TSchemaOptions['typeKey']> extends true ? ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>: ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
+     [K in keyof (
+       RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
+       OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>
+      )]:
+     IsPathRequired<DocDefinition[K], TSchemaOptions['typeKey']> extends true ?
+      ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>:
+      ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
    };
 
   /**

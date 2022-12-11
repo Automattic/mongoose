@@ -5,21 +5,21 @@ for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_del
 Each of these functions returns a
 [mongoose `Query` object](query.html#Query).
 
-- [`Model.deleteMany()`](model.html#model_Model-deleteMany)
-- [`Model.deleteOne()`](model.html#model_Model-deleteOne)
-- [`Model.find()`](model.html#model_Model-find)
-- [`Model.findById()`](model.html#model_Model-findById)
-- [`Model.findByIdAndDelete()`](model.html#model_Model-findByIdAndDelete)
-- [`Model.findByIdAndRemove()`](model.html#model_Model-findByIdAndRemove)
-- [`Model.findByIdAndUpdate()`](model.html#model_Model-findByIdAndUpdate)
-- [`Model.findOne()`](model.html#model_Model-findOne)
-- [`Model.findOneAndDelete()`](model.html#model_Model-findOneAndDelete)
-- [`Model.findOneAndRemove()`](model.html#model_Model-findOneAndRemove)
-- [`Model.findOneAndReplace()`](model.html#model_Model-findOneAndReplace)
-- [`Model.findOneAndUpdate()`](model.html#model_Model-findOneAndUpdate)
-- [`Model.replaceOne()`](model.html#model_Model-replaceOne)
-- [`Model.updateMany()`](model.html#model_Model-updateMany)
-- [`Model.updateOne()`](model.html#model_Model-updateOne)
+- [`Model.deleteMany()`](api.html#model_Model-deleteMany)
+- [`Model.deleteOne()`](api.html#model_Model-deleteOne)
+- [`Model.find()`](api.html#model_Model-find)
+- [`Model.findById()`](api.html#model_Model-findById)
+- [`Model.findByIdAndDelete()`](api.html#model_Model-findByIdAndDelete)
+- [`Model.findByIdAndRemove()`](api.html#model_Model-findByIdAndRemove)
+- [`Model.findByIdAndUpdate()`](api.html#model_Model-findByIdAndUpdate)
+- [`Model.findOne()`](api.html#model_Model-findOne)
+- [`Model.findOneAndDelete()`](api.html#model_Model-findOneAndDelete)
+- [`Model.findOneAndRemove()`](api.html#model_Model-findOneAndRemove)
+- [`Model.findOneAndReplace()`](api.html#model_Model-findOneAndReplace)
+- [`Model.findOneAndUpdate()`](api.html#model_Model-findOneAndUpdate)
+- [`Model.replaceOne()`](api.html#model_Model-replaceOne)
+- [`Model.updateMany()`](api.html#model_Model-updateMany)
+- [`Model.updateOne()`](api.html#model_Model-updateOne)
 
 A mongoose query can be executed in one of two ways. First, if you
 pass in a `callback` function, Mongoose will execute the query asynchronously
@@ -57,7 +57,7 @@ will be null. If the query is successful, the `error` parameter will be null, an
 
 Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern `callback(error, results)`.
 What `results` is depends on the operation: For `findOne()` it is a [potentially-null single document](api/model.html#model_Model-findOne), `find()` a [list of documents](api/model.html#model_Model-find), `count()` [the number of documents](api/model.html#model_Model-count), `update()` the [number of documents affected](api/model.html#model_Model-update), etc.
-The [API docs for Models](api/model-js.html#model-js) provide more detail on what is passed to the callbacks.
+The [API docs for Models](api/model.html) provide more detail on what is passed to the callbacks.
 
 Now let's look at what happens when no `callback` is passed:
 

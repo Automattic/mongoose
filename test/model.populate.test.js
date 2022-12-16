@@ -9942,7 +9942,6 @@ describe('model: populate:', function() {
 
       const Child = db.model('Child', Schema({ name: String }));
 
-
       const children = await Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
       let p = await Parent.create({
         name: 'Anakin',
@@ -10022,6 +10021,35 @@ describe('model: populate:', function() {
       assert.equal(called.length, 1);
       assert.strictEqual(called[0].doc, null);
       assert.equal(called[0].id.toHexString(), newId.toHexString());
+    });
+
+    it('avoids calling `transform()` with `lean()` when no results (gh-12739)', async function() {
+      const parentSchema = new Schema({ title: String });
+      const childSchema = new Schema({
+        title: String,
+        parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Parent' }
+      });
+      parentSchema.virtual('children', {
+        ref: 'Child',
+        localField: '_id',
+        foreignField: 'parent'
+      });
+      const Parent = db.model('Parent', parentSchema);
+      const Child = db.model('Child', childSchema);
+
+      await Parent.create({ title: 'parent' });
+      await Child.create({ title: 'child' });
+      const p = await Parent.find().lean().populate({
+        path: 'children',
+        match: { title: 'child' },
+        select: '-__v',
+        strictPopulate: false,
+        transform: doc => {
+          return doc;
+        }
+      });
+      assert.equal(p.length, 1);
+      assert.deepStrictEqual(p[0].children, []);
     });
 
     it('transform to primitive (gh-10064)', async function() {

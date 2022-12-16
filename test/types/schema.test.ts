@@ -969,3 +969,12 @@ function gh12611() {
     anotherField?: string;
   }>({} as Props);
 }
+
+function gh12782() {
+  const schemaObj = { test: { type: String, required: true } };
+  const schema = new Schema(schemaObj);
+  type Props = InferSchemaType<typeof schema>;
+  expectType<{
+    test: string
+  }>({} as Props);
+}

@@ -203,7 +203,7 @@ myDoc.<span class="hljs-title function_">save</span>(<span class="hljs-keyword">
 error <code>err1</code> and then throw an error <code>err2</code>, mongoose will report <code>err1</code>.</p>
 <h3 id="post"><a href="#post">Post middleware</a></h3>
 
-<p><a href="schema.html#schema_Schema-post">post</a> middleware are executed <em>after</em>
+<p><a href="api.html#schema_Schema-post">post</a> middleware are executed <em>after</em>
 the hooked method and all of its <code>pre</code> middleware have completed.</p>
 <pre><code class="language-javascript">schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;init&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;%s has been initialized from the db&#x27;</span>, doc.<span class="hljs-property">_id</span>);
@@ -310,8 +310,8 @@ doc.<span class="hljs-title function_">remove</span>();
 <span class="hljs-comment">// executed by default.</span>
 <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">remove</span>();
 </code></pre>
-<p>You can pass options to <a href="schema.html#schema_Schema-pre"><code>Schema.pre()</code></a>
-and <a href="schema.html#schema_Schema-post"><code>Schema.post()</code></a> to switch whether
+<p>You can pass options to <a href="api.html#schema_Schema-pre"><code>Schema.pre()</code></a>
+and <a href="api.html#schema_Schema-post"><code>Schema.post()</code></a> to switch whether
 Mongoose calls your <code>remove()</code> hook for <a href="model.html#model_Model-remove"><code>Document.remove()</code></a>
 or <a href="model.html#model_Model-remove"><code>Model.remove()</code></a>. Note here that you need to set both <code>document</code> and <code>query</code> properties in the passed object:</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Only document middleware</span>

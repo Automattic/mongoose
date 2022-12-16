@@ -21,21 +21,21 @@ for <a href="https://en.wikipedia.org/wiki/Create,_read,_update_and_delete">CRUD
 Each of these functions returns a
 <a href="query.html#Query">mongoose <code>Query</code> object</a>.</p>
 <ul>
-<li><a href="model.html#model_Model-deleteMany"><code>Model.deleteMany()</code></a></li>
-<li><a href="model.html#model_Model-deleteOne"><code>Model.deleteOne()</code></a></li>
-<li><a href="model.html#model_Model-find"><code>Model.find()</code></a></li>
-<li><a href="model.html#model_Model-findById"><code>Model.findById()</code></a></li>
-<li><a href="model.html#model_Model-findByIdAndDelete"><code>Model.findByIdAndDelete()</code></a></li>
-<li><a href="model.html#model_Model-findByIdAndRemove"><code>Model.findByIdAndRemove()</code></a></li>
-<li><a href="model.html#model_Model-findByIdAndUpdate"><code>Model.findByIdAndUpdate()</code></a></li>
-<li><a href="model.html#model_Model-findOne"><code>Model.findOne()</code></a></li>
-<li><a href="model.html#model_Model-findOneAndDelete"><code>Model.findOneAndDelete()</code></a></li>
-<li><a href="model.html#model_Model-findOneAndRemove"><code>Model.findOneAndRemove()</code></a></li>
-<li><a href="model.html#model_Model-findOneAndReplace"><code>Model.findOneAndReplace()</code></a></li>
-<li><a href="model.html#model_Model-findOneAndUpdate"><code>Model.findOneAndUpdate()</code></a></li>
-<li><a href="model.html#model_Model-replaceOne"><code>Model.replaceOne()</code></a></li>
-<li><a href="model.html#model_Model-updateMany"><code>Model.updateMany()</code></a></li>
-<li><a href="model.html#model_Model-updateOne"><code>Model.updateOne()</code></a></li>
+<li><a href="api.html#model_Model-deleteMany"><code>Model.deleteMany()</code></a></li>
+<li><a href="api.html#model_Model-deleteOne"><code>Model.deleteOne()</code></a></li>
+<li><a href="api.html#model_Model-find"><code>Model.find()</code></a></li>
+<li><a href="api.html#model_Model-findById"><code>Model.findById()</code></a></li>
+<li><a href="api.html#model_Model-findByIdAndDelete"><code>Model.findByIdAndDelete()</code></a></li>
+<li><a href="api.html#model_Model-findByIdAndRemove"><code>Model.findByIdAndRemove()</code></a></li>
+<li><a href="api.html#model_Model-findByIdAndUpdate"><code>Model.findByIdAndUpdate()</code></a></li>
+<li><a href="api.html#model_Model-findOne"><code>Model.findOne()</code></a></li>
+<li><a href="api.html#model_Model-findOneAndDelete"><code>Model.findOneAndDelete()</code></a></li>
+<li><a href="api.html#model_Model-findOneAndRemove"><code>Model.findOneAndRemove()</code></a></li>
+<li><a href="api.html#model_Model-findOneAndReplace"><code>Model.findOneAndReplace()</code></a></li>
+<li><a href="api.html#model_Model-findOneAndUpdate"><code>Model.findOneAndUpdate()</code></a></li>
+<li><a href="api.html#model_Model-replaceOne"><code>Model.replaceOne()</code></a></li>
+<li><a href="api.html#model_Model-updateMany"><code>Model.updateMany()</code></a></li>
+<li><a href="api.html#model_Model-updateOne"><code>Model.updateOne()</code></a></li>
 </ul>
 <p>A mongoose query can be executed in one of two ways. First, if you
 pass in a <code>callback</code> function, Mongoose will execute the query asynchronously
@@ -70,7 +70,7 @@ and pass the results to the <code>callback</code>.</p>
 will be null. If the query is successful, the <code>error</code> parameter will be null, and the <code>result</code> will be populated with the results of the query.</p>
 <p>Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern <code>callback(error, results)</code>.
 What <code>results</code> is depends on the operation: For <code>findOne()</code> it is a <a href="api/model.html#model_Model-findOne">potentially-null single document</a>, <code>find()</code> a <a href="api/model.html#model_Model-find">list of documents</a>, <code>count()</code> <a href="api/model.html#model_Model-count">the number of documents</a>, <code>update()</code> the <a href="api/model.html#model_Model-update">number of documents affected</a>, etc.
-The <a href="api/model-js.html#model-js">API docs for Models</a> provide more detail on what is passed to the callbacks.</p>
+The <a href="api/model.html">API docs for Models</a> provide more detail on what is passed to the callbacks.</p>
 <p>Now let&#39;s look at what happens when no <code>callback</code> is passed:</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// find each person with a last name matching &#x27;Ghost&#x27;</span>
 <span class="hljs-keyword">const</span> query = <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-string">&#x27;name.last&#x27;</span>: <span class="hljs-string">&#x27;Ghost&#x27;</span> });

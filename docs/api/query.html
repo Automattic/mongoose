@@ -1757,18 +1757,31 @@ query.<span class="hljs-title function_">getUpdate</span>(); <span class="hljs-c
 <p>Cannot be used with <code>distinct()</code></p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-slice"><a href="#query_Query-slice"><code>Query.prototype.slice()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Number&raquo;</span> number/range of elements to slice</p>
+<span class="method-type">&laquo;Number|Array&raquo;</span> number of elements to slice or array with number of elements to skip and number of elements to slice</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields#RetrievingaSubsetofFields-RetrievingaSubrangeofArrayElements">mongodb</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/projection/slice/#prj._S_slice">$slice</a></span></li></ul><div><p>Specifies a <code>$slice</code> projection for an array.</p>
 <h4 id="example">
       <a href="#example">
         Example:
       </a>
     </h4>
-<pre><code>query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;comments&#x27;</span>, <span class="hljs-number">5</span>);
-query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;comments&#x27;</span>, -<span class="hljs-number">5</span>);
-query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;comments&#x27;</span>, [<span class="hljs-number">10</span>, <span class="hljs-number">5</span>]);
-query.<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;comments&#x27;</span>).<span class="hljs-title function_">slice</span>(<span class="hljs-number">5</span>);
-query.<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;comments&#x27;</span>).<span class="hljs-title function_">slice</span>([-<span class="hljs-number">10</span>, <span class="hljs-number">5</span>]);
+<pre><code>query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;comments&#x27;</span>, <span class="hljs-number">5</span>); <span class="hljs-comment">// Returns the first 5 comments</span>
+query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;comments&#x27;</span>, -<span class="hljs-number">5</span>); <span class="hljs-comment">// Returns the last 5 comments</span>
+query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;comments&#x27;</span>, [<span class="hljs-number">10</span>, <span class="hljs-number">5</span>]); <span class="hljs-comment">// Returns the first 5 comments after the 10-th</span>
+query.<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;comments&#x27;</span>).<span class="hljs-title function_">slice</span>(<span class="hljs-number">5</span>); <span class="hljs-comment">// Returns the first 5 comments</span>
+query.<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;comments&#x27;</span>).<span class="hljs-title function_">slice</span>([-<span class="hljs-number">10</span>, <span class="hljs-number">5</span>]); <span class="hljs-comment">// Returns the first 5 comments after the 10-th to last</span>
+</code></pre>
+<p><strong>Note:</strong> If the absolute value of the number of elements to be sliced is greater than the number of elements in the array, all array elements will be returned.</p>
+<pre><code> <span class="hljs-comment">// Given `arr`: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
+ query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;arr&#x27;</span>, <span class="hljs-number">20</span>); <span class="hljs-comment">// Returns [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
+ query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;arr&#x27;</span>, -<span class="hljs-number">20</span>); <span class="hljs-comment">// Returns [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
+</code></pre>
+<p><strong>Note:</strong> If the number of elements to skip is positive and greater than the number of elements in the array, an empty array will be returned.</p>
+<pre><code> <span class="hljs-comment">// Given `arr`: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
+ query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;arr&#x27;</span>, [<span class="hljs-number">20</span>, <span class="hljs-number">5</span>]); <span class="hljs-comment">// Returns []</span>
+</code></pre>
+<p><strong>Note:</strong> If the number of elements to skip is negative and its absolute value is greater than the number of elements in the array, the starting position is the start of the array.</p>
+<pre><code> <span class="hljs-comment">// Given `arr`: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
+ query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;arr&#x27;</span>, [-<span class="hljs-number">20</span>, <span class="hljs-number">5</span>]); <span class="hljs-comment">// Returns [1, 2, 3, 4, 5]</span>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-snapshot"><a href="#query_Query-snapshot"><code>Query.prototype.snapshot()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/snapshot/">snapshot</a></span></li></ul><div><p>Specifies this query as a <code>snapshot</code> query.</p>
 <h4 id="example">

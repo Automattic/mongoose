@@ -4335,8 +4335,8 @@ describe('Query', function() {
       },
       { title: undefined },
       { returnOriginal: false }
-    );
+    ).lean();
 
-    assert.ok(updatedDoc.title === undefined);
+    assert.ok('title' in updatedDoc === false);
   });
 });

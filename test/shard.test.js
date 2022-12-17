@@ -17,7 +17,7 @@ if (!uri) {
     redColorEscapeCharacter,
     'You\'re not testing shards!',
     'Please set the MONGOOSE_SHARD_TEST_URI env variable.',
-    'e.g: `mongodb://localhost:27017/database',
+    'e.g: `mongodb://127.0.0.1:27017/database',
     'Sharding must already be enabled on your database',
     colorResetEscapeCharacter
   ].join('\n'));

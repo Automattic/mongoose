@@ -3,7 +3,7 @@
 You can connect to MongoDB with the `mongoose.connect()` method.
 
 ```javascript
-mongoose.connect('mongodb://localhost:27017/myapp');
+mongoose.connect('mongodb://127.0.0.1:27017/myapp');
 ```
 
 This is the minimum needed to connect the `myapp` database running locally
@@ -39,7 +39,7 @@ Mongoose lets you start using your models immediately, without waiting for
 mongoose to establish a connection to MongoDB.
 
 ```javascript
-mongoose.connect('mongodb://localhost:27017/myapp');
+mongoose.connect('mongodb://127.0.0.1:27017/myapp');
 const MyModel = mongoose.model('Test', new Schema({ name: String }));
 // Works
 MyModel.findOne(function(error, result) { /* ... */ });
@@ -56,7 +56,7 @@ const MyModel = mongoose.model('Test', new Schema({ name: String }));
 MyModel.findOne(function(error, result) { /* ... */ });
 
 setTimeout(function() {
-  mongoose.connect('mongodb://localhost:27017/myapp');
+  mongoose.connect('mongodb://127.0.0.1:27017/myapp');
 }, 60000);
 ```
 
@@ -101,12 +101,12 @@ There are two classes of errors that can occur with a Mongoose connection.
 To handle initial connection errors, you should use `.catch()` or `try/catch` with async/await.
 
 ```javascript
-mongoose.connect('mongodb://localhost:27017/test').
+mongoose.connect('mongodb://127.0.0.1:27017/test').
   catch(error => handleError(error));
 
 // Or:
 try {
-  await mongoose.connect('mongodb://localhost:27017/test');
+  await mongoose.connect('mongodb://127.0.0.1:27017/test');
 } catch (error) {
   handleError(error);
 }
@@ -201,9 +201,9 @@ driver. You **can't** set Mongoose-specific options like `bufferCommands`
 in the query string.
 
 ```javascript
-mongoose.connect('mongodb://localhost:27017/test?connectTimeoutMS=1000&bufferCommands=false&authSource=otherdb');
+mongoose.connect('mongodb://127.0.0.1:27017/test?connectTimeoutMS=1000&bufferCommands=false&authSource=otherdb');
 // The above is equivalent to:
-mongoose.connect('mongodb://localhost:27017/test', {
+mongoose.connect('mongodb://127.0.0.1:27017/test', {
   connectTimeoutMS: 1000
   // Note that mongoose will **not** pull `bufferCommands` from the query string
 });
@@ -453,7 +453,7 @@ using your connection options:
 mongoose.createConnection(uri, { maxPoolSize: 10 });
 
 // With connection string options
-const uri = 'mongodb://localhost:27017/test?maxPoolSize=10';
+const uri = 'mongodb://127.0.0.1:27017/test?maxPoolSize=10';
 mongoose.createConnection(uri);
 ```
 

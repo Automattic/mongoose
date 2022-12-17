@@ -10,7 +10,7 @@ const Person = mongoose.model('Person');
 
 // connect to a server to do a quick write / read example
 
-mongoose.connect('mongodb://localhost/persons', function(err) {
+mongoose.connect('mongodb://127.0.0.1/persons', function(err) {
   if (err) {
     throw err;
   }

@@ -17,7 +17,7 @@ async function main() {
   app.use('/', express.static(website.cwd));
 
   app.listen(port, () => {
-    console.log(`now listening on http://localhost:${port}`);
+    console.log(`now listening on http://127.0.0.1:${port}`);
   });
 }
 

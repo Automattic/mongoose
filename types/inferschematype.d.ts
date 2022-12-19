@@ -83,15 +83,19 @@ type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined } 
 type IsPathRequired<P, TypeKey extends string = DefaultTypeKey> =
   P extends { required: true | [true, string | undefined] } | ArrayConstructor | any[]
     ? true
-    : P extends (Record<TypeKey, ArrayConstructor | any[]>)
-      ? IsPathDefaultUndefined<P> extends true
+    : P extends { required: boolean }
+      ? P extends { required: false }
         ? false
         : true
-      : P extends (Record<TypeKey, any>)
-        ? P extends { default: any }
-          ? IfEquals<P['default'], undefined, false, true>
-          : false
-        : false;
+      : P extends (Record<TypeKey, ArrayConstructor | any[]>)
+        ? IsPathDefaultUndefined<P> extends true
+          ? false
+          : true
+        : P extends (Record<TypeKey, any>)
+          ? P extends { default: any }
+            ? IfEquals<P['default'], undefined, false, true>
+            : false
+          : false;
 
 /**
  * @summary Path base type defined by using TypeKey

@@ -206,7 +206,7 @@ error `err1` and then throw an error `err2`, mongoose will report `err1`.
 
 <h3 id="post"><a href="#post">Post middleware</a></h3>
 
-[post](schema.html#schema_Schema-post) middleware are executed _after_
+[post](api.html#schema_Schema-post) middleware are executed _after_
 the hooked method and all of its `pre` middleware have completed.
 
 ```javascript
@@ -334,8 +334,8 @@ doc.remove();
 Model.remove();
 ```
 
-You can pass options to [`Schema.pre()`](schema.html#schema_Schema-pre)
-and [`Schema.post()`](schema.html#schema_Schema-post) to switch whether
+You can pass options to [`Schema.pre()`](api.html#schema_Schema-pre)
+and [`Schema.post()`](api.html#schema_Schema-post) to switch whether
 Mongoose calls your `remove()` hook for [`Document.remove()`](model.html#model_Model-remove)
 or [`Model.remove()`](model.html#model_Model-remove). Note here that you need to set both `document` and `query` properties in the passed object:
 

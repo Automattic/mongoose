@@ -81,3 +81,11 @@ corresponding getter for `email`.
 ```javascript
 [require:getters/setters.*setters.*vs ES6]
 ```
+
+## $locals
+
+You can use `$locals` to support internationalization for your application.
+
+```javascript
+[require:getters/setters.*localization.*locale]
+```

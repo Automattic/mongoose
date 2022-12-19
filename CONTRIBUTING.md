@@ -58,7 +58,7 @@ If you'd like to preview your documentation changes, first commit your changes t
 * `npm install`
 * `npm run docs:view`
 
-Visit `http://localhost:8089` and you should see the docs with your local changes. Make sure you `npm run docs:clean` before committing, because automated generated files to `docs/*` should **not** be in PRs.
+Visit `http://127.0.0.1:8089` and you should see the docs with your local changes. Make sure you `npm run docs:clean` before committing, because automated generated files to `docs/*` should **not** be in PRs.
 
 #### Documentation Style Guidelines
 

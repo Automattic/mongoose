@@ -64,13 +64,13 @@ uses is open. Every model has an associated connection. When you use
 `mongoose.model()`, your model will use the default mongoose connection.
 
 ```javascript
-mongoose.connect('mongodb://localhost/gettingstarted');
+mongoose.connect('mongodb://127.0.0.1/gettingstarted');
 ```
 
 If you create a custom connection, use that connection's `model()` function
 instead.
 ```javascript
-const connection = mongoose.createConnection('mongodb://localhost:27017/test');
+const connection = mongoose.createConnection('mongodb://127.0.0.1:27017/test');
 const Tank = connection.model('Tank', yourSchema);
 ```
 

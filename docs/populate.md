@@ -444,8 +444,8 @@ Let's say you have a schema representing events, and a schema representing
 conversations. Each event has a corresponding conversation thread.
 
 ```javascript
-const db1 = mongoose.createConnection('mongodb://localhost:27000/db1');
-const db2 = mongoose.createConnection('mongodb://localhost:27001/db2');
+const db1 = mongoose.createConnection('mongodb://127.0.0.1:27000/db1');
+const db2 = mongoose.createConnection('mongodb://127.0.0.1:27001/db2');
 
 const conversationSchema = new Schema({ numMessages: Number });
 const Conversation = db2.model('Conversation', conversationSchema);

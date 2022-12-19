@@ -21,7 +21,7 @@ async function run() {
   // Start process
   await server.start();
 
-  const db = await mongodb.MongoClient.connect('mongodb://localhost:27017/admin');
+  const db = await mongodb.MongoClient.connect('mongodb://127.0.0.1:27017/admin');
 
   await db.addUser('passwordIsTaco', 'taco', {
     roles: ['dbOwner']

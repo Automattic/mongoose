@@ -3,10 +3,10 @@
 Mongoose supports connecting to [MongoDB clusters that require SSL connections](https://docs.mongodb.com/manual/tutorial/configure-ssl/). Setting the `ssl` option to `true` in [`mongoose.connect()`](../api/mongoose.html#mongoose_Mongoose-connect) or your connection string is enough to connect to a MongoDB cluster using SSL:
 
 ```javascript
-mongoose.connect('mongodb://localhost:27017/test', { ssl: true });
+mongoose.connect('mongodb://127.0.0.1:27017/test', { ssl: true });
 
 // Equivalent:
-mongoose.connect('mongodb://localhost:27017/test?ssl=true');
+mongoose.connect('mongodb://127.0.0.1:27017/test?ssl=true');
 ```
 
 The `ssl` option defaults to `false` for connection strings that start with `mongodb://`. However,
@@ -27,7 +27,7 @@ By default, Mongoose validates the SSL certificate against a [certificate author
 to `false`.
 
 ```javascript
-mongoose.connect('mongodb://localhost:27017/test', {
+mongoose.connect('mongodb://127.0.0.1:27017/test', {
   ssl: true,
   sslValidate: false
 });
@@ -49,7 +49,7 @@ server is not registered with an established certificate authority. The solution
 [essentially sets a list of allowed SSL certificates](https://mongodb.github.io/node-mongodb-native/2.1/tutorials/connect/ssl/).
 
 ```javascript
-await mongoose.connect('mongodb://localhost:27017/test', {
+await mongoose.connect('mongodb://127.0.0.1:27017/test', {
   ssl: true,
   sslValidate: true,
   // For example, see https://medium.com/@rajanmaharjan/secure-your-mongodb-connections-ssl-tls-92e2addb3c89
@@ -76,7 +76,7 @@ If you're using [X509 authentication](https://www.mongodb.com/docs/drivers/node/
 ```javascript
 // Do this:
 const username = 'myusername';
-await mongoose.connect(`mongodb://${encodeURIComponent(username)}@localhost:27017/test`, {
+await mongoose.connect(`mongodb://${encodeURIComponent(username)}@127.0.0.1:27017/test`, {
   ssl: true,
   sslValidate: true,
   sslCA: `${__dirname}/rootCA.pem`,
@@ -84,7 +84,7 @@ await mongoose.connect(`mongodb://${encodeURIComponent(username)}@localhost:2701
 });
 
 // Not this:
-await mongoose.connect(`mongodb://localhost:27017/test`, {
+await mongoose.connect(`mongodb://127.0.0.1:27017/test`, {
   ssl: true,
   sslValidate: true,
   sslCA: `${__dirname}/rootCA.pem`,

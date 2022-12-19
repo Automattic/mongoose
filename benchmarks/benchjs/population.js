@@ -18,7 +18,7 @@ const utils = require('../../lib/utils.js');
  * These are all the benchmark tests for population ops
  */
 
-mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
+mongoose.connect('mongodb://127.0.0.1/mongoose-bench', function (err) {
   if (err) {
     throw err;
   }

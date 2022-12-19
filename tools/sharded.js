@@ -17,18 +17,18 @@ async function run() {
 
   await topology.addShard([{
     options: {
-      bind_ip: 'localhost', port: 31000, dbpath: '/data/db/31000', shardsvr: null
+      bind_ip: '127.0.0.1', port: 31000, dbpath: '/data/db/31000', shardsvr: null
     }
   }], { replSet: 'rs1' });
 
   await topology.addConfigurationServers([{
     options: {
-      bind_ip: 'localhost', port: 35000, dbpath: '/data/db/35000'
+      bind_ip: '127.0.0.1', port: 35000, dbpath: '/data/db/35000'
     }
   }], { replSet: 'rs0' });
 
   await topology.addProxies([{
-    bind_ip: 'localhost', port: 51000, configdb: 'localhost:35000'
+    bind_ip: '127.0.0.1', port: 51000, configdb: '127.0.0.1:35000'
   }], {
     binary: 'mongos'
   });

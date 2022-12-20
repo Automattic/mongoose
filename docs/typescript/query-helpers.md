@@ -69,7 +69,7 @@ const ProjectModel = model<Project, ProjectModelType>('Project', schema);
 run().catch(err => console.log(err));
 
 async function run(): Promise<void> {
-  await connect('mongodb://localhost:27017/test');
+  await connect('mongodb://127.0.0.1:27017/test');
   
   // Equivalent to `ProjectModel.find({ stars: { $gt: 1000 }, name: 'mongoose' })`
   await ProjectModel.find().where('stars').gt(1000).byName('mongoose');

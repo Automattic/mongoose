@@ -68,13 +68,13 @@ declare module 'mongoose' {
     [key: string]: any;
   }
 
-  class Aggregate<R> implements SessionOperation {
+  class Aggregate<ResultType> implements SessionOperation {
     /**
      * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js)
      * You do not need to call this function explicitly, the JavaScript runtime
      * will call it for you.
      */
-    [Symbol.asyncIterator](): AsyncIterableIterator<Unpacked<R>>;
+    [Symbol.asyncIterator](): AsyncIterableIterator<Unpacked<ResultType>>;
 
     options: AggregateOptions;
 
@@ -103,7 +103,7 @@ declare module 'mongoose' {
      * resolved with either the doc(s) or rejected with the error.
      * Like [`.then()`](#query_Query-then), but only takes a rejection handler.
      */
-    catch: Promise<R>['catch'];
+    catch: Promise<ResultType>['catch'];
 
     /** Set the collation. */
     collation(options: mongodb.CollationOptions): this;
@@ -121,8 +121,8 @@ declare module 'mongoose' {
 
 
     /** Executes the aggregate pipeline on the currently bound Model. */
-    exec(callback: Callback<R>): void;
-    exec(): Promise<R>;
+    exec(callback: Callback<ResultType>): void;
+    exec(): Promise<ResultType>;
 
     /** Execute the aggregation with explain */
     explain(verbosity: mongodb.ExplainVerbosityLike, callback: Callback<AnyObject>): void;
@@ -215,7 +215,7 @@ declare module 'mongoose' {
     sort(arg: string | Record<string, SortValues> | PipelineStage.Sort['$sort']): this;
 
     /** Provides promise for aggregate. */
-    then: Promise<R>['then'];
+    then: Promise<ResultType>['then'];
 
     /**
      * Appends a new $sortByCount operator to this aggregate pipeline. Accepts either a string field name

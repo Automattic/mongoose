@@ -978,3 +978,7 @@ function gh12782() {
     test: string
   }>({} as Props);
 }
+
+function gh12816() {
+  const schema = new Schema({}, { overwriteModels: true });
+}

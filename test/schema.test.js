@@ -2913,4 +2913,12 @@ describe('schema', function() {
 
     assert.equal(schema._getSchema('child.testMap.foo.bar').instance, 'Mixed');
   });
+
+  it('Schema.add method should add properties to schema.obj object (gh-12799)', () => {
+    const schema = new Schema();
+
+    schema.add({ test: String });
+
+    assert.ok('test' in schema.obj === true);
+  });
 });

@@ -243,7 +243,7 @@ const aggRes = await Person.aggregate([{ $match: { _id: idString } }])
 
 <h3 id="sorting"><a href="#sorting">Sorting</a></h3>
 
-[Sorting](/docs/api.html#query_Query-sort) is how you can ensure you db requests come back in the desired order.
+[Sorting](/docs/api.html#query_Query-sort) is how you can ensure you query results come back in the desired order.
 
 ```javascript
 const personSchema = new mongoose.Schema({
@@ -259,9 +259,7 @@ await Person.find().sort({ age: -1 }); // returns age starting from 10 as the fi
 await Person.find().sort({ age: 1 }); // returns age starting from 0 as the first entry
 ```
 
-<h3 id="sorting-multiple"><a href="#sorting-multiple">Sorting with Multiple Fields</a></h3>
-
-When sorting with mutiple fields, It is important to understand that the order you send the sort fields will determine the order of priority.
+When sorting with mutiple fields, the order of the sort keys determines what key MongoDB server sorts by first.
 
 ```javascript
 const personSchema = new mongoose.Schema({
@@ -284,7 +282,7 @@ await Person.find().sort({ age: 1, weight: -1 }); // returns age starting from 0
 ```
 
 You can view the output of a single run of this block below.
-As you can see, age was sorted from 0 to 2 and then to break ties it would sort by whichever document had a bigger weight.
+As you can see, age is sorted from 0 to 2 but when age is equal, sorts by weight.
 
 ```javascript
 [

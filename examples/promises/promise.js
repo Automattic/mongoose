@@ -40,7 +40,7 @@ const data = [
 ];
 
 
-mongoose.connect('mongodb://localhost/persons', function(err) {
+mongoose.connect('mongodb://127.0.0.1/persons', function(err) {
   if (err) {
     throw err;
   }

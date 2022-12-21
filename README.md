@@ -66,7 +66,7 @@ const require = createRequire(import.meta.url);
 
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/test')
+mongoose.connect('mongodb://127.0.0.1:27017/test')
   .then(() => console.log('Connected!'));
 ```
 
@@ -91,12 +91,12 @@ First, we need to define a connection. If your app uses only one database, you s
 Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters `host, database, port, options`.
 
 ```js
-await mongoose.connect('mongodb://localhost/my_database');
+await mongoose.connect('mongodb://127.0.0.1/my_database');
 ```
 
 Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`.
 
-**Note:** _If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed._
+**Note:** _If the local connection fails then try using 127.0.0.1 instead of 127.0.0.1. Sometimes issues may arise when the local hostname has been changed._
 
 **Important!** Mongoose buffers all the commands until it's connected to the database. This means that you don't have to wait until it connects to MongoDB in order to define models, run queries, etc.
 

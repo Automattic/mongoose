@@ -262,4 +262,53 @@ describe('castArrayFilters', function() {
       castArrayFilters(q);
     }, /Could not find path "arr\.0\.notInSchema" in schema/);
   });
+
+  it('handles embedded discriminators (gh-12565)', function() {
+    const elementSchema = new Schema(
+      { elementType: String },
+      { discriminatorKey: 'elementType' }
+    );
+    const versionSchema = new Schema(
+      { version: Number, elements: [elementSchema] },
+      { strictQuery: 'throw' }
+    );
+    versionSchema.path('elements').discriminator(
+      'Graph',
+      new Schema({
+        number: Number,
+        curves: [{ line: { label: String, type: String, number: String, latLong: [Number], controller: String } }]
+      })
+    );
+
+    const testSchema = new Schema({ versions: [versionSchema] });
+
+    const q = new Query();
+    q.schema = testSchema;
+
+    const p = {
+      $push: {
+        'versions.$[version].elements.$[element].curves': {
+          line: {
+            label: 'CC110_Ligne 02',
+            type: 'numerique',
+            number: '30',
+            latLong: [44, 8],
+            controller: 'CC110'
+          }
+        }
+      }
+    };
+    const opts = {
+      arrayFilters: [
+        {
+          'element.elementType': 'Graph',
+          'element.number': '1'
+        }
+      ]
+    };
+    q.updateOne({}, p, opts);
+    castArrayFilters(q);
+
+    assert.strictEqual(q.options.arrayFilters[0]['element.number'], 1);
+  });
 });

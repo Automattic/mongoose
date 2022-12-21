@@ -274,9 +274,9 @@ While nice for development, it is recommended this behavior be disabled in produ
 Disable the behavior by setting the `autoIndex` option of your schema to `false`, or globally on the connection by setting the option `autoIndex` to `false`.
 
 ```javascript
-mongoose.connect('mongodb://user:pass@localhost:port/database', { autoIndex: false });
+mongoose.connect('mongodb://user:pass@127.0.0.1:port/database', { autoIndex: false });
 // or
-mongoose.createConnection('mongodb://user:pass@localhost:port/database', { autoIndex: false });
+mongoose.createConnection('mongodb://user:pass@127.0.0.1:port/database', { autoIndex: false });
 // or
 mongoose.set('autoIndex', false);
 // or

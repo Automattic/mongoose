@@ -32,11 +32,11 @@ const gameSchema = Schema({
 const Game = mongoose.model('Game', gameSchema);
 
 /**
- * Connect to the console database on localhost with
+ * Connect to the console database on 127.0.0.1 with
  * the default port (27017)
  */
 
-mongoose.connect('mongodb://localhost/console', function(err) {
+mongoose.connect('mongodb://127.0.0.1/console', function(err) {
   // if we failed to connect, abort
   if (err) throw err;
 

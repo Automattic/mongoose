@@ -70,6 +70,19 @@ below.
 [require:getters/setters.*setters.*update skip]
 ```
 
+## Passing Parameters using `$locals`
+
+You can't pass parameters to your getter and setter functions like you do to normal function calls.
+To configure or pass additional properties to your getters and setters, you can use the document's `$locals` property.
+
+The `$locals` property is the preferred place to store any program-defined data on your document without conflicting with schema-defined properties.
+In your getter and setter functions, `this` is the document being accessed, so you set properties on `$locals` and then access those properties in your getters examples.
+For example, the following shows how you can use `$locals` to configure the language for a custom getter that returns a string in different languages.
+
+```javascript
+[require:getters/setters.*localization.*locale]
+```
+
 Differences vs ES6 Getters/Setters
 ----------------------------------
 

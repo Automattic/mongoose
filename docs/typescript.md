@@ -37,7 +37,7 @@ run().catch(err => console.log(err));
 
 async function run() {
   // 4. Connect to MongoDB
-  await connect('mongodb://localhost:27017/test');
+  await connect('mongodb://127.0.0.1:27017/test');
 
   const user = new User({
     name: 'Bill',

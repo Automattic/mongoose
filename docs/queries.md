@@ -241,6 +241,91 @@ const queryRes = await Person.findOne({ _id: idString });
 const aggRes = await Person.aggregate([{ $match: { _id: idString } }])
 ```
 
+<h3 id="sorting"><a href="#sorting">Sorting</a></h3>
+
+[Sorting](/docs/api.html#query_Query-sort) is how you can ensure you db requests come back in the desired order.
+
+```javascript
+const personSchema = new mongoose.Schema({
+  age: Number
+});
+
+const Person = mongoose.model('Person', personSchema);
+for (let i = 0; i < 10; i++) {
+  await Person.create({ age: i });
+}
+
+await Person.find().sort({ age: -1 }); // returns age starting from 10 as the first entry
+await Person.find().sort({ age: 1 }); // returns age starting from 0 as the first entry
+```
+
+<h3 id="sorting-multiple"><a href="#sorting-multiple">Sorting with Multiple Fields</a></h3>
+
+When sorting with mutiple fields, It is important to understand that the order you send the sort fields will determine the order of priority.
+
+```javascript
+const personSchema = new mongoose.Schema({
+  age: Number,
+  name: String,
+  weight: Number
+});
+
+const Person = mongoose.model('Person', personSchema);
+const iterations = 5;
+for (let i = 0; i < iterations; i++) {
+  await Person.create({
+    age: Math.abs(2-i),
+    name: 'Test'+i,
+    weight: Math.floor(Math.random() * 100) + 1
+  });
+}
+
+await Person.find().sort({ age: 1, weight: -1 }); // returns age starting from 0, but while keeping that order will then sort by weight.
+```
+
+You can view the output of a single run of this block below.
+As you can see, age was sorted from 0 to 2 and then to break ties it would sort by whichever document had a bigger weight.
+
+```javascript
+[
+  {
+    _id: new ObjectId("63a335a6b9b6a7bfc186cb37"),
+    age: 0,
+    name: 'Test2',
+    weight: 67,
+    __v: 0
+  },
+  {
+    _id: new ObjectId("63a335a6b9b6a7bfc186cb35"),
+    age: 1,
+    name: 'Test1',
+    weight: 99,
+    __v: 0
+  },
+  {
+    _id: new ObjectId("63a335a6b9b6a7bfc186cb39"),
+    age: 1,
+    name: 'Test3',
+    weight: 73,
+    __v: 0
+  },
+  {
+    _id: new ObjectId("63a335a6b9b6a7bfc186cb33"),
+    age: 2,
+    name: 'Test0',
+    weight: 65,
+    __v: 0
+  },
+  {
+    _id: new ObjectId("63a335a6b9b6a7bfc186cb3b"),
+    age: 2,
+    name: 'Test4',
+    weight: 62,
+    __v: 0
+  }
+]
+```
+
 <h3 id="next"><a href="#next">Next Up</a></h3>
 
 Now that we've covered `Queries`, let's take a look at [Validation](validation.html).

@@ -8,7 +8,7 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
 describe('model: validate: ', function() {
-  afterEach(() => mongoose.deleteModel(/.*/));
+  beforeEach(() => mongoose.deleteModel(/.*/));
 
   it('Model.validate() (gh-7587)', async function() {
     const Model = mongoose.model('Test', new Schema({

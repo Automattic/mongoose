@@ -217,6 +217,80 @@ pipeline have the correct type.</p>
 <span class="hljs-comment">// pipelines.</span>
 <span class="hljs-keyword">const</span> aggRes = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">aggregate</span>([{ <span class="hljs-attr">$match</span>: { <span class="hljs-attr">_id</span>: idString } }])
 </code></pre>
+<h3 id="sorting"><a href="#sorting">Sorting</a></h3>
+
+<p><a href="/docs/api.html#query_Query-sort">Sorting</a> is how you can ensure you query results come back in the desired order.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> personSchema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span>
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Person</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Person&#x27;</span>, personSchema);
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">age</span>: i });
+}
+
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">sort</span>({ <span class="hljs-attr">age</span>: -<span class="hljs-number">1</span> }); <span class="hljs-comment">// returns age starting from 10 as the first entry</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">sort</span>({ <span class="hljs-attr">age</span>: <span class="hljs-number">1</span> }); <span class="hljs-comment">// returns age starting from 0 as the first entry</span>
+</code></pre>
+<p>When sorting with mutiple fields, the order of the sort keys determines what key MongoDB server sorts by first.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> personSchema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span>,
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">weight</span>: <span class="hljs-title class_">Number</span>
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Person</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Person&#x27;</span>, personSchema);
+<span class="hljs-keyword">const</span> iterations = <span class="hljs-number">5</span>;
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; iterations; i++) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">create</span>({
+    <span class="hljs-attr">age</span>: <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">abs</span>(<span class="hljs-number">2</span>-i),
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Test&#x27;</span>+i,
+    <span class="hljs-attr">weight</span>: <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() * <span class="hljs-number">100</span>) + <span class="hljs-number">1</span>
+  });
+}
+
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">sort</span>({ <span class="hljs-attr">age</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">weight</span>: -<span class="hljs-number">1</span> }); <span class="hljs-comment">// returns age starting from 0, but while keeping that order will then sort by weight.</span>
+</code></pre>
+<p>You can view the output of a single run of this block below.
+As you can see, age is sorted from 0 to 2 but when age is equal, sorts by weight.</p>
+<pre><code class="language-javascript">[
+  {
+    <span class="hljs-attr">_id</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectId</span>(<span class="hljs-string">&quot;63a335a6b9b6a7bfc186cb37&quot;</span>),
+    <span class="hljs-attr">age</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Test2&#x27;</span>,
+    <span class="hljs-attr">weight</span>: <span class="hljs-number">67</span>,
+    <span class="hljs-attr">__v</span>: <span class="hljs-number">0</span>
+  },
+  {
+    <span class="hljs-attr">_id</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectId</span>(<span class="hljs-string">&quot;63a335a6b9b6a7bfc186cb35&quot;</span>),
+    <span class="hljs-attr">age</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Test1&#x27;</span>,
+    <span class="hljs-attr">weight</span>: <span class="hljs-number">99</span>,
+    <span class="hljs-attr">__v</span>: <span class="hljs-number">0</span>
+  },
+  {
+    <span class="hljs-attr">_id</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectId</span>(<span class="hljs-string">&quot;63a335a6b9b6a7bfc186cb39&quot;</span>),
+    <span class="hljs-attr">age</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Test3&#x27;</span>,
+    <span class="hljs-attr">weight</span>: <span class="hljs-number">73</span>,
+    <span class="hljs-attr">__v</span>: <span class="hljs-number">0</span>
+  },
+  {
+    <span class="hljs-attr">_id</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectId</span>(<span class="hljs-string">&quot;63a335a6b9b6a7bfc186cb33&quot;</span>),
+    <span class="hljs-attr">age</span>: <span class="hljs-number">2</span>,
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Test0&#x27;</span>,
+    <span class="hljs-attr">weight</span>: <span class="hljs-number">65</span>,
+    <span class="hljs-attr">__v</span>: <span class="hljs-number">0</span>
+  },
+  {
+    <span class="hljs-attr">_id</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectId</span>(<span class="hljs-string">&quot;63a335a6b9b6a7bfc186cb3b&quot;</span>),
+    <span class="hljs-attr">age</span>: <span class="hljs-number">2</span>,
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Test4&#x27;</span>,
+    <span class="hljs-attr">weight</span>: <span class="hljs-number">62</span>,
+    <span class="hljs-attr">__v</span>: <span class="hljs-number">0</span>
+  }
+]
+</code></pre>
 <h3 id="next"><a href="#next">Next Up</a></h3>
 
 <p>Now that we&#39;ve covered <code>Queries</code>, let&#39;s take a look at <a href="validation.html">Validation</a>.</p>

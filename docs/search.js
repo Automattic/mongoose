@@ -122,13 +122,13 @@ async function run() {
   await Content.deleteMany({ version });
   for (const content of contents) {
     if (version !== '6.x') {
-      content.url = `/docs/${version}/docs/${content.url}`;
+      content.url = `/docs/${version}/docs${content.url}`;
     }
     await content.save();
   }
 
   const results = await Content.
-    find({ $text: { $search: 'validate' } }, { score: { $meta: 'textScore' } }).
+    find({ $text: { $search: 'validate' }, version }, { score: { $meta: 'textScore' } }).
     sort({ score: { $meta: 'textScore' } }).
     limit(10);
 

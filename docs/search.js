@@ -6,6 +6,7 @@ const filemap = require('./source');
 const fs = require('fs');
 const pug = require('pug');
 const mongoose = require('../');
+let { version } = require('../package.json');
 
 const markdown = require('marked');
 const highlight = require('highlight.js');
@@ -15,12 +16,14 @@ markdown.setOptions({
   }
 });
 
-mongoose.set('useCreateIndex', true);
+// 5.13.5 -> 5.x, 6.8.2 -> 6.x, etc.
+version = version.slice(0, version.indexOf('.')) + '.x';
 
 const contentSchema = new mongoose.Schema({
   title: { type: String, required: true },
   body: { type: String, required: true },
-  url: { type: String, required: true }
+  url: { type: String, required: true },
+  version: { type: String, required: true, default: version }
 });
 contentSchema.index({ title: 'text', body: 'text' });
 const Content = mongoose.model('Content', contentSchema, 'Content');
@@ -30,7 +33,6 @@ const files = Object.keys(filemap);
 
 for (const filename of files) {
   const file = filemap[filename];
-  console.log(file)
   if (file.api) {
     // API docs are special, raw content is in the `docs` property
     for (const _class of file.docs) {
@@ -42,6 +44,7 @@ for (const filename of files) {
         });
         const err = content.validateSync();
         if (err != null) {
+          console.log(content);
           throw err;
         }
         contents.push(content);
@@ -49,7 +52,7 @@ for (const filename of files) {
     }
   } else if (file.markdown) {
     let text = fs.readFileSync(filename, 'utf8');
-    text = markdown(text);
+    text = markdown.parse(text);
 
     const content = new Content({
       title: file.title,
@@ -114,15 +117,18 @@ for (const filename of files) {
 run().catch(error => console.error(error.stack));
 
 async function run() {
-  await mongoose.connect(config.uri, { useNewUrlParser: true, dbName: 'mongoose' });
+  await mongoose.connect(config.uri, { dbName: 'mongoose' });
 
-  await Content.deleteMany({});
+  await Content.deleteMany({ version });
   for (const content of contents) {
+    if (version !== '6.x') {
+      content.url = `/docs/${version}/docs${content.url}`;
+    }
     await content.save();
   }
 
   const results = await Content.
-    find({ $text: { $search: 'validate' } }, { score: { $meta: 'textScore' } }).
+    find({ $text: { $search: 'validate' }, version }, { score: { $meta: 'textScore' } }).
     sort({ score: { $meta: 'textScore' } }).
     limit(10);
 

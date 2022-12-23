@@ -4314,7 +4314,7 @@ describe('Query', function() {
     assert.strictEqual(found[0].title, 'burrito bowl');
   });
 
-  it('update operation should remove fields set to undefined (gh-12794)', async() => {
+  it('update operation should remove fields set to undefined (gh-12794) (gh-12821)', async function() {
     const m = new mongoose.Mongoose();
 
     await m.connect(start.uri);
@@ -4338,5 +4338,15 @@ describe('Query', function() {
     ).lean();
 
     assert.ok('title' in updatedDoc === false);
+
+    const replacedDoc = await Test.findOneAndReplace(
+      {
+        _id: doc._id
+      },
+      { title: undefined },
+      { returnOriginal: false }
+    ).lean();
+
+    assert.ok('title' in replacedDoc === false);
   });
 });

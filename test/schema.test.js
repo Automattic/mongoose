@@ -2913,4 +2913,17 @@ describe('schema', function() {
 
     assert.equal(schema._getSchema('child.testMap.foo.bar').instance, 'Mixed');
   });
+
+  it('should not allow to create a path with primitive value (gh-7558)', () => {
+    assert.throws(() => {
+      new Schema({
+        foo: false
+      });
+    }, /invalid.*false.*foo/i);
+
+    assert.throws(() => {
+      const schema = new Schema();
+      schema.add({ foo: false });
+    }, /invalid.*false.*foo/i);
+  });
 });

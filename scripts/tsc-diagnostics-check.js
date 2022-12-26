@@ -3,7 +3,7 @@
 const fs = require('fs');
 
 const stdin = fs.readFileSync(0).toString('utf8');
-const maxInstantiations = isNaN(process.argv[2]) ? 100_000 : +process.argv[2];
+const maxInstantiations = isNaN(process.argv[2]) ? 100000 : +process.argv[2];
 
 console.log(stdin);
 

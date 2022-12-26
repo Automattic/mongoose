@@ -62,7 +62,7 @@ const UserModel = mongoose.model('User', schema);
 
 There are a few caveats for using automatic type inference:
 
-1. You need to set `strict: true` in your `tsconfig.json` or `--strict` if running `tsc`. There are [known issues](https://github.com/Automattic/mongoose/issues/12420) with automatic type inference with strict mode disabled.
+1. You need to set `strictNullChecks: true` or `strict: true` in your `tsconfig.json`. Or, if you're setting flags at the command line, `--strictNullChecks` or `--strict`. There are [known issues](https://github.com/Automattic/mongoose/issues/12420) with automatic type inference with strict mode disabled.
 2. You need to define your schema in the `new Schema()` call. Don't assign your schema definition to a temporary variable. Doing something like `const schemaDefinition = { name: String }; const schema = new Schema(schemaDefinition);` will not work.
 
 If automatic type inference doesn't work for you, you can always fall back to document interface definitions.

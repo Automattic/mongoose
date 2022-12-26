@@ -1,3 +1,21 @@
+6.8.1 / 2022-12-19
+==================
+ * fix(query): avoid throwing circular dependency error if same object is used in multiple properties #12774 [orgads](https://github.com/orgads)
+ * fix(map): return value from super.delete() #12777 [danbrud](https://github.com/danbrud)
+ * fix(populate): handle virtual populate underneath document array with justOne=true and sort set where 1 element has only 1 result #12815 #12730
+ * fix(update): handle embedded discriminators when casting array filters #12802 #12565
+ * fix(populate): avoid calling transform if there's no populate results and using lean #12804 #12739
+ * fix(model): prevent index creation on syncIndexes if not necessary #12785 #12250 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): correctly infer this when using pre('updateOne') with { document: true, query: false } #12778
+ * fix(types): make InferSchemaType: consider { required: boolean } required if it isn't explicitly false #12784 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * docs: replace many occurrences of "localhost" with "127.0.0.1" #12811 #12741 [hasezoey](https://github.com/hasezoey) [SadiqOnGithub](https://github.com/SadiqOnGithub)
+ * docs(mongoose): Added missing options to set #12810 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: add info on `$locals` parameters to getters/setters tutorial #12814 #12550 [IslandRhythms](https://github.com/IslandRhythms)
+ * docs: make Document.prototype.$clone() public #12803
+ * docs(query): updated explanation for slice #12776 #12474 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(middleware): fix broken links #12787 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(queries): fixed broken links #12790 [lpizzinidev](https://github.com/lpizzinidev)
+
 6.8.0 / 2022-12-05
 ==================
  * feat: add alpha support for Deno #12397 #9056

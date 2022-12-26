@@ -18,7 +18,7 @@ const B = mongoose.model('B', Schema({
 let start;
 let count = 0;
 
-mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
+mongoose.connect('mongodb://127.0.0.1/mongoose-bench', function(err) {
   if (err) {
     return done(err);
   }

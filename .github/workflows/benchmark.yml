@@ -37,7 +37,7 @@ jobs:
       - run: npm install
         working-directory: benchmarks/typescript/simple
 
-      - run: npx ts-benchmark -p ./ -f 17/100000 18 29 32 -b master -g -t --colors
+      - run: npx ts-benchmark -p ./ -f 17/110000 18 29 32 -b master -g -t --colors
         working-directory: benchmarks/typescript/simple
         env:
           DB_URL: ${{ secrets.DB_URL }}

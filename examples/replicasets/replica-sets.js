@@ -46,7 +46,7 @@ const data = [
 const opts = {
   replSet: { rs_name: 'rs0' }
 };
-mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27020', opts, function(err) {
+mongoose.connect('mongodb://127.0.0.1:27018/persons,127.0.0.1:27019,127.0.0.1:27020', opts, function(err) {
   if (err) throw err;
 
   // create all of the dummy people

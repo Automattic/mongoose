@@ -4,18 +4,18 @@ import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 
 expectType<Connection>(createConnection());
-expectType<Connection>(createConnection('mongodb://localhost:27017/test'));
-expectType<Connection>(createConnection('mongodb://localhost:27017/test', { appName: 'mongoose' }));
-expectType<void>(createConnection('mongodb://localhost:27017/test', { appName: 'mongoose' }, (err, res) => (expectType<Connection>(res))));
+expectType<Connection>(createConnection('mongodb://127.0.0.1:27017/test'));
+expectType<Connection>(createConnection('mongodb://127.0.0.1:27017/test', { appName: 'mongoose' }));
+expectType<void>(createConnection('mongodb://127.0.0.1:27017/test', { appName: 'mongoose' }, (err, res) => (expectType<Connection>(res))));
 
 const conn = createConnection();
 
 expectAssignable<Model<{ name: string }, any, any, any>>(conn.model('Test', new Schema<{ name: string }>({ name: { type: String } })));
 expectType<Model<{ name: string }>>(conn.model<{ name: string }>('Test', new Schema({ name: { type: String } })));
 
-expectType<Promise<Connection>>(conn.openUri('mongodb://localhost:27017/test'));
-expectType<Promise<Connection>>(conn.openUri('mongodb://localhost:27017/test', { bufferCommands: true }));
-expectType<Connection>(conn.openUri('mongodb://localhost:27017/test', { bufferCommands: true }, (err, value) => {
+expectType<Promise<Connection>>(conn.openUri('mongodb://127.0.0.1:27017/test'));
+expectType<Promise<Connection>>(conn.openUri('mongodb://127.0.0.1:27017/test', { bufferCommands: true }));
+expectType<Connection>(conn.openUri('mongodb://127.0.0.1:27017/test', { bufferCommands: true }, (err, value) => {
   expectType<Connection>(value);
 }));
 
@@ -43,22 +43,22 @@ expectType<Connection>(conn.deleteModel(/.+/));
 
 expectType<Array<string>>(conn.modelNames());
 
-expectType<Promise<void>>(createConnection('mongodb://localhost:27017/test').close());
-expectType<Promise<void>>(createConnection('mongodb://localhost:27017/test').close(true));
-expectType<void>(createConnection('mongodb://localhost:27017/test').close(() => {
+expectType<Promise<void>>(createConnection('mongodb://127.0.0.1:27017/test').close());
+expectType<Promise<void>>(createConnection('mongodb://127.0.0.1:27017/test').close(true));
+expectType<void>(createConnection('mongodb://127.0.0.1:27017/test').close(() => {
   // do nothing.
 }));
-expectType<void>(createConnection('mongodb://localhost:27017/test').close(true, () => {
+expectType<void>(createConnection('mongodb://127.0.0.1:27017/test').close(true, () => {
   // do nothing.
 }));
-expectType<void>(createConnection('mongodb://localhost:27017/test').close(false, () => {
+expectType<void>(createConnection('mongodb://127.0.0.1:27017/test').close(false, () => {
   // do nothing.
 }));
 
 expectType<mongodb.Db>(conn.db);
 
 expectType<mongodb.MongoClient>(conn.getClient());
-expectType<Connection>(conn.setClient(new mongodb.MongoClient('mongodb://localhost:27017/test')));
+expectType<Connection>(conn.setClient(new mongodb.MongoClient('mongodb://127.0.0.1:27017/test')));
 
 expectType<Promise<void>>(conn.transaction(async(res) => {
   expectType<mongodb.ClientSession>(res);

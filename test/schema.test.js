@@ -2833,7 +2833,7 @@ describe('schema', function() {
     assert.equal(entry instanceof mongoose.Document, false);
   });
 
-  it('disallows setting special properties with `add()` or constructor (gh-12085)', async function() {
+  it('disallows setting special properties with `add()` or constructor (gh-12085)', function() {
     const maliciousPayload = '{"__proto__.toString": "Number"}';
 
     assert.throws(() => {

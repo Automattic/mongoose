@@ -75,6 +75,15 @@ describe('schema.documentarray', function() {
     done();
   });
 
+  it('propagates strictQuery to implicitly created schemas (gh-12796)', function() {
+    const schema = new Schema({
+      arr: [{ name: String }]
+    }, { strictQuery: 'throw' });
+
+    assert.equal(schema.childSchemas.length, 1);
+    assert.equal(schema.childSchemas[0].schema.options.strictQuery, 'throw');
+  });
+
   it('supports set with array of document arrays (gh-7799)', function() {
     const subSchema = new Schema({
       title: String

@@ -6916,10 +6916,12 @@ describe('Model', function() {
           granularity: 'hours'
         },
         autoCreate: false,
+        autoIndex: false,
         expireAfterSeconds: 86400
       });
 
-      const Test = db.model('Test', schema);
+      const Test = db.model('Test', schema, 'Test');
+      await Test.init();
 
       await Test.collection.drop().catch(() => {});
       await Test.createCollection();

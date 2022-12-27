@@ -9,9 +9,12 @@ for (var i = 0; i < pairs.length; ++i) {
   }
 }
 
+var versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
+var version = versionFromUrl ? versionFromUrl[1] : '6.x';
+
 if (q != null) {
   document.getElementById('search-input').value = decodeURIComponent(q);
-  fetch(root + '/search?search=' + q).
+  fetch(root + '/search?search=' + q + '&version=' + version).
     then(function(res) { return res.json(); }).
     then(
       function(result) {

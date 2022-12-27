@@ -17,10 +17,12 @@
 </div>
 
 <p>Mongoose <a href="../guide.html">schemas</a> are how you tell Mongoose what your documents look like.
-Mongoose schemas are separate from TypeScript interfaces, so you need to define both a <em>document interface</em> and a <em>schema</em> until V6.3.1.
-Mongoose supports auto typed schemas so you don&#39;t need to define additional typescript interface anymore but you are still able to do so.
-Mongoose provides a <code>InferSchemaType</code>, which infers the type of the auto typed schema document when needed.</p>
-<p><code>Until mongoose V6.3.1:</code></p>
+Mongoose schemas are separate from TypeScript interfaces, so you need to either define both a <em>document interface</em> and a <em>schema</em>; or rely on Mongoose to automatically infer the type from the schema definition.</p>
+<h3 id="separate-document-interface-definition">
+      <a href="#separate-document-interface-definition">
+        Separate document interface definition
+      </a>
+    </h3>
 <pre><code class="language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Schema</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mongoose&#x27;</span>;
 
 <span class="hljs-comment">// Document interface</span>
@@ -37,7 +39,14 @@ Mongoose provides a <code>InferSchemaType</code>, which infers the type of the a
   <span class="hljs-attr">avatar</span>: <span class="hljs-title class_">String</span>
 });
 </code></pre>
-<p><code>another approach:</code></p>
+<p>By default, Mongoose does <strong>not</strong> check if your document interface lines up with your schema.
+For example, the above code won&#39;t throw an error if <code>email</code> is optional in the document interface, but <code>required</code> in <code>schema</code>.</p>
+<h3 id="automatic-type-inference">
+      <a href="#automatic-type-inference">
+        Automatic type inference
+      </a>
+    </h3>
+<p>Mongoose can also automatically infer the document type from your schema definition as follows.</p>
 <pre><code class="language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Schema</span>, <span class="hljs-title class_">InferSchemaType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mongoose&#x27;</span>;
 
 <span class="hljs-comment">// Document interface</span>
@@ -63,9 +72,15 @@ Mongoose provides a <code>InferSchemaType</code>, which infers the type of the a
 <span class="hljs-comment">//   avatar?: string;</span>
 <span class="hljs-comment">// }</span>
 
+<span class="hljs-comment">// `UserModel` will have `name: string`, etc.</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">UserModel</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, schema);
 </code></pre>
-<p>By default, Mongoose does <strong>not</strong> check if your document interface lines up with your schema.
-For example, the above code won&#39;t throw an error if <code>email</code> is optional in the document interface, but <code>required</code> in <code>schema</code>.</p>
+<p>There are a few caveats for using automatic type inference:</p>
+<ol>
+<li>You need to set <code>strictNullChecks: true</code> or <code>strict: true</code> in your <code>tsconfig.json</code>. Or, if you&#39;re setting flags at the command line, <code>--strictNullChecks</code> or <code>--strict</code>. There are <a href="https://github.com/Automattic/mongoose/issues/12420">known issues</a> with automatic type inference with strict mode disabled.</li>
+<li>You need to define your schema in the <code>new Schema()</code> call. Don&#39;t assign your schema definition to a temporary variable. Doing something like <code>const schemaDefinition = { name: String }; const schema = new Schema(schemaDefinition);</code> will not work.</li>
+</ol>
+<p>If automatic type inference doesn&#39;t work for you, you can always fall back to document interface definitions.</p>
 <h2 id="generic-parameters">
       <a href="#generic-parameters">
         Generic parameters

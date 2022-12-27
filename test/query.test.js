@@ -1404,8 +1404,6 @@ describe('Query', function() {
     });
 
     describe('read', function() {
-      const P = mongoose.mongo.ReadPreference;
-
       describe('without tags', function() {
         it('works', function(done) {
           const query = new Query({});

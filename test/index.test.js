@@ -7,7 +7,6 @@ const start = require('./common');
 const assert = require('assert');
 const random = require('./util').random;
 const stream = require('stream');
-const { EventEmitter } = require('events');
 
 const collection = 'blogposts_' + random();
 
@@ -1046,46 +1045,6 @@ describe('mongoose module:', function() {
     });
   });
 
-  describe('custom drivers', function() {
-    it('can set custom driver (gh-11900)', async function() {
-      const m = new mongoose.Mongoose();
-
-      class Collection {
-        findOne(filter, options, cb) {
-          cb(null, { answer: 42 });
-        }
-      }
-      class Connection extends EventEmitter {
-        constructor(base) {
-          super();
-          this.base = base;
-          this.models = {};
-        }
-
-        collection() {
-          return new Collection();
-        }
-
-        openUri(uri, opts, callback) {
-          this.readyState = mongoose.ConnectionStates.connected;
-          callback();
-        }
-      }
-      const driver = {
-        Collection,
-        getConnection: () => Connection
-      };
-
-      m.setDriver(driver);
-
-      await m.connect();
-
-      const Test = m.model('Test', m.Schema({ answer: Number }));
-
-      const res = await Test.findOne();
-      assert.deepEqual(res.toObject(), { answer: 42 });
-    });
-  });
   describe('global id option', function() {
     it('can disable the id virtual on schemas gh-11966', async function() {
       const m = new mongoose.Mongoose();

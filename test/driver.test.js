@@ -96,6 +96,7 @@ describe('driver', function() {
     const Test = m1.model('Test', new Schema({ answer: Number }, { versionKey: false }));
     await Test.create({ answer: 42 });
     let doc = await Test.findOne();
+    /* eslint-disable no-unused-vars */
     assert.deepEqual((({ _id, ...doc }) => doc)(doc.toObject()), { answer: 42 });
 
     await m2.connect('fake.com');

@@ -3,11 +3,11 @@
 const fs = require('fs');
 
 const stdin = fs.readFileSync(0).toString('utf8');
-const maxInstantiations = isNaN(process.argv[2]) ? 100000 : +process.argv[2];
+const maxInstantiations = isNaN(process.argv[2]) ? 100000 : parseInt(process.argv[2], 10);
 
 console.log(stdin);
 
-const numInstantiations = stdin.match(/Instantiations:\s+(\d+)/)[1];
+const numInstantiations = parseInt(stdin.match(/Instantiations:\s+(\d+)/)[1], 10);
 if (numInstantiations > maxInstantiations) {
   throw new Error(`Instantiations ${numInstantiations} > max ${maxInstantiations}`);
 }

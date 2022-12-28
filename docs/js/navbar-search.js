@@ -1,3 +1,5 @@
+var defaultVersion = '6.x';
+
 (function() {
   var versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
   var version = versionFromUrl ? versionFromUrl[1] : defaultVersion;

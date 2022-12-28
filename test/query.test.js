@@ -1564,7 +1564,7 @@ describe('Query', function() {
       const Product = db.model('Product', productSchema);
       Product.create(
         { numbers: [3, 4, 5] },
-        { strings: 'hi there'.split(' ') }, function(err, doc1, doc2) {
+        { strings: 'hi there'.split(' '), w: 'majority' }, function(err, doc1, doc2) {
           assert.ifError(err);
           Product.find().setOptions({ limit: 1, sort: { _id: -1 }, read: 'n' }).exec(function(err, docs) {
             assert.ifError(err);

@@ -121,8 +121,15 @@ async function run() {
 
   await Content.deleteMany({ version });
   for (const content of contents) {
-    if (version !== '6.x') {
-      content.url = `/docs/${version}/docs${content.url}`;
+    if (version === '6.x') {
+      let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
+      if (!url.startsWith('/docs')) {
+        url = '/docs'  + url;
+      }
+      content.url = url;
+    } else {
+      const url = content.url.startsWith('/') ? content.url : `/${content.url}`;
+      content.url = `/docs/${version}/docs${url}`;
     }
     await content.save();
   }

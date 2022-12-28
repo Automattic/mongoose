@@ -6916,10 +6916,12 @@ describe('Model', function() {
           granularity: 'hours'
         },
         autoCreate: false,
+        autoIndex: false,
         expireAfterSeconds: 86400
       });
 
-      const Test = db.model('Test', schema);
+      const Test = db.model('Test', schema, 'Test');
+      await Test.init();
 
       await Test.collection.drop().catch(() => {});
       await Test.createCollection();
@@ -7454,119 +7456,6 @@ describe('Model', function() {
       const explainResult = await Model.exists({}, { explain: true });
       assert.ok(explainResult);
     });
-  });
-
-  it('Model.validate() (gh-7587)', async function() {
-    const Model = db.model('Test', new Schema({
-      name: {
-        first: {
-          type: String,
-          required: true
-        },
-        last: {
-          type: String,
-          required: true
-        }
-      },
-      age: {
-        type: Number,
-        required: true
-      },
-      comments: [{ name: { type: String, required: true } }]
-    }));
-
-
-    let err = null;
-    let obj = null;
-
-    err = await Model.validate({ age: null }, ['age']).
-      then(() => null, err => err);
-    assert.ok(err);
-    assert.deepEqual(Object.keys(err.errors), ['age']);
-
-    err = await Model.validate({ name: {} }, ['name']).
-      then(() => null, err => err);
-    assert.ok(err);
-    assert.deepEqual(Object.keys(err.errors), ['name.first', 'name.last']);
-
-    obj = { name: { first: 'foo' } };
-    err = await Model.validate(obj, ['name']).
-      then(() => null, err => err);
-    assert.ok(err);
-    assert.deepEqual(Object.keys(err.errors), ['name.last']);
-
-    obj = { comments: [{ name: 'test' }, {}] };
-    err = await Model.validate(obj, ['comments']).
-      then(() => null, err => err);
-    assert.ok(err);
-    assert.deepEqual(Object.keys(err.errors), ['comments.name']);
-
-    obj = { age: '42' };
-    await Model.validate(obj, ['age']);
-    assert.strictEqual(obj.age, 42);
-  });
-
-  it('Model.validate(...) validates paths in arrays (gh-8821)', async function() {
-    const userSchema = new Schema({
-      friends: [{ type: String, required: true, minlength: 3 }]
-    });
-
-    const User = db.model('User', userSchema);
-
-    const err = await User.validate({ friends: [null, 'A'] }).catch(err => err);
-
-    assert.ok(err.errors['friends.0']);
-    assert.ok(err.errors['friends.1']);
-
-  });
-
-  it('Model.validate() works with arrays (gh-10669)', async function() {
-    const testSchema = new Schema({
-      docs: [String]
-    });
-
-    const Test = db.model('Test', testSchema);
-
-    const test = { docs: ['6132655f2cdb9d94eaebc09b'] };
-
-    const err = await Test.validate(test);
-    assert.ifError(err);
-  });
-
-  it('Model.validate(...) uses document instance as context by default (gh-10132)', async function() {
-    const userSchema = new Schema({
-      name: {
-        type: String,
-        required: function() {
-          return this.nameRequired;
-        }
-      },
-      nameRequired: Boolean
-    });
-
-    const User = db.model('User', userSchema);
-
-    const user = new User({ name: 'test', nameRequired: false });
-    const err = await User.validate(user).catch(err => err);
-
-    assert.ifError(err);
-
-  });
-  it('Model.validate(...) uses object as context by default (gh-10346)', async() => {
-
-    const userSchema = new mongoose.Schema({
-      name: { type: String, required: true },
-      age: { type: Number, required() {return this && this.name === 'John';} }
-    });
-
-    const User = db.model('User', userSchema);
-
-    const err1 = await User.validate({ name: 'John' }).then(() => null, err => err);
-    assert.ok(err1);
-
-    const err2 = await User.validate({ name: 'Sam' }).then(() => null, err => err);
-    assert.ok(err2 === null);
-
   });
 
   it('sets correct `Document#op` with `save()` (gh-8439)', function() {

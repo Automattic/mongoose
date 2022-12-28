@@ -1,11 +1,10 @@
 import { Schema, model, Document, Types } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
-// https://github.com/Automattic/mongoose/issues/10293
 async function gh10293() {
   interface ITest {
     name: string;
-    arrayOfArray: Types.Array<string[]>; // <-- Array of Array
+    arrayOfArray: string[][]; // <-- Array of Array
   }
 
   const testSchema = new Schema<ITest>({

@@ -540,9 +540,7 @@ declare module 'mongoose' {
   export type DocumentDefinition<T> = {
     [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:
     [Extract<T[K], mongodb.ObjectId>] extends [never]
-      ? T[K] extends TreatAsPrimitives
-        ? T[K]
-        : LeanDocumentElement<T[K]>
+      ? T[K]
       : T[K] | string;
   };
 
@@ -554,26 +552,6 @@ declare module 'mongoose' {
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
-
-  export type LeanType<T> =
-    0 extends (1 & T) ? T : // any
-      T extends TreatAsPrimitives ? T : // primitives
-        T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> :
-          LeanDocument<T>; // Documents and everything else
-
-  export type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
-
-  export type _LeanDocument<T> = {
-    [K in keyof T]: LeanDocumentElement<T[K]>;
-  };
-
-  // Keep this a separate type, to ensure that T is a naked type.
-  // This way, the conditional type is distributive over union types.
-  // This is required for PopulatedDoc.
-  export type LeanDocumentElement<T> =
-    T extends unknown[] ? LeanArray<T> : // Array
-      T extends Document ? LeanDocument<T> : // Subdocument
-        T;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 
@@ -598,23 +576,6 @@ declare module 'mongoose' {
    * strip things out. In the other two cases we can infer the type, so we should
    */
   export type BaseDocumentType<T> = _pickObject<DocTypeFromUnion<T>, DocTypeFromGeneric<T>, false>;
-
-  /**
-   * Documents returned from queries with the lean option enabled.
-   * Plain old JavaScript object documents (POJO).
-   * @see https://mongoosejs.com/docs/tutorials/lean.html
-   */
-  export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
-
-  export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
-    T extends unknown[] ? LeanDocument<T[number]>[] :
-      T extends Document ? LeanDocument<T> :
-        T;
-
-  export type LeanDocumentOrArrayWithRawType<T, RawDocType> = 0 extends (1 & T) ? T :
-    T extends unknown[] ? LeanDocument<RawDocType>[] :
-      T extends Document ? LeanDocument<RawDocType> :
-        T;
 
   /* for ts-mongoose */
   export class mquery { }

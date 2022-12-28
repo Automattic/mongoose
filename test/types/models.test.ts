@@ -17,28 +17,6 @@ import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 import { UpdateOneModel } from 'mongodb';
 
-function conventionalSyntax(): void {
-  interface ITest extends Document {
-    foo: string;
-  }
-
-  const TestSchema = new Schema<ITest>({
-    foo: { type: String, required: true }
-  });
-
-  const Test = connection.model<ITest>('Test', TestSchema);
-
-  const bar = (SomeModel: Model<ITest>) => console.log(SomeModel);
-
-  bar(Test);
-
-  const doc = new Test({ foo: '42' });
-  console.log(doc.foo);
-  doc.save();
-
-  expectError(new Test<{ foo: string }>({}));
-}
-
 function rawDocSyntax(): void {
   interface ITest {
     foo: string;
@@ -100,23 +78,6 @@ async function insertManyTest() {
   expectType<ObjectId>(res.insertedIds[0]);
 }
 
-function schemaStaticsWithoutGenerics() {
-  const UserSchema = new Schema({});
-  UserSchema.statics.static1 = function() {
-    return '';
-  };
-
-  interface IUserDocument extends Document {
-    instanceField: string;
-  }
-  interface IUserModel extends Model<IUserDocument> {
-    static1: () => string;
-  }
-
-  const UserModel: IUserModel = model<IUserDocument, IUserModel>('User', UserSchema);
-  UserModel.static1();
-}
-
 function gh10074() {
   interface IDog {
     breed: string;
@@ -173,9 +134,8 @@ const ExpiresSchema = new Schema({
   }
 });
 
-interface IProject extends Document {
+interface IProject {
   name: string;
-  myMethod(): number;
 }
 
 interface ProjectModel extends Model<IProject> {

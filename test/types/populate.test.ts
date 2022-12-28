@@ -27,7 +27,7 @@ ParentModel.findOne({}).populate('child').orFail().then((doc: Document<ObjectId,
   } else {
     useChildDoc(child);
   }
-  const lean = doc.toObject();
+  const lean = doc.toObject<Omit<Parent, 'child'> & { child: Child }>();
   const leanChild = lean.child;
   if (leanChild == null || leanChild instanceof ObjectId) {
     throw new Error('should be populated');

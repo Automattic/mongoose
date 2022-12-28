@@ -139,7 +139,7 @@ async function getBaseDocumentTypeFromModel(): Promise<void> {
 async function _11767() {
   interface Question {
     text: string;
-    answers: Types.Array<string>;
+    answers: string[];
     correct: number;
   }
   const QuestionSchema = new Schema<Question>({
@@ -150,7 +150,7 @@ async function _11767() {
   interface Exam {
     element: string;
     dateTaken: Date;
-    questions: Types.DocumentArray<Question>;
+    questions: Question[];
   }
   const ExamSchema = new Schema<Exam>({
     element: String,

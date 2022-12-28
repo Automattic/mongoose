@@ -1,3 +1,16 @@
+6.8.2 / 2022-12-28
+==================
+ * fix(schema): propagate strictQuery to implicitly created schemas for embedded discriminators #12827 #12796
+ * fix(model): respect discriminators with Model.validate() #12824 #12621
+ * fix(query): fix unexpected validation error when doing findOneAndReplace() with a nullish value #12826 #12821
+ * fix(discriminator): apply built-in plugins to discriminator schema even if mergeHooks and mergePlugins are both false #12833 #12696
+ * fix(types): add option "overwriteModels" as a schema option #12817 #12816 [hasezoey](https://github.com/hasezoey)
+ * fix(types): add property "defaultOptions" #12818 [hasezoey](https://github.com/hasezoey)
+ * docs: make search bar respect documentation version, so you can search 5.x docs #12548
+ * docs(typescript): make note about recommending strict mode when using auto typed schemas #12825 #12420
+ * docs: add section on sorting to query docs #12588 [IslandRhythms](https://github.com/IslandRhythms)
+ * test(query.test): add write-concern option #12829 [hasezoey](https://github.com/hasezoey)
+
 6.8.1 / 2022-12-19
 ==================
  * fix(query): avoid throwing circular dependency error if same object is used in multiple properties #12774 [orgads](https://github.com/orgads)

@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint JS-Files
     steps:
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Setup node
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
@@ -59,7 +59,7 @@ jobs:
       MONGOMS_VERSION: ${{ matrix.mongodb }}
       MONGOMS_PREFER_GLOBAL_PATH: 1
     steps:
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Setup node
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-20.04
     name: Deno tests
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.0.2
       - name: Setup
         run: |
           wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-6.0.0.tgz
@@ -121,7 +121,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Replica Set tests
     steps:
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
       - name: Setup node
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
@@ -138,6 +138,6 @@ jobs:
       contents: read
     steps:
       - name: Check out repo
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
       - name: Dependency review
         uses: actions/dependency-review-action@v3

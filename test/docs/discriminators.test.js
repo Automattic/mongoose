@@ -100,6 +100,42 @@ describe('discriminator docs', function() {
     assert.equal(event3.__t, 'SignedUp');
   });
 
+  it('Update discriminator key', async function() {
+    let event = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    await event.save();
+
+    event.__t = 'SignedUp';
+    // ValidationError: ClickedLink validation failed: __t: Cast to String failed for value "SignedUp" (type string) at path "__t"
+    // acquit:ignore:start
+    await assert.rejects(async () => {
+    // acquit:ignore:end
+    await event.save();
+    // acquit:ignore:start
+    }, /__t: Cast to String failed/);
+    // acquit:ignore:end
+
+    event = await ClickedLinkEvent.findByIdAndUpdate(event._id, { __t: 'SignedUp' }, { new: true });
+    event.__t; // 'ClickedLink', update was a no-op
+    // acquit:ignore:start
+    assert.equal(event.__t, 'ClickedLink');
+    // acquit:ignore:end
+  });
+
+  it('use overwriteDiscriminatorKey to change discriminator key', async function() {
+    let event = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    await event.save();
+
+    event = await ClickedLinkEvent.findByIdAndUpdate(
+      event._id,
+      { __t: 'SignedUp' },
+      { overwriteDiscriminatorKey: true, new: true }
+    );
+    event.__t; // 'SignedUp', updated discriminator key
+    // acquit:ignore:start
+    assert.equal(event.__t, 'SignedUp');
+    // acquit:ignore:end
+  });
+
   /**
    * Discriminator models are special; they attach the discriminator key
    * to queries. In other words, `find()`, `count()`, `aggregate()`, etc.

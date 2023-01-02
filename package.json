@@ -50,7 +50,7 @@
     "highlight.js": "11.7.0",
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",
-    "marked": "4.2.3",
+    "marked": "4.2.5",
     "mkdirp": "^1.0.4",
     "mocha": "10.2.0",
     "moment": "2.x",

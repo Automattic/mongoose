@@ -4753,7 +4753,7 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany() validation error with ordered true when all documents are invalid (', function(done) {
+    it('insertMany() validation error with ordered true when all documents are invalid', function(done) {
       const schema = new Schema({
         name: { type: String, required: true }
       });

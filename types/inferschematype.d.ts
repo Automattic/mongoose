@@ -162,7 +162,7 @@ type ObtainDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeK
  * @param {T} T A generic refers to string path enums.
  * @returns Path enum values type as literal strings or string.
  */
-type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (infer E)[] ? E : T extends { values: any } ? PathEnumOrString<T['values']> : string;
+type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends ReadonlyArray<infer E> ? E : T extends { values: any } ? PathEnumOrString<T['values']> : string;
 
 /**
  * @summary Resolve path type by returning the corresponding type.

@@ -4753,7 +4753,7 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany() validation error with ordered true when all documents are invalid', function(done) {
+    it('insertMany() validation error with ordered true when all documents are invalid (', function(done) {
       const schema = new Schema({
         name: { type: String, required: true }
       });
@@ -4789,6 +4789,38 @@ describe('Model', function() {
         assert.equal(error, null);
         done();
       });
+    });
+
+    it('insertMany() validation error with ordered false and rawResult for checking which documents failed (gh-12791)', async function() {
+      const schema = new Schema({
+        name: { type: String, required: true },
+        year: { type: Number, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const id1 = new mongoose.Types.ObjectId();
+      const id2 = new mongoose.Types.ObjectId();
+      const id3 = new mongoose.Types.ObjectId();
+      const arr = [
+        { _id: id1, foo: 'The Phantom Menace', year: 1999 },
+        { _id: id2, name: 'The Force Awakens', bar: 2015 },
+        { _id: id3, name: 'The Empire Strikes Back', year: 1980 }
+      ];
+      const opts = { ordered: false, rawResult: true };
+      const res = await Movie.insertMany(arr, opts);
+      // {
+      //   acknowledged: true,
+      //   insertedCount: 1,
+      //   insertedIds: { '0': new ObjectId("63b34b062cfe38622738e510") },
+      //   mongoose: { validationErrors: [ [Error], [Error] ] }
+      // }
+      assert.equal(res.insertedCount, 1);
+      assert.equal(res.insertedIds[0].toHexString(), id3.toHexString());
+      assert.equal(res.mongoose.validationErrors.length, 2);
+      assert.ok(res.mongoose.validationErrors[0].errors['name']);
+      assert.ok(!res.mongoose.validationErrors[0].errors['year']);
+      assert.ok(res.mongoose.validationErrors[1].errors['year']);
+      assert.ok(!res.mongoose.validationErrors[1].errors['name']);
     });
 
     it('insertMany() populate option (gh-9720)', async function() {

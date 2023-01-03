@@ -986,19 +986,19 @@ function gh12816() {
 function gh12869() {
   const dbExampleConst = new Schema(
     {
-      active: { type: String, enum: ["foo", "bar"] as const, required: true }
+      active: { type: String, enum: ['foo', 'bar'] as const, required: true }
     }
   );
 
   type ExampleConst = InferSchemaType<typeof dbExampleConst>;
-  expectType<"foo" | "bar">({} as ExampleConst['active']);
+  expectType<'foo' | 'bar'>({} as ExampleConst['active']);
 
   const dbExample = new Schema(
     {
-      active: { type: String, enum: ["foo", "bar"], required: true }
+      active: { type: String, enum: ['foo', 'bar'], required: true }
     }
   );
 
   type Example = InferSchemaType<typeof dbExample>;
-  expectType<"foo" | "bar">({} as Example['active']);
+  expectType<'foo' | 'bar'>({} as Example['active']);
 }

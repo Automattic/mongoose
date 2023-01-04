@@ -167,6 +167,11 @@ declare module 'mongoose' {
     model(model: Model<any>): this;
 
     /**
+     * Returns the current model bound to this aggregate object
+     */
+    model(): Model<any>;
+
+    /**
      * Append a new $near operator to this aggregation pipeline
      * @param arg $near operator contents
      */

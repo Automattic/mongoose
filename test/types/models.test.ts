@@ -11,7 +11,8 @@ import {
   HydratedDocument,
   HydratedDocumentFromSchema,
   Query,
-  UpdateWriteOpResult
+  UpdateWriteOpResult,
+  SaveOptions
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -568,4 +569,12 @@ function gh12573ModelAny() {
   expectType<any>(doc);
   const { fieldA } = doc;
   expectType<any>(fieldA);
+}
+
+function gh12877() {
+  const TestModel = model('Test', new Schema({}));
+
+  const objToInsert = {};
+  const options: SaveOptions = {};
+  TestModel.create(objToInsert, options);
 }

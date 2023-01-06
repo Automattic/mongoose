@@ -39,7 +39,6 @@ declare module 'mongoose' {
   export const Mongoose: new (options?: MongooseOptions | null) => Mongoose;
 
   export let Promise: any;
-  export const PromiseProvider: any;
 
   /**
    * Can be extended to explicitly type specific models.

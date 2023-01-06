@@ -73,7 +73,7 @@ describe('model', function() {
 
     it('returns a promise', function() {
       const p = B.create({ title: 'returns promise' });
-      assert.ok(p instanceof mongoose.Promise);
+      assert.ok(p instanceof Promise);
     });
 
     it('creates in parallel', async function() {

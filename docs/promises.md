@@ -54,7 +54,7 @@ better stack traces.
 
 If you're an advanced user, you may want to plug in your own promise
 library like [bluebird](https://www.npmjs.com/package/bluebird). Just set
-`mongoose.Promise` to your favorite
+`global.Promise` to your favorite
 ES6-style promise constructor and mongoose will use it.
 
 ```javascript

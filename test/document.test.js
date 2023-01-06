@@ -4113,8 +4113,6 @@ describe('document', function() {
     });
 
     it('supports $where in pre save hook (gh-4004)', function(done) {
-      const Promise = global.Promise;
-
       const schema = new Schema({
         name: String
       }, { timestamps: true, versionKey: null });

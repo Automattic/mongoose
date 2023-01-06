@@ -833,7 +833,7 @@ describe('aggregate: ', function() {
         const agg = new Aggregate([], db.model('Employee'));
 
         const promise = agg.exec();
-        assert.ok(promise instanceof mongoose.Promise);
+        assert.ok(promise instanceof Promise);
 
         return promise.catch(error => {
           assert.ok(error);

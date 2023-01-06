@@ -889,7 +889,7 @@ describe('Model', function() {
 
       function dovalidateAsync() {
         assert.equal(this.scope, 'correct');
-        return global.Promise.resolve(true);
+        return Promise.resolve(true);
       }
 
       const TestValidation = db.model('Test', new Schema({
@@ -5272,7 +5272,7 @@ describe('Model', function() {
         it('watch() (gh-5964)', async function() {
           const MyModel = db.model('Test', new Schema({ name: String }));
 
-          const changed = new global.Promise(resolve => {
+          const changed = new Promise(resolve => {
             changeStream = MyModel.watch();
             listener = data => resolve(data);
             changeStream.once('change', listener);
@@ -5325,7 +5325,7 @@ describe('Model', function() {
           const BaseModel = db.model('Test', new Schema({ name: String }));
           const ChildModel = BaseModel.discriminator('Test1', new Schema({ email: String }));
 
-          const changed = new global.Promise(resolve => {
+          const changed = new Promise(resolve => {
             changeStream = ChildModel.watch();
             listener = data => resolve(data);
             changeStream.once('change', listener);
@@ -5348,7 +5348,7 @@ describe('Model', function() {
 
           // Synchronous, before connection happens
           const changeStream = MyModel.watch();
-          const changed = new global.Promise(resolve => {
+          const changed = new Promise(resolve => {
             changeStream.once('change', data => resolve(data));
           });
 
@@ -5365,7 +5365,7 @@ describe('Model', function() {
           connectionsToClose.push(db);
           const MyModel = db.model('Test', new Schema({}));
           const changeStream = MyModel.watch();
-          const ready = new global.Promise(resolve => {
+          const ready = new Promise(resolve => {
             changeStream.once('data', () => {
               resolve(true);
             });
@@ -5386,7 +5386,7 @@ describe('Model', function() {
           await MyModel.init();
 
           const changeStream = MyModel.watch();
-          const closed = new global.Promise(resolve => {
+          const closed = new Promise(resolve => {
             changeStream.once('close', () => resolve(true));
           });
 

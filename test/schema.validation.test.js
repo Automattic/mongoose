@@ -514,7 +514,7 @@ describe('schema', function() {
         let executed = 0;
 
         function validator(value) {
-          return new global.Promise(function(resolve) {
+          return new Promise(function(resolve) {
             setTimeout(function() {
               executed++;
               resolve(value === true);
@@ -542,7 +542,7 @@ describe('schema', function() {
         let called = false;
 
         function validator() {
-          return new global.Promise(resolve => {
+          return new Promise(resolve => {
             assert.equal(this.a, 'b');
             setTimeout(function() {
               called = true;

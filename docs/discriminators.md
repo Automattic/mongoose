@@ -31,12 +31,25 @@ instances.
 
 ### Discriminator keys
 
-The way mongoose tells the difference between the different
-discriminator models is by the 'discriminator key', which is
-`__t` by default. Mongoose adds a String path called `__t`
-to your schemas that it uses to track which discriminator
-this document is an instance of.
+The way Mongoose tells the difference between the different discriminator models is by the 'discriminator key', which is `__t` by default.
+Mongoose adds a String path called `__t` to your schemas that it uses to track which discriminator this document is an instance of.
 
 ```javascript
 [require:Discriminator keys]
+```
+
+### Updating the discriminator key
+
+By default, Mongoose doesn't let you update the discriminator key.
+`save()` will throw an error if you attempt to update the discriminator key.
+And `findOneAndUpdate()`, `updateOne()`, etc. will strip out discriminator key updates.
+
+```javascript
+[require:Update discriminator key]
+```
+
+To update a document's discriminator key, use `findOneAndUpdate()` or `updateOne()` with the `overwriteDiscriminatorKey` option set as follows.
+
+```javascript
+[require:use overwriteDiscriminatorKey to change discriminator key]
 ```

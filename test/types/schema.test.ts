@@ -873,6 +873,22 @@ function testInferTimestamps() {
   // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
   // { name?: string | undefined; }"
   expectType<{ createdAt: Date, updatedAt: Date } & { name?: string }>({} as WithTimestamps);
+
+  const schema2 = new Schema({
+    name: String
+  }, {
+    timestamps: true,
+    methods: { myName(): string | undefined {
+      return this.name;
+    } }
+  });
+
+  type WithTimestamps2 = InferSchemaType<typeof schema2>;
+  // For some reason, expectType<{ createdAt: Date, updatedAt: Date, name?: string }> throws
+  // an error "Parameter type { createdAt: Date; updatedAt: Date; name?: string | undefined; }
+  // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
+  // { name?: string | undefined; }"
+  expectType<{ name?: string }>({} as WithTimestamps2);
 }
 
 function gh12431() {
@@ -981,4 +997,24 @@ function gh12782() {
 
 function gh12816() {
   const schema = new Schema({}, { overwriteModels: true });
+}
+
+function gh12869() {
+  const dbExampleConst = new Schema(
+    {
+      active: { type: String, enum: ['foo', 'bar'] as const, required: true }
+    }
+  );
+
+  type ExampleConst = InferSchemaType<typeof dbExampleConst>;
+  expectType<'foo' | 'bar'>({} as ExampleConst['active']);
+
+  const dbExample = new Schema(
+    {
+      active: { type: String, enum: ['foo', 'bar'], required: true }
+    }
+  );
+
+  type Example = InferSchemaType<typeof dbExample>;
+  expectType<'foo' | 'bar'>({} as Example['active']);
 }

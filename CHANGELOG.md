@@ -1,3 +1,15 @@
+6.8.3 / 2023-01-06
+==================
+ * perf: improve performance of assignRawDocsToIdStructure for faster populate on large docs #12867 [Uzlopak](https://github.com/Uzlopak)
+ * fix(model): ensure consistent ordering of validation errors in insertMany() with ordered: false and rawResult: true #12866
+ * fix: avoid passing final callback to pre hook, because calling the callback can mess up hook execution #12836
+ * fix(types): avoid inferring timestamps if methods, virtuals, or statics set #12871
+ * fix(types): correctly infer string enums on const arrays #12870 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * fix(types): allow virtuals to be invoked in the definition of other virtuals #12874 [sffc](https://github.com/sffc)
+ * fix(types): add type def for Aggregate#model without arguments #12864 [hasezoey](https://github.com/hasezoey)
+ * docs(discriminators): add section about changing discriminator key #12861
+ * docs(typescript): explain that virtuals inferred from schema only show up on Model, not raw document type #12860 #12684
+
 6.8.2 / 2022-12-28
 ==================
  * fix(schema): propagate strictQuery to implicitly created schemas for embedded discriminators #12827 #12796

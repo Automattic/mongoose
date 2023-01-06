@@ -998,3 +998,23 @@ function gh12782() {
 function gh12816() {
   const schema = new Schema({}, { overwriteModels: true });
 }
+
+function gh12869() {
+  const dbExampleConst = new Schema(
+    {
+      active: { type: String, enum: ['foo', 'bar'] as const, required: true }
+    }
+  );
+
+  type ExampleConst = InferSchemaType<typeof dbExampleConst>;
+  expectType<'foo' | 'bar'>({} as ExampleConst['active']);
+
+  const dbExample = new Schema(
+    {
+      active: { type: String, enum: ['foo', 'bar'], required: true }
+    }
+  );
+
+  type Example = InferSchemaType<typeof dbExample>;
+  expectType<'foo' | 'bar'>({} as Example['active']);
+}

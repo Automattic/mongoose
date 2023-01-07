@@ -103,7 +103,7 @@ jobs:
           mongod --version
           echo `pwd`/mongodb-linux-x86_64-ubuntu2004-6.0.0/bin >> $GITHUB_PATH
       - name: Setup node
-        uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93 # v3.4.1
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: 16
       - name: Setup Deno

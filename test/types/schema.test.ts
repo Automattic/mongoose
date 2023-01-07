@@ -1018,3 +1018,46 @@ function gh12869() {
   type Example = InferSchemaType<typeof dbExample>;
   expectType<'foo' | 'bar'>({} as Example['active']);
 }
+
+function gh12882() {
+  // Array of strings
+  const arrString = new Schema({
+    fooArray: {
+      type: [{
+        type: String,
+        required: true
+      }],
+      required: true
+    }
+  });
+  type tArrString = InferSchemaType<typeof arrString>;
+  expectType<{
+    fooArray: string[]
+  }>({} as tArrString);
+  // Array of object with key named "type"
+  const arrType = new Schema({
+    fooArray: {
+      type: [{
+        type: {
+          type: String,
+          required: true
+        },
+        foo: {
+          type: Number,
+          required: true
+        }
+      }],
+      required: true
+    }
+  });
+  type tArrType = InferSchemaType<typeof arrType>;
+  expectType<{
+    fooArray: {
+      type: string;
+      foo: number;
+    }[]
+  }>({} as tArrType);
+
+  type faaaa = StringConstructor extends Function ? string: number;
+  type fbbb = { type: String } extends Function ? string : number;
+}

@@ -1,6 +1,8 @@
+import { OperationTime } from 'mongodb';
 import {
   Schema,
   InferSchemaType,
+  ScalarSchemaDefinition,
   SchemaType,
   SchemaTypeOptions,
   TypeKeyBaseType,
@@ -179,8 +181,24 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends R
  */
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey']> =
   PathValueType extends Schema ? InferSchemaType<PathValueType> :
-    PathValueType extends (infer Item)[] ? IfEquals<Item, never, any[], Item extends Schema ? Types.DocumentArray<ObtainDocumentPathType<Item, TypeKey>> : ObtainDocumentPathType<Item, TypeKey>[]> :
-      PathValueType extends ReadonlyArray<infer Item> ? IfEquals<Item, never, any[], Item extends Schema ? Types.DocumentArray<ObtainDocumentPathType<Item, TypeKey>> : ObtainDocumentPathType<Item, TypeKey>[]> :
+    PathValueType extends (infer Item)[] ?
+      IfEquals<Item, never, any[], Item extends Schema ?
+        Types.DocumentArray<ObtainDocumentPathType<Item, TypeKey>> :
+        Item extends Record<TypeKey, any>?
+          Item[TypeKey] extends Function ?
+            ObtainDocumentPathType<Item, TypeKey>[] :
+            ObtainDocumentType<Item, any, { typeKey: TypeKey }>[]:
+          ObtainDocumentPathType<Item, TypeKey>[]
+      >:
+      PathValueType extends ReadonlyArray<infer Item> ?
+        IfEquals<Item, never, any[], Item extends Schema ?
+          Types.DocumentArray<ObtainDocumentPathType<Item, TypeKey>> :
+          Item extends Record<TypeKey, any> ?
+            Item[TypeKey] extends Function ?
+              ObtainDocumentPathType<Item, TypeKey>[] :
+              ObtainDocumentType<Item, any, { typeKey: TypeKey }>[]:
+            ObtainDocumentPathType<Item, TypeKey>[]
+        >:
         PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
           IfEquals<PathValueType, Schema.Types.String> extends true ? PathEnumOrString<Options['enum']> :
             IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']> :

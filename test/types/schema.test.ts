@@ -1057,7 +1057,41 @@ function gh12882() {
       foo: number;
     }[]
   }>({} as tArrType);
-
-  type faaaa = StringConstructor extends Function ? string: number;
-  type fbbb = { type: String } extends Function ? string : number;
+  // Readonly array of strings
+  const rArrString = new Schema({
+    fooArray: {
+      type: [{
+        type: String,
+        required: true
+      }] as const,
+      required: true
+    }
+  });
+  type rTArrString = InferSchemaType<typeof rArrString>;
+  expectType<{
+    fooArray: string[]
+  }>({} as rTArrString);
+  // Array of object with key named "type"
+  const rArrType = new Schema({
+    fooArray: {
+      type: [{
+        type: {
+          type: String,
+          required: true
+        },
+        foo: {
+          type: Number,
+          required: true
+        }
+      }] as const,
+      required: true
+    }
+  });
+  type rTArrType = InferSchemaType<typeof rArrType>;
+  expectType<{
+    fooArray: {
+      type: string;
+      foo: number;
+    }[]
+  }>({} as rTArrType);
 }

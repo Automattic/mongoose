@@ -1,6 +1,8 @@
 'use strict';
 
 const assert = require('assert');
+
+require('../common'); // required for side-effect setup (so that the default driver is set-up)
 const isIndexEqual = require('../../lib/helpers/indexes/isIndexEqual');
 
 describe('isIndexEqual', function() {

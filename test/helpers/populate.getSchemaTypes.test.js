@@ -1,9 +1,10 @@
 'use strict';
 
-const Schema = require('../../lib/schema');
 const assert = require('assert');
-const getSchemaTypes = require('../../lib/helpers/populate/getSchemaTypes');
+
 const mongoose = require('../common').mongoose;
+const Schema = require('../../lib/schema');
+const getSchemaTypes = require('../../lib/helpers/populate/getSchemaTypes');
 
 describe('getSchemaTypes', function() {
   it('handles embedded discriminators (gh-5970)', function() {

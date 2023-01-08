@@ -19,12 +19,15 @@ const Schema = mongoose.Schema;
 describe('collections: capped:', function() {
   let db;
 
+  const connectionsToClose = [];
+
   before(function() {
     db = start();
   });
 
   after(async function() {
     await db.close();
+    await Promise.all(connectionsToClose.map((v) => v.close()));
   });
 
   it('schemas should have option size', function() {
@@ -52,6 +55,7 @@ describe('collections: capped:', function() {
 
   it('skips when setting autoCreate to false (gh-8566)', async function() {
     const db = start();
+    connectionsToClose.push(db);
     this.timeout(30000);
     await db.dropDatabase();
 

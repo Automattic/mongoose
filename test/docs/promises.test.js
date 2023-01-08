@@ -5,6 +5,8 @@ const mongoose = require('../../');
 const start = require('../common');
 
 describe('promises docs', function () {
+  const defaultPromise = global.Promise;
+
   let Band;
   let db;
 
@@ -21,6 +23,8 @@ describe('promises docs', function () {
   });
 
   after(async function () {
+    global.Promise = defaultPromise;
+    
     await db.close();
   });
 
@@ -164,7 +168,6 @@ describe('promises docs', function () {
     if (!global.Promise) {
       return done();
     }
-    const defaultPromise = global.Promise;
     // acquit:ignore:end
     // Use bluebird
     global.Promise = require('bluebird');
@@ -179,7 +182,6 @@ describe('promises docs', function () {
     // acquit:ignore:start
     // Wait for promises
     bluebirdPromise.then(qPromise).then(function () {
-      global.Promise = defaultPromise;
       done();
     });
     // acquit:ignore:end

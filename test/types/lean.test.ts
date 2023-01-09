@@ -234,3 +234,26 @@ async function _11767() {
   // expectError(examFound2Obj.questions[0].populated);
   expectType<string[]>(examFound2Obj.questions[0].answers);
 }
+
+async function gh12880() {
+  interface IUser {
+    username: string;
+    test(): void;
+  }
+
+  const UserSchema = new Schema({ username: String }, { methods: { test() {} } });
+
+  const UserModel = model<IUser>(
+    'User',
+    UserSchema
+  );
+
+  await UserModel.create({ username: 'hello' });
+
+  const doc = await UserModel
+    .findOne({})
+    .lean();
+  if (!doc) return;
+
+  expectError(doc.test());
+}

@@ -564,7 +564,7 @@ declare module 'mongoose' {
   export type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 
   export type _LeanDocument<T> = {
-    [K in keyof T]: LeanDocumentElement<T[K]>;
+    [K in keyof T]: T[K] extends Function ? never : LeanDocumentElement<T[K]>;
   };
 
   // Keep this a separate type, to ensure that T is a naked type.

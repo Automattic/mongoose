@@ -68,6 +68,30 @@ In model middleware functions, `this` refers to the model.
 
 * [insertMany](api/model.html#model_Model-insertMany)
 
+Here are the possible strings that can be passed to `pre()`
+
+* aggregate
+* count
+* countDocuments
+* deleteOne
+* deleteMany
+* estimatedDocumentCount
+* find
+* findOne
+* findOneAndDelete
+* findOneAndRemove
+* findOneAndReplace
+* findOneAndUpdate
+* init
+* insertMany
+* remove
+* replaceOne
+* save
+* update
+* updateOne
+* updateMany
+* validate
+
 All middleware types support pre and post hooks.
 How pre and post hooks work is described in more detail below.
 
@@ -117,17 +141,6 @@ schema.pre('save', function(next) {
   next();
 });
 ```
-
-Here are the possible strings that can be passed to `pre()`
-- save
-- validate
-- find
-- findOne
-- findOneAndUpdate
-- updateOne
-- deleteOne
-- remove
-- init
 
 In [mongoose 5.x](http://thecodebarbarian.com/introducing-mongoose-5.html#promises-and-async-await-with-middleware), instead of calling `next()` manually, you can use a
 function that returns a promise. In particular, you can use [`async/await`](http://thecodebarbarian.com/common-async-await-design-patterns-in-node.js.html).

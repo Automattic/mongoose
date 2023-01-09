@@ -684,4 +684,21 @@ describe('schema select option', function() {
       });
     });
   });
+
+  it('should allow deselecting a field on a query even if the definition has select set to true (gh-11694)', function(done) {
+    const testSchema = new mongoose.Schema({
+      name: String,
+      age: { type: String, select: true }
+    });
+
+    const Test = db.model('gh-11694', testSchema);
+    Test.create({ name: 'Test', age: '42' }, function(error, doc) {
+      assert.ifError(error);
+      Test.findOne({ _id: doc._id }, 'name -age', function(error, doc) {
+        assert.equal(doc.name, 'Test');
+        assert.equal(doc.age, undefined);
+        done();
+      });
+    });
+  });
 });

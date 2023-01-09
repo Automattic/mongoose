@@ -16,9 +16,9 @@ const schema = new Schema(
     lastName: String,
   },
   {
-    virtuals:{
-      fullName:{
-        get(){
+    virtuals: {
+      fullName: {
+        get() {
           return `${this.firstName} ${this.lastName}`;
         }
         // virtual setter and options can be defined here as well.
@@ -28,7 +28,32 @@ const schema = new Schema(
 );
 ```
 
+Note that Mongoose does **not** include virtuals in the returned type from `InferSchemaType`.
+That is because `InferSchemaType` returns the "raw" document interface, which represents the structure of the data stored in MongoDB.
+
+```ts
+type User = InferSchemaType<typeof schema>;
+
+const user: User = {};
+// Property 'fullName' does not exist on type '{ firstName?: string | undefined; ... }'.
+user.fullName;
+```
+
+However, Mongoose **does** add the virtuals to the model type.
+
+```ts
+const UserModel = model('User', schema);
+
+const user = new UserModel({ firstName: 'foo' });
+// Works
+user.fullName;
+
+// Here's how to get the hydrated document type
+type UserDocument = ReturnType<(typeof UserModel)['hydrate']>;
+```
+
 ### Set virtuals type manually:
+
 You shouldn't define virtuals in your TypeScript [document interface](../typescript.html).
 Instead, you should define a separate interface for your virtuals, and pass this interface to `Model` and `Schema`.
 

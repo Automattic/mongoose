@@ -60,12 +60,18 @@ declare module 'mongoose' {
      }[alias]
      : unknown;
 
-  type ResolveSchemaOptions<T> = Omit<MergeType<DefaultSchemaOptions, T>, 'statics' | 'methods' | 'query' | 'virtuals'>;
+  // Without Omit, this gives us a "Type parameter 'TSchemaOptions' has a circular constraint."
+  type ResolveSchemaOptions<T> = Omit<MergeType<DefaultSchemaOptions, T>, 'fakepropertyname'>;
 
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
   type ResolveTimestamps<T, O> = O extends { timestamps: true }
-    ? { createdAt: NativeDate; updatedAt: NativeDate; } & T
+    // For some reason, TypeScript sets all the document properties to unknown
+    // if we use methods, statics, or virtuals. So avoid inferring timestamps
+    // if any of these are set for now. See gh-12807
+    ? O extends { methods: any } | { statics: any } | { virtuals: any }
+      ? T
+      : { createdAt: NativeDate; updatedAt: NativeDate; } & T
     : T;
 }
 
@@ -162,7 +168,7 @@ type ObtainDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeK
  * @param {T} T A generic refers to string path enums.
  * @returns Path enum values type as literal strings or string.
  */
-type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends (infer E)[] ? E : T extends { values: any } ? PathEnumOrString<T['values']> : string;
+type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends ReadonlyArray<infer E> ? E : T extends { values: any } ? PathEnumOrString<T['values']> : string;
 
 /**
  * @summary Resolve path type by returning the corresponding type.

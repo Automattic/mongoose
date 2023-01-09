@@ -887,10 +887,6 @@ describe('connections:', function() {
   });
 
   it('throws a MongooseServerSelectionError on server selection timeout (gh-8451)', function() {
-    if (typeof Deno !== 'undefined') {
-      // In Deno dns throws an uncatchable error here.
-      return this.skip();
-    }
     const opts = {
       serverSelectionTimeoutMS: 100
     };

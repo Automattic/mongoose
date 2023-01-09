@@ -23,9 +23,11 @@ describe('promises docs', function () {
   });
 
   after(async function () {
-    global.Promise = defaultPromise;
-    
     await db.close();
+  });
+
+  afterEach(function () {
+    global.Promise = defaultPromise;
   });
 
   /**

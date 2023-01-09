@@ -686,6 +686,8 @@ describe('schema select option', function() {
   });
 
   it('should allow deselecting a field on a query even if the definition has select set to true (gh-11694)', function(done) {
+    mongoose.set('debug', true);
+
     const testSchema = new mongoose.Schema({
       name: String,
       age: { type: String, select: true }

@@ -1071,7 +1071,7 @@ function gh12882() {
   expectType<{
     fooArray: string[]
   }>({} as rTArrString);
-  // Array of object with key named "type"
+  // Readonly array of object with key named "type"
   const rArrType = new Schema({
     fooArray: {
       type: [{

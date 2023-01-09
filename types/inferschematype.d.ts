@@ -1,4 +1,3 @@
-import { OperationTime } from 'mongodb';
 import {
   Schema,
   InferSchemaType,

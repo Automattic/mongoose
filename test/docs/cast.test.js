@@ -97,40 +97,58 @@ describe('Cast Tutorial', function() {
     await query.exec();
   });
 
-  it('strictQuery true', async function() {
-    mongoose.deleteModel('Character');
-    const schema = new mongoose.Schema({ name: String, age: Number }, {
-      strictQuery: true
+  describe('strictQuery', function() {
+    it('strictQuery true - simple object', async function() {
+      mongoose.deleteModel('Character');
+      const schema = new mongoose.Schema({ name: String, age: Number }, {
+        strictQuery: true
+      });
+      Character = mongoose.model('Character', schema);
+
+      const query = Character.findOne({ notInSchema: { $lt: 'not a number' } });
+
+      await query.exec();
+      query.getFilter(); // Empty object `{}`, Mongoose removes `notInSchema`
+      // acquit:ignore:start
+      assert.deepEqual(query.getFilter(), {});
+      // acquit:ignore:end
     });
-    Character = mongoose.model('Character', schema);
 
-    const query = Character.findOne({ notInSchema: { $lt: 'not a number' } });
+    it('strictQuery true - conditions', async function() {
+      mongoose.deleteModel('Character');
+      const schema = new mongoose.Schema({ name: String, age: Number }, {
+        strictQuery: true
+      });
+      Character = mongoose.model('Character', schema);
 
-    await query.exec();
-    query.getFilter(); // Empty object `{}`, Mongoose removes `notInSchema`
-    // acquit:ignore:start
-    assert.deepEqual(query.getFilter(), {});
-    // acquit:ignore:end
-  });
+      const query = Character.findOne({ $or: [{ notInSchema: { $lt: 'not a number' } }], $and: [{ name: 'abc' }, { age: { $gt: 18 } }, { notInSchema: { $lt: 'not a number' } }] });
 
-  it('strictQuery throw', async function() {
-    mongoose.deleteModel('Character');
-    const schema = new mongoose.Schema({ name: String, age: Number }, {
-      strictQuery: 'throw'
+      await query.exec();
+      query.getFilter(); // Empty object `{}`, Mongoose removes `notInSchema`
+      // acquit:ignore:start
+      assert.deepEqual(query.getFilter(), { $and: [{ name: 'abc' }, { age: { $gt: 18 } }] });
+      // acquit:ignore:end
     });
-    Character = mongoose.model('Character', schema);
 
-    const query = Character.findOne({ notInSchema: { $lt: 'not a number' } });
+    it('strictQuery throw', async function() {
+      mongoose.deleteModel('Character');
+      const schema = new mongoose.Schema({ name: String, age: Number }, {
+        strictQuery: 'throw'
+      });
+      Character = mongoose.model('Character', schema);
 
-    const err = await query.exec().then(() => null, err => err);
-    err.name; // 'StrictModeError'
-    // Path "notInSchema" is not in schema and strictQuery is 'throw'.
-    err.message;
-    // acquit:ignore:start
-    assert.equal(err.name, 'StrictModeError');
-    assert.equal(err.message, 'Path "notInSchema" is not in schema and ' +
-      'strictQuery is \'throw\'.');
-    // acquit:ignore:end
+      const query = Character.findOne({ notInSchema: { $lt: 'not a number' } });
+
+      const err = await query.exec().then(() => null, err => err);
+      err.name; // 'StrictModeError'
+      // Path "notInSchema" is not in schema and strictQuery is 'throw'.
+      err.message;
+      // acquit:ignore:start
+      assert.equal(err.name, 'StrictModeError');
+      assert.equal(err.message, 'Path "notInSchema" is not in schema and ' +
+        'strictQuery is \'throw\'.');
+      // acquit:ignore:end
+    });
   });
 
   it('implicit in', async function() {

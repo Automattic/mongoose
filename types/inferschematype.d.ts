@@ -182,8 +182,8 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
         // If Item is a schema, infer its type.
         Types.DocumentArray<InferSchemaType<Item>> :
         Item extends Record<TypeKey, any>?
-          Item[TypeKey] extends Function ?
-            // If Item has a type key that's callable, it must be a scalar,
+          Item[TypeKey] extends Function | String ?
+            // If Item has a type key that's a string or a callable, it must be a scalar,
             // so we can directly obtain its path type.
             ObtainDocumentPathType<Item, TypeKey>[] :
             // If the type key isn't callable, then this is an array of objects, in which case
@@ -195,7 +195,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
         IfEquals<Item, never, any[], Item extends Schema ?
           Types.DocumentArray<InferSchemaType<Item>> :
           Item extends Record<TypeKey, any> ?
-            Item[TypeKey] extends Function ?
+            Item[TypeKey] extends Function | String ?
               ObtainDocumentPathType<Item, TypeKey>[] :
               ObtainDocumentType<Item, any, { typeKey: TypeKey }>[]:
             ObtainDocumentPathType<Item, TypeKey>[]

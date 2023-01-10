@@ -1031,9 +1031,20 @@ function gh12882() {
     }
   });
   type tArrString = InferSchemaType<typeof arrString>;
+  // Array of numbers using string definition
+  const arrNum = new Schema({
+    fooArray: {
+      type: [{
+        type: 'Number',
+        required: true
+      }],
+      required: true
+    }
+  });
+  type tArrNum = InferSchemaType<typeof arrNum>;
   expectType<{
-    fooArray: string[]
-  }>({} as tArrString);
+    fooArray: number[]
+  }>({} as tArrNum);
   // Array of object with key named "type"
   const arrType = new Schema({
     fooArray: {
@@ -1071,6 +1082,20 @@ function gh12882() {
   expectType<{
     fooArray: string[]
   }>({} as rTArrString);
+  // Readonly array of numbers using string definition
+  const rArrNum = new Schema({
+    fooArray: {
+      type: [{
+        type: 'Number',
+        required: true
+      }] as const,
+      required: true
+    }
+  });
+  type rTArrNum = InferSchemaType<typeof rArrNum>;
+  expectType<{
+    fooArray: number[]
+  }>({} as rTArrNum);
   // Readonly array of object with key named "type"
   const rArrType = new Schema({
     fooArray: {

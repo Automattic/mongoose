@@ -68,7 +68,7 @@ describe('Query', function() {
       done();
     });
 
-    it('(string)', function(done) {
+    it('(string) asdf', function(done) {
       const query = new Query({});
       query.select(' a  b -c ');
       assert.deepEqual(query._fields, { a: 1, b: 1, c: 0 });

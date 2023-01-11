@@ -515,7 +515,7 @@ describe('schema select option', function() {
     });
   });
 
-  it('all inclusive/exclusive combos work asdf', function(done) {
+  it('all inclusive/exclusive combos work', function(done) {
     const coll = 'Test';
 
     const schema = new Schema({

@@ -559,10 +559,15 @@ describe('schema select option', function() {
       });
     }
 
-    function nonId(M, id, cb) {
+    function nonId(M, id, nameSelected, cb) {
       M.findOne().select('age -name').exec(function(err, d) {
-        assert.ok(err);
-        assert.ok(!d);
+        if (nameSelected) {
+          assert.ifError(err);
+          assert.equal(d.age, 0);
+          assert.equal(d.name, undefined);
+        } else {
+          assert.ok(err);
+        }
         M.findOne().select('-age name').exec(function(err, d) {
           assert.ok(err);
           assert.ok(!d);
@@ -587,11 +592,11 @@ describe('schema select option', function() {
       assert.ifError(err);
       const id = d.id;
       useId(M, id, function() {
-        nonId(M, id, function() {
+        nonId(M, id, false, function() {
           useId(S, id, function() {
-            nonId(S, id, function() {
+            nonId(S, id, false, function() {
               useId(T, id, function() {
-                nonId(T, id, function() {
+                nonId(T, id, true, function() {
                   done();
                 });
               });

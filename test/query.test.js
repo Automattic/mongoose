@@ -68,7 +68,7 @@ describe('Query', function() {
       done();
     });
     /* failing due to new changes. We make it so now the keys retain the minus and so c should have the minus.
-    it('(string) asdf', function(done) {
+    it('(string)', function(done) {
       const query = new Query({});
       query.select(' a  b -c ');
       assert.deepEqual(query._fields, { a: 1, b: 1, c: 0 });

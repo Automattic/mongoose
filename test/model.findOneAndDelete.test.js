@@ -224,6 +224,7 @@ describe('model: findOneAndDelete:', function() {
     assert.equal(query._conditions._id, undefined);
   });
 
+  // this test and the ones similar fail due to the change on L1119 of query.js
   it('supports v3 select string syntax', function() {
     const M = BlogPost;
     const _id = new DocumentObjectId();

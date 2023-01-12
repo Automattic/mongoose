@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const { AssertionError } = require('assert');
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 

@@ -297,7 +297,6 @@ describe('model: findOneAndDelete:', function() {
 
     const b = await N.create({ a: a._id, i: 10 });
 
-
     const doc = await N.findOneAndDelete({ _id: b._id }, { select: 'a -_id' })
       .populate('a')
       .exec();

@@ -7,6 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
+const { AssertionError } = require('assert');
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
@@ -25,46 +26,42 @@ describe('schema select option', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it('excluding paths through schematype', function(done) {
+  it('excluding paths through schematype', async function() {
     const schema = new Schema({
       thin: Boolean,
       name: { type: String, select: false },
       docs: [new Schema({ bool: Boolean, name: { type: String, select: false } })]
     });
 
-    const S = db.model('Test', schema);
-    S.create({ thin: true, name: 'the excluded', docs: [{ bool: true, name: 'test' }] }, function(err, s) {
-      assert.ifError(err);
-      assert.equal(s.name, 'the excluded');
-      assert.equal(s.docs[0].name, 'test');
-
-      let pending = 5;
-      const item = s;
-
-      function cb(err, s) {
-        pending--;
-
-        if (Array.isArray(s)) {
-          s = s[0];
-        }
-        assert.strictEqual(null, err);
-        assert.equal(s.isSelected('name'), false);
-        assert.equal(s.isSelected('docs.name'), false);
-        assert.strictEqual(undefined, s.name);
-        // we need to make sure this executes absolutely last.
-        if (pending === 1) {
-          S.findOneAndRemove({ _id: item._id }, cb);
-        }
-        if (pending === 0) {
-          done();
-        }
-      }
-
-      S.findById(s).select('-thin -docs.bool').exec(cb);
-      S.find({ _id: s._id }).select('thin docs.bool').exec(cb);
-      S.findById(s, cb);
-      S.findOneAndUpdate({ _id: s._id }, { name: 'changed' }, cb);
+    const Test = db.model('Test', schema);
+    const doc = await Test.create({
+      thin: true,
+      name: 'the excluded',
+      docs: [{ bool: true, name: 'test'}]
     });
+    assert.equal(doc.name, 'the excluded');
+    assert.equal(doc.docs[0].name, 'test');
+    const findByIdDoc = await Test.findById({ _id: doc._id }).select('-thin -docs.bool');
+    assert.equal(findByIdDoc.isSelected('name'), false);
+    assert.equal(findByIdDoc.isSelected('docs.name'), false);
+    assert.strictEqual(undefined, findByIdDoc.name);
+    let findDoc = await Test.find({ _id: doc._id }).select('thin docs.bool');
+    const singleFindDoc = findDoc[0];
+    assert.equal(singleFindDoc.isSelected('name'), false);
+    assert.equal(singleFindDoc.isSelected('docs.name'), false);
+    assert.strictEqual(undefined, singleFindDoc.name);
+    const findByIdDocAgain = await Test.findById({ _id: doc._id });
+    assert.equal(findByIdDocAgain.isSelected('name'), false);
+    assert.equal(findByIdDocAgain.isSelected('docs.name'), false);
+    assert.strictEqual(undefined, findByIdDocAgain.name);
+    const findUpdateDoc = await Test.findOneAndUpdate({ _id: doc._id });
+    assert.equal(findUpdateDoc.isSelected('name'), false);
+    assert.equal(findUpdateDoc.isSelected('docs.name'), false);
+    assert.strictEqual(undefined, findUpdateDoc.name);
+    const findAndRemoveDoc = await Test.findOneAndRemove({ _id: doc._id });
+    assert.equal(findAndRemoveDoc.isSelected('name'), false);
+    assert.equal(findAndRemoveDoc.isSelected('docs.name'), false);
+    assert.strictEqual(undefined, findAndRemoveDoc.name);
   });
 
   it('including paths through schematype', function(done) {

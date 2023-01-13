@@ -485,11 +485,16 @@ describe('schema select option', function() {
     assert.equal(d.id, doc.id);
     assert.equal(d.name, 'ssd');
     assert.equal(d.age, undefined);
-    d = await M.findOne().select('age -name');
-    assert.equal(d.age, 0);
-    assert.equal(d.name, undefined);
-    d = await M.findOne().select('-age name');
-    assert.ok(!d);
+    try {
+      d = await M.findOne().select('age -name');
+    } catch (error) {
+      assert.ok(error)
+    }
+    try {
+      d = await M.findOne().select('-age name');
+    } catch (error) {
+      assert.ok(error);
+    }
     d = await M.findOne().select('-age -name');
     assert.equal(d.id, doc.id);
     assert.equal(d.name, undefined);

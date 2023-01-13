@@ -211,7 +211,7 @@ describe('schema select option', function() {
           assert.ok(findOneAndUpdateDoc.docs[0].bool);
         });
         it('with findOneAndRemove', async function() {
-          const findOneAndRemoveDoc = await E.findOneAndRemove({ _id: findOneAndRemoveDoc._id }).select('-name -docs.name');
+          const findOneAndRemoveDoc = await E.findOneAndRemove({ _id: exclusionDoc._id }).select('-name -docs.name');
           assert.equal(findOneAndRemoveDoc.isSelected('name'), false);
           assert.equal(findOneAndRemoveDoc.isSelected('thin'), true);
           assert.equal(findOneAndRemoveDoc.isSelected('docs.name'), false);

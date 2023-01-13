@@ -463,7 +463,43 @@ describe('schema select option', function() {
     });
   });
 
-  it('all inclusive/exclusive combos work', function(done) {
+  it('inclusive/exclusive combos should work', async function() {
+    const coll = 'Test';
+
+    const schema = new Schema({
+      name: { type: String },
+      age: Number
+    }, { collection: coll });
+    const M = db.model('Test1', schema);
+
+    const doc = await M.create({ name: 'ssd', age: 0 });
+    let d = await M.findOne().select('-_id name');
+    assert.equal(d.id, undefined);
+    assert.equal(d.name, 'ssd');
+    assert.equal(d.age, undefined);
+    d = await M.findOne().select('-_id -name');
+    assert.equal(d.id, undefined);
+    assert.equal(d.name, undefined);
+    assert.equal(d.age, 0);
+    d = await M.findOne().select('_id name');
+    assert.equal(d.id, doc.id);
+    assert.equal(d.name, 'ssd');
+    assert.equal(d.age, undefined);
+    d = await M.findOne().select('age -name');
+    assert.equal(d.age, 0);
+    assert.equal(d.name, undefined);
+    d = await M.findOne().select('-age name');
+    assert.ok(!d);
+    d = await M.findOne().select('-age -name');
+    assert.equal(d.id, doc.id);
+    assert.equal(d.name, undefined);
+    assert.equal(d.age, undefined);
+    d = await M.findOne().select('age name');
+    assert.equal(d.id, doc.id);
+    assert.equal(d.name, 'ssd');
+    assert.equal(d.age, 0);
+  });
+  it('when select is false in the schema definition, all inclusive/exclusive combos should work', async function() {
     const coll = 'Test';
 
     const schema = new Schema({
@@ -476,83 +512,84 @@ describe('schema select option', function() {
       name: { type: String, select: false },
       age: Number
     }, { collection: coll });
-    const S = db.model('Test2', schema1);
+    const SelectFalse = db.model('Test2', schema1);
+    const doc = await M.create({ name: 'ssd', age: 0 });
+    let d = await SelectFalse.findOne().select('-_id name');
+    assert.equal(d.id, undefined);
+    assert.equal(d.name, 'ssd');
+    assert.equal(d.age, undefined);
+    d = await SelectFalse.findOne().select('-_id -name');
+    assert.equal(d.id, undefined);
+    assert.equal(d.name, undefined);
+    assert.equal(d.age, 0);
+    d = await SelectFalse.findOne().select('_id name');
+    assert.equal(d.id, doc.id);
+    assert.equal(d.name, 'ssd');
+    assert.equal(d.age, undefined);
+    try {
+      d = await SelectFalse.findOne().select('age -name');
+    } catch (error) {
+      assert.ok(error);
+    }
+    try {
+      d = await SelectFalse.findOne().select('-age name');
+    } catch (error) {
+      assert.ok(error);
+    }
+    d = await SelectFalse.findOne().select('-age -name');
+    assert.equal(d.id, doc.id);
+    assert.equal(d.name, undefined);
+    assert.equal(d.age, undefined);
+    d = await SelectFalse.findOne().select('age name');
+    assert.equal(d.id, doc.id);
+    assert.equal(d.name, 'ssd');
+    assert.equal(d.age, 0);
+
+  });
+  it('when select is set to true in the schema definition, all inclusive/exclusive combos should work', async function() {
+    const coll = 'Test';
+
+    const schema = new Schema({
+      name: { type: String },
+      age: Number
+    }, { collection: coll });
+    const M = db.model('Test1', schema);
 
     const schema2 = new Schema({
       name: { type: String, select: true },
       age: Number
     }, { collection: coll });
-    const T = db.model('Test3', schema2);
+    const SelectTrue = db.model('Test3', schema2);
 
-    function useId(M, id, cb) {
-      M.findOne().select('-_id name').exec(function(err, d) {
-        // mongo special case for exclude _id + include path
-        assert.ifError(err);
-        assert.equal(d.id, undefined);
-        assert.equal(d.name, 'ssd');
-        assert.equal(d.age, undefined);
-        M.findOne().select('-_id -name').exec(function(err, d) {
-          assert.ifError(err);
-          assert.equal(d.id, undefined);
-          assert.equal(d.name, undefined);
-          assert.equal(d.age, 0);
-          M.findOne().select('_id name').exec(function(err, d) {
-            assert.ifError(err);
-            assert.equal(d.id, id);
-            assert.equal(d.name, 'ssd');
-            assert.equal(d.age, undefined);
-            cb();
-          });
-        });
-      });
+    const doc = await M.create({ name: 'ssd', age: 0 });
+    let d = await SelectTrue.findOne().select('-_id name');
+    assert.equal(d.id, undefined);
+    assert.equal(d.name, 'ssd');
+    assert.equal(d.age, undefined);
+    d = await SelectTrue.findOne().select('-_id -name');
+    assert.equal(d.id, undefined);
+    assert.equal(d.name, undefined);
+    assert.equal(d.age, 0);
+    d = await SelectTrue.findOne().select('_id name');
+    assert.equal(d.id, doc.id);
+    assert.equal(d.name, 'ssd');
+    assert.equal(d.age, undefined);
+    d = await SelectTrue.findOne().select('age -name');
+    assert.equal(d.age, 0);
+    assert.equal(d.name, undefined);
+    try {
+      d = await SelectTrue.findOne().select('-age name');
+    } catch (error) {
+      assert.ok(error);
     }
-
-    function nonId(M, id, nameSelected, cb) {
-      M.findOne().select('age -name').exec(function(err, d) {
-        if (nameSelected) {
-          assert.ifError(err);
-          assert.equal(d.age, 0);
-          assert.equal(d.name, undefined);
-        } else {
-          assert.ok(err);
-        }
-        M.findOne().select('-age name').exec(function(err, d) {
-          assert.ok(err);
-          assert.ok(!d);
-          M.findOne().select('-age -name').exec(function(err, d) {
-            assert.ifError(err);
-            assert.equal(d.id, id);
-            assert.equal(d.name, undefined);
-            assert.equal(d.age, undefined);
-            M.findOne().select('age name').exec(function(err, d) {
-              assert.ifError(err);
-              assert.equal(d.id, id);
-              assert.equal(d.name, 'ssd');
-              assert.equal(d.age, 0);
-              cb();
-            });
-          });
-        });
-      });
-    }
-
-    M.create({ name: 'ssd', age: 0 }, function(err, d) {
-      assert.ifError(err);
-      const id = d.id;
-      useId(M, id, function() {
-        nonId(M, id, false, function() {
-          useId(S, id, function() {
-            nonId(S, id, false, function() {
-              useId(T, id, function() {
-                nonId(T, id, true, function() {
-                  done();
-                });
-              });
-            });
-          });
-        });
-      });
-    });
+    d = await SelectTrue.findOne().select('-age -name');
+    assert.equal(d.id, doc.id);
+    assert.equal(d.name, undefined);
+    assert.equal(d.age, undefined);
+    d = await SelectTrue.findOne().select('age name');
+    assert.equal(d.id, doc.id);
+    assert.equal(d.name, 'ssd');
+    assert.equal(d.age, 0);
   });
 
   it('does not set defaults for nested objects (gh-4707)', function(done) {

@@ -488,7 +488,7 @@ describe('schema select option', function() {
     try {
       d = await M.findOne().select('age -name');
     } catch (error) {
-      assert.ok(error)
+      assert.ok(error);
     }
     try {
       d = await M.findOne().select('-age name');

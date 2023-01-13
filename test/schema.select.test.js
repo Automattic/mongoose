@@ -36,7 +36,7 @@ describe('schema select option', function() {
     const doc = await Test.create({
       thin: true,
       name: 'the excluded',
-      docs: [{ bool: true, name: 'test'}]
+      docs: [{ bool: true, name: 'test' }]
     });
     assert.equal(doc.name, 'the excluded');
     assert.equal(doc.docs[0].name, 'test');
@@ -44,7 +44,7 @@ describe('schema select option', function() {
     assert.equal(findByIdDoc.isSelected('name'), false);
     assert.equal(findByIdDoc.isSelected('docs.name'), false);
     assert.strictEqual(undefined, findByIdDoc.name);
-    let findDoc = await Test.find({ _id: doc._id }).select('thin docs.bool');
+    const findDoc = await Test.find({ _id: doc._id }).select('thin docs.bool');
     const singleFindDoc = findDoc[0];
     assert.equal(singleFindDoc.isSelected('name'), false);
     assert.equal(singleFindDoc.isSelected('docs.name'), false);
@@ -71,7 +71,7 @@ describe('schema select option', function() {
     });
 
     const S = db.model('Test', schema);
-    const doc = await S.create({ thin: true, name: 'the included', docs: [{ bool: true, name: 'test' }]});
+    const doc = await S.create({ thin: true, name: 'the included', docs: [{ bool: true, name: 'test' }] });
     assert.equal(doc.name, 'the included');
     assert.equal(doc.docs[0].name, 'test');
     const findByIdDoc = await S.findById({ _id: doc._id }).select('-thin -docs.bool');
@@ -115,7 +115,7 @@ describe('schema select option', function() {
     describe('works', function() {
       describe('for inclusions', function() {
         let inclusionDoc;
-        beforeEach( async function() {
+        beforeEach(async function() {
           inclusionDoc = await S.create({ thin: true, name: 'the included', docs: [{ name: 'test', bool: true }] });
           assert.equal(inclusionDoc.name, 'the included');
           assert.equal(inclusionDoc.docs[0].name, 'test');
@@ -135,7 +135,8 @@ describe('schema select option', function() {
         });
         it('for findById', async function() {
           const findByIdDoc = await S.findById({ _id: inclusionDoc._id }).select('-name -docs.name');
-          assert.equal(findByIdDoc.isSelected('name'), false);assert.equal(s.isSelected('thin'), true);
+          assert.equal(findByIdDoc.isSelected('name'), false);
+          assert.equal(findByIdDoc.isSelected('thin'), true);
           assert.equal(findByIdDoc.isSelected('docs.name'), false);
           assert.equal(findByIdDoc.isSelected('docs.bool'), true);
           assert.ok(findByIdDoc.isSelected('docs'));
@@ -171,7 +172,7 @@ describe('schema select option', function() {
       describe('for exclusions', function() {
         let exclusionDoc;
         beforeEach(async function() {
-          exclusionDoc = await E.create({ thin: true, name: 'the excluded', docs: [{ name: 'test', bool: true }]});
+          exclusionDoc = await E.create({ thin: true, name: 'the excluded', docs: [{ name: 'test', bool: true }] });
           assert.equal(exclusionDoc.name, 'the excluded');
           assert.equal(exclusionDoc.docs[0].name, 'test');
         });

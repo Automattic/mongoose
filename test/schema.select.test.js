@@ -177,7 +177,7 @@ describe('schema select option', function() {
           assert.equal(exclusionDoc.docs[0].name, 'test');
         });
         it('with find', async function() {
-          const findDoc = await E.find({ _id: exclusionDoc._id });
+          const findDoc = await E.find({ _id: exclusionDoc._id }).select('thin name docs.name docs.bool');
           const singleFindDoc = findDoc[0];
           assert.equal(singleFindDoc.isSelected('name'), true);
           assert.equal(singleFindDoc.isSelected('thin'), true);

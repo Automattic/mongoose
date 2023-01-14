@@ -558,8 +558,9 @@ declare module 'mongoose' {
   export type LeanType<T> =
     0 extends (1 & T) ? T : // any
       T extends TreatAsPrimitives ? T : // primitives
-        T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> :
-          LeanDocument<T>; // Documents and everything else
+        T extends Types.ArraySubdocument ? Omit<LeanDocument<T>, 'parentArray' | 'ownerDocument' | 'parent'> :
+          T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> :
+            LeanDocument<T>; // Documents and everything else
 
   export type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 

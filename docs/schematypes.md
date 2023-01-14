@@ -684,10 +684,9 @@ site for compatible types like
 [mongoose-long](https://github.com/aheckmann/mongoose-long),
 [mongoose-int32](https://github.com/vkarpov15/mongoose-int32),
 and
-[other](https://github.com/aheckmann/mongoose-function)
-[types](https://github.com/OpenifyIt/mongoose-types).
+[mongoose-function](https://github.com/aheckmann/mongoose-function).
 
-Read more about creating [custom SchemaTypes here](customschematypes.html).
+Read more about creating custom SchemaTypes [here](customschematypes.html).
 
 <h3 id="path"><a href="#path">The `schema.path()` Function</a></h3>
 

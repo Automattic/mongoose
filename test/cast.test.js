@@ -193,4 +193,21 @@ describe('cast: ', function() {
       name: 'foo'
     });
   });
+
+  it('returns cast value with context undefined for nested schema', function() {
+    const nested = new Schema({ _id: Number }, {});
+
+    const schema = new Schema({ status: [nested] });
+
+    const filter = {
+      $elemMatch: {
+        'status._id': 42,
+        'status.name': "John Doe"
+      }
+    };
+
+    assert.deepStrictEqual(cast(schema, filter), {
+      $elemMatch: { 'status._id': 42 }
+    });
+  });
 });

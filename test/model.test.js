@@ -8900,6 +8900,40 @@ describe('Model', function() {
       assert.equal(TestModel.staticFn(), 'Returned from staticFn');
     });
   });
+
+  it('returns document with nested schema', async function() {
+    const bioSchema = new Schema({
+      name: { type: String }
+    }, { strictQuery: false });
+
+    const Book = db.model('book', new Schema({
+      name: String,
+      authors: [{
+        bio: bioSchema
+      }]
+    }, { strictQuery: false }));
+
+    await new Book({
+      name: 'Mongoose Fundamentals',
+      authors: [{
+        bio: {
+          name: 'Foo Bar'
+        }
+      }]
+    }).save();
+
+    const books = await Book.find({
+      name: 'Mongoose Fundamentals',
+      authors: {
+        $elemMatch: {
+          'bio.name': { $in: ['Foo Bar'] },
+          'bio.location': 'Mandurah'
+        }
+      }
+    }).lean();
+
+    assert.strictEqual(books.length, 0);
+  });
 });
 
 

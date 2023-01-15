@@ -8904,14 +8904,14 @@ describe('Model', function() {
   it('returns document with nested schema (gh-12902)', async function() {
     const bioSchema = new Schema({
       name: { type: String }
-    }, { strictQuery: false });
+    });
 
     const Book = db.model('book', new Schema({
       name: String,
       authors: [{
         bio: bioSchema
       }]
-    }, { strictQuery: false }));
+    }));
 
     await new Book({
       name: 'Mongoose Fundamentals',
@@ -8932,7 +8932,7 @@ describe('Model', function() {
       }
     }).lean();
 
-    assert.strictEqual(books.length, 0);
+    assert.strictEqual(books.length, 1);
   });
 });
 

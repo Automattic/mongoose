@@ -206,8 +206,11 @@ describe('cast: ', function() {
       }
     };
 
-    assert.deepStrictEqual(cast(schema, filter, { strictQuery: true }), {
-      $elemMatch: { 'status._id': 42 }
-    });
+    const result = cast(schema, filter)
+
+    assert.deepStrictEqual(
+      result,
+      { $elemMatch: { 'status._id': 42 } }
+    );
   });
 });

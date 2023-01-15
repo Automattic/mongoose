@@ -206,7 +206,7 @@ describe('cast: ', function() {
       }
     };
 
-    const result = cast(schema, filter)
+    const result = cast(schema, filter);
 
     assert.deepStrictEqual(
       result,

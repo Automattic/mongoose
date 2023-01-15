@@ -202,7 +202,7 @@ describe('cast: ', function() {
     const filter = {
       $elemMatch: {
         'status._id': 42,
-        'status.name': "John Doe"
+        'status.name': 'John Doe'
       }
     };
 

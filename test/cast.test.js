@@ -194,8 +194,8 @@ describe('cast: ', function() {
     });
   });
 
-  it('returns cast value with context undefined for nested schema', function() {
-    const nested = new Schema({ _id: Number }, {});
+  it('returns cast value with context undefined for nested schema (gh-12902)', function() {
+    const nested = new Schema({ _id: Number });
 
     const schema = new Schema({ status: [nested] });
 

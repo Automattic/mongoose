@@ -8901,7 +8901,7 @@ describe('Model', function() {
     });
   });
 
-  it('returns document with nested schema', async function() {
+  it('returns document with nested schema (gh-12902)', async function() {
     const bioSchema = new Schema({
       name: { type: String }
     }, { strictQuery: false });

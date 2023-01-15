@@ -83,7 +83,7 @@ describe('cast: ', function() {
   });
 
   describe('$all', function() {
-    it('casts $elemMatch (gh-11314)', async function() {
+    it('casts $elemMatch (gh-11314)', function() {
       const nested = new Schema({ _id: Number }, {});
 
       const schema = new Schema({ status: [nested] });

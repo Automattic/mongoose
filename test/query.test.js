@@ -4350,7 +4350,7 @@ describe('Query', function() {
     assert.ok('title' in replacedDoc === false);
   });
 
-  it('handles $elemMatch with nested schema (gh-12902)', async function() {
+  it('handles $elemMatch with nested schema if strictQuery is false (gh-12902)', async function() {
     const m = new mongoose.Mongoose();
 
     await m.connect(start.uri);
@@ -4388,5 +4388,45 @@ describe('Query', function() {
     });
 
     assert.strictEqual(books.length, 0);
+  });
+
+  it('handles $elemMatch with nested schema if strictQuery is true (gh-12902)', async function() {
+    const m = new mongoose.Mongoose();
+
+    await m.connect(start.uri);
+
+    m.set('strictQuery', true);
+
+    const bioSchema = new m.Schema({
+      name: { type: String }
+    });
+
+    const Book = m.model('book', new m.Schema({
+      name: String,
+      authors: [{
+        bio: bioSchema
+      }]
+    }));
+
+    await new Book({
+      name: 'Mongoose Fundamentals',
+      authors: [{
+        bio: {
+          name: 'Foo Bar'
+        }
+      }]
+    }).save();
+
+    const books = await Book.find({
+      name: 'Mongoose Fundamentals',
+      authors: {
+        $elemMatch: {
+          'bio.name': { $in: ['Foo Bar'] },
+          'bio.location': 'Mandurah' // Not in schema
+        }
+      }
+    });
+
+    assert.strictEqual(books.length, 1);
   });
 });

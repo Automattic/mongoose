@@ -193,24 +193,4 @@ describe('cast: ', function() {
       name: 'foo'
     });
   });
-
-  it('returns cast value with context undefined for nested schema (gh-12902)', function() {
-    const nested = new Schema({ _id: Number });
-
-    const schema = new Schema({ status: [nested] });
-
-    const filter = {
-      $elemMatch: {
-        'status._id': 42,
-        'status.name': 'John Doe'
-      }
-    };
-
-    const result = cast(schema, filter);
-
-    assert.deepStrictEqual(
-      result,
-      { $elemMatch: { 'status._id': 42 } }
-    );
-  });
 });

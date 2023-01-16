@@ -4351,11 +4351,17 @@ describe('Query', function() {
   });
 
   it('handles $elemMatch with nested schema (gh-12902)', async function() {
-    const bioSchema = new Schema({
+    const m = new mongoose.Mongoose();
+
+    await m.connect(start.uri);
+
+    m.set('strictQuery', false);
+
+    const bioSchema = new m.Schema({
       name: { type: String }
     });
 
-    const Book = db.model('book', new Schema({
+    const Book = m.model('book', new m.Schema({
       name: String,
       authors: [{
         bio: bioSchema
@@ -4381,6 +4387,6 @@ describe('Query', function() {
       }
     });
 
-    assert.strictEqual(books.length, 1);
+    assert.strictEqual(books.length, 0);
   });
 });

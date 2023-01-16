@@ -83,3 +83,19 @@ schema.virtual('fullName').get(function() {
   return `${this.firstName} ${this.lastName}`;
 });
 ```
+
+### Override the Type of `this` in Your Virtual
+
+In case the value of `this` in your virtual is incorrect for some reason, you can always override it using the generic parameter to `virtual()`.
+
+```ts
+interface MyCustomUserDocumentType {
+  firstName: string;
+  lastName: string;
+  myMethod(): string;
+}
+
+schema.virtual<MyCustomUserDocumentType>('fullName').get(function() {
+  return this.method(); // returns string
+});
+```

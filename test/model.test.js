@@ -3719,28 +3719,25 @@ describe('Model', function() {
 
     it('with positional notation on path not existing in schema (gh-1048)', function(done) {
       const M = db.model('Test', Schema({ name: 'string' }));
-      db.on('open', function() {
-        const o = {
-          name: 'gh-1048',
-          _id: new mongoose.Types.ObjectId(),
-          databases: {
-            0: { keys: 100, expires: 0 },
-            15: { keys: 1, expires: 0 }
-          }
-        };
+      const o = {
+        name: 'gh-1048',
+        _id: new mongoose.Types.ObjectId(),
+        databases: {
+          0: { keys: 100, expires: 0 },
+          15: { keys: 1, expires: 0 }
+        }
+      };
 
-        M.collection.insertOne(o, function(err) {
+      M.updateOne({ _id: o._id }, o, { upsert: true, strict: false }, function(err) {
+        assert.ifError(err);
+        M.findById(o._id, function(err, doc) {
           assert.ifError(err);
-          M.findById(o._id, function(err, doc) {
-            db.close();
-            assert.ifError(err);
-            assert.ok(doc);
-            assert.ok(doc._doc.databases);
-            assert.ok(doc._doc.databases['0']);
-            assert.ok(doc._doc.databases['15']);
-            assert.equal(doc.databases, undefined);
-            done();
-          });
+          assert.ok(doc);
+          assert.ok(doc._doc.databases);
+          assert.ok(doc._doc.databases['0']);
+          assert.ok(doc._doc.databases['15']);
+          assert.equal(doc.databases, undefined);
+          done();
         });
       });
     });

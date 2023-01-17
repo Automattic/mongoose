@@ -154,7 +154,7 @@ describe('collections:', function() {
   });
 
   it('buffers for sync methods (gh-10610)', function(done) {
-    mongoose.createConnection();
+    db = mongoose.createConnection();
     const collection = db.collection('gh10610');
 
     collection.find({}, {}, function(err, res) {

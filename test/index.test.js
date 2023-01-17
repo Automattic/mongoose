@@ -88,6 +88,7 @@ describe('mongoose module:', function() {
     await User.findOne();
     assert.equal(written.length, 1);
     assert.ok(written[0].startsWith('users.findOne('));
+    await mongoose.disconnect();
   });
 
   it('{g,s}etting options', function() {
@@ -479,6 +480,7 @@ describe('mongoose module:', function() {
 
     assert.equal(doc.createdAt.valueOf(), date.valueOf());
     assert.equal(doc.updatedAt.valueOf(), date.valueOf());
+    await mongoose.disconnect();
   });
 
   it('isolates custom types between mongoose instances (gh-6933) (gh-7158)', function() {
@@ -758,6 +760,7 @@ describe('mongoose module:', function() {
     await Person.create({ name: 'Test1', favoriteMovie: movie._id });
     const entry = await Person.findOne().populate({ path: 'favoriteMovie' });
     assert(entry);
+    await mongoose.disconnect();
   });
   it('global `strictPopulate` works when true (gh-10694)', async function() {
     const mongoose = new Mongoose();
@@ -774,6 +777,7 @@ describe('mongoose module:', function() {
     await assert.rejects(async() => {
       await Person.findOne().populate({ path: 'favoriteGame' });
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
+    await mongoose.disconnect();
   });
   it('allows global `strictPopulate` to be overriden on specific queries set to true (gh-10694)', async function() {
     const mongoose = new Mongoose();
@@ -789,6 +793,7 @@ describe('mongoose module:', function() {
     await assert.rejects(async() => {
       await Person.findOne().populate({ path: 'favoriteGame', strictPopulate: true });
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
+    await mongoose.disconnect();
   });
   it('allows global `strictPopulate` to be overriden on specific queries set to false (gh-10694)', async function() {
     const mongoose = new Mongoose();
@@ -803,6 +808,7 @@ describe('mongoose module:', function() {
     await Person.create({ name: 'Test1', favoriteMovie: movie._id });
     const entry = await Person.findOne().populate({ path: 'favoriteMovie' });
     assert(entry);
+    await mongoose.disconnect();
   });
 
   describe('exports', function() {
@@ -871,6 +877,7 @@ describe('mongoose module:', function() {
       // lean is necessary to avoid defaults by casting
       const movie = await Movie.findOne({ title: 'Cloud Atlas' }).lean();
       assert.equal(movie.genre, 'Action');
+      await m.disconnect();
     });
 
     it('setting `setDefaultOnInsert` on operation has priority over base option (gh-9032)', async function() {
@@ -896,6 +903,7 @@ describe('mongoose module:', function() {
       // lean is necessary to avoid defaults by casting
       const movie = await Movie.findOne({ title: 'The Man From Earth' }).lean();
       assert.ok(!movie.genre);
+      await m.disconnect();
     });
     it('should prevent non-hexadecimal strings (gh-9996)', function() {
       const badIdString = 'z'.repeat(24);
@@ -970,6 +978,7 @@ describe('mongoose module:', function() {
         // Assert
         const optionsSentToMongo = nativeAggregateSpy.args[0][1];
         assert.strictEqual(optionsSentToMongo.allowDiskUse, undefined);
+        await m.disconnect();
       });
 
       it('works when set to `true` and no option provided', async() => {
@@ -992,6 +1001,7 @@ describe('mongoose module:', function() {
         // Assert
         const optionsSentToMongo = nativeAggregateSpy.args[0][1];
         assert.strictEqual(optionsSentToMongo.allowDiskUse, true);
+        await m.disconnect();
       });
       it('can be overridden by a specific query', async() => {
         // Arrange
@@ -1013,6 +1023,7 @@ describe('mongoose module:', function() {
         // Assert
         const optionsSentToMongo = nativeAggregateSpy.args[0][1];
         assert.equal(optionsSentToMongo.allowDiskUse, false);
+        await m.disconnect();
       });
     });
     describe('global `timestamps.createdAt.immutable` (gh-10139)', () => {
@@ -1097,6 +1108,7 @@ describe('mongoose module:', function() {
         title: 'The IDless master'
       });
       assert.equal(entry.id, undefined);
+      await m.disconnect();
     });
   });
 

@@ -26,6 +26,10 @@ describe('Tutorial: findOneAndUpdate()', function() {
     await Character.create({ name: 'Jean-Luc Picard' });
   });
 
+  after(async () => {
+    await mongoose.disconnect();
+  })
+
   it('basic case', async function() {
     // acquit:ignore:start
     await mongoose.model('Character').deleteMany({});

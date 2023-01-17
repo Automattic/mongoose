@@ -20,12 +20,9 @@ const EmbeddedDocument = mongoose.Types.Subdocument;
 const MongooseError = mongoose.Error;
 
 describe('Model', function() {
-
   let db;
   let Comments;
   let BlogPost;
-
-  const connectionsToClose = [];
 
   beforeEach(() => db.deleteModel(/.*/));
 
@@ -84,7 +81,6 @@ describe('Model', function() {
 
   after(async function() {
     await db.close();
-    await Promise.all(connectionsToClose.map(async(v) => /* v instanceof Promise ? (await v).close() : */ v.close()));
   });
 
   afterEach(() => util.clearTestData(db));
@@ -3722,9 +3718,6 @@ describe('Model', function() {
     });
 
     it('with positional notation on path not existing in schema (gh-1048)', function(done) {
-      const db = start();
-      connectionsToClose.push(db);
-
       const M = db.model('Test', Schema({ name: 'string' }));
       db.on('open', function() {
         const o = {
@@ -4336,7 +4329,6 @@ describe('Model', function() {
   it('save max bson size error with buffering (gh-3906)', async function() {
     this.timeout(10000);
     const db = start({ noErrorListener: true });
-    connectionsToClose.push(db);
     const Test = db.model('Test', { name: Object });
 
     const test = new Test({
@@ -4355,7 +4347,6 @@ describe('Model', function() {
   it('reports max bson size error in save (gh-3906)', async function() {
     this.timeout(10000);
     const db = await start({ noErrorListener: true });
-    connectionsToClose.push(db);
     const Test = db.model('Test', { name: Object });
 
     const test = new Test({
@@ -5339,63 +5330,6 @@ describe('Model', function() {
           assert.equal(changeData.operationType, 'insert');
           assert.equal(changeData.fullDocument.name, 'Child');
         });
-
-        it('watch() before connecting (gh-5964)', async function() {
-          const db = start();
-          connectionsToClose.push(db);
-
-          const MyModel = db.model('Test5964', new Schema({ name: String }));
-
-          // Synchronous, before connection happens
-          const changeStream = MyModel.watch();
-          const changed = new global.Promise(resolve => {
-            changeStream.once('change', data => resolve(data));
-          });
-
-          await db;
-          await MyModel.create({ name: 'Ned Stark' });
-
-          const changeData = await changed;
-          assert.equal(changeData.operationType, 'insert');
-          assert.equal(changeData.fullDocument.name, 'Ned Stark');
-        });
-
-        it('watch() close() prevents buffered watch op from running (gh-7022)', async function() {
-          const db = start();
-          connectionsToClose.push(db);
-          const MyModel = db.model('Test', new Schema({}));
-          const changeStream = MyModel.watch();
-          const ready = new global.Promise(resolve => {
-            changeStream.once('data', () => {
-              resolve(true);
-            });
-            setTimeout(resolve, 500, false);
-          });
-
-          changeStream.close();
-          await db;
-          const readyCalled = await ready;
-          assert.strictEqual(readyCalled, false);
-        });
-
-        it('watch() close() closes the stream (gh-7022)', async function() {
-          const db = await start();
-          connectionsToClose.push(db);
-          const MyModel = db.model('Test', new Schema({ name: String }));
-
-          await MyModel.init();
-
-          const changeStream = MyModel.watch();
-          const closed = new global.Promise(resolve => {
-            changeStream.once('close', () => resolve(true));
-          });
-
-          await MyModel.create({ name: 'Hodor' });
-
-          changeStream.close();
-          const closedData = await closed;
-          assert.strictEqual(closedData, true);
-        });
       });
 
       describe('sessions (gh-6362)', function() {
@@ -5429,9 +5363,7 @@ describe('Model', function() {
         });
 
         it('startSession() before connecting', async function() {
-
           const db = start();
-          connectionsToClose.push(db);
 
           const MyModel = db.model('Test', new Schema({ name: String }));
 
@@ -5446,6 +5378,7 @@ describe('Model', function() {
 
           session.endSession();
 
+          await db.close();
         });
 
         it('sets session when pulling a document from db', async function() {

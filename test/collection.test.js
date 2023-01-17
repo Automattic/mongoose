@@ -8,15 +8,18 @@ const assert = require('assert');
 const mongoose = start.mongoose;
 
 describe('collections:', function() {
-  const connectionsToClose = [];
+  let db = null;
 
-  after(async function() {
-    await Promise.all(connectionsToClose.map((v) => v.close()));
+  this.afterEach(async function() {
+    if (db == null) {
+      return;
+    }
+    await db.close();
+    db = null;
   });
 
   it('should buffer commands until connection is established', function(done) {
-    const db = mongoose.createConnection();
-    connectionsToClose.push(db);
+    db = mongoose.createConnection();
     const collection = db.collection('test-buffering-collection');
     let connected = false;
     let insertedId = undefined;
@@ -49,8 +52,7 @@ describe('collections:', function() {
   });
 
   it('returns a promise if buffering and no callback (gh-7676)', function(done) {
-    const db = mongoose.createConnection();
-    connectionsToClose.push(db);
+    db = mongoose.createConnection();
     const collection = db.collection('gh7676');
 
     const promise = collection.insertOne({ foo: 'bar' }, {})
@@ -152,8 +154,7 @@ describe('collections:', function() {
   });
 
   it('buffers for sync methods (gh-10610)', function(done) {
-    const db = mongoose.createConnection();
-    connectionsToClose.push(db);
+    mongoose.createConnection();
     const collection = db.collection('gh10610');
 
     collection.find({}, {}, function(err, res) {

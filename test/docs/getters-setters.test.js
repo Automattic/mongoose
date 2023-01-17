@@ -17,6 +17,10 @@ describe('getters/setters', function() {
     mongoose.deleteModel(/.*/);
   });
 
+  after(async () => {
+    await mongoose.disconnect();
+  })
+
   describe('getters', function() {
     it('basic example', async function() {
       const userSchema = new Schema({

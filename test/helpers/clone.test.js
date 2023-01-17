@@ -1,6 +1,8 @@
 'use strict';
 
 const assert = require('assert');
+
+require('../common'); // required for side-effect setup (so that the default driver is set-up)
 const clone = require('../../lib/helpers/clone');
 const symbols = require('../../lib/helpers/symbols');
 const ObjectId = require('../../lib/types/objectid');

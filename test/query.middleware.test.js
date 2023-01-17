@@ -14,12 +14,15 @@ describe('query middleware', function() {
   let Author;
   let Publisher;
 
+  const connectionsToClose = [];
+
   before(function() {
     db = start();
   });
 
   after(async function() {
     await db.close();
+    await Promise.all(connectionsToClose.map((v) => v.close()));
   });
 
   const initializeData = function(done) {
@@ -81,7 +84,8 @@ describe('query middleware', function() {
       next();
     });
 
-    start();
+    const conn = start();
+    connectionsToClose.push(conn);
 
     initializeData(function(error) {
       assert.ifError(error);

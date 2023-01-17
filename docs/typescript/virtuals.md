@@ -86,7 +86,7 @@ schema.virtual('fullName').get(function() {
 
 ### Override the Type of `this` in Your Virtual
 
-In case the value of `this` in your virtual is incorrect for some reason, you can always override it using the generic parameter to `virtual()`.
+In case the value of `this` in your virtual is incorrect for some reason, you can always override it using the generic parameter in the `virtual()` function.
 
 ```ts
 interface MyCustomUserDocumentType {

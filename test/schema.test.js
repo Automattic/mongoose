@@ -2913,4 +2913,32 @@ describe('schema', function() {
 
     assert.equal(schema._getSchema('child.testMap.foo.bar').instance, 'Mixed');
   });
+
+  it('should allow deleting a virtual path off the schema gh-8397', async function() {
+    const schema = new Schema({
+      name: String
+    }, {
+      virtuals: {
+        foo: {
+          get() {
+            return 42;
+          }
+        }
+      }
+    });
+    assert.ok(schema.virtuals.foo);
+    schema.removeVirtual('foo');
+    assert.ok(!schema.virtuals.foo);
+  });
+
+  it('should throw an error if attempting to delete a virtual path that does not exist gh-8397', function() {
+    const schema = new Schema({
+      name: String
+    });
+    assert.ok(!schema.virtuals.foo);
+    assert.throws(() => {
+      schema.removeVirtual('foo');
+    }, { message: 'Attempting to remove virtual path that does not exist.' });
+    
+  });
 });

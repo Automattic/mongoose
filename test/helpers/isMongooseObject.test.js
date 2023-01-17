@@ -1,6 +1,8 @@
 'use strict';
 
 const assert = require('assert');
+
+require('../common'); // required for side-effect setup (so that the default driver is set-up)
 const isMongooseObject = require('../../lib/helpers/isMongooseObject');
 const MongooseArray = require('../../lib/types/array');
 

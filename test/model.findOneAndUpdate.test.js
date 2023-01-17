@@ -2013,11 +2013,6 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('setting subtype when saving (gh-5551)', function(done) {
-      if (parseInt(process.version.substring(1).split('.')[0], 10) < 4) {
-        // Don't run on node 0.x because of `const` issues
-        this.skip();
-      }
-
       const uuid = require('uuid');
       function toUUID(string) {
         if (!string) {

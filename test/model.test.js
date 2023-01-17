@@ -25,6 +25,8 @@ describe('Model', function() {
   let Comments;
   let BlogPost;
 
+  const connectionsToClose = [];
+
   beforeEach(() => db.deleteModel(/.*/));
 
   beforeEach(function() {
@@ -80,8 +82,9 @@ describe('Model', function() {
     db = start();
   });
 
-  after(function() {
-    db.close();
+  after(async function() {
+    await db.close();
+    await Promise.all(connectionsToClose.map(async(v) => /* v instanceof Promise ? (await v).close() : */ v.close()));
   });
 
   afterEach(() => util.clearTestData(db));
@@ -3720,6 +3723,7 @@ describe('Model', function() {
 
     it('with positional notation on path not existing in schema (gh-1048)', function(done) {
       const db = start();
+      connectionsToClose.push(db);
 
       const M = db.model('Test', Schema({ name: 'string' }));
       db.on('open', function() {
@@ -4332,6 +4336,7 @@ describe('Model', function() {
   it('save max bson size error with buffering (gh-3906)', async function() {
     this.timeout(10000);
     const db = start({ noErrorListener: true });
+    connectionsToClose.push(db);
     const Test = db.model('Test', { name: Object });
 
     const test = new Test({
@@ -4350,6 +4355,7 @@ describe('Model', function() {
   it('reports max bson size error in save (gh-3906)', async function() {
     this.timeout(10000);
     const db = await start({ noErrorListener: true });
+    connectionsToClose.push(db);
     const Test = db.model('Test', { name: Object });
 
     const test = new Test({
@@ -4789,6 +4795,67 @@ describe('Model', function() {
         assert.equal(error, null);
         done();
       });
+    });
+
+    it('insertMany() validation error with ordered false and rawResult for checking which documents failed (gh-12791)', async function() {
+      const schema = new Schema({
+        name: { type: String, required: true },
+        year: { type: Number, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const id1 = new mongoose.Types.ObjectId();
+      const id2 = new mongoose.Types.ObjectId();
+      const id3 = new mongoose.Types.ObjectId();
+      const arr = [
+        { _id: id1, foo: 'The Phantom Menace', year: 1999 },
+        { _id: id2, name: 'The Force Awakens', bar: 2015 },
+        { _id: id3, name: 'The Empire Strikes Back', year: 1980 }
+      ];
+      const opts = { ordered: false, rawResult: true };
+      const res = await Movie.insertMany(arr, opts);
+      // {
+      //   acknowledged: true,
+      //   insertedCount: 1,
+      //   insertedIds: { '0': new ObjectId("63b34b062cfe38622738e510") },
+      //   mongoose: { validationErrors: [ [Error], [Error] ] }
+      // }
+      assert.equal(res.insertedCount, 1);
+      assert.equal(res.insertedIds[0].toHexString(), id3.toHexString());
+      assert.equal(res.mongoose.validationErrors.length, 2);
+      assert.ok(res.mongoose.validationErrors[0].errors['name']);
+      assert.ok(!res.mongoose.validationErrors[0].errors['year']);
+      assert.ok(res.mongoose.validationErrors[1].errors['year']);
+      assert.ok(!res.mongoose.validationErrors[1].errors['name']);
+    });
+
+    it('insertMany() validation error with ordered false and rawResult for mixed write and validation error (gh-12791)', async function() {
+      const schema = new Schema({
+        name: { type: String, required: true, unique: true },
+        year: { type: Number, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+      await Movie.init();
+
+      const arr = [
+        { foo: 'The Phantom Menace', year: 1999 },
+        { name: 'The Force Awakens', bar: 2015 },
+        { name: 'The Empire Strikes Back', year: 1980 },
+        { name: 'The Empire Strikes Back', year: 1980 }
+      ];
+      const opts = { ordered: false, rawResult: true };
+      const err = await Movie.insertMany(arr, opts).then(() => null, err => err);
+
+      assert.ok(err);
+      assert.equal(err.insertedDocs.length, 1);
+      assert.equal(err.insertedDocs[0].name, 'The Empire Strikes Back');
+      assert.equal(err.writeErrors.length, 1);
+      assert.equal(err.writeErrors[0].index, 3);
+      assert.equal(err.mongoose.validationErrors.length, 2);
+      assert.ok(err.mongoose.validationErrors[0].errors['name']);
+      assert.ok(!err.mongoose.validationErrors[0].errors['year']);
+      assert.ok(err.mongoose.validationErrors[1].errors['year']);
+      assert.ok(!err.mongoose.validationErrors[1].errors['name']);
     });
 
     it('insertMany() populate option (gh-9720)', async function() {
@@ -5275,6 +5342,7 @@ describe('Model', function() {
 
         it('watch() before connecting (gh-5964)', async function() {
           const db = start();
+          connectionsToClose.push(db);
 
           const MyModel = db.model('Test5964', new Schema({ name: String }));
 
@@ -5294,6 +5362,7 @@ describe('Model', function() {
 
         it('watch() close() prevents buffered watch op from running (gh-7022)', async function() {
           const db = start();
+          connectionsToClose.push(db);
           const MyModel = db.model('Test', new Schema({}));
           const changeStream = MyModel.watch();
           const ready = new global.Promise(resolve => {
@@ -5311,6 +5380,7 @@ describe('Model', function() {
 
         it('watch() close() closes the stream (gh-7022)', async function() {
           const db = await start();
+          connectionsToClose.push(db);
           const MyModel = db.model('Test', new Schema({ name: String }));
 
           await MyModel.init();
@@ -5361,6 +5431,7 @@ describe('Model', function() {
         it('startSession() before connecting', async function() {
 
           const db = start();
+          connectionsToClose.push(db);
 
           const MyModel = db.model('Test', new Schema({ name: String }));
 

@@ -2496,12 +2496,12 @@ describe('Query', function() {
     it('cast embedded discriminators with $elemMatch discriminator key (gh-7449)', async function() {
       const ListingLineSchema = new Schema({
         sellerId: Number
-      }, { strictQuery: false });
+      });
 
       const OrderSchema = new Schema({
         lines: [new Schema({
           amount: Number
-        }, { discriminatorKey: 'kind', strictQuery: false })]
+        }, { discriminatorKey: 'kind' })]
       });
 
       OrderSchema.path('lines').discriminator('listing', ListingLineSchema);
@@ -3237,7 +3237,7 @@ describe('Query', function() {
     assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
   });
 
-  it('strictQuery inherits from strict (gh-10763) (gh-4136) (gh-7178)', async function() {
+  it('strictQuery does not inherit from strict (gh-11861)', async function() {
     const modelSchema = new Schema({
       field: Number,
       nested: { path: String }
@@ -3247,8 +3247,17 @@ describe('Query', function() {
 
     // `find()` on a top-level path not in the schema
     const err = await Model.find({ notInschema: 1 }).then(() => null, e => e);
-    assert.ok(err);
-    assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
+    assert.ifError(err);
+  });
+
+  it('strictQuery is false by default (gh-11861)', async function() {
+    const modelSchema = new Schema({ field: Number }, {});
+    const Model = db.model('Test', modelSchema);
+
+    await Model.create({ field: 1 });
+    const docs = await Model.find({ nonexistingField: 1 });
+
+    assert.equal(docs.length, 0);
   });
 
   it('strictQuery = true (gh-6032)', async function() {

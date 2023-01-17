@@ -886,10 +886,7 @@ In Mongoose 7, `strictQuery` is `false` by default.
 However, you can override this behavior globally:
 
 ```javascript
-// Set `strictQuery` to `false` to prepare for the change
-mongoose.set('strictQuery', false);
-
-// Set `strictQuery` to `true` to suppress the warning message
+// Set `strictQuery` to `true` to omit unknown fields in queries.
 mongoose.set('strictQuery', true);
 ```
 

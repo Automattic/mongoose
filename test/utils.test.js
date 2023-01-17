@@ -227,45 +227,6 @@ describe('utils', function() {
     assert.ok(!utils.deepEqual(2, []));
   });
 
-  describe('clone', function() {
-    it('retains RegExp options gh-1355', function() {
-      const a = new RegExp('hello', 'igm');
-      assert.ok(a.global);
-      assert.ok(a.ignoreCase);
-      assert.ok(a.multiline);
-
-      const b = utils.clone(a);
-      assert.equal(b.source, a.source);
-      assert.equal(a.global, b.global);
-      assert.equal(a.ignoreCase, b.ignoreCase);
-      assert.equal(a.multiline, b.multiline);
-    });
-
-    it('clones objects created with Object.create(null)', function() {
-      const o = Object.create(null);
-      o.a = 0;
-      o.b = '0';
-      o.c = 1;
-      o.d = '1';
-
-      const out = utils.clone(o);
-      assert.strictEqual(0, out.a);
-      assert.strictEqual('0', out.b);
-      assert.strictEqual(1, out.c);
-      assert.strictEqual('1', out.d);
-      assert.equal(Object.keys(out).length, 4);
-    });
-
-    it('doesnt minimize empty objects in arrays to null (gh-7322)', function() {
-      const o = { arr: [{ a: 42 }, {}, {}] };
-
-      const out = utils.clone(o, { minimize: true });
-      assert.deepEqual(out.arr[0], { a: 42 });
-      assert.deepEqual(out.arr[1], {});
-      assert.deepEqual(out.arr[2], {});
-    });
-  });
-
   it('array.flatten', function() {
     const orig = [0, [1, 2, [3, 4, [5, [6]], 7], 8], 9];
     assert.deepEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], utils.array.flatten(orig));
@@ -341,20 +302,6 @@ describe('utils', function() {
       utils.mergeClone(to, from);
 
       assert.ok(to.val instanceof Date);
-    });
-
-    it('skips cloning types that have `toBSON()` if `bson` is set (gh-8299)', function() {
-      const o = {
-        toBSON() {
-          return 'toBSON';
-        },
-        valueOf() {
-          return 'valueOf()';
-        }
-      };
-
-      const out = utils.clone(o, { bson: true });
-      assert.deepEqual(out, o);
     });
   });
   describe('errorToPOJO(...)', () => {

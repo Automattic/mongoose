@@ -1404,59 +1404,22 @@ describe('Query', function() {
     });
 
     describe('read', function() {
-      const P = mongoose.mongo.ReadPreference;
-
       describe('without tags', function() {
         it('works', function(done) {
           const query = new Query({});
           query.read('primary');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
-          assert.equal(query.options.readPreference.mode, 'primary');
-
-          query.read('p');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'primary');
 
           query.read('primaryPreferred');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
-          assert.equal(query.options.readPreference.mode, 'primaryPreferred');
-
-          query.read('pp');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'primaryPreferred');
 
           query.read('secondary');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
-          assert.equal(query.options.readPreference.mode, 'secondary');
-
-          query.read('s');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'secondary');
 
           query.read('secondaryPreferred');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
-          assert.equal(query.options.readPreference.mode, 'secondaryPreferred');
-
-          query.read('sp');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'secondaryPreferred');
 
           query.read('nearest');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
-          assert.equal(query.options.readPreference.mode, 'nearest');
-
-          query.read('n');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'nearest');
 
           done();
@@ -1468,9 +1431,7 @@ describe('Query', function() {
           const query = new Query({});
           const tags = [{ dc: 'sf', s: 1 }, { dc: 'jp', s: 2 }];
 
-          query.read('pp', tags);
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
+          query.read('primaryPreferred', tags);
           assert.equal(query.options.readPreference.mode, 'primaryPreferred');
           assert.ok(Array.isArray(query.options.readPreference.tags));
           assert.equal(query.options.readPreference.tags[0].dc, 'sf');
@@ -1484,20 +1445,18 @@ describe('Query', function() {
       describe('inherits its models schema read option', function() {
         let schema, M, called;
         before(function() {
-          schema = new Schema({}, { read: 'p' });
+          schema = new Schema({}, { read: 'primary' });
           M = mongoose.model('schemaOptionReadPrefWithQuery', schema);
         });
 
         it('if not set in query', function(done) {
           const options = M.where()._optionsForExec(M);
-          assert.ok(options.readPreference instanceof P);
-          assert.equal(options.readPreference.mode, 'primary');
+          assert.equal(options.readPreference, 'primary');
           done();
         });
 
         it('if set in query', function(done) {
-          const options = M.where().read('s')._optionsForExec(M);
-          assert.ok(options.readPreference instanceof P);
+          const options = M.where().read('secondary')._optionsForExec(M);
           assert.equal(options.readPreference.mode, 'secondary');
           done();
         });
@@ -1516,7 +1475,7 @@ describe('Query', function() {
             const ret = getopts.call(this, model);
 
             assert.ok(ret.readPreference);
-            assert.equal(ret.readPreference.mode, 'secondary');
+            assert.equal(ret.readPreference, 'secondary');
             assert.deepEqual({ w: 'majority' }, ret.writeConcern);
             called = true;
 
@@ -1546,7 +1505,7 @@ describe('Query', function() {
       q.setOptions({ sort: '-blah' });
       q.setOptions({ sort: { woot: -1 } });
       q.setOptions({ hint: { index1: 1, index2: -1 } });
-      q.setOptions({ read: ['s', [{ dc: 'eu' }]] });
+      q.setOptions({ read: ['secondary', [{ dc: 'eu' }]] });
 
       assert.equal(q.options.thing, 'cat');
       assert.deepEqual(q._mongooseOptions.populate.fans, { path: 'fans', _docs: {}, _childDocs: [] });

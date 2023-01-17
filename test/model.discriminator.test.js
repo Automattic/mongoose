@@ -7,7 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
-const clone = require('../lib/utils').clone;
+const clone = require('../lib/helpers/clone');
 const random = require('./util').random;
 const util = require('util');
 

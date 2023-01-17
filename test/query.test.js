@@ -4388,6 +4388,7 @@ describe('Query', function() {
     });
 
     assert.strictEqual(books.length, 0);
+    m.disconnect();
   });
 
   it('handles $elemMatch with nested schema if strictQuery is true (gh-12902)', async function() {
@@ -4428,5 +4429,7 @@ describe('Query', function() {
     });
 
     assert.strictEqual(books.length, 1);
+
+    m.disconnect();
   });
 });

@@ -17,6 +17,10 @@ describe('Virtuals', function() {
     mongoose.deleteModel(/.*/);
   });
 
+  after(async () => {
+    await mongoose.disconnect();
+  })
+
   it('basic', async function() {
     const userSchema = mongoose.Schema({
       email: String

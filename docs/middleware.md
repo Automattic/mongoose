@@ -68,6 +68,30 @@ In model middleware functions, `this` refers to the model.
 
 * [insertMany](api/model.html#model_Model-insertMany)
 
+Here are the possible strings that can be passed to `pre()`
+
+* aggregate
+* count
+* countDocuments
+* deleteOne
+* deleteMany
+* estimatedDocumentCount
+* find
+* findOne
+* findOneAndDelete
+* findOneAndRemove
+* findOneAndReplace
+* findOneAndUpdate
+* init
+* insertMany
+* remove
+* replaceOne
+* save
+* update
+* updateOne
+* updateMany
+* validate
+
 All middleware types support pre and post hooks.
 How pre and post hooks work is described in more detail below.
 

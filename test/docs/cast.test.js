@@ -23,6 +23,10 @@ describe('Cast Tutorial', function() {
     });
   });
 
+  after(async () => {
+    await mongoose.disconnect();
+  })
+
   it('get and set', async function() {
     const query = Character.find({ name: 'Jean-Luc Picard' });
     query.getFilter(); // `{ name: 'Jean-Luc Picard' }`

@@ -1018,3 +1018,105 @@ function gh12869() {
   type Example = InferSchemaType<typeof dbExample>;
   expectType<'foo' | 'bar'>({} as Example['active']);
 }
+
+function gh12882() {
+  // Array of strings
+  const arrString = new Schema({
+    fooArray: {
+      type: [{
+        type: String,
+        required: true
+      }],
+      required: true
+    }
+  });
+  type tArrString = InferSchemaType<typeof arrString>;
+  // Array of numbers using string definition
+  const arrNum = new Schema({
+    fooArray: {
+      type: [{
+        type: 'Number',
+        required: true
+      }],
+      required: true
+    }
+  });
+  type tArrNum = InferSchemaType<typeof arrNum>;
+  expectType<{
+    fooArray: number[]
+  }>({} as tArrNum);
+  // Array of object with key named "type"
+  const arrType = new Schema({
+    fooArray: {
+      type: [{
+        type: {
+          type: String,
+          required: true
+        },
+        foo: {
+          type: Number,
+          required: true
+        }
+      }],
+      required: true
+    }
+  });
+  type tArrType = InferSchemaType<typeof arrType>;
+  expectType<{
+    fooArray: {
+      type: string;
+      foo: number;
+    }[]
+  }>({} as tArrType);
+  // Readonly array of strings
+  const rArrString = new Schema({
+    fooArray: {
+      type: [{
+        type: String,
+        required: true
+      }] as const,
+      required: true
+    }
+  });
+  type rTArrString = InferSchemaType<typeof rArrString>;
+  expectType<{
+    fooArray: string[]
+  }>({} as rTArrString);
+  // Readonly array of numbers using string definition
+  const rArrNum = new Schema({
+    fooArray: {
+      type: [{
+        type: 'Number',
+        required: true
+      }] as const,
+      required: true
+    }
+  });
+  type rTArrNum = InferSchemaType<typeof rArrNum>;
+  expectType<{
+    fooArray: number[]
+  }>({} as rTArrNum);
+  // Readonly array of object with key named "type"
+  const rArrType = new Schema({
+    fooArray: {
+      type: [{
+        type: {
+          type: String,
+          required: true
+        },
+        foo: {
+          type: Number,
+          required: true
+        }
+      }] as const,
+      required: true
+    }
+  });
+  type rTArrType = InferSchemaType<typeof rArrType>;
+  expectType<{
+    fooArray: {
+      type: string;
+      foo: number;
+    }[]
+  }>({} as rTArrType);
+}

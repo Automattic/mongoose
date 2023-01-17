@@ -1,7 +1,9 @@
 'use strict';
 
-const applyProjection = require('../../lib/helpers/projection/applyProjection');
 const assert = require('assert');
+
+require('../common'); // required for side-effect setup (so that the default driver is set-up)
+const applyProjection = require('../../lib/helpers/projection/applyProjection');
 
 describe('applyProjection', function() {
   it('handles deep inclusive projections', function() {

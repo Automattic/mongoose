@@ -2939,6 +2939,6 @@ describe('schema', function() {
     assert.throws(() => {
       schema.removeVirtual('foo');
     }, { message: 'Attempting to remove virtual path that does not exist.' });
-    
+
   });
 });

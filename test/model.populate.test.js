@@ -10915,6 +10915,56 @@ describe('model: populate:', function() {
     );
   });
 
+  it('merges match when match is on `_id` (gh-12834)', async function() {
+    const personSchema = new Schema({
+      name: String,
+      stories: [{ type: Schema.Types.ObjectId, ref: 'Story' }]
+    });
+
+    const storySchema = new Schema({ title: String });
+
+    const Story = db.model('Story', storySchema);
+    const Person = db.model('Person', personSchema);
+
+    const stories = await Story.create([
+      { _id: '0'.repeat(24), title: 'The Fellowship of the Ring' },
+      { _id: '1'.repeat(24), title: 'Casino Royale' },
+      { _id: '2'.repeat(24), title: 'Live and Let Die' },
+      { _id: '3'.repeat(24), title: 'The Two Towers' }
+    ]);
+    let person = await Person.create({
+      name: 'Ian Fleming',
+      stories: [stories[1]._id, stories[2]._id]
+    });
+
+    person = await Person.findById(person).populate({
+      path: 'stories',
+      match: {
+        _id: { $gte: stories[2]._id }
+      }
+    });
+    assert.equal(person.stories.length, 1);
+    assert.equal(person.stories[0].title, 'Live and Let Die');
+
+    person = await Person.findById(person).populate({
+      path: 'stories',
+      match: {
+        _id: { $lte: stories[1]._id }
+      }
+    });
+    assert.equal(person.stories.length, 1);
+    assert.equal(person.stories[0].title, 'Casino Royale');
+
+    person = await Person.findById(person).populate({
+      path: 'stories',
+      match: {
+        _id: stories[1]._id
+      }
+    });
+    assert.equal(person.stories.length, 1);
+    assert.equal(person.stories[0].title, 'Casino Royale');
+  });
+
   describe('strictPopulate', function() {
     it('reports full path when throwing `strictPopulate` error with deep populate (gh-10923)', async function() {
       const L2 = db.model('Test', new Schema({ name: String }));

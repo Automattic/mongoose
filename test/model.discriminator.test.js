@@ -2077,4 +2077,28 @@ describe('model', function() {
       schema.pre('save', function testHook12604() {});
     }
   });
+
+  it('applies built-in plugins if mergePlugins and mergeHooks disabled (gh-12696) (gh-12604)', async function() {
+    const shapeDef = { name: String };
+    const shapeSchema = Schema(shapeDef, { discriminatorKey: 'kind' });
+
+    const Shape = db.model('Test', shapeSchema);
+
+    let subdocSaveCalls = 0;
+    const nestedSchema = Schema({ test: String });
+    nestedSchema.pre('save', function() {
+      ++subdocSaveCalls;
+    });
+
+    const squareSchema = Schema({ ...shapeDef, nested: nestedSchema });
+    const Square = Shape.discriminator(
+      'Square',
+      squareSchema,
+      { mergeHooks: false, mergePlugins: false }
+    );
+
+    assert.equal(subdocSaveCalls, 0);
+    await Square.create({ nested: { test: 'foo' } });
+    assert.equal(subdocSaveCalls, 1);
+  });
 });

@@ -12,7 +12,10 @@ const {
 
 describe('getRelatedIndexes', () => {
   let db;
-  beforeEach(() => db = start());
+  before(() => db = start());
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('../util').clearTestData(db));
+  afterEach(() => require('../util').stopRemainingOps(db));
   after(() => db.close());
 
   describe('getRelatedSchemaIndexes', () => {

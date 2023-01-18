@@ -9,9 +9,13 @@ for (var i = 0; i < pairs.length; ++i) {
   }
 }
 
+var defaultVersion = '6.x';
+var versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
+var version = versionFromUrl ? versionFromUrl[1] : defaultVersion;
+
 if (q != null) {
   document.getElementById('search-input').value = decodeURIComponent(q);
-  fetch(root + '/search?search=' + q).
+  fetch(root + '/search?search=' + q + '&version=' + version).
     then(function(res) { return res.json(); }).
     then(
       function(result) {
@@ -22,7 +26,7 @@ if (q != null) {
         var html = '';
         for (var i = 0; i < result.results.length; ++i) {
           var res = result.results[i];
-          var url = res.url.replace(/^\//, '');
+          var url = res.url;
           html += '<li>' +
             '<a class="title" href="' + url + '">' +
             res.title +

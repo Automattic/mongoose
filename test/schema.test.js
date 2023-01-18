@@ -2931,6 +2931,30 @@ describe('schema', function() {
     assert.ok(!schema.virtuals.foo);
   });
 
+  it('should allow deleting multiple virtuals gh-8397', async function() {
+    const schema = new Schema({
+      name: String
+    }, {
+      virtuals: {
+        foo: {
+          get() {
+            return 42;
+          }
+        },
+        bar: {
+          get() {
+            return 41;
+          }
+        }
+      }
+    });
+    assert.ok(schema.virtuals.foo);
+    assert.ok(schema.virtuals.bar);
+    schema.removeVirtual(['foo', 'bar']);
+    assert.ok(!schema.virtuals.foo);
+    assert.ok(!schema.virtuals.bar);
+  });
+
   it('should throw an error if attempting to delete a virtual path that does not exist gh-8397', function() {
     const schema = new Schema({
       name: String

@@ -129,7 +129,9 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
-  export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = DocType extends Document ? Require_id<DocType> : (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
+  export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
+  export type HydratedSingleSubdocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = (Types.Subdocument<unknown> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
+  export type HydratedArraySubdocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = (Types.ArraySubdocument<unknown> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,
@@ -512,11 +514,6 @@ declare module 'mongoose' {
     $pullAll?: AnyKeys<TSchema> & AnyObject;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
-    // Needs to be `AnyKeys` for now, because anything stricter makes us incompatible
-    // with the MongoDB Node driver's `UpdateFilter` interface (see gh-12595, gh-11911)
-    // and using the Node driver's `$bit` definition breaks because their `OnlyFieldsOfType`
-    // interface breaks on Mongoose Document class due to circular references.
-    // Re-evaluate this when we drop `extends Document` support in document interfaces.
     $bit?: AnyKeys<TSchema>;
   };
 
@@ -537,13 +534,6 @@ declare module 'mongoose' {
    */
   export type UpdateQuery<T> = _UpdateQuery<T> & AnyObject;
 
-  export type DocumentDefinition<T> = {
-    [K in keyof Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>>]:
-    [Extract<T[K], mongodb.ObjectId>] extends [never]
-      ? T[K]
-      : T[K] | string;
-  };
-
   export type FlattenMaps<T> = {
     [K in keyof T]: T[K] extends Map<any, any>
       ? AnyObject : T[K] extends TreatAsPrimitives
@@ -555,27 +545,10 @@ declare module 'mongoose' {
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 
-  // tests for these two types are located in test/types/lean.test.ts
-  export type DocTypeFromUnion<T> = T extends (Document<infer T1, infer T2, infer T3> & infer U) ?
-    [U] extends [Document<T1, T2, T3> & infer U] ? IfUnknown<IfAny<U, false>, false> : false : false;
-
-  export type DocTypeFromGeneric<T> = T extends Document<infer IdType, infer TQueryHelpers, infer DocType> ?
-    IfUnknown<IfAny<DocType, false>, false> : false;
-
   /**
    * Helper to choose the best option between two type helpers
    */
   export type _pickObject<T1, T2, Fallback> = T1 extends false ? T2 extends false ? Fallback : T2 : T1;
-
-  /**
-   * There may be a better way to do this, but the goal is to return the DocType if it can be infered
-   * and if not to return a type which is easily identified as "not valid" so we fall back to
-   * "strip out known things added by extending Document"
-   * There are three basic ways to mix in Document -- "Document & T", "Document<ObjId, mixins, T>",
-   * and "T extends Document". In the last case there is no type without Document mixins, so we can only
-   * strip things out. In the other two cases we can infer the type, so we should
-   */
-  export type BaseDocumentType<T> = _pickObject<DocTypeFromUnion<T>, DocTypeFromGeneric<T>, false>;
 
   /* for ts-mongoose */
   export class mquery { }

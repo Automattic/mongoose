@@ -1,4 +1,13 @@
-import { Schema, model, Model, Document, Types } from 'mongoose';
+import {
+  Schema,
+  model,
+  Model,
+  Document,
+  Types,
+  HydratedDocument,
+  HydratedArraySubdocument,
+  HydratedSingleSubdocument
+} from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { autoTypedModelConnection } from './connection.test';
@@ -213,10 +222,6 @@ function autoTypedDocumentConnection() {
 }
 
 async function gh11960() {
-  type DocumentType<T> = Document<any> & T;
-  type SubDocumentType<T> = DocumentType<T> & Types.Subdocument;
-  type ArraySubDocumentType<T> = DocumentType<T> & Types.ArraySubdocument;
-
   interface Nested {
     dummy?: string;
   }
@@ -224,22 +229,29 @@ async function gh11960() {
   interface Parent {
     username?: string;
     map?: Map<string, string>;
-    nested?: SubDocumentType<Nested>;
-    nestedArray?: ArraySubDocumentType<Nested>[];
+    nested?: Nested;
+    nestedArray?: Nested[];
   }
+
+  interface ParentDocumentOverrides {
+    nested: HydratedSingleSubdocument<Nested>,
+    nestedArray: HydratedArraySubdocument<Nested>[]
+  }
+
+  type ParentDocument = HydratedDocument<Parent> & ParentDocumentOverrides;
 
   const NestedSchema = new Schema({
     dummy: { type: String }
   });
 
-  const ParentSchema = new Schema({
+  const ParentSchema = new Schema<Parent, Model<Parent>, ParentDocumentOverrides>({
     username: { type: String },
     map: { type: Map, of: String },
     nested: { type: NestedSchema },
     nestedArray: [{ type: NestedSchema }]
   });
 
-  const ParentModel = model<DocumentType<Parent>>('Parent', ParentSchema);
+  const ParentModel = model('Parent', ParentSchema);
 
   {
     const doc = new ParentModel({
@@ -249,7 +261,7 @@ async function gh11960() {
       nestedArray: [{ dummy: 'hello again' }]
     });
 
-    expectType<Document<any, any, any> & Parent & { _id: Types.ObjectId }>(doc);
+    expectType<ParentDocument>(doc);
     expectType<Map<string, string> | undefined>(doc.map);
     doc.nested!.parent();
     doc.nestedArray?.[0].parentArray();
@@ -263,7 +275,7 @@ async function gh11960() {
       nestedArray: [{ dummy: 'hello again' }]
     });
 
-    expectType<Document<any, any, any> & Parent & { _id: Types.ObjectId }>(doc);
+    expectType<ParentDocument>(doc);
     expectType<Map<string, string> | undefined>(doc.map);
     doc.nested!.parent();
     doc.nestedArray?.[0].parentArray();

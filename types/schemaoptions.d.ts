@@ -186,7 +186,7 @@ declare module 'mongoose' {
      * You can suppress the warning by setting { suppressReservedKeysWarning: true } schema options. Keep in mind that this
      * can break plugins that rely on these reserved names.
      */
-    suprpessReservedKeysWarning?: boolean,
+    suppressReservedKeysWarning?: boolean,
 
     /**
      * Model Statics methods.

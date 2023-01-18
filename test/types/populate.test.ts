@@ -143,13 +143,13 @@ function gh11321(): void {
   });
 
   parentSchema.virtual('test', {
-    localField: (doc: HydratedDocument<Parent, {}>): string => {
+    localField: (doc: HydratedDocument<Parent>): string => {
       if (typeof doc.name === 'string') {
         return doc.name;
       }
       return 'foo';
     },
-    foreignField: (doc: HydratedDocument<Parent, {}>): string => {
+    foreignField: (doc: HydratedDocument<Parent>): string => {
       if (typeof doc.name === 'string') {
         return doc.name;
       }

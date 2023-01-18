@@ -129,13 +129,12 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
-  export type HydratedDocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = (Document<unknown, any, DocType> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
-  export type HydratedSingleSubdocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = (Types.Subdocument<unknown> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
-  export type HydratedArraySubdocument<DocType, TMethodsAndOverrides = {}, TVirtuals = {}> = (Types.ArraySubdocument<unknown> & Require_id<DocType> & TVirtuals & TMethodsAndOverrides);
+  export type HydratedDocument<DocType, TOverrides = {}> = (Document<unknown, any, DocType> & Require_id<DocType> & TOverrides);
+  export type HydratedSingleSubdocument<DocType, TOverrides = {}> = (Types.Subdocument<unknown> & Require_id<DocType> & TOverrides);
+  export type HydratedArraySubdocument<DocType, TOverrides = {}> = (Types.ArraySubdocument<unknown> & Require_id<DocType> & TOverrides);
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
   ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>
   >;
 
@@ -355,7 +354,7 @@ declare module 'mongoose' {
     statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } & { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
-    virtual<T = HydratedDocument<DocType, TInstanceMethods, TVirtuals>>(
+    virtual<T = HydratedDocument<DocType, TVirtuals & TInstanceMethods>>(
       name: keyof TVirtuals | string,
       options?: VirtualTypeOptions<T, DocType>
     ): VirtualType<T>;

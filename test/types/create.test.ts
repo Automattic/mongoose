@@ -1,7 +1,7 @@
 import { Schema, model, Types, CallbackError } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
-const schema: Schema = new Schema({ name: { type: 'String' } });
+const schema = new Schema({ name: { type: 'String' } });
 
 interface ITest {
   _id?: Types.ObjectId;

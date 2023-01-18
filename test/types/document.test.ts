@@ -238,7 +238,7 @@ async function gh11960() {
     nestedArray: HydratedArraySubdocument<Nested>[]
   }
 
-  type ParentDocument = HydratedDocument<Parent> & ParentDocumentOverrides;
+  type ParentDocument = HydratedDocument<Parent, ParentDocumentOverrides>;
 
   const NestedSchema = new Schema({
     dummy: { type: String }

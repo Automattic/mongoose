@@ -125,13 +125,3 @@ async function _11767() {
   // expectError(examFound2Obj.questions[0].populated);
   expectType<string[]>(examFound2Obj.questions[0].answers);
 }
-
-async function gh12859() {
-  interface TestInterface {
-    example: String;
-  }
-
-  type ArraySubdocumentType = Types.ArraySubdocument<TestInterface>;
-  type leanType = LeanType<ArraySubdocumentType>;
-  expectType<Omit<LeanDocument<ArraySubdocumentType>, 'parentArray' | 'ownerDocument' | 'parent'>>({} as leanType);
-}

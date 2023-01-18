@@ -1622,7 +1622,7 @@ describe('model: populate:', function() {
     assert.strictEqual(returned.fans[3], null);
   });
 
-  it('supports `retainNullValues` while supressing _id of subdocument', async function() {
+  it('supports `retainNullValues` while suppressing _id of subdocument', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db.model('User', userSchema);
 

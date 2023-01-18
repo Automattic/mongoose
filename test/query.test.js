@@ -1404,59 +1404,22 @@ describe('Query', function() {
     });
 
     describe('read', function() {
-      const P = mongoose.mongo.ReadPreference;
-
       describe('without tags', function() {
         it('works', function(done) {
           const query = new Query({});
           query.read('primary');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
-          assert.equal(query.options.readPreference.mode, 'primary');
-
-          query.read('p');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'primary');
 
           query.read('primaryPreferred');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
-          assert.equal(query.options.readPreference.mode, 'primaryPreferred');
-
-          query.read('pp');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'primaryPreferred');
 
           query.read('secondary');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
-          assert.equal(query.options.readPreference.mode, 'secondary');
-
-          query.read('s');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'secondary');
 
           query.read('secondaryPreferred');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
-          assert.equal(query.options.readPreference.mode, 'secondaryPreferred');
-
-          query.read('sp');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'secondaryPreferred');
 
           query.read('nearest');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
-          assert.equal(query.options.readPreference.mode, 'nearest');
-
-          query.read('n');
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'nearest');
 
           done();
@@ -1468,9 +1431,7 @@ describe('Query', function() {
           const query = new Query({});
           const tags = [{ dc: 'sf', s: 1 }, { dc: 'jp', s: 2 }];
 
-          query.read('pp', tags);
-          assert.ok(query.options.readPreference instanceof P);
-          assert.ok(query.options.readPreference.isValid());
+          query.read('primaryPreferred', tags);
           assert.equal(query.options.readPreference.mode, 'primaryPreferred');
           assert.ok(Array.isArray(query.options.readPreference.tags));
           assert.equal(query.options.readPreference.tags[0].dc, 'sf');
@@ -1484,20 +1445,18 @@ describe('Query', function() {
       describe('inherits its models schema read option', function() {
         let schema, M, called;
         before(function() {
-          schema = new Schema({}, { read: 'p' });
+          schema = new Schema({}, { read: 'primary' });
           M = mongoose.model('schemaOptionReadPrefWithQuery', schema);
         });
 
         it('if not set in query', function(done) {
           const options = M.where()._optionsForExec(M);
-          assert.ok(options.readPreference instanceof P);
-          assert.equal(options.readPreference.mode, 'primary');
+          assert.equal(options.readPreference, 'primary');
           done();
         });
 
         it('if set in query', function(done) {
-          const options = M.where().read('s')._optionsForExec(M);
-          assert.ok(options.readPreference instanceof P);
+          const options = M.where().read('secondary')._optionsForExec(M);
           assert.equal(options.readPreference.mode, 'secondary');
           done();
         });
@@ -1516,7 +1475,7 @@ describe('Query', function() {
             const ret = getopts.call(this, model);
 
             assert.ok(ret.readPreference);
-            assert.equal(ret.readPreference.mode, 'secondary');
+            assert.equal(ret.readPreference, 'secondary');
             assert.deepEqual({ w: 'majority' }, ret.writeConcern);
             called = true;
 
@@ -1546,7 +1505,7 @@ describe('Query', function() {
       q.setOptions({ sort: '-blah' });
       q.setOptions({ sort: { woot: -1 } });
       q.setOptions({ hint: { index1: 1, index2: -1 } });
-      q.setOptions({ read: ['s', [{ dc: 'eu' }]] });
+      q.setOptions({ read: ['secondary', [{ dc: 'eu' }]] });
 
       assert.equal(q.options.thing, 'cat');
       assert.deepEqual(q._mongooseOptions.populate.fans, { path: 'fans', _docs: {}, _childDocs: [] });
@@ -2537,12 +2496,12 @@ describe('Query', function() {
     it('cast embedded discriminators with $elemMatch discriminator key (gh-7449)', async function() {
       const ListingLineSchema = new Schema({
         sellerId: Number
-      }, { strictQuery: false });
+      });
 
       const OrderSchema = new Schema({
         lines: [new Schema({
           amount: Number
-        }, { discriminatorKey: 'kind', strictQuery: false })]
+        }, { discriminatorKey: 'kind' })]
       });
 
       OrderSchema.path('lines').discriminator('listing', ListingLineSchema);
@@ -3278,7 +3237,7 @@ describe('Query', function() {
     assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
   });
 
-  it('strictQuery inherits from strict (gh-10763) (gh-4136) (gh-7178)', async function() {
+  it('strictQuery does not inherit from strict (gh-11861)', async function() {
     const modelSchema = new Schema({
       field: Number,
       nested: { path: String }
@@ -3288,8 +3247,17 @@ describe('Query', function() {
 
     // `find()` on a top-level path not in the schema
     const err = await Model.find({ notInschema: 1 }).then(() => null, e => e);
-    assert.ok(err);
-    assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
+    assert.ifError(err);
+  });
+
+  it('strictQuery is false by default (gh-11861)', async function() {
+    const modelSchema = new Schema({ field: Number }, {});
+    const Model = db.model('Test', modelSchema);
+
+    await Model.create({ field: 1 });
+    const docs = await Model.find({ nonexistingField: 1 });
+
+    assert.equal(docs.length, 0);
   });
 
   it('strictQuery = true (gh-6032)', async function() {

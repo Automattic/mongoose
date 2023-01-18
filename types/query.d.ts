@@ -136,7 +136,7 @@ declare module 'mongoose' {
     /**
      * Another alias for the `new` option. `returnOriginal` is deprecated so this should be used.
      */
-    returnDocument?: string;
+    returnDocument?: 'before' | 'after';
     runValidators?: boolean;
     /* Set to `true` to automatically sanitize potentially unsafe user-generated query projections */
     sanitizeProjection?: boolean;
@@ -529,7 +529,7 @@ declare module 'mongoose' {
     projection(): ProjectionFields<DocType> | null;
 
     /** Determines the MongoDB nodes from which to read. */
-    read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
+    read(mode: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
 
     /** Sets the readConcern option for the query. */
     readConcern(level: string): this;

@@ -115,11 +115,11 @@ async function gh10359() {
   }
 
   async function foo(model: Model<User, {}, {}, {}>) {
-    const doc = await model.findOne({ groupId: 'test' }).lean().exec();
-    expectType<string | undefined>(doc?.firstName);
-    expectType<string | undefined>(doc?.lastName);
-    expectType<Types.ObjectId | undefined>(doc?._id);
-    expectType<string | undefined>(doc?.groupId);
+    const doc = await model.findOne({ groupId: 'test' }).orFail().lean().exec();
+    expectType<string>(doc.firstName);
+    expectType<string>(doc.lastName);
+    expectType<Types.ObjectId>(doc._id);
+    expectType<string>(doc.groupId);
     return doc;
   }
 
@@ -138,11 +138,19 @@ interface IProject {
   name: string;
 }
 
-interface ProjectModel extends Model<IProject> {
+interface IProjectInstanceMethods {
+  myMethod(): number;
+}
+
+interface ProjectModel extends Model<IProject, {}, IProjectInstanceMethods> {
   myStatic(): number;
 }
 
-const projectSchema = new Schema<IProject, ProjectModel>({ name: String });
+const projectSchema = new Schema<
+IProject,
+ProjectModel,
+IProjectInstanceMethods
+>({ name: String });
 
 projectSchema.pre('save', function() {
   // this => IProject
@@ -460,7 +468,10 @@ async function gh12286() {
   const User = model<IUser>('User', schema);
 
   const user = await User.findById('0'.repeat(24), { name: 1 }).lean();
-  expectType<string | undefined>(user?.name);
+  if (user == null) {
+    return;
+  }
+  expectType<string>(user.name);
 }
 
 

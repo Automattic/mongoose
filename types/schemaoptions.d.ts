@@ -10,7 +10,14 @@ declare module 'mongoose' {
   type TypeKeyBaseType = string;
 
   type DefaultTypeKey = 'type';
-  interface SchemaOptions<DocType = unknown, TInstanceMethods = {}, QueryHelpers = {}, TStaticMethods = {}, TVirtuals = {}> {
+  interface SchemaOptions<
+    DocType = unknown,
+    TInstanceMethods = {},
+    QueryHelpers = {},
+    TStaticMethods = {},
+    TVirtuals = {},
+    THydratedDocumentType = HydratedDocument<DocType, TInstanceMethods>
+  > {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
      * calling Model.createIndexes() after you successfully connect to MongoDB. If you want to disable
@@ -196,12 +203,17 @@ declare module 'mongoose' {
     /**
      * Document instance methods.
      */
-    methods?: Record<any, (this: HydratedDocument<DocType>, ...args: any) => unknown> | TInstanceMethods,
+    methods?: IfEquals<
+    TInstanceMethods,
+    {},
+    Record<any, (this: THydratedDocumentType, ...args: any) => unknown>,
+    TInstanceMethods
+    >
 
     /**
      * Query helper functions.
      */
-    query?: Record<any, <T extends QueryWithHelpers<unknown, HydratedDocument<DocType>>>(this: T, ...args: any) => T> | QueryHelpers,
+    query?: Record<any, <T extends QueryWithHelpers<unknown, THydratedDocumentType>>(this: T, ...args: any) => T> | QueryHelpers,
 
     /**
      * Set whether to cast non-array values to arrays.

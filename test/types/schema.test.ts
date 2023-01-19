@@ -953,7 +953,8 @@ function gh12590() {
 
   type User = InferSchemaType<typeof UserSchema>;
 
-  expectType<SchemaType<User>>(UserSchema.path('hashed_password'));
+  const path = UserSchema.path('hashed_password');
+  expectType<SchemaType<any, HydratedDocument<User>>>(path);
 
   UserSchema.path('hashed_password').validate(function(v) {
     expectType<HydratedDocument<User>>(this);

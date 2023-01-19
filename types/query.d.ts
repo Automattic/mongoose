@@ -218,6 +218,15 @@ declare module 'mongoose' {
      */
     catch: Promise<ResultType>['catch'];
 
+    /**
+     * Executes the query returning a `Promise` which will be
+     * resolved with `.finally()` chained.
+     */
+    finally: Promise<ResultType>['finally'];
+
+    // Returns a string representation of this query.
+    [Symbol.toStringTag]: string;
+
     /** Specifies a `$center` or `$centerSphere` condition. */
     circle(path: string, area: any): this;
     circle(area: any): this;

@@ -198,7 +198,12 @@ declare module 'mongoose' {
     /**
      * Model Statics methods.
      */
-    statics?: Record<any, (this: Model<DocType>, ...args: any) => unknown> | TStaticMethods,
+    statics?: IfEquals<
+    TStaticMethods,
+    {},
+    Record<any, (this: Model<DocType>, ...args: any) => unknown>,
+    TStaticMethods
+    >
 
     /**
      * Document instance methods.
@@ -213,7 +218,12 @@ declare module 'mongoose' {
     /**
      * Query helper functions.
      */
-    query?: Record<any, <T extends QueryWithHelpers<unknown, THydratedDocumentType>>(this: T, ...args: any) => T> | QueryHelpers,
+    query?: IfEquals<
+    QueryHelpers,
+    {},
+    Record<any, <T extends QueryWithHelpers<unknown, THydratedDocumentType>>(this: T, ...args: any) => T>,
+    QueryHelpers
+    >
 
     /**
      * Set whether to cast non-array values to arrays.

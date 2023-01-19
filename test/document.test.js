@@ -7508,7 +7508,7 @@ describe('document', function() {
   });
 
   it('handles nested properties named `on` (gh-11656)', async function() {
-    const schema = new mongoose.Schema({ on: String }, { supressReservedKeysWarning: true });
+    const schema = new mongoose.Schema({ on: String }, { suppressReservedKeysWarning: true });
     const Model = db.model('Test', schema);
 
     await Model.create({ on: 'test string' });
@@ -12041,7 +12041,7 @@ describe('document', function() {
       schema: { type: 'String', required: true },
       title: { type: 'String', required: true },
       authors: [AuthorSchema]
-    }, { supressReservedKeysWarning: true });
+    }, { suppressReservedKeysWarning: true });
 
     const Book = db.model('Book', BookSchema);
 

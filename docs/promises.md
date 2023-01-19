@@ -50,17 +50,6 @@ better stack traces.
 [require:Should You Use `exec\(\)` With `await`]
 ```
 
-### Plugging in your own Promises Library
-
-If you're an advanced user, you may want to plug in your own promise
-library like [bluebird](https://www.npmjs.com/package/bluebird). Just set
-`global.Promise` to your favorite
-ES6-style promise constructor and mongoose will use it.
-
-```javascript
-[require:Plugging in your own Promises Library]
-```
-
 <i>
   Want to learn how to check whether your favorite npm modules work with
   async/await without cobbling together contradictory answers from Google

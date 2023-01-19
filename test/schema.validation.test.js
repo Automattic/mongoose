@@ -6,7 +6,6 @@
 
 const start = require('./common');
 
-const Promise = require('bluebird');
 const assert = require('assert');
 const random = require('./util').random;
 

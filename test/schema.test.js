@@ -2879,4 +2879,19 @@ describe('schema', function() {
 
     assert.equal(schema._getSchema('child.testMap.foo.bar').instance, 'Mixed');
   });
+  it('should not throw an error when the user is not modifying anything involving discriminators gh-12135', function() {
+    const baseSchema = new Schema({}, { typeKey: 'foo' });
+    const Base = mongoose.model('Base', baseSchema);
+    const customizedSchema = new Schema({}, {});
+    const test = Base.discriminator('model-discriminator-custom', customizedSchema);
+    assert.ok(test);
+  });
+  it ('should throw an error because of the different typeKeys gh-12135', function() {
+    const baseSchema = new Schema({}, { typeKey: 'foo' });
+    const Base = mongoose.model('Base1', baseSchema);
+    const customizedSchema = new Schema({}, {typeKey: 'bar' });
+    assert.throws(() => {
+      Base.discriminator('model-discriminator-custom1', customizedSchema);
+    }, { message: 'Can\'t customize discriminator option typeKey (can only modify toJSON, toObject, _id, id, virtuals, methods)' })
+  })
 });

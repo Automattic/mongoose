@@ -284,7 +284,7 @@ describe('model', function() {
         done();
       });
 
-      it('is not customizable asdf', function() {
+      it('is not customizable', function() {
         const CustomizedSchema = new Schema({}, { capped: true });
 
         assert.throws(function() {

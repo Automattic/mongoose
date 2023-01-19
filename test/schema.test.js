@@ -2969,7 +2969,7 @@ describe('schema', function() {
     assert.ok(!schema.virtuals.foo);
     assert.throws(() => {
       schema.removeVirtual('foo');
-    }, { message: 'Attempting to remove virtual path that does not exist.' });
+    }, { message: 'Attempting to remove virtual "foo" that does not exist.' });
 
   });
 });

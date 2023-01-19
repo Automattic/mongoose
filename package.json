@@ -43,6 +43,7 @@
     "buffer": "^5.6.0",
     "cheerio": "1.0.0-rc.12",
     "crypto-browserify": "3.12.0",
+    "dotenv": "16.0.3",
     "dox": "1.0.0",
     "eslint": "8.31.0",
     "eslint-plugin-mocha-no-only": "1.1.1",

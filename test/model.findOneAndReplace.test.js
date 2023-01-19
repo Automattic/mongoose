@@ -226,6 +226,7 @@ describe('model: findOneAndReplace:', function() {
     const M = BlogPost;
 
     const query = M.findOneAndReplace({}, {}, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
   });

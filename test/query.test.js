@@ -71,7 +71,7 @@ describe('Query', function() {
     it('(string)', function(done) {
       const query = new Query({});
       query.select(' a  b -c ');
-      assert.deepEqual(query._fields, { a: 1, b: 1, c: 0 });
+      assert.deepEqual(query._fields, { a: 1, b: 1, '-c': 0 });
       done();
     });
 

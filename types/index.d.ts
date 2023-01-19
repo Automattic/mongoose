@@ -164,10 +164,10 @@ declare module 'mongoose' {
     useProjection?: boolean;
   }
 
-  export type DiscriminatorModel<M, T> = T extends Model<infer T, infer TQueryHelpers, infer TMethodsAndOverrides, infer TVirtuals>
+  export type DiscriminatorModel<M, T> = T extends Model<infer T, infer TQueryHelpers, infer TInstanceMethods, infer TVirtuals>
     ?
-    M extends Model<infer M, infer MQueryHelpers, infer MMethodsAndOverrides, infer MVirtuals>
-      ? Model<Omit<M, keyof T> & T, MQueryHelpers | TQueryHelpers, MMethodsAndOverrides | TMethodsAndOverrides, MVirtuals | TVirtuals>
+    M extends Model<infer M, infer MQueryHelpers, infer MInstanceMethods, infer MVirtuals>
+      ? Model<Omit<M, keyof T> & T, MQueryHelpers | TQueryHelpers, MInstanceMethods | TInstanceMethods, MVirtuals | TVirtuals>
       : M
     : M;
 

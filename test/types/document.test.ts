@@ -6,7 +6,8 @@ import {
   Types,
   HydratedDocument,
   HydratedArraySubdocument,
-  HydratedSingleSubdocument
+  HydratedSingleSubdocument,
+  DefaultSchemaOptions
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
@@ -233,25 +234,35 @@ async function gh11960() {
     nestedArray?: Nested[];
   }
 
-  interface ParentDocumentOverrides {
+  type ParentDocument = HydratedDocument<Parent, {
     nested: HydratedSingleSubdocument<Nested>,
     nestedArray: HydratedArraySubdocument<Nested>[]
-  }
-
-  type ParentDocument = HydratedDocument<Parent, ParentDocumentOverrides>;
+  }>;
 
   const NestedSchema = new Schema({
     dummy: { type: String }
   });
 
-  const ParentSchema = new Schema<Parent, Model<Parent>, ParentDocumentOverrides>({
+  type ParentModelType = Model<Parent, {}, {}, {}, ParentDocument>;
+
+  const ParentSchema = new Schema<
+  Parent,
+  ParentModelType,
+  {},
+  {},
+  {},
+  {},
+  DefaultSchemaOptions,
+  Parent,
+  ParentDocument
+  >({
     username: { type: String },
     map: { type: Map, of: String },
     nested: { type: NestedSchema },
     nestedArray: [{ type: NestedSchema }]
   });
 
-  const ParentModel = model('Parent', ParentSchema);
+  const ParentModel = model<Parent, ParentModelType>('Parent', ParentSchema);
 
   {
     const doc = new ParentModel({

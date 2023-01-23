@@ -1,3 +1,17 @@
+6.8.4 / 2023-01-17
+==================
+ * fix(collection): handle creating model when connection disconnected with bufferCommands = false #12889
+ * fix(populate): merge instead of overwrite when match is on _id #12891
+ * fix: add guard to stop loadClass copying Document if Document is used as base of loaded class (same hack as implemented for Model already) #12820 [sgpinkus](https://github.com/sgpinkus)
+ * fix(types): correctly infer types on document arrays #12884 #12882 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * fix(types): added omit for ArraySubdocument type in LeanType declaration #12903 [piyushk96](https://github.com/piyushk96)
+ * fix(types): add returnDocument type safety #12906 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(typescript): add notes about virtual context to Mongoose 6 migration and TypeScript virtuals docs #12912 #12806
+ * docs(schematypes): removed dead link and fixed formatting #12897 #12885 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: fix link to lean api #12910 [manniL](https://github.com/manniL)
+ * docs: list all possible strings for schema.pre in one place #12868 
+ * docs: add list of known incompatible npm packages #12892 [IslandRhythms](https://github.com/IslandRhythms)
+
 6.8.3 / 2023-01-06
 ==================
  * perf: improve performance of assignRawDocsToIdStructure for faster populate on large docs #12867 [Uzlopak](https://github.com/Uzlopak)

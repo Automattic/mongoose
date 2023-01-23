@@ -10,7 +10,7 @@ const mongoose = start.mongoose;
 describe('collections:', function() {
   let db = null;
 
-  this.afterEach(async function() {
+  afterEach(async function() {
     if (db == null) {
       return;
     }

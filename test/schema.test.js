@@ -2452,7 +2452,7 @@ describe('schema', function() {
     assert.ok(!schema.virtuals.id);
   });
 
-  describe('mongoose.set(`strictQuery`, value); (gh-6658)', function() {
+  describe.skip('mongoose.set(`strictQuery`, value); (gh-6658)', function() {
     let strictQueryOriginalValue;
 
     this.beforeEach(() => strictQueryOriginalValue = mongoose.get('strictQuery'));

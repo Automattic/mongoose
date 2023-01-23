@@ -14,7 +14,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [`strictQuery`](#strictquery)
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper-updated-castforquery-signature)
 
-<h3 id="strictquery"><a href="#strictquery">`strictQuery`</a></h3>
+<h3 id="strictquery"><a href="#strictquery"><code>strictQuery</code></a></h3>
 
 `strictQuery` is now false by default.
 
@@ -28,7 +28,7 @@ const docs = await MyModel.find({ notInSchema: 1 });
 docs;
 ```
 
-<h3 id="removed-castforquerywrapper"><a href="#removed-castforquerywrapper">Removed <code>castForQueryWrapper, updated <code>castForQuery()</code> signature</code></a></h3>
+<h3 id="removed-castforquerywrapper"><a href="#removed-castforquerywrapper">Removed <code>castForQueryWrapper</code>, updated <code>castForQuery()</code> signature</a></h3>
 
 Mongoose now always calls SchemaType `castForQuery()` method with 3 arguments: `$conditional`, `value`, and `context`.
 If you've implemented a custom schema type that defines its own `castForQuery()` method, you need to update the method as follows.

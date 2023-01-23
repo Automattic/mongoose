@@ -1,11 +1,9 @@
 # Schemas in TypeScript
 
 Mongoose [schemas](../guide.html) are how you tell Mongoose what your documents look like.
-Mongoose schemas are separate from TypeScript interfaces, so you need to define both a _document interface_ and a _schema_ until V6.3.1.
-Mongoose supports auto typed schemas so you don't need to define additional typescript interface anymore but you are still able to do so.
-Mongoose provides a `InferSchemaType`, which infers the type of the auto typed schema document when needed.
+Mongoose schemas are separate from TypeScript interfaces, so you need to either define both a _document interface_ and a _schema_; or rely on Mongoose to automatically infer the type from the schema definition.
 
-`Until mongoose V6.3.1:`
+### Separate document interface definition
 
 ```typescript
 import { Schema } from 'mongoose';
@@ -25,7 +23,12 @@ const schema = new Schema<User>({
 });
 ```
 
-`another approach:`
+By default, Mongoose does **not** check if your document interface lines up with your schema.
+For example, the above code won't throw an error if `email` is optional in the document interface, but `required` in `schema`.
+
+### Automatic type inference
+
+Mongoose can also automatically infer the document type from your schema definition as follows.
 
 ```typescript
 import { Schema, InferSchemaType } from 'mongoose';
@@ -53,11 +56,17 @@ type User = InferSchemaType<typeof schema>;
 //   avatar?: string;
 // }
 
-
+// `UserModel` will have `name: string`, etc.
+const UserModel = mongoose.model('User', schema);
 ```
 
-By default, Mongoose does **not** check if your document interface lines up with your schema.
-For example, the above code won't throw an error if `email` is optional in the document interface, but `required` in `schema`.
+There are a few caveats for using automatic type inference:
+
+1. You need to set `strictNullChecks: true` or `strict: true` in your `tsconfig.json`. Or, if you're setting flags at the command line, `--strictNullChecks` or `--strict`. There are [known issues](https://github.com/Automattic/mongoose/issues/12420) with automatic type inference with strict mode disabled.
+2. You need to define your schema in the `new Schema()` call. Don't assign your schema definition to a temporary variable. Doing something like `const schemaDefinition = { name: String }; const schema = new Schema(schemaDefinition);` will not work.
+3. Mongoose adds `createdAt` and `updatedAt` to your schema if you specify the `timestamps` option in your schema, _except_ if you also specify `methods`, `virtuals`, or `statics`. There is a [known issue](https://github.com/Automattic/mongoose/issues/12807) with type inference with timestamps and methods/virtuals/statics options. If you use methods, virtuals, and statics, you're responsible for adding `createdAt` and `updatedAt` to your schema definition.
+
+If automatic type inference doesn't work for you, you can always fall back to document interface definitions.
 
 ## Generic parameters
 

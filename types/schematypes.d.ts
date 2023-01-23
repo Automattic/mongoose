@@ -278,6 +278,9 @@ declare module 'mongoose' {
 
     /** Adds validator(s) for this document path. */
     validate(obj: RegExp | ((this: DocType, value: any, validatorProperties?: Validator) => any), errorMsg?: string, type?: string): this;
+
+    /** Default options for this SchemaType */
+    defaultOptions?: Record<string, any>;
   }
 
   namespace Schema {
@@ -293,6 +296,9 @@ declare module 'mongoose' {
 
         /** The schematype embedded in this array */
         caster?: SchemaType;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -310,6 +316,9 @@ declare module 'mongoose' {
 
         /** Configure which values get casted to `false`. */
         static convertToFalse: Set<any>;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
 
       class Buffer extends SchemaType {
@@ -321,6 +330,9 @@ declare module 'mongoose' {
          * for this buffer. You can find a [list of allowed subtypes here](http://api.mongodb.com/python/current/api/bson/binary.html).
          */
         subtype(subtype: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 128): this;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
 
       class Date extends SchemaType {
@@ -335,11 +347,17 @@ declare module 'mongoose' {
 
         /** Sets a minimum date validator. */
         min(value: NativeDate, message: string): this;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
 
       class Decimal128 extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Decimal128';
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
 
       class DocumentArray extends SchemaType implements AcceptsDiscriminator {
@@ -356,16 +374,25 @@ declare module 'mongoose' {
 
         /** The constructor used for subdocuments in this array */
         caster?: typeof Types.Subdocument;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
 
       class Map extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Map';
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
 
       class Mixed extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Mixed';
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
 
       class Number extends SchemaType {
@@ -380,6 +407,9 @@ declare module 'mongoose' {
 
         /** Sets a minimum number validator. */
         min(value: number, message: string): this;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
 
       class ObjectId extends SchemaType {
@@ -388,6 +418,9 @@ declare module 'mongoose' {
 
         /** Adds an auto-generated ObjectId default if turnOn is true. */
         auto(turnOn: boolean): this;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
 
       class Subdocument extends SchemaType implements AcceptsDiscriminator {
@@ -396,6 +429,9 @@ declare module 'mongoose' {
 
         /** The document's schema */
         schema: Schema;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
 
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
         discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
@@ -425,11 +461,17 @@ declare module 'mongoose' {
 
         /** Adds an uppercase [setter](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set). */
         uppercase(shouldApply?: boolean): this;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
 
       class UUID extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'UUID';
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
     }
   }

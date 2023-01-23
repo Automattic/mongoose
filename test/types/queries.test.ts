@@ -304,9 +304,18 @@ async function gh11602(): Promise<void> {
     returnDocument: 'after',
     rawResult: true
   });
+
   expectError(updateResult.lastErrorObject?.modifiedCount);
   expectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
   expectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
+
+  Model.findOneAndUpdate({}, {}, { returnDocument: 'before' });
+  Model.findOneAndUpdate({}, {}, { returnDocument: 'after' });
+  Model.findOneAndUpdate({}, {}, { returnDocument: undefined });
+  Model.findOneAndUpdate({}, {}, {});
+  expectError(Model.findOneAndUpdate({}, {}, {
+    returnDocument: 'not-before-or-after'
+  }));
 }
 
 function autoTypedQuery() {

@@ -235,7 +235,8 @@ describe('ValidationError', function() {
   describe('when user code defines a r/o Error#toJSON', function() {
     it('should not fail', function(done) {
       if (typeof Deno !== 'undefined') {
-        // Deno doesn't support child_process.fork
+        // Deno currently errors with:
+        // could not find npm package for 'file:///path/to/mongoose/test/isolated/project-has-error.toJSON.js'
         return this.skip();
       }
       this.timeout(10000);

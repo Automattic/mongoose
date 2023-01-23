@@ -90,7 +90,7 @@ res.deletedCount; // Number of documents that were deleted. Replaces `res.n`
 // No longer necessary:
 mongoose.set('useFindAndModify', false);
 
-await mongoose.connect('mongodb://localhost:27017/test', {
+await mongoose.connect('mongodb://127.0.0.1:27017/test', {
   useNewUrlParser: true, // <-- no longer necessary
   useUnifiedTopology: true // <-- no longer necessary
 });
@@ -511,3 +511,22 @@ The following legacy types have been removed:
 * `HookDoneFunction`
 * `SchemaTypeOpts`
 * `ConnectionOptions`
+
+Mongoose 6 infers the document's type for `this` in virtual getters and setters.
+In Mongoose 5.x, `this` would be `any` in the following code.
+
+```ts
+schema.virtual('myVirtual').get(function() {
+  this; // any in Mongoose 5.x
+});
+```
+
+In Mongoose 6, `this` will be set to the document type.
+
+```ts
+const schema = new Schema({ name: String });
+
+schema.virtual('myVirtual').get(function() {
+  this.name; // string
+});
+```

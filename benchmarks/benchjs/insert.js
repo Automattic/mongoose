@@ -19,12 +19,12 @@ const ObjectId = Schema.Types.ObjectId;
  * These are all the benchmark tests for inserting data
  */
 
-mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
+mongoose.connect('mongodb://127.0.0.1/mongoose-bench', function (err) {
   if (err) {
     throw err;
   }
   mongoClient.connect(
-    'mongodb://localhost/mongoose-bench',
+    'mongodb://127.0.0.1/mongoose-bench',
     function (err, client) {
       if (err) {
         throw err;

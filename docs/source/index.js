@@ -63,6 +63,7 @@ exports['docs/jobs.pug'] = {
 };
 exports['docs/change-streams.md'] = { title: 'MongoDB Change Streams in NodeJS with Mongoose', markdown: true };
 exports['docs/lodash.md'] = { title: 'Using Mongoose with Lodash', markdown: true };
+exports['docs/incompatible_packages.md'] = { title: 'Known Incompatible npm Packages', markdown: true };
 
 for (const props of Object.values(exports)) {
   props.jobs = jobs;

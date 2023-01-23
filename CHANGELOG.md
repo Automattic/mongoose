@@ -1,3 +1,60 @@
+6.8.4 / 2023-01-17
+==================
+ * fix(collection): handle creating model when connection disconnected with bufferCommands = false #12889
+ * fix(populate): merge instead of overwrite when match is on _id #12891
+ * fix: add guard to stop loadClass copying Document if Document is used as base of loaded class (same hack as implemented for Model already) #12820 [sgpinkus](https://github.com/sgpinkus)
+ * fix(types): correctly infer types on document arrays #12884 #12882 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * fix(types): added omit for ArraySubdocument type in LeanType declaration #12903 [piyushk96](https://github.com/piyushk96)
+ * fix(types): add returnDocument type safety #12906 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(typescript): add notes about virtual context to Mongoose 6 migration and TypeScript virtuals docs #12912 #12806
+ * docs(schematypes): removed dead link and fixed formatting #12897 #12885 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: fix link to lean api #12910 [manniL](https://github.com/manniL)
+ * docs: list all possible strings for schema.pre in one place #12868 
+ * docs: add list of known incompatible npm packages #12892 [IslandRhythms](https://github.com/IslandRhythms)
+
+6.8.3 / 2023-01-06
+==================
+ * perf: improve performance of assignRawDocsToIdStructure for faster populate on large docs #12867 [Uzlopak](https://github.com/Uzlopak)
+ * fix(model): ensure consistent ordering of validation errors in insertMany() with ordered: false and rawResult: true #12866
+ * fix: avoid passing final callback to pre hook, because calling the callback can mess up hook execution #12836
+ * fix(types): avoid inferring timestamps if methods, virtuals, or statics set #12871
+ * fix(types): correctly infer string enums on const arrays #12870 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * fix(types): allow virtuals to be invoked in the definition of other virtuals #12874 [sffc](https://github.com/sffc)
+ * fix(types): add type def for Aggregate#model without arguments #12864 [hasezoey](https://github.com/hasezoey)
+ * docs(discriminators): add section about changing discriminator key #12861
+ * docs(typescript): explain that virtuals inferred from schema only show up on Model, not raw document type #12860 #12684
+
+6.8.2 / 2022-12-28
+==================
+ * fix(schema): propagate strictQuery to implicitly created schemas for embedded discriminators #12827 #12796
+ * fix(model): respect discriminators with Model.validate() #12824 #12621
+ * fix(query): fix unexpected validation error when doing findOneAndReplace() with a nullish value #12826 #12821
+ * fix(discriminator): apply built-in plugins to discriminator schema even if mergeHooks and mergePlugins are both false #12833 #12696
+ * fix(types): add option "overwriteModels" as a schema option #12817 #12816 [hasezoey](https://github.com/hasezoey)
+ * fix(types): add property "defaultOptions" #12818 [hasezoey](https://github.com/hasezoey)
+ * docs: make search bar respect documentation version, so you can search 5.x docs #12548
+ * docs(typescript): make note about recommending strict mode when using auto typed schemas #12825 #12420
+ * docs: add section on sorting to query docs #12588 [IslandRhythms](https://github.com/IslandRhythms)
+ * test(query.test): add write-concern option #12829 [hasezoey](https://github.com/hasezoey)
+
+6.8.1 / 2022-12-19
+==================
+ * fix(query): avoid throwing circular dependency error if same object is used in multiple properties #12774 [orgads](https://github.com/orgads)
+ * fix(map): return value from super.delete() #12777 [danbrud](https://github.com/danbrud)
+ * fix(populate): handle virtual populate underneath document array with justOne=true and sort set where 1 element has only 1 result #12815 #12730
+ * fix(update): handle embedded discriminators when casting array filters #12802 #12565
+ * fix(populate): avoid calling transform if there's no populate results and using lean #12804 #12739
+ * fix(model): prevent index creation on syncIndexes if not necessary #12785 #12250 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): correctly infer this when using pre('updateOne') with { document: true, query: false } #12778
+ * fix(types): make InferSchemaType: consider { required: boolean } required if it isn't explicitly false #12784 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * docs: replace many occurrences of "localhost" with "127.0.0.1" #12811 #12741 [hasezoey](https://github.com/hasezoey) [SadiqOnGithub](https://github.com/SadiqOnGithub)
+ * docs(mongoose): Added missing options to set #12810 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: add info on `$locals` parameters to getters/setters tutorial #12814 #12550 [IslandRhythms](https://github.com/IslandRhythms)
+ * docs: make Document.prototype.$clone() public #12803
+ * docs(query): updated explanation for slice #12776 #12474 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(middleware): fix broken links #12787 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(queries): fixed broken links #12790 [lpizzinidev](https://github.com/lpizzinidev)
+
 6.8.0 / 2022-12-05
 ==================
  * feat: add alpha support for Deno #12397 #9056

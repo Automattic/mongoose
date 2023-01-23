@@ -21,6 +21,10 @@ describe('Lean Tutorial', function() {
     mongoose.deleteModel(/Group/);
   });
 
+  after(async () => {
+    await mongoose.disconnect();
+  })
+
   it('compare sizes lean vs not lean', async function() {
     // acquit:ignore:start
     if (typeof Deno !== 'undefined') {

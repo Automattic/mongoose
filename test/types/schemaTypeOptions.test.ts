@@ -53,3 +53,22 @@ function index() {
   expectError<SchemaTypeOptions<string>['index']>(-2); // test invalid number
   expectError<SchemaTypeOptions<string>['index']>(new Date()); // test invalid type
 }
+
+function defaultOptions() {
+  // property "defaultOptions" may not be defined on the base "SchemaType", but is explicitly defined on all mongoose provided Schema.Types
+  // https://github.com/Automattic/mongoose/blob/5528a6428bb08091c03d868e249c2e5a30144a71/lib/schematype.js#L55
+  expectType<Record<string, any> | undefined>(new SchemaType('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.String('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Boolean('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Array('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Buffer('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Date('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Decimal128('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.DocumentArray('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Map('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Mixed('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Number('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.ObjectId('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Subdocument('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.UUID('none').defaultOptions);
+}

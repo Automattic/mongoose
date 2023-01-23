@@ -5,21 +5,21 @@ for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_del
 Each of these functions returns a
 [mongoose `Query` object](query.html#Query).
 
-- [`Model.deleteMany()`](model.html#model_Model-deleteMany)
-- [`Model.deleteOne()`](model.html#model_Model-deleteOne)
-- [`Model.find()`](model.html#model_Model-find)
-- [`Model.findById()`](model.html#model_Model-findById)
-- [`Model.findByIdAndDelete()`](model.html#model_Model-findByIdAndDelete)
-- [`Model.findByIdAndRemove()`](model.html#model_Model-findByIdAndRemove)
-- [`Model.findByIdAndUpdate()`](model.html#model_Model-findByIdAndUpdate)
-- [`Model.findOne()`](model.html#model_Model-findOne)
-- [`Model.findOneAndDelete()`](model.html#model_Model-findOneAndDelete)
-- [`Model.findOneAndRemove()`](model.html#model_Model-findOneAndRemove)
-- [`Model.findOneAndReplace()`](model.html#model_Model-findOneAndReplace)
-- [`Model.findOneAndUpdate()`](model.html#model_Model-findOneAndUpdate)
-- [`Model.replaceOne()`](model.html#model_Model-replaceOne)
-- [`Model.updateMany()`](model.html#model_Model-updateMany)
-- [`Model.updateOne()`](model.html#model_Model-updateOne)
+- [`Model.deleteMany()`](api.html#model_Model-deleteMany)
+- [`Model.deleteOne()`](api.html#model_Model-deleteOne)
+- [`Model.find()`](api.html#model_Model-find)
+- [`Model.findById()`](api.html#model_Model-findById)
+- [`Model.findByIdAndDelete()`](api.html#model_Model-findByIdAndDelete)
+- [`Model.findByIdAndRemove()`](api.html#model_Model-findByIdAndRemove)
+- [`Model.findByIdAndUpdate()`](api.html#model_Model-findByIdAndUpdate)
+- [`Model.findOne()`](api.html#model_Model-findOne)
+- [`Model.findOneAndDelete()`](api.html#model_Model-findOneAndDelete)
+- [`Model.findOneAndRemove()`](api.html#model_Model-findOneAndRemove)
+- [`Model.findOneAndReplace()`](api.html#model_Model-findOneAndReplace)
+- [`Model.findOneAndUpdate()`](api.html#model_Model-findOneAndUpdate)
+- [`Model.replaceOne()`](api.html#model_Model-replaceOne)
+- [`Model.updateMany()`](api.html#model_Model-updateMany)
+- [`Model.updateOne()`](api.html#model_Model-updateOne)
 
 A mongoose query can be executed in one of two ways. First, if you
 pass in a `callback` function, Mongoose will execute the query asynchronously
@@ -57,7 +57,7 @@ will be null. If the query is successful, the `error` parameter will be null, an
 
 Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern `callback(error, results)`.
 What `results` is depends on the operation: For `findOne()` it is a [potentially-null single document](api/model.html#model_Model-findOne), `find()` a [list of documents](api/model.html#model_Model-find), `count()` [the number of documents](api/model.html#model_Model-count), `update()` the [number of documents affected](api/model.html#model_Model-update), etc.
-The [API docs for Models](api/model-js.html#model-js) provide more detail on what is passed to the callbacks.
+The [API docs for Models](api/model.html) provide more detail on what is passed to the callbacks.
 
 Now let's look at what happens when no `callback` is passed:
 
@@ -239,6 +239,89 @@ const queryRes = await Person.findOne({ _id: idString });
 // Does **not** find the `Person`, because Mongoose doesn't cast aggregation
 // pipelines.
 const aggRes = await Person.aggregate([{ $match: { _id: idString } }])
+```
+
+<h3 id="sorting"><a href="#sorting">Sorting</a></h3>
+
+[Sorting](/docs/api.html#query_Query-sort) is how you can ensure you query results come back in the desired order.
+
+```javascript
+const personSchema = new mongoose.Schema({
+  age: Number
+});
+
+const Person = mongoose.model('Person', personSchema);
+for (let i = 0; i < 10; i++) {
+  await Person.create({ age: i });
+}
+
+await Person.find().sort({ age: -1 }); // returns age starting from 10 as the first entry
+await Person.find().sort({ age: 1 }); // returns age starting from 0 as the first entry
+```
+
+When sorting with mutiple fields, the order of the sort keys determines what key MongoDB server sorts by first.
+
+```javascript
+const personSchema = new mongoose.Schema({
+  age: Number,
+  name: String,
+  weight: Number
+});
+
+const Person = mongoose.model('Person', personSchema);
+const iterations = 5;
+for (let i = 0; i < iterations; i++) {
+  await Person.create({
+    age: Math.abs(2-i),
+    name: 'Test'+i,
+    weight: Math.floor(Math.random() * 100) + 1
+  });
+}
+
+await Person.find().sort({ age: 1, weight: -1 }); // returns age starting from 0, but while keeping that order will then sort by weight.
+```
+
+You can view the output of a single run of this block below.
+As you can see, age is sorted from 0 to 2 but when age is equal, sorts by weight.
+
+```javascript
+[
+  {
+    _id: new ObjectId("63a335a6b9b6a7bfc186cb37"),
+    age: 0,
+    name: 'Test2',
+    weight: 67,
+    __v: 0
+  },
+  {
+    _id: new ObjectId("63a335a6b9b6a7bfc186cb35"),
+    age: 1,
+    name: 'Test1',
+    weight: 99,
+    __v: 0
+  },
+  {
+    _id: new ObjectId("63a335a6b9b6a7bfc186cb39"),
+    age: 1,
+    name: 'Test3',
+    weight: 73,
+    __v: 0
+  },
+  {
+    _id: new ObjectId("63a335a6b9b6a7bfc186cb33"),
+    age: 2,
+    name: 'Test0',
+    weight: 65,
+    __v: 0
+  },
+  {
+    _id: new ObjectId("63a335a6b9b6a7bfc186cb3b"),
+    age: 2,
+    name: 'Test4',
+    weight: 62,
+    __v: 0
+  }
+]
 ```
 
 <h3 id="next"><a href="#next">Next Up</a></h3>

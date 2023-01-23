@@ -1564,7 +1564,7 @@ describe('Query', function() {
       const Product = db.model('Product', productSchema);
       Product.create(
         { numbers: [3, 4, 5] },
-        { strings: 'hi there'.split(' ') }, function(err, doc1, doc2) {
+        { strings: 'hi there'.split(' '), w: 'majority' }, function(err, doc1, doc2) {
           assert.ifError(err);
           Product.find().setOptions({ limit: 1, sort: { _id: -1 }, read: 'n' }).exec(function(err, docs) {
             assert.ifError(err);
@@ -4312,5 +4312,75 @@ describe('Query', function() {
     const found = await Test.find(cond);
     assert.strictEqual(found.length, 1);
     assert.strictEqual(found[0].title, 'burrito bowl');
+  });
+
+  it('update operation should remove fields set to undefined (gh-12794) (gh-12821)', async function() {
+    const m = new mongoose.Mongoose();
+
+    await m.connect(start.uri);
+
+    const schema = new mongoose.Schema({ title: String });
+
+    const Test = m.model('test', schema);
+
+    const doc = await Test.create({
+      title: 'test'
+    });
+
+    assert.strictEqual(doc.title, 'test');
+
+    const updatedDoc = await Test.findOneAndUpdate(
+      {
+        _id: doc._id
+      },
+      { title: undefined },
+      { returnOriginal: false }
+    ).lean();
+
+    assert.ok('title' in updatedDoc === false);
+
+    const replacedDoc = await Test.findOneAndReplace(
+      {
+        _id: doc._id
+      },
+      { title: undefined },
+      { returnOriginal: false }
+    ).lean();
+
+    assert.ok('title' in replacedDoc === false);
+  });
+
+  it('handles $elemMatch with nested schema (gh-12902)', async function() {
+    const bioSchema = new Schema({
+      name: { type: String }
+    });
+
+    const Book = db.model('book', new Schema({
+      name: String,
+      authors: [{
+        bio: bioSchema
+      }]
+    }));
+
+    await new Book({
+      name: 'Mongoose Fundamentals',
+      authors: [{
+        bio: {
+          name: 'Foo Bar'
+        }
+      }]
+    }).save();
+
+    const books = await Book.find({
+      name: 'Mongoose Fundamentals',
+      authors: {
+        $elemMatch: {
+          'bio.name': { $in: ['Foo Bar'] },
+          'bio.location': 'Mandurah' // Not in schema
+        }
+      }
+    });
+
+    assert.strictEqual(books.length, 1);
   });
 });

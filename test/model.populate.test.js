@@ -4429,6 +4429,55 @@ describe('model: populate:', function() {
         assert.deepEqual(app.modules[1].menu.map(i => i.title), ['Redo', 'Undo']);
       });
 
+      it('in embedded array with sort and one result (gh-10552)', async function() {
+        const AppMenuItemSchema = new Schema({
+          appId: 'ObjectId',
+          moduleId: Number,
+          title: String,
+          parent: {
+            type: mongoose.ObjectId,
+            ref: 'AppMenuItem'
+          },
+          order: Number
+        });
+
+        const moduleSchema = new Schema({
+          _id: Number,
+          title: { type: String },
+          hidden: { type: Boolean }
+        });
+
+        moduleSchema.virtual('menu', {
+          ref: 'Test1',
+          localField: '_id',
+          foreignField: 'moduleId',
+          options: { sort: { title: 1 } }
+        });
+
+        const appSchema = new Schema({
+          modules: [moduleSchema]
+        });
+
+        const App = db.model('Test', appSchema);
+        const AppMenuItem = db.model('Test1', AppMenuItemSchema);
+
+        let app = await App.create({ modules: [{ _id: 1, title: 'File' }, { _id: 2, title: 'Preferences' }] });
+        await AppMenuItem.create([
+          { title: 'Save', moduleId: 1 },
+          { title: 'Save As', moduleId: 1 },
+          // { title: 'Undo', moduleId: 2 },
+          { title: 'Redo', moduleId: 2 }
+        ]);
+
+        app = await App.findById(app).populate('modules.menu');
+        app = app.toObject({ virtuals: true });
+
+        assert.equal(app.modules.length, 2);
+        assert.equal(app.modules[0].menu.length, 2);
+        assert.deepEqual(app.modules[0].menu.map(i => i.title), ['Save', 'Save As']);
+        assert.deepEqual(app.modules[1].menu.map(i => i.title), ['Redo']);
+      });
+
       it('justOne option (gh-4263)', function(done) {
         const PersonSchema = new Schema({
           name: String,
@@ -9942,7 +9991,6 @@ describe('model: populate:', function() {
 
       const Child = db.model('Child', Schema({ name: String }));
 
-
       const children = await Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
       let p = await Parent.create({
         name: 'Anakin',
@@ -10022,6 +10070,35 @@ describe('model: populate:', function() {
       assert.equal(called.length, 1);
       assert.strictEqual(called[0].doc, null);
       assert.equal(called[0].id.toHexString(), newId.toHexString());
+    });
+
+    it('avoids calling `transform()` with `lean()` when no results (gh-12739)', async function() {
+      const parentSchema = new Schema({ title: String });
+      const childSchema = new Schema({
+        title: String,
+        parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Parent' }
+      });
+      parentSchema.virtual('children', {
+        ref: 'Child',
+        localField: '_id',
+        foreignField: 'parent'
+      });
+      const Parent = db.model('Parent', parentSchema);
+      const Child = db.model('Child', childSchema);
+
+      await Parent.create({ title: 'parent' });
+      await Child.create({ title: 'child' });
+      const p = await Parent.find().lean().populate({
+        path: 'children',
+        match: { title: 'child' },
+        select: '-__v',
+        strictPopulate: false,
+        transform: doc => {
+          return doc;
+        }
+      });
+      assert.equal(p.length, 1);
+      assert.deepStrictEqual(p[0].children, []);
     });
 
     it('transform to primitive (gh-10064)', async function() {
@@ -10763,6 +10840,129 @@ describe('model: populate:', function() {
     });
 
     assert.equal(row.values.get(createList._id.toString()).valueObject.name, 'test');
+  });
+
+  it('handles virtual populate with `justOne` underneath document array and sort (gh-12730) (gh-10552)', async function() {
+    const shiftSchema = new mongoose.Schema({
+      employeeId: mongoose.Types.ObjectId,
+      startedAt: Date,
+      endedAt: Date,
+      name: String
+    });
+
+    const Shift = db.model('Child', shiftSchema);
+
+    const employeeSchema = new mongoose.Schema({
+      name: String
+    }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
+
+    employeeSchema.virtual('mostRecentShift', {
+      ref: Shift,
+      localField: '_id',
+      foreignField: 'employeeId',
+      options: {
+        sort: { startedAt: -1 }
+      },
+      justOne: true
+    });
+
+    const storeSchema = new mongoose.Schema({
+      location: String,
+      employees: [employeeSchema]
+    });
+
+    const Store = db.model('Parent', storeSchema);
+
+    const store = await Store.create({
+      location: 'Tashbaan',
+      employees: [
+        { name: 'Aravis' },
+        { name: 'Shasta' }
+      ]
+    });
+
+    const employeeAravis = store.employees.find(({ name }) => name === 'Aravis');
+    const employeeShasta = store.employees.find(({ name }) => name === 'Shasta');
+
+    await Shift.insertMany([
+      {
+        employeeId: employeeAravis._id,
+        startedAt: new Date(Date.now() - 57600000),
+        endedAt: new Date(Date.now() - 43200000),
+        name: 'shift1'
+      },
+      {
+        employeeId: employeeAravis._id,
+        startedAt: new Date(Date.now() - 28800000),
+        endedAt: new Date(Date.now() - 14400000),
+        name: 'shift2'
+      },
+      {
+        employeeId: employeeShasta._id,
+        startedAt: new Date(Date.now() - 14400000),
+        endedAt: new Date(),
+        name: 'shift3'
+      }
+    ]);
+
+    const storeWithMostRecentShifts = await Store.
+      findOne({ location: 'Tashbaan' }).
+      populate('employees.mostRecentShift');
+
+    assert.deepStrictEqual(
+      storeWithMostRecentShifts.employees.map(e => e.mostRecentShift.name),
+      ['shift2', 'shift3']
+    );
+  });
+
+  it('merges match when match is on `_id` (gh-12834)', async function() {
+    const personSchema = new Schema({
+      name: String,
+      stories: [{ type: Schema.Types.ObjectId, ref: 'Story' }]
+    });
+
+    const storySchema = new Schema({ title: String });
+
+    const Story = db.model('Story', storySchema);
+    const Person = db.model('Person', personSchema);
+
+    const stories = await Story.create([
+      { _id: '0'.repeat(24), title: 'The Fellowship of the Ring' },
+      { _id: '1'.repeat(24), title: 'Casino Royale' },
+      { _id: '2'.repeat(24), title: 'Live and Let Die' },
+      { _id: '3'.repeat(24), title: 'The Two Towers' }
+    ]);
+    let person = await Person.create({
+      name: 'Ian Fleming',
+      stories: [stories[1]._id, stories[2]._id]
+    });
+
+    person = await Person.findById(person).populate({
+      path: 'stories',
+      match: {
+        _id: { $gte: stories[2]._id }
+      }
+    });
+    assert.equal(person.stories.length, 1);
+    assert.equal(person.stories[0].title, 'Live and Let Die');
+
+    person = await Person.findById(person).populate({
+      path: 'stories',
+      match: {
+        _id: { $lte: stories[1]._id }
+      }
+    });
+    assert.equal(person.stories.length, 1);
+    assert.equal(person.stories[0].title, 'Casino Royale');
+
+    person = await Person.findById(person).populate({
+      path: 'stories',
+      match: {
+        _id: stories[1]._id
+      }
+    });
+    assert.equal(person.stories.length, 1);
+    assert.equal(person.stories[0].title, 'Casino Royale');
   });
 
   describe('strictPopulate', function() {

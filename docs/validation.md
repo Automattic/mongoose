@@ -34,8 +34,8 @@ Before we get into the specifics of validation syntax, please keep the following
 Mongoose has several built-in validators.
 
 - All [SchemaTypes](schematypes.html) have the built-in [required](api/schematype.html#schematype_SchemaType-required) validator. The required validator uses the [SchemaType's `checkRequired()` function](api/schematype.html#schematype_SchemaType-checkRequired) to determine if the value satisfies the required validator.
-- [Numbers](api/schema-number-js.html#schema-number-js) have [`min` and `max`](schematypes.html#number-validators) validators.
-- [Strings](api/schema-string-js.html#schema-string-js) have [`enum`, `match`, `minLength`, and `maxLength`](schematypes.html#string-validators) validators.
+- [Numbers](schematypes.html#numbers) have [`min` and `max`](schematypes.html#number-validators) validators.
+- [Strings](schematypes.html#strings) have [`enum`, `match`, `minLength`, and `maxLength`](schematypes.html#string-validators) validators.
 
 Each of the validator links above provide more information about how to enable them and customize their error messages.
 
@@ -96,7 +96,7 @@ the value `false`, Mongoose will consider that a validation error.
 
 Errors returned after failed validation contain an `errors` object
 whose values are `ValidatorError` objects. Each
-[ValidatorError](api/error-validation-js.html#error-validation-js) has `kind`, `path`,
+[ValidatorError](api/error.html#error_Error-ValidatorError) has `kind`, `path`,
 `value`, and `message` properties.
 A ValidatorError also may have a `reason` property. If an error was
 thrown in the validator, this property will contain the error that was
@@ -142,10 +142,10 @@ nested objects are not fully fledged paths.
 ### Update Validators
 
 In the above examples, you learned about document validation. Mongoose also
-supports validation for [`update()`](query.html#query_Query-update),
-[`updateOne()`](query.html#query_Query-updateOne),
-[`updateMany()`](query.html#query_Query-updateMany),
-and [`findOneAndUpdate()`](query.html#query_Query-findOneAndUpdate) operations.
+supports validation for [`update()`](api/query.html#query_Query-update),
+[`updateOne()`](api/query.html#query_Query-updateOne),
+[`updateMany()`](api/query.html#query_Query-updateMany),
+and [`findOneAndUpdate()`](api/query.html#query_Query-findOneAndUpdate) operations.
 Update validators are off by default - you need to specify
 the `runValidators` option.
 

@@ -305,6 +305,16 @@ declare module 'mongoose' {
     post<T = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
 
     /** Defines a pre hook for the model. */
+    pre<T = HydratedDocument<DocType, TInstanceMethods>>(
+      method: DocumentOrQueryMiddleware | DocumentOrQueryMiddleware[],
+      options: SchemaPreOptions & { document: true; query: false; },
+      fn: PreMiddlewareFunction<T>
+    ): this;
+    pre<T = Query<any, any>>(
+      method: DocumentOrQueryMiddleware | DocumentOrQueryMiddleware[],
+      options: SchemaPreOptions & { document: false; query: true; },
+      fn: PreMiddlewareFunction<T>
+    ): this;
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = HydratedDocument<DocType, TInstanceMethods>>(method: 'save', options: SchemaPreOptions, fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
@@ -343,7 +353,7 @@ declare module 'mongoose' {
     statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } & { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
-    virtual<T = HydratedDocument<DocType, TInstanceMethods>>(
+    virtual<T = HydratedDocument<DocType, TInstanceMethods, TVirtuals>>(
       name: keyof TVirtuals | string,
       options?: VirtualTypeOptions<T, DocType>
     ): VirtualType<T>;
@@ -548,8 +558,9 @@ declare module 'mongoose' {
   export type LeanType<T> =
     0 extends (1 & T) ? T : // any
       T extends TreatAsPrimitives ? T : // primitives
-        T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> :
-          LeanDocument<T>; // Documents and everything else
+        T extends Types.ArraySubdocument ? Omit<LeanDocument<T>, 'parentArray' | 'ownerDocument' | 'parent'> :
+          T extends Types.Subdocument ? Omit<LeanDocument<T>, '$isSingleNested' | 'ownerDocument' | 'parent'> :
+            LeanDocument<T>; // Documents and everything else
 
   export type LeanArray<T extends unknown[]> = T extends unknown[][] ? LeanArray<T[number]>[] : LeanType<T[number]>[];
 

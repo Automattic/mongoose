@@ -36,12 +36,12 @@ CharacterSchema.methods.attack = function() {
 const Character = mongoose.model('Character', CharacterSchema);
 
 /**
- * Connect to the database on localhost with
+ * Connect to the database on 127.0.0.1 with
  * the default port (27017)
  */
 
 const dbname = 'mongoose-example-doc-methods-' + ((Math.random() * 10000) | 0);
-const uri = 'mongodb://localhost/' + dbname;
+const uri = 'mongodb://127.0.0.1/' + dbname;
 
 console.log('connecting to %s', uri);
 

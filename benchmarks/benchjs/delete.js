@@ -17,11 +17,11 @@ const mongoClient = require('mongodb').MongoClient;
  * These are all the benchmark tests for deleting data
  */
 
-mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
+mongoose.connect('mongodb://127.0.0.1/mongoose-bench', function (err) {
   if (err) {
     throw err;
   }
-  mongoClient.connect('mongodb://localhost', function (err, client) {
+  mongoClient.connect('mongodb://127.0.0.1', function (err, client) {
     if (err) {
       throw err;
     }

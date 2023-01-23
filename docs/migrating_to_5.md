@@ -70,10 +70,10 @@ MyModel.find().exec(function() {
 // Worked in mongoose 4. Does **not** work in mongoose 5, `mongoose.connect()`
 // now returns a promise consistently. This is to avoid the horrible things
 // we've done to allow mongoose to be a thenable that resolves to itself.
-mongoose.connect('mongodb://localhost:27017/test').model('Test', new Schema({}));
+mongoose.connect('mongodb://127.0.0.1:27017/test').model('Test', new Schema({}));
 
 // Do this instead
-mongoose.connect('mongodb://localhost:27017/test');
+mongoose.connect('mongodb://127.0.0.1:27017/test');
 mongoose.model('Test', new Schema({}));
 ```
 
@@ -87,8 +87,8 @@ no longer supports several function signatures for `mongoose.connect()` that
 worked in Mongoose 4.x if the `useMongoClient` option was off. Below are some
 examples of `mongoose.connect()` calls that do **not** work in Mongoose 5.x.
 
-* `mongoose.connect('localhost', 27017);`
-* `mongoose.connect('localhost', 'mydb', 27017);`
+* `mongoose.connect('127.0.0.1', 27017);`
+* `mongoose.connect('127.0.0.1', 'mydb', 27017);`
 * `mongoose.connect('mongodb://host1:27017,mongodb://host2:27017');`
 
 In Mongoose 5.x, the first parameter to `mongoose.connect()` and `mongoose.createConnection()`, if specified, **must** be a [MongoDB connection string](https://docs.mongodb.com/manual/reference/connection-string/). The

@@ -4,7 +4,7 @@ const mongoose = require('../');
 
 const Schema = mongoose.Schema;
 
-mongoose.connect('mongodb://localhost/mongoose-bench');
+mongoose.connect('mongodb://127.0.0.1/mongoose-bench');
 
 const DocSchema = new Schema({
   title: String

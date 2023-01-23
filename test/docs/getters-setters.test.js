@@ -17,6 +17,10 @@ describe('getters/setters', function() {
     mongoose.deleteModel(/.*/);
   });
 
+  after(async () => {
+    await mongoose.disconnect();
+  })
+
   describe('getters', function() {
     it('basic example', async function() {
       const userSchema = new Schema({
@@ -174,4 +178,53 @@ describe('getters/setters', function() {
       // acquit:ignore:end
     });
   });
+  describe('localization', function() {
+    it('locale', async function() {
+      const internationalizedStringSchema = new Schema({
+        en: String,
+        es: String
+      });
+      
+      const ingredientSchema = new Schema({
+        // Instead of setting `name` to just a string, set `name` to a map
+        // of language codes to strings.
+        name: {
+          type: internationalizedStringSchema,
+          // When you access `name`, pull the document's locale
+          get: function(value) {
+            return value[this.$locals.language || 'en'];
+          }
+        }
+      });
+
+      const recipeSchema = new Schema({
+        ingredients: [{ type: mongoose.ObjectId, ref: 'Ingredient' }]
+      });
+      
+      const Ingredient = mongoose.model('Ingredient', ingredientSchema);
+      const Recipe = mongoose.model('Recipe', recipeSchema);
+
+      // Create some sample data
+      const { _id } = await Ingredient.create({
+        name: {
+          en: 'Eggs',
+          es: 'Huevos'
+        }
+      });
+      await Recipe.create({ ingredients: [_id] });
+
+      // Populate with setting `$locals.language` for internationalization
+      const language = 'es';
+      const recipes = await Recipe.find().populate({
+        path: 'ingredients',
+        transform: function(doc) {
+          doc.$locals.language = language;
+          return doc;
+        }
+      });
+
+      // Gets the ingredient's name in Spanish `name.es`
+      assert.equal(recipes[0].ingredients[0].name, 'Huevos'); // 'Huevos'
+    });
+  })
 });

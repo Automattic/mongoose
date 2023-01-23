@@ -81,8 +81,6 @@ describe('query middleware', function() {
       next();
     });
 
-    start();
-
     initializeData(function(error) {
       assert.ifError(error);
       Author.find({ x: 1 }, function(error) {

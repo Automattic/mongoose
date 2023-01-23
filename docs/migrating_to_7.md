@@ -12,7 +12,7 @@ you should be aware of when migrating from Mongoose 6.x to Mongoose 7.x.
 If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration guide](migrating_to_6.html) and upgrade to Mongoose 6.x first.
 
 * [`strictQuery`](#strictquery)
-* [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper-updated-castforquery-signature)
+* [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
 
 <h3 id="strictquery"><a href="#strictquery"><code>strictQuery</code></a></h3>
 

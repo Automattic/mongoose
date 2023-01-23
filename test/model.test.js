@@ -4323,40 +4323,49 @@ describe('Model', function() {
     });
   });
 
-  it('save max bson size error with buffering (gh-3906)', async function() {
-    this.timeout(10000);
-    const db = start({ noErrorListener: true });
-    const Test = db.model('Test', { name: Object });
+  describe('max bson size error', function() {
+    let db;
 
-    const test = new Test({
-      name: {
-        data: (new Array(16 * 1024 * 1024)).join('x')
+    afterEach(async() => {
+      if (db != null) {
+        await db.close();
+        db = null;
       }
     });
 
-    const error = await test.save().then(() => null, err => err);
+    it('save max bson size error with buffering (gh-3906)', async function() {
+      this.timeout(10000);
+      db = start({ noErrorListener: true });
+      const Test = db.model('Test', { name: Object });
 
-    assert.ok(error);
-    assert.equal(error.name, 'MongoServerError');
-    await db.close();
-  });
+      const test = new Test({
+        name: {
+          data: (new Array(16 * 1024 * 1024)).join('x')
+        }
+      });
 
-  it('reports max bson size error in save (gh-3906)', async function() {
-    this.timeout(10000);
-    const db = await start({ noErrorListener: true });
-    const Test = db.model('Test', { name: Object });
+      const error = await test.save().then(() => null, err => err);
 
-    const test = new Test({
-      name: {
-        data: (new Array(16 * 1024 * 1024)).join('x')
-      }
+      assert.ok(error);
+      assert.equal(error.name, 'MongoServerError');
     });
 
-    const error = await test.save().then(() => null, err => err);
+    it('reports max bson size error in save (gh-3906)', async function() {
+      this.timeout(10000);
+      db = await start({ noErrorListener: true });
+      const Test = db.model('Test', { name: Object });
 
-    assert.ok(error);
-    assert.equal(error.name, 'MongoServerError');
-    await db.close();
+      const test = new Test({
+        name: {
+          data: (new Array(16 * 1024 * 1024)).join('x')
+        }
+      });
+
+      const error = await test.save().then(() => null, err => err);
+
+      assert.ok(error);
+      assert.equal(error.name, 'MongoServerError');
+    });
   });
 
   describe('insertMany()', function() {

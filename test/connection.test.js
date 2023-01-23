@@ -1495,4 +1495,23 @@ describe('connections:', function() {
 
     assert.equal(m.connection.model('Test2'), Test2);
   });
+
+  it('creates collection if creating model while connection is disconnected with bufferCommands=false', async function() {
+    const m = new mongoose.Mongoose();
+    m.set('bufferCommands', false);
+    const conn = await m.createConnection(start.uri, { bufferCommands: false }).asPromise();
+    conn.client.emit('serverDescriptionChanged', { newDescription: { type: 'Unknown' } });
+
+    const Test = conn.model('Test', new Schema({ name: String }));
+
+    const [res] = await Promise.all([
+      Test.findOne().exec(),
+      new Promise.resolve(resolve => setTimeout(resolve, 100)).then(() => {
+        conn.client.emit('serverDescriptionChanged', { newDescription: { type: 'Single' } });
+      })
+    ]);
+    assert.equal(res, null);
+
+    await m.disconnect();
+  });
 });

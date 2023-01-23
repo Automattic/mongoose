@@ -137,20 +137,14 @@ describe('model query casting', function() {
     });
   });
 
-  it('casts $in values of arrays with single item instead of array (jrl-3238)', function(done) {
+  it('casts $in values of arrays with single item instead of array (gh-3238)', async function() {
     const post = new BlogPostB();
     const id = post._id.toString();
 
-    post.save(function(err) {
-      assert.ifError(err);
+    await post.save();
 
-      BlogPostB.findOne({ _id: { $in: id } }, function(err, doc) {
-        assert.ifError(err);
-
-        assert.equal(doc._id.toString(), id);
-        done();
-      });
-    });
+    const doc = await BlogPostB.findOne({ _id: { $in: id } });
+    assert.equal(doc._id.toString(), id);
   });
 
   it('casts $nin values of arrays (gh-232)', function(done) {

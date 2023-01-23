@@ -2453,17 +2453,13 @@ describe('schema', function() {
   });
 
   describe('mongoose.set(`strictQuery`, value); (gh-6658)', function() {
-    let strictQueryOriginalValue;
-
-    this.beforeEach(() => strictQueryOriginalValue = mongoose.get('strictQuery'));
-    this.afterEach(() => mongoose.set('strictQuery', strictQueryOriginalValue));
-
     it('setting `strictQuery` on base sets strictQuery to schema (gh-6658)', function() {
       // Arrange
-      mongoose.set('strictQuery', 'some value');
+      const m = new mongoose.Mongoose();
+      m.set('strictQuery', 'some value');
 
       // Act
-      const schema = new Schema();
+      const schema = new m.Schema();
 
       // Assert
       assert.equal(schema.get('strictQuery'), 'some value');
@@ -2471,10 +2467,11 @@ describe('schema', function() {
 
     it('`strictQuery` set on base gets overwritten by option set on schema (gh-6658)', function() {
       // Arrange
-      mongoose.set('strictQuery', 'base option');
+      const m = new mongoose.Mongoose();
+      m.set('strictQuery', 'base option');
 
       // Act
-      const schema = new Schema({}, { strictQuery: 'schema option' });
+      const schema = new m.Schema({}, { strictQuery: 'schema option' });
 
       // Assert
       assert.equal(schema.get('strictQuery'), 'schema option');

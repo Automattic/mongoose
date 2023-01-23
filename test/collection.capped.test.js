@@ -53,7 +53,7 @@ describe('collections: capped:', function() {
   });
 
   it('skips when setting autoCreate to false (gh-8566)', async function() {
-    const db = start();
+    db = start();
     this.timeout(30000);
     await db.dropDatabase();
 

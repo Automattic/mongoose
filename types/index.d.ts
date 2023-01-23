@@ -130,9 +130,9 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
-  export type HydratedDocument<DocType, TOverrides = {}> = (Document<unknown, any, DocType> & Require_id<DocType> & TOverrides);
-  export type HydratedSingleSubdocument<DocType, TOverrides = {}> = (Types.Subdocument<unknown> & Require_id<DocType> & TOverrides);
-  export type HydratedArraySubdocument<DocType, TOverrides = {}> = (Types.ArraySubdocument<unknown> & Require_id<DocType> & TOverrides);
+  export type HydratedDocument<DocType, TOverrides = {}> = Document<unknown, any, DocType> & Require_id<DocType> & TOverrides;
+  export type HydratedSingleSubdocument<DocType, TOverrides = {}> = Types.Subdocument<unknown> & Require_id<DocType> & TOverrides;
+  export type HydratedArraySubdocument<DocType, TOverrides = {}> = Types.ArraySubdocument<unknown> & Require_id<DocType> & TOverrides;
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,

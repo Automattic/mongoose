@@ -2339,6 +2339,81 @@ describe('schema', function() {
     });
   });
 
+  describe('omit() (gh-12931)', function() {
+    it('works with nested paths', function() {
+      const schema = Schema({
+        name: {
+          first: {
+            type: String,
+            required: true
+          },
+          last: {
+            type: String,
+            required: true
+          }
+        },
+        age: {
+          type: Number,
+          index: true
+        }
+      });
+      assert.ok(schema.path('name.first'));
+      assert.ok(schema.path('name.last'));
+
+      let newSchema = schema.omit(['name.first']);
+      assert.ok(!newSchema.path('name.first'));
+      assert.ok(newSchema.path('age'));
+      assert.ok(newSchema.path('age').index);
+
+      newSchema = schema.omit(['age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(newSchema.path('name.last'));
+      assert.ok(newSchema.path('name.last').required);
+      assert.ok(!newSchema.path('age'));
+
+      newSchema = schema.omit(['name.last', 'age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(!newSchema.path('name.last'));
+      assert.ok(!newSchema.path('age'));
+    });
+
+    it('with single nested paths', function() {
+      const schema = Schema({
+        name: Schema({
+          first: {
+            type: String,
+            required: true
+          },
+          last: {
+            type: String,
+            required: true
+          }
+        }),
+        age: {
+          type: Number,
+          index: true
+        }
+      });
+      assert.ok(schema.path('name.first'));
+      assert.ok(schema.path('name.last'));
+
+      let newSchema = schema.omit(['age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(newSchema.path('name.last'));
+      assert.ok(newSchema.path('name.last').required);
+      assert.ok(!newSchema.path('age'));
+
+      newSchema = schema.omit(['name.last', 'age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(!newSchema.path('name.last'));
+      assert.ok(!newSchema.path('age'));
+    });
+  });
+
   describe('path-level custom cast (gh-8300)', function() {
     it('with numbers', function() {
       const schema = Schema({

@@ -1,3 +1,9 @@
+6.9.0 / 2023-01-25
+==================
+ * feat(schema): add removeVirtual(path) function to schema #12920 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(cast): remove empty `$or` conditions after strict applied #12898 [0x0a0d](https://github.com/0x0a0d)
+ * docs: fixed typo #12946 [Gbengstar](https://github.com/Gbengstar)
+
 6.8.5 / 2023-01-23
 ==================
  * fix(query): correctly pass context when casting $elemMatch #12915 #12909 #12902 [MohOraby](https://github.com/MohOraby)

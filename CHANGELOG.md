@@ -1,3 +1,7 @@
+6.8.5 / 2023-01-23
+==================
+ * fix(query): correctly pass context when casting $elemMatch #12915 #12909 #12902 [MohOraby](https://github.com/MohOraby)
+
 6.8.4 / 2023-01-17
 ==================
  * fix(collection): handle creating model when connection disconnected with bufferCommands = false #12889

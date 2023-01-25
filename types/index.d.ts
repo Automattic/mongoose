@@ -105,7 +105,7 @@ declare module 'mongoose' {
   export function setDriver(driver: any): Mongoose;
 
   /** The node-mongodb-native driver Mongoose uses. */
-  export const mongo: typeof mongodb;
+  export { mongodb as mongo };
 
   /** Declares a global plugin executed on all Schemas. */
   export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): Mongoose;

@@ -2910,4 +2910,63 @@ describe('schema', function() {
 
     assert.equal(schema._getSchema('child.testMap.foo.bar').instance, 'Mixed');
   });
+
+  it('should allow deleting a virtual path off the schema gh-8397', async function() {
+    const schema = new Schema({
+      name: String
+    }, {
+      virtuals: {
+        foo: {
+          get() {
+            return 42;
+          }
+        }
+      }
+    });
+    assert.ok(schema.virtuals.foo);
+    schema.removeVirtual('foo');
+    assert.ok(!schema.virtuals.foo);
+    const Test = db.model('gh-8397', schema);
+    const doc = new Test({ name: 'Test' });
+    assert.equal(doc.foo, undefined);
+  });
+
+  it('should allow deleting multiple virtuals gh-8397', async function() {
+    const schema = new Schema({
+      name: String
+    }, {
+      virtuals: {
+        foo: {
+          get() {
+            return 42;
+          }
+        },
+        bar: {
+          get() {
+            return 41;
+          }
+        }
+      }
+    });
+    assert.ok(schema.virtuals.foo);
+    assert.ok(schema.virtuals.bar);
+    schema.removeVirtual(['foo', 'bar']);
+    assert.ok(!schema.virtuals.foo);
+    assert.ok(!schema.virtuals.bar);
+    const Test = db.model('gh-8397', schema);
+    const doc = new Test({ name: 'Test' });
+    assert.equal(doc.foo, undefined);
+    assert.equal(doc.bar, undefined);
+  });
+
+  it('should throw an error if attempting to delete a virtual path that does not exist gh-8397', function() {
+    const schema = new Schema({
+      name: String
+    });
+    assert.ok(!schema.virtuals.foo);
+    assert.throws(() => {
+      schema.removeVirtual('foo');
+    }, { message: 'Attempting to remove virtual "foo" that does not exist.' });
+
+  });
 });

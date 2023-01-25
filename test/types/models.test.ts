@@ -466,7 +466,7 @@ function gh12100() {
   const TestModel = model('test', schema_with_string_id);
   const obj = new TestModel();
 
-  expectType<string | null>(obj._id);
+  expectType<string>(obj._id);
 })();
 
 (async function gh12094() {

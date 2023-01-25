@@ -292,6 +292,7 @@ describe('utils', function() {
     it('merges two objects together without overriding properties & methods', function() {
       function To() {
         this.name = 'to';
+        this.array = ['to'];
         this.toProperty = true;
       }
       To.prototype.getName = function() {};
@@ -299,6 +300,7 @@ describe('utils', function() {
 
       function From() {
         this.name = 'from';
+        this.array = ['from'];
         this.fromProperty = true;
       }
       From.prototype.getName = function() {};
@@ -310,6 +312,7 @@ describe('utils', function() {
       utils.merge(to, from);
 
       assert.equal(to.name, 'to');
+      assert.deepEqual(to.array,['to', 'from']);
       assert.equal(to.toProperty, true);
       assert.equal(to.fromProperty, true);
       assert.ok(to.getName === To.prototype.getName);

@@ -411,7 +411,7 @@ async function gh12342_manual() {
 
 async function gh12342_auto() {
   interface Project {
-    name?: string | null, stars?: number | null
+    name?: string, stars?: number
   }
 
   const ProjectSchema = new Schema({

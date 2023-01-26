@@ -2046,7 +2046,7 @@ describe('model: update:', function() {
         }
       };
       await Earth.updateOne(
-        { _id: mongoose.Types.ObjectId() },
+        { _id: new mongoose.Types.ObjectId() },
         data,
         {
           runValidators: true

@@ -7498,7 +7498,7 @@ describe('Model', function() {
       const docFromCreation = await Model.create({ name: 'foo' });
       const existingDocument = await Model.exists({ _id: docFromCreation._id });
       assert.equal(existingDocument._id.toString(), docFromCreation._id.toString());
-      assert.deepStrictEqual(existingDocument, { _id: docFromCreation._id });
+      assert.deepStrictEqual(Object.keys(existingDocument), ['_id']);
       assert.ok(isLean(existingDocument));
     });
 

@@ -10829,7 +10829,7 @@ describe('model: populate:', function() {
       sortOrder: 1,
       values: {
         [createList._id]: {
-          valueObject: mongoose.Types.ObjectId(createUser._id),
+          valueObject: new mongoose.Types.ObjectId(createUser._id),
           refp: 'User'
         }
       }

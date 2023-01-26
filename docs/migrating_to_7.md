@@ -12,6 +12,7 @@ you should be aware of when migrating from Mongoose 6.x to Mongoose 7.x.
 If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration guide](migrating_to_6.html) and upgrade to Mongoose 6.x first.
 
 * [`strictQuery`](#strictquery)
+* [ObjectIds no longer deepStrictEqual](#objectids-no-longer-deepstrictequal)
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
 
 <h3 id="strictquery"><a href="#strictquery"><code>strictQuery</code></a></h3>
@@ -26,6 +27,18 @@ const MyModel = mongoose.model('Test', mySchema);
 const docs = await MyModel.find({ notInSchema: 1 });
 // Empty array in Mongoose 7. In Mongoose 6, this would contain all documents in MyModel
 docs;
+```
+
+<h3 id="objectids-no-longer-deepstrictequal"><a href="#objectids-no-longer-deepstrictequal">ObjectIds no longer deepStrictEqual</a></h3>
+
+Two ObjectIds are no longer `assert.deepStrictEqual()` even though they have the same string representation.
+
+```javascript
+const oid1 = new mongoose.Types.ObjectId();
+const oid2 = new mongoose.Types.ObjectId(oid1.toString());
+
+oid1.toHexString() === oid2.toHexString(); // true
+assert.deepStrictEqual(oid1, oid2); // Throws "Values have same structure but are not reference-equal"
 ```
 
 <h3 id="removed-castforquerywrapper"><a href="#removed-castforquerywrapper">Removed <code>castForQueryWrapper</code>, updated <code>castForQuery()</code> signature</a></h3>

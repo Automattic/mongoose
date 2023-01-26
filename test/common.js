@@ -137,27 +137,16 @@ module.exports.mongoose = mongoose;
  */
 
 module.exports.mongodVersion = async function() {
-  return new Promise((resolve, reject) => {
-    const db = module.exports();
+  const db = await module.exports();
 
+  const admin = db.client.db().admin();
 
-    db.on('error', reject);
-
-    db.on('open', function() {
-      const admin = db.db.admin();
-      admin.serverStatus(function(err, info) {
-        if (err) {
-          return reject(err);
-        }
-        const version = info.version.split('.').map(function(n) {
-          return parseInt(n, 10);
-        });
-        db.close(function() {
-          resolve(version);
-        });
-      });
-    });
+  const info = await admin.serverStatus();
+  const version = info.version.split('.').map(function(n) {
+    return parseInt(n, 10);
   });
+  await db.close();
+  return version;
 };
 
 async function dropDBs() {

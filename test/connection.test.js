@@ -9,7 +9,6 @@ const start = require('./common');
 const Promise = require('bluebird');
 const Q = require('q');
 const assert = require('assert');
-const sinon = require('sinon');
 const mongodb = require('mongodb');
 const MongooseError = require('../lib/error/index');
 
@@ -371,21 +370,15 @@ describe('connections:', function() {
     });
   });
 
-  it('destroy connection and remove it permanantly', (done) => {
+  it('destroy connection and remove it permanently', (done) => {
     const opts = {};
     const conn = mongoose.createConnection(start.uri, opts);
-    const MongoClient = mongodb.MongoClient;
-    const stub = sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
-      callback();
-    });
-
     conn.useDb('test-db');
 
     const totalConn = mongoose.connections.length;
 
     conn.destroy(() => {
       assert.equal(mongoose.connections.length, totalConn - 1);
-      stub.restore();
       done();
     });
   });
@@ -393,10 +386,6 @@ describe('connections:', function() {
   it('verify that attempt to re-open destroyed connection throws error, via promise', (done) => {
     const opts = {};
     const conn = mongoose.createConnection(start.uri, opts);
-    const MongoClient = mongodb.MongoClient;
-    const stub = sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
-      callback();
-    });
 
     conn.useDb('test-db');
 
@@ -405,7 +394,6 @@ describe('connections:', function() {
         await conn.openUri(start.uri);
       } catch (error) {
         assert.equal(error.message, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
-        stub.restore();
         done();
       }
     });
@@ -414,10 +402,6 @@ describe('connections:', function() {
   it('verify that attempt to re-open destroyed connection throws error, via callback', (done) => {
     const opts = {};
     const conn = mongoose.createConnection(start.uri, opts);
-    const MongoClient = mongodb.MongoClient;
-    const stub = sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
-      callback();
-    });
 
     conn.useDb('test-db');
 
@@ -425,7 +409,6 @@ describe('connections:', function() {
       conn.openUri(start.uri, function(error, result) {
         assert.equal(result, undefined);
         assert.equal(error, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
-        stub.restore();
         done();
       });
     });

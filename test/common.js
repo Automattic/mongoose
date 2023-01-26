@@ -20,31 +20,6 @@ if (process.env.PRINT_COLLECTIONS) {
 }
 
 /**
- * Override all Collection related queries to keep count
- */
-
-[
-  'createIndex',
-  'findAndModify',
-  'findOne',
-  'find',
-  'insert',
-  'save',
-  'update',
-  'remove',
-  'count',
-  'distinct',
-  'isCapped',
-  'options'
-].forEach(function(method) {
-  const oldMethod = Collection.prototype[method];
-
-  Collection.prototype[method] = function() {
-    return oldMethod.apply(this, arguments);
-  };
-});
-
-/**
  * Override Collection#onOpen to keep track of connections
  */
 

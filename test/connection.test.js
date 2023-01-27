@@ -153,6 +153,7 @@ describe('connections:', function() {
       conn1.model('Test', schema);
       assert.equal(called.length, 1);
       assert.equal(called[0], schema);
+
       await conn1.close();
       await conn2.close();
     });
@@ -161,8 +162,9 @@ describe('connections:', function() {
   describe('helpers', function() {
     let conn;
 
-    before(function() {
+    before(async function() {
       conn = mongoose.createConnection(start.uri2);
+      await conn.asPromise();
       return conn;
     });
 
@@ -846,13 +848,15 @@ describe('connections:', function() {
   });
 
   describe('passing a function into createConnection', function() {
-    it('should store the name of the function (gh-6517)', function(done) {
+    it('should store the name of the function (gh-6517)', async function() {
       const conn = mongoose.createConnection(start.uri);
       const schema = new Schema({ name: String });
       class Person extends mongoose.Model {}
-      conn.model(Person, schema);
+      const PersonModel = conn.model(Person, schema);
       assert.strictEqual(conn.modelNames()[0], 'Person');
-      conn.close(done);
+      await conn.asPromise();
+      await PersonModel.init();
+      await conn.close();
     });
   });
 

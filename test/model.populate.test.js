@@ -1387,7 +1387,6 @@ describe('model: populate:', function() {
                   assert.ifError(err);
 
                   // allow population of unknown property by passing model name.
-                  // helpful when populating mapReduce results too.
                   BlogPost
                     .findById(post._id)
                     .populate({

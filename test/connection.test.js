@@ -1214,7 +1214,8 @@ describe('connections:', function() {
 
     before(async() => {
       mongooseInstance = new mongoose.Mongoose();
-      connection = mongooseInstance.createConnection(start.uri);
+      connection = await mongooseInstance.createConnection(start.uri).asPromise();
+      await connection.dropDatabase();
     });
     beforeEach(() => connection.deleteModel(/.*/));
     afterEach(async() => {

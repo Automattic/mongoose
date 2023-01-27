@@ -1520,7 +1520,7 @@ describe('Model', function() {
         assert.ifError(err);
         BlogPost.findOne({ title: 1 }, function(error, doc) {
           assert.ifError(error);
-          doc.remove(function(err) {
+          doc.deleteOne(function(err) {
             assert.ifError(err);
             BlogPost.find(function(err, found) {
               assert.ifError(err);
@@ -1528,127 +1528,6 @@ describe('Model', function() {
               assert.equal(found[0].title, '2');
               done();
             });
-          });
-        });
-      });
-    });
-  });
-
-  describe('#remove()', function() {
-    it('passes the removed document (gh-1419)', function(done) {
-      BlogPost.create({}, function(err, post) {
-        assert.ifError(err);
-        BlogPost.findById(post, function(err, found) {
-          assert.ifError(err);
-
-          found.remove(function(err, doc) {
-            assert.ifError(err);
-            assert.ok(doc);
-            assert.ok(doc.equals(found));
-            done();
-          });
-        });
-      });
-    });
-
-    it('works as a promise', function(done) {
-      BlogPost.create({}, function(err, post) {
-        assert.ifError(err);
-        BlogPost.findById(post, function(err, found) {
-          assert.ifError(err);
-
-          found.remove().then(function(doc) {
-            assert.ok(doc);
-            assert.ok(doc.equals(found));
-            done();
-          }).catch(done);
-        });
-      });
-    });
-
-    it('works as a promise with a hook', function(done) {
-      let called = 0;
-      const RHS = new Schema({
-        name: String
-      });
-      RHS.pre('remove', function(next) {
-        called++;
-        return next();
-      });
-
-      const RH = db.model('Test', RHS);
-
-      RH.create({ name: 'to be removed' }, function(err, post) {
-        assert.ifError(err);
-        assert.ok(post);
-        RH.findById(post, function(err, found) {
-          assert.ifError(err);
-          assert.ok(found);
-
-          found.remove().then(function(doc) {
-            assert.ifError(err);
-            assert.equal(called, 1);
-            assert.ok(doc);
-            assert.ok(doc.equals(found));
-            done();
-          }).catch(done);
-        });
-      });
-    });
-
-    it('handles query vs document middleware (gh-3054)', async function() {
-      const schema = new Schema({ name: String });
-
-      let docMiddleware = 0;
-      let queryMiddleware = 0;
-
-      schema.pre('remove', { query: true, document: false }, function() {
-        ++queryMiddleware;
-        assert.ok(this instanceof Model.Query);
-      });
-
-      schema.pre('remove', { query: false, document: true }, function() {
-        ++docMiddleware;
-        assert.ok(this instanceof Model);
-      });
-
-      const Model = db.model('Test', schema);
-
-
-      const doc = await Model.create({ name: String });
-
-      assert.equal(docMiddleware, 0);
-      assert.equal(queryMiddleware, 0);
-      await doc.remove();
-
-      assert.equal(docMiddleware, 1);
-      assert.equal(queryMiddleware, 0);
-
-      await Model.remove({});
-      assert.equal(docMiddleware, 1);
-      assert.equal(queryMiddleware, 1);
-    });
-
-    describe('when called multiple times', function() {
-      it('always executes the passed callback gh-1210', function(done) {
-        const post = new BlogPost();
-
-        post.save(function(err) {
-          assert.ifError(err);
-
-          let pending = 2;
-
-          post.remove(function() {
-            if (--pending) {
-              return;
-            }
-            done();
-          });
-          post.remove(function() {
-            if (--pending) {
-              return;
-            }
-            done();
           });
         });
       });

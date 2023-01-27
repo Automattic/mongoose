@@ -146,14 +146,14 @@ describe('document', function() {
     });
   });
 
-  describe('delete', function() {
+  describe('deleteOne', function() {
     it('deletes the document', async function() {
       const schema = new Schema({ x: String });
       const Test = db.model('Test', schema);
 
       const test = new Test({ x: 'test' });
       const doc = await test.save();
-      await doc.delete();
+      await doc.deleteOne();
       const found = await Test.findOne({ _id: doc._id });
       assert.strictEqual(found, null);
 
@@ -1901,8 +1901,7 @@ describe('document', function() {
       let threw = false;
       try {
         await createdPerson.save();
-      }
-      catch (err) {
+      } catch (err) {
         threw = true;
         assert.equal(err.code, 11000);
       }
@@ -3101,13 +3100,13 @@ describe('document', function() {
       assert.equal(p.child.$parent(), p);
     });
 
-    it('removing parent doc calls remove hooks on subdocs (gh-2348) (gh-4566)', async function() {
+    it('removing parent doc calls deleteOne hooks on subdocs (gh-2348) (gh-4566)', async function() {
       const ChildSchema = new Schema({
         name: String
       });
 
       const called = {};
-      ChildSchema.pre('remove', function(next) {
+      ChildSchema.pre('deleteOne', function(next) {
         called[this.name] = true;
         next();
       });
@@ -3124,7 +3123,7 @@ describe('document', function() {
         child: { name: 'Anakin' }
       });
 
-      await doc.remove();
+      await doc.deleteOne();
 
       assert.deepEqual(called, {
         Jacen: true,
@@ -5259,7 +5258,7 @@ describe('document', function() {
         catch(done);
     });
 
-    it('single nested subdoc post remove hooks (gh-5388)', function(done) {
+    it('single nested subdoc post deleteOne hooks (gh-5388)', function(done) {
       const contentSchema = new Schema({
         blocks: [{ type: String }],
         summary: { type: String }
@@ -5267,7 +5266,7 @@ describe('document', function() {
 
       let called = 0;
 
-      contentSchema.post('remove', function() {
+      contentSchema.post('deleteOne', function() {
         ++called;
       });
 
@@ -5287,7 +5286,7 @@ describe('document', function() {
 
       note.save(function(error) {
         assert.ifError(error);
-        note.remove(function(error) {
+        note.deleteOne(function(error) {
           assert.ifError(error);
           setTimeout(function() {
             assert.equal(called, 1);
@@ -10408,35 +10407,6 @@ describe('document', function() {
         const user = new User({ get: 12 });
 
         assert.equal(user.get, 12);
-      });
-    });
-    describe('Document#remove', () => {
-      it('is available as `$remove`', async() => {
-        const userSchema = new Schema({ name: String });
-        const User = db.model('User', userSchema);
-
-        const user = new User({ name: 'Hafez' });
-        await user.save();
-        await user.$remove();
-        const userFromDB = await User.findOne({ _id: user._id });
-
-        assert.ok(userFromDB == null);
-      });
-      it('can be used as a property in documents', async() => {
-        const userSchema = new Schema({
-          remove: Number
-        });
-
-        const User = db.model('User', userSchema);
-        const user = new User({ remove: 12 });
-
-        assert.equal(user.remove, 12);
-
-        await user.save();
-        await user.$remove();
-        const userFromDB = await User.findOne({ _id: user._id });
-
-        assert.ok(userFromDB == null);
       });
     });
   });

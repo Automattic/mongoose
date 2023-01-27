@@ -1638,7 +1638,7 @@ describe('model: populate:', function() {
       $set: { fans: [user.id] }
     });
 
-    await user.delete();
+    await user.deleteOne();
 
     const returned = await BlogPost.
       findById(post._id).

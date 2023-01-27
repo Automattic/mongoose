@@ -2146,7 +2146,6 @@ describe('Query', function() {
         'findOneAndRemove',
         'findOneAndUpdate',
         'replaceOne',
-        'update',
         'updateOne',
         'updateMany'
       ];
@@ -2206,7 +2205,7 @@ describe('Query', function() {
 
       M.create({ name: 'test' }, function(error, doc) {
         assert.ifError(error);
-        doc.remove(function(error) {
+        doc.deleteOne(function(error) {
           assert.ifError(error);
           M.findById(doc._id, function(error, doc) {
             assert.ifError(error);
@@ -2315,22 +2314,6 @@ describe('Query', function() {
 
         Test.find({}, function() { throw new Error('Oops!'); });
       });
-    });
-
-    it.skip('set overwrite after update() (gh-4740)', async function() {
-      const schema = new Schema({ name: String, age: Number });
-      const User = db.model('User', schema);
-
-
-      await User.create({ name: 'Bar', age: 29 });
-
-      await User.where({ name: 'Bar' }).
-        update({ name: 'Baz' }).
-        setOptions({ overwrite: true });
-
-      const doc = await User.findOne();
-      assert.equal(doc.name, 'Baz');
-      assert.ok(!doc.age);
     });
 
     it('queries with BSON overflow (gh-5812)', function(done) {
@@ -2706,7 +2689,6 @@ describe('Query', function() {
     });
 
     it('find()', async function() {
-
       let threw = false;
       try {
         await Model.find({ name: 'na' }).orFail(() => new Error('Oops!'));
@@ -2723,7 +2705,6 @@ describe('Query', function() {
     });
 
     it('findOne()', async function() {
-
       let threw = false;
       try {
         await Model.findOne({ name: 'na' }).orFail(() => new Error('Oops!'));
@@ -2740,7 +2721,6 @@ describe('Query', function() {
     });
 
     it('deleteMany()', async function() {
-
       let threw = false;
       try {
         await Model.deleteMany({ name: 'na' }).orFail(new Error('Oops!'));
@@ -2757,7 +2737,6 @@ describe('Query', function() {
     });
 
     it('deleteOne()', async function() {
-
       let threw = false;
       try {
         await Model.deleteOne({ name: 'na' }).orFail(new Error('Oops!'));
@@ -2770,23 +2749,6 @@ describe('Query', function() {
 
       // Shouldn't throw
       const res = await Model.deleteOne({ name: 'Test' }).orFail(new Error('Oops'));
-      assert.equal(res.deletedCount, 1);
-    });
-
-    it('remove()', async function() {
-
-      let threw = false;
-      try {
-        await Model.remove({ name: 'na' }).orFail(new Error('Oops!'));
-      } catch (error) {
-        assert.ok(error);
-        assert.equal(error.message, 'Oops!');
-        threw = true;
-      }
-      assert.ok(threw);
-
-      // Shouldn't throw
-      const res = await Model.remove({ name: 'Test' }).orFail(new Error('Oops'));
       assert.equal(res.deletedCount, 1);
     });
 
@@ -2806,26 +2768,7 @@ describe('Query', function() {
       assert.equal(res.modifiedCount, 1);
     });
 
-    it('update()', async function() {
-
-      let threw = false;
-      try {
-        await Model.update({ name: 'na' }, { name: 'foo' }).
-          orFail(new Error('Oops!'));
-      } catch (error) {
-        assert.ok(error);
-        assert.equal(error.message, 'Oops!');
-        threw = true;
-      }
-      assert.ok(threw);
-
-      // Shouldn't throw
-      const res = await Model.update({}, { name: 'Test2' }).orFail(new Error('Oops'));
-      assert.equal(res.modifiedCount, 1);
-    });
-
     it('updateMany()', async function() {
-
       let threw = false;
       try {
         await Model.updateMany({ name: 'na' }, { name: 'foo' }).
@@ -2843,7 +2786,6 @@ describe('Query', function() {
     });
 
     it('updateOne()', async function() {
-
       let threw = false;
       try {
         await Model.updateOne({ name: 'na' }, { name: 'foo' }).
@@ -2861,7 +2803,6 @@ describe('Query', function() {
     });
 
     it('findOneAndUpdate()', async function() {
-
       let threw = false;
       try {
         await Model.findOneAndUpdate({ name: 'na' }, { name: 'foo' }).
@@ -2879,7 +2820,6 @@ describe('Query', function() {
     });
 
     it('findOneAndDelete()', async function() {
-
       let threw = false;
       try {
         await Model.findOneAndDelete({ name: 'na' }).
@@ -2897,7 +2837,6 @@ describe('Query', function() {
     });
 
     it('executes before post hooks (gh-7280)', async function() {
-
       const schema = new Schema({ name: String });
       const docs = [];
       schema.post('findOne', function(doc, next) {
@@ -3346,21 +3285,6 @@ describe('Query', function() {
       () => { throw new Error('Should have failed'); },
       err => assert.ok(err.message.indexOf('updateOne') !== -1)
     );
-  });
-
-  it('sets deletedCount on result of remove() (gh-7629)', async function() {
-    const schema = new Schema({ name: String });
-
-    const Model = db.model('Test', schema);
-
-
-    await Model.create({ name: 'foo' });
-
-    let res = await Model.remove({});
-    assert.equal(res.deletedCount, 1);
-
-    res = await Model.remove({});
-    assert.strictEqual(res.deletedCount, 0);
   });
 
   describe('merge()', function() {

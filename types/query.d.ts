@@ -121,7 +121,7 @@ declare module 'mongoose' {
      * instead give you the object after `update` was applied.
      */
     new?: boolean;
-    overwrite?: boolean;
+
     overwriteDiscriminatorKey?: boolean;
     projection?: ProjectionType<DocType>;
     /**

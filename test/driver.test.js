@@ -12,8 +12,8 @@ describe('driver', function() {
     const m = new mongoose.Mongoose();
 
     class Collection {
-      findOne(filter, options, cb) {
-        cb(null, { answer: 42 });
+      findOne(filter, options) {
+        return Promise.resolve({ answer: 42 });
       }
     }
     class Connection extends EventEmitter {
@@ -69,13 +69,13 @@ describe('driver', function() {
       }
     }
     class Collection {
-      insertOne(doc, options, cb) {
+      insertOne(doc, options) {
         this.doc = doc;
-        return cb();
+        return Promise.resolve();
       }
 
-      findOne(filter, options, cb) {
-        return cb(null, this.doc);
+      findOne(filter, options) {
+        return Promise.resolve(this.doc);
       }
     }
     class Connection2 extends Connection1 {}

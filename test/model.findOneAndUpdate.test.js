@@ -383,12 +383,12 @@ describe('model: findOneAndUpdate:', function() {
     const M = BlogPost;
     let pending = 6;
 
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron6' } }, { new: false }, cb);
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron4' } }, cb);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron1' } }, { new: false }, cb);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron2' } }, cb);
-    M.where().findOneAndUpdate({ $set: { name: 'Aaron6' } }, cb);
-    M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron' } }).findOneAndUpdate(cb);
+    M.findOneAndUpdate({ author: 'aaron' }, { $set: { author: 'Aaron6' } }, { new: false }, cb);
+    M.findOneAndUpdate({ author: 'aaron' }, { $set: { author: 'Aaron4' } }, cb);
+    M.where().findOneAndUpdate({ author: 'aaron' }, { $set: { author: 'Aaron1' } }, { new: false }, cb);
+    M.where().findOneAndUpdate({ author: 'aaron' }, { $set: { author: 'Aaron2' } }, cb);
+    M.where().findOneAndUpdate({ $set: { author: 'Aaron6' } }, cb);
+    M.where('author', 'aaron').findOneAndUpdate({ $set: { author: 'Aaron' } }).findOneAndUpdate(cb);
 
     function cb(err, doc) {
       assert.ifError(err);
@@ -404,12 +404,12 @@ describe('model: findOneAndUpdate:', function() {
     const M = BlogPost;
     let pending = 6;
 
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron' } }, { new: false }).exec(cb);
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron' } }).exec(cb);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron' } }, { new: false }).exec(cb);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron' } }).exec(cb);
-    M.where().findOneAndUpdate({ $set: { name: 'Aaron' } }).exec(cb);
-    M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron' } }).exec(cb);
+    M.findOneAndUpdate({ author: 'aaron' }, { $set: { author: 'Aaron' } }, { new: false }).exec(cb);
+    M.findOneAndUpdate({ author: 'aaron' }, { $set: { author: 'Aaron' } }).exec(cb);
+    M.where().findOneAndUpdate({ author: 'aaron' }, { $set: { author: 'Aaron' } }, { new: false }).exec(cb);
+    M.where().findOneAndUpdate({ author: 'aaron' }, { $set: { author: 'Aaron' } }).exec(cb);
+    M.where().findOneAndUpdate({ $set: { author: 'Aaron' } }).exec(cb);
+    M.where('author', 'aaron').findOneAndUpdate({ $set: { author: 'Aaron' } }).exec(cb);
 
     function cb(err, doc) {
       assert.ifError(err);
@@ -529,8 +529,8 @@ describe('model: findOneAndUpdate:', function() {
     const _id = new DocumentObjectId();
     let pending = 2;
 
-    M.findByIdAndUpdate(_id, { $set: { name: 'Aaron' } }, { new: false }, cb);
-    M.findByIdAndUpdate(_id, { $set: { name: 'changed' } }, cb);
+    M.findByIdAndUpdate(_id, { $set: { author: 'Aaron' } }, { new: false }, cb);
+    M.findByIdAndUpdate(_id, { $set: { author: 'changed' } }, cb);
 
     function cb(err, doc) {
       assert.ifError(err);
@@ -869,23 +869,6 @@ describe('model: findOneAndUpdate:', function() {
           assert.equal(null, doc.name);
           done();
         });
-    });
-  });
-
-  it('honors the overwrite option (gh-1809)', function(done) {
-    const M = db.model('Test', { name: String, change: Boolean });
-    M.create({ name: 'first' }, function(err, doc) {
-      if (err) {
-        return done(err);
-      }
-      M.findByIdAndUpdate(doc._id, { change: true }, { overwrite: true, new: true }, function(err, doc) {
-        if (err) {
-          return done(err);
-        }
-        assert.ok(doc.change);
-        assert.equal(doc.name, undefined);
-        done();
-      });
     });
   });
 
@@ -1756,27 +1739,6 @@ describe('model: findOneAndUpdate:', function() {
         then(function() {
           done();
         });
-    });
-
-    it('overwrite doc with update validators (gh-3556)', function(done) {
-      const testSchema = new Schema({
-        name: {
-          type: String,
-          required: true
-        },
-        otherName: String
-      });
-      const Test = db.model('Test', testSchema);
-
-      const opts = { overwrite: true, runValidators: true };
-      Test.findOneAndUpdate({}, { otherName: 'test' }, opts, function(error) {
-        assert.ok(error);
-        assert.ok(error.errors['name']);
-        Test.findOneAndUpdate({}, { $set: { otherName: 'test' } }, opts, function(error) {
-          assert.ifError(error);
-          done();
-        });
-      });
     });
 
     it('update using $ (gh-5628)', function(done) {

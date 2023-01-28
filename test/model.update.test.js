@@ -2220,27 +2220,6 @@ describe('model: update:', function() {
       });
     });
 
-    it('overwrite doc with update validators (gh-3556)', function(done) {
-      const testSchema = new Schema({
-        name: {
-          type: String,
-          required: true
-        },
-        otherName: String
-      });
-      const Test = db.model('Test', testSchema);
-
-      const opts = { overwrite: true, runValidators: true };
-      Test.update({}, { otherName: 'test' }, opts, function(error) {
-        assert.ok(error);
-        assert.ok(error.errors['name']);
-        Test.update({}, { $set: { otherName: 'test' } }, opts, function(error) {
-          assert.ifError(error);
-          done();
-        });
-      });
-    });
-
     it('does not fail if passing whole doc (gh-5088)', function(done) {
       const schema = new Schema({
         username: String,

@@ -1108,12 +1108,12 @@ describe('types array', function() {
                   assert.ok(~m.str.indexOf('eight'));
 
                   assert.equal(m.id.length, 6);
-                  assert.ok(m.id.find(id => id.toString() === id1.toString()));
-                  assert.ok(m.id.find(id => id.toString() === id2.toString()));
-                  assert.ok(m.id.find(id => id.toString() === id3.toString()));
-                  assert.ok(m.id.find(id => id.toString() === id4.toString()));
-                  assert.ok(m.id.find(id => id.toString() === id5.toString()));
-                  assert.ok(m.id.find(id => id.toString() === id6.toString()));
+                  assert.ok(~m.id.indexOf(id1));
+                  assert.ok(~m.id.indexOf(id2));
+                  assert.ok(~m.id.indexOf(id3));
+                  assert.ok(~m.id.indexOf(id4));
+                  assert.ok(~m.id.indexOf(id5));
+                  assert.ok(~m.id.indexOf(id6));
 
                   assert.equal(m.date.length, 6);
                   assert.ok(~m.date.indexOf(d1.toString()));

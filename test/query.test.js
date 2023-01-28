@@ -4314,30 +4314,39 @@ describe('Query', function() {
     assert.strictEqual(found[0].title, 'burrito bowl');
   });
 
-  it('update operation should remove fields set to undefined (gh-12794) (gh-12821)', async function() {
+  it('update operation should remove fields set to undefined, unless they are required (gh-12794) (gh-12821) (gh-12930)', async function() {
     const m = new mongoose.Mongoose();
 
     await m.connect(start.uri);
 
-    const schema = new mongoose.Schema({ title: String });
+    const schema = new mongoose.Schema({
+      title: String,
+      description: {
+        type: String,
+        required: true
+      }
+    });
 
     const Test = m.model('test', schema);
 
     const doc = await Test.create({
-      title: 'test'
+      title: 'test',
+      description: 'example'
     });
 
     assert.strictEqual(doc.title, 'test');
+    assert.strictEqual(doc.description, 'example');
 
     const updatedDoc = await Test.findOneAndUpdate(
       {
         _id: doc._id
       },
-      { title: undefined },
+      { title: undefined, description: undefined },
       { returnOriginal: false }
     ).lean();
 
     assert.ok('title' in updatedDoc === false);
+    assert.equal(updatedDoc.description, 'example');
 
     const replacedDoc = await Test.findOneAndReplace(
       {

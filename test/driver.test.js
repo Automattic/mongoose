@@ -12,7 +12,7 @@ describe('driver', function() {
     const m = new mongoose.Mongoose();
 
     class Collection {
-      findOne(filter, options) {
+      findOne(filter, options) { // eslint-disable-line no-unused-vars
         return Promise.resolve({ answer: 42 });
       }
     }
@@ -69,12 +69,12 @@ describe('driver', function() {
       }
     }
     class Collection {
-      insertOne(doc, options) {
+      insertOne(doc, options) { // eslint-disable-line no-unused-vars
         this.doc = doc;
         return Promise.resolve();
       }
 
-      findOne(filter, options) {
+      findOne(filter, options) { // eslint-disable-line no-unused-vars
         return Promise.resolve(this.doc);
       }
     }

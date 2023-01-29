@@ -175,7 +175,7 @@ describe('model middleware', function() {
       next(new Error('Error 101'));
     });
 
-    schema.pre('remove', function(next) {
+    schema.pre('deleteOne', { document: true, query: false }, function(next) {
       called++;
       next();
     });
@@ -193,7 +193,7 @@ describe('model middleware', function() {
         assert.equal(err.message, 'Error 101');
         assert.equal(called, 2);
 
-        test.remove(function(err) {
+        test.deleteOne(function(err) {
           assert.ifError(err);
           assert.equal(called, 3);
           done();
@@ -362,7 +362,7 @@ describe('model middleware', function() {
       next();
     });
 
-    schema.pre('remove', function(next) {
+    schema.pre('deleteOne', { document: true, query: false }, function(next) {
       ++preRemove;
       next();
     });
@@ -372,7 +372,7 @@ describe('model middleware', function() {
       ++postValidate;
     });
 
-    schema.post('remove', function(doc) {
+    schema.post('deleteOne', { document: true, query: false }, function(doc) {
       assert.ok(doc instanceof mongoose.Document);
       ++postRemove;
     });
@@ -387,7 +387,7 @@ describe('model middleware', function() {
       assert.equal(postValidate, 1);
       assert.equal(preRemove, 0);
       assert.equal(postRemove, 0);
-      test.remove(function(err) {
+      test.deleteOne(function(err) {
         assert.ifError(err);
         assert.equal(preValidate, 1);
         assert.equal(postValidate, 1);

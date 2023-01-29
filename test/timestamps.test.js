@@ -683,10 +683,10 @@ describe('timestamps', function() {
       assert.equal(cats[1].createdAt.valueOf(), new Date('2011-06-01').valueOf());
     });
 
-    it('should have fields when update', function(done) {
+    it('should have fields when updateOne', function(done) {
       Cat.findOne({ name: 'newcat' }, function(err, doc) {
         const old = doc.updatedAt;
-        Cat.update({ name: 'newcat' }, { $set: { hobby: 'fish' } }, function() {
+        Cat.updateOne({ name: 'newcat' }, { $set: { hobby: 'fish' } }, function() {
           Cat.findOne({ name: 'newcat' }, function(err, doc) {
             assert.ok(doc.updatedAt.getTime() > old.getTime());
             done();

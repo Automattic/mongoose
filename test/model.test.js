@@ -554,7 +554,7 @@ describe('Model', function() {
       MyModel.findById(35, function(err, doc) {
         assert.ifError(err);
 
-        doc.remove({}, function(err) {
+        doc.deleteOne({}, function(err) {
           assert.ifError(err);
           done();
         });
@@ -1469,12 +1469,12 @@ describe('Model', function() {
     });
   });
 
-  describe('.remove()', function() {
+  describe('.deleteOne()', function() {
     it('works', function(done) {
       BlogPost.create({ title: 1 }, { title: 2 }, function(err) {
         assert.ifError(err);
 
-        BlogPost.remove({ title: 1 }, function(err) {
+        BlogPost.deleteOne({ title: 1 }, function(err) {
           assert.ifError(err);
 
           BlogPost.find({}, function(err, found) {
@@ -1492,7 +1492,7 @@ describe('Model', function() {
         assert.ifError(err);
         BlogPost.findOne({ title: 1 }, { _id: 0 }, function(error, doc) {
           assert.ifError(error);
-          doc.remove(function(err) {
+          doc.deleteOne(function(err) {
             assert.ok(err);
             assert.equal(err.message, 'No _id found on document!');
             done();
@@ -1505,7 +1505,7 @@ describe('Model', function() {
       BlogPost.create({ title: 1 }, { title: 2 }, function(err) {
         assert.ifError(err);
 
-        BlogPost.remove({ _id: undefined }, function(err) {
+        BlogPost.deleteOne({ _id: undefined }, function(err) {
           assert.ifError(err);
           BlogPost.find({}, function(err, found) {
             assert.equal(found.length, 2, 'Should not remove any records');
@@ -2442,14 +2442,14 @@ describe('Model', function() {
         b.save(function(err) {
           assert.ifError(err);
 
-          b.comments[0].remove();
+          b.comments[0].deleteOne();
           b.save(function(err) {
             assert.ifError(err);
 
             B.findByIdAndUpdate({ _id: b._id }, { $set: { comments: [{ title: 'a' }] } }, { new: true }, function(err, doc) {
               assert.ifError(err);
               doc.comments[0].title = 'differ';
-              doc.comments[0].remove();
+              doc.comments[0].deleteOne();
               doc.save(function(err) {
                 assert.ifError(err);
                 B.findById(doc._id, function(err, doc) {
@@ -2631,7 +2631,7 @@ describe('Model', function() {
       BlogPost.findById(post.get('_id'), function(err, doc) {
         assert.ifError(err);
 
-        doc.comments[0].remove();
+        doc.comments[0].deleteOne();
         doc.save(function(err) {
           assert.ifError(err);
 
@@ -2965,7 +2965,7 @@ describe('Model', function() {
           title: String
         });
         let save = false;
-        let remove = false;
+        let deleteOne = false;
         let init = false;
         let post = undefined;
 
@@ -2978,9 +2978,9 @@ describe('Model', function() {
           init = true;
         });
 
-        schema.post('remove', function(arg) {
+        schema.post('deleteOne', { document: true, query: false }, function(arg) {
           assert.equal(arg.id, post.id);
-          remove = true;
+          deleteOne = true;
         });
 
         const BlogPost = db.model('Test', schema);
@@ -2996,10 +2996,10 @@ describe('Model', function() {
                 assert.ifError(err);
                 assert.ok(init);
 
-                doc.remove(function(err) {
+                doc.deleteOne(function(err) {
                   process.nextTick(function() {
                     assert.ifError(err);
-                    assert.ok(remove);
+                    assert.ok(deleteOne);
                     done();
                   });
                 });
@@ -3040,18 +3040,6 @@ describe('Model', function() {
   });
 
   describe('#exec()', function() {
-    it.skip('count()', function(done) {
-      BlogPost.create({ title: 'interoperable count as promise' }, function(err) {
-        assert.ifError(err);
-        const query = BlogPost.count({ title: 'interoperable count as promise' });
-        query.exec(function(err, count) {
-          assert.ifError(err);
-          assert.equal(count, 1);
-          done();
-        });
-      });
-    });
-
     it('countDocuments()', function() {
       return BlogPost.create({ title: 'foo' }).
         then(() => BlogPost.countDocuments({ title: 'foo' }).exec()).
@@ -3068,10 +3056,10 @@ describe('Model', function() {
         });
     });
 
-    it('update()', function(done) {
+    it('updateOne()', function(done) {
       BlogPost.create({ title: 'interoperable update as promise' }, function(err) {
         assert.ifError(err);
-        const query = BlogPost.update({ title: 'interoperable update as promise' }, { title: 'interoperable update as promise delta' });
+        const query = BlogPost.updateOne({ title: 'interoperable update as promise' }, { title: 'interoperable update as promise delta' });
         query.exec(function(err, res) {
           assert.ifError(err);
           assert.equal(res.matchedCount, 1);
@@ -3113,22 +3101,6 @@ describe('Model', function() {
             assert.ok(String(createdOne._id) in ids);
             assert.ok(String(createdTwo._id) in ids);
             done();
-          });
-        });
-    });
-
-    it.skip('remove()', function(done) {
-      BlogPost.create(
-        { title: 'interoperable remove as promise' },
-        function(err) {
-          assert.ifError(err);
-          const query = BlogPost.remove({ title: 'interoperable remove as promise' });
-          query.exec(function(err) {
-            assert.ifError(err);
-            BlogPost.count({ title: 'interoperable remove as promise' }, function(err, count) {
-              assert.equal(count, 0);
-              done();
-            });
           });
         });
     });
@@ -4228,7 +4200,6 @@ describe('Model', function() {
 
     assert.ok(error);
     assert.equal(error.name, 'MongoServerError');
-    await db.close();
   });
 
   it('reports max bson size error in save (gh-3906)', async function() {
@@ -4247,7 +4218,6 @@ describe('Model', function() {
 
     assert.ok(error);
     assert.equal(error.name, 'MongoServerError');
-    await db.close();
   });
 
   describe('insertMany()', function() {
@@ -5922,7 +5892,7 @@ describe('Model', function() {
       await Money.insertMany([{ amount: '123.45' }]);
     });
 
-    it('remove with cast error (gh-5323)', function(done) {
+    it('deleteOne with cast error (gh-5323)', async function() {
       const schema = new mongoose.Schema({
         name: String
       });
@@ -5933,19 +5903,11 @@ describe('Model', function() {
         { name: 'test-2' }
       ];
 
-      Model.create(arr, function(error) {
-        assert.ifError(error);
-        Model.remove([], function(error) {
-          assert.ok(error);
-          assert.ok(error.message.indexOf('must be an object') !== -1,
-            error.message);
-          Model.find({}, function(error, docs) {
-            assert.ifError(error);
-            assert.equal(docs.length, 2);
-            done();
-          });
-        });
-      });
+      await Model.create(arr);
+      await assert.rejects(() => Model.deleteOne([]), /must be an object/);
+      const docs = await Model.find({});
+
+      assert.equal(docs.length, 2);
     });
 
     it('.create() with non-object (gh-2037)', function(done) {
@@ -7221,7 +7183,6 @@ describe('Model', function() {
 
     const SampleModel = db.model('Test', schema);
 
-
     await SampleModel.create({ name: 'foo' });
     // start session
     const session = await db.startSession();
@@ -7239,13 +7200,12 @@ describe('Model', function() {
     await doc.save({ session: null });
     assert.equal(sessions.length, 1);
     assert.strictEqual(sessions[0], null);
-
   });
 
-  it('sets $session() before pre remove hooks run (gh-7742)', async function() {
+  it('sets $session() before pre deleteOne hooks run (gh-7742)', async function() {
     const schema = new Schema({ name: String });
     let sessions = [];
-    schema.pre('remove', function() {
+    schema.pre('deleteOne', { document: true, query: false }, function() {
       sessions.push(this.$session());
     });
 
@@ -7261,7 +7221,7 @@ describe('Model', function() {
     doc.foo = 'bar';
 
     sessions = [];
-    await doc.remove({ session });
+    await doc.deleteOne({ session });
     assert.equal(sessions.length, 1);
     assert.strictEqual(sessions[0], session);
 

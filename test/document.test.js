@@ -3106,7 +3106,7 @@ describe('document', function() {
       });
 
       const called = {};
-      ChildSchema.pre('deleteOne', function(next) {
+      ChildSchema.pre('deleteOne', { document: true, query: false }, function(next) {
         called[this.name] = true;
         next();
       });
@@ -6744,8 +6744,8 @@ describe('document', function() {
 
     let removeCount1 = 0;
     let removeCount2 = 0;
-    schema.pre('remove', () => ++removeCount1);
-    schema.pre('remove', { document: true, query: false }, () => ++removeCount2);
+    schema.pre('deleteOne', { document: true }, () => ++removeCount1);
+    schema.pre('deleteOne', { document: true, query: false }, () => ++removeCount2);
 
     const Model = db.model('Test', schema);
 
@@ -6770,7 +6770,7 @@ describe('document', function() {
     assert.equal(removeCount1, 0);
     assert.equal(removeCount2, 0);
 
-    await doc.remove();
+    await doc.deleteOne();
 
     assert.equal(removeCount1, 1);
     assert.equal(removeCount2, 1);
@@ -9749,7 +9749,7 @@ describe('document', function() {
     doc.schema = 'test2';
     await doc.save();
 
-    await fromDb.remove();
+    await fromDb.deleteOne();
     doc.name = 'test3';
     const err = await doc.save().then(() => null, err => err);
     assert.ok(err);
@@ -9866,7 +9866,7 @@ describe('document', function() {
       }
     }, {});
     let count = 0;
-    SubSchema.pre('remove', function(next) {
+    SubSchema.pre('deleteOne', { document: true, query: false }, function(next) {
       count++;
       next();
     });
@@ -9883,14 +9883,13 @@ describe('document', function() {
 
     const Model = db.model('TestModel', thisSchema);
 
-
     await Model.deleteMany({}); // remove all existing documents
     const newModel = {
       foo: 'bar',
       mySubdoc: [{ myValue: 'some value' }]
     };
     const document = await Model.create(newModel);
-    document.mySubdoc[0].remove();
+    document.mySubdoc[0].deleteOne();
     await document.save().catch((error) => {
       console.error(error);
     });

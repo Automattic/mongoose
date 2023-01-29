@@ -43,3 +43,6 @@ webpack.base.config.js
 .nyc-output
 
 *.tgz
+
+notes.md
+list.out

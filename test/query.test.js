@@ -2192,7 +2192,7 @@ describe('Query', function() {
         isDeleted: Boolean
       });
 
-      schema.pre('remove', function(next) {
+      schema.pre('deleteOne', { document: true, query: false }, function(next) {
         const _this = this;
         this.constructor.updateOne({ isDeleted: true }, function(error) {
           // Force mongoose to consider this doc as deleted.
@@ -2361,7 +2361,6 @@ describe('Query', function() {
     });
 
     it('explain() (gh-6625)', async function() {
-
       const schema = new mongoose.Schema({ n: Number });
 
       const Model = db.model('Test', schema);
@@ -2805,8 +2804,8 @@ describe('Query', function() {
     it('findOneAndUpdate()', async function() {
       let threw = false;
       try {
-        await Model.findOneAndUpdate({ name: 'na' }, { name: 'foo' }).
-          orFail(new Error('Oops!'));
+        const q = Model.findOneAndUpdate({ name: 'na' }, { name: 'foo' }).orFail(new Error('Oops!'));
+        await q;
       } catch (error) {
         assert.ok(error);
         assert.equal(error.message, 'Oops!');

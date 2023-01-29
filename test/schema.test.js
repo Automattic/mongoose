@@ -2861,8 +2861,8 @@ describe('schema', function() {
       }
     });
 
-    assert.equal(schema.path('testId').instance, 'ObjectID');
-    assert.equal(schema.path('testId2').instance, 'ObjectID');
+    assert.equal(schema.path('testId').instance, 'ObjectId');
+    assert.equal(schema.path('testId2').instance, 'ObjectId');
     assert.equal(schema.path('num').instance, 'Decimal128');
     assert.equal(schema.path('num2').instance, 'Decimal128');
   });

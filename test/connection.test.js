@@ -463,7 +463,11 @@ describe('connections:', function() {
     db.openUri(start.uri, opts);
     assert.ok(!M.collection._shouldBufferCommands());
 
-    return M.findOne().then(() => assert.ok(false), err => assert.ok(err.message.includes('initial connection'))).
+    return M.findOne().
+      then(
+        () => assert.ok(false),
+        err => assert.ok(err.message.includes('initial connection'))
+      ).
       then(() => db.close());
   });
 

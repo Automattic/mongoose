@@ -1882,7 +1882,7 @@ describe('types array', function() {
               assert.equal(m.em[1].username, 'Homily');
 
               m.em[0].username = 'Arrietty';
-              m.em[1].remove();
+              m.em[1].deleteOne();
               m.save(function(err) {
                 assert.ifError(err);
 

@@ -11016,11 +11016,11 @@ describe('model: populate:', function() {
 
       const entry = await Test.create({
         name: 'Test',
-        uuid: mongoose.Types.ObjectId()
+        uuid: new mongoose.Types.ObjectId()
       });
       const otherEntry = await Test.create({
         name: 'Other Test',
-        uuid: mongoose.Types.ObjectId()
+        uuid: new mongoose.Types.ObjectId()
       });
       await User.create({
         name: 'User',
@@ -11037,11 +11037,11 @@ describe('model: populate:', function() {
       // =================localField======================
       const localEntry = await Test.create({
         name: 'local test',
-        uuid: mongoose.Types.ObjectId()
+        uuid: new mongoose.Types.ObjectId()
       });
       const otherLocalEntry = await Test.create({
         name: 'other local test',
-        uuid: mongoose.Types.ObjectId()
+        uuid: new mongoose.Types.ObjectId()
       });
 
       await User.create({
@@ -11064,8 +11064,8 @@ describe('model: populate:', function() {
         populate({ path: 'test' });
       assert.equal(check.test.length, 0);
       // ============localFieldAndForeignField============
-      const bothEntry = await Test.create({ name: 'Both', uuid: mongoose.Types.ObjectId() });
-      const otherBothEntry = await Test.create({ name: 'Other Both', uuid: mongoose.Types.ObjectId() });
+      const bothEntry = await Test.create({ name: 'Both', uuid: new mongoose.Types.ObjectId() });
+      const otherBothEntry = await Test.create({ name: 'Other Both', uuid: new mongoose.Types.ObjectId() });
       await User.create({
         name: 'both user',
         field: bothEntry.uuid,

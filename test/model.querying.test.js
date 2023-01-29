@@ -182,54 +182,6 @@ describe('model: querying:', function() {
     assert.ok(BlogPostB.findOne(q, null, {}, fn) instanceof Query);
   });
 
-  describe.skip('count', function() {
-    it('returns a Query', function(done) {
-      assert.ok(BlogPostB.count({}) instanceof Query);
-      done();
-    });
-
-    it('Query executes when you pass a callback', function(done) {
-      let pending = 2;
-
-      function fn() {
-        if (--pending) {
-          return;
-        }
-        done();
-      }
-
-      assert.ok(BlogPostB.count({}, fn) instanceof Query);
-      assert.ok(BlogPostB.count(fn) instanceof Query);
-    });
-
-    it('counts documents', function(done) {
-      const title = 'Wooooot ' + random();
-
-      const post = new BlogPostB();
-      post.set('title', title);
-
-      post.save(function(err) {
-        assert.ifError(err);
-
-        const post = new BlogPostB();
-        post.set('title', title);
-
-        post.save(function(err) {
-          assert.ifError(err);
-
-          BlogPostB.count({ title: title }, function(err, count) {
-            assert.ifError(err);
-
-            assert.equal(typeof count, 'number');
-            assert.equal(count, 2);
-
-            done();
-          });
-        });
-      });
-    });
-  });
-
   describe('distinct', function() {
     it('returns a Query', function(done) {
       assert.ok(BlogPostB.distinct('title', {}) instanceof Query);
@@ -269,10 +221,10 @@ describe('model: querying:', function() {
     });
   });
 
-  describe('update', function() {
+  describe('updateOne', function() {
     it('returns a Query', function(done) {
-      assert.ok(BlogPostB.update({}, {}) instanceof Query);
-      assert.ok(BlogPostB.update({}, {}, {}) instanceof Query);
+      assert.ok(BlogPostB.updateOne({}, {}) instanceof Query);
+      assert.ok(BlogPostB.updateOne({}, {}, {}) instanceof Query);
       done();
     });
 
@@ -286,8 +238,8 @@ describe('model: querying:', function() {
         done();
       }
 
-      assert.ok(BlogPostB.update({ title: random() }, {}, fn) instanceof Query);
-      assert.ok(BlogPostB.update({ title: random() }, {}, {}, fn) instanceof Query);
+      assert.ok(BlogPostB.updateOne({ title: random() }, {}, fn) instanceof Query);
+      assert.ok(BlogPostB.updateOne({ title: random() }, {}, {}, fn) instanceof Query);
     });
 
     it('can handle minimize option (gh-3381)', function() {
@@ -1415,9 +1367,9 @@ describe('model: querying:', function() {
                   assert.ifError(error);
                   assert.equal(documents.length, 1);
                   assert.equal(documents[0].title, 'text search in mongoose');
-                  a.remove({}, function(error) {
+                  a.deleteOne({}, function(error) {
                     assert.ifError(error);
-                    b.remove({}, function(error) {
+                    b.deleteOne({}, function(error) {
                       assert.ifError(error);
                       done();
                     });

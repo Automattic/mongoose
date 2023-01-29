@@ -15,7 +15,7 @@ const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
 const CastError = mongoose.Error.CastError;
 
-describe('model: update:', function() {
+describe('model: updateOne:', function() {
   let post;
   const title = 'Tobi';
   const author = 'Brian';
@@ -135,7 +135,7 @@ describe('model: update:', function() {
         'comments.1.body': 8 // $set
       };
 
-      BlogPost.update({ title: title }, update, function(err) {
+      BlogPost.updateOne({ title: title }, update, function(err) {
         assert.ifError(err);
 
         BlogPost.findById(post._id, function(err, up) {
@@ -161,7 +161,7 @@ describe('model: update:', function() {
             'comments.body': 'fail'
           };
 
-          BlogPost.update({ _id: post._id }, update2, function(err) {
+          BlogPost.updateOne({ _id: post._id }, update2, function(err) {
             assert.ok(err);
             assert.ok(err.message.length > 0);
             BlogPost.findById(post, function(err) {
@@ -171,7 +171,7 @@ describe('model: update:', function() {
                 $pull: 'fail'
               };
 
-              BlogPost.update({ _id: post._id }, update3, function(err) {
+              BlogPost.updateOne({ _id: post._id }, update3, function(err) {
                 assert.ok(err);
 
                 assert.ok(/Invalid atomic update value for \$pull\. Expected an object, received string/.test(err.message));
@@ -181,7 +181,7 @@ describe('model: update:', function() {
                 };
 
                 // should not overwrite doc when no valid paths are submitted
-                BlogPost.update({ _id: post._id }, update4, function(err) {
+                BlogPost.updateOne({ _id: post._id }, update4, function(err) {
                   assert.ifError(err);
 
                   BlogPost.findById(post._id, function(err, up) {
@@ -220,7 +220,7 @@ describe('model: update:', function() {
       $inc: { idontexist: 1 }
     };
 
-    BlogPost.update({ _id: post._id }, update, function(err) {
+    BlogPost.updateOne({ _id: post._id }, update, function(err) {
       assert.ifError(err);
 
       // get the underlying doc
@@ -241,7 +241,7 @@ describe('model: update:', function() {
   it('makes copy of conditions and update options', function(done) {
     const conditions = { _id: post._id.toString() };
     const update = { $set: { some_attrib: post._id.toString() } };
-    BlogPost.update(conditions, update, function(err) {
+    BlogPost.updateOne(conditions, update, function(err) {
       assert.ifError(err);
       assert.equal(typeof conditions._id, 'string');
       done();
@@ -262,7 +262,7 @@ describe('model: update:', function() {
       $set: { 'comments.$.title': crazy }
     };
 
-    BlogPost.update({ _id: post._id, 'comments.body': 'been there' }, update, function(err) {
+    BlogPost.updateOne({ _id: post._id, 'comments.body': 'been there' }, update, function(err) {
       assert.ifError(err);
       BlogPost.findById(post, function(err, ret) {
         assert.ifError(err);
@@ -294,7 +294,7 @@ describe('model: update:', function() {
         $set: { date: (new Date()).getTime() } // check for single val casting
       };
 
-      BlogPost.update({ _id: post._id, 'comments.body': 'been there' }, update, { strict: false }, function(err) {
+      BlogPost.updateOne({ _id: post._id, 'comments.body': 'been there' }, update, { strict: false }, function(err) {
         assert.ifError(err);
         BlogPost.findById(post, function(err, ret) {
           assert.ifError(err);
@@ -316,7 +316,7 @@ describe('model: update:', function() {
         $addToSet: { owners: owner }
       };
 
-      BlogPost.update({ _id: last._id }, update, function(err) {
+      BlogPost.updateOne({ _id: last._id }, update, function(err) {
         assert.ifError(err);
         BlogPost.findById(last, function(err, ret) {
           assert.ifError(err);
@@ -337,7 +337,7 @@ describe('model: update:', function() {
         $addToSet: { owners: { $each: [owner, newowner] } }
       };
 
-      BlogPost.update({ _id: post._id }, update, function(err) {
+      BlogPost.updateOne({ _id: post._id }, update, function(err) {
         assert.ifError(err);
         BlogPost.findById(post, function(err, ret) {
           assert.ifError(err);
@@ -356,7 +356,7 @@ describe('model: update:', function() {
         $unset: { title: 1 }
       };
 
-      BlogPost.update({ _id: post._id }, update, function(err) {
+      BlogPost.updateOne({ _id: post._id }, update, function(err) {
         assert.ifError(err);
         BlogPost.findById(post, function(err, ret) {
           assert.ifError(err);
@@ -378,7 +378,7 @@ describe('model: update:', function() {
       }
     };
 
-    BlogPost.update({ _id: post._id }, update, function(err) {
+    BlogPost.updateOne({ _id: post._id }, update, function(err) {
       assert.ifError(err);
       BlogPost.findById(post, function(err, ret) {
         assert.ifError(err);
@@ -400,7 +400,7 @@ describe('model: update:', function() {
         $pull: { comments: { _id: doc.comments[0].id } }
       };
 
-      BlogPost.update({ _id: post._id }, update, function(err) {
+      BlogPost.updateOne({ _id: post._id }, update, function(err) {
         assert.ifError(err);
         BlogPost.findById(post, function(err, ret) {
           assert.ifError(err);
@@ -417,7 +417,7 @@ describe('model: update:', function() {
       $pull: { comments: { body: { $in: ['been there'] } } }
     };
 
-    BlogPost.update({ _id: post._id }, update, function(err) {
+    BlogPost.updateOne({ _id: post._id }, update, function(err) {
       assert.ifError(err);
       BlogPost.findById(post, function(err, ret) {
         assert.ifError(err);
@@ -444,7 +444,7 @@ describe('model: update:', function() {
             $pull: { comments: { body: { $nin: ['there'] } } }
           };
 
-          BlogPost.update({ _id: ret._id }, update, function(err) {
+          BlogPost.updateOne({ _id: ret._id }, update, function(err) {
             assert.ifError(err);
             BlogPost.findById(post, function(err, ret) {
               assert.ifError(err);
@@ -480,7 +480,7 @@ describe('model: update:', function() {
       }
       for (let i = 0; i < 4; ++i) {
         BlogPost
-          .update({ _id: post._id }, { $inc: { 'meta.visitors': 1 } }, callback);
+          .updateOne({ _id: post._id }, { $inc: { 'meta.visitors': 1 } }, callback);
       }
     });
   });
@@ -502,7 +502,7 @@ describe('model: update:', function() {
         assert.ifError(err);
         assert.strictEqual(b.meta.visitors, null);
 
-        B.update({ _id: b._id }, { meta: { visitors: null } }, function(err) {
+        B.updateOne({ _id: b._id }, { meta: { visitors: null } }, function(err) {
           assert.strictEqual(null, err);
           done();
         });
@@ -515,7 +515,7 @@ describe('model: update:', function() {
     const M = db.model('Test', schema);
     M.create({ comments: [{ name: 'node 0.8' }] }, function(err, doc) {
       assert.ifError(err);
-      M.update({ _id: doc._id }, { $pull: { comments: { name: 'node 0.8' } } }, function(err, affected) {
+      M.updateOne({ _id: doc._id }, { $pull: { comments: { name: 'node 0.8' } } }, function(err, affected) {
         assert.ifError(err);
         assert.equal(affected.modifiedCount, 1);
         done();
@@ -544,10 +544,10 @@ describe('model: update:', function() {
       assert.ifError(err);
       const pid = project.id;
       const comp = project.components.create({ name: 'component' });
-      Project.update({ _id: pid }, { $push: { components: comp } }, function(err) {
+      Project.updateOne({ _id: pid }, { $push: { components: comp } }, function(err) {
         assert.ifError(err);
         const task = comp.tasks.create({ name: 'my task' });
-        Project.update({ _id: pid, 'components._id': comp._id }, { $push: { 'components.$.tasks': task } }, function(err) {
+        Project.updateOne({ _id: pid, 'components._id': comp._id }, { $push: { 'components.$.tasks': task } }, function(err) {
           assert.ifError(err);
           Project.findById(pid, function(err, proj) {
             assert.ifError(err);
@@ -570,7 +570,7 @@ describe('model: update:', function() {
     const M = db.model('Test', schema);
     M.create({ counts: {} }, function(err, m) {
       assert.ifError(err);
-      M.update({}, { $inc: { 'counts.1': 1, 'counts.1a': 10 } }, function(err) {
+      M.updateOne({}, { $inc: { 'counts.1': 1, 'counts.1a': 10 } }, function(err) {
         assert.ifError(err);
         M.findById(m, function(err, doc) {
           assert.ifError(err);
@@ -589,7 +589,7 @@ describe('model: update:', function() {
     Some.create({ obj: ['a', 'b', 'c'] }, function(err, s) {
       assert.ifError(err);
 
-      Some.update({ _id: s._id, obj: 'b' }, { $set: { 'obj.$': 2 } }, function(err) {
+      Some.updateOne({ _id: s._id, obj: 'b' }, { $set: { 'obj.$': 2 } }, function(err) {
         assert.ifError(err);
 
         Some.findById(s._id, function(err, ss) {
@@ -649,7 +649,7 @@ describe('model: update:', function() {
 
       const match = { name: 'set on insert' };
       const op = { $setOnInsert: { age: '47' }, x: 'inserted' };
-      M.update(match, op, { upsert: true }, function(err) {
+      M.updateOne(match, op, { upsert: true }, function(err) {
         assert.ifError(err);
         M.findOne(function(err, doc) {
           assert.ifError(err);
@@ -658,7 +658,7 @@ describe('model: update:', function() {
 
           const match = { name: 'set on insert' };
           const op = { $setOnInsert: { age: 108 }, name: 'changed' };
-          M.update(match, op, { upsert: true }, function(err) {
+          M.updateOne(match, op, { upsert: true }, function(err) {
             assert.ifError(err);
 
             M.findOne(function(err, doc) {
@@ -693,7 +693,7 @@ describe('model: update:', function() {
           }
         };
 
-        M.update({ _id: created._id }, op, function(err) {
+        M.updateOne({ _id: created._id }, op, function(err) {
           assert.ifError(err);
           M.findById(created._id, function(err, doc) {
             assert.ifError(err);
@@ -709,7 +709,7 @@ describe('model: update:', function() {
                 }
               }
             };
-            M.update({ _id: created._id }, op, function(err) {
+            M.updateOne({ _id: created._id }, op, function(err) {
               assert.ifError(err);
               M.findById(created._id, function(error, doc) {
                 assert.ifError(error);
@@ -773,7 +773,7 @@ describe('model: update:', function() {
       m.save(function(error) {
         assert.ifError(error);
         const before = Date.now();
-        M.update(
+        M.updateOne(
           { name: '2.6' },
           { $currentDate: { lastModified: true, lastModifiedTS: { $type: 'timestamp' } } },
           function(error) {
@@ -799,7 +799,7 @@ describe('model: update:', function() {
         return done(err);
       }
 
-      Some.update({ _id: s._id }, { arr: [] }, function(err) {
+      Some.updateOne({ _id: s._id }, { arr: [] }, function(err) {
         if (err) {
           return done(err);
         }
@@ -820,7 +820,7 @@ describe('model: update:', function() {
       const s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
       const Breakfast = db.model('Test', s);
       const updateOptions = { upsert: true };
-      Breakfast.update({}, { base: 'eggs' }, updateOptions, function(error) {
+      Breakfast.updateOne({}, { base: 'eggs' }, updateOptions, function(error) {
         assert.ifError(error);
         Breakfast.findOne({}).lean().exec(function(error, breakfast) {
           assert.ifError(error);
@@ -860,7 +860,7 @@ describe('model: update:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { upsert: true };
-      Breakfast.update({ topping: 'sausage' }, { base: 'eggs' }, updateOptions, function(error) {
+      Breakfast.updateOne({ topping: 'sausage' }, { base: 'eggs' }, updateOptions, function(error) {
         assert.ifError(error);
         Breakfast.findOne({}, function(error, breakfast) {
           assert.ifError(error);
@@ -876,7 +876,7 @@ describe('model: update:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { upsert: true };
-      Breakfast.update({ topping: { $ne: 'sausage' } }, { base: 'eggs' }, updateOptions, function(error) {
+      Breakfast.updateOne({ topping: { $ne: 'sausage' } }, { base: 'eggs' }, updateOptions, function(error) {
         assert.ifError(error);
         Breakfast.findOne({}, function(error, breakfast) {
           assert.ifError(error);
@@ -898,7 +898,7 @@ describe('model: update:', function() {
       const M = db.model('Test', schema);
 
       const opts = { upsert: true };
-      M.update({}, {}, opts, function(error) {
+      M.updateOne({}, {}, opts, function(error) {
         assert.ifError(error);
         M.findOne({}, function(error, doc) {
           assert.ifError(error);
@@ -926,7 +926,7 @@ describe('model: update:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { upsert: true, runValidators: true };
-      Breakfast.update({}, { topping: 'bacon', base: 'eggs' }, updateOptions, function(error) {
+      Breakfast.updateOne({}, { topping: 'bacon', base: 'eggs' }, updateOptions, function(error) {
         assert.ok(!!error);
         assert.equal(Object.keys(error.errors).length, 1);
         assert.equal(Object.keys(error.errors)[0], 'topping');
@@ -946,7 +946,7 @@ describe('model: update:', function() {
         eggs: {
           type: String,
           validate: function() {
-            assert.ok(this instanceof require('../').Query);
+            assert.ok(this instanceof mongoose.Query);
             return false;
           }
         }
@@ -954,7 +954,7 @@ describe('model: update:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { runValidators: true };
-      Breakfast.update({}, { $unset: { steak: '' }, $setOnInsert: { eggs: 'softboiled' } }, updateOptions, function(error) {
+      Breakfast.updateOne({}, { $unset: { steak: '' }, $setOnInsert: { eggs: 'softboiled' } }, updateOptions, function(error) {
         assert.ok(!!error);
         assert.equal(Object.keys(error.errors).length, 2);
         assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
@@ -991,19 +991,19 @@ describe('model: update:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { runValidators: true };
-      Breakfast.update({}, { $set: { steak: 'ribeye', eggs: 3, bacon: '3 strips' } }, updateOptions, function(error) {
+      Breakfast.updateOne({}, { $set: { steak: 'ribeye', eggs: 3, bacon: '3 strips' } }, updateOptions, function(error) {
         assert.ok(!!error);
         assert.equal(Object.keys(error.errors).length, 1);
         assert.equal(Object.keys(error.errors)[0], 'eggs');
         assert.equal(error.errors.eggs.message, 'Path `eggs` (3) is less than minimum allowed value (4).');
 
-        Breakfast.update({}, { $set: { steak: 'tofu', eggs: 5, bacon: '3 strips' } }, updateOptions, function(error) {
+        Breakfast.updateOne({}, { $set: { steak: 'tofu', eggs: 5, bacon: '3 strips' } }, updateOptions, function(error) {
           assert.ok(!!error);
           assert.equal(Object.keys(error.errors).length, 1);
           assert.equal(Object.keys(error.errors)[0], 'steak');
           assert.equal(error.errors.steak, '`tofu` is not a valid enum value for path `steak`.');
 
-          Breakfast.update({}, { $set: { steak: 'sirloin', eggs: 6, bacon: 'none' } }, updateOptions, function(error) {
+          Breakfast.updateOne({}, { $set: { steak: 'sirloin', eggs: 6, bacon: 'none' } }, updateOptions, function(error) {
             assert.ok(!!error);
             assert.equal(Object.keys(error.errors).length, 1);
             assert.equal(Object.keys(error.errors)[0], 'bacon');
@@ -1024,7 +1024,7 @@ describe('model: update:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { runValidators: true };
-      Breakfast.update({}, { $set: { steak: 'tofu', eggs: 2, bacon: '3 strips' } }, updateOptions, function(error) {
+      Breakfast.updateOne({}, { $set: { steak: 'tofu', eggs: 2, bacon: '3 strips' } }, updateOptions, function(error) {
         assert.ok(!!error);
         assert.equal(Object.keys(error.errors).length, 2);
         assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
@@ -1041,7 +1041,7 @@ describe('model: update:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { runValidators: true };
-      Breakfast.update({}, { $inc: { eggs: 1 } }, updateOptions, function(error) {
+      Breakfast.updateOne({}, { $inc: { eggs: 1 } }, updateOptions, function(error) {
         assert.ifError(error);
         done();
       });
@@ -1054,7 +1054,7 @@ describe('model: update:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { runValidators: true };
-      Breakfast.update(
+      Breakfast.updateOne(
         { 'toppings.name': 'bacon' },
         { 'toppings.$.name': 'tofu' },
         updateOptions,
@@ -1101,7 +1101,7 @@ describe('model: update:', function() {
       const Company = db.model('Test', CompanySchema);
       const update = { file: { name: '' } };
       const options = { runValidators: true };
-      Company.update({}, update, options, function(error) {
+      Company.updateOne({}, update, options, function(error) {
         assert.ok(error);
         assert.equal(error.errors['file.name'].message,
           'Path `name` is required.');
@@ -1116,7 +1116,7 @@ describe('model: update:', function() {
 
     M.create({ breakfast: 'bacon' }, function(error, doc) {
       assert.ifError(error);
-      M.update(
+      M.updateOne(
         { _id: doc._id },
         { $set: { breakfast: 'eggs' } },
         { overwrite: true },
@@ -1137,7 +1137,7 @@ describe('model: update:', function() {
 
     M.create({}, function(error, doc) {
       assert.ifError(error);
-      M.update(
+      M.updateOne(
         { _id: doc._id },
         { breakfast: { eggs: 2, bacon: 3 } },
         function(error, result) {
@@ -1172,11 +1172,11 @@ describe('model: update:', function() {
       let numPres = 0;
       let numPosts = 0;
       const band = new Schema({ members: [String] });
-      band.pre('update', function(next) {
+      band.pre('updateOne', function(next) {
         ++numPres;
         next();
       });
-      band.post('update', function() {
+      band.post('updateOne', function() {
         ++numPosts;
       });
       const Band = db.model('Band', band);
@@ -1186,7 +1186,7 @@ describe('model: update:', function() {
         assert.ifError(error);
         assert.equal(numPres, 0);
         assert.equal(numPosts, 0);
-        Band.update(
+        Band.updateOne(
           { _id: gnr._id },
           { $pull: { members: 'Adler' } },
           function(error) {
@@ -1207,12 +1207,12 @@ describe('model: update:', function() {
       const bandSchema = new Schema({
         lead: { type: String, enum: ['Axl Rose'] }
       });
-      bandSchema.pre('update', function() {
+      bandSchema.pre('updateOne', function() {
         this.options.runValidators = true;
       });
       const Band = db.model('Band', bandSchema);
 
-      Band.update({}, { $set: { lead: 'Not Axl' } }, function(err) {
+      Band.updateOne({}, { $set: { lead: 'Not Axl' } }, function(err) {
         assert.ok(err);
         done();
       });
@@ -1226,12 +1226,12 @@ describe('model: update:', function() {
             lastName: { type: String, enum: ['Rose'] }
           }
         });
-        bandSchema.pre('update', function() {
+        bandSchema.pre('updateOne', function() {
           this.options.runValidators = true;
         });
         const Band = db.model('Band', bandSchema);
 
-        Band.update({}, { $set: { singer: { firstName: 'Not', lastName: 'Axl' } } }, function(err) {
+        Band.updateOne({}, { $set: { singer: { firstName: 'Not', lastName: 'Axl' } } }, function(err) {
           assert.ok(err);
           done();
         });
@@ -1286,7 +1286,7 @@ describe('model: update:', function() {
     const D = db.model('Test', dateSchema);
 
     assert.doesNotThrow(function() {
-      D.update({}, { d: undefined }, function() {
+      D.updateOne({}, { d: undefined }, function() {
         done();
       });
     });
@@ -1296,12 +1296,12 @@ describe('model: update:', function() {
     it('works with middleware and doesn\'t change the op', function() {
       const schema = new Schema({ name: String, updatedAt: Date });
       const date = new Date();
-      schema.pre('update', function() {
+      schema.pre('updateOne', function() {
         this.set('updatedAt', date);
       });
       const M = db.model('Test', schema);
 
-      return M.update({}, { name: 'Test' }, { upsert: true }).
+      return M.updateOne({}, { name: 'Test' }, { upsert: true }).
         then(() => M.findOne()).
         then(doc => {
           assert.equal(doc.updatedAt.valueOf(), date.valueOf());
@@ -1311,12 +1311,12 @@ describe('model: update:', function() {
     it('object syntax for path parameter', function() {
       const schema = new Schema({ name: String, updatedAt: Date });
       const date = new Date();
-      schema.pre('update', function() {
+      schema.pre('updateOne', function() {
         this.set({ updatedAt: date });
       });
       const M = db.model('Test', schema);
 
-      return M.update({}, { name: 'Test' }, { upsert: true }).
+      return M.updateOne({}, { name: 'Test' }, { upsert: true }).
         then(() => M.findOne()).
         then(doc => {
           assert.equal(doc.updatedAt.valueOf(), date.valueOf());
@@ -1334,7 +1334,7 @@ describe('model: update:', function() {
 
     const Parent = db.model('Parent', parentSchema);
 
-    const update = Parent.update({}, { $push: { children: { foo: 'foo' } } }, { upsert: true });
+    const update = Parent.updateOne({}, { $push: { children: { foo: 'foo' } } }, { upsert: true });
     assert.equal(update._update.$push.children.bar, undefined);
 
     update.exec(function(error) {
@@ -1356,7 +1356,7 @@ describe('model: update:', function() {
     const Model = db.model('Test', FooSchema);
 
     const update = { $set: { values: 2, value: 2 } };
-    Model.update({ key: 1 }, update, function() {
+    Model.updateOne({ key: 1 }, update, function() {
       assert.equal(update.$set.values, 2);
       done();
     });
@@ -1370,7 +1370,7 @@ describe('model: update:', function() {
       const update = { $rename: { foo: 'bar' } };
       Model.create({ foo: Date.now() }, function(error) {
         assert.ifError(error);
-        Model.update({}, update, { multi: true }, function(error, res) {
+        Model.updateOne({}, update, { multi: true }, function(error, res) {
           assert.ifError(error);
           assert.equal(res.modifiedCount, 1);
           done();
@@ -1403,7 +1403,7 @@ describe('model: update:', function() {
       Model.create({}, function(error, m) {
         assert.ifError(error);
         Model.
-          update({ _id: m._id }, { $push: { myArr: { key: 'Value' } } }).
+          updateOne({ _id: m._id }, { $push: { myArr: { key: 'Value' } } }).
           exec(function(error, res) {
             assert.ifError(error);
             assert.equal(res.modifiedCount, 1);
@@ -1473,7 +1473,7 @@ describe('model: update:', function() {
       Parent.create({ name: 'test' }, function(error, doc) {
         assert.ifError(error);
         const update = { 'item1.item2': { item3: 'test1', item4: 'test2' } };
-        doc.update(update, function(error) {
+        doc.updateOne(update, function(error) {
           assert.ifError(error);
           Parent.findOne({ _id: doc._id }, function(error, doc) {
             assert.ifError(error);
@@ -1506,7 +1506,7 @@ describe('model: update:', function() {
       Collection.create({}, function(error, doc) {
         assert.ifError(error);
         const update = { field2: { name: 'test' } };
-        Collection.update({ _id: doc._id }, update, function(err) {
+        Collection.updateOne({ _id: doc._id }, update, function(err) {
           assert.ifError(err);
           Collection.collection.findOne({ _id: doc._id }, function(err, doc) {
             assert.ifError(err);
@@ -1523,20 +1523,20 @@ describe('model: update:', function() {
       const Schema = mongoose.Schema({ myBufferField: Buffer });
       const Model = db.model('Test', Schema);
 
-      Model.update({}, { myBufferField: Buffer.alloc(1) }, function(error) {
+      Model.updateOne({}, { myBufferField: Buffer.alloc(1) }, function(error) {
         assert.ifError(error);
         done();
       });
     });
 
-    it('.update(doc) (gh-3221)', function() {
+    it('.updateOne(doc) (gh-3221)', function() {
       const Schema = mongoose.Schema({ name: String });
       const Model = db.model('Test', Schema);
 
-      let query = Model.update({ name: 'Val' });
+      let query = Model.updateOne({ name: 'Val' });
       assert.equal(query.getUpdate().name, 'Val');
 
-      query = Model.find().update({ name: 'Val' });
+      query = Model.find().updateOne({ name: 'Val' });
       assert.equal(query.getUpdate().name, 'Val');
 
       return query.setOptions({ upsert: true }).
@@ -1549,8 +1549,8 @@ describe('model: update:', function() {
     it('middleware update with exec (gh-3549)', function(done) {
       const Schema = mongoose.Schema({ name: String });
 
-      Schema.pre('update', function(next) {
-        this.update({ name: 'Val' });
+      Schema.pre('updateOne', function(next) {
+        this.updateOne({ name: 'Val' });
         next();
       });
 
@@ -1558,7 +1558,7 @@ describe('model: update:', function() {
 
       Model.create({}, function(error, doc) {
         assert.ifError(error);
-        Model.update({ _id: doc._id }, { name: 'test' }).exec(function(error) {
+        Model.updateOne({ _id: doc._id }, { name: 'test' }).exec(function(error) {
           assert.ifError(error);
           Model.findOne({ _id: doc._id }, function(error, doc) {
             assert.ifError(error);
@@ -1590,7 +1590,7 @@ describe('model: update:', function() {
         const update = { $push: { followers: 200 } };
         const opts = { overwrite: true, new: true, upsert: false, multi: false };
 
-        M.update({ topicId: doc.topicId }, update, opts, function(err) {
+        M.updateOne({ topicId: doc.topicId }, update, opts, function(err) {
           assert.ifError(err);
           M.findOne({ topicId: doc.topicId }, function(error, doc) {
             assert.ifError(error);
@@ -1621,7 +1621,7 @@ describe('model: update:', function() {
         }
       };
 
-      ModelA.update({}, update, function(error) {
+      ModelA.updateOne({}, update, function(error) {
         assert.ifError(error);
         done();
       });
@@ -1644,7 +1644,7 @@ describe('model: update:', function() {
         const ok = function() {
           done();
         };
-        Model.update(query, update).then(ok, done);
+        Model.updateOne(query, update).then(ok, done);
       });
     });
 
@@ -1661,7 +1661,7 @@ describe('model: update:', function() {
         new: true,
         runValidators: true
       };
-      Model.update({}, update, options, function(error) {
+      Model.updateOne({}, update, options, function(error) {
         assert.ifError(error);
         done();
       });
@@ -1681,7 +1681,7 @@ describe('model: update:', function() {
       let start = Date.now();
       await delay(10);
 
-      await Tag.update({}, { $set: { tags: ['test1'] } });
+      await Tag.updateOne({}, { $set: { tags: ['test1'] } });
 
       let tag = await Tag.findOne();
       assert.ok(tag.updatedAt.valueOf() > start);
@@ -1725,7 +1725,7 @@ describe('model: update:', function() {
       Test.create({ name: 'test' }, function(error) {
         assert.ifError(error);
         const u = { $currentDate: { updatedAt: true }, name: 'test2' };
-        Test.update({}, u, function(error) {
+        Test.updateOne({}, u, function(error) {
           assert.ifError(error);
           done();
         });
@@ -1761,7 +1761,7 @@ describe('model: update:', function() {
         runValidators: true
       };
 
-      Company.update({}, update, opts, function(error) {
+      Company.updateOne({}, update, opts, function(error) {
         assert.ok(error);
         assert.equal(error.errors['area'].message, 'Not valid Area');
         done();
@@ -1862,7 +1862,7 @@ describe('model: update:', function() {
       const Model = db.model('Test', schema);
       const query = { 'thing.thing2': 'test' };
       const update = { $set: { 'thing.$.test': 'test' } };
-      Model.update(query, update, function(error) {
+      Model.updateOne(query, update, function(error) {
         assert.ifError(error);
         done();
       });
@@ -1882,7 +1882,7 @@ describe('model: update:', function() {
 
       newRecord.save(function(err) {
         assert.ifError(err);
-        sampleModel.update({ 'sampleArray.values': 'record1' }, {
+        sampleModel.updateOne({ 'sampleArray.values': 'record1' }, {
           $push: { 'sampleArray.$.values': 'another record' }
         },
         { runValidators: true },
@@ -1959,7 +1959,7 @@ describe('model: update:', function() {
       const m = new M({ arr: [{ ip: Buffer.alloc(1) }] });
       m.save(function(error, m) {
         assert.ifError(error);
-        m.update({ $push: { arr: { ip: Buffer.alloc(1) } } }).exec(function(error) {
+        m.updateOne({ $push: { arr: { ip: Buffer.alloc(1) } } }).exec(function(error) {
           assert.ifError(error);
           done();
         });
@@ -1982,7 +1982,7 @@ describe('model: update:', function() {
         assert.ifError(error);
         const update = { file: { name: 'new-name' } };
         const options = { runValidators: true };
-        Company.update({}, update, options, function(error) {
+        Company.updateOne({}, update, options, function(error) {
           assert.ifError(error);
           done();
         });
@@ -2004,7 +2004,7 @@ describe('model: update:', function() {
 
       User.create({}).
         then(function(user) {
-          return User.update({
+          return User.updateOne({
             _id: user._id
           }, {
             sell: [{
@@ -2061,7 +2061,7 @@ describe('model: update:', function() {
       const containerSchema = new Schema({ address: addressSchema });
       const Container = db.model('Test', containerSchema);
 
-      Container.update({}, { address: { geo: [-120.24, 39.21] } }).
+      Container.updateOne({}, { address: { geo: [-120.24, 39.21] } }).
         exec(function(error) {
           assert.ifError(error);
           done();
@@ -2115,7 +2115,7 @@ describe('model: update:', function() {
 
       User.create({ profiles: [] }, function(error, user) {
         assert.ifError(error);
-        User.update({ _id: user._id }, { $set: { 'profiles.0.rules': {} } }).
+        User.updateOne({ _id: user._id }, { $set: { 'profiles.0.rules': {} } }).
           exec(function(error) {
             assert.ifError(error);
             User.findOne({ _id: user._id }).lean().exec(function(error, doc) {
@@ -2137,7 +2137,7 @@ describe('model: update:', function() {
       const filter = { name: 'Bar' };
       const update = { name: 'Bar', meta: { age: 33 } };
       const options = { overwrite: true, upsert: true };
-      const q2 = User.update(filter, update, options);
+      const q2 = User.updateOne(filter, update, options);
       assert.deepEqual(q2.getUpdate(), {
         __v: 0,
         meta: { age: 33 },
@@ -2184,7 +2184,7 @@ describe('model: update:', function() {
         { new: true, upsert: true },
         function(error) {
           assert.ifError(error);
-          User.update({ username: 'test' }, { createdAt: new Date() }).
+          User.updateOne({ username: 'test' }, { createdAt: new Date() }).
             exec(function(error) {
               assert.ifError(error);
               done();
@@ -2254,7 +2254,7 @@ describe('model: update:', function() {
             runValidators: false,
             strict: false
           };
-          return Test.update({}, data, opts);
+          return Test.updateOne({}, data, opts);
         }).
         then(function() {
           return Test.findOne();
@@ -2278,7 +2278,7 @@ describe('model: update:', function() {
 
       return doc.save().
         then(function(doc) {
-          return Test.update({ _id: doc._id }, {
+          return Test.updateOne({ _id: doc._id }, {
             $pullAll: { arr: [null] }
           });
         }).
@@ -2300,7 +2300,7 @@ describe('model: update:', function() {
 
       Model.create({ colors: ['green'] }).
         then(function() {
-          return Model.update({}, { $set: { colors: 'red' } });
+          return Model.updateOne({}, { $set: { colors: 'red' } });
         }).
         then(function() {
           return Model.collection.findOne();
@@ -2391,7 +2391,7 @@ describe('model: update:', function() {
 
       const Parent = db.model('Parent', parentSchema);
 
-      Parent.update({}, { d: { d2: 'test' } }, { runValidators: true }, function(error) {
+      Parent.updateOne({}, { d: { d2: 'test' } }, { runValidators: true }, function(error) {
         assert.ok(error);
         assert.ok(error.errors['d.d1']);
         assert.ok(error.errors['d.d1'].message.indexOf('Path `d1` is required') !== -1,
@@ -2413,7 +2413,7 @@ describe('model: update:', function() {
 
       const User = db.model('User', userSchema);
 
-      User.update({}, {
+      User.updateOne({}, {
         $push: {
           notifications: {
             $each: [new Notification({ message: 'test' })]
@@ -2450,12 +2450,12 @@ describe('model: update:', function() {
       User.create({ notifications: [{ message: 'test' }] }, function(error, doc) {
         assert.ifError(error);
 
-        User.update({}, update, opts).exec(function(error) {
+        User.updateOne({}, update, opts).exec(function(error) {
           assert.ok(error);
           assert.ok(error.errors['notifications.message']);
 
           update.$pull.notifications.message = 'test';
-          User.update({ _id: doc._id }, update, opts).exec(function(error) {
+          User.updateOne({ _id: doc._id }, update, opts).exec(function(error) {
             assert.ifError(error);
             User.findById(doc._id, function(error, doc) {
               assert.ifError(error);
@@ -2480,7 +2480,7 @@ describe('model: update:', function() {
 
       ExampleModel.create(exampleDocument, function(error, doc) {
         assert.ifError(error);
-        ExampleModel.update({ _id: doc._id }, {
+        ExampleModel.updateOne({ _id: doc._id }, {
           $pull: {
             subdocuments: {
               _id: { $in: [doc.subdocuments[0]._id] }
@@ -2557,7 +2557,7 @@ describe('model: update:', function() {
           { program: 'B', money: mongoose.Types.Decimal128.fromString('7.8') }
         ]
       };
-      await Person.update({ name: 'Jack' }, newData);
+      await Person.updateOne({ name: 'Jack' }, newData);
     });
 
     it('strict false in query (gh-5453)', function(done) {
@@ -2569,7 +2569,7 @@ describe('model: update:', function() {
       const q = { notInSchema: true };
       const u = { $set: { smth: 1 } };
       const o = { strict: false, upsert: true };
-      Model.update(q, u, o).then(function() {
+      Model.updateOne(q, u, o).then(function() {
         done();
       }).catch(done);
     });
@@ -2617,7 +2617,7 @@ describe('model: update:', function() {
       const Model = db.model('Test', schema);
 
       const opts = { upsert: 1 };
-      Model.update({ name: 'Test' }, { name: 'Test2' }, opts, function(error) {
+      Model.updateOne({ name: 'Test' }, { name: 'Test2' }, opts, function(error) {
         assert.ifError(error);
         Model.findOne({}, function(error, doc) {
           assert.ifError(error);
@@ -2692,7 +2692,7 @@ describe('model: update:', function() {
         ]
       });
 
-      await Site.update({ 'sections.type': 'header' }, {
+      await Site.updateOne({ 'sections.type': 'header' }, {
         $set: { 'sections.$.title': 'Test' }
       });
 
@@ -2724,7 +2724,7 @@ describe('model: update:', function() {
       Test.create(doc, function(error, doc) {
         assert.ifError(error);
         doc.foo = 'baz';
-        Test.update({ _id: doc._id }, doc, { upsert: true }, function(error) {
+        Test.updateOne({ _id: doc._id }, doc, { upsert: true }, function(error) {
           assert.ifError(error);
           Test.findOne({ _id: doc._id }, function(error, doc) {
             assert.ifError(error);
@@ -2743,7 +2743,7 @@ describe('model: update:', function() {
 
       let threw = false;
       try {
-        await Test.update({}, { $inc: { num: 'not a number' } });
+        await Test.updateOne({}, { $inc: { num: 'not a number' } });
       } catch (error) {
         threw = true;
         assert.ok(error instanceof CastError);
@@ -2753,7 +2753,7 @@ describe('model: update:', function() {
 
       threw = false;
       try {
-        await Test.update({}, { $inc: { num: null } });
+        await Test.updateOne({}, { $inc: { num: null } });
       } catch (error) {
         threw = true;
         assert.ok(error instanceof CastError);
@@ -2775,7 +2775,7 @@ describe('model: update:', function() {
       const Test = db.model('Test', schema);
 
       // Shouldn't throw an error because `capitalGainsTax` is a virtual
-      return Test.update({}, { total: 10000, capitalGainsTax: 1500 });
+      return Test.updateOne({}, { total: 10000, capitalGainsTax: 1500 });
     });
 
     it('cast error in update conditions (gh-5477)', async function() {
@@ -2788,7 +2788,7 @@ describe('model: update:', function() {
       const u = { $set: { name: 'Test' } };
       const o = { upsert: true };
 
-      let error = await Model.update(q, u, o).then(() => null, err => err);
+      let error = await Model.updateOne(q, u, o).then(() => null, err => err);
       assert.ok(error);
       assert.ok(error.message.indexOf('notAField') !== -1, error.message);
       assert.ok(error.message.indexOf('upsert') !== -1, error.message);
@@ -2823,7 +2823,7 @@ describe('model: update:', function() {
         runValidators: true
       };
 
-      Group.update({}, update, opts, function(error) {
+      Group.updateOne({}, update, opts, function(error) {
         assert.ok(error);
         assert.ok(error.errors['users.0.permission.read'], Object.keys(error.errors));
         done();
@@ -2852,7 +2852,7 @@ describe('model: update:', function() {
 
       Test.create(test).
         then(function() {
-          return Test.update(cond, set);
+          return Test.updateOne(cond, set);
         }).
         then(function() {
           return Test.collection.findOne({});

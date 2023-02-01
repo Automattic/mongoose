@@ -14,41 +14,24 @@ describe('collections:', function() {
     await Promise.all(connectionsToClose.map((v) => v.close()));
   });
 
-  it('should buffer commands until connection is established', function(done) {
+  it('should buffer commands until connection is established', async function() {
     const db = mongoose.createConnection();
     connectionsToClose.push(db);
     const collection = db.collection('test-buffering-collection');
-    let connected = false;
-    let insertedId = undefined;
-    let pending = 2;
 
-    function finish() {
-      if (--pending) {
-        return;
-      }
-      assert.ok(connected);
-      assert.ok(insertedId !== undefined);
-      collection.findOne({ _id: insertedId }).then(doc => {
-        assert.strictEqual(doc.foo, 'bar');
-        db.close();
-        done();
-      });
-    }
-
-    collection.insertOne({ foo: 'bar' }, {}, function(err, result) {
-      assert.ok(connected);
-      insertedId = result.insertedId;
-      finish();
-    });
+    const op = collection.insertOne({ foo: 'bar' }, {});
 
     const uri = start.uri;
-    db.openUri(process.env.MONGOOSE_TEST_URI || uri, function(err) {
-      connected = !err;
-      finish();
-    });
+    await db.openUri(process.env.MONGOOSE_TEST_URI || uri);
+
+    const res = await op;
+    assert.ok(res.insertedId);
+    const doc = await collection.findOne({ _id: res.insertedId });
+    assert.strictEqual(doc.foo, 'bar');
+    await db.close();
   });
 
-  it('returns a promise if buffering and no callback (gh-7676)', function(done) {
+  it('returns a promise if buffering and no callback (gh-7676)', async function() {
     const db = mongoose.createConnection();
     connectionsToClose.push(db);
     const collection = db.collection('gh7676');
@@ -60,10 +43,9 @@ describe('collections:', function() {
         assert.strictEqual(doc.foo, 'bar');
       });
 
-    db.openUri(start.uri, function(err) {
-      assert.ifError(err);
-      promise.then(() => done(), done);
-    });
+    await db.openUri(start.uri);
+
+    await promise;
   });
 
   it('methods should that throw (unimplemented)', function() {
@@ -151,18 +133,17 @@ describe('collections:', function() {
     thrown = false;
   });
 
-  it('buffers for sync methods (gh-10610)', function(done) {
+  it('buffers for sync methods (gh-10610)', async function() {
     const db = mongoose.createConnection();
     connectionsToClose.push(db);
     const collection = db.collection('gh10610');
 
-    collection.find({}, {}, function(err, res) {
-      assert.ifError(err);
-      assert.equal(typeof res.toArray, 'function');
-      done();
-    });
+    const promise = collection.find({}, {});
 
     const uri = start.uri;
-    db.openUri(process.env.MONGOOSE_TEST_URI || uri);
+    await db.openUri(process.env.MONGOOSE_TEST_URI || uri);
+
+    const res = await promise;
+    assert.equal(typeof res.toArray, 'function');
   });
 });

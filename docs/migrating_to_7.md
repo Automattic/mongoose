@@ -13,6 +13,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 
 * [`strictQuery`](#strictquery)
 * [Removed `remove()`](#removed-remove)
+* [Dropped callback support](#dropped-callback-support)
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
 
 <h3 id="strictquery"><a href="#strictquery"><code>strictQuery</code></a></h3>
@@ -66,6 +67,34 @@ schema.pre('remove', function() {
 schema.pre('deleteOne', { document: true, query: false }, function() {
   /* ... */
 });
+```
+
+<h3 id="dropped-callback-support"><a href="#dropped-callback-support">Dropped callback support</a></h3>
+
+The following functions no longer accept callbacks.
+They always return promises.
+
+- `Connection.prototype.startSession`
+- `Connection.prototype.dropCollection`
+- `Connection.prototype.createCollection`
+- `Connection.prototype.dropDatabase`
+- `Connection.prototype.openUri`
+- `Connection.prototype.close`
+- `Mongoose.prototype.connect`
+- `Mongoose.prototype.createConnection`
+
+If you are using the above functions with callbacks, we recommend switching to async/await, or promises if async functions don't work for you.
+
+```javascript
+// Before
+conn.startSession(function(err, session) {
+  // ...
+});
+
+// After
+const session = await conn.startSession();
+// Or:
+conn.startSession().then(sesson => { /* ... */ });
 ```
 
 <h3 id="objectids-no-longer-deepstrictequal"><a href="#objectids-no-longer-deepstrictequal">ObjectIds no longer deepStrictEqual</a></h3>

@@ -113,15 +113,9 @@ describe('connections:', function() {
       await conn.close();
     });
 
-    it('throws helpful error with legacy syntax (gh-6756)', function() {
-      assert.throws(function() {
-        mongoose.createConnection('127.0.0.1', 'dbname', 27017);
-      }, /mongoosejs\.com.*connections\.html/);
-    });
-
-    it('throws helpful error with undefined uri (gh-6763)', function() {
-      assert.throws(function() {
-        mongoose.createConnection(void 0);
+    it('throws helpful error with undefined uri (gh-6763)', async function() {
+      await assert.rejects(async function() {
+        await mongoose.createConnection(void 0).asPromise();
       }, /string.*createConnection/);
     });
 
@@ -252,15 +246,10 @@ describe('connections:', function() {
     });
   });
 
-  describe('connect callbacks', function() {
-    it('should return an error if malformed uri passed', function(done) {
-      const db = mongoose.createConnection('mongodb:///fake', {}, function(err) {
-        assert.equal(err.name, 'MongoParseError');
-        done();
-      });
-      db.close();
-      assert.ok(!db.options);
-    });
+  it('should return an error if malformed uri passed', async function() {
+    const err = await mongoose.createConnection('mongodb:///fake').asPromise().then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'MongoParseError');
   });
 
   describe('.model()', function() {
@@ -401,19 +390,16 @@ describe('connections:', function() {
     });
   });
 
-  it('verify that attempt to re-open destroyed connection throws error, via callback', (done) => {
+  it('verify that attempt to re-open destroyed connection throws error, via callback', async function() {
     const opts = {};
     const conn = mongoose.createConnection(start.uri, opts);
 
     conn.useDb('test-db');
-
-    conn.destroy(() => {
-      conn.openUri(start.uri, function(error, result) {
-        assert.equal(result, undefined);
-        assert.equal(error, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
-        done();
-      });
-    });
+    await conn.destroy();
+    await assert.rejects(
+      () => conn.openUri(start.uri),
+      /Connection has been closed and destroyed/
+    );
   });
 
   it('force close with connection created after close (gh-5664)', function(done) {
@@ -888,15 +874,17 @@ describe('connections:', function() {
     await conn.close();
   });
 
-  it('throws a MongooseServerSelectionError on server selection timeout (gh-8451)', function() {
+  it('throws a MongooseServerSelectionError on server selection timeout (gh-8451)', async function() {
     const opts = {
       serverSelectionTimeoutMS: 100
     };
     const uri = 'mongodb://baddomain:27017/test';
 
-    return mongoose.createConnection(uri, opts).asPromise().then(() => assert.ok(false), err => {
-      assert.equal(err.name, 'MongooseServerSelectionError');
-    });
+    const err = await mongoose.createConnection(uri, opts).
+      asPromise().
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'MongooseServerSelectionError');
   });
 
   it('`watch()` on a whole collection (gh-8425)', async function() {
@@ -1103,13 +1091,13 @@ describe('connections:', function() {
                         'autoCreate, autoIndex'
         );
         const m = new mongoose.Mongoose();
-        return assert.throws(
-          () => m.createConnection(start.uri, opts),
+        return assert.rejects(
+          () => m.createConnection(start.uri, opts).asPromise(),
           err
         );
       });
 
-      it('throws if options.config.autoIndex is true, even if options.autoIndex is false', function() {
+      it('throws if options.config.autoIndex is true, even if options.autoIndex is false', async function() {
         const opts = {
           readPreference: 'secondary',
           autoIndex: false,
@@ -1124,8 +1112,8 @@ describe('connections:', function() {
                         'autoCreate, autoIndex'
         );
 
-        assert.throws(
-          () => mongoose.createConnection(start.uri, opts),
+        await assert.rejects(
+          () => mongoose.createConnection(start.uri, opts).asPromise(),
           err
         );
       });

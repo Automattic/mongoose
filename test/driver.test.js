@@ -27,9 +27,9 @@ describe('driver', function() {
         return new Collection();
       }
 
-      openUri(uri, opts, callback) {
+      async openUri() {
         this.readyState = mongoose.ConnectionStates.connected;
-        callback();
+        return this;
       }
     }
     const driver = {
@@ -63,9 +63,9 @@ describe('driver', function() {
         return new Collection();
       }
 
-      openUri(uri, opts, callback) {
+      async openUri() {
         this.readyState = mongoose.ConnectionStates.connected;
-        callback();
+        return this;
       }
     }
     class Collection {

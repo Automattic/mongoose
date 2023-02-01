@@ -5266,7 +5266,7 @@ describe('document', function() {
 
       let called = 0;
 
-      contentSchema.post('deleteOne', function() {
+      contentSchema.post('deleteOne', { document: true, query: false }, function() {
         ++called;
       });
 

@@ -6060,7 +6060,6 @@ describe('Model', function() {
       const res = await Model.findById(doc._id).lean();
 
       assert.equal(schema.virtual('nameAlias').getters[0].call(res), 'Val');
-
     });
 
     it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
@@ -6141,6 +6140,7 @@ describe('Model', function() {
         counter();
       });
     });
+
     describe('Model.syncIndexes()', () => {
       it('adds indexes to the collection', async() => {
         // Arrange

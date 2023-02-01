@@ -401,22 +401,22 @@ describe('Model', function() {
         done();
       });
 
-      it('isNew on embedded documents after saving', function(done) {
+      it('isNew on embedded documents after saving', async function() {
         const post = new BlogPost({ title: 'hocus pocus' });
         post.comments.push({ title: 'Humpty Dumpty', comments: [{ title: 'nested' }] });
         assert.equal(post.get('comments')[0].isNew, true);
         assert.equal(post.get('comments')[0].comments[0].isNew, true);
         post.invalidate('title'); // force error
-        post.save(function() {
+
+        await post.save(async function() {
           assert.equal(post.isNew, true);
           assert.equal(post.get('comments')[0].isNew, true);
           assert.equal(post.get('comments')[0].comments[0].isNew, true);
-          post.save(function(err) {
+          await post.save(function(err) {
             assert.strictEqual(null, err);
             assert.equal(post.isNew, false);
             assert.equal(post.get('comments')[0].isNew, false);
             assert.equal(post.get('comments')[0].comments[0].isNew, false);
-            done();
           });
         });
       });
@@ -434,22 +434,17 @@ describe('Model', function() {
     done();
   });
 
-  it('saving a model with a null value should perpetuate that null value to the db', function(done) {
+  it('saving a model with a null value should perpetuate that null value to the db', async function() {
     const post = new BlogPost({
       title: null
     });
     assert.strictEqual(null, post.title);
-    post.save(function(err) {
-      assert.strictEqual(err, null);
-      BlogPost.findById(post.id, function(err, found) {
-        assert.strictEqual(err, null);
-        assert.strictEqual(found.title, null);
-        done();
-      });
-    });
+    await post.save();
+    const check = await BlogPost.findById(post.id);
+    assert.strictEqual(check.title, null);
   });
 
-  it('saves subdocuments middleware correctly', function(done) {
+  it('saves subdocuments middleware correctly', async function() {
     let child_hook;
     let parent_hook;
     const childSchema = new Schema({
@@ -480,35 +475,25 @@ describe('Model', function() {
       }]
     });
 
-    parent.save(function(err, parent) {
-      assert.equal(parent_hook, 'Bob');
-      assert.equal(child_hook, 'Mary');
-      assert.ifError(err);
-      parent.children[0].name = 'Jane';
-      parent.save(function(err) {
-        assert.equal(child_hook, 'Jane');
-        assert.ifError(err);
-        done();
-      });
-    });
+    const doc = await parent.save();
+    assert.equal(parent_hook, 'Bob');
+    assert.equal(child_hook, 'Mary');
+    doc.children[0].name = 'Jane';
+    await doc.save();
+    assert.equal(child_hook, 'Jane');
   });
 
-  it('instantiating a model with a hash that maps to at least 1 undefined value', function(done) {
+  it('instantiating a model with a hash that maps to at least 1 undefined value', async function() {
     const post = new BlogPost({
       title: undefined
     });
     assert.strictEqual(undefined, post.title);
-    post.save(function(err) {
-      assert.strictEqual(null, err);
-      BlogPost.findById(post.id, function(err, found) {
-        assert.strictEqual(err, null);
-        assert.strictEqual(found.title, undefined);
-        done();
-      });
-    });
+    await post.save();
+    const check = await BlogPost.findById(post.id);
+    assert.strictEqual(check.title, undefined);
   });
 
-  it('modified nested objects which contain MongoseNumbers should not cause a RangeError on save (gh-714)', function(done) {
+  it('modified nested objects which contain MongoseNumbers should not cause a RangeError on save (gh-714)', async function() {
     const schema = new Schema({
       nested: {
         num: Number
@@ -518,21 +503,14 @@ describe('Model', function() {
     const M = db.model('Test', schema);
     const m = new M();
     m.nested = null;
-    m.save(function(err) {
-      assert.ifError(err);
-
-      M.findById(m, function(err, m) {
-        assert.ifError(err);
-        m.nested.num = 5;
-        m.save(function(err) {
-          assert.ifError(err);
-          done();
-        });
-      });
-    });
+    await m.save();
+    const check = await M.findById(m);
+    check.nested.num = 5;
+    const res = await check.save();
+    assert.ok(res);
   });
 
-  it('no RangeError on remove() of a doc with Number _id (gh-714)', function(done) {
+  it('no RangeError on remove() of a doc with Number _id (gh-714)', async function() {
     const MySchema = new Schema({
       _id: { type: Number },
       name: String
@@ -544,40 +522,26 @@ describe('Model', function() {
       name: 'test',
       _id: 35
     });
-    instance.save(function(err) {
-      assert.ifError(err);
 
-      MyModel.findById(35, function(err, doc) {
-        assert.ifError(err);
-
-        doc.remove({}, function(err) {
-          assert.ifError(err);
-          done();
-        });
-      });
-    });
+    await instance.save();
+    const doc = await MyModel.findById(35);
+    assert.ok(doc);
+    await doc.remove({});
+    assert.ok(doc);
   });
 
-  it('over-writing a number should persist to the db (gh-342)', function(done) {
+  it('over-writing a number should persist to the db (gh-342)', async function() {
     const post = new BlogPost({
       meta: {
         date: new Date(),
         visitors: 10
       }
     });
-
-    post.save(function(err) {
-      assert.ifError(err);
-      post.set('meta.visitors', 20);
-      post.save(function(err) {
-        assert.ifError(err);
-        BlogPost.findById(post.id, function(err, found) {
-          assert.ifError(err);
-          assert.equal(found.get('meta.visitors').valueOf(), 20);
-          done();
-        });
-      });
-    });
+    const doc = await post.save();
+    doc.set('meta.visitors', 20);
+    await doc.save();
+    const check = await BlogPost.findById(doc.id);
+    assert.equal(check.get('meta.visitors').valueOf(), 20);
   });
 
   describe('methods', function() {
@@ -631,7 +595,7 @@ describe('Model', function() {
   });
 
   describe('casting as validation errors', function() {
-    it('error', function(done) {
+    it('error', async function() {
       let threw = false;
 
       let post;
@@ -651,19 +615,15 @@ describe('Model', function() {
 
       assert.equal(threw, false);
 
-      post.save(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-        assert.equal(Object.keys(err.errors).length, 2);
-        post.date = new Date();
-        post.meta.date = new Date();
-        post.save(function(err) {
-          assert.ifError(err);
-          done();
-        });
-      });
+      const err = await post.save().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
+      assert.equal(Object.keys(err.errors).length, 2);
+      post.date = new Date();
+      post.meta.date = new Date();
+      await post.save();
     });
-    it('nested error', function(done) {
+    it('nested error', async function() {
       let threw = false;
 
       const post = new BlogPost();
@@ -688,15 +648,13 @@ describe('Model', function() {
 
       assert.equal(threw, false);
 
-      post.save(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-        done();
-      });
+      const err = await post.save().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
     });
 
 
-    it('subdocument cast error', function(done) {
+    it('subdocument cast error', async function() {
       const post = new BlogPost({
         title: 'Test',
         slug: 'test',
@@ -704,16 +662,13 @@ describe('Model', function() {
       });
 
       post.get('comments')[0].set('date', 'invalid');
-
-      post.save(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-        done();
-      });
+      const err = await post.save().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
     });
 
 
-    it('subdocument validation error', function(done) {
+    it('subdocument validation error', async function() {
       function failingvalidator() {
         return false;
       }
@@ -731,14 +686,12 @@ describe('Model', function() {
         subs: [{ str: 'gaga' }]
       });
 
-      post.save(function(err) {
-        assert.ok(err instanceof ValidationError);
-        done();
-      });
+      const err = await post.save().then(() => null, err => err);
+      assert.ok(err instanceof ValidationError);
     });
 
 
-    it('subdocument error when adding a subdoc', function(done) {
+    it('subdocument error when adding a subdoc', async function() {
       let threw = false;
 
       const post = new BlogPost();
@@ -753,33 +706,22 @@ describe('Model', function() {
 
       assert.equal(threw, false);
 
-      post.save(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-        done();
-      });
+      const err = await post.save().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
     });
 
 
-    it('updates', function(done) {
+    it('updates', async function() {
       const post = new BlogPost();
       post.set('title', '1');
 
       const id = post.get('_id');
 
-      post.save(function(err) {
-        assert.ifError(err);
-
-        BlogPost.updateOne({ title: 1, _id: id }, { title: 2 }, function(err) {
-          assert.ifError(err);
-
-          BlogPost.findOne({ _id: post.get('_id') }, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(doc.get('title'), '2');
-            done();
-          });
-        });
-      });
+      const doc = await post.save();
+      await BlogPost.updateOne({ title: 1, _id: id }, { title: 2 });
+      const check = await BlogPost.findOne({ _id: doc.get('_id') });
+      assert.equal(check.get('title'), '2');
     });
 
     it('$pull', function(done) {
@@ -790,42 +732,28 @@ describe('Model', function() {
       done();
     });
 
-    it('$push', function(done) {
+    it('$push', async function() {
       const post = new BlogPost();
 
       post.get('numbers').push(1, 2, 3, 4);
-      post.save(function() {
-        BlogPost.findById(post.get('_id'), function(err, found) {
-          assert.equal(found.get('numbers').length, 4);
-          found.get('numbers').pull('3');
-          found.save(function() {
-            BlogPost.findById(found.get('_id'), function(err, found2) {
-              assert.ifError(err);
-              assert.equal(found2.get('numbers').length, 3);
-              done();
-            });
-          });
-        });
-      });
+      const doc = await post.save();
+      let check = await BlogPost.findById(doc.get('_id'));
+      assert.equal(check.get('numbers').length, 4);
+      check.get('numbers').pull('3');
+      await check.save();
+      check = await BlogPost.findById(check.get('_id'));
+      assert.equal(check.get('numbers').length, 3);
     });
 
-    it('Number arrays', function(done) {
+    it('Number arrays', async function() {
       const post = new BlogPost();
       post.numbers.push(1, '2', 3);
 
-      post.save(function(err) {
-        assert.strictEqual(err, null);
-
-        BlogPost.findById(post._id, function(err, doc) {
-          assert.ifError(err);
-
-          assert.ok(~doc.numbers.indexOf(1));
-          assert.ok(~doc.numbers.indexOf(2));
-          assert.ok(~doc.numbers.indexOf(3));
-
-          done();
-        });
-      });
+      const doc = await post.save();
+      const check = await BlogPost.findById(doc._id);
+      assert.ok(~check.numbers.indexOf(1));
+      assert.ok(~check.numbers.indexOf(2));
+      assert.ok(~check.numbers.indexOf(3));
     });
 
     it('date casting compat with datejs (gh-502)', function(done) {

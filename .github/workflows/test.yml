@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Setup node
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
         with:
           node-version: 14
 
@@ -62,7 +62,7 @@ jobs:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Setup node
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
         with:
           node-version: ${{ matrix.node }}
 
@@ -103,7 +103,7 @@ jobs:
           mongod --version
           echo `pwd`/mongodb-linux-x86_64-ubuntu2004-6.0.0/bin >> $GITHUB_PATH
       - name: Setup node
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
         with:
           node-version: 16
       - name: Setup Deno
@@ -123,7 +123,7 @@ jobs:
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
       - name: Setup node
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
         with:
           node-version: 16
       - run: npm install

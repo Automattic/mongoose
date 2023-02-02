@@ -1514,4 +1514,16 @@ describe('connections:', function() {
 
     await m.disconnect();
   });
+
+  it('should create connections with unique IDs also if one has been destroyed (gh-12966)', function() {
+    const m = new mongoose.Mongoose();
+    m.createConnection();
+    m.createConnection();
+    m.connections[0].destroy();
+    m.createConnection();
+    m.createConnection();
+    m.createConnection();
+    const connectionIds = m.connections.map(c => c.id);
+    assert.deepEqual(connectionIds, [1, 2, 3, 4, 5]);
+  });
 });

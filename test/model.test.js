@@ -9,6 +9,7 @@ const start = require('./common');
 const assert = require('assert');
 const random = require('./util').random;
 const util = require('./util');
+const { Test } = require('mocha');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -756,7 +757,7 @@ describe('Model', function() {
       assert.ok(~check.numbers.indexOf(3));
     });
 
-    it('date casting compat with datejs (gh-502)', function(done) {
+    it('date casting compat with datejs (gh-502)', async function() {
       Date.prototype.toObject = function() {
         return {
           millisecond: 86,
@@ -787,25 +788,18 @@ describe('Model', function() {
       const M = db.model('Test', S);
 
       const m = new M();
-      m.save(function(err) {
-        assert.ifError(err);
-        M.findById(m._id, function(err, m) {
-          assert.ifError(err);
-          m.save(function(err) {
-            assert.ifError(err);
-            M.deleteOne({}, function(err) {
-              delete Date.prototype.toObject;
-              assert.ifError(err);
-              done();
-            });
-          });
-        });
-      });
+      const doc = await m.save();
+      assert.ok(doc);
+      const check = await M.findById(m._id);
+      await check.save();
+      assert.ok(check);
+      await M.deleteOne();
+      delete Date.prototype.toObject;
     });
   });
 
   describe('validation', function() {
-    it('works', function(done) {
+    it('works', async function() {
       function dovalidate() {
         assert.equal(this.asyncScope, 'correct');
         return true;
@@ -827,19 +821,15 @@ describe('Model', function() {
       post.set('scope', 'correct');
       post.set('asyncScope', 'correct');
 
-      post.save(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-
-        post.set('simple', 'here');
-        post.save(function(err) {
-          assert.ifError(err);
-          done();
-        });
-      });
+      const err = await post.save().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
+      post.set('simple', 'here');
+      const doc = await post.save();
+      assert.ok(doc);
     });
 
-    it('custom messaging', function(done) {
+    it('custom messaging', async function() {
       function validate(val) {
         return val === 'abc';
       }
@@ -851,22 +841,18 @@ describe('Model', function() {
       const post = new TestValidationMessage();
       post.set('simple', '');
 
-      post.save(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-        assert.ok(err.errors.simple instanceof ValidatorError);
-        assert.equal(err.errors.simple.message, 'must be abc');
-        assert.equal(post.errors.simple.message, 'must be abc');
-
-        post.set('simple', 'abc');
-        post.save(function(err) {
-          assert.ifError(err);
-          done();
-        });
-      });
+      const err = await post.save().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.simple instanceof ValidatorError);
+      assert.equal(err.errors.simple.message, 'must be abc');
+      assert.equal(post.errors.simple.message, 'must be abc');
+      post.set('simple', 'abc');
+      const doc = await post.save();
+      assert.ok(doc);
     });
 
-    it('with Model.schema.path introspection (gh-272)', function(done) {
+    it('with Model.schema.path introspection (gh-272)', async function() {
       const IntrospectionValidationSchema = new Schema({
         name: String
       });
@@ -875,34 +861,27 @@ describe('Model', function() {
         return value.length < 2;
       }, 'Name cannot be greater than 1 character for path "{PATH}" with value `{VALUE}`');
       const doc = new IntrospectionValidation({ name: 'hi' });
-      doc.save(function(err) {
-        assert.equal(err.errors.name.message, 'Name cannot be greater than 1 character for path "name" with value `hi`');
-        assert.equal(err.name, 'ValidationError');
-        assert.ok(err.message.indexOf('Test validation failed') !== -1, err.message);
-        done();
-      });
+      const err = await doc.save().then(() => null, err => err);
+      assert.equal(err.errors.name.message, 'Name cannot be greater than 1 character for path "name" with value `hi`');
+      assert.equal(err.name, 'ValidationError');
+      assert.ok(err.message.indexOf('Test validation failed') !== -1, err.message);
     });
 
-    it('of required undefined values', function(done) {
+    it('of required undefined values', async function() {
       const TestUndefinedValidation = db.model('Test', new Schema({
         simple: { type: String, required: true }
       }));
 
       const post = new TestUndefinedValidation();
-
-      post.save(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-
-        post.set('simple', 'here');
-        post.save(function(err) {
-          assert.ifError(err);
-          done();
-        });
-      });
+      const err = await post.save().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
+      post.set('simple', 'here');
+      const doc = await post.save();
+      assert.ok(doc);
     });
 
-    it('save callback should only execute once (gh-319)', function(done) {
+    it('save callback should only execute once (gh-319)', async function() {
       const D = db.model('Test', new Schema({
         username: { type: String, validate: /^[a-z]{6}$/i },
         email: { type: String, validate: /^[a-z]{6}$/i },
@@ -916,87 +895,67 @@ describe('Model', function() {
       });
 
       let timesCalled = 0;
+      const err = await post.save().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
 
-      post.save(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
+      assert.equal(++timesCalled, 1);
 
-        assert.equal(++timesCalled, 1);
+      assert.equal(Object.keys(err.errors).length, 3);
+      assert.ok(err.errors.password instanceof ValidatorError);
+      assert.ok(err.errors.email instanceof ValidatorError);
+      assert.ok(err.errors.username instanceof ValidatorError);
+      assert.equal(err.errors.password.message, 'Validator failed for path `password` with value `short`');
+      assert.equal(err.errors.email.message, 'Validator failed for path `email` with value `too`');
+      assert.equal(err.errors.username.message, 'Validator failed for path `username` with value `nope`');
 
-        assert.equal(Object.keys(err.errors).length, 3);
-        assert.ok(err.errors.password instanceof ValidatorError);
-        assert.ok(err.errors.email instanceof ValidatorError);
-        assert.ok(err.errors.username instanceof ValidatorError);
-        assert.equal(err.errors.password.message, 'Validator failed for path `password` with value `short`');
-        assert.equal(err.errors.email.message, 'Validator failed for path `email` with value `too`');
-        assert.equal(err.errors.username.message, 'Validator failed for path `username` with value `nope`');
-
-        assert.equal(Object.keys(post.errors).length, 3);
-        assert.ok(post.errors.password instanceof ValidatorError);
-        assert.ok(post.errors.email instanceof ValidatorError);
-        assert.ok(post.errors.username instanceof ValidatorError);
-        assert.equal(post.errors.password.message, 'Validator failed for path `password` with value `short`');
-        assert.equal(post.errors.email.message, 'Validator failed for path `email` with value `too`');
-        assert.equal(post.errors.username.message, 'Validator failed for path `username` with value `nope`');
-        done();
-      });
+      assert.equal(Object.keys(post.errors).length, 3);
+      assert.ok(post.errors.password instanceof ValidatorError);
+      assert.ok(post.errors.email instanceof ValidatorError);
+      assert.ok(post.errors.username instanceof ValidatorError);
+      assert.equal(post.errors.password.message, 'Validator failed for path `password` with value `short`');
+      assert.equal(post.errors.email.message, 'Validator failed for path `email` with value `too`');
+      assert.equal(post.errors.username.message, 'Validator failed for path `username` with value `nope`');
     });
 
-    it('query result', function(done) {
+    it('query result', async function() {
       const TestV = db.model('Test', new Schema({
         resultv: { type: String, required: true }
       }));
 
       const post = new TestV();
 
-      post.validate(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-
-        post.resultv = 'yeah';
-        post.save(function(err) {
-          assert.ifError(err);
-          TestV.findOne({ _id: post.id }, function(err, found) {
-            assert.ifError(err);
-            assert.equal(found.resultv, 'yeah');
-            found.save(function(err) {
-              assert.ifError(err);
-              done();
-            });
-          });
-        });
-      });
+      const err = await post.validate().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
+      post.resultv = 'yeah';
+      const doc = await post.save();
+      const check = await TestV.findOne({ _id: doc._id });
+      assert.equal(check.resultv, 'yeah');
+      await check.save();
+      assert.ok(check);
     });
 
-    it('of required previously existing null values', function(done) {
+    it('of required previously existing null values', async function() {
       const TestP = db.model('Test', new Schema({
         previous: { type: String, required: true },
         a: String
       }));
 
       const doc = { a: null, previous: null };
-      TestP.collection.insertOne(doc, {}, function(err) {
-        assert.ifError(err);
-        TestP.findOne({ _id: doc._id }, function(err, found) {
-          assert.ifError(err);
-          assert.equal(found.isNew, false);
-          assert.strictEqual(found.get('previous'), null);
-
-          found.validate(function(err) {
-            assert.ok(err instanceof MongooseError);
-            assert.ok(err instanceof ValidationError);
-
-            found.set('previous', 'yoyo');
-            found.save(function(err) {
-              assert.strictEqual(err, null);
-              done();
-            });
-          });
-        });
-      });
+      await TestP.collection.insertOne(doc);
+      const check = await TestP.findOne({ _id: doc._id });
+      assert.equal(check.isNew, false);
+      assert.strictEqual(check.get('previous'), null);
+      const err = await check.validate().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
+      check.set('previous', 'yoyo');
+      await check.save();
+      assert.ok(check);
     });
 
-    it('nested', function(done) {
+    it('nested', async function() {
       const TestNestedValidation = db.model('Test', new Schema({
         nested: {
           required: { type: String, required: true }
@@ -1005,20 +964,15 @@ describe('Model', function() {
 
       const post = new TestNestedValidation();
       post.set('nested.required', null);
-
-      post.save(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-
-        post.set('nested.required', 'here');
-        post.save(function(err) {
-          assert.ifError(err);
-          done();
-        });
-      });
+      const err = await post.save().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
+      post.set('nested.required', 'here');
+      const check = await post.save();
+      assert.ok(check);
     });
 
-    it('of nested subdocuments', function(done) {
+    it('of nested subdocuments', async function() {
       const Subsubdocs = new Schema({ required: { type: String, required: true } });
 
       const Subdocs = new Schema({
@@ -1034,42 +988,36 @@ describe('Model', function() {
 
       post.get('items').push({ required: '', subs: [{ required: '' }] });
 
-      post.save(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-        assert.ok(err.errors['items.0.subs.0.required'] instanceof ValidatorError);
-        assert.equal(err.errors['items.0.subs.0.required'].message, 'Path `required` is required.');
-        assert.ok(post.errors['items.0.subs.0.required'] instanceof ValidatorError);
-        assert.equal(post.errors['items.0.subs.0.required'].message, 'Path `required` is required.');
+      let err = await post.save().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors['items.0.subs.0.required'] instanceof ValidatorError);
+      assert.equal(err.errors['items.0.subs.0.required'].message, 'Path `required` is required.');
+      assert.ok(post.errors['items.0.subs.0.required'] instanceof ValidatorError);
+      assert.equal(post.errors['items.0.subs.0.required'].message, 'Path `required` is required.');
 
-        assert.ok(err.errors['items.0.required']);
-        assert.ok(post.errors['items.0.required']);
+      assert.ok(err.errors['items.0.required']);
+      assert.ok(post.errors['items.0.required']);
 
-        post.items[0].subs[0].set('required', true);
-        assert.equal(post.$__.validationError, undefined);
+      post.items[0].subs[0].set('required', true);
+      assert.equal(post.$__.validationError, undefined);
 
-        post.save(function(err) {
-          assert.ok(err);
-          assert.ok(err.errors);
-          assert.ok(err.errors['items.0.required'] instanceof ValidatorError);
-          assert.equal(err.errors['items.0.required'].message, 'Path `required` is required.');
+      err = await post.save().then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.errors);
+      assert.ok(err.errors['items.0.required'] instanceof ValidatorError);
+      assert.equal(err.errors['items.0.required'].message, 'Path `required` is required.');
 
-          assert.ok(!err.errors['items.0.subs.0.required']);
-          assert.ok(!err.errors['items.0.subs.0.required']);
-          assert.ok(!post.errors['items.0.subs.0.required']);
-          assert.ok(!post.errors['items.0.subs.0.required']);
-
-          post.get('items')[0].set('required', true);
-          post.save(function(err) {
-            assert.ok(!post.errors);
-            assert.ifError(err);
-            done();
-          });
-        });
-      });
+      assert.ok(!err.errors['items.0.subs.0.required']);
+      assert.ok(!err.errors['items.0.subs.0.required']);
+      assert.ok(!post.errors['items.0.subs.0.required']);
+      assert.ok(!post.errors['items.0.subs.0.required']);
+      post.get('items')[0].set('required', true);
+      await post.save();
+      assert.ok(!post.errors);
     });
 
-    it('without saving', function(done) {
+    it('without saving', async function() {
       const TestCallingValidation = db.model('Test', new Schema({
         item: { type: String, required: true }
       }));
@@ -1078,19 +1026,13 @@ describe('Model', function() {
 
       assert.equal(post.schema.path('item').isRequired, true);
       assert.strictEqual(post.isNew, true);
-
-      post.validate(function(err) {
-        assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof ValidationError);
-        assert.strictEqual(post.isNew, true);
-
-        post.item = 'yo';
-        post.validate(function(err) {
-          assert.equal(err, null);
-          assert.strictEqual(post.isNew, true);
-          done();
-        });
-      });
+      const err = await post.validate().then(() => null, err => err);
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
+      assert.strictEqual(post.isNew, true);
+      post.item = 'yo';
+      await post.validate();
+      assert.strictEqual(post.isNew, true);
     });
 
     it('when required is set to false', function(done) {
@@ -1109,7 +1051,7 @@ describe('Model', function() {
     });
 
     describe('middleware', function() {
-      it('works', function(done) {
+      it('works', async function() {
         let ValidationMiddlewareSchema = null,
             Post = null,
             post = null;
@@ -1128,22 +1070,17 @@ describe('Model', function() {
         Post = db.model('Test', ValidationMiddlewareSchema);
         post = new Post();
         post.set({ baz: 'bad' });
-
-        post.save(function(err) {
-          assert.ok(err instanceof MongooseError);
-          assert.ok(err instanceof ValidationError);
-          assert.equal(err.errors.baz.kind, 'user defined');
-          assert.equal(err.errors.baz.path, 'baz');
-
-          post.set('baz', 'good');
-          post.save(function(err) {
-            assert.ifError(err);
-            done();
-          });
-        });
+        const err = await post.save().then(() => null, err => err);
+        assert.ok(err instanceof MongooseError);
+        assert.ok(err instanceof ValidationError);
+        assert.equal(err.errors.baz.kind, 'user defined');
+        assert.equal(err.errors.baz.path, 'baz');
+        post.set('baz', 'good');
+        const doc = await post.save();
+        assert.ok(doc);
       });
 
-      it('async', function(done) {
+      it('async', async function() {
         let AsyncValidationMiddlewareSchema = null;
         let Post = null;
         let post = null;
@@ -1166,19 +1103,14 @@ describe('Model', function() {
         Post = db.model('Test', AsyncValidationMiddlewareSchema);
         post = new Post();
         post.set({ prop: 'bad' });
-
-        post.save(function(err) {
-          assert.ok(err instanceof MongooseError);
-          assert.ok(err instanceof ValidationError);
-          assert.equal(err.errors.prop.kind, 'user defined');
-          assert.equal(err.errors.prop.path, 'prop');
-
-          post.set('prop', 'good');
-          post.save(function(err) {
-            assert.ifError(err);
-            done();
-          });
-        });
+        const err = await post.save().then(() => null, err => err);
+        assert.ok(err instanceof MongooseError);
+        assert.ok(err instanceof ValidationError);
+        assert.equal(err.errors.prop.kind, 'user defined');
+        assert.equal(err.errors.prop.path, 'prop');
+        post.set('prop', 'good');
+        const doc = await post.save();
+        assert.ok(doc);
       });
 
       it('complex', function(done) {

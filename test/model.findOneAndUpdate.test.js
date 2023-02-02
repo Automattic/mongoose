@@ -1106,7 +1106,7 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   describe('validators (gh-860)', function() {
-    it('applies defaults on upsert', function(done) {
+    it('applies defaults on upsert', async function() {
       const s = new Schema({
         topping: { type: String, default: 'bacon' },
         base: String
@@ -1114,23 +1114,19 @@ describe('model: findOneAndUpdate:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { upsert: true, new: true };
-      Breakfast.findOneAndUpdate(
+      const breakfast = await Breakfast.findOneAndUpdate(
         {},
         { base: 'eggs' },
-        updateOptions,
-        function(error, breakfast) {
-          assert.ifError(error);
-          assert.equal(breakfast.base, 'eggs');
-          assert.equal(breakfast.topping, 'bacon');
-          Breakfast.countDocuments({ topping: 'bacon' }, function(error, count) {
-            assert.ifError(error);
-            assert.equal(1, count);
-            done();
-          });
-        });
+        updateOptions
+      );
+      assert.equal(breakfast.base, 'eggs');
+      assert.equal(breakfast.topping, 'bacon');
+
+      const count = await Breakfast.countDocuments({ topping: 'bacon' });
+      assert.equal(1, count);
     });
 
-    it('doesnt set default on upsert if query sets it', function(done) {
+    it('doesnt set default on upsert if query sets it', async function() {
       const s = new Schema({
         topping: { type: String, default: 'bacon' },
         numEggs: { type: Number, default: 3 },
@@ -1139,20 +1135,17 @@ describe('model: findOneAndUpdate:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { upsert: true, new: true };
-      Breakfast.findOneAndUpdate(
+      const breakfast = await Breakfast.findOneAndUpdate(
         { topping: 'sausage', numEggs: 4 },
         { base: 'eggs' },
-        updateOptions,
-        function(error, breakfast) {
-          assert.ifError(error);
-          assert.equal(breakfast.base, 'eggs');
-          assert.equal(breakfast.topping, 'sausage');
-          assert.equal(breakfast.numEggs, 4);
-          done();
-        });
+        updateOptions
+      );
+      assert.equal(breakfast.base, 'eggs');
+      assert.equal(breakfast.topping, 'sausage');
+      assert.equal(breakfast.numEggs, 4);
     });
 
-    it('properly sets default on upsert if query wont set it', function(done) {
+    it('properly sets default on upsert if query wont set it', async function() {
       const s = new Schema({
         topping: { type: String, default: 'bacon' },
         base: String
@@ -1160,20 +1153,16 @@ describe('model: findOneAndUpdate:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { upsert: true, new: true };
-      Breakfast.findOneAndUpdate(
+      const breakfast = await Breakfast.findOneAndUpdate(
         { topping: { $ne: 'sausage' } },
         { base: 'eggs' },
-        updateOptions,
-        function(error, breakfast) {
-          assert.ifError(error);
-          assert.equal(breakfast.base, 'eggs');
-          assert.equal(breakfast.topping, 'bacon');
-          Breakfast.countDocuments({ topping: 'bacon' }, function(error, count) {
-            assert.ifError(error);
-            assert.equal(1, count);
-            done();
-          });
-        });
+        updateOptions
+      );
+      assert.equal(breakfast.base, 'eggs');
+      assert.equal(breakfast.topping, 'bacon');
+
+      const count = await Breakfast.countDocuments({ topping: 'bacon' });
+      assert.equal(1, count);
     });
 
     it('skips setting defaults within maps (gh-7909)', async function() {
@@ -1195,7 +1184,7 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(doc.socialMediaHandles, undefined);
     });
 
-    it('runs validators if theyre set', function(done) {
+    it('runs validators if theyre set', async function() {
       const s = new Schema({
         topping: {
           type: String,
@@ -1217,23 +1206,19 @@ describe('model: findOneAndUpdate:', function() {
         runValidators: true,
         new: true
       };
-      Breakfast.findOneAndUpdate(
+      const error = await Breakfast.findOneAndUpdate(
         {},
         { topping: 'bacon', base: 'eggs' },
-        updateOptions,
-        function(error, breakfast) {
-          assert.ok(!!error);
-          assert.ok(!breakfast);
-          assert.equal(Object.keys(error.errors).length, 1);
-          assert.equal(Object.keys(error.errors)[0], 'topping');
-          assert.equal(error.errors.topping.message, 'Validator failed for path `topping` with value `bacon`');
+        updateOptions
+      ).then(() => null, err => err);
 
-          assert.ok(!breakfast);
-          done();
-        });
+      assert.ok(error);
+      assert.equal(Object.keys(error.errors).length, 1);
+      assert.equal(Object.keys(error.errors)[0], 'topping');
+      assert.equal(error.errors.topping.message, 'Validator failed for path `topping` with value `bacon`');
     });
 
-    it('validators handle $unset and $setOnInsert', function(done) {
+    it('validators handle $unset and $setOnInsert', async function() {
       const s = new Schema({
         steak: { type: String, required: true },
         eggs: {
@@ -1245,23 +1230,21 @@ describe('model: findOneAndUpdate:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { runValidators: true, new: true };
-      Breakfast.findOneAndUpdate(
+      const error = await Breakfast.findOneAndUpdate(
         {},
         { $unset: { steak: '' }, $setOnInsert: { eggs: 'softboiled' } },
-        updateOptions,
-        function(error, breakfast) {
-          assert.ok(!!error);
-          assert.ok(!breakfast);
-          assert.equal(Object.keys(error.errors).length, 2);
-          assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
-          assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
-          assert.equal(error.errors.eggs.message, 'Validator failed for path `eggs` with value `softboiled`');
-          assert.equal(error.errors.steak.message, 'Path `steak` is required.');
-          done();
-        });
+        updateOptions
+      ).then(() => null, err => err);
+
+      assert.ok(error);
+      assert.equal(Object.keys(error.errors).length, 2);
+      assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
+      assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
+      assert.equal(error.errors.eggs.message, 'Validator failed for path `eggs` with value `softboiled`');
+      assert.equal(error.errors.steak.message, 'Path `steak` is required.');
     });
 
-    it('min/max, enum, and regex built-in validators work', function(done) {
+    it('min/max, enum, and regex built-in validators work', async function() {
       const s = new Schema({
         steak: { type: String, enum: ['ribeye', 'sirloin'] },
         eggs: { type: Number, min: 4, max: 6 },
@@ -1270,43 +1253,36 @@ describe('model: findOneAndUpdate:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { runValidators: true, new: true };
-      Breakfast.findOneAndUpdate(
+      let error = await Breakfast.findOneAndUpdate(
         {},
         { $set: { steak: 'ribeye', eggs: 3, bacon: '3 strips' } },
-        updateOptions,
-        function(error) {
-          assert.ok(!!error);
-          assert.equal(Object.keys(error.errors).length, 1);
-          assert.equal(Object.keys(error.errors)[0], 'eggs');
-          assert.equal(error.errors.eggs.message, 'Path `eggs` (3) is less than minimum allowed value (4).');
+        updateOptions
+      ).then(() => null, err => err);
+      assert.equal(Object.keys(error.errors).length, 1);
+      assert.equal(Object.keys(error.errors)[0], 'eggs');
+      assert.equal(error.errors.eggs.message, 'Path `eggs` (3) is less than minimum allowed value (4).');
 
-          Breakfast.findOneAndUpdate(
-            {},
-            { $set: { steak: 'tofu', eggs: 5, bacon: '3 strips' } },
-            updateOptions,
-            function(error) {
-              assert.ok(!!error);
-              assert.equal(Object.keys(error.errors).length, 1);
-              assert.equal(Object.keys(error.errors)[0], 'steak');
-              assert.equal(error.errors.steak, '`tofu` is not a valid enum value for path `steak`.');
+      error = await Breakfast.findOneAndUpdate(
+        {},
+        { $set: { steak: 'tofu', eggs: 5, bacon: '3 strips' } },
+        updateOptions
+      ).then(() => null, err => err);
 
-              Breakfast.findOneAndUpdate(
-                {},
-                { $set: { steak: 'sirloin', eggs: 6, bacon: 'none' } },
-                updateOptions,
-                function(error) {
-                  assert.ok(!!error);
-                  assert.equal(Object.keys(error.errors).length, 1);
-                  assert.equal(Object.keys(error.errors)[0], 'bacon');
-                  assert.equal(error.errors.bacon.message, 'Path `bacon` is invalid (none).');
+      assert.equal(Object.keys(error.errors).length, 1);
+      assert.equal(Object.keys(error.errors)[0], 'steak');
+      assert.equal(error.errors.steak, '`tofu` is not a valid enum value for path `steak`.');
 
-                  done();
-                });
-            });
-        });
+      error = await Breakfast.findOneAndUpdate(
+        {},
+        { $set: { steak: 'sirloin', eggs: 6, bacon: 'none' } },
+        updateOptions
+      ).then(() => null, err => err);
+      assert.equal(Object.keys(error.errors).length, 1);
+      assert.equal(Object.keys(error.errors)[0], 'bacon');
+      assert.equal(error.errors.bacon.message, 'Path `bacon` is invalid (none).');
     });
 
-    it('multiple validation errors', function(done) {
+    it('multiple validation errors', async function() {
       const s = new Schema({
         steak: { type: String, enum: ['ribeye', 'sirloin'] },
         eggs: { type: Number, min: 4, max: 6 },
@@ -1315,21 +1291,18 @@ describe('model: findOneAndUpdate:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { runValidators: true, new: true };
-      Breakfast.findOneAndUpdate(
+      const error = await Breakfast.findOneAndUpdate(
         {},
         { $set: { steak: 'tofu', eggs: 2, bacon: '3 strips' } },
-        updateOptions,
-        function(error, breakfast) {
-          assert.ok(!!error);
-          assert.equal(Object.keys(error.errors).length, 2);
-          assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
-          assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
-          assert.ok(!breakfast);
-          done();
-        });
+        updateOptions
+      ).then(() => null, err => err);
+      assert.ok(!!error);
+      assert.equal(Object.keys(error.errors).length, 2);
+      assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
+      assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
     });
 
-    it('validators ignore $inc', function(done) {
+    it('validators ignore $inc', async function() {
       const s = new Schema({
         steak: { type: String, required: true },
         eggs: { type: Number, min: 4 }
@@ -1337,16 +1310,12 @@ describe('model: findOneAndUpdate:', function() {
       const Breakfast = db.model('Test', s);
 
       const updateOptions = { runValidators: true, upsert: true, new: true };
-      Breakfast.findOneAndUpdate(
+      const breakfast = await Breakfast.findOneAndUpdate(
         {},
         { $inc: { eggs: 1 } },
-        updateOptions,
-        function(error, breakfast) {
-          assert.ifError(error);
-          assert.ok(!!breakfast);
-          assert.equal(breakfast.eggs, 1);
-          done();
-        });
+        updateOptions
+      );
+      assert.equal(breakfast.eggs, 1);
     });
 
     it('validators ignore paths underneath mixed (gh-8659)', function() {
@@ -1386,7 +1355,7 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
-    it('should allow null values in query (gh-3135)', function(done) {
+    it('should allow null values in query (gh-3135)', async function() {
       const testSchema = new mongoose.Schema({
         id: String,
         blob: ObjectId,
@@ -1394,14 +1363,8 @@ describe('model: findOneAndUpdate:', function() {
       });
 
       const TestModel = db.model('Test', testSchema);
-      TestModel.create({ blob: null, status: 'active' }, function(error) {
-        assert.ifError(error);
-        TestModel.findOneAndUpdate({ id: '1', blob: null }, { $set: { status: 'inactive' } }, { upsert: true },
-          function(error) {
-            assert.ifError(error);
-            done();
-          });
-      });
+      await TestModel.create({ blob: null, status: 'active' });
+      await TestModel.findOneAndUpdate({ id: '1', blob: null }, { $set: { status: 'inactive' } }, { upsert: true });
     });
 
     it('should work with array documents (gh-3034)', function(done) {

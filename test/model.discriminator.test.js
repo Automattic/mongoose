@@ -669,7 +669,7 @@ describe('model', function() {
         assert.ok(threw);
       });
 
-      it('copies query hooks (gh-5147)', function(done) {
+      it('copies query hooks (gh-5147)', async function() {
         const options = { discriminatorKey: 'kind' };
 
         const eventSchema = new mongoose.Schema({ time: Date }, options);
@@ -687,13 +687,9 @@ describe('model', function() {
         });
         const ClickedLinkEvent = Event.discriminator('ClickedLink', clickedEventSchema);
 
-        ClickedLinkEvent.findOneAndUpdate({}, { time: new Date() }, {}).
-          exec(function(error) {
-            assert.ifError(error);
-            assert.equal(eventSchemaCalls, 1);
-            assert.equal(clickedEventSchemaCalls, 1);
-            done();
-          });
+        await ClickedLinkEvent.findOneAndUpdate({}, { time: new Date() }, {}).exec();
+        assert.equal(eventSchemaCalls, 1);
+        assert.equal(clickedEventSchemaCalls, 1);
       });
 
       it('reusing schema for discriminators (gh-5684)', function() {

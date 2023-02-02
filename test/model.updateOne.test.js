@@ -974,7 +974,7 @@ describe('model: updateOne:', function() {
 
       const updateOptions = { runValidators: true };
       const error = await Breakfast.
-        update({}, { $unset: { steak: 1 } }, updateOptions).
+        updateOne({}, { $unset: { steak: 1 } }, updateOptions).
         catch(err => err);
 
       assert.ok(!!error);
@@ -1076,7 +1076,7 @@ describe('model: updateOne:', function() {
         arrayFilters: [{ 't.name': 'bacon' }]
       };
       return Breakfast.
-        update({}, { 'toppings.$[t].name': 'tofu' }, updateOptions).
+        updateOne({}, { 'toppings.$[t].name': 'tofu' }, updateOptions).
         then(
           () => assert.ok(false),
           err => {

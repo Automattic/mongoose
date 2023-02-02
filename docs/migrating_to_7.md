@@ -14,6 +14,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [`strictQuery`](#strictquery)
 * [Removed `remove()`](#removed-remove)
 * [Dropped callback support](#dropped-callback-support)
+* [Removed `update()`](#removed-update)
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
 
 <h3 id="strictquery"><a href="#strictquery"><code>strictQuery</code></a></h3>
@@ -96,6 +97,21 @@ conn.startSession(function(err, session) {
 const session = await conn.startSession();
 // Or:
 conn.startSession().then(sesson => { /* ... */ });
+```
+
+<h3 id="removed-update"><a href="#removed-update"><code>Removed <code>update()</code></a></h3>
+
+`Model.update()` and `Document.prototype.update()` have been removed.
+Use `updateOne()` instead.
+
+```javascript
+// Before
+await Model.update(filter, update);
+await doc.update(update);
+
+// After
+await Model.updateOne(filter, update);
+await doc.updateOne(update);
 ```
 
 <h3 id="objectids-no-longer-deepstrictequal"><a href="#objectids-no-longer-deepstrictequal">ObjectIds no longer deepStrictEqual</a></h3>

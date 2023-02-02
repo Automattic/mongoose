@@ -63,7 +63,7 @@ describe('collections:', function() {
     thrown = false;
 
     try {
-      collection.update();
+      collection.updateOne();
     } catch (e) {
       assert.ok(/unimplemented/.test(e.message));
       thrown = true;

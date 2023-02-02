@@ -48,7 +48,7 @@ describe('Query:', function() {
     });
 
     it('copies all the right values', function(done) {
-      const prodQ = Product.update({ title: /test/ }, { title: 'blah' });
+      const prodQ = Product.updateOne({ title: /test/ }, { title: 'blah' });
 
       const prodC = prodQ.toConstructor();
 
@@ -140,7 +140,7 @@ describe('Query:', function() {
       const update = { $set: { title: 'thing' } };
       const path = 'title';
 
-      const q = Product.update(match, update);
+      const q = Product.updateOne(match, update);
       q.select(select);
       q.where(path);
       q.setOptions(opts);

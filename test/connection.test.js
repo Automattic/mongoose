@@ -361,38 +361,34 @@ describe('connections:', function() {
     });
   });
 
-  it('destroy connection and remove it permanently', (done) => {
+  it('destroy connection and remove it permanently', async function() {
     const opts = {};
-    const conn = mongoose.createConnection(start.uri, opts);
+    const conn = await mongoose.createConnection(start.uri, opts).asPromise();
     conn.useDb('test-db');
 
     const totalConn = mongoose.connections.length;
 
-    conn.destroy(() => {
-      assert.equal(mongoose.connections.length, totalConn - 1);
-      done();
-    });
+    await conn.destroy();
+    assert.equal(mongoose.connections.length, totalConn - 1);
   });
 
-  it('verify that attempt to re-open destroyed connection throws error, via promise', (done) => {
+  it('verify that attempt to re-open destroyed connection throws error, via promise', async function() {
     const opts = {};
-    const conn = mongoose.createConnection(start.uri, opts);
+    const conn = await mongoose.createConnection(start.uri, opts).asPromise();
 
     conn.useDb('test-db');
 
-    conn.destroy(async() => {
-      try {
-        await conn.openUri(start.uri);
-      } catch (error) {
-        assert.equal(error.message, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
-        done();
-      }
-    });
+    await conn.destroy();
+    try {
+      await conn.openUri(start.uri);
+    } catch (error) {
+      assert.equal(error.message, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
+    }
   });
 
   it('verify that attempt to re-open destroyed connection throws error, via callback', async function() {
     const opts = {};
-    const conn = mongoose.createConnection(start.uri, opts);
+    const conn = await mongoose.createConnection(start.uri, opts).asPromise();
 
     conn.useDb('test-db');
     await conn.destroy();
@@ -748,29 +744,29 @@ describe('connections:', function() {
       db2.close();
     });
 
-    it('cache connections to the same db', function(done) {
+    it('cache connections to the same db', function() {
       const db = start();
       const db2 = db.useDb(start.databases[1], { useCache: true });
       const db3 = db.useDb(start.databases[1], { useCache: true });
 
       assert.strictEqual(db2, db3);
-      db.close(done);
+      return db.close();
     });
   });
 
   describe('shouldAuthenticate()', function() {
     describe('when using standard authentication', function() {
       describe('when username and password are undefined', function() {
-        it('should return false', function(done) {
+        it('should return false', function() {
           const db = mongoose.createConnection(start.uri, {});
 
           assert.equal(db.shouldAuthenticate(), false);
 
-          db.close(done);
+          return db.close();
         });
       });
       describe('when username and password are empty strings', function() {
-        it('should return false', function(done) {
+        it('should return false', function() {
           const db = mongoose.createConnection(start.uri, {
             user: '',
             pass: ''
@@ -779,7 +775,7 @@ describe('connections:', function() {
 
           assert.equal(db.shouldAuthenticate(), false);
 
-          db.close(done);
+          return db.close();
         });
       });
       describe('when both username and password are defined', function() {
@@ -792,20 +788,20 @@ describe('connections:', function() {
 
           assert.equal(db.shouldAuthenticate(), true);
 
-          db.close(); // does not actually do anything
+          return db.close();
         });
       });
     });
     describe('when using MONGODB-X509 authentication', function() {
       describe('when username and password are undefined', function() {
-        it('should return false', function(done) {
+        it('should return false', function() {
           const db = mongoose.createConnection(start.uri, {});
           db.on('error', function() {
           });
 
           assert.equal(db.shouldAuthenticate(), false);
 
-          db.close(done);
+          return db.close();
         });
       });
       describe('when only username is defined', function() {
@@ -817,7 +813,7 @@ describe('connections:', function() {
           db.asPromise().catch(() => {});
           assert.equal(db.shouldAuthenticate(), true);
 
-          db.close(); // does not actually do anything
+          return db.close();
         });
       });
       describe('when both username and password are defined', function() {
@@ -831,7 +827,7 @@ describe('connections:', function() {
 
           assert.equal(db.shouldAuthenticate(), true);
 
-          db.close(); // does not actually do anything
+          return db.close(); // does not actually do anything
         });
       });
     });

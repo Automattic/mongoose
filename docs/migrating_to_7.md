@@ -80,6 +80,7 @@ They always return promises.
 - `Connection.prototype.dropDatabase`
 - `Connection.prototype.openUri`
 - `Connection.prototype.close`
+- `Connection.prototype.destroy`
 - `Mongoose.prototype.connect`
 - `Mongoose.prototype.createConnection`
 

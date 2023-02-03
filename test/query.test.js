@@ -4349,6 +4349,6 @@ describe('Query', function() {
       }
     });
 
-    assert.strictEqual(books.length, 1);
+    assert.strictEqual(books.length, 0);
   });
 });

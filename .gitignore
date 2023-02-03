@@ -21,6 +21,7 @@ npm-debug.log
 data/
 .nyc_output/
 .env
+
 tools/31*
 
 # Visual Studio

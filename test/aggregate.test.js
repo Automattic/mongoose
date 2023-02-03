@@ -1073,7 +1073,7 @@ describe('aggregate: ', function() {
       const schema = new Schema({ name: String }, { read: 'secondary' });
       const M = db.model('Test', schema);
       const a = M.aggregate();
-      assert.equal(a.options.readPreference.mode, 'secondary');
+      assert.equal(a.options.readPreference, 'secondary');
 
       a.read('secondaryPreferred');
 

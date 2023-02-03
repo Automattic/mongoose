@@ -652,10 +652,12 @@ describe('model: findOneAndUpdate:', function() {
     let query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now } }, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
 
     query = M.findOneAndUpdate({}, { $set: { date: now } }, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
   });

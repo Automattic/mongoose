@@ -1470,67 +1470,35 @@ describe('Model', function() {
   });
 
   describe('.deleteOne()', function() {
-    it('works', function(done) {
-      BlogPost.create({ title: 1 }, { title: 2 }, function(err) {
-        assert.ifError(err);
-
-        BlogPost.deleteOne({ title: 1 }, function(err) {
-          assert.ifError(err);
-
-          BlogPost.find({}, function(err, found) {
-            assert.ifError(err);
-            assert.equal(found.length, 1);
-            assert.equal(found[0].title, '2');
-            done();
-          });
-        });
-      });
+    it('works', async function() {
+      await BlogPost.create({ title: 1 }, { title: 2 });
+      await BlogPost.deleteOne({ title: 1 });
+      const found = await BlogPost.find({});
+      assert.equal(found.length, 1);
+      assert.equal(found[0].title, '2');
     });
 
-    it('errors when id deselected (gh-3118)', function(done) {
-      BlogPost.create({ title: 1 }, { title: 2 }, function(err) {
-        assert.ifError(err);
-        BlogPost.findOne({ title: 1 }, { _id: 0 }, function(error, doc) {
-          assert.ifError(error);
-          doc.deleteOne(function(err) {
-            assert.ok(err);
-            assert.equal(err.message, 'No _id found on document!');
-            done();
-          });
-        });
-      });
+    it('errors when id deselected (gh-3118)', async function() {
+      await BlogPost.create({ title: 1 }, { title: 2 });
+      const doc = await BlogPost.findOne({ title: 1 }, { _id: 0 });
+      const err = await doc.deleteOne().then(() => null, err => err);
+      assert.equal(err.message, 'No _id found on document!');
     });
 
-    it('should not remove any records when deleting by id undefined', function(done) {
-      BlogPost.create({ title: 1 }, { title: 2 }, function(err) {
-        assert.ifError(err);
-
-        BlogPost.deleteOne({ _id: undefined }, function(err) {
-          assert.ifError(err);
-          BlogPost.find({}, function(err, found) {
-            assert.equal(found.length, 2, 'Should not remove any records');
-            done();
-          });
-        });
-      });
+    it('should not remove any records when deleting by id undefined', async function() {
+      await BlogPost.create({ title: 1 }, { title: 2 });
+      await BlogPost.deleteOne({ _id: undefined });
+      const found = await BlogPost.find({});
+      assert.equal(found.length, 2, 'Should not remove any records');
     });
 
-    it('should not remove all documents in the collection (gh-3326)', function(done) {
-      BlogPost.create({ title: 1 }, { title: 2 }, function(err) {
-        assert.ifError(err);
-        BlogPost.findOne({ title: 1 }, function(error, doc) {
-          assert.ifError(error);
-          doc.deleteOne(function(err) {
-            assert.ifError(err);
-            BlogPost.find(function(err, found) {
-              assert.ifError(err);
-              assert.equal(found.length, 1);
-              assert.equal(found[0].title, '2');
-              done();
-            });
-          });
-        });
-      });
+    it('should not remove all documents in the collection (gh-3326)', async function() {
+      await BlogPost.create({ title: 1 }, { title: 2 });
+      const doc = await BlogPost.findOne({ title: 1 });
+      await doc.deleteOne();
+      const found = await BlogPost.find();
+      assert.equal(found.length, 1);
+      assert.equal(found[0].title, '2');
     });
   });
 
@@ -4936,7 +4904,7 @@ describe('Model', function() {
 
     });
 
-    it('deleteOne() with options (gh-7857)', function(done) {
+    it('deleteOne() with options (gh-7857)', async function() {
       const schema = new Schema({
         name: String
       });
@@ -4948,21 +4916,13 @@ describe('Model', function() {
         { name: 'Jon Snow' },
         { name: 'Daenerys Targaryen' }
       ];
-      Character.insertMany(arr, function(err, docs) {
-        assert.ifError(err);
-        assert.equal(docs.length, 4);
-        Character.deleteOne({ name: 'Jon Snow' }, { w: 1 }, function(err) {
-          assert.ifError(err);
-          Character.find({}, function(err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 3);
-            done();
-          });
-        });
-      });
+      await Character.insertMany(arr);
+      await Character.deleteOne({ name: 'Jon Snow' }, { w: 1 });
+      const docs = await Character.find();
+      assert.equal(docs.length, 3);
     });
 
-    it('deleteMany() with options (gh-6805)', function(done) {
+    it('deleteMany() with options (gh-6805)', async function() {
       const schema = new Schema({
         name: String
       });
@@ -4974,18 +4934,11 @@ describe('Model', function() {
         { name: 'Jon Snow' },
         { name: 'Daenerys Targaryen' }
       ];
-      Character.insertMany(arr, function(err, docs) {
-        assert.ifError(err);
-        assert.equal(docs.length, 4);
-        Character.deleteMany({ name: /Lannister/ }, { w: 1 }, function(err) {
-          assert.ifError(err);
-          Character.find({}, function(err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 2);
-            done();
-          });
-        });
-      });
+      await Character.insertMany(arr);
+      await Character.deleteMany({ name: /Lannister/ }, { w: 1 });
+
+      const docs = await Character.find();
+      assert.equal(docs.length, 2);
     });
 
     it('run default function with correct this scope in DocumentArray (gh-6840)', function() {
@@ -5969,7 +5922,7 @@ describe('Model', function() {
       });
     });
 
-    it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', function(done) {
+    it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', async function() {
       const schema = new Schema({
         str: String,
         num: Number
@@ -6002,14 +5955,10 @@ describe('Model', function() {
           }
         }
       ];
-      M.bulkWrite(ops, function(error) {
-        assert.ifError(error);
-        M.countDocuments({}, function(error, count) {
-          assert.ifError(error);
-          assert.equal(count, 0);
-          done();
-        });
-      });
+
+      await M.bulkWrite(ops);
+      const count = await M.countDocuments({});
+      assert.equal(count, 0);
     });
 
     it('bulkWrite casting replaceOne (gh-3998)', function(done) {

@@ -2186,35 +2186,24 @@ describe('Query', function() {
         });
     });
 
-    it('change deleteOne to updateOne for soft deletes using $isDeleted (gh-4428)', function(done) {
+    it('change deleteOne to updateOne for soft deletes using $isDeleted (gh-4428)', async function() {
       const schema = new mongoose.Schema({
         name: String,
         isDeleted: Boolean
       });
 
-      schema.pre('deleteOne', { document: true, query: false }, function(next) {
-        const _this = this;
-        this.constructor.updateOne({ isDeleted: true }, function(error) {
-          // Force mongoose to consider this doc as deleted.
-          _this.$isDeleted(true);
-          next(error);
-        });
+      schema.pre('deleteOne', { document: true, query: false }, async function() {
+        await this.constructor.updateOne({ isDeleted: true });
+        this.$isDeleted(true);
       });
 
       const M = db.model('Test', schema);
 
-      M.create({ name: 'test' }, function(error, doc) {
-        assert.ifError(error);
-        doc.deleteOne(function(error) {
-          assert.ifError(error);
-          M.findById(doc._id, function(error, doc) {
-            assert.ifError(error);
-            assert.ok(doc);
-            assert.equal(doc.isDeleted, true);
-            done();
-          });
-        });
-      });
+      let doc = await M.create({ name: 'test' });
+      await doc.deleteOne();
+      doc = await M.findById(doc._id);
+      assert.ok(doc);
+      assert.equal(doc.isDeleted, true);
     });
 
     it('child schema with select: false in multiple paths (gh-5603)', function(done) {

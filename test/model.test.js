@@ -1855,37 +1855,22 @@ describe('Model', function() {
       });
     });
 
-    it('setting (gh-310)', function(done) {
-      BlogPost.create({
-        comments: [{ title: 'first-title', body: 'first-body' }]
-      }, function(err, blog) {
-        assert.ifError(err);
-        BlogPost.findById(blog.id, function(err, agent1blog) {
-          assert.ifError(err);
-          BlogPost.findById(blog.id, function(err, agent2blog) {
-            assert.ifError(err);
-            agent1blog.get('comments')[0].title = 'second-title';
-            agent1blog.save(function(err) {
-              assert.ifError(err);
-              agent2blog.get('comments')[0].body = 'second-body';
-              agent2blog.save(function(err) {
-                assert.ifError(err);
-                BlogPost.findById(blog.id, function(err, foundBlog) {
-                  assert.ifError(err);
-                  const comment = foundBlog.get('comments')[0];
-                  assert.equal(comment.title, 'second-title');
-                  assert.equal(comment.body, 'second-body');
-                  done();
-                });
-              });
-            });
-          });
-        });
-      });
+    it('setting (gh-310)', async function() {
+      const blog = await BlogPost.create({ comments: [{ title: 'first-title', body: 'first-body' }] });
+      const agent1blog = await BlogPost.findById(blog.id);
+      const agent2blog = await BlogPost.findById(blog.id);
+      agent1blog.get('comments')[0].title = 'second-title';
+      await agent1blog.save();
+      agent2blog.get('comments')[0].body = 'second-body';
+      await agent2blog.save();
+      const res = await BlogPost.findById(blog.id);
+      const comment = res.get('comments')[0];
+      assert.equal(comment.title, 'second-title');
+      assert.equal(comment.body, 'second-body');
     });
   });
 
-  it('doubly nested array saving and loading', function(done) {
+  it('doubly nested array saving and loading', async function() {
     const Inner = new Schema({
       arr: [Number]
     });
@@ -1897,30 +1882,20 @@ describe('Model', function() {
 
     const outer = new Outer();
     outer.inner.push({});
-    outer.save(function(err) {
-      assert.ifError(err);
-      assert.ok(outer.get('_id') instanceof DocumentObjectId);
-
-      Outer.findById(outer.get('_id'), function(err, found) {
-        assert.ifError(err);
-        assert.equal(found.inner.length, 1);
-        found.inner[0].arr.push(5);
-        found.save(function(err) {
-          assert.ifError(err);
-          assert.ok(found.get('_id') instanceof DocumentObjectId);
-          Outer.findById(found.get('_id'), function(err, found2) {
-            assert.ifError(err);
-            assert.equal(found2.inner.length, 1);
-            assert.equal(found2.inner[0].arr.length, 1);
-            assert.equal(found2.inner[0].arr[0], 5);
-            done();
-          });
-        });
-      });
-    });
+    await outer.save();
+    assert.ok(outer.get('_id') instanceof DocumentObjectId);
+    const doc = await Outer.findById(outer.get('_id'));
+    assert.equal(doc.inner.length, 1);
+    doc.inner[0].arr.push(5);
+    await doc.save();
+    assert.ok(doc.get('_id') instanceof DocumentObjectId);
+    const res = await Outer.findById(doc.get('_id'));
+    assert.equal(res.inner.length, 1);
+    assert.equal(res.inner[0].arr.length, 1);
+    assert.equal(res.inner[0].arr[0], 5);
   });
 
-  it('multiple number push() calls', function(done) {
+  it('multiple number push() calls', async function() {
     const schema = new Schema({
       nested: {
         nums: [Number]
@@ -1929,26 +1904,56 @@ describe('Model', function() {
 
     const Temp = db.model('Test', schema);
 
-    Temp.create({}, function(err, t) {
-      assert.ifError(err);
-      t.nested.nums.push(1);
-      t.nested.nums.push(2);
+    const t = await Temp.create({});
 
-      assert.equal(t.nested.nums.length, 2);
+    t.nested.nums.push(1);
+    t.nested.nums.push(2);
 
-      t.save(function(err) {
-        assert.ifError(err);
-        assert.equal(t.nested.nums.length, 2);
-        Temp.findById(t._id, function(err) {
-          assert.ifError(err);
-          assert.equal(t.nested.nums.length, 2);
-          done();
-        });
-      });
-    });
+    assert.equal(t.nested.nums.length, 2);
+
+    await t.save();
+
+    assert.equal(t.nested.nums.length, 2);
+
+    const check = await Temp.findById(t._id);
+    assert.equal(check.nested.nums.length, 2);
   });
 
-  it('multiple push() calls', function(done) {
+  it('multiple push() calls', async function() {
+    const schema = new Schema({
+      nested: {
+        nums: [Number]
+      }
+    });
+
+    const Temp = db.model('Test', schema);
+    const t = await Temp.create({});
+
+    t.nested.nums.push(1);
+    t.nested.nums.push(2, 3);
+    assert.equal(t.nested.nums.length, 3);
+    await t.save();
+    assert.equal(t.nested.nums.length, 3);
+    const check = await Temp.findById(t._id);
+    assert.equal(check.nested.nums.length, 3);
+  });
+
+  it('activePaths should be updated for nested modifieds', async function() {
+    const schema = new Schema({
+      nested: {
+        nums: [Number]
+      }
+    });
+
+    const Temp = db.model('Test', schema);
+    const t = await Temp.create({ nested: { nums: [1, 2, 3, 4, 5] } });
+    t.nested.nums.pull(1);
+    t.nested.nums.pull(2);
+    assert.equal(t.$__.activePaths.paths['nested.nums'], 'modify');
+  });
+
+
+  it('activePaths should be updated for nested modifieds as promise', async function() {
     const schema = new Schema({
       nested: {
         nums: [Number]
@@ -1957,25 +1962,26 @@ describe('Model', function() {
 
     const Temp = db.model('Test', schema);
 
-    Temp.create({}, function(err, t) {
-      assert.ifError(err);
-      t.nested.nums.push(1);
-      t.nested.nums.push(2, 3);
-      assert.equal(t.nested.nums.length, 3);
-
-      t.save(function(err) {
-        assert.ifError(err);
-        assert.equal(t.nested.nums.length, 3);
-        Temp.findById(t._id, function(err, found) {
-          assert.ifError(err);
-          assert.equal(found.nested.nums.length, 3);
-          done();
-        });
-      });
-    });
+    const t = await Temp.create({ nested: { nums: [1, 2, 3, 4, 5] } });
+    t.nested.nums.pull(1);
+    t.nested.nums.pull(2);
+    assert.equal(t.$__.activePaths.paths['nested.nums'], 'modify');
   });
 
-  it('activePaths should be updated for nested modifieds', function(done) {
+  it('$pull should affect what you see in an array before a save', async function() {
+    const schema = new Schema({
+      nested: {
+        nums: [Number]
+      }
+    });
+
+    const Temp = db.model('Test', schema);
+    const t = Temp.create({ nested: { nums: [1, 2, 3, 4, 5] } });
+    t.nested.nums.pull(1);
+    assert.equal(t.nested.nums.length, 4);
+  });
+
+  it('$shift', async function() {
     const schema = new Schema({
       nested: {
         nums: [Number]
@@ -1984,95 +1990,25 @@ describe('Model', function() {
 
     const Temp = db.model('Test', schema);
 
-    Temp.create({ nested: { nums: [1, 2, 3, 4, 5] } }, function(err, t) {
-      assert.ifError(err);
-      t.nested.nums.pull(1);
-      t.nested.nums.pull(2);
-      assert.equal(t.$__.activePaths.paths['nested.nums'], 'modify');
-      done();
-    });
-  });
-
-
-  it('activePaths should be updated for nested modifieds as promise', function(done) {
-    const schema = new Schema({
-      nested: {
-        nums: [Number]
-      }
-    });
-
-    const Temp = db.model('Test', schema);
-
-    const p1 = Temp.create({ nested: { nums: [1, 2, 3, 4, 5] } });
-    p1.then(function(t) {
-      t.nested.nums.pull(1);
-      t.nested.nums.pull(2);
-      assert.equal(t.$__.activePaths.paths['nested.nums'], 'modify');
-      done();
-    }).catch(done);
-  });
-
-  it('$pull should affect what you see in an array before a save', function(done) {
-    const schema = new Schema({
-      nested: {
-        nums: [Number]
-      }
-    });
-
-    const Temp = db.model('Test', schema);
-
-    Temp.create({ nested: { nums: [1, 2, 3, 4, 5] } }, function(err, t) {
-      assert.ifError(err);
-      t.nested.nums.pull(1);
-      assert.equal(t.nested.nums.length, 4);
-      done();
-    });
-  });
-
-  it('$shift', function(done) {
-    const schema = new Schema({
-      nested: {
-        nums: [Number]
-      }
-    });
-
-    const Temp = db.model('Test', schema);
-
-    Temp.create({ nested: { nums: [1, 2, 3] } }, function(err, t) {
-      assert.ifError(err);
-
-      Temp.findById(t._id, function(err, found) {
-        assert.ifError(err);
-        assert.equal(found.nested.nums.length, 3);
-        found.nested.nums.$pop();
-        assert.equal(found.nested.nums.length, 2);
-        assert.equal(found.nested.nums[0], 1);
-        assert.equal(found.nested.nums[1], 2);
-
-        found.save(function(err) {
-          assert.ifError(err);
-          Temp.findById(t._id, function(err, found) {
-            assert.ifError(err);
-            assert.equal(found.nested.nums.length, 2);
-            assert.equal(found.nested.nums[0], 1, 1);
-            assert.equal(found.nested.nums[1], 2, 2);
-            found.nested.nums.$shift();
-            assert.equal(found.nested.nums.length, 1);
-            assert.equal(found.nested.nums[0], 2);
-
-            found.save(function(err) {
-              assert.ifError(err);
-              Temp.findById(t._id, function(err, found) {
-                assert.ifError(err);
-                assert.equal(found.nested.nums.length, 1);
-                assert.equal(found.nested.nums[0], 2);
-                done();
-              });
-            });
-          });
-        });
-      });
-    });
+    const t = await Temp.create({ nested: { nums: [1, 2, 3 ] } });
+    const doc = await Temp.findById(t._id);
+    assert.equal(doc.nested.nums.length, 3);
+    doc.nested.nums.$pop();
+    assert.equal(doc.nested.nums.length, 2);
+    assert.equal(doc.nested.nums[0], 1);
+    assert.equal(doc.nested.nums[1], 2);
+    await doc.save();
+    const check = await Temp.findById(t._id);
+    assert.equal(check.nested.nums.length, 2);
+    assert.equal(check.nested.nums[0], 1, 1);
+    assert.equal(check.nested.nums[1], 2, 2);
+    check.nested.nums.$shift();
+    assert.equal(check.nested.nums.length, 1);
+    assert.equal(check.nested.nums[0], 2);
+    await check.save();
+    const final = await Temp.findById(t._id);
+    assert.equal(final.nested.nums.length, 1);
+    assert.equal(final.nested.nums[0], 2);
   });
 
   describe('saving embedded arrays', function() {
@@ -2268,37 +2204,21 @@ describe('Model', function() {
       });
     });
 
-    it('works with modified element properties + doc removal (gh-975)', function(done) {
+    it('works with modified element properties + doc removal (gh-975)', async function() {
       const B = BlogPost;
       const b = new B({ comments: [{ title: 'gh-975' }] });
 
-      b.save(function(err) {
-        assert.ifError(err);
-
-        b.comments[0].title = 'changed';
-        b.save(function(err) {
-          assert.ifError(err);
-
-          b.comments[0].remove();
-          b.save(function(err) {
-            assert.ifError(err);
-
-            B.findByIdAndUpdate({ _id: b._id }, { $set: { comments: [{ title: 'a' }] } }, { new: true }, function(err, doc) {
-              assert.ifError(err);
-              doc.comments[0].title = 'differ';
-              doc.comments[0].remove();
-              doc.save(function(err) {
-                assert.ifError(err);
-                B.findById(doc._id, function(err, doc) {
-                  assert.ifError(err);
-                  assert.equal(doc.comments.length, 0);
-                  done();
-                });
-              });
-            });
-          });
-        });
-      });
+      await b.save();
+      b.comments[0].title = 'changed';
+      await b.save();
+      await b.comments[0].remove();
+      await b.save();
+      const check = await B.findByIdAndUpdate({ _id: b._id }, { $set: { comments: [{ title: 'a' }] } }, { new: true });
+      check.comments[0].title = 'differ';
+      await check.comments[0].remove();
+      await check.save();
+      const final = await B.findById(check._id);
+      assert.equal(final.comments.length, 0);
     });
 
     it('updating an embedded document in an embedded array with set call', function(done) {

@@ -213,17 +213,12 @@ describe('QueryCursor', function() {
       });
     });
 
-    it('casting ObjectIds with where() (gh-4355)', function(done) {
-      Model.findOne(function(error, doc) {
-        assert.ifError(error);
+    it('casting ObjectIds with where() (gh-4355)', async function() {
+      let doc = await Model.findOne();
         assert.ok(doc);
         const query = { _id: doc._id.toHexString() };
-        Model.find().where(query).cursor().next(function(error, doc) {
-          assert.ifError(error);
+        doc = await Model.find().where(query).cursor().next();
           assert.ok(doc);
-          done();
-        });
-      });
     });
 
     it('cast errors (gh-4355)', function(done) {

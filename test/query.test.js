@@ -52,38 +52,34 @@ describe('Query', function() {
   afterEach(() => require('./util').stopRemainingOps(db));
 
   describe('constructor', function() {
-    it('should not corrupt options', function(done) {
+    it('should not corrupt options', function() {
       const opts = {};
       const query = new Query({}, opts);
       assert.notEqual(opts, query._mongooseOptions);
-      done();
     });
   });
 
   describe('select', function() {
-    it('(object)', function(done) {
+    it('(object)', function() {
       const query = new Query({});
       query.select({ a: 1, b: 1, c: 0 });
       assert.deepEqual(query._fields, { a: 1, b: 1, c: 0 });
-      done();
     });
 
-    it('(string)', function(done) {
+    it('(string)', function() {
       const query = new Query({});
       query.select(' a  b -c ');
       assert.deepEqual(query._fields, { a: 1, b: 1, '-c': 0 });
-      done();
     });
 
-    it('("a","b","c")', function(done) {
+    it('("a","b","c")', function() {
       assert.throws(function() {
         const query = new Query({});
         query.select('a', 'b', 'c');
       }, /Invalid select/);
-      done();
     });
 
-    it('should not overwrite fields set in prior calls', function(done) {
+    it('should not overwrite fields set in prior calls', function() {
       const query = new Query({});
       query.select('a');
       assert.deepEqual(query._fields, { a: 1 });
@@ -93,10 +89,9 @@ describe('Query', function() {
       assert.deepEqual(query._fields, { a: 1, b: 1, c: 1 });
       query.select('d');
       assert.deepEqual(query._fields, { a: 1, b: 1, c: 1, d: 1 });
-      done();
     });
 
-    it('should remove existing fields from inclusive projection', function(done) {
+    it('should remove existing fields from inclusive projection', function() {
       const query = new Query({});
       query.select({
         a: 1,
@@ -108,10 +103,9 @@ describe('Query', function() {
         'parent2.child2': 1
       }).select({ b: 0, d: 1, 'c.child': 0, parent1: 0, 'parent2.child1': 0 });
       assert.deepEqual(query._fields, { a: 1, c: 1, d: 1, 'parent2.child2': 1 });
-      done();
     });
 
-    it('should remove existing fields from exclusive projection', function(done) {
+    it('should remove existing fields from exclusive projection', function() {
       const query = new Query({});
       query.select({
         a: 0,
@@ -123,7 +117,6 @@ describe('Query', function() {
         'parent2.child2': 0
       }).select({ b: 1, d: 0, 'c.child': 1, parent1: 1, 'parent2.child1': 1 });
       assert.deepEqual(query._fields, { a: 0, c: 0, d: 0, 'parent2.child2': 0 });
-      done();
     });
   });
 
@@ -143,16 +136,15 @@ describe('Query', function() {
   });
 
   describe('where', function() {
-    it('works', function(done) {
+    it('works', function() {
       const query = new Query({});
       query.where('name', 'guillermo');
       assert.deepEqual(query._conditions, { name: 'guillermo' });
       query.where('a');
       query.equals('b');
       assert.deepEqual(query._conditions, { name: 'guillermo', a: 'b' });
-      done();
     });
-    it('throws if non-string or non-object path is passed', function(done) {
+    it('throws if non-string or non-object path is passed', function() {
       const query = new Query({});
       assert.throws(function() {
         query.where(50);
@@ -160,318 +152,303 @@ describe('Query', function() {
       assert.throws(function() {
         query.where([]);
       });
-      done();
     });
-    it('does not throw when 0 args passed', function(done) {
+    it('does not throw when 0 args passed', function() {
       const query = new Query({});
       assert.doesNotThrow(function() {
         query.where();
       });
-      done();
     });
   });
 
   describe('equals', function() {
-    it('works', function(done) {
+    it('works', function() {
       const query = new Query({});
       query.where('name').equals('guillermo');
       assert.deepEqual(query._conditions, { name: 'guillermo' });
-      done();
     });
   });
 
   describe('gte', function() {
-    it('with 2 args', function(done) {
+    it('with 2 args', function() {
       const query = new Query({});
       query.gte('age', 18);
       assert.deepEqual(query._conditions, { age: { $gte: 18 } });
-      done();
     });
-    it('with 1 arg', function(done) {
+    it('with 1 arg', function() {
       const query = new Query({});
       query.where('age').gte(18);
       assert.deepEqual(query._conditions, { age: { $gte: 18 } });
-      done();
     });
   });
 
   describe('gt', function() {
-    it('with 1 arg', function(done) {
+    it('with 1 arg', function() {
       const query = new Query({});
       query.where('age').gt(17);
       assert.deepEqual(query._conditions, { age: { $gt: 17 } });
-      done();
     });
-    it('with 2 args', function(done) {
+    it('with 2 args', function() {
       const query = new Query({});
       query.gt('age', 17);
       assert.deepEqual(query._conditions, { age: { $gt: 17 } });
-      done();
     });
   });
 
   describe('lte', function() {
-    it('with 1 arg', function(done) {
+    it('with 1 arg', function() {
       const query = new Query({});
       query.where('age').lte(65);
       assert.deepEqual(query._conditions, { age: { $lte: 65 } });
-      done();
     });
-    it('with 2 args', function(done) {
+    it('with 2 args', function() {
       const query = new Query({});
       query.lte('age', 65);
       assert.deepEqual(query._conditions, { age: { $lte: 65 } });
-      done();
     });
   });
 
   describe('lt', function() {
-    it('with 1 arg', function(done) {
+    it('with 1 arg', function() {
       const query = new Query({});
       query.where('age').lt(66);
       assert.deepEqual(query._conditions, { age: { $lt: 66 } });
-      done();
     });
-    it('with 2 args', function(done) {
+    it('with 2 args', function() {
       const query = new Query({});
       query.lt('age', 66);
       assert.deepEqual(query._conditions, { age: { $lt: 66 } });
-      done();
     });
   });
 
   describe('combined', function() {
     describe('lt and gt', function() {
-      it('works', function(done) {
+      it('works', function() {
         const query = new Query({});
         query.where('age').lt(66).gt(17);
         assert.deepEqual(query._conditions, { age: { $lt: 66, $gt: 17 } });
-        done();
       });
     });
   });
 
   describe('tl on one path and gt on another', function() {
-    it('works', function(done) {
+    it('works', function() {
       const query = new Query({});
       query
         .where('age').lt(66)
         .where('height').gt(5);
       assert.deepEqual(query._conditions, { age: { $lt: 66 }, height: { $gt: 5 } });
-      done();
     });
   });
 
   describe('ne', function() {
-    it('with 1 arg', function(done) {
+    it('with 1 arg', function() {
       const query = new Query({});
       query.where('age').ne(21);
       assert.deepEqual(query._conditions, { age: { $ne: 21 } });
-      done();
     });
-    it('with 2 args', function(done) {
+    it('with 2 args', function() {
       const query = new Query({});
       query.ne('age', 21);
       assert.deepEqual(query._conditions, { age: { $ne: 21 } });
-      done();
     });
   });
 
   describe('in', function() {
-    it('with 1 arg', function(done) {
+    it('with 1 arg', function() {
       const query = new Query({});
       query.where('age').in([21, 25, 30]);
       assert.deepEqual(query._conditions, { age: { $in: [21, 25, 30] } });
-      done();
+      
     });
-    it('with 2 args', function(done) {
+    it('with 2 args', function() {
       const query = new Query({});
       query.in('age', [21, 25, 30]);
       assert.deepEqual(query._conditions, { age: { $in: [21, 25, 30] } });
-      done();
+      
     });
-    it('where a non-array value no via where', function(done) {
+    it('where a non-array value no via where', function() {
       const query = new Query({});
       query.in('age', 21);
       assert.deepEqual(query._conditions, { age: { $in: 21 } });
-      done();
+      
     });
-    it('where a non-array value via where', function(done) {
+    it('where a non-array value via where', function() {
       const query = new Query({});
       query.where('age').in(21);
       assert.deepEqual(query._conditions, { age: { $in: 21 } });
-      done();
+      
     });
   });
 
   describe('nin', function() {
-    it('with 1 arg', function(done) {
+    it('with 1 arg', function() {
       const query = new Query({});
       query.where('age').nin([21, 25, 30]);
       assert.deepEqual(query._conditions, { age: { $nin: [21, 25, 30] } });
-      done();
+      
     });
-    it('with 2 args', function(done) {
+    it('with 2 args', function() {
       const query = new Query({});
       query.nin('age', [21, 25, 30]);
       assert.deepEqual(query._conditions, { age: { $nin: [21, 25, 30] } });
-      done();
+      
     });
-    it('with a non-array value not via where', function(done) {
+    it('with a non-array value not via where', function() {
       const query = new Query({});
       query.nin('age', 21);
       assert.deepEqual(query._conditions, { age: { $nin: 21 } });
-      done();
+      
     });
-    it('with a non-array value via where', function(done) {
+    it('with a non-array value via where', function() {
       const query = new Query({});
       query.where('age').nin(21);
       assert.deepEqual(query._conditions, { age: { $nin: 21 } });
-      done();
+      
     });
   });
 
   describe('mod', function() {
-    it('not via where, where [a, b] param', function(done) {
+    it('not via where, where [a, b] param', function() {
       const query = new Query({});
       query.mod('age', [5, 2]);
       assert.deepEqual(query._conditions, { age: { $mod: [5, 2] } });
-      done();
+      
     });
-    it('not via where, where a and b params', function(done) {
+    it('not via where, where a and b params', function() {
       const query = new Query({});
       query.mod('age', 5, 2);
       assert.deepEqual(query._conditions, { age: { $mod: [5, 2] } });
-      done();
+      
     });
-    it('via where, where [a, b] param', function(done) {
+    it('via where, where [a, b] param', function() {
       const query = new Query({});
       query.where('age').mod([5, 2]);
       assert.deepEqual(query._conditions, { age: { $mod: [5, 2] } });
-      done();
+      
     });
-    it('via where, where a and b params', function(done) {
+    it('via where, where a and b params', function() {
       const query = new Query({});
       query.where('age').mod(5, 2);
       assert.deepEqual(query._conditions, { age: { $mod: [5, 2] } });
-      done();
+      
     });
   });
 
   describe('near', function() {
-    it('via where, where { center :[lat, long]} param', function(done) {
+    it('via where, where { center :[lat, long]} param', function() {
       const query = new Query({});
       query.where('checkin').near({ center: [40, -72] });
       assert.deepEqual(query._conditions, { checkin: { $near: [40, -72] } });
-      done();
+      
     });
-    it('via where, where [lat, long] param', function(done) {
+    it('via where, where [lat, long] param', function() {
       const query = new Query({});
       query.where('checkin').near([40, -72]);
       assert.deepEqual(query._conditions, { checkin: { $near: [40, -72] } });
-      done();
+      
     });
-    it('via where, where lat and long params', function(done) {
+    it('via where, where lat and long params', function() {
       const query = new Query({});
       query.where('checkin').near(40, -72);
       assert.deepEqual(query._conditions, { checkin: { $near: [40, -72] } });
-      done();
+      
     });
-    it('not via where, where [lat, long] param', function(done) {
+    it('not via where, where [lat, long] param', function() {
       const query = new Query({});
       query.near('checkin', [40, -72]);
       assert.deepEqual(query._conditions, { checkin: { $near: [40, -72] } });
-      done();
+      
     });
-    it('not via where, where lat and long params', function(done) {
+    it('not via where, where lat and long params', function() {
       const query = new Query({});
       query.near('checkin', 40, -72);
       assert.deepEqual(query._conditions, { checkin: { $near: [40, -72] } });
-      done();
+      
     });
-    it('via where, where GeoJSON param', function(done) {
+    it('via where, where GeoJSON param', function() {
       const query = new Query({});
       query.where('numbers').near({ center: { type: 'Point', coordinates: [40, -72] } });
       assert.deepEqual(query._conditions, { numbers: { $near: { $geometry: { type: 'Point', coordinates: [40, -72] } } } });
       assert.doesNotThrow(function() {
         query.cast(db.model('Product', productSchema));
       });
-      done();
+      
     });
-    it('with path, where GeoJSON param', function(done) {
+    it('with path, where GeoJSON param', function() {
       const query = new Query({});
       query.near('loc', { center: { type: 'Point', coordinates: [40, -72] } });
       assert.deepEqual(query._conditions, { loc: { $near: { $geometry: { type: 'Point', coordinates: [40, -72] } } } });
-      done();
+      
     });
   });
 
   describe('nearSphere', function() {
-    it('via where, where [lat, long] param', function(done) {
+    it('via where, where [lat, long] param', function() {
       const query = new Query({});
       query.where('checkin').nearSphere([40, -72]);
       assert.deepEqual(query._conditions, { checkin: { $nearSphere: [40, -72] } });
-      done();
+      
     });
-    it('via where, where lat and long params', function(done) {
+    it('via where, where lat and long params', function() {
       const query = new Query({});
       query.where('checkin').nearSphere(40, -72);
       assert.deepEqual(query._conditions, { checkin: { $nearSphere: [40, -72] } });
-      done();
+      
     });
-    it('not via where, where [lat, long] param', function(done) {
+    it('not via where, where [lat, long] param', function() {
       const query = new Query({});
       query.nearSphere('checkin', [40, -72]);
       assert.deepEqual(query._conditions, { checkin: { $nearSphere: [40, -72] } });
-      done();
+      
     });
-    it('not via where, where lat and long params', function(done) {
+    it('not via where, where lat and long params', function() {
       const query = new Query({});
       query.nearSphere('checkin', 40, -72);
       assert.deepEqual(query._conditions, { checkin: { $nearSphere: [40, -72] } });
-      done();
+      
     });
 
-    it('via where, with object', function(done) {
+    it('via where, with object', function() {
       const query = new Query({});
       query.where('checkin').nearSphere({ center: [20, 23], maxDistance: 2 });
       assert.deepEqual(query._conditions, { checkin: { $nearSphere: [20, 23], $maxDistance: 2 } });
-      done();
+      
     });
 
-    it('via where, where GeoJSON param', function(done) {
+    it('via where, where GeoJSON param', function() {
       const query = new Query({});
       query.where('numbers').nearSphere({ center: { type: 'Point', coordinates: [40, -72] } });
       assert.deepEqual(query._conditions, { numbers: { $nearSphere: { $geometry: { type: 'Point', coordinates: [40, -72] } } } });
       assert.doesNotThrow(function() {
         query.cast(db.model('Product', productSchema));
       });
-      done();
+      
     });
 
-    it('with path, with GeoJSON', function(done) {
+    it('with path, with GeoJSON', function() {
       const query = new Query({});
       query.nearSphere('numbers', { center: { type: 'Point', coordinates: [40, -72] } });
       assert.deepEqual(query._conditions, { numbers: { $nearSphere: { $geometry: { type: 'Point', coordinates: [40, -72] } } } });
       assert.doesNotThrow(function() {
         query.cast(db.model('Product', productSchema));
       });
-      done();
+      
     });
   });
 
   describe('maxDistance', function() {
-    it('via where', function(done) {
+    it('via where', function() {
       const query = new Query({});
       query.where('checkin').near([40, -72]).maxDistance(1);
       assert.deepEqual(query._conditions, { checkin: { $near: [40, -72], $maxDistance: 1 } });
-      done();
+      
     });
   });
 
   describe('within', function() {
     describe('box', function() {
-      it('via where', function(done) {
+      it('via where', function() {
         const query = new Query({});
         query.where('gps').within().box({ ll: [5, 25], ur: [10, 30] });
         const match = { gps: { $within: { $box: [[5, 25], [10, 30]] } } };
@@ -480,9 +457,9 @@ describe('Query', function() {
           delete match.gps.$within;
         }
         assert.deepEqual(query._conditions, match);
-        done();
+        
       });
-      it('via where, no object', function(done) {
+      it('via where, no object', function() {
         const query = new Query({});
         query.where('gps').within().box([5, 25], [10, 30]);
         const match = { gps: { $within: { $box: [[5, 25], [10, 30]] } } };
@@ -491,12 +468,12 @@ describe('Query', function() {
           delete match.gps.$within;
         }
         assert.deepEqual(query._conditions, match);
-        done();
+        
       });
     });
 
     describe('center', function() {
-      it('via where', function(done) {
+      it('via where', function() {
         const query = new Query({});
         query.where('gps').within().center({ center: [5, 25], radius: 5 });
         const match = { gps: { $within: { $center: [[5, 25], 5] } } };
@@ -505,12 +482,12 @@ describe('Query', function() {
           delete match.gps.$within;
         }
         assert.deepEqual(query._conditions, match);
-        done();
+        
       });
     });
 
     describe('centerSphere', function() {
-      it('via where', function(done) {
+      it('via where', function() {
         const query = new Query({});
         query.where('gps').within().centerSphere({ center: [5, 25], radius: 5 });
         const match = { gps: { $within: { $centerSphere: [[5, 25], 5] } } };
@@ -519,12 +496,12 @@ describe('Query', function() {
           delete match.gps.$within;
         }
         assert.deepEqual(query._conditions, match);
-        done();
+        
       });
     });
 
     describe('polygon', function() {
-      it('via where', function(done) {
+      it('via where', function() {
         const query = new Query({});
         query.where('gps').within().polygon({ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 } });
         const match = { gps: { $within: { $polygon: [{ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 } }] } } };
@@ -533,62 +510,62 @@ describe('Query', function() {
           delete match.gps.$within;
         }
         assert.deepEqual(query._conditions, match);
-        done();
+        
       });
     });
   });
 
   describe('exists', function() {
-    it('0 args via where', function(done) {
+    it('0 args via where', function() {
       const query = new Query({});
       query.where('username').exists();
       assert.deepEqual(query._conditions, { username: { $exists: true } });
-      done();
+      
     });
-    it('1 arg via where', function(done) {
+    it('1 arg via where', function() {
       const query = new Query({});
       query.where('username').exists(false);
       assert.deepEqual(query._conditions, { username: { $exists: false } });
-      done();
+      
     });
-    it('where 1 argument not via where', function(done) {
+    it('where 1 argument not via where', function() {
       const query = new Query({});
       query.exists('username');
       assert.deepEqual(query._conditions, { username: { $exists: true } });
-      done();
+      
     });
 
-    it('where 2 args not via where', function(done) {
+    it('where 2 args not via where', function() {
       const query = new Query({});
       query.exists('username', false);
       assert.deepEqual(query._conditions, { username: { $exists: false } });
-      done();
+      
     });
   });
 
   describe('all', function() {
-    it('via where', function(done) {
+    it('via where', function() {
       const query = new Query({});
       query.where('pets').all(['dog', 'cat', 'ferret']);
       assert.deepEqual(query._conditions, { pets: { $all: ['dog', 'cat', 'ferret'] } });
-      done();
+      
     });
-    it('not via where', function(done) {
+    it('not via where', function() {
       const query = new Query({});
       query.all('pets', ['dog', 'cat', 'ferret']);
       assert.deepEqual(query._conditions, { pets: { $all: ['dog', 'cat', 'ferret'] } });
-      done();
+      
     });
   });
 
   describe('find', function() {
-    it('strict array equivalence condition v', function(done) {
+    it('strict array equivalence condition v', function() {
       const query = new Query({});
       query.find({ pets: ['dog', 'cat', 'ferret'] });
       assert.deepEqual(query._conditions, { pets: ['dog', 'cat', 'ferret'] });
-      done();
+      
     });
-    it('with no args', function(done) {
+    it('with no args', function() {
       let threw = false;
       const q = new Query({});
 
@@ -599,149 +576,149 @@ describe('Query', function() {
       }
 
       assert.ok(!threw);
-      done();
+      
     });
 
-    it('works with overwriting previous object args (1176)', function(done) {
+    it('works with overwriting previous object args (1176)', function() {
       const q = new Query({});
       assert.doesNotThrow(function() {
         q.find({ age: { $lt: 30 } });
         q.find({ age: 20 }); // overwrite
       });
       assert.deepEqual({ age: 20 }, q._conditions);
-      done();
+      
     });
   });
 
   describe('size', function() {
-    it('via where', function(done) {
+    it('via where', function() {
       const query = new Query({});
       query.where('collection').size(5);
       assert.deepEqual(query._conditions, { collection: { $size: 5 } });
-      done();
+      
     });
-    it('not via where', function(done) {
+    it('not via where', function() {
       const query = new Query({});
       query.size('collection', 5);
       assert.deepEqual(query._conditions, { collection: { $size: 5 } });
-      done();
+      
     });
   });
 
   describe('slice', function() {
-    it('where and positive limit param', function(done) {
+    it('where and positive limit param', function() {
       const query = new Query({});
       query.where('collection').slice(5);
       assert.deepEqual(query._fields, { collection: { $slice: 5 } });
-      done();
+      
     });
-    it('where just negative limit param', function(done) {
+    it('where just negative limit param', function() {
       const query = new Query({});
       query.where('collection').slice(-5);
       assert.deepEqual(query._fields, { collection: { $slice: -5 } });
-      done();
+      
     });
-    it('where [skip, limit] param', function(done) {
+    it('where [skip, limit] param', function() {
       const query = new Query({});
       query.where('collection').slice([14, 10]); // Return the 15th through 25th
       assert.deepEqual(query._fields, { collection: { $slice: [14, 10] } });
-      done();
+      
     });
-    it('where skip and limit params', function(done) {
+    it('where skip and limit params', function() {
       const query = new Query({});
       query.where('collection').slice(14, 10); // Return the 15th through 25th
       assert.deepEqual(query._fields, { collection: { $slice: [14, 10] } });
-      done();
+      
     });
-    it('where just positive limit param', function(done) {
+    it('where just positive limit param', function() {
       const query = new Query({});
       query.where('collection').slice(5);
       assert.deepEqual(query._fields, { collection: { $slice: 5 } });
-      done();
+      
     });
-    it('where just negative limit param', function(done) {
+    it('where just negative limit param', function() {
       const query = new Query({});
       query.where('collection').slice(-5);
       assert.deepEqual(query._fields, { collection: { $slice: -5 } });
-      done();
+      
     });
-    it('where the [skip, limit] param', function(done) {
+    it('where the [skip, limit] param', function() {
       const query = new Query({});
       query.where('collection').slice([14, 10]); // Return the 15th through 25th
       assert.deepEqual(query._fields, { collection: { $slice: [14, 10] } });
-      done();
+      
     });
-    it('where the skip and limit params', function(done) {
+    it('where the skip and limit params', function() {
       const query = new Query({});
       query.where('collection').slice(14, 10); // Return the 15th through 25th
       assert.deepEqual(query._fields, { collection: { $slice: [14, 10] } });
-      done();
+      
     });
-    it('not via where, with just positive limit param', function(done) {
+    it('not via where, with just positive limit param', function() {
       const query = new Query({});
       query.slice('collection', 5);
       assert.deepEqual(query._fields, { collection: { $slice: 5 } });
-      done();
+      
     });
-    it('not via where, where just negative limit param', function(done) {
+    it('not via where, where just negative limit param', function() {
       const query = new Query({});
       query.slice('collection', -5);
       assert.deepEqual(query._fields, { collection: { $slice: -5 } });
-      done();
+      
     });
-    it('not via where, where [skip, limit] param', function(done) {
+    it('not via where, where [skip, limit] param', function() {
       const query = new Query({});
       query.slice('collection', [14, 10]); // Return the 15th through 25th
       assert.deepEqual(query._fields, { collection: { $slice: [14, 10] } });
-      done();
+      
     });
-    it('not via where, where skip and limit params', function(done) {
+    it('not via where, where skip and limit params', function() {
       const query = new Query({});
       query.slice('collection', 14, 10); // Return the 15th through 25th
       assert.deepEqual(query._fields, { collection: { $slice: [14, 10] } });
-      done();
+      
     });
   });
 
   describe('elemMatch', function() {
     describe('not via where', function() {
-      it('works', function(done) {
+      it('works', function() {
         const query = new Query({});
         query.elemMatch('comments', { author: 'bnoguchi', votes: { $gte: 5 } });
         assert.deepEqual(query._conditions, { comments: { $elemMatch: { author: 'bnoguchi', votes: { $gte: 5 } } } });
-        done();
+        
       });
-      it('where block notation', function(done) {
+      it('where block notation', function() {
         const query = new Query({});
         query.elemMatch('comments', function(elem) {
           elem.where('author', 'bnoguchi');
           elem.where('votes').gte(5);
         });
         assert.deepEqual(query._conditions, { comments: { $elemMatch: { author: 'bnoguchi', votes: { $gte: 5 } } } });
-        done();
+        
       });
     });
     describe('via where', function() {
-      it('works', function(done) {
+      it('works', function() {
         const query = new Query({});
         query.where('comments').elemMatch({ author: 'bnoguchi', votes: { $gte: 5 } });
         assert.deepEqual(query._conditions, { comments: { $elemMatch: { author: 'bnoguchi', votes: { $gte: 5 } } } });
-        done();
+        
       });
-      it('where block notation', function(done) {
+      it('where block notation', function() {
         const query = new Query({});
         query.where('comments').elemMatch(function(elem) {
           elem.where('author', 'bnoguchi');
           elem.where('votes').gte(5);
         });
         assert.deepEqual(query._conditions, { comments: { $elemMatch: { author: 'bnoguchi', votes: { $gte: 5 } } } });
-        done();
+        
       });
     });
   });
 
   describe('$where', function() {
-    it('function arg', function(done) {
+    it('function arg', function() {
       const query = new Query({});
 
       function filter() {
@@ -750,22 +727,22 @@ describe('Query', function() {
 
       query.$where(filter);
       assert.deepEqual(query._conditions, { $where: filter });
-      done();
+      
     });
-    it('string arg', function(done) {
+    it('string arg', function() {
       const query = new Query({});
       query.$where('this.lastName === this.firstName');
       assert.deepEqual(query._conditions, { $where: 'this.lastName === this.firstName' });
-      done();
+      
     });
   });
 
   describe('limit', function() {
-    it('works', function(done) {
+    it('works', function() {
       const query = new Query({});
       query.limit(5);
       assert.strictEqual(query.options.limit, 5);
-      done();
+      
     });
 
     it('with string limit (gh-11017)', function() {
@@ -778,16 +755,16 @@ describe('Query', function() {
   });
 
   describe('skip', function() {
-    it('works', function(done) {
+    it('works', function() {
       const query = new Query({});
       query.skip(9);
       assert.equal(query.options.skip, 9);
-      done();
+      
     });
   });
 
   describe('sort', function() {
-    it('works', function(done) {
+    it('works', function() {
       let query = new Query({});
       query.sort('a -c b');
       assert.deepEqual(query.options.sort, { a: 1, c: -1, b: 1 });
@@ -822,12 +799,12 @@ describe('Query', function() {
       }
       assert.ok(e, 'uh oh. no error was thrown');
       assert.equal(e.message, 'sort() only takes 1 Argument');
-      done();
+      
     });
   });
 
   describe('or', function() {
-    it('works', function(done) {
+    it('works', function() {
       const query = new Query();
       query.find({ $or: [{ x: 1 }, { x: 2 }] });
       assert.equal(query._conditions.$or.length, 2);
@@ -838,12 +815,12 @@ describe('Query', function() {
       assert.equal(query._conditions.$or.length, 5);
       assert.equal(query._conditions.$or[3].z, 47);
       assert.equal(query._conditions.$or[4].z, 'phew');
-      done();
+      
     });
   });
 
   describe('and', function() {
-    it('works', function(done) {
+    it('works', function() {
       const query = new Query();
       query.find({ $and: [{ x: 1 }, { y: 2 }] });
       assert.equal(query._conditions.$and.length, 2);
@@ -857,12 +834,12 @@ describe('Query', function() {
       assert.equal(query._conditions.$and[2].z, 'We\'re under attack');
       assert.equal(query._conditions.$and[3].w, 47);
       assert.equal(query._conditions.$and[4].a, 'phew');
-      done();
+      
     });
   });
 
   describe('populate', function() {
-    it('converts to PopulateOptions objects', function(done) {
+    it('converts to PopulateOptions objects', function() {
       const q = new Query({});
       const o = {
         path: 'yellow.brick',
@@ -875,10 +852,10 @@ describe('Query', function() {
       };
       q.populate(o);
       assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
-      done();
+      
     });
 
-    it('overwrites duplicate paths', function(done) {
+    it('overwrites duplicate paths', function() {
       const q = new Query({});
       let o = {
         path: 'yellow.brick',
@@ -898,10 +875,10 @@ describe('Query', function() {
       };
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 1);
       assert.deepEqual(q._mongooseOptions.populate['yellow.brick'], o);
-      done();
+      
     });
 
-    it('accepts space delimited strings', function(done) {
+    it('accepts space delimited strings', function() {
       const q = new Query({});
       q.populate('yellow.brick dirt');
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 2);
@@ -915,18 +892,18 @@ describe('Query', function() {
         _docs: {},
         _childDocs: []
       });
-      done();
+      
     });
   });
 
   describe('casting', function() {
-    it('to an array of mixed', function(done) {
+    it('to an array of mixed', function() {
       const query = new Query({});
       const Product = db.model('Product', productSchema);
       const params = { _id: new DocumentObjectId(), tags: { $in: [4, 8, 15, 16] } };
       query.cast(Product, params);
       assert.deepEqual(params.tags.$in, [4, 8, 15, 16]);
-      done();
+      
     });
 
     it('doesn\'t wipe out $in (gh-6439)', async function() {
@@ -967,7 +944,7 @@ describe('Query', function() {
       assert.strictEqual(found.props[0].name, 'abc');
     });
 
-    it('find $ne should not cast single value to array for schematype of Array', function(done) {
+    it('find $ne should not cast single value to array for schematype of Array', function() {
       const query = new Query({});
       const Product = db.model('Product', productSchema);
       const Comment = db.model('Comment', commentSchema);
@@ -1008,10 +985,10 @@ describe('Query', function() {
       assert.equal(params.strings.$ne[0], 'Hi there');
       assert.ok(params.numbers.$ne instanceof Array);
       assert.equal(params.numbers.$ne[0], 10000);
-      done();
+      
     });
 
-    it('subdocument array with $ne: null should not throw', function(done) {
+    it('subdocument array with $ne: null should not throw', function() {
       const query = new Query({});
       const Product = db.model('Product', productSchema);
 
@@ -1021,10 +998,10 @@ describe('Query', function() {
 
       query.cast(Product, params);
       assert.strictEqual(params.comments.$ne, null);
-      done();
+      
     });
 
-    it('find should not cast single value to array for schematype of Array', function(done) {
+    it('find should not cast single value to array for schematype of Array', function() {
       const query = new Query({});
       const Product = db.model('Product', productSchema);
       const Comment = db.model('Comment', commentSchema);
@@ -1065,10 +1042,10 @@ describe('Query', function() {
       assert.equal(params.strings[0], 'Hi there');
       assert.ok(params.numbers instanceof Array);
       assert.equal(params.numbers[0], 10000);
-      done();
+      
     });
 
-    it('an $elemMatch with $in works (gh-1100)', function(done) {
+    it('an $elemMatch with $in works (gh-1100)', function() {
       const query = new Query({});
       const Product = db.model('Product', productSchema);
       const ids = [String(new DocumentObjectId()), String(new DocumentObjectId())];
@@ -1078,10 +1055,10 @@ describe('Query', function() {
       assert.ok(params.ids.$elemMatch.$in[1] instanceof DocumentObjectId);
       assert.deepEqual(params.ids.$elemMatch.$in[0].toString(), ids[0]);
       assert.deepEqual(params.ids.$elemMatch.$in[1].toString(), ids[1]);
-      done();
+      
     });
 
-    it('inequality operators for an array', function(done) {
+    it('inequality operators for an array', function() {
       const query = new Query({});
       const Product = db.model('Product', productSchema);
       const Comment = db.model('Comment', commentSchema);
@@ -1102,7 +1079,7 @@ describe('Query', function() {
       assert.deepEqual(params.comments.$gt.toObject(), castedComment);
       assert.equal(params.strings.$gt, 'Hi there');
       assert.equal(params.numbers.$gt, 10000);
-      done();
+      
     });
   });
 
@@ -1117,29 +1094,13 @@ describe('Query', function() {
   });
 
   describe('findOne', function() {
-    it('sets the op', function(done) {
+    it('sets the op', function() {
       const Product = db.model('Product', productSchema);
       const prod = new Product({});
       const q = new Query(prod.collection, {}, Product).distinct();
-      // use a timeout here because we have to wait for the connection to start
-      // before any ops will get set
-      setTimeout(function() {
-        assert.equal(q.op, 'distinct');
-        q.findOne();
-        assert.equal(q.op, 'findOne');
-        done();
-      }, 50);
-    });
-
-    it('works as a promise', function(done) {
-      const Product = db.model('Product', productSchema);
-      const promise = Product.findOne();
-
-      promise.then(function() {
-        done();
-      }, function(err) {
-        assert.ifError(err);
-      });
+      assert.equal(q.op, 'distinct');
+      q.findOne();
+      assert.equal(q.op, 'findOne');
     });
   });
 
@@ -1171,96 +1132,67 @@ describe('Query', function() {
     });
   });
 
-  describe('remove', function() {
-    it('handles cast errors async', function(done) {
+  describe('deleteMany', function() {
+    it('handles cast errors async', async function() {
       const Product = db.model('Product', productSchema);
 
-      assert.doesNotThrow(function() {
-        Product.where({ numbers: [[[]]] }).deleteMany(function(err) {
-          assert.ok(err);
-          done();
-        });
-      });
+      const err = await Product.where({ numbers: [[[]]] }).deleteMany().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'CastError');
     });
 
-    it('supports a single conditions arg', function(done) {
+    it('supports a single conditions arg', async function() {
       const Product = db.model('Product', productSchema);
 
-      Product.create({ strings: ['remove-single-condition'] }).then(function() {
-        const q = Product.where().deleteMany({ strings: 'remove-single-condition' });
-        assert.ok(q instanceof mongoose.Query);
-        done();
-      }, done);
+      await Product.create({ strings: ['remove-single-condition'] });
+      const q = Product.where().deleteMany({ strings: 'remove-single-condition' });
+      assert.ok(q instanceof mongoose.Query);
     });
 
-    it('supports a single callback arg', function(done) {
+    it('supports a single callback arg', async function() {
       const Product = db.model('Product', productSchema);
       const val = 'remove-single-callback';
 
-      Product.create({ strings: [val] }).then(function() {
-        Product.where({ strings: val }).deleteMany(function(err) {
-          assert.ifError(err);
-          Product.findOne({ strings: val }, function(err, doc) {
-            assert.ifError(err);
-            assert.ok(!doc);
-            done();
-          });
-        });
-      }, done);
+      await Product.create({ strings: [val] });
+      await Product.where({ strings: val }).deleteMany();
+      const doc = await Product.findOne({ strings: val });
+      assert.ok(!doc);
     });
 
-    it('supports conditions and callback args', function(done) {
+    it('supports conditions and callback args', async function() {
       const Product = db.model('Product', productSchema);
       const val = 'remove-cond-and-callback';
 
-      Product.create({ strings: [val] }).then(function() {
-        Product.where().deleteMany({ strings: val }, function(err) {
-          assert.ifError(err);
-          Product.findOne({ strings: val }, function(err, doc) {
-            assert.ifError(err);
-            assert.ok(!doc);
-            done();
-          });
-        });
-      }, done);
+      await Product.create({ strings: [val] });
+      await Product.where().deleteMany({ strings: val });
+      const doc = await Product.findOne({ strings: val });
+      assert.ok(!doc);
     });
   });
 
   describe('querying/updating with model instance containing embedded docs should work (#454)', function() {
-    it('works', function(done) {
+    it('works', async function() {
       const Product = db.model('Product', productSchema);
 
       const proddoc = { comments: [{ text: 'hello' }] };
       const prod2doc = { comments: [{ text: 'goodbye' }] };
 
       const prod = new Product(proddoc);
-      prod.save(function(err) {
-        assert.ifError(err);
+      await prod.save();
 
-        Product.findOne({ _id: prod._id }, function(err, product) {
-          assert.ifError(err);
-          assert.equal(product.comments.length, 1);
+      const product = await Product.findOne({ _id: prod._id });
+      assert.equal(product.comments.length, 1);
           assert.equal(product.comments[0].text, 'hello');
+          await Product.updateOne({ _id: prod._id }, prod2doc);
+          const doc = await Product.collection.findOne({ _id: product._id });
 
-          Product.updateOne({ _id: prod._id }, prod2doc, function(err) {
-            assert.ifError(err);
-
-            Product.collection.findOne({ _id: product._id }, function(err, doc) {
-              assert.ifError(err);
-              assert.equal(doc.comments.length, 1);
-              // ensure hidden private props were not saved to db
-              assert.ok(!doc.comments[0].hasOwnProperty('parentArry'));
-              assert.equal(doc.comments[0].text, 'goodbye');
-              done();
-            });
-          });
-        });
-      });
+          assert.ok(!doc.comments[0].hasOwnProperty('parentArry'));
+          assert.equal(doc.comments[0].text, 'goodbye');
     });
   });
 
   describe('optionsForExec', function() {
-    it('should retain key order', function(done) {
+    it('should retain key order', function() {
       // this is important for query hints
       const hint = { x: 1, y: 1, z: 1 };
       const a = JSON.stringify({ hint: hint });
@@ -1270,10 +1202,9 @@ describe('Query', function() {
 
       const options = q._optionsForExec({ schema: { options: {} } });
       assert.equal(JSON.stringify(options), a);
-      done();
     });
 
-    it('applies schema-level writeConcern option', function(done) {
+    it('applies schema-level writeConcern option', function() {
       const q = new Query();
 
       q.j(true);
@@ -1291,10 +1222,9 @@ describe('Query', function() {
           j: true
         }
       });
-      done();
     });
 
-    it('session() (gh-6663)', function(done) {
+    it('session() (gh-6663)', function() {
       const q = new Query();
 
       const fakeSession = 'foo';
@@ -1304,7 +1234,6 @@ describe('Query', function() {
       assert.deepEqual(options, {
         session: fakeSession
       });
-      done();
     });
   });
 
@@ -1312,33 +1241,15 @@ describe('Query', function() {
 
   describe('options', function() {
     describe('maxscan', function() {
-      it('works', function(done) {
+      it('works', function() {
         const query = new Query({});
         query.maxscan(100);
         assert.equal(query.options.maxScan, 100);
-        done();
-      });
-    });
-
-    describe('slaveOk', function() {
-      it('works', function(done) {
-        let query = new Query({});
-        query.slaveOk();
-        assert.equal(query.options.slaveOk, true);
-
-        query = new Query({});
-        query.slaveOk(true);
-        assert.equal(query.options.slaveOk, true);
-
-        query = new Query({});
-        query.slaveOk(false);
-        assert.equal(query.options.slaveOk, false);
-        done();
       });
     });
 
     describe('tailable', function() {
-      it('works', function(done) {
+      it('works', function() {
         let query = new Query({});
         query.tailable();
         assert.equal(query.options.tailable, true);
@@ -1350,29 +1261,26 @@ describe('Query', function() {
         query = new Query({});
         query.tailable(false);
         assert.equal(query.options.tailable, false);
-        done();
       });
-      it('supports passing the `awaitData` option', function(done) {
+      it('supports passing the `awaitData` option', function() {
         const query = new Query({});
         query.tailable({ awaitData: true });
         assert.equal(query.options.tailable, true);
         assert.equal(query.options.awaitData, true);
-        done();
       });
     });
 
     describe('comment', function() {
-      it('works', function(done) {
+      it('works', function() {
         const query = new Query();
         assert.equal(typeof query.comment, 'function');
         assert.equal(query.comment('Lowpass is more fun'), query);
         assert.equal(query.options.comment, 'Lowpass is more fun');
-        done();
       });
     });
 
     describe('hint', function() {
-      it('works', function(done) {
+      it('works', function() {
         const query2 = new Query({});
         query2.hint({ indexAttributeA: 1, indexAttributeB: -1 });
         assert.deepEqual(query2.options.hint, { indexAttributeA: 1, indexAttributeB: -1 });
@@ -1380,32 +1288,28 @@ describe('Query', function() {
         const query3 = new Query({});
         query3.hint('indexAttributeA_1');
         assert.deepEqual(query3.options.hint, 'indexAttributeA_1');
-
-        done();
       });
     });
 
     describe('snapshot', function() {
-      it('works', function(done) {
+      it('works', function() {
         const query = new Query({});
         query.snapshot(true);
         assert.equal(query.options.snapshot, true);
-        done();
       });
     });
 
     describe('batchSize', function() {
-      it('works', function(done) {
+      it('works', function() {
         const query = new Query({});
         query.batchSize(10);
         assert.equal(query.options.batchSize, 10);
-        done();
       });
     });
 
     describe('read', function() {
       describe('without tags', function() {
-        it('works', function(done) {
+        it('works', function() {
           const query = new Query({});
           query.read('primary');
           assert.equal(query.options.readPreference.mode, 'primary');
@@ -1421,13 +1325,11 @@ describe('Query', function() {
 
           query.read('nearest');
           assert.equal(query.options.readPreference.mode, 'nearest');
-
-          done();
         });
       });
 
       describe('with tags', function() {
-        it('works', function(done) {
+        it('works', function() {
           const query = new Query({});
           const tags = [{ dc: 'sf', s: 1 }, { dc: 'jp', s: 2 }];
 
@@ -1438,7 +1340,6 @@ describe('Query', function() {
           assert.equal(query.options.readPreference.tags[0].s, 1);
           assert.equal(query.options.readPreference.tags[1].dc, 'jp');
           assert.equal(query.options.readPreference.tags[1].s, 2);
-          done();
         });
       });
 
@@ -1449,19 +1350,17 @@ describe('Query', function() {
           M = mongoose.model('schemaOptionReadPrefWithQuery', schema);
         });
 
-        it('if not set in query', function(done) {
+        it('if not set in query', function() {
           const options = M.where()._optionsForExec(M);
           assert.equal(options.readPreference, 'primary');
-          done();
         });
 
-        it('if set in query', function(done) {
+        it('if set in query', function() {
           const options = M.where().read('secondary')._optionsForExec(M);
           assert.equal(options.readPreference.mode, 'secondary');
-          done();
         });
 
-        it('and sends it though the driver', function(done) {
+        it('and sends it though the driver', async function() {
           const options = { read: 'secondary', writeConcern: { w: 'majority' } };
           const schema = new Schema({ name: String }, options);
           const M = db.model('Test', schema);
@@ -1482,20 +1381,15 @@ describe('Query', function() {
             return ret;
           };
 
-          q.exec(function(err) {
-            if (err) {
-              return done(err);
-            }
-            assert.ok(called);
-            done();
-          });
+          await q.exec();
+          assert.ok(called);
         });
       });
     });
   });
 
   describe('setOptions', function() {
-    it('works', function(done) {
+    it('works', async function() {
       const q = new Query();
       q.setOptions({ thing: 'cat' });
       q.setOptions({ populate: ['fans'] });
@@ -1521,25 +1415,21 @@ describe('Query', function() {
       assert.equal(q.options.readPreference.tags[0].dc, 'eu');
 
       const Product = db.model('Product', productSchema);
-      Product.create(
+      const [, doc2] = await Product.create([
         { numbers: [3, 4, 5] },
-        { strings: 'hi there'.split(' '), w: 'majority' }, function(err, doc1, doc2) {
-          assert.ifError(err);
-          Product.find().setOptions({ limit: 1, sort: { _id: -1 }, read: 'n' }).exec(function(err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 1);
-            assert.equal(docs[0].id, doc2.id);
-            done();
-          });
-        });
+        { strings: 'hi there'.split(' '), w: 'majority' }
+      ]);
+      
+      const docs = await Product.find().setOptions({ limit: 1, sort: { _id: -1 }, read: 'n' });
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].id, doc2.id);
     });
 
-    it('populate as array in options (gh-4446)', function(done) {
+    it('populate as array in options (gh-4446)', function() {
       const q = new Query();
       q.setOptions({ populate: [{ path: 'path1' }, { path: 'path2' }] });
       assert.deepEqual(Object.keys(q._mongooseOptions.populate),
         ['path1', 'path2']);
-      done();
     });
   });
 
@@ -1566,7 +1456,7 @@ describe('Query', function() {
         }
       });
 
-      it('collation support (gh-4839)', function(done) {
+      it('collation support (gh-4839)', function() {
         const schema = new Schema({
           name: String
         });
@@ -1574,7 +1464,7 @@ describe('Query', function() {
         const MyModel = db.model('Test', schema);
         const collation = { locale: 'en_US', strength: 1 };
 
-        MyModel.create([{ name: 'a' }, { name: 'A' }]).
+        return MyModel.create([{ name: 'a' }, { name: 'A' }]).
           then(function() {
             return MyModel.find({ name: 'a' }).collation(collation);
           }).
@@ -1595,13 +1485,10 @@ describe('Query', function() {
           }).
           then(function(docs) {
             assert.equal(docs.length, 1);
-            done();
-          }).
-          catch(done);
+          });
       });
 
       it('set on schema (gh-5295)', async function() {
-
         await db.db.collection('tests').drop().catch(err => {
           if (err.message === 'ns not found') {
             return;
@@ -1624,30 +1511,19 @@ describe('Query', function() {
     });
 
     describe('gh-1950', function() {
-      it.skip('ignores sort when passed to count', function(done) {
-        const Product = db.model('Product', productSchema);
-        Product.find().sort({ _id: 1 }).count({}).exec(function(error) {
-          assert.ifError(error);
-          done();
-        });
-      });
-
       it('ignores sort when passed to countDocuments', function() {
         const Product = db.model('Product', productSchema);
         return Product.create({}).
           then(() => Product.find().sort({ _id: 1 }).countDocuments({}).exec());
       });
 
-      it.skip('ignores count when passed to sort', function(done) {
+      it.skip('ignores count when passed to sort', function() {
         const Product = db.model('Product', productSchema);
-        Product.find().count({}).sort({ _id: 1 }).exec(function(error) {
-          assert.ifError(error);
-          done();
-        });
+        return Product.find().count({}).sort({ _id: 1 }).exec();
       });
     });
 
-    it('excludes _id when select false and inclusive mode (gh-3010)', function(done) {
+    it('excludes _id when select false and inclusive mode (gh-3010)', async function() {
       const User = db.model('User', {
         _id: {
           select: false,
@@ -1657,19 +1533,14 @@ describe('Query', function() {
         username: String
       });
 
-      User.create({ username: 'Val' }, function(error, user) {
-        assert.ifError(error);
-        User.find({ _id: user._id }).select('username').exec(function(error, users) {
-          assert.ifError(error);
-          assert.equal(users.length, 1);
-          assert.ok(!users[0]._id);
-          assert.equal(users[0].username, 'Val');
-          done();
-        });
-      });
+      const user = await User.create({ username: 'Val' });
+      const users = await User.find({ _id: user._id }).select('username').exec();
+      assert.equal(users.length, 1);
+      assert.ok(!users[0]._id);
+      assert.equal(users[0].username, 'Val');
     });
 
-    it('doesnt reverse key order for update docs (gh-3215)', function(done) {
+    it('doesnt reverse key order for update docs (gh-3215)', function() {
       const Test = db.model('Test', {
         arr: [{ date: Date, value: Number }]
       });
@@ -1685,52 +1556,24 @@ describe('Query', function() {
 
       assert.deepEqual(Object.keys(q.getUpdate().$push.arr.$sort),
         ['value', 'date']);
-      done();
     });
 
-    it('timestamps with $each (gh-4805)', function(done) {
+    it('timestamps with $each (gh-4805)', async function() {
       const nestedSchema = new Schema({ value: Number }, { timestamps: true });
       const Test = db.model('Test', new Schema({
         arr: [nestedSchema]
       }, { timestamps: true }));
 
-      Test.updateOne({}, {
+      await Test.updateOne({}, {
         $push: {
           arr: {
             $each: [{ value: 1 }]
           }
         }
-      }).exec(function(error) {
-        assert.ifError(error);
-        done();
       });
     });
 
-    it.skip('allows sort with count (gh-3914)', function(done) {
-      const Post = db.model('BlogPost', {
-        title: String
-      });
-
-      Post.count({}).sort({ title: 1 }).exec(function(error, count) {
-        assert.ifError(error);
-        assert.strictEqual(count, 0);
-        done();
-      });
-    });
-
-    it.skip('allows sort with select (gh-3914)', function(done) {
-      const Post = db.model('BlogPost', {
-        title: String
-      });
-
-      Post.count({}).select({ _id: 0 }).exec(function(error, count) {
-        assert.ifError(error);
-        assert.strictEqual(count, 0);
-        done();
-      });
-    });
-
-    it('handles nested $ (gh-3265)', function(done) {
+    it('handles nested $ (gh-3265)', function() {
       const Post = db.model('BlogPost', {
         title: String,
         answers: [{
@@ -1749,10 +1592,9 @@ describe('Query', function() {
 
       assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
         { votes: 1, count: 3 });
-      done();
     });
 
-    it('$geoWithin with single nested schemas (gh-4044)', function(done) {
+    it('$geoWithin with single nested schemas (gh-4044)', async function() {
       const locationSchema = new Schema({
         type: { type: String },
         coordinates: []
@@ -1776,13 +1618,10 @@ describe('Query', function() {
           }
         }
       };
-      Model.find(query, function(error) {
-        assert.ifError(error);
-        done();
-      });
+      await Model.find(query);
     });
 
-    it('setDefaultsOnInsert with empty update (gh-3825)', function(done) {
+    it('setDefaultsOnInsert with empty update (gh-3825)', async function() {
       const schema = new mongoose.Schema({
         test: { type: Number, default: 8472 },
         name: String
@@ -1791,19 +1630,14 @@ describe('Query', function() {
       const MyModel = db.model('Test', schema);
 
       const opts = { upsert: true };
-      MyModel.updateOne({}, {}, opts, function(error) {
-        assert.ifError(error);
-        MyModel.findOne({}, function(error, doc) {
-          assert.ifError(error);
-          assert.ok(doc);
-          assert.strictEqual(doc.test, 8472);
-          assert.ok(!doc.name);
-          done();
-        });
-      });
+      await MyModel.updateOne({}, {}, opts);
+      const doc = await MyModel.findOne({});
+      assert.ok(doc);
+      assert.strictEqual(doc.test, 8472);
+      assert.ok(!doc.name);
     });
 
-    it('custom query methods (gh-3714)', function(done) {
+    it('custom query methods (gh-3714)', async function() {
       const schema = new mongoose.Schema({
         name: String
       });
@@ -1813,33 +1647,25 @@ describe('Query', function() {
       };
 
       const MyModel = db.model('Test', schema);
-
-      MyModel.create({ name: 'Val' }, function(error) {
-        assert.ifError(error);
-        MyModel.find().byName('Val').exec(function(error, docs) {
-          assert.ifError(error);
-          assert.equal(docs.length, 1);
-          assert.equal(docs[0].name, 'Val');
-          done();
-        });
-      });
+      await MyModel.create({ name: 'Val' });
+      const docs = await MyModel.find().byName('Val').exec();
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].name, 'Val');
     });
 
-    it('string as input (gh-4378)', function(done) {
+    it('string as input (gh-4378)', async function() {
       const schema = new mongoose.Schema({
         name: String
       });
 
       const MyModel = db.model('Test', schema);
 
-      MyModel.findOne('', function(error) {
-        assert.ok(error);
-        assert.equal(error.name, 'ObjectParameterError');
-        done();
-      });
+      const error = await MyModel.findOne('').then(() => null, err => err);
+      assert.ok(error);
+      assert.equal(error.name, 'ObjectParameterError');
     });
 
-    it('handles geoWithin with $center and mongoose object (gh-4419)', function(done) {
+    it('handles geoWithin with $center and mongoose object (gh-4419)', async function() {
       const areaSchema = new Schema({
         name: String,
         circle: Array
@@ -1864,36 +1690,30 @@ describe('Query', function() {
         name: 'Tromso, Norway',
         circle: [[18.89, 69.62], 10 / 3963.2]
       });
-      tromso.save(function(error) {
-        assert.ifError(error);
+      await tromso.save();
 
-        const airport = {
-          name: 'Center',
-          geometry: {
-            type: 'Point',
-            coordinates: [18.895, 69.67]
+      const airport = {
+        name: 'Center',
+        geometry: {
+          type: 'Point',
+          coordinates: [18.895, 69.67]
+        }
+      };
+      await Place.create(airport);
+
+      const q = {
+        geometry: {
+          $geoWithin: {
+            $centerSphere: tromso.circle
           }
-        };
-        Place.create(airport, function(error) {
-          assert.ifError(error);
-          const q = {
-            geometry: {
-              $geoWithin: {
-                $centerSphere: tromso.circle
-              }
-            }
-          };
-          Place.find(q).exec(function(error, docs) {
-            assert.ifError(error);
-            assert.equal(docs.length, 1);
-            assert.equal(docs[0].name, 'Center');
-            done();
-          });
-        });
-      });
+        }
+      };
+      const docs = await Place.find(q).exec();
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].name, 'Center');
     });
 
-    it('$not with objects (gh-4495)', function(done) {
+    it('$not with objects (gh-4495)', function() {
       const schema = new Schema({
         createdAt: Date
       });
@@ -1911,10 +1731,9 @@ describe('Query', function() {
 
       assert.ok(q._conditions.createdAt.$not.$gte instanceof Date);
       assert.ok(q._conditions.createdAt.$not.$lte instanceof Date);
-      done();
     });
 
-    it('geoIntersects with mongoose doc as coords (gh-4408)', function(done) {
+    it('geoIntersects with mongoose doc as coords (gh-4408)', async function() {
       const lineStringSchema = new Schema({
         name: String,
         geo: {
@@ -1937,41 +1756,32 @@ describe('Query', function() {
           coordinates: [[27.528, 25.006], [14.063, 15.591]]
         }
       };
-      LineString.create(ls, ls2, function(error, ls1) {
-        assert.ifError(error);
-        const query = {
-          geo: {
-            $geoIntersects: {
-              $geometry: {
-                type: 'LineString',
-                coordinates: ls1.geo.coordinates
-              }
+      const [ls1] = await LineString.create([ls, ls2]);
+      const query = {
+        geo: {
+          $geoIntersects: {
+            $geometry: {
+              type: 'LineString',
+              coordinates: ls1.geo.coordinates
             }
           }
-        };
-        LineString.find(query, function(error, results) {
-          assert.ifError(error);
-          assert.equal(results.length, 2);
-          done();
-        });
-      });
+        }
+      };
+      const results = await LineString.find(query);
+      assert.equal(results.length, 2);
     });
 
-    it('string with $not (gh-4592)', function(done) {
+    it('string with $not (gh-4592)', async function() {
       const TestSchema = new Schema({
         test: String
       });
 
       const Test = db.model('Test', TestSchema);
 
-      Test.findOne({ test: { $not: /test/ } }, function(error) {
-        assert.ifError(error);
-        done();
-      });
+      await Test.findOne({ test: { $not: /test/ } });
     });
 
     it('does not cast undefined to null in mongoose (gh-6236)', async function() {
-
       const TestSchema = new Schema({
         test: String
       });
@@ -1988,13 +1798,13 @@ describe('Query', function() {
       assert.equal(res.length, 1);
     });
 
-    it('runs query setters with _id field (gh-5351)', function(done) {
+    it('runs query setters with _id field (gh-5351)', function() {
       const testSchema = new Schema({
         val: { type: String }
       });
 
       const Test = db.model('Test', testSchema);
-      Test.create({ val: 'A string' }).
+      return Test.create({ val: 'A string' }).
         then(function() {
           return Test.findOne({});
         }).
@@ -2008,9 +1818,7 @@ describe('Query', function() {
         then(function(doc) {
           assert.ok(doc);
           assert.equal(doc.val, 'another string');
-        }).
-        then(done).
-        catch(done);
+        });
     });
 
     it('runs setters if query field is an array (gh-6277)', async function() {
@@ -2036,20 +1844,17 @@ describe('Query', function() {
       assert.deepEqual(setterCalled, [['test']]);
     });
 
-    it('$exists under $not (gh-4933)', function(done) {
+    it('$exists under $not (gh-4933)', async function() {
       const TestSchema = new Schema({
         test: String
       });
 
       const Test = db.model('Test', TestSchema);
 
-      Test.findOne({ test: { $not: { $exists: true } } }, function(error) {
-        assert.ifError(error);
-        done();
-      });
+      await Test.findOne({ test: { $not: { $exists: true } } });
     });
 
-    it('geojson underneath array (gh-5467)', function(done) {
+    it('geojson underneath array (gh-5467)', async function() {
       const storySchema = new Schema({
         name: String,
         gallery: [{
@@ -2076,16 +1881,11 @@ describe('Query', function() {
           }
         }
       };
-      Story.once('index', function(error) {
-        assert.ifError(error);
-        Story.updateOne(q, { name: 'test' }, { upsert: true }, function(error) {
-          assert.ifError(error);
-          done();
-        });
-      });
+      await Story.init();
+      await Story.updateOne(q, { name: 'test' }, { upsert: true });
     });
 
-    it('slice respects schema projections (gh-5450)', function(done) {
+    it('slice respects schema projections (gh-5450)', async function() {
       const gameSchema = Schema({
         name: String,
         developer: {
@@ -2096,16 +1896,11 @@ describe('Query', function() {
       });
       const Game = db.model('Test', gameSchema);
 
-      Game.create({ name: 'Mass Effect', developer: 'BioWare', arr: [1, 2, 3] }, function(error) {
-        assert.ifError(error);
-        Game.findOne({ name: 'Mass Effect' }).slice({ arr: 1 }).exec(function(error, doc) {
-          assert.ifError(error);
-          assert.equal(doc.name, 'Mass Effect');
-          assert.deepEqual(doc.toObject().arr, [1]);
-          assert.ok(!doc.developer);
-          done();
-        });
-      });
+      await Game.create({ name: 'Mass Effect', developer: 'BioWare', arr: [1, 2, 3] });
+      const doc = await Game.findOne({ name: 'Mass Effect' }).slice({ arr: 1 });
+      assert.equal(doc.name, 'Mass Effect');
+      assert.deepEqual(doc.toObject().arr, [1]);
+      assert.ok(!doc.developer);
     });
 
     it('overwrites when passing an object when path already set to primitive (gh-6097)', function() {
@@ -2118,7 +1913,7 @@ describe('Query', function() {
         where({ status: { $ne: 'delayed' } });
     });
 
-    it('$exists for arrays and embedded docs (gh-4937)', function(done) {
+    it('$exists for arrays and embedded docs (gh-4937)', async function() {
       const subSchema = new Schema({
         name: String
       });
@@ -2130,13 +1925,10 @@ describe('Query', function() {
       const Test = db.model('Test', TestSchema);
 
       const q = { test: { $exists: true }, sub: { $exists: false } };
-      Test.findOne(q, function(error) {
-        assert.ifError(error);
-        done();
-      });
+      await Test.findOne(q);
     });
 
-    it('report error in pre hook (gh-5520)', function(done) {
+    it('report error in pre hook (gh-5520)', async function() {
       const TestSchema = new Schema({ name: String });
 
       const ops = [
@@ -2161,28 +1953,26 @@ describe('Query', function() {
 
       let numOps = ops.length;
 
-      ops.forEach(function(op) {
-        TestModel.find({}).updateOne({ name: 'test' })[op](function(error) {
-          assert.ok(error);
+      for (const op of ops) {
+        const error = await TestModel.find({}).updateOne({ name: 'test' })[op].then(() => null, err => err);
+        assert.ok(error);
           assert.equal(error.message, op + ' error');
-          --numOps || done();
-        });
-      });
+      }
     });
 
-    it('cast error with custom error (gh-5520)', function(done) {
+    it('cast error with custom error (gh-5520)', function() {
       const TestSchema = new Schema({ name: Number });
 
       const TestModel = db.model('Test', TestSchema);
 
-      TestModel.
+      return TestModel.
         find({ name: 'not a number' }).
         error(new Error('woops')).
-        exec(function(error) {
+        exec().
+        then(() => assert.ok(false), err => {
           assert.ok(error);
           // CastError check happens **after** `.error()`
           assert.equal(error.name, 'CastError');
-          done();
         });
     });
 
@@ -2206,7 +1996,7 @@ describe('Query', function() {
       assert.equal(doc.isDeleted, true);
     });
 
-    it('child schema with select: false in multiple paths (gh-5603)', function(done) {
+    it('child schema with select: false in multiple paths (gh-5603)', async function() {
       const ChildSchema = new mongoose.Schema({
         field: {
           type: String,
@@ -2223,18 +2013,13 @@ describe('Query', function() {
       const ogParent = new Parent();
       ogParent.child = { field: 'test' };
       ogParent.child2 = { field: 'test' };
-      ogParent.save(function(error) {
-        assert.ifError(error);
-        Parent.findById(ogParent._id).exec(function(error, doc) {
-          assert.ifError(error);
-          assert.ok(!doc.child.field);
-          assert.ok(!doc.child2.field);
-          done();
-        });
-      });
+      await ogParent.save();
+      const doc = await Parent.findById(ogParent._id);
+      assert.ok(!doc.child.field);
+      assert.ok(!doc.child2.field);
     });
 
-    it('errors in post init (gh-5592)', function(done) {
+    it('errors in post init (gh-5592)', async function() {
       const TestSchema = new Schema();
 
       let count = 0;
@@ -2249,63 +2034,24 @@ describe('Query', function() {
         docs.push({});
       }
 
-      TestModel.create(docs, function(error) {
-        assert.ifError(error);
-        TestModel.find({}, function(error) {
-          assert.ok(error);
-          assert.equal(error.message, 'Failed! 0');
+      await TestModel.create(docs);
+      const error = await TestModel.find({}).then(() => null, err => err);
+      assert.equal(error.message, 'Failed! 0');
           assert.equal(count, 10);
-          done();
-        });
-      });
     });
 
-    it('with non-object args (gh-1698)', function(done) {
+    it('with non-object args (gh-1698)', async function() {
       const schema = new mongoose.Schema({
         email: String
       });
       const M = db.model('Test', schema);
 
-      M.find(42, function(error) {
-        assert.ok(error);
+      const error = await M.find(42).then(() => null, err => err);
+      assert.ok(error);
         assert.equal(error.name, 'ObjectParameterError');
-        done();
-      });
     });
 
-    describe('throw', function() {
-      let listeners;
-
-      beforeEach(function() {
-        listeners = process.listeners('uncaughtException');
-        process.removeAllListeners('uncaughtException');
-      });
-
-      afterEach(function() {
-        process.on('uncaughtException', listeners[0]);
-      });
-
-      it('throw on sync exceptions in callbacks (gh-6178)', function(done) {
-        // Deno doesn't support 'uncaughtException', so there's no way to test this in Deno
-        // without starting a separate process.
-        // See: https://stackoverflow.com/questions/64871554/deno-how-to-handle-exceptions
-        if (typeof Deno !== 'undefined') {
-          return this.skip();
-        }
-
-        const schema = new Schema({});
-        const Test = db.model('Test', schema);
-
-        process.once('uncaughtException', err => {
-          assert.equal(err.message, 'Oops!');
-          done();
-        });
-
-        Test.find({}, function() { throw new Error('Oops!'); });
-      });
-    });
-
-    it('queries with BSON overflow (gh-5812)', function(done) {
+    it('queries with BSON overflow (gh-5812)', async function() {
       this.timeout(10000);
 
       const schema = new mongoose.Schema({
@@ -2319,34 +2065,8 @@ describe('Query', function() {
         bigData[i] = 'test1234567890';
       }
 
-      model.find({ email: { $in: bigData } }).lean().
-        then(function() {
-          done(new Error('Expected an error'));
-        }).
-        catch(function(error) {
-          assert.ok(error);
-          assert.ok(error.message !== 'Expected error');
-          done();
-        });
-    });
-
-    it('consistently return query when callback specified (gh-6271)', function(done) {
-      const schema = new mongoose.Schema({
-        n: Number
-      });
-
-      const Model = db.model('Test', schema);
-
-      Model.create({ n: 0 }, (err, doc) => {
-        assert.ifError(err);
-
-        const updateQuery = Model.findOneAndUpdate({ _id: doc._id }, { $inc: { n: 1 } }, { new: true }, (err, doc) => {
-          assert.ifError(err);
-          assert.equal(doc.n, 1);
-          done();
-        });
-        assert.ok(updateQuery instanceof Query);
-      });
+      const error = await model.find({ email: { $in: bigData } }).lean().then(() => null, err => err);
+      assert.ok(error);
     });
 
     it('explain() (gh-6625)', async function() {
@@ -2582,30 +2302,19 @@ describe('Query', function() {
       });
     });
 
-    it('falsy projection', function(done) {
-      MyModel.findOne({ name: 'John' }, { lastName: false }).
-        exec(function(error, person) {
-          assert.ifError(error);
-          assert.equal(person.salary, 25000);
-          done();
-        });
+    it('falsy projection', async function() {
+      const person = await MyModel.findOne({ name: 'John' }, { lastName: false });
+      assert.equal(person.salary, 25000);
     });
 
-    it('slice projection', function(done) {
-      MyModel.findOne({ name: 'John' }, { dependents: { $slice: 1 } }).exec(function(error, person) {
-        assert.ifError(error);
+    it('slice projection', async function() {
+      const person = await MyModel.findOne({ name: 'John' }, { dependents: { $slice: 1 } });
         assert.equal(person.salary, 25000);
-        done();
-      });
     });
 
-    it('empty projection', function(done) {
-      MyModel.findOne({ name: 'John' }, {}).
-        exec(function(error, person) {
-          assert.ifError(error);
-          assert.equal(person.salary, 25000);
-          done();
-        });
+    it('empty projection', async function() {
+      const person = await MyModel.findOne({ name: 'John' }, {}).exec();
+      assert.equal(person.salary, 25000);
     });
   });
 
@@ -3852,7 +3561,7 @@ describe('Query', function() {
     assert.equal(result[0].name, '@foo.com');
   });
 
-  it('should return query helper supplied in schema options query property instead of undefined', function(done) {
+  it('should return query helper supplied in schema options query property instead of undefined', async function() {
     const Model = db.model('Test', new Schema({
       userName: {
         type: String,
@@ -3866,19 +3575,10 @@ describe('Query', function() {
       }
     }));
 
-    Model.create({ userName: 'test' }, function(error) {
-      if (error instanceof Error) {
-        return done(error);
-      }
-      Model.find().byUserName('test').exec(function(error, docs) {
-        if (error instanceof Error) {
-          return done(error);
-        }
-        assert.equal(docs.length, 1);
+    await Model.create({ userName: 'test' });
+    const docs = await Model.find().byUserName('test').exec();
+    assert.equal(docs.length, 1);
         assert.equal(docs[0].userName, 'test');
-        done();
-      });
-    });
   });
 
   it('allows a transform option for lean on a query (gh-10423)', async function() {

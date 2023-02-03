@@ -46,7 +46,20 @@ The changes in that document are not persisted to MongoDB.
 The `Connection#transaction()` function informs Mongoose change tracking that the `save()` was rolled back, and marks all fields that were changed in the transaction as modified.
 
 ```javascript
-[require:transactions.*can save document after aborted transaction]
+const doc = new Person({ name: 'Will Riker' });
+
+await db.transaction(async function setRank(session) {
+    doc.name = 'Captain';
+    await doc.save({ session });
+    doc.isNew; // false
+
+    // Throw an error to abort the transaction
+    throw new Error('Oops!');
+}, { readPreference: 'primary' }).catch(() => {});
+
+// true, `transaction()` reset the document's state because the
+// transaction was aborted.
+doc.isNew;
 ```
 
 <h2 id="with-mongoose-documents-and-save"><a href="#with-mongoose-documents-and-save">With Mongoose Documents and <code>save()</code></a></h2>

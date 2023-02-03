@@ -76,7 +76,6 @@ describe('transactions', function() {
     // acquit:ignore:start
     const Customer = db.model('Customer_withTrans', new Schema({ name: String }));
     // acquit:ignore:end
-
     let session = null;
     return Customer.createCollection().
       then(() => Customer.startSession()).

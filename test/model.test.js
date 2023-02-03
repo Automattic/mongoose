@@ -1975,7 +1975,7 @@ describe('Model', function() {
     });
 
     const Temp = db.model('Test', schema);
-    const t = Temp.create({ nested: { nums: [1, 2, 3, 4, 5] } });
+    const t = await Temp.create({ nested: { nums: [1, 2, 3, 4, 5] } });
     t.nested.nums.pull(1);
     assert.equal(t.nested.nums.length, 4);
   });

@@ -9,7 +9,6 @@ const start = require('./common');
 const assert = require('assert');
 const random = require('./util').random;
 const util = require('./util');
-const { Test } = require('mocha');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -1163,7 +1162,7 @@ describe('Model', function() {
         assert.equal(err.errors.required.kind, 'required');
         assert.equal(err.errors.required.path, 'required');
 
-        
+
         post.set({
           baz: 'good',
           abc: 'abc',
@@ -1308,7 +1307,7 @@ describe('Model', function() {
 
   describe('.remove()', function() {
     it('works', async function() {
-      await BlogPost.create({ title: 1}, { title: 2});
+      await BlogPost.create({ title: 1 }, { title: 2 });
       await BlogPost.remove({ title: 1 });
       const res = await BlogPost.find();
       assert.equal(res.length, 1);
@@ -1317,7 +1316,7 @@ describe('Model', function() {
 
     it('errors when id deselected (gh-3118)', async function() {
       await BlogPost.create({ title: 1 }, { title: 2 });
-      const doc = await BlogPost.findOne({ title: 1}, { _id: 0 });
+      const doc = await BlogPost.findOne({ title: 1 }, { _id: 0 });
       const err = await doc.remove().then(() => null, err => err);
       assert.ok(err);
       assert.equal(err.message, 'No _id found on document!');
@@ -1748,7 +1747,7 @@ describe('Model', function() {
       assert.equal(deal.locations[0].lat.valueOf(), 1);
       assert.equal(deal.locations[0].long.valueOf(), 2);
       const doc = await deal.save();
-      const check = await Deal.findById(deal._id);
+      const check = await Deal.findById(doc._id);
       assert.equal(check.locations[0].lat.valueOf(), 1);
       // GH-422
       assert.equal(check.locations[0].long.valueOf(), 2);
@@ -1990,7 +1989,7 @@ describe('Model', function() {
 
     const Temp = db.model('Test', schema);
 
-    const t = await Temp.create({ nested: { nums: [1, 2, 3 ] } });
+    const t = await Temp.create({ nested: { nums: [1, 2, 3] } });
     const doc = await Temp.findById(t._id);
     assert.equal(doc.nested.nums.length, 3);
     doc.nested.nums.$pop();

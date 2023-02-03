@@ -12,7 +12,7 @@ If you haven't already, import mongoose:
 import mongoose from 'mongoose';
 ```
 
-To create a transaction, you first need to create a session using or [`Mongoose#startSession`](api/mongoose.html#mongoose_Mongoose-startSession)
+To create a transaction, you first need to create a session using [`Mongoose#startSession`](api/mongoose.html#mongoose_Mongoose-startSession)
 or [`Connection#startSession()`](api/connection.html#connection_Connection-startSession).
 
 ```javascript

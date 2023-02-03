@@ -408,17 +408,14 @@ describe('Model', function() {
         assert.equal(post.get('comments')[0].comments[0].isNew, true);
         post.invalidate('title'); // force error
 
-        await post.save(async function() {
-          assert.equal(post.isNew, true);
-          assert.equal(post.get('comments')[0].isNew, true);
-          assert.equal(post.get('comments')[0].comments[0].isNew, true);
-          await post.save(function(err) {
-            assert.strictEqual(null, err);
-            assert.equal(post.isNew, false);
-            assert.equal(post.get('comments')[0].isNew, false);
-            assert.equal(post.get('comments')[0].comments[0].isNew, false);
-          });
-        });
+        await post.save().catch(() => {});
+        assert.equal(post.isNew, true);
+        assert.equal(post.get('comments')[0].isNew, true);
+        assert.equal(post.get('comments')[0].comments[0].isNew, true);
+        await post.save();
+        assert.equal(post.isNew, false);
+        assert.equal(post.get('comments')[0].isNew, false);
+        assert.equal(post.get('comments')[0].comments[0].isNew, false);
       });
     });
   });

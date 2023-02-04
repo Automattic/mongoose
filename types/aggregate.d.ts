@@ -171,11 +171,8 @@ declare module 'mongoose' {
      */
     model(): Model<any>;
 
-    /**
-     * Append a new $near operator to this aggregation pipeline
-     * @param arg $near operator contents
-     */
-    near(arg: { near?: number[]; distanceField: string; maxDistance?: number; query?: Record<string, any>; includeLocs?: string; num?: number; uniqueDocs?: boolean }): this;
+    /** Appends a new $geoNear operator to this aggregate pipeline. */
+    near(arg: PipelineStage.GeoNear['$geoNear']): this;
 
     /** Returns the current pipeline */
     pipeline(): PipelineStage[];

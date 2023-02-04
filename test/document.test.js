@@ -12073,6 +12073,41 @@ describe('document', function() {
     assert.equal(doc.list.length, 3);
     assert.deepStrictEqual(doc.list.map(el => el.a), [1, 2, 3]);
   });
+
+  it('should not trigger isModified when setting a nested boolean to the same value as previously  (gh-12992)', async function() {
+    const Test = db.model('Test', new Schema({
+      result: new Schema(
+        {
+          score: Number,
+          passed: Boolean
+        },
+        { _id: false }
+      )
+    }));
+    const newTest = await Test.create({
+      result: {
+        score: 40,
+        passed: false
+      }
+    });
+
+    const existingTest = await Test.findById(newTest._id);
+    existingTest.result = {
+      score: 40,
+      passed: false
+    };
+
+    assert.equal(existingTest.isModified(), false);
+    assert.equal(existingTest.modifiedPaths().length, 0);
+
+    existingTest.result = {
+      score: 40,
+      passed: true
+    };
+
+    assert.equal(existingTest.isModified(), true);
+    assert.equal(existingTest.modifiedPaths().length, 1);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

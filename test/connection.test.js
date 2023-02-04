@@ -773,29 +773,29 @@ describe('connections:', function() {
       db2.close();
     });
 
-    it('cache connections to the same db', function(done) {
+    it('cache connections to the same db', function() {
       const db = start();
       const db2 = db.useDb(start.databases[1], { useCache: true });
       const db3 = db.useDb(start.databases[1], { useCache: true });
 
       assert.strictEqual(db2, db3);
-      db.close(done);
+      return db.close();
     });
   });
 
   describe('shouldAuthenticate()', function() {
     describe('when using standard authentication', function() {
       describe('when username and password are undefined', function() {
-        it('should return false', function(done) {
+        it('should return false', function() {
           const db = mongoose.createConnection(start.uri, {});
 
           assert.equal(db.shouldAuthenticate(), false);
 
-          db.close(done);
+          return db.close();
         });
       });
       describe('when username and password are empty strings', function() {
-        it('should return false', function(done) {
+        it('should return false', function() {
           const db = mongoose.createConnection(start.uri, {
             user: '',
             pass: ''
@@ -804,7 +804,7 @@ describe('connections:', function() {
 
           assert.equal(db.shouldAuthenticate(), false);
 
-          db.close(done);
+          return db.close();
         });
       });
       describe('when both username and password are defined', function() {
@@ -823,14 +823,14 @@ describe('connections:', function() {
     });
     describe('when using MONGODB-X509 authentication', function() {
       describe('when username and password are undefined', function() {
-        it('should return false', function(done) {
+        it('should return false', function() {
           const db = mongoose.createConnection(start.uri, {});
           db.on('error', function() {
           });
 
           assert.equal(db.shouldAuthenticate(), false);
 
-          db.close(done);
+          return db.close();
         });
       });
       describe('when only username is defined', function() {
@@ -1513,5 +1513,17 @@ describe('connections:', function() {
     assert.equal(res, null);
 
     await m.disconnect();
+  });
+
+  it('should create connections with unique IDs also if one has been destroyed (gh-12966)', function() {
+    const m = new mongoose.Mongoose();
+    m.createConnection();
+    m.createConnection();
+    m.connections[0].destroy();
+    m.createConnection();
+    m.createConnection();
+    m.createConnection();
+    const connectionIds = m.connections.map(c => c.id);
+    assert.deepEqual(connectionIds, [1, 2, 3, 4, 5]);
   });
 });

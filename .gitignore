@@ -20,6 +20,7 @@ coverage
 npm-debug.log
 data/
 .nyc_output/
+.env
 
 tools/31*
 

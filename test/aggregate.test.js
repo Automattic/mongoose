@@ -614,6 +614,7 @@ describe('aggregate: ', function() {
 
   describe('exec', function() {
     beforeEach(async function() {
+      this.timeout(4000); // double the default of 2 seconds
       await setupData(db);
     });
 

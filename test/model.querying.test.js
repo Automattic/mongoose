@@ -1586,7 +1586,7 @@ describe('model: querying:', function() {
     });
   });
 
-  it('mixed types with $elemMatch (gh-591)', function(done) {
+  it('mixed types with $elemMatch (gh-591)', async function() {
     const S = new Schema({ a: [{}], b: Number });
     const M = db.model('Test', S);
 
@@ -1594,27 +1594,19 @@ describe('model: querying:', function() {
     m.a = [1, 2, { name: 'Frodo' }, 'IDK', { name: 100 }];
     m.b = 10;
 
-    m.save(function(err) {
-      assert.ifError(err);
+    await m.save();
 
-      M.find({ a: { name: 'Frodo' }, b: '10' }, function(err, docs) {
-        assert.ifError(err);
-        assert.equal(docs[0].a.length, 5);
-        assert.equal(docs[0].b.valueOf(), 10);
+    let docs = await M.find({ a: { name: 'Frodo' }, b: '10' });
+    assert.equal(docs[0].a.length, 5);
+    assert.equal(docs[0].b.valueOf(), 10);
 
-        const query = {
-          a: {
-            $elemMatch: { name: 100 }
-          }
-        };
-
-        M.find(query, function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs[0].a.length, 5);
-          done();
-        });
-      });
-    });
+    const query = {
+      a: {
+        $elemMatch: { name: 100 }
+      }
+    };
+    docs = await M.find(query);
+    assert.equal(docs[0].a.length, 5);
   });
 
   describe('$all', function() {

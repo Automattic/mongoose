@@ -3,6 +3,7 @@ import {
   Schema,
   Document,
   Model,
+  ModelClass,
   connection,
   model,
   Types,
@@ -222,7 +223,7 @@ function find() {
 }
 
 function inheritance() {
-  class InteractsWithDatabase extends Model {
+  class InteractsWithDatabase extends ModelClass {
     async _update(): Promise<void> {
       await this.save();
     }

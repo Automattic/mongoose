@@ -302,7 +302,7 @@ function gh11439() {
   const bookSchema = new Schema<Book>({
     collection: String
   }, {
-    supressReservedKeysWarning: true
+    suppressReservedKeysWarning: true
   });
 }
 

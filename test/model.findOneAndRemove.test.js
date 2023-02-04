@@ -239,10 +239,12 @@ describe('model: findOneAndRemove:', async function() {
     let query;
 
     query = M.findByIdAndRemove(_id, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
 
     query = M.findOneAndRemove({}, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
     done();

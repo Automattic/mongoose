@@ -883,7 +883,7 @@ Alternatively, you can check out the [mongoose-autopopulate plugin](http://npmjs
 <h3 id="transform-populated-documents"><a href="#transform-populated-documents">Transform populated documents</a></h3>
 
 You can manipulate populated documents using the `transform` option.
-If you specify a `transform` function, Mongoose will call this function on every populated document in the result wiwith two arguments: the populated document, and the original id used to populate the document.
+If you specify a `transform` function, Mongoose will call this function on every populated document in the result with two arguments: the populated document, and the original id used to populate the document.
 This gives you more control over the result of the `populate()` execution.
 It is especially useful when you're populating multiple documents.
 

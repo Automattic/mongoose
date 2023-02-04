@@ -46,17 +46,17 @@ schema.query.byName = function(name: string): QueryWithHelpers<any, ITest, Query
 interface Child {
   name: string;
 }
-interface ISubdoc extends Document {
+interface ISubdoc {
   myId?: Types.ObjectId;
   id?: number;
   tags?: string[];
 }
 
-interface ITest extends Document {
+interface ITest {
   name?: string;
   age?: number;
   parent?: Types.ObjectId;
-  child?: PopulatedDoc<Child & Document<ObjectId>>,
+  child?: PopulatedDoc<HydratedDocument<Child>>,
   tags?: string[];
   docs?: ISubdoc[];
   endDate?: Date;
@@ -179,10 +179,10 @@ function testGenericQuery(): void {
 
 function eachAsync(): void {
   Test.find().cursor().eachAsync((doc) => {
-    expectType<(ITest & { _id: Types.ObjectId; })>(doc);
+    expectType<HydratedDocument<ITest>>(doc);
   });
   Test.find().cursor().eachAsync((docs) => {
-    expectType<(ITest & { _id: Types.ObjectId; })[]>(docs);
+    expectType<HydratedDocument<ITest>[]>(docs);
   }, { batchSize: 2 });
 }
 

@@ -3,12 +3,12 @@ import { expectType } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
-interface ITest extends Document {
+interface ITest {
   name?: string;
 }
 
-const Test = model<ITest>('Test', schema);
-const AnotherTest = model<ITest>('AnotherTest', schema);
+const Test = model('Test', schema);
+const AnotherTest = model('AnotherTest', schema);
 
 Test.aggregate([{ $match: { name: 'foo' } }]).exec().then((res: any) => console.log(res));
 

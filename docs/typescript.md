@@ -93,29 +93,6 @@ const userSchema = new Schema<IUser>({
 
 That's because `Schema.Types.ObjectId` is a [class that inherits from SchemaType](schematypes.html), **not** the class you use to create a new MongoDB ObjectId.
 
-### Using `extends Document`
-
-Alternatively, your document interface can extend Mongoose's `Document` class.
-
-We **strongly** recommend against using this approach, its support will be dropped in the next major version as it causes major performance issues.
-Many Mongoose TypeScript codebases use the below approach.
-
-```typescript
-import { Document, Schema, model, connect } from 'mongoose';
-
-interface IUser extends Document {
-  name: string;
-  email: string;
-  avatar?: string;
-}
-```
-
-This approach works, but we recommend your document interface _not_ extend `Document`.
-Using `extends Document` makes it difficult for Mongoose to infer which properties are present on [query filters](queries.html), [lean documents](tutorials/lean.html), and other cases.
-
-We recommend your document interface contain the properties defined in your schema and line up with what your documents look like in MongoDB.
-Although you can add [instance methods](guide.html#methods) to your document interface, we do not recommend doing so.
-
 ### Using Custom Bindings
 
 If Mongoose's built-in `index.d.ts` file does not work for you, you can remove it in a postinstall script in your `package.json` as shown below.

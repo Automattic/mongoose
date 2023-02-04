@@ -1,10 +1,6 @@
 import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction } from 'mongoose';
 import { expectError, expectType, expectNotType } from 'tsd';
 
-interface ITest extends Document {
-  name?: string;
-}
-
 const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(next, opts) {
   this.$markValid('name');
   if (opts.session) {
@@ -14,7 +10,9 @@ const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(next, opts
   }
 };
 
-const schema: Schema<ITest> = new Schema<ITest>({ name: { type: 'String' } });
+const schema = new Schema({ name: { type: 'String' } });
+
+type ITest = ReturnType<Model<{ name?: string }>['hydrate']>;
 
 schema.pre<Query<any, any>>('find', async function() {
   console.log('Find', this.getFilter());

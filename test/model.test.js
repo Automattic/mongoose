@@ -803,7 +803,7 @@ describe('Model', function() {
 
       function dovalidateAsync() {
         assert.equal(this.scope, 'correct');
-        return global.Promise.resolve(true);
+        return Promise.resolve(true);
       }
 
       const TestValidation = db.model('Test', new Schema({
@@ -4905,7 +4905,7 @@ describe('Model', function() {
         it('watch() (gh-5964)', async function() {
           const MyModel = db.model('Test', new Schema({ name: String }));
 
-          const changed = new global.Promise(resolve => {
+          const changed = new Promise(resolve => {
             changeStream = MyModel.watch();
             listener = data => resolve(data);
             changeStream.once('change', listener);
@@ -4958,7 +4958,7 @@ describe('Model', function() {
           const BaseModel = db.model('Test', new Schema({ name: String }));
           const ChildModel = BaseModel.discriminator('Test1', new Schema({ email: String }));
 
-          const changed = new global.Promise(resolve => {
+          const changed = new Promise(resolve => {
             changeStream = ChildModel.watch();
             listener = data => resolve(data);
             changeStream.once('change', listener);
@@ -4971,6 +4971,63 @@ describe('Model', function() {
           // Should get change data from 2nd insert, skipping first insert
           assert.equal(changeData.operationType, 'insert');
           assert.equal(changeData.fullDocument.name, 'Child');
+        });
+
+        it('watch() before connecting (gh-5964)', async function() {
+          const db = start();
+          connectionsToClose.push(db);
+
+          const MyModel = db.model('Test5964', new Schema({ name: String }));
+
+          // Synchronous, before connection happens
+          const changeStream = MyModel.watch();
+          const changed = new Promise(resolve => {
+            changeStream.once('change', data => resolve(data));
+          });
+
+          await db;
+          await MyModel.create({ name: 'Ned Stark' });
+
+          const changeData = await changed;
+          assert.equal(changeData.operationType, 'insert');
+          assert.equal(changeData.fullDocument.name, 'Ned Stark');
+        });
+
+        it('watch() close() prevents buffered watch op from running (gh-7022)', async function() {
+          const db = start();
+          connectionsToClose.push(db);
+          const MyModel = db.model('Test', new Schema({}));
+          const changeStream = MyModel.watch();
+          const ready = new Promise(resolve => {
+            changeStream.once('data', () => {
+              resolve(true);
+            });
+            setTimeout(resolve, 500, false);
+          });
+
+          changeStream.close();
+          await db;
+          const readyCalled = await ready;
+          assert.strictEqual(readyCalled, false);
+        });
+
+        it('watch() close() closes the stream (gh-7022)', async function() {
+          const db = await start();
+          connectionsToClose.push(db);
+          const MyModel = db.model('Test', new Schema({ name: String }));
+
+          await MyModel.init();
+
+          const changeStream = MyModel.watch();
+          const closed = new Promise(resolve => {
+            changeStream.once('close', () => resolve(true));
+          });
+
+          await MyModel.create({ name: 'Hodor' });
+
+          changeStream.close();
+          const closedData = await closed;
+          assert.strictEqual(closedData, true);
         });
       });
 

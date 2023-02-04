@@ -6,7 +6,6 @@
 
 const start = require('./common');
 
-const Promise = require('bluebird');
 const Q = require('q');
 const assert = require('assert');
 const sinon = require('sinon');
@@ -1506,7 +1505,7 @@ describe('connections:', function() {
 
     const [res] = await Promise.all([
       Test.findOne().exec(),
-      new Promise.resolve(resolve => setTimeout(resolve, 100)).then(() => {
+      Promise.resolve(resolve => setTimeout(resolve, 100)).then(() => {
         conn.client.emit('serverDescriptionChanged', { newDescription: { type: 'Single' } });
       })
     ]);

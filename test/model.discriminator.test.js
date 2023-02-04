@@ -1681,7 +1681,10 @@ describe('model', function() {
   it('can use compiled model schema as a discriminator (gh-9238)', function() {
     const SmsSchema = new mongoose.Schema({ senderNumber: String });
     const EmailSchema = new mongoose.Schema({ fromEmailAddress: String });
-    const messageSchema = new mongoose.Schema({ method: String }, { discriminatorKey: 'method' });
+    const messageSchema = new mongoose.Schema(
+      { method: String },
+      { discriminatorKey: 'method' }
+    );
 
     const Message = db.model('Test', messageSchema);
     Message.discriminator('email', EmailSchema);

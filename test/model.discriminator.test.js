@@ -2105,8 +2105,8 @@ describe('model', function() {
     const baseSchema = Schema({}, { typeKey: 'foo' });
     const Base = db.model('Base', baseSchema);
     const childSchema = new Schema({}, {});
-    const test = Base.discriminator('model-discriminator-custom', childSchema);
-    assert.ok(test);
+    const Test = Base.discriminator('model-discriminator-custom', childSchema);
+    assert.equal(Test.schema.options.typeKey, 'foo');
   });
   it('should throw an error because of the different typeKeys gh-12135', function() {
     const baseSchema = Schema({}, { typeKey: 'foo' });
@@ -2115,5 +2115,12 @@ describe('model', function() {
     assert.throws(() => {
       Base.discriminator('model-discriminator-custom1', childSchema);
     }, { message: 'Can\'t customize discriminator option typeKey (can only modify toJSON, toObject, _id, id, virtuals, methods)' });
+  });
+  it('handles customizable discriminator options gh-12135', function() {
+    const baseSchema = Schema({}, { toJSON: { virtuals: true } });
+    const Base = db.model('Base1', baseSchema);
+    const childSchema = new Schema({}, { toJSON: { virtuals: true, getters: true } });
+    const Test = Base.discriminator('model-discriminator-custom1', childSchema);
+    assert.deepEqual(Test.schema.options.toJSON, { virtuals: true, getters: true });
   });
 });

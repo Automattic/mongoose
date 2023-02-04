@@ -482,7 +482,7 @@ declare module 'mongoose' {
     mod(val: Array<number>): this;
 
     /** The model this query was created from */
-    model: typeof Model;
+    model: Model<any>; // Can't use DocType, causes "Type instantiation is excessively deep"
 
     /**
      * Getter/setter around the current mongoose-specific options for this query

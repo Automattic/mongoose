@@ -123,8 +123,18 @@ declare module 'mongoose' {
 
   interface RemoveOptions extends SessionOption, Omit<mongodb.DeleteOptions, 'session'> {}
 
-  const Model: Model<any>;
-  interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> extends
+  /**
+   * Legacy construct for allowing `extends ModelClass`.
+   * In Mongoose 6, `extends Model` was allowed, but caused naming conflicts.
+   */
+  export const ModelClass: Model<any>;
+
+  /**
+   * Models are fancy constructors compiled from `Schema` definitions.
+   * An instance of a model is called a document.
+   * Models are responsible for creating and reading documents from the underlying MongoDB database
+   */
+  export interface Model<T, TQueryHelpers = {}, TMethodsAndOverrides = {}, TVirtuals = {}, TSchema = any> extends
     NodeJS.EventEmitter,
     AcceptsDiscriminator,
     IndexManager,

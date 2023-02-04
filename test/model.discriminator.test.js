@@ -2104,16 +2104,16 @@ describe('model', function() {
   it('should not throw an error when the user is not modifying anything involving discriminators gh-12135', function() {
     const baseSchema = Schema({}, { typeKey: 'foo' });
     const Base = db.model('Base', baseSchema);
-    const customizedSchema = new Schema({}, {});
-    const test = Base.discriminator('model-discriminator-custom', customizedSchema);
+    const childSchema = new Schema({}, {});
+    const test = Base.discriminator('model-discriminator-custom', childSchema);
     assert.ok(test);
   });
   it('should throw an error because of the different typeKeys gh-12135', function() {
     const baseSchema = Schema({}, { typeKey: 'foo' });
     const Base = db.model('Base1', baseSchema);
-    const customizedSchema = new Schema({}, { typeKey: 'bar' });
+    const childSchema = new Schema({}, { typeKey: 'bar' });
     assert.throws(() => {
-      Base.discriminator('model-discriminator-custom1', customizedSchema);
+      Base.discriminator('model-discriminator-custom1', childSchema);
     }, { message: 'Can\'t customize discriminator option typeKey (can only modify toJSON, toObject, _id, id, virtuals, methods)' });
   });
 });

@@ -338,7 +338,7 @@ describe('model field selection', function() {
 
     it('works with $ positional in select (gh-2031)', function(done) {
       const postSchema = new Schema({
-        tags: [{ tag: String, count: 0 }]
+        tags: [{ tag: String, count: Number }]
       });
 
       const Post = db.model('Test', postSchema);

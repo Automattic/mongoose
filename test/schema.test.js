@@ -2952,6 +2952,31 @@ describe('schema', function() {
     assert.equal(schema._getSchema('child.testMap.foo.bar').instance, 'Mixed');
   });
 
+  it('should not allow to create a path with primitive values (gh-7558)', () => {
+    assert.throws(() => {
+      new Schema({
+        foo: false
+      });
+    }, /invalid.*false.*foo/i);
+
+    assert.throws(() => {
+      const schema = new Schema();
+      schema.add({ foo: false });
+    }, /invalid.*false.*foo/i);
+
+    assert.throws(() => {
+      new Schema({
+        foo: 1
+      });
+    }, /invalid.*1.*foo/i);
+
+    assert.throws(() => {
+      new Schema({
+        foo: 'invalid'
+      });
+    }, /invalid.*invalid.*foo/i);
+  });
+
   it('should allow deleting a virtual path off the schema gh-8397', async function() {
     const schema = new Schema({
       name: String
@@ -3008,6 +3033,5 @@ describe('schema', function() {
     assert.throws(() => {
       schema.removeVirtual('foo');
     }, { message: 'Attempting to remove virtual "foo" that does not exist.' });
-
   });
 });

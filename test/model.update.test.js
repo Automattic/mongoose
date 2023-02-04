@@ -3288,10 +3288,10 @@ describe('model: updateOne: ', function() {
       const baseModel = db.model('Test', baseSchema);
 
       const aSchema = Schema({ aThing: Number }, { _id: false, id: false });
-      const aModel = baseModel.discriminator('A', aSchema);
+      const aModel = baseModel.discriminator('discriminator-A', aSchema, 'A');
 
       const bSchema = new Schema({ bThing: String }, { _id: false, id: false });
-      const bModel = baseModel.discriminator('B', bSchema);
+      const bModel = baseModel.discriminator('discriminator-B', bSchema, 'B');
 
       // Model is created as a type A
       let doc = await baseModel.create({ type: 'A', aThing: 1 });
@@ -3450,6 +3450,23 @@ describe('model: updateOne: ', function() {
         undefined
       );
     }
+  });
+  it('should throw when matchedCount === 0 and using orFail() on the query gh-11620', async function() {
+    const schema = new mongoose.Schema({
+      name: String
+    });
+
+    const Person = db.model('gh-11620', schema);
+
+    const doc = await Person.create({
+      name: 'Anakin'
+    });
+
+    const res = await Person.updateOne({ _id: doc._id }, { name: 'Darth Vader' }).orFail();
+    assert.equal(res.matchedCount, 1);
+    await assert.rejects(async() => {
+      await Person.updateOne({ name: 'Anakin' }, { name: 'The Chosen One' }).orFail();
+    }, { message: 'No document found for query "{ name: \'Anakin\' }" on model "gh-11620"' });
   });
 });
 

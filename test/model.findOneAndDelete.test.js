@@ -231,10 +231,12 @@ describe('model: findOneAndDelete:', function() {
     let query;
 
     query = M.findByIdAndDelete(_id, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
 
     query = M.findOneAndDelete({}, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
   });
@@ -295,7 +297,6 @@ describe('model: findOneAndDelete:', function() {
     const a = await M.create({ name: 'i am an A' });
 
     const b = await N.create({ a: a._id, i: 10 });
-
 
     const doc = await N.findOneAndDelete({ _id: b._id }, { select: 'a -_id' })
       .populate('a')

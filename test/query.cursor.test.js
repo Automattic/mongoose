@@ -510,7 +510,7 @@ describe('QueryCursor', function() {
     const User = db.model('User', Schema({ name: String }, { read }));
     const cursor = User.find().cursor();
 
-    assert.equal(cursor.options.readPreference.mode, read);
+    assert.equal(cursor.options.readPreference, read);
   });
 
   it('eachAsync() with parallel > numDocs (gh-8422)', async function() {

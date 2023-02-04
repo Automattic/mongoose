@@ -16,7 +16,6 @@ const SchemaTypes = Schema.Types;
 const ObjectId = SchemaTypes.ObjectId;
 const Mixed = SchemaTypes.Mixed;
 const DocumentObjectId = mongoose.Types.ObjectId;
-const ReadPref = mongoose.mongo.ReadPreference;
 const vm = require('vm');
 const idGetter = require('../lib/helpers/schema/idGetter');
 const applyPlugins = require('../lib/helpers/schema/applyPlugins');
@@ -968,7 +967,6 @@ describe('schema', function() {
       const tags = [{ x: 1 }];
 
       Tobi.set('read', 'n');
-      assert.ok(Tobi.options.read instanceof ReadPref);
       assert.equal(Tobi.options.read.mode, 'nearest');
 
       Tobi.set('read', 'n', tags);
@@ -984,122 +982,90 @@ describe('schema', function() {
       assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, { read: 'p' });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal(Tobi.options.read.mode, 'primary');
+      assert.equal(Tobi.options.read, 'primary');
 
       Tobi = new Schema({}, { read: ['s', tags] });
-      assert.ok(Tobi.options.read instanceof ReadPref);
       assert.equal(Tobi.options.read.mode, 'secondary');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
       assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, { read: 'primary' });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal(Tobi.options.read.mode, 'primary');
+      assert.equal(Tobi.options.read, 'primary');
 
       Tobi = new Schema({}, { read: ['secondary', tags] });
-      assert.ok(Tobi.options.read instanceof ReadPref);
       assert.equal(Tobi.options.read.mode, 'secondary');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
       assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, { read: 's' });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal(Tobi.options.read.mode, 'secondary');
+      assert.equal(Tobi.options.read, 'secondary');
 
       Tobi = new Schema({}, { read: ['s', tags] });
-      assert.ok(Tobi.options.read instanceof ReadPref);
       assert.equal(Tobi.options.read.mode, 'secondary');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
       assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, { read: 'secondary' });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal(Tobi.options.read.mode, 'secondary');
+      assert.equal(Tobi.options.read, 'secondary');
 
       Tobi = new Schema({}, { read: ['secondary', tags] });
-      assert.ok(Tobi.options.read instanceof ReadPref);
       assert.equal(Tobi.options.read.mode, 'secondary');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
       assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, { read: 'pp' });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
-      assert.equal(Tobi.options.read.mode, 'primaryPreferred');
+      assert.equal(Tobi.options.read, 'primaryPreferred');
 
       Tobi = new Schema({}, { read: ['pp', tags] });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
       assert.equal(Tobi.options.read.mode, 'primaryPreferred');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
       assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, { read: 'primaryPreferred' });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
-      assert.equal(Tobi.options.read.mode, 'primaryPreferred');
+      assert.equal(Tobi.options.read, 'primaryPreferred');
 
       Tobi = new Schema({}, { read: ['primaryPreferred', tags] });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
       assert.equal(Tobi.options.read.mode, 'primaryPreferred');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
       assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, { read: 'sp' });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
-      assert.equal(Tobi.options.read.mode, 'secondaryPreferred');
+      assert.equal(Tobi.options.read, 'secondaryPreferred');
 
       Tobi = new Schema({}, { read: ['sp', tags] });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
       assert.equal(Tobi.options.read.mode, 'secondaryPreferred');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
       assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, { read: 'secondaryPreferred' });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
-      assert.equal(Tobi.options.read.mode, 'secondaryPreferred');
+      assert.equal(Tobi.options.read, 'secondaryPreferred');
 
       Tobi = new Schema({}, { read: ['secondaryPreferred', tags] });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
       assert.equal(Tobi.options.read.mode, 'secondaryPreferred');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
       assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, { read: 'n' });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
-      assert.equal(Tobi.options.read.mode, 'nearest');
+      assert.equal(Tobi.options.read, 'nearest');
 
       Tobi = new Schema({}, { read: ['n', tags] });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
       assert.equal(Tobi.options.read.mode, 'nearest');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
       assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, { read: 'nearest' });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
-      assert.equal(Tobi.options.read.mode, 'nearest');
+      assert.equal(Tobi.options.read, 'nearest');
 
       Tobi = new Schema({}, { read: ['nearest', tags] });
-      assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.ok(Tobi.options.read.isValid());
       assert.equal(Tobi.options.read.mode, 'nearest');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
@@ -1474,7 +1440,7 @@ describe('schema', function() {
           assert.ok(lastWarnMessage.includes(`\`${reservedProperty}\` is a reserved schema pathname`), lastWarnMessage);
         });
 
-        it(`\`${reservedProperty}\` when used as a schema path doesn't log a warning if \`supressReservedKeysWarning\` is true`, async() => {
+        it(`\`${reservedProperty}\` when used as a schema path doesn't log a warning if \`suppressReservedKeysWarning\` is true`, async() => {
           // Arrange
           const emitWarningStub = sinon.stub(process, 'emitWarning').returns();
 
@@ -1482,7 +1448,7 @@ describe('schema', function() {
           // Act
           new Schema(
             { [reservedProperty]: String },
-            { supressReservedKeysWarning: true }
+            { suppressReservedKeysWarning: true }
           );
 
           const lastWarnMessage = emitWarningStub.args[0] && emitWarningStub.args[0][0];
@@ -2339,6 +2305,81 @@ describe('schema', function() {
     });
   });
 
+  describe('omit() (gh-12931)', function() {
+    it('works with nested paths', function() {
+      const schema = Schema({
+        name: {
+          first: {
+            type: String,
+            required: true
+          },
+          last: {
+            type: String,
+            required: true
+          }
+        },
+        age: {
+          type: Number,
+          index: true
+        }
+      });
+      assert.ok(schema.path('name.first'));
+      assert.ok(schema.path('name.last'));
+
+      let newSchema = schema.omit(['name.first']);
+      assert.ok(!newSchema.path('name.first'));
+      assert.ok(newSchema.path('age'));
+      assert.ok(newSchema.path('age').index);
+
+      newSchema = schema.omit(['age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(newSchema.path('name.last'));
+      assert.ok(newSchema.path('name.last').required);
+      assert.ok(!newSchema.path('age'));
+
+      newSchema = schema.omit(['name.last', 'age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(!newSchema.path('name.last'));
+      assert.ok(!newSchema.path('age'));
+    });
+
+    it('with single nested paths', function() {
+      const schema = Schema({
+        name: Schema({
+          first: {
+            type: String,
+            required: true
+          },
+          last: {
+            type: String,
+            required: true
+          }
+        }),
+        age: {
+          type: Number,
+          index: true
+        }
+      });
+      assert.ok(schema.path('name.first'));
+      assert.ok(schema.path('name.last'));
+
+      let newSchema = schema.omit(['age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(newSchema.path('name.last'));
+      assert.ok(newSchema.path('name.last').required);
+      assert.ok(!newSchema.path('age'));
+
+      newSchema = schema.omit(['name.last', 'age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(!newSchema.path('name.last'));
+      assert.ok(!newSchema.path('age'));
+    });
+  });
+
   describe('path-level custom cast (gh-8300)', function() {
     it('with numbers', function() {
       const schema = Schema({
@@ -2453,17 +2494,13 @@ describe('schema', function() {
   });
 
   describe('mongoose.set(`strictQuery`, value); (gh-6658)', function() {
-    let strictQueryOriginalValue;
-
-    this.beforeEach(() => strictQueryOriginalValue = mongoose.get('strictQuery'));
-    this.afterEach(() => mongoose.set('strictQuery', strictQueryOriginalValue));
-
     it('setting `strictQuery` on base sets strictQuery to schema (gh-6658)', function() {
       // Arrange
-      mongoose.set('strictQuery', 'some value');
+      const m = new mongoose.Mongoose();
+      m.set('strictQuery', 'some value');
 
       // Act
-      const schema = new Schema();
+      const schema = new m.Schema();
 
       // Assert
       assert.equal(schema.get('strictQuery'), 'some value');
@@ -2471,10 +2508,11 @@ describe('schema', function() {
 
     it('`strictQuery` set on base gets overwritten by option set on schema (gh-6658)', function() {
       // Arrange
-      mongoose.set('strictQuery', 'base option');
+      const m = new mongoose.Mongoose();
+      m.set('strictQuery', 'base option');
 
       // Act
-      const schema = new Schema({}, { strictQuery: 'schema option' });
+      const schema = new m.Schema({}, { strictQuery: 'schema option' });
 
       // Assert
       assert.equal(schema.get('strictQuery'), 'schema option');
@@ -2912,5 +2950,64 @@ describe('schema', function() {
     });
 
     assert.equal(schema._getSchema('child.testMap.foo.bar').instance, 'Mixed');
+  });
+
+  it('should allow deleting a virtual path off the schema gh-8397', async function() {
+    const schema = new Schema({
+      name: String
+    }, {
+      virtuals: {
+        foo: {
+          get() {
+            return 42;
+          }
+        }
+      }
+    });
+    assert.ok(schema.virtuals.foo);
+    schema.removeVirtual('foo');
+    assert.ok(!schema.virtuals.foo);
+    const Test = db.model('gh-8397', schema);
+    const doc = new Test({ name: 'Test' });
+    assert.equal(doc.foo, undefined);
+  });
+
+  it('should allow deleting multiple virtuals gh-8397', async function() {
+    const schema = new Schema({
+      name: String
+    }, {
+      virtuals: {
+        foo: {
+          get() {
+            return 42;
+          }
+        },
+        bar: {
+          get() {
+            return 41;
+          }
+        }
+      }
+    });
+    assert.ok(schema.virtuals.foo);
+    assert.ok(schema.virtuals.bar);
+    schema.removeVirtual(['foo', 'bar']);
+    assert.ok(!schema.virtuals.foo);
+    assert.ok(!schema.virtuals.bar);
+    const Test = db.model('gh-8397', schema);
+    const doc = new Test({ name: 'Test' });
+    assert.equal(doc.foo, undefined);
+    assert.equal(doc.bar, undefined);
+  });
+
+  it('should throw an error if attempting to delete a virtual path that does not exist gh-8397', function() {
+    const schema = new Schema({
+      name: String
+    });
+    assert.ok(!schema.virtuals.foo);
+    assert.throws(() => {
+      schema.removeVirtual('foo');
+    }, { message: 'Attempting to remove virtual "foo" that does not exist.' });
+
   });
 });

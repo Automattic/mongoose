@@ -1,3 +1,13 @@
+6.9.0 / 2023-01-25
+==================
+ * feat(schema): add removeVirtual(path) function to schema #12920 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(cast): remove empty `$or` conditions after strict applied #12898 [0x0a0d](https://github.com/0x0a0d)
+ * docs: fixed typo #12946 [Gbengstar](https://github.com/Gbengstar)
+
+6.8.5 / 2023-01-23
+==================
+ * fix(query): correctly pass context when casting $elemMatch #12915 #12909 #12902 [MohOraby](https://github.com/MohOraby)
+
 6.8.4 / 2023-01-17
 ==================
  * fix(collection): handle creating model when connection disconnected with bufferCommands = false #12889
@@ -588,7 +598,7 @@
  * fix(index.d.ts): ValidationError `errors` only contains CastError or ValidationError #11369 [Uzlopak](https://github.com/Uzlopak)
  * fix(index.d.ts): make InsertManyResult.insertedIds return an array of Types.ObjectId by default #11197
  * fix(index.d.ts): allow pre('save') middleware with pre options #11257
- * fix(index.d.ts): add `supressReservedKeysWarning` option to schema #11439 [hiukky](https://github.com/hiukky)
+ * fix(index.d.ts): add `suppressReservedKeysWarning` option to schema #11439 [hiukky](https://github.com/hiukky)
  * docs(connections): improve replica set hostname docs with correct error message and info about `err.reason.servers` #11200
  * docs(populate): add virtual populate match option documentation #11411 [remirobichet](https://github.com/remirobichet)
  * docs(document): add note to API docs that flattenMaps defaults to `true` for `toJSON()` but not `toObject()` #11213

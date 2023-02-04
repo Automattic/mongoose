@@ -614,6 +614,7 @@ describe('aggregate: ', function() {
 
   describe('exec', function() {
     beforeEach(async function() {
+      this.timeout(4000); // double the default of 2 seconds
       await setupData(db);
     });
 
@@ -1072,7 +1073,7 @@ describe('aggregate: ', function() {
       const schema = new Schema({ name: String }, { read: 'secondary' });
       const M = db.model('Test', schema);
       const a = M.aggregate();
-      assert.equal(a.options.readPreference.mode, 'secondary');
+      assert.equal(a.options.readPreference, 'secondary');
 
       a.read('secondaryPreferred');
 

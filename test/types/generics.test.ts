@@ -1,10 +1,14 @@
 import { Model, Document } from 'mongoose';
 
 class Repository<T> {
-  private readonly Model: Model<T & Document>;
+  private readonly M: Model<T>;
 
-  findById(id: string): Promise<T & Document> {
-    return Model.findById(id).exec();
+  constructor(MM: Model<T>) {
+    this.M = MM;
+  }
+
+  findById(id: string): Promise<T> {
+    return this.M.findById(id).orFail().exec();
   }
 }
 

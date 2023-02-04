@@ -191,7 +191,7 @@ describe('model: mapreduce:', function() {
       };
 
       const promise = MR.mapReduce(o);
-      assert.ok(promise instanceof mongoose.Promise);
+      assert.ok(promise instanceof Promise);
     });
   });
 

@@ -19,7 +19,7 @@ declare module 'mongoose' {
 
   type MongooseQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, 'populate' | 'lean' | 'strict' | 'sanitizeProjection' | 'sanitizeFilter'>;
 
-  type ProjectionFields<DocType> = { [Key in keyof Omit<LeanDocument<DocType>, '__v'>]?: any } & Record<string, any>;
+  type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;
 
   type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType> = Query<ResultType, DocType, THelpers, RawDocType> & THelpers;
 
@@ -217,6 +217,15 @@ declare module 'mongoose' {
      * Like `.then()`, but only takes a rejection handler.
      */
     catch: Promise<ResultType>['catch'];
+
+    /**
+     * Executes the query returning a `Promise` which will be
+     * resolved with `.finally()` chained.
+     */
+    finally: Promise<ResultType>['finally'];
+
+    // Returns a string representation of this query.
+    [Symbol.toStringTag]: string;
 
     /** Specifies a `$center` or `$centerSphere` condition. */
     circle(path: string, area: any): this;
@@ -441,7 +450,7 @@ declare module 'mongoose' {
     j(val: boolean | null): this;
 
     /** Sets the lean option. */
-    lean<LeanResultType = RawDocType extends Document ? LeanDocumentOrArray<ResultType> : LeanDocumentOrArrayWithRawType<ResultType, Require_id<RawDocType>>>(val?: boolean | any): QueryWithHelpers<LeanResultType, DocType, THelpers, RawDocType>;
+    lean<LeanResultType = ResultType extends any[] ? Require_id<RawDocType>[] : Require_id<RawDocType>>(val?: boolean | any): QueryWithHelpers<LeanResultType, DocType, THelpers, RawDocType>;
 
     /** Specifies the maximum number of documents the query will return. */
     limit(val: number): this;
@@ -482,7 +491,7 @@ declare module 'mongoose' {
     mod(val: Array<number>): this;
 
     /** The model this query was created from */
-    model: typeof Model;
+    model: Model<any>; // Can't use DocType, causes "Type instantiation is excessively deep"
 
     /**
      * Getter/setter around the current mongoose-specific options for this query
@@ -529,7 +538,7 @@ declare module 'mongoose' {
     projection(): ProjectionFields<DocType> | null;
 
     /** Determines the MongoDB nodes from which to read. */
-    read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
+    read(mode: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
 
     /** Sets the readConcern option for the query. */
     readConcern(level: string): this;

@@ -46,17 +46,17 @@ schema.query.byName = function(name: string): QueryWithHelpers<any, ITest, Query
 interface Child {
   name: string;
 }
-interface ISubdoc extends Document {
+interface ISubdoc {
   myId?: Types.ObjectId;
   id?: number;
   tags?: string[];
 }
 
-interface ITest extends Document {
+interface ITest {
   name?: string;
   age?: number;
   parent?: Types.ObjectId;
-  child?: PopulatedDoc<Child & Document<ObjectId>>,
+  child?: PopulatedDoc<HydratedDocument<Child>>,
   tags?: string[];
   docs?: ISubdoc[];
   endDate?: Date;
@@ -136,9 +136,6 @@ Test.findByIdAndUpdate({ name: 'test' }, { name: 'test2' }, (err: any, doc) => c
 
 Test.findOneAndUpdate({ name: 'test' }, { 'docs.0.myId': '0'.repeat(24) });
 
-const query: Query<ITest | null, ITest> = Test.findOne();
-query instanceof Query;
-
 // Chaining
 Test.findOne().where({ name: 'test' });
 Test.where().find({ name: 'test' });
@@ -182,10 +179,10 @@ function testGenericQuery(): void {
 
 function eachAsync(): void {
   Test.find().cursor().eachAsync((doc) => {
-    expectType<(ITest & { _id: Types.ObjectId; })>(doc);
+    expectType<HydratedDocument<ITest>>(doc);
   });
   Test.find().cursor().eachAsync((docs) => {
-    expectType<(ITest & { _id: Types.ObjectId; })[]>(docs);
+    expectType<HydratedDocument<ITest>[]>(docs);
   }, { batchSize: 2 });
 }
 
@@ -296,26 +293,6 @@ async function gh11306(): Promise<void> {
 
   expectType<any[]>(await MyModel.distinct('name'));
   expectType<string[]>(await MyModel.distinct<string>('name'));
-}
-
-async function gh11602(): Promise<void> {
-  const updateResult = await Model.findOneAndUpdate(query, { $inc: { occurence: 1 } }, {
-    upsert: true,
-    returnDocument: 'after',
-    rawResult: true
-  });
-
-  expectError(updateResult.lastErrorObject?.modifiedCount);
-  expectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
-  expectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
-
-  Model.findOneAndUpdate({}, {}, { returnDocument: 'before' });
-  Model.findOneAndUpdate({}, {}, { returnDocument: 'after' });
-  Model.findOneAndUpdate({}, {}, { returnDocument: undefined });
-  Model.findOneAndUpdate({}, {}, {});
-  expectError(Model.findOneAndUpdate({}, {}, {
-    returnDocument: 'not-before-or-after'
-  }));
 }
 
 function autoTypedQuery() {
@@ -430,4 +407,29 @@ async function gh12342_auto() {
   expectType<HydratedDocument<Project>[]>(
     await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
   );
+}
+
+async function gh11602(): Promise<void> {
+  const query: Query<ITest | null, ITest> = Test.findOne();
+  query instanceof Query;
+
+  const ModelType = model<ITest>('foo', schema);
+
+  const updateResult = await ModelType.findOneAndUpdate(query, { $inc: { occurence: 1 } }, {
+    upsert: true,
+    returnDocument: 'after',
+    rawResult: true
+  });
+
+  expectError(updateResult.lastErrorObject?.modifiedCount);
+  expectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
+
+  ModelType.findOneAndUpdate({}, {}, { returnDocument: 'before' });
+  ModelType.findOneAndUpdate({}, {}, { returnDocument: 'after' });
+  ModelType.findOneAndUpdate({}, {}, { returnDocument: undefined });
+  ModelType.findOneAndUpdate({}, {}, {});
+  expectError(ModelType.findOneAndUpdate({}, {}, {
+    returnDocument: 'not-before-or-after'
+  }));
 }

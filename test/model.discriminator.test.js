@@ -7,7 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
-const clone = require('../lib/utils').clone;
+const clone = require('../lib/helpers/clone');
 const random = require('./util').random;
 const util = require('util');
 
@@ -1681,7 +1681,10 @@ describe('model', function() {
   it('can use compiled model schema as a discriminator (gh-9238)', function() {
     const SmsSchema = new mongoose.Schema({ senderNumber: String });
     const EmailSchema = new mongoose.Schema({ fromEmailAddress: String });
-    const messageSchema = new mongoose.Schema({ method: String }, { discriminatorKey: 'method' });
+    const messageSchema = new mongoose.Schema(
+      { method: String },
+      { discriminatorKey: 'method' }
+    );
 
     const Message = db.model('Test', messageSchema);
     Message.discriminator('email', EmailSchema);
@@ -2100,5 +2103,27 @@ describe('model', function() {
     assert.equal(subdocSaveCalls, 0);
     await Square.create({ nested: { test: 'foo' } });
     assert.equal(subdocSaveCalls, 1);
+  });
+  it('should not throw an error when the user is not modifying anything involving discriminators gh-12135', function() {
+    const baseSchema = Schema({}, { typeKey: 'foo' });
+    const Base = db.model('Base', baseSchema);
+    const childSchema = new Schema({}, {});
+    const Test = Base.discriminator('model-discriminator-custom', childSchema);
+    assert.equal(Test.schema.options.typeKey, 'foo');
+  });
+  it('should throw an error because of the different typeKeys gh-12135', function() {
+    const baseSchema = Schema({}, { typeKey: 'foo' });
+    const Base = db.model('Base1', baseSchema);
+    const childSchema = new Schema({}, { typeKey: 'bar' });
+    assert.throws(() => {
+      Base.discriminator('model-discriminator-custom1', childSchema);
+    }, { message: 'Can\'t customize discriminator option typeKey (can only modify toJSON, toObject, _id, id, virtuals, methods)' });
+  });
+  it('handles customizable discriminator options gh-12135', function() {
+    const baseSchema = Schema({}, { toJSON: { virtuals: true } });
+    const Base = db.model('Base1', baseSchema);
+    const childSchema = new Schema({}, { toJSON: { virtuals: true, getters: true } });
+    const Test = Base.discriminator('model-discriminator-custom1', childSchema);
+    assert.deepEqual(Test.schema.options.toJSON, { virtuals: true, getters: true });
   });
 });

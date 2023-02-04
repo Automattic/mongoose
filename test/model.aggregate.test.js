@@ -102,7 +102,7 @@ describe('model aggregate', function() {
 
       const res = await promise;
 
-      assert.ok(promise instanceof mongoose.Promise);
+      assert.ok(promise instanceof Promise);
       assert.ok(res);
       assert.equal(res.length, 1);
       assert.ok('maxAge' in res[0]);

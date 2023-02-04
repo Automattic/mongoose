@@ -1622,7 +1622,7 @@ describe('model: populate:', function() {
     assert.strictEqual(returned.fans[3], null);
   });
 
-  it('supports `retainNullValues` while supressing _id of subdocument', async function() {
+  it('supports `retainNullValues` while suppressing _id of subdocument', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db.model('User', userSchema);
 
@@ -2429,7 +2429,7 @@ describe('model: populate:', function() {
 
     it('returns a promise', function(done) {
       const p = B.populate(post1, '_creator');
-      assert.ok(p instanceof mongoose.Promise);
+      assert.ok(p instanceof Promise);
       p.then(success, done);
       function success(doc) {
         assert.ok(doc);

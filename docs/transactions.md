@@ -64,8 +64,8 @@ doc.isNew;
 
 <h2 id="with-mongoose-documents-and-save"><a href="#with-mongoose-documents-and-save">With Mongoose Documents and <code>save()</code></a></h2>
 
-If you get a [Mongoose document](documents.html) from [`findOne()`](model.html#model_Model-findOne)
-or [`find()`](model.html#model_Model-find) using a session, the document will
+If you get a [Mongoose document](documents.html) from [`findOne()`](api/model.html#model_Model-findOne)
+or [`find()`](api/model.html#model_Model-find) using a session, the document will
 keep a reference to the session and use that session for [`save()`](document.html#document_Document-save).
 
 To get/set the session associated with a given document, use [`doc.$session()`](document.html#document_Document-$session).

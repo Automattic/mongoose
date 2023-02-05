@@ -360,8 +360,8 @@ Model.remove();
 
 You can pass options to [`Schema.pre()`](api.html#schema_Schema-pre)
 and [`Schema.post()`](api.html#schema_Schema-post) to switch whether
-Mongoose calls your `remove()` hook for [`Document.remove()`](model.html#model_Model-remove)
-or [`Model.remove()`](model.html#model_Model-remove). Note here that you need to set both `document` and `query` properties in the passed object:
+Mongoose calls your `remove()` hook for [`Document.remove()`](api/model.html#model_Model-remove)
+or [`Model.remove()`](api/model.html#model_Model-remove). Note here that you need to set both `document` and `query` properties in the passed object:
 
 ```javascript
 // Only document middleware

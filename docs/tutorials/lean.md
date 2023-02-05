@@ -1,7 +1,7 @@
 # Faster Mongoose Queries With Lean
 
 The [lean option](../api/query.html#query_Query-lean) tells Mongoose to skip
-[hydrating](../model.html#model_Model-hydrate) the result documents. This
+[hydrating](../api/model.html#model_Model-hydrate) the result documents. This
 makes queries faster and less memory intensive, but the result documents are
 plain old JavaScript objects (POJOs), **not** [Mongoose documents](../documents.html).
 In this tutorial, you'll learn more about the tradeoffs of using `lean()`.

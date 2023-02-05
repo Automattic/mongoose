@@ -107,6 +107,7 @@ parse();
  * @property {string} docName
  * @property {string} filePath
  * @property {string} fullName
+ * @property {string} docFileName
  */
 
 /**
@@ -136,18 +137,22 @@ function processName(input) {
     name = 'MongooseDocumentArray';
   }
 
+  const docName = name.charAt(0).toUpperCase() === name.charAt(0) ? name : name.charAt(0).toUpperCase() + name.substr(1);
+
   return {
-    docName: name,
+    docName: docName,
     fullName: fullName,
-    filePath: input
+    filePath: input,
+    docFileName: name.toLowerCase()
   }
 }
 
 function parse() {
   for (const props of combinedFiles) {
-    const { docName: name } = processName(props.file);
+    const { docName: name, docFileName } = processName(props.file);
     const data = {
-      name: name.charAt(0).toUpperCase() === name.charAt(0) ? name : name.charAt(0).toUpperCase() + name.substr(1),
+      name: name,
+      fileName: docFileName,
       props: []
     };
 
@@ -235,7 +240,26 @@ function parse() {
             ctx.return = tag;
             break;
           case 'inherits':
-            ctx.inherits = extractTextUrlFromTag(tag, ctx);
+            const obj = extractTextUrlFromTag(tag, ctx);
+            // try to get the documentation name for the "@inherits" value
+            // example: "@inherits SchemaType" -> "schematype.html"
+            if (!obj.url || obj.url === obj.text) {
+              let match = undefined;
+              for (const file of files) {
+                const { docName, docFileName } = processName(file);
+                if (docName.toLowerCase().includes(obj.text.toLowerCase())) {
+                  match = docFileName;
+                  break;
+                }
+              }
+
+              if (match) {
+                obj.url = match + '.html';
+              } else {
+                console.warn(`no match found in files for inherits "${obj.text}" on "${ctx.constructor}.${ctx.name}"`);
+              }
+            }
+            ctx.inherits = obj;
             break;
           case 'event':
           case 'param':

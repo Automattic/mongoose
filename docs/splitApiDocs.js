@@ -11,10 +11,6 @@ try {
 } catch (err) {}
 
 api.docs.forEach(file => {
-  if (file.name === 'Index') {
-    file.name = 'Mongoose';
-  }
-
   const options = Object.assign({}, file, {
     package: pkg,
     docs: api.docs,

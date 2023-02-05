@@ -136,6 +136,9 @@ function processName(input) {
   if (name === 'DocumentArray') {
     name = 'MongooseDocumentArray';
   }
+  if (name === 'index') {
+    name = 'Mongoose';
+  }
 
   const docName = name.charAt(0).toUpperCase() === name.charAt(0) ? name : name.charAt(0).toUpperCase() + name.substr(1);
 

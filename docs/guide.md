@@ -578,17 +578,17 @@ const schema = new Schema({..}, { bufferTimeoutMS: 1000 });
 
 <h3 id="capped"><a href="#capped">option: capped</a></h3>
 
-Mongoose supports MongoDBs [capped](http://www.mongodb.org/display/DOCS/Capped+Collections)
+Mongoose supports MongoDBs [capped](https://www.mongodb.com/docs/manual/core/capped-collections/)
 collections. To specify the underlying MongoDB collection be `capped`, set
 the `capped` option to the maximum size of the collection in
-[bytes](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-size.).
+[bytes](https://www.mongodb.com/docs/manual/core/capped-collections/#create-a-capped-collection).
 
 ```javascript
 new Schema({..}, { capped: 1024 });
 ```
 
 The `capped` option may also be set to an object if you want to pass
-additional options like [max](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-max)
+additional options like [max](https://www.mongodb.com/docs/manual/core/capped-collections/#change-the-maximum-number-of-documents-in-a-capped-collection)
 or [autoIndexId](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-autoIndexId).
 In this case you must explicitly pass the `size` option, which is required.
 
@@ -775,7 +775,7 @@ const schema = new Schema({ name: String }, {
 
 <h3 id="shardKey"><a href="#shardKey">option: shardKey</a></h3>
 
-The `shardKey` option is used when we have a [sharded MongoDB architecture](http://www.mongodb.org/display/DOCS/Sharding+Introduction).
+The `shardKey` option is used when we have a [sharded MongoDB architecture](https://www.mongodb.com/docs/manual/sharding/).
 Each sharded collection is given a shard key which must be present in all
 insert/update operations. We just need to set this schema option to the same
 shard key and we’ll be all set.

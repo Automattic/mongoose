@@ -76,7 +76,7 @@ const Tank = connection.model('Tank', yourSchema);
 
 ## Querying
 
-Finding documents is easy with Mongoose, which supports the [rich](http://www.mongodb.org/display/DOCS/Advanced+Queries) query syntax of MongoDB.
+Finding documents is easy with Mongoose, which supports the [rich](https://www.mongodb.com/docs/manual/reference/method/js-cursor/) query syntax of MongoDB.
 Documents can be retrieved using a `model`'s [find](api/model.html#model_Model-find), [findById](api/model.html#model_Model-findById), [findOne](api/model.html#model_Model-findOne), or [where](api/model.html#model_Model-where) static functions.
 
 ```javascript

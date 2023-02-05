@@ -102,28 +102,50 @@ parse();
  * @property {SeeObject} [inherits] Defines the string for "@inherits"
  */
 
+/**
+ * @typedef {Object} NameObj
+ * @property {string} docName
+ * @property {string} filePath
+ * @property {string} fullName
+ */
+
+/**
+ * Process a file name to a documentation name
+ * @param {string} input
+ * @returns {NameObj}
+ */
+function processName(input) {
+  let name = input.
+    replace('lib/', '').
+    replace('.js', '').
+    replace('/index', '').
+    replace('/methods', '');
+  const lastSlash = name.lastIndexOf('/');
+  const fullName = name;
+  name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
+  if (name === 'core_array') {
+    name = 'array';
+  }
+  if (fullName === 'schema/array') {
+    name = 'SchemaArray';
+  }
+  if (name === 'documentarray') {
+    name = 'DocumentArrayPath';
+  }
+  if (name === 'DocumentArray') {
+    name = 'MongooseDocumentArray';
+  }
+
+  return {
+    docName: name,
+    fullName: fullName,
+    filePath: input
+  }
+}
+
 function parse() {
   for (const props of combinedFiles) {
-    let name = props.file.
-      replace('lib/', '').
-      replace('.js', '').
-      replace('/index', '').
-      replace('/methods', '');
-    const lastSlash = name.lastIndexOf('/');
-    const fullName = name;
-    name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
-    if (name === 'core_array') {
-      name = 'array';
-    }
-    if (fullName === 'schema/array') {
-      name = 'SchemaArray';
-    }
-    if (name === 'documentarray') {
-      name = 'DocumentArrayPath';
-    }
-    if (name === 'DocumentArray') {
-      name = 'MongooseDocumentArray';
-    }
+    const { docName: name } = processName(props.file);
     const data = {
       name: name.charAt(0).toUpperCase() === name.charAt(0) ? name : name.charAt(0).toUpperCase() + name.substr(1),
       props: []

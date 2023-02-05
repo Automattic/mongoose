@@ -3,7 +3,7 @@
 Mongoose [models](models.html) provide several static helper functions
 for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
 Each of these functions returns a
-[mongoose `Query` object](query.html#Query).
+[mongoose `Query` object](api/query.html#Query).
 
 - [`Model.deleteMany()`](api.html#model_Model-deleteMany)
 - [`Model.deleteOne()`](api.html#model_Model-deleteOne)
@@ -201,7 +201,7 @@ of inactivity. You can read more about working around session idle timeouts in t
 
 <h3 id="versus-aggregation"><a href="#versus-aggregation">Versus Aggregation</a></h3>
 
-[Aggregation](aggregate.html#aggregate_Aggregate) can
+[Aggregation](api/aggregate.html#aggregate_Aggregate) can
 do many of the same things that queries can. For example, below is
 how you can use `aggregate()` to find docs where `name.last = 'Ghost'`:
 

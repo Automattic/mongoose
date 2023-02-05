@@ -116,10 +116,10 @@ instead._
 
 ## Change Streams
 
-[Change streams](https://docs.mongodb.com/manual/changeStreams/) provide
+[Change streams](https://www.mongodb.com/docs/manual/changeStreams/) provide
 a way for you to listen to all inserts and updates going through your
 MongoDB database. Note that change streams do **not** work unless you're
-connected to a [MongoDB replica set](https://docs.mongodb.com/manual/replication/).
+connected to a [MongoDB replica set](https://www.mongodb.com/docs/manual/replication/).
 
 ```javascript
 async function run() {

@@ -93,7 +93,7 @@ declare module 'mongoose' {
      */
     'timestamps.createdAt.immutable'?: boolean
 
-    /** If set, attaches [maxTimeMS](https://docs.mongodb.com/manual/reference/operator/meta/maxTimeMS/) to every query */
+    /** If set, attaches [maxTimeMS](https://www.mongodb.com/docs/manual/reference/operator/meta/maxTimeMS/) to every query */
     maxTimeMS?: number;
 
     /**

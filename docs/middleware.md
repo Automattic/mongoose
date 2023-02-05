@@ -518,7 +518,7 @@ For example, suppose you're implementing soft deletes on a `Customer` model
 by adding an `isDeleted` property. To make sure `aggregate()` calls only look
 at customers that aren't soft deleted, you can use the below middleware to
 add a [`$match` stage](api/aggregate.html#aggregate_Aggregate-match) to the beginning
-of each [aggregation pipeline](https://docs.mongodb.com/manual/core/aggregation-pipeline/).
+of each [aggregation pipeline](https://www.mongodb.com/docs/manual/core/aggregation-pipeline/).
 
 ```javascript
 customerSchema.pre('aggregate', function() {

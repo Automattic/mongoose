@@ -195,9 +195,9 @@ To override this, set the `noCursorTimeout` option on your cursor.
 const cursor = Person.find().cursor().addCursorFlag('noCursorTimeout', true);
 ```
 
-However, cursors can still time out because of [session idle timeouts](https://docs.mongodb.com/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
+However, cursors can still time out because of [session idle timeouts](https://www.mongodb.com/docs/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
 So even a cursor with `noCursorTimeout` set will still time out after 30 minutes
-of inactivity. You can read more about working around session idle timeouts in the [MongoDB documentation](https://docs.mongodb.com/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
+of inactivity. You can read more about working around session idle timeouts in the [MongoDB documentation](https://www.mongodb.com/docs/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
 
 <h3 id="versus-aggregation"><a href="#versus-aggregation">Versus Aggregation</a></h3>
 

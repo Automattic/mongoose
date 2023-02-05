@@ -254,7 +254,7 @@ Animal.findOne().byName('fido').exec((err, animal) => {
 MongoDB supports [secondary indexes](http://www.mongodb.com/docs/manual/indexes/).
 With mongoose, we define these indexes within our `Schema` [at](api/schematype.html#schematype_SchemaType-index) [the](api/schematype.html#schematype_SchemaType-unique) [path](api/schematype.html#schematype_SchemaType-sparse) [level](api/schemadateoptions.html.html#schemadateoptions_SchemaDateOptions-expires) or the `schema` level.
 Defining indexes at the schema level is necessary when creating
-[compound indexes](https://docs.mongodb.com/manual/core/index-compound/).
+[compound indexes](https://www.mongodb.com/docs/manual/core/index-compound/).
 
 ```javascript
 const animalSchema = new Schema({
@@ -268,9 +268,9 @@ animalSchema.index({ name: 1, type: -1 }); // schema level
 
 See [SchemaType#index()](api/schematype.html#schematype_SchemaType-index) for other index options.
 
-When your application starts up, Mongoose automatically calls [`createIndex`](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each defined index in your schema.
+When your application starts up, Mongoose automatically calls [`createIndex`](https://www.mongodb.com/docs/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each defined index in your schema.
 Mongoose will call `createIndex` for each index sequentially, and emit an 'index' event on the model when all the `createIndex` calls succeeded or when there was an error.
-While nice for development, it is recommended this behavior be disabled in production since index creation can cause a [significant performance impact](https://docs.mongodb.com/manual/core/index-creation/#index-build-impact-on-database-performance).
+While nice for development, it is recommended this behavior be disabled in production since index creation can cause a [significant performance impact](https://www.mongodb.com/docs/manual/core/index-creation/#index-build-impact-on-database-performance).
 Disable the behavior by setting the `autoIndex` option of your schema to `false`, or globally on the connection by setting the option `autoIndex` to `false`.
 
 ```javascript
@@ -760,7 +760,7 @@ mongoose.model('JellyBean', schema);
 
 <h3 id="writeConcern"><a href="#writeConcern">option: writeConcern</a></h3>
 
-Allows setting [write concern](https://docs.mongodb.com/manual/reference/write-concern/)
+Allows setting [write concern](https://www.mongodb.com/docs/manual/reference/write-concern/)
 at the schema level.
 
 ```javascript
@@ -1137,7 +1137,7 @@ await house.save();
 
 <h3 id="collation"><a href="#collation">option: collation</a></h3>
 
-Sets a default [collation](https://docs.mongodb.com/manual/reference/collation/)
+Sets a default [collation](https://www.mongodb.com/docs/manual/reference/collation/)
 for every query and aggregation. [Here's a beginner-friendly overview of collations](http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations).
 
 ```javascript
@@ -1159,7 +1159,7 @@ MyModel.create([{ name: 'val' }, { name: 'Val' }]).
 
 <h3 id="timeseries"><a href="#timeseries">option: timeseries</a></h3>
 
-If you set the `timeseries` option on a schema, Mongoose will create a [timeseries collection](https://docs.mongodb.com/manual/core/timeseries-collections/) for any model that you create from that schema.
+If you set the `timeseries` option on a schema, Mongoose will create a [timeseries collection](https://www.mongodb.com/docs/manual/core/timeseries-collections/) for any model that you create from that schema.
 
 ```javascript
 const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
@@ -1200,7 +1200,7 @@ the field names by setting `timestamps.createdAt` and `timestamps.updatedAt`.
 The way `timestamps` works under the hood is:
 * If you create a new document, mongoose simply sets `createdAt`, and `updatedAt` to the time of creation.
 * If you update a document, mongoose will add `updatedAt` to the `$set` object.
-* If you set `upsert: true` on an update operation, mongoose will use [`$setOnInsert`](https://docs.mongodb.com/manual/reference/operator/update/setOnInsert/) operator to add `createdAt` to the document in case the `upsert` operation resulted into a new inserted document.
+* If you set `upsert: true` on an update operation, mongoose will use [`$setOnInsert`](https://www.mongodb.com/docs/manual/reference/operator/update/setOnInsert/) operator to add `createdAt` to the document in case the `upsert` operation resulted into a new inserted document.
 
 ```javascript
 const thingSchema = new Schema({..}, { timestamps: { createdAt: 'created_at' } });

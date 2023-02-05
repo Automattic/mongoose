@@ -226,7 +226,7 @@ declare module 'mongoose' {
     }
 
     export interface Search {
-      /** [`$search` reference](https://docs.atlas.mongodb.com/reference/atlas-search/query-syntax/) */
+      /** [`$search` reference](https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/) */
       $search: {
         index?: string;
         highlight?: {

@@ -39,7 +39,7 @@ await Test.findOne(); // Will throw "Operation timed out" error because `db` isn
 
 <a class="anchor" href="#not-local"> **Q**</a>. I am able to connect locally but when I try to connect to MongoDB Atlas I get this error. What gives?
 
-You must ensure that you have whitelisted your ip on [mongodb](https://docs.atlas.mongodb.com/security/ip-access-list/) to allow Mongoose to connect.
+You must ensure that you have whitelisted your ip on [mongodb](https://www.mongodb.com/docs/atlas/security/ip-access-list/) to allow Mongoose to connect.
 You can allow access from all ips with `0.0.0.0/0`.
 
 <hr id="not-a-function" />

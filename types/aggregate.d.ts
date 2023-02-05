@@ -133,7 +133,7 @@ declare module 'mongoose' {
     replaceRoot(newRoot: PipelineStage.ReplaceRoot['$replaceRoot']['newRoot'] | string): this;
 
     /**
-     * Helper for [Atlas Text Search](https://docs.atlas.mongodb.com/reference/atlas-search/tutorial/)'s
+     * Helper for [Atlas Text Search](https://www.mongodb.com/docs/atlas/atlas-search/tutorial/)'s
      * `$search` stage.
      */
     search(options: PipelineStage.Search['$search']): this;

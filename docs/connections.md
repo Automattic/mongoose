@@ -16,7 +16,7 @@ You can also specify several more parameters in the `uri`:
 mongoose.connect('mongodb://username:password@host:port/database?options...');
 ```
 
-See the [mongodb connection string spec](http://docs.mongodb.org/manual/reference/connection-string/) for more details.
+See the [mongodb connection string spec](http://www.mongodb.com/docs/manual/reference/connection-string/) for more details.
 
 <ul class="toc">
   <li><a href="#buffering">Buffering</a></li>

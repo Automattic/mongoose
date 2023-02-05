@@ -37,7 +37,7 @@ A query also has a `.then()` function, and thus can be used as a promise.
 
 ### Executing
 
-When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://docs.mongodb.org/manual/tutorial/query-documents/).
+When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://www.mongodb.com/docs/manual/tutorial/query-documents/).
 
 ```javascript
 const Person = mongoose.model('Person', yourSchema);

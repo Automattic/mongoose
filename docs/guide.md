@@ -251,7 +251,7 @@ Animal.findOne().byName('fido').exec((err, animal) => {
 
 <h3 id="indexes"><a href="#indexes">Indexes</a></h3>
 
-MongoDB supports [secondary indexes](http://docs.mongodb.org/manual/indexes/).
+MongoDB supports [secondary indexes](http://www.mongodb.com/docs/manual/indexes/).
 With mongoose, we define these indexes within our `Schema` [at](api/schematype.html#schematype_SchemaType-index) [the](api/schematype.html#schematype_SchemaType-unique) [path](api/schematype.html#schematype_SchemaType-sparse) [level](api/schemadateoptions.html.html#schemadateoptions_SchemaDateOptions-expires) or the `schema` level.
 Defining indexes at the schema level is necessary when creating
 [compound indexes](https://docs.mongodb.com/manual/core/index-compound/).
@@ -726,7 +726,7 @@ sam.$isEmpty('inventory'); // false
 
 Allows setting [query#read](query.html#query_Query-read) options at the
 schema level, providing us a way to apply default
-[ReadPreferences](http://docs.mongodb.org/manual/applications/replication/#replica-set-read-preference)
+[ReadPreferences](http://www.mongodb.com/docs/manual/applications/replication/#replica-set-read-preference)
 to all queries derived from a model.
 
 ```javascript
@@ -743,7 +743,7 @@ The alias of each pref is also permitted so instead of having to type out
 The read option also allows us to specify _tag sets_. These tell the
 [driver](https://github.com/mongodb/node-mongodb-native/) from which members
 of the replica-set it should attempt to read. Read more about tag sets
-[here](http://docs.mongodb.org/manual/applications/replication/#tag-sets) and
+[here](http://www.mongodb.com/docs/manual/applications/replication/#tag-sets) and
 [here](https://www.mongodb.com/docs/manual/core/read-preference).
 
 _NOTE: you may also specify the driver read preference [strategy](https://www.mongodb.com/docs/manual/core/read-preference/#read-preference-modes)
@@ -959,7 +959,7 @@ will interpret it as a type declaration.
 const schema = new Schema({ loc: { type: String, coordinates: [Number] } });
 ```
 
-However, for applications like [geoJSON](http://docs.mongodb.org/manual/reference/geojson/),
+However, for applications like [geoJSON](http://www.mongodb.com/docs/manual/reference/geojson/),
 the 'type' property is important. If you want to control which key mongoose
 uses to find type declarations, set the 'typeKey' schema option.
 

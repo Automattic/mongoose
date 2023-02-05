@@ -183,7 +183,7 @@ ways to add a static:
 
 - Add a function property to the second argument of the schema-constructor (`statics`)
 - Add a function property to `schema.statics`
-- Call the [`Schema#static()` function](schema.html#schema_Schema-static)
+- Call the [`Schema#static()` function](api/schema.html#schema_Schema-static)
 
 ```javascript
 
@@ -252,7 +252,7 @@ Animal.findOne().byName('fido').exec((err, animal) => {
 <h3 id="indexes"><a href="#indexes">Indexes</a></h3>
 
 MongoDB supports [secondary indexes](http://www.mongodb.com/docs/manual/indexes/).
-With mongoose, we define these indexes within our `Schema` [at](api/schematype.html#schematype_SchemaType-index) [the](api/schematype.html#schematype_SchemaType-unique) [path](api/schematype.html#schematype_SchemaType-sparse) [level](api/schemadateoptions.html.html#schemadateoptions_SchemaDateOptions-expires) or the `schema` level.
+With mongoose, we define these indexes within our `Schema` [at](api/schematype.html#schematype_SchemaType-index) [the](api/schematype.html#schematype_SchemaType-unique) [path](api/schematype.html#schematype_SchemaType-sparse) [level](api/schemadateoptions.html#schemadateoptions_SchemaDateOptions-expires) or the `schema` level.
 Defining indexes at the schema level is necessary when creating
 [compound indexes](https://www.mongodb.com/docs/manual/core/index-compound/).
 
@@ -506,9 +506,9 @@ Valid options:
 
 <h3 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h3>
 
-By default, Mongoose's [`init()` function](model.html#model_Model-init)
+By default, Mongoose's [`init()` function](api/model.html#model_Model-init)
 creates all the indexes defined in your model's schema by calling
-[`Model.createIndexes()`](model.html#model_Model-createIndexes)
+[`Model.createIndexes()`](api/model.html#model_Model-createIndexes)
 after you successfully connect to MongoDB. Creating indexes automatically is
 great for development and test environments. But index builds can also create
 significant load on your production database. If you want to manage indexes
@@ -650,8 +650,8 @@ console.log(p.id); // undefined
 <h3 id="_id"><a href="#_id">option: _id</a></h3>
 
 Mongoose assigns each of your schemas an `_id` field by default if one
-is not passed into the [Schema](schema.html#schema_Schema) constructor.
-The type assigned is an [ObjectId](schema.html#schema_Schema-Types)
+is not passed into the [Schema](api/schema.html#schema_Schema) constructor.
+The type assigned is an [ObjectId](api/schema.html#schema_Schema-Types)
 to coincide with MongoDB's default behavior. If you don't want an `_id`
 added to your schema at all, you may disable it using this option.
 
@@ -724,7 +724,7 @@ sam.$isEmpty('inventory'); // false
 
 <h3 id="read"><a href="#read">option: read</a></h3>
 
-Allows setting [query#read](query.html#query_Query-read) options at the
+Allows setting [query#read](api/query.html#query_Query-read) options at the
 schema level, providing us a way to apply default
 [ReadPreferences](http://www.mongodb.com/docs/manual/applications/replication/#replica-set-read-preference)
 to all queries derived from a model.
@@ -923,11 +923,11 @@ console.log(m.toJSON()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom
 console.log(JSON.stringify(m)); // { "_id": "504e0cd7dd992d9be2f20b6f", "name": "Max Headroom is my name" }
 ```
 
-To see all available `toJSON/toObject` options, read [this](document.html#document_Document-toObject).
+To see all available `toJSON/toObject` options, read [this](api/document.html#document_Document-toObject).
 
 <h3 id="toObject"><a href="#toObject">option: toObject</a></h3>
 
-Documents have a [toObject](document.html#document_Document-toObject) method
+Documents have a [toObject](api/document.html#document_Document-toObject) method
 which converts the mongoose document into a plain JavaScript object. This
 method accepts a few options. Instead of applying these options on a
 per-document basis, we may declare the options at the schema level and have
@@ -947,7 +947,7 @@ const m = new M({ name: 'Max Headroom' });
 console.log(m); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
 ```
 
-To see all available `toObject` options, read [this](document.html#document_Document-toObject).
+To see all available `toObject` options, read [this](api/document.html#document_Document-toObject).
 
 <h3 id="typeKey"><a href="#typeKey">option: typeKey</a></h3>
 
@@ -1047,7 +1047,7 @@ const thing = new Thing({ name: 'no versioning please' });
 thing.save(); // { name: 'no versioning please' }
 ```
 
-Mongoose _only_ updates the version key when you use [`save()`](document.html#document_Document-save).
+Mongoose _only_ updates the version key when you use [`save()`](api/document.html#document_Document-save).
 If you use `update()`, `findOneAndUpdate()`, etc. Mongoose will **not**
 update the version key. As a workaround, you can use the below middleware.
 

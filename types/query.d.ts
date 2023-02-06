@@ -68,22 +68,22 @@ declare module 'mongoose' {
   };
 
   type RootQuerySelector<T> = {
-    /** @see https://docs.mongodb.com/manual/reference/operator/query/and/#op._S_and */
+    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/and/#op._S_and */
     $and?: Array<FilterQuery<T>>;
-    /** @see https://docs.mongodb.com/manual/reference/operator/query/nor/#op._S_nor */
+    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/nor/#op._S_nor */
     $nor?: Array<FilterQuery<T>>;
-    /** @see https://docs.mongodb.com/manual/reference/operator/query/or/#op._S_or */
+    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/or/#op._S_or */
     $or?: Array<FilterQuery<T>>;
-    /** @see https://docs.mongodb.com/manual/reference/operator/query/text */
+    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/text */
     $text?: {
       $search: string;
       $language?: string;
       $caseSensitive?: boolean;
       $diacriticSensitive?: boolean;
     };
-    /** @see https://docs.mongodb.com/manual/reference/operator/query/where/#op._S_where */
+    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/where/#op._S_where */
     $where?: string | Function;
-    /** @see https://docs.mongodb.com/manual/reference/operator/query/comment/#op._S_comment */
+    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/comment/#op._S_comment */
     $comment?: string;
     // we could not find a proper TypeScript generic to support nested queries e.g. 'user.friends.name'
     // this will mark all unrecognized properties as any (including nested queries)
@@ -292,7 +292,7 @@ declare module 'mongoose' {
     exists(val: boolean): this;
 
     /**
-     * Sets the [`explain` option](https://docs.mongodb.com/manual/reference/method/cursor.explain/),
+     * Sets the [`explain` option](https://www.mongodb.com/docs/manual/reference/method/cursor.explain/),
      * which makes this query return detailed execution stats instead of the actual
      * query result. This method is useful for determining what index your queries
      * use.
@@ -468,7 +468,7 @@ declare module 'mongoose' {
     maxScan(val: number): this;
 
     /**
-     * Sets the [maxTimeMS](https://docs.mongodb.com/manual/reference/method/cursor.maxTimeMS/)
+     * Sets the [maxTimeMS](https://www.mongodb.com/docs/manual/reference/method/cursor.maxTimeMS/)
      * option. This will tell the MongoDB server to abort if the query or write op
      * has been running for more than `ms` milliseconds.
      */
@@ -548,7 +548,7 @@ declare module 'mongoose' {
     /**
      * Declare and/or execute this query as a replaceOne() operation. Same as
      * `update()`, except MongoDB will replace the existing document and will
-     * not accept any [atomic](https://docs.mongodb.com/manual/tutorial/model-data-for-atomic-operations/#pattern) operators (`$set`, etc.)
+     * not accept any [atomic](https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern) operators (`$set`, etc.)
      */
     replaceOne(filter?: FilterQuery<DocType>, replacement?: DocType | AnyObject, options?: QueryOptions<DocType> | null, callback?: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
 
@@ -565,7 +565,7 @@ declare module 'mongoose' {
     selectedInclusively(): boolean;
 
     /**
-     * Sets the [MongoDB session](https://docs.mongodb.com/manual/reference/server-sessions/)
+     * Sets the [MongoDB session](https://www.mongodb.com/docs/manual/reference/server-sessions/)
      * associated with this query. Sessions are how you mark a query as part of a
      * [transaction](/docs/transactions.html).
      */

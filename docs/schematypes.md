@@ -203,7 +203,7 @@ types.
 
 * `required`: boolean or function, if true adds a [required validator](validation.html#built-in-validators) for this property
 * `default`: Any or function, sets a default value for the path. If the value is a function, the return value of the function is used as the default.
-* `select`: boolean, specifies default [projections](https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/) for queries
+* `select`: boolean, specifies default [projections](https://www.mongodb.com/docs/manual/tutorial/project-fields-from-query-results/) for queries
 * `validate`: function, adds a [validator function](validation.html#built-in-validators) for this property
 * `get`: function, defines a custom getter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
 * `set`: function, defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
@@ -234,12 +234,12 @@ doc.i; // 3
 
 <h5>Indexes</h5>
 
-You can also define [MongoDB indexes](https://docs.mongodb.com/manual/indexes/)
+You can also define [MongoDB indexes](https://www.mongodb.com/docs/manual/indexes/)
 using schema type options.
 
-* `index`: boolean, whether to define an [index](https://docs.mongodb.com/manual/indexes/) on this property.
-* `unique`: boolean, whether to define a [unique index](https://docs.mongodb.com/manual/core/index-unique/) on this property.
-* `sparse`: boolean, whether to define a [sparse index](https://docs.mongodb.com/manual/core/index-sparse/) on this property.
+* `index`: boolean, whether to define an [index](https://www.mongodb.com/docs/manual/indexes/) on this property.
+* `unique`: boolean, whether to define a [unique index](https://www.mongodb.com/docs/manual/core/index-unique/) on this property.
+* `sparse`: boolean, whether to define a [sparse index](https://www.mongodb.com/docs/manual/core/index-sparse/) on this property.
 
 ```javascript
 const schema2 = new Schema({
@@ -399,7 +399,7 @@ person.save(); // Mongoose will save changes to `anything`.
 
 <h4 id="objectids">ObjectIds</h4>
 
-An [ObjectId](https://docs.mongodb.com/manual/reference/method/ObjectId/)
+An [ObjectId](https://www.mongodb.com/docs/manual/reference/method/ObjectId/)
 is a special type typically used for unique identifiers. Here's how
 you declare a schema with a path `driver` that is an ObjectId:
 

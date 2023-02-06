@@ -102,7 +102,7 @@ The Mongoose team maintains several plugins that add cool new features to
 Mongoose. Here's a couple:
 
 * [mongoose-autopopulate](http://plugins.mongoosejs.io/plugins/autopopulate): Always [`populate()`](populate.html) certain fields in your Mongoose schemas.
-* [mongoose-lean-virtuals](http://plugins.mongoosejs.io/plugins/lean-virtuals): Attach virtuals to the results of Mongoose queries when using [`.lean()`](query.html#query_Query-lean).
+* [mongoose-lean-virtuals](http://plugins.mongoosejs.io/plugins/lean-virtuals): Attach virtuals to the results of Mongoose queries when using [`.lean()`](api/query.html#query_Query-lean).
 * [mongoose-cast-aggregation](https://www.npmjs.com/package/mongoose-cast-aggregation)
 
 You can find a full list of officially supported plugins on [Mongoose's plugins search site](https://plugins.mongoosejs.io/).

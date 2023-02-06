@@ -1,6 +1,6 @@
 # SSL Connections
 
-Mongoose supports connecting to [MongoDB clusters that require SSL connections](https://docs.mongodb.com/manual/tutorial/configure-ssl/). Setting the `ssl` option to `true` in [`mongoose.connect()`](../api/mongoose.html#mongoose_Mongoose-connect) or your connection string is enough to connect to a MongoDB cluster using SSL:
+Mongoose supports connecting to [MongoDB clusters that require SSL connections](https://www.mongodb.com/docs/manual/tutorial/configure-ssl/). Setting the `ssl` option to `true` in [`mongoose.connect()`](../api/mongoose.html#mongoose_Mongoose-connect) or your connection string is enough to connect to a MongoDB cluster using SSL:
 
 ```javascript
 mongoose.connect('mongodb://127.0.0.1:27017/test', { ssl: true });

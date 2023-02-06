@@ -102,30 +102,60 @@ parse();
  * @property {SeeObject} [inherits] Defines the string for "@inherits"
  */
 
+/**
+ * @typedef {Object} NameObj
+ * @property {string} docName
+ * @property {string} filePath
+ * @property {string} fullName
+ * @property {string} docFileName
+ */
+
+/**
+ * Process a file name to a documentation name
+ * @param {string} input
+ * @returns {NameObj}
+ */
+function processName(input) {
+  let name = input.
+    replace('lib/', '').
+    replace('.js', '').
+    replace('/index', '').
+    replace('/methods', '');
+  const lastSlash = name.lastIndexOf('/');
+  const fullName = name;
+  name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
+  if (name === 'core_array') {
+    name = 'array';
+  }
+  if (fullName === 'schema/array') {
+    name = 'SchemaArray';
+  }
+  if (name === 'documentarray') {
+    name = 'DocumentArrayPath';
+  }
+  if (name === 'DocumentArray') {
+    name = 'MongooseDocumentArray';
+  }
+  if (name === 'index') {
+    name = 'Mongoose';
+  }
+
+  const docName = name.charAt(0).toUpperCase() === name.charAt(0) ? name : name.charAt(0).toUpperCase() + name.substr(1);
+
+  return {
+    docName: docName,
+    fullName: fullName,
+    filePath: input,
+    docFileName: name.toLowerCase()
+  }
+}
+
 function parse() {
   for (const props of combinedFiles) {
-    let name = props.file.
-      replace('lib/', '').
-      replace('.js', '').
-      replace('/index', '').
-      replace('/methods', '');
-    const lastSlash = name.lastIndexOf('/');
-    const fullName = name;
-    name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
-    if (name === 'core_array') {
-      name = 'array';
-    }
-    if (fullName === 'schema/array') {
-      name = 'SchemaArray';
-    }
-    if (name === 'documentarray') {
-      name = 'DocumentArrayPath';
-    }
-    if (name === 'DocumentArray') {
-      name = 'MongooseDocumentArray';
-    }
+    const { docName: name, docFileName } = processName(props.file);
     const data = {
-      name: name.charAt(0).toUpperCase() === name.charAt(0) ? name : name.charAt(0).toUpperCase() + name.substr(1),
+      name: name,
+      fileName: docFileName,
       props: []
     };
 
@@ -213,7 +243,26 @@ function parse() {
             ctx.return = tag;
             break;
           case 'inherits':
-            ctx.inherits = extractTextUrlFromTag(tag, ctx);
+            const obj = extractTextUrlFromTag(tag, ctx);
+            // try to get the documentation name for the "@inherits" value
+            // example: "@inherits SchemaType" -> "schematype.html"
+            if (!obj.url || obj.url === obj.text) {
+              let match = undefined;
+              for (const file of files) {
+                const { docName, docFileName } = processName(file);
+                if (docName.toLowerCase().includes(obj.text.toLowerCase())) {
+                  match = docFileName;
+                  break;
+                }
+              }
+
+              if (match) {
+                obj.url = match + '.html';
+              } else {
+                console.warn(`no match found in files for inherits "${obj.text}" on "${ctx.constructor}.${ctx.name}"`);
+              }
+            }
+            ctx.inherits = obj;
             break;
           case 'event':
           case 'param':

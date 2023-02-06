@@ -12148,6 +12148,20 @@ describe('document', function() {
     assert.equal(rawDoc.referenced.refOriginal, 'hello');
     assert.equal(rawDoc.referenced.refAnother, 'goodbye');
   });
+
+  it('$shift() triggers $pop', function() {
+    const Test = db.model('Test', mongoose.Schema({
+      arr: [String]
+    }, { autoCreate: false, autoIndex: false }));
+
+    const doc = Test.hydrate({ arr: ['a', 'b', 'c'] });
+    doc.arr.$shift();
+
+    assert.deepStrictEqual(
+      doc.getChanges(),
+      { $pop: { arr: -1 }, $inc: { __v: 1 } }
+    );
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

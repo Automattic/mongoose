@@ -79,6 +79,13 @@ const timewithOffset430DateToString: Expression = { $dateToString: { format: '%H
 const minutesOffsetNYDateToString: Expression = { $dateToString: { format: '%Z', date: '$date', timezone: 'America/New_York' } };
 const minutesOffset430DateToString: Expression = { $dateToString: { format: '%Z', date: '$date', timezone: '+04:30' } };
 
+const top: Expression.Top = {
+  $top: {
+    output: ['$playerId', '$score'],
+    sortBy: { score: 1 }
+  }
+};
+
 const topN: Expression.TopN = {
   $topN: {
     output: ['$playerId', '$score'],

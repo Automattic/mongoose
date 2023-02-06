@@ -140,7 +140,7 @@ declare module 'mongoose' {
     >
     > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
-    aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline?: PipelineStage[], options?: AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[], callback?: Callback<R[]>): Aggregate<Array<R>>;
 
     /** Base Mongoose instance the model uses. */

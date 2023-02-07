@@ -3267,10 +3267,10 @@ describe('model: updateOne: ', function() {
       const baseModel = db.model('Test', baseSchema);
 
       const aSchema = Schema({ aThing: Number }, { _id: false, id: false });
-      const aModel = baseModel.discriminator('A', aSchema);
+      const aModel = baseModel.discriminator('discriminator-A', aSchema, 'A');
 
       const bSchema = new Schema({ bThing: String }, { _id: false, id: false });
-      const bModel = baseModel.discriminator('B', bSchema);
+      const bModel = baseModel.discriminator('discriminator-B', bSchema, 'B');
 
       // Model is created as a type A
       let doc = await baseModel.create({ type: 'A', aThing: 1 });

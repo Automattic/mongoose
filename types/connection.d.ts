@@ -147,14 +147,20 @@ declare module 'mongoose' {
       schema?: TSchema,
       collection?: string,
       options?: CompileModelOptions
-    ): Model<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+    ): Model<
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+    {},
+    HydratedDocument<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>>,
+    TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
-      schema?: Schema<T, any, any, TQueryHelpers, any, any>,
+      schema?: Schema<T, any, any, TQueryHelpers, any, any, any>,
       collection?: string,
       options?: CompileModelOptions
     ): U;
-    model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+    model<T>(name: string, schema?: Schema<T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
     /** Returns an array of model names created on this connection. */
     modelNames(): Array<string>;

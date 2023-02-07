@@ -108,22 +108,19 @@ expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: false }); // tes
 interface IProfile {
   age: number;
 }
-interface ProfileDoc extends Document, IProfile { }
 const ProfileSchemaDef: SchemaDefinition<IProfile> = { age: Number };
-export const ProfileSchema = new Schema<ProfileDoc, Model<ProfileDoc>, ProfileDoc>(ProfileSchemaDef);
+export const ProfileSchema = new Schema<IProfile, Model<IProfile>>(ProfileSchemaDef);
 
 interface IUser {
   email: string;
-  profile: ProfileDoc;
+  profile: IProfile;
 }
-
-interface UserDoc extends Document, IUser { }
 
 const ProfileSchemaDef2: SchemaDefinition<IProfile> = {
   age: Schema.Types.Number
 };
 
-const ProfileSchema2: Schema<ProfileDoc, Model<ProfileDoc>> = new Schema<ProfileDoc>(ProfileSchemaDef2);
+const ProfileSchema2: Schema<IProfile, Model<IProfile>> = new Schema<IProfile>(ProfileSchemaDef2);
 
 const UserSchemaDef: SchemaDefinition<IUser> = {
   email: String,
@@ -224,7 +221,7 @@ function gh10605() {
 }
 
 function gh10605_2() {
-  interface ITestSchema extends Document {
+  interface ITestSchema {
     someObject: Array<{ id: string }>
   }
 
@@ -956,7 +953,8 @@ function gh12590() {
 
   type User = InferSchemaType<typeof UserSchema>;
 
-  expectType<SchemaType<User>>(UserSchema.path('hashed_password'));
+  const path = UserSchema.path('hashed_password');
+  expectType<SchemaType<any, HydratedDocument<User>>>(path);
 
   UserSchema.path('hashed_password').validate(function(v) {
     expectType<HydratedDocument<User>>(this);

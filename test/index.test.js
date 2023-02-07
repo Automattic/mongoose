@@ -818,7 +818,6 @@ describe('mongoose module:', function() {
       assert.ok(mongoose.Schema.Types);
       assert.equal(typeof mongoose.SchemaType, 'function');
       assert.equal(typeof mongoose.Query, 'function');
-      assert.equal(typeof mongoose.Promise, 'function');
       assert.equal(typeof mongoose.Model, 'function');
       assert.equal(typeof mongoose.Document, 'function');
       assert.equal(typeof mongoose.Error, 'function');

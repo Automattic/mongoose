@@ -2,7 +2,7 @@ import mongoose, { Document, Model, Schema, SchemaDefinition, SchemaOptions, Typ
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
-interface IBaseTest extends Document {
+interface IBaseTest {
   name?: string;
 }
 
@@ -32,7 +32,7 @@ function test(): void {
     Land = 'land',
   }
 
-  interface CardDb extends Document {
+  interface CardDb {
     _id: Types.ObjectId;
     type: CardType;
   }

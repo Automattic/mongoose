@@ -3,8 +3,6 @@ const assert = require('assert');
 const mongoose = require('../../');
 const start = require('../common');
 
-const Promise = global.Promise || require('bluebird');
-
 describe('validation docs', function() {
   let db;
   const Schema = mongoose.Schema;

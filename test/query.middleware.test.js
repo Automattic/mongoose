@@ -14,15 +14,12 @@ describe('query middleware', function() {
   let Author;
   let Publisher;
 
-  const connectionsToClose = [];
-
   before(function() {
     db = start();
   });
 
   after(async function() {
     await db.close();
-    await Promise.all(connectionsToClose.map((v) => v.close()));
   });
 
   const initializeData = async function() {
@@ -65,9 +62,6 @@ describe('query middleware', function() {
       ++count;
       next();
     });
-
-    const conn = start();
-    connectionsToClose.push(conn);
 
     await initializeData();
     await Author.find({ x: 1 });

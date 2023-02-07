@@ -2305,6 +2305,81 @@ describe('schema', function() {
     });
   });
 
+  describe('omit() (gh-12931)', function() {
+    it('works with nested paths', function() {
+      const schema = Schema({
+        name: {
+          first: {
+            type: String,
+            required: true
+          },
+          last: {
+            type: String,
+            required: true
+          }
+        },
+        age: {
+          type: Number,
+          index: true
+        }
+      });
+      assert.ok(schema.path('name.first'));
+      assert.ok(schema.path('name.last'));
+
+      let newSchema = schema.omit(['name.first']);
+      assert.ok(!newSchema.path('name.first'));
+      assert.ok(newSchema.path('age'));
+      assert.ok(newSchema.path('age').index);
+
+      newSchema = schema.omit(['age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(newSchema.path('name.last'));
+      assert.ok(newSchema.path('name.last').required);
+      assert.ok(!newSchema.path('age'));
+
+      newSchema = schema.omit(['name.last', 'age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(!newSchema.path('name.last'));
+      assert.ok(!newSchema.path('age'));
+    });
+
+    it('with single nested paths', function() {
+      const schema = Schema({
+        name: Schema({
+          first: {
+            type: String,
+            required: true
+          },
+          last: {
+            type: String,
+            required: true
+          }
+        }),
+        age: {
+          type: Number,
+          index: true
+        }
+      });
+      assert.ok(schema.path('name.first'));
+      assert.ok(schema.path('name.last'));
+
+      let newSchema = schema.omit(['age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(newSchema.path('name.last'));
+      assert.ok(newSchema.path('name.last').required);
+      assert.ok(!newSchema.path('age'));
+
+      newSchema = schema.omit(['name.last', 'age']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(!newSchema.path('name.last'));
+      assert.ok(!newSchema.path('age'));
+    });
+  });
+
   describe('path-level custom cast (gh-8300)', function() {
     it('with numbers', function() {
       const schema = Schema({
@@ -2419,17 +2494,13 @@ describe('schema', function() {
   });
 
   describe('mongoose.set(`strictQuery`, value); (gh-6658)', function() {
-    let strictQueryOriginalValue;
-
-    this.beforeEach(() => strictQueryOriginalValue = mongoose.get('strictQuery'));
-    this.afterEach(() => mongoose.set('strictQuery', strictQueryOriginalValue));
-
     it('setting `strictQuery` on base sets strictQuery to schema (gh-6658)', function() {
       // Arrange
-      mongoose.set('strictQuery', 'some value');
+      const m = new mongoose.Mongoose();
+      m.set('strictQuery', 'some value');
 
       // Act
-      const schema = new Schema();
+      const schema = new m.Schema();
 
       // Assert
       assert.equal(schema.get('strictQuery'), 'some value');
@@ -2437,10 +2508,11 @@ describe('schema', function() {
 
     it('`strictQuery` set on base gets overwritten by option set on schema (gh-6658)', function() {
       // Arrange
-      mongoose.set('strictQuery', 'base option');
+      const m = new mongoose.Mongoose();
+      m.set('strictQuery', 'base option');
 
       // Act
-      const schema = new Schema({}, { strictQuery: 'schema option' });
+      const schema = new m.Schema({}, { strictQuery: 'schema option' });
 
       // Assert
       assert.equal(schema.get('strictQuery'), 'schema option');
@@ -2878,5 +2950,88 @@ describe('schema', function() {
     });
 
     assert.equal(schema._getSchema('child.testMap.foo.bar').instance, 'Mixed');
+  });
+
+  it('should not allow to create a path with primitive values (gh-7558)', () => {
+    assert.throws(() => {
+      new Schema({
+        foo: false
+      });
+    }, /invalid.*false.*foo/i);
+
+    assert.throws(() => {
+      const schema = new Schema();
+      schema.add({ foo: false });
+    }, /invalid.*false.*foo/i);
+
+    assert.throws(() => {
+      new Schema({
+        foo: 1
+      });
+    }, /invalid.*1.*foo/i);
+
+    assert.throws(() => {
+      new Schema({
+        foo: 'invalid'
+      });
+    }, /invalid.*invalid.*foo/i);
+  });
+
+  it('should allow deleting a virtual path off the schema gh-8397', async function() {
+    const schema = new Schema({
+      name: String
+    }, {
+      virtuals: {
+        foo: {
+          get() {
+            return 42;
+          }
+        }
+      }
+    });
+    assert.ok(schema.virtuals.foo);
+    schema.removeVirtual('foo');
+    assert.ok(!schema.virtuals.foo);
+    const Test = db.model('gh-8397', schema);
+    const doc = new Test({ name: 'Test' });
+    assert.equal(doc.foo, undefined);
+  });
+
+  it('should allow deleting multiple virtuals gh-8397', async function() {
+    const schema = new Schema({
+      name: String
+    }, {
+      virtuals: {
+        foo: {
+          get() {
+            return 42;
+          }
+        },
+        bar: {
+          get() {
+            return 41;
+          }
+        }
+      }
+    });
+    assert.ok(schema.virtuals.foo);
+    assert.ok(schema.virtuals.bar);
+    schema.removeVirtual(['foo', 'bar']);
+    assert.ok(!schema.virtuals.foo);
+    assert.ok(!schema.virtuals.bar);
+    const Test = db.model('gh-8397', schema);
+    const doc = new Test({ name: 'Test' });
+    assert.equal(doc.foo, undefined);
+    assert.equal(doc.bar, undefined);
+  });
+
+  it('should throw an error if attempting to delete a virtual path that does not exist gh-8397', function() {
+    const schema = new Schema({
+      name: String
+    });
+    assert.ok(!schema.virtuals.foo);
+    assert.throws(() => {
+      schema.removeVirtual('foo');
+    }, { message: 'Attempting to remove virtual "foo" that does not exist.' });
   });
 });

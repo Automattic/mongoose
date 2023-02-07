@@ -15,6 +15,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [Removed `remove()`](#removed-remove)
 * [Dropped callback support](#dropped-callback-support)
 * [Removed `update()`](#removed-update)
+* [Discriminator schemas use base schema options by default](#discriminator-schemas-use-base-schema-options-by-default)
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
 
 <h3 id="strictquery"><a href="#strictquery"><code>strictQuery</code></a></h3>
@@ -124,6 +125,24 @@ const oid2 = new mongoose.Types.ObjectId(oid1.toString());
 
 oid1.toHexString() === oid2.toHexString(); // true
 assert.deepStrictEqual(oid1, oid2); // Throws "Values have same structure but are not reference-equal"
+```
+
+<h3 id="discriminator-schemas-use-base-schema-options-by-default"><a href="#discriminator-schemas-use-base-schema-options-by-default">Discriminator schemas use base schema options by default</a></h3>
+
+When you use `Model.discriminator()`, Mongoose will now use the discriminator base schema's options by default.
+This means you don't need to explicitly set child schema options to match the base schema's.
+
+```javascript
+const baseSchema = Schema({}, { typeKey: '$type' });
+const Base = db.model('Base', baseSchema);
+
+// In Mongoose 6.x, the `Base.discriminator()` call would throw because
+// no `typeKey` option. In Mongoose 7, Mongoose uses the base schema's
+// `typeKey` by default.
+const childSchema = new Schema({}, {});
+const Test = Base.discriminator('Child', childSchema);
+
+Test.schema.options.typeKey; // '$type'
 ```
 
 <h3 id="removed-castforquerywrapper"><a href="#removed-castforquerywrapper">Removed <code>castForQueryWrapper</code>, updated <code>castForQuery()</code> signature</a></h3>

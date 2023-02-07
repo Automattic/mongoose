@@ -3929,4 +3929,38 @@ describe('Query', function() {
 
     assert.ok('title' in replacedDoc === false);
   });
+
+  it('handles $elemMatch with nested schema (gh-12902)', async function() {
+    const bioSchema = new Schema({
+      name: { type: String }
+    });
+
+    const Book = db.model('book', new Schema({
+      name: String,
+      authors: [{
+        bio: bioSchema
+      }]
+    }));
+
+    await new Book({
+      name: 'Mongoose Fundamentals',
+      authors: [{
+        bio: {
+          name: 'Foo Bar'
+        }
+      }]
+    }).save();
+
+    const books = await Book.find({
+      name: 'Mongoose Fundamentals',
+      authors: {
+        $elemMatch: {
+          'bio.name': { $in: ['Foo Bar'] },
+          'bio.location': 'Mandurah' // Not in schema
+        }
+      }
+    });
+
+    assert.strictEqual(books.length, 0);
+  });
 });

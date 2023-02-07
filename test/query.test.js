@@ -4314,6 +4314,32 @@ describe('Query', function() {
     assert.strictEqual(found[0].title, 'burrito bowl');
   });
 
+  it('update operation should not remove fields set to undefined (gh-12930)', async function() {
+    const m = new mongoose.Mongoose();
+
+    await m.connect(start.uri);
+
+    const schema = new mongoose.Schema({ title: String });
+
+    const Test = m.model('test', schema);
+
+    const doc = await Test.create({
+      title: 'test'
+    });
+
+    assert.strictEqual(doc.title, 'test');
+
+    const updatedDoc = await Test.findOneAndUpdate(
+      {
+        _id: doc._id
+      },
+      { title: undefined },
+      { returnOriginal: false }
+    ).lean();
+
+    assert.strictEqual(updatedDoc.title, 'test');
+  });
+
   it('handles $elemMatch with nested schema (gh-12902)', async function() {
     const bioSchema = new Schema({
       name: { type: String }

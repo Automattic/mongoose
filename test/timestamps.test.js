@@ -24,7 +24,7 @@ describe('timestamps', function() {
 
   // These tests use schemas only, no database connection needed.
   describe('schema options', function() {
-    it('should have createdAt and updatedAt fields', function(done) {
+    it('should have createdAt and updatedAt fields', function() {
       const TestSchema = new Schema({
         name: String
       }, {
@@ -33,10 +33,10 @@ describe('timestamps', function() {
 
       assert.ok(TestSchema.path('createdAt'));
       assert.ok(TestSchema.path('updatedAt'));
-      done();
+
     });
 
-    it('should have createdAt and updatedAt fields', function(done) {
+    it('should have createdAt and updatedAt fields', function() {
       const TestSchema = new Schema({
         name: String
       });
@@ -45,10 +45,10 @@ describe('timestamps', function() {
 
       assert.ok(TestSchema.path('createdAt'));
       assert.ok(TestSchema.path('updatedAt'));
-      done();
+
     });
 
-    it('should have created and updatedAt fields', function(done) {
+    it('should have created and updatedAt fields', function() {
       const TestSchema = new Schema({
         name: String
       }, {
@@ -59,10 +59,10 @@ describe('timestamps', function() {
 
       assert.ok(TestSchema.path('created'));
       assert.ok(TestSchema.path('updatedAt'));
-      done();
+
     });
 
-    it('should have created and updatedAt fields', function(done) {
+    it('should have created and updatedAt fields', function() {
       const TestSchema = new Schema({
         name: String
       });
@@ -73,10 +73,10 @@ describe('timestamps', function() {
 
       assert.ok(TestSchema.path('created'));
       assert.ok(TestSchema.path('updatedAt'));
-      done();
+
     });
 
-    it('should have created and updated fields', function(done) {
+    it('should have created and updated fields', function() {
       const TestSchema = new Schema({
         name: String
       }, {
@@ -88,10 +88,10 @@ describe('timestamps', function() {
 
       assert.ok(TestSchema.path('created'));
       assert.ok(TestSchema.path('updated'));
-      done();
+
     });
 
-    it('should have just createdAt if updatedAt set to falsy', function(done) {
+    it('should have just createdAt if updatedAt set to falsy', function() {
       const TestSchema = new Schema({
         name: String
       });
@@ -102,10 +102,10 @@ describe('timestamps', function() {
 
       assert.ok(TestSchema.path('createdAt'));
       assert.ok(!TestSchema.path('updatedAt'));
-      done();
+
     });
 
-    it('should have created and updated fields', function(done) {
+    it('should have created and updated fields', function() {
       const TestSchema = new Schema({
         name: String
       });
@@ -117,7 +117,7 @@ describe('timestamps', function() {
 
       assert.ok(TestSchema.path('created'));
       assert.ok(TestSchema.path('updated'));
-      done();
+
     });
 
     it('TTL index with timestamps (gh-5656)', function() {
@@ -136,7 +136,7 @@ describe('timestamps', function() {
     });
   });
 
-  it('does not override timestamp params defined in schema (gh-4868)', function(done) {
+  it('does not override timestamp params defined in schema (gh-4868)', async function() {
     const startTime = Date.now();
     const schema = new mongoose.Schema({
       createdAt: {
@@ -151,38 +151,28 @@ describe('timestamps', function() {
     }, { timestamps: true });
     const M = db.model('Test', schema);
 
-    M.create({ name: 'Test' }, function(error, doc) {
-      assert.ifError(error);
-      M.findOne({ _id: doc._id }, function(error, doc) {
-        assert.ifError(error);
-        assert.ok(!doc.createdAt);
-        assert.ok(doc.updatedAt);
-        assert.ok(doc.updatedAt.valueOf() >= startTime);
-        done();
-      });
-    });
+    let doc = await M.create({ name: 'Test' });
+    doc = await M.findOne({ _id: doc._id });
+    assert.ok(!doc.createdAt);
+    assert.ok(doc.updatedAt);
+    assert.ok(doc.updatedAt.valueOf() >= startTime);
   });
 
-  it('updatedAt without createdAt (gh-5598)', function(done) {
+  it('updatedAt without createdAt (gh-5598)', async function() {
     const startTime = Date.now();
     const schema = new mongoose.Schema({
       name: String
     }, { timestamps: { createdAt: null, updatedAt: true } });
     const M = db.model('Test', schema);
 
-    M.create({ name: 'Test' }, function(error, doc) {
-      assert.ifError(error);
-      M.findOne({ _id: doc._id }, function(error, doc) {
-        assert.ifError(error);
-        assert.ok(!doc.createdAt);
-        assert.ok(doc.updatedAt);
-        assert.ok(doc.updatedAt.valueOf() >= startTime);
-        done();
-      });
-    });
+    let doc = await M.create({ name: 'Test' });
+    doc = await M.findOne({ _id: doc._id });
+    assert.ok(!doc.createdAt);
+    assert.ok(doc.updatedAt);
+    assert.ok(doc.updatedAt.valueOf() >= startTime);
   });
 
-  it('updatedAt without createdAt for nested (gh-5598)', function(done) {
+  it('updatedAt without createdAt for nested (gh-5598)', async function() {
     const startTime = Date.now();
     const schema = new mongoose.Schema({
       name: String
@@ -192,39 +182,31 @@ describe('timestamps', function() {
     });
     const M = db.model('Test', parentSchema);
 
-    M.create({ child: { name: 'test' } }, function(error, doc) {
-      assert.ifError(error);
-      M.findOne({ _id: doc._id }, function(error, doc) {
-        assert.ifError(error);
-        assert.ok(!doc.child.createdAt);
-        assert.ok(doc.child.updatedAt);
-        assert.ok(doc.child.updatedAt.valueOf() >= startTime);
-        done();
-      });
-    });
+    let doc = await M.create({ child: { name: 'test' } });
+    doc = await M.findOne({ _id: doc._id });
+    assert.ok(!doc.child.createdAt);
+    assert.ok(doc.child.updatedAt);
+    assert.ok(doc.child.updatedAt.valueOf() >= startTime);
+
   });
 
-  it('nested paths (gh-4503)', function(done) {
+  it('nested paths (gh-4503)', async function() {
     const startTime = Date.now();
     const schema = new mongoose.Schema({
       name: String
     }, { timestamps: { createdAt: 'ts.c', updatedAt: 'ts.a' } });
     const M = db.model('Test', schema);
 
-    M.create({ name: 'Test' }, function(error, doc) {
-      assert.ifError(error);
-      M.findOne({ _id: doc._id }, function(error, doc) {
-        assert.ifError(error);
-        assert.ok(doc.ts.c);
-        assert.ok(doc.ts.c.valueOf() >= startTime);
-        assert.ok(doc.ts.a);
-        assert.ok(doc.ts.a.valueOf() >= startTime);
-        done();
-      });
-    });
+    let doc = await M.create({ name: 'Test' });
+    doc = await M.findOne({ _id: doc._id });
+    assert.ok(doc.ts.c);
+    assert.ok(doc.ts.c.valueOf() >= startTime);
+    assert.ok(doc.ts.a);
+    assert.ok(doc.ts.a.valueOf() >= startTime);
+
   });
 
-  it('does not override nested timestamp params defined in schema (gh-4868)', function(done) {
+  it('does not override nested timestamp params defined in schema (gh-4868)', async function() {
     const startTime = Date.now();
     const schema = new mongoose.Schema({
       ts: {
@@ -241,19 +223,14 @@ describe('timestamps', function() {
     }, { timestamps: { createdAt: 'ts.createdAt', updatedAt: 'ts.updatedAt' } });
     const M = db.model('Test', schema);
 
-    M.create({ name: 'Test' }, function(error, doc) {
-      assert.ifError(error);
-      M.findOne({ _id: doc._id }, function(error, doc) {
-        assert.ifError(error);
-        assert.ok(!doc.ts.createdAt);
-        assert.ok(doc.ts.updatedAt);
-        assert.ok(doc.ts.updatedAt.valueOf() >= startTime);
-        done();
-      });
-    });
+    let doc = await M.create({ name: 'Test' });
+    doc = await M.findOne({ _id: doc._id });
+    assert.ok(!doc.ts.createdAt);
+    assert.ok(doc.ts.updatedAt);
+    assert.ok(doc.ts.updatedAt.valueOf() >= startTime);
   });
 
-  it('does not override timestamps in nested schema (gh-4868)', function(done) {
+  it('does not override timestamps in nested schema (gh-4868)', async function() {
     const startTime = Date.now();
     const tsSchema = new mongoose.Schema({
       createdAt: {
@@ -271,33 +248,25 @@ describe('timestamps', function() {
     }, { timestamps: { createdAt: 'ts.createdAt', updatedAt: 'ts.updatedAt' } });
     const M = db.model('Test', schema);
 
-    M.create({ name: 'Test' }, function(error, doc) {
-      assert.ifError(error);
-      M.findOne({ _id: doc._id }, function(error, doc) {
-        assert.ifError(error);
-        assert.ok(!doc.ts.createdAt);
-        assert.ok(doc.ts.updatedAt);
-        assert.ok(doc.ts.updatedAt.valueOf() >= startTime);
-        done();
-      });
-    });
+    let doc = await M.create({ name: 'Test' });
+    doc = await M.findOne({ _id: doc._id });
+    assert.ok(!doc.ts.createdAt);
+    assert.ok(doc.ts.updatedAt);
+    assert.ok(doc.ts.updatedAt.valueOf() >= startTime);
   });
 
-  it('no timestamps added when parent/child timestamps explicitly false (gh-7202)', function(done) {
+  it('no timestamps added when parent/child timestamps explicitly false (gh-7202)', async function() {
     const subSchema = new Schema({}, { timestamps: false });
     const schema = new Schema({ sub: subSchema }, { timestamps: false });
 
     const Test = db.model('Test', schema);
     const test = new Test({ sub: {} });
 
-    test.save((err, saved) => {
-      assert.ifError(err);
-      assert.strictEqual(saved.createdAt, undefined);
-      assert.strictEqual(saved.updatedAt, undefined);
-      assert.strictEqual(saved.sub.createdAt, undefined);
-      assert.strictEqual(saved.sub.updatedAt, undefined);
-      done();
-    });
+    const saved = await test.save();
+    assert.strictEqual(saved.createdAt, undefined);
+    assert.strictEqual(saved.updatedAt, undefined);
+    assert.strictEqual(saved.sub.createdAt, undefined);
+    assert.strictEqual(saved.sub.updatedAt, undefined);
   });
 
   it('avoids calling createdAt getters when setting updatedAt (gh-7496)', function() {
@@ -506,46 +475,42 @@ describe('timestamps', function() {
     return Model.create({ set: 'test' }).then(doc => assert.ok(doc.createdAt));
   });
 
-  it('should not override createdAt when not selected (gh-4340)', function(done) {
+  it('should not override createdAt when not selected (gh-4340)', async function() {
     const TestSchema = new Schema({ name: String }, { timestamps: true });
 
     const Test = db.model('Test', TestSchema);
 
-    Test.create({
+    let doc = await Test.create({
       name: 'hello'
-    }, function(err, doc) {
-      // Let’s save the dates to compare later.
-      const createdAt = doc.createdAt;
-      const updatedAt = doc.updatedAt;
-
-      assert.ok(doc.createdAt);
-
-      Test.findById(doc._id, { name: true }, function(err, doc) {
-        // The dates shouldn’t be selected here.
-        assert.ok(!doc.createdAt);
-        assert.ok(!doc.updatedAt);
-
-        doc.name = 'world';
-
-        doc.save(function(err, doc) {
-          // Let’s save the new updatedAt date as it should have changed.
-          const newUpdatedAt = doc.updatedAt;
-
-          assert.ok(!doc.createdAt);
-          assert.ok(doc.updatedAt);
-
-          Test.findById(doc._id, function(err, doc) {
-            // Let’s make sure that everything is working again by
-            // comparing the dates with the ones we saved.
-            assert.equal(doc.createdAt.valueOf(), createdAt.valueOf());
-            assert.notEqual(doc.updatedAt.valueOf(), updatedAt.valueOf());
-            assert.equal(doc.updatedAt.valueOf(), newUpdatedAt.valueOf());
-
-            done();
-          });
-        });
-      });
     });
+    // Let’s save the dates to compare later.
+    const createdAt = doc.createdAt;
+    const updatedAt = doc.updatedAt;
+
+    assert.ok(doc.createdAt);
+
+    doc = await Test.findById(doc._id, { name: true });
+    // The dates shouldn’t be selected here.
+    assert.ok(!doc.createdAt);
+    assert.ok(!doc.updatedAt);
+
+    doc.name = 'world';
+
+    await doc.save();
+    // Let’s save the new updatedAt date as it should have changed.
+    const newUpdatedAt = doc.updatedAt;
+
+    assert.ok(!doc.createdAt);
+    assert.ok(doc.updatedAt);
+
+    doc = await Test.findById(doc._id);
+    // Let’s make sure that everything is working again by
+    // comparing the dates with the ones we saved.
+    assert.equal(doc.createdAt.valueOf(), createdAt.valueOf());
+    assert.notEqual(doc.updatedAt.valueOf(), updatedAt.valueOf());
+    assert.equal(doc.updatedAt.valueOf(), newUpdatedAt.valueOf());
+
+
   });
 
   describe('auto update createdAt and updatedAt when create/save/update document', function() {
@@ -561,55 +526,44 @@ describe('timestamps', function() {
       return Cat.deleteMany({}).then(() => Cat.create({ name: 'newcat' }));
     });
 
-    it('should have fields when create', function(done) {
+    it('should have fields when create', async function() {
       const cat = new Cat({ name: 'newcat' });
-      cat.save(function(err, doc) {
-        assert.ok(doc.createdAt);
-        assert.ok(doc.updatedAt);
-        assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
-        done();
-      });
+      const doc = await cat.save();
+      assert.ok(doc.createdAt);
+      assert.ok(doc.updatedAt);
+      assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
     });
 
-    it('sets timestamps on findOneAndUpdate', function(done) {
-      Cat.findOneAndUpdate({ name: 'notexistname' }, { $set: {} }, { upsert: true, new: true }, function(err, doc) {
-        assert.ok(doc.createdAt);
-        assert.ok(doc.updatedAt);
-        assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
-        done();
-      });
+    it('sets timestamps on findOneAndUpdate', async function() {
+      const doc = await Cat.findOneAndUpdate({ name: 'notexistname' }, { $set: {} }, { upsert: true, new: true });
+      assert.ok(doc.createdAt);
+      assert.ok(doc.updatedAt);
+      assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
     });
 
-    it('sets timestamps on findOneAndReplace (gh-9951)', function() {
-      return Cat.findOneAndReplace({ name: 'notexistname' }, {}, { upsert: true, new: true }).then(doc => {
-        assert.ok(doc.createdAt);
-        assert.ok(doc.updatedAt);
-        assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
-      });
+    it('sets timestamps on findOneAndReplace (gh-9951)', async function() {
+      const doc = await Cat.findOneAndReplace({ name: 'notexistname' }, {}, { upsert: true, new: true });
+      assert.ok(doc.createdAt);
+      assert.ok(doc.updatedAt);
+      assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
     });
 
-    it('should change updatedAt when save', function(done) {
-      Cat.findOne({ name: 'newcat' }, function(err, doc) {
-        const old = doc.updatedAt;
+    it('should change updatedAt when save', async function() {
+      const doc = await Cat.findOne({ name: 'newcat' });
+      const old = doc.updatedAt;
 
-        doc.hobby = 'coding';
+      doc.hobby = 'coding';
 
-        doc.save(function(err, doc) {
-          assert.ok(doc.updatedAt.getTime() > old.getTime());
-          done();
-        });
-      });
+      await doc.save();
+      assert.ok(doc.updatedAt.getTime() > old.getTime());
     });
 
-    it('should not change updatedAt when save with no modifications', function(done) {
-      Cat.findOne({ name: 'newcat' }, function(err, doc) {
-        const old = doc.updatedAt;
+    it('should not change updatedAt when save with no modifications', async function() {
+      const doc = await Cat.findOne({ name: 'newcat' });
+      const old = doc.updatedAt;
 
-        doc.save(function(err, doc) {
-          assert.ok(doc.updatedAt.getTime() === old.getTime());
-          done();
-        });
-      });
+      await doc.save();
+      assert.ok(doc.updatedAt.getTime() === old.getTime());
     });
 
     it('can skip with timestamps: false (gh-7357)', async function() {
@@ -640,17 +594,13 @@ describe('timestamps', function() {
       assert.strictEqual(cat.updatedAt, old);
     });
 
-    it('should change updatedAt when findOneAndUpdate', function(done) {
-      Cat.create({ name: 'test123' }, function(err) {
-        assert.ifError(err);
-        Cat.findOne({ name: 'test123' }, function(err, doc) {
-          const old = doc.updatedAt;
-          Cat.findOneAndUpdate({ name: 'test123' }, { $set: { hobby: 'fish' } }, { new: true }, function(err, doc) {
-            assert.ok(doc.updatedAt.getTime() > old.getTime());
-            done();
-          });
-        });
-      });
+    it('should change updatedAt when findOneAndUpdate', async function() {
+      await Cat.create({ name: 'test123' });
+      let doc = await Cat.findOne({ name: 'test123' });
+      const old = doc.updatedAt;
+      doc = await Cat.findOneAndUpdate({ name: 'test123' }, { $set: { hobby: 'fish' } }, { new: true });
+      assert.ok(doc.updatedAt.getTime() > old.getTime());
+
     });
 
     it('insertMany with createdAt off (gh-6381)', async function() {
@@ -683,77 +633,59 @@ describe('timestamps', function() {
       assert.equal(cats[1].createdAt.valueOf(), new Date('2011-06-01').valueOf());
     });
 
-    it('should have fields when updateOne', function(done) {
-      Cat.findOne({ name: 'newcat' }, function(err, doc) {
-        const old = doc.updatedAt;
-        Cat.updateOne({ name: 'newcat' }, { $set: { hobby: 'fish' } }, function() {
-          Cat.findOne({ name: 'newcat' }, function(err, doc) {
-            assert.ok(doc.updatedAt.getTime() > old.getTime());
-            done();
-          });
-        });
-      });
+    it('should have fields when updateOne', async function() {
+      let doc = await Cat.findOne({ name: 'newcat' });
+      const old = doc.updatedAt;
+      await Cat.updateOne({ name: 'newcat' }, { $set: { hobby: 'fish' } });
+      doc = await Cat.findOne({ name: 'newcat' });
+      assert.ok(doc.updatedAt.getTime() > old.getTime());
+
     });
 
-    it('should change updatedAt when updateOne', function(done) {
-      Cat.findOne({ name: 'newcat' }, function(err, doc) {
-        const old = doc.updatedAt;
-        Cat.updateOne({ name: 'newcat' }, { $set: { hobby: 'fish' } }, function() {
-          Cat.findOne({ name: 'newcat' }, function(err, doc) {
-            assert.ok(doc.updatedAt.getTime() > old.getTime());
-            done();
-          });
-        });
-      });
+    it('should change updatedAt when updateOne', async function() {
+      let doc = await Cat.findOne({ name: 'newcat' });
+      const old = doc.updatedAt;
+      await Cat.updateOne({ name: 'newcat' }, { $set: { hobby: 'fish' } });
+      doc = await Cat.findOne({ name: 'newcat' });
+      assert.ok(doc.updatedAt.getTime() > old.getTime());
+
     });
 
-    it('should change updatedAt when updateMany', function(done) {
-      Cat.findOne({ name: 'newcat' }, function(err, doc) {
-        const old = doc.updatedAt;
-        Cat.updateMany({ name: 'newcat' }, { $set: { hobby: 'fish' } }, function() {
-          Cat.findOne({ name: 'newcat' }, function(err, doc) {
-            assert.ok(doc.updatedAt.getTime() > old.getTime());
-            done();
-          });
-        });
-      });
+    it('should change updatedAt when updateMany', async function() {
+      let doc = await Cat.findOne({ name: 'newcat' });
+      const old = doc.updatedAt;
+      await Cat.updateMany({ name: 'newcat' }, { $set: { hobby: 'fish' } });
+      doc = await Cat.findOne({ name: 'newcat' });
+      assert.ok(doc.updatedAt.getTime() > old.getTime());
+
     });
 
-    it('nested docs (gh-4049)', function(done) {
+    it('nested docs (gh-4049)', async function() {
       const GroupSchema = new Schema({
         cats: [CatSchema]
       });
 
       const Group = db.model('Test', GroupSchema);
       const now = Date.now();
-      Group.create({ cats: [{ name: 'Garfield' }] }, function(error, group) {
-        assert.ifError(error);
-        assert.ok(group.cats[0].createdAt);
-        assert.ok(group.cats[0].createdAt.getTime() >= now);
-        done();
-      });
+      const group = await Group.create({ cats: [{ name: 'Garfield' }] });
+      assert.ok(group.cats[0].createdAt);
+      assert.ok(group.cats[0].createdAt.getTime() >= now);
     });
 
-    it('nested docs with push (gh-4049)', function(done) {
+    it('nested docs with push (gh-4049)', async function() {
       const GroupSchema = new Schema({
         cats: [CatSchema]
       });
 
       const Group = db.model('Test', GroupSchema);
       const now = Date.now();
-      Group.create({ cats: [{ name: 'Garfield' }] }, function(error, group) {
-        assert.ifError(error);
-        group.cats.push({ name: 'Keanu' });
-        group.save(function(error) {
-          assert.ifError(error);
-          Group.findById(group._id, function(error, group) {
-            assert.ifError(error);
-            assert.ok(group.cats[1].createdAt);
-            assert.ok(group.cats[1].createdAt.getTime() > now);
-            done();
-          });
-        });
-      });
+      let group = await Group.create({ cats: [{ name: 'Garfield' }] });
+      group.cats.push({ name: 'Keanu' });
+      await group.save();
+      group = await Group.findById(group._id);
+      assert.ok(group.cats[1].createdAt);
+      assert.ok(group.cats[1].createdAt.getTime() > now);
+
     });
   });
 

@@ -215,10 +215,10 @@ describe('QueryCursor', function() {
 
     it('casting ObjectIds with where() (gh-4355)', async function() {
       let doc = await Model.findOne();
-        assert.ok(doc);
-        const query = { _id: doc._id.toHexString() };
-        doc = await Model.find().where(query).cursor().next();
-          assert.ok(doc);
+      assert.ok(doc);
+      const query = { _id: doc._id.toHexString() };
+      doc = await Model.find().where(query).cursor().next();
+      assert.ok(doc);
     });
 
     it('cast errors (gh-4355)', function(done) {

@@ -18,14 +18,8 @@ describe('collections:', function() {
     db = null;
   });
 
-<<<<<<< HEAD
   it('should buffer commands until connection is established', async function() {
-    const db = mongoose.createConnection();
-    connectionsToClose.push(db);
-=======
-  it('should buffer commands until connection is established', function(done) {
     db = mongoose.createConnection();
->>>>>>> 7.0
     const collection = db.collection('test-buffering-collection');
 
     const op = collection.insertOne({ foo: 'bar' }, {});
@@ -142,14 +136,8 @@ describe('collections:', function() {
     thrown = false;
   });
 
-<<<<<<< HEAD
   it('buffers for sync methods (gh-10610)', async function() {
-    const db = mongoose.createConnection();
-    connectionsToClose.push(db);
-=======
-  it('buffers for sync methods (gh-10610)', function(done) {
     db = mongoose.createConnection();
->>>>>>> 7.0
     const collection = db.collection('gh10610');
 
     const promise = collection.find({}, {});

@@ -183,7 +183,7 @@ ways to add a static:
 
 - Add a function property to the second argument of the schema-constructor (`statics`)
 - Add a function property to `schema.statics`
-- Call the [`Schema#static()` function](schema.html#schema_Schema-static)
+- Call the [`Schema#static()` function](api/schema.html#schema_Schema-static)
 
 ```javascript
 
@@ -251,10 +251,10 @@ Animal.findOne().byName('fido').exec((err, animal) => {
 
 <h3 id="indexes"><a href="#indexes">Indexes</a></h3>
 
-MongoDB supports [secondary indexes](http://docs.mongodb.org/manual/indexes/).
-With mongoose, we define these indexes within our `Schema` [at](api/schematype.html#schematype_SchemaType-index) [the](api/schematype.html#schematype_SchemaType-unique) [path](api/schematype.html#schematype_SchemaType-sparse) [level](api/schemadateoptions.html.html#schemadateoptions_SchemaDateOptions-expires) or the `schema` level.
+MongoDB supports [secondary indexes](http://www.mongodb.com/docs/manual/indexes/).
+With mongoose, we define these indexes within our `Schema` [at](api/schematype.html#schematype_SchemaType-index) [the](api/schematype.html#schematype_SchemaType-unique) [path](api/schematype.html#schematype_SchemaType-sparse) [level](api/schemadateoptions.html#schemadateoptions_SchemaDateOptions-expires) or the `schema` level.
 Defining indexes at the schema level is necessary when creating
-[compound indexes](https://docs.mongodb.com/manual/core/index-compound/).
+[compound indexes](https://www.mongodb.com/docs/manual/core/index-compound/).
 
 ```javascript
 const animalSchema = new Schema({
@@ -268,9 +268,9 @@ animalSchema.index({ name: 1, type: -1 }); // schema level
 
 See [SchemaType#index()](api/schematype.html#schematype_SchemaType-index) for other index options.
 
-When your application starts up, Mongoose automatically calls [`createIndex`](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each defined index in your schema.
+When your application starts up, Mongoose automatically calls [`createIndex`](https://www.mongodb.com/docs/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each defined index in your schema.
 Mongoose will call `createIndex` for each index sequentially, and emit an 'index' event on the model when all the `createIndex` calls succeeded or when there was an error.
-While nice for development, it is recommended this behavior be disabled in production since index creation can cause a [significant performance impact](https://docs.mongodb.com/manual/core/index-creation/#index-build-impact-on-database-performance).
+While nice for development, it is recommended this behavior be disabled in production since index creation can cause a [significant performance impact](https://www.mongodb.com/docs/manual/core/index-creation/#index-build-impact-on-database-performance).
 Disable the behavior by setting the `autoIndex` option of your schema to `false`, or globally on the connection by setting the option `autoIndex` to `false`.
 
 ```javascript
@@ -506,9 +506,9 @@ Valid options:
 
 <h3 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h3>
 
-By default, Mongoose's [`init()` function](model.html#model_Model-init)
+By default, Mongoose's [`init()` function](api/model.html#model_Model-init)
 creates all the indexes defined in your model's schema by calling
-[`Model.createIndexes()`](model.html#model_Model-createIndexes)
+[`Model.createIndexes()`](api/model.html#model_Model-createIndexes)
 after you successfully connect to MongoDB. Creating indexes automatically is
 great for development and test environments. But index builds can also create
 significant load on your production database. If you want to manage indexes
@@ -578,17 +578,17 @@ const schema = new Schema({..}, { bufferTimeoutMS: 1000 });
 
 <h3 id="capped"><a href="#capped">option: capped</a></h3>
 
-Mongoose supports MongoDBs [capped](http://www.mongodb.org/display/DOCS/Capped+Collections)
+Mongoose supports MongoDBs [capped](https://www.mongodb.com/docs/manual/core/capped-collections/)
 collections. To specify the underlying MongoDB collection be `capped`, set
 the `capped` option to the maximum size of the collection in
-[bytes](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-size.).
+[bytes](https://www.mongodb.com/docs/manual/core/capped-collections/#create-a-capped-collection).
 
 ```javascript
 new Schema({..}, { capped: 1024 });
 ```
 
 The `capped` option may also be set to an object if you want to pass
-additional options like [max](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-max)
+additional options like [max](https://www.mongodb.com/docs/manual/core/capped-collections/#change-the-maximum-number-of-documents-in-a-capped-collection)
 or [autoIndexId](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-autoIndexId).
 In this case you must explicitly pass the `size` option, which is required.
 
@@ -650,8 +650,8 @@ console.log(p.id); // undefined
 <h3 id="_id"><a href="#_id">option: _id</a></h3>
 
 Mongoose assigns each of your schemas an `_id` field by default if one
-is not passed into the [Schema](schema.html#schema_Schema) constructor.
-The type assigned is an [ObjectId](schema.html#schema_Schema-Types)
+is not passed into the [Schema](api/schema.html#schema_Schema) constructor.
+The type assigned is an [ObjectId](api/schema.html#schema_Schema-Types)
 to coincide with MongoDB's default behavior. If you don't want an `_id`
 added to your schema at all, you may disable it using this option.
 
@@ -724,9 +724,9 @@ sam.$isEmpty('inventory'); // false
 
 <h3 id="read"><a href="#read">option: read</a></h3>
 
-Allows setting [query#read](query.html#query_Query-read) options at the
+Allows setting [query#read](api/query.html#query_Query-read) options at the
 schema level, providing us a way to apply default
-[ReadPreferences](http://docs.mongodb.org/manual/applications/replication/#replica-set-read-preference)
+[ReadPreferences](http://www.mongodb.com/docs/manual/applications/replication/#replica-set-read-preference)
 to all queries derived from a model.
 
 ```javascript
@@ -743,7 +743,7 @@ The alias of each pref is also permitted so instead of having to type out
 The read option also allows us to specify _tag sets_. These tell the
 [driver](https://github.com/mongodb/node-mongodb-native/) from which members
 of the replica-set it should attempt to read. Read more about tag sets
-[here](http://docs.mongodb.org/manual/applications/replication/#tag-sets) and
+[here](http://www.mongodb.com/docs/manual/applications/replication/#tag-sets) and
 [here](https://www.mongodb.com/docs/manual/core/read-preference).
 
 _NOTE: you may also specify the driver read preference [strategy](https://www.mongodb.com/docs/manual/core/read-preference/#read-preference-modes)
@@ -760,7 +760,7 @@ mongoose.model('JellyBean', schema);
 
 <h3 id="writeConcern"><a href="#writeConcern">option: writeConcern</a></h3>
 
-Allows setting [write concern](https://docs.mongodb.com/manual/reference/write-concern/)
+Allows setting [write concern](https://www.mongodb.com/docs/manual/reference/write-concern/)
 at the schema level.
 
 ```javascript
@@ -775,7 +775,7 @@ const schema = new Schema({ name: String }, {
 
 <h3 id="shardKey"><a href="#shardKey">option: shardKey</a></h3>
 
-The `shardKey` option is used when we have a [sharded MongoDB architecture](http://www.mongodb.org/display/DOCS/Sharding+Introduction).
+The `shardKey` option is used when we have a [sharded MongoDB architecture](https://www.mongodb.com/docs/manual/sharding/).
 Each sharded collection is given a shard key which must be present in all
 insert/update operations. We just need to set this schema option to the same
 shard key and we’ll be all set.
@@ -923,11 +923,11 @@ console.log(m.toJSON()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom
 console.log(JSON.stringify(m)); // { "_id": "504e0cd7dd992d9be2f20b6f", "name": "Max Headroom is my name" }
 ```
 
-To see all available `toJSON/toObject` options, read [this](document.html#document_Document-toObject).
+To see all available `toJSON/toObject` options, read [this](api/document.html#document_Document-toObject).
 
 <h3 id="toObject"><a href="#toObject">option: toObject</a></h3>
 
-Documents have a [toObject](document.html#document_Document-toObject) method
+Documents have a [toObject](api/document.html#document_Document-toObject) method
 which converts the mongoose document into a plain JavaScript object. This
 method accepts a few options. Instead of applying these options on a
 per-document basis, we may declare the options at the schema level and have
@@ -947,7 +947,7 @@ const m = new M({ name: 'Max Headroom' });
 console.log(m); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
 ```
 
-To see all available `toObject` options, read [this](document.html#document_Document-toObject).
+To see all available `toObject` options, read [this](api/document.html#document_Document-toObject).
 
 <h3 id="typeKey"><a href="#typeKey">option: typeKey</a></h3>
 
@@ -959,7 +959,7 @@ will interpret it as a type declaration.
 const schema = new Schema({ loc: { type: String, coordinates: [Number] } });
 ```
 
-However, for applications like [geoJSON](http://docs.mongodb.org/manual/reference/geojson/),
+However, for applications like [geoJSON](http://www.mongodb.com/docs/manual/reference/geojson/),
 the 'type' property is important. If you want to control which key mongoose
 uses to find type declarations, set the 'typeKey' schema option.
 
@@ -1047,7 +1047,7 @@ const thing = new Thing({ name: 'no versioning please' });
 thing.save(); // { name: 'no versioning please' }
 ```
 
-Mongoose _only_ updates the version key when you use [`save()`](document.html#document_Document-save).
+Mongoose _only_ updates the version key when you use [`save()`](api/document.html#document_Document-save).
 If you use `update()`, `findOneAndUpdate()`, etc. Mongoose will **not**
 update the version key. As a workaround, you can use the below middleware.
 
@@ -1137,7 +1137,7 @@ await house.save();
 
 <h3 id="collation"><a href="#collation">option: collation</a></h3>
 
-Sets a default [collation](https://docs.mongodb.com/manual/reference/collation/)
+Sets a default [collation](https://www.mongodb.com/docs/manual/reference/collation/)
 for every query and aggregation. [Here's a beginner-friendly overview of collations](http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations).
 
 ```javascript
@@ -1159,7 +1159,7 @@ MyModel.create([{ name: 'val' }, { name: 'Val' }]).
 
 <h3 id="timeseries"><a href="#timeseries">option: timeseries</a></h3>
 
-If you set the `timeseries` option on a schema, Mongoose will create a [timeseries collection](https://docs.mongodb.com/manual/core/timeseries-collections/) for any model that you create from that schema.
+If you set the `timeseries` option on a schema, Mongoose will create a [timeseries collection](https://www.mongodb.com/docs/manual/core/timeseries-collections/) for any model that you create from that schema.
 
 ```javascript
 const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
@@ -1200,7 +1200,7 @@ the field names by setting `timestamps.createdAt` and `timestamps.updatedAt`.
 The way `timestamps` works under the hood is:
 * If you create a new document, mongoose simply sets `createdAt`, and `updatedAt` to the time of creation.
 * If you update a document, mongoose will add `updatedAt` to the `$set` object.
-* If you set `upsert: true` on an update operation, mongoose will use [`$setOnInsert`](https://docs.mongodb.com/manual/reference/operator/update/setOnInsert/) operator to add `createdAt` to the document in case the `upsert` operation resulted into a new inserted document.
+* If you set `upsert: true` on an update operation, mongoose will use [`$setOnInsert`](https://www.mongodb.com/docs/manual/reference/operator/update/setOnInsert/) operator to add `createdAt` to the document in case the `upsert` operation resulted into a new inserted document.
 
 ```javascript
 const thingSchema = new Schema({..}, { timestamps: { createdAt: 'created_at' } });

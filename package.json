@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "6.9.0",
+  "version": "6.9.1",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -40,6 +40,7 @@
     "babel-loader": "8.2.5",
     "benchmark": "2.1.4",
     "bluebird": "3.7.2",
+    "broken-link-checker": "^0.7.8",
     "buffer": "^5.6.0",
     "cheerio": "1.0.0-rc.12",
     "crypto-browserify": "3.12.0",
@@ -85,6 +86,7 @@
     "docs:view": "node ./scripts/static.js",
     "docs:prepare:publish:stable": "npm run docs:checkout:gh-pages && npm run docs:merge:stable && npm run docs:clean:stable && npm run docs:generate && npm run docs:generate:search",
     "docs:prepare:publish:legacy": "npm run docs:checkout:legacy && npm run docs:merge:legacy && npm run docs:clean:stable && npm run docs:generate && npm run docs:copy:tmp && docs:checkout:gh-pages && docs:copy:tmp:legacy",
+    "docs:check-links": "blc http://127.0.0.1:8089 -ro",
     "lint": "eslint .",
     "lint-js": "eslint . --ext .js",
     "lint-ts": "eslint . --ext .ts",

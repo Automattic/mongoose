@@ -3,7 +3,7 @@
 Mongoose [models](models.html) provide several static helper functions
 for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
 Each of these functions returns a
-[mongoose `Query` object](query.html#Query).
+[mongoose `Query` object](api/query.html#Query).
 
 - [`Model.deleteMany()`](api.html#model_Model-deleteMany)
 - [`Model.deleteOne()`](api.html#model_Model-deleteOne)
@@ -37,7 +37,7 @@ A query also has a `.then()` function, and thus can be used as a promise.
 
 ### Executing
 
-When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://docs.mongodb.org/manual/tutorial/query-documents/).
+When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://www.mongodb.com/docs/manual/tutorial/query-documents/).
 
 ```javascript
 const Person = mongoose.model('Person', yourSchema);
@@ -195,13 +195,13 @@ To override this, set the `noCursorTimeout` option on your cursor.
 const cursor = Person.find().cursor().addCursorFlag('noCursorTimeout', true);
 ```
 
-However, cursors can still time out because of [session idle timeouts](https://docs.mongodb.com/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
+However, cursors can still time out because of [session idle timeouts](https://www.mongodb.com/docs/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
 So even a cursor with `noCursorTimeout` set will still time out after 30 minutes
-of inactivity. You can read more about working around session idle timeouts in the [MongoDB documentation](https://docs.mongodb.com/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
+of inactivity. You can read more about working around session idle timeouts in the [MongoDB documentation](https://www.mongodb.com/docs/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
 
 <h3 id="versus-aggregation"><a href="#versus-aggregation">Versus Aggregation</a></h3>
 
-[Aggregation](aggregate.html#aggregate_Aggregate) can
+[Aggregation](api/aggregate.html#aggregate_Aggregate) can
 do many of the same things that queries can. For example, below is
 how you can use `aggregate()` to find docs where `name.last = 'Ghost'`:
 

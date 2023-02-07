@@ -76,7 +76,7 @@ const Tank = connection.model('Tank', yourSchema);
 
 ## Querying
 
-Finding documents is easy with Mongoose, which supports the [rich](http://www.mongodb.org/display/DOCS/Advanced+Queries) query syntax of MongoDB.
+Finding documents is easy with Mongoose, which supports the [rich](https://www.mongodb.com/docs/manual/reference/method/js-cursor/) query syntax of MongoDB.
 Documents can be retrieved using a `model`'s [find](api/model.html#model_Model-find), [findById](api/model.html#model_Model-findById), [findOne](api/model.html#model_Model-findOne), or [where](api/model.html#model_Model-where) static functions.
 
 ```javascript
@@ -116,10 +116,10 @@ instead._
 
 ## Change Streams
 
-[Change streams](https://docs.mongodb.com/manual/changeStreams/) provide
+[Change streams](https://www.mongodb.com/docs/manual/changeStreams/) provide
 a way for you to listen to all inserts and updates going through your
 MongoDB database. Note that change streams do **not** work unless you're
-connected to a [MongoDB replica set](https://docs.mongodb.com/manual/replication/).
+connected to a [MongoDB replica set](https://www.mongodb.com/docs/manual/replication/).
 
 ```javascript
 async function run() {

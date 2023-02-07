@@ -21,7 +21,7 @@ Mongoose 6.0.0 was released on August 24, 2021. You can find more details on [ba
   - [Bug Reports](https://github.com/Automattic/mongoose/issues/)
   - [Mongoose Slack Channel](http://slack.mongoosejs.io/)
   - [Help Forum](http://groups.google.com/group/mongoose-orm)
-  - [MongoDB Support](https://docs.mongodb.org/manual/support/)
+  - [MongoDB Support](https://www.mongodb.com/docs/manual/support/)
 
 ## Plugins
 

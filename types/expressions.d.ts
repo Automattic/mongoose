@@ -1,7 +1,7 @@
 declare module 'mongoose' {
 
   /**
-   * [Expressions reference](https://docs.mongodb.com/manual/meta/aggregation-quick-reference/#expressions)
+   * [Expressions reference](https://www.mongodb.com/docs/manual/meta/aggregation-quick-reference/#expressions)
    */
   type AggregationVariables =
     SpecialPathVariables |
@@ -21,7 +21,7 @@ declare module 'mongoose' {
       /**
        * Returns the absolute value of a number.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/abs/#mongodb-expression-exp.-abs
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/abs/#mongodb-expression-exp.-abs
        */
       $abs: Path | ArithmeticExpressionOperator;
     }
@@ -30,7 +30,7 @@ declare module 'mongoose' {
       /**
        * Adds numbers to return the sum, or adds numbers and a date to return a new date. If adding numbers and a date, treats the numbers as milliseconds. Accepts any number of argument expressions, but at most, one expression can resolve to a date.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/add/#mongodb-expression-exp.-add
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/add/#mongodb-expression-exp.-add
        */
       $add: Expression[];
     }
@@ -39,7 +39,7 @@ declare module 'mongoose' {
       /**
        * Returns the smallest integer greater than or equal to the specified number.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ceil/#mongodb-expression-exp.-ceil
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/ceil/#mongodb-expression-exp.-ceil
        */
       $ceil: NumberExpression;
     }
@@ -48,7 +48,7 @@ declare module 'mongoose' {
       /**
        * Returns the result of dividing the first number by the second. Accepts two argument expressions.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/divide/#mongodb-expression-exp.-divide
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/divide/#mongodb-expression-exp.-divide
        */
       $divide: NumberExpression[];
     }
@@ -57,7 +57,7 @@ declare module 'mongoose' {
       /**
        * Raises e to the specified exponent.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/exp/#mongodb-expression-exp.-exp
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/exp/#mongodb-expression-exp.-exp
        */
       $exp: NumberExpression;
     }
@@ -66,7 +66,7 @@ declare module 'mongoose' {
       /**
        * Returns the largest integer less than or equal to the specified number.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/floor/#mongodb-expression-exp.-floor
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/floor/#mongodb-expression-exp.-floor
        */
       $floor: NumberExpression;
     }
@@ -75,7 +75,7 @@ declare module 'mongoose' {
       /**
        * Calculates the natural log of a number.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ln/#mongodb-expression-exp.-ln
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/ln/#mongodb-expression-exp.-ln
        */
       $ln: NumberExpression;
     }
@@ -84,7 +84,7 @@ declare module 'mongoose' {
       /**
        * Calculates the log of a number in the specified base.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/log/#mongodb-expression-exp.-log
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/log/#mongodb-expression-exp.-log
        */
       $log: [NumberExpression, NumberExpression];
     }
@@ -93,7 +93,7 @@ declare module 'mongoose' {
       /**
        * Calculates the log base 10 of a number.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/log10/#mongodb-expression-exp.-log10
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/log10/#mongodb-expression-exp.-log10
        */
       $log10: NumberExpression;
     }
@@ -102,7 +102,7 @@ declare module 'mongoose' {
       /**
        * Returns the remainder of the first number divided by the second. Accepts two argument expressions.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/mod/#mongodb-expression-exp.-mod
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/mod/#mongodb-expression-exp.-mod
        */
       $mod: [NumberExpression, NumberExpression];
     }
@@ -110,7 +110,7 @@ declare module 'mongoose' {
       /**
        * Multiplies numbers to return the product. Accepts any number of argument expressions.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/multiply/#mongodb-expression-exp.-multiply
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/multiply/#mongodb-expression-exp.-multiply
        */
       $multiply: NumberExpression[];
     }
@@ -119,7 +119,7 @@ declare module 'mongoose' {
       /**
        * Raises a number to the specified exponent.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/pow/#mongodb-expression-exp.-pow
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/pow/#mongodb-expression-exp.-pow
        */
       $pow: [NumberExpression, NumberExpression];
     }
@@ -128,7 +128,7 @@ declare module 'mongoose' {
       /**
        * Rounds a number to to a whole integer or to a specified decimal place.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/round/#mongodb-expression-exp.-round
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/round/#mongodb-expression-exp.-round
        */
       $round: [NumberExpression, NumberExpression?];
     }
@@ -137,7 +137,7 @@ declare module 'mongoose' {
       /**
        * Calculates the square root.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/sqrt/#mongodb-expression-exp.-sqrt
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/sqrt/#mongodb-expression-exp.-sqrt
        */
       $sqrt: NumberExpression;
     }
@@ -146,7 +146,7 @@ declare module 'mongoose' {
       /**
        * Returns the result of subtracting the second value from the first. If the two values are numbers, return the difference. If the two values are dates, return the difference in milliseconds. If the two values are a date and a number in milliseconds, return the resulting date. Accepts two argument expressions. If the two values are a date and a number, specify the date argument first as it is not meaningful to subtract a date from a number.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/subtract/#mongodb-expression-exp.-subtract
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/subtract/#mongodb-expression-exp.-subtract
        */
       $subtract: (NumberExpression | DateExpression)[];
     }
@@ -155,7 +155,7 @@ declare module 'mongoose' {
       /**
        * Truncates a number to a whole integer or to a specified decimal place.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/trunc/#mongodb-expression-exp.-trunc
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/trunc/#mongodb-expression-exp.-trunc
        */
       $trunc: [NumberExpression, NumberExpression?];
     }
@@ -164,7 +164,7 @@ declare module 'mongoose' {
       /**
        * Returns the sine of a value that is measured in radians.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/sin/#mongodb-expression-exp.-sin
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/sin/#mongodb-expression-exp.-sin
        */
       $sin: NumberExpression;
     }
@@ -174,7 +174,7 @@ declare module 'mongoose' {
        * Returns the cosine of a value that is measured in radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cos/#mongodb-expression-exp.-cos
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/cos/#mongodb-expression-exp.-cos
        */
       $cos: NumberExpression;
     }
@@ -184,7 +184,7 @@ declare module 'mongoose' {
        * Returns the tangent of a value that is measured in radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/tan/#mongodb-expression-exp.-tan
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/tan/#mongodb-expression-exp.-tan
        */
       $tan: NumberExpression;
     }
@@ -194,7 +194,7 @@ declare module 'mongoose' {
        * Returns the inverse sin (arc sine) of a value in radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/asin/#mongodb-expression-exp.-asin
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/asin/#mongodb-expression-exp.-asin
        */
       $asin: NumberExpression;
     }
@@ -204,7 +204,7 @@ declare module 'mongoose' {
        * Returns the inverse cosine (arc cosine) of a value in radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/acos/#mongodb-expression-exp.-acos
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/acos/#mongodb-expression-exp.-acos
        */
       $acos: NumberExpression;
     }
@@ -214,7 +214,7 @@ declare module 'mongoose' {
        * Returns the inverse tangent (arc tangent) of a value in radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/atan/#mongodb-expression-exp.-atan
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/atan/#mongodb-expression-exp.-atan
        */
       $atan: NumberExpression;
     }
@@ -224,7 +224,7 @@ declare module 'mongoose' {
        * Returns the inverse tangent (arc tangent) of y / x in radians, where y and x are the first and second values passed to the expression respectively.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/atan2/#mongodb-expression-exp.-atan2
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/atan2/#mongodb-expression-exp.-atan2
        */
       $atan2: NumberExpression;
     }
@@ -234,7 +234,7 @@ declare module 'mongoose' {
        * Returns the inverse hyperbolic sine (hyperbolic arc sine) of a value in radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/asinh/#mongodb-expression-exp.-asinh
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/asinh/#mongodb-expression-exp.-asinh
        */
       $asinh: NumberExpression;
     }
@@ -244,7 +244,7 @@ declare module 'mongoose' {
        * Returns the inverse hyperbolic cosine (hyperbolic arc cosine) of a value in radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/acosh/#mongodb-expression-exp.-acosh
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/acosh/#mongodb-expression-exp.-acosh
        */
       $acosh: NumberExpression;
     }
@@ -255,7 +255,7 @@ declare module 'mongoose' {
        * Returns the inverse hyperbolic tangent (hyperbolic arc tangent) of a value in radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/atanh/#mongodb-expression-exp.-atanh
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/atanh/#mongodb-expression-exp.-atanh
        */
       $atanh: NumberExpression;
     }
@@ -265,7 +265,7 @@ declare module 'mongoose' {
        * Returns the hyperbolic sine of a value that is measured in radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/sinh/#mongodb-expression-exp.-sinh
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/sinh/#mongodb-expression-exp.-sinh
        */
       $sinh: NumberExpression;
     }
@@ -275,7 +275,7 @@ declare module 'mongoose' {
        * Returns the hyperbolic cosine of a value that is measured in radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cosh/#mongodb-expression-exp.-cosh
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/cosh/#mongodb-expression-exp.-cosh
        */
       $cosh: NumberExpression;
     }
@@ -285,7 +285,7 @@ declare module 'mongoose' {
        * Returns the hyperbolic tangent of a value that is measured in radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/tanh/#mongodb-expression-exp.-tanh
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/tanh/#mongodb-expression-exp.-tanh
        */
       $tanh: NumberExpression;
     }
@@ -295,7 +295,7 @@ declare module 'mongoose' {
        * Converts a value from degrees to radians.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/degreesToRadians/#mongodb-expression-exp.-degreesToRadians
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/degreesToRadians/#mongodb-expression-exp.-degreesToRadians
        */
       $degreesToRadians: NumberExpression;
     }
@@ -305,7 +305,7 @@ declare module 'mongoose' {
        * Converts a value from radians to degrees.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/radiansToDegrees/#mongodb-expression-exp.-radiansToDegrees
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/radiansToDegrees/#mongodb-expression-exp.-radiansToDegrees
        */
       $radiansToDegrees: NumberExpression;
     }
@@ -314,7 +314,7 @@ declare module 'mongoose' {
       /**
        * Access available per-document metadata related to the aggregation operation.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/meta/#mongodb-expression-exp.-meta
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/meta/#mongodb-expression-exp.-meta
        */
       $meta: 'textScore' | 'indexKey';
     }
@@ -324,7 +324,7 @@ declare module 'mongoose' {
        * Adds a number of time units to a date object.
        *
        * @version 5.0.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dateAdd/#mongodb-expression-exp.-dateAdd
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateAdd/#mongodb-expression-exp.-dateAdd
        */
       $dateAdd: {
         /**
@@ -360,7 +360,7 @@ declare module 'mongoose' {
        * Returns the difference between two dates.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dateDiff/#mongodb-expression-exp.-dateDiff
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateDiff/#mongodb-expression-exp.-dateDiff
        */
       $dateDiff: {
         /**
@@ -408,7 +408,7 @@ declare module 'mongoose' {
        * Constructs a BSON Date object given the date's constituent parts.
        *
        * @version 3.6
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dateFromParts/#mongodb-expression-exp.-dateFromParts
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateFromParts/#mongodb-expression-exp.-dateFromParts
        */
       $dateFromParts: {
         /**
@@ -517,7 +517,7 @@ declare module 'mongoose' {
        * Converts a date/time string to a date object.
        *
        * @version 3.6
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dateFromString/#mongodb-expression-exp.-dateFromString
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateFromString/#mongodb-expression-exp.-dateFromString
        */
       $dateFromString: {
         dateString: StringExpression<string>;
@@ -554,7 +554,7 @@ declare module 'mongoose' {
        * Subtracts a number of time units from a date object.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dateSubtract/#mongodb-expression-exp.-dateSubtract
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateSubtract/#mongodb-expression-exp.-dateSubtract
        */
       $dateSubtract: {
         /**
@@ -592,7 +592,7 @@ declare module 'mongoose' {
        * Returns a document containing the constituent parts of a date.
        *
        * @version 3.6
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dateToParts/#mongodb-expression-exp.-dateToParts
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateToParts/#mongodb-expression-exp.-dateToParts
        */
       $dateToParts: {
         /**
@@ -617,7 +617,7 @@ declare module 'mongoose' {
        * Returns the date as a formatted string.
        *
        * @version 3.6
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dateToString/#mongodb-expression-exp.-dateToString
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateToString/#mongodb-expression-exp.-dateToString
        */
       $dateToString: {
         /**
@@ -654,7 +654,7 @@ declare module 'mongoose' {
        * Truncates a date.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dateTrunc/#mongodb-expression-exp.-dateTrunc
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateTrunc/#mongodb-expression-exp.-dateTrunc
        */
       $dateTrunc: {
         /**
@@ -704,7 +704,7 @@ declare module 'mongoose' {
       /**
        * Returns the day of the month for a date as a number between 1 and 31.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dayOfMonth/#mongodb-expression-exp.-dayOfMonth
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/dayOfMonth/#mongodb-expression-exp.-dayOfMonth
        */
       $dayOfMonth: DateExpression | {
         /**
@@ -722,7 +722,7 @@ declare module 'mongoose' {
       /**
        * Returns the day of the week for a date as a number between 1 (Sunday) and 7 (Saturday).
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dayOfWeek/#mongodb-expression-exp.-dayOfWeek
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/dayOfWeek/#mongodb-expression-exp.-dayOfWeek
        */
       $dayOfWeek: DateExpression | {
         /**
@@ -740,7 +740,7 @@ declare module 'mongoose' {
       /**
        * Returns the day of the year for a date as a number between 1 and 366 (leap year).
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/dayOfYear/#mongodb-expression-exp.-dayOfYear
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/dayOfYear/#mongodb-expression-exp.-dayOfYear
        */
       $dayOfYear: DateExpression | {
         /**
@@ -758,7 +758,7 @@ declare module 'mongoose' {
       /**
        * Returns the hour for a date as a number between 0 and 23.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/hour/#mongodb-expression-exp.-hour
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/hour/#mongodb-expression-exp.-hour
        */
       $hour: DateExpression | {
         /**
@@ -777,7 +777,7 @@ declare module 'mongoose' {
        * Returns the weekday number in ISO 8601 format, ranging from 1 (for Monday) to 7 (for Sunday).
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/isoDayOfWeek/#mongodb-expression-exp.-isoDayOfWeek
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/isoDayOfWeek/#mongodb-expression-exp.-isoDayOfWeek
        */
       $isoDayOfWeek: DateExpression | {
         /**
@@ -796,7 +796,7 @@ declare module 'mongoose' {
        * Returns the week number in ISO 8601 format, ranging from 1 to 53. Week numbers start at 1 with the week (Monday through Sunday) that contains the year's first Thursday.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/isoWeek/#mongodb-expression-exp.-isoWeek
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/isoWeek/#mongodb-expression-exp.-isoWeek
        */
       $isoWeek: DateExpression | {
         /**
@@ -815,7 +815,7 @@ declare module 'mongoose' {
        * Returns the year number in ISO 8601 format. The year starts with the Monday of week 1 (ISO 8601) and ends with the Sunday of the last week (ISO 8601).
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/isoWeekYear/#mongodb-expression-exp.-isoWeekYear
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/isoWeekYear/#mongodb-expression-exp.-isoWeekYear
        */
       $isoWeekYear: DateExpression | {
         /**
@@ -833,7 +833,7 @@ declare module 'mongoose' {
       /**
        * Returns the milliseconds of a date as a number between 0 and 999.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/millisecond/#mongodb-expression-exp.-millisecond
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/millisecond/#mongodb-expression-exp.-millisecond
        */
       $millisecond: DateExpression | {
         /**
@@ -851,7 +851,7 @@ declare module 'mongoose' {
       /**
        * Returns the minute for a date as a number between 0 and 59.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/minute/#mongodb-expression-exp.-minute
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/minute/#mongodb-expression-exp.-minute
        */
       $minute: DateExpression | {
         /**
@@ -869,7 +869,7 @@ declare module 'mongoose' {
       /**
        * Returns the month for a date as a number between 1 (January) and 12 (December).
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/month/#mongodb-expression-exp.-month
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/month/#mongodb-expression-exp.-month
        */
       $month: DateExpression | {
         /**
@@ -887,7 +887,7 @@ declare module 'mongoose' {
       /**
        * Returns the seconds for a date as a number between 0 and 60 (leap seconds).
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/second/#mongodb-expression-exp.-second
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/second/#mongodb-expression-exp.-second
        */
       $second: DateExpression | {
         /**
@@ -906,7 +906,7 @@ declare module 'mongoose' {
        * Converts value to a Date.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toDate/#mongodb-expression-exp.-toDate
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/toDate/#mongodb-expression-exp.-toDate
        */
       $toDate: Expression;
     }
@@ -915,7 +915,7 @@ declare module 'mongoose' {
       /**
        * Returns the week number for a date as a number between 0 (the partial week that precedes the first Sunday of the year) and 53 (leap year).
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/week/#mongodb-expression-exp.-week
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/week/#mongodb-expression-exp.-week
        */
       $week: DateExpression | {
         /**
@@ -933,7 +933,7 @@ declare module 'mongoose' {
       /**
        * Returns the year for a date as a number (e.g. 2014).
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/year/#mongodb-expression-exp.-year
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/year/#mongodb-expression-exp.-year
        */
       $year: DateExpression | {
         /**
@@ -951,7 +951,7 @@ declare module 'mongoose' {
       /**
        * Returns true only when all its expressions evaluate to true. Accepts any number of argument expressions.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/and/#mongodb-expression-exp.-and
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/and/#mongodb-expression-exp.-and
        */
       $and: (Expression | Record<string, Expression>)[];
     }
@@ -960,7 +960,7 @@ declare module 'mongoose' {
       /**
        * Returns the boolean value that is the opposite of its argument expression. Accepts a single argument expression.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/not/#mongodb-expression-exp.-not
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/not/#mongodb-expression-exp.-not
        */
       $not: [Expression];
     }
@@ -969,7 +969,7 @@ declare module 'mongoose' {
       /**
        * Returns true when any of its expressions evaluates to true. Accepts any number of argument expressions.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/or/#mongodb-expression-exp.-or
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/or/#mongodb-expression-exp.-or
        */
       $or: (Expression | Record<string, Expression>)[];
     }
@@ -978,7 +978,7 @@ declare module 'mongoose' {
       /**
        * Returns 0 if the two values are equivalent, 1 if the first value is greater than the second, and -1 if the first value is less than the second.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cmp/#mongodb-expression-exp.-cmp
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/cmp/#mongodb-expression-exp.-cmp
        */
       $cmp: [Record<string, AnyExpression> | Expression, Record<string, AnyExpression> | Expression];
     }
@@ -987,7 +987,7 @@ declare module 'mongoose' {
       /**
        * Returns true if the values are equivalent.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/eq/#mongodb-expression-exp.-eq
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/eq/#mongodb-expression-exp.-eq
        */
       $eq: AnyExpression | [AnyExpression, AnyExpression];
     }
@@ -996,7 +996,7 @@ declare module 'mongoose' {
       /**
        * Returns true if the first value is greater than the second.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/gt/#mongodb-expression-exp.-gt
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/gt/#mongodb-expression-exp.-gt
        */
       $gt: NumberExpression | [NumberExpression, NumberExpression];
     }
@@ -1005,7 +1005,7 @@ declare module 'mongoose' {
       /**
        * Returns true if the first value is greater than or equal to the second.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/gte/#mongodb-expression-exp.-gte
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/gte/#mongodb-expression-exp.-gte
        */
       $gte: NumberExpression | [NumberExpression, NumberExpression];
     }
@@ -1014,7 +1014,7 @@ declare module 'mongoose' {
       /**
        * Returns true if the first value is less than the second.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/lt/#mongodb-expression-exp.-lt
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/lt/#mongodb-expression-exp.-lt
        */
       $lt: NumberExpression | [NumberExpression, NumberExpression];
     }
@@ -1023,7 +1023,7 @@ declare module 'mongoose' {
       /**
        * Returns true if the first value is less than or equal to the second.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/lte/#mongodb-expression-exp.-lte
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/lte/#mongodb-expression-exp.-lte
        */
       $lte: NumberExpression | [NumberExpression, NumberExpression];
     }
@@ -1032,7 +1032,7 @@ declare module 'mongoose' {
       /**
        * Returns true if the values are not equivalent.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ne/#mongodb-expression-exp.-ne
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/ne/#mongodb-expression-exp.-ne
        */
       $ne: Expression | [Expression, Expression | NullExpression] | null;
     }
@@ -1041,7 +1041,7 @@ declare module 'mongoose' {
       /**
        * A ternary operator that evaluates one expression, and depending on the result, returns the value of one of the other two expressions. Accepts either three expressions in an ordered list or three named parameters.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/cond/#mongodb-expression-exp.-cond
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/cond/#mongodb-expression-exp.-cond
        */
       $cond: { if: Expression, then: AnyExpression, else: AnyExpression } | [BooleanExpression, AnyExpression, AnyExpression];
     }
@@ -1050,7 +1050,7 @@ declare module 'mongoose' {
       /**
        * Returns either the non-null result of the first expression or the result of the second expression if the first expression results in a null result. Null result encompasses instances of undefined values or missing fields. Accepts two expressions as arguments. The result of the second expression can be null.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ifNull/#mongodb-expression-exp.-ifNull
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/ifNull/#mongodb-expression-exp.-ifNull
        */
       $ifNull: Expression[];
     }
@@ -1059,7 +1059,7 @@ declare module 'mongoose' {
       /**
        * Evaluates a series of case expressions. When it finds an expression which evaluates to true, $switch executes a specified expression and breaks out of the control flow.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/switch/#mongodb-expression-exp.-switch
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/switch/#mongodb-expression-exp.-switch
        */
       $switch: {
         /**
@@ -1082,7 +1082,7 @@ declare module 'mongoose' {
        * Returns the element at the specified array index.
        *
        * @version 3.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/arrayElemAt/#mongodb-expression-exp.-arrayElemAt
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/arrayElemAt/#mongodb-expression-exp.-arrayElemAt
        */
       $arrayElemAt: [ArrayExpression, NumberExpression];
     }
@@ -1092,7 +1092,7 @@ declare module 'mongoose' {
        * Converts an array of key value pairs to a document.
        *
        * @version 3.4.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/arrayToObject/#mongodb-expression-exp.-arrayToObject
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/arrayToObject/#mongodb-expression-exp.-arrayToObject
        */
       $arrayToObject: ArrayExpression;
     }
@@ -1102,7 +1102,7 @@ declare module 'mongoose' {
        * Concatenates arrays to return the concatenated array.
        *
        * @version 3.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/concatArrays/#mongodb-expression-exp.-concatArrays
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/concatArrays/#mongodb-expression-exp.-concatArrays
        */
       $concatArrays: Expression[];
     }
@@ -1112,7 +1112,7 @@ declare module 'mongoose' {
        * Selects a subset of the array to return an array with only the elements that match the filter condition.
        *
        * @version 3.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/filter/#mongodb-expression-exp.-filter
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/filter/#mongodb-expression-exp.-filter
        */
       $filter: {
         /**
@@ -1145,7 +1145,7 @@ declare module 'mongoose' {
        * Returns the first array element. Distinct from $first accumulator.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/first/#mongodb-expression-exp.-first
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/first/#mongodb-expression-exp.-first
        */
       $first: Expression;
     }
@@ -1155,7 +1155,7 @@ declare module 'mongoose' {
        * Returns a boolean indicating whether a specified value is in an array.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/in/#mongodb-expression-exp.-in
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/in/#mongodb-expression-exp.-in
        */
       $in: [Expression, ArrayExpression];
     }
@@ -1165,7 +1165,7 @@ declare module 'mongoose' {
        * Searches an array for an occurrence of a specified value and returns the array index of the first occurrence. If the substring is not found, returns -1.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/indexOfArray/#mongodb-expression-exp.-indexOfArray
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/indexOfArray/#mongodb-expression-exp.-indexOfArray
        */
       $indexOfArray: [ArrayExpression, Expression] | [ArrayExpression, Expression, NumberExpression] | [ArrayExpression, Expression, NumberExpression, NumberExpression];
     }
@@ -1175,7 +1175,7 @@ declare module 'mongoose' {
        * Determines if the operand is an array. Returns a boolean.
        *
        * @version 3.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/isArray/#mongodb-expression-exp.-isArray
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/isArray/#mongodb-expression-exp.-isArray
        */
       $isArray: [Expression];
     }
@@ -1185,7 +1185,7 @@ declare module 'mongoose' {
        * Returns the last array element. Distinct from $last accumulator.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/last/#mongodb-expression-exp.-last
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/last/#mongodb-expression-exp.-last
        */
       $last: Expression;
     }
@@ -1214,7 +1214,7 @@ declare module 'mongoose' {
       /**
        * Applies a subexpression to each element of an array and returns the array of resulting values in order. Accepts named parameters.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/map/#mongodb-expression-exp.-map
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/map/#mongodb-expression-exp.-map
        */
       $map: {
         /**
@@ -1237,7 +1237,7 @@ declare module 'mongoose' {
        * Converts a document to an array of documents representing key-value pairs.
        *
        * @version 3.4.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/objectToArray/#mongodb-expression-exp.-objectToArray
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/objectToArray/#mongodb-expression-exp.-objectToArray
        */
       $objectToArray: ObjectExpression;
     }
@@ -1246,7 +1246,7 @@ declare module 'mongoose' {
       /**
        * Outputs an array containing a sequence of integers according to user-defined inputs.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/range/#mongodb-expression-exp.-range
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/range/#mongodb-expression-exp.-range
        */
       $range: [NumberExpression, NumberExpression] | [NumberExpression, NumberExpression, NumberExpression];
     }
@@ -1256,7 +1256,7 @@ declare module 'mongoose' {
        * Applies an expression to each element in an array and combines them into a single value.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/reduce/#mongodb-expression-exp.-reduce
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/reduce/#mongodb-expression-exp.-reduce
        */
       $reduce: {
         /**
@@ -1287,7 +1287,7 @@ declare module 'mongoose' {
        * Returns an array with the elements in reverse order.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/reverseArray/#mongodb-expression-exp.-reverseArray
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/reverseArray/#mongodb-expression-exp.-reverseArray
        */
       $reverseArray: ArrayExpression;
     }
@@ -1296,7 +1296,7 @@ declare module 'mongoose' {
       /**
        * Returns the number of elements in the array. Accepts a single expression as argument.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/size/#mongodb-expression-exp.-size
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/size/#mongodb-expression-exp.-size
        */
       $size: ArrayExpression;
     }
@@ -1306,7 +1306,7 @@ declare module 'mongoose' {
        * Returns a subset of an array.
        *
        * @version 3.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/slice/#mongodb-expression-exp.-slice
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/slice/#mongodb-expression-exp.-slice
        */
       $slice: [ArrayExpression, NumberExpression] | [ArrayExpression, NumberExpression, NumberExpression];
     }
@@ -1316,7 +1316,7 @@ declare module 'mongoose' {
        * Merge two arrays together.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/zip/#mongodb-expression-exp.-zip
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/zip/#mongodb-expression-exp.-zip
        */
       $zip: {
         /**
@@ -1348,7 +1348,7 @@ declare module 'mongoose' {
       /**
        * Concatenates any number of strings.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/concat/#mongodb-expression-exp.-concat
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/concat/#mongodb-expression-exp.-concat
        */
       $concat: StringExpression[];
     }
@@ -1358,7 +1358,7 @@ declare module 'mongoose' {
        * Searches a string for an occurrence of a substring and returns the UTF-8 byte index of the first occurrence. If the substring is not found, returns -1.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/indexOfBytes/#mongodb-expression-exp.-indexOfBytes
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/indexOfBytes/#mongodb-expression-exp.-indexOfBytes
        */
       $indexOfBytes: [StringExpression, StringExpression] | [StringExpression, StringExpression, NumberExpression] | [StringExpression, StringExpression, NumberExpression, NumberExpression];
     }
@@ -1368,7 +1368,7 @@ declare module 'mongoose' {
        * Searches a string for an occurrence of a substring and returns the UTF-8 code point index of the first occurrence. If the substring is not found, returns -1
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/indexOfCP/#mongodb-expression-exp.-indexOfCP
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/indexOfCP/#mongodb-expression-exp.-indexOfCP
        */
       $indexOfCP: [StringExpression, StringExpression] | [StringExpression, StringExpression, NumberExpression] | [StringExpression, StringExpression, NumberExpression, NumberExpression];
     }
@@ -1378,7 +1378,7 @@ declare module 'mongoose' {
        * Removes whitespace or the specified characters from the beginning of a string.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/ltrim/#mongodb-expression-exp.-ltrim
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/ltrim/#mongodb-expression-exp.-ltrim
        */
       $ltrim: {
         /**
@@ -1401,7 +1401,7 @@ declare module 'mongoose' {
        * Applies a regular expression (regex) to a string and returns information on the first matched substring.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/regexFind/#mongodb-expression-exp.-regexFind
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/regexFind/#mongodb-expression-exp.-regexFind
        */
       $regexFind: {
         /**
@@ -1448,7 +1448,7 @@ declare module 'mongoose' {
        * Applies a regular expression (regex) to a string and returns information on the all matched substrings.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/regexFindAll/#mongodb-expression-exp.-regexFindAll
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/regexFindAll/#mongodb-expression-exp.-regexFindAll
        */
       $regexFindAll: {
         /**
@@ -1495,7 +1495,7 @@ declare module 'mongoose' {
        * Applies a regular expression (regex) to a string and returns a boolean that indicates if a match is found or not.
        *
        * @version 4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/regexMatch/#mongodb-expression-exp.-regexMatch
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/regexMatch/#mongodb-expression-exp.-regexMatch
        */
       $regexMatch: {
         /**
@@ -1542,7 +1542,7 @@ declare module 'mongoose' {
        * Replaces the first instance of a matched string in a given input.
        *
        * @version 4.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/replaceOne/#mongodb-expression-exp.-replaceOne
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/replaceOne/#mongodb-expression-exp.-replaceOne
        */
       $replaceOne: {
         /**
@@ -1565,7 +1565,7 @@ declare module 'mongoose' {
        * Replaces all instances of a matched string in a given input.
        *
        * @version 4.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/replaceAll/#mongodb-expression-exp.-replaceAll
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/replaceAll/#mongodb-expression-exp.-replaceAll
        */
       $replaceAll: {
         /**
@@ -1588,7 +1588,7 @@ declare module 'mongoose' {
        * Removes whitespace or the specified characters from the end of a string.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/rtrim/#mongodb-expression-exp.-rtrim
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/rtrim/#mongodb-expression-exp.-rtrim
        */
       $rtrim: {
         /**
@@ -1611,7 +1611,7 @@ declare module 'mongoose' {
        * Splits a string into substrings based on a delimiter. Returns an array of substrings. If the delimiter is not found within the string, returns an array containing the original string.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/split/#mongodb-expression-exp.-split
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/split/#mongodb-expression-exp.-split
        */
       $split: [StringExpression, StringExpression];
     }
@@ -1621,7 +1621,7 @@ declare module 'mongoose' {
        * Returns the number of UTF-8 encoded bytes in a string.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/strLenBytes/#mongodb-expression-exp.-strLenBytes
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/strLenBytes/#mongodb-expression-exp.-strLenBytes
        */
       $strLenBytes: StringExpression;
     }
@@ -1631,7 +1631,7 @@ declare module 'mongoose' {
        * Returns the number of UTF-8 code points in a string.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/strLenCP/#mongodb-expression-exp.-strLenCP
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/strLenCP/#mongodb-expression-exp.-strLenCP
        */
       $strLenCP: StringExpression;
     }
@@ -1640,7 +1640,7 @@ declare module 'mongoose' {
       /**
        * Performs case-insensitive string comparison and returns: 0 if two strings are equivalent, 1 if the first string is greater than the second, and -1 if the first string is less than the second.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/strcasecmp/#mongodb-expression-exp.-strcasecmp
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/strcasecmp/#mongodb-expression-exp.-strcasecmp
        */
       $strcasecmp: [StringExpression, StringExpression];
     }
@@ -1651,7 +1651,7 @@ declare module 'mongoose' {
        *
        * @deprecated 3.4
        * @alias {Expression.SubstrBytes}
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/substr/#mongodb-expression-exp.-substr
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/substr/#mongodb-expression-exp.-substr
        */
       $substr: [StringExpression, number, number];
     }
@@ -1661,7 +1661,7 @@ declare module 'mongoose' {
        * Returns the substring of a string. Starts with the character at the specified UTF-8 byte index (zero-based) in the string and continues for the specified number of bytes.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/substrBytes/#mongodb-expression-exp.-substrBytes
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/substrBytes/#mongodb-expression-exp.-substrBytes
        */
       $substrBytes: [StringExpression, number, number];
     }
@@ -1671,7 +1671,7 @@ declare module 'mongoose' {
        * Returns the substring of a string. Starts with the character at the specified UTF-8 code point (CP) index (zero-based) in the string and continues for the number of code points specified.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/substrCP/#mongodb-expression-exp.-substrCP
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/substrCP/#mongodb-expression-exp.-substrCP
        */
       $substrCP: [StringExpression, number, number];
     }
@@ -1680,7 +1680,7 @@ declare module 'mongoose' {
       /**
        * Converts a string to lowercase. Accepts a single argument expression.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toLower/#mongodb-expression-exp.-toLower
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/toLower/#mongodb-expression-exp.-toLower
        */
       $toLower: StringExpression;
     }
@@ -1690,7 +1690,7 @@ declare module 'mongoose' {
        * Converts value to a string.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toString/#mongodb-expression-exp.-toString
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/toString/#mongodb-expression-exp.-toString
        */
       $toString: Expression;
     }
@@ -1700,7 +1700,7 @@ declare module 'mongoose' {
        * Removes whitespace or the specified characters from the beginning and end of a string.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/trim/#mongodb-expression-exp.-trim
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/trim/#mongodb-expression-exp.-trim
        */
       $trim: {
         /**
@@ -1722,7 +1722,7 @@ declare module 'mongoose' {
       /**
        * Converts a string to uppercase. Accepts a single argument expression.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toUpper/#mongodb-expression-exp.-toUpper
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/toUpper/#mongodb-expression-exp.-toUpper
        */
       $toUpper: StringExpression;
     }
@@ -1733,7 +1733,7 @@ declare module 'mongoose' {
        * Returns a value without parsing. Use for values that the aggregation pipeline may interpret as an
        * expression.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/literal/#mongodb-expression-exp.-literal
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/literal/#mongodb-expression-exp.-literal
        */
       $literal: any;
     }
@@ -1745,7 +1745,7 @@ declare module 'mongoose' {
        * the value of the field from $$CURRENT.
        *
        * @version 4.4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/getField/#mongodb-expression-exp.-getField
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/getField/#mongodb-expression-exp.-getField
        */
       $getField: {
         /**
@@ -1768,7 +1768,7 @@ declare module 'mongoose' {
        * Returns a random float between 0 and 1 each time it is called.
        *
        * @version 4.4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/rand/#mongodb-expression-exp.-rand
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/rand/#mongodb-expression-exp.-rand
        */
       $rand: Record<string | number | symbol, never>;
     }
@@ -1780,7 +1780,7 @@ declare module 'mongoose' {
        * rate expressed as a percentage of the total number of documents.
        *
        * @version 4.4.2
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/sampleRate/#mongodb-expression-exp.-sampleRate
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/sampleRate/#mongodb-expression-exp.-sampleRate
        */
       $sampleRate: number;
     }
@@ -1791,7 +1791,7 @@ declare module 'mongoose' {
        * Combines multiple documents into a single document.
        *
        * @version 3.6
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/mergeObjects/#mongodb-expression-exp.-mergeObjects
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#mongodb-expression-exp.-mergeObjects
        */
       $mergeObjects: ObjectExpression | ObjectExpression[] | ArrayExpression;
     }
@@ -1802,7 +1802,7 @@ declare module 'mongoose' {
        * Adds, updates, or removes a specified field in a document.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setField/#mongodb-expression-exp.-setField
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/setField/#mongodb-expression-exp.-setField
        */
       $setField: {
         /**
@@ -1828,7 +1828,7 @@ declare module 'mongoose' {
        * Removes a specified field in a document.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/unsetField/#mongodb-expression-exp.-unsetField
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/unsetField/#mongodb-expression-exp.-unsetField
        */
       $unsetField: {
         /**
@@ -1850,7 +1850,7 @@ declare module 'mongoose' {
        * Binds variables for use in the specified expression, and returns the result of the expression.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/let/#mongodb-expression-exp.-let
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/let/#mongodb-expression-exp.-let
        */
       $let: {
         /**
@@ -1870,7 +1870,7 @@ declare module 'mongoose' {
        * Evaluates an array as a set and returns true if no element in the array is false. Otherwise, returns false. An
        * empty array returns true.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/allElementsTrue/#mongodb-expression-exp.-allElementsTrue
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/allElementsTrue/#mongodb-expression-exp.-allElementsTrue
        */
       $allElementsTrue: ArrayExpression;
     }
@@ -1880,7 +1880,7 @@ declare module 'mongoose' {
        * Evaluates an array as a set and returns true if any of the elements are true and false otherwise. An empty
        * array returns false.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/anyElementsTrue/#mongodb-expression-exp.-anyElementsTrue
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/anyElementsTrue/#mongodb-expression-exp.-anyElementsTrue
        */
       $anyElementTrue: ArrayExpression;
     }
@@ -1890,7 +1890,7 @@ declare module 'mongoose' {
        * Takes two sets and returns an array containing the elements that only exist in the first set; i.e. performs a
        * relative complement of the second set relative to the first.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setDifference/#mongodb-expression-exp.-setDifference
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/setDifference/#mongodb-expression-exp.-setDifference
        */
       $setDifference: [ArrayExpression, ArrayExpression];
     }
@@ -1899,7 +1899,7 @@ declare module 'mongoose' {
       /**
        * Compares two or more arrays and returns true if they have the same distinct elements and false otherwise.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setEquals/#mongodb-expression-exp.-setEquals
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/setEquals/#mongodb-expression-exp.-setEquals
        */
       $setEquals: ArrayExpression[];
     }
@@ -1908,7 +1908,7 @@ declare module 'mongoose' {
       /**
        * Takes two or more arrays and returns an array that contains the elements that appear in every input array.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setIntersection/#mongodb-expression-exp.-setIntersection
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/setIntersection/#mongodb-expression-exp.-setIntersection
        */
       $setIntersection: ArrayExpression[];
     }
@@ -1918,7 +1918,7 @@ declare module 'mongoose' {
        * Takes two arrays and returns true when the first array is a subset of the second, including when the first
        * array equals the second array, and false otherwise.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setIsSubset/#mongodb-expression-exp.-setIsSubset
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/setIsSubset/#mongodb-expression-exp.-setIsSubset
        */
       $setIsSubset: [ArrayExpression, ArrayExpression];
     }
@@ -1927,7 +1927,7 @@ declare module 'mongoose' {
       /**
        * Takes two or more arrays and returns an array containing the elements that appear in any input array.
        *
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/setUnion/#mongodb-expression-exp.-setUnion
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/setUnion/#mongodb-expression-exp.-setUnion
        */
       $setUnion: ArrayExpression[];
     }
@@ -1940,7 +1940,7 @@ declare module 'mongoose' {
        * also $function.
        *
        * @version 4.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/accumulator/#mongodb-expression-exp.-accumulator
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/accumulator/#mongodb-expression-exp.-accumulator
        */
       $accumulator: {
         /**
@@ -1985,7 +1985,7 @@ declare module 'mongoose' {
        * Returns an array of all unique values that results from applying an expression to each document in a group.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/addToSet/#mongodb-expression-exp.-addToSet
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/addToSet/#mongodb-expression-exp.-addToSet
        */
       $addToSet: Expression | Record<string, Expression>;
     }
@@ -1995,7 +1995,7 @@ declare module 'mongoose' {
        * Returns the average value of the numeric values. $avg ignores non-numeric values.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/avg/#mongodb-expression-exp.-avg
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/avg/#mongodb-expression-exp.-avg
        */
       $avg: Expression;
     }
@@ -2005,7 +2005,7 @@ declare module 'mongoose' {
        * Returns the number of documents in a group.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/count/#mongodb-expression-exp.-count
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/count/#mongodb-expression-exp.-count
        */
       $count: Record<string | number | symbol, never> | Path;
     }
@@ -2016,7 +2016,7 @@ declare module 'mongoose' {
        * $setWindowFields stage window.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/covariancePop/#mongodb-expression-exp.-covariancePop
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/covariancePop/#mongodb-expression-exp.-covariancePop
        */
       $covariancePop: [NumberExpression, NumberExpression];
     }
@@ -2027,7 +2027,7 @@ declare module 'mongoose' {
        * $setWindowFields stage window.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/covarianceSamp/#mongodb-expression-exp.-covarianceSamp
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/covarianceSamp/#mongodb-expression-exp.-covarianceSamp
        */
       $covarianceSamp: [NumberExpression, NumberExpression];
     }
@@ -2038,7 +2038,7 @@ declare module 'mongoose' {
        * partition.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/denseRank/#mongodb-expression-exp.-denseRank
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/denseRank/#mongodb-expression-exp.-denseRank
        */
       $denseRank: Record<string | number | symbol, never>;
     }
@@ -2048,7 +2048,7 @@ declare module 'mongoose' {
        * Returns the average rate of change within the specified window, which is calculated using the:
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/derivative/#mongodb-expression-exp.-derivative
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/derivative/#mongodb-expression-exp.-derivative
        */
       $derivative: {
         /**
@@ -2067,7 +2067,7 @@ declare module 'mongoose' {
        * Returns the position of a document (known as the document number) in the $setWindowFields stage partition.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/documentNumber/#mongodb-expression-exp.-documentNumber
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/documentNumber/#mongodb-expression-exp.-documentNumber
        */
       $documentNumber: Record<string | number | symbol, never>;
     }
@@ -2078,7 +2078,7 @@ declare module 'mongoose' {
        * the $setWindowFields stage.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/expMovingAvg/#mongodb-expression-exp.-expMovingAvg
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/expMovingAvg/#mongodb-expression-exp.-expMovingAvg
        */
       $expMovingAvg: {
         /**
@@ -2132,7 +2132,7 @@ declare module 'mongoose' {
        * set of adjacent documents form a trapezoid using the:
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/integral/#mongodb-expression-exp.-integral
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/integral/#mongodb-expression-exp.-integral
        */
       $integral: {
         /**
@@ -2153,7 +2153,7 @@ declare module 'mongoose' {
        * values of different types.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/max/#mongodb-expression-exp.-max
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/max/#mongodb-expression-exp.-max
        */
       $max: Expression | Expression[];
     }
@@ -2164,7 +2164,7 @@ declare module 'mongoose' {
        * values of different types.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/min/#mongodb-expression-exp.-min
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/min/#mongodb-expression-exp.-min
        */
       $min: Expression | Expression[];
     }
@@ -2174,7 +2174,7 @@ declare module 'mongoose' {
        * Returns an array of all values that result from applying an expression to documents.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/push/#mongodb-expression-exp.-push
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/push/#mongodb-expression-exp.-push
        */
       $push: Expression | Record<string, Expression>;
     }
@@ -2185,7 +2185,7 @@ declare module 'mongoose' {
        * partition.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/rank/#mongodb-expression-exp.-rank
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/rank/#mongodb-expression-exp.-rank
        */
       $rank: Record<string | number | symbol, never>;
     }
@@ -2196,7 +2196,7 @@ declare module 'mongoose' {
        * document in the $setWindowFields stage partition.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/shift/#mongodb-expression-exp.-shift
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/shift/#mongodb-expression-exp.-shift
        */
       $shift: {
         /**
@@ -2222,7 +2222,7 @@ declare module 'mongoose' {
        * ignores non-numeric values.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/stdDevPop/#mongodb-expression-exp.-stdDevPop
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/stdDevPop/#mongodb-expression-exp.-stdDevPop
        */
       $stdDevPop: Expression;
     }
@@ -2233,7 +2233,7 @@ declare module 'mongoose' {
        * population of data from which to generalize about the population. $stdDevSamp ignores non-numeric values.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/stdDevSamp/#mongodb-expression-exp.-stdDevSamp
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/stdDevSamp/#mongodb-expression-exp.-stdDevSamp
        */
       $stdDevSamp: Expression;
     }
@@ -2243,7 +2243,7 @@ declare module 'mongoose' {
        * Calculates and returns the collective sum of numeric values. $sum ignores non-numeric values.
        *
        * @version 5.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#mongodb-expression-exp.-sum
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/sum/#mongodb-expression-exp.-sum
        */
       $sum: number | Expression | Expression[];
     }
@@ -2257,7 +2257,7 @@ declare module 'mongoose' {
        * - Long
        *
        * @version 4.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/convert/#mongodb-expression-exp.-convert
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/convert/#mongodb-expression-exp.-convert
        */
       $convert: {
         input: Expression;
@@ -2276,7 +2276,7 @@ declare module 'mongoose' {
        * - Long
        *
        * @version 4.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/isNumber/#mongodb-expression-exp.-isNumber
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/isNumber/#mongodb-expression-exp.-isNumber
        */
       $isNumber: Expression;
     }
@@ -2286,7 +2286,7 @@ declare module 'mongoose' {
        * Converts a value to a boolean.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toBool/#mongodb-expression-exp.-toBool
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/toBool/#mongodb-expression-exp.-toBool
        */
       $toBool: Expression;
     }
@@ -2297,7 +2297,7 @@ declare module 'mongoose' {
        * is null or missing, $toDecimal returns null.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toDecimal/#mongodb-expression-exp.-toDecimal
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/toDecimal/#mongodb-expression-exp.-toDecimal
        */
       $toDecimal: Expression;
     }
@@ -2308,7 +2308,7 @@ declare module 'mongoose' {
        * null or missing, $toDouble returns null.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toDouble/#mongodb-expression-exp.-toDouble
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/toDouble/#mongodb-expression-exp.-toDouble
        */
       $toDouble: Expression;
     }
@@ -2319,7 +2319,7 @@ declare module 'mongoose' {
        * missing, $toLong returns null.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toInt/#mongodb-expression-exp.-toInt
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/toInt/#mongodb-expression-exp.-toInt
        */
       $toInt: Expression;
     }
@@ -2330,7 +2330,7 @@ declare module 'mongoose' {
        * missing, $toLong returns null.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toLong/#mongodb-expression-exp.-toLong
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/toLong/#mongodb-expression-exp.-toLong
        */
       $toLong: Expression;
     }
@@ -2341,7 +2341,7 @@ declare module 'mongoose' {
        * value is null or missing, $toObjectId returns null.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toObjectId/#mongodb-expression-exp.-toObjectId
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/toObjectId/#mongodb-expression-exp.-toObjectId
        */
       $toObjectId: Expression;
     }
@@ -2367,7 +2367,7 @@ declare module 'mongoose' {
        * null or missing, $toString returns null.
        *
        * @version 4.0
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/toString/#mongodb-expression-exp.-toString
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/toString/#mongodb-expression-exp.-toString
        */
       $toString: Expression;
     }
@@ -2377,7 +2377,7 @@ declare module 'mongoose' {
        * Returns a string that specifies the BSON type of the argument.
        *
        * @version 3.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/type/#mongodb-expression-exp.-type
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/type/#mongodb-expression-exp.-type
        */
       $type: Expression;
     }
@@ -2387,7 +2387,7 @@ declare module 'mongoose' {
        * Returns the size of a given string or binary data value's content in bytes.
        *
        * @version 4.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/binarySize/#mongodb-expression-exp.-binarySize
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/binarySize/#mongodb-expression-exp.-binarySize
        */
       $binarySize: NullExpression | StringExpression | BinaryExpression;
     }
@@ -2398,7 +2398,7 @@ declare module 'mongoose' {
        * $bsonSize as an alternative to the Object.bsonSize() method.
        *
        * @version 4.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/bsonSize/#mongodb-expression-exp.-bsonSize
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/bsonSize/#mongodb-expression-exp.-bsonSize
        */
       $bsonSize: NullExpression | ObjectExpression;
     }
@@ -2408,7 +2408,7 @@ declare module 'mongoose' {
        * Defines a custom aggregation function or expression in JavaScript.
        *
        * @version 4.4
-       * @see https://docs.mongodb.com/manual/reference/operator/aggregation/function/#mongodb-expression-exp.-function
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/function/#mongodb-expression-exp.-function
        */
       $function: {
         /**
@@ -2868,6 +2868,7 @@ declare module 'mongoose' {
     Expression.StdDevPop |
     Expression.StdDevSamp |
     Expression.Sum |
+    Expression.Top |
     Expression.TopN;
 
   export type tzExpression = UTCOffset | StringExpressionOperatorReturningBoolean | string;

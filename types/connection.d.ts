@@ -85,8 +85,8 @@ declare module 'mongoose' {
 
     /**
      * Helper for `createCollection()`. Will explicitly create the given collection
-     * with specified options. Used to create [capped collections](https://docs.mongodb.com/manual/core/capped-collections/)
-     * and [views](https://docs.mongodb.com/manual/core/views/) from mongoose.
+     * with specified options. Used to create [capped collections](https://www.mongodb.com/docs/manual/core/capped-collections/)
+     * and [views](https://www.mongodb.com/docs/manual/core/views/) from mongoose.
      */
     createCollection<T extends AnyObject = AnyObject>(name: string, options: mongodb.CreateCollectionOptions, callback: Callback<mongodb.Collection<T>>): void;
     createCollection<T extends AnyObject = AnyObject>(name: string, callback: Callback<mongodb.Collection<T>>): void;
@@ -204,8 +204,8 @@ declare module 'mongoose' {
     setClient(client: mongodb.MongoClient): this;
 
     /**
-     * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
-     * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
+     * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://www.mongodb.com/docs/manual/release-notes/3.6/#client-sessions)
+     * for benefits like causal consistency, [retryable writes](https://www.mongodb.com/docs/manual/core/retryable-writes/),
      * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
      */
     startSession(options: ClientSessionOptions | undefined | null, callback: Callback<ClientSession>): void;

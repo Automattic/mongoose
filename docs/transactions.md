@@ -12,7 +12,7 @@ If you haven't already, import mongoose:
 import mongoose from 'mongoose';
 ```
 
-To create a transaction, you first need to create a session using or [`Mongoose#startSession`](api/mongoose.html#mongoose_Mongoose-startSession)
+To create a transaction, you first need to create a session using [`Mongoose#startSession`](api/mongoose.html#mongoose_Mongoose-startSession)
 or [`Connection#startSession()`](api/connection.html#connection_Connection-startSession).
 
 ```javascript
@@ -46,16 +46,29 @@ The changes in that document are not persisted to MongoDB.
 The `Connection#transaction()` function informs Mongoose change tracking that the `save()` was rolled back, and marks all fields that were changed in the transaction as modified.
 
 ```javascript
-[require:transactions.*can save document after aborted transaction]
+const doc = new Person({ name: 'Will Riker' });
+
+await db.transaction(async function setRank(session) {
+    doc.name = 'Captain';
+    await doc.save({ session });
+    doc.isNew; // false
+
+    // Throw an error to abort the transaction
+    throw new Error('Oops!');
+}, { readPreference: 'primary' }).catch(() => {});
+
+// true, `transaction()` reset the document's state because the
+// transaction was aborted.
+doc.isNew;
 ```
 
 <h2 id="with-mongoose-documents-and-save"><a href="#with-mongoose-documents-and-save">With Mongoose Documents and <code>save()</code></a></h2>
 
-If you get a [Mongoose document](documents.html) from [`findOne()`](model.html#model_Model-findOne)
-or [`find()`](model.html#model_Model-find) using a session, the document will
-keep a reference to the session and use that session for [`save()`](document.html#document_Document-save).
+If you get a [Mongoose document](documents.html) from [`findOne()`](api/model.html#model_Model-findOne)
+or [`find()`](api/model.html#model_Model-find) using a session, the document will
+keep a reference to the session and use that session for [`save()`](api/document.html#document_Document-save).
 
-To get/set the session associated with a given document, use [`doc.$session()`](document.html#document_Document-$session).
+To get/set the session associated with a given document, use [`doc.$session()`](api/document.html#document_Document-$session).
 
 ```javascript
 [require:transactions.*save]
@@ -64,8 +77,8 @@ To get/set the session associated with a given document, use [`doc.$session()`](
 <h2 id="with-the-aggregation-framework"><a href="#with-the-aggregation-framework">With the Aggregation Framework</a></h2>
 
 The `Model.aggregate()` function also supports transactions. Mongoose
-aggregations have a [`session()` helper](aggregate.html#aggregate_Aggregate-session)
-that sets the [`session` option](aggregate.html#aggregate_Aggregate-option).
+aggregations have a [`session()` helper](api/aggregate.html#aggregate_Aggregate-session)
+that sets the [`session` option](api/aggregate.html#aggregate_Aggregate-option).
 Below is an example of executing an aggregation within a transaction.
 
 ```javascript

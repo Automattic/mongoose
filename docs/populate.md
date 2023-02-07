@@ -1,6 +1,6 @@
 ## Populate
 
-MongoDB has the join-like [$lookup](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/) aggregation operator in versions >= 3.2. Mongoose has a more powerful alternative called `populate()`, which lets you reference documents in other collections.
+MongoDB has the join-like [$lookup](https://www.mongodb.com/docs/manual/reference/operator/aggregation/lookup/) aggregation operator in versions >= 3.2. Mongoose has a more powerful alternative called `populate()`, which lets you reference documents in other collections.
 
 Population is the process of automatically replacing the specified paths in the document with document(s) from other collection(s). We may populate a single document, multiple documents, a plain object, multiple plain objects, or all objects returned from a query. Let's look at some examples.
 
@@ -498,7 +498,7 @@ const commentSchema = new Schema({
     type: Schema.Types.ObjectId,
     required: true,
     // Instead of a hardcoded model name in `ref`, `refPath` means Mongoose
-    // will look at the `onModel` property to find the right model.
+    // will look at the `docModel` property to find the right model.
     refPath: 'docModel'
   },
   docModel: {
@@ -883,7 +883,7 @@ Alternatively, you can check out the [mongoose-autopopulate plugin](http://npmjs
 <h3 id="transform-populated-documents"><a href="#transform-populated-documents">Transform populated documents</a></h3>
 
 You can manipulate populated documents using the `transform` option.
-If you specify a `transform` function, Mongoose will call this function on every populated document in the result wiwith two arguments: the populated document, and the original id used to populate the document.
+If you specify a `transform` function, Mongoose will call this function on every populated document in the result with two arguments: the populated document, and the original id used to populate the document.
 This gives you more control over the result of the `populate()` execution.
 It is especially useful when you're populating multiple documents.
 

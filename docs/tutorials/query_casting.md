@@ -43,7 +43,7 @@ To make Mongoose throw an error if your `filter` has a property that isn't in th
 Implicit `$in`
 --------------
 
-Because of schemas, Mongoose knows what types fields should be, so it can provide some neat syntactic sugar. For example, if you forget to put [`$in`](https://docs.mongodb.com/manual/reference/operator/query/in/) on a non-array field, Mongoose will add `$in` for you.
+Because of schemas, Mongoose knows what types fields should be, so it can provide some neat syntactic sugar. For example, if you forget to put [`$in`](https://www.mongodb.com/docs/manual/reference/operator/query/in/) on a non-array field, Mongoose will add `$in` for you.
 
 ```javascript
 [require:Cast Tutorial.*implicit in]

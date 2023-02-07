@@ -7,7 +7,7 @@ There are several [backwards-breaking changes](https://github.com/Automattic/mon
 Mongoose's `findOneAndUpdate()`, `findOneAndRemove()`,
 `findByIdAndUpdate()`, and `findByIdAndRemove()` functions are just
 wrappers around MongoDB's
-[`findAndModify` command](http://docs.mongodb.org/manual/reference/method/db.collection.findAndModify/).
+[`findAndModify` command](http://www.mongodb.com/docs/manual/reference/method/db.collection.findAndModify/).
 Both the MongoDB server and the MongoDB NodeJS driver set the `new` option
 to false by default, but mongoose 3 overwrote this default. In order to be
 more consistent with the MongoDB server's documentation, mongoose will

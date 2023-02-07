@@ -21,7 +21,7 @@ Mongoose 6.0.0 was released on August 24, 2021. You can find more details on [ba
   - [Bug Reports](https://github.com/Automattic/mongoose/issues/)
   - [Mongoose Slack Channel](http://slack.mongoosejs.io/)
   - [Help Forum](http://groups.google.com/group/mongoose-orm)
-  - [MongoDB Support](https://docs.mongodb.org/manual/support/)
+  - [MongoDB Support](https://www.mongodb.com/docs/manual/support/)
 
 ## Plugins
 
@@ -96,7 +96,7 @@ await mongoose.connect('mongodb://127.0.0.1/my_database');
 
 Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`.
 
-**Note:** _If the local connection fails then try using 127.0.0.1 instead of 127.0.0.1. Sometimes issues may arise when the local hostname has been changed._
+**Note:** _If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed._
 
 **Important!** Mongoose buffers all the commands until it's connected to the database. This means that you don't have to wait until it connects to MongoDB in order to define models, run queries, etc.
 

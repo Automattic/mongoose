@@ -1,3 +1,40 @@
+6.9.1 / 2023-02-06
+==================
+ * fix(document): isModified should not be triggered when setting a nested boolean to the same value as previously #12994 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(document): save newly set defaults underneath single nested subdocuments #13002 #12905
+ * fix(update): handle custom discriminator model name when casting update #12947 [wassil](https://github.com/wassil)
+ * fix(connection): handles unique autoincrement ID for connections #12990 [lpizzinidev](https://github.com/lpizzinidev) 
+ * fix(types): fix type of options of Model.aggregate #12933 [ghost91-](https://github.com/ghost91-)
+ * fix(types): fix "near" aggregation operator input type #12954 [Jokero](https://github.com/Jokero)
+ * fix(types): add missing Top operator to AccumulatorOperator type declaration #12952 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(transactions): added example for Connection.transaction() method #12943 #12934 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(populate): fix out of date comment referencing onModel property #13000
+ * docs(transactions): fix typo in transactions.md #12995 [Parth86](https://github.com/Parth86)
+
+6.9.0 / 2023-01-25
+==================
+ * feat(schema): add removeVirtual(path) function to schema #12920 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(cast): remove empty `$or` conditions after strict applied #12898 [0x0a0d](https://github.com/0x0a0d)
+ * docs: fixed typo #12946 [Gbengstar](https://github.com/Gbengstar)
+
+6.8.5 / 2023-01-23
+==================
+ * fix(query): correctly pass context when casting $elemMatch #12915 #12909 #12902 [MohOraby](https://github.com/MohOraby)
+
+6.8.4 / 2023-01-17
+==================
+ * fix(collection): handle creating model when connection disconnected with bufferCommands = false #12889
+ * fix(populate): merge instead of overwrite when match is on _id #12891
+ * fix: add guard to stop loadClass copying Document if Document is used as base of loaded class (same hack as implemented for Model already) #12820 [sgpinkus](https://github.com/sgpinkus)
+ * fix(types): correctly infer types on document arrays #12884 #12882 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * fix(types): added omit for ArraySubdocument type in LeanType declaration #12903 [piyushk96](https://github.com/piyushk96)
+ * fix(types): add returnDocument type safety #12906 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(typescript): add notes about virtual context to Mongoose 6 migration and TypeScript virtuals docs #12912 #12806
+ * docs(schematypes): removed dead link and fixed formatting #12897 #12885 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: fix link to lean api #12910 [manniL](https://github.com/manniL)
+ * docs: list all possible strings for schema.pre in one place #12868 
+ * docs: add list of known incompatible npm packages #12892 [IslandRhythms](https://github.com/IslandRhythms)
+
 6.8.3 / 2023-01-06
 ==================
  * perf: improve performance of assignRawDocsToIdStructure for faster populate on large docs #12867 [Uzlopak](https://github.com/Uzlopak)

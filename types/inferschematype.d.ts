@@ -152,17 +152,15 @@ type OptionalPaths<T, TypeKey extends string = DefaultTypeKey> = {
 
 /**
  * @summary Obtains schema Path type.
- * @description Obtains Path type by calling {@link ResolvePathType} OR by calling {@link InferSchemaType} if path of schema type.
+ * @description Obtains Path type by separating path type from other options and calling {@link ResolvePathType}
  * @param {PathValueType} PathValueType Document definition path type.
  * @param {TypeKey} TypeKey A generic refers to document definition.
  */
-type ObtainDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeKey> = PathValueType extends Schema<any>
-  ? InferSchemaType<PathValueType>
-  : ResolvePathType<
-  PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
-  PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {},
-  TypeKey
-  >;
+type ObtainDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeKey> = ResolvePathType<
+PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
+PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {},
+TypeKey
+>;
 
 /**
  * @param {T} T A generic refers to string path enums.
@@ -179,8 +177,29 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends R
  */
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey']> =
   PathValueType extends Schema ? InferSchemaType<PathValueType> :
-    PathValueType extends (infer Item)[] ? IfEquals<Item, never, any[], Item extends Schema ? Types.DocumentArray<ObtainDocumentPathType<Item, TypeKey>> : ObtainDocumentPathType<Item, TypeKey>[]> :
-      PathValueType extends ReadonlyArray<infer Item> ? IfEquals<Item, never, any[], Item extends Schema ? Types.DocumentArray<ObtainDocumentPathType<Item, TypeKey>> : ObtainDocumentPathType<Item, TypeKey>[]> :
+    PathValueType extends (infer Item)[] ?
+      IfEquals<Item, never, any[], Item extends Schema ?
+        // If Item is a schema, infer its type.
+        Types.DocumentArray<InferSchemaType<Item>> :
+        Item extends Record<TypeKey, any>?
+          Item[TypeKey] extends Function | String ?
+            // If Item has a type key that's a string or a callable, it must be a scalar,
+            // so we can directly obtain its path type.
+            ObtainDocumentPathType<Item, TypeKey>[] :
+            // If the type key isn't callable, then this is an array of objects, in which case
+            // we need to call ObtainDocumentType to correctly infer its type.
+            ObtainDocumentType<Item, any, { typeKey: TypeKey }>[]:
+          ObtainDocumentPathType<Item, TypeKey>[]
+      >:
+      PathValueType extends ReadonlyArray<infer Item> ?
+        IfEquals<Item, never, any[], Item extends Schema ?
+          Types.DocumentArray<InferSchemaType<Item>> :
+          Item extends Record<TypeKey, any> ?
+            Item[TypeKey] extends Function | String ?
+              ObtainDocumentPathType<Item, TypeKey>[] :
+              ObtainDocumentType<Item, any, { typeKey: TypeKey }>[]:
+            ObtainDocumentPathType<Item, TypeKey>[]
+        >:
         PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
           IfEquals<PathValueType, Schema.Types.String> extends true ? PathEnumOrString<Options['enum']> :
             IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']> :

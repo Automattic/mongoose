@@ -12075,6 +12075,79 @@ describe('document', function() {
     assert.equal(doc.list.length, 3);
     assert.deepStrictEqual(doc.list.map(el => el.a), [1, 2, 3]);
   });
+
+  it('should not trigger isModified when setting a nested boolean to the same value as previously  (gh-12992)', async function() {
+    const Test = db.model('Test', new Schema({
+      result: new Schema(
+        {
+          score: Number,
+          passed: Boolean
+        },
+        { _id: false }
+      )
+    }));
+    const newTest = await Test.create({
+      result: {
+        score: 40,
+        passed: false
+      }
+    });
+
+    const existingTest = await Test.findById(newTest._id);
+    existingTest.result = {
+      score: 40,
+      passed: false
+    };
+
+    assert.equal(existingTest.isModified(), false);
+    assert.equal(existingTest.modifiedPaths().length, 0);
+
+    existingTest.result = {
+      score: 40,
+      passed: true
+    };
+
+    assert.equal(existingTest.isModified(), true);
+    assert.equal(existingTest.modifiedPaths().length, 1);
+  });
+
+  it('saves single nested subdoc defaults (gh-12905)', async function() {
+    const nestedSchema = new mongoose.Schema({
+      refOriginal: String,
+      refAnother: {
+        type: String,
+        default: () => 'goodbye'
+      }
+    });
+    const testSchema = new mongoose.Schema({
+      original: String,
+      another: {
+        type: String,
+        default: 'hello'
+      },
+      referenced: {
+        type: nestedSchema,
+        default: () => ({})
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const _id = new mongoose.Types.ObjectId();
+    await Test.collection.insertOne({
+      _id,
+      original: 'foo',
+      referenced: { refOriginal: 'hello' }
+    });
+
+    const doc = await Test.findById(_id);
+    assert.equal(doc.referenced.refOriginal, 'hello');
+    assert.equal(doc.referenced.refAnother, 'goodbye');
+
+    await doc.save();
+    const rawDoc = await Test.findById(_id).lean();
+    assert.equal(rawDoc.referenced.refOriginal, 'hello');
+    assert.equal(rawDoc.referenced.refAnother, 'goodbye');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

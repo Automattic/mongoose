@@ -223,7 +223,7 @@ doc.child; // { age: 0 }
 ### Finding a Subdocument
 
 Each subdocument has an `_id` by default. Mongoose document arrays have a
-special [id](api/types.html#types_documentarray_MongooseDocumentArray-id) method
+special [id](api/mongoosedocumentarray.html#mongoosedocumentarray_MongooseDocumentArray-id) method
 for searching a document array to find a document with a given `_id`.
 
 ```javascript
@@ -262,7 +262,7 @@ const newdoc = parent.children.create({ name: 'Aaron' });
 ### Removing Subdocs
 
 Each subdocument has its own
-[remove](api/types.html#types_embedded_EmbeddedDocument-remove) method. For
+[remove](api/subdocument.html#subdocument_Subdocument-remove) method. For
 an array subdocument, this is equivalent to calling `.pull()` on the
 subdocument. For a single nested subdocument, `remove()` is equivalent
 to setting the subdocument to `null`.

@@ -493,7 +493,7 @@ declare module 'mongoose' {
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
   type _UpdateQuery<TSchema> = {
-    /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
+    /** @see https://www.mongodb.com/docs/manual/reference/operator/update-field/ */
     $currentDate?: AnyKeys<TSchema> & AnyObject;
     $inc?: AnyKeys<TSchema> & AnyObject;
     $min?: AnyKeys<TSchema> & AnyObject;
@@ -504,14 +504,14 @@ declare module 'mongoose' {
     $setOnInsert?: AnyKeys<TSchema> & AnyObject;
     $unset?: AnyKeys<TSchema> & AnyObject;
 
-    /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
+    /** @see https://www.mongodb.com/docs/manual/reference/operator/update-array/ */
     $addToSet?: AnyKeys<TSchema> & AnyObject;
     $pop?: AnyKeys<TSchema> & AnyObject;
     $pull?: AnyKeys<TSchema> & AnyObject;
     $push?: AnyKeys<TSchema> & AnyObject;
     $pullAll?: AnyKeys<TSchema> & AnyObject;
 
-    /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
+    /** @see https://www.mongodb.com/docs/manual/reference/operator/update-bitwise/ */
     // Needs to be `AnyKeys` for now, because anything stricter makes us incompatible
     // with the MongoDB Node driver's `UpdateFilter` interface (see gh-12595, gh-11911)
     // and using the Node driver's `$bit` definition breaks because their `OnlyFieldsOfType`

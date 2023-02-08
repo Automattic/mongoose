@@ -2978,7 +2978,9 @@ describe('Query', function() {
 
     return Model.updateOne({}, { name: 'bar' }, { overwrite: true }).then(
       () => { throw new Error('Should have failed'); },
-      err => assert.ok(err.message.indexOf('updateOne') !== -1)
+      err => {
+        assert.ok(err.message.indexOf('updateOne') !== -1);
+      }
     );
   });
 

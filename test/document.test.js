@@ -2156,38 +2156,38 @@ describe('document', function() {
         name: String,
         email: String
       }, { _id: false, id: false });
-    
+
       let userHookCount = 0;
       userSchema.pre('save', function(next) {
         ++userHookCount;
         next();
       });
-    
+
       const eventSchema = new mongoose.Schema({
         user: userSchema,
         name: String
       });
-    
+
       let eventHookCount = 0;
       eventSchema.pre('save', function(next) {
         ++eventHookCount;
         next();
       });
-    
+
       const Event = db.model('Event', eventSchema);
-    
+
       const e = new Event({ name: 'test', user: { name: 123, email: 'val' } });
       await e.save();
       assert.strictEqual(e.user.name, '123');
       assert.equal(eventHookCount, 1);
       assert.equal(userHookCount, 1);
-    
+
       const doc = await Event.findOne({ user: { name: '123', email: 'val' } });
       assert.ok(doc);
-    
+
       const doc2 = await Event.findOne({ user: { $in: [{ name: '123', email: 'val' }] } });
       assert.ok(doc2);
-    });    
+    });
 
     it('single embedded schemas with validation (gh-2689)', function() {
       const userSchema = new mongoose.Schema({
@@ -4493,14 +4493,14 @@ describe('document', function() {
       const ParentModelSchema = new mongoose.Schema({
         children: [ChildModelSchema]
       });
-    
+
       const Model = db.model('Parent', ParentModelSchema);
-    
+
       await Model.create({ children: [{ text: 'test' }] });
       const doc = await Model.findOne({});
       assert.equal(doc.children.length, 1);
       assert.equal(doc.children[0].text, 'test');
-    });    
+    });
 
     it('post hooks on array child subdocs run after save (gh-5085) (gh-6926)', function() {
       const subSchema = new Schema({
@@ -5014,22 +5014,22 @@ describe('document', function() {
           dob: Date
         },
         { _id: false });
-    
+
       const socialSchema = new mongoose.Schema(
         {
           friends: [friendSchema]
         },
         { _id: false });
-    
+
       const userSchema = new mongoose.Schema({
         social: {
           type: socialSchema,
           required: true
         }
       });
-    
+
       const User = db.model('User', userSchema);
-    
+
       const user = new User({
         social: {
           friends: [
@@ -5037,23 +5037,23 @@ describe('document', function() {
           ]
         }
       });
-    
+
       user.social.friends = [{ _id: 'val', name: 'Val' }];
-    
+
       assert.deepEqual(user.toObject().social.friends[0], {
         _id: 'val',
         name: 'Val'
       });
-    
+
       await user.save();
-    
+
       const doc = await User.findOne({ _id: user._id });
-    
+
       assert.deepEqual(doc.toObject().social.friends[0], {
         _id: 'val',
         name: 'Val'
       });
-    });    
+    });
 
     it('consistent setter context for single nested (gh-5363)', function(done) {
       const contentSchema = new Schema({
@@ -5771,34 +5771,34 @@ describe('document', function() {
           required: true
         }
       });
-    
+
       const ItemParentSchema = new mongoose.Schema({
         children: [ItemChildSchema]
       });
-    
+
       const ItemParent = db.model('Parent', ItemParentSchema);
-    
+
       const p = new ItemParent({
         children: [{ name: 'test1' }, { name: 'test2' }]
       });
-    
+
       await p.save();
-    
+
       const doc = await ItemParent.findById(p._id);
-    
+
       assert.ok(doc);
       assert.equal(doc.children.length, 2);
-    
+
       doc.children[1].name = 'test3';
       doc.children.remove(doc.children[0]);
-    
+
       await doc.save();
-    
+
       const doc2 = await ItemParent.findById(doc._id);
-    
+
       assert.equal(doc2.children.length, 1);
       assert.equal(doc2.children[0].name, 'test3');
-    });    
+    });
 
     it('doc array: modify then sort (gh-7556)', async function() {
       const assetSchema = new Schema({
@@ -6175,21 +6175,21 @@ describe('document', function() {
       assert.deepEqual(isNew, [true]);
     });
 
-    it('modify multiple subdoc paths (gh-4405)', async () => {
+    it('modify multiple subdoc paths (gh-4405)', async() => {
       const ChildObjectSchema = new Schema({
         childProperty1: String,
         childProperty2: String,
         childProperty3: String
       });
-    
+
       const ParentObjectSchema = new Schema({
         parentProperty1: String,
         parentProperty2: String,
         child: ChildObjectSchema
       });
-    
+
       const Parent = db.model('Parent', ParentObjectSchema);
-    
+
       const p = new Parent({
         parentProperty1: 'abc',
         parentProperty2: '123',
@@ -6199,25 +6199,25 @@ describe('document', function() {
           childProperty3: 'c'
         }
       });
-    
+
       await p.save();
-    
+
       const p1 = await Parent.findById(p._id);
-    
+
       p1.parentProperty1 = 'foo';
       p1.parentProperty2 = 'bar';
       p1.child.childProperty1 = 'ping';
       p1.child.childProperty2 = 'pong';
       p1.child.childProperty3 = 'weee';
-    
+
       await p1.save();
-    
+
       const p2 = await Parent.findById(p._id);
-    
+
       assert.equal(p2.child.childProperty1, 'ping');
       assert.equal(p2.child.childProperty2, 'pong');
       assert.equal(p2.child.childProperty3, 'weee');
-    });    
+    });
 
     it('doesnt try to cast populated embedded docs (gh-6390)', async function() {
       const otherSchema = new Schema({
@@ -9807,35 +9807,35 @@ describe('document', function() {
       }
     });
     const Test = db.model('Test', testSchema);
-  
+
     const doc = await new Test({
       prop: 'Test',
       nestedProp: null
     }).save();
-  
+
     doc.id;
     doc.nestedProp;
-  
+
     new Test({
       prop: 'Test 2',
       nestedProp: doc.nestedProp
     });
-  
+
     await Test.updateOne({
       _id: doc._id
     }, {
       nestedProp: null
     });
-  
+
     const updatedDoc = await Test.findOne({
       _id: doc._id
     });
-  
+
     new Test({
       prop: 'Test 3',
       nestedProp: updatedDoc.nestedProp
     });
-  });  
+  });
 
   it('handles directly setting embedded document array element with projection (gh-9909)', async function() {
     const schema = Schema({

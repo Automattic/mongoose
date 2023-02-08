@@ -86,7 +86,6 @@ describe('model: findOneAndReplace:', function() {
     await post.save();
 
     const doc = await M.findOneAndReplace({ title: title });
-
     assert.equal(post.id, doc.id);
   });
 

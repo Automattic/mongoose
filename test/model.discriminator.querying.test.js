@@ -217,27 +217,27 @@ describe('model', function() {
             await impressionEvent.save();
             await conversionEvent1.save();
             await conversionEvent2.save();
-          
+
             // doesn't find anything since we're querying for an impression id
             const query = ConversionEvent.find({ _id: impressionEvent._id });
             assert.equal(query.op, 'find');
             assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'Conversion' });
             const documents = await query.exec();
             assert.equal(documents.length, 0);
-          
+
             // now find one with no criteria given and ensure it gets added to _conditions
             const query2 = ConversionEvent.find();
             assert.deepEqual(query2._conditions, { __t: 'Conversion' });
             assert.equal(query2.op, 'find');
             const documents2 = await query2.exec();
             assert.equal(documents2.length, 2);
-          
+
             assert.ok(documents2[0] instanceof ConversionEvent);
             assert.equal(documents2[0].__t, 'Conversion');
-          
+
             assert.ok(documents2[1] instanceof ConversionEvent);
             assert.equal(documents2[1].__t, 'Conversion');
-          });          
+          });
         });
       });
 
@@ -245,33 +245,33 @@ describe('model', function() {
         const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         const conversionEvent1 = new ConversionEvent({ name: 'Conversion event 1', revenue: 1 });
         const conversionEvent2 = new ConversionEvent({ name: 'Conversion event 2', revenue: 2 });
-      
+
         await impressionEvent.save();
         await conversionEvent1.save();
         await conversionEvent2.save();
-      
+
         // doesn't find anything since we're querying for an impression id
         const query = ConversionEvent.find({ _id: impressionEvent._id }, fields);
         assert.equal(query.op, 'find');
         assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'Conversion' });
         const documents = await query.exec();
-      
+
         assert.equal(documents.length, 0);
-      
+
         // now find one with no criteria given and ensure it gets added to _conditions
         const query2 = ConversionEvent.find({}, fields);
         assert.deepEqual(query2._conditions, { __t: 'Conversion' });
         assert.equal(query2.op, 'find');
         const documents2 = await query2.exec();
-      
+
         assert.equal(documents2.length, 2);
-      
+
         assert.ok(documents2[0] instanceof ConversionEvent);
         assert.equal(documents2[0].__t, 'Conversion');
-      
+
         assert.ok(documents2[1] instanceof ConversionEvent);
         assert.equal(documents2[1].__t, 'Conversion');
-      };      
+      };
 
       it('discriminator model only finds documents of its type when fields selection set as string inclusive', function() {
         return checkDiscriminatorModelsFindDocumentsOfItsType('name');
@@ -440,52 +440,52 @@ describe('model', function() {
       it('discriminator model only finds a document of its type', async function() {
         const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         const conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 2 });
-      
+
         await impressionEvent.save();
         await conversionEvent.save();
-      
+
         // doesn't find anything since we're querying for an impression id
         const query = ConversionEvent.findOne({ _id: impressionEvent._id });
         assert.equal(query.op, 'findOne');
         assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'Conversion' });
-      
+
         const document = await query.exec();
         assert.equal(document, null);
-      
+
         // now find one with no criteria given and ensure it gets added to _conditions
         const query2 = ConversionEvent.findOne();
         assert.equal(query2.op, 'findOne');
         assert.deepEqual(query2._conditions, { __t: 'Conversion' });
-      
+
         const document2 = await query2.exec();
         assert.ok(document2 instanceof ConversionEvent);
         assert.equal(document2.__t, 'Conversion');
-      });      
+      });
 
       const checkDiscriminatorModelsFindOneDocumentOfItsType = async function(fields) {
         const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         const conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 2 });
-      
+
         await impressionEvent.save();
         await conversionEvent.save();
-      
+
         // doesn't find anything since we're querying for an impression id
         const query = ConversionEvent.findOne({ _id: impressionEvent._id }, fields);
         assert.equal(query.op, 'findOne');
         assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'Conversion' });
-      
+
         const document = await query.exec();
         assert.equal(document, null);
-      
+
         // now find one with no criteria given and ensure it gets added to _conditions
         const query2 = ConversionEvent.findOne({}, fields);
         assert.equal(query2.op, 'findOne');
         assert.deepEqual(query2._conditions, { __t: 'Conversion' });
-      
+
         const document2 = await query2.exec();
         assert.ok(document2 instanceof ConversionEvent);
         assert.equal(document2.__t, 'Conversion');
-      };      
+      };
 
       it('discriminator model only finds a document of its type when fields selection set as string inclusive', function() {
         return checkDiscriminatorModelsFindOneDocumentOfItsType('name');
@@ -517,53 +517,53 @@ describe('model', function() {
         const baseEvent = new BaseEvent({ name: 'Base event' });
         const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         const conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
-      
+
         await baseEvent.save();
         await impressionEvent.save();
         await conversionEvent.save();
-      
+
         const query = ConversionEvent.findOneAndUpdate({ name: 'Impression event' }, { $set: { name: 'Impression event - updated' } });
         assert.deepEqual(query._conditions, { name: 'Impression event', __t: 'Conversion' });
         const document = await query.exec();
         assert.equal(document, null);
       });
-      
+
 
       it('updates models of its own type', async function() {
         const baseEvent = new BaseEvent({ name: 'Base event' });
         const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         const conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
-      
+
         await baseEvent.save();
         await impressionEvent.save();
         await conversionEvent.save();
-      
+
         const query = ConversionEvent.findOneAndUpdate({ name: 'Conversion event' }, { $set: { name: 'Conversion event - updated' } }, { new: true });
         assert.deepEqual(query._conditions, { name: 'Conversion event', __t: 'Conversion' });
-      
+
         const document = await query.exec();
-      
+
         const expected = conversionEvent.toJSON();
         expected.name = 'Conversion event - updated';
         assert.deepEqual(document.toJSON(), expected);
-      });      
+      });
 
       it('base model modifies any event type', async function() {
         const baseEvent = new BaseEvent({ name: 'Base event' });
         const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         const conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
-      
+
         await baseEvent.save();
         await impressionEvent.save();
         await conversionEvent.save();
-      
+
         const query = BaseEvent.findOneAndUpdate({ name: 'Conversion event' }, { $set: { name: 'Conversion event - updated' } }, { new: true });
         assert.deepEqual(query._conditions, { name: 'Conversion event' });
         const document = await query.exec();
         const expected = conversionEvent.toJSON();
         expected.name = 'Conversion event - updated';
         assert.deepEqual(document.toJSON(), expected);
-      });      
+      });
     });
 
     describe('population/reference mapping', function() {
@@ -571,26 +571,26 @@ describe('model', function() {
         const vehicleSchema = new Schema();
         const carSchema = new Schema({ speed: Number });
         const busSchema = new Schema({ speed: Number });
-      
+
         const userSchema = new Schema({
           vehicles: [{ type: Schema.Types.ObjectId, ref: 'Vehicle' }],
           favoriteVehicle: { type: Schema.Types.ObjectId, ref: 'Vehicle' },
           favoriteBus: { type: Schema.Types.ObjectId, ref: 'Bus' }
         });
-      
+
         const Vehicle = db.model('Vehicle', vehicleSchema);
         const Car = Vehicle.discriminator('Car', carSchema);
         const Bus = Vehicle.discriminator('Bus', busSchema);
         const User = db.model('User', userSchema);
-      
+
         const vehicle = await Vehicle.create({});
         const car = await Car.create({ speed: 160 });
         const bus = await Bus.create({ speed: 80 });
-      
+
         await User.create({ vehicles: [vehicle._id, car._id, bus._id], favoriteVehicle: car._id, favoriteBus: bus._id });
-      
+
         const user = await User.findOne({}).populate('vehicles favoriteVehicle favoriteBus').exec();
-      
+
         const expected = {
           __v: 0,
           _id: user._id,
@@ -602,22 +602,22 @@ describe('model', function() {
           favoriteVehicle: { _id: car._id, speed: 160, __v: 0, __t: 'Car' },
           favoriteBus: { _id: bus._id, speed: 80, __v: 0, __t: 'Bus' }
         };
-      
+
         assert.deepEqual(user.toJSON(), expected);
         assert.ok(user.vehicles[0] instanceof Vehicle);
         assert.ok(!(user.vehicles[0] instanceof Car));
         assert.ok(!(user.vehicles[0] instanceof Bus));
-      
+
         assert.ok(user.vehicles[1] instanceof Car);
         assert.ok(!(user.vehicles[1] instanceof Bus));
-      
+
         assert.ok(user.vehicles[2] instanceof Bus);
         assert.ok(!(user.vehicles[2] instanceof Car));
-      
+
         assert.ok(user.favoriteVehicle instanceof Car);
         assert.ok(user.favoriteBus instanceof Bus);
       });
-      
+
       it('reference in child schemas (gh-2719)', async function() {
         const vehicleSchema = new Schema({});
         const carSchema = new Schema({
@@ -628,23 +628,23 @@ describe('model', function() {
           speed: Number,
           garage: { type: Schema.Types.ObjectId, ref: 'Test' }
         });
-      
+
         const garageSchema = new Schema({
           name: String,
           num_of_places: Number
         });
-      
+
         const Vehicle = db.model('Vehicle', vehicleSchema);
         const Car = Vehicle.discriminator('Car', carSchema);
         const Bus = Vehicle.discriminator('Bus', busSchema);
         const Garage = db.model('Test', garageSchema);
-      
+
         const garage = await Garage.create({ name: 'My', num_of_places: 3 });
         await Car.create({ speed: 160, garage });
         await Bus.create({ speed: 80, garage });
-      
+
         const vehicles = await Vehicle.find({}).populate('garage');
-      
+
         vehicles.forEach(function(v) {
           assert.ok(v.garage instanceof Garage);
         });
@@ -659,44 +659,44 @@ describe('model', function() {
         });
         const wheelSchema = new Schema({ brand: String });
         const busSchema = new Schema({ speed: Number });
-      
+
         const Vehicle = db.model('Vehicle', vehicleSchema);
         const Bus = Vehicle.discriminator('Bus', busSchema);
         const Wheel = db.model('Test', wheelSchema);
-      
+
         const wheel = await Wheel.create({ brand: 'Rotiform' });
         await Bus.create({ speed: 80, wheels: [wheel] });
         const bus = await Bus.findOne({}).populate('wheels');
-      
+
         assert.ok(bus instanceof Vehicle);
         assert.ok(bus instanceof Bus);
         assert.equal(bus.wheels.length, 1);
         assert.ok(bus.wheels[0] instanceof Wheel);
         assert.equal(bus.wheels[0].brand, 'Rotiform');
-      });      
+      });
 
-      it('updating discriminator key (gh-5613)', async () => {
+      it('updating discriminator key (gh-5613)', async() => {
         function BaseSchema() {
           Schema.apply(this, arguments);
-      
+
           this.add({
             name: { type: String, required: true }
           });
         }
-      
+
         util.inherits(BaseSchema, Schema);
-      
+
         const orgSchema = new BaseSchema({});
         const schoolSchema = new BaseSchema({ principal: String });
-      
+
         const Org = db.model('Test', orgSchema);
         Org.discriminator('D', schoolSchema);
-      
+
         const doc = await Org.create({ name: 'test' });
         assert.ok(!doc.__t);
         const updatedDoc = await Org.findByIdAndUpdate(doc._id, { __t: 'D' }, { new: true, overwriteDiscriminatorKey: true });
         assert.equal(updatedDoc.__t, 'D');
-      });      
+      });
 
       it('disallows updating discriminator key using `$unset` (gh-11456)', async function() {
         const options = { discriminatorKey: 'kind' };
@@ -933,19 +933,19 @@ describe('model', function() {
           const aggregate = ImpressionEvent.aggregate([
             { $group: { _id: '$__t', count: { $sum: 1 } } }
           ]);
-        
+
           const result = await aggregate.exec();
-        
+
           assert.deepEqual(aggregate._pipeline, [
             { $match: { __t: 'Impression' } },
             { $group: { _id: '$__t', count: { $sum: 1 } } }
           ]);
-        
+
           assert.equal(result.length, 1);
           assert.deepEqual(result, [
             { _id: 'Impression', count: 2 }
           ]);
-        });        
+        });
 
         it('hides fields when discriminated model has select (gh-4991)', function(done) {
           const baseSchema = new mongoose.Schema({
@@ -983,19 +983,19 @@ describe('model', function() {
             propA: { type: String, default: 'default value' },
             array: [{ type: String }]
           });
-        
+
           const Base = db.model('Test', baseSchema);
           const discriminatorSchema = new mongoose.Schema({
             propB: { type: String }
           });
           const Discriminator = Base.discriminator('D', discriminatorSchema);
-        
+
           const obj = { propA: 'Hi', propB: 'test', array: ['a', 'b'] };
           await Discriminator.create(obj);
           const docs = await Base.find().slice('array', 1).exec();
           assert.equal(docs.length, 1);
           assert.equal(docs[0].propA, 'Hi');
-        });        
+        });
 
         it('merges the first pipeline stages if applicable', function(done) {
           const aggregate = ImpressionEvent.aggregate([

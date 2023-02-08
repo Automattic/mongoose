@@ -623,20 +623,20 @@ describe('model', function() {
         const schema = new mongoose.Schema({
           name: String
         });
-      
+
         const schemaExt = new mongoose.Schema({
           nameExt: String
         });
-      
+
         const ModelA = db.model('Test1', schema);
         ModelA.discriminator('D1', schemaExt);
-      
+
         await ModelA.findOneAndUpdate({}, { $set: { name: 'test' } });
-      
+
         const ModelB = db.model('Test2', schema.clone());
         ModelB.discriminator('D2', schemaExt.clone());
       });
-      
+
 
       it('incorrect discriminator key throws readable error with create (gh-6434)', async function() {
         const settingSchema = new Schema({ name: String }, {
@@ -748,19 +748,19 @@ describe('model', function() {
         assert.ifError(d1.validateSync());
       });
 
-      it('nested discriminator key with projecting in parent (gh-5775)', async () => {
+      it('nested discriminator key with projecting in parent (gh-5775)', async() => {
         const itemSchema = new Schema({
           type: { type: String },
           active: { type: Boolean, default: true }
         }, { discriminatorKey: 'type' });
-      
+
         const collectionSchema = new Schema({
           items: [itemSchema]
         });
-      
+
         const s = new Schema({ count: Number });
         collectionSchema.path('items').discriminator('type1', s);
-      
+
         const MyModel = db.model('Test', collectionSchema);
         const doc = {
           items: [{ type: 'type1', active: false, count: 3 }]
@@ -771,7 +771,7 @@ describe('model', function() {
         assert.equal(result.items[0].type, 'type1');
         assert.strictEqual(result.items[0].active, false);
         assert.strictEqual(result.items[0].count, 3);
-      });      
+      });
 
       it('with $meta projection (gh-5859)', function() {
         const eventSchema = new Schema({ eventField: String }, { id: false });

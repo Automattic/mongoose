@@ -334,7 +334,7 @@ describe('connections:', function() {
         await a.save();
         await A.findById(a);
         assert.strictEqual(47, a.n[0].age);
-      });      
+      });
     });
   });
 

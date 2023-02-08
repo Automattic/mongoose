@@ -132,14 +132,14 @@ describe('model: findOneAndRemove:', async function() {
   it('returns the original document', async function() {
     const M = BlogPost;
     const title = 'remove muah pleez';
-  
+
     const post = new M({ title: title });
     await post.save();
     const doc = await M.findByIdAndRemove(post.id);
     assert.equal(post.id, doc.id);
     const gone = await M.findById(post.id);
     assert.equal(gone, null);
-  });  
+  });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
     const M = BlogPost;
@@ -236,14 +236,14 @@ describe('model: findOneAndRemove:', async function() {
   it('supports population (gh-1395)', async function() {
     const M = db.model('Test1', { name: String });
     const N = db.model('Test2', { a: { type: Schema.ObjectId, ref: 'Test1' }, i: Number });
-  
+
     const a = await M.create({ name: 'i am an A' });
     const b = await N.create({ a: a._id, i: 10 });
-  
+
     const doc = await N.findOneAndRemove({ _id: b._id }, { select: 'a -_id' })
       .populate('a')
       .exec();
-  
+
     assert.ok(doc);
     assert.equal(doc._id, undefined);
     assert.ok(doc.a);
@@ -288,62 +288,62 @@ describe('model: findOneAndRemove:', async function() {
         topping: { type: String, default: 'bacon' },
         base: String
       });
-    
+
       let preCount = 0;
       s.pre('findOneAndRemove', function() {
         ++preCount;
       });
-    
+
       let postCount = 0;
       s.post('findOneAndRemove', function() {
         ++postCount;
       });
-    
+
       const Breakfast = db.model('Test', s);
       const breakfast = new Breakfast({
         base: 'eggs'
       });
-    
+
       await breakfast.save();
-    
+
       const breakfast2 = await Breakfast.findOneAndRemove(
         { base: 'eggs' },
-        {},
+        {}
       );
-    
+
       assert.equal(breakfast2.base, 'eggs');
       assert.equal(preCount, 1);
       assert.equal(postCount, 1);
-    });    
+    });
 
-    it('works with exec() (gh-439)', async () => {
+    it('works with exec() (gh-439)', async() => {
       const s = new Schema({
         topping: { type: String, default: 'bacon' },
         base: String
       });
-    
+
       let preCount = 0;
       s.pre('findOneAndRemove', function() {
         ++preCount;
       });
-    
+
       let postCount = 0;
       s.post('findOneAndRemove', function() {
         ++postCount;
       });
-    
+
       const Breakfast = db.model('Test', s);
       const breakfast = new Breakfast({
         base: 'eggs'
       });
-    
+
       await breakfast.save();
-    
+
       const breakfast2 = await Breakfast.findOneAndRemove({ base: 'eggs' }, {});
-    
+
       assert.equal(breakfast2.base, 'eggs');
       assert.equal(preCount, 1);
       assert.equal(postCount, 1);
-    });    
+    });
   });
 });

@@ -90,16 +90,16 @@ describe('document modified', function() {
     it('reset after save', async function() {
       const B = BlogPost;
       const b = new B();
-    
+
       b.numbers.push(3);
       await b.save();
-    
+
       b.numbers.push(3);
       await b.save();
-    
+
       const blogPost = await B.findById(b);
       assert.equal(blogPost.numbers.length, 2);
-    });    
+    });
 
     it('of embedded docs reset after save', function(done) {
       const post = new BlogPost({ title: 'hocus pocus' });
@@ -234,17 +234,17 @@ describe('document modified', function() {
           { title: 'Super', date: new Date(), body: 'Cool' }
         ]
       };
-    
+
       const post = await BlogPost.create(doc);
-    
+
       const postRead = await BlogPost.findById(post.id);
-    
+
       // set the same data again back to the document.
       // expected result, nothing should be set to modified
       assert.equal(postRead.isModified('comments'), false);
       assert.equal(postRead.isNew, false);
       postRead.set(postRead.toObject());
-    
+
       assert.equal(postRead.isModified('title'), false);
       assert.equal(postRead.isModified('slug'), false);
       assert.equal(postRead.isModified('date'), false);
@@ -255,13 +255,13 @@ describe('document modified', function() {
       assert.equal(postRead.isModified('numbers'), false);
       assert.equal(postRead.isModified('owners'), false);
       assert.equal(postRead.isModified('comments'), false);
-    
+
       const arr = postRead.comments.slice();
       arr[2] = postRead.comments.create({ title: 'index' });
       postRead.comments = arr;
-    
+
       assert.equal(postRead.isModified('comments'), true);
-    });    
+    });
 
     it('should let you set ref paths (gh-1530)', async function() {
       const parentSchema = new Schema({
@@ -452,15 +452,15 @@ describe('document modified', function() {
 
       b = new BlogPost({ mixed: {} });
       await b.save();
-        path = 'mixed.9a.x';
-        b.set(path, 8);
-        assert.ok(b.isModified(path));
-        assert.equal(b.get(path), 8);
+      path = 'mixed.9a.x';
+      b.set(path, 8);
+      assert.ok(b.isModified(path));
+      assert.equal(b.get(path), 8);
 
-        await b.save();
-        const doc = await BlogPost.findById(b);
-            assert.equal(doc.get(path), 8);
-            
+      await b.save();
+      const doc = await BlogPost.findById(b);
+      assert.equal(doc.get(path), 8);
+
     });
 
     it('should mark multi-level nested schemas as modified (gh-1754)', async function() {
@@ -500,11 +500,11 @@ describe('document modified', function() {
       b.unmarkModified('author');
       assert.equal(b.isModified('author'), false);
       assert.equal(b.isModified(), false);
-    
+
       await b.save();
-    
+
       const b2 = await BlogPost.findById(b._id);
-    
+
       assert.equal(b2.isModified('author'), false);
       assert.equal(b2.isModified(), false);
       b2.author = 'bar';
@@ -513,13 +513,13 @@ describe('document modified', function() {
       b2.unmarkModified('author');
       assert.equal(b2.isModified('author'), false);
       assert.equal(b2.isModified(), false);
-    
+
       await b2.save();
-    
+
       const b3 = await BlogPost.findById(b._id);
-    
+
       // was not saved because modified state was unset
       assert.equal(b3.author, 'foo');
-    });    
+    });
   });
 });

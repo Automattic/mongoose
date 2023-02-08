@@ -1526,4 +1526,23 @@ describe('connections:', function() {
     const connectionIds = m.connections.map(c => c.id);
     assert.deepEqual(connectionIds, [1, 2, 3, 4, 5]);
   });
+
+  it('with autoCreate = false after schema create (gh-12940)', async function() {
+    const m = new mongoose.Mongoose();
+
+    const schema = new Schema({ name: String }, {
+      collation: { locale: 'en_US', strength: 1 },
+      collection: 'gh12940_Conn'
+    });
+    const Model = m.model('gh12940_Conn', schema);
+
+    await m.connect(start.uri, {
+      autoCreate: false
+    });
+
+    await Model.init();
+
+    const res = await m.connection.db.listCollections().toArray();
+    assert.ok(!res.map(c => c.name).includes('gh12940_Conn'));
+  });
 });

@@ -243,107 +243,79 @@ describe('document: strict mode:', function() {
     assert.equal(setCount, 2);
   });
 
-  it('can be overridden during set()', function(done) {
+  it('can be overridden during set()', async function() {
     const strict = new Schema({
       bool: Boolean
     });
-
+  
     const Strict = db.model('Test', strict);
     const s = new Strict({ bool: true });
-
+  
     // insert non-schema property
     const doc = s.toObject();
     doc.notInSchema = true;
+  
+    await Strict.collection.insertOne(doc, { w: 1 });
+    const foundDoc = await Strict.findById(doc._id);
+    assert.equal(foundDoc._doc.bool, true);
+    assert.equal(foundDoc._doc.notInSchema, true);
+    foundDoc.bool = undefined;
+    foundDoc.set('notInSchema', undefined, { strict: false });
+    await foundDoc.save();
+    const foundDoc2 = await Strict.findById(doc._id);
+    assert.equal(foundDoc2._doc.bool, undefined);
+    assert.equal(foundDoc2._doc.notInSchema, undefined);
+  });  
 
-    Strict.collection.insertOne(doc, { w: 1 }, function(err) {
-      assert.ifError(err);
-      Strict.findById(doc._id, function(err, doc) {
-        assert.ifError(err);
-        assert.equal(doc._doc.bool, true);
-        assert.equal(doc._doc.notInSchema, true);
-        doc.bool = undefined;
-        doc.set('notInSchema', undefined, { strict: false });
-        doc.save(function() {
-          Strict.findById(doc._id, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(doc._doc.bool, undefined);
-            assert.equal(doc._doc.notInSchema, undefined);
-            done();
-          });
-        });
-      });
-    });
-  });
-
-  it('can be overridden during update()', function(done) {
+  it('can be overridden during update()', async function() {
     const strict = new Schema({
       bool: Boolean
     });
-
+  
     const Strict = db.model('Test', strict);
     const s = new Strict({ bool: true });
-
+  
     // insert non-schema property
     const doc = s.toObject();
     doc.notInSchema = true;
+  
+    await Strict.collection.insertOne(doc);
+  
+    const doc2 = await Strict.findById(doc._id);
+    assert.equal(doc2._doc.bool, true);
+    assert.equal(doc2._doc.notInSchema, true);
+  
+    await Strict.updateOne({ _id: doc._id }, { $unset: { bool: 1, notInSchema: 1 } }, { strict: false });
+  
+    const doc3 = await Strict.findById(doc._id);
+    assert.equal(doc3._doc.bool, undefined);
+    assert.equal(doc3._doc.notInSchema, undefined);
+  });  
 
-    Strict.collection.insertOne(doc, function(err) {
-      assert.ifError(err);
-
-      Strict.findById(doc._id, function(err, doc) {
-        assert.ifError(err);
-        assert.equal(doc._doc.bool, true);
-        assert.equal(doc._doc.notInSchema, true);
-
-        Strict.updateOne({ _id: doc._id }, { $unset: { bool: 1, notInSchema: 1 } }, { strict: false },
-          function(err) {
-            assert.ifError(err);
-
-            Strict.findById(doc._id, function(err, doc) {
-              assert.ifError(err);
-              assert.equal(doc._doc.bool, undefined);
-              assert.equal(doc._doc.notInSchema, undefined);
-              done();
-            });
-          });
-      });
-    });
-  });
-
-  it('can be overwritten with findOneAndUpdate (gh-1967)', function(done) {
+  it('can be overwritten with findOneAndUpdate (gh-1967)', async function() {
     const strict = new Schema({
       bool: Boolean
     });
-
+  
     const Strict = db.model('Test', strict);
     const s = new Strict({ bool: true });
-
+  
     // insert non-schema property
     const doc = s.toObject();
     doc.notInSchema = true;
-
-    Strict.collection.insertOne(doc, { w: 1 }, function(err) {
-      assert.ifError(err);
-
-      Strict.findById(doc._id, function(err, doc) {
-        assert.ifError(err);
-        assert.equal(doc._doc.bool, true);
-        assert.equal(doc._doc.notInSchema, true);
-
-        Strict.findOneAndUpdate({ _id: doc._id }, { $unset: { bool: 1, notInSchema: 1 } }, { strict: false, w: 1 },
-          function(err) {
-            assert.ifError(err);
-
-            Strict.findById(doc._id, function(err, doc) {
-              assert.ifError(err);
-              assert.equal(doc._doc.bool, undefined);
-              assert.equal(doc._doc.notInSchema, undefined);
-              done();
-            });
-          });
-      });
-    });
-  });
+  
+    await Strict.collection.insertOne(doc, { w: 1 });
+  
+    const doc1 = await Strict.findById(doc._id);
+    assert.equal(doc1._doc.bool, true);
+    assert.equal(doc1._doc.notInSchema, true);
+  
+    await Strict.findOneAndUpdate({ _id: doc._id }, { $unset: { bool: 1, notInSchema: 1 } }, { strict: false, w: 1 });
+  
+    const doc2 = await Strict.findById(doc._id);
+    assert.equal(doc2._doc.bool, undefined);
+    assert.equal(doc2._doc.notInSchema, undefined);
+  });  
 
   describe('"throws" mode', function() {
     it('throws on set() of unknown property', function() {

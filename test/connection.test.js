@@ -327,19 +327,14 @@ describe('connections:', function() {
     });
 
     describe('passing object literal schemas', function() {
-      it('works', function(done) {
+      it('works', async function() {
         const A = db.model('A', { n: [{ age: 'number' }] });
         const a = new A({ n: [{ age: '47' }] });
         assert.strictEqual(47, a.n[0].age);
-        a.save(function(err) {
-          assert.ifError(err);
-          A.findById(a, function(err) {
-            assert.ifError(err);
-            assert.strictEqual(47, a.n[0].age);
-            done();
-          });
-        });
-      });
+        await a.save();
+        await A.findById(a);
+        assert.strictEqual(47, a.n[0].age);
+      });      
     });
   });
 

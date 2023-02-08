@@ -82,7 +82,7 @@ describe('model: querying:', function() {
     await db.close();
   });
 
-  it('find returns a Query', function(done) {
+  it('find returns a Query', function() {
     // query
     assert.ok(BlogPostB.find({}) instanceof Query);
 
@@ -97,11 +97,9 @@ describe('model: querying:', function() {
 
     // query, fields (null), options
     assert.ok(BlogPostB.find({}, null, {}) instanceof Query);
-
-    done();
   });
 
-  it('findOne returns a Query', function(done) {
+  it('findOne returns a Query', function() {
     // query
     assert.ok(BlogPostB.findOne({}) instanceof Query);
 
@@ -116,70 +114,6 @@ describe('model: querying:', function() {
 
     // query, fields (null), options
     assert.ok(BlogPostB.findOne({}, null, {}) instanceof Query);
-
-    done();
-  });
-
-  it('an empty find does not hang', function(done) {
-    function fn() {
-      done();
-    }
-
-    BlogPostB.find({}, fn);
-  });
-
-  it('a query is executed when a callback is passed', function(done) {
-    let count = 5;
-    const q = { _id: new DocumentObjectId() }; // make sure the query is fast
-
-    function fn() {
-      if (--count) {
-        return;
-      }
-      done();
-    }
-
-    // query
-    assert.ok(BlogPostB.find(q, fn) instanceof Query);
-
-    // query, fields (object)
-    assert.ok(BlogPostB.find(q, {}, fn) instanceof Query);
-
-    // query, fields (null)
-    assert.ok(BlogPostB.find(q, null, fn) instanceof Query);
-
-    // query, fields, options
-    assert.ok(BlogPostB.find(q, {}, {}, fn) instanceof Query);
-
-    // query, fields (''), options
-    assert.ok(BlogPostB.find(q, '', {}, fn) instanceof Query);
-  });
-
-  it('query is executed where a callback for findOne', function(done) {
-    let count = 5;
-    const q = { _id: new DocumentObjectId() }; // make sure the query is fast
-
-    function fn() {
-      if (--count) {
-        return;
-      }
-      done();
-    }
-
-    // query
-    assert.ok(BlogPostB.findOne(q, fn) instanceof Query);
-
-    // query, fields
-    assert.ok(BlogPostB.findOne(q, {}, fn) instanceof Query);
-
-    // query, fields (empty string)
-    assert.ok(BlogPostB.findOne(q, '', fn) instanceof Query);
-
-    // query, fields, options
-    assert.ok(BlogPostB.findOne(q, {}, {}, fn) instanceof Query);
-
-    // query, fields (null), options
-    assert.ok(BlogPostB.findOne(q, null, {}, fn) instanceof Query);
   });
 
   describe('distinct', function() {
@@ -188,58 +122,36 @@ describe('model: querying:', function() {
       done();
     });
 
-    it('executes when you pass a callback', function(done) {
+    it('executes when you exec', async function() {
       let Address = new Schema({ zip: String });
       Address = db.model('Test', Address);
 
-      Address.create({ zip: '10010' }, { zip: '10010' }, { zip: '99701' }, function(err) {
-        assert.strictEqual(null, err);
-        const query = Address.distinct('zip', {}, function(err, results) {
-          assert.ifError(err);
-          assert.equal(results.length, 2);
-          assert.ok(results.indexOf('10010') > -1);
-          assert.ok(results.indexOf('99701') > -1);
-          done();
-        });
-        assert.ok(query instanceof Query);
-      });
+      await Address.create({ zip: '10010' }, { zip: '10010' }, { zip: '99701' });
+      const query = Address.distinct('zip', {});
+      assert.ok(query instanceof Query);
+      const results = await query.exec();
+
+      assert.equal(results.length, 2);
+      assert.ok(results.indexOf('10010') > -1);
+      assert.ok(results.indexOf('99701') > -1);
     });
 
-    it('permits excluding conditions gh-1541', function(done) {
+    it('permits excluding conditions gh-1541', async function() {
       let Address = new Schema({ zip: String });
       Address = db.model('Test', Address);
-      Address.create({ zip: '10010' }, { zip: '10010' }, { zip: '99701' }, function(err) {
-        assert.ifError(err);
-        Address.distinct('zip', function(err, results) {
-          assert.ifError(err);
-          assert.equal(results.length, 2);
-          assert.ok(results.indexOf('10010') > -1);
-          assert.ok(results.indexOf('99701') > -1);
-          done();
-        });
-      });
+      await Address.create({ zip: '10010' }, { zip: '10010' }, { zip: '99701' });
+      const results = await Address.distinct('zip');
+      assert.equal(results.length, 2);
+      assert.ok(results.indexOf('10010') > -1);
+      assert.ok(results.indexOf('99701') > -1);
+
     });
   });
 
   describe('updateOne', function() {
-    it('returns a Query', function(done) {
+    it('returns a Query', function() {
       assert.ok(BlogPostB.updateOne({}, {}) instanceof Query);
       assert.ok(BlogPostB.updateOne({}, {}, {}) instanceof Query);
-      done();
-    });
-
-    it('Query executes when you pass a callback', function(done) {
-      let count = 2;
-
-      function fn() {
-        if (--count) {
-          return;
-        }
-        done();
-      }
-
-      assert.ok(BlogPostB.updateOne({ title: random() }, {}, fn) instanceof Query);
-      assert.ok(BlogPostB.updateOne({ title: random() }, {}, {}, fn) instanceof Query);
     });
 
     it('can handle minimize option (gh-3381)', function() {
@@ -253,205 +165,138 @@ describe('model: querying:', function() {
         then(() => Model.collection.findOne()).
         then(doc => {
           assert.ok(doc.mixed == null);
-        }).
-        catch(err => {
-          throw err;
         });
     });
   });
 
   describe('findOne', function() {
-    it('works', function(done) {
+    it('works', async function() {
       const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
       post.set('title', title);
 
-      post.save(function(err) {
-        assert.ifError(err);
+      await post.save();
 
-        BlogPostB.findOne({ title: title }, function(err, doc) {
-          assert.ifError(err);
-          assert.equal(title, doc.get('title'));
-          assert.equal(doc.isNew, false);
-
-          done();
-        });
-      });
+      const doc = await BlogPostB.findOne({ title: title });
+      assert.equal(title, doc.get('title'));
+      assert.equal(doc.isNew, false);
     });
 
-    it('casts $modifiers', function(done) {
+    it('casts $modifiers', async function() {
       const post = new BlogPostB({
         meta: {
           visitors: -10
         }
       });
 
-      post.save(function(err) {
-        assert.ifError(err);
-
-        const query = { 'meta.visitors': { $gt: '-20', $lt: -1 } };
-        BlogPostB.findOne(query, function(err, found) {
-          assert.ifError(err);
-          assert.ok(found);
-          assert.equal(found.get('meta.visitors').valueOf(), post.get('meta.visitors').valueOf());
-          found.id; // trigger caching
-          assert.equal(found.get('_id').toString(), post.get('_id'));
-          done();
-        });
-      });
+      await post.save();
+      const query = { 'meta.visitors': { $gt: '-20', $lt: -1 } };
+      const found = await BlogPostB.findOne(query);
+      assert.ok(found);
+      assert.equal(found.get('meta.visitors').valueOf(), post.get('meta.visitors').valueOf());
+      found.id; // trigger caching
+      assert.equal(found.get('_id').toString(), post.get('_id'));
     });
 
-    it('querying if an array contains one of multiple members $in a set', function(done) {
+    it('querying if an array contains one of multiple members $in a set', async function() {
       const post = new BlogPostB();
 
       post.tags.push('football');
 
-      post.save(function(err) {
-        assert.ifError(err);
+      await post.save();
 
-        BlogPostB.findOne({ tags: { $in: ['football', 'baseball'] } }, function(err, doc) {
-          assert.ifError(err);
-          assert.equal(doc._id.toString(), post._id);
+      let doc = await BlogPostB.findOne({ tags: { $in: ['football', 'baseball'] } });
+      assert.equal(doc._id.toString(), post._id);
 
-          BlogPostB.findOne({ _id: post._id, tags: /otba/i }, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(doc._id.toString(), post._id);
-            done();
-          });
-        });
-      });
+      doc = await BlogPostB.findOne({ _id: post._id, tags: /otba/i });
+      assert.equal(doc._id.toString(), post._id);
+
     });
 
-    it('querying if an array contains one of multiple members $in a set 2', function(done) {
+    it('querying if an array contains one of multiple members $in a set 2', async function() {
       const BlogPostA = BlogPostB;
       const post = new BlogPostA({ tags: ['gooberOne'] });
 
-      post.save(function(err) {
-        assert.ifError(err);
+      await post.save();
+      const query = { tags: { $in: ['gooberOne'] } };
 
-        const query = { tags: { $in: ['gooberOne'] } };
-
-        BlogPostA.findOne(query, function(err, returned) {
-          cb();
-          assert.ifError(err);
-          assert.ok(!!~returned.tags.indexOf('gooberOne'));
-          assert.equal(returned._id.toString(), post._id);
-        });
-      });
+      const returned = await BlogPostA.findOne(query);
+      assert.ok(!!~returned.tags.indexOf('gooberOne'));
+      assert.equal(returned._id.toString(), post._id);
 
       const doc = { meta: { visitors: 9898, a: null } };
-      post.collection.insertOne(doc, {}, function(err) {
-        assert.ifError(err);
+      await post.collection.insertOne(doc, {});
 
-        BlogPostA.findOne({ _id: doc._id }, function(err, found) {
-          cb();
-          assert.ifError(err);
-          assert.equal(found.get('meta.visitors'), 9898);
-        });
+      const found = await BlogPostA.findOne({ _id: doc._id });
+      assert.equal(found.get('meta.visitors'), 9898);
+
+    });
+
+    it('querying via $where a string', async function() {
+      const created = await BlogPostB.create({
+        title: 'Steve Jobs',
+        author: 'Steve Jobs'
       });
+      const found = await BlogPostB.findOne({ $where: 'this.title && this.title === this.author' });
 
-      let pending = 2;
+      assert.equal(found._id.toString(), created._id);
+    });
 
-      function cb() {
-        if (--pending) {
-          return;
+    it('querying via $where a function', async function() {
+      const created = await BlogPostB.create({ author: 'Atari', slug: 'Atari' });
+
+      const found = await BlogPostB.findOne({
+        $where: function() {
+          return (this.author && this.slug && this.author === this.slug);
         }
-        done();
-      }
-    });
-
-    it('querying via $where a string', function(done) {
-      BlogPostB.create({ title: 'Steve Jobs', author: 'Steve Jobs' }, function(err, created) {
-        assert.ifError(err);
-
-        BlogPostB.findOne({ $where: 'this.title && this.title === this.author' }, function(err, found) {
-          assert.ifError(err);
-
-          assert.equal(found._id.toString(), created._id);
-          done();
-        });
       });
+      assert.equal(found._id.toString(), created._id);
     });
 
-    it('querying via $where a function', function(done) {
-      BlogPostB.create({ author: 'Atari', slug: 'Atari' }, function(err, created) {
-        assert.ifError(err);
-
-        BlogPostB.findOne({
-          $where: function() {
-            return (this.author && this.slug && this.author === this.slug);
-          }
-        }, function(err, found) {
-          assert.ifError(err);
-
-          assert.equal(found._id.toString(), created._id);
-          done();
-        });
-      });
-    });
-
-    it('based on nested fields', function(done) {
+    it('based on nested fields', async function() {
       const post = new BlogPostB({
         meta: {
           visitors: 5678
         }
       });
 
-      post.save(function(err) {
-        assert.ifError(err);
-
-        BlogPostB.findOne({ 'meta.visitors': 5678 }, function(err, found) {
-          assert.ifError(err);
-          assert.equal(found.get('meta.visitors')
-            .valueOf(), post.get('meta.visitors').valueOf());
-          assert.equal(found.get('_id').toString(), post.get('_id'));
-          done();
-        });
-      });
+      await post.save();
+      const found = await BlogPostB.findOne({ 'meta.visitors': 5678 });
+      assert.equal(found.get('meta.visitors')
+        .valueOf(), post.get('meta.visitors').valueOf());
+      assert.equal(found.get('_id').toString(), post.get('_id'));
     });
 
-    it('based on embedded doc fields (gh-242, gh-463)', function(done) {
-      BlogPostB.create({ comments: [{ title: 'i should be queryable' }], numbers: [1, 2, 33333], tags: ['yes', 'no'] }, function(err, created) {
-        assert.ifError(err);
-        BlogPostB.findOne({ 'comments.title': 'i should be queryable' }, function(err, found) {
-          assert.ifError(err);
-          assert.equal(found._id.toString(), created._id);
+    it('based on embedded doc fields (gh-242, gh-463)', async function() {
+      const created = await BlogPostB.create({ comments: [{ title: 'i should be queryable' }], numbers: [1, 2, 33333], tags: ['yes', 'no'] });
+      let found = await BlogPostB.findOne({ 'comments.title': 'i should be queryable' });
+      assert.equal(found._id.toString(), created._id);
 
-          BlogPostB.findOne({ 'comments.0.title': 'i should be queryable' }, function(err, found) {
-            assert.ifError(err);
-            assert.equal(found._id.toString(), created._id);
+      found = await BlogPostB.findOne({ 'comments.0.title': 'i should be queryable' });
 
-            // GH-463
-            BlogPostB.findOne({ 'numbers.2': 33333 }, function(err, found) {
-              assert.ifError(err);
-              assert.equal(found._id.toString(), created._id);
+      assert.equal(found._id.toString(), created._id);
 
-              BlogPostB.findOne({ 'tags.1': 'no' }, function(err, found) {
-                assert.ifError(err);
-                assert.equal(found._id.toString(), created._id);
-                done();
-              });
-            });
-          });
-        });
-      });
+      // GH-463
+      found = await BlogPostB.findOne({ 'numbers.2': 33333 });
+      assert.equal(found._id.toString(), created._id);
+
+      found = await BlogPostB.findOne({ 'tags.1': 'no' });
+      assert.equal(found._id.toString(), created._id);
+
     });
 
-    it('works with nested docs and string ids (gh-389)', function(done) {
-      BlogPostB.create({ comments: [{ title: 'i should be queryable by _id' }, { title: 'me too me too!' }] }, function(err, created) {
-        assert.ifError(err);
-        const id = created.comments[1]._id.toString();
-        BlogPostB.findOne({ 'comments._id': id }, function(err, found) {
-          assert.ifError(err);
-          assert.strictEqual(!!found, true, 'Find by nested doc id hex string fails');
-          assert.equal(found._id.toString(), created._id);
-          done();
-        });
-      });
+    it('works with nested docs and string ids (gh-389)', async function() {
+      const created = await BlogPostB.create({ comments: [{ title: 'i should be queryable by _id' }, { title: 'me too me too!' }] });
+
+      const id = created.comments[1]._id.toString();
+      const found = await BlogPostB.findOne({ 'comments._id': id });
+      assert.strictEqual(!!found, true, 'Find by nested doc id hex string fails');
+      assert.equal(found._id.toString(), created._id);
+
     });
 
-    it('using #all with nested #elemMatch', function(done) {
+    it('using #all with nested #elemMatch', async function() {
       const P = BlogPostB;
       const post = new P({ title: 'nested elemMatch' });
       post.comments.push({ title: 'comment A' }, { title: 'comment B' }, { title: 'comment C' });
@@ -459,18 +304,12 @@ describe('model: querying:', function() {
       const id1 = post.comments[1]._id;
       const id2 = post.comments[2]._id;
 
-      post.save(function(err) {
-        assert.ifError(err);
+      await post.save();
+      const query0 = { $elemMatch: { _id: id1, title: 'comment B' } };
+      const query1 = { $elemMatch: { _id: id2.toString(), title: 'comment C' } };
 
-        const query0 = { $elemMatch: { _id: id1, title: 'comment B' } };
-        const query1 = { $elemMatch: { _id: id2.toString(), title: 'comment C' } };
-
-        P.findOne({ comments: { $all: [query0, query1] } }, function(err, p) {
-          assert.ifError(err);
-          assert.equal(p.id, post.id);
-          done();
-        });
-      });
+      const p = await P.findOne({ comments: { $all: [query0, query1] } });
+      assert.equal(p.id, post.id);
     });
 
     it('using #or with nested #elemMatch', function(done) {
@@ -2189,78 +2028,46 @@ describe('model: querying:', function() {
     });
 
     describe('$near', function() {
-      it('Point', function(done) {
-        if (!mongo24_or_greater) {
-          return done();
-        }
-
+      it('Point', async function() {
         const Test = db.model('Test', geoSchema);
 
-        Test.on('index', function(err) {
-          assert.ifError(err);
+        await Test.init();
 
-          Test.create({ line: { type: 'Point', coordinates: [-179.0, 0.0] } }, function(err, created) {
-            assert.ifError(err);
+        const created = await Test.create({ line: { type: 'Point', coordinates: [-179.0, 0.0] } });
 
-            const geojsonPoint = { type: 'Point', coordinates: [-179.0, 0.0] };
+        const geojsonPoint = { type: 'Point', coordinates: [-179.0, 0.0] };
 
-            Test.find({ line: { $near: geojsonPoint } }, function(err, docs) {
-              assert.ifError(err);
-              assert.equal(docs.length, 1);
-              assert.equal(created.id, docs[0].id);
+        let docs = await Test.find({ line: { $near: geojsonPoint } });
+        assert.equal(docs.length, 1);
+        assert.equal(created.id, docs[0].id);
 
-              Test.find({ line: { $near: { $geometry: geojsonPoint, $maxDistance: 50 } } }, function(err, docs) {
-                assert.ifError(err);
-                assert.equal(docs.length, 1);
-                assert.equal(created.id, docs[0].id);
-                done();
-              });
-            });
-          });
-        });
+        docs = await Test.find({ line: { $near: { $geometry: geojsonPoint, $maxDistance: 50 } } });
+        assert.equal(docs.length, 1);
+        assert.equal(created.id, docs[0].id);
+
       });
 
-      it('works with GeoJSON (gh-1482)', function(done) {
-        if (!mongo24_or_greater) {
-          return done();
-        }
-
+      it('works with GeoJSON (gh-1482)', async function() {
         const geoJSONSchema = new Schema({ loc: { type: { type: String }, coordinates: [Number] } });
         geoJSONSchema.index({ loc: '2dsphere' });
         const Test = db.model('Test', geoJSONSchema);
+        await Test.init();
 
-        let pending = 2;
-
-        function complete(err) {
-          if (complete.ran) {
-            return;
-          }
-          if (err) {
-            return done(complete.ran = err);
-          }
-          --pending || test();
-        }
-
-        Test.on('index', complete);
-        Test.create({ loc: { type: 'Point', coordinates: [10, 20] } }, {
+        await Test.create({ loc: { type: 'Point', coordinates: [10, 20] } }, {
           loc: {
             type: 'Point', coordinates: [40, 90]
           }
-        }, complete);
+        });
 
-        function test() {
-          // $maxDistance is in meters... so even though they aren't that far off
-          // in lat/long, need an incredibly high number here
-          Test.where('loc').near({
-            center: {
-              type: 'Point', coordinates: [11, 20]
-            }, maxDistance: 1000000
-          }).exec(function(err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 1);
-            done();
-          });
-        }
+        // $maxDistance is in meters... so even though they aren't that far off
+        // in lat/long, need an incredibly high number here
+        const docs = await Test.where('loc').near({
+          center: {
+            type: 'Point', coordinates: [11, 20]
+          }, maxDistance: 1000000
+        }).exec();
+        assert.equal(docs.length, 1);
+
       });
       it('works with legacy 2dsphere pair in schema (gh-6937)', async function() {
         if (!mongo24_or_greater) {
@@ -2290,56 +2097,39 @@ describe('model: querying:', function() {
       }
     });
 
-    it('work', function(done) {
-      if (!mongo24_or_greater) {
-        return done();
-      }
-
+    it('work', async function() {
       const schema = new Schema({ t: { type: String, index: 'hashed' } });
 
       const H = db.model('Test', schema);
-      H.on('index', function(err) {
-        assert.ifError(err);
-        H.collection.getIndexes({ full: true }, function(err, indexes) {
-          assert.ifError(err);
+      await H.init();
+      const indexes = await H.collection.getIndexes({ full: true });
 
-          const found = indexes.some(function(index) {
-            return index.key.t === 'hashed';
-          });
-          assert.ok(found);
-
-          H.create({ t: 'hashing' }, {}, function(err, doc1, doc2) {
-            assert.ifError(err);
-            assert.ok(doc1);
-            assert.ok(doc2);
-            done();
-          });
-        });
+      const found = indexes.some(function(index) {
+        return index.key.t === 'hashed';
       });
+      assert.ok(found);
+
+      const [doc1, doc2] = await H.create([{ t: 'hashing' }, {}]);
+      assert.ok(doc1);
+      assert.ok(doc2);
     });
   });
 
   describe('lean', function() {
-    it('find', function(done) {
+    it('find', async function() {
       const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
       post.set('title', title);
 
-      post.save(function(err) {
-        assert.ifError(err);
-        BlogPostB.find({ title: title }).lean().exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs.length, 1);
-          assert.strictEqual(docs[0] instanceof mongoose.Document, false);
-          BlogPostB.find({ title: title }, null, { lean: true }, function(err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 1);
-            assert.strictEqual(docs[0] instanceof mongoose.Document, false);
-            done();
-          });
-        });
-      });
+      await post.save();
+      let docs = await BlogPostB.find({ title: title }).lean().exec();
+      assert.equal(docs.length, 1);
+      assert.strictEqual(docs[0] instanceof mongoose.Document, false);
+      docs = await BlogPostB.find({ title: title }, null, { lean: true });
+      assert.equal(docs.length, 1);
+      assert.strictEqual(docs[0] instanceof mongoose.Document, false);
+
     });
 
     it('removes the __v property if versionKey: false is set (gh-8934)', async function() {
@@ -2353,21 +2143,17 @@ describe('model: querying:', function() {
       assert.ok(!('__v' in updateFoundPost));
     });
 
-    it('findOne', function(done) {
+    it('findOne', async function() {
       const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
       post.set('title', title);
 
-      post.save(function(err) {
-        assert.ifError(err);
-        BlogPostB.findOne({ title: title }, null, { lean: true }, function(err, doc) {
-          assert.ifError(err);
-          assert.ok(doc);
-          assert.strictEqual(false, doc instanceof mongoose.Document);
-          done();
-        });
-      });
+      await post.save();
+      const doc = await BlogPostB.findOne({ title: title }, null, { lean: true });
+      assert.ok(doc);
+      assert.strictEqual(false, doc instanceof mongoose.Document);
+
     });
     it('properly casts nested and/or queries (gh-676)', function(done) {
       const sch = new Schema({
@@ -2391,7 +2177,7 @@ describe('model: querying:', function() {
       assert.equal(typeof q._conditions.$and[1].$and[1].num, 'number');
       done();
     });
-    it('properly casts deeply nested and/or queries (gh-676)', function(done) {
+    it('properly casts deeply nested and/or queries (gh-676)', function() {
       const sch = new Schema({
         num: Number,
         subdoc: { title: String, num: Number }
@@ -2406,25 +2192,20 @@ describe('model: querying:', function() {
       q._castConditions();
       assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[0].num, 'number');
       assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[1]['subdoc.num'], 'number');
-      done();
     });
 
-    it('casts $elemMatch (gh-2199)', function(done) {
+    it('casts $elemMatch (gh-2199)', async function() {
       const schema = new Schema({ dates: [Date] });
       const Dates = db.model('Test', schema);
 
       const array = ['2014-07-01T02:00:00.000Z', '2014-07-01T04:00:00.000Z'];
-      Dates.create({ dates: array }, function(err) {
-        assert.ifError(err);
-        const elemMatch = { $gte: '2014-07-01T03:00:00.000Z' };
-        Dates.findOne({}, { dates: { $elemMatch: elemMatch } }, function(err, doc) {
-          assert.ifError(err);
-          assert.equal(doc.dates.length, 1);
-          assert.equal(doc.dates[0].getTime(),
-            new Date('2014-07-01T04:00:00.000Z').getTime());
-          done();
-        });
-      });
+      await Dates.create({ dates: array });
+      const elemMatch = { $gte: '2014-07-01T03:00:00.000Z' };
+      const doc = await Dates.findOne({}, { dates: { $elemMatch: elemMatch } });
+      assert.equal(doc.dates.length, 1);
+      assert.equal(doc.dates[0].getTime(),
+        new Date('2014-07-01T04:00:00.000Z').getTime());
+
     });
 
     it('does not run resetId setter on query (gh-6093)', function() {
@@ -2436,27 +2217,11 @@ describe('model: querying:', function() {
     });
 
     describe('$eq', function() {
-      let mongo26 = false;
-
-      before(async function() {
-        const version = await start.mongodVersion();
-
-        mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-      });
-
-      it('casts $eq (gh-2752)', function(done) {
-        BlogPostB.findOne(
-          { _id: { $eq: '000000000000000000000001' }, numbers: { $eq: [1, 2] } },
-          function(err, doc) {
-            if (mongo26) {
-              assert.ifError(err);
-            } else {
-              assert.ok(err.toString().indexOf('MongoServerError') !== -1);
-            }
-
-            assert.ok(!doc);
-            done();
-          });
+      it('casts $eq (gh-2752)', async function() {
+        const doc = await BlogPostB.findOne(
+          { _id: { $eq: '000000000000000000000001' }, numbers: { $eq: [1, 2] } }
+        );
+        assert.ok(!doc);
       });
     });
   });

@@ -293,7 +293,7 @@ describe('schema select option', function() {
   });
 
   describe('forcing inclusion of a deselected schema path', function() {
-    it('works', function(done) {
+    it('works', async function() {
       const excluded = new Schema({
         thin: Boolean,
         name: { type: String, select: false },
@@ -301,74 +301,57 @@ describe('schema select option', function() {
       });
 
       const M = db.model('Test', excluded);
-      M.create({ thin: false, name: '1 meter', docs: [{ name: 'test', bool: false }] }, function(err, d) {
-        assert.ifError(err);
-
-        M.findById(d)
-          .select('+name +docs.name')
-          .exec(function(err, doc) {
-            assert.ifError(err);
-            assert.equal(doc.thin, false);
-            assert.equal(doc.name, '1 meter');
-            assert.equal(doc.docs[0].bool, false);
-            assert.equal(doc.docs[0].name, 'test');
-            assert.equal(d.id, doc.id);
-
-            M.findById(d)
-              .select('+name -thin +docs.name -docs.bool')
-              .exec(function(err, doc) {
-                assert.ifError(err);
-                assert.equal(doc.thin, undefined);
-                assert.equal(doc.name, '1 meter');
-                assert.equal(doc.docs[0].bool, undefined);
-                assert.equal(doc.docs[0].name, 'test');
-                assert.equal(d.id, doc.id);
-
-                M.findById(d)
-                  .select('-thin +name -docs.bool +docs.name')
-                  .exec(function(err, doc) {
-                    assert.ifError(err);
-                    assert.equal(doc.thin, undefined);
-                    assert.equal(doc.name, '1 meter');
-                    assert.equal(doc.docs[0].bool, undefined);
-                    assert.equal(doc.docs[0].name, 'test');
-                    assert.equal(d.id, doc.id);
-
-                    M.findById(d)
-                      .select('-thin -docs.bool')
-                      .exec(function(err, doc) {
-                        assert.ifError(err);
-                        assert.equal(doc.thin, undefined);
-                        assert.equal(doc.name, undefined);
-                        assert.equal(doc.docs[0].bool, undefined);
-                        assert.equal(doc.docs[0].name, undefined);
-                        assert.equal(d.id, doc.id);
-                        done();
-                      });
-                  });
-              });
-          });
+      const d = await M.create({
+        thin: false,
+        name: '1 meter',
+        docs: [{ name: 'test', bool: false }]
       });
+      let doc = await M.findById(d)
+        .select('+name +docs.name')
+        .exec();
+      assert.equal(doc.thin, false);
+      assert.equal(doc.name, '1 meter');
+      assert.equal(doc.docs[0].bool, false);
+      assert.equal(doc.docs[0].name, 'test');
+      assert.equal(d.id, doc.id);
+
+      doc = await M.findById(d)
+        .select('+name -thin +docs.name -docs.bool')
+        .exec();
+      assert.equal(doc.thin, undefined);
+      assert.equal(doc.name, '1 meter');
+      assert.equal(doc.docs[0].bool, undefined);
+      assert.equal(doc.docs[0].name, 'test');
+      assert.equal(d.id, doc.id);
+
+      doc = await M.findById(d)
+        .select('-thin +name -docs.bool +docs.name')
+        .exec();
+      assert.equal(doc.thin, undefined);
+      assert.equal(doc.name, '1 meter');
+      assert.equal(doc.docs[0].bool, undefined);
+      assert.equal(doc.docs[0].name, 'test');
+      assert.equal(d.id, doc.id);
+
+      doc = await M.findById(d)
+        .select('-thin -docs.bool')
+        .exec();
+      assert.equal(doc.thin, undefined);
+      assert.equal(doc.name, undefined);
+      assert.equal(doc.docs[0].bool, undefined);
+      assert.equal(doc.docs[0].name, undefined);
+      assert.equal(d.id, doc.id);
     });
 
-    it('works with query.slice (gh-1370)', function(done) {
+    it('works with query.slice (gh-1370)', async function() {
       const M = db.model('Test', new Schema({ many: { type: [String], select: false } }));
 
-      M.create({ many: ['1', '2', '3', '4', '5'] }, function(err) {
-        if (err) {
-          return done(err);
-        }
+      await M.create({ many: ['1', '2', '3', '4', '5'] });
 
-        const query = M.findOne().select('+many').where('many').slice(2);
+      const query = M.findOne().select('+many').where('many').slice(2);
 
-        query.exec(function(err, doc) {
-          if (err) {
-            return done(err);
-          }
-          assert.equal(doc.many.length, 2);
-          done();
-        });
-      });
+      const doc = await query.exec();
+      assert.equal(doc.many.length, 2);
     });
 
     it('ignores if path does not have select in schema (gh-6785)', async function() {
@@ -407,7 +390,7 @@ describe('schema select option', function() {
     });
   });
 
-  it('conflicting schematype path selection should not error', function(done) {
+  it('conflicting schematype path selection should not error', async function() {
     const schema = new Schema({
       thin: Boolean,
       name: { type: String, select: true },
@@ -415,52 +398,35 @@ describe('schema select option', function() {
     });
 
     const S = db.model('Test', schema);
-    S.create({ thin: true, name: 'bing', conflict: 'crosby' }, function(err, s) {
-      assert.strictEqual(null, err);
-      assert.equal(s.name, 'bing');
-      assert.equal(s.conflict, 'crosby');
+    let s = await S.create({ thin: true, name: 'bing', conflict: 'crosby' });
+    assert.equal(s.name, 'bing');
+    assert.equal(s.conflict, 'crosby');
 
-      let pending = 2;
+    s = await S.findById(s).exec();
+    assert.equal(s.name, 'bing');
+    assert.equal(s.conflict, undefined);
 
-      function cb(err, s) {
-        if (!--pending) {
-          done();
-        }
-        if (Array.isArray(s)) {
-          s = s[0];
-        }
-        assert.ifError(err);
-        assert.equal(s.name, 'bing');
-        assert.equal(s.conflict, undefined);
-      }
-
-      S.findById(s).exec(cb);
-      S.find({ _id: s._id }).exec(cb);
-    });
+    s = await S.find({ _id: s._id }).exec();
+    assert.equal(s[0].name, 'bing');
+    assert.equal(s[0].conflict, undefined);
   });
 
-  it('selecting _id works with excluded schematype path', function(done) {
+  it('selecting _id works with excluded schematype path', function() {
     const schema = new Schema({
       name: { type: String, select: false }
     });
 
     const M = db.model('Test', schema);
-    M.find().select('_id').exec(function(err) {
-      assert.ifError(err, err && err.stack);
-      done();
-    });
+    return M.find().select('_id').exec();
   });
 
-  it('selecting _id works with excluded schematype path on sub doc', function(done) {
+  it('selecting _id works with excluded schematype path on sub doc', async function() {
     const schema = new Schema({
       docs: [new Schema({ name: { type: String, select: false } })]
     });
 
     const M = db.model('Test', schema);
-    M.find().select('_id').exec(function(err) {
-      assert.ifError(err, err && err.stack);
-      done();
-    });
+    await M.find().select('_id').exec();
   });
 
   it('inclusive/exclusive combos should work', async function() {
@@ -626,7 +592,7 @@ describe('schema select option', function() {
       catch(done);
   });
 
-  it('does not create nested objects if not included (gh-4669)', function(done) {
+  it('does not create nested objects if not included (gh-4669)', async function() {
     const schema = new Schema({
       field1: String,
       field2: String,
@@ -648,18 +614,13 @@ describe('schema select option', function() {
       field4: { f1: 'e' },
       field5: 'f'
     };
-    M.create(obj, function(error, doc) {
-      assert.ifError(error);
-      M.findOne({ _id: doc._id }, 'field1 field2', function(error, doc) {
-        assert.ifError(error);
-        assert.ok(!doc.toObject({ minimize: false }).field3);
-        assert.ok(!doc.toObject({ minimize: false }).field4);
-        done();
-      });
-    });
+    let doc = await M.create(obj);
+    doc = await M.findOne({ _id: doc._id }, 'field1 field2');
+    assert.ok(!doc.toObject({ minimize: false }).field3);
+    assert.ok(!doc.toObject({ minimize: false }).field4);
   });
 
-  it('initializes nested defaults with selected objects (gh-2629)', function(done) {
+  it('initializes nested defaults with selected objects (gh-2629)', async function() {
     const NestedSchema = new mongoose.Schema({
       nested: {
         name: { type: String, default: 'val' }
@@ -668,16 +629,11 @@ describe('schema select option', function() {
 
     const Model = db.model('Test', NestedSchema);
 
-    const doc = new Model();
+    let doc = new Model();
     doc.nested.name = undefined;
-    doc.save(function(error) {
-      assert.ifError(error);
-      Model.findOne({}, { nested: 1 }, function(error, doc) {
-        assert.ifError(error);
-        assert.equal(doc.nested.name, 'val');
-        done();
-      });
-    });
+    await doc.save();
+    doc = await Model.findOne({}, { nested: 1 });
+    assert.equal(doc.nested.name, 'val');
   });
 
   it('should allow deselecting a field on a query even if the definition has select set to true (gh-11694)', async function() {

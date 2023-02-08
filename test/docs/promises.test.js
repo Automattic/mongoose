@@ -8,16 +8,14 @@ describe('promises docs', function () {
   let Band;
   let db;
 
-  before(function (done) {
+  before(function() {
     db = mongoose.createConnection(start.uri);
 
     Band = db.model('band-promises', {name: String, members: [String]});
-
-    done();
   });
 
-  beforeEach(function (done) {
-    Band.deleteMany({}, done);
+  beforeEach(function() {
+    return Band.deleteMany({});
   });
 
   after(async function () {

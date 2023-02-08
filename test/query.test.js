@@ -3110,13 +3110,6 @@ describe('Query', function() {
     assert.equal(err.message, 'Query was already executed: Test.findOne({})');
     assert.ok(err.originalStack);
 
-    const cb = () => {};
-    err = await Test.find(cb).then(() => null, err => err);
-    assert.ok(err);
-    assert.equal(err.name, 'MongooseError');
-    assert.equal(err.message, 'Query was already executed: Test.find({})');
-    assert.ok(err.originalStack);
-
     err = await q.clone().then(() => null, err => err);
     assert.ifError(err);
   });

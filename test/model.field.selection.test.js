@@ -214,7 +214,7 @@ describe('model field selection', function() {
       const _id1 = new mongoose.Types.ObjectId();
       const _id2 = new mongoose.Types.ObjectId();
 
-      const doc = await B.create({ ids: [_id1, _id2 ] });
+      const doc = await B.create({ ids: [_id1, _id2] });
       let found = await B.findById(doc._id).select({ ids: { $elemMatch: { $in: [_id2.toString()] } } });
       assert.ok(found);
       assert.equal(found.id, doc.id);

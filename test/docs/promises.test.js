@@ -106,8 +106,12 @@ describe('promises docs', function () {
    * - `await Band.findOne().exec();`
    * 
    * As far as functionality is concerned, these two are equivalent.
-   * However, we recommend using `.exec()` because that gives you
+   * In Mongoose 6, we recommended using `.exec()` because that gives you
    * better stack traces.
+   * However, in Mongoose 7+, that is no longer the case.
+   * You may use whichever you prefer: `await Band.findOne()` is more concise,
+   * `await Band.findOne().exec()` is more explicit and ensures that you `await`
+   * on a fully fledged promise.
    */
   it('Should You Use `exec()` With `await`?', async function() {
     const doc = await Band.findOne({ name: "Guns N' Roses" }); // works
@@ -129,7 +133,7 @@ describe('promises docs', function () {
       //   at process._tickCallback (internal/process/next_tick.js:68:7)
       err.stack;
       // acquit:ignore:start
-      assert.ok(!err.stack.includes('promises.test.js'));
+      assert.ok(err.stack.includes('promises.test.js'));
       // acquit:ignore:end
     }
 

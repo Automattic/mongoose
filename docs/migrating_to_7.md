@@ -85,6 +85,8 @@ They always return promises.
 - `Connection.prototype.destroy`
 - `Mongoose.prototype.connect`
 - `Mongoose.prototype.createConnection`
+- `Model.prototype.save`
+- `Model.create`
 
 If you are using the above functions with callbacks, we recommend switching to async/await, or promises if async functions don't work for you.
 

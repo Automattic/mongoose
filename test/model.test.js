@@ -5466,18 +5466,6 @@ describe('Model', function() {
       }, /should not be run with `new`/);
     });
 
-    it('throws if non-function passed as callback (gh-6640)', function() {
-      const Model = db.model('Test', new Schema({
-        name: String
-      }));
-
-      const doc = new Model({});
-
-      assert.throws(function() {
-        doc.save({}, {});
-      }, /callback must be a function/i);
-    });
-
     it('allows calling save in a post save hook (gh-6611)', async function() {
       let called = 0;
       const noteSchema = new Schema({
@@ -5495,6 +5483,7 @@ describe('Model', function() {
 
       const Note = db.model('Test', noteSchema);
 
+      await Note.deleteMany({});
       await Note.create({ body: 'a note.' });
       const doc = await Note.findOne({});
       assert.strictEqual(doc.body, 'a note, part deux.');

@@ -2507,7 +2507,7 @@ describe('document', function() {
       assert.equal(gnr.leadSinger.firstName(), 'Axl');
     });
 
-    it('single embedded schemas with models (gh-3535)', function(done) {
+    it('single embedded schemas with models (gh-3535)', async function() {
       const personSchema = new Schema({ name: String });
       const Person = db.model('Person', personSchema);
 
@@ -2517,11 +2517,8 @@ describe('document', function() {
       const axl = new Person({ name: 'Axl Rose' });
       const gnr = new Band({ leadSinger: axl });
 
-      gnr.save(function(error) {
-        assert.ifError(error);
-        assert.equal(gnr.leadSinger.name, 'Axl Rose');
-        done();
-      });
+      await gnr.save();
+      assert.equal(gnr.leadSinger.name, 'Axl Rose');
     });
 
     it('single embedded schemas with indexes (gh-3594)', function() {

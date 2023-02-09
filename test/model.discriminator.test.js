@@ -356,15 +356,18 @@ describe('model', function() {
         assert.deepEqual(personOptions, employeeOptions);
       });
 
-      it('does not allow setting discriminator key (gh-2041)', function(done) {
+      it('does not allow setting discriminator key (gh-2041)', async function() {
         const doc = new Employee({ __t: 'fake' });
         assert.equal(doc.__t, 'Employee');
-        doc.save(function(error) {
+        try {
+          await doc.save();
+
+          throw new Error('Should not get here');
+        } catch (error) {
           assert.ok(error);
           assert.equal(error.errors['__t'].reason.message,
             'Can\'t set discriminator key "__t"');
-          done();
-        });
+        }
       });
 
       it('deduplicates hooks (gh-2945)', function() {
@@ -551,7 +554,7 @@ describe('model', function() {
         assert.equal(fromDb.types[1].hello, 'world');
       });
 
-      it('supports clone() (gh-4983)', function(done) {
+      it('supports clone() (gh-4983)', async function() {
         const childSchema = new Schema({
           name: String
         });
@@ -591,17 +594,15 @@ describe('model', function() {
         };
         const doc = new Parent(obj);
 
-        doc.save(function(error, doc) {
-          assert.ifError(error);
-          assert.equal(doc.name, 'Ned Stark');
-          assert.equal(doc.heir.name, 'Robb Stark');
-          assert.equal(doc.children.length, 1);
-          assert.equal(doc.children[0].name, 'Jon Snow');
-          assert.equal(childValidateCalls, 2);
-          assert.equal(childCalls, 2);
-          assert.equal(parentCalls, 1);
-          done();
-        });
+        await doc.save();
+
+        assert.equal(doc.name, 'Ned Stark');
+        assert.equal(doc.heir.name, 'Robb Stark');
+        assert.equal(doc.children.length, 1);
+        assert.equal(doc.children[0].name, 'Jon Snow');
+        assert.equal(childValidateCalls, 2);
+        assert.equal(childCalls, 2);
+        assert.equal(parentCalls, 1);
       });
 
       it('clone() allows reusing schemas (gh-5098)', function() {
@@ -1262,7 +1263,7 @@ describe('model', function() {
         });
       });
 
-      it('should call the hooks on the embedded document defined by both the parent and discriminated schemas', function(done) {
+      it('should call the hooks on the embedded document defined by both the parent and discriminated schemas', async function() {
         const trackSchema = new Schema({
           event: eventSchema
         });
@@ -1277,18 +1278,15 @@ describe('model', function() {
             kind: 'Purchased'
           }
         });
-        doc.save(function(err) {
-          assert.ok(!err);
-          assert.equal(doc.event.message, 'Test');
-          assert.equal(doc.event.kind, 'Purchased');
-          Object.keys(counters).forEach(function(i) {
-            assert.equal(counters[i], 1, 'Counter ' + i + ' incorrect');
-          });
-          done();
+        await doc.save();
+        assert.equal(doc.event.message, 'Test');
+        assert.equal(doc.event.kind, 'Purchased');
+        Object.keys(counters).forEach(function(i) {
+          assert.equal(counters[i], 1, 'Counter ' + i + ' incorrect');
         });
       });
 
-      it('should call the hooks on the embedded document in an embedded array defined by both the parent and discriminated schemas', function(done) {
+      it('should call the hooks on the embedded document in an embedded array defined by both the parent and discriminated schemas', async function() {
         const trackSchema = new Schema({
           events: [eventSchema]
         });
@@ -1309,16 +1307,16 @@ describe('model', function() {
             }
           ]
         });
-        doc.save(function(err) {
-          assert.ok(!err);
-          assert.equal(doc.events[0].kind, 'Purchased');
-          assert.equal(doc.events[0].message, 'Test');
-          assert.equal(doc.events[1].kind, 'Purchased');
-          assert.equal(doc.events[1].message, 'TestAgain');
-          Object.keys(counters).forEach(function(i) {
-            assert.equal(counters[i], 2);
-          });
-          done();
+
+        await doc.save();
+
+        assert.equal(doc.events[0].kind, 'Purchased');
+        assert.equal(doc.events[0].message, 'Test');
+        assert.equal(doc.events[1].kind, 'Purchased');
+        assert.equal(doc.events[1].message, 'TestAgain');
+
+        Object.keys(counters).forEach(function(i) {
+          assert.equal(counters[i], 2);
         });
       });
     });

@@ -1835,13 +1835,13 @@ describe('model: populate:', function() {
     let B, User;
     let user1, user2, post1, post2, _id;
 
-    beforeEach(function(done) {
+    beforeEach(async function() {
       B = db.model('BlogPost', blogPostSchema);
       User = db.model('User', userSchema);
 
       _id = new mongoose.Types.ObjectId();
 
-      User.create({
+      const [u1, u2] = await User.create({
         name: 'Phoenix',
         email: 'phx@az.com',
         blogposts: [_id]
@@ -1849,27 +1849,23 @@ describe('model: populate:', function() {
         name: 'Newark',
         email: 'ewr@nj.com',
         blogposts: [_id]
-      }, function(err, u1, u2) {
-        assert.ifError(err);
-
-        user1 = u1;
-        user2 = u2;
-
-        B.create({
-          title: 'the how and why',
-          _creator: user1,
-          fans: [user1, user2]
-        }, {
-          title: 'green eggs and ham',
-          _creator: user2,
-          fans: [user2, user1]
-        }, function(err, p1, p2) {
-          assert.ifError(err);
-          post1 = p1;
-          post2 = p2;
-          done();
-        });
       });
+
+      user1 = u1;
+      user2 = u2;
+
+      const [p1, p2] = await B.create({
+        title: 'the how and why',
+        _creator: user1,
+        fans: [user1, user2]
+      }, {
+        title: 'green eggs and ham',
+        _creator: user2,
+        fans: [user2, user1]
+      });
+      post1 = p1;
+      post2 = p2;
+
     });
 
     it('returns a promise', function(done) {
@@ -2878,7 +2874,7 @@ describe('model: populate:', function() {
       assert.notEqual(err.message.indexOf('subproperty of a document array'), -1);
     });
 
-    it('handles toObject() (gh-3279)', function(done) {
+    it('handles toObject() (gh-3279)', async function() {
       const teamSchema = new Schema({
         members: [{
           user: { type: ObjectId, ref: 'User' },
@@ -2893,7 +2889,6 @@ describe('model: populate:', function() {
           return ret;
         }
       });
-
 
       const Team = db.model('Test', teamSchema);
 
@@ -2911,19 +2906,17 @@ describe('model: populate:', function() {
 
       const user = new User({ username: 'Test' });
 
-      user.save(function(err) {
-        assert.ifError(err);
-        const team = new Team({ members: [{ user: user }] });
+      await user.save();
 
-        team.save(function(err) {
-          assert.ifError(err);
-          team.populate('members.user', function() {
-            team.toJSON();
-            assert.equal(calls, 1);
-            done();
-          });
-        });
-      });
+      const team = new Team({ members: [{ user: user }] });
+
+      await team.save();
+
+      await team.populate('members.user');
+
+      team.toJSON();
+
+      assert.equal(calls, 1);
     });
 
     it('populate option (gh-2321)', async function() {
@@ -5168,7 +5161,7 @@ describe('model: populate:', function() {
           catch(done);
       });
 
-      it('no ref + cursor (gh-5334)', function(done) {
+      it('no ref + cursor (gh-5334)', async function() {
         const parentSchema = new Schema({
           name: String,
           child: mongoose.Schema.Types.ObjectId
@@ -5176,24 +5169,17 @@ describe('model: populate:', function() {
         const childSchema = new Schema({
           name: String
         });
-
+      
         const Parent = db.model('Parent', parentSchema);
         const Child = db.model('Child', childSchema);
+      
+        const child = await Child.create({ name: 'Luke' });
+        await Parent.create({ name: 'Vader', child: child._id });
+        const doc = await Parent.find().populate({ path: 'child', model: 'Child' }).cursor().next();
+        assert.equal(doc.child.name, 'Luke');
+      });      
 
-        Child.create({ name: 'Luke' }, function(error, child) {
-          assert.ifError(error);
-          Parent.create({ name: 'Vader', child: child._id }, function(error) {
-            assert.ifError(error);
-            Parent.find().populate({ path: 'child', model: 'Child' }).cursor().next(function(error, doc) {
-              assert.ifError(error);
-              assert.equal(doc.child.name, 'Luke');
-              done();
-            });
-          });
-        });
-      });
-
-      it('retains limit when using cursor (gh-5468)', function(done) {
+      it('retains limit when using cursor (gh-5468)', async function() {
         const refSchema = new mongoose.Schema({
           _id: Number,
           name: String
@@ -5209,29 +5195,27 @@ describe('model: populate:', function() {
         const docs = [1, 2, 3, 4, 5, 6].map(function(i) {
           return { _id: i };
         });
-        Ref.create(docs, function(error) {
-          assert.ifError(error);
-          const docs = [
-            { _id: 1, prevnxt: [1, 2, 3] },
-            { _id: 2, prevnxt: [4, 5, 6] }
-          ];
-          Test.create(docs, function(error) {
-            assert.ifError(error);
+        await Ref.create(docs);
 
-            const cursor = Test.
-              find().
-              populate({ path: 'prevnxt', options: { limit: 2 } }).
-              cursor();
+        const docs2 = [
+          { _id: 1, prevnxt: [1, 2, 3] },
+          { _id: 2, prevnxt: [4, 5, 6] }
+        ];
+        await Test.create(docs2);
 
-            cursor.on('data', function(doc) {
-              assert.equal(doc.prevnxt.length, 2);
-            });
-            cursor.on('error', done);
-            cursor.on('end', function() {
-              done();
-            });
-          });
-        });
+        const cursor = Test.
+          find().
+          populate({ path: 'prevnxt', options: { limit: 2 } }).
+          cursor();
+
+        let count = 0;
+
+        for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
+          assert.equal(doc.prevnxt.length, 2);
+          ++count;
+        }
+
+        assert.equal(count, 2);
       });
 
       it('virtuals + doc.populate() (gh-5311)', function(done) {
@@ -5268,7 +5252,7 @@ describe('model: populate:', function() {
           catch(done);
       });
 
-      it('empty virtual with Model.populate (gh-5331)', function(done) {
+      it('empty virtual with Model.populate (gh-5331)', async function() {
         const myModelSchema = new Schema({
           virtualRefKey: { type: String, ref: 'Test' }
         });
@@ -5286,15 +5270,11 @@ describe('model: populate:', function() {
         const MyModel = db.model('Test', myModelSchema);
         db.model('Test1', otherModelSchema);
 
-        MyModel.create({ virtualRefKey: 'test' }, function(error, doc) {
-          assert.ifError(error);
-          MyModel.populate(doc, 'populatedVirtualRef', function(error, doc) {
-            assert.ifError(error);
-            assert.ok(doc.populatedVirtualRef);
-            assert.ok(Array.isArray(doc.populatedVirtualRef));
-            done();
-          });
-        });
+        const doc = await MyModel.create({ virtualRefKey: 'test' });
+        const populatedDoc = await MyModel.populate(doc, 'populatedVirtualRef');
+
+        assert.ok(populatedDoc.populatedVirtualRef);
+        assert.ok(Array.isArray(populatedDoc.populatedVirtualRef));
       });
 
       it('virtual populate in single nested doc (gh-4715)', function(done) {

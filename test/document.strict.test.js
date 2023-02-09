@@ -111,14 +111,12 @@ describe('document: strict mode:', function() {
       assert.ok(!s3.rouge);
     });
 
-    it('when using Model#create', function(done) {
+    it('when using Model#create', async function() {
       // strict on create
-      Strict.create({ content: 'sample2', rouge: 'data' }, function(err, doc) {
-        assert.equal(doc.content, 'sample2');
-        assert.ok(!('rouge' in doc));
-        assert.ok(!doc.rouge);
-        done();
-      });
+      const doc = await Strict.create({ content: 'sample2', rouge: 'data' });
+      assert.equal(doc.content, 'sample2');
+      assert.ok(!('rouge' in doc));
+      assert.ok(!doc.rouge);
     });
   });
 

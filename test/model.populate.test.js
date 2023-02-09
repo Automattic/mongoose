@@ -5169,15 +5169,15 @@ describe('model: populate:', function() {
         const childSchema = new Schema({
           name: String
         });
-      
+
         const Parent = db.model('Parent', parentSchema);
         const Child = db.model('Child', childSchema);
-      
+
         const child = await Child.create({ name: 'Luke' });
         await Parent.create({ name: 'Vader', child: child._id });
         const doc = await Parent.find().populate({ path: 'child', model: 'Child' }).cursor().next();
         assert.equal(doc.child.name, 'Luke');
-      });      
+      });
 
       it('retains limit when using cursor (gh-5468)', async function() {
         const refSchema = new mongoose.Schema({

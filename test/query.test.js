@@ -1952,7 +1952,8 @@ describe('Query', function() {
       const TestModel = db.model('Test', TestSchema);
 
       for (const op of ops) {
-        const error = await TestModel.find({}).updateOne({ name: 'test' })[op].then(() => null, err => err);
+        const q = TestModel.find({}).updateOne({ name: 'test' });
+        const error = await q[op]().then(() => null, err => err);
         assert.ok(error);
         assert.equal(error.message, op + ' error');
       }

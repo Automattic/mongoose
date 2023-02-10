@@ -5240,7 +5240,7 @@ describe('document', function() {
       assert.ok(referrerE.reference[0] instanceof Referrer);
     });
 
-    it('single nested conditional required scope (gh-5569)', function(done) {
+    it('single nested conditional required scope (gh-5569)', async function() {
       const scopes = [];
 
       const ThingSchema = new mongoose.Schema({
@@ -5266,16 +5266,17 @@ describe('document', function() {
       let doc = new SuperDocument();
       doc.thing.undefinedDisallowed = null;
 
-      doc.save(function(error) {
-        assert.ifError(error);
-        doc = new SuperDocument();
-        doc.thing.undefinedDisallowed = undefined;
-        doc.save(function(error) {
-          assert.ok(error);
-          assert.ok(error.errors['thing.undefinedDisallowed']);
-          done();
-        });
-      });
+      await doc.save();
+
+      doc = new SuperDocument();
+      doc.thing.undefinedDisallowed = undefined;
+
+      try {
+        await doc.save();
+      } catch (error) {
+        assert.ok(error);
+        assert.ok(error.errors['thing.undefinedDisallowed']);
+      }
     });
 
     it('single nested setters only get called once (gh-5601)', function() {
@@ -5358,7 +5359,7 @@ describe('document', function() {
       assert.deepStrictEqual(res.name, { value: 'JOHN SMITH' });
     });
 
-    it('setting doc array to array of top-level docs works (gh-5632)', function(done) {
+    it('setting doc array to array of top-level docs works (gh-5632)', async function() {
       const MainSchema = new Schema({
         name: { type: String },
         children: [{
@@ -5369,37 +5370,25 @@ describe('document', function() {
       const Model = db.model('Test', MainSchema);
       const RelatedModel = db.model('Test1', RelatedSchema);
 
-      RelatedModel.create({ name: 'test' }, function(error, doc) {
-        assert.ifError(error);
-        Model.create({ name: 'test1', children: [doc] }, function(error, m) {
-          assert.ifError(error);
-          m.children = [doc];
-          m.save(function(error) {
-            assert.ifError(error);
-            assert.equal(m.children.length, 1);
-            assert.equal(m.children[0].name, 'test');
-            done();
-          });
-        });
-      });
+      const doc = await RelatedModel.create({ name: 'test' });
+      const m = await Model.create({ name: 'test1', children: [doc] });
+      m.children = [doc];
+      await m.save();
+      assert.equal(m.children.length, 1);
+      assert.equal(m.children[0].name, 'test');
     });
 
-    it('Using set as a schema path (gh-1939)', function(done) {
+    it('Using set as a schema path (gh-1939)', async function() {
       const testSchema = new Schema({ set: String });
 
       const Test = db.model('Test', testSchema);
 
       const t = new Test({ set: 'test 1' });
       assert.equal(t.set, 'test 1');
-      t.save(function(error) {
-        assert.ifError(error);
-        t.set = 'test 2';
-        t.save(function(error) {
-          assert.ifError(error);
-          assert.equal(t.set, 'test 2');
-          done();
-        });
-      });
+      await t.save();
+      t.set = 'test 2';
+      await t.save();
+      assert.equal(t.set, 'test 2');
     });
 
     it('handles array defaults correctly (gh-5780)', function() {
@@ -5663,7 +5652,7 @@ describe('document', function() {
         });
     });
 
-    it('Single nested subdocs using discriminator can be modified (gh-5693)', function(done) {
+    it('Single nested subdocs using discriminator can be modified (gh-5693)', async() => {
       const eventSchema = new Schema({ message: String }, {
         discriminatorKey: 'kind',
         _id: false
@@ -5689,26 +5678,21 @@ describe('document', function() {
         }
       });
 
-      doc.save(function(error) {
-        assert.ifError(error);
-        assert.equal(doc.event.message, 'Test');
-        assert.equal(doc.event.kind, 'Clicked');
-        assert.equal(doc.event.element, 'Amazon Link');
+      await doc.save();
+      assert.equal(doc.event.message, 'Test');
+      assert.equal(doc.event.kind, 'Clicked');
+      assert.equal(doc.event.element, 'Amazon Link');
 
-        doc.set('event', {
-          kind: 'Purchased',
-          product: 'Professional AngularJS'
-        });
-
-        doc.save(function(error) {
-          assert.ifError(error);
-          assert.equal(doc.event.kind, 'Purchased');
-          assert.equal(doc.event.product, 'Professional AngularJS');
-          assert.ok(!doc.event.element);
-          assert.ok(!doc.event.message);
-          done();
-        });
+      doc.set('event', {
+        kind: 'Purchased',
+        product: 'Professional AngularJS'
       });
+
+      await doc.save();
+      assert.equal(doc.event.kind, 'Purchased');
+      assert.equal(doc.event.product, 'Professional AngularJS');
+      assert.ok(!doc.event.element);
+      assert.ok(!doc.event.message);
     });
 
     it('required function only gets called once (gh-6801)', function() {
@@ -5929,7 +5913,7 @@ describe('document', function() {
       assert.equal(doc.media[0].position, 'right');
     });
 
-    it('consistent context for nested docs (gh-5347)', function(done) {
+    it('consistent context for nested docs (gh-5347)', async function() {
       const contexts = [];
       const childSchema = new mongoose.Schema({
         phoneNumber: {
@@ -5951,7 +5935,7 @@ describe('document', function() {
 
       const Parent = db.model('Parent', parentSchema);
 
-      Parent.create({
+      const doc = await Parent.create({
         name: 'test',
         children: [
           {
@@ -5961,19 +5945,20 @@ describe('document', function() {
             }
           }
         ]
-      }, function(error, doc) {
-        assert.ifError(error);
-        const child = doc.children.id(doc.children[0]._id);
-        child.phoneNumber = '345';
-        assert.equal(contexts.length, 1);
-        doc.save(function(error) {
-          assert.ifError(error);
-          assert.equal(contexts.length, 2);
-          assert.ok(contexts[0].toObject().notifications.isEnabled);
-          assert.ok(contexts[1].toObject().notifications.isEnabled);
-          done();
-        });
       });
+
+      const child = doc.children.id(doc.children[0]._id);
+      child.phoneNumber = '345';
+
+      assert.equal(contexts.length, 1);
+
+      await doc.save();
+
+      assert.equal(contexts.length, 2);
+
+      assert.ok(contexts[0].toObject().notifications.isEnabled);
+
+      assert.ok(contexts[1].toObject().notifications.isEnabled);
     });
 
     it('accessing arrays in setters on initial document creation (gh-6155)', function() {

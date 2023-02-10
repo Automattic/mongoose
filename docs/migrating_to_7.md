@@ -76,6 +76,7 @@ schema.pre('deleteOne', { document: true, query: false }, function() {
 The following functions no longer accept callbacks.
 They always return promises.
 
+- `Aggregate.prototype.explain`
 - `Connection.prototype.startSession`
 - `Connection.prototype.dropCollection`
 - `Connection.prototype.createCollection`

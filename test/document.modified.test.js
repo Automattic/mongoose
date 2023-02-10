@@ -101,16 +101,13 @@ describe('document modified', function() {
       assert.equal(blogPost.numbers.length, 2);
     });
 
-    it('of embedded docs reset after save', function(done) {
+    it('of embedded docs reset after save', async() => {
       const post = new BlogPost({ title: 'hocus pocus' });
       post.comments.push({ title: 'Humpty Dumpty', comments: [{ title: 'nested' }] });
-      post.save(function(err) {
-        assert.strictEqual(null, err);
-        const mFlag = post.comments[0].isModified('title');
-        assert.equal(mFlag, false);
-        assert.equal(post.isModified('title'), false);
-        done();
-      });
+      await post.save();
+      const mFlag = post.comments[0].isModified('title');
+      assert.equal(mFlag, false);
+      assert.equal(post.isModified('title'), false);
     });
   });
 
@@ -408,26 +405,25 @@ describe('document modified', function() {
         assert.ok(test.bars[1]._id);
       });
 
-      it('updates embedded doc parents upon direct assignment (gh-5189)', function(done) {
+      it('updates embedded doc parents upon direct assignment (gh-5189)', async function() {
         const familySchema = new Schema({
           children: [{ name: { type: String, required: true } }]
         });
         db.deleteModel(/Test/);
         const Family = db.model('Test', familySchema);
-        Family.create({
+        const family = await Family.create({
           children: [
             { name: 'John' },
             { name: 'Mary' }
           ]
-        }, function(err, family) {
-          family.set({ children: family.children.slice(1) });
-          family.children.forEach(function(child) {
-            child.set({ name: 'Maryanne' });
-          });
-
-          assert.equal(family.validateSync(), undefined);
-          done();
         });
+
+        family.set({ children: family.children.slice(1) });
+        family.children.forEach(function(child) {
+          child.set({ name: 'Maryanne' });
+        });
+
+        assert.equal(family.validateSync(), undefined);
       });
     });
 

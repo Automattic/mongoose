@@ -1526,4 +1526,11 @@ describe('connections:', function() {
     const connectionIds = m.connections.map(c => c.id);
     assert.deepEqual(connectionIds, [1, 2, 3, 4, 5]);
   });
+
+  it('should not create default connection with createInitialConnection = false (gh-12965)', function() {
+    const m = new mongoose.Mongoose({
+      createInitialConnection: false
+    });
+    assert.deepEqual(m.connections.length, 0);
+  });
 });

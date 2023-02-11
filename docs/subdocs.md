@@ -232,11 +232,8 @@ const doc = parent.children.id(_id);
 
 ### Adding Subdocs to Arrays
 
-MongooseArray methods such as
-[push](api/mongoosearray.html#mongoosearray_MongooseArray-push),
-[unshift](api/mongoosearray.html#mongoosearray_MongooseArray-unshift),
-[addToSet](api/mongoosearray.html#mongoosearray_MongooseArray-addToSet),
-and others cast arguments to their proper types transparently:
+MongooseArray methods such as `push`, `unshift`, `addToSet`, and others cast arguments to their proper types transparently:
+
 ```javascript
 const Parent = mongoose.model('Parent');
 const parent = new Parent();

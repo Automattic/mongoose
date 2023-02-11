@@ -599,7 +599,7 @@ new Schema({..}, { capped: { size: 1024, max: 1000, autoIndexId: true } });
 <h3 id="collection"><a href="#collection">option: collection</a></h3>
 
 Mongoose by default produces a collection name by passing the model name to
-the [utils.toCollectionName](api/utils.html#utils_exports-toCollectionName) method.
+the `utils.toCollectionName` method.
 This method pluralizes the name. Set this option if you need a different name
 for your collection.
 

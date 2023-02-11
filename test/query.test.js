@@ -1385,15 +1385,6 @@ describe('Query', function() {
       });
     });
 
-    describe('snapshot', function() {
-      it('works', function(done) {
-        const query = new Query({});
-        query.snapshot(true);
-        assert.equal(query.options.snapshot, true);
-        done();
-      });
-    });
-
     describe('batchSize', function() {
       it('works', function(done) {
         const query = new Query({});

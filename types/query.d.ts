@@ -147,7 +147,6 @@ declare module 'mongoose' {
     sanitizeFilter?: boolean;
     setDefaultsOnInsert?: boolean;
     skip?: number;
-    snapshot?: any;
     sort?: any;
     /** overwrites the schema's strict mode option */
     strict?: boolean | string;
@@ -605,9 +604,6 @@ declare module 'mongoose' {
     /** Specifies a `$slice` projection for an array. */
     slice(path: string, val: number | Array<number>): this;
     slice(val: number | Array<number>): this;
-
-    /** Specifies this query as a `snapshot` query. */
-    snapshot(val?: boolean): this;
 
     /** Sets the sort order. If an object is passed, values allowed are `asc`, `desc`, `ascending`, `descending`, `1`, and `-1`. */
     sort(arg?: string | { [key: string]: SortOrder | { $meta: 'textScore' } } | [string, SortOrder][] | undefined | null): this;

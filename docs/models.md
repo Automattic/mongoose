@@ -83,7 +83,7 @@ Documents can be retrieved using a `model`'s [find](api/model.html#model_Model-f
 Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
 ```
 
-See the chapter on [queries](queries.html) for more details on how to use the [Query](api/query-js.html#query-js) api.
+See the chapter on [queries](queries.html) for more details on how to use the [Query](api/query.html) api.
 
 ## Deleting
 

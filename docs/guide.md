@@ -588,8 +588,7 @@ new Schema({..}, { capped: 1024 });
 ```
 
 The `capped` option may also be set to an object if you want to pass
-additional options like [max](https://www.mongodb.com/docs/manual/core/capped-collections/#change-the-maximum-number-of-documents-in-a-capped-collection)
-or [autoIndexId](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-autoIndexId).
+additional options like [max](https://www.mongodb.com/docs/manual/core/capped-collections/#change-the-maximum-number-of-documents-in-a-capped-collection).
 In this case you must explicitly pass the `size` option, which is required.
 
 ```javascript

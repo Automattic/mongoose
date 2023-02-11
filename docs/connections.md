@@ -253,7 +253,7 @@ For long running applications, it is often prudent to enable `keepAlive`
 with a number of milliseconds. Without it, after some period of time
 you may start to see `"connection closed"` errors for what seems like
 no reason. If so, after
-[reading this](http://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html),
+[reading this](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html),
 you may decide to enable `keepAlive`:
 
 ```javascript

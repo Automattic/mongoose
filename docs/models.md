@@ -1,6 +1,6 @@
 # Models
 
-[Models](api/model-js.html#model-js) are fancy constructors compiled from
+[Models](api/model.html) are fancy constructors compiled from
 `Schema` definitions. An instance of a model is called a
 [document](documents.html). Models are responsible for creating and
 reading documents from the underlying MongoDB database.

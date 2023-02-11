@@ -48,7 +48,7 @@ If you want to add additional keys later, use the
 Each key in our code `blogSchema` defines a property in our documents which
 will be cast to its associated [SchemaType](api/schematype.html#schematype_SchemaType).
 For example, we've defined a property `title` which will be cast to the
-[String](api/schema-string-js.html#schema-string-js) SchemaType and property `date`
+[String](schematypes.html#strings) SchemaType and property `date`
 which will be cast to a `Date` SchemaType.
 
 Notice above that if a property only requires a type, it can be specified using
@@ -1192,7 +1192,7 @@ thing.save(); // version is not incremented
 <h3 id="timestamps"><a href="#timestamps">option: timestamps</a></h3>
 
 The `timestamps` option tells Mongoose to assign `createdAt` and `updatedAt` fields
-to your schema. The type assigned is [Date](api/schema-date-js.html#schema-date-js).
+to your schema. The type assigned is [Date](schematypes.html#dates).
 
 By default, the names of the fields are `createdAt` and `updatedAt`. Customize
 the field names by setting `timestamps.createdAt` and `timestamps.updatedAt`.

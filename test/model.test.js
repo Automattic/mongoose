@@ -5485,9 +5485,9 @@ describe('Model', function() {
 
       await Note.deleteMany({});
       await Note.create({ body: 'a note.' });
+      assert.equal(called, 1);
       const doc = await Note.findOne({});
       assert.strictEqual(doc.body, 'a note, part deux.');
-
     });
 
     it('createCollection() respects schema collation (gh-6489)', async function() {

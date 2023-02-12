@@ -88,8 +88,18 @@ They always return promises.
 - `Mongoose.prototype.connect`
 - `Mongoose.prototype.createConnection`
 - `Model.prototype.save`
+- `Model.cleanIndexes()`
 - `Model.create`
+- `Model.createCollection`
 - `Model.exists`
+- `Model.listIndexes`
+- `Model.syncIndexes`
+- `Query.prototype.find`
+- `Query.prototype.findOne`
+- `Query.prototype.findOneAndDelete`
+- `Query.prototype.findOneAndUpdate`
+- `Query.prototype.findOneAndRemove`
+- `Query.prototype.findOneAndReplace`
 - `QueryCursor.prototype.close`
 - `QueryCursor.prototype.next`
 

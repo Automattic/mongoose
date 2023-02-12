@@ -4874,7 +4874,6 @@ describe('Model', function() {
     });
 
     it('Throws when saving same doc in parallel w/ callback (gh-6456)', async function() {
-
       const schema = new Schema({
         name: String
       });
@@ -4885,10 +4884,12 @@ describe('Model', function() {
         name: 'Billy'
       });
 
-      const err = await Promise.all([test.save(), test.save()]).then(() => null, err => err);
+      const promises = [test.save(), test.save()];
+      const err = await Promise.all(promises).then(() => null, err => err);
       assert.strictEqual(err.name, 'ParallelSaveError');
       const regex = new RegExp(test.id);
       assert.ok(regex.test(err.message));
+      await Promise.allSettled(promises);
     });
 
     describe('Model.syncIndexes()', () => {

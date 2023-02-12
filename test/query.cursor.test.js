@@ -38,21 +38,6 @@ describe('QueryCursor', function() {
   });
 
   describe('#next()', function() {
-    it('with callbacks', function(done) {
-      const cursor = Model.find().sort({ name: 1 }).cursor();
-      cursor.next(function(error, doc) {
-        assert.ifError(error);
-        assert.equal(doc.name, 'Axl');
-        assert.equal(doc.test, 'test');
-        cursor.next(function(error, doc) {
-          assert.ifError(error);
-          assert.equal(doc.name, 'Slash');
-          assert.equal(doc.test, 'test');
-          done();
-        });
-      });
-    });
-
     it('with promises', function(done) {
       const cursor = Model.find().sort({ name: 1 }).cursor();
       cursor.next().then(function(doc) {
@@ -66,20 +51,15 @@ describe('QueryCursor', function() {
       });
     });
 
-    it('with limit (gh-4266)', function(done) {
+    it('with limit (gh-4266)', async function() {
       const cursor = Model.find().limit(1).sort({ name: 1 }).cursor();
-      cursor.next(function(error, doc) {
-        assert.ifError(error);
-        assert.equal(doc.name, 'Axl');
-        cursor.next(function(error, doc) {
-          assert.ifError(error);
-          assert.ok(!doc);
-          done();
-        });
-      });
+      const doc = await cursor.next();
+      assert.equal(doc.name, 'Axl');
+      const doc2 = await cursor.next();
+      assert.ok(!doc2);
     });
 
-    it('with projection', function(done) {
+    it('with projection', async function() {
       const personSchema = new Schema({
         name: String,
         born: String
@@ -89,23 +69,16 @@ describe('QueryCursor', function() {
         { name: 'Axl Rose', born: 'William Bruce Rose' },
         { name: 'Slash', born: 'Saul Hudson' }
       ];
-      Person.create(people, function(error) {
-        assert.ifError(error);
-        const cursor = Person.find({}, { _id: 0, name: 1 }).sort({ name: 1 }).cursor();
-        cursor.next(function(error, doc) {
-          assert.ifError(error);
-          assert.equal(doc._id, undefined);
-          assert.equal(doc.name, 'Axl Rose');
-          assert.equal(doc.born, undefined);
-          cursor.next(function(error, doc) {
-            assert.ifError(error);
-            assert.equal(doc._id, undefined);
-            assert.equal(doc.name, 'Slash');
-            assert.equal(doc.born, undefined);
-            done();
-          });
-        });
-      });
+      await Person.create(people);
+      const cursor = Person.find({}, { _id: 0, name: 1 }).sort({ name: 1 }).cursor();
+      const doc1 = await cursor.next();
+      assert.equal(doc1._id, undefined);
+      assert.equal(doc1.name, 'Axl Rose');
+      assert.equal(doc1.born, undefined);
+      const doc2 = await cursor.next();
+      assert.equal(doc2._id, undefined);
+      assert.equal(doc2.name, 'Slash');
+      assert.equal(doc2.born, undefined);
     });
 
     describe('with populate', function() {
@@ -221,13 +194,15 @@ describe('QueryCursor', function() {
       assert.ok(doc);
     });
 
-    it('cast errors (gh-4355)', function(done) {
-      Model.find().where({ _id: 'BadId' }).cursor().next(function(error) {
+    it('cast errors (gh-4355)', async function() {
+      try {
+        await Model.find().where({ _id: 'BadId' }).cursor().next();
+        assert.ok(false);
+      } catch (error) {
         assert.ok(error);
         assert.equal(error.name, 'CastError');
         assert.equal(error.path, '_id');
-        done();
-      });
+      }
     });
 
     it('with pre-find hooks (gh-5096)', async function() {
@@ -326,24 +301,20 @@ describe('QueryCursor', function() {
       });
     });
 
-    it('with #next', function(done) {
+    it('with #next', async function() {
       const cursor = Model.find().sort({ name: 1 }).cursor()
         .map(function(obj) {
           obj.name += '_next';
           return obj;
         });
 
-      cursor.next(function(error, doc) {
-        assert.ifError(error);
-        assert.equal(doc.name, 'Axl_next');
-        assert.equal(doc.test, 'test');
-        cursor.next(function(error, doc) {
-          assert.ifError(error);
-          assert.equal(doc.name, 'Slash_next');
-          assert.equal(doc.test, 'test');
-          done();
-        });
-      });
+      const doc = await cursor.next();
+      assert.equal(doc.name, 'Axl_next');
+      assert.equal(doc.test, 'test');
+
+      const doc2 = await cursor.next();
+      assert.equal(doc2.name, 'Slash_next');
+      assert.equal(doc2.test, 'test');
     });
   });
 
@@ -427,28 +398,25 @@ describe('QueryCursor', function() {
   });
 
   describe('#close()', function() {
-    it('works (gh-4258)', function(done) {
+    it('works (gh-4258)', async function() {
       const cursor = Model.find().sort({ name: 1 }).cursor();
-      cursor.next(function(error, doc) {
-        assert.ifError(error);
-        assert.equal(doc.name, 'Axl');
-        assert.equal(doc.test, 'test');
+      const doc = await cursor.next();
+      assert.equal(doc.name, 'Axl');
+      assert.equal(doc.test, 'test');
 
-        let closed = false;
-        cursor.on('close', function() {
-          closed = true;
-        });
-
-        cursor.close(function(error) {
-          assert.ifError(error);
-          assert.ok(closed);
-          cursor.next(function(error) {
-            assert.ok(error);
-            assert.equal(error.name, 'MongoCursorExhaustedError');
-            done();
-          });
-        });
+      let closed = false;
+      cursor.on('close', function() {
+        closed = true;
       });
+
+      await cursor.close();
+      assert.ok(closed);
+      try {
+        await cursor.next();
+        assert.ok(false);
+      } catch (error) {
+        assert.equal(error.name, 'MongoCursorExhaustedError');
+      }
     });
   });
 
@@ -469,7 +437,7 @@ describe('QueryCursor', function() {
     assert.ok(!doc.$__);
   });
 
-  it('data before close (gh-4998)', function(done) {
+  it('data before close (gh-4998)', async function() {
     const userSchema = new mongoose.Schema({
       name: String
     });
@@ -483,21 +451,19 @@ describe('QueryCursor', function() {
       });
     }
 
-    User.insertMany(users, function(error) {
-      assert.ifError(error);
+    await User.insertMany(users);
 
-      const stream = User.find({}).cursor();
-      const docs = [];
+    const stream = User.find({}).cursor();
+    const docs = [];
 
-      stream.on('data', function(doc) {
-        docs.push(doc);
-      });
-
-      stream.on('close', function() {
-        assert.equal(docs.length, 100);
-        done();
-      });
+    stream.on('data', function(doc) {
+      docs.push(doc);
     });
+
+    await new Promise(resolve => {
+      stream.on('close', resolve);
+    });
+    assert.equal(docs.length, 100);
   });
 
   it('pulls schema-level readPreference (gh-8421)', function() {

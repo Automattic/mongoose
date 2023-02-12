@@ -155,7 +155,7 @@ describe('document: strict mode:', function() {
     assert.ok(!s.shouldnt);
   });
 
-  it('sub doc', function(done) {
+  it('sub doc', async function() {
     const lax = new Schema({
       ts: { type: Date, default: Date.now },
       content: String
@@ -193,12 +193,10 @@ describe('document: strict mode:', function() {
     assert.ok(!s3.dox[0].rouge);
 
     // strict on create
-    Strict.create({ dox: [{ content: 'sample2', rouge: 'data' }] }, function(err, doc) {
-      assert.equal(doc.dox[0].content, 'sample2');
-      assert.ok(!('rouge' in doc.dox[0]));
-      assert.ok(!doc.dox[0].rouge);
-      done();
-    });
+    const doc = await Strict.create({ dox: [{ content: 'sample2', rouge: 'data' }] });
+    assert.equal(doc.dox[0].content, 'sample2');
+    assert.ok(!('rouge' in doc.dox[0]));
+    assert.ok(!doc.dox[0].rouge);
   });
 
   it('virtuals', function() {

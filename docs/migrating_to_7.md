@@ -76,6 +76,7 @@ schema.pre('deleteOne', { document: true, query: false }, function() {
 The following functions no longer accept callbacks.
 They always return promises.
 
+- `Aggregate.prototype.exec`
 - `Aggregate.prototype.explain`
 - `Connection.prototype.startSession`
 - `Connection.prototype.dropCollection`
@@ -88,6 +89,9 @@ They always return promises.
 - `Mongoose.prototype.createConnection`
 - `Model.prototype.save`
 - `Model.create`
+- `Model.exists`
+- `QueryCursor.prototype.close`
+- `QueryCursor.prototype.next`
 
 If you are using the above functions with callbacks, we recommend switching to async/await, or promises if async functions don't work for you.
 

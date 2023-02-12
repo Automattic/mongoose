@@ -174,13 +174,20 @@ describe('validation docs', function() {
     // acquit:ignore:end
 
     const dup = [{ username: 'Val' }, { username: 'Val' }];
-    U1.create(dup, err => {
-      // Race condition! This may save successfully, depending on whether
-      // MongoDB built the index before writing the 2 docs.
-      // acquit:ignore:start
-      err;
-      --remaining || done();
-      // acquit:ignore:end
+    // Race condition! This may save successfully, depending on whether
+    // MongoDB built the index before writing the 2 docs.
+    // acquit:ignore:start
+    U1.create(dup).
+      then(() => {
+        // acquit:ignore:start
+        --remaining || done();
+        // acquit:ignore:end
+      }).
+      catch(err => {
+        // acquit:ignore:start
+        err;
+        --remaining || done();
+        // acquit:ignore:end
     });
 
     // You need to wait for Mongoose to finish building the `unique`
@@ -191,7 +198,7 @@ describe('validation docs', function() {
     U2.init().
       then(() => U2.create(dup)).
       catch(error => {
-        // Will error, but will *not* be a mongoose validation error, it will be
+        // `U2.create()` will error, but will *not* be a mongoose validation error, it will be
         // a duplicate key error.
         // See: https://masteringjs.io/tutorials/mongoose/e11000-duplicate-key
         assert.ok(error);

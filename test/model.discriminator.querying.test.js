@@ -912,19 +912,17 @@ describe('model', function() {
       });
 
       describe('using "RootModel#aggregate"', function() {
-        it('to aggregate documents of all discriminators', function(done) {
+        it('to aggregate documents of all discriminators', async function() {
           const aggregate = BaseEvent.aggregate([
             { $match: { name: 'Test Event' } }
           ]);
 
-          aggregate.exec(function(err, docs) {
-            assert.ifError(err);
-            assert.deepEqual(aggregate._pipeline, [
-              { $match: { name: 'Test Event' } }
-            ]);
-            assert.equal(docs.length, 2);
-            done();
-          });
+          const docs = await aggregate.exec();
+
+          assert.deepEqual(aggregate._pipeline, [
+            { $match: { name: 'Test Event' } }
+          ]);
+          assert.equal(docs.length, 2);
         });
       });
 
@@ -997,26 +995,23 @@ describe('model', function() {
           assert.equal(docs[0].propA, 'Hi');
         });
 
-        it('merges the first pipeline stages if applicable', function(done) {
+        it('merges the first pipeline stages if applicable', async function() {
           const aggregate = ImpressionEvent.aggregate([
             { $match: { name: 'Test Event' } }
           ]);
 
-          aggregate.exec(function(err, result) {
-            assert.ifError(err);
+          const result = await aggregate.exec();
 
-            // Discriminator `$match` pipeline step was added on the
-            // `exec` step. The reasoning for this is to not let
-            // aggregations with empty pipelines, but that are over
-            // discriminators be executed
-            assert.deepEqual(aggregate._pipeline, [
-              { $match: { __t: 'Impression', name: 'Test Event' } }
-            ]);
+          // Discriminator `$match` pipeline step was added on the
+          // `exec` step. The reasoning for this is to not let
+          // aggregations with empty pipelines, but that are over
+          // discriminators be executed
+          assert.deepEqual(aggregate._pipeline, [
+            { $match: { __t: 'Impression', name: 'Test Event' } }
+          ]);
 
-            assert.equal(result.length, 1);
-            assert.equal(result[0]._id, impressionEvent.id);
-            done();
-          });
+          assert.equal(result.length, 1);
+          assert.equal(result[0]._id, impressionEvent.id);
         });
       });
     });

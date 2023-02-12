@@ -176,27 +176,24 @@ describe('schema', function() {
           await db.close();
         });
 
-        it('and can be set to "undefined" (gh-1594)', function(done) {
+        it('and can be set to "undefined" (gh-1594)', async function() {
           const p = new Person({ name: 'Daniel' });
           p.num_cars = 25;
 
-          p.save(function(err) {
-            assert.ifError(err);
-            assert.equal(p.num_cars, 25);
-            p.num_cars = undefined;
+          await p.save();
+          assert.equal(p.num_cars, 25);
+          p.num_cars = undefined;
 
-            p.save(function(err) {
-              assert.ifError(err);
-              assert.equal(p.num_cars, undefined);
-              p.num_cars = 5;
+          await p.save();
+          assert.equal(p.num_cars, undefined);
+          p.num_cars = 5;
 
-              p.save(function(err) {
-                // validation should still work for non-undefined values
-                assert.ok(err);
-                done();
-              });
-            });
-          });
+          try {
+            await p.save();
+            assert.ok(false);
+          } catch (err) {
+            assert.ok(err);
+          }
         });
       });
 

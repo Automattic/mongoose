@@ -78,6 +78,7 @@ They always return promises.
 
 - `Aggregate.prototype.exec`
 - `Aggregate.prototype.explain`
+- `AggregationCursor.prototype.close`
 - `Connection.prototype.startSession`
 - `Connection.prototype.dropCollection`
 - `Connection.prototype.createCollection`
@@ -85,9 +86,13 @@ They always return promises.
 - `Connection.prototype.openUri`
 - `Connection.prototype.close`
 - `Connection.prototype.destroy`
+- `Document.prototype.populate`
+- `Document.prototype.validate`
 - `Mongoose.prototype.connect`
 - `Mongoose.prototype.createConnection`
 - `Model.prototype.save`
+- `Model.aggregate`
+- `Model.bulkWrite`
 - `Model.cleanIndexes`
 - `Model.create`
 - `Model.createCollection`
@@ -106,14 +111,19 @@ They always return promises.
 - `Model.findOneAndDelete`
 - `Model.findOneAndUpdate`
 - `Model.findOneAndRemove`
+- `Model.insertMany`
 - `Model.listIndexes`
+- `Model.replaceOne`
 - `Model.syncIndexes`
+- `Model.updateMany`
+- `Model.updateOne`
 - `Query.prototype.find`
 - `Query.prototype.findOne`
 - `Query.prototype.findOneAndDelete`
 - `Query.prototype.findOneAndUpdate`
 - `Query.prototype.findOneAndRemove`
 - `Query.prototype.findOneAndReplace`
+- `Query.prototype.validate`
 - `QueryCursor.prototype.close`
 - `QueryCursor.prototype.next`
 

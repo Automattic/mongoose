@@ -1619,17 +1619,14 @@ describe('document', function() {
       });
     });
 
-    it('works with undefined (gh-1892)', function(done) {
+    it('works with undefined (gh-1892)', async function() {
       const d = new TestDocument();
       d.nested.setr = undefined;
       assert.equal(d.nested.setr, 'undefined setter');
       dateSetterCalled = false;
       d.date = undefined;
-      d.validate(function(err) {
-        assert.ifError(err);
-        assert.ok(dateSetterCalled);
-        done();
-      });
+      await d.validate();
+      assert.ok(dateSetterCalled);
     });
 
     it('passes priorVal (gh-8629)', function() {
@@ -2147,7 +2144,7 @@ describe('document', function() {
       assert.equal(doc2.data.email, 'some@example.com');
     });
 
-    it('doesnt attempt to cast generic objects as strings (gh-3030)', function(done) {
+    it('doesnt attempt to cast generic objects as strings (gh-3030)', async function() {
       const M = db.model('Test', {
         myStr: {
           type: String
@@ -2156,10 +2153,7 @@ describe('document', function() {
 
       const t = new M({ myStr: { thisIs: 'anObject' } });
       assert.ok(!t.myStr);
-      t.validate(function(error) {
-        assert.ok(error);
-        done();
-      });
+      await assert.rejects(t.validate());
     });
 
     it('single embedded schemas 1 (gh-2689)', async function() {
@@ -4426,7 +4420,7 @@ describe('document', function() {
       assert.equal(nick.vehicle.name, 'Eleanor');
     });
 
-    it('handles errors in sync validators (gh-2185)', function(done) {
+    it('handles errors in sync validators (gh-2185)', async function() {
       const schema = new Schema({
         name: {
           type: String,
@@ -4442,11 +4436,13 @@ describe('document', function() {
       assert.ok(error);
       assert.equal(error.errors['name'].reason.message, 'woops!');
 
-      new M({ name: 'test' }).validate(function(error) {
+      try {
+        await new M({ name: 'test' }).validate();
+        assert.ok(false);
+      } catch (error) {
         assert.ok(error);
         assert.equal(error.errors['name'].reason.message, 'woops!');
-        done();
-      });
+      }
     });
 
     it('allows hook as a schema key (gh-5047)', async function() {
@@ -4667,7 +4663,7 @@ describe('document', function() {
       assert.ok(!doc.child.nested.childPath);
     });
 
-    it('JSON.stringify nested errors (gh-5208)', function(done) {
+    it('JSON.stringify nested errors (gh-5208)', async function() {
       const AdditionalContactSchema = new Schema({
         contactName: {
           type: String,
@@ -4714,14 +4710,12 @@ describe('document', function() {
           ]
         }
       });
-      contact.validate(function(error) {
-        assert.ok(error);
-        assert.ok(error.errors['contact.additionalContacts.0.contactValue']);
+      const error = await contact.validate().then(() => null, err => err);
+      assert.ok(error.errors['contact.additionalContacts.0.contactValue']);
 
-        // This `JSON.stringify()` should not throw
-        assert.ok(JSON.stringify(error).indexOf('contactValue') !== -1);
-        done();
-      });
+      // This `JSON.stringify()` should not throw
+      assert.ok(JSON.stringify(error).indexOf('contactValue') !== -1);
+
     });
 
     it('handles errors in subdoc pre validate (gh-5215)', async function() {

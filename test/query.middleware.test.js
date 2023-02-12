@@ -178,9 +178,7 @@ describe('query middleware', function() {
 
   it('can populate in post hook', async function() {
     schema.post('findOne', function(doc, next) {
-      doc.populate('publisher', function(error) {
-        next(error);
-      });
+      doc.populate('publisher').then(() => next(), err => next(err));
     });
 
     await initializeData();

@@ -5488,7 +5488,6 @@ describe('Model', function() {
       await Note.create({ body: 'a note.' });
       assert.equal(called, 1);
       const doc = await Note.findOne({});
-      console.log(doc);
       assert.strictEqual(doc.body, 'a note, part deux.');
     });
 

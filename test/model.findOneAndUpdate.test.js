@@ -419,19 +419,6 @@ describe('model: findOneAndUpdate:', function() {
     assert.ok(/not in schema/.test(err2));
   });
 
-  it('executing with just a callback throws', function() {
-    const M = BlogPost;
-    let err;
-
-    try {
-      M.findByIdAndUpdate(function() {});
-    } catch (e) {
-      err = e;
-    }
-
-    assert.ok(/First argument must not be a function/.test(err));
-  });
-
   it('returns the original document', async function() {
     const M = BlogPost;
     const title = 'Tobi ' + random();

@@ -116,6 +116,10 @@ describe('promises docs', function () {
   it('Should You Use `exec()` With `await`?', async function() {
     const doc = await Band.findOne({ name: "Guns N' Roses" }); // works
     // acquit:ignore:start
+    if (typeof Deno !== 'undefined') {
+      // Deno doesn't have V8 async stack traces
+      return this.skip();
+    }
     assert.ok(!doc);
     // acquit:ignore:end
 

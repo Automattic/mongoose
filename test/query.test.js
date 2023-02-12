@@ -3119,6 +3119,10 @@ describe('Query', function() {
 
   describe('stack traces', function() {
     it('includes calling file for filter cast errors (gh-8691)', async function() {
+      if (typeof Deno !== 'undefined') {
+        // Deno doesn't have V8 async stack traces
+        return this.skip();
+      }
       const toCheck = ['find', 'findOne', 'deleteOne'];
       const Model = db.model('Test', Schema({}));
 

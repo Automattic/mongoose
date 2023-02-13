@@ -112,7 +112,6 @@ declare module 'mongoose' {
     lean?: boolean | any;
     limit?: number;
     maxTimeMS?: number;
-    maxscan?: number;
     multi?: boolean;
     multipleCastError?: boolean;
     /**
@@ -471,9 +470,6 @@ declare module 'mongoose' {
     /** Specifies an `$maxDistance` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     maxDistance(path: string, val: number): this;
     maxDistance(val: number): this;
-
-    /** Specifies the maxScan option. */
-    maxScan(val: number): this;
 
     /**
      * Sets the [maxTimeMS](https://docs.mongodb.com/manual/reference/method/cursor.maxTimeMS/)

@@ -1311,15 +1311,6 @@ describe('Query', function() {
   // Advanced Query options
 
   describe('options', function() {
-    describe('maxscan', function() {
-      it('works', function(done) {
-        const query = new Query({});
-        query.maxscan(100);
-        assert.equal(query.options.maxScan, 100);
-        done();
-      });
-    });
-
     describe('slaveOk', function() {
       it('works', function(done) {
         let query = new Query({});

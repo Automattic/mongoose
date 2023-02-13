@@ -39,10 +39,6 @@ declare module 'mongoose' {
       constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
     }
 
-    export class DisconnectedError extends MongooseError {
-      name: 'DisconnectedError';
-    }
-
     export class DivergentArrayError extends MongooseError {
       name: 'DivergentArrayError';
     }

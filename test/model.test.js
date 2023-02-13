@@ -4975,7 +4975,6 @@ describe('Model', function() {
 
         it('watch() before connecting (gh-5964)', async function() {
           const db = start();
-          connectionsToClose.push(db);
 
           const MyModel = db.model('Test5964', new Schema({ name: String }));
 
@@ -4991,11 +4990,12 @@ describe('Model', function() {
           const changeData = await changed;
           assert.equal(changeData.operationType, 'insert');
           assert.equal(changeData.fullDocument.name, 'Ned Stark');
+
+          await db.close();
         });
 
         it('watch() close() prevents buffered watch op from running (gh-7022)', async function() {
           const db = start();
-          connectionsToClose.push(db);
           const MyModel = db.model('Test', new Schema({}));
           const changeStream = MyModel.watch();
           const ready = new Promise(resolve => {
@@ -5009,11 +5009,12 @@ describe('Model', function() {
           await db;
           const readyCalled = await ready;
           assert.strictEqual(readyCalled, false);
+
+          await db.close();
         });
 
         it('watch() close() closes the stream (gh-7022)', async function() {
           const db = await start();
-          connectionsToClose.push(db);
           const MyModel = db.model('Test', new Schema({ name: String }));
 
           await MyModel.init();
@@ -5028,6 +5029,8 @@ describe('Model', function() {
           changeStream.close();
           const closedData = await closed;
           assert.strictEqual(closedData, true);
+
+          await db.close();
         });
       });
 

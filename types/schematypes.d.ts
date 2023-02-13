@@ -28,7 +28,7 @@ declare module 'mongoose' {
   /**
    * The Mongoose ObjectId [SchemaType](/docs/schematypes.html). Used for
    * declaring paths in your schema that should be
-   * [MongoDB ObjectIds](https://docs.mongodb.com/manual/reference/method/ObjectId/).
+   * [MongoDB ObjectIds](https://www.mongodb.com/docs/manual/reference/method/ObjectId/).
    * Do not use this to create a new ObjectId instance, use `mongoose.Types.ObjectId`
    * instead.
    */

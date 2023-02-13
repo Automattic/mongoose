@@ -1,6 +1,6 @@
 declare module 'mongoose' {
   /**
-     * [Stages reference](https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/#aggregation-pipeline-stages)
+     * [Stages reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation-pipeline/#aggregation-pipeline-stages)
      */
   export type PipelineStage =
     | PipelineStage.AddFields
@@ -39,12 +39,12 @@ declare module 'mongoose' {
 
   export namespace PipelineStage {
     export interface AddFields {
-      /** [`$addFields` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/) */
+      /** [`$addFields` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/addFields/) */
       $addFields: Record<string, AnyExpression>
     }
 
     export interface Bucket {
-      /** [`$bucket` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/bucket/) */
+      /** [`$bucket` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/bucket/) */
       $bucket: {
         groupBy: Expression;
         boundaries: any[];
@@ -54,7 +54,7 @@ declare module 'mongoose' {
     }
 
     export interface BucketAuto {
-      /** [`$bucketAuto` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/bucketAuto/) */
+      /** [`$bucketAuto` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/bucketAuto/) */
       $bucketAuto: {
         groupBy: Expression | Record<string, Expression>;
         buckets: number;
@@ -64,7 +64,7 @@ declare module 'mongoose' {
     }
 
     export interface CollStats {
-      /** [`$collStats` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/collStats/) */
+      /** [`$collStats` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/collStats/) */
       $collStats: {
         latencyStats?: { histograms?: boolean };
         storageStats?: { scale?: number };
@@ -74,12 +74,12 @@ declare module 'mongoose' {
     }
 
     export interface Count {
-      /** [`$count` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/count/) */
+      /** [`$count` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/count/) */
       $count: string;
     }
 
     export interface Densify{
-      /** [`$densify` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/densify/) */
+      /** [`$densify` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/densify/) */
       $densify: {
         field: string,
         partitionByFields?: string[],
@@ -92,7 +92,7 @@ declare module 'mongoose' {
     }
 
     export interface Fill {
-      /** [`$fill` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/fill/) */
+      /** [`$fill` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/fill/) */
       $fill: {
         partitionBy?: Expression,
         partitionByFields?: string[],
@@ -102,14 +102,14 @@ declare module 'mongoose' {
     }
 
     export interface Facet {
-      /** [`$facet` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/facet/) */
+      /** [`$facet` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/facet/) */
       $facet: Record<string, FacetPipelineStage[]>;
     }
 
     export type FacetPipelineStage = Exclude<PipelineStage, PipelineStage.CollStats | PipelineStage.Facet | PipelineStage.GeoNear | PipelineStage.IndexStats | PipelineStage.Out | PipelineStage.Merge | PipelineStage.PlanCacheStats>;
 
     export interface GeoNear {
-      /** [`$geoNear` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/) */
+      /** [`$geoNear` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/geoNear/) */
       $geoNear: {
         near: { type: 'Point'; coordinates: [number, number] } | [number, number];
         distanceField: string;
@@ -129,7 +129,7 @@ declare module 'mongoose' {
     }
 
     export interface GraphLookup {
-      /** [`$graphLookup` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/graphLookup/) */
+      /** [`$graphLookup` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/graphLookup/) */
       $graphLookup: {
         from: string;
         startWith: any
@@ -143,27 +143,27 @@ declare module 'mongoose' {
     }
 
     export interface Group {
-      /** [`$group` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/group) */
+      /** [`$group` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/group) */
       $group: { _id: any } | { [key: string]: AccumulatorOperator }
     }
 
     export interface IndexStats {
-      /** [`$indexStats` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/indexStats/) */
+      /** [`$indexStats` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/indexStats/) */
       $indexStats: Record<string | number | symbol, never>;
     }
 
     export interface Limit {
-      /** [`$limit` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/limit/) */
+      /** [`$limit` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/limit/) */
       $limit: number
     }
 
     export interface ListSessions {
-      /** [`$listSessions` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/listSessions/) */
+      /** [`$listSessions` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/listSessions/) */
       $listSessions: { users?: { user: string; db: string }[] } | { allUsers?: true }
     }
 
     export interface Lookup {
-      /** [`$lookup` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/) */
+      /** [`$lookup` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/lookup/) */
       $lookup: {
         from: string
         as: string
@@ -175,12 +175,12 @@ declare module 'mongoose' {
     }
 
     export interface Match {
-      /** [`$match` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/match/) */
+      /** [`$match` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/match/) */
       $match: FilterQuery<any>;
     }
 
     export interface Merge {
-      /** [`$merge` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/merge/) */
+      /** [`$merge` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/merge/) */
       $merge: {
         into: string | { db: string; coll: string }
         on?: string | string[]
@@ -191,42 +191,42 @@ declare module 'mongoose' {
     }
 
     export interface Out {
-      /** [`$out` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/out/) */
+      /** [`$out` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/out/) */
       $out: string | { db: string; coll: string }
     }
 
     export interface PlanCacheStats {
-      /** [`$planCacheStats` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/planCacheStats/) */
+      /** [`$planCacheStats` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/planCacheStats/) */
       $planCacheStats: Record<string | number | symbol, never>
     }
 
     export interface Project {
-      /** [`$project` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/project/) */
+      /** [`$project` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/project/) */
       $project: { [field: string]: AnyExpression | Expression | Project['$project'] }
     }
 
     export interface Redact {
-      /** [`$redact` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/redact/) */
+      /** [`$redact` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/redact/) */
       $redact: Expression;
     }
 
     export interface ReplaceRoot {
-      /** [`$replaceRoot` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/replaceRoot/) */
+      /** [`$replaceRoot` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/replaceRoot/) */
       $replaceRoot: { newRoot: AnyExpression }
     }
 
     export interface ReplaceWith {
-      /** [`$replaceWith` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/replaceWith/) */
+      /** [`$replaceWith` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/replaceWith/) */
       $replaceWith: ObjectExpressionOperator | { [field: string]: Expression } | `$${string}`;
     }
 
     export interface Sample {
-      /** [`$sample` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/sample/) */
+      /** [`$sample` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/sample/) */
       $sample: { size: number }
     }
 
     export interface Search {
-      /** [`$search` reference](https://docs.atlas.mongodb.com/reference/atlas-search/query-syntax/) */
+      /** [`$search` reference](https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/) */
       $search: {
         index?: string;
         highlight?: {
@@ -240,12 +240,12 @@ declare module 'mongoose' {
     }
 
     export interface Set {
-      /** [`$set` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/set/) */
+      /** [`$set` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/set/) */
       $set: Record<string, AnyExpression | any>
     }
 
     export interface SetWindowFields {
-      /** [`$setWindowFields` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/setWindowFields/) */
+      /** [`$setWindowFields` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/setWindowFields/) */
       $setWindowFields: {
         partitionBy?: any
         sortBy?: Record<string, 1 | -1>
@@ -263,34 +263,34 @@ declare module 'mongoose' {
     }
 
     export interface Skip {
-      /** [`$skip` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/skip/) */
+      /** [`$skip` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/skip/) */
       $skip: number
     }
 
     export interface Sort {
-      /** [`$sort` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/sort/) */
+      /** [`$sort` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/sort/) */
       $sort: Record<string, 1 | -1 | Expression.Meta>
     }
 
     export interface SortByCount {
-      /** [`$sortByCount` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/sortByCount/) */
+      /** [`$sortByCount` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/sortByCount/) */
       $sortByCount: Expression;
     }
 
     export interface UnionWith {
-      /** [`$unionWith` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/) */
+      /** [`$unionWith` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/unionWith/) */
       $unionWith:
       | string
       | { coll: string; pipeline?: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge>[] }
     }
 
     export interface Unset {
-      /** [`$unset` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/unset/) */
+      /** [`$unset` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/unset/) */
       $unset: string | string[]
     }
 
     export interface Unwind {
-      /** [`$unwind` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/) */
+      /** [`$unwind` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/unwind/) */
       $unwind: string | { path: string; includeArrayIndex?: string; preserveNullAndEmptyArrays?: boolean }
     }
   }

@@ -1,3 +1,16 @@
+6.9.1 / 2023-02-06
+==================
+ * fix(document): isModified should not be triggered when setting a nested boolean to the same value as previously #12994 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(document): save newly set defaults underneath single nested subdocuments #13002 #12905
+ * fix(update): handle custom discriminator model name when casting update #12947 [wassil](https://github.com/wassil)
+ * fix(connection): handles unique autoincrement ID for connections #12990 [lpizzinidev](https://github.com/lpizzinidev) 
+ * fix(types): fix type of options of Model.aggregate #12933 [ghost91-](https://github.com/ghost91-)
+ * fix(types): fix "near" aggregation operator input type #12954 [Jokero](https://github.com/Jokero)
+ * fix(types): add missing Top operator to AccumulatorOperator type declaration #12952 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(transactions): added example for Connection.transaction() method #12943 #12934 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(populate): fix out of date comment referencing onModel property #13000
+ * docs(transactions): fix typo in transactions.md #12995 [Parth86](https://github.com/Parth86)
+
 6.9.0 / 2023-01-25
 ==================
  * feat(schema): add removeVirtual(path) function to schema #12920 [IslandRhythms](https://github.com/IslandRhythms)

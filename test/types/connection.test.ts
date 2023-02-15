@@ -120,10 +120,6 @@ export function autoTypedModelConnection() {
 
   (async() => {
   // Model-functions-test
-  // Create should works with arbitrary objects.
-    const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' });
-    expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
-
     const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });
     expectType<AutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
     expectType<AutoTypedSchemaType['schema']['description']>(testDoc1.description);

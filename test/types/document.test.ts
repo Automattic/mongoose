@@ -138,7 +138,7 @@ async function gh11117(): Promise<void> {
 
   const fooModel = model('foos', fooSchema);
 
-  const items = await fooModel.create<Foo>([
+  const items = await fooModel.create([
     {
       someId: new Types.ObjectId(),
       someDate: new Date(),

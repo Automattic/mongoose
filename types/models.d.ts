@@ -185,12 +185,12 @@ declare module 'mongoose' {
     countDocuments(callback?: Callback<number>): QueryWithHelpers<number, HydratedDocument<T, TMethodsAndOverrides, TVirtuals>, TQueryHelpers, T>;
 
     /** Creates a new document or documents */
-    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, options?: SaveOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = AnyKeys<T>>(docs: Array<T | DocContents>, callback: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>): void;
-    create<DocContents = AnyKeys<T>>(doc: DocContents | T): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
-    create<DocContents = AnyKeys<T>>(...docs: Array<T | DocContents>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
-    create<DocContents = AnyKeys<T>>(doc: T | DocContents, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
+    create(docs: Array<T | AnyKeys<T>>, options?: SaveOptions): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create(docs: Array<T | AnyKeys<T>>, options?: SaveOptions, callback?: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create(docs: Array<T | AnyKeys<T>>, callback: Callback<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>): void;
+    create(doc: AnyKeys<T> | T): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
+    create(...docs: Array<T | AnyKeys<T>>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>[]>;
+    create(doc: T | AnyKeys<T>, callback: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,

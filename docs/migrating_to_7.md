@@ -15,6 +15,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [Removed `remove()`](#removed-remove)
 * [Dropped callback support](#dropped-callback-support)
 * [Removed `update()`](#removed-update)
+* [ObjectIds no longer `deepStrictEqual`](#objectids-no-longer-deepstrictequal)
 * [Discriminator schemas use base schema options by default](#discriminator-schemas-use-base-schema-options-by-default)
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
 

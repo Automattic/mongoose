@@ -176,7 +176,6 @@ describe('validation docs', function() {
     const dup = [{ username: 'Val' }, { username: 'Val' }];
     // Race condition! This may save successfully, depending on whether
     // MongoDB built the index before writing the 2 docs.
-    // acquit:ignore:start
     U1.create(dup).
       then(() => {
         // acquit:ignore:start

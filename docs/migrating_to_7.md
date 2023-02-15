@@ -15,9 +15,9 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [Removed `remove()`](#removed-remove)
 * [Dropped callback support](#dropped-callback-support)
 * [Removed `update()`](#removed-update)
-* [ObjectIds no longer `deepStrictEqual`](#objectids-no-longer-deepstrictequal)
 * [Discriminator schemas use base schema options by default](#discriminator-schemas-use-base-schema-options-by-default)
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
+* [ObjectId bsontype now has lowercase d](#objectid-bsontype-now-has-lowercase-d)
 
 <h3 id="strictquery"><a href="#strictquery"><code>strictQuery</code></a></h3>
 
@@ -154,7 +154,7 @@ const [err, session] = await conn.startSession().then(
 
 <h3 id="removed-update"><a href="#removed-update">Removed <code>update()</code></a></h3>
 
-`Model.update()` and `Document.prototype.update()` have been removed.
+`Model.update()`, `Query.prototype.update()`, and `Document.prototype.update()` have been removed.
 Use `updateOne()` instead.
 
 ```javascript
@@ -165,18 +165,6 @@ await doc.update(update);
 // After
 await Model.updateOne(filter, update);
 await doc.updateOne(update);
-```
-
-<h3 id="objectids-no-longer-deepstrictequal"><a href="#objectids-no-longer-deepstrictequal">ObjectIds no longer <code>deepStrictEqual</code></a></h3>
-
-Two ObjectIds are no longer `assert.deepStrictEqual()` even though they have the same string representation.
-
-```javascript
-const oid1 = new mongoose.Types.ObjectId();
-const oid2 = new mongoose.Types.ObjectId(oid1.toString());
-
-oid1.toHexString() === oid2.toHexString(); // true
-assert.deepStrictEqual(oid1, oid2); // Throws "Values have same structure but are not reference-equal"
 ```
 
 <h3 id="discriminator-schemas-use-base-schema-options-by-default"><a href="#discriminator-schemas-use-base-schema-options-by-default">Discriminator schemas use base schema options by default</a></h3>
@@ -222,3 +210,16 @@ MySchemaType.prototype.castForQuery = function($conditional, value, context) {
   }
 };
 ```
+
+<h3 id="objectid-bsontype-now-has-lowercase-d"><a href="#objectid-bsontype-now-has-lowercase-d">ObjectId bsontype now has lowercase d</a></h3>
+
+The internal `_bsontype` property on ObjectIds is equal to `'ObjectId'` in Mongoose 7, as opposed to `'ObjectID'` in Mongoose 6.
+
+```javascript
+const oid = new mongoose.Types.ObjectId();
+
+oid._bsontype; // 'ObjectId' in Mongoose 7, 'ObjectID' in older versions of Mongoose
+```
+
+Please update any places where you use `_bsontype` to check if an object is an ObjectId.
+This may also affect libraries that use Mongoose.

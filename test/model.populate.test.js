@@ -1562,6 +1562,62 @@ describe('model: populate:', function() {
     assert.equal(populatedNote.author.name, 'Alice');
   });
 
+  it('required works on ref fields (gh-577)', async function() {
+    const userSchema = new Schema({
+      email: { type: String, required: true }
+    });
+    const User = db.model('User', userSchema);
+
+    const numSchema = new Schema({ _id: Number, val: Number });
+    const Num = db.model('Test', numSchema);
+
+    const strSchema = new Schema({ _id: String, val: String });
+    const Str = db.model('Test1', strSchema);
+
+    const commentSchema = new Schema({
+      user: { type: ObjectId, ref: 'User', required: true },
+      num: { type: Number, ref: 'Test', required: true },
+      str: { type: String, ref: 'Test1', required: true },
+      text: String
+    });
+    const Comment = db.model('Comment', commentSchema);
+
+    let comment = new Comment({
+      text: 'test'
+    });
+
+    const err = await comment.save().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.message.indexOf('Comment validation failed') === 0, err.message);
+    assert.ok('num' in err.errors);
+    assert.ok('str' in err.errors);
+    assert.ok('user' in err.errors);
+
+    const string = new Str({ _id: 'my string', val: 'hello' });
+    const number = new Num({ _id: 1995, val: 234 });
+    const user = new User({ email: 'test' });
+
+    await Promise.all([string.save(), number.save(), user.save()]);
+
+    comment.user = user;
+    comment.num = 1995;
+    comment.str = 'my string';
+    await comment.save();
+
+    comment = await Comment
+      .findById(comment.id)
+      .populate('user')
+      .populate('num')
+      .populate('str');
+
+    assert.equal(comment.user.email, 'test');
+    assert.equal(comment.num.val, 234);
+    assert.equal(comment.str.val, 'hello');
+
+    comment.set({ text: 'test2' });
+    await comment.save();
+  });
+
   it('populate should work on Number _ids', async function() {
     const UserSchema = new Schema({
       _id: Number,

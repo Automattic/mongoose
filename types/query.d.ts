@@ -178,7 +178,6 @@ declare module 'mongoose' {
     [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
 
     /** Executes the query */
-    exec(callback: Callback<ResultType>): void;
     exec(): Promise<ResultType>;
 
     $where(argument: string | Function): QueryWithHelpers<DocType[], DocType, THelpers, RawDocType>;
@@ -239,16 +238,15 @@ declare module 'mongoose' {
     comment(val: string): this;
 
     /** Specifies this query as a `count` query. */
-    count(criteria: FilterQuery<DocType>, callback?: Callback<number>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
-    count(callback?: Callback<number>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
+    count(criteria: FilterQuery<DocType>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
+    count(): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
 
     /** Specifies this query as a `countDocuments` query. */
     countDocuments(
       criteria: FilterQuery<DocType>,
-      options?: QueryOptions<DocType>,
-      callback?: Callback<number>
+      options?: QueryOptions<DocType>
     ): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
-    countDocuments(callback?: Callback<number>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
+    countDocuments(): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
 
     /**
      * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html).
@@ -261,21 +259,21 @@ declare module 'mongoose' {
      * remove, except it deletes _every_ document that matches `filter` in the
      * collection, regardless of the value of `single`.
      */
-    deleteMany(filter?: FilterQuery<DocType>, options?: QueryOptions<DocType>, callback?: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
-    deleteMany(filter: FilterQuery<DocType>, callback: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
-    deleteMany(callback: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    deleteMany(filter?: FilterQuery<DocType>, options?: QueryOptions<DocType>): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    deleteMany(filter: FilterQuery<DocType>): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    deleteMany(): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
 
     /**
      * Declare and/or execute this query as a `deleteOne()` operation. Works like
      * remove, except it deletes at most one document regardless of the `single`
      * option.
      */
-    deleteOne(filter?: FilterQuery<DocType>, options?: QueryOptions<DocType>, callback?: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
-    deleteOne(filter: FilterQuery<DocType>, callback: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
-    deleteOne(callback: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    deleteOne(filter?: FilterQuery<DocType>, options?: QueryOptions<DocType>): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    deleteOne(filter: FilterQuery<DocType>): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    deleteOne(): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct<ReturnType = any>(field: string, filter?: FilterQuery<DocType>, callback?: Callback<number>): QueryWithHelpers<Array<ReturnType>, DocType, THelpers, RawDocType>;
+    distinct<ReturnType = any>(field: string, filter?: FilterQuery<DocType>): QueryWithHelpers<Array<ReturnType>, DocType, THelpers, RawDocType>;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     elemMatch<K = string>(path: K, val: any): this;
@@ -292,7 +290,7 @@ declare module 'mongoose' {
     equals(val: any): this;
 
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
-    estimatedDocumentCount(options?: QueryOptions<DocType>, callback?: Callback<number>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
+    estimatedDocumentCount(options?: QueryOptions<DocType>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
 
     /** Specifies a `$exists` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     exists<K = string>(path: K, val: boolean): this;
@@ -310,96 +308,82 @@ declare module 'mongoose' {
     find(
       filter: FilterQuery<DocType>,
       projection?: ProjectionType<DocType> | null,
-      options?: QueryOptions<DocType> | null,
-      callback?: Callback<DocType[]>
+      options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType>;
     find(
       filter: FilterQuery<DocType>,
-      projection?: ProjectionType<DocType> | null,
-      callback?: Callback<DocType[]>
+      projection?: ProjectionType<DocType> | null
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType>;
     find(
-      filter: FilterQuery<DocType>,
-      callback?: Callback<DocType[]>
+      filter: FilterQuery<DocType>
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType>;
-    find(callback?: Callback<DocType[]>): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType>;
+    find(): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType>;
 
-    /** Declares the query a findOne operation. When executed, the first found document is passed to the callback. */
+    /** Declares the query a findOne operation. When executed, returns the first found document. */
     findOne(
       filter?: FilterQuery<DocType>,
       projection?: ProjectionType<DocType> | null,
-      options?: QueryOptions<DocType> | null,
-      callback?: Callback<DocType | null>
+      options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
     findOne(
       filter?: FilterQuery<DocType>,
-      projection?: ProjectionType<DocType> | null,
-      callback?: Callback<DocType | null>
+      projection?: ProjectionType<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
     findOne(
-      filter?: FilterQuery<DocType>,
-      callback?: Callback<DocType | null>
+      filter?: FilterQuery<DocType>
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(
       filter?: FilterQuery<DocType>,
-      options?: QueryOptions<DocType> | null,
-      callback?: (err: CallbackError, doc: DocType | null, res: any) => void
+      options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
     /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
     findOneAndRemove(
       filter?: FilterQuery<DocType>,
-      options?: QueryOptions<DocType> | null,
-      callback?: (err: CallbackError, doc: DocType | null, res: any) => void
+      options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
     findOneAndUpdate(
       filter: FilterQuery<DocType>,
       update: UpdateQuery<DocType>,
-      options: QueryOptions<DocType> & { rawResult: true },
-      callback?: (err: CallbackError, doc: DocType | null, res: ModifyResult<DocType>) => void
+      options: QueryOptions<DocType> & { rawResult: true }
     ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType>;
     findOneAndUpdate(
       filter: FilterQuery<DocType>,
       update: UpdateQuery<DocType>,
-      options: QueryOptions<DocType> & { upsert: true } & ReturnsNewDoc,
-      callback?: (err: CallbackError, doc: DocType, res: ModifyResult<DocType>) => void
+      options: QueryOptions<DocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<DocType, DocType, THelpers, RawDocType>;
     findOneAndUpdate(
       filter?: FilterQuery<DocType>,
       update?: UpdateQuery<DocType>,
-      options?: QueryOptions<DocType> | null,
-      callback?: (err: CallbackError, doc: DocType | null, res: ModifyResult<DocType>) => void
+      options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
-    /** Declares the query a findById operation. When executed, the document with the given `_id` is passed to the callback. */
+    /** Declares the query a findById operation. When executed, returns the document with the given `_id`. */
     findById(
       id: mongodb.ObjectId | any,
       projection?: ProjectionType<DocType> | null,
-      options?: QueryOptions<DocType> | null,
-      callback?: Callback<DocType | null>
+      options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
     findById(
       id: mongodb.ObjectId | any,
-      projection?: ProjectionType<DocType> | null,
-      callback?: Callback<DocType | null>
+      projection?: ProjectionType<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
     findById(
-      id: mongodb.ObjectId | any,
-      callback?: Callback<DocType | null>
+      id: mongodb.ObjectId | any
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
-    findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions<DocType> | null, callback?: (err: CallbackError, doc: DocType | null, res: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
+    findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions<DocType> | null): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions<DocType> & { rawResult: true }, callback?: (err: CallbackError, doc: any, res?: any) => void): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions<DocType> & { upsert: true } & ReturnsNewDoc, callback?: (err: CallbackError, doc: DocType, res?: any) => void): QueryWithHelpers<DocType, DocType, THelpers, RawDocType>;
-    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions<DocType> | null, callback?: (CallbackError: any, doc: DocType | null, res?: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, callback: (CallbackError: any, doc: DocType | null, res?: any) => void): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions<DocType> & { rawResult: true }): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions<DocType> & { upsert: true } & ReturnsNewDoc): QueryWithHelpers<DocType, DocType, THelpers, RawDocType>;
+    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions<DocType> | null): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType>;
 
     /** Specifies a `$geometry` condition */
     geometry(object: { type: string, coordinates: any[] }): this;
@@ -543,18 +527,11 @@ declare module 'mongoose' {
     regex(val: string | RegExp): this;
 
     /**
-     * Declare and/or execute this query as a remove() operation. `remove()` is
-     * deprecated, you should use [`deleteOne()`](#query_Query-deleteOne)
-     * or [`deleteMany()`](#query_Query-deleteMany) instead.
-     */
-    remove(filter?: FilterQuery<DocType>, callback?: Callback<mongodb.UpdateResult>): Query<mongodb.UpdateResult, DocType, THelpers, RawDocType>;
-
-    /**
      * Declare and/or execute this query as a replaceOne() operation. Same as
      * `update()`, except MongoDB will replace the existing document and will
      * not accept any [atomic](https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern) operators (`$set`, etc.)
      */
-    replaceOne(filter?: FilterQuery<DocType>, replacement?: DocType | AnyObject, options?: QueryOptions<DocType> | null, callback?: Callback): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
+    replaceOne(filter?: FilterQuery<DocType>, replacement?: DocType | AnyObject, options?: QueryOptions<DocType> | null): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
 
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
     select(arg: string | any): this;
@@ -620,7 +597,7 @@ declare module 'mongoose' {
     toConstructor<RetType = typeof Query>(): RetType;
 
     /** Declare and/or execute this query as an update() operation. */
-    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions<DocType> | null, callback?: Callback<UpdateWriteOpResult>): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType>;
+    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions<DocType> | null): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType>;
 
     /**
      * Declare and/or execute this query as an updateMany() operation. Same as
@@ -628,13 +605,13 @@ declare module 'mongoose' {
      * `filter` (as opposed to just the first one) regardless of the value of
      * the `multi` option.
      */
-    updateMany(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions<DocType> | null, callback?: Callback<UpdateWriteOpResult>): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType>;
+    updateMany(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions<DocType> | null): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType>;
 
     /**
      * Declare and/or execute this query as an updateOne() operation. Same as
      * `update()`, except it does not support the `multi` or `overwrite` options.
      */
-    updateOne(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions<DocType> | null, callback?: Callback<UpdateWriteOpResult>): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType>;
+    updateOne(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions<DocType> | null): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType>;
 
     /**
      * Sets the specified number of `mongod` servers, or tag set of `mongod` servers,

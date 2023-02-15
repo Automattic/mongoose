@@ -43,7 +43,7 @@ async function gh10597(): Promise<void> {
   const GameModel = model<IGameDocument>('Game', schema);
 
   const doc = await GameModel.findOne().orFail();
-  await doc.update({ events: [{ description: 'test' }] });
+  await doc.updateOne({ events: [{ description: 'test' }] });
 }
 
 function gh10674() {

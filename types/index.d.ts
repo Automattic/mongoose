@@ -82,7 +82,11 @@ declare module 'mongoose' {
   ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
   ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
   ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-  HydratedDocument<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>>,
+  HydratedDocument<
+  InferSchemaType<TSchema>,
+  ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
+  >,
   TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
@@ -129,13 +133,20 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
-  export type HydratedDocument<DocType, TOverrides = {}> = Document<unknown, any, DocType> & Require_id<DocType> & TOverrides;
+  export type HydratedDocument<
+    DocType,
+    TOverrides = {},
+    TQueryHelpers = {}
+  > = Document<unknown, TQueryHelpers, DocType> &
+  Require_id<DocType> &
+  TOverrides;
   export type HydratedSingleSubdocument<DocType, TOverrides = {}> = Types.Subdocument<unknown> & Require_id<DocType> & TOverrides;
   export type HydratedArraySubdocument<DocType, TOverrides = {}> = Types.ArraySubdocument<unknown> & Require_id<DocType> & TOverrides;
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>
+  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
   >;
 
   export interface TagSet {
@@ -355,7 +366,7 @@ declare module 'mongoose' {
     statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } & { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
-    virtual<T = HydratedDocument<DocType, TVirtuals & TInstanceMethods>>(
+    virtual<T = HydratedDocument<DocType, TVirtuals & TInstanceMethods, TQueryHelpers>>(
       name: keyof TVirtuals | string,
       options?: VirtualTypeOptions<T, DocType>
     ): VirtualType<T>;

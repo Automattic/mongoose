@@ -32,7 +32,7 @@ const docs = await MyModel.find({ notInSchema: 1 });
 docs;
 ```
 
-<h3 id="removed-remove"><a href="#removed-remove"><code>Removed <code>remove()</code></a></h3>
+<h3 id="removed-remove"><a href="#removed-remove">Removed <code>remove()</code></a></h3>
 
 The `remove()` method on documents and models has been removed.
 Use `deleteOne()` or `deleteMany()` instead.

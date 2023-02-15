@@ -139,6 +139,16 @@ conn.startSession(function(err, session) {
 const session = await conn.startSession();
 // Or:
 conn.startSession().then(sesson => { /* ... */ });
+
+// With error handling
+try {
+  await conn.startSession();
+} catch (err) { /* ... */ }
+// Or:
+const [err, session] = await conn.startSession().then(
+  session => ([null, session]),
+  err => ([err, null])
+);
 ```
 
 <h3 id="removed-update"><a href="#removed-update"><code>Removed <code>update()</code></a></h3>

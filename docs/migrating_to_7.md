@@ -151,7 +151,7 @@ const [err, session] = await conn.startSession().then(
 );
 ```
 
-<h3 id="removed-update"><a href="#removed-update"><code>Removed <code>update()</code></a></h3>
+<h3 id="removed-update"><a href="#removed-update">Removed <code>update()</code></a></h3>
 
 `Model.update()` and `Document.prototype.update()` have been removed.
 Use `updateOne()` instead.

@@ -5,7 +5,7 @@ import { expectError, expectType } from 'tsd';
 /**
  * $addFields:
  *
- * @see https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/
+ * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/addFields/
  */
 const addFields1: PipelineStage = {
   $addFields: {
@@ -45,7 +45,7 @@ const addFields6: PipelineStage = {
 /**
  * $bucket
  *
- * @see https://docs.mongodb.com/manual/reference/operator/aggregation/bucket/
+ * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/bucket/
  */
 
 const bucket1: PipelineStage = {
@@ -101,7 +101,7 @@ const bucket2: PipelineStage = {
 /**
  * $unionWith
  *
- * @see https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/
+ * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/unionWith/
  */
 
 const unionWith1: PipelineStage = { $unionWith: { coll: 'warehouses', pipeline: [{ $project: { state: 1, _id: 0 } }] } };
@@ -112,7 +112,7 @@ const unionWith4: PipelineStage = { $unionWith: { coll: 'sales2019q2', pipeline:
 /**
  * $unset
  *
- * @see https://docs.mongodb.com/manual/reference/operator/aggregation/unset/
+ * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/unset/
  */
 const unset1: PipelineStage = { $unset: '<field.nestedfield>' };
 const unset2: PipelineStage = { $unset: ['isbn', 'copies'] };
@@ -122,7 +122,7 @@ const unset3: PipelineStage = { $unset: ['isbn', 'author.first', 'copies.warehou
 /**
  * $unwind
  *
- * @see https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/
+ * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/unwind/
  */
 
 const unwind1: PipelineStage = { $unwind: '$sizes' };

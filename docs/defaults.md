@@ -23,7 +23,7 @@ execute that function and use the return value as the default.
 
 ### The `setDefaultsOnInsert` Option
 
-Mongoose also sets defaults on `update()` and `findOneAndUpdate()` when the `upsert` option is set by adding your schema's defaults to a [MongoDB `$setOnInsert` operator](https://docs.mongodb.org/manual/reference/operator/update/setOnInsert/).
+Mongoose also sets defaults on `update()` and `findOneAndUpdate()` when the `upsert` option is set by adding your schema's defaults to a [MongoDB `$setOnInsert` operator](https://www.mongodb.com/docs/manual/reference/operator/update/setOnInsert/).
 You can disable this behavior by setting the `setDefaultsOnInsert` option to `false`.
 
 ```javascript

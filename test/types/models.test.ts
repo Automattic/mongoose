@@ -12,7 +12,8 @@ import {
   HydratedDocument,
   HydratedDocumentFromSchema,
   Query,
-  UpdateWriteOpResult
+  UpdateWriteOpResult,
+  AggregateOptions
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -540,4 +541,10 @@ function gh12573ModelAny() {
   expectType<any>(doc);
   const { fieldA } = doc;
   expectType<any>(fieldA);
+}
+
+function aggregateOptionsTest() {
+  const TestModel = model('test', new Schema({}));
+  const options: AggregateOptions = {};
+  TestModel.aggregate(undefined, options);
 }

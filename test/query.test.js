@@ -1240,14 +1240,6 @@ describe('Query', function() {
   // Advanced Query options
 
   describe('options', function() {
-    describe('maxscan', function() {
-      it('works', function() {
-        const query = new Query({});
-        query.maxscan(100);
-        assert.equal(query.options.maxScan, 100);
-      });
-    });
-
     describe('tailable', function() {
       it('works', function() {
         let query = new Query({});

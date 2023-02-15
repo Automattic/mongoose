@@ -4,67 +4,7 @@ declare module 'mongoose' {
   /** Extract generic type from Aggregate class */
   type AggregateExtract<P> = P extends Aggregate<infer T> ? T : never;
 
-  interface AggregateOptions extends
-    SessionOption {
-    /**
-     * If true, the MongoDB server will use the hard drive to store data during this aggregation.
-     */
-    allowDiskUse?: boolean;
-    /**
-     * Applicable only if you specify the $out or $merge aggregation stages.
-     *
-     * Enables db.collection.aggregate() to bypass document validation during the operation. This lets you insert documents that do not meet the validation requirements.
-     */
-    bypassDocumentValidation?: boolean;
-    /**
-     * The BSON-serializer will check if keys are valid
-     */
-    collation?: mongodb.CollationOptions;
-    /**
-     * Users can specify an arbitrary string to help trace the operation through the database profiler, currentOp, and logs.
-     */
-    comment?: string;
-    /**
-     *  Specifies the initial batch size for the cursor. The value of the cursor field is a document with the field batchSize.
-     */
-    cursor?: { batchSize?: number; };
-
-    /**
-     * Specifies to return the information on the processing of the pipeline. See Return Information on Aggregation Pipeline Operation for an example.
-     *
-     * Not available in multi-document transactions.
-     */
-    explain?: mongodb.ExplainVerbosityLike;
-    /**
-     * The index to use for the aggregation. The index is on the initial collection/view against which the aggregation is run.
-     */
-    hint?: string | AnyObject;
-    /**
-     * Specifies a document with a list of variables. This allows you to improve command readability by separating the variables from the query text.
-     */
-    let?: AnyObject;
-    /**
-     * Specifies a time limit in milliseconds for processing operations on a cursor. If you do not specify a value for maxTimeMS, operations will not time out. A value of 0 explicitly specifies the default unbounded behavior.
-     *
-     * @see https://docs.mongodb.com/manual/reference/operator/meta/maxTimeMS/
-     */
-    maxTimeMS?: number;
-    /**
-     * Return BSON filled buffers from operations.
-     */
-    raw?: boolean;
-    /**
-     * Specifies the read concern.
-     */
-    readConcern?: mongodb.ReadConcernLike;
-    /**
-     * The preferred read preference.
-     */
-    readPreference?: mongodb.ReadPreferenceLike;
-    /**
-     * Specifies the write concern.
-     */
-    writeConcern?: mongodb.WriteConcern;
+  interface AggregateOptions extends Omit<mongodb.AggregateOptions, 'session'>, SessionOption {
     [key: string]: any;
   }
 
@@ -193,7 +133,7 @@ declare module 'mongoose' {
     replaceRoot(newRoot: PipelineStage.ReplaceRoot['$replaceRoot']['newRoot'] | string): this;
 
     /**
-     * Helper for [Atlas Text Search](https://docs.atlas.mongodb.com/reference/atlas-search/tutorial/)'s
+     * Helper for [Atlas Text Search](https://www.mongodb.com/docs/atlas/atlas-search/tutorial/)'s
      * `$search` stage.
      */
     search(options: PipelineStage.Search['$search']): this;

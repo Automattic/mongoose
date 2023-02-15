@@ -11943,6 +11943,58 @@ describe('document', function() {
     assert.equal(existingTest.isModified(), true);
     assert.equal(existingTest.modifiedPaths().length, 1);
   });
+
+  it('saves single nested subdoc defaults (gh-12905)', async function() {
+    const nestedSchema = new mongoose.Schema({
+      refOriginal: String,
+      refAnother: {
+        type: String,
+        default: () => 'goodbye'
+      }
+    });
+    const testSchema = new mongoose.Schema({
+      original: String,
+      another: {
+        type: String,
+        default: 'hello'
+      },
+      referenced: {
+        type: nestedSchema,
+        default: () => ({})
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const _id = new mongoose.Types.ObjectId();
+    await Test.collection.insertOne({
+      _id,
+      original: 'foo',
+      referenced: { refOriginal: 'hello' }
+    });
+
+    const doc = await Test.findById(_id);
+    assert.equal(doc.referenced.refOriginal, 'hello');
+    assert.equal(doc.referenced.refAnother, 'goodbye');
+
+    await doc.save();
+    const rawDoc = await Test.findById(_id).lean();
+    assert.equal(rawDoc.referenced.refOriginal, 'hello');
+    assert.equal(rawDoc.referenced.refAnother, 'goodbye');
+  });
+
+  it('$shift() triggers $pop', function() {
+    const Test = db.model('Test', mongoose.Schema({
+      arr: [String]
+    }, { autoCreate: false, autoIndex: false }));
+
+    const doc = Test.hydrate({ arr: ['a', 'b', 'c'] });
+    doc.arr.$shift();
+
+    assert.deepStrictEqual(
+      doc.getChanges(),
+      { $pop: { arr: -1 }, $inc: { __v: 1 } }
+    );
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

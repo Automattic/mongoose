@@ -91,7 +91,7 @@ examples of `mongoose.connect()` calls that do **not** work in Mongoose 5.x.
 * `mongoose.connect('127.0.0.1', 'mydb', 27017);`
 * `mongoose.connect('mongodb://host1:27017,mongodb://host2:27017');`
 
-In Mongoose 5.x, the first parameter to `mongoose.connect()` and `mongoose.createConnection()`, if specified, **must** be a [MongoDB connection string](https://docs.mongodb.com/manual/reference/connection-string/). The
+In Mongoose 5.x, the first parameter to `mongoose.connect()` and `mongoose.createConnection()`, if specified, **must** be a [MongoDB connection string](https://www.mongodb.com/docs/manual/reference/connection-string/). The
 connection string and options are then passed down to [the MongoDB Node.js driver's `MongoClient.connect()` function](http://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html#.connect). Mongoose does not modify the connection string, although `mongoose.connect()` and `mongoose.createConnection()` support a [few additional options in addition to the ones the MongoDB driver supports](http://mongoosejs.com/docs/connections.html#options).
 
 <h3 id="setter-order"><a href="#setter-order">
@@ -365,7 +365,7 @@ m.save(function() {
   The `$pushAll` Operator
 </a></h3>
 
-`$pushAll` is no longer supported and no longer used internally for `save()`, since it has been [deprecated since MongoDB 2.4](https://docs.mongodb.com/manual/reference/operator/update/pushAll/). Use `$push` with `$each` instead.
+`$pushAll` is no longer supported and no longer used internally for `save()`, since it has been [deprecated since MongoDB 2.4](https://www.mongodb.com/docs/manual/reference/operator/update/pushAll/). Use `$push` with `$each` instead.
 
 <h3 id="retain-key-order"><a href="#retain-key-order">
   Always Use Forward Key Order
@@ -465,7 +465,7 @@ In Mongoose 5.x, the above code will correctly overwrite `'baseball'` with `{ $n
 </a></h3>
 
 Mongoose 5.x uses version 3.x of the [MongoDB Node.js driver](http://npmjs.com/package/mongodb). MongoDB driver 3.x changed the format of
-the result of [`bulkWrite()` calls](model.html#model_Model-bulkWrite) so there is no longer a top-level `nInserted`, `nModified`, etc. property. The new result object structure is [described here](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~BulkWriteOpResult).
+the result of [`bulkWrite()` calls](api/model.html#model_Model-bulkWrite) so there is no longer a top-level `nInserted`, `nModified`, etc. property. The new result object structure is [described here](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~BulkWriteOpResult).
 
 ```javascript
 const Model = mongoose.model('Test', new Schema({ name: String }));

@@ -147,7 +147,7 @@ declare module 'mongoose' {
     SessionStarter {
     new <DocType = TRawDocType>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): THydratedDocumentType;
 
-    aggregate<R = any>(pipeline?: PipelineStage[], options?: mongodb.AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline?: PipelineStage[], options?: AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[], callback?: Callback<R[]>): Aggregate<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
@@ -334,7 +334,7 @@ declare module 'mongoose' {
     hydrate(obj: any, projection?: AnyObject, options?: { setters?: boolean }): THydratedDocumentType;
 
     /**
-     * This function is responsible for building [indexes](https://docs.mongodb.com/manual/indexes/),
+     * This function is responsible for building [indexes](https://www.mongodb.com/docs/manual/indexes/),
      * unless [`autoIndex`](http://mongoosejs.com/docs/guide.html#autoIndex) is turned off.
      * Mongoose calls this function automatically when a model is created using
      * [`mongoose.model()`](/docs/api/mongoose.html#mongoose_Mongoose-model) or
@@ -420,7 +420,7 @@ declare module 'mongoose' {
     validate(optional: any, callback?: CallbackWithoutResult): Promise<void>;
     validate(optional: any, pathsToValidate: PathsToValidate, callback?: CallbackWithoutResult): Promise<void>;
 
-    /** Watches the underlying collection for changes using [MongoDB change streams](https://docs.mongodb.com/manual/changeStreams/). */
+    /** Watches the underlying collection for changes using [MongoDB change streams](https://www.mongodb.com/docs/manual/changeStreams/). */
     watch<ResultType extends mongodb.Document = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean }): mongodb.ChangeStream<ResultType>;
 
     /** Adds a `$where` clause to this query */

@@ -11,19 +11,15 @@ try {
 } catch (err) {}
 
 api.docs.forEach(file => {
-  if (file.name === 'Index') {
-    file.name = 'Mongoose';
-  }
-
   const options = Object.assign({}, file, {
     package: pkg,
     docs: api.docs,
-    outputUrl: `/docs/api/${file.name.toLowerCase()}.html`,
+    outputUrl: `/docs/api/${file.fileName}.html`,
     jobs,
     title: file.name
   });
 
   const html = pug.renderFile('./docs/api_split.pug', options);
   console.log('Write', file.name);
-  fs.writeFileSync(`./docs/api/${file.name.toLowerCase()}.html`, html);
+  fs.writeFileSync(`./docs/api/${file.fileName}.html`, html);
 });

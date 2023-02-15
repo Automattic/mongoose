@@ -16,7 +16,7 @@ You can also specify several more parameters in the `uri`:
 mongoose.connect('mongodb://username:password@host:port/database?options...');
 ```
 
-See the [mongodb connection string spec](http://docs.mongodb.org/manual/reference/connection-string/) for more details.
+See the [mongodb connection string spec](http://www.mongodb.com/docs/manual/reference/connection-string/) for more details.
 
 <ul class="toc">
   <li><a href="#buffering">Buffering</a></li>
@@ -146,11 +146,11 @@ exceptions that are explained below.
 Below are some of the options that are important for tuning Mongoose.
 
 * `promiseLibrary`    - Sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html).
-* `maxPoolSize`       - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `maxPoolSize` is 100. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See [Slow Trains in MongoDB and Node.js](http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs). You may want to decrease `maxPoolSize` if you are running into [connection limits](https://docs.atlas.mongodb.com/reference/atlas-limits/#connection-limits-and-cluster-tier).
+* `maxPoolSize`       - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `maxPoolSize` is 100. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See [Slow Trains in MongoDB and Node.js](http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs). You may want to decrease `maxPoolSize` if you are running into [connection limits](https://www.mongodb.com/docs/atlas/atlas-limits/#connection-limits-and-cluster-tier).
 * `minPoolSize`       - The minimum number of sockets the MongoDB driver will keep open for this connection. The MongoDB driver may close sockets that have been inactive for some time. You may want to increase `minPoolSize` if you expect your app to go through long idle times and want to make sure your sockets stay open to avoid slow trains when activity picks up.
 * `socketTimeoutMS`   - How long the MongoDB driver will wait before killing a socket due to inactivity _after initial connection_. A socket may be inactive because of either no activity or a long-running operation. This is set to `30000` by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
 * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
-* `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://docs.mongodb.com/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
+* `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://www.mongodb.com/docs/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
 * `serverSelectionTimeoutMS` - The MongoDB driver will try to find a server to send any given operation to, and keep retrying for `serverSelectionTimeoutMS` milliseconds. If not set, the MongoDB driver defaults to using `30000` (30 seconds).
 * `heartbeatFrequencyMS` - The MongoDB driver sends a heartbeat every `heartbeatFrequencyMS` to check on the status of the connection. A heartbeat is subject to `serverSelectionTimeoutMS`, so the MongoDB driver will retry failed heartbeats for up to 30 seconds by default. Mongoose only emits a `'disconnected'` event after a heartbeat has failed, so you may want to decrease this setting to reduce the time between when your server goes down and when Mongoose emits `'disconnected'`. We recommend you do **not** set this setting below 1000, too many heartbeats can lead to performance degradation.
 
@@ -218,11 +218,11 @@ or `ssl`, in the connection string, and options that should remain constant,
 like `connectTimeoutMS` or `maxPoolSize`, in the options object.
 
 The MongoDB docs have a full list of
-[supported connection string options](https://docs.mongodb.com/manual/reference/connection-string/).
+[supported connection string options](https://www.mongodb.com/docs/manual/reference/connection-string/).
 Below are some options that are often useful to set in the connection string because they
 are closely associated with the hostname and authentication information.
 
-* `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://docs.mongodb.com/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
+* `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://www.mongodb.com/docs/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
 * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
 
 <h3 id="connection-events"><a href="#connection-events">Connection Events</a></h3>
@@ -239,7 +239,7 @@ connection may emit.
 * `disconnected`: Emitted when Mongoose lost connection to the MongoDB server. This event may be due to your code explicitly closing the connection, the database server crashing, or network connectivity issues.
 * `close`: Emitted after [`Connection#close()`](api/connection.html#connection_Connection-close) successfully closes the connection. If you call `conn.close()`, you'll get both a 'disconnected' event and a 'close' event.
 * `reconnected`: Emitted if Mongoose lost connectivity to MongoDB and successfully reconnected. Mongoose attempts to [automatically reconnect](https://thecodebarbarian.com/managing-connections-with-the-mongodb-node-driver.html) when it loses connection to the database.
-* `error`: Emitted if an error occurs on a connection, like a `parseError` due to malformed data or a payload larger than [16MB](https://docs.mongodb.com/manual/reference/limits/#BSON-Document-Size).
+* `error`: Emitted if an error occurs on a connection, like a `parseError` due to malformed data or a payload larger than [16MB](https://www.mongodb.com/docs/manual/reference/limits/#BSON-Document-Size).
 * `fullsetup`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to the primary and at least one secondary.
 * `all`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to all servers specified in your connection string.
 
@@ -332,8 +332,8 @@ This can cause confusing errors if you're connecting to a remote MongoDB replica
 MongooseServerSelectionError: connect ECONNREFUSED localhost:27017
 ```
 
-If you're experiencing a similar error, connect to the replica set using the `mongo` shell and run the [`rs.conf()`](https://docs.mongodb.com/manual/reference/method/rs.conf/) command to check the host names of each replica set member.
-Follow [this page's instructions to change a replica set member's host name](https://docs.mongodb.com/manual/tutorial/change-hostnames-in-a-replica-set/#change-hostnames-while-maintaining-replica-set-availability).
+If you're experiencing a similar error, connect to the replica set using the `mongo` shell and run the [`rs.conf()`](https://www.mongodb.com/docs/manual/reference/method/rs.conf/) command to check the host names of each replica set member.
+Follow [this page's instructions to change a replica set member's host name](https://www.mongodb.com/docs/manual/tutorial/change-hostnames-in-a-replica-set/#change-hostnames-while-maintaining-replica-set-availability).
 
 You can also check the `reason.servers` property of `MongooseServerSelectionError` to see what the MongoDB Node driver thinks the state of your replica set is.
 The `reason.servers` property contains a [map](https://masteringjs.io/tutorials/fundamentals/map) of server descriptions.
@@ -354,7 +354,7 @@ if (err.name === 'MongooseServerSelectionError') {
 
 <h3 id="mongos_connections"><a href="#mongos_connections">Multi-mongos support</a></h3>
 
-You can also connect to multiple [mongos](https://docs.mongodb.com/manual/reference/program/mongos/) instances
+You can also connect to multiple [mongos](https://www.mongodb.com/docs/manual/reference/program/mongos/) instances
 for high availability in a sharded cluster. You do
 [not need to pass any special options to connect to multiple mongos](http://mongodb.github.io/node-mongodb-native/3.0/tutorials/connect/#connect-to-sharded-cluster) in mongoose 5.x.
 

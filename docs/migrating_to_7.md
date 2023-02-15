@@ -167,7 +167,7 @@ await Model.updateOne(filter, update);
 await doc.updateOne(update);
 ```
 
-<h3 id="objectids-no-longer-deepstrictequal"><a href="#objectids-no-longer-deepstrictequal">ObjectIds no longer deepStrictEqual</a></h3>
+<h3 id="objectids-no-longer-deepstrictequal"><a href="#objectids-no-longer-deepstrictequal">ObjectIds no longer <code>deepStrictEqual</code></a></h3>
 
 Two ObjectIds are no longer `assert.deepStrictEqual()` even though they have the same string representation.
 

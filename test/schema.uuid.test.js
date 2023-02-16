@@ -10,6 +10,8 @@ const assert = require('assert');
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
+const { v4: uuidv4 } = require('uuid');
+
 describe('SchemaUUID', function() {
   let Model;
   let TestSchema;
@@ -99,6 +101,32 @@ describe('SchemaUUID', function() {
     assert.strictEqual(foundDocAll[0].y[0], '13d51406-cd06-4fc2-93d1-4fad9b3eecd7');
     assert.strictEqual(foundDocAll[0].y[1], 'f004416b-e02a-4212-ac77-2d3fcf04898b');
     assert.strictEqual(foundDocAll[0].y[2], '5b544b71-8988-422b-a4df-bf691939fe4e');
+  });
+
+  it('should not convert to string nullish UUIDs (gh-13032)', async function() {
+    const schema = new Schema({
+      _id: {
+        type: Schema.Types.UUID,
+        default: uuidv4(),
+        immutable: true
+      },
+      name: {
+        type: String,
+        required: true
+      },
+      organization: {
+        type: Schema.Types.UUID,
+        ref: 'Organization',
+        index: true
+      }
+    }, { _id: false });
+
+    const Test = db.model('gh_13032', schema);
+
+    const { name, organization } = await Test.create({ name: 'test' });
+
+    assert.equal(name, 'test');
+    assert.equal(organization, undefined);
   });
 
   // the following are TODOs based on SchemaUUID.prototype.$conditionalHandlers which are not tested yet

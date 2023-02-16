@@ -1,6 +1,6 @@
 # Models
 
-[Models](api/model-js.html#model-js) are fancy constructors compiled from
+[Models](api/model.html) are fancy constructors compiled from
 `Schema` definitions. An instance of a model is called a
 [document](documents.html). Models are responsible for creating and
 reading documents from the underlying MongoDB database.
@@ -83,7 +83,7 @@ Documents can be retrieved using a `model`'s [find](api/model.html#model_Model-f
 Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
 ```
 
-See the chapter on [queries](queries.html) for more details on how to use the [Query](api/query-js.html#query-js) api.
+See the chapter on [queries](queries.html) for more details on how to use the [Query](api/query.html) api.
 
 ## Deleting
 

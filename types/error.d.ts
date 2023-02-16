@@ -129,5 +129,10 @@ declare module 'mongoose' {
 
       constructor(doc: Document, currentVersion: number, modifiedPaths: Array<string>);
     }
+
+    export class StrictPopulateError extends MongooseError {
+      name: 'StrictPopulateError';
+      path: string;
+    }
   }
 }

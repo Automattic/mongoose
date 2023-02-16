@@ -9,6 +9,7 @@ const start = require('./common');
 const assert = require('assert');
 const utils = require('../lib/utils');
 const util = require('./util');
+const MongooseError = require('../lib/error/mongooseError');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -10965,6 +10966,7 @@ describe('model: populate:', function() {
     assert.equal(person.stories[0].title, 'Casino Royale');
   });
 
+
   describe('strictPopulate', function() {
     it('reports full path when throwing `strictPopulate` error with deep populate (gh-10923)', async function() {
       const L2 = db.model('Test', new Schema({ name: String }));
@@ -11001,6 +11003,7 @@ describe('model: populate:', function() {
         then(() => null, err => err);
       assert.ok(err);
       assert.ok(err.message.includes('strictPopulate'), err.message);
+      assert.ok(err instanceof MongooseError.StrictPopulateError);
     });
 
     it('allows overwriting localField and foreignField when populating a virtual gh-6963', async function() {

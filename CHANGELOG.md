@@ -1,3 +1,14 @@
+6.9.2 / 2023-02-16
+==================
+ * fix(model): fixed post('save') callback parameter #13030 #13026 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(UUID): added null check to prevent error on binaryToString conversion #13034 #13032 #13029 [lpizzinidev](https://github.com/lpizzinidev) [Freezystem](https://github.com/Freezystem)
+ * fix(query): revert breaking changes introduced by #12797 #12999 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(document): make array $shift() use $pop instead of overwriting array #13004
+ * docs: update & remove old links #13019 [hasezoey](https://github.com/hasezoey)
+ * docs(middleware): describe how to access model from document middleware #13031 [AxeOfMen](https://github.com/AxeOfMen)
+ * docs: update broken & outdated links #13001 [hasezoey](https://github.com/hasezoey)
+ * chore: change deno tests to also use MMS #12918 [hasezoey](https://github.com/hasezoey)
+
 6.9.1 / 2023-02-06
 ==================
  * fix(document): isModified should not be triggered when setting a nested boolean to the same value as previously #12994 [lpizzinidev](https://github.com/lpizzinidev)

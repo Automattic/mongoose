@@ -48,7 +48,7 @@ If you want to add additional keys later, use the
 Each key in our code `blogSchema` defines a property in our documents which
 will be cast to its associated [SchemaType](api/schematype.html#schematype_SchemaType).
 For example, we've defined a property `title` which will be cast to the
-[String](api/schema-string-js.html#schema-string-js) SchemaType and property `date`
+[String](schematypes.html#strings) SchemaType and property `date`
 which will be cast to a `Date` SchemaType.
 
 Notice above that if a property only requires a type, it can be specified using
@@ -588,8 +588,7 @@ new Schema({..}, { capped: 1024 });
 ```
 
 The `capped` option may also be set to an object if you want to pass
-additional options like [max](https://www.mongodb.com/docs/manual/core/capped-collections/#change-the-maximum-number-of-documents-in-a-capped-collection)
-or [autoIndexId](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-autoIndexId).
+additional options like [max](https://www.mongodb.com/docs/manual/core/capped-collections/#change-the-maximum-number-of-documents-in-a-capped-collection).
 In this case you must explicitly pass the `size` option, which is required.
 
 ```javascript
@@ -599,7 +598,7 @@ new Schema({..}, { capped: { size: 1024, max: 1000, autoIndexId: true } });
 <h3 id="collection"><a href="#collection">option: collection</a></h3>
 
 Mongoose by default produces a collection name by passing the model name to
-the [utils.toCollectionName](api/utils.html#utils_exports-toCollectionName) method.
+the `utils.toCollectionName` method.
 This method pluralizes the name. Set this option if you need a different name
 for your collection.
 
@@ -1179,7 +1178,7 @@ thing.save(); // version is not incremented
 <h3 id="timestamps"><a href="#timestamps">option: timestamps</a></h3>
 
 The `timestamps` option tells Mongoose to assign `createdAt` and `updatedAt` fields
-to your schema. The type assigned is [Date](api/schema-date-js.html#schema-date-js).
+to your schema. The type assigned is [Date](schematypes.html#dates).
 
 By default, the names of the fields are `createdAt` and `updatedAt`. Customize
 the field names by setting `timestamps.createdAt` and `timestamps.updatedAt`.

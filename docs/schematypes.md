@@ -6,7 +6,7 @@ SchemaTypes handle definition of path
 [getters](#getters),
 [setters](api/schematype.html#schematype_SchemaType-set),
 [field selection defaults](api/schematype.html#schematype_SchemaType-select) for
-[queries](api/query-js.html#query-js),
+[queries](api/query.html),
 and other general characteristics for Mongoose document properties.
 
 * [What is a SchemaType?](#what-is-a-schematype)

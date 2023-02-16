@@ -2789,6 +2789,28 @@ describe('Model', function() {
           done();
         });
       });
+
+      it('callback should receive parameter of type document after bulkSave (gh-13026)', async function() {
+        const schema = new Schema({
+          foo: Boolean,
+          bar: Boolean
+        });
+
+        schema.post('save', function(doc) {
+          assert.deepEqual(this, doc);
+        });
+
+        const Test = db.model('Test', schema);
+
+        await Test.create({
+          foo: true,
+          bar: true
+        });
+
+        const tests = await Test.find();
+        tests.forEach(t => t.foo = false);
+        await Test.bulkSave(tests);
+      });
     });
   });
 

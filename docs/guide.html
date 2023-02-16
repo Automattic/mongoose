@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.9.1: Schemas</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
-</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.9.1</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.15</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/guide.md" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.9.2: Schemas</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.9.2</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.15</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/guide.md" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h2 id="schemas">
       <a href="#schemas">
@@ -59,7 +59,7 @@ collection and defines the shape of the documents within that collection.</p>
 <p>Each key in our code <code>blogSchema</code> defines a property in our documents which
 will be cast to its associated <a href="api/schematype.html#schematype_SchemaType">SchemaType</a>.
 For example, we&#39;ve defined a property <code>title</code> which will be cast to the
-<a href="api/schema-string-js.html#schema-string-js">String</a> SchemaType and property <code>date</code>
+<a href="schematypes.html#strings">String</a> SchemaType and property <code>date</code>
 which will be cast to a <code>Date</code> SchemaType.</p>
 <p>Notice above that if a property only requires a type, it can be specified using
 a shorthand notation (contrast the <code>title</code> property above with the <code>date</code>
@@ -171,7 +171,7 @@ ways to add a static:</p>
 <ul>
 <li>Add a function property to the second argument of the schema-constructor (<code>statics</code>)</li>
 <li>Add a function property to <code>schema.statics</code></li>
-<li>Call the <a href="schema.html#schema_Schema-static"><code>Schema#static()</code> function</a></li>
+<li>Call the <a href="api/schema.html#schema_Schema-static"><code>Schema#static()</code> function</a></li>
 </ul>
 <pre><code class="language-javascript">
 <span class="hljs-comment">// define a schema</span>
@@ -233,10 +233,10 @@ animalSchema.<span class="hljs-property">query</span>.<span class="hljs-property
 </code></pre>
 <h3 id="indexes"><a href="#indexes">Indexes</a></h3>
 
-<p>MongoDB supports <a href="http://docs.mongodb.org/manual/indexes/">secondary indexes</a>.
-With mongoose, we define these indexes within our <code>Schema</code> <a href="api/schematype.html#schematype_SchemaType-index">at</a> <a href="api/schematype.html#schematype_SchemaType-unique">the</a> <a href="api/schematype.html#schematype_SchemaType-sparse">path</a> <a href="api/schemadateoptions.html.html#schemadateoptions_SchemaDateOptions-expires">level</a> or the <code>schema</code> level.
+<p>MongoDB supports <a href="http://www.mongodb.com/docs/manual/indexes/">secondary indexes</a>.
+With mongoose, we define these indexes within our <code>Schema</code> <a href="api/schematype.html#schematype_SchemaType-index">at</a> <a href="api/schematype.html#schematype_SchemaType-unique">the</a> <a href="api/schematype.html#schematype_SchemaType-sparse">path</a> <a href="api/schemadateoptions.html#schemadateoptions_SchemaDateOptions-expires">level</a> or the <code>schema</code> level.
 Defining indexes at the schema level is necessary when creating
-<a href="https://docs.mongodb.com/manual/core/index-compound/">compound indexes</a>.</p>
+<a href="https://www.mongodb.com/docs/manual/core/index-compound/">compound indexes</a>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> animalSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
   <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
   <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
@@ -246,9 +246,9 @@ Defining indexes at the schema level is necessary when creating
 animalSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">name</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">type</span>: -<span class="hljs-number">1</span> }); <span class="hljs-comment">// schema level</span>
 </code></pre>
 <p>See <a href="api/schematype.html#schematype_SchemaType-index">SchemaType#index()</a> for other index options.</p>
-<p>When your application starts up, Mongoose automatically calls <a href="https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex"><code>createIndex</code></a> for each defined index in your schema.
+<p>When your application starts up, Mongoose automatically calls <a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.createIndex/#db.collection.createIndex"><code>createIndex</code></a> for each defined index in your schema.
 Mongoose will call <code>createIndex</code> for each index sequentially, and emit an &#39;index&#39; event on the model when all the <code>createIndex</code> calls succeeded or when there was an error.
-While nice for development, it is recommended this behavior be disabled in production since index creation can cause a <a href="https://docs.mongodb.com/manual/core/index-creation/#index-build-impact-on-database-performance">significant performance impact</a>.
+While nice for development, it is recommended this behavior be disabled in production since index creation can cause a <a href="https://www.mongodb.com/docs/manual/core/index-creation/#index-build-impact-on-database-performance">significant performance impact</a>.
 Disable the behavior by setting the <code>autoIndex</code> option of your schema to <code>false</code>, or globally on the connection by setting the option <code>autoIndex</code> to <code>false</code>.</p>
 <pre><code class="language-javascript">mongoose.<span class="hljs-title function_">connect</span>(<span class="hljs-string">&#x27;mongodb://user:pass@127.0.0.1:port/database&#x27;</span>, { <span class="hljs-attr">autoIndex</span>: <span class="hljs-literal">false</span> });
 <span class="hljs-comment">// or</span>
@@ -466,9 +466,9 @@ schema.<span class="hljs-title function_">set</span>(option, value);
 </ul>
 <h3 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h3>
 
-<p>By default, Mongoose&#39;s <a href="model.html#model_Model-init"><code>init()</code> function</a>
+<p>By default, Mongoose&#39;s <a href="api/model.html#model_Model-init"><code>init()</code> function</a>
 creates all the indexes defined in your model&#39;s schema by calling
-<a href="model.html#model_Model-createIndexes"><code>Model.createIndexes()</code></a>
+<a href="api/model.html#model_Model-createIndexes"><code>Model.createIndexes()</code></a>
 after you successfully connect to MongoDB. Creating indexes automatically is
 great for development and test environments. But index builds can also create
 significant load on your production database. If you want to manage indexes
@@ -520,22 +520,21 @@ throwing an error. If not specified, Mongoose will use 10000 (10 seconds).</p>
 </code></pre>
 <h3 id="capped"><a href="#capped">option: capped</a></h3>
 
-<p>Mongoose supports MongoDBs <a href="http://www.mongodb.org/display/DOCS/Capped+Collections">capped</a>
+<p>Mongoose supports MongoDBs <a href="https://www.mongodb.com/docs/manual/core/capped-collections/">capped</a>
 collections. To specify the underlying MongoDB collection be <code>capped</code>, set
 the <code>capped</code> option to the maximum size of the collection in
-<a href="http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-size.">bytes</a>.</p>
+<a href="https://www.mongodb.com/docs/manual/core/capped-collections/#create-a-capped-collection">bytes</a>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({..}, { <span class="hljs-attr">capped</span>: <span class="hljs-number">1024</span> });
 </code></pre>
 <p>The <code>capped</code> option may also be set to an object if you want to pass
-additional options like <a href="http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-max">max</a>
-or <a href="http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-autoIndexId">autoIndexId</a>.
+additional options like <a href="https://www.mongodb.com/docs/manual/core/capped-collections/#change-the-maximum-number-of-documents-in-a-capped-collection">max</a>.
 In this case you must explicitly pass the <code>size</code> option, which is required.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({..}, { <span class="hljs-attr">capped</span>: { <span class="hljs-attr">size</span>: <span class="hljs-number">1024</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">1000</span>, <span class="hljs-attr">autoIndexId</span>: <span class="hljs-literal">true</span> } });
 </code></pre>
 <h3 id="collection"><a href="#collection">option: collection</a></h3>
 
 <p>Mongoose by default produces a collection name by passing the model name to
-the <a href="api/utils.html#utils_exports-toCollectionName">utils.toCollectionName</a> method.
+the <code>utils.toCollectionName</code> method.
 This method pluralizes the name. Set this option if you need a different name
 for your collection.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> dataSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({..}, { <span class="hljs-attr">collection</span>: <span class="hljs-string">&#x27;data&#x27;</span> });
@@ -577,8 +576,8 @@ schema, you may disable it by passing this option at schema construction time.</
 <h3 id="_id"><a href="#_id">option: _id</a></h3>
 
 <p>Mongoose assigns each of your schemas an <code>_id</code> field by default if one
-is not passed into the <a href="schema.html#schema_Schema">Schema</a> constructor.
-The type assigned is an <a href="schema.html#schema_Schema-Types">ObjectId</a>
+is not passed into the <a href="api/schema.html#schema_Schema">Schema</a> constructor.
+The type assigned is an <a href="api/schema.html#schema_Schema-Types">ObjectId</a>
 to coincide with MongoDB&#39;s default behavior. If you don&#39;t want an <code>_id</code>
 added to your schema at all, you may disable it using this option.</p>
 <p>You can <strong>only</strong> use this option on subdocuments. Mongoose can&#39;t
@@ -638,9 +637,9 @@ sam.$isEmpty(<span class="hljs-string">&#x27;inventory&#x27;</span>); <span clas
 </code></pre>
 <h3 id="read"><a href="#read">option: read</a></h3>
 
-<p>Allows setting <a href="query.html#query_Query-read">query#read</a> options at the
+<p>Allows setting <a href="api/query.html#query_Query-read">query#read</a> options at the
 schema level, providing us a way to apply default
-<a href="http://docs.mongodb.org/manual/applications/replication/#replica-set-read-preference">ReadPreferences</a>
+<a href="http://www.mongodb.com/docs/manual/applications/replication/#replica-set-read-preference">ReadPreferences</a>
 to all queries derived from a model.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({..}, { <span class="hljs-attr">read</span>: <span class="hljs-string">&#x27;primary&#x27;</span> });            <span class="hljs-comment">// also aliased as &#x27;p&#x27;</span>
 <span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({..}, { <span class="hljs-attr">read</span>: <span class="hljs-string">&#x27;primaryPreferred&#x27;</span> });   <span class="hljs-comment">// aliased as &#x27;pp&#x27;</span>
@@ -653,7 +652,7 @@ to all queries derived from a model.</p>
 <p>The read option also allows us to specify <em>tag sets</em>. These tell the
 <a href="https://github.com/mongodb/node-mongodb-native/">driver</a> from which members
 of the replica-set it should attempt to read. Read more about tag sets
-<a href="http://docs.mongodb.org/manual/applications/replication/#tag-sets">here</a> and
+<a href="http://www.mongodb.com/docs/manual/applications/replication/#tag-sets">here</a> and
 <a href="https://www.mongodb.com/docs/manual/core/read-preference">here</a>.</p>
 <p><em>NOTE: you may also specify the driver read preference <a href="https://www.mongodb.com/docs/manual/core/read-preference/#read-preference-modes">strategy</a>
 option when connecting:</em></p>
@@ -666,7 +665,7 @@ mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-strin
 </code></pre>
 <h3 id="writeConcern"><a href="#writeConcern">option: writeConcern</a></h3>
 
-<p>Allows setting <a href="https://docs.mongodb.com/manual/reference/write-concern/">write concern</a>
+<p>Allows setting <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a>
 at the schema level.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }, {
   <span class="hljs-attr">writeConcern</span>: {
@@ -678,7 +677,7 @@ at the schema level.</p>
 </code></pre>
 <h3 id="shardKey"><a href="#shardKey">option: shardKey</a></h3>
 
-<p>The <code>shardKey</code> option is used when we have a <a href="http://www.mongodb.org/display/DOCS/Sharding+Introduction">sharded MongoDB architecture</a>.
+<p>The <code>shardKey</code> option is used when we have a <a href="https://www.mongodb.com/docs/manual/sharding/">sharded MongoDB architecture</a>.
 Each sharded collection is given a shard key which must be present in all
 insert/update operations. We just need to set this schema option to the same
 shard key and we’ll be all set.</p>
@@ -787,10 +786,10 @@ schema.<span class="hljs-title function_">set</span>(<span class="hljs-string">&
 <span class="hljs-comment">// since we know toJSON is called whenever a js object is stringified:</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(m)); <span class="hljs-comment">// { &quot;_id&quot;: &quot;504e0cd7dd992d9be2f20b6f&quot;, &quot;name&quot;: &quot;Max Headroom is my name&quot; }</span>
 </code></pre>
-<p>To see all available <code>toJSON/toObject</code> options, read <a href="document.html#document_Document-toObject">this</a>.</p>
+<p>To see all available <code>toJSON/toObject</code> options, read <a href="api/document.html#document_Document-toObject">this</a>.</p>
 <h3 id="toObject"><a href="#toObject">option: toObject</a></h3>
 
-<p>Documents have a <a href="document.html#document_Document-toObject">toObject</a> method
+<p>Documents have a <a href="api/document.html#document_Document-toObject">toObject</a> method
 which converts the mongoose document into a plain JavaScript object. This
 method accepts a few options. Instead of applying these options on a
 per-document basis, we may declare the options at the schema level and have
@@ -806,7 +805,7 @@ schema.<span class="hljs-title function_">set</span>(<span class="hljs-string">&
 <span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> <span class="hljs-title function_">M</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Max Headroom&#x27;</span> });
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(m); <span class="hljs-comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: &#x27;Max Headroom is my name&#x27; }</span>
 </code></pre>
-<p>To see all available <code>toObject</code> options, read <a href="document.html#document_Document-toObject">this</a>.</p>
+<p>To see all available <code>toObject</code> options, read <a href="api/document.html#document_Document-toObject">this</a>.</p>
 <h3 id="typeKey"><a href="#typeKey">option: typeKey</a></h3>
 
 <p>By default, if you have an object with key &#39;type&#39; in your schema, mongoose
@@ -814,7 +813,7 @@ will interpret it as a type declaration.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Mongoose interprets this as &#x27;loc is a String&#x27;</span>
 <span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">loc</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">coordinates</span>: [<span class="hljs-title class_">Number</span>] } });
 </code></pre>
-<p>However, for applications like <a href="http://docs.mongodb.org/manual/reference/geojson/">geoJSON</a>,
+<p>However, for applications like <a href="http://www.mongodb.com/docs/manual/reference/geojson/">geoJSON</a>,
 the &#39;type&#39; property is important. If you want to control which key mongoose
 uses to find type declarations, set the &#39;typeKey&#39; schema option.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
@@ -886,7 +885,7 @@ doc2.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x
 <span class="hljs-keyword">const</span> thing = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thing</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;no versioning please&#x27;</span> });
 thing.<span class="hljs-title function_">save</span>(); <span class="hljs-comment">// { name: &#x27;no versioning please&#x27; }</span>
 </code></pre>
-<p>Mongoose <em>only</em> updates the version key when you use <a href="document.html#document_Document-save"><code>save()</code></a>.
+<p>Mongoose <em>only</em> updates the version key when you use <a href="api/document.html#document_Document-save"><code>save()</code></a>.
 If you use <code>update()</code>, <code>findOneAndUpdate()</code>, etc. Mongoose will <strong>not</strong>
 update the version key. As a workaround, you can use the below middleware.</p>
 <pre><code class="language-javascript">schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;findOneAndUpdate&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
@@ -963,7 +962,7 @@ house.<span class="hljs-property">status</span> = <span class="hljs-string">&#x2
 </code></pre>
 <h3 id="collation"><a href="#collation">option: collation</a></h3>
 
-<p>Sets a default <a href="https://docs.mongodb.com/manual/reference/collation/">collation</a>
+<p>Sets a default <a href="https://www.mongodb.com/docs/manual/reference/collation/">collation</a>
 for every query and aggregation. <a href="http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations">Here&#39;s a beginner-friendly overview of collations</a>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
   <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>
@@ -982,7 +981,7 @@ for every query and aggregation. <a href="http://thecodebarbarian.com/a-nodejs-p
 </code></pre>
 <h3 id="timeseries"><a href="#timeseries">option: timeseries</a></h3>
 
-<p>If you set the <code>timeseries</code> option on a schema, Mongoose will create a <a href="https://docs.mongodb.com/manual/core/timeseries-collections/">timeseries collection</a> for any model that you create from that schema.</p>
+<p>If you set the <code>timeseries</code> option on a schema, Mongoose will create a <a href="https://www.mongodb.com/docs/manual/core/timeseries-collections/">timeseries collection</a> for any model that you create from that schema.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">timestamp</span>: <span class="hljs-title class_">Date</span>, <span class="hljs-attr">metadata</span>: <span class="hljs-title class_">Object</span> }, {
   <span class="hljs-attr">timeseries</span>: {
     <span class="hljs-attr">timeField</span>: <span class="hljs-string">&#x27;timestamp&#x27;</span>,
@@ -1009,14 +1008,14 @@ thing.<span class="hljs-title function_">save</span>(); <span class="hljs-commen
 <h3 id="timestamps"><a href="#timestamps">option: timestamps</a></h3>
 
 <p>The <code>timestamps</code> option tells Mongoose to assign <code>createdAt</code> and <code>updatedAt</code> fields
-to your schema. The type assigned is <a href="api/schema-date-js.html#schema-date-js">Date</a>.</p>
+to your schema. The type assigned is <a href="schematypes.html#dates">Date</a>.</p>
 <p>By default, the names of the fields are <code>createdAt</code> and <code>updatedAt</code>. Customize
 the field names by setting <code>timestamps.createdAt</code> and <code>timestamps.updatedAt</code>.</p>
 <p>The way <code>timestamps</code> works under the hood is:</p>
 <ul>
 <li>If you create a new document, mongoose simply sets <code>createdAt</code>, and <code>updatedAt</code> to the time of creation.</li>
 <li>If you update a document, mongoose will add <code>updatedAt</code> to the <code>$set</code> object.</li>
-<li>If you set <code>upsert: true</code> on an update operation, mongoose will use <a href="https://docs.mongodb.com/manual/reference/operator/update/setOnInsert/"><code>$setOnInsert</code></a> operator to add <code>createdAt</code> to the document in case the <code>upsert</code> operation resulted into a new inserted document.</li>
+<li>If you set <code>upsert: true</code> on an update operation, mongoose will use <a href="https://www.mongodb.com/docs/manual/reference/operator/update/setOnInsert/"><code>$setOnInsert</code></a> operator to add <code>createdAt</code> to the document in case the <code>upsert</code> operation resulted into a new inserted document.</li>
 </ul>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> thingSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({..}, { <span class="hljs-attr">timestamps</span>: { <span class="hljs-attr">createdAt</span>: <span class="hljs-string">&#x27;created_at&#x27;</span> } });
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">Thing</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Thing&#x27;</span>, thingSchema);
@@ -1194,4 +1193,4 @@ of use cases, including e-commerce, wikis, and appointment bookings.</p>
 <h3 id="next">Next Up</h3>
 
 <p>Now that we&#39;ve covered <code>Schemas</code>, let&#39;s take a look at <a href="schematypes.html">SchemaTypes</a>.</p>
-</div></div><div id="jobs"><div class="job-listing"><a href="/docs/jobs#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/jobs#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/jobs#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/jobs">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/js/mobile-navbar-toggle.js"></script></div></body></html>
+</div></div><div id="jobs"><div class="job-listing"><a href="/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/jobs.html#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/jobs.html#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/js/mobile-navbar-toggle.js"></script></div></body></html>

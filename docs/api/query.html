@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.9.1: Query</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><script src="/docs/js/api-bold-current-nav.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.9.1</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.15</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/query.js" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.9.2: Query</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><script src="/docs/js/api-bold-current-nav.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.9.2</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.15</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/query.js" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h1>Query</h1><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"><div id="native-direct"></div><script>(function() {
 if (typeof _bsa !== 'undefined' && _bsa) {
@@ -21,7 +21,7 @@ template: `
 <span class="method-type">&laquo;Object&raquo;</span> Mongoose collection</p>
 </li></ul><div><p>Query constructor used for building queries. You do not need
 to instantiate a <code>Query</code> directly. Instead use Model functions like
-<a href="/docs/api/find.html#find_find"><code>Model.find()</code></a>.</p>
+<a href="/docs/api/model.html#model_Model-find"><code>Model.find()</code></a>.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -38,7 +38,7 @@ query.<span class="hljs-title function_">where</span>(<span class="hljs-string">
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-$where"><a href="#query_Query-$where"><code>Query.prototype.$where()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>js</code>
 <span class="method-type">&laquo;String|Function&raquo;</span> javascript string or function</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/where/">$where</a></span></li></ul><div><p>Specifies a javascript function or expression to pass to MongoDBs query system.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/where/">$where</a></span></li></ul><div><p>Specifies a javascript function or expression to pass to MongoDBs query system.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -58,7 +58,7 @@ query.$where(<span class="hljs-keyword">function</span> (<span class="hljs-param
       </a>
     </h4>
 <p>Only use <code>$where</code> when you have a condition that cannot be met using other MongoDB operators like <code>$lt</code>.
-<strong>Be sure to read about all of <a href="https://docs.mongodb.org/manual/reference/operator/where/">its caveats</a> before using.</strong></p>
+<strong>Be sure to read about all of <a href="https://www.mongodb.com/docs/manual/reference/operator/where/">its caveats</a> before using.</strong></p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-Symbol.asyncIterator"><a href="#query_Query-Symbol.asyncIterator"><code>Query.prototype.Symbol.asyncIterator()</code></a></h3><div><p>Returns an asyncIterator for use with <a href="https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js"><code>for/await/of</code> loops</a>
 This function <em>only</em> works for <code>find()</code> queries.
 You do not need to call this function explicitly, the JavaScript runtime
@@ -79,7 +79,7 @@ enable async iterators in Node.js 8.x using the <a href="https://github.com/tc39
 support async iterators.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-all"><a href="#query_Query-all"><code>Query.prototype.all()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Array&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/all/">$all</a></span></li></ul><div><p>Specifies an <code>$all</code> query condition.</p>
+<span class="method-type">&laquo;Array&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/all/">$all</a></span></li></ul><div><p>Specifies an <code>$all</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
 <h4 id="example">
       <a href="#example">
@@ -92,7 +92,7 @@ support async iterators.</p>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-allowDiskUse"><a href="#query_Query-allowDiskUse"><code>Query.prototype.allowDiskUse()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[v]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> Enable/disable <code>allowDiskUse</code>. If called with 0 arguments, sets <code>allowDiskUse: true</code></p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the <a href="https://docs.mongodb.com/manual/reference/method/cursor.allowDiskUse/"><code>allowDiskUse</code> option</a>,
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the <a href="https://www.mongodb.com/docs/manual/reference/method/cursor.allowDiskUse/"><code>allowDiskUse</code> option</a>,
 which allows the MongoDB server to use more than 100 MB for this query&#39;s <code>sort()</code>. This option can
 let you work around <code>QueryExceededMemoryLimitNoDiskUseAllowed</code> errors from the MongoDB server.</p>
 <p>Note that this option requires MongoDB server &gt;= 4.4. Setting this option is a no-op for MongoDB 4.2
@@ -109,7 +109,7 @@ and earlier.</p>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-and"><a href="#query_Query-and"><code>Query.prototype.and()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>array</code>
 <span class="method-type">&laquo;Array&raquo;</span> array of conditions</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/and/">$and</a></span></li></ul><div><p>Specifies arguments for a <code>$and</code> condition.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/and/">$and</a></span></li></ul><div><p>Specifies arguments for a <code>$and</code> condition.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -118,7 +118,7 @@ and earlier.</p>
 <pre><code>query.<span class="hljs-title function_">and</span>([{ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;green&#x27;</span> }, { <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;ok&#x27;</span> }])
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-batchSize"><a href="#query_Query-batchSize"><code>Query.prototype.batchSize()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>val</code>
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/method/cursor.batchSize/">batchSize</a></span></li></ul><div><p>Specifies the batchSize option.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.batchSize/">batchSize</a></span></li></ul><div><p>Specifies the batchSize option.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -136,7 +136,7 @@ and earlier.</p>
 <span class="method-type">&laquo;Object|Array&lt;Number&gt;&raquo;</span> Lower Left Coordinates OR a object of lower-left(ll) and upper-right(ur) Coordinates</p>
 </li><li class="param"><code>[val2]</code>
 <span class="method-type">&laquo;Array&lt;Number&gt;&raquo;</span> Upper Right Coordinates</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/box/">$box</a></span></li><li><span class="method-type"><a href="#query_Query-within">within() Query#within</a></span></li><li><span class="method-type"><a href="https://www.mongodb.org/display/DOCS/Geospatial+Indexing">MongoDB Geospatial Indexing</a></span></li></ul><div><p>Specifies a <code>$box</code> condition</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/box/">$box</a></span></li><li><span class="method-type"><a href="#query_Query-within">within() Query#within</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/core/geospatial-indexes/">MongoDB Geospatial Indexing</a></span></li></ul><div><p>Specifies a <code>$box</code> condition</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -167,7 +167,7 @@ Like <code>.then()</code>, but only takes a rejection handler.</p>
 <p><strong>Deprecated.</strong> Use <a href="#query_Query-circle">circle</a> instead.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-centerSphere"><a href="#query_Query-centerSphere"><code>Query.prototype.centerSphere()</code></a></h3><span class="deprecated">~DEPRECATED~</span><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.org/display/DOCS/Geospatial+Indexing">MongoDB Geospatial Indexing</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/centerSphere/">$centerSphere</a></span></li></ul><div><p><em>DEPRECATED</em> Specifies a <code>$centerSphere</code> condition</p>
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/core/geospatial-indexes/">MongoDB Geospatial Indexing</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/centerSphere/">$centerSphere</a></span></li></ul><div><p><em>DEPRECATED</em> Specifies a <code>$centerSphere</code> condition</p>
 <p><strong>Deprecated.</strong> Use <a href="#query_Query-circle">circle</a> instead.</p>
 <h4 id="example">
       <a href="#example">
@@ -179,7 +179,7 @@ query.<span class="hljs-title function_">where</span>(<span class="hljs-string">
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-circle"><a href="#query_Query-circle"><code>Query.prototype.circle()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>area</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/center/">$center</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/centerSphere/">$centerSphere</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/geoWithin/">$geoWithin</a></span></li><li><span class="method-type"><a href="https://www.mongodb.org/display/DOCS/Geospatial+Indexing">MongoDB Geospatial Indexing</a></span></li></ul><div><p>Specifies a <code>$center</code> or <code>$centerSphere</code> condition.</p>
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/center/">$center</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/centerSphere/">$centerSphere</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/geoWithin/">$geoWithin</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/core/geospatial-indexes/">MongoDB Geospatial Indexing</a></span></li></ul><div><p>Specifies a <code>$center</code> or <code>$centerSphere</code> condition.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -209,9 +209,9 @@ query.<span class="hljs-title function_">circle</span>(<span class="hljs-string"
 <span class="hljs-keyword">await</span> q.<span class="hljs-title function_">clone</span>().<span class="hljs-title function_">exec</span>(); <span class="hljs-comment">// Works</span>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-collation"><a href="#query_Query-collation"><code>Query.prototype.collation()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>value</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/method/cursor.collation/#cursor.collation">MongoDB docs</a></span></li></ul><div><p>Adds a collation to this op (MongoDB 3.4 and up)</p>
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.collation/#cursor.collation">MongoDB docs</a></span></li></ul><div><p>Adds a collation to this op (MongoDB 3.4 and up)</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-comment"><a href="#query_Query-comment"><code>Query.prototype.comment()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>val</code>
-<span class="method-type">&laquo;String&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/comment/">comment</a></span></li></ul><div><p>Specifies the <code>comment</code> option.</p>
+<span class="method-type">&laquo;String&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/comment/">comment</a></span></li></ul><div><p>Specifies the <code>comment</code> option.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -229,10 +229,10 @@ query.<span class="hljs-title function_">circle</span>(<span class="hljs-string"
 <span class="method-type">&laquo;Object&raquo;</span> count documents that match this object</p>
 </li><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, count)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/method/db.collection.count/">count</a></span></li></ul><div><p>Specifies this query as a <code>count</code> query.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.count/">count</a></span></li></ul><div><p>Specifies this query as a <code>count</code> query.</p>
 <p>This method is deprecated. If you want to count the number of documents in
-a collection, e.g. <code>count({})</code>, use the <a href="/docs/api/query.html#query_Query-estimatedDocumentCount"><code>estimatedDocumentCount()</code> function</a>
-instead. Otherwise, use the <a href="/docs/api/query.html#query_Query-countDocuments"><code>countDocuments()</code></a> function instead.</p>
+a collection, e.g. <code>count({})</code>, use the <a href="#query_Query-estimatedDocumentCount"><code>estimatedDocumentCount()</code> function</a>
+instead. Otherwise, use the <a href="#query_Query-countDocuments"><code>countDocuments()</code></a> function instead.</p>
 <p>Passing a <code>callback</code> executes the query.</p>
 <p>This function triggers the following middleware.</p>
 <ul>
@@ -290,12 +290,12 @@ query.<span class="hljs-title function_">where</span>(<span class="hljs-string">
 Below are the operators that <code>count()</code> supports but <code>countDocuments()</code> does not,
 and the suggested replacement:</p>
 <ul>
-<li><code>$where</code>: <a href="https://docs.mongodb.com/manual/reference/operator/query/expr/"><code>$expr</code></a></li>
-<li><code>$near</code>: <a href="https://docs.mongodb.com/manual/reference/operator/query/geoWithin/"><code>$geoWithin</code></a> with <a href="https://docs.mongodb.com/manual/reference/operator/query/center/#op._S_center"><code>$center</code></a></li>
-<li><code>$nearSphere</code>: <a href="https://docs.mongodb.com/manual/reference/operator/query/geoWithin/"><code>$geoWithin</code></a> with <a href="https://docs.mongodb.com/manual/reference/operator/query/centerSphere/#op._S_centerSphere"><code>$centerSphere</code></a></li>
+<li><code>$where</code>: <a href="https://www.mongodb.com/docs/manual/reference/operator/query/expr/"><code>$expr</code></a></li>
+<li><code>$near</code>: <a href="https://www.mongodb.com/docs/manual/reference/operator/query/geoWithin/"><code>$geoWithin</code></a> with <a href="https://www.mongodb.com/docs/manual/reference/operator/query/center/#op._S_center"><code>$center</code></a></li>
+<li><code>$nearSphere</code>: <a href="https://www.mongodb.com/docs/manual/reference/operator/query/geoWithin/"><code>$geoWithin</code></a> with <a href="https://www.mongodb.com/docs/manual/reference/operator/query/centerSphere/#op._S_centerSphere"><code>$centerSphere</code></a></li>
 </ul>
   </div><hr class="separate-api-elements"><h3 id="query_Query-cursor"><a href="#query_Query-cursor"><code>Query.prototype.cursor()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;QueryCursor&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/querycursor">QueryCursor</a></span></li></ul><div><p>Returns a wrapper around a <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html">mongodb driver cursor</a>.
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;QueryCursor&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/querycursor.html">QueryCursor</a></span></li></ul><div><p>Returns a wrapper around a <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html">mongodb driver cursor</a>.
 A QueryCursor exposes a Streams3 interface, as well as a <code>.next()</code> function.</p>
 <p>The <code>.cursor()</code> function triggers pre find hooks, but <strong>not</strong> post find hooks.</p>
 <h4 id="example">
@@ -336,7 +336,7 @@ cursor.<span class="hljs-title function_">next</span>(<span class="hljs-keyword"
   </div><hr class="separate-api-elements"><h3 id="query_Query-deleteMany"><a href="#query_Query-deleteMany"><code>Query.prototype.deleteMany()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
 <span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api/query.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, mongooseDeleteResult)</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/DeleteResult.html">DeleteResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#deleteMany">deleteMany</a></span></li></ul><div><p>Declare and/or execute this query as a <code>deleteMany()</code> operation. Works like
@@ -373,7 +373,7 @@ res.<span class="hljs-property">deletedCount</span>;
   </div><hr class="separate-api-elements"><h3 id="query_Query-deleteOne"><a href="#query_Query-deleteOne"><code>Query.prototype.deleteOne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
 <span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api/query.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, mongooseDeleteResult)</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/DeleteResult.html">DeleteResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#deleteOne">deleteOne</a></span></li></ul><div><p>Declare and/or execute this query as a <code>deleteOne()</code> operation. Works like
@@ -411,7 +411,7 @@ res.<span class="hljs-property">deletedCount</span>;
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>[filter]</code>
 <span class="method-type">&laquo;Object|Query&raquo;</span> </li><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, arr)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/method/db.collection.distinct/">distinct</a></span></li></ul><div><p>Declares or executes a distinct() operation.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.distinct/">distinct</a></span></li></ul><div><p>Declares or executes a distinct() operation.</p>
 <p>Passing a <code>callback</code> executes the query.</p>
 <p>This function does not trigger any middleware.</p>
 <h4 id="example">
@@ -428,7 +428,7 @@ res.<span class="hljs-property">deletedCount</span>;
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-elemMatch"><a href="#query_Query-elemMatch"><code>Query.prototype.elemMatch()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
 <span class="method-type">&laquo;String|Object|Function&raquo;</span> </li><li class="param"><code>filter</code>
-<span class="method-type">&laquo;Object|Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/elemMatch/">$elemMatch</a></span></li></ul><div><p>Specifies an <code>$elemMatch</code> condition</p>
+<span class="method-type">&laquo;Object|Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/elemMatch/">$elemMatch</a></span></li></ul><div><p>Specifies an <code>$elemMatch</code> condition</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -530,7 +530,7 @@ query.<span class="hljs-title function_">exec</span>(<span class="hljs-string">&
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-exists"><a href="#query_Query-exists"><code>Query.prototype.exists()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/exists/">$exists</a></span></li></ul><div><p>Specifies an <code>$exists</code> condition</p>
+<span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/exists/">$exists</a></span></li></ul><div><p>Specifies an <code>$exists</code> condition</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -547,7 +547,7 @@ query.<span class="hljs-title function_">exec</span>(<span class="hljs-string">&
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-explain"><a href="#query_Query-explain"><code>Query.prototype.explain()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[verbose]</code>
 <span class="method-type">&laquo;String&raquo;</span> The verbosity mode. Either &#39;queryPlanner&#39;, &#39;executionStats&#39;, or &#39;allPlansExecution&#39;. The default is &#39;queryPlanner&#39;</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the <a href="https://docs.mongodb.com/manual/reference/method/cursor.explain/"><code>explain</code> option</a>,
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the <a href="https://www.mongodb.com/docs/manual/reference/method/cursor.explain/"><code>explain</code> option</a>,
 which makes this query return detailed execution stats instead of the actual
 query result. This method is useful for determining what index your queries
 use.</p>
@@ -566,7 +566,7 @@ use.</p>
 </li><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Find all documents that match <code>selector</code>. The result will be an array of documents.</p>
 <p>If there are too many documents in the result to fit in memory, use
-<a href="api/query.html#query_Query-cursor"><code>Query.prototype.cursor()</code></a></p>
+<a href="#query_Query-cursor"><code>Query.prototype.cursor()</code></a></p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -583,10 +583,10 @@ use.</p>
 </li><li class="param"><code>[projection]</code>
 <span class="method-type">&laquo;Object&raquo;</span> optional fields to return</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> see <a href="https://mongoosejs.com/docs/api/query.html#query_Query-setOptions"><code>setOptions()</code></a></p>
+<span class="method-type">&laquo;Object&raquo;</span> see <a href="#query_Query-setOptions"><code>setOptions()</code></a></p>
 </li><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, document)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/method/db.collection.findOne/">findOne</a></span></li><li><span class="method-type"><a href="#query_Query-select">Query.select</a></span></li></ul><div><p>Declares the query a findOne operation. When executed, the first found document is passed to the callback.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.findOne/">findOne</a></span></li><li><span class="method-type"><a href="#query_Query-select">Query.select</a></span></li></ul><div><p>Declares the query a findOne operation. When executed, the first found document is passed to the callback.</p>
 <p>Passing a <code>callback</code> executes the query. The result of the query is a single document.</p>
 <ul>
 <li><em>Note:</em> <code>conditions</code> is optional, and if <code>conditions</code> is null or undefined,
@@ -621,7 +621,7 @@ query.<span class="hljs-title function_">findOne</span>(<span class="hljs-keywor
 <span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, document)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li></ul><div><p>Issues a MongoDB <a href="https://docs.mongodb.com/manual/reference/method/db.collection.findOneAndDelete/">findOneAndDelete</a> command.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li></ul><div><p>Issues a MongoDB <a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.findOneAndDelete/">findOneAndDelete</a> command.</p>
 <p>Finds a matching document, removes it, and passes the found document (if any)
 to the callback. Executes if <code>callback</code> is passed.</p>
 <p>This function triggers the following middleware.</p>
@@ -629,7 +629,7 @@ to the callback. Executes if <code>callback</code> is passed.</p>
 <li><code>findOneAndDelete()</code></li>
 </ul>
 <p>This function differs slightly from <code>Model.findOneAndRemove()</code> in that
-<code>findOneAndRemove()</code> becomes a <a href="https://docs.mongodb.com/manual/reference/method/db.collection.findAndModify/">MongoDB <code>findAndModify()</code> command</a>,
+<code>findOneAndRemove()</code> becomes a <a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.findAndModify/">MongoDB <code>findAndModify()</code> command</a>,
 as opposed to a <code>findOneAndDelete()</code> command. For most mongoose use cases,
 this distinction is purely pedantic. You should use <code>findOneAndDelete()</code>
 unless you have a good reason not to.</p>
@@ -675,7 +675,7 @@ A.<span class="hljs-title function_">where</span>().<span class="hljs-title func
 <span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, document)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li></ul><div><p>Issues a mongodb <a href="https://www.mongodb.org/display/DOCS/findAndModify+Command">findAndModify</a> remove command.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li></ul><div><p>Issues a mongodb <a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify</a> remove command.</p>
 <p>Finds a matching document, removes it, passing the found document (if any) to
 the callback. Executes if <code>callback</code> is passed.</p>
 <p>This function triggers the following middleware.</p>
@@ -726,7 +726,7 @@ A.<span class="hljs-title function_">where</span>().<span class="hljs-title func
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.new=false]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> By default, <code>findOneAndUpdate()</code> returns the document as it was <strong>before</strong> <code>update</code> was applied. If you set <code>new: true</code>, <code>findOneAndUpdate()</code> will instead give you the object after <code>update</code> was applied.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.lean]</code>
-<span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api/query.html#query_Query-lean"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
+<span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="#query_Query-lean"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.session=null]</code>
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
@@ -737,7 +737,7 @@ A.<span class="hljs-title function_">where</span>().<span class="hljs-title func
 <span class="method-type">&laquo;Boolean&raquo;</span> An alias for the <code>new</code> option. <code>returnOriginal: false</code> is equivalent to <code>new: true</code>.</p>
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, document)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Issues a MongoDB <a href="https://docs.mongodb.com/manual/reference/method/db.collection.findOneAndReplace/">findOneAndReplace</a> command.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Issues a MongoDB <a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.findOneAndReplace/">findOneAndReplace</a> command.</p>
 <p>Finds a matching document, removes it, and passes the found document (if any)
 to the callback. Executes if <code>callback</code> is passed.</p>
 <p>This function triggers the following middleware.</p>
@@ -790,7 +790,7 @@ A.<span class="hljs-title function_">where</span>().<span class="hljs-title func
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.new=false]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> By default, <code>findOneAndUpdate()</code> returns the document as it was <strong>before</strong> <code>update</code> was applied. If you set <code>new: true</code>, <code>findOneAndUpdate()</code> will instead give you the object after <code>update</code> was applied.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.lean]</code>
-<span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api/query.html#query_Query-lean"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
+<span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="#query_Query-lean"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.session=null]</code>
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
@@ -801,7 +801,7 @@ A.<span class="hljs-title function_">where</span>().<span class="hljs-title func
 <span class="method-type">&laquo;Boolean&raquo;</span> An alias for the <code>new</code> option. <code>returnOriginal: false</code> is equivalent to <code>new: true</code>.</p>
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, doc), <em>unless</em> <code>rawResult</code> is used, in which case params are (error, writeOpResult)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/tutorials/findoneandupdate.html">Tutorial</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">ModifyResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#findOneAndUpdate">findOneAndUpdate</a></span></li></ul><div><p>Issues a mongodb <a href="https://www.mongodb.org/display/DOCS/findAndModify+Command">findAndModify</a> update command.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/tutorials/findoneandupdate.html">Tutorial</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">ModifyResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#findOneAndUpdate">findOneAndUpdate</a></span></li></ul><div><p>Issues a mongodb <a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify</a> update command.</p>
 <p>Finds a matching document, updates it according to the <code>update</code> arg, passing any <code>options</code>, and returns the found
 document (if any) to the callback. The query executes if
 <code>callback</code> is passed.</p>
@@ -850,7 +850,7 @@ query.<span class="hljs-title function_">findOneAndUpdate</span>()              
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-geometry"><a href="#query_Query-geometry"><code>Query.prototype.geometry()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>object</code>
 <span class="method-type">&laquo;Object&raquo;</span> Must contain a <code>type</code> property which is a String and a <code>coordinates</code> property which is an Array. See the examples.</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/geometry/">$geometry</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/release-notes/2.4/#geospatial-support-enhancements">Geospatial Support Enhancements</a></span></li><li><span class="method-type"><a href="https://www.mongodb.org/display/DOCS/Geospatial+Indexing">MongoDB Geospatial Indexing</a></span></li></ul><div><p>Specifies a <code>$geometry</code> condition</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/geometry/">$geometry</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/release-notes/2.4/#geospatial-support-enhancements">Geospatial Support Enhancements</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/core/geospatial-indexes/">MongoDB Geospatial Indexing</a></span></li></ul><div><p>Specifies a <code>$geometry</code> condition</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -964,7 +964,7 @@ query.<span class="hljs-title function_">getUpdate</span>(); <span class="hljs-c
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-gt"><a href="#query_Query-gt"><code>Query.prototype.gt()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/gt/">$gt</a></span></li></ul><div><p>Specifies a <code>$gt</code> query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/gt/">$gt</a></span></li></ul><div><p>Specifies a <code>$gt</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
 <h4 id="example">
       <a href="#example">
@@ -978,11 +978,11 @@ query.<span class="hljs-title function_">getUpdate</span>(); <span class="hljs-c
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-gte"><a href="#query_Query-gte"><code>Query.prototype.gte()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/gte/">$gte</a></span></li></ul><div><p>Specifies a <code>$gte</code> query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/gte/">$gte</a></span></li></ul><div><p>Specifies a <code>$gte</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-hint"><a href="#query_Query-hint"><code>Query.prototype.hint()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>val</code>
 <span class="method-type">&laquo;Object&raquo;</span> a hint object</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/hint/">$hint</a></span></li></ul><div><p>Sets query hints.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/hint/">$hint</a></span></li></ul><div><p>Sets query hints.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -998,10 +998,10 @@ query.<span class="hljs-title function_">getUpdate</span>(); <span class="hljs-c
 <p>Cannot be used with <code>distinct()</code></p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-in"><a href="#query_Query-in"><code>Query.prototype.in()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Array&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/in/">$in</a></span></li></ul><div><p>Specifies an <code>$in</code> query condition.</p>
+<span class="method-type">&laquo;Array&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/in/">$in</a></span></li></ul><div><p>Specifies an <code>$in</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-intersects"><a href="#query_Query-intersects"><code>Query.prototype.intersects()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[arg]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/geometry/">$geometry</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/geoIntersects/">geoIntersects</a></span></li></ul><div><p>Declares an intersects query for <code>geometry()</code>.</p>
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/geometry/">$geometry</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/geoIntersects/">geoIntersects</a></span></li></ul><div><p>Declares an intersects query for <code>geometry()</code>.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1030,7 +1030,7 @@ query.<span class="hljs-title function_">where</span>(<span class="hljs-string">
     </h4>
 <p>In Mongoose 3.7, <code>intersects</code> changed from a getter to a function. If you need the old syntax, use <a href="https://github.com/ebensing/mongoose-within">this</a>.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-j"><a href="#query_Query-j"><code>Query.prototype.j()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>val</code>
-<span class="method-type">&laquo;boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/write-concern/#j-option">mongodb</a></span></li></ul><div><p>Requests acknowledgement that this operation has been persisted to MongoDB&#39;s
+<span class="method-type">&laquo;boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/write-concern/#j-option">mongodb</a></span></li></ul><div><p>Requests acknowledgement that this operation has been persisted to MongoDB&#39;s
 on-disk journal.
 This option is only valid for operations that write to the database:</p>
 <ul>
@@ -1056,7 +1056,7 @@ This option is only valid for operations that write to the database:</p>
 <span class="method-type">&laquo;Boolean|Object&raquo;</span> defaults to true</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the lean option.</p>
 <p>Documents returned from queries with the <code>lean</code> option enabled are plain
-javascript objects, not <a href="/api/document.html">Mongoose Documents</a>. They have no
+javascript objects, not <a href="/docs/api/document.html">Mongoose Documents</a>. They have no
 <code>save</code> method, getters/setters, virtuals, or other Mongoose features.</p>
 <h4 id="example">
       <a href="#example">
@@ -1097,18 +1097,18 @@ to use a plugin. See:</p>
 <p>Cannot be used with <code>distinct()</code></p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-lt"><a href="#query_Query-lt"><code>Query.prototype.lt()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/lt/">$lt</a></span></li></ul><div><p>Specifies a <code>$lt</code> query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/lt/">$lt</a></span></li></ul><div><p>Specifies a <code>$lt</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-lte"><a href="#query_Query-lte"><code>Query.prototype.lte()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/lte/">$lte</a></span></li></ul><div><p>Specifies a <code>$lte</code> query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/lte/">$lte</a></span></li></ul><div><p>Specifies a <code>$lte</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-maxDistance"><a href="#query_Query-maxDistance"><code>Query.prototype.maxDistance()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/maxDistance/">$maxDistance</a></span></li></ul><div><p>Specifies a <code>maxDistance</code> query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/maxDistance/">$maxDistance</a></span></li></ul><div><p>Specifies a <code>maxDistance</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-maxScan"><a href="#query_Query-maxScan"><code>Query.prototype.maxScan()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>val</code>
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/maxScan/">maxScan</a></span></li></ul><div><p>Specifies the maxScan option.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/v4.0/reference/method/cursor.maxScan/">maxScan</a></span></li></ul><div><p>Specifies the maxScan option.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1124,7 +1124,7 @@ to use a plugin. See:</p>
 <p>Cannot be used with <code>distinct()</code></p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-maxTimeMS"><a href="#query_Query-maxTimeMS"><code>Query.prototype.maxTimeMS()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[ms]</code>
 <span class="method-type">&laquo;Number&raquo;</span> The number of milliseconds</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the <a href="https://docs.mongodb.com/manual/reference/method/cursor.maxTimeMS/">maxTimeMS</a>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the <a href="https://www.mongodb.com/docs/manual/reference/method/cursor.maxTimeMS/">maxTimeMS</a>
 option. This will tell the MongoDB server to abort if the query or write op
 has been running for more than <code>ms</code> milliseconds.</p>
 <p>Calling <code>query.maxTimeMS(v)</code> is equivalent to <code>query.setOptions({ maxTimeMS: v })</code></p>
@@ -1145,7 +1145,7 @@ has been running for more than <code>ms</code> milliseconds.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-mod"><a href="#query_Query-mod"><code>Query.prototype.mod()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
 <span class="method-type">&laquo;Array&raquo;</span> must be of length 2, first element is <code>divisor</code>, 2nd element is <code>remainder</code>.</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/mod/">$mod</a></span></li></ul><div><p>Specifies a <code>$mod</code> condition, filters documents for documents whose
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/mod/">$mod</a></span></li></ul><div><p>Specifies a <code>$mod</code> condition, filters documents for documents whose
 <code>path</code> property is a number that is equal to <code>remainder</code> modulo <code>divisor</code>.</p>
 <h4 id="example">
       <a href="#example">
@@ -1172,22 +1172,22 @@ q.<span class="hljs-property">model</span> === <span class="hljs-title class_">M
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the options</li></ul><div><p>Getter/setter around the current mongoose-specific options for this query
 Below are the current Mongoose-specific options.</p>
 <ul>
-<li><code>populate</code>: an array representing what paths will be populated. Should have one entry for each call to <a href="/docs/api/query.html#query_Query-populate"><code>Query.prototype.populate()</code></a></li>
-<li><code>lean</code>: if truthy, Mongoose will not <a href="/docs/api/model.html#model_Model-hydrate">hydrate</a> any documents that are returned from this query. See <a href="/docs/api/query.html#query_Query-lean"><code>Query.prototype.lean()</code></a> for more information.</li>
+<li><code>populate</code>: an array representing what paths will be populated. Should have one entry for each call to <a href="#query_Query-populate"><code>Query.prototype.populate()</code></a></li>
+<li><code>lean</code>: if truthy, Mongoose will not <a href="/docs/api/model.html#model_Model-hydrate">hydrate</a> any documents that are returned from this query. See <a href="#query_Query-lean"><code>Query.prototype.lean()</code></a> for more information.</li>
 <li><code>strict</code>: controls how Mongoose handles keys that aren&#39;t in the schema for updates. This option is <code>true</code> by default, which means Mongoose will silently strip any paths in the update that aren&#39;t in the schema. See the <a href="/docs/guide.html#strict"><code>strict</code> mode docs</a> for more information.</li>
 <li><code>strictQuery</code>: controls how Mongoose handles keys that aren&#39;t in the schema for the query <code>filter</code>. This option is <code>false</code> by default for backwards compatibility, which means Mongoose will allow <code>Model.find({ foo: &#39;bar&#39; })</code> even if <code>foo</code> is not in the schema. See the <a href="/docs/guide.html#strictQuery"><code>strictQuery</code> docs</a> for more information.</li>
-<li><code>nearSphere</code>: use <code>$nearSphere</code> instead of <code>near()</code>. See the <a href="/docs/api/query.html#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code> docs</a></li>
+<li><code>nearSphere</code>: use <code>$nearSphere</code> instead of <code>near()</code>. See the <a href="#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code> docs</a></li>
 </ul>
 <p>Mongoose maintains a separate object for internal options because
 Mongoose sends <code>Query.prototype.options</code> to the MongoDB server, and the
 above options are not relevant for the MongoDB server.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-ne"><a href="#query_Query-ne"><code>Query.prototype.ne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;any&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/ne/">$ne</a></span></li></ul><div><p>Specifies a <code>$ne</code> query condition.</p>
+<span class="method-type">&laquo;any&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/ne/">$ne</a></span></li></ul><div><p>Specifies a <code>$ne</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-near"><a href="#query_Query-near"><code>Query.prototype.near()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/near/">$near</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/nearSphere/">$nearSphere</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/maxDistance/">$maxDistance</a></span></li><li><span class="method-type"><a href="https://www.mongodb.org/display/DOCS/Geospatial+Indexing">MongoDB Geospatial Indexing</a></span></li></ul><div><p>Specifies a <code>$near</code> or <code>$nearSphere</code> condition</p>
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/near/">$near</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/nearSphere/">$nearSphere</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/maxDistance/">$maxDistance</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/core/geospatial-indexes/">MongoDB Geospatial Indexing</a></span></li></ul><div><p>Specifies a <code>$near</code> or <code>$nearSphere</code> condition</p>
 <p>These operators return documents sorted by distance.</p>
 <h4 id="example">
       <a href="#example">
@@ -1199,7 +1199,7 @@ query.<span class="hljs-title function_">where</span>(<span class="hljs-string">
 query.<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;loc&#x27;</span>).<span class="hljs-title function_">near</span>({ <span class="hljs-attr">center</span>: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>], <span class="hljs-attr">maxDistance</span>: <span class="hljs-number">5</span>, <span class="hljs-attr">spherical</span>: <span class="hljs-literal">true</span> });
 query.<span class="hljs-title function_">near</span>(<span class="hljs-string">&#x27;loc&#x27;</span>, { <span class="hljs-attr">center</span>: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>], <span class="hljs-attr">maxDistance</span>: <span class="hljs-number">5</span> });
 </code></pre>
-  </div><hr class="separate-api-elements"><h3 id="query_Query-nearSphere"><a href="#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code></a></h3><span class="deprecated">~DEPRECATED~</span><h5>See:</h5><ul><li><span class="method-type"><a href="#query_Query-near">near()</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/near/">$near</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/nearSphere/">$nearSphere</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/maxDistance/">$maxDistance</a></span></li></ul><div><p><em>DEPRECATED</em> Specifies a <code>$nearSphere</code> condition</p>
+  </div><hr class="separate-api-elements"><h3 id="query_Query-nearSphere"><a href="#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code></a></h3><span class="deprecated">~DEPRECATED~</span><h5>See:</h5><ul><li><span class="method-type"><a href="#query_Query-near">near()</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/near/">$near</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/nearSphere/">$nearSphere</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/maxDistance/">$maxDistance</a></span></li></ul><div><p><em>DEPRECATED</em> Specifies a <code>$nearSphere</code> condition</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1217,11 +1217,11 @@ query.<span class="hljs-title function_">near</span>(<span class="hljs-string">&
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-nin"><a href="#query_Query-nin"><code>Query.prototype.nin()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Array&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/nin/">$nin</a></span></li></ul><div><p>Specifies an <code>$nin</code> query condition.</p>
+<span class="method-type">&laquo;Array&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/nin/">$nin</a></span></li></ul><div><p>Specifies an <code>$nin</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-nor"><a href="#query_Query-nor"><code>Query.prototype.nor()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>array</code>
 <span class="method-type">&laquo;Array&raquo;</span> array of conditions</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/nor/">$nor</a></span></li></ul><div><p>Specifies arguments for a <code>$nor</code> condition.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/nor/">$nor</a></span></li></ul><div><p>Specifies arguments for a <code>$nor</code> condition.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1231,7 +1231,7 @@ query.<span class="hljs-title function_">near</span>(<span class="hljs-string">&
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-or"><a href="#query_Query-or"><code>Query.prototype.or()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>array</code>
 <span class="method-type">&laquo;Array&raquo;</span> array of conditions</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/or/">$or</a></span></li></ul><div><p>Specifies arguments for an <code>$or</code> condition.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/or/">$or</a></span></li></ul><div><p>Specifies arguments for an <code>$or</code> condition.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1267,7 +1267,7 @@ an extra <code>if</code> statement to check if no document was found.</p>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-polygon"><a href="#query_Query-polygon"><code>Query.prototype.polygon()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String|Array&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[coordinatePairs...]</code>
-<span class="method-type">&laquo;Array|Object&raquo;</span> </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/polygon/">$polygon</a></span></li><li><span class="method-type"><a href="https://www.mongodb.org/display/DOCS/Geospatial+Indexing">MongoDB Geospatial Indexing</a></span></li></ul><div><p>Specifies a <code>$polygon</code> condition</p>
+<span class="method-type">&laquo;Array|Object&raquo;</span> </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/polygon/">$polygon</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/core/geospatial-indexes/">MongoDB Geospatial Indexing</a></span></li></ul><div><p>Specifies a <code>$polygon</code> condition</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1295,12 +1295,12 @@ query.<span class="hljs-title function_">polygon</span>(<span class="hljs-string
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.clone=false]</code>
 <span class="method-type">&laquo;boolean&raquo;</span> When you do <code>BlogPost.find().populate(&#39;author&#39;)</code>, blog posts with the same author will share 1 copy of an <code>author</code> doc. Enable this option to make Mongoose clone populated docs before assigning them.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.match=null]</code>
-<span class="method-type">&laquo;Object|Function&raquo;</span> Add an additional filter to the populate query. Can be a filter object containing <a href="https://docs.mongodb.com/manual/tutorial/query-documents/">MongoDB query syntax</a>, or a function that returns a filter object.</p>
+<span class="method-type">&laquo;Object|Function&raquo;</span> Add an additional filter to the populate query. Can be a filter object containing <a href="https://www.mongodb.com/docs/manual/tutorial/query-documents/">MongoDB query syntax</a>, or a function that returns a filter object.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.transform=null]</code>
 <span class="method-type">&laquo;Function&raquo;</span> Function that Mongoose will call on every populated document that allows you to transform the populated document.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.options=null]</code>
 <span class="method-type">&laquo;Object&raquo;</span> Additional options like <code>limit</code> and <code>lean</code>.</p>
-</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/populate">population</a></span></li><li><span class="method-type"><a href="#query_Query-select">Query#select</a></span></li><li><span class="method-type"><a href="#model_Model-populate">Model.populate</a></span></li></ul><div><p>Specifies paths which should be populated with other documents.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/populate.html">population</a></span></li><li><span class="method-type"><a href="#query_Query-select">Query#select</a></span></li><li><span class="method-type"><a href="#model_Model-populate">Model.populate</a></span></li></ul><div><p>Specifies paths which should be populated with other documents.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1395,7 +1395,7 @@ q.<span class="hljs-title function_">projection</span>(); <span class="hljs-comm
 <span class="method-type">&laquo;String&raquo;</span> one of the listed preference options or aliases</p>
 </li><li class="param"><code>[tags]</code>
 <span class="method-type">&laquo;Array&raquo;</span> optional tags for this query</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/applications/replication/#read-preference">mongodb</a></span></li></ul><div><p>Determines the MongoDB nodes from which to read.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/applications/replication/#read-preference">mongodb</a></span></li></ul><div><p>Determines the MongoDB nodes from which to read.</p>
 <h4 id="preferences">
       <a href="#preferences">
         Preferences:
@@ -1437,10 +1437,10 @@ n   nearest
 <span class="hljs-comment">// read from secondaries with matching tags</span>
 <span class="hljs-keyword">new</span> <span class="hljs-title class_">Query</span>().<span class="hljs-title function_">read</span>(<span class="hljs-string">&#x27;s&#x27;</span>, [{ <span class="hljs-attr">dc</span>:<span class="hljs-string">&#x27;sf&#x27;</span>, <span class="hljs-attr">s</span>: <span class="hljs-number">1</span> },{ <span class="hljs-attr">dc</span>:<span class="hljs-string">&#x27;ma&#x27;</span>, <span class="hljs-attr">s</span>: <span class="hljs-number">2</span> }])
 </code></pre>
-<p>Read more about how to use read preferences <a href="https://docs.mongodb.org/manual/applications/replication/#read-preference">here</a>.</p>
+<p>Read more about how to use read preferences <a href="https://www.mongodb.com/docs/manual/applications/replication/#read-preference">here</a>.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-readConcern"><a href="#query_Query-readConcern"><code>Query.prototype.readConcern()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>level</code>
 <span class="method-type">&laquo;String&raquo;</span> one of the listed read concern level or their aliases</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/read-concern/">mongodb</a></span></li></ul><div><p>Sets the readConcern option for the query.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/read-concern/">mongodb</a></span></li></ul><div><p>Sets the readConcern option for the query.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1479,10 +1479,10 @@ m   majority
 lz  linearizable
 s   snapshot
 </code></pre>
-<p>Read more about how to use read concern <a href="https://docs.mongodb.com/manual/reference/read-concern/">here</a>.</p>
+<p>Read more about how to use read concern <a href="https://www.mongodb.com/docs/manual/reference/read-concern/">here</a>.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-regex"><a href="#query_Query-regex"><code>Query.prototype.regex()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;String|RegExp&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/regex/">$regex</a></span></li></ul><div><p>Specifies a <code>$regex</code> query condition.</p>
+<span class="method-type">&laquo;String|RegExp&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/regex/">$regex</a></span></li></ul><div><p>Specifies a <code>$regex</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-remove"><a href="#query_Query-remove"><code>Query.prototype.remove()</code></a></h3><span class="deprecated">~DEPRECATED~</span><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
 <span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</p>
@@ -1521,7 +1521,7 @@ res.<span class="hljs-property">deletedCount</span>;
         Note:
       </a>
     </h4>
-<p>Calling <code>remove()</code> creates a <a href="./queries.html">Mongoose query</a>, and a query
+<p>Calling <code>remove()</code> creates a <a href="/docs/queries.html">Mongoose query</a>, and a query
 does not execute until you either pass a callback, call <a href="#query_Query-then"><code>Query#then()</code></a>,
 or call <a href="#query_Query-exec"><code>Query#exec()</code></a>.</p>
 <pre><code><span class="hljs-comment">// not executed</span>
@@ -1545,14 +1545,14 @@ or call <a href="#query_Query-exec"><code>Query#exec()</code></a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.upsert=false]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.writeConcern=null]</code>
-<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://docs.mongodb.com/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
+<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> params are (error, writeOpResult)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as a replaceOne() operation. Same as
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as a replaceOne() operation. Same as
 <code>update()</code>, except MongoDB will replace the existing document and will
-not accept any <a href="https://docs.mongodb.com/manual/tutorial/model-data-for-atomic-operations/#pattern">atomic</a> operators (<code>$set</code>, etc.)</p>
+not accept any <a href="https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern">atomic</a> operators (<code>$set</code>, etc.)</p>
 <p><strong>Note</strong> replaceOne will <em>not</em> fire update middleware. Use <code>pre(&#39;replaceOne&#39;)</code>
 and <code>post(&#39;replaceOne&#39;)</code> instead.</p>
 <h4 id="example">
@@ -1572,11 +1572,11 @@ res.<span class="hljs-property">upsertedId</span>; <span class="hljs-comment">//
 <li><code>replaceOne()</code></li>
 </ul>
   </div><hr class="separate-api-elements"><h3 id="query_Query-select"><a href="#query_Query-select"><code>Query.prototype.select()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>arg</code>
-<span class="method-type">&laquo;Object|String|Array[String]&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/schematype">SchemaType</a></span></li></ul><div><p>Specifies which document fields to include or exclude (also known as the query &quot;projection&quot;)</p>
+<span class="method-type">&laquo;Object|String|Array[String]&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/schematype.html">SchemaType</a></span></li></ul><div><p>Specifies which document fields to include or exclude (also known as the query &quot;projection&quot;)</p>
 <p>When using string syntax, prefixing a path with <code>-</code> will flag that path as excluded. When a path does not have the <code>-</code> prefix, it is included. Lastly, if a path is prefixed with <code>+</code>, it forces inclusion of the path, which is useful for paths excluded at the <a href="/docs/api/schematype.html#schematype_SchemaType-select">schema level</a>.</p>
 <p>A projection <em>must</em> be either inclusive or exclusive. In other words, you must
 either list the fields to include (which excludes all others), or list the fields
-to exclude (which implies all other fields are included). The <a href="https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/#suppress-id-field"><code>_id</code> field is the only exception because MongoDB includes it by default</a>.</p>
+to exclude (which implies all other fields are included). The <a href="https://www.mongodb.com/docs/manual/tutorial/project-fields-from-query-results/#suppress-id-field"><code>_id</code> field is the only exception because MongoDB includes it by default</a>.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1623,7 +1623,7 @@ query.<span class="hljs-title function_">selectedInclusively</span>(); <span cla
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-session"><a href="#query_Query-session"><code>Query.prototype.session()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[session]</code>
 <span class="method-type">&laquo;ClientSession&raquo;</span> from <code>await conn.startSession()</code></p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/connection.html#connection_Connection-startSession">Connection.prototype.startSession()</a></span></li><li><span class="method-type"><a href="/docs/api/mongoose.html#mongoose_Mongoose-startSession">mongoose.startSession()</a></span></li></ul><div><p>Sets the <a href="https://docs.mongodb.com/manual/reference/server-sessions/">MongoDB session</a>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/connection.html#connection_Connection-startSession">Connection.prototype.startSession()</a></span></li><li><span class="method-type"><a href="/docs/api/mongoose.html#mongoose_Mongoose-startSession">mongoose.startSession()</a></span></li></ul><div><p>Sets the <a href="https://www.mongodb.com/docs/manual/reference/server-sessions/">MongoDB session</a>
 associated with this query. Sessions are how you mark a query as part of a
 <a href="/docs/transactions.html">transaction</a>.</p>
 <p>Calling <code>session(null)</code> removes the session from this query.</p>
@@ -1660,35 +1660,35 @@ of whether you use <code>updateOne()</code>, <code>updateMany()</code>, <code>fi
     </h4>
 <p>The following options are only for <code>find()</code>:</p>
 <ul>
-<li><a href="https://www.mongodb.org/display/DOCS/Tailable+Cursors">tailable</a></li>
-<li><a href="https://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsort()%7D%7D">sort</a></li>
-<li><a href="https://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Blimit%28%29%7D%7D">limit</a></li>
-<li><a href="https://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bskip%28%29%7D%7D">skip</a></li>
-<li><a href="https://docs.mongodb.com/manual/reference/method/cursor.allowDiskUse/">allowDiskUse</a></li>
-<li><a href="https://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7BbatchSize%28%29%7D%7D">batchSize</a></li>
-<li><a href="https://docs.mongodb.org/manual/applications/replication/#read-preference">readPreference</a></li>
-<li><a href="https://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24hint">hint</a></li>
-<li><a href="https://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24comment">comment</a></li>
-<li><a href="https://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsnapshot%28%29%7D%7D">snapshot</a></li>
-<li><a href="https://docs.mongodb.org/v3.2/reference/operator/meta/maxScan/#metaOp._S_maxScan">maxscan</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/core/tailable-cursors/">tailable</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.sort/">sort</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.limit/">limit</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.skip/">skip</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.allowDiskUse/">allowDiskUse</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.batchSize/">batchSize</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/applications/replication/#read-preference">readPreference</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.hint/">hint</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.comment/">comment</a></li>
+<li>snapshot</li>
+<li><a href="https://www.mongodb.com/docs/v4.0/reference/method/cursor.maxScan/">maxscan</a></li>
 </ul>
 <p>The following options are only for write operations: <code>update()</code>, <code>updateOne()</code>, <code>updateMany()</code>, <code>replaceOne()</code>, <code>findOneAndUpdate()</code>, and <code>findByIdAndUpdate()</code>:</p>
 <ul>
-<li><a href="https://docs.mongodb.com/manual/reference/method/db.collection.update/">upsert</a></li>
-<li><a href="https://docs.mongodb.com/manual/reference/method/db.collection.update/">writeConcern</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">upsert</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">writeConcern</a></li>
 <li><a href="https://mongoosejs.com/docs/guide.html#timestamps">timestamps</a>: If <code>timestamps</code> is set in the schema, set this option to <code>false</code> to skip timestamps for that particular update. Has no effect if <code>timestamps</code> is not enabled in the schema options.</li>
 <li>overwriteDiscriminatorKey: allow setting the discriminator key in the update. Will use the correct discriminator schema if the update changes the discriminator key.</li>
 </ul>
 <p>The following options are only for <code>find()</code>, <code>findOne()</code>, <code>findById()</code>, <code>findOneAndUpdate()</code>, and <code>findByIdAndUpdate()</code>:</p>
 <ul>
-<li><a href="./api/query.html#query_Query-lean">lean</a></li>
+<li><a href="#query_Query-lean">lean</a></li>
 <li><a href="/docs/populate.html">populate</a></li>
-<li><a href="/docs/api/query.html#query_Query-projection">projection</a></li>
+<li><a href="#query_Query-projection">projection</a></li>
 <li>sanitizeProjection</li>
 </ul>
 <p>The following options are only for all operations <strong>except</strong> <code>update()</code>, <code>updateOne()</code>, <code>updateMany()</code>, <code>remove()</code>, <code>deleteOne()</code>, and <code>deleteMany()</code>:</p>
 <ul>
-<li><a href="https://docs.mongodb.com/manual/reference/operator/meta/maxTimeMS/">maxTimeMS</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/operator/meta/maxTimeMS/">maxTimeMS</a></li>
 </ul>
 <p>The following options are for <code>findOneAndUpdate()</code> and <code>findOneAndRemove()</code></p>
 <ul>
@@ -1697,9 +1697,9 @@ of whether you use <code>updateOne()</code>, <code>updateMany()</code>, <code>fi
 <p>The following options are for all operations:</p>
 <ul>
 <li><a href="/docs/guide.html#strict">strict</a></li>
-<li><a href="https://docs.mongodb.com/manual/reference/collation/">collation</a></li>
-<li><a href="https://docs.mongodb.com/manual/reference/server-sessions/">session</a></li>
-<li><a href="https://docs.mongodb.com/manual/reference/method/cursor.explain/">explain</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/collation/">collation</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/server-sessions/">session</a></li>
+<li><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.explain/">explain</a></li>
 </ul>
   </div><hr class="separate-api-elements"><h3 id="query_Query-setQuery"><a href="#query_Query-setQuery"><code>Query.prototype.setQuery()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>new</code>
 <span class="method-type">&laquo;Object&raquo;</span> query conditions</p>
@@ -1729,7 +1729,7 @@ query.<span class="hljs-title function_">getUpdate</span>(); <span class="hljs-c
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-size"><a href="#query_Query-size"><code>Query.prototype.size()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/size/">$size</a></span></li></ul><div><p>Specifies a <code>$size</code> query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/size/">$size</a></span></li></ul><div><p>Specifies a <code>$size</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
 <h4 id="example">
       <a href="#example">
@@ -1741,7 +1741,7 @@ query.<span class="hljs-title function_">getUpdate</span>(); <span class="hljs-c
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;documents with 0 tags&#x27;</span>, docs);
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-skip"><a href="#query_Query-skip"><code>Query.prototype.skip()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>val</code>
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/method/cursor.skip/">cursor.skip</a></span></li></ul><div><p>Specifies the number of documents to skip.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.skip/">cursor.skip</a></span></li></ul><div><p>Specifies the number of documents to skip.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1758,7 +1758,7 @@ query.<span class="hljs-title function_">getUpdate</span>(); <span class="hljs-c
   </div><hr class="separate-api-elements"><h3 id="query_Query-slice"><a href="#query_Query-slice"><code>Query.prototype.slice()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
 <span class="method-type">&laquo;Number|Array&raquo;</span> number of elements to slice or array with number of elements to skip and number of elements to slice</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields#RetrievingaSubsetofFields-RetrievingaSubrangeofArrayElements">mongodb</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/projection/slice/#prj._S_slice">$slice</a></span></li></ul><div><p>Specifies a <code>$slice</code> projection for an array.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/tutorial/query-documents/#projection">mongodb</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/projection/slice/#prj._S_slice">$slice</a></span></li></ul><div><p>Specifies a <code>$slice</code> projection for an array.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1783,7 +1783,7 @@ query.<span class="hljs-title function_">where</span>(<span class="hljs-string">
 <pre><code> <span class="hljs-comment">// Given `arr`: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
  query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;arr&#x27;</span>, [-<span class="hljs-number">20</span>, <span class="hljs-number">5</span>]); <span class="hljs-comment">// Returns [1, 2, 3, 4, 5]</span>
 </code></pre>
-  </div><hr class="separate-api-elements"><h3 id="query_Query-snapshot"><a href="#query_Query-snapshot"><code>Query.prototype.snapshot()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/snapshot/">snapshot</a></span></li></ul><div><p>Specifies this query as a <code>snapshot</code> query.</p>
+  </div><hr class="separate-api-elements"><h3 id="query_Query-snapshot"><a href="#query_Query-snapshot"><code>Query.prototype.snapshot()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies this query as a <code>snapshot</code> query.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1800,7 +1800,7 @@ query.<span class="hljs-title function_">snapshot</span>(<span class="hljs-liter
     </h4>
 <p>Cannot be used with <code>distinct()</code></p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-sort"><a href="#query_Query-sort"><code>Query.prototype.sort()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>arg</code>
-<span class="method-type">&laquo;Object|String|Array&lt;Array&lt;string|number&gt;&gt;&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/method/cursor.sort/">cursor.sort</a></span></li></ul><div><p>Sets the sort order</p>
+<span class="method-type">&laquo;Object|String|Array&lt;Array&lt;string|number&gt;&gt;&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.sort/">cursor.sort</a></span></li></ul><div><p>Sets the sort order</p>
 <p>If an object is passed, values allowed are <code>asc</code>, <code>desc</code>, <code>ascending</code>, <code>descending</code>, <code>1</code>, and <code>-1</code>.</p>
 <p>If a string is passed, it must be a space delimited list of path names. The
 sort order of each path is ascending unless the path name is prefixed with <code>-</code>
@@ -1833,7 +1833,7 @@ query.<span class="hljs-title function_">sort</span>([[<span class="hljs-string"
 <span class="method-type">&laquo;Boolean&raquo;</span> false by default. Set to true to keep the cursor open even if there&#39;s no data.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[opts.maxAwaitTimeMS]</code>
 <span class="method-type">&laquo;Number&raquo;</span> the maximum amount of time for the server to wait on new documents to satisfy a tailable cursor query. Requires <code>tailable</code> and <code>awaitData</code> to be true</p>
-</li></ul></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/tutorial/create-tailable-cursor/">tailable</a></span></li></ul><div><p>Sets the tailable option (for use with capped collections).</p>
+</li></ul></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/tutorial/create-tailable-cursor/">tailable</a></span></li></ul><div><p>Sets the tailable option (for use with capped collections).</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -1921,13 +1921,13 @@ for the query to resolve to.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.upsert=false]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.writeConcern=null]</code>
-<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://docs.mongodb.com/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
+<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> params are (error, writeOpResult)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as an update() operation.</p>
-<p><em>All paths passed that are not <a href="https://docs.mongodb.com/manual/tutorial/model-data-for-atomic-operations/#pattern">atomic</a> operations will become <code>$set</code> ops.</em></p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as an update() operation.</p>
+<p><em>All paths passed that are not <a href="https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern">atomic</a> operations will become <code>$set</code> ops.</em></p>
 <p>This function triggers the following middleware.</p>
 <ul>
 <li><code>update()</code></li>
@@ -1974,7 +1974,7 @@ q.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">$se
 
 q.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;bob&#x27;</span> }}).<span class="hljs-title function_">exec</span>(); <span class="hljs-comment">// executed</span>
 
-<span class="hljs-comment">// keys that are not [atomic](https://docs.mongodb.com/manual/tutorial/model-data-for-atomic-operations/#pattern) ops become `$set`.</span>
+<span class="hljs-comment">// keys that are not [atomic](https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern) ops become `$set`.</span>
 <span class="hljs-comment">// this executes the same command as the previous example.</span>
 q.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;bob&#x27;</span> }).<span class="hljs-title function_">exec</span>();
 
@@ -2013,12 +2013,12 @@ q.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">nam
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.upsert=false]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.writeConcern=null]</code>
-<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://docs.mongodb.com/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
+<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> params are (error, writeOpResult)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as an updateMany() operation. Same as
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as an updateMany() operation. Same as
 <code>update()</code>, except MongoDB will update <em>all</em> documents that match
 <code>filter</code> (as opposed to just the first one) regardless of the value of
 the <code>multi</code> option.</p>
@@ -2048,16 +2048,16 @@ res.<span class="hljs-property">nModified</span>; <span class="hljs-comment">// 
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.upsert=false]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.writeConcern=null]</code>
-<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://docs.mongodb.com/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
+<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> params are (error, writeOpResult)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as an updateOne() operation. Same as
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as an updateOne() operation. Same as
 <code>update()</code>, except it does not support the <code>multi</code> option.</p>
 <ul>
 <li>MongoDB will update <em>only</em> the first document that matches <code>filter</code> regardless of the value of the <code>multi</code> option.</li>
-<li>Use <code>replaceOne()</code> if you want to overwrite an entire document rather than using <a href="https://docs.mongodb.com/manual/tutorial/model-data-for-atomic-operations/#pattern">atomic</a> operators like <code>$set</code>.</li>
+<li>Use <code>replaceOne()</code> if you want to overwrite an entire document rather than using <a href="https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern">atomic</a> operators like <code>$set</code>.</li>
 </ul>
 <p><strong>Note</strong> updateOne will <em>not</em> fire update middleware. Use <code>pre(&#39;updateOne&#39;)</code>
 and <code>post(&#39;updateOne&#39;)</code> instead.</p>
@@ -2078,8 +2078,8 @@ res.<span class="hljs-property">upsertedId</span>; <span class="hljs-comment">//
 <li><code>updateOne()</code></li>
 </ul>
   </div><hr class="separate-api-elements"><h3 id="query_Query-w"><a href="#query_Query-w"><code>Query.prototype.w()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>val</code>
-<span class="method-type">&laquo;String|number&raquo;</span> 0 for fire-and-forget, 1 for acknowledged by one server, &#39;majority&#39; for majority of the replica set, or <a href="https://docs.mongodb.com/manual/reference/write-concern/#w-option">any of the more advanced options</a>.</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/write-concern/#w-option">mongodb</a></span></li></ul><div><p>Sets the specified number of <code>mongod</code> servers, or tag set of <code>mongod</code> servers,
+<span class="method-type">&laquo;String|number&raquo;</span> 0 for fire-and-forget, 1 for acknowledged by one server, &#39;majority&#39; for majority of the replica set, or <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#w-option">any of the more advanced options</a>.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/write-concern/#w-option">mongodb</a></span></li></ul><div><p>Sets the specified number of <code>mongod</code> servers, or tag set of <code>mongod</code> servers,
 that must acknowledge this write before this write is considered successful.
 This option is only valid for operations that write to the database:</p>
 <ul>
@@ -2129,7 +2129,7 @@ This option is only valid for operations that write to the database:</p>
 .<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;friends&#x27;</span>).<span class="hljs-title function_">slice</span>(<span class="hljs-number">10</span>)
 .<span class="hljs-title function_">exec</span>(callback)
 </code></pre>
-  </div><hr class="separate-api-elements"><h3 id="query_Query-within"><a href="#query_Query-within"><code>Query.prototype.within()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/polygon/">$polygon</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/box/">$box</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/geometry/">$geometry</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/center/">$center</a></span></li><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/centerSphere/">$centerSphere</a></span></li></ul><div><p>Defines a <code>$within</code> or <code>$geoWithin</code> argument for geo-spatial queries.</p>
+  </div><hr class="separate-api-elements"><h3 id="query_Query-within"><a href="#query_Query-within"><code>Query.prototype.within()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/polygon/">$polygon</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/box/">$box</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/geometry/">$geometry</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/center/">$center</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/centerSphere/">$centerSphere</a></span></li></ul><div><p>Defines a <code>$within</code> or <code>$geoWithin</code> argument for geo-spatial queries.</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -2166,7 +2166,7 @@ query.<span class="hljs-title function_">where</span>(<span class="hljs-string">
 <ul>
 <li><code>w</code>: Sets the specified number of <code>mongod</code> servers, or tag set of <code>mongod</code> servers, that must acknowledge this write before this write is considered successful.</li>
 <li><code>j</code>: Boolean, set to <code>true</code> to request acknowledgement that this operation has been persisted to MongoDB&#39;s on-disk journal.</li>
-<li><code>wtimeout</code>: If <a href="/docs/api/query.html#query_Query-w"><code>w &gt; 1</code></a>, the maximum amount of time to wait for this write to propagate through the replica set before this operation fails. The default is <code>0</code>, which means no timeout.</li>
+<li><code>wtimeout</code>: If <a href="#query_Query-w"><code>w &gt; 1</code></a>, the maximum amount of time to wait for this write to propagate through the replica set before this operation fails. The default is <code>0</code>, which means no timeout.</li>
 </ul>
 <p>This option is only valid for operations that write to the database:</p>
 <ul>
@@ -2194,7 +2194,7 @@ query.<span class="hljs-title function_">where</span>(<span class="hljs-string">
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-wtimeout"><a href="#query_Query-wtimeout"><code>Query.prototype.wtimeout()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>ms</code>
 <span class="method-type">&laquo;number&raquo;</span> number of milliseconds to wait</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.com/manual/reference/write-concern/#wtimeout">mongodb</a></span></li></ul><div><p>If <a href="/docs/api/query.html#query_Query-w"><code>w &gt; 1</code></a>, the maximum amount of time to
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/write-concern/#wtimeout">mongodb</a></span></li></ul><div><p>If <a href="#query_Query-w"><code>w &gt; 1</code></a>, the maximum amount of time to
 wait for this write to propagate through the replica set before this
 operation fails. The default is <code>0</code>, which means no timeout.</p>
 <p>This option is only valid for operations that write to the database:</p>
@@ -2223,8 +2223,8 @@ operation fails. The default is <code>0</code>, which means no timeout.</p>
   <span class="hljs-title function_">w</span>(<span class="hljs-number">2</span>).
   <span class="hljs-title function_">wtimeout</span>(<span class="hljs-number">1000</span>);
 </code></pre>
-  </div><hr class="separate-api-elements"><h3 id="query_Query-use$geoWithin"><a href="#query_Query-use$geoWithin"><code>Query.use$geoWithin</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://docs.mongodb.org/manual/reference/operator/geoWithin/">geoWithin</a></span></li></ul><div><p>Flag to opt out of using <code>$geoWithin</code>.</p>
+  </div><hr class="separate-api-elements"><h3 id="query_Query-use$geoWithin"><a href="#query_Query-use$geoWithin"><code>Query.use$geoWithin</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/geoWithin/">geoWithin</a></span></li></ul><div><p>Flag to opt out of using <code>$geoWithin</code>.</p>
 <pre><code class="language-javascript">mongoose.<span class="hljs-property">Query</span>.<span class="hljs-property">use$geoWithin</span> = <span class="hljs-literal">false</span>;
 </code></pre>
 <p>MongoDB 2.4 deprecated the use of <code>$within</code>, replacing it with <code>$geoWithin</code>. Mongoose uses <code>$geoWithin</code> by default (which is 100% backward compatible with <code>$within</code>). If you are running an older version of MongoDB, set this flag to <code>false</code> so your <code>within()</code> queries continue to work.</p>
-  </div></div></div></div><div id="jobs"><div class="job-listing"><a href="/docs/jobs#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/jobs#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/jobs#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/jobs">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/js/mobile-navbar-toggle.js"></script></div></body></html>
+  </div></div></div></div><div id="jobs"><div class="job-listing"><a href="/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/jobs.html#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/jobs.html#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/js/mobile-navbar-toggle.js"></script></div></body></html>

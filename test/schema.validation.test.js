@@ -1504,6 +1504,37 @@ describe('schema', function() {
         name: 'uuidRefName'
       });
       assert.ifError(uuidRef.validateSync());
+
+      const uuidRef2 = new UUIDRefModel({
+        _id: uuidv4(),
+        uuidNonRef: uuidv4(),
+        uuidRefNonRequired: uuidv4(),
+        name: 'uuidRefName'
+      });
+
+      const err2 = uuidRef2.validateSync();
+      assert.ok(err2);
+      assert.ok(err2.errors['uuidRef']);
+
+      const uuidRef3 = new UUIDRefModel({
+        _id: uuidv4(),
+        uuidRef: uuidv4(),
+        uuidRefNonRequired: uuidv4(),
+        name: 'uuidRefName'
+      });
+
+      const err3 = uuidRef3.validateSync();
+      assert.ok(err3);
+      assert.ok(err3.errors['uuidNonRef']);
+
+      const uuidRef4 = new UUIDRefModel({
+        _id: uuidv4(),
+        uuidRef: uuidv4(),
+        uuidNonRef: uuidv4(),
+        name: 'uuidRefName'
+      });
+
+      assert.ifError(uuidRef4.validateSync());
     });
   });
 });

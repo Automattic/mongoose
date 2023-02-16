@@ -1,6 +1,6 @@
 # Models
 
-[Models](api/model-js.html#model-js) are fancy constructors compiled from
+[Models](api/model.html) are fancy constructors compiled from
 `Schema` definitions. An instance of a model is called a
 [document](documents.html). Models are responsible for creating and
 reading documents from the underlying MongoDB database.
@@ -76,14 +76,14 @@ const Tank = connection.model('Tank', yourSchema);
 
 ## Querying
 
-Finding documents is easy with Mongoose, which supports the [rich](http://www.mongodb.org/display/DOCS/Advanced+Queries) query syntax of MongoDB.
+Finding documents is easy with Mongoose, which supports the [rich](https://www.mongodb.com/docs/manual/reference/method/js-cursor/) query syntax of MongoDB.
 Documents can be retrieved using a `model`'s [find](api/model.html#model_Model-find), [findById](api/model.html#model_Model-findById), [findOne](api/model.html#model_Model-findOne), or [where](api/model.html#model_Model-where) static functions.
 
 ```javascript
 Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
 ```
 
-See the chapter on [queries](queries.html) for more details on how to use the [Query](api/query-js.html#query-js) api.
+See the chapter on [queries](queries.html) for more details on how to use the [Query](api/query.html) api.
 
 ## Deleting
 
@@ -116,10 +116,10 @@ instead._
 
 ## Change Streams
 
-[Change streams](https://docs.mongodb.com/manual/changeStreams/) provide
+[Change streams](https://www.mongodb.com/docs/manual/changeStreams/) provide
 a way for you to listen to all inserts and updates going through your
 MongoDB database. Note that change streams do **not** work unless you're
-connected to a [MongoDB replica set](https://docs.mongodb.com/manual/replication/).
+connected to a [MongoDB replica set](https://www.mongodb.com/docs/manual/replication/).
 
 ```javascript
 async function run() {

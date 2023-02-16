@@ -49,7 +49,7 @@ doc instanceof mongoose.Document; // true
 <h2 id="updating-using-save"><a href="#updating-using-save">Updating Using <code>save()</code></a></h2>
 
 Mongoose documents track changes. You can modify a document using vanilla
-JavaScript assignments and Mongoose will convert it into [MongoDB update operators](https://docs.mongodb.com/manual/reference/operator/update/).
+JavaScript assignments and Mongoose will convert it into [MongoDB update operators](https://www.mongodb.com/docs/manual/reference/operator/update/).
 
 ```javascript
 doc.name = 'foo';
@@ -88,7 +88,7 @@ way to update a document with Mongoose. With `save()`, you get full
 [validation](validation.html) and [middleware](middleware.html).
 
 For cases when `save()` isn't flexible enough, Mongoose lets you create
-your own [MongoDB updates](https://docs.mongodb.com/manual/reference/operator/update/)
+your own [MongoDB updates](https://www.mongodb.com/docs/manual/reference/operator/update/)
 with casting, [middleware](middleware.html#notes), and [limited validation](validation.html#update-validators).
 
 ```javascript

@@ -1,6 +1,6 @@
 # SSL Connections
 
-Mongoose supports connecting to [MongoDB clusters that require SSL connections](https://docs.mongodb.com/manual/tutorial/configure-ssl/). Setting the `ssl` option to `true` in [`mongoose.connect()`](../api/mongoose.html#mongoose_Mongoose-connect) or your connection string is enough to connect to a MongoDB cluster using SSL:
+Mongoose supports connecting to [MongoDB clusters that require SSL connections](https://www.mongodb.com/docs/manual/tutorial/configure-ssl/). Setting the `ssl` option to `true` in [`mongoose.connect()`](../api/mongoose.html#mongoose_Mongoose-connect) or your connection string is enough to connect to a MongoDB cluster using SSL:
 
 ```javascript
 mongoose.connect('mongodb://127.0.0.1:27017/test', { ssl: true });
@@ -45,8 +45,7 @@ MongooseServerSelectionError: unable to verify the first certificate
 ```
 
 This error is often caused by [self-signed MongoDB certificates](https://medium.com/@rajanmaharjan/secure-your-mongodb-connections-ssl-tls-92e2addb3c89) or other situations where the certificate sent by the MongoDB
-server is not registered with an established certificate authority. The solution is to set the `sslCA` option, which
-[essentially sets a list of allowed SSL certificates](https://mongodb.github.io/node-mongodb-native/2.1/tutorials/connect/ssl/).
+server is not registered with an established certificate authority. The solution is to set the `sslCA` option, which essentially sets a list of allowed SSL certificates.
 
 ```javascript
 await mongoose.connect('mongodb://127.0.0.1:27017/test', {

@@ -155,11 +155,11 @@ html(lang='en')
           #content
             block content
 
-        - if (!outputUrl.startsWith('/docs/jobs'))
+        - if (!outputUrl.startsWith('/docs/jobs.html'))
           div#jobs
             each job in jobs
               .job-listing
-                a(href='/docs/jobs#' + job._id)
+                a(href='/docs/jobs.html#' + job._id)
                   .company-logo
                     img(src=job.logo)
                   .description
@@ -167,7 +167,7 @@ html(lang='en')
                     .title #{job.title}
                     .location #{job.location}
             .button.jobs-view-more
-              a(href='/docs/jobs') View more jobs!
+              a(href='/docs/jobs.html') View more jobs!
     
 
         script(type="text/javascript" src="/docs/js/navbar-search.js")

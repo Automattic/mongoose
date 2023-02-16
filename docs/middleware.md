@@ -26,7 +26,7 @@ of middleware: document middleware, model middleware, aggregate middleware, and 
 
 Document middleware is supported for the following document functions.
 In Mongoose, a document is an instance of a `Model` class.
-In document middleware functions, `this` refers to the document.
+In document middleware functions, `this` refers to the document. To access the model, use `this.constructor`.
 
 * [validate](api/document.html#document_Document-validate)
 * [save](api/model.html#model_Model-save)
@@ -360,8 +360,8 @@ Model.remove();
 
 You can pass options to [`Schema.pre()`](api.html#schema_Schema-pre)
 and [`Schema.post()`](api.html#schema_Schema-post) to switch whether
-Mongoose calls your `remove()` hook for [`Document.remove()`](model.html#model_Model-remove)
-or [`Model.remove()`](model.html#model_Model-remove). Note here that you need to set both `document` and `query` properties in the passed object:
+Mongoose calls your `remove()` hook for [`Document.remove()`](api/model.html#model_Model-remove)
+or [`Model.remove()`](api/model.html#model_Model-remove). Note here that you need to set both `document` and `query` properties in the passed object:
 
 ```javascript
 // Only document middleware
@@ -518,7 +518,7 @@ For example, suppose you're implementing soft deletes on a `Customer` model
 by adding an `isDeleted` property. To make sure `aggregate()` calls only look
 at customers that aren't soft deleted, you can use the below middleware to
 add a [`$match` stage](api/aggregate.html#aggregate_Aggregate-match) to the beginning
-of each [aggregation pipeline](https://docs.mongodb.com/manual/core/aggregation-pipeline/).
+of each [aggregation pipeline](https://www.mongodb.com/docs/manual/core/aggregation-pipeline/).
 
 ```javascript
 customerSchema.pre('aggregate', function() {

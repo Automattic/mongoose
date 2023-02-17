@@ -2,7 +2,7 @@
 
 const config = require('../.config');
 const cheerio = require('cheerio');
-const filemap = require('./source');
+const filemap = require('../docs/source');
 const fs = require('fs');
 const pug = require('pug');
 const mongoose = require('../');
@@ -107,7 +107,7 @@ for (const [filename, file] of Object.entries(filemap)) {
         body: html,
         url: `${filename.replace('.pug', '.html').replace(/^docs/, '')}#${el.prop('id')}`
       });
-  
+
       content.validateSync();
       contents.push(content);
     });
@@ -137,7 +137,7 @@ async function run() {
     if (version === '6.x') {
       let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
       if (!url.startsWith('/docs')) {
-        url = '/docs'  + url;
+        url = '/docs' + url;
       }
       content.url = url;
     } else {

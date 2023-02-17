@@ -1,13 +1,13 @@
 'use strict';
 
-const api = require('./source/api');
+const api = require('./api');
 const fs = require('fs');
 const pug = require('pug');
-const pkg = require('../package.json');
+const pkg = require('../../package.json');
 
 let jobs = [];
 try {
-  jobs = require('./data/jobs.json');
+  jobs = require('../../docs/data/jobs.json');
 } catch (err) {}
 
 api.docs.forEach(file => {

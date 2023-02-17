@@ -114,7 +114,12 @@ for (const filename of files) {
   }
 }
 
-run().catch(error => console.error(error.stack));
+run().catch(async error => {
+  console.error(error.stack);
+
+  // ensure the script exists in case of error
+  await mongoose.disconnect();
+});
 
 async function run() {
   await mongoose.connect(config.uri, { dbName: 'mongoose' });

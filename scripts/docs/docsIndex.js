@@ -10,9 +10,10 @@ try {
   jobs = require('../data/jobs.json');
 } catch (err) {}
 
-exports['index.pug'] = require('./home');
-exports['docs/api.pug'] = require('./api');
+const _package = require('./../../package.json')
 
+exports['index.pug'] = { package: _package, title: 'ODM' };
+exports['docs/api.pug'] = require('./api');
 exports['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, markdown: true };
 exports['docs/validation.md'] = { title: 'Validation', acquit: true, markdown: true };
 exports['docs/customschematypes.md'] = { title: 'Custom Schema Types', acquit: true, markdown: true };

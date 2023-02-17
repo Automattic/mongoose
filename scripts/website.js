@@ -107,7 +107,7 @@ try {
 } catch (err) {} // eslint-disable-line no-empty
 
 require('./docs/splitApiDocs');
-const filemap = Object.assign({}, require('./docs/docsIndex'), require('./docs/tutorialsIndex'), require('./docs/typescriptIndex'));
+const filemap = Object.assign({}, require('./docs/docsIndex'));
 const files = Object.keys(filemap);
 
 const wrapMarkdown = (md, baseLayout) => `

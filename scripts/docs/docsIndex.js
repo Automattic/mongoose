@@ -1,6 +1,8 @@
 
 'use strict';
 
+const fs = require('fs');
+
 let sponsors = [];
 try {
   sponsors = require('../data/sponsors.json');
@@ -66,6 +68,46 @@ exports['docs/change-streams.md'] = { title: 'MongoDB Change Streams in NodeJS w
 exports['docs/lodash.md'] = { title: 'Using Mongoose with Lodash', markdown: true };
 exports['docs/incompatible_packages.md'] = { title: 'Known Incompatible npm Packages', markdown: true };
 
+// do sub-directories
+
+mapSubDoc('tutorials', {
+  title: `Mongoose Tutorials:`,
+  acquit: true,
+  markdown: true
+});
+mapSubDoc('typescript', {
+  title: `Mongoose:`,
+  markdown: true
+});
+
 for (const props of Object.values(exports)) {
   props.jobs = jobs;
 }
+
+/**
+ * Map sub-directories with custom options
+ * @param {String} subDoc Path to the subdoc, like "tutorials" (no beginning or ending slash)
+ * @param {DocsOptions} options Options applied to all files in the subdoc (title gets appended to provided title)
+ */
+function mapSubDoc(subDoc, options) {
+  const dirName = `docs/${subDoc}`
+
+  const files = fs.readdirSync(dirName).filter(file => file.endsWith('.md'));
+
+  files.forEach((filename) => {
+    const content = fs.readFileSync(`${dirName}/${filename}`, 'utf8');
+    exports[`${dirName}/${filename}`] = {
+      ...options,
+      title: `${options.title} ${content.split('\n')[0].replace(/^#+/, '').trim()}`
+    };
+  });
+}
+
+/**
+ * @typedef {Object} DocsOptions
+ * @property {String} title Title of the page
+ * @property {Boolean} [acquit] Enable test parsing and insertion
+ * @property {Boolean} [markdown] Enable markdown processing
+ * @property {Boolean} [guide] Indicate the page is a guide
+ * @property {Boolean} [schema]
+ */

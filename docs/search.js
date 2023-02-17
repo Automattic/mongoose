@@ -124,6 +124,9 @@ run().catch(async error => {
 async function run() {
   await mongoose.connect(config.uri, { dbName: 'mongoose' });
 
+  // wait for the index to be created
+  await Content.init();
+
   await Content.deleteMany({ version });
   for (const content of contents) {
     if (version === '6.x') {

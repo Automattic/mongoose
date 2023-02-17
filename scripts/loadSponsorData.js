@@ -3,12 +3,14 @@
 const axios = require('axios');
 const config = require('../.config');
 const fs = require('fs');
-const mongoose = require('../');
+const mongoose = require('../types');
 
 run().catch(err => {
   console.error(err);
   process.exit(-1);
 });
+
+const docsDir = './docs';
 
 async function run() {
   await mongoose.connect(config.uri);
@@ -57,17 +59,17 @@ async function run() {
   }), 'OpenCollectiveSponsor');
 
   try {
-    fs.mkdirSync(`${__dirname}/data`);
-  } catch(err) {}
+    fs.mkdirSync(`${docsDir}/data`);
+  } catch (err) {}
 
   const subscribers = await Subscriber.
     find({ companyName: { $exists: true }, description: { $exists: true }, logo: { $exists: true } }).
     sort({ createdAt: 1 }).
     select({ companyName: 1, description: 1, url: 1, logo: 1 });
-  fs.writeFileSync(`${__dirname}/data/sponsors.json`, JSON.stringify(subscribers, null, '  '));
-  
-  const jobs = await Job.find().select({ logo: 1, company: 1, title: 1, location: 1, description: 1, url: 1  });
-  fs.writeFileSync(`${__dirname}/data/jobs.json`, JSON.stringify(jobs, null, '  '));
+  fs.writeFileSync(`${docsDir}/data/sponsors.json`, JSON.stringify(subscribers, null, '  '));
+
+  const jobs = await Job.find().select({ logo: 1, company: 1, title: 1, location: 1, description: 1, url: 1 });
+  fs.writeFileSync(`${docsDir}/data/jobs.json`, JSON.stringify(jobs, null, '  '));
 
   const opencollectiveSponsors = await axios.get('https://opencollective.com/mongoose/members.json').
     then(res => res.data).
@@ -94,9 +96,9 @@ async function run() {
   for (const sponsor of additionalSponsors) {
     opencollectiveSponsors.push(sponsor);
   }
-  
+
   if (opencollectiveSponsors != null) {
-    fs.writeFileSync(`${__dirname}/data/opencollective.json`, JSON.stringify(opencollectiveSponsors, null, '  '));
+    fs.writeFileSync(`${docsDir}/data/opencollective.json`, JSON.stringify(opencollectiveSponsors, null, '  '));
   }
 
   console.log('Done');

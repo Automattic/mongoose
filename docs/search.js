@@ -31,10 +31,8 @@ contentSchema.index({ title: 'text', body: 'text' });
 const Content = mongoose.model('Content', contentSchema, 'Content');
 
 const contents = [];
-const files = Object.keys(filemap);
 
-for (const filename of files) {
-  const file = filemap[filename];
+for (const [filename, file] of Object.entries(filemap)) {
   if (file.api) {
     // API docs are special, raw content is in the `docs` property
     for (const _class of file.docs) {

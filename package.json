@@ -80,6 +80,7 @@
     "docs:checkout:legacy": "git checkout 5.x",
     "docs:generate": "node ./scripts/website.js",
     "docs:generate:search": "node docs/search.js",
+    "docs:generate:sponsorData": "node ./scripts/loadSponsorData.js",
     "docs:merge:stable": "git merge master",
     "docs:merge:legacy": "git merge 5.x",
     "docs:test": "npm run docs:generate && npm run docs:generate:search",

@@ -77,7 +77,7 @@ query.exec(function (err, person) {
 });
 ```
 
-In the above code, the `query` variable is of type [Query](api/query-js.html#query-js).
+In the above code, the `query` variable is of type [Query](api/query.html).
 A `Query` enables you to build up a query using chaining syntax, rather than specifying a JSON object.
 The below 2 examples are equivalent.
 
@@ -107,7 +107,7 @@ Person.
   exec(callback);
 ```
 
-A full list of [Query helper functions can be found in the API docs](api/query-js.html#query-js).
+A full list of [Query helper functions can be found in the API docs](api/query.html).
 
 <h3 id="queries-are-not-promises">
   <a href="#queries-are-not-promises">

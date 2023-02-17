@@ -26,7 +26,7 @@ of middleware: document middleware, model middleware, aggregate middleware, and 
 
 Document middleware is supported for the following document functions.
 In Mongoose, a document is an instance of a `Model` class.
-In document middleware functions, `this` refers to the document.
+In document middleware functions, `this` refers to the document. To access the model, use `this.constructor`.
 
 * [validate](api/document.html#document_Document-validate)
 * [save](api/model.html#model_Model-save)

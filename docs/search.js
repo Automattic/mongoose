@@ -16,6 +16,8 @@ markdown.setOptions({
   }
 });
 
+mongoose.set('strictQuery', false);
+
 // 5.13.5 -> 5.x, 6.8.2 -> 6.x, etc.
 version = version.slice(0, version.indexOf('.')) + '.x';
 

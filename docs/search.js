@@ -44,7 +44,7 @@ for (const [filename, file] of Object.entries(filemap)) {
         });
         const err = content.validateSync();
         if (err != null) {
-          console.log(content);
+          console.error(content);
           throw err;
         }
         contents.push(content);
@@ -122,6 +122,11 @@ run().catch(async error => {
 });
 
 async function run() {
+  if (!config || !config.uri) {
+    console.error('No Config or config.URI given, please create a .config.js file with those values');
+    process.exit(-1);
+  }
+
   await mongoose.connect(config.uri, { dbName: 'mongoose' });
 
   // wait for the index to be created

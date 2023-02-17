@@ -133,6 +133,7 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
+  /** Helper type for getting the hydrated document type from the raw document type. The hydrated document type is what `new MyModel()` returns. */
   export type HydratedDocument<
     DocType,
     TOverrides = {},

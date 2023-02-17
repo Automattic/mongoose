@@ -107,9 +107,6 @@ declare module 'mongoose' {
     db: Connection;
 
     /** Removes this document from the db. */
-    delete(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
-
-    /** Removes this document from the db. */
     deleteOne(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
 
     /**

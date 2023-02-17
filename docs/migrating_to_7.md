@@ -125,6 +125,9 @@ They always return promises.
 - `Query.prototype.findOneAndRemove`
 - `Query.prototype.findOneAndReplace`
 - `Query.prototype.validate`
+- `Query.prototype.deleteOne`
+- `Query.prototype.deleteMany`
+- `Query.prototype.exec`
 - `QueryCursor.prototype.close`
 - `QueryCursor.prototype.next`
 

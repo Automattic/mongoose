@@ -5,11 +5,11 @@ const fs = require('fs');
 
 let sponsors = [];
 try {
-  sponsors = require('../data/sponsors.json');
+  sponsors = require('../../docs/data/sponsors.json');
 } catch (err) {}
 let jobs = [];
 try {
-  jobs = require('../data/jobs.json');
+  jobs = require('../../docs/data/jobs.json');
 } catch (err) {}
 
 const _package = require('./../../package.json')

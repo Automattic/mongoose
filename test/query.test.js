@@ -4323,4 +4323,22 @@ describe('Query', function() {
 
     assert.strictEqual(books.length, 0);
   });
+
+  it('merges $and, $or conditions (gh-12944)', function() {
+    const Test = db.model('Test', new Schema({ tags: [String] }));
+
+    let q = Test.find({ $and: [{ tags: 'a' }] });
+    q.find({ $and: [{ tags: 'b' }] });
+    q.find({ $and: [{ tags: 'c' }] });
+
+    assert.deepEqual(q.getFilter(), {
+      $and: [{ tags: 'a' }, { tags: 'b' }, { tags: 'c' }]
+    });
+
+    q = Test.find({ $or: [{ tags: 'a' }] });
+    q.find({ $or: [{ tags: 'b' }] });
+    assert.deepEqual(q.getFilter(), {
+      $or: [{ tags: 'a' }, { tags: 'b' }]
+    });
+  });
 });

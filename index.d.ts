@@ -803,6 +803,13 @@ declare module 'mongoose' {
     bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions): Promise<mongodb.BulkWriteOpResultObject>;
     bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions, cb?: Callback<mongodb.BulkWriteOpResultObject>): void;
 
+    /**
+     * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than
+     * sending multiple `save()` calls because with `bulkSave()` there is only one
+     * network round trip to the MongoDB server.
+     */
+    bulkSave(documents: Array<Document>): Promise<mongodb.BulkWriteResult>;
+
     /** Collection the model uses. */
     collection: Collection;
 

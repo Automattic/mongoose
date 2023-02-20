@@ -91,4 +91,12 @@ describe('debug: shell', function() {
     // Last log should not have been overwritten
     assert.equal(storedLog, lastLog);
   });
+
+  it('should avoid sending null session option with document ops (gh-13052)', async function() {
+    const schema = new Schema({ name: String });
+    const Test = db.model('gh_13052', schema);
+
+    await Test.create({ name: 'foo' });
+    assert.equal(false, lastLog.includes('session'));
+  });
 });

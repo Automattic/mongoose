@@ -1,3 +1,9 @@
+5.13.16 / 2023-02-20
+====================
+ * fix: make access to process.versions lazy #12584 [maciasello](https://github.com/maciasello)
+ * fix(types): add missing type definitions for `bulkSave()` #12019
+ * docs: backport documentation URL updates #12692 [hasezoey](https://github.com/hasezoey)
+
 5.13.15 / 2022-08-22
 ====================
  * fix: backport fix for CVE-2022-2564 #12281 [shubanker](https://github.com/shubanker)

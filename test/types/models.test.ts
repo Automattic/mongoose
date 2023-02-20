@@ -187,9 +187,6 @@ Project.create({
 Project.exists({ name: 'Hello' }).then(result => {
   result?._id;
 });
-Project.exists({ name: 'Hello' }, (err, result) => {
-  result?._id;
-});
 
 function find() {
   // no args
@@ -216,11 +213,6 @@ function find() {
   Project.find({}, undefined, { limit: 5 });
   Project.find({}, null, { limit: 5 });
   Project.find({}, { name: 1 }, { limit: 5 });
-
-  // filter + projection + options + callback
-  Project.find({}, undefined, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
-  Project.find({}, null, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
-  Project.find({}, { name: 1 }, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
 }
 
 function inheritance() {
@@ -456,7 +448,7 @@ function gh12100() {
 function modelRemoveOptions() {
   const cmodel = model('Test', new Schema());
 
-  cmodel.remove({}, {});
+  cmodel.deleteOne({}, {});
 }
 
 async function gh12286() {

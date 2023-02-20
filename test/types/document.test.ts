@@ -2,7 +2,7 @@ import {
   Schema,
   model,
   Model,
-  Document,
+  Query,
   Types,
   HydratedDocument,
   HydratedArraySubdocument,
@@ -31,22 +31,15 @@ interface ITestBase {
   name?: string;
 }
 
-interface ITest extends ITestBase, Document {}
+type ITest = ITestBase;
+type TestDocument = ReturnType<Model<{ name?: string }>['hydrate']>;
 
 const Test = model<ITest>('Test', schema);
 
 void async function main() {
-  const doc: ITest = await Test.findOne().orFail();
+  const doc = await Test.findOne().orFail();
 
-  expectType<Promise<ITest>>(doc.remove());
-  expectType<void>(doc.remove({}, (err, doc) => {
-    expectType<Error | null>(err);
-    expectType<any>(doc);
-  }));
-  expectType<void>(doc.remove((err, doc) => {
-    expectType<Error | null>(err);
-    expectType<any>(doc);
-  }));
+  expectType<Query<any, TestDocument>>(doc.deleteOne());
 }();
 
 
@@ -68,14 +61,6 @@ void async function run() {
   const x = test.save();
   expectAssignable<Promise<ITest & { _id: any; }>>(test.save());
   expectAssignable<Promise<ITest & { _id: any; }>>(test.save({}));
-  expectType<void>(test.save({}, (err, doc) => {
-    expectType<Error | null>(err);
-    expectAssignable<ITest & { _id: any; }>(doc);
-  }));
-  expectType<void>(test.save((err, doc) => {
-    expectType<Error | null>(err);
-    expectAssignable<ITest & { _id: any; }>(doc);
-  }));
 })();
 
 function gh10526<U extends ITest>(arg1: Model<U>) {

@@ -18,6 +18,9 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [Discriminator schemas use base schema options by default](#discriminator-schemas-use-base-schema-options-by-default)
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
 * [ObjectId bsontype now has lowercase d](#objectid-bsontype-now-has-lowercase-d)
+* [TypeScript-specific changes](#typescript-specific-changes)
+  * [Removed `LeanDocument` and support for `extends Document`](#removed-leandocument-and-support-for-extends-document)
+  * [New parameters for `HydratedDocument`](#new-parameters-for-hydrateddocument)
 
 <h3 id="strictquery"><a href="#strictquery"><code>strictQuery</code></a></h3>
 
@@ -226,3 +229,68 @@ oid._bsontype; // 'ObjectId' in Mongoose 7, 'ObjectID' in older versions of Mong
 
 Please update any places where you use `_bsontype` to check if an object is an ObjectId.
 This may also affect libraries that use Mongoose.
+
+<h3 id="typescript-specific-changes"><a href="#typescript-specific-changes">TypeScript-specific Changes</a></h3>
+
+<h4 id="removed-leandocument-and-support-for-extends-document"><a href="#removed-leandocument-and-support-for-extends-document">Removed <code>LeanDocument</code> and support for <code>extends Document</code></a></h4>
+
+Mongoose 7 no longer exports a `LeanDocument` type, and no longer supports passing a document type that `extends Document` into `Model<>`.
+
+```ts
+// No longer supported
+interface ITest extends Document {
+  name?: string;
+}
+const Test = model<ITest>('Test', schema);
+
+// Do this instead, no `extends Document`
+interface ITest {
+  name?: string;
+}
+const Test = model<ITest>('Test', schema);
+
+// If you need to access the hydrated document type, use the following code
+type TestDocument = ReturnType<(typeof Test)['hydrate']>;
+```
+
+<h4 id="new-parameters-for-hydrateddocument"><a href="#new-parameters-for-hydrateddocument">New Parameters for <code>HydratedDocument</code></a></h4>
+
+Mongoose's `HydratedDocument` type transforms a raw document interface into the type of the hydrated Mongoose document, including virtuals, methods, etc.
+In Mongoose 7, the generic parameters to `HydratedDocument` have changed.
+In Mongoose 6, the generic parameters were:
+
+```ts
+type HydratedDocument<
+  DocType,
+  TMethodsAndOverrides = {},
+  TVirtuals = {}
+> = Document<unknown, any, DocType> &
+  Require_id<DocType> &
+  TMethodsAndOverrides &
+  TVirtuals;
+```
+
+In Mongoose 7, the new type is as follows.
+
+```ts
+type HydratedDocument<
+  DocType,
+  TOverrides = {},
+  TQueryHelpers = {}
+> = Document<unknown, TQueryHelpers, DocType> &
+  Require_id<DocType> &
+  TOverrides;
+```
+
+In Mongoose 7, the first parameter is the raw document interface, the 2nd parameter is any document-specific overrides (usually virtuals and methods), and the 3rd parameter is any query helpers associated with the document's model.
+
+The key difference is that, in Mongoose 6, the 3rd generic param was the document's _virtuals_.
+In Mongoose 7, the 3rd generic param is the document's _query helpers_.
+
+```ts
+// Mongoose 6 version:
+type UserDocument = HydratedDocument<TUser, TUserMethods, TUserVirtuals>;
+
+// Mongoose 7:
+type UserDocument = HydratedDocument<TUser, TUserMethods & TUserVirtuals, TUserQueryHelpers>;
+```

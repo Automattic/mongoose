@@ -139,7 +139,7 @@ declare module 'mongoose' {
     TQueryHelpers = {},
     TInstanceMethods = {},
     TVirtuals = {},
-    THydratedDocumentType = HydratedDocument<TRawDocType, TVirtuals & TInstanceMethods>,
+    THydratedDocumentType = HydratedDocument<TRawDocType, TVirtuals & TInstanceMethods, TQueryHelpers>,
     TSchema = any> extends
     NodeJS.EventEmitter,
     AcceptsDiscriminator,
@@ -147,8 +147,8 @@ declare module 'mongoose' {
     SessionStarter {
     new <DocType = TRawDocType>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): THydratedDocumentType;
 
-    aggregate<R = any>(pipeline?: PipelineStage[], options?: AggregateOptions, callback?: Callback<R[]>): Aggregate<Array<R>>;
-    aggregate<R = any>(pipeline: PipelineStage[], callback?: Callback<R[]>): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline?: PipelineStage[], options?: AggregateOptions): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline: PipelineStage[]): Aggregate<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
     base: Mongoose;
@@ -169,8 +169,6 @@ declare module 'mongoose' {
      * if you use `create()`) because with `bulkWrite()` there is only one network
      * round trip to the MongoDB server.
      */
-    bulkWrite(writes: Array<mongodb.AnyBulkWriteOperation<TRawDocType extends Document ? any : (TRawDocType extends {} ? TRawDocType : any)>>, options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions, callback: Callback<mongodb.BulkWriteResult>): void;
-    bulkWrite(writes: Array<mongodb.AnyBulkWriteOperation<TRawDocType extends Document ? any : (TRawDocType extends {} ? TRawDocType : any)>>, callback: Callback<mongodb.BulkWriteResult>): void;
     bulkWrite(writes: Array<mongodb.AnyBulkWriteOperation<TRawDocType extends Document ? any : (TRawDocType extends {} ? TRawDocType : any)>>, options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions): Promise<mongodb.BulkWriteResult>;
 
     /**
@@ -184,21 +182,14 @@ declare module 'mongoose' {
     collection: Collection;
 
     /** Creates a `count` query: counts the number of documents that match `filter`. */
-    count(callback?: Callback<number>): QueryWithHelpers<number, THydratedDocumentType, TQueryHelpers, TRawDocType>;
-    count(filter: FilterQuery<TRawDocType>, callback?: Callback<number>): QueryWithHelpers<number, THydratedDocumentType, TQueryHelpers, TRawDocType>;
+    count(): QueryWithHelpers<number, THydratedDocumentType, TQueryHelpers, TRawDocType>;
+    count(filter: FilterQuery<TRawDocType>): QueryWithHelpers<number, THydratedDocumentType, TQueryHelpers, TRawDocType>;
 
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
     countDocuments(
       filter: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType>,
-      callback?: Callback<number>
+      options?: QueryOptions<TRawDocType>
     ): QueryWithHelpers<
-    number,
-    THydratedDocumentType,
-    TQueryHelpers,
-    TRawDocType
-    >;
-    countDocuments(callback?: Callback<number>): QueryWithHelpers<
     number,
     THydratedDocumentType,
     TQueryHelpers,
@@ -207,19 +198,14 @@ declare module 'mongoose' {
 
     /** Creates a new document or documents */
     create<DocContents = AnyKeys<TRawDocType>>(docs: Array<TRawDocType | DocContents>, options?: SaveOptions): Promise<THydratedDocumentType[]>;
-    create<DocContents = AnyKeys<TRawDocType>>(docs: Array<TRawDocType | DocContents>, options?: SaveOptions, callback?: Callback<Array<THydratedDocumentType>>): Promise<THydratedDocumentType[]>;
-    create<DocContents = AnyKeys<TRawDocType>>(docs: Array<TRawDocType | DocContents>, callback: Callback<Array<THydratedDocumentType>>): void;
     create<DocContents = AnyKeys<TRawDocType>>(doc: DocContents | TRawDocType): Promise<THydratedDocumentType>;
     create<DocContents = AnyKeys<TRawDocType>>(...docs: Array<TRawDocType | DocContents>): Promise<THydratedDocumentType[]>;
-    create<DocContents = AnyKeys<TRawDocType>>(doc: TRawDocType | DocContents, callback: Callback<THydratedDocumentType>): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,
      * mongoose will not create the collection for the model until any documents are
      * created. Use this method to create the collection explicitly.
      */
-    createCollection<T extends mongodb.Document>(options: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'> | null, callback: Callback<mongodb.Collection<T>>): void;
-    createCollection<T extends mongodb.Document>(callback: Callback<mongodb.Collection<T>>): void;
     createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>): Promise<mongodb.Collection<T>>;
 
     /** Connection the model uses. */
@@ -232,8 +218,7 @@ declare module 'mongoose' {
      */
     deleteMany(
       filter?: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType>,
-      callback?: CallbackWithoutResult
+      options?: QueryOptions<TRawDocType>
     ): QueryWithHelpers<
     mongodb.DeleteResult,
     THydratedDocumentType,
@@ -241,15 +226,8 @@ declare module 'mongoose' {
     TRawDocType
     >;
     deleteMany(
-      filter: FilterQuery<TRawDocType>,
-      callback: CallbackWithoutResult
+      filter: FilterQuery<TRawDocType>
     ): QueryWithHelpers<
-    mongodb.DeleteResult,
-    THydratedDocumentType,
-    TQueryHelpers,
-    TRawDocType
-    >;
-    deleteMany(callback: CallbackWithoutResult): QueryWithHelpers<
     mongodb.DeleteResult,
     THydratedDocumentType,
     TQueryHelpers,
@@ -263,8 +241,7 @@ declare module 'mongoose' {
      */
     deleteOne(
       filter?: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType>,
-      callback?: CallbackWithoutResult
+      options?: QueryOptions<TRawDocType>
     ): QueryWithHelpers<
     mongodb.DeleteResult,
     THydratedDocumentType,
@@ -272,15 +249,8 @@ declare module 'mongoose' {
     TRawDocType
     >;
     deleteOne(
-      filter: FilterQuery<TRawDocType>,
-      callback: CallbackWithoutResult
+      filter: FilterQuery<TRawDocType>
     ): QueryWithHelpers<
-    mongodb.DeleteResult,
-    THydratedDocumentType,
-    TQueryHelpers,
-    TRawDocType
-    >;
-    deleteOne(callback: CallbackWithoutResult): QueryWithHelpers<
     mongodb.DeleteResult,
     THydratedDocumentType,
     TQueryHelpers,
@@ -301,30 +271,25 @@ declare module 'mongoose' {
     findById<ResultDoc = THydratedDocumentType>(
       id: any,
       projection?: ProjectionType<TRawDocType> | null,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: Callback<ResultDoc | null>
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
     findById<ResultDoc = THydratedDocumentType>(
       id: any,
-      projection?: ProjectionType<TRawDocType> | null,
-      callback?: Callback<ResultDoc | null>
+      projection?: ProjectionType<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Finds one document. */
     findOne<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       projection?: ProjectionType<TRawDocType> | null,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: Callback<ResultDoc | null>
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
     findOne<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
-      projection?: ProjectionType<TRawDocType> | null,
-      callback?: Callback<ResultDoc | null>
+      projection?: ProjectionType<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
     findOne<ResultDoc = THydratedDocumentType>(
-      filter?: FilterQuery<TRawDocType>,
-      callback?: Callback<ResultDoc | null>
+      filter?: FilterQuery<TRawDocType>
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /**
@@ -341,43 +306,9 @@ declare module 'mongoose' {
      * [`connection.model()`](/docs/api/connection.html#connection_Connection-model), so you
      * don't need to call it.
      */
-    init(callback?: CallbackWithoutResult): Promise<THydratedDocumentType>;
+    init(): Promise<THydratedDocumentType>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
-    insertMany<DocContents = TRawDocType>(
-      docs: Array<DocContents | TRawDocType>,
-      options: InsertManyOptions & { lean: true; },
-      callback: Callback<Array<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>>>
-    ): void;
-    insertMany<DocContents = TRawDocType>(
-      docs: Array<DocContents | TRawDocType>,
-      options: InsertManyOptions & { rawResult: true; },
-      callback: Callback<mongodb.InsertManyResult<TRawDocType>>
-    ): void;
-    insertMany<DocContents = TRawDocType>(
-      docs: Array<DocContents | TRawDocType>,
-      callback: Callback<Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods>>>
-    ): void;
-    insertMany<DocContents = TRawDocType>(
-      doc: DocContents,
-      options: InsertManyOptions & { lean: true; },
-      callback: Callback<Array<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>>>
-    ): void;
-    insertMany<DocContents = TRawDocType>(
-      doc: DocContents,
-      options: InsertManyOptions & { rawResult: true; },
-      callback: Callback<mongodb.InsertManyResult<TRawDocType>>
-    ): void;
-    insertMany<DocContents = TRawDocType>(
-      doc: DocContents,
-      options: InsertManyOptions & { lean?: false | undefined },
-      callback: Callback<Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods>>>
-    ): void;
-    insertMany<DocContents = TRawDocType>(
-      doc: DocContents,
-      callback: Callback<Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods>>>
-    ): void;
-
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>,
       options: InsertManyOptions & { lean: true; }
@@ -388,7 +319,7 @@ declare module 'mongoose' {
     ): Promise<mongodb.InsertManyResult<TRawDocType>>;
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>
-    ): Promise<Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods>>>;
+    ): Promise<Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods, TQueryHelpers>>>;
     insertMany<DocContents = TRawDocType>(
       doc: DocContents,
       options: InsertManyOptions & { lean: true; }
@@ -400,25 +331,27 @@ declare module 'mongoose' {
     insertMany<DocContents = TRawDocType>(
       doc: DocContents,
       options: InsertManyOptions
-    ): Promise<Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods>>>;
+    ): Promise<Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods, TQueryHelpers>>>;
     insertMany<DocContents = TRawDocType>(doc: DocContents): Promise<
-    Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods>>
+    Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods, TQueryHelpers>>
     >;
 
     /** The name of the model */
     modelName: string;
 
     /** Populates document references. */
-    populate(docs: Array<any>, options: PopulateOptions | Array<PopulateOptions> | string,
-      callback?: Callback<(THydratedDocumentType)[]>): Promise<Array<THydratedDocumentType>>;
-    populate(doc: any, options: PopulateOptions | Array<PopulateOptions> | string,
-      callback?: Callback<THydratedDocumentType>): Promise<THydratedDocumentType>;
-
+    populate(
+      docs: Array<any>,
+      options: PopulateOptions | Array<PopulateOptions> | string
+    ): Promise<Array<THydratedDocumentType>>;
+    populate(
+      doc: any, options: PopulateOptions | Array<PopulateOptions> | string
+    ): Promise<THydratedDocumentType>;
 
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
-    validate(callback?: CallbackWithoutResult): Promise<void>;
-    validate(optional: any, callback?: CallbackWithoutResult): Promise<void>;
-    validate(optional: any, pathsToValidate: PathsToValidate, callback?: CallbackWithoutResult): Promise<void>;
+    validate(): Promise<void>;
+    validate(optional: any): Promise<void>;
+    validate(optional: any, pathsToValidate: PathsToValidate): Promise<void>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://www.mongodb.com/docs/manual/changeStreams/). */
     watch<ResultType extends mongodb.Document = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean }): mongodb.ChangeStream<ResultType>;
@@ -433,20 +366,19 @@ declare module 'mongoose' {
     translateAliases(raw: any): any;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct<ReturnType = any>(field: string, filter?: FilterQuery<TRawDocType>, callback?: Callback<number>): QueryWithHelpers<Array<ReturnType>, THydratedDocumentType, TQueryHelpers, TRawDocType>;
+    distinct<ReturnType = any>(field: string, filter?: FilterQuery<TRawDocType>): QueryWithHelpers<Array<ReturnType>, THydratedDocumentType, TQueryHelpers, TRawDocType>;
 
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
-    estimatedDocumentCount(options?: QueryOptions<TRawDocType>, callback?: Callback<number>): QueryWithHelpers<number, THydratedDocumentType, TQueryHelpers, TRawDocType>;
+    estimatedDocumentCount(options?: QueryOptions<TRawDocType>): QueryWithHelpers<number, THydratedDocumentType, TQueryHelpers, TRawDocType>;
 
     /**
      * Returns a document with its `_id` if at least one document exists in the database that matches
      * the given `filter`, and `null` otherwise.
      */
     exists(
-      filter: FilterQuery<TRawDocType>,
-      callback: Callback<{ _id: InferId<TRawDocType> } | null>
+      filter: FilterQuery<TRawDocType>
     ): QueryWithHelpers<
-    Pick<Document<TRawDocType>, '_id'> | null,
+    { _id: InferId<TRawDocType> } | null,
     THydratedDocumentType,
     TQueryHelpers,
     TRawDocType
@@ -462,173 +394,124 @@ declare module 'mongoose' {
     find<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       projection?: ProjectionType<TRawDocType> | null | undefined,
-      options?: QueryOptions<TRawDocType> | null | undefined,
-      callback?: Callback<ResultDoc[]> | undefined
+      options?: QueryOptions<TRawDocType> | null | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
     find<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
-      projection?: ProjectionType<TRawDocType> | null | undefined,
-      callback?: Callback<ResultDoc[]> | undefined
+      projection?: ProjectionType<TRawDocType> | null | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
     find<ResultDoc = THydratedDocumentType>(
-      filter: FilterQuery<TRawDocType>,
-      callback?: Callback<ResultDoc[]> | undefined
+      filter: FilterQuery<TRawDocType>
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
     find<ResultDoc = THydratedDocumentType>(
-      callback?: Callback<ResultDoc[]> | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete<ResultDoc = THydratedDocumentType>(
       id?: mongodb.ObjectId | any,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Creates a `findByIdAndRemove` query, filtering by the given `_id`. */
     findByIdAndRemove<ResultDoc = THydratedDocumentType>(
       id?: mongodb.ObjectId | any,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
       update: UpdateQuery<TRawDocType>,
-      options: QueryOptions<TRawDocType> & { rawResult: true },
-      callback?: (err: CallbackError, doc: any, res: any) => void
+      options: QueryOptions<TRawDocType> & { rawResult: true }
     ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
       update: UpdateQuery<TRawDocType>,
-      options: QueryOptions<TRawDocType> & { upsert: true } & ReturnsNewDoc,
-      callback?: (err: CallbackError, doc: ResultDoc, res: any) => void
+      options: QueryOptions<TRawDocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<ResultDoc, ResultDoc, TQueryHelpers, TRawDocType>;
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       id?: mongodb.ObjectId | any,
       update?: UpdateQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
-      update: UpdateQuery<TRawDocType>,
-      callback: (err: CallbackError, doc: ResultDoc | null, res: any) => void
+      update: UpdateQuery<TRawDocType>
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
     findOneAndRemove<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
     findOneAndReplace<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       replacement: TRawDocType | AnyObject,
-      options: QueryOptions<TRawDocType> & { rawResult: true },
-      callback?: (err: CallbackError, doc: any, res: any) => void
+      options: QueryOptions<TRawDocType> & { rawResult: true }
     ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
     findOneAndReplace<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       replacement: TRawDocType | AnyObject,
-      options: QueryOptions<TRawDocType> & { upsert: true } & ReturnsNewDoc,
-      callback?: (err: CallbackError, doc: ResultDoc, res: any) => void
+      options: QueryOptions<TRawDocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<ResultDoc, ResultDoc, TQueryHelpers, TRawDocType>;
     findOneAndReplace<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       replacement?: TRawDocType | AnyObject,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: (err: CallbackError, doc: ResultDoc | null, res: any) => void
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
-      options: QueryOptions<TRawDocType> & { rawResult: true },
-      callback?: (err: CallbackError, doc: any, res: any) => void
+      options: QueryOptions<TRawDocType> & { rawResult: true }
     ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
-      options: QueryOptions<TRawDocType> & { upsert: true } & ReturnsNewDoc,
-      callback?: (err: CallbackError, doc: ResultDoc, res: any) => void
+      options: QueryOptions<TRawDocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<ResultDoc, ResultDoc, TQueryHelpers, TRawDocType>;
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       update?: UpdateQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: (err: CallbackError, doc: TRawDocType | null, res: any) => void
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType>;
 
     geoSearch<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
-      options?: GeoSearchOptions,
-      callback?: Callback<Array<ResultDoc>>
+      options?: GeoSearchOptions
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
-
-    /** Executes a mapReduce command. */
-    mapReduce<Key, Value>(
-      o: MapReduceOptions<TRawDocType, Key, Value>,
-      callback?: Callback
-    ): Promise<any>;
-
-    remove<ResultDoc = THydratedDocumentType>(
-      filter?: any,
-      callback?: CallbackWithoutResult
-    ): QueryWithHelpers<any, ResultDoc, TQueryHelpers, TRawDocType>;
-    remove<ResultDoc = THydratedDocumentType>(
-      filter?: any,
-      options?: RemoveOptions,
-      callback?: CallbackWithoutResult
-    ): QueryWithHelpers<any, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
     replaceOne<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       replacement?: TRawDocType | AnyObject,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: Callback
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Schema the model uses. */
     schema: Schema<TRawDocType>;
 
-    /**
-   * @deprecated use `updateOne` or `updateMany` instead.
-   * Creates a `update` query: updates one or many documents that match `filter` with `update`, based on the `multi` option.
-   */
-    update<ResultDoc = THydratedDocumentType>(
-      filter?: FilterQuery<TRawDocType>,
-      update?: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: Callback
-    ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType>;
-
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
     updateMany<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       update?: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: Callback
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
     updateOne<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       update?: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
-      options?: QueryOptions<TRawDocType> | null,
-      callback?: Callback
+      options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */

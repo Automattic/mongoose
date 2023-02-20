@@ -64,6 +64,7 @@
     "pug": "2.0.3",
     "q": "1.5.1",
     "rimraf": "2.6.3",
+    "schema-utils": "2.6.5",
     "semver": "5.5.0",
     "typescript": "4.1.x",
     "uuid": "2.0.3",

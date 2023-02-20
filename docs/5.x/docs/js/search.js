@@ -26,7 +26,7 @@ if (q != null) {
         var html = '';
         for (var i = 0; i < result.results.length; ++i) {
           var res = result.results[i];
-          var url = res.url.replace(/^\//, '');
+          var url = res.url;
           html += '<li>' +
             '<a class="title" href="' + url + '">' +
             res.title +

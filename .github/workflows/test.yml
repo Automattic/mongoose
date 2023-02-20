@@ -41,6 +41,8 @@ jobs:
           ln -s `pwd` ./test/typescript/node_modules/mongoose
           echo `pwd`/mongodb-linux-x86_64-ubuntu1804-4.0.2/bin >> $GITHUB_PATH
 
+      - run: npm run build-browser
+
       - run: npm test
 
   lint:

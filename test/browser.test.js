@@ -4,6 +4,8 @@
  * Module dependencies.
  */
 
+require('../lib/browser');
+
 const Document = require('../lib/browserDocument');
 const Schema = require('../lib/schema');
 const assert = require('assert');
@@ -16,6 +18,10 @@ const exec = require('child_process').exec;
 describe('browser', function() {
   it('require() works with no other require calls (gh-5842)', function(done) {
     exec('node --eval "require(\'./lib/browser\')"', done);
+  });
+
+  it('require() works in an environment where process.versions is an empty object (gh-5842)', function(done) {
+    exec('node --eval "Object.defineProperty(process, \'versions\', { value: {} }); require(\'./dist/browser.umd\')"', done);
   });
 
   it('using schema (gh-7170)', function(done) {

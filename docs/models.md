@@ -1,8 +1,8 @@
 ## Models
 
-[Models](./api.html#model-js) are fancy constructors compiled from
+[Models](api.html#model-js) are fancy constructors compiled from
 `Schema` definitions. An instance of a model is called a
-[document](./documents.html). Models are responsible for creating and
+[document](documents.html). Models are responsible for creating and
 reading documents from the underlying MongoDB database.
 
 * [Compiling your first model](#compiling)
@@ -33,7 +33,7 @@ before calling `.model()`!
 
 ### Constructing Documents
 
-An instance of a model is called a [document](./documents.html). Creating
+An instance of a model is called a [document](documents.html). Creating
 them and saving to the database is easy.
 
 ```javascript
@@ -75,13 +75,13 @@ const Tank = connection.model('Tank', yourSchema);
 
 ### Querying
 
-Finding documents is easy with Mongoose, which supports the [rich](http://www.mongodb.org/display/DOCS/Advanced+Queries) query syntax of MongoDB. Documents can be retreived using each `models` [find](./api.html#model_Model.find), [findById](./api.html#model_Model.findById), [findOne](./api.html#model_Model.findOne), or [where](./api.html#model_Model.where) static methods.
+Finding documents is easy with Mongoose, which supports the [rich](http://www.mongodb.org/display/DOCS/Advanced+Queries) query syntax of MongoDB. Documents can be retreived using each `models` [find](api.html#model_Model.find), [findById](api.html#model_Model.findById), [findOne](api.html#model_Model.findOne), or [where](api.html#model_Model.where) static methods.
 
 ```javascript
 Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
 ```
 
-See the chapter on [queries](./queries.html) for more details on how to use the [Query](./api.html#query-js) api.
+See the chapter on [queries](queries.html) for more details on how to use the [Query](api.html#query-js) api.
 
 ### Deleting
 
@@ -99,7 +99,7 @@ Tank.deleteOne({ size: 'large' }, function (err) {
 
 Each `model` has its own `update` method for modifying documents in the
 database without returning them to your application. See the
-[API](./api.html#model_Model.updateOne) docs for more detail.
+[API](api.html#model_Model.updateOne) docs for more detail.
 
 ```javascript
 Tank.updateOne({ size: 'large' }, { name: 'T-90' }, function(err, res) {
@@ -109,7 +109,7 @@ Tank.updateOne({ size: 'large' }, { name: 'T-90' }, function(err, res) {
 ```
 
 _If you want to update a single document in the db and return it to your
-application, use [findOneAndUpdate](./api.html#model_Model.findOneAndUpdate)
+application, use [findOneAndUpdate](api.html#model_Model.findOneAndUpdate)
 instead._
 
 ### Change Streams
@@ -156,8 +156,8 @@ You can read more about [change streams in mongoose in this blog post](http://th
 
 ### Yet more
 
-The [API docs](./api.html#model_Model) cover many additional methods available like [count](./api.html#model_Model.count), [mapReduce](./api.html#model_Model.mapReduce), [aggregate](./api.html#model_Model.aggregate), and [more](./api.html#model_Model.findOneAndRemove).
+The [API docs](api.html#model_Model) cover many additional methods available like [count](api.html#model_Model.count), [mapReduce](api.html#model_Model.mapReduce), [aggregate](api.html#model_Model.aggregate), and [more](api.html#model_Model.findOneAndRemove).
 
 ### Next Up
 
-Now that we've covered `Models`, let's take a look at [Documents](/docs/documents.html).
+Now that we've covered `Models`, let's take a look at [Documents](documents.html).

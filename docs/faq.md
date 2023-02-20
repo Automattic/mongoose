@@ -25,8 +25,8 @@ doc.save();
 **A**. Mongoose doesn't create getters/setters for array indexes; without
 them mongoose never gets notified of the change and so doesn't know to
 persist the new value. There are two workarounds:
-[`MongooseArray#set`](./api.html#types_array_MongooseArray.set) or
-[`Document#markModified()`](/docs/api/document.html#document_Document-markModified).
+[`MongooseArray#set`](api.html#types_array_MongooseArray.set) or
+[`Document#markModified()`](api/document.html#document_Document-markModified).
 
 ```javascript
 // Saves changes successfully
@@ -123,7 +123,7 @@ console.log(new Model());
 
 **A**. This is a performance optimization. These empty objects are not saved
 to the database, nor are they in the result `toObject()`, nor do they show
-up in `JSON.stringify()` output unless you turn off the [`minimize` option](./guide.html#minimize).
+up in `JSON.stringify()` output unless you turn off the [`minimize` option](guide.html#minimize).
 
 The reason for this behavior is that Mongoose's change detection
 and getters/setters are based on [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
@@ -132,7 +132,7 @@ the overhead of running `Object.defineProperty()` every time a document is creat
 mongoose defines properties on the `Model` prototype when the model is compiled.
 Because mongoose needs to define getters and setters for `nested.prop`, `nested`
 must always be defined as an object on a mongoose document, even if `nested`
-is undefined on the underlying [POJO](./guide.html#minimize).
+is undefined on the underlying [POJO](guide.html#minimize).
 
 <hr id="destructured-imports" />
 
@@ -141,7 +141,7 @@ is undefined on the underlying [POJO](./guide.html#minimize).
 
 **A**. The only import syntax Mongoose supports is `import mongoose from 'mongoose'`.
 Syntaxes like `import * from 'mongoose'` or `import { model } from 'mongoose'` do **not** work.
-The global Mongoose object stores types, [global options](/docs/api.html#mongoose_Mongoose-set), and other important
+The global Mongoose object stores types, [global options](api.html#mongoose_Mongoose-set), and other important
 properties that Mongoose needs. When you do `import { model } from 'mongoose'`, the
 `this` value in `model()` is not the Mongoose global.
 
@@ -161,7 +161,7 @@ foo(); // "undefined"
 
 <hr id="arrow-functions" />
 
-<a href="#arrow-functions">**Q**</a>. I'm using an arrow function for a [virtual](./guide.html#virtuals), [middleware](./middleware.html), [getter](./api.html#schematype_SchemaType-get)/[setter](./api.html#schematype_SchemaType-set), or [method](./guide.html#methods) and the value of `this` is wrong.
+<a href="#arrow-functions">**Q**</a>. I'm using an arrow function for a [virtual](guide.html#virtuals), [middleware](middleware.html), [getter](api.html#schematype_SchemaType-get)/[setter](api.html#schematype_SchemaType-set), or [method](guide.html#methods) and the value of `this` is wrong.
 
 **A**. Arrow functions [handle the `this` keyword much differently than conventional functions](https://masteringjs.io/tutorials/fundamentals/arrow#why-not-arrow-functions).
 Mongoose getters/setters depend on `this` to give you access to the document that you're writing to, but this functionality does not work with arrow functions. Do **not** use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.
@@ -254,7 +254,7 @@ new Schema({
 <a href="#model_functions_hanging">**Q**</a>. All function calls on my models hang, what am I doing wrong?
 
 **A**. By default, mongoose will buffer your function calls until it can
-connect to MongoDB. Read the [buffering section of the connection docs](./connections.html#buffering)
+connect to MongoDB. Read the [buffering section of the connection docs](connections.html#buffering)
 for more information.
 
 <hr id="enable_debugging" />
@@ -274,7 +274,7 @@ mongoose.set('debug', { color: false })
 mongoose.set('debug', { shell: true })
 ```
 
-For more debugging options (streams, callbacks), see the ['debug' option under `.set()`](./api.html#mongoose_Mongoose-set).
+For more debugging options (streams, callbacks), see the ['debug' option under `.set()`](api.html#mongoose_Mongoose-set).
 
 <hr id="callback_never_executes" />
 
@@ -425,7 +425,7 @@ Consider using a regex like `/^[a-f0-9]{24}$/` to test whether a string is exact
 
 **A**. In order to avoid executing a separate query for each document returned from the `find` query, Mongoose
 instead queries using (numDocuments * limit) as the limit. If you need the correct limit, you should use the
-[perDocumentLimit](/docs/populate.html#limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in
+[perDocumentLimit](populate.html#limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in
 mind that populate() will execute a separate query for each document.
 
 <hr id="duplicate-query" />

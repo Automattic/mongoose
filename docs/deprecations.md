@@ -32,15 +32,15 @@ removed in a future version. To use the new parser, pass option
 The MongoDB Node.js driver rewrote the tool it uses to parse [MongoDB connection strings](https://docs.mongodb.com/manual/reference/connection-string/).
 Because this is such a big change, they put the new connection string parser
 behind a flag. To turn on this option, pass the `useNewUrlParser` option to
-[`mongoose.connect()`](/docs/api.html#mongoose_Mongoose-connect)
-or [`mongoose.createConnection()`](/docs/api.html#mongoose_Mongoose-createConnection).
+[`mongoose.connect()`](api.html#mongoose_Mongoose-connect)
+or [`mongoose.createConnection()`](api.html#mongoose_Mongoose-createConnection).
 
 ```javascript
 mongoose.connect(uri, { useNewUrlParser: true });
 mongoose.createConnection(uri, { useNewUrlParser: true });
 ```
 
-You can also [set the global `useNewUrlParser` option](/docs/api.html#mongoose_Mongoose-set)
+You can also [set the global `useNewUrlParser` option](api.html#mongoose_Mongoose-set)
 to turn on `useNewUrlParser` for every connection by default.
 
 ```javascript
@@ -56,7 +56,7 @@ with `{ useNewUrlParser: true }`, please [open an issue on GitHub](https://githu
 
 <h2 id="findandmodify"><a href="#findandmodify"><code>findAndModify()</code></a></h2>
 
-If you use [`Model.findOneAndUpdate()`](/docs/api.html#model_Model.findOneAndUpdate),
+If you use [`Model.findOneAndUpdate()`](api.html#model_Model.findOneAndUpdate),
 by default you'll see one of the below deprecation warnings.
 
 ```
@@ -67,7 +67,7 @@ DeprecationWarning: collection.findAndModify is deprecated. Use findOneAndUpdate
 Mongoose's `findOneAndUpdate()` long pre-dates the MongoDB driver's `findOneAndUpdate()`
 function, so it uses the MongoDB driver's [`findAndModify()` function](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findAndModify)
 instead. You can opt in to using the MongoDB driver's `findOneAndUpdate()`
-function using the [`useFindAndModify` global option](/docs/api.html#mongoose_Mongoose-set).
+function using the [`useFindAndModify` global option](api.html#mongoose_Mongoose-set).
 
 ```javascript
 // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
@@ -86,22 +86,22 @@ no intentional backwards breaking changes, so you should be able to turn
 this option on without any code changes. If you discover any issues,
 please [open an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
 
-* [`Model.findByIdAndDelete()`](/docs/api.html#model_Model.findByIdAndDelete)
-* [`Model.findByIdAndRemove()`](/docs/api.html#model_Model.findByIdAndRemove)
-* [`Model.findByIdAndUpdate()`](/docs/api.html#model_Model.findByIdAndUpdate)
-* [`Model.findOneAndDelete()`](/docs/api.html#model_Model.findOneAndDelete)
-* [`Model.findOneAndRemove()`](/docs/api.html#model_Model.findOneAndRemove)
-* [`Model.findOneAndUpdate()`](/docs/api.html#model_Model.findOneAndUpdate)
-* [`Query.findOneAndDelete()`](/docs/api.html#query_Query-findOneAndDelete)
-* [`Query.findOneAndRemove()`](/docs/api.html#query_Query-findOneAndRemove)
-* [`Query.findOneAndUpdate()`](/docs/api.html#query_Query-findOneAndUpdate)
+* [`Model.findByIdAndDelete()`](api.html#model_Model.findByIdAndDelete)
+* [`Model.findByIdAndRemove()`](api.html#model_Model.findByIdAndRemove)
+* [`Model.findByIdAndUpdate()`](api.html#model_Model.findByIdAndUpdate)
+* [`Model.findOneAndDelete()`](api.html#model_Model.findOneAndDelete)
+* [`Model.findOneAndRemove()`](api.html#model_Model.findOneAndRemove)
+* [`Model.findOneAndUpdate()`](api.html#model_Model.findOneAndUpdate)
+* [`Query.findOneAndDelete()`](api.html#query_Query-findOneAndDelete)
+* [`Query.findOneAndRemove()`](api.html#query_Query-findOneAndRemove)
+* [`Query.findOneAndUpdate()`](api.html#query_Query-findOneAndUpdate)
 
 You can also safely ignore this warning. Mongoose will not remove the legacy `useFindAndModify: true`
 behavior until Mongoose 6.0.
 
 <h2 id="ensureindex"><a href="#ensureindex"><code>ensureIndex()</code></a></h2>
 
-If you define [indexes in your Mongoose schemas](https://mongoosejs.com/docs/guide.html#indexes), you'll see the below
+If you define [indexes in your Mongoose schemas](guide.html#indexes), you'll see the below
 deprecation warning.
 
 ```
@@ -111,7 +111,7 @@ instead.
 
 By default, Mongoose 5.x calls the [MongoDB driver's `ensureIndex()` function](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#ensureIndex).
 The MongoDB driver deprecated this function in favor of [`createIndex()`](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#createIndex).
-Set the [`useCreateIndex` global option](/docs/api.html#mongoose_Mongoose-set) to opt in to making Mongoose use `createIndex()` instead.
+Set the [`useCreateIndex` global option](api.html#mongoose_Mongoose-set) to opt in to making Mongoose use `createIndex()` instead.
 
 ```javascript
 mongoose.set('useCreateIndex', true);
@@ -144,7 +144,7 @@ deleteMany, or bulkWrite instead.
 ```
 
 To remove this deprecation warning, replace any usage of `remove()` with
-`deleteMany()`, _unless_ you specify the [`single` option to `remove()`](/docs/api.html#model_Model.remove). The `single`
+`deleteMany()`, _unless_ you specify the [`single` option to `remove()`](api.html#model_Model.remove). The `single`
 option limited `remove()` to deleting at most one document, so you should
 replace `remove(filter, { single: true })` with `deleteOne(filter)`.
 
@@ -183,7 +183,7 @@ mongoose.set('useUnifiedTopology', true);
 ```
 
 The `useUnifiedTopology` option removes support for several
-[connection options](/docs/connections.html#options) that are
+[connection options](connections.html#options) that are
 no longer relevant with the new topology engine:
 
 - `autoReconnect`
@@ -191,16 +191,16 @@ no longer relevant with the new topology engine:
 - `reconnectInterval`
 
 When you enable `useUnifiedTopology`, please remove those options
-from your [`mongoose.connect()`](/docs/api/mongoose.html#mongoose_Mongoose-connect) or
-[`createConnection()`](/docs/api/mongoose.html#mongoose_Mongoose-createConnection) calls.
+from your [`mongoose.connect()`](api/mongoose.html#mongoose_Mongoose-connect) or
+[`createConnection()`](api/mongoose.html#mongoose_Mongoose-createConnection) calls.
 
 If you find any unexpected behavior, please [open up an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
 
 <h2 id="update"><a href="#update"><code>update()</code></a></h2>
 
-Like `remove()`, the [`update()` function](/docs/api.html#model_Model.update) is deprecated in favor
-of the more explicit [`updateOne()`](/docs/api.html#model_Model.updateOne), [`updateMany()`](/docs/api.html#model_Model.updateMany), and [`replaceOne()`](/docs/api.html#model_Model.replaceOne) functions. You should replace
-`update()` with `updateOne()`, unless you use the [`multi` or `overwrite` options](/docs/api.html#model_Model.update).
+Like `remove()`, the [`update()` function](api.html#model_Model.update) is deprecated in favor
+of the more explicit [`updateOne()`](api.html#model_Model.updateOne), [`updateMany()`](api.html#model_Model.updateMany), and [`replaceOne()`](api.html#model_Model.replaceOne) functions. You should replace
+`update()` with `updateOne()`, unless you use the [`multi` or `overwrite` options](api.html#model_Model.update).
 
 ```
 collection.update is deprecated. Use updateOne, updateMany, or bulkWrite

@@ -7,7 +7,7 @@ This means that you can do things like `MyModel.findOne({}).then()` and
 `await MyModel.findOne({}).exec()` if you're using
 [async/await](http://thecodebarbarian.com/80-20-guide-to-async-await-in-node.js.html).
  
-You can find the return type of specific operations [in the api docs](https://mongoosejs.com/docs/api.html)
+You can find the return type of specific operations [in the api docs](api.html)
 You can also read more about [promises in Mongoose](https://masteringjs.io/tutorials/mongoose/promise).
 
 ```javascript
@@ -71,5 +71,5 @@ ES6-style promise constructor and mongoose will use it.
 </i>
 <br><br>
 <a href="http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=promises" style="margin-left: 100px">
-  <img src="/docs/images/asyncawait.png" style="width: 650px" />
+  <img src="images/asyncawait.png" style="width: 650px" />
 </a>

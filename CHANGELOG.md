@@ -1,3 +1,9 @@
+5.13.16 / 2023-02-20
+====================
+ * fix: make access to process.versions lazy #12584 [maciasello](https://github.com/maciasello)
+ * fix(types): add missing type definitions for `bulkSave()` #12019
+ * docs: backport documentation URL updates #12692 [hasezoey](https://github.com/hasezoey)
+
 6.9.2 / 2023-02-16
 ==================
  * fix(model): fixed post('save') callback parameter #13030 #13026 [lpizzinidev](https://github.com/lpizzinidev)

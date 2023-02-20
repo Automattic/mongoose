@@ -99,9 +99,3 @@ exports.connect = async function() {
   return conn;
 };
 ```
-
-*Want to learn how to check whether your favorite JavaScript frameworks, like [Express](http://expressjs.com/) or [React](https://reactjs.org/), work with async/await? Spoiler alert: neither Express nor React support async/await. Chapter 4 of Mastering Async/Await explains the basic principles for determining whether a framework supports async/await. [Get your copy!](http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=lambda)*
-
-<a href="http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=lambda" style="margin-left: 100px">
-  <img src="/docs/images/asyncawait.png" style="width: 650px" />
-</a>

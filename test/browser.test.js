@@ -4,8 +4,6 @@
  * Module dependencies.
  */
 
-require('../lib/browser');
-
 const Document = require('../lib/browserDocument');
 const Schema = require('../lib/schema');
 const assert = require('assert');

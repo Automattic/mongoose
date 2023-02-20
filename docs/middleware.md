@@ -55,6 +55,7 @@ In query middleware functions, `this` refers to the query.
 * [update](api/query.html#query_Query-update)
 * [updateOne](api/query.html#query_Query-updateOne)
 * [updateMany](api/query.html#query_Query-updateMany)
+* [validate](validation.html#update-validators)
 
 Aggregate middleware is for `MyModel.aggregate()`.
 Aggregate middleware executes when you call `exec()` on an aggregate object.

@@ -179,10 +179,10 @@ function testGenericQuery(): void {
 
 function eachAsync(): void {
   Test.find().cursor().eachAsync((doc) => {
-    expectType<HydratedDocument<ITest>>(doc);
+    expectType<HydratedDocument<ITest, {}, QueryHelpers>>(doc);
   });
   Test.find().cursor().eachAsync((docs) => {
-    expectType<HydratedDocument<ITest>[]>(docs);
+    expectType<HydratedDocument<ITest, {}, QueryHelpers>[]>(docs);
   }, { batchSize: 2 });
 }
 

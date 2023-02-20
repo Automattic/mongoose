@@ -111,14 +111,12 @@ describe('document: strict mode:', function() {
       assert.ok(!s3.rouge);
     });
 
-    it('when using Model#create', function(done) {
+    it('when using Model#create', async function() {
       // strict on create
-      Strict.create({ content: 'sample2', rouge: 'data' }, function(err, doc) {
-        assert.equal(doc.content, 'sample2');
-        assert.ok(!('rouge' in doc));
-        assert.ok(!doc.rouge);
-        done();
-      });
+      const doc = await Strict.create({ content: 'sample2', rouge: 'data' });
+      assert.equal(doc.content, 'sample2');
+      assert.ok(!('rouge' in doc));
+      assert.ok(!doc.rouge);
     });
   });
 
@@ -157,7 +155,7 @@ describe('document: strict mode:', function() {
     assert.ok(!s.shouldnt);
   });
 
-  it('sub doc', function(done) {
+  it('sub doc', async function() {
     const lax = new Schema({
       ts: { type: Date, default: Date.now },
       content: String
@@ -195,12 +193,10 @@ describe('document: strict mode:', function() {
     assert.ok(!s3.dox[0].rouge);
 
     // strict on create
-    Strict.create({ dox: [{ content: 'sample2', rouge: 'data' }] }, function(err, doc) {
-      assert.equal(doc.dox[0].content, 'sample2');
-      assert.ok(!('rouge' in doc.dox[0]));
-      assert.ok(!doc.dox[0].rouge);
-      done();
-    });
+    const doc = await Strict.create({ dox: [{ content: 'sample2', rouge: 'data' }] });
+    assert.equal(doc.dox[0].content, 'sample2');
+    assert.ok(!('rouge' in doc.dox[0]));
+    assert.ok(!doc.dox[0].rouge);
   });
 
   it('virtuals', function() {
@@ -243,7 +239,7 @@ describe('document: strict mode:', function() {
     assert.equal(setCount, 2);
   });
 
-  it('can be overridden during set()', function(done) {
+  it('can be overridden during set()', async function() {
     const strict = new Schema({
       bool: Boolean
     });
@@ -255,27 +251,19 @@ describe('document: strict mode:', function() {
     const doc = s.toObject();
     doc.notInSchema = true;
 
-    Strict.collection.insertOne(doc, { w: 1 }, function(err) {
-      assert.ifError(err);
-      Strict.findById(doc._id, function(err, doc) {
-        assert.ifError(err);
-        assert.equal(doc._doc.bool, true);
-        assert.equal(doc._doc.notInSchema, true);
-        doc.bool = undefined;
-        doc.set('notInSchema', undefined, { strict: false });
-        doc.save(function() {
-          Strict.findById(doc._id, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(doc._doc.bool, undefined);
-            assert.equal(doc._doc.notInSchema, undefined);
-            done();
-          });
-        });
-      });
-    });
+    await Strict.collection.insertOne(doc, { w: 1 });
+    const foundDoc = await Strict.findById(doc._id);
+    assert.equal(foundDoc._doc.bool, true);
+    assert.equal(foundDoc._doc.notInSchema, true);
+    foundDoc.bool = undefined;
+    foundDoc.set('notInSchema', undefined, { strict: false });
+    await foundDoc.save();
+    const foundDoc2 = await Strict.findById(doc._id);
+    assert.equal(foundDoc2._doc.bool, undefined);
+    assert.equal(foundDoc2._doc.notInSchema, undefined);
   });
 
-  it('can be overridden during update()', function(done) {
+  it('can be overridden during update()', async function() {
     const strict = new Schema({
       bool: Boolean
     });
@@ -287,30 +275,20 @@ describe('document: strict mode:', function() {
     const doc = s.toObject();
     doc.notInSchema = true;
 
-    Strict.collection.insertOne(doc, function(err) {
-      assert.ifError(err);
+    await Strict.collection.insertOne(doc);
 
-      Strict.findById(doc._id, function(err, doc) {
-        assert.ifError(err);
-        assert.equal(doc._doc.bool, true);
-        assert.equal(doc._doc.notInSchema, true);
+    const doc2 = await Strict.findById(doc._id);
+    assert.equal(doc2._doc.bool, true);
+    assert.equal(doc2._doc.notInSchema, true);
 
-        Strict.updateOne({ _id: doc._id }, { $unset: { bool: 1, notInSchema: 1 } }, { strict: false },
-          function(err) {
-            assert.ifError(err);
+    await Strict.updateOne({ _id: doc._id }, { $unset: { bool: 1, notInSchema: 1 } }, { strict: false });
 
-            Strict.findById(doc._id, function(err, doc) {
-              assert.ifError(err);
-              assert.equal(doc._doc.bool, undefined);
-              assert.equal(doc._doc.notInSchema, undefined);
-              done();
-            });
-          });
-      });
-    });
+    const doc3 = await Strict.findById(doc._id);
+    assert.equal(doc3._doc.bool, undefined);
+    assert.equal(doc3._doc.notInSchema, undefined);
   });
 
-  it('can be overwritten with findOneAndUpdate (gh-1967)', function(done) {
+  it('can be overwritten with findOneAndUpdate (gh-1967)', async function() {
     const strict = new Schema({
       bool: Boolean
     });
@@ -322,27 +300,17 @@ describe('document: strict mode:', function() {
     const doc = s.toObject();
     doc.notInSchema = true;
 
-    Strict.collection.insertOne(doc, { w: 1 }, function(err) {
-      assert.ifError(err);
+    await Strict.collection.insertOne(doc, { w: 1 });
 
-      Strict.findById(doc._id, function(err, doc) {
-        assert.ifError(err);
-        assert.equal(doc._doc.bool, true);
-        assert.equal(doc._doc.notInSchema, true);
+    const doc1 = await Strict.findById(doc._id);
+    assert.equal(doc1._doc.bool, true);
+    assert.equal(doc1._doc.notInSchema, true);
 
-        Strict.findOneAndUpdate({ _id: doc._id }, { $unset: { bool: 1, notInSchema: 1 } }, { strict: false, w: 1 },
-          function(err) {
-            assert.ifError(err);
+    await Strict.findOneAndUpdate({ _id: doc._id }, { $unset: { bool: 1, notInSchema: 1 } }, { strict: false, w: 1 });
 
-            Strict.findById(doc._id, function(err, doc) {
-              assert.ifError(err);
-              assert.equal(doc._doc.bool, undefined);
-              assert.equal(doc._doc.notInSchema, undefined);
-              done();
-            });
-          });
-      });
-    });
+    const doc2 = await Strict.findById(doc._id);
+    assert.equal(doc2._doc.bool, undefined);
+    assert.equal(doc2._doc.notInSchema, undefined);
   });
 
   describe('"throws" mode', function() {

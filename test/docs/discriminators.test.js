@@ -214,7 +214,7 @@ describe('discriminator docs', function() {
     // The discriminator schema has a String `time` and an
     // implicitly added ObjectId `_id`.
     assert.ok(clickedLinkSchema.path('_id'));
-    assert.equal(clickedLinkSchema.path('_id').instance, 'ObjectID');
+    assert.equal(clickedLinkSchema.path('_id').instance, 'ObjectId');
     const ClickedLinkEvent = Event.discriminator('ChildEventBad',
       clickedLinkSchema);
 

@@ -28,6 +28,6 @@ describe('isBsonType', () => {
   });
 
   it('true for ObjectId', () => {
-    assert.ok(isBsonType(new ObjectId(), 'ObjectID'));
+    assert.ok(isBsonType(new ObjectId(), 'ObjectId'));
   });
 });

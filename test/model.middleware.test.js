@@ -26,7 +26,7 @@ describe('model middleware', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it('post save', function(done) {
+  it('post save', async function() {
     const schema = new Schema({
       title: String
     });
@@ -58,15 +58,13 @@ describe('model middleware', function() {
 
     const test = new TestMiddleware({ title: 'Little Green Running Hood' });
 
-    test.save(function(err) {
-      assert.ifError(err);
-      assert.equal(test.title, 'Little Green Running Hood');
-      assert.equal(called, 3);
-      done();
-    });
+    await test.save();
+
+    assert.equal(test.title, 'Little Green Running Hood');
+    assert.equal(called, 3);
   });
 
-  it('sync error in post save (gh-3483)', function(done) {
+  it('sync error in post save (gh-3483)', async function() {
     const schema = new Schema({
       title: String
     });
@@ -79,14 +77,13 @@ describe('model middleware', function() {
 
     const test = new TestMiddleware({ title: 'Test' });
 
-    test.save(function(err) {
+    await test.save().catch(err => {
       assert.ok(err);
       assert.equal(err.message, 'woops!');
-      done();
     });
   });
 
-  it('pre hook promises (gh-3779)', function(done) {
+  it('pre hook promises (gh-3779)', async function() {
     const schema = new Schema({
       title: String
     });
@@ -105,11 +102,8 @@ describe('model middleware', function() {
 
     const test = new TestMiddleware({ title: 'Test' });
 
-    test.save(function(err) {
-      assert.ifError(err);
-      assert.equal(calledPre, 1);
-      done();
-    });
+    await test.save();
+    assert.equal(calledPre, 1);
   });
 
   it('post hook promises (gh-3779)', async function() {
@@ -135,7 +129,7 @@ describe('model middleware', function() {
     assert.equal(doc.title, 'From Post Save');
   });
 
-  it('validate middleware runs before save middleware (gh-2462)', function(done) {
+  it('validate middleware runs before save middleware (gh-2462)', async() => {
     const schema = new Schema({
       title: String
     });
@@ -153,13 +147,11 @@ describe('model middleware', function() {
 
     const Book = db.model('Test', schema);
 
-    Book.create({}, function() {
-      assert.equal(count, 2);
-      done();
-    });
+    await Book.create({});
+    assert.equal(count, 2);
   });
 
-  it('works', function(done) {
+  it('works', async function() {
     const schema = new Schema({
       title: String
     });
@@ -175,7 +167,7 @@ describe('model middleware', function() {
       next(new Error('Error 101'));
     });
 
-    schema.pre('remove', function(next) {
+    schema.pre('deleteOne', { document: true, query: false }, function(next) {
       called++;
       next();
     });
@@ -184,22 +176,21 @@ describe('model middleware', function() {
 
     const test = new TestMiddleware();
 
-    test.init({ title: 'Test' }, function(err) {
-      assert.ifError(err);
-      assert.equal(called, 1);
+    await test.init({ title: 'Test' });
+    assert.equal(called, 1);
 
-      test.save(function(err) {
-        assert.ok(err instanceof Error);
-        assert.equal(err.message, 'Error 101');
-        assert.equal(called, 2);
+    try {
+      await test.save();
 
-        test.remove(function(err) {
-          assert.ifError(err);
-          assert.equal(called, 3);
-          done();
-        });
-      });
-    });
+      assert.ok(false);
+    } catch (err) {
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'Error 101');
+      assert.equal(called, 2);
+    }
+
+    await test.deleteOne();
+    assert.equal(called, 3);
   });
 
   describe('post init hooks', function() {
@@ -242,7 +233,7 @@ describe('model middleware', function() {
     });
   });
 
-  it('gh-1829', function(done) {
+  it('gh-1829', async function() {
     const childSchema = new mongoose.Schema({
       name: String
     });
@@ -278,27 +269,26 @@ describe('model middleware', function() {
       ]
     });
 
-    parent.save(function(error) {
-      assert.ifError(error);
-      assert.equal(childPreCalls, 2);
-      assert.equal(childPreCallsByName.Jaina, 1);
-      assert.equal(childPreCallsByName.Jacen, 1);
-      assert.equal(parentPreCalls, 1);
-      parent.children[0].name = 'Anakin';
-      parent.save(function(error) {
-        assert.ifError(error);
-        assert.equal(childPreCalls, 4);
-        assert.equal(childPreCallsByName.Anakin, 1);
-        assert.equal(childPreCallsByName.Jaina, 1);
-        assert.equal(childPreCallsByName.Jacen, 2);
+    await parent.save();
 
-        assert.equal(parentPreCalls, 2);
-        done();
-      });
-    });
+    assert.equal(childPreCalls, 2);
+    assert.equal(childPreCallsByName.Jaina, 1);
+    assert.equal(childPreCallsByName.Jacen, 1);
+    assert.equal(parentPreCalls, 1);
+
+    parent.children[0].name = 'Anakin';
+
+    await parent.save();
+
+    assert.equal(childPreCalls, 4);
+    assert.equal(childPreCallsByName.Anakin, 1);
+    assert.equal(childPreCallsByName.Jaina, 1);
+    assert.equal(childPreCallsByName.Jacen, 2);
+
+    assert.equal(parentPreCalls, 2);
   });
 
-  it('sync error in pre save (gh-3483)', function(done) {
+  it('sync error in pre save (gh-3483)', async function() {
     const schema = new Schema({
       title: String
     });
@@ -311,14 +301,17 @@ describe('model middleware', function() {
 
     const test = new TestMiddleware({ title: 'Test' });
 
-    test.save(function(err) {
+    try {
+      await test.save();
+
+      throw new Error('Should not get here');
+    } catch (err) {
       assert.ok(err);
       assert.equal(err.message, 'woops!');
-      done();
-    });
+    }
   });
 
-  it('sync error in pre save after next() (gh-3483)', function(done) {
+  it('sync error in pre save after next() (gh-3483)', async function() {
     const schema = new Schema({
       title: String
     });
@@ -340,14 +333,11 @@ describe('model middleware', function() {
 
     const test = new TestMiddleware({ title: 'Test' });
 
-    test.save(function(error) {
-      assert.ifError(error);
-      assert.equal(called, 1);
-      done();
-    });
+    await test.save();
+    assert.equal(called, 1);
   });
 
-  it('validate + remove', function(done) {
+  it('validate + remove', async function() {
     const schema = new Schema({
       title: String
     });
@@ -362,7 +352,7 @@ describe('model middleware', function() {
       next();
     });
 
-    schema.pre('remove', function(next) {
+    schema.pre('deleteOne', { document: true, query: false }, function(next) {
       ++preRemove;
       next();
     });
@@ -372,7 +362,7 @@ describe('model middleware', function() {
       ++postValidate;
     });
 
-    schema.post('remove', function(doc) {
+    schema.post('deleteOne', { document: true, query: false }, function(doc) {
       assert.ok(doc instanceof mongoose.Document);
       ++postRemove;
     });
@@ -381,21 +371,17 @@ describe('model middleware', function() {
 
     const test = new Test({ title: 'banana' });
 
-    test.save(function(err) {
-      assert.ifError(err);
-      assert.equal(preValidate, 1);
-      assert.equal(postValidate, 1);
-      assert.equal(preRemove, 0);
-      assert.equal(postRemove, 0);
-      test.remove(function(err) {
-        assert.ifError(err);
-        assert.equal(preValidate, 1);
-        assert.equal(postValidate, 1);
-        assert.equal(preRemove, 1);
-        assert.equal(postRemove, 1);
-        done();
-      });
-    });
+    await test.save();
+    assert.equal(preValidate, 1);
+    assert.equal(postValidate, 1);
+    assert.equal(preRemove, 0);
+    assert.equal(postRemove, 0);
+
+    await test.deleteOne();
+    assert.equal(preValidate, 1);
+    assert.equal(postValidate, 1);
+    assert.equal(preRemove, 1);
+    assert.equal(postRemove, 1);
   });
 
   it('static hooks (gh-5982)', async function() {

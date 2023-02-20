@@ -841,33 +841,19 @@ describe('aggregate: ', function() {
           assert.ok(error.message.indexOf('empty pipeline') !== -1, error.message);
         });
       });
-
-      it('with a callback', function(done) {
-        const aggregate = new Aggregate([], db.model('Employee'));
-
-        const callback = function(err) {
-          assert.ok(err);
-          assert.equal(err.message, 'Aggregate has empty pipeline');
-          done();
-        };
-
-        aggregate.exec(callback);
-      });
     });
 
     describe('error when not bound to a model', function() {
-      it('with callback', function() {
+      it('with callback', async function() {
         const aggregate = new Aggregate();
 
         aggregate.skip(0);
-        let threw = false;
         try {
-          aggregate.exec();
+          await aggregate.exec();
+          assert.ok(false);
         } catch (error) {
-          threw = true;
           assert.equal(error.message, 'Aggregate not bound to any Model');
         }
-        assert.ok(threw);
       });
     });
 

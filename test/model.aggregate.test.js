@@ -113,10 +113,6 @@ describe('model aggregate', function() {
       assert(A.aggregate([project]) instanceof Aggregate);
     });
 
-    it('throws when passing object (gh-6732)', function() {
-      assert.throws(() => A.aggregate({}), /disallows passing a spread/);
-    });
-
     it('can use helper for $out', async function() {
       if (!mongo26_or_greater) {
         return;

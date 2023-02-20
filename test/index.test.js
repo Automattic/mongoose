@@ -570,9 +570,7 @@ describe('mongoose module:', function() {
       mong.connect(start.uri, options);
 
       mong.connection.on('open', function() {
-        mong.disconnect(function() {
-          done();
-        });
+        mong.disconnect().then(() => done()).catch(err => done(err));
       });
     });
 

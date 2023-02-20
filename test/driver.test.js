@@ -12,8 +12,8 @@ describe('driver', function() {
     const m = new mongoose.Mongoose();
 
     class Collection {
-      findOne(filter, options, cb) {
-        cb(null, { answer: 42 });
+      findOne(filter, options) { // eslint-disable-line no-unused-vars
+        return Promise.resolve({ answer: 42 });
       }
     }
     class Connection extends EventEmitter {
@@ -27,9 +27,9 @@ describe('driver', function() {
         return new Collection();
       }
 
-      openUri(uri, opts, callback) {
+      async openUri() {
         this.readyState = mongoose.ConnectionStates.connected;
-        callback();
+        return this;
       }
     }
     const driver = {
@@ -63,19 +63,19 @@ describe('driver', function() {
         return new Collection();
       }
 
-      openUri(uri, opts, callback) {
+      async openUri() {
         this.readyState = mongoose.ConnectionStates.connected;
-        callback();
+        return this;
       }
     }
     class Collection {
-      insertOne(doc, options, cb) {
+      insertOne(doc, options) { // eslint-disable-line no-unused-vars
         this.doc = doc;
-        return cb();
+        return Promise.resolve();
       }
 
-      findOne(filter, options, cb) {
-        return cb(null, this.doc);
+      findOne(filter, options) { // eslint-disable-line no-unused-vars
+        return Promise.resolve(this.doc);
       }
     }
     class Connection2 extends Connection1 {}

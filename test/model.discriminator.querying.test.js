@@ -839,7 +839,7 @@ describe('model', function() {
         assert.equal(doc.kind, 'bar');
       });
 
-      it('allows updating document where discriminator key is present in payload but have the same value (13055)', async function () {
+      it('allows updating document where discriminator key is present in payload but have the same value (13055)', async function() {
         const options = { discriminatorKey: 'kind', strict: 'throw' };
         const eventSchema = new Schema({ time: Date }, options);
         db.deleteModel(/Event/);
@@ -852,14 +852,14 @@ describe('model', function() {
           url: 'http://www.example.com'
         });
 
-        let doc = await ClickedLinkEvent.findOneAndUpdate(
+        const doc = await ClickedLinkEvent.findOneAndUpdate(
           {},
           { $set: { url: 'http://www.new-url.com', kind: 'ClickedLink' } },
           { new: true }
         ).lean();
         assert.equal(doc.url, 'http://www.new-url.com');
       });
-      
+
       it('reference in child schemas (gh-2719-2)', async function() {
         function BaseSchema() {
           Schema.apply(this, arguments);

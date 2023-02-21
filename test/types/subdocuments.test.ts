@@ -90,11 +90,11 @@ function gh13040(): void {
     products: Types.DocumentArray<Product>;
   }
 
-  interface UserModel extends Model<User, {}, UserOverrides> {}
+  type UserModel = Model<User, {}, UserOverrides>;
 
   // Here I determine the type of user documents; I could also manually define a `HydratedDocument` - makes no difference.
 
-  interface UserDocument extends InstanceType<UserModel> {}
+  type UserDocument = InstanceType<UserModel>;
 
   // Assume I have an instance of `UserDocument`
 

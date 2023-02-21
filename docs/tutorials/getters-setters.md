@@ -14,19 +14,18 @@ Keep in mind that getters do **not** impact the underlying data stored in
 MongoDB. If you save `user`, the `email` property will be 'ab@gmail.com' in
 the database.
 
-By default, Mongoose executes getters when converting a document to JSON,
-including [Express' `res.json()` function](http://expressjs.com/en/4x/api.html#res.json).
+By default, Mongoose does **not** execute getters when converting a document to JSON, including [Express' `res.json()` function](http://expressjs.com/en/4x/api.html#res.json).
 
 ```javascript
 app.get(function(req, res) {
   return User.findOne().
-    // The `email` getter will run here
+    // The `email` getter will NOT run here
     then(doc => res.json(doc)).
     catch(err => res.status(500).json({ message: err.message }));
 });
 ```
 
-To disable running getters when converting a document to JSON, set the [`toJSON.getters` option to `false` in your schema](../guide.html#toJSON) as shown below.
+To run getters when converting a document to JSON, set the [`toJSON.getters` option to `true` in your schema](../guide.html#toJSON) as shown below.
 
 ```javascript
 const userSchema = new Schema({
@@ -34,7 +33,18 @@ const userSchema = new Schema({
     type: String,
     get: obfuscate
   }
-}, { toJSON: { getters: false } });
+}, { toJSON: { getters: true } });
+
+// Or, globally
+mongoose.set('toJSON', { getters: true });
+
+// Or, on a one-off basis
+app.get(function(req, res) {
+  return User.findOne().
+    // The `email` getter will run here
+    then(doc => res.json(doc.toJSON({ getters: true }))).
+    catch(err => res.status(500).json({ message: err.message }));
+});
 ```
 
 To skip getters on a one-off basis, use [`user.get()` with the `getters` option set to `false`](../api/document.html#document_Document-get) as shown below.

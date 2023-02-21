@@ -94,6 +94,7 @@ describe('Model', function() {
         some: String
       }
     }));
+    await Test.deleteMany();
     const t = new Test({
       _id: {
         first_name: 'Daniel',

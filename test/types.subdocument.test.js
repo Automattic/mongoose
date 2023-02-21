@@ -5,6 +5,7 @@
 
 'use strict';
 
+const setDocumentTimestamps = require('../lib/helpers/timestamps/setDocumentTimestamps');
 const start = require('./common');
 
 const assert = require('assert');
@@ -76,21 +77,13 @@ describe('types.subdocument', function() {
         testString: 'Test 1'
       }]
     });
-    let id;
-    return thingy.save().
-      then(function() {
-        id = thingy._id;
-      }).
-      then(function() {
-        const thingy2 = {
-          subArray: [{
-            testString: 'Test 2'
-          }]
-        };
-        return Thing.updateOne({
-          _id: id
-        }, { $set: thingy2 });
-      });
+
+    const now = new Date();
+    setDocumentTimestamps(thingy, undefined, () => now, 'createdAt', 'updatedAt');
+    assert.equal(thingy.createdAt.valueOf(), now.valueOf());
+    assert.equal(thingy.updatedAt.valueOf(), now.valueOf());
+    assert.strictEqual(thingy.subArray[0].createdAt, undefined);
+    assert.strictEqual(thingy.subArray[0].updatedAt, undefined);
   });
 
   describe('#isModified', function() {

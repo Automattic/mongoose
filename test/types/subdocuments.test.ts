@@ -76,3 +76,35 @@ function gh10674() {
 async function gh10947(): Promise<void> {
   await Test.findOneAndUpdate({}, { child1: { name: 'foo' } });
 }
+
+function gh13040(): void {
+  interface Product {}
+
+  interface User {
+    products: Product[];
+  }
+
+  // I want my `UserDocument` type to define `products` as a `DocumentArray`; I'll do this using overrides
+
+  interface UserOverrides {
+    products: Types.DocumentArray<Product>;
+  }
+
+  interface UserModel extends Model<User, {}, UserOverrides> {}
+
+  // Here I determine the type of user documents; I could also manually define a `HydratedDocument` - makes no difference.
+
+  interface UserDocument extends InstanceType<UserModel> {}
+
+  // Assume I have an instance of `UserDocument`
+
+  let user!: UserDocument;
+
+  // This is then fine:
+
+  user.products[0].ownerDocument(); // ok
+
+  user.products.forEach(product => {
+    product.ownerDocument();
+  });
+}

@@ -2,7 +2,7 @@
 
 const config = require('../.config');
 const cheerio = require('cheerio');
-const filemap = require('./source');
+const filemap = require('../docs/source');
 const fs = require('fs');
 const pug = require('pug');
 const mongoose = require('../');
@@ -15,6 +15,8 @@ markdown.setOptions({
     return highlight.highlight(code, { language: 'JavaScript' }).value;
   }
 });
+
+mongoose.set('strictQuery', false);
 
 // 5.13.5 -> 5.x, 6.8.2 -> 6.x, etc.
 version = version.slice(0, version.indexOf('.')) + '.x';
@@ -29,10 +31,8 @@ contentSchema.index({ title: 'text', body: 'text' });
 const Content = mongoose.model('Content', contentSchema, 'Content');
 
 const contents = [];
-const files = Object.keys(filemap);
 
-for (const filename of files) {
-  const file = filemap[filename];
+for (const [filename, file] of Object.entries(filemap)) {
   if (file.api) {
     // API docs are special, raw content is in the `docs` property
     for (const _class of file.docs) {
@@ -40,11 +40,11 @@ for (const filename of files) {
         const content = new Content({
           title: `API: ${prop.string}`,
           body: prop.description,
-          url: `api.html#${prop.anchorId}`
+          url: `api/${_class.fileName}.html#${prop.anchorId}`
         });
         const err = content.validateSync();
         if (err != null) {
-          console.log(content);
+          console.error(content);
           throw err;
         }
         contents.push(content);
@@ -107,24 +107,37 @@ for (const filename of files) {
         body: html,
         url: `${filename.replace('.pug', '.html').replace(/^docs/, '')}#${el.prop('id')}`
       });
-  
+
       content.validateSync();
       contents.push(content);
     });
   }
 }
 
-run().catch(error => console.error(error.stack));
+run().catch(async error => {
+  console.error(error.stack);
+
+  // ensure the script exists in case of error
+  await mongoose.disconnect();
+});
 
 async function run() {
+  if (!config || !config.uri) {
+    console.error('No Config or config.URI given, please create a .config.js file with those values');
+    process.exit(-1);
+  }
+
   await mongoose.connect(config.uri, { dbName: 'mongoose' });
+
+  // wait for the index to be created
+  await Content.init();
 
   await Content.deleteMany({ version });
   for (const content of contents) {
     if (version === '6.x') {
       let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
       if (!url.startsWith('/docs')) {
-        url = '/docs'  + url;
+        url = '/docs' + url;
       }
       content.url = url;
     } else {

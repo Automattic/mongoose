@@ -7,7 +7,7 @@ const pkg = require('../../package.json');
 
 let jobs = [];
 try {
-  jobs = require('../../docs/data/jobs.json');
+  jobs = require('../data/jobs.json');
 } catch (err) {}
 
 api.docs.forEach(file => {

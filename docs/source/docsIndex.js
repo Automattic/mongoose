@@ -1,18 +1,24 @@
 
 'use strict';
 
-const fs = require('fs');
-
 let sponsors = [];
 try {
-  sponsors = require('../../docs/data/sponsors.json');
+  sponsors = require('../data/sponsors.json');
 } catch (err) {}
 let jobs = [];
 try {
-  jobs = require('../../docs/data/jobs.json');
+  jobs = require('../data/jobs.json');
 } catch (err) {}
 
-const _package = require('./../../package.json')
+/**
+ * @typedef {Object} DocsOptions
+ * @property {String} title Title of the page
+ * @property {Boolean} [acquit] Enable test parsing and insertion
+ * @property {Boolean} [markdown] Enable markdown processing
+ * @property {Boolean} [guide] Indicate the page is a guide
+ * @property {Boolean} [schema]
+ * @property {*}  [jobs] Overwrite which jobs should be listed in the page (applied automatically)
+ */
 
 /**
  * Separate type from `exports`, because `exports` cannot be typed
@@ -20,7 +26,7 @@ const _package = require('./../../package.json')
  */
 const docs = {};
 
-docs['index.pug'] = { package: _package, title: 'ODM' };
+docs['index.pug'] = require('./home');
 docs['docs/api.pug'] = require('./api');
 docs['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, markdown: true };
 docs['docs/validation.md'] = { title: 'Validation', acquit: true, markdown: true };
@@ -75,48 +81,11 @@ docs['docs/lodash.md'] = { title: 'Using Mongoose with Lodash', markdown: true }
 docs['docs/incompatible_packages.md'] = { title: 'Known Incompatible npm Packages', markdown: true };
 
 // do sub-directories
-
-mapSubDoc('tutorials', {
-  title: `Mongoose Tutorials:`,
-  acquit: true,
-  markdown: true
-});
-mapSubDoc('typescript', {
-  title: `Mongoose:`,
-  markdown: true
-});
+require('./typescript');
+require('./tutorials');
 
 for (const props of Object.values(docs)) {
   props.jobs = jobs;
 }
-
-/**
- * Map sub-directories with custom options
- * @param {String} subDoc Path to the subdoc, like "tutorials" (no beginning or ending slash)
- * @param {DocsOptions} options Options applied to all files in the subdoc (title gets appended to provided title)
- */
-function mapSubDoc(subDoc, options) {
-  const dirName = `docs/${subDoc}`
-
-  const files = fs.readdirSync(dirName).filter(file => file.endsWith('.md'));
-
-  files.forEach((filename) => {
-    const content = fs.readFileSync(`${dirName}/${filename}`, 'utf8');
-    docs[`${dirName}/${filename}`] = {
-      ...options,
-      title: `${options.title} ${content.split('\n')[0].replace(/^#+/, '').trim()}`
-    };
-  });
-}
-
-/**
- * @typedef {Object} DocsOptions
- * @property {String} title Title of the page
- * @property {Boolean} [acquit] Enable test parsing and insertion
- * @property {Boolean} [markdown] Enable markdown processing
- * @property {Boolean} [guide] Indicate the page is a guide
- * @property {Boolean} [schema]
- * @property {*}  [jobs] Overwrite which jobs should be listed in the page (applied automatically)
- */
 
 module.exports = docs;

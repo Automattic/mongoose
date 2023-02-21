@@ -106,8 +106,8 @@ try {
   fs.mkdirSync(path.join(cwd, './docs/api'));
 } catch (err) {} // eslint-disable-line no-empty
 
-require('./docs/splitApiDocs');
-const filemap = Object.assign({}, require('./docs/docsIndex'));
+require('../docs/source/splitApiDocs');
+const filemap = Object.assign({}, require('../docs/source/docsIndex'));
 const files = Object.keys(filemap);
 
 const wrapMarkdown = (md, baseLayout) => `

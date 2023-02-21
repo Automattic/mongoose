@@ -372,50 +372,50 @@ export function autoTypedSchema() {
   }
 
   type TestSchemaType = {
-    string1?: string;
-    string2?: string;
-    string3?: string;
-    string4?: string;
+    string1?: string | null;
+    string2?: string | null;
+    string3?: string | null;
+    string4?: string | null;
     string5: string;
-    number1?: number;
-    number2?: number;
-    number3?: number;
-    number4?: number;
+    number1?: number | null;
+    number2?: number | null;
+    number3?: number | null;
+    number4?: number | null;
     number5: number;
-    date1?: Date;
-    date2?: Date;
-    date3?: Date;
-    date4?: Date;
+    date1?: Date | null;
+    date2?: Date | null;
+    date3?: Date | null;
+    date4?: Date | null;
     date5: Date;
-    buffer1?: Buffer;
-    buffer2?: Buffer;
-    buffer3?: Buffer;
-    buffer4?: Buffer;
-    boolean1?: boolean;
-    boolean2?: boolean;
-    boolean3?: boolean;
-    boolean4?: boolean;
+    buffer1?: Buffer | null;
+    buffer2?: Buffer | null;
+    buffer3?: Buffer | null;
+    buffer4?: Buffer | null;
+    boolean1?: boolean | null;
+    boolean2?: boolean | null;
+    boolean3?: boolean | null;
+    boolean4?: boolean | null;
     boolean5: boolean;
-    mixed1?: any;
-    mixed2?: any;
-    mixed3?: any;
-    objectId1?: Types.ObjectId;
-    objectId2?: Types.ObjectId;
-    objectId3?: Types.ObjectId;
-    customSchema?: Int8;
-    map1?: Map<string, string>;
-    map2?: Map<string, number>;
+    mixed1?: any | null;
+    mixed2?: any | null;
+    mixed3?: any | null;
+    objectId1?: Types.ObjectId | null;
+    objectId2?: Types.ObjectId | null;
+    objectId3?: Types.ObjectId | null;
+    customSchema?: Int8 | null;
+    map1?: Map<string, string> | null;
+    map2?: Map<string, number> | null;
     array1: string[];
     array2: any[];
     array3: any[];
     array4: any[];
     array5: any[];
     array6: string[];
-    array7?: string[];
-    array8?: string[];
-    decimal1?: Types.Decimal128;
-    decimal2?: Types.Decimal128;
-    decimal3?: Types.Decimal128;
+    array7?: string[] | null;
+    array8?: string[] | null;
+    decimal1?: Types.Decimal128 | null;
+    decimal2?: Types.Decimal128 | null;
+    decimal3?: Types.Decimal128 | null;
   };
 
   const TestSchema = new Schema({
@@ -552,17 +552,17 @@ export function autoTypedSchema() {
 export type AutoTypedSchemaType = {
   schema: {
     userName: string;
-    description?: string;
+    description?: string | null;
     nested?: {
       age: number;
-      hobby?: string
-    },
-    favoritDrink?: 'Tea' | 'Coffee',
+      hobby?: string | null
+    } | null,
+    favoritDrink?: 'Tea' | 'Coffee' | null,
     favoritColorMode: 'dark' | 'light'
-    friendID?: Types.ObjectId;
+    friendID?: Types.ObjectId | null;
     nestedArray: Types.DocumentArray<{
       date: Date;
-      messages?: number;
+      messages?: number | null;
     }>
   }
   , statics: {
@@ -639,7 +639,7 @@ function gh12003() {
 
   expectType<'type'>({} as ObtainSchemaGeneric<typeof BaseSchema, 'TSchemaOptions'>['typeKey']);
 
-  expectType<{ name?: string }>({} as BaseSchemaType);
+  expectType<{ name?: string | null }>({} as BaseSchemaType);
 }
 
 function gh11987() {
@@ -675,7 +675,7 @@ function gh12030() {
     }
   ]>;
   expectType<{
-    username?: string
+    username?: string | null
   }[]>({} as A);
 
   type B = ObtainDocumentType<{
@@ -687,13 +687,13 @@ function gh12030() {
   }>;
   expectType<{
     users: {
-      username?: string
+      username?: string | null
     }[];
   }>({} as B);
 
   expectType<{
     users: {
-      username?: string
+      username?: string | null
     }[];
   }>({} as InferSchemaType<typeof Schema1>);
 
@@ -715,7 +715,7 @@ function gh12030() {
   expectType<{
     users: Types.DocumentArray<{
       credit: number;
-      username?: string;
+      username?: string | null;
     }>;
   }>({} as InferSchemaType<typeof Schema3>);
 
@@ -724,7 +724,7 @@ function gh12030() {
     data: { type: { role: String }, default: {} }
   });
 
-  expectType<{ data: { role?: string } }>({} as InferSchemaType<typeof Schema4>);
+  expectType<{ data: { role?: string | null } }>({} as InferSchemaType<typeof Schema4>);
 
   const Schema5 = new Schema({
     data: { type: { role: Object }, default: {} }
@@ -749,7 +749,7 @@ function gh12030() {
     track?: {
       backupCount: number;
       count: number;
-    };
+    } | null;
   }>({} as InferSchemaType<typeof Schema6>);
 
 }
@@ -826,7 +826,7 @@ function gh12450() {
   });
 
   expectType<{
-    user?: Types.ObjectId;
+    user?: Types.ObjectId | null;
   }>({} as InferSchemaType<typeof ObjectIdSchema>);
 
   const Schema2 = new Schema({
@@ -841,14 +841,14 @@ function gh12450() {
     decimalValue: { type: Schema.Types.Decimal128 }
   });
 
-  expectType<{ createdAt: Date, decimalValue?: Types.Decimal128 }>({} as InferSchemaType<typeof Schema3>);
+  expectType<{ createdAt: Date, decimalValue?: Types.Decimal128 | null }>({} as InferSchemaType<typeof Schema3>);
 
   const Schema4 = new Schema({
     createdAt: { type: Date },
     decimalValue: { type: Schema.Types.Decimal128 }
   });
 
-  expectType<{ createdAt?: Date, decimalValue?: Types.Decimal128 }>({} as InferSchemaType<typeof Schema4>);
+  expectType<{ createdAt?: Date | null, decimalValue?: Types.Decimal128 | null }>({} as InferSchemaType<typeof Schema4>);
 }
 
 function gh12242() {
@@ -872,7 +872,7 @@ function testInferTimestamps() {
   // an error "Parameter type { createdAt: Date; updatedAt: Date; name?: string | undefined; }
   // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
   // { name?: string | undefined; }"
-  expectType<{ createdAt: Date, updatedAt: Date } & { name?: string }>({} as WithTimestamps);
+  expectType<{ createdAt: Date, updatedAt: Date } & { name?: string | null }>({} as WithTimestamps);
 
   const schema2 = new Schema({
     name: String
@@ -898,25 +898,25 @@ function gh12431() {
   });
 
   type Example = InferSchemaType<typeof testSchema>;
-  expectType<{ testDate?: Date, testDecimal?: Types.Decimal128 }>({} as Example);
+  expectType<{ testDate?: Date | null, testDecimal?: Types.Decimal128 | null }>({} as Example);
 }
 
 async function gh12593() {
   const testSchema = new Schema({ x: { type: Schema.Types.UUID } });
 
   type Example = InferSchemaType<typeof testSchema>;
-  expectType<{ x?: Buffer }>({} as Example);
+  expectType<{ x?: Buffer | null }>({} as Example);
 
   const Test = model('Test', testSchema);
 
   const doc = await Test.findOne({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' }).orFail();
-  expectType<Buffer | undefined>(doc.x);
+  expectType<Buffer | undefined | null>(doc.x);
 
   const doc2 = new Test({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' });
-  expectType<Buffer | undefined>(doc2.x);
+  expectType<Buffer | undefined | null>(doc2.x);
 
   const doc3 = await Test.findOne({}).orFail().lean();
-  expectType<Buffer | undefined>(doc3.x);
+  expectType<Buffer | undefined | null>(doc3.x);
 
   const arrSchema = new Schema({ arr: [{ type: Schema.Types.UUID }] });
 
@@ -982,7 +982,7 @@ function gh12611() {
   expectType<{
     description: string;
     skills: Types.ObjectId[];
-    anotherField?: string;
+    anotherField?: string | null;
   }>({} as Props);
 }
 

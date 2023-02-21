@@ -109,6 +109,7 @@ describe('Model', function() {
 
     const doc = await Test.findOne();
 
+    console.log('Found', doc);
     assert.ok('last_name' in doc);
     assert.ok('_id' in doc);
     assert.ok('first_name' in doc._id);

@@ -178,12 +178,11 @@ declare module 'mongoose' {
     collection: Collection;
 
     /** Creates a `count` query: counts the number of documents that match `filter`. */
-    count(): QueryWithHelpers<number, THydratedDocumentType, TQueryHelpers, TRawDocType>;
-    count(filter: FilterQuery<TRawDocType>): QueryWithHelpers<number, THydratedDocumentType, TQueryHelpers, TRawDocType>;
+    count(filter?: FilterQuery<TRawDocType>): QueryWithHelpers<number, THydratedDocumentType, TQueryHelpers, TRawDocType>;
 
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
     countDocuments(
-      filter: FilterQuery<TRawDocType>,
+      filter?: FilterQuery<TRawDocType>,
       options?: QueryOptions<TRawDocType>
     ): QueryWithHelpers<
     number,

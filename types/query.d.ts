@@ -238,15 +238,13 @@ declare module 'mongoose' {
     comment(val: string): this;
 
     /** Specifies this query as a `count` query. */
-    count(criteria: FilterQuery<DocType>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
-    count(): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
+    count(criteria?: FilterQuery<DocType>): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
 
     /** Specifies this query as a `countDocuments` query. */
     countDocuments(
-      criteria: FilterQuery<DocType>,
+      criteria?: FilterQuery<DocType>,
       options?: QueryOptions<DocType>
     ): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
-    countDocuments(): QueryWithHelpers<number, DocType, THelpers, RawDocType>;
 
     /**
      * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html).

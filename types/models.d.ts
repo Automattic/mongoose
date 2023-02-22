@@ -123,11 +123,7 @@ declare module 'mongoose' {
 
   interface RemoveOptions extends SessionOption, Omit<mongodb.DeleteOptions, 'session'> {}
 
-  /**
-   * Legacy construct for allowing `extends ModelClass`.
-   * In Mongoose 6, `extends Model` was allowed, but caused naming conflicts.
-   */
-  export const ModelClass: Model<any>;
+  const Model: Model<any>;
 
   /**
    * Models are fancy constructors compiled from `Schema` definitions.

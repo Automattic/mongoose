@@ -3,7 +3,6 @@ import {
   Schema,
   Document,
   Model,
-  ModelClass,
   connection,
   model,
   Types,
@@ -216,11 +215,14 @@ function find() {
 }
 
 function inheritance() {
-  class InteractsWithDatabase extends ModelClass {
+  class InteractsWithDatabase extends Model {
     async _update(): Promise<void> {
       await this.save();
     }
   }
+
+  const doc = new InteractsWithDatabase();
+  doc instanceof Model;
 
   class SourceProvider extends InteractsWithDatabase {
     static async deleteInstallation(installationId: number): Promise<void> {

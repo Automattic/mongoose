@@ -39,14 +39,7 @@ const files = [
   'lib/types/map.js'
 ];
 
-module.exports = {
-  docs: [],
-  github: 'https://github.com/Automattic/mongoose/blob/',
-  title: 'API docs',
-  api: true
-};
-
-const out = module.exports.docs;
+const out = module.exports.docs = [];
 
 const combinedFiles = [];
 for (const file of files) {

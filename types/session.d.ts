@@ -9,8 +9,6 @@ declare module 'mongoose' {
    * for benefits like causal consistency, [retryable writes](https://www.mongodb.com/docs/manual/core/retryable-writes/),
    * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
    */
-  function startSession(options: ClientSessionOptions | undefined | null, callback: Callback<ClientSession>): void;
-  function startSession(callback: Callback<ClientSession>): void;
   function startSession(options?: ClientSessionOptions): Promise<ClientSession>;
 
   interface SessionOperation {
@@ -25,8 +23,6 @@ declare module 'mongoose' {
      * for benefits like causal consistency, [retryable writes](https://www.mongodb.com/docs/manual/core/retryable-writes/),
      * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
      */
-    startSession(options: ClientSessionOptions | undefined | null, callback: Callback<ClientSession>): void;
-    startSession(callback: Callback<ClientSession>): void;
     startSession(options?: ClientSessionOptions): Promise<ClientSession>;
   }
 

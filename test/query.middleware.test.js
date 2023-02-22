@@ -22,40 +22,24 @@ describe('query middleware', function() {
     await db.close();
   });
 
-  const initializeData = function(done) {
+  const initializeData = async function() {
     Author = db.model('Person', schema);
     Publisher = db.model('Publisher', publisherSchema, 'Publisher');
 
-    Author.deleteMany({}, function(error) {
-      if (error) {
-        return done(error);
-      }
+    await Author.deleteMany({});
+    await Publisher.deleteMany({});
 
-      Publisher.deleteMany({}, function(error) {
-        if (error) {
-          return done(error);
-        }
-        Publisher.create({ name: 'Wiley' }, function(error, publisher) {
-          if (error) {
-            return done(error);
-          }
-
-          const doc = {
-            title: 'Professional AngularJS',
-            author: 'Val',
-            publisher: publisher._id,
-            options: 'bacon'
-          };
-
-          Author.create(doc, function(error) {
-            done(error);
-          });
-        });
-      });
-    });
+    const publisher = await Publisher.create({ name: 'Wiley' });
+    const doc = {
+      title: 'Professional AngularJS',
+      author: 'Val',
+      publisher: publisher._id,
+      options: 'bacon'
+    };
+    await Author.create(doc);
   };
 
-  beforeEach(function(done) {
+  beforeEach(function() {
     schema = new Schema({
       title: String,
       author: String,
@@ -66,32 +50,25 @@ describe('query middleware', function() {
     publisherSchema = new Schema({
       name: String
     });
-
-    done();
   });
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it('has a pre find hook', function(done) {
+  it('has a pre find hook', async function() {
     let count = 0;
     schema.pre('find', function(next) {
       ++count;
       next();
     });
 
-    initializeData(function(error) {
-      assert.ifError(error);
-      Author.find({ x: 1 }, function(error) {
-        assert.ifError(error);
-        assert.equal(count, 1);
-        done();
-      });
-    });
+    await initializeData();
+    await Author.find({ x: 1 });
+    assert.equal(count, 1);
   });
 
-  it('has post find hooks', function(done) {
+  it('has post find hooks', async function() {
     let postCount = 0;
     schema.post('find', function(results, next) {
       assert.equal(results.length, 1);
@@ -101,18 +78,14 @@ describe('query middleware', function() {
       next();
     });
 
-    initializeData(function(error) {
-      assert.ifError(error);
-      Author.find({ title: 'Professional AngularJS' }, function(error, docs) {
-        assert.ifError(error);
-        assert.equal(postCount, 1);
-        assert.equal(docs.length, 1);
-        done();
-      });
-    });
+    await initializeData();
+
+    const docs = await Author.find({ title: 'Professional AngularJS' });
+    assert.equal(postCount, 1);
+    assert.equal(docs.length, 1);
   });
 
-  it('works when using a chained query builder', function(done) {
+  it('works when using a chained query builder', async function() {
     let count = 0;
     schema.pre('find', function(next) {
       ++count;
@@ -127,18 +100,15 @@ describe('query middleware', function() {
       next();
     });
 
-    initializeData(function() {
-      Author.find({ title: 'Professional AngularJS' }).exec(function(error, docs) {
-        assert.ifError(error);
-        assert.equal(count, 1);
-        assert.equal(postCount, 1);
-        assert.equal(docs.length, 1);
-        done();
-      });
-    });
+    await initializeData();
+
+    const docs = await Author.findOne({ title: 'Professional AngularJS' }).find();
+    assert.equal(count, 1);
+    assert.equal(postCount, 1);
+    assert.equal(docs.length, 1);
   });
 
-  it('has separate pre-findOne() and post-findOne() hooks', function(done) {
+  it('has separate pre-findOne() and post-findOne() hooks', async function() {
     let count = 0;
     schema.pre('findOne', function(next) {
       ++count;
@@ -152,18 +122,14 @@ describe('query middleware', function() {
       next();
     });
 
-    initializeData(function() {
-      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
-        assert.ifError(error);
-        assert.equal(count, 1);
-        assert.equal(postCount, 1);
-        assert.equal(doc.author, 'Val');
-        done();
-      });
-    });
+    await initializeData();
+    const doc = await Author.findOne({ title: 'Professional AngularJS' });
+    assert.equal(count, 1);
+    assert.equal(postCount, 1);
+    assert.equal(doc.author, 'Val');
   });
 
-  it('with regular expression (gh-6680)', function(done) {
+  it('with regular expression (gh-6680)', async function() {
     let count = 0;
     let postCount = 0;
     schema.pre(/find/, function(next) {
@@ -176,92 +142,52 @@ describe('query middleware', function() {
       next();
     });
 
-    initializeData(function() {
-      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
-        assert.ifError(error);
-        assert.equal(count, 1);
-        assert.equal(postCount, 1);
-        assert.equal(doc.author, 'Val');
+    await initializeData();
 
-        count = 0;
-        postCount = 0;
-        Author.find({ title: 'Professional AngularJS' }, function(error, docs) {
-          assert.ifError(error);
-          assert.equal(count, 1);
-          assert.equal(postCount, 1);
-          assert.equal(docs[0].author, 'Val');
+    const doc = await Author.findOne({ title: 'Professional AngularJS' });
+    assert.equal(count, 1);
+    assert.equal(postCount, 1);
+    assert.equal(doc.author, 'Val');
 
-          Author.updateOne({}, { title: 'Foo' }, function(error) {
-            assert.ifError(error);
-            assert.equal(count, 1);
-            assert.equal(postCount, 1);
-            done();
-          });
-        });
-      });
-    });
+    count = 0;
+    postCount = 0;
+
+    const docs = await Author.find({ title: 'Professional AngularJS' });
+    assert.equal(count, 1);
+    assert.equal(postCount, 1);
+    assert.equal(docs[0].author, 'Val');
+
+    await Author.updateOne({}, { title: 'Foo' });
+    assert.equal(count, 1);
+    assert.equal(postCount, 1);
   });
 
-  it('can populate in pre hook', function(done) {
+  it('can populate in pre hook', async function() {
     schema.pre('findOne', function(next) {
       this.populate('publisher');
       next();
     });
 
-    initializeData(function() {
-      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
-        assert.ifError(error);
-        assert.equal(doc.author, 'Val');
-        assert.equal(doc.publisher.name, 'Wiley');
-        done();
-      });
-    });
+    await initializeData();
+
+    const doc = await Author.findOne({ title: 'Professional AngularJS' }).exec();
+
+    assert.equal(doc.author, 'Val');
+    assert.equal(doc.publisher.name, 'Wiley');
   });
 
-  it('can populate in post hook', function(done) {
+  it('can populate in post hook', async function() {
     schema.post('findOne', function(doc, next) {
-      doc.populate('publisher', function(error) {
-        next(error);
-      });
+      doc.populate('publisher').then(() => next(), err => next(err));
     });
 
-    initializeData(function() {
-      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
-        assert.ifError(error);
-        assert.equal(doc.author, 'Val');
-        assert.equal(doc.publisher.name, 'Wiley');
-        done();
-      });
-    });
+    await initializeData();
+    const doc = await Author.findOne({ title: 'Professional AngularJS' });
+    assert.equal(doc.author, 'Val');
+    assert.equal(doc.publisher.name, 'Wiley');
   });
 
-  it.skip('has hooks for count()', function(done) {
-    let preCount = 0;
-    let postCount = 0;
-
-    schema.pre('count', function() {
-      ++preCount;
-    });
-
-    schema.post('count', function() {
-      ++postCount;
-    });
-
-    initializeData(function(error) {
-      assert.ifError(error);
-      Author.
-        find({ title: 'Professional AngularJS' }).
-        count(function(error, count) {
-          assert.ifError(error);
-          assert.equal(1, count);
-          assert.equal(1, preCount);
-          assert.equal(1, postCount);
-          done();
-        });
-    });
-  });
-
-  it('has hooks for countDocuments()', function(done) {
+  it('has hooks for countDocuments()', async function() {
     let preCount = 0;
     let postCount = 0;
 
@@ -273,21 +199,18 @@ describe('query middleware', function() {
       ++postCount;
     });
 
-    initializeData(function(error) {
-      assert.ifError(error);
-      Author.
-        find({ title: 'Professional AngularJS' }).
-        countDocuments(function(error, count) {
-          assert.ifError(error);
-          assert.equal(1, count);
-          assert.equal(1, preCount);
-          assert.equal(1, postCount);
-          done();
-        });
-    });
+    await initializeData();
+
+    const count = await Author.
+      find({ title: 'Professional AngularJS' }).
+      countDocuments();
+
+    assert.equal(1, count);
+    assert.equal(1, preCount);
+    assert.equal(1, postCount);
   });
 
-  it('has hooks for estimatedDocumentCount()', function(done) {
+  it('has hooks for estimatedDocumentCount()', async function() {
     let preCount = 0;
     let postCount = 0;
 
@@ -299,21 +222,18 @@ describe('query middleware', function() {
       ++postCount;
     });
 
-    initializeData(function(error) {
-      assert.ifError(error);
-      Author.
-        find({ title: 'Professional AngularJS' }).
-        estimatedDocumentCount(function(error, count) {
-          assert.ifError(error);
-          assert.equal(1, count);
-          assert.equal(1, preCount);
-          assert.equal(1, postCount);
-          done();
-        });
-    });
+    await initializeData();
+
+    const count = await Author.
+      find({ title: 'Professional AngularJS' }).
+      estimatedDocumentCount();
+
+    assert.equal(1, count);
+    assert.equal(1, preCount);
+    assert.equal(1, postCount);
   });
 
-  it('updateOne() (gh-3997)', function(done) {
+  it('updateOne() (gh-3997)', async function() {
     let preCount = 0;
     let postCount = 0;
 
@@ -325,24 +245,20 @@ describe('query middleware', function() {
       ++postCount;
     });
 
-    initializeData(function(error) {
-      assert.ifError(error);
-      Author.
-        updateOne({}, { author: 'updatedOne' }).
-        exec(function(error) {
-          assert.ifError(error);
-          assert.equal(preCount, 1);
-          assert.equal(postCount, 1);
-          Author.find({ author: 'updatedOne' }, function(error, res) {
-            assert.ifError(error);
-            assert.equal(res.length, 1);
-            done();
-          });
-        });
-    });
+    await initializeData();
+
+    await Author.
+      updateOne({}, { author: 'updatedOne' }).
+      exec();
+
+    assert.equal(preCount, 1);
+    assert.equal(postCount, 1);
+
+    const res = await Author.find({ author: 'updatedOne' });
+    assert.equal(res.length, 1);
   });
 
-  it('updateMany() (gh-3997)', function(done) {
+  it('updateMany() (gh-3997)', async function() {
     let preCount = 0;
     let postCount = 0;
 
@@ -354,27 +270,17 @@ describe('query middleware', function() {
       ++postCount;
     });
 
-    initializeData(function(error) {
-      assert.ifError(error);
+    await initializeData();
+    await Author.create({ author: 'test' });
+    await Author.updateMany({}, { author: 'updatedMany' });
 
-      Author.create({ author: 'test' }, function(error) {
-        assert.ifError(error);
-        Author.
-          updateMany({}, { author: 'updatedMany' }).
-          exec(function(error) {
-            assert.ifError(error);
-            assert.equal(preCount, 1);
-            assert.equal(postCount, 1);
-            Author.find({}, function(error, res) {
-              assert.ifError(error);
-              assert.ok(res.length > 1);
-              res.forEach(function(doc) {
-                assert.equal(doc.author, 'updatedMany');
-              });
-              done();
-            });
-          });
-      });
+    assert.equal(preCount, 1);
+    assert.equal(postCount, 1);
+
+    const res = await Author.find({});
+    assert.ok(res.length > 1);
+    res.forEach(function(doc) {
+      assert.equal(doc.author, 'updatedMany');
     });
   });
 
@@ -453,7 +359,7 @@ describe('query middleware', function() {
     assert.equal(postCount, 1);
   });
 
-  it('error handlers (gh-2284)', async function() {
+  it('error handlers XYZ (gh-2284)', async function() {
     const testSchema = new Schema({ title: { type: String, unique: true } });
 
     testSchema.post('updateOne', function(error, res, next) {
@@ -476,7 +382,7 @@ describe('query middleware', function() {
     assert.equal(err.message, 'woops');
   });
 
-  it('error handlers for validate (gh-4885)', function(done) {
+  it('error handlers for validate (gh-4885)', async function() {
     const testSchema = new Schema({ title: { type: String, required: true } });
 
     let called = 0;
@@ -487,14 +393,11 @@ describe('query middleware', function() {
 
     const Test = db.model('Test', testSchema);
 
-    Test.create({}, function(error) {
-      assert.ok(error);
-      assert.equal(called, 1);
-      done();
-    });
+    await Test.create({}).catch(() => {});
+    assert.equal(called, 1);
   });
 
-  it('error handlers with findOneAndUpdate and passRawResult (gh-4836)', function(done) {
+  it('error handlers with findOneAndUpdate and passRawResult (gh-4836)', async function() {
     const schema = new Schema({ name: { type: String } });
 
     let called = false;
@@ -507,16 +410,14 @@ describe('query middleware', function() {
 
     const Person = db.model('Person', schema);
 
-    Person.
+    await Person.
       findOneAndUpdate({ name: 'name' }, {}, { upsert: true, passRawResult: true }).
-      exec(function(error) {
-        assert.ifError(error);
-        assert.ok(!called);
-        done();
-      });
+      exec();
+
+    assert.ok(!called);
   });
 
-  it('error handlers with findOneAndUpdate error and passRawResult (gh-4836)', function(done) {
+  it('error handlers with findOneAndUpdate error and passRawResult (gh-4836)', async function() {
     const schema = new Schema({ name: { type: String } });
 
     let called = false;
@@ -529,16 +430,15 @@ describe('query middleware', function() {
 
     const Person = db.model('Person', schema);
 
-    Person.
+    const err = await Person.
       findOneAndUpdate({}, { _id: 'test' }, { upsert: true, passRawResult: true }).
-      exec(function(error) {
-        assert.ok(error);
-        assert.ok(called);
-        done();
-      });
+      exec().
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(called);
   });
 
-  it('error handlers with error from pre hook (gh-4927)', function(done) {
+  it('error handlers with error from pre hook (gh-4927)', async function() {
     const schema = new Schema({});
     let called = false;
 
@@ -558,14 +458,12 @@ describe('query middleware', function() {
 
     const Test = db.model('Test', schema);
 
-    Test.find().exec(function(error) {
-      assert.equal(error.message, 'test2');
-      assert.ok(!called);
-      done();
-    });
+    const error = await Test.find().exec().then(() => null, err => err);
+    assert.equal(error.message, 'test2');
+    assert.ok(!called);
   });
 
-  it('with clone() (gh-5153)', function(done) {
+  it('with clone() (gh-5153)', async function() {
     const schema = new Schema({});
     let calledPre = 0;
     let calledPost = 0;
@@ -582,12 +480,9 @@ describe('query middleware', function() {
 
     const Test = db.model('Test', schema.clone());
 
-    Test.find().exec(function(error) {
-      assert.ifError(error);
-      assert.equal(calledPre, 1);
-      assert.equal(calledPost, 1);
-      done();
-    });
+    await Test.find();
+    assert.equal(calledPre, 1);
+    assert.equal(calledPost, 1);
   });
 
   it('doesnt double call post(regexp) with updateOne (gh-7418)', function() {

@@ -35,7 +35,6 @@ module.exports.SchemaTypes = mongoose.SchemaTypes;
 module.exports.VirtualType = mongoose.VirtualType;
 module.exports.Types = mongoose.Types;
 module.exports.Query = mongoose.Query;
-module.exports.Promise = mongoose.Promise;
 module.exports.Model = mongoose.Model;
 module.exports.Document = mongoose.Document;
 module.exports.ObjectId = mongoose.ObjectId;

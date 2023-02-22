@@ -8,15 +8,12 @@ declare module 'mongoose' {
    * are in your schema but not in MongoDB.
    */
   function syncIndexes(options?: SyncIndexesOptions): Promise<ConnectionSyncIndexesResult>;
-  function syncIndexes(options: SyncIndexesOptions | null, callback: Callback<ConnectionSyncIndexesResult>): void;
 
   interface IndexManager {
     /**
      * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#createIndex)
      * function.
      */
-    createIndexes(options: mongodb.CreateIndexesOptions, callback: CallbackWithoutResult): void;
-    createIndexes(callback: CallbackWithoutResult): void;
     createIndexes(options?: mongodb.CreateIndexesOptions): Promise<void>;
 
     /**
@@ -24,16 +21,12 @@ declare module 'mongoose' {
      * the result of this function would be the result of
      * Model.syncIndexes().
      */
-    diffIndexes(options: Record<string, unknown> | null, callback: Callback<IndexesDiff>): void
-    diffIndexes(callback: Callback<IndexesDiff>): void
     diffIndexes(options?: Record<string, unknown>): Promise<IndexesDiff>
 
     /**
      * Sends `createIndex` commands to mongo for each index declared in the schema.
      * The `createIndex` commands are sent in series.
      */
-    ensureIndexes(options: mongodb.CreateIndexesOptions, callback: CallbackWithoutResult): void;
-    ensureIndexes(callback: CallbackWithoutResult): void;
     ensureIndexes(options?: mongodb.CreateIndexesOptions): Promise<void>;
 
     /**
@@ -42,7 +35,6 @@ declare module 'mongoose' {
      * use the [`autoIndex` option](/docs/guide.html#autoIndex) and if you
      * build indexes manually.
      */
-    listIndexes(callback: Callback<Array<any>>): void;
     listIndexes(): Promise<Array<any>>;
 
     /**
@@ -51,7 +43,6 @@ declare module 'mongoose' {
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-    syncIndexes(options: SyncIndexesOptions | null, callback: Callback<Array<string>>): void;
     syncIndexes(options?: SyncIndexesOptions): Promise<Array<string>>;
   }
 

@@ -139,7 +139,7 @@ declare module 'mongoose' {
     TOverrides = {},
     TQueryHelpers = {}
   > = Document<unknown, TQueryHelpers, DocType> &
-  IfAny<DocType, any, MergeType<Require_id<DocType>, TOverrides>>;
+  IfAny<DocType, any, MergeType<Require_id<DocType>, IfAny<TOverrides, {}>>>;
   export type HydratedSingleSubdocument<DocType, TOverrides = {}> = Types.Subdocument<unknown> & Require_id<DocType> & TOverrides;
   export type HydratedArraySubdocument<DocType, TOverrides = {}> = Types.ArraySubdocument<unknown> & Require_id<DocType> & TOverrides;
 

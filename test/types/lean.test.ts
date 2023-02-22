@@ -182,7 +182,7 @@ async function getBaseDocumentTypeFromModel(): Promise<void> {
 
   type baseFromUserDocType = BaseDocumentType<UserDocType>;
 
-  expectType<User & { _id: Types.ObjectId }>({} as baseFromUserDocType);
+  expectType<Omit<User & { _id: Types.ObjectId }, never>>({} as baseFromUserDocType);
 
   const a: UserDocType = {} as any;
 

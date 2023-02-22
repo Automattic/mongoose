@@ -875,7 +875,7 @@ function testInferTimestamps() {
     name: String
   }, {
     timestamps: true,
-    methods: { myName(): string | undefined {
+    methods: { myName(): string | undefined | null {
       return this.name;
     } }
   });
@@ -885,7 +885,7 @@ function testInferTimestamps() {
   // an error "Parameter type { createdAt: Date; updatedAt: Date; name?: string | undefined; }
   // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
   // { name?: string | undefined; }"
-  expectType<{ name?: string }>({} as WithTimestamps2);
+  expectType<{ name?: string | null }>({} as WithTimestamps2);
 }
 
 function gh12431() {

@@ -10,6 +10,6 @@ type ITest = ReturnType<(typeof Test)['hydrate']>;
 Test.find().cursor().
   eachAsync(async(doc: ITest) => {
     expectType<Types.ObjectId>(doc._id);
-    expectType<string | undefined>(doc.name);
+    expectType<string | undefined | null>(doc.name);
   }).
   then(() => console.log('Done!'));

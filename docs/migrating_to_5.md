@@ -61,7 +61,7 @@ MyModel.find().exec(function() {
 ```
 
 <h3 id="promises-and-callbacks"><a href="#promises-and-callbacks">
-  Promises and Callbacks for `mongoose.connect()`
+  Promises and Callbacks for <code>mongoose.connect()</code>
 </a></h3>
 
 `mongoose.connect()` and `mongoose.disconnect()` now return a promise if no callback specified, or `null` otherwise. It does **not** return the mongoose singleton.
@@ -78,7 +78,7 @@ mongoose.model('Test', new Schema({}));
 ```
 
 <h3 id="connection-logic"><a href="#connection-logic">
-  Connection Logic and `useMongoClient`
+  Connection Logic and <code>useMongoClient</code>
 </a></h3>
 
 The [`useMongoClient` option](/docs/4.x/docs/connections.html#use-mongo-client) was
@@ -149,7 +149,7 @@ As a consequence, checking whether `blogPost.author._id` is [no longer viable as
 Note that you can call `mongoose.set('objectIdGetter', false)` to change this behavior.
 
 <h3 id="return-value-for-delete"><a href="#return-value-for-delete">
-  Return Values for `remove()` and `deleteX()`
+  Return Values for <code>remove()</code> and <code>deleteX()</code>
 </a></h3>
 
 `deleteOne()`, `deleteMany()`, and `remove()` now resolve to the result object
@@ -246,7 +246,7 @@ mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
 ```
 
 <h3 id="toobject-options"><a href="#toobject-options">
-  `toObject()` Options
+  <code>toObject()</code> Options
 </a></h3>
 
 The `options` parameter to `toObject()` and `toJSON()` merge defaults rather than overwriting them.
@@ -362,7 +362,7 @@ m.save(function() {
 ```
 
 <h3 id="pushall"><a href="#pushall">
-  The `$pushAll` Operator
+  The <code>$pushAll</code> Operator
 </a></h3>
 
 `$pushAll` is no longer supported and no longer used internally for `save()`, since it has been [deprecated since MongoDB 2.4](https://www.mongodb.com/docs/manual/reference/operator/update/pushAll/). Use `$push` with `$each` instead.
@@ -410,19 +410,19 @@ The `saveErrorIfNotFound` option was removed, mongoose will now always error out
 was always synchronous, just had a callback for legacy reasons.
 
 <h3 id="save-num-affected"><a href="#save-num-affected">
-  `numAffected` and `save()`
+  <code>numAffected</code> and <code>save()</code>
 </a></h3>
 
 `doc.save()` no longer passes `numAffected` as a 3rd param to its callback.
 
 <h3 id="remove-debounce"><a href="#remove-debounce">
-  `remove()` and debouncing
+  <code>remove()</code> and debouncing
 </a></h3>
 
 `doc.remove()` no longer debounces
 
 <h3 id="get-promise-constructor"><a href="#get-promise-constructor">
-  `getPromiseConstructor()`
+  <code>getPromiseConstructor()</code>
 </a></h3>
 
 `getPromiseConstructor()` is gone, just use `mongoose.Promise`.
@@ -435,7 +435,7 @@ You cannot pass parameters to the next pre middleware in the chain using `next()
 next middleware with 'Test' as a parameter. Mongoose 5.x has removed support for this.
 
 <h3 id="array-required"><a href="#array-required">
-  `required` validator for arrays
+  <code>required</code> validator for arrays
 </a></h3>
 
 In mongoose 5 the `required` validator only verifies if the value is an
@@ -461,7 +461,7 @@ Sport.find({ name: 'baseball' }).where({name: {$ne: 'softball'}});
 In Mongoose 5.x, the above code will correctly overwrite `'baseball'` with `{ $ne: 'softball' }` 
 
 <h3 id="bulkwrite-results"><a href="#bulkwrite-results">
-  `bulkWrite()` results
+  <code>bulkWrite()</code> results
 </a></h3>
 
 Mongoose 5.x uses version 3.x of the [MongoDB Node.js driver](http://npmjs.com/package/mongodb). MongoDB driver 3.x changed the format of

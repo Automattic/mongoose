@@ -129,7 +129,7 @@ describe('types.document', function() {
     assert.equal(super8.ratings.id(id4).stars.valueOf(), 6);
 
     super8.ratings.id(id1).stars = 5;
-    super8.ratings.id(id2).remove();
+    super8.ratings.id(id2).deleteOne();
     super8.ratings.id(id3).stars = 4;
     super8.ratings.id(id4).stars = 3;
 
@@ -144,7 +144,7 @@ describe('types.document', function() {
     assert.equal(movie.ratings.id(id4).stars.valueOf(), 3);
 
     movie.ratings.id(id1).stars = 2;
-    movie.ratings.id(id3).remove();
+    movie.ratings.id(id3).deleteOne();
     movie.ratings.id(id4).stars = 1;
 
     await movie.save();
@@ -157,8 +157,8 @@ describe('types.document', function() {
     assert.equal(modifiedMovie.ratings.id(id4).stars.valueOf(), 1);
 
     // gh-531
-    modifiedMovie.ratings[0].remove();
-    modifiedMovie.ratings[0].remove();
+    modifiedMovie.ratings[0].deleteOne();
+    modifiedMovie.ratings[0].deleteOne();
     await modifiedMovie.save();
 
     const finalMovie = await Movie.findById(super8._id);

@@ -67,17 +67,16 @@ describe('versioning', function() {
     BlogPost = db.model('BlogPost', BlogPost);
   });
 
-  it('is only added to parent schema (gh-1265)', function(done) {
+  it('is only added to parent schema (gh-1265)', function() {
     assert.ok(BlogPost.schema.path('__v'));
     assert.ok(!BlogPost.schema.path('comments').__v);
     assert.ok(!BlogPost.schema.path('meta.nested').__v);
-    done();
   });
 
-  it('versioning without version key', function(done) {
+  it('versioning without version key', async function() {
     const V = BlogPost;
 
-    const doc = new V();
+    let doc = new V();
     doc.numbers = [3, 4, 5, 6, 7];
     doc.comments = [
       { title: 'does it work?', date: new Date() },
@@ -86,147 +85,99 @@ describe('versioning', function() {
       { title: 'hi', date: new Date() }
     ];
 
-    function test(err) {
-      assert.ifError(err);
-      // test getting docs back from db missing version key
-      V.findById(doc).select('numbers comments').exec(function(err, doc) {
-        assert.ifError(err);
-        doc.comments[0].title = 'no version was included';
-        const d = doc.$__delta();
-        assert.ok(!d[0].__v, 'no version key was selected so should not be included');
-        done();
-      });
-    }
-
-    doc.save(test);
+    await doc.save();
+    doc = await V.findById(doc).select('numbers comments');
+    doc.comments[0].title = 'no version was included';
+    const d = doc.$__delta();
+    assert.ok(!d[0].__v, 'no version key was selected so should not be included');
   });
 
-  it('version works with strict docs', function(done) {
+  it('version works with strict docs', async function() {
     const schema = new Schema({ str: ['string'] }, { strict: true, collection: 'versionstrict_' + random() });
     db.deleteModel(/BlogPost/);
     const M = db.model('BlogPost', schema);
-    const m = new M({ str: ['death', 'to', 'smootchy'] });
-    m.save(function(err) {
-      assert.ifError(err);
-      M.find(m, function(err, m) {
-        assert.ifError(err);
-        assert.equal(m.length, 1);
-        m = m[0];
-        assert.equal(m._doc.__v, 0);
-        m.str.pull('death');
-        m.save(function(err) {
-          assert.ifError(err);
-          M.findById(m, function(err, m) {
-            assert.ifError(err);
-            assert.equal(m._doc.__v, 1);
-            assert.equal(m.str.length, 2);
-            assert.ok(!~m.str.indexOf('death'));
-            done();
-          });
-        });
-      });
-    });
+    let m = new M({ str: ['death', 'to', 'smootchy'] });
+    await m.save();
+    m = await M.find(m);
+    assert.equal(m.length, 1);
+    m = m[0];
+    assert.equal(m._doc.__v, 0);
+    m.str.pull('death');
+    await m.save();
+    m = await M.findById(m);
+    assert.equal(m._doc.__v, 1);
+    assert.equal(m.str.length, 2);
+    assert.ok(!~m.str.indexOf('death'));
   });
 
-  it('version works with existing unversioned docs', function(done) {
+  it('version works with existing unversioned docs', async function() {
     const V = BlogPost;
 
-    V.collection.insertOne({ title: 'unversioned', numbers: [1, 2, 3] }, function(err) {
-      assert.ifError(err);
-      V.findOne({ title: 'unversioned' }, function(err, d) {
-        assert.ifError(err);
-        assert.ok(!d._doc.__v);
-        d.numbers.splice(1, 1, 10);
-        const o = d.$__delta();
-        assert.equal(o[0].__v, undefined);
-        assert.ok(o[1].$inc);
-        assert.equal(o[1].$inc.__v, 1);
-        d.save(function(err, d) {
-          assert.ifError(err);
-          assert.equal(d._doc.__v, 1);
-          V.findById(d, function(err, d) {
-            assert.ifError(err);
-            assert.ok(d);
-            done();
-          });
-        });
-      });
-    });
+    await V.collection.insertOne({ title: 'unversioned', numbers: [1, 2, 3] });
+    let d = await V.findOne({ title: 'unversioned' });
+    assert.ok(!d._doc.__v);
+    d.numbers.splice(1, 1, 10);
+    const o = d.$__delta();
+    assert.equal(o[0].__v, undefined);
+    assert.ok(o[1].$inc);
+    assert.equal(o[1].$inc.__v, 1);
+    await d.save();
+    assert.equal(d._doc.__v, 1);
+    d = await V.findById(d);
+    assert.ok(d);
   });
 
-  it('versionKey is configurable', function(done) {
+  it('versionKey is configurable', async function() {
     const schema = new Schema(
       { configured: 'bool' },
       { versionKey: 'lolwat', collection: 'configuredversion' + random() });
     const V = db.model('Test', schema);
-    const v = new V({ configured: true });
-    v.save(function(err) {
-      assert.ifError(err);
-      V.findById(v, function(err1, v) {
-        assert.ifError(err1);
-        assert.equal(v._doc.lolwat, 0);
-        done();
-      });
-    });
+    let v = new V({ configured: true });
+    await v.save();
+    v = await V.findById(v);
+    assert.equal(v._doc.lolwat, 0);
   });
 
-  it('can be disabled', function(done) {
+  it('can be disabled', async function() {
     const schema = new Schema({ x: ['string'] }, { versionKey: false });
     const M = db.model('Test', schema);
-    M.create({ x: ['hi'] }, function(err, doc) {
-      assert.ifError(err);
-      assert.equal('__v' in doc._doc, false);
-      doc.x.pull('hi');
-      doc.save(function(err) {
-        assert.ifError(err);
-        assert.equal('__v' in doc._doc, false);
+    let doc = await M.create({ x: ['hi'] });
+    assert.equal('__v' in doc._doc, false);
+    doc.x.pull('hi');
+    await doc.save();
+    assert.equal('__v' in doc._doc, false);
 
-        doc.set('x.0', 'updated');
-        const d = doc.$__delta()[0];
-        assert.equal(d.__v, undefined, 'version should not be added to where clause');
+    doc.set('x.0', 'updated');
+    const d = doc.$__delta()[0];
+    assert.equal(d.__v, undefined, 'version should not be added to where clause');
 
-        M.collection.findOne({ _id: doc._id }, function(err, doc) {
-          assert.equal('__v' in doc, false);
-          done();
-        });
-      });
-    });
+    doc = await M.collection.findOne({ _id: doc._id });
+    assert.equal('__v' in doc, false);
   });
 
-  it('works with numbericAlpha paths', function(done) {
+  it('works with numbericAlpha paths', async function() {
     const M = BlogPost;
     const m = new M({ mixed: {} });
     const path = 'mixed.4a';
     m.set(path, 2);
-    m.save(function(err) {
-      assert.ifError(err);
-      done();
-    });
+    await m.save();
   });
 
   describe('doc.increment()', function() {
-    it('works without any other changes (gh-1475)', function(done) {
+    it('works without any other changes (gh-1475)', async function() {
       const V = BlogPost;
 
-      const doc = new V();
-      doc.save(function(err) {
-        assert.ifError(err);
-        assert.equal(doc.__v, 0);
+      let doc = new V();
+      await doc.save();
+      assert.equal(doc.__v, 0);
 
-        doc.increment();
+      doc.increment();
 
-        doc.save(function(err) {
-          assert.ifError(err);
+      await doc.save();
+      assert.equal(doc.__v, 1);
 
-          assert.equal(doc.__v, 1);
-
-          V.findById(doc, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(doc.__v, 1);
-            done();
-          });
-        });
-      });
+      doc = await V.findById(doc);
+      assert.equal(doc.__v, 1);
     });
   });
 
@@ -561,40 +512,33 @@ describe('versioning', function() {
     assert.equal(err.name, 'VersionError');
   });
 
-  it('gh-1898', function(done) {
+  it('gh-1898', async function() {
     const schema = new Schema({ tags: [String], name: String });
 
     const M = db.model('Test', schema);
 
     const m = new M({ tags: ['eggs'] });
 
-    m.save(function(err) {
-      assert.ifError(err);
+    await m.save();
+    m.tags.push('bacon');
+    m.name = 'breakfast';
+    m.tags[0] = 'eggs';
+    m.markModified('tags.0');
 
-      m.tags.push('bacon');
-      m.name = 'breakfast';
-      m.tags[0] = 'eggs';
-      m.markModified('tags.0');
-
-      assert.equal(m.$__where(m.$__delta()[0]).__v, 0);
-      assert.equal(m.$__delta()[1].$inc.__v, 1);
-      done();
-    });
+    assert.equal(m.$__where(m.$__delta()[0]).__v, 0);
+    assert.equal(m.$__delta()[1].$inc.__v, 1);
   });
 
-  it('can remove version key from toObject() (gh-2675)', function(done) {
+  it('can remove version key from toObject() (gh-2675)', async function() {
     const schema = new Schema({ name: String });
     const M = db.model('Test', schema);
 
     const m = new M();
-    m.save(function(err, m) {
-      assert.ifError(err);
-      let obj = m.toObject();
-      assert.equal(obj.__v, 0);
-      obj = m.toObject({ versionKey: false });
-      assert.equal(obj.__v, undefined);
-      done();
-    });
+    await m.save();
+    let obj = m.toObject();
+    assert.equal(obj.__v, 0);
+    obj = m.toObject({ versionKey: false });
+    assert.equal(obj.__v, undefined);
   });
 
   it('pull doesnt add version where clause (gh-6190)', async function() {
@@ -622,31 +566,19 @@ describe('versioning', function() {
     assert.equal(doc3.unreadPosts.length, 0);
   });
 
-  it('copying doc works (gh-5779)', function(done) {
+  it('copying doc works (gh-5779)', async function() {
     const schema = new Schema({ subdocs: [{ a: Number }] });
     const M = db.model('Test', schema);
     const m = new M({ subdocs: [] });
-    let m2;
-
-    m.save().
-      then(function() {
-        m2 = new M(m);
-        m2.subdocs.push({ a: 2 });
-        return m2.save();
-      }).
-      then(function() {
-        m2.subdocs[0].a = 3;
-        return m2.save();
-      }).
-      then(function() {
-        assert.equal(m2.subdocs[0].a, 3);
-        return M.findById(m._id);
-      }).
-      then(function(doc) {
-        assert.equal(doc.subdocs[0].a, 3);
-        done();
-      }).
-      catch(done);
+    await m.save();
+    const m2 = new M(m);
+    m2.subdocs.push({ a: 2 });
+    await m2.save();
+    m2.subdocs[0].a = 3;
+    await m2.save();
+    assert.equal(m2.subdocs[0].a, 3);
+    const doc = await M.findById(m._id);
+    assert.equal(doc.subdocs[0].a, 3);
   });
 
   it('optimistic concurrency (gh-9001) (gh-5424)', async function() {

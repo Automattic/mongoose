@@ -341,7 +341,7 @@ const schema = new Schema({
 
 <h3 id="schema-reserved-names-warning"><a href="#schema-reserved-names-warning">Schema Reserved Names Warning</a></h3>
 
-Using `save`, `isNew`, and other Mongoose reserved names as schema path names now triggers a warning, not an error. You can suppress the warning by setting the `supressReservedKeysWarning` in your schema options: `new Schema({ save: String }, { supressReservedKeysWarning: true })`. Keep in mind that this may break plugins that rely on these reserved names.
+Using `save`, `isNew`, and other Mongoose reserved names as schema path names now triggers a warning, not an error. You can suppress the warning by setting the `suppressReservedKeysWarning` in your schema options: `new Schema({ save: String }, { suppressReservedKeysWarning: true })`. Keep in mind that this may break plugins that rely on these reserved names.
 
 <h3 id="subdocument-paths"><a href="#subdocument-paths">Subdocument Paths</a></h3>
 

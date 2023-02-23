@@ -1,12 +1,15 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Model, Types } from 'mongoose';
+import { expectType } from 'tsd';
 
-const schema: Schema = new Schema({ name: { type: 'String' } });
+const schema = new Schema({ name: { type: 'String' } });
 
-interface ITest extends Document {
-  name?: string;
-}
+const Test = model('Test', schema);
 
-const Test = model<ITest>('Test', schema);
+type ITest = ReturnType<(typeof Test)['hydrate']>;
 
-Test.find().cursor().eachAsync(async(doc: ITest) => console.log(doc.name)).
+Test.find().cursor().
+  eachAsync(async(doc: ITest) => {
+    expectType<Types.ObjectId>(doc._id);
+    expectType<string | undefined>(doc.name);
+  }).
   then(() => console.log('Done!'));

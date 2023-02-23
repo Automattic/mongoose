@@ -1,4 +1,14 @@
-import { Schema, model, Model, Document, Types } from 'mongoose';
+import {
+  Schema,
+  model,
+  Model,
+  Query,
+  Types,
+  HydratedDocument,
+  HydratedArraySubdocument,
+  HydratedSingleSubdocument,
+  DefaultSchemaOptions
+} from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { autoTypedModelConnection } from './connection.test';
@@ -21,22 +31,15 @@ interface ITestBase {
   name?: string;
 }
 
-interface ITest extends ITestBase, Document {}
+type ITest = ITestBase;
+type TestDocument = ReturnType<Model<{ name?: string }>['hydrate']>;
 
 const Test = model<ITest>('Test', schema);
 
 void async function main() {
-  const doc: ITest = await Test.findOne().orFail();
+  const doc = await Test.findOne().orFail();
 
-  expectType<Promise<ITest>>(doc.remove());
-  expectType<void>(doc.remove({}, (err, doc) => {
-    expectType<Error | null>(err);
-    expectType<any>(doc);
-  }));
-  expectType<void>(doc.remove((err, doc) => {
-    expectType<Error | null>(err);
-    expectType<any>(doc);
-  }));
+  expectType<Query<any, TestDocument>>(doc.deleteOne());
 }();
 
 
@@ -58,14 +61,6 @@ void async function run() {
   const x = test.save();
   expectAssignable<Promise<ITest & { _id: any; }>>(test.save());
   expectAssignable<Promise<ITest & { _id: any; }>>(test.save({}));
-  expectType<void>(test.save({}, (err, doc) => {
-    expectType<Error | null>(err);
-    expectAssignable<ITest & { _id: any; }>(doc);
-  }));
-  expectType<void>(test.save((err, doc) => {
-    expectType<Error | null>(err);
-    expectAssignable<ITest & { _id: any; }>(doc);
-  }));
 })();
 
 function gh10526<U extends ITest>(arg1: Model<U>) {
@@ -213,10 +208,6 @@ function autoTypedDocumentConnection() {
 }
 
 async function gh11960() {
-  type DocumentType<T> = Document<any> & T;
-  type SubDocumentType<T> = DocumentType<T> & Types.Subdocument;
-  type ArraySubDocumentType<T> = DocumentType<T> & Types.ArraySubdocument;
-
   interface Nested {
     dummy?: string;
   }
@@ -224,22 +215,39 @@ async function gh11960() {
   interface Parent {
     username?: string;
     map?: Map<string, string>;
-    nested?: SubDocumentType<Nested>;
-    nestedArray?: ArraySubDocumentType<Nested>[];
+    nested?: Nested;
+    nestedArray?: Nested[];
   }
+
+  type ParentDocument = HydratedDocument<Parent, {
+    nested: HydratedSingleSubdocument<Nested>,
+    nestedArray: HydratedArraySubdocument<Nested>[]
+  }>;
 
   const NestedSchema = new Schema({
     dummy: { type: String }
   });
 
-  const ParentSchema = new Schema({
+  type ParentModelType = Model<Parent, {}, {}, {}, ParentDocument>;
+
+  const ParentSchema = new Schema<
+  Parent,
+  ParentModelType,
+  {},
+  {},
+  {},
+  {},
+  DefaultSchemaOptions,
+  Parent,
+  ParentDocument
+  >({
     username: { type: String },
     map: { type: Map, of: String },
     nested: { type: NestedSchema },
     nestedArray: [{ type: NestedSchema }]
   });
 
-  const ParentModel = model<DocumentType<Parent>>('Parent', ParentSchema);
+  const ParentModel = model<Parent, ParentModelType>('Parent', ParentSchema);
 
   {
     const doc = new ParentModel({
@@ -249,7 +257,7 @@ async function gh11960() {
       nestedArray: [{ dummy: 'hello again' }]
     });
 
-    expectType<Document<any, any, any> & Parent & { _id: Types.ObjectId }>(doc);
+    expectType<ParentDocument>(doc);
     expectType<Map<string, string> | undefined>(doc.map);
     doc.nested!.parent();
     doc.nestedArray?.[0].parentArray();
@@ -263,7 +271,7 @@ async function gh11960() {
       nestedArray: [{ dummy: 'hello again' }]
     });
 
-    expectType<Document<any, any, any> & Parent & { _id: Types.ObjectId }>(doc);
+    expectType<ParentDocument>(doc);
     expectType<Map<string, string> | undefined>(doc.map);
     doc.nested!.parent();
     doc.nestedArray?.[0].parentArray();

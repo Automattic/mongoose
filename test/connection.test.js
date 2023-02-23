@@ -1522,4 +1522,11 @@ describe('connections:', function() {
     const res = await m.connection.db.listCollections().toArray();
     assert.ok(!res.map(c => c.name).includes('gh12940_Conn'));
   });
+
+  it('should not create default connection with createInitialConnection = false (gh-12965)', function() {
+    const m = new mongoose.Mongoose({
+      createInitialConnection: false
+    });
+    assert.deepEqual(m.connections.length, 0);
+  });
 });

@@ -391,7 +391,7 @@ describe('model', function() {
         const schema = mongoose.Schema({ x: 'string' });
         const Test = mongoose.createConnection().model('ensureIndexes-' + random, schema);
         const p = Test.ensureIndexes();
-        assert.ok(p instanceof mongoose.Promise);
+        assert.ok(p instanceof Promise);
       });
 
       it('creates indexes', async function() {

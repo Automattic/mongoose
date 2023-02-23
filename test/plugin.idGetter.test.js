@@ -26,45 +26,35 @@ describe('id virtual getter', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it('should work as expected with an ObjectId', function(done) {
+  it('should work as expected with an ObjectId', async function() {
     const schema = new Schema({});
 
     const S = db.model('Test', schema);
-    S.create({}, function(err, s) {
-      assert.ifError(err);
+    const s = await S.create({});
 
-      // Comparing with virtual getter
-      assert.equal(s._id.toString(), s.id);
-      done();
-    });
+    // Comparing with virtual getter
+    assert.equal(s._id.toString(), s.id);
   });
 
-  it('should be turned off when `id` option is set to false', function(done) {
+  it('should be turned off when `id` option is set to false', async function() {
     const schema = new Schema({}, { id: false });
 
     const S = db.model('Test', schema);
-    S.create({}, function(err, s) {
-      assert.ifError(err);
+    const s = await S.create({});
 
-      // Comparing with virtual getter
-      assert.equal(s.id, undefined);
-      done();
-    });
+    // Comparing with virtual getter
+    assert.equal(s.id, undefined);
   });
 
-
-  it('should be turned off when the schema has a set `id` path', function(done) {
+  it('should be turned off when the schema has a set `id` path', async function() {
     const schema = new Schema({
       id: String
     });
 
     const S = db.model('Test', schema);
-    S.create({ id: 'test' }, function(err, s) {
-      assert.ifError(err);
+    const s = await S.create({ id: 'test' });
 
-      // Comparing with expected value
-      assert.equal(s.id, 'test');
-      done();
-    });
+    // Comparing with expected value
+    assert.equal(s.id, 'test');
   });
 });

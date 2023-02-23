@@ -48,20 +48,14 @@ describe('model', function() {
       assert.equal(post2.title, 'bye');
     });
 
-    it('fires callback when passed 0 docs', function(done) {
-      B.create(function(err, a) {
-        assert.ifError(err);
-        assert.ok(!a);
-        done();
-      });
+    it('fires callback when passed 0 docs', async function() {
+      const docs = await B.create();
+      assert.strictEqual(docs, null);
     });
 
-    it('fires callback when empty array passed', function(done) {
-      B.create([], function(err, a) {
-        assert.ifError(err);
-        assert.deepEqual(a, []);
-        done();
-      });
+    it('fires callback when empty array passed', async function() {
+      const a = await B.create([]);
+      assert.deepEqual(a, []);
     });
 
     it('supports passing options', async function() {
@@ -73,7 +67,7 @@ describe('model', function() {
 
     it('returns a promise', function() {
       const p = B.create({ title: 'returns promise' });
-      assert.ok(p instanceof mongoose.Promise);
+      assert.ok(p instanceof Promise);
     });
 
     it('creates in parallel', async function() {
@@ -155,12 +149,6 @@ describe('model', function() {
 
         const err = await B.create({ _id: doc._id }).then(() => null, err => err);
         assert(err);
-      });
-
-      it('if callback is falsy, will ignore it (gh-5061)', async function() {
-        const doc = await B.create({ title: 'test' }, null);
-
-        assert.equal(doc.title, 'test');
       });
 
       it('when passed an empty array, returns an empty array', async function() {

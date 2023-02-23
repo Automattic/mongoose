@@ -86,7 +86,6 @@ describe('model: findOneAndReplace:', function() {
     await post.save();
 
     const doc = await M.findOneAndReplace({ title: title });
-
     assert.equal(post.id, doc.id);
   });
 
@@ -123,68 +122,6 @@ describe('model: findOneAndReplace:', function() {
     query = M.find().findOneAndReplace();
     assert.equal(query._fields, undefined);
     assert.equal(query._conditions.author, undefined);
-  });
-
-  it('executes when a callback is passed', function(done) {
-    const M = BlogPost;
-    let pending = 5;
-
-    M.findOneAndReplace({ name: 'aaron1' }, { select: 'name' }, cb);
-    M.findOneAndReplace({ name: 'aaron1' }, cb);
-    M.where().findOneAndReplace({ name: 'aaron1' }, { select: 'name' }, cb);
-    M.where().findOneAndReplace({ name: 'aaron1' }, cb);
-    M.where('name', 'aaron1').findOneAndReplace(cb);
-
-    function cb(err, doc) {
-      assert.ifError(err);
-      assert.equal(doc, null); // no previously existing doc
-      if (--pending) {
-        return;
-      }
-      done();
-    }
-  });
-
-  it('executed with only a callback throws', function() {
-    const M = BlogPost;
-    let err;
-
-    try {
-      M.findOneAndReplace(function() {});
-    } catch (e) {
-      err = e;
-    }
-
-    assert.ok(/First argument must not be a function/.test(err));
-  });
-
-  it('executed with only a callback throws', function() {
-    const M = BlogPost;
-    let err;
-
-    try {
-      M.findByIdAndDelete(function() {});
-    } catch (e) {
-      err = e;
-    }
-
-    assert.ok(/First argument must not be a function/.test(err));
-  });
-
-  it('executes when a callback is passed', function(done) {
-    const M = BlogPost;
-    const _id = new DocumentObjectId();
-    let pending = 2;
-
-    M.findByIdAndDelete(_id, { select: 'name' }, cb);
-    M.findByIdAndDelete(_id, cb);
-
-    function cb(err, doc) {
-      assert.ifError(err);
-      assert.equal(doc, null); // no previously existing doc
-      if (--pending) return;
-      done();
-    }
   });
 
   it('returns the original document', async function() {
@@ -226,6 +163,7 @@ describe('model: findOneAndReplace:', function() {
     const M = BlogPost;
 
     const query = M.findOneAndReplace({}, {}, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
   });

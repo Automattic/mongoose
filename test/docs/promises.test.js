@@ -8,21 +8,17 @@ describe('promises docs', function () {
   let Band;
   let db;
 
-  before(function (done) {
+  before(function() {
     db = mongoose.createConnection(start.uri);
 
     Band = db.model('band-promises', {name: String, members: [String]});
-
-    done();
   });
 
-  beforeEach(function (done) {
-    Band.deleteMany({}, done);
+  beforeEach(function() {
+    return Band.deleteMany({});
   });
 
   after(async function () {
-    mongoose.Promise = global.Promise;
-
     await db.close();
   });
 
@@ -110,12 +106,20 @@ describe('promises docs', function () {
    * - `await Band.findOne().exec();`
    * 
    * As far as functionality is concerned, these two are equivalent.
-   * However, we recommend using `.exec()` because that gives you
+   * In Mongoose 6, we recommended using `.exec()` because that gives you
    * better stack traces.
+   * However, in Mongoose 7+, that is no longer the case.
+   * You may use whichever you prefer: `await Band.findOne()` is more concise,
+   * `await Band.findOne().exec()` is more explicit and ensures that you `await`
+   * on a fully fledged promise.
    */
   it('Should You Use `exec()` With `await`?', async function() {
     const doc = await Band.findOne({ name: "Guns N' Roses" }); // works
     // acquit:ignore:start
+    if (typeof Deno !== 'undefined') {
+      // Deno doesn't have V8 async stack traces
+      return this.skip();
+    }
     assert.ok(!doc);
     // acquit:ignore:end
 
@@ -133,7 +137,7 @@ describe('promises docs', function () {
       //   at process._tickCallback (internal/process/next_tick.js:68:7)
       err.stack;
       // acquit:ignore:start
-      assert.ok(!err.stack.includes('promises.test.js'));
+      assert.ok(err.stack.includes('promises.test.js'));
       // acquit:ignore:end
     }
 
@@ -153,35 +157,5 @@ describe('promises docs', function () {
       assert.ok(err.stack.includes('promises.test.js'));
       // acquit:ignore:end
     }
-  });
-  
-  /**
-   * If you're an advanced user, you may want to plug in your own promise
-   * library like [bluebird](https://www.npmjs.com/package/bluebird). Just set
-   * `mongoose.Promise` to your favorite
-   * ES6-style promise constructor and mongoose will use it.
-   */
-  it('Plugging in your own Promises Library', function (done) {
-    // acquit:ignore:start
-    if (!global.Promise) {
-      return done();
-    }
-    // acquit:ignore:end
-    // Use bluebird
-    mongoose.Promise = require('bluebird');
-    const bluebirdPromise = Band.findOne({name: "Guns N' Roses"}).exec();
-    assert.equal(bluebirdPromise.constructor, require('bluebird'));
-
-    // Use q. Note that you **must** use `require('q').Promise`.
-    mongoose.Promise = require('q').Promise;
-    const qPromise = Band.findOne({name: "Guns N' Roses"}).exec();
-    assert.ok(qPromise instanceof require('q').makePromise);
-
-    // acquit:ignore:start
-    // Wait for promises
-    bluebirdPromise.then(qPromise).then(function () {
-      done();
-    });
-    // acquit:ignore:end
   });
 });

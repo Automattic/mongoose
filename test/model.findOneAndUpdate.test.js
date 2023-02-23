@@ -1654,7 +1654,7 @@ describe('model: findOneAndUpdate:', function() {
       }, { collection: 'users' });
 
       UserSchema.pre('findOneAndUpdate', function() {
-        this.update({}, { $set: { lastUpdate: new Date() } });
+        this.updateOne({}, { $set: { lastUpdate: new Date() } });
       });
 
       const User = db.model('User', UserSchema);

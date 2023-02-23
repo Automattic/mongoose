@@ -9,7 +9,6 @@ const start = require('./common');
 const { EJSON } = require('bson');
 const Query = require('../lib/query');
 const assert = require('assert');
-const sinon = require('sinon');
 const util = require('./util');
 
 const mongoose = start.mongoose;
@@ -4377,25 +4376,24 @@ describe('Query', function() {
 
   it('should avoid sending empty projection to MongoDB server (gh-13065)', async function() {
     const m = new mongoose.Mongoose();
-    m.set('debug', true);
+
+    let lastOptions = {};
+    m.set('debug', function(_coll, _method, ...args) {
+      lastOptions = args[args.length - 1];
+    });
 
     const connDebug = m.createConnection(start.uri);
 
     const schema = new Schema({ name: String });
     const Test = connDebug.model('Test', schema);
 
-    const consoleInfoStub = sinon.stub(console, 'info').returns();
-
     await Test.findOne();
-    const consoleInfo = consoleInfoStub.args[0][0];
-    assert.equal(false, consoleInfo.includes('projection'));
+    assert.ok(!('projection' in lastOptions));
 
     await Test.find();
-    const consoleInfo2 = consoleInfoStub.args[0][0];
-    assert.equal(false, consoleInfo2.includes('projection'));
+    assert.ok(!('projection' in lastOptions));
 
     await Test.findOneAndUpdate({}, { name: 'bar' });
-    const consoleInfo3 = consoleInfoStub.args[0][0];
-    assert.equal(false, consoleInfo3.includes('projection'));
+    assert.ok(!('projection' in lastOptions));
   });
 });

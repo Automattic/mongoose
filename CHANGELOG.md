@@ -1,3 +1,20 @@
+6.10.0 / 2023-02-22
+===================
+ * feat: upgrade to mongodb driver 4.14.0 #13036
+ * feat: added Schema.prototype.omit() function #12939 #12931 [lpizzinidev](https://github.com/lpizzinidev)
+ * feat(index): added createInitialConnection option to Mongoose constructor #13021 #12965 [lpizzinidev](https://github.com/lpizzinidev)
+
+6.9.3 / 2023-02-22
+==================
+ * fix(connection): delay calculating `autoCreate` and `autoIndex` until after initial connection established #13007 #12940 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(discriminator): allows update doc with discriminatorKey #13056 #13055 [abarriel](https://github.com/abarriel)
+ * fix(query): avoid sending unnecessary empty projection to MongoDB server #13059 #13050
+ * fix(model): avoid sending null session option with document operations #13053 #13052 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): use MergeTypes for type overrides in HydratedDocument #13066 #13040
+ * docs(middleware): list validate as a potential query middleware #13057 #12680
+ * docs(getters-setters): explain that getters do not run by default on toJSON() #13058 #13049
+ * docs: refactor docs generation scripts #13044 [hasezoey](https://github.com/hasezoey)
+
 5.13.16 / 2023-02-20
 ====================
  * fix: make access to process.versions lazy #12584 [maciasello](https://github.com/maciasello)

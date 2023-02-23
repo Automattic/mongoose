@@ -64,6 +64,13 @@ declare module 'mongoose' {
     cloneSchemas?: boolean;
 
     /**
+     * Set to `false` to disable the creation of the initial default connection.
+     *
+     * @default true
+     */
+    createInitialConnection?: boolean;
+
+    /**
      * If `true`, prints the operations mongoose sends to MongoDB to the console.
      * If a writable stream is passed, it will log to that stream, without colorization.
      * If a callback function is passed, it will receive the collection name, the method

@@ -211,19 +211,18 @@ the `mongodb-uri` module to parse the connection strings, and then produce the p
 versions. You can use a function like this:
 
 ```javascript
-const uriFormat = require('mongodb-uri')
+const uriFormat = require('mongodb-uri');
 function encodeMongoURI (urlString) {
     if (urlString) {
-      let parsed = uriFormat.parse(urlString)
+      let parsed = uriFormat.parse(urlString);
       urlString = uriFormat.format(parsed);
     }
     return urlString;
-  }
 }
 
 // Your un-encoded string.
 const mongodbConnectString = "mongodb://...";
-mongoose.connect(encodeMongoURI(mongodbConnectString))
+mongoose.connect(encodeMongoURI(mongodbConnectString));
 ```
 
 The function above is safe to use whether the existing string is already encoded or not.

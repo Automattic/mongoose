@@ -16,6 +16,16 @@ document.getElementById('search-input').onkeyup = function(ev) {
   }
 };
 
+document.getElementById('search-button-nav').onclick = function() {
+  addHistory(document.getElementById('search-input-nav').value);
+};
+
+document.getElementById('search-input-nav').onkeyup = function(ev) {
+  if (ev.keyCode === 13) {
+    addHistory(document.getElementById('search-input-nav').value);
+  }
+};
+
 /** Helper to consistently add history and reload results */
 function addHistory(value) {
   const url = new URL(window.location.href);
@@ -43,6 +53,7 @@ function search() {
   const qSearch = url.searchParams.get("q");
 
   document.getElementById('search-input').value = qSearch;
+  document.getElementById('search-input-nav').value = ""; // set navbar search empty, to encourage big input usage
 
   fetch(root + '/search?search=' + encodeURIComponent(qSearch) + '&version=' + version).
     then(function(res) { return res.json(); }).

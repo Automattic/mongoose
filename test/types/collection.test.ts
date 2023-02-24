@@ -2,12 +2,12 @@ import { Schema, model, Document, connection, Collection } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
-interface ITest extends Document {
+interface ITest {
   name?: string;
   age?: number;
 }
 
-const Test = model<ITest>('Test', schema);
+const Test = model('Test', schema);
 
 Test.collection.collectionName;
 Test.collection.findOne({});

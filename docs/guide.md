@@ -881,24 +881,11 @@ const docs = await MyModel.find(req.query);
 const docs = await MyModel.find({ name: req.query.name, age: req.query.age }).setOptions({ sanitizeFilter: true });
 ```
 
-In Mongoose 6, `strictQuery` is equal to `strict` by default.
+In Mongoose 7, `strictQuery` is `false` by default.
 However, you can override this behavior globally:
 
 ```javascript
-// Set `strictQuery` to `false`, so Mongoose doesn't strip out non-schema
-// query filter properties by default.
-// This does **not** affect `strict`.
-mongoose.set('strictQuery', false);
-```
-
-In Mongoose 7, `strictQuery` default value will be switched back to `false`.
-You can prepare for the change by specifying:
-
-```javascript
-// Set `strictQuery` to `false` to prepare for the change
-mongoose.set('strictQuery', false);
-
-// Set `strictQuery` to `true` to suppress the warning message
+// Set `strictQuery` to `true` to omit unknown fields in queries.
 mongoose.set('strictQuery', true);
 ```
 

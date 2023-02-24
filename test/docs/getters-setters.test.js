@@ -49,6 +49,7 @@ describe('getters/setters', function() {
       user.email; // **@gmail.com
       // acquit:ignore:start
       assert.equal(user.email, '**@gmail.com');
+      assert.equal(user.toJSON().email, 'ab@gmail.com');
       
       user.email = 'test42@gmail.com';
       assert.equal(user.email, 'te****@gmail.com');

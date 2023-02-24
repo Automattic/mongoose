@@ -87,38 +87,27 @@ describe('document modified', function() {
   });
 
   describe('modified states', function() {
-    it('reset after save', function(done) {
+    it('reset after save', async function() {
       const B = BlogPost;
       const b = new B();
 
       b.numbers.push(3);
-      b.save(function(err) {
-        assert.strictEqual(null, err);
+      await b.save();
 
-        b.numbers.push(3);
-        b.save(function(err1) {
-          assert.strictEqual(null, err1);
+      b.numbers.push(3);
+      await b.save();
 
-          B.findById(b, function(err2, b) {
-            assert.strictEqual(null, err2);
-            assert.equal(b.numbers.length, 2);
-
-            done();
-          });
-        });
-      });
+      const blogPost = await B.findById(b);
+      assert.equal(blogPost.numbers.length, 2);
     });
 
-    it('of embedded docs reset after save', function(done) {
+    it('of embedded docs reset after save', async() => {
       const post = new BlogPost({ title: 'hocus pocus' });
       post.comments.push({ title: 'Humpty Dumpty', comments: [{ title: 'nested' }] });
-      post.save(function(err) {
-        assert.strictEqual(null, err);
-        const mFlag = post.comments[0].isModified('title');
-        assert.equal(mFlag, false);
-        assert.equal(post.isModified('title'), false);
-        done();
-      });
+      await post.save();
+      const mFlag = post.comments[0].isModified('title');
+      assert.equal(mFlag, false);
+      assert.equal(post.isModified('title'), false);
     });
   });
 
@@ -224,7 +213,7 @@ describe('document modified', function() {
       });
     });
 
-    it('on entire document', function(done) {
+    it('on entire document', async function() {
       const doc = {
         title: 'Test',
         slug: 'test',
@@ -243,33 +232,32 @@ describe('document modified', function() {
         ]
       };
 
-      BlogPost.create(doc, function(err, post) {
-        assert.ifError(err);
-        BlogPost.findById(post.id, function(err, postRead) {
-          assert.ifError(err);
-          // set the same data again back to the document.
-          // expected result, nothing should be set to modified
-          assert.equal(postRead.isModified('comments'), false);
-          assert.equal(postRead.isNew, false);
-          postRead.set(postRead.toObject());
+      const post = await BlogPost.create(doc);
 
-          assert.equal(postRead.isModified('title'), false);
-          assert.equal(postRead.isModified('slug'), false);
-          assert.equal(postRead.isModified('date'), false);
-          assert.equal(postRead.isModified('meta.date'), false);
-          assert.equal(postRead.isModified('meta.visitors'), false);
-          assert.equal(postRead.isModified('published'), false);
-          assert.equal(postRead.isModified('mixed'), false);
-          assert.equal(postRead.isModified('numbers'), false);
-          assert.equal(postRead.isModified('owners'), false);
-          assert.equal(postRead.isModified('comments'), false);
-          const arr = postRead.comments.slice();
-          arr[2] = postRead.comments.create({ title: 'index' });
-          postRead.comments = arr;
-          assert.equal(postRead.isModified('comments'), true);
-          done();
-        });
-      });
+      const postRead = await BlogPost.findById(post.id);
+
+      // set the same data again back to the document.
+      // expected result, nothing should be set to modified
+      assert.equal(postRead.isModified('comments'), false);
+      assert.equal(postRead.isNew, false);
+      postRead.set(postRead.toObject());
+
+      assert.equal(postRead.isModified('title'), false);
+      assert.equal(postRead.isModified('slug'), false);
+      assert.equal(postRead.isModified('date'), false);
+      assert.equal(postRead.isModified('meta.date'), false);
+      assert.equal(postRead.isModified('meta.visitors'), false);
+      assert.equal(postRead.isModified('published'), false);
+      assert.equal(postRead.isModified('mixed'), false);
+      assert.equal(postRead.isModified('numbers'), false);
+      assert.equal(postRead.isModified('owners'), false);
+      assert.equal(postRead.isModified('comments'), false);
+
+      const arr = postRead.comments.slice();
+      arr[2] = postRead.comments.create({ title: 'index' });
+      postRead.comments = arr;
+
+      assert.equal(postRead.isModified('comments'), true);
     });
 
     it('should let you set ref paths (gh-1530)', async function() {
@@ -417,30 +405,29 @@ describe('document modified', function() {
         assert.ok(test.bars[1]._id);
       });
 
-      it('updates embedded doc parents upon direct assignment (gh-5189)', function(done) {
+      it('updates embedded doc parents upon direct assignment (gh-5189)', async function() {
         const familySchema = new Schema({
           children: [{ name: { type: String, required: true } }]
         });
         db.deleteModel(/Test/);
         const Family = db.model('Test', familySchema);
-        Family.create({
+        const family = await Family.create({
           children: [
             { name: 'John' },
             { name: 'Mary' }
           ]
-        }, function(err, family) {
-          family.set({ children: family.children.slice(1) });
-          family.children.forEach(function(child) {
-            child.set({ name: 'Maryanne' });
-          });
-
-          assert.equal(family.validateSync(), undefined);
-          done();
         });
+
+        family.set({ children: family.children.slice(1) });
+        family.children.forEach(function(child) {
+          child.set({ name: 'Maryanne' });
+        });
+
+        assert.equal(family.validateSync(), undefined);
       });
     });
 
-    it('should support setting mixed paths by string (gh-1418)', function(done) {
+    it('should support setting mixed paths by string (gh-1418)', async function() {
       const BlogPost = db.model('Test', new Schema({ mixed: {} }));
       let b = new BlogPost();
       b.init({ mixed: {} });
@@ -460,23 +447,16 @@ describe('document modified', function() {
       assert.equal(b.get(path), 4);
 
       b = new BlogPost({ mixed: {} });
-      b.save(function(err) {
-        assert.ifError(err);
+      await b.save();
+      path = 'mixed.9a.x';
+      b.set(path, 8);
+      assert.ok(b.isModified(path));
+      assert.equal(b.get(path), 8);
 
-        path = 'mixed.9a.x';
-        b.set(path, 8);
-        assert.ok(b.isModified(path));
-        assert.equal(b.get(path), 8);
+      await b.save();
+      const doc = await BlogPost.findById(b);
+      assert.equal(doc.get(path), 8);
 
-        b.save(function(err) {
-          assert.ifError(err);
-          BlogPost.findById(b, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(doc.get(path), 8);
-            done();
-          });
-        });
-      });
     });
 
     it('should mark multi-level nested schemas as modified (gh-1754)', async function() {
@@ -507,7 +487,7 @@ describe('document modified', function() {
       assert.equal(p.child[0].grandChild[0].name, 'Jason');
     });
 
-    it('should reset the modified state after calling unmarkModified', function(done) {
+    it('should reset the modified state after calling unmarkModified', async function() {
       const b = new BlogPost();
       assert.equal(b.isModified('author'), false);
       b.author = 'foo';
@@ -517,32 +497,25 @@ describe('document modified', function() {
       assert.equal(b.isModified('author'), false);
       assert.equal(b.isModified(), false);
 
-      b.save(function(err) {
-        assert.strictEqual(null, err);
+      await b.save();
 
-        BlogPost.findById(b._id, function(err2, b2) {
-          assert.strictEqual(null, err2);
+      const b2 = await BlogPost.findById(b._id);
 
-          assert.equal(b2.isModified('author'), false);
-          assert.equal(b2.isModified(), false);
-          b2.author = 'bar';
-          assert.equal(b2.isModified('author'), true);
-          assert.equal(b2.isModified(), true);
-          b2.unmarkModified('author');
-          assert.equal(b2.isModified('author'), false);
-          assert.equal(b2.isModified(), false);
+      assert.equal(b2.isModified('author'), false);
+      assert.equal(b2.isModified(), false);
+      b2.author = 'bar';
+      assert.equal(b2.isModified('author'), true);
+      assert.equal(b2.isModified(), true);
+      b2.unmarkModified('author');
+      assert.equal(b2.isModified('author'), false);
+      assert.equal(b2.isModified(), false);
 
-          b2.save(function(err3) {
-            assert.strictEqual(err3, null);
-            BlogPost.findById(b._id, function(err4, b3) {
-              assert.strictEqual(err4, null);
-              // was not saved because modified state was unset
-              assert.equal(b3.author, 'foo');
-              done();
-            });
-          });
-        });
-      });
+      await b2.save();
+
+      const b3 = await BlogPost.findById(b._id);
+
+      // was not saved because modified state was unset
+      assert.equal(b3.author, 'foo');
     });
   });
 });

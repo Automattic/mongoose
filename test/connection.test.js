@@ -6,10 +6,8 @@
 
 const start = require('./common');
 
-const Promise = require('bluebird');
 const Q = require('q');
 const assert = require('assert');
-const sinon = require('sinon');
 const mongodb = require('mongodb');
 const MongooseError = require('../lib/error/index');
 
@@ -114,15 +112,9 @@ describe('connections:', function() {
       await conn.close();
     });
 
-    it('throws helpful error with legacy syntax (gh-6756)', function() {
-      assert.throws(function() {
-        mongoose.createConnection('127.0.0.1', 'dbname', 27017);
-      }, /mongoosejs\.com.*connections\.html/);
-    });
-
-    it('throws helpful error with undefined uri (gh-6763)', function() {
-      assert.throws(function() {
-        mongoose.createConnection(void 0);
+    it('throws helpful error with undefined uri (gh-6763)', async function() {
+      await assert.rejects(async function() {
+        await mongoose.createConnection(void 0).asPromise();
       }, /string.*createConnection/);
     });
 
@@ -154,6 +146,7 @@ describe('connections:', function() {
       conn1.model('Test', schema);
       assert.equal(called.length, 1);
       assert.equal(called[0], schema);
+
       await conn1.close();
       await conn2.close();
     });
@@ -162,8 +155,9 @@ describe('connections:', function() {
   describe('helpers', function() {
     let conn;
 
-    before(function() {
+    before(async function() {
       conn = mongoose.createConnection(start.uri2);
+      await conn.asPromise();
       return conn;
     });
 
@@ -251,15 +245,10 @@ describe('connections:', function() {
     });
   });
 
-  describe('connect callbacks', function() {
-    it('should return an error if malformed uri passed', function(done) {
-      const db = mongoose.createConnection('mongodb:///fake', {}, function(err) {
-        assert.equal(err.name, 'MongoParseError');
-        done();
-      });
-      db.close();
-      assert.ok(!db.options);
-    });
+  it('should return an error if malformed uri passed', async function() {
+    const err = await mongoose.createConnection('mongodb:///fake').asPromise().then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'MongoParseError');
   });
 
   describe('.model()', function() {
@@ -338,18 +327,13 @@ describe('connections:', function() {
     });
 
     describe('passing object literal schemas', function() {
-      it('works', function(done) {
+      it('works', async function() {
         const A = db.model('A', { n: [{ age: 'number' }] });
         const a = new A({ n: [{ age: '47' }] });
         assert.strictEqual(47, a.n[0].age);
-        a.save(function(err) {
-          assert.ifError(err);
-          A.findById(a, function(err) {
-            assert.ifError(err);
-            assert.strictEqual(47, a.n[0].age);
-            done();
-          });
-        });
+        await a.save();
+        await A.findById(a);
+        assert.strictEqual(47, a.n[0].age);
       });
     });
   });
@@ -371,64 +355,41 @@ describe('connections:', function() {
     });
   });
 
-  it('destroy connection and remove it permanantly', (done) => {
+  it('destroy connection and remove it permanently', async function() {
     const opts = {};
-    const conn = mongoose.createConnection(start.uri, opts);
-    const MongoClient = mongodb.MongoClient;
-    const stub = sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
-      callback();
-    });
-
+    const conn = await mongoose.createConnection(start.uri, opts).asPromise();
     conn.useDb('test-db');
 
     const totalConn = mongoose.connections.length;
 
-    conn.destroy(() => {
-      assert.equal(mongoose.connections.length, totalConn - 1);
-      stub.restore();
-      done();
-    });
+    await conn.destroy();
+    assert.equal(mongoose.connections.length, totalConn - 1);
   });
 
-  it('verify that attempt to re-open destroyed connection throws error, via promise', (done) => {
+  it('verify that attempt to re-open destroyed connection throws error, via promise', async function() {
     const opts = {};
-    const conn = mongoose.createConnection(start.uri, opts);
-    const MongoClient = mongodb.MongoClient;
-    const stub = sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
-      callback();
-    });
+    const conn = await mongoose.createConnection(start.uri, opts).asPromise();
 
     conn.useDb('test-db');
 
-    conn.destroy(async() => {
-      try {
-        await conn.openUri(start.uri);
-      } catch (error) {
-        assert.equal(error.message, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
-        stub.restore();
-        done();
-      }
-    });
+    await conn.destroy();
+    try {
+      await conn.openUri(start.uri);
+    } catch (error) {
+      assert.equal(error.message, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
+    }
   });
 
-  it('verify that attempt to re-open destroyed connection throws error, via callback', (done) => {
+  it('verify that attempt to re-open destroyed connection throws error, via callback', async function() {
     const opts = {};
-    const conn = mongoose.createConnection(start.uri, opts);
-    const MongoClient = mongodb.MongoClient;
-    const stub = sinon.stub(MongoClient.prototype, 'close').callsFake((force, callback) => {
-      callback();
-    });
+    const conn = await mongoose.createConnection(start.uri, opts).asPromise();
 
     conn.useDb('test-db');
-
-    conn.destroy(() => {
-      conn.openUri(start.uri, function(error, result) {
-        assert.equal(result, undefined);
-        assert.equal(error, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
-        stub.restore();
-        done();
-      });
-    });
+    await conn.destroy();
+    await assert.rejects(
+      () => conn.openUri(start.uri),
+      /Connection has been closed and destroyed/
+    );
   });
 
   it('force close with connection created after close (gh-5664)', function(done) {
@@ -478,7 +439,11 @@ describe('connections:', function() {
     db.openUri(start.uri, opts);
     assert.ok(!M.collection._shouldBufferCommands());
 
-    return M.findOne().then(() => assert.ok(false), err => assert.ok(err.message.includes('initial connection'))).
+    return M.findOne().
+      then(
+        () => assert.ok(false),
+        err => assert.ok(err.message.includes('initial connection'))
+      ).
       then(() => db.close());
   });
 
@@ -817,7 +782,7 @@ describe('connections:', function() {
 
           assert.equal(db.shouldAuthenticate(), true);
 
-          db.close(); // does not actually do anything
+          return db.close();
         });
       });
     });
@@ -842,7 +807,7 @@ describe('connections:', function() {
           db.asPromise().catch(() => {});
           assert.equal(db.shouldAuthenticate(), true);
 
-          db.close(); // does not actually do anything
+          return db.close();
         });
       });
       describe('when both username and password are defined', function() {
@@ -856,20 +821,22 @@ describe('connections:', function() {
 
           assert.equal(db.shouldAuthenticate(), true);
 
-          db.close(); // does not actually do anything
+          return db.close(); // does not actually do anything
         });
       });
     });
   });
 
   describe('passing a function into createConnection', function() {
-    it('should store the name of the function (gh-6517)', function(done) {
+    it('should store the name of the function (gh-6517)', async function() {
       const conn = mongoose.createConnection(start.uri);
       const schema = new Schema({ name: String });
       class Person extends mongoose.Model {}
-      conn.model(Person, schema);
+      const PersonModel = conn.model(Person, schema);
       assert.strictEqual(conn.modelNames()[0], 'Person');
-      conn.close(done);
+      await conn.asPromise();
+      await PersonModel.init();
+      await conn.close();
     });
   });
 
@@ -897,15 +864,17 @@ describe('connections:', function() {
     await conn.close();
   });
 
-  it('throws a MongooseServerSelectionError on server selection timeout (gh-8451)', function() {
+  it('throws a MongooseServerSelectionError on server selection timeout (gh-8451)', async function() {
     const opts = {
       serverSelectionTimeoutMS: 100
     };
     const uri = 'mongodb://baddomain:27017/test';
 
-    return mongoose.createConnection(uri, opts).asPromise().then(() => assert.ok(false), err => {
-      assert.equal(err.name, 'MongooseServerSelectionError');
-    });
+    const err = await mongoose.createConnection(uri, opts).
+      asPromise().
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'MongooseServerSelectionError');
   });
 
   it('`watch()` on a whole collection (gh-8425)', async function() {
@@ -1112,13 +1081,13 @@ describe('connections:', function() {
                         'autoCreate, autoIndex'
         );
         const m = new mongoose.Mongoose();
-        return assert.throws(
-          () => m.createConnection(start.uri, opts),
+        return assert.rejects(
+          () => m.createConnection(start.uri, opts).asPromise(),
           err
         );
       });
 
-      it('throws if options.config.autoIndex is true, even if options.autoIndex is false', function() {
+      it('throws if options.config.autoIndex is true, even if options.autoIndex is false', async function() {
         const opts = {
           readPreference: 'secondary',
           autoIndex: false,
@@ -1133,8 +1102,8 @@ describe('connections:', function() {
                         'autoCreate, autoIndex'
         );
 
-        assert.throws(
-          () => mongoose.createConnection(start.uri, opts),
+        await assert.rejects(
+          () => mongoose.createConnection(start.uri, opts).asPromise(),
           err
         );
       });
@@ -1227,7 +1196,8 @@ describe('connections:', function() {
 
     before(async() => {
       mongooseInstance = new mongoose.Mongoose();
-      connection = mongooseInstance.createConnection(start.uri);
+      connection = await mongooseInstance.createConnection(start.uri).asPromise();
+      await connection.dropDatabase();
     });
     beforeEach(() => connection.deleteModel(/.*/));
     afterEach(async() => {
@@ -1506,7 +1476,7 @@ describe('connections:', function() {
 
     const [res] = await Promise.all([
       Test.findOne().exec(),
-      new Promise.resolve(resolve => setTimeout(resolve, 100)).then(() => {
+      Promise.resolve(resolve => setTimeout(resolve, 100)).then(() => {
         conn.client.emit('serverDescriptionChanged', { newDescription: { type: 'Single' } });
       })
     ]);
@@ -1525,5 +1495,38 @@ describe('connections:', function() {
     m.createConnection();
     const connectionIds = m.connections.map(c => c.id);
     assert.deepEqual(connectionIds, [1, 2, 3, 4, 5]);
+  });
+
+  it('should not create default connection with createInitialConnection = false (gh-12965)', function() {
+    const m = new mongoose.Mongoose({
+      createInitialConnection: false
+    });
+    assert.deepEqual(m.connections.length, 0);
+  });
+
+  it('with autoCreate = false after schema create (gh-12940)', async function() {
+    const m = new mongoose.Mongoose();
+
+    const schema = new Schema({ name: String }, {
+      collation: { locale: 'en_US', strength: 1 },
+      collection: 'gh12940_Conn'
+    });
+    const Model = m.model('gh12940_Conn', schema);
+
+    await m.connect(start.uri, {
+      autoCreate: false
+    });
+
+    await Model.init();
+
+    const res = await m.connection.db.listCollections().toArray();
+    assert.ok(!res.map(c => c.name).includes('gh12940_Conn'));
+  });
+
+  it('should not create default connection with createInitialConnection = false (gh-12965)', function() {
+    const m = new mongoose.Mongoose({
+      createInitialConnection: false
+    });
+    assert.deepEqual(m.connections.length, 0);
   });
 });

@@ -23,7 +23,7 @@ describe('types.number', function() {
 
   it('a null number should castForQuery to null', function(done) {
     const n = new SchemaNumber();
-    assert.strictEqual(n.castForQuery(null), null);
+    assert.strictEqual(n.castForQuery(null, null), null);
     done();
   });
 
@@ -104,7 +104,7 @@ describe('types.number', function() {
     const n = new SchemaNumber();
     let err;
     try {
-      n.castForQuery({ somePath: { $x: 43 } });
+      n.castForQuery(null, { somePath: { $x: 43 } });
     } catch (e) {
       err = e;
     }

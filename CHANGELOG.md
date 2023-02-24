@@ -1,3 +1,36 @@
+7.0.0-rc0 / 2023-02-23
+======================
+ * BREAKING CHANGE: remove support for callbacks #11431
+ * BREAKING CHANGE: upgrade to MongoDB node driver 5.x, bson 5.x #12955
+ * BREAKING CHANGE: make `strictQuery: false` by default #11861 #11807 #11514
+ * BREAKING CHANGE: remove support for setting schema path definitions to primitives, except `_id: false` #12832 #7558 [lpizzinidev](https://github.com/lpizzinidev)
+ * BREAKING CHANGE: discriminator schemas now inherit base schema options by default #12928 #12135
+ * BREAKING CHANGE: orFail() now throws on updateOne() and updateMany() if matchedCount === 0, not modifiedCount === 0 #11620
+ * BREAKING CHANGE: remove support for custom promise libraries #12878 #12872 [lpizzinidev](https://github.com/lpizzinidev)
+ * BREAKING CHANGE: select('name -path') behaves as select('name') if path has schema-level select: true #11694
+ * BREAKING CHANGE(types): remove support for document interfaces that extends Document #11615
+ * BREAKING CHANGE: pluralize 'human' as 'humans', not 'humen' #13037
+ * BREAKING CHANGE: renamed schema option supressReservedKeysWarning -> suppressReservedKeysWarning #11495
+ * BREAKING CHANGE: remove unused DisconnectedError #13028 [lpizzinidev](https://github.com/lpizzinidev)
+ * BREAKING CHANGE: remove unsupported query options maxScan and snapshot #13023 #13022 [hasezoey](https://github.com/hasezoey)
+
+6.10.0 / 2023-02-22
+===================
+ * feat: upgrade to mongodb driver 4.14.0 #13036
+ * feat: added Schema.prototype.omit() function #12939 #12931 [lpizzinidev](https://github.com/lpizzinidev)
+ * feat(index): added createInitialConnection option to Mongoose constructor #13021 #12965 [lpizzinidev](https://github.com/lpizzinidev)
+
+6.9.3 / 2023-02-22
+==================
+ * fix(connection): delay calculating `autoCreate` and `autoIndex` until after initial connection established #13007 #12940 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(discriminator): allows update doc with discriminatorKey #13056 #13055 [abarriel](https://github.com/abarriel)
+ * fix(query): avoid sending unnecessary empty projection to MongoDB server #13059 #13050
+ * fix(model): avoid sending null session option with document operations #13053 #13052 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): use MergeTypes for type overrides in HydratedDocument #13066 #13040
+ * docs(middleware): list validate as a potential query middleware #13057 #12680
+ * docs(getters-setters): explain that getters do not run by default on toJSON() #13058 #13049
+ * docs: refactor docs generation scripts #13044 [hasezoey](https://github.com/hasezoey)
+
 5.13.16 / 2023-02-20
 ====================
  * fix: make access to process.versions lazy #12584 [maciasello](https://github.com/maciasello)
@@ -628,7 +661,7 @@
  * fix(index.d.ts): ValidationError `errors` only contains CastError or ValidationError #11369 [Uzlopak](https://github.com/Uzlopak)
  * fix(index.d.ts): make InsertManyResult.insertedIds return an array of Types.ObjectId by default #11197
  * fix(index.d.ts): allow pre('save') middleware with pre options #11257
- * fix(index.d.ts): add `supressReservedKeysWarning` option to schema #11439 [hiukky](https://github.com/hiukky)
+ * fix(index.d.ts): add `suppressReservedKeysWarning` option to schema #11439 [hiukky](https://github.com/hiukky)
  * docs(connections): improve replica set hostname docs with correct error message and info about `err.reason.servers` #11200
  * docs(populate): add virtual populate match option documentation #11411 [remirobichet](https://github.com/remirobichet)
  * docs(document): add note to API docs that flattenMaps defaults to `true` for `toJSON()` but not `toObject()` #11213

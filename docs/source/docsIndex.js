@@ -26,7 +26,10 @@ try {
  */
 const docs = {};
 
-docs['index.pug'] = require('./home');
+docs['docs/api.pug'] = {
+  docs: [],
+  title: 'Redirect to API',
+};
 docs['docs/api.pug'] = require('./api');
 docs['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, markdown: true };
 docs['docs/validation.md'] = { title: 'Validation', acquit: true, markdown: true };
@@ -49,6 +52,7 @@ docs['docs/populate.md'] = { guide: true, title: 'Query Population', markdown: t
 docs['docs/migration.md'] = { guide: true, title: 'Migration Guide', markdown: true };
 docs['docs/migrating_to_5.md'] = { guide: true, title: 'Migrating to Mongoose 5', markdown: true };
 docs['docs/migrating_to_6.md'] = { guide: true, title: 'Migrating to Mongoose 6', markdown: true };
+docs['docs/migrating_to_7.md'] = { guide: true, title: 'Migrating to Mongoose 7', markdown: true };
 docs['docs/contributing.md'] = { guide: true, title: 'Contributing', markdown: true };
 docs['docs/connections.md'] = { guide: true, title: 'Connecting to MongoDB', markdown: true };
 docs['docs/lambda.md'] = { guide: true, title: 'Using Mongoose With AWS Lambda', markdown: true };

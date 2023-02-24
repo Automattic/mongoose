@@ -319,7 +319,13 @@ function parse() {
       // the following condition will be true if "isInstance = true" or if "isInstance = false && isStatic = false" AND "ctx.string" are empty or not defined
       // if "isStatic" and "isInstance" are falsy and "ctx.string" is not falsy, then rely on the "ctx.string" set by "dox"
       if (ctx.isInstance || (!ctx.isStatic && !ctx.isInstance && (!ctx.string || ctx.constructorWasUndefined))) {
-        ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+        // to transform things like "[Symbol.toStringTag]" to ".prototype[Symbol.toStringTag]" instead of ".prototype.[Symbol.toStringTag]"
+        if (ctx.name.startsWith('[')) {
+          ctx.string = `${ctx.constructor}.prototype${ctx.name}`;
+
+        } else {
+          ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+        }
       } else if (ctx.isStatic) {
         ctx.string = `${ctx.constructor}.${ctx.name}`;
       }

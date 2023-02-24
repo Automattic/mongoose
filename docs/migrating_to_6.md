@@ -532,7 +532,7 @@ schema.virtual('myVirtual').get(function() {
 });
 ```
 
-## Removed `reconnectTries` and `reconnectInterval` options
+<h3 id="removed-reconnecttries-and-reconnectinterval-options"><a href="#removed-reconnecttries-and-reconnectinterval-options">Removed <code>reconnectTries</code> and <code>reconnectInterval</code> options</a></h3>
 
 The `reconnectTries` and `reconnectInterval` options have been removed since they are no longer necessary.
 

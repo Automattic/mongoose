@@ -1,17 +1,17 @@
-var root = 'https://mongoosejs.azurewebsites.net/api';
-var pairs = window.location.search.replace(/^\?/, '').split('&');
+const root = 'https://mongoosejs.azurewebsites.net/api';
+const pairs = window.location.search.replace(/^\?/, '').split('&');
 
-var q = null;
-for (var i = 0; i < pairs.length; ++i) {
-  var _pair = pairs[i].split('=');
+let q = null;
+for (let i = 0; i < pairs.length; ++i) {
+  const _pair = pairs[i].split('=');
   if (_pair[0] === 'q') {
     q = _pair[1];
   }
 }
 
-var defaultVersion = '6.x';
-var versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
-var version = versionFromUrl ? versionFromUrl[1] : defaultVersion;
+const defaultVersion = '6.x';
+const versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
+const version = versionFromUrl ? versionFromUrl[1] : defaultVersion;
 
 if (q != null) {
   document.getElementById('search-input').value = decodeURIComponent(q);
@@ -23,10 +23,10 @@ if (q != null) {
           document.getElementById('results').innerHTML = '<h1>No Results</h1>';
           return;
         }
-        var html = '';
-        for (var i = 0; i < result.results.length; ++i) {
-          var res = result.results[i];
-          var url = res.url;
+        let html = '';
+        for (let i = 0; i < result.results.length; ++i) {
+          const res = result.results[i];
+          const url = res.url;
           html += '<li>' +
             '<a class="title" href="' + url + '">' +
             res.title +
@@ -46,13 +46,13 @@ if (q != null) {
 }
 
 document.getElementById('search-button').onclick = function() {
-  var q = document.getElementById('search-input').value;
+  const q = document.getElementById('search-input').value;
   window.location.href = 'search.html?q=' + encodeURIComponent(q);
 };
 
-var q = document.getElementById('search-input').onkeyup = function(ev) {
+q = document.getElementById('search-input').onkeyup = function(ev) {
   if (ev.keyCode === 13) {
-    var q = document.getElementById('search-input').value;
+    let q = document.getElementById('search-input').value;
     window.location.href = 'search.html?q=' + encodeURIComponent(q);
   }
 };

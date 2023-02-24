@@ -11,9 +11,10 @@ try {
 } catch (err) {}
 
 exports['index.pug'] = require('./home');
-exports['docs/api.pug'] = {
+exports['docs/api.md'] = {
   docs: [],
   title: 'Redirect to API',
+  markdown: true
 };
 
 exports['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, markdown: true };

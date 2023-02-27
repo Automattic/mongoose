@@ -1391,8 +1391,24 @@ describe('schema', function() {
       assert.ok(s.path('created'));
       assert.ok(s.path('name'));
       assert.ok(!s.options.id);
+    });
 
+    it('copies options from array of schemas', function() {
+      const baseSchema = new Schema({ created: Date }, { id: true, toJSON: { virtuals: true } });
+      const s = new Schema([baseSchema, { name: String }]);
 
+      assert.ok(s.path('created'));
+      assert.ok(s.path('name'));
+      assert.ok(s.options.id);
+      assert.deepEqual(s.options.toJSON, { virtuals: true });
+      assert.strictEqual(s.options.toObject, undefined);
+
+      s.add(new Schema({}, { toObject: { getters: true } }));
+      assert.ok(s.path('created'));
+      assert.ok(s.path('name'));
+      assert.ok(s.options.id);
+      assert.deepEqual(s.options.toJSON, { virtuals: true });
+      assert.deepEqual(s.options.toObject, { getters: true });
     });
   });
 

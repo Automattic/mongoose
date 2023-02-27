@@ -44,6 +44,7 @@ user and have a good reason for doing so.
   <li><a href="#field-selection">Field Selection</a></li>
   <li><a href="#populating-multiple-paths">Populating Multiple Paths</a></li>
   <li><a href="#query-conditions">Query conditions and other options</a></li>
+  <li><a href="#limit-vs-perDocumentLimit"><code>limit</code> vs. <code>perDocumentLimit</code></a></li>
   <li><a href="#refs-to-children">Refs to children</a></li>
   <li><a href="#populate_an_existing_mongoose_document">Populating an existing document</a></li>
   <li><a href="#populate_multiple_documents">Populating multiple existing documents</a></li>

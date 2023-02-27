@@ -1,3 +1,10 @@
+7.0.0 / 2023-02-27
+==================
+ * BREAKING CHANGE: copy schema options when merging schemas using new Schema() or Schema.prototype.add() #13092
+ * feat(types): export mongodb types more robustly #12948 [simon-abbott](https://github.com/simon-abbott)
+ * docs: fix populate docs #13090 [hasezoey](https://github.com/hasezoey)
+ * docs(migrating_to_6): added info about removal of reconnectTries and reconnectInterval options #13083 [lpizzinidev](https://github.com/lpizzinidev)
+
 7.0.0-rc0 / 2023-02-23
 ======================
  * BREAKING CHANGE: remove support for callbacks #11431

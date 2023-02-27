@@ -48,6 +48,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [No default model for `Query.prototype.populate()`](#no-default-model-for-query-prototype-populate)
 * [`toObject()` and `toJSON()` Use Nested Schema `minimize`](#toobject-and-tojson-use-nested-schema-minimize)
 * [TypeScript changes](#typescript-changes)
+* [Removed `reconnectTries` and `reconnectInterval` options](#removed-reconnecttries-and-reconnectinterval-options)
 
 <h3 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h3>
 
@@ -530,3 +531,10 @@ schema.virtual('myVirtual').get(function() {
   this.name; // string
 });
 ```
+
+<h3 id="removed-reconnecttries-and-reconnectinterval-options"><a href="#removed-reconnecttries-and-reconnectinterval-options">Removed <code>reconnectTries</code> and <code>reconnectInterval</code> options</a></h3>
+
+The `reconnectTries` and `reconnectInterval` options have been removed since they are no longer necessary.
+
+The MongoDB node driver will always attempt to retry any operation for up to `serverSelectionTimeoutMS`, even if MongoDB is down for a long period of time.
+So, it will never run out of retries or try to reconnect to MongoDB.

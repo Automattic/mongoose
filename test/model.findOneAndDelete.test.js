@@ -128,66 +128,6 @@ describe('model: findOneAndDelete:', function() {
     assert.equal(query._conditions.author, undefined);
   });
 
-  it('executes when a callback is passed', function(done) {
-    const M = BlogPost;
-    let pending = 5;
-
-    M.findOneAndDelete({ name: 'aaron1' }, { select: 'name' }, cb);
-    M.findOneAndDelete({ name: 'aaron1' }, cb);
-    M.where().findOneAndDelete({ name: 'aaron1' }, { select: 'name' }, cb);
-    M.where().findOneAndDelete({ name: 'aaron1' }, cb);
-    M.where('name', 'aaron1').findOneAndDelete(cb);
-
-    function cb(err, doc) {
-      assert.ifError(err);
-      assert.equal(doc, null); // no previously existing doc
-      if (--pending) return;
-      done();
-    }
-  });
-
-  it('executed with only a callback throws', function() {
-    const M = BlogPost;
-    let err;
-
-    try {
-      M.findOneAndDelete(function() {});
-    } catch (e) {
-      err = e;
-    }
-
-    assert.ok(/First argument must not be a function/.test(err));
-  });
-
-  it('executed with only a callback throws', function() {
-    const M = BlogPost;
-    let err;
-
-    try {
-      M.findByIdAndDelete(function() {});
-    } catch (e) {
-      err = e;
-    }
-
-    assert.ok(/First argument must not be a function/.test(err));
-  });
-
-  it('executes when a callback is passed', function(done) {
-    const M = BlogPost;
-    const _id = new DocumentObjectId();
-    let pending = 2;
-
-    M.findByIdAndDelete(_id, { select: 'name' }, cb);
-    M.findByIdAndDelete(_id, cb);
-
-    function cb(err, doc) {
-      assert.ifError(err);
-      assert.equal(doc, null); // no previously existing doc
-      if (--pending) return;
-      done();
-    }
-  });
-
   it('returns the original document', async function() {
     const M = BlogPost;
     const title = 'remove muah pleez';
@@ -231,10 +171,12 @@ describe('model: findOneAndDelete:', function() {
     let query;
 
     query = M.findByIdAndDelete(_id, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
 
     query = M.findOneAndDelete({}, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
   });
@@ -295,7 +237,6 @@ describe('model: findOneAndDelete:', function() {
     const a = await M.create({ name: 'i am an A' });
 
     const b = await N.create({ a: a._id, i: 10 });
-
 
     const doc = await N.findOneAndDelete({ _id: b._id }, { select: 'a -_id' })
       .populate('a')

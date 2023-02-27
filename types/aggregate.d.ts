@@ -61,13 +61,10 @@ declare module 'mongoose' {
 
 
     /** Executes the aggregate pipeline on the currently bound Model. */
-    exec(callback: Callback<ResultType>): void;
     exec(): Promise<ResultType>;
 
     /** Execute the aggregation with explain */
-    explain(verbosity: mongodb.ExplainVerbosityLike, callback: Callback<AnyObject>): void;
     explain(verbosity: mongodb.ExplainVerbosityLike): Promise<AnyObject>;
-    explain(callback: Callback<AnyObject>): void;
     explain(): Promise<AnyObject>;
 
     /** Combines multiple aggregation pipelines. */

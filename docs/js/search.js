@@ -9,7 +9,7 @@ for (var i = 0; i < pairs.length; ++i) {
   }
 }
 
-var defaultVersion = '6.x';
+var defaultVersion = '7.x';
 var versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
 var version = versionFromUrl ? versionFromUrl[1] : defaultVersion;
 

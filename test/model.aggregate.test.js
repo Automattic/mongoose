@@ -102,7 +102,7 @@ describe('model aggregate', function() {
 
       const res = await promise;
 
-      assert.ok(promise instanceof mongoose.Promise);
+      assert.ok(promise instanceof Promise);
       assert.ok(res);
       assert.equal(res.length, 1);
       assert.ok('maxAge' in res[0]);
@@ -111,10 +111,6 @@ describe('model aggregate', function() {
 
     it('when returning Aggregate', function() {
       assert(A.aggregate([project]) instanceof Aggregate);
-    });
-
-    it('throws when passing object (gh-6732)', function() {
-      assert.throws(() => A.aggregate({}), /disallows passing a spread/);
     });
 
     it('can use helper for $out', async function() {

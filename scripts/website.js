@@ -98,8 +98,8 @@ function getLatestLegacyVersion(startsWith) {
 
 // use last release
 pkg.version = getVersion();
+pkg.latest6x = getLatestLegacyVersion('6.');
 pkg.latest5x = getLatestLegacyVersion('5.');
-pkg.latest4x = getLatestLegacyVersion('4.');
 
 // Create api dir if it doesn't already exist
 try {

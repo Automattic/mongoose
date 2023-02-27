@@ -129,85 +129,16 @@ describe('model: findOneAndRemove:', async function() {
     done();
   });
 
-  it('executes when a callback is passed', function(done) {
-    const M = BlogPost;
-    let pending = 5;
-
-    M.findOneAndRemove({ name: 'aaron1' }, { select: 'name' }, cb);
-    M.findOneAndRemove({ name: 'aaron1' }, cb);
-    M.where().findOneAndRemove({ name: 'aaron1' }, { select: 'name' }, cb);
-    M.where().findOneAndRemove({ name: 'aaron1' }, cb);
-    M.where('name', 'aaron1').findOneAndRemove(cb);
-
-    function cb(err, doc) {
-      assert.ifError(err);
-      assert.equal(doc, null); // no previously existing doc
-      if (--pending) return;
-      done();
-    }
-  });
-
-  it('executed with only a callback throws', function(done) {
-    const M = BlogPost;
-    let err;
-
-    try {
-      M.findOneAndRemove(function() {});
-    } catch (e) {
-      err = e;
-    }
-
-    assert.ok(/First argument must not be a function/.test(err));
-    done();
-  });
-
-  it('executed with only a callback throws', function(done) {
-    const M = BlogPost;
-    let err;
-
-    try {
-      M.findByIdAndRemove(function() {});
-    } catch (e) {
-      err = e;
-    }
-
-    assert.ok(/First argument must not be a function/.test(err));
-    done();
-  });
-
-  it('executes when a callback is passed', function(done) {
-    const M = BlogPost;
-    const _id = new DocumentObjectId();
-    let pending = 2;
-
-    M.findByIdAndRemove(_id, { select: 'name' }, cb);
-    M.findByIdAndRemove(_id, cb);
-
-    function cb(err, doc) {
-      assert.ifError(err);
-      assert.equal(doc, null); // no previously existing doc
-      if (--pending) return;
-      done();
-    }
-  });
-
-  it('returns the original document', function(done) {
+  it('returns the original document', async function() {
     const M = BlogPost;
     const title = 'remove muah pleez';
 
     const post = new M({ title: title });
-    post.save(function(err) {
-      assert.ifError(err);
-      M.findByIdAndRemove(post.id, function(err, doc) {
-        assert.ifError(err);
-        assert.equal(post.id, doc.id);
-        M.findById(post.id, function(err, gone) {
-          assert.ifError(err);
-          assert.equal(gone, null);
-          done();
-        });
-      });
-    });
+    await post.save();
+    const doc = await M.findByIdAndRemove(post.id);
+    assert.equal(post.id, doc.id);
+    const gone = await M.findById(post.id);
+    assert.equal(gone, null);
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
@@ -239,10 +170,12 @@ describe('model: findOneAndRemove:', async function() {
     let query;
 
     query = M.findByIdAndRemove(_id, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
 
     query = M.findOneAndRemove({}, { select: 'author -title' });
+    query._applyPaths();
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
     done();
@@ -300,27 +233,21 @@ describe('model: findOneAndRemove:', async function() {
     done();
   });
 
-  it('supports population (gh-1395)', function(done) {
+  it('supports population (gh-1395)', async function() {
     const M = db.model('Test1', { name: String });
     const N = db.model('Test2', { a: { type: Schema.ObjectId, ref: 'Test1' }, i: Number });
 
-    M.create({ name: 'i am an A' }, function(err, a) {
-      if (err) return done(err);
-      N.create({ a: a._id, i: 10 }, function(err, b) {
-        if (err) return done(err);
+    const a = await M.create({ name: 'i am an A' });
+    const b = await N.create({ a: a._id, i: 10 });
 
-        N.findOneAndRemove({ _id: b._id }, { select: 'a -_id' })
-          .populate('a')
-          .exec(function(err, doc) {
-            if (err) return done(err);
-            assert.ok(doc);
-            assert.equal(doc._id, undefined);
-            assert.ok(doc.a);
-            assert.equal('i am an A', doc.a.name);
-            done();
-          });
-      });
-    });
+    const doc = await N.findOneAndRemove({ _id: b._id }, { select: 'a -_id' })
+      .populate('a')
+      .exec();
+
+    assert.ok(doc);
+    assert.equal(doc._id, undefined);
+    assert.ok(doc.a);
+    assert.equal('i am an A', doc.a.name);
   });
 
   it('only calls setters once (gh-6203)', async function() {
@@ -355,7 +282,8 @@ describe('model: findOneAndRemove:', async function() {
   });
 
   describe('middleware', function() {
-    it('works', function(done) {
+
+    it('works', async function() {
       const s = new Schema({
         topping: { type: String, default: 'bacon' },
         base: String
@@ -376,23 +304,19 @@ describe('model: findOneAndRemove:', async function() {
         base: 'eggs'
       });
 
-      breakfast.save(function(error) {
-        assert.ifError(error);
+      await breakfast.save();
 
-        Breakfast.findOneAndRemove(
-          { base: 'eggs' },
-          {},
-          function(error, breakfast) {
-            assert.ifError(error);
-            assert.equal(breakfast.base, 'eggs');
-            assert.equal(preCount, 1);
-            assert.equal(postCount, 1);
-            done();
-          });
-      });
+      const breakfast2 = await Breakfast.findOneAndRemove(
+        { base: 'eggs' },
+        {}
+      );
+
+      assert.equal(breakfast2.base, 'eggs');
+      assert.equal(preCount, 1);
+      assert.equal(postCount, 1);
     });
 
-    it('works with exec() (gh-439)', function(done) {
+    it('works with exec() (gh-439)', async() => {
       const s = new Schema({
         topping: { type: String, default: 'bacon' },
         base: String
@@ -413,19 +337,13 @@ describe('model: findOneAndRemove:', async function() {
         base: 'eggs'
       });
 
-      breakfast.save(function(error) {
-        assert.ifError(error);
+      await breakfast.save();
 
-        Breakfast.
-          findOneAndRemove({ base: 'eggs' }, {}).
-          exec(function(error, breakfast) {
-            assert.ifError(error);
-            assert.equal(breakfast.base, 'eggs');
-            assert.equal(preCount, 1);
-            assert.equal(postCount, 1);
-            done();
-          });
-      });
+      const breakfast2 = await Breakfast.findOneAndRemove({ base: 'eggs' }, {});
+
+      assert.equal(breakfast2.base, 'eggs');
+      assert.equal(preCount, 1);
+      assert.equal(postCount, 1);
     });
   });
 });

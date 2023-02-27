@@ -63,7 +63,7 @@ describe('types.documentarray', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it('behaves and quacks like an array', function(done) {
+  it('behaves and quacks like an array', function() {
     const a = new MongooseDocumentArray();
 
     assert.ok(a instanceof Array);
@@ -73,10 +73,10 @@ describe('types.documentarray', function() {
 
     assert.deepEqual(a.$atomics().constructor, Object);
 
-    done();
+
   });
 
-  it('#id', function(done) {
+  it('#id', function() {
     let Subdocument = TestDoc();
 
     let sub1 = new Subdocument();
@@ -187,11 +187,11 @@ describe('types.documentarray', function() {
     a = new MongooseDocumentArray([sub]);
     assert.equal(a.id(id).title, 'Hello again to all my friends');
 
-    done();
+
   });
 
   describe('inspect', function() {
-    it('works with bad data', function(done) {
+    it('works with bad data', function() {
       let threw = false;
       const a = new MongooseDocumentArray([null]);
       try {
@@ -201,12 +201,12 @@ describe('types.documentarray', function() {
         console.error(err.stack);
       }
       assert.ok(!threw);
-      done();
+
     });
   });
 
   describe('toObject', function() {
-    it('works with bad data', function(done) {
+    it('works with bad data', function() {
       let threw = false;
       const a = new MongooseDocumentArray([null]);
       try {
@@ -216,9 +216,9 @@ describe('types.documentarray', function() {
         console.error(err.stack);
       }
       assert.ok(!threw);
-      done();
+
     });
-    it('passes options to its documents (gh-1415) (gh-4455)', function(done) {
+    it('passes options to its documents (gh-1415) (gh-4455)', function() {
       const subSchema = new Schema({
         title: { type: String }
       });
@@ -239,9 +239,9 @@ describe('types.documentarray', function() {
       const delta = m.$__delta()[1];
       assert.equal(delta.$push.docs.$each[0].changed, undefined);
 
-      done();
+
     });
-    it('uses the correct transform (gh-1412)', function(done) {
+    it('uses the correct transform (gh-1412)', function() {
       const SecondSchema = new Schema({});
 
       SecondSchema.set('toObject', {
@@ -276,12 +276,12 @@ describe('types.documentarray', function() {
       assert.ok(obj.second[1].secondToObject);
       assert.ok(!obj.second[0].firstToObject);
       assert.ok(!obj.second[1].firstToObject);
-      done();
+
     });
   });
 
   describe('create()', function() {
-    it('works', function(done) {
+    it('works', function() {
       const a = new MongooseDocumentArray([]);
       assert.equal(typeof a.create, 'function');
 
@@ -294,12 +294,12 @@ describe('types.documentarray', function() {
       assert.ok(subdoc._id);
       assert.equal(subdoc.name, '100');
       assert.ok(subdoc instanceof ArraySubdocument);
-      done();
+
     });
   });
 
   describe('push()', function() {
-    it('does not re-cast instances of its embedded doc', function(done) {
+    it('does not re-cast instances of its embedded doc', async function() {
       const child = new Schema({ name: String, date: Date });
       child.pre('save', function(next) {
         this.date = new Date();
@@ -308,39 +308,28 @@ describe('types.documentarray', function() {
       const schema = new Schema({ children: [child] });
       const M = db.model('Test', schema);
       const m = new M();
-      m.save(function(err) {
-        assert.ifError(err);
-        M.findById(m._id, function(err, doc) {
-          assert.ifError(err);
-          const c = doc.children.create({ name: 'first' });
-          assert.equal(c.date, undefined);
-          doc.children.push(c);
-          assert.equal(c.date, undefined);
-          doc.save(function(err) {
-            assert.ifError(err);
-            assert.ok(doc.children[doc.children.length - 1].date);
-            assert.equal(c.date, doc.children[doc.children.length - 1].date);
+      await m.save();
+      let doc = await M.findById(m._id);
+      const c = doc.children.create({ name: 'first' });
+      assert.equal(c.date, undefined);
+      doc.children.push(c);
+      assert.equal(c.date, undefined);
+      await doc.save();
+      assert.ok(doc.children[doc.children.length - 1].date);
+      assert.equal(c.date, doc.children[doc.children.length - 1].date);
 
-            doc.children.push(c);
-            doc.children.push(c);
+      doc.children.push(c);
+      doc.children.push(c);
 
-            doc.save(function(err) {
-              assert.ifError(err);
-              M.findById(m._id, function(err, doc) {
-                assert.ifError(err);
-                assert.equal(doc.children.length, 3);
-                doc.children.forEach(function(child) {
-                  assert.equal(doc.children[0].id, child.id);
-                });
-                done();
-              });
-            });
-          });
-        });
+      await doc.save();
+      doc = await M.findById(m._id);
+      assert.equal(doc.children.length, 3);
+      doc.children.forEach(function(child) {
+        assert.equal(doc.children[0].id, child.id);
       });
     });
 
-    it('corrects #ownerDocument() and index if value was created with array.create() (gh-1385)', function(done) {
+    it('corrects #ownerDocument() and index if value was created with array.create() (gh-1385)', function() {
       const mg = new mongoose.Mongoose();
       const M = mg.model('Test', { docs: [{ name: String }] });
       const m = new M();
@@ -349,10 +338,10 @@ describe('types.documentarray', function() {
       m.docs.push(doc);
       assert.equal(doc.ownerDocument()._id, String(m._id));
       assert.strictEqual(doc.__index, 0);
-      done();
+
     });
 
-    it('corrects #ownerDocument() if value was created with array.create() and set() (gh-7504)', function(done) {
+    it('corrects #ownerDocument() if value was created with array.create() and set() (gh-7504)', function() {
       const M = db.model('Test', {
         docs: [{ name: { type: String, validate: () => false } }]
       });
@@ -363,7 +352,7 @@ describe('types.documentarray', function() {
       assert.strictEqual(doc.__index, 0);
 
       assert.ok(m.validateSync().errors['docs.0.name']);
-      done();
+
     });
 
     it('reports validation errors with correct index path (gh-7724)', function() {
@@ -396,7 +385,7 @@ describe('types.documentarray', function() {
     });
   });
 
-  it('#push should work on ArraySubdocument more than 2 levels deep', function(done) {
+  it('#push should work on ArraySubdocument more than 2 levels deep', async function() {
     const Comments = new Schema();
     Comments.add({
       title: String,
@@ -409,7 +398,7 @@ describe('types.documentarray', function() {
 
     const Post = db.model('BlogPost', BlogPost);
 
-    const p = new Post({ title: 'comment nesting' });
+    let p = new Post({ title: 'comment nesting' });
     const c1 = p.comments.create({ title: 'c1' });
     const c2 = c1.comments.create({ title: 'c2' });
     const c3 = c2.comments.create({ title: 'c3' });
@@ -418,28 +407,17 @@ describe('types.documentarray', function() {
     c1.comments.push(c2);
     c2.comments.push(c3);
 
-    p.save(function(err) {
-      assert.ifError(err);
+    await p.save();
+    p = await Post.findById(p._id);
 
-      Post.findById(p._id, function(err, p) {
-        assert.ifError(err);
-
-        p.comments[0].comments[0].comments[0].comments.push({ title: 'c4' });
-        p.save(function(err) {
-          assert.ifError(err);
-
-          Post.findById(p._id, function(err, p) {
-            assert.ifError(err);
-            assert.equal(p.comments[0].comments[0].comments[0].comments[0].title, 'c4');
-            done();
-          });
-        });
-      });
-    });
+    p.comments[0].comments[0].comments[0].comments.push({ title: 'c4' });
+    await p.save();
+    p = await Post.findById(p._id);
+    assert.equal(p.comments[0].comments[0].comments[0].comments[0].title, 'c4');
   });
 
   describe('required (gh-6364)', function() {
-    it('on top level', function(done) {
+    it('on top level', function() {
       const calls = [];
       const schema = new Schema({
         docs: {
@@ -459,10 +437,10 @@ describe('types.documentarray', function() {
 
       t.validateSync();
       assert.equal(calls.length, 1);
-      done();
+
     });
 
-    it('in arr', function(done) {
+    it('in arr', function() {
       const calls = [];
       const schema = new Schema({
         docs: [{
@@ -484,12 +462,12 @@ describe('types.documentarray', function() {
       assert.equal(calls.length, 2);
       assert.ok(err);
       assert.ok(err.errors['docs.0']);
-      done();
+
     });
   });
 
   describe('invalidate()', function() {
-    it('works', function(done) {
+    it('works', async function() {
       const schema = new Schema({ docs: [{ name: 'string' }] });
       schema.pre('validate', function(next) {
         const subdoc = this.docs[this.docs.length - 1];
@@ -506,28 +484,24 @@ describe('types.documentarray', function() {
         // has no parent array
         subdoc.invalidate('name', 'junk', 47);
       });
-      t.validate(function() {
-        const e = t.errors['docs.0.name'];
-        assert.ok(e);
-        assert.equal(e.path, 'docs.0.name');
-        assert.equal(e.kind, 'user defined');
-        assert.equal(e.message, 'boo boo');
-        assert.equal(e.value, '%');
-        done();
-      });
+      await t.validate().catch(() => {});
+      const e = t.errors['docs.0.name'];
+      assert.ok(e);
+      assert.equal(e.path, 'docs.0.name');
+      assert.equal(e.kind, 'user defined');
+      assert.equal(e.message, 'boo boo');
+      assert.equal(e.value, '%');
     });
 
-    it('handles validation failures', function(done) {
+    it('handles validation failures', async function() {
       const nested = new Schema({ v: { type: Number, max: 30 } });
       const schema = new Schema({
         docs: [nested]
       });
       const M = db.model('Test', schema);
       const m = new M({ docs: [{ v: 900 }] });
-      m.save(function(err) {
-        assert.equal(err.errors['docs.0.v'].value, 900);
-        done();
-      });
+      const err = await m.save().then(() => null, err => err);
+      assert.equal(err.errors['docs.0.v'].value, 900);
     });
 
     it('clears listeners on cast error (gh-6723)', function() {

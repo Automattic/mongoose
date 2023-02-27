@@ -1,3 +1,26 @@
+7.0.0 / 2023-02-27
+==================
+ * BREAKING CHANGE: copy schema options when merging schemas using new Schema() or Schema.prototype.add() #13092
+ * feat(types): export mongodb types more robustly #12948 [simon-abbott](https://github.com/simon-abbott)
+ * docs: fix populate docs #13090 [hasezoey](https://github.com/hasezoey)
+ * docs(migrating_to_6): added info about removal of reconnectTries and reconnectInterval options #13083 [lpizzinidev](https://github.com/lpizzinidev)
+
+7.0.0-rc0 / 2023-02-23
+======================
+ * BREAKING CHANGE: remove support for callbacks #11431
+ * BREAKING CHANGE: upgrade to MongoDB node driver 5.x, bson 5.x #12955
+ * BREAKING CHANGE: make `strictQuery: false` by default #11861 #11807 #11514
+ * BREAKING CHANGE: remove support for setting schema path definitions to primitives, except `_id: false` #12832 #7558 [lpizzinidev](https://github.com/lpizzinidev)
+ * BREAKING CHANGE: discriminator schemas now inherit base schema options by default #12928 #12135
+ * BREAKING CHANGE: orFail() now throws on updateOne() and updateMany() if matchedCount === 0, not modifiedCount === 0 #11620
+ * BREAKING CHANGE: remove support for custom promise libraries #12878 #12872 [lpizzinidev](https://github.com/lpizzinidev)
+ * BREAKING CHANGE: select('name -path') behaves as select('name') if path has schema-level select: true #11694
+ * BREAKING CHANGE(types): remove support for document interfaces that extends Document #11615
+ * BREAKING CHANGE: pluralize 'human' as 'humans', not 'humen' #13037
+ * BREAKING CHANGE: renamed schema option supressReservedKeysWarning -> suppressReservedKeysWarning #11495
+ * BREAKING CHANGE: remove unused DisconnectedError #13028 [lpizzinidev](https://github.com/lpizzinidev)
+ * BREAKING CHANGE: remove unsupported query options maxScan and snapshot #13023 #13022 [hasezoey](https://github.com/hasezoey)
+
 6.10.0 / 2023-02-22
 ===================
  * feat: upgrade to mongodb driver 4.14.0 #13036
@@ -645,7 +668,7 @@
  * fix(index.d.ts): ValidationError `errors` only contains CastError or ValidationError #11369 [Uzlopak](https://github.com/Uzlopak)
  * fix(index.d.ts): make InsertManyResult.insertedIds return an array of Types.ObjectId by default #11197
  * fix(index.d.ts): allow pre('save') middleware with pre options #11257
- * fix(index.d.ts): add `supressReservedKeysWarning` option to schema #11439 [hiukky](https://github.com/hiukky)
+ * fix(index.d.ts): add `suppressReservedKeysWarning` option to schema #11439 [hiukky](https://github.com/hiukky)
  * docs(connections): improve replica set hostname docs with correct error message and info about `err.reason.servers` #11200
  * docs(populate): add virtual populate match option documentation #11411 [remirobichet](https://github.com/remirobichet)
  * docs(document): add note to API docs that flattenMaps defaults to `true` for `toJSON()` but not `toObject()` #11213

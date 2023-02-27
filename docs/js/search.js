@@ -1,6 +1,6 @@
 const root = 'https://mongoosejs.azurewebsites.net/api';
 
-const defaultVersion = '6.x';
+const defaultVersion = '7.x';
 const versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
 const version = versionFromUrl ? versionFromUrl[1] : defaultVersion;
 

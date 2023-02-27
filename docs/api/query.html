@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.10.0: Query</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><script src="/docs/js/api-bold-current-nav.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.10.0</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.16</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/query.js" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v7.0.0: Query</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><script src="/docs/js/api-bold-current-nav.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 7.0.0</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x">Version 6.10.0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.16</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/query.js" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h1>Query</h1><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"><div id="native-direct"></div><script>(function() {
 if (typeof _bsa !== 'undefined' && _bsa) {
@@ -14,7 +14,7 @@ template: `
 }
 );
 }
-})();</script><div class="api-nav"><div class="api-nav-content"><div class="nav-item" id="nav-Mongoose"><div class="nav-item-title"><a href="mongoose.html">Mongoose</a></div></div><div class="nav-item" id="nav-Schema"><div class="nav-item-title"><a href="schema.html">Schema</a></div></div><div class="nav-item" id="nav-Connection"><div class="nav-item-title"><a href="connection.html">Connection</a></div></div><div class="nav-item" id="nav-Document"><div class="nav-item-title"><a href="document.html">Document</a></div></div><div class="nav-item" id="nav-Model"><div class="nav-item-title"><a href="model.html">Model</a></div></div><div class="nav-item" id="nav-Query"><div class="nav-item-title" style="font-weight: bold"><a href="query.html">Query</a></div><ul class="nav-item-sub"><li><a href="#query_Query"><code>Query()</code></a></li><li><a href="#query_Query-$where"><code>Query.prototype.$where()</code></a></li><li><a href="#query_Query-Symbol.asyncIterator"><code>Query.prototype.Symbol.asyncIterator()</code></a></li><li><a href="#query_Query-all"><code>Query.prototype.all()</code></a></li><li><a href="#query_Query-allowDiskUse"><code>Query.prototype.allowDiskUse()</code></a></li><li><a href="#query_Query-and"><code>Query.prototype.and()</code></a></li><li><a href="#query_Query-batchSize"><code>Query.prototype.batchSize()</code></a></li><li><a href="#query_Query-box"><code>Query.prototype.box()</code></a></li><li><a href="#query_Query-cast"><code>Query.prototype.cast()</code></a></li><li><a href="#query_Query-catch"><code>Query.prototype.catch()</code></a></li><li><a href="#query_Query-center"><code>Query.prototype.center()</code></a></li><li><a href="#query_Query-centerSphere"><code>Query.prototype.centerSphere()</code></a></li><li><a href="#query_Query-circle"><code>Query.prototype.circle()</code></a></li><li><a href="#query_Query-clone"><code>Query.prototype.clone()</code></a></li><li><a href="#query_Query-collation"><code>Query.prototype.collation()</code></a></li><li><a href="#query_Query-comment"><code>Query.prototype.comment()</code></a></li><li><a href="#query_Query-count"><code>Query.prototype.count()</code></a></li><li><a href="#query_Query-countDocuments"><code>Query.prototype.countDocuments()</code></a></li><li><a href="#query_Query-cursor"><code>Query.prototype.cursor()</code></a></li><li><a href="#query_Query-deleteMany"><code>Query.prototype.deleteMany()</code></a></li><li><a href="#query_Query-deleteOne"><code>Query.prototype.deleteOne()</code></a></li><li><a href="#query_Query-distinct"><code>Query.prototype.distinct()</code></a></li><li><a href="#query_Query-elemMatch"><code>Query.prototype.elemMatch()</code></a></li><li><a href="#query_Query-equals"><code>Query.prototype.equals()</code></a></li><li><a href="#query_Query-error"><code>Query.prototype.error()</code></a></li><li><a href="#query_Query-estimatedDocumentCount"><code>Query.prototype.estimatedDocumentCount()</code></a></li><li><a href="#query_Query-exec"><code>Query.prototype.exec()</code></a></li><li><a href="#query_Query-exists"><code>Query.prototype.exists()</code></a></li><li><a href="#query_Query-explain"><code>Query.prototype.explain()</code></a></li><li><a href="#query_Query-find"><code>Query.prototype.find()</code></a></li><li><a href="#query_Query-findOne"><code>Query.prototype.findOne()</code></a></li><li><a href="#query_Query-findOneAndDelete"><code>Query.prototype.findOneAndDelete()</code></a></li><li><a href="#query_Query-findOneAndRemove"><code>Query.prototype.findOneAndRemove()</code></a></li><li><a href="#query_Query-findOneAndReplace"><code>Query.prototype.findOneAndReplace()</code></a></li><li><a href="#query_Query-findOneAndUpdate"><code>Query.prototype.findOneAndUpdate()</code></a></li><li><a href="#query_Query-geometry"><code>Query.prototype.geometry()</code></a></li><li><a href="#query_Query-get"><code>Query.prototype.get()</code></a></li><li><a href="#query_Query-getFilter"><code>Query.prototype.getFilter()</code></a></li><li><a href="#query_Query-getOptions"><code>Query.prototype.getOptions()</code></a></li><li><a href="#query_Query-getPopulatedPaths"><code>Query.prototype.getPopulatedPaths()</code></a></li><li><a href="#query_Query-getQuery"><code>Query.prototype.getQuery()</code></a></li><li><a href="#query_Query-getUpdate"><code>Query.prototype.getUpdate()</code></a></li><li><a href="#query_Query-gt"><code>Query.prototype.gt()</code></a></li><li><a href="#query_Query-gte"><code>Query.prototype.gte()</code></a></li><li><a href="#query_Query-hint"><code>Query.prototype.hint()</code></a></li><li><a href="#query_Query-in"><code>Query.prototype.in()</code></a></li><li><a href="#query_Query-intersects"><code>Query.prototype.intersects()</code></a></li><li><a href="#query_Query-j"><code>Query.prototype.j()</code></a></li><li><a href="#query_Query-lean"><code>Query.prototype.lean()</code></a></li><li><a href="#query_Query-limit"><code>Query.prototype.limit()</code></a></li><li><a href="#query_Query-lt"><code>Query.prototype.lt()</code></a></li><li><a href="#query_Query-lte"><code>Query.prototype.lte()</code></a></li><li><a href="#query_Query-maxDistance"><code>Query.prototype.maxDistance()</code></a></li><li><a href="#query_Query-maxScan"><code>Query.prototype.maxScan()</code></a></li><li><a href="#query_Query-maxTimeMS"><code>Query.prototype.maxTimeMS()</code></a></li><li><a href="#query_Query-maxscan"><code>Query.prototype.maxscan()</code></a></li><li><a href="#query_Query-merge"><code>Query.prototype.merge()</code></a></li><li><a href="#query_Query-mod"><code>Query.prototype.mod()</code></a></li><li><a href="#query_Query-model"><code>Query.prototype.model</code></a></li><li><a href="#query_Query-mongooseOptions"><code>Query.prototype.mongooseOptions()</code></a></li><li><a href="#query_Query-ne"><code>Query.prototype.ne()</code></a></li><li><a href="#query_Query-near"><code>Query.prototype.near()</code></a></li><li><a href="#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code></a></li><li><a href="#query_Query-nin"><code>Query.prototype.nin()</code></a></li><li><a href="#query_Query-nor"><code>Query.prototype.nor()</code></a></li><li><a href="#query_Query-or"><code>Query.prototype.or()</code></a></li><li><a href="#query_Query-orFail"><code>Query.prototype.orFail()</code></a></li><li><a href="#query_Query-polygon"><code>Query.prototype.polygon()</code></a></li><li><a href="#query_Query-populate"><code>Query.prototype.populate()</code></a></li><li><a href="#query_Query-post"><code>Query.prototype.post()</code></a></li><li><a href="#query_Query-pre"><code>Query.prototype.pre()</code></a></li><li><a href="#query_Query-projection"><code>Query.prototype.projection()</code></a></li><li><a href="#query_Query-read"><code>Query.prototype.read()</code></a></li><li><a href="#query_Query-readConcern"><code>Query.prototype.readConcern()</code></a></li><li><a href="#query_Query-regex"><code>Query.prototype.regex()</code></a></li><li><a href="#query_Query-remove"><code>Query.prototype.remove()</code></a></li><li><a href="#query_Query-replaceOne"><code>Query.prototype.replaceOne()</code></a></li><li><a href="#query_Query-select"><code>Query.prototype.select()</code></a></li><li><a href="#query_Query-selected"><code>Query.prototype.selected()</code></a></li><li><a href="#query_Query-selectedExclusively"><code>Query.prototype.selectedExclusively()</code></a></li><li><a href="#query_Query-selectedInclusively"><code>Query.prototype.selectedInclusively()</code></a></li><li><a href="#query_Query-session"><code>Query.prototype.session()</code></a></li><li><a href="#query_Query-set"><code>Query.prototype.set()</code></a></li><li><a href="#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></li><li><a href="#query_Query-setQuery"><code>Query.prototype.setQuery()</code></a></li><li><a href="#query_Query-setUpdate"><code>Query.prototype.setUpdate()</code></a></li><li><a href="#query_Query-size"><code>Query.prototype.size()</code></a></li><li><a href="#query_Query-skip"><code>Query.prototype.skip()</code></a></li><li><a href="#query_Query-slice"><code>Query.prototype.slice()</code></a></li><li><a href="#query_Query-snapshot"><code>Query.prototype.snapshot()</code></a></li><li><a href="#query_Query-sort"><code>Query.prototype.sort()</code></a></li><li><a href="#query_Query-tailable"><code>Query.prototype.tailable()</code></a></li><li><a href="#query_Query-then"><code>Query.prototype.then()</code></a></li><li><a href="#query_Query-toConstructor"><code>Query.prototype.toConstructor()</code></a></li><li><a href="#query_Query-transform"><code>Query.prototype.transform()</code></a></li><li><a href="#query_Query-update"><code>Query.prototype.update()</code></a></li><li><a href="#query_Query-updateMany"><code>Query.prototype.updateMany()</code></a></li><li><a href="#query_Query-updateOne"><code>Query.prototype.updateOne()</code></a></li><li><a href="#query_Query-w"><code>Query.prototype.w()</code></a></li><li><a href="#query_Query-where"><code>Query.prototype.where()</code></a></li><li><a href="#query_Query-within"><code>Query.prototype.within()</code></a></li><li><a href="#query_Query-writeConcern"><code>Query.prototype.writeConcern()</code></a></li><li><a href="#query_Query-wtimeout"><code>Query.prototype.wtimeout()</code></a></li><li><a href="#query_Query-use$geoWithin"><code>Query.use$geoWithin</code></a></li></ul></div><div class="nav-item" id="nav-QueryCursor"><div class="nav-item-title"><a href="querycursor.html">QueryCursor</a></div></div><div class="nav-item" id="nav-Aggregate"><div class="nav-item-title"><a href="aggregate.html">Aggregate</a></div></div><div class="nav-item" id="nav-AggregationCursor"><div class="nav-item-title"><a href="aggregationcursor.html">AggregationCursor</a></div></div><div class="nav-item" id="nav-Schematype"><div class="nav-item-title"><a href="schematype.html">Schematype</a></div></div><div class="nav-item" id="nav-Virtualtype"><div class="nav-item-title"><a href="virtualtype.html">Virtualtype</a></div></div><div class="nav-item" id="nav-Error"><div class="nav-item-title"><a href="error.html">Error</a></div></div><div class="nav-item" id="nav-SchemaArray"><div class="nav-item-title"><a href="schemaarray.html">SchemaArray</a></div></div><div class="nav-item" id="nav-DocumentArrayPath"><div class="nav-item-title"><a href="documentarraypath.html">DocumentArrayPath</a></div></div><div class="nav-item" id="nav-SubdocumentPath"><div class="nav-item-title"><a href="subdocumentpath.html">SubdocumentPath</a></div></div><div class="nav-item" id="nav-MongooseDocumentArray"><div class="nav-item-title"><a href="mongoosedocumentarray.html">MongooseDocumentArray</a></div></div><div class="nav-item" id="nav-Subdocument"><div class="nav-item-title"><a href="subdocument.html">Subdocument</a></div></div><div class="nav-item" id="nav-ArraySubdocument"><div class="nav-item-title"><a href="arraysubdocument.html">ArraySubdocument</a></div></div><div class="nav-item" id="nav-Buffer"><div class="nav-item-title"><a href="buffer.html">Buffer</a></div></div><div class="nav-item" id="nav-Decimal128"><div class="nav-item-title"><a href="decimal128.html">Decimal128</a></div></div><div class="nav-item" id="nav-Map"><div class="nav-item-title"><a href="map.html">Map</a></div></div></div></div><div class="api-content"><ul><li><a href="#query_Query"><code>Query()</code></a></li><li><a href="#query_Query-$where"><code>Query.prototype.$where()</code></a></li><li><a href="#query_Query-Symbol.asyncIterator"><code>Query.prototype.Symbol.asyncIterator()</code></a></li><li><a href="#query_Query-all"><code>Query.prototype.all()</code></a></li><li><a href="#query_Query-allowDiskUse"><code>Query.prototype.allowDiskUse()</code></a></li><li><a href="#query_Query-and"><code>Query.prototype.and()</code></a></li><li><a href="#query_Query-batchSize"><code>Query.prototype.batchSize()</code></a></li><li><a href="#query_Query-box"><code>Query.prototype.box()</code></a></li><li><a href="#query_Query-cast"><code>Query.prototype.cast()</code></a></li><li><a href="#query_Query-catch"><code>Query.prototype.catch()</code></a></li><li><a href="#query_Query-center"><code>Query.prototype.center()</code></a></li><li><a href="#query_Query-centerSphere"><code>Query.prototype.centerSphere()</code></a></li><li><a href="#query_Query-circle"><code>Query.prototype.circle()</code></a></li><li><a href="#query_Query-clone"><code>Query.prototype.clone()</code></a></li><li><a href="#query_Query-collation"><code>Query.prototype.collation()</code></a></li><li><a href="#query_Query-comment"><code>Query.prototype.comment()</code></a></li><li><a href="#query_Query-count"><code>Query.prototype.count()</code></a></li><li><a href="#query_Query-countDocuments"><code>Query.prototype.countDocuments()</code></a></li><li><a href="#query_Query-cursor"><code>Query.prototype.cursor()</code></a></li><li><a href="#query_Query-deleteMany"><code>Query.prototype.deleteMany()</code></a></li><li><a href="#query_Query-deleteOne"><code>Query.prototype.deleteOne()</code></a></li><li><a href="#query_Query-distinct"><code>Query.prototype.distinct()</code></a></li><li><a href="#query_Query-elemMatch"><code>Query.prototype.elemMatch()</code></a></li><li><a href="#query_Query-equals"><code>Query.prototype.equals()</code></a></li><li><a href="#query_Query-error"><code>Query.prototype.error()</code></a></li><li><a href="#query_Query-estimatedDocumentCount"><code>Query.prototype.estimatedDocumentCount()</code></a></li><li><a href="#query_Query-exec"><code>Query.prototype.exec()</code></a></li><li><a href="#query_Query-exists"><code>Query.prototype.exists()</code></a></li><li><a href="#query_Query-explain"><code>Query.prototype.explain()</code></a></li><li><a href="#query_Query-find"><code>Query.prototype.find()</code></a></li><li><a href="#query_Query-findOne"><code>Query.prototype.findOne()</code></a></li><li><a href="#query_Query-findOneAndDelete"><code>Query.prototype.findOneAndDelete()</code></a></li><li><a href="#query_Query-findOneAndRemove"><code>Query.prototype.findOneAndRemove()</code></a></li><li><a href="#query_Query-findOneAndReplace"><code>Query.prototype.findOneAndReplace()</code></a></li><li><a href="#query_Query-findOneAndUpdate"><code>Query.prototype.findOneAndUpdate()</code></a></li><li><a href="#query_Query-geometry"><code>Query.prototype.geometry()</code></a></li><li><a href="#query_Query-get"><code>Query.prototype.get()</code></a></li><li><a href="#query_Query-getFilter"><code>Query.prototype.getFilter()</code></a></li><li><a href="#query_Query-getOptions"><code>Query.prototype.getOptions()</code></a></li><li><a href="#query_Query-getPopulatedPaths"><code>Query.prototype.getPopulatedPaths()</code></a></li><li><a href="#query_Query-getQuery"><code>Query.prototype.getQuery()</code></a></li><li><a href="#query_Query-getUpdate"><code>Query.prototype.getUpdate()</code></a></li><li><a href="#query_Query-gt"><code>Query.prototype.gt()</code></a></li><li><a href="#query_Query-gte"><code>Query.prototype.gte()</code></a></li><li><a href="#query_Query-hint"><code>Query.prototype.hint()</code></a></li><li><a href="#query_Query-in"><code>Query.prototype.in()</code></a></li><li><a href="#query_Query-intersects"><code>Query.prototype.intersects()</code></a></li><li><a href="#query_Query-j"><code>Query.prototype.j()</code></a></li><li><a href="#query_Query-lean"><code>Query.prototype.lean()</code></a></li><li><a href="#query_Query-limit"><code>Query.prototype.limit()</code></a></li><li><a href="#query_Query-lt"><code>Query.prototype.lt()</code></a></li><li><a href="#query_Query-lte"><code>Query.prototype.lte()</code></a></li><li><a href="#query_Query-maxDistance"><code>Query.prototype.maxDistance()</code></a></li><li><a href="#query_Query-maxScan"><code>Query.prototype.maxScan()</code></a></li><li><a href="#query_Query-maxTimeMS"><code>Query.prototype.maxTimeMS()</code></a></li><li><a href="#query_Query-maxscan"><code>Query.prototype.maxscan()</code></a></li><li><a href="#query_Query-merge"><code>Query.prototype.merge()</code></a></li><li><a href="#query_Query-mod"><code>Query.prototype.mod()</code></a></li><li><a href="#query_Query-model"><code>Query.prototype.model</code></a></li><li><a href="#query_Query-mongooseOptions"><code>Query.prototype.mongooseOptions()</code></a></li><li><a href="#query_Query-ne"><code>Query.prototype.ne()</code></a></li><li><a href="#query_Query-near"><code>Query.prototype.near()</code></a></li><li><a href="#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code></a></li><li><a href="#query_Query-nin"><code>Query.prototype.nin()</code></a></li><li><a href="#query_Query-nor"><code>Query.prototype.nor()</code></a></li><li><a href="#query_Query-or"><code>Query.prototype.or()</code></a></li><li><a href="#query_Query-orFail"><code>Query.prototype.orFail()</code></a></li><li><a href="#query_Query-polygon"><code>Query.prototype.polygon()</code></a></li><li><a href="#query_Query-populate"><code>Query.prototype.populate()</code></a></li><li><a href="#query_Query-post"><code>Query.prototype.post()</code></a></li><li><a href="#query_Query-pre"><code>Query.prototype.pre()</code></a></li><li><a href="#query_Query-projection"><code>Query.prototype.projection()</code></a></li><li><a href="#query_Query-read"><code>Query.prototype.read()</code></a></li><li><a href="#query_Query-readConcern"><code>Query.prototype.readConcern()</code></a></li><li><a href="#query_Query-regex"><code>Query.prototype.regex()</code></a></li><li><a href="#query_Query-remove"><code>Query.prototype.remove()</code></a></li><li><a href="#query_Query-replaceOne"><code>Query.prototype.replaceOne()</code></a></li><li><a href="#query_Query-select"><code>Query.prototype.select()</code></a></li><li><a href="#query_Query-selected"><code>Query.prototype.selected()</code></a></li><li><a href="#query_Query-selectedExclusively"><code>Query.prototype.selectedExclusively()</code></a></li><li><a href="#query_Query-selectedInclusively"><code>Query.prototype.selectedInclusively()</code></a></li><li><a href="#query_Query-session"><code>Query.prototype.session()</code></a></li><li><a href="#query_Query-set"><code>Query.prototype.set()</code></a></li><li><a href="#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></li><li><a href="#query_Query-setQuery"><code>Query.prototype.setQuery()</code></a></li><li><a href="#query_Query-setUpdate"><code>Query.prototype.setUpdate()</code></a></li><li><a href="#query_Query-size"><code>Query.prototype.size()</code></a></li><li><a href="#query_Query-skip"><code>Query.prototype.skip()</code></a></li><li><a href="#query_Query-slice"><code>Query.prototype.slice()</code></a></li><li><a href="#query_Query-snapshot"><code>Query.prototype.snapshot()</code></a></li><li><a href="#query_Query-sort"><code>Query.prototype.sort()</code></a></li><li><a href="#query_Query-tailable"><code>Query.prototype.tailable()</code></a></li><li><a href="#query_Query-then"><code>Query.prototype.then()</code></a></li><li><a href="#query_Query-toConstructor"><code>Query.prototype.toConstructor()</code></a></li><li><a href="#query_Query-transform"><code>Query.prototype.transform()</code></a></li><li><a href="#query_Query-update"><code>Query.prototype.update()</code></a></li><li><a href="#query_Query-updateMany"><code>Query.prototype.updateMany()</code></a></li><li><a href="#query_Query-updateOne"><code>Query.prototype.updateOne()</code></a></li><li><a href="#query_Query-w"><code>Query.prototype.w()</code></a></li><li><a href="#query_Query-where"><code>Query.prototype.where()</code></a></li><li><a href="#query_Query-within"><code>Query.prototype.within()</code></a></li><li><a href="#query_Query-writeConcern"><code>Query.prototype.writeConcern()</code></a></li><li><a href="#query_Query-wtimeout"><code>Query.prototype.wtimeout()</code></a></li><li><a href="#query_Query-use$geoWithin"><code>Query.use$geoWithin</code></a></li></ul><hr class="separate-api-elements"><h3 id="query_Query"><a href="#query_Query"><code>Query()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
+})();</script><div class="api-nav"><div class="api-nav-content"><div class="nav-item" id="nav-Mongoose"><div class="nav-item-title"><a href="mongoose.html">Mongoose</a></div></div><div class="nav-item" id="nav-Schema"><div class="nav-item-title"><a href="schema.html">Schema</a></div></div><div class="nav-item" id="nav-Connection"><div class="nav-item-title"><a href="connection.html">Connection</a></div></div><div class="nav-item" id="nav-Document"><div class="nav-item-title"><a href="document.html">Document</a></div></div><div class="nav-item" id="nav-Model"><div class="nav-item-title"><a href="model.html">Model</a></div></div><div class="nav-item" id="nav-Query"><div class="nav-item-title" style="font-weight: bold"><a href="query.html">Query</a></div><ul class="nav-item-sub"><li><a href="#query_Query"><code>Query()</code></a></li><li><a href="#query_Query-$where"><code>Query.prototype.$where()</code></a></li><li><a href="#query_Query-Symbol.asyncIterator"><code>Query.prototype.Symbol.asyncIterator()</code></a></li><li><a href="#query_Query-all"><code>Query.prototype.all()</code></a></li><li><a href="#query_Query-allowDiskUse"><code>Query.prototype.allowDiskUse()</code></a></li><li><a href="#query_Query-and"><code>Query.prototype.and()</code></a></li><li><a href="#query_Query-batchSize"><code>Query.prototype.batchSize()</code></a></li><li><a href="#query_Query-box"><code>Query.prototype.box()</code></a></li><li><a href="#query_Query-cast"><code>Query.prototype.cast()</code></a></li><li><a href="#query_Query-catch"><code>Query.prototype.catch()</code></a></li><li><a href="#query_Query-center"><code>Query.prototype.center()</code></a></li><li><a href="#query_Query-centerSphere"><code>Query.prototype.centerSphere()</code></a></li><li><a href="#query_Query-circle"><code>Query.prototype.circle()</code></a></li><li><a href="#query_Query-clone"><code>Query.prototype.clone()</code></a></li><li><a href="#query_Query-collation"><code>Query.prototype.collation()</code></a></li><li><a href="#query_Query-comment"><code>Query.prototype.comment()</code></a></li><li><a href="#query_Query-count"><code>Query.prototype.count()</code></a></li><li><a href="#query_Query-countDocuments"><code>Query.prototype.countDocuments()</code></a></li><li><a href="#query_Query-cursor"><code>Query.prototype.cursor()</code></a></li><li><a href="#query_Query-deleteMany"><code>Query.prototype.deleteMany()</code></a></li><li><a href="#query_Query-deleteOne"><code>Query.prototype.deleteOne()</code></a></li><li><a href="#query_Query-distinct"><code>Query.prototype.distinct()</code></a></li><li><a href="#query_Query-elemMatch"><code>Query.prototype.elemMatch()</code></a></li><li><a href="#query_Query-equals"><code>Query.prototype.equals()</code></a></li><li><a href="#query_Query-error"><code>Query.prototype.error()</code></a></li><li><a href="#query_Query-estimatedDocumentCount"><code>Query.prototype.estimatedDocumentCount()</code></a></li><li><a href="#query_Query-exec"><code>Query.prototype.exec</code></a></li><li><a href="#query_Query-exists"><code>Query.prototype.exists()</code></a></li><li><a href="#query_Query-explain"><code>Query.prototype.explain()</code></a></li><li><a href="#query_Query-finally"><code>Query.prototype.finally()</code></a></li><li><a href="#query_Query-find"><code>Query.prototype.find()</code></a></li><li><a href="#query_Query-findOne"><code>Query.prototype.findOne()</code></a></li><li><a href="#query_Query-findOneAndDelete"><code>Query.prototype.findOneAndDelete()</code></a></li><li><a href="#query_Query-findOneAndRemove"><code>Query.prototype.findOneAndRemove()</code></a></li><li><a href="#query_Query-findOneAndReplace"><code>Query.prototype.findOneAndReplace()</code></a></li><li><a href="#query_Query-findOneAndUpdate"><code>Query.prototype.findOneAndUpdate()</code></a></li><li><a href="#query_Query-geometry"><code>Query.prototype.geometry()</code></a></li><li><a href="#query_Query-get"><code>Query.prototype.get()</code></a></li><li><a href="#query_Query-getFilter"><code>Query.prototype.getFilter()</code></a></li><li><a href="#query_Query-getOptions"><code>Query.prototype.getOptions()</code></a></li><li><a href="#query_Query-getPopulatedPaths"><code>Query.prototype.getPopulatedPaths()</code></a></li><li><a href="#query_Query-getQuery"><code>Query.prototype.getQuery()</code></a></li><li><a href="#query_Query-getUpdate"><code>Query.prototype.getUpdate()</code></a></li><li><a href="#query_Query-gt"><code>Query.prototype.gt()</code></a></li><li><a href="#query_Query-gte"><code>Query.prototype.gte()</code></a></li><li><a href="#query_Query-hint"><code>Query.prototype.hint()</code></a></li><li><a href="#query_Query-in"><code>Query.prototype.in()</code></a></li><li><a href="#query_Query-intersects"><code>Query.prototype.intersects()</code></a></li><li><a href="#query_Query-j"><code>Query.prototype.j()</code></a></li><li><a href="#query_Query-lean"><code>Query.prototype.lean()</code></a></li><li><a href="#query_Query-limit"><code>Query.prototype.limit()</code></a></li><li><a href="#query_Query-lt"><code>Query.prototype.lt()</code></a></li><li><a href="#query_Query-lte"><code>Query.prototype.lte()</code></a></li><li><a href="#query_Query-maxDistance"><code>Query.prototype.maxDistance()</code></a></li><li><a href="#query_Query-maxTimeMS"><code>Query.prototype.maxTimeMS()</code></a></li><li><a href="#query_Query-merge"><code>Query.prototype.merge()</code></a></li><li><a href="#query_Query-mod"><code>Query.prototype.mod()</code></a></li><li><a href="#query_Query-model"><code>Query.prototype.model</code></a></li><li><a href="#query_Query-mongooseOptions"><code>Query.prototype.mongooseOptions()</code></a></li><li><a href="#query_Query-ne"><code>Query.prototype.ne()</code></a></li><li><a href="#query_Query-near"><code>Query.prototype.near()</code></a></li><li><a href="#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code></a></li><li><a href="#query_Query-nin"><code>Query.prototype.nin()</code></a></li><li><a href="#query_Query-nor"><code>Query.prototype.nor()</code></a></li><li><a href="#query_Query-or"><code>Query.prototype.or()</code></a></li><li><a href="#query_Query-orFail"><code>Query.prototype.orFail()</code></a></li><li><a href="#query_Query-polygon"><code>Query.prototype.polygon()</code></a></li><li><a href="#query_Query-populate"><code>Query.prototype.populate()</code></a></li><li><a href="#query_Query-post"><code>Query.prototype.post()</code></a></li><li><a href="#query_Query-pre"><code>Query.prototype.pre()</code></a></li><li><a href="#query_Query-projection"><code>Query.prototype.projection()</code></a></li><li><a href="#query_Query-read"><code>Query.prototype.read()</code></a></li><li><a href="#query_Query-readConcern"><code>Query.prototype.readConcern()</code></a></li><li><a href="#query_Query-regex"><code>Query.prototype.regex()</code></a></li><li><a href="#query_Query-replaceOne"><code>Query.prototype.replaceOne()</code></a></li><li><a href="#query_Query-select"><code>Query.prototype.select()</code></a></li><li><a href="#query_Query-selected"><code>Query.prototype.selected()</code></a></li><li><a href="#query_Query-selectedExclusively"><code>Query.prototype.selectedExclusively()</code></a></li><li><a href="#query_Query-selectedInclusively"><code>Query.prototype.selectedInclusively()</code></a></li><li><a href="#query_Query-session"><code>Query.prototype.session()</code></a></li><li><a href="#query_Query-set"><code>Query.prototype.set()</code></a></li><li><a href="#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></li><li><a href="#query_Query-setQuery"><code>Query.prototype.setQuery()</code></a></li><li><a href="#query_Query-setUpdate"><code>Query.prototype.setUpdate()</code></a></li><li><a href="#query_Query-size"><code>Query.prototype.size()</code></a></li><li><a href="#query_Query-skip"><code>Query.prototype.skip()</code></a></li><li><a href="#query_Query-slice"><code>Query.prototype.slice()</code></a></li><li><a href="#query_Query-sort"><code>Query.prototype.sort()</code></a></li><li><a href="#query_Query-tailable"><code>Query.prototype.tailable()</code></a></li><li><a href="#query_Query-then"><code>Query.prototype.then()</code></a></li><li><a href="#query_Query-toConstructor"><code>Query.prototype.toConstructor()</code></a></li><li><a href="#query_Query-transform"><code>Query.prototype.transform()</code></a></li><li><a href="#query_Query-updateMany"><code>Query.prototype.updateMany()</code></a></li><li><a href="#query_Query-updateOne"><code>Query.prototype.updateOne()</code></a></li><li><a href="#query_Query-w"><code>Query.prototype.w()</code></a></li><li><a href="#query_Query-where"><code>Query.prototype.where()</code></a></li><li><a href="#query_Query-within"><code>Query.prototype.within()</code></a></li><li><a href="#query_Query-writeConcern"><code>Query.prototype.writeConcern()</code></a></li><li><a href="#query_Query-wtimeout"><code>Query.prototype.wtimeout()</code></a></li><li><a href="#query_Query-use$geoWithin"><code>Query.use$geoWithin</code></a></li><li><a href="#tostringtag_toStringTag"><code>function Object() { [native code] }.prototype.toStringTag()</code></a></li></ul></div><div class="nav-item" id="nav-QueryCursor"><div class="nav-item-title"><a href="querycursor.html">QueryCursor</a></div></div><div class="nav-item" id="nav-Aggregate"><div class="nav-item-title"><a href="aggregate.html">Aggregate</a></div></div><div class="nav-item" id="nav-AggregationCursor"><div class="nav-item-title"><a href="aggregationcursor.html">AggregationCursor</a></div></div><div class="nav-item" id="nav-Schematype"><div class="nav-item-title"><a href="schematype.html">Schematype</a></div></div><div class="nav-item" id="nav-Virtualtype"><div class="nav-item-title"><a href="virtualtype.html">Virtualtype</a></div></div><div class="nav-item" id="nav-Error"><div class="nav-item-title"><a href="error.html">Error</a></div></div><div class="nav-item" id="nav-SchemaArray"><div class="nav-item-title"><a href="schemaarray.html">SchemaArray</a></div></div><div class="nav-item" id="nav-DocumentArrayPath"><div class="nav-item-title"><a href="documentarraypath.html">DocumentArrayPath</a></div></div><div class="nav-item" id="nav-SubdocumentPath"><div class="nav-item-title"><a href="subdocumentpath.html">SubdocumentPath</a></div></div><div class="nav-item" id="nav-MongooseDocumentArray"><div class="nav-item-title"><a href="mongoosedocumentarray.html">MongooseDocumentArray</a></div></div><div class="nav-item" id="nav-Subdocument"><div class="nav-item-title"><a href="subdocument.html">Subdocument</a></div></div><div class="nav-item" id="nav-ArraySubdocument"><div class="nav-item-title"><a href="arraysubdocument.html">ArraySubdocument</a></div></div><div class="nav-item" id="nav-Buffer"><div class="nav-item-title"><a href="buffer.html">Buffer</a></div></div><div class="nav-item" id="nav-Decimal128"><div class="nav-item-title"><a href="decimal128.html">Decimal128</a></div></div><div class="nav-item" id="nav-Map"><div class="nav-item-title"><a href="map.html">Map</a></div></div></div></div><div class="api-content"><ul><li><a href="#query_Query"><code>Query()</code></a></li><li><a href="#query_Query-$where"><code>Query.prototype.$where()</code></a></li><li><a href="#query_Query-Symbol.asyncIterator"><code>Query.prototype.Symbol.asyncIterator()</code></a></li><li><a href="#query_Query-all"><code>Query.prototype.all()</code></a></li><li><a href="#query_Query-allowDiskUse"><code>Query.prototype.allowDiskUse()</code></a></li><li><a href="#query_Query-and"><code>Query.prototype.and()</code></a></li><li><a href="#query_Query-batchSize"><code>Query.prototype.batchSize()</code></a></li><li><a href="#query_Query-box"><code>Query.prototype.box()</code></a></li><li><a href="#query_Query-cast"><code>Query.prototype.cast()</code></a></li><li><a href="#query_Query-catch"><code>Query.prototype.catch()</code></a></li><li><a href="#query_Query-center"><code>Query.prototype.center()</code></a></li><li><a href="#query_Query-centerSphere"><code>Query.prototype.centerSphere()</code></a></li><li><a href="#query_Query-circle"><code>Query.prototype.circle()</code></a></li><li><a href="#query_Query-clone"><code>Query.prototype.clone()</code></a></li><li><a href="#query_Query-collation"><code>Query.prototype.collation()</code></a></li><li><a href="#query_Query-comment"><code>Query.prototype.comment()</code></a></li><li><a href="#query_Query-count"><code>Query.prototype.count()</code></a></li><li><a href="#query_Query-countDocuments"><code>Query.prototype.countDocuments()</code></a></li><li><a href="#query_Query-cursor"><code>Query.prototype.cursor()</code></a></li><li><a href="#query_Query-deleteMany"><code>Query.prototype.deleteMany()</code></a></li><li><a href="#query_Query-deleteOne"><code>Query.prototype.deleteOne()</code></a></li><li><a href="#query_Query-distinct"><code>Query.prototype.distinct()</code></a></li><li><a href="#query_Query-elemMatch"><code>Query.prototype.elemMatch()</code></a></li><li><a href="#query_Query-equals"><code>Query.prototype.equals()</code></a></li><li><a href="#query_Query-error"><code>Query.prototype.error()</code></a></li><li><a href="#query_Query-estimatedDocumentCount"><code>Query.prototype.estimatedDocumentCount()</code></a></li><li><a href="#query_Query-exec"><code>Query.prototype.exec</code></a></li><li><a href="#query_Query-exists"><code>Query.prototype.exists()</code></a></li><li><a href="#query_Query-explain"><code>Query.prototype.explain()</code></a></li><li><a href="#query_Query-finally"><code>Query.prototype.finally()</code></a></li><li><a href="#query_Query-find"><code>Query.prototype.find()</code></a></li><li><a href="#query_Query-findOne"><code>Query.prototype.findOne()</code></a></li><li><a href="#query_Query-findOneAndDelete"><code>Query.prototype.findOneAndDelete()</code></a></li><li><a href="#query_Query-findOneAndRemove"><code>Query.prototype.findOneAndRemove()</code></a></li><li><a href="#query_Query-findOneAndReplace"><code>Query.prototype.findOneAndReplace()</code></a></li><li><a href="#query_Query-findOneAndUpdate"><code>Query.prototype.findOneAndUpdate()</code></a></li><li><a href="#query_Query-geometry"><code>Query.prototype.geometry()</code></a></li><li><a href="#query_Query-get"><code>Query.prototype.get()</code></a></li><li><a href="#query_Query-getFilter"><code>Query.prototype.getFilter()</code></a></li><li><a href="#query_Query-getOptions"><code>Query.prototype.getOptions()</code></a></li><li><a href="#query_Query-getPopulatedPaths"><code>Query.prototype.getPopulatedPaths()</code></a></li><li><a href="#query_Query-getQuery"><code>Query.prototype.getQuery()</code></a></li><li><a href="#query_Query-getUpdate"><code>Query.prototype.getUpdate()</code></a></li><li><a href="#query_Query-gt"><code>Query.prototype.gt()</code></a></li><li><a href="#query_Query-gte"><code>Query.prototype.gte()</code></a></li><li><a href="#query_Query-hint"><code>Query.prototype.hint()</code></a></li><li><a href="#query_Query-in"><code>Query.prototype.in()</code></a></li><li><a href="#query_Query-intersects"><code>Query.prototype.intersects()</code></a></li><li><a href="#query_Query-j"><code>Query.prototype.j()</code></a></li><li><a href="#query_Query-lean"><code>Query.prototype.lean()</code></a></li><li><a href="#query_Query-limit"><code>Query.prototype.limit()</code></a></li><li><a href="#query_Query-lt"><code>Query.prototype.lt()</code></a></li><li><a href="#query_Query-lte"><code>Query.prototype.lte()</code></a></li><li><a href="#query_Query-maxDistance"><code>Query.prototype.maxDistance()</code></a></li><li><a href="#query_Query-maxTimeMS"><code>Query.prototype.maxTimeMS()</code></a></li><li><a href="#query_Query-merge"><code>Query.prototype.merge()</code></a></li><li><a href="#query_Query-mod"><code>Query.prototype.mod()</code></a></li><li><a href="#query_Query-model"><code>Query.prototype.model</code></a></li><li><a href="#query_Query-mongooseOptions"><code>Query.prototype.mongooseOptions()</code></a></li><li><a href="#query_Query-ne"><code>Query.prototype.ne()</code></a></li><li><a href="#query_Query-near"><code>Query.prototype.near()</code></a></li><li><a href="#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code></a></li><li><a href="#query_Query-nin"><code>Query.prototype.nin()</code></a></li><li><a href="#query_Query-nor"><code>Query.prototype.nor()</code></a></li><li><a href="#query_Query-or"><code>Query.prototype.or()</code></a></li><li><a href="#query_Query-orFail"><code>Query.prototype.orFail()</code></a></li><li><a href="#query_Query-polygon"><code>Query.prototype.polygon()</code></a></li><li><a href="#query_Query-populate"><code>Query.prototype.populate()</code></a></li><li><a href="#query_Query-post"><code>Query.prototype.post()</code></a></li><li><a href="#query_Query-pre"><code>Query.prototype.pre()</code></a></li><li><a href="#query_Query-projection"><code>Query.prototype.projection()</code></a></li><li><a href="#query_Query-read"><code>Query.prototype.read()</code></a></li><li><a href="#query_Query-readConcern"><code>Query.prototype.readConcern()</code></a></li><li><a href="#query_Query-regex"><code>Query.prototype.regex()</code></a></li><li><a href="#query_Query-replaceOne"><code>Query.prototype.replaceOne()</code></a></li><li><a href="#query_Query-select"><code>Query.prototype.select()</code></a></li><li><a href="#query_Query-selected"><code>Query.prototype.selected()</code></a></li><li><a href="#query_Query-selectedExclusively"><code>Query.prototype.selectedExclusively()</code></a></li><li><a href="#query_Query-selectedInclusively"><code>Query.prototype.selectedInclusively()</code></a></li><li><a href="#query_Query-session"><code>Query.prototype.session()</code></a></li><li><a href="#query_Query-set"><code>Query.prototype.set()</code></a></li><li><a href="#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></li><li><a href="#query_Query-setQuery"><code>Query.prototype.setQuery()</code></a></li><li><a href="#query_Query-setUpdate"><code>Query.prototype.setUpdate()</code></a></li><li><a href="#query_Query-size"><code>Query.prototype.size()</code></a></li><li><a href="#query_Query-skip"><code>Query.prototype.skip()</code></a></li><li><a href="#query_Query-slice"><code>Query.prototype.slice()</code></a></li><li><a href="#query_Query-sort"><code>Query.prototype.sort()</code></a></li><li><a href="#query_Query-tailable"><code>Query.prototype.tailable()</code></a></li><li><a href="#query_Query-then"><code>Query.prototype.then()</code></a></li><li><a href="#query_Query-toConstructor"><code>Query.prototype.toConstructor()</code></a></li><li><a href="#query_Query-transform"><code>Query.prototype.transform()</code></a></li><li><a href="#query_Query-updateMany"><code>Query.prototype.updateMany()</code></a></li><li><a href="#query_Query-updateOne"><code>Query.prototype.updateOne()</code></a></li><li><a href="#query_Query-w"><code>Query.prototype.w()</code></a></li><li><a href="#query_Query-where"><code>Query.prototype.where()</code></a></li><li><a href="#query_Query-within"><code>Query.prototype.within()</code></a></li><li><a href="#query_Query-writeConcern"><code>Query.prototype.writeConcern()</code></a></li><li><a href="#query_Query-wtimeout"><code>Query.prototype.wtimeout()</code></a></li><li><a href="#query_Query-use$geoWithin"><code>Query.use$geoWithin</code></a></li><li><a href="#tostringtag_toStringTag"><code>function Object() { [native code] }.prototype.toStringTag()</code></a></li></ul><hr class="separate-api-elements"><h3 id="query_Query"><a href="#query_Query"><code>Query()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[model]</code>
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[conditions]</code>
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[collection]</code>
@@ -227,13 +227,10 @@ query.<span class="hljs-title function_">circle</span>(<span class="hljs-string"
 <p>Cannot be used with <code>distinct()</code></p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-count"><a href="#query_Query-count"><code>Query.prototype.count()</code></a></h3><span class="deprecated">~DEPRECATED~</span><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
 <span class="method-type">&laquo;Object&raquo;</span> count documents that match this object</p>
-</li><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, count)</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.count/">count</a></span></li></ul><div><p>Specifies this query as a <code>count</code> query.</p>
 <p>This method is deprecated. If you want to count the number of documents in
 a collection, e.g. <code>count({})</code>, use the <a href="#query_Query-estimatedDocumentCount"><code>estimatedDocumentCount()</code> function</a>
 instead. Otherwise, use the <a href="#query_Query-countDocuments"><code>countDocuments()</code></a> function instead.</p>
-<p>Passing a <code>callback</code> executes the query.</p>
 <p>This function triggers the following middleware.</p>
 <ul>
 <li><code>count()</code></li>
@@ -245,26 +242,20 @@ instead. Otherwise, use the <a href="#query_Query-countDocuments"><code>countDoc
     </h4>
 <pre><code><span class="hljs-keyword">const</span> countQuery = model.<span class="hljs-title function_">where</span>({ <span class="hljs-string">&#x27;color&#x27;</span>: <span class="hljs-string">&#x27;black&#x27;</span> }).<span class="hljs-title function_">count</span>();
 
-query.<span class="hljs-title function_">count</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;black&#x27;</span> }).<span class="hljs-title function_">count</span>(callback)
+query.<span class="hljs-title function_">count</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;black&#x27;</span> }).<span class="hljs-title function_">count</span>().<span class="hljs-title function_">exec</span>();
 
-query.<span class="hljs-title function_">count</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;black&#x27;</span> }, callback)
+<span class="hljs-keyword">await</span> query.<span class="hljs-title function_">count</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;black&#x27;</span> });
 
-query.<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;color&#x27;</span>, <span class="hljs-string">&#x27;black&#x27;</span>).<span class="hljs-title function_">count</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err, count</span>) {
-  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleError</span>(err);
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;there are %d kittens&#x27;</span>, count);
-})
+query.<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;color&#x27;</span>, <span class="hljs-string">&#x27;black&#x27;</span>).<span class="hljs-title function_">count</span>();
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-countDocuments"><a href="#query_Query-countDocuments"><code>Query.prototype.countDocuments()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
 <span class="method-type">&laquo;Object&raquo;</span> mongodb selector</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, count)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#countDocuments">countDocuments</a></span></li></ul><div><p>Specifies this query as a <code>countDocuments()</code> query. Behaves like <code>count()</code>,
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#countDocuments">countDocuments</a></span></li></ul><div><p>Specifies this query as a <code>countDocuments()</code> query. Behaves like <code>count()</code>,
 except it always does a full collection scan when passed an empty filter <code>{}</code>.</p>
 <p>There are also minor differences in how <code>countDocuments()</code> handles
 <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#countDocuments"><code>$where</code> and a couple geospatial operators</a>.
 versus <code>count()</code>.</p>
-<p>Passing a <code>callback</code> executes the query.</p>
 <p>This function triggers the following middleware.</p>
 <ul>
 <li><code>countDocuments()</code></li>
@@ -276,14 +267,11 @@ versus <code>count()</code>.</p>
     </h4>
 <pre><code><span class="hljs-keyword">const</span> countQuery = model.<span class="hljs-title function_">where</span>({ <span class="hljs-string">&#x27;color&#x27;</span>: <span class="hljs-string">&#x27;black&#x27;</span> }).<span class="hljs-title function_">countDocuments</span>();
 
-query.<span class="hljs-title function_">countDocuments</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;black&#x27;</span> }).<span class="hljs-title function_">count</span>(callback);
+query.<span class="hljs-title function_">countDocuments</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;black&#x27;</span> }).<span class="hljs-title function_">count</span>().<span class="hljs-title function_">exec</span>();
 
-query.<span class="hljs-title function_">countDocuments</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;black&#x27;</span> }, callback);
+<span class="hljs-keyword">await</span> query.<span class="hljs-title function_">countDocuments</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;black&#x27;</span> });
 
-query.<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;color&#x27;</span>, <span class="hljs-string">&#x27;black&#x27;</span>).<span class="hljs-title function_">countDocuments</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">err, count</span>) {
-  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleError</span>(err);
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;there are %d kittens&#x27;</span>, count);
-});
+query.<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;color&#x27;</span>, <span class="hljs-string">&#x27;black&#x27;</span>).<span class="hljs-title function_">countDocuments</span>().<span class="hljs-title function_">exec</span>();
 </code></pre>
 <p>The <code>countDocuments()</code> function is similar to <code>count()</code>, but there are a
 <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#countDocuments">few operators that <code>countDocuments()</code> does not support</a>.
@@ -337,8 +325,6 @@ cursor.<span class="hljs-title function_">next</span>(<span class="hljs-keyword"
 <span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</p>
 </li><li class="param"><code>[options]</code>
 <span class="method-type">&laquo;Object&raquo;</span> optional see <a href="#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
-</li><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, mongooseDeleteResult)</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/DeleteResult.html">DeleteResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#deleteMany">deleteMany</a></span></li></ul><div><p>Declare and/or execute this query as a <code>deleteMany()</code> operation. Works like
 remove, except it deletes <em>every</em> document that matches <code>filter</code> in the
 collection, regardless of the value of <code>single</code>.</p>
@@ -349,9 +335,6 @@ collection, regardless of the value of <code>single</code>.</p>
       </a>
     </h4>
 <pre><code><span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">deleteMany</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Stark/</span>, <span class="hljs-attr">age</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">18</span> } });
-
-<span class="hljs-comment">// Using callbacks:</span>
-<span class="hljs-title class_">Character</span>.<span class="hljs-title function_">deleteMany</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Stark/</span>, <span class="hljs-attr">age</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">18</span> } }, callback);
 </code></pre>
 <p>This function calls the MongoDB driver&#39;s <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#deleteMany"><code>Collection#deleteMany()</code> function</a>.
 The returned <a href="https://mongoosejs.com/docs/queries.html">promise</a> resolves to an
@@ -374,8 +357,6 @@ res.<span class="hljs-property">deletedCount</span>;
 <span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</p>
 </li><li class="param"><code>[options]</code>
 <span class="method-type">&laquo;Object&raquo;</span> optional see <a href="#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
-</li><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, mongooseDeleteResult)</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/DeleteResult.html">DeleteResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#deleteOne">deleteOne</a></span></li></ul><div><p>Declare and/or execute this query as a <code>deleteOne()</code> operation. Works like
 remove, except it deletes at most one document regardless of the <code>single</code>
 option.</p>
@@ -386,9 +367,6 @@ option.</p>
       </a>
     </h4>
 <pre><code><span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">deleteOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Eddard Stark&#x27;</span> });
-
-<span class="hljs-comment">// Using callbacks:</span>
-<span class="hljs-title class_">Character</span>.<span class="hljs-title function_">deleteOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Eddard Stark&#x27;</span> }, callback);
 </code></pre>
 <p>This function calls the MongoDB driver&#39;s <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#deleteOne"><code>Collection#deleteOne()</code> function</a>.
 The returned <a href="https://mongoosejs.com/docs/queries.html">promise</a> resolves to an
@@ -409,21 +387,15 @@ res.<span class="hljs-property">deletedCount</span>;
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-distinct"><a href="#query_Query-distinct"><code>Query.prototype.distinct()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[field]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>[filter]</code>
-<span class="method-type">&laquo;Object|Query&raquo;</span> </li><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, arr)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.distinct/">distinct</a></span></li></ul><div><p>Declares or executes a distinct() operation.</p>
-<p>Passing a <code>callback</code> executes the query.</p>
+<span class="method-type">&laquo;Object|Query&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.distinct/">distinct</a></span></li></ul><div><p>Declares or executes a distinct() operation.</p>
 <p>This function does not trigger any middleware.</p>
 <h4 id="example">
       <a href="#example">
         Example:
       </a>
     </h4>
-<pre><code><span class="hljs-title function_">distinct</span>(field, conditions, callback)
-<span class="hljs-title function_">distinct</span>(field, conditions)
-<span class="hljs-title function_">distinct</span>(field, callback)
+<pre><code><span class="hljs-title function_">distinct</span>(field, conditions)
 <span class="hljs-title function_">distinct</span>(field)
-<span class="hljs-title function_">distinct</span>(callback)
 <span class="hljs-title function_">distinct</span>()
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-elemMatch"><a href="#query_Query-elemMatch"><code>Query.prototype.elemMatch()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
@@ -494,8 +466,6 @@ custom errors.</p>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-estimatedDocumentCount"><a href="#query_Query-estimatedDocumentCount"><code>Query.prototype.estimatedDocumentCount()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
 <span class="method-type">&laquo;Object&raquo;</span> passed transparently to the <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/EstimatedDocumentCountOptions.html">MongoDB driver</a></p>
-</li><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, count)</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#estimatedDocumentCount">estimatedDocumentCount</a></span></li></ul><div><p>Specifies this query as a <code>estimatedDocumentCount()</code> query. Faster than
 using <code>countDocuments()</code> for large collections because
 <code>estimatedDocumentCount()</code> uses collection metadata rather than scanning
@@ -513,10 +483,8 @@ is equivalent to <code>Model.find().estimatedDocumentCount()</code></p>
     </h4>
 <pre><code><span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">estimatedDocumentCount</span>();
 </code></pre>
-  </div><hr class="separate-api-elements"><h3 id="query_Query-exec"><a href="#query_Query-exec"><code>Query.prototype.exec()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[operation]</code>
-<span class="method-type">&laquo;String|Function&raquo;</span> </li><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params depend on the function being called</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query</p>
+  </div><hr class="separate-api-elements"><h3 id="query_Query-exec"><a href="#query_Query-exec"><code>Query.prototype.exec</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[operation]</code>
+<span class="method-type">&laquo;String|Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Executes the query</p>
 <h4 id="example">
       <a href="#example">
         Example:
@@ -524,9 +492,6 @@ is equivalent to <code>Model.find().estimatedDocumentCount()</code></p>
     </h4>
 <pre><code><span class="hljs-keyword">const</span> promise = query.<span class="hljs-title function_">exec</span>();
 <span class="hljs-keyword">const</span> promise = query.<span class="hljs-title function_">exec</span>(<span class="hljs-string">&#x27;update&#x27;</span>);
-
-query.<span class="hljs-title function_">exec</span>(callback);
-query.<span class="hljs-title function_">exec</span>(<span class="hljs-string">&#x27;find&#x27;</span>, callback);
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-exists"><a href="#query_Query-exists"><code>Query.prototype.exists()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
@@ -561,10 +526,13 @@ use.</p>
 <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> query.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">a</span>: <span class="hljs-number">1</span> }).<span class="hljs-title function_">explain</span>(<span class="hljs-string">&#x27;queryPlanner&#x27;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res);
 </code></pre>
+  </div><hr class="separate-api-elements"><h3 id="query_Query-finally"><a href="#query_Query-finally"><code>Query.prototype.finally()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[onFinally]</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query returning a <code>Promise</code> which will be
+resolved with <code>.finally()</code> chained.</p>
+<p>More about <a href="https://thecodebarbarian.com/using-promise-finally-in-node-js.html">Promise <code>finally()</code> in JavaScript</a>.</p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-find"><a href="#query_Query-find"><code>Query.prototype.find()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
-<span class="method-type">&laquo;Object|ObjectId&raquo;</span> mongodb selector. If not specified, returns all documents.</p>
-</li><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Find all documents that match <code>selector</code>. The result will be an array of documents.</p>
+<span class="method-type">&laquo;Object|ObjectId&raquo;</span> mongodb filter. If not specified, returns all documents.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Find all documents that match <code>selector</code>. The result will be an array of documents.</p>
 <p>If there are too many documents in the result to fit in memory, use
 <a href="#query_Query-cursor"><code>Query.prototype.cursor()</code></a></p>
 <h4 id="example">
@@ -572,11 +540,7 @@ use.</p>
         Example:
       </a>
     </h4>
-<pre><code><span class="hljs-comment">// Using async/await</span>
-<span class="hljs-keyword">const</span> arr = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">year</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">1980</span>, <span class="hljs-attr">$lte</span>: <span class="hljs-number">1989</span> } });
-
-<span class="hljs-comment">// Using callbacks</span>
-<span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">year</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">1980</span>, <span class="hljs-attr">$lte</span>: <span class="hljs-number">1989</span> } }, <span class="hljs-keyword">function</span>(<span class="hljs-params">err, arr</span>) {});
+<pre><code><span class="hljs-keyword">const</span> arr = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">year</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">1980</span>, <span class="hljs-attr">$lte</span>: <span class="hljs-number">1989</span> } });
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-findOne"><a href="#query_Query-findOne"><code>Query.prototype.findOne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
 <span class="method-type">&laquo;Object&raquo;</span> mongodb selector</p>
@@ -584,10 +548,8 @@ use.</p>
 <span class="method-type">&laquo;Object&raquo;</span> optional fields to return</p>
 </li><li class="param"><code>[options]</code>
 <span class="method-type">&laquo;Object&raquo;</span> see <a href="#query_Query-setOptions"><code>setOptions()</code></a></p>
-</li><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, document)</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.findOne/">findOne</a></span></li><li><span class="method-type"><a href="#query_Query-select">Query.select</a></span></li></ul><div><p>Declares the query a findOne operation. When executed, the first found document is passed to the callback.</p>
-<p>Passing a <code>callback</code> executes the query. The result of the query is a single document.</p>
+<p>The result of the query is a single document, or <code>null</code> if no document was found.</p>
 <ul>
 <li><em>Note:</em> <code>conditions</code> is optional, and if <code>conditions</code> is null or undefined,
 mongoose will send an empty <code>findOne</code> command to MongoDB, which will return
@@ -603,13 +565,8 @@ instead.</li>
         Example:
       </a>
     </h4>
-<pre><code><span class="hljs-keyword">const</span> query  = <span class="hljs-title class_">Kitten</span>.<span class="hljs-title function_">where</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;white&#x27;</span> });
-query.<span class="hljs-title function_">findOne</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err, kitten</span>) {
-  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleError</span>(err);
-  <span class="hljs-keyword">if</span> (kitten) {
-    <span class="hljs-comment">// doc may be null if no document matched</span>
-  }
-});
+<pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-title class_">Kitten</span>.<span class="hljs-title function_">where</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;white&#x27;</span> });
+<span class="hljs-keyword">const</span> kitten = <span class="hljs-keyword">await</span> query.<span class="hljs-title function_">findOne</span>();
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-findOneAndDelete"><a href="#query_Query-findOneAndDelete"><code>Query.prototype.findOneAndDelete()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[conditions]</code>
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
@@ -619,20 +576,12 @@ query.<span class="hljs-title function_">findOne</span>(<span class="hljs-keywor
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
 <span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
-</li></ul><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, document)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li></ul><div><p>Issues a MongoDB <a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.findOneAndDelete/">findOneAndDelete</a> command.</p>
-<p>Finds a matching document, removes it, and passes the found document (if any)
-to the callback. Executes if <code>callback</code> is passed.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li></ul><div><p>Issues a MongoDB <a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.findOneAndDelete/">findOneAndDelete</a> command.</p>
+<p>Finds a matching document, removes it, and returns the found document (if any).</p>
 <p>This function triggers the following middleware.</p>
 <ul>
 <li><code>findOneAndDelete()</code></li>
 </ul>
-<p>This function differs slightly from <code>Model.findOneAndRemove()</code> in that
-<code>findOneAndRemove()</code> becomes a <a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.findAndModify/">MongoDB <code>findAndModify()</code> command</a>,
-as opposed to a <code>findOneAndDelete()</code> command. For most mongoose use cases,
-this distinction is purely pedantic. You should use <code>findOneAndDelete()</code>
-unless you have a good reason not to.</p>
 <h4 id="available-options">
       <a href="#available-options">
         Available options
@@ -658,11 +607,8 @@ unless you have a good reason not to.</p>
         Example:
       </a>
     </h4>
-<pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndDelete</span>(conditions, options, callback) <span class="hljs-comment">// executes</span>
-A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndDelete</span>(conditions, options)  <span class="hljs-comment">// return Query</span>
-A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndDelete</span>(conditions, callback) <span class="hljs-comment">// executes</span>
+<pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndDelete</span>(conditions, options)  <span class="hljs-comment">// return Query</span>
 A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndDelete</span>(conditions) <span class="hljs-comment">// returns Query</span>
-A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndDelete</span>(callback)   <span class="hljs-comment">// executes</span>
 A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndDelete</span>()           <span class="hljs-comment">// returns Query</span>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-findOneAndRemove"><a href="#query_Query-findOneAndRemove"><code>Query.prototype.findOneAndRemove()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[conditions]</code>
@@ -673,11 +619,8 @@ A.<span class="hljs-title function_">where</span>().<span class="hljs-title func
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
 <span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
-</li></ul><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, document)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li></ul><div><p>Issues a mongodb <a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify</a> remove command.</p>
-<p>Finds a matching document, removes it, passing the found document (if any) to
-the callback. Executes if <code>callback</code> is passed.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li></ul><div><p>Legacy alias for <code>findOneAndDelete()</code>.</p>
+<p>Finds a matching document, removes it, returns the found document (if any).</p>
 <p>This function triggers the following middleware.</p>
 <ul>
 <li><code>findOneAndRemove()</code></li>
@@ -692,26 +635,13 @@ the callback. Executes if <code>callback</code> is passed.</p>
 <li><code>maxTimeMS</code>: puts a time limit on the query - requires mongodb &gt;= 2.6.0</li>
 <li><code>rawResult</code>: if true, resolves to the <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">raw result from the MongoDB driver</a></li>
 </ul>
-<h4 id="callback-signature">
-      <a href="#callback-signature">
-        Callback Signature
-      </a>
-    </h4>
-<pre><code><span class="hljs-keyword">function</span>(<span class="hljs-params">error, doc</span>) {
-  <span class="hljs-comment">// error: any errors that occurred</span>
-  <span class="hljs-comment">// doc: the document before updates are applied if `new: false`, or after updates if `new = true`</span>
-}
-</code></pre>
 <h4 id="example">
       <a href="#example">
         Example:
       </a>
     </h4>
-<pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndRemove</span>(conditions, options, callback) <span class="hljs-comment">// executes</span>
-A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndRemove</span>(conditions, options)  <span class="hljs-comment">// return Query</span>
-A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndRemove</span>(conditions, callback) <span class="hljs-comment">// executes</span>
+<pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndRemove</span>(conditions, options)  <span class="hljs-comment">// return Query</span>
 A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndRemove</span>(conditions) <span class="hljs-comment">// returns Query</span>
-A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndRemove</span>(callback)   <span class="hljs-comment">// executes</span>
 A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndRemove</span>()           <span class="hljs-comment">// returns Query</span>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-findOneAndReplace"><a href="#query_Query-findOneAndReplace"><code>Query.prototype.findOneAndReplace()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
@@ -735,11 +665,8 @@ A.<span class="hljs-title function_">where</span>().<span class="hljs-title func
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.returnOriginal=null]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> An alias for the <code>new</code> option. <code>returnOriginal: false</code> is equivalent to <code>new: true</code>.</p>
-</li></ul><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, document)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Issues a MongoDB <a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.findOneAndReplace/">findOneAndReplace</a> command.</p>
-<p>Finds a matching document, removes it, and passes the found document (if any)
-to the callback. Executes if <code>callback</code> is passed.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Issues a MongoDB <a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.findOneAndReplace/">findOneAndReplace</a> command.</p>
+<p>Finds a matching document, removes it, and returns the found document (if any).</p>
 <p>This function triggers the following middleware.</p>
 <ul>
 <li><code>findOneAndReplace()</code></li>
@@ -769,11 +696,8 @@ to the callback. Executes if <code>callback</code> is passed.</p>
         Example:
       </a>
     </h4>
-<pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement, options, callback); <span class="hljs-comment">// executes</span>
-A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement, options); <span class="hljs-comment">// return Query</span>
-A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement, callback); <span class="hljs-comment">// executes</span>
+<pre><code>A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement, options); <span class="hljs-comment">// return Query</span>
 A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndReplace</span>(filter); <span class="hljs-comment">// returns Query</span>
-A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndReplace</span>(callback); <span class="hljs-comment">// executes</span>
 A.<span class="hljs-title function_">where</span>().<span class="hljs-title function_">findOneAndReplace</span>(); <span class="hljs-comment">// returns Query</span>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-findOneAndUpdate"><a href="#query_Query-findOneAndUpdate"><code>Query.prototype.findOneAndUpdate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
@@ -799,12 +723,9 @@ A.<span class="hljs-title function_">where</span>().<span class="hljs-title func
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.returnOriginal=null]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> An alias for the <code>new</code> option. <code>returnOriginal: false</code> is equivalent to <code>new: true</code>.</p>
-</li></ul><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, doc), <em>unless</em> <code>rawResult</code> is used, in which case params are (error, writeOpResult)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/tutorials/findoneandupdate.html">Tutorial</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">ModifyResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#findOneAndUpdate">findOneAndUpdate</a></span></li></ul><div><p>Issues a mongodb <a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify</a> update command.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/tutorials/findoneandupdate.html">Tutorial</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">findAndModify command</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">ModifyResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#findOneAndUpdate">findOneAndUpdate</a></span></li></ul><div><p>Issues a mongodb <code>findOneAndUpdate()</code> command.</p>
 <p>Finds a matching document, updates it according to the <code>update</code> arg, passing any <code>options</code>, and returns the found
-document (if any) to the callback. The query executes if
-<code>callback</code> is passed.</p>
+document (if any).</p>
 <p>This function triggers the following middleware.</p>
 <ul>
 <li><code>findOneAndUpdate()</code></li>
@@ -824,28 +745,14 @@ document (if any) to the callback. The query executes if
 <li><code>setDefaultsOnInsert</code>: <code>true</code> by default. If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="https://mongoosejs.com/docs/defaults.html">defaults</a> specified in the model&#39;s schema if a new document is created.</li>
 <li><code>rawResult</code>: if true, returns the <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">raw result from the MongoDB driver</a></li>
 </ul>
-<h4 id="callback-signature">
-      <a href="#callback-signature">
-        Callback Signature
-      </a>
-    </h4>
-<pre><code><span class="hljs-keyword">function</span>(<span class="hljs-params">error, doc</span>) {
-  <span class="hljs-comment">// error: any errors that occurred</span>
-  <span class="hljs-comment">// doc: the document before updates are applied if `new: false`, or after updates if `new = true`</span>
-}
-</code></pre>
 <h4 id="example">
       <a href="#example">
         Example:
       </a>
     </h4>
-<pre><code>query.<span class="hljs-title function_">findOneAndUpdate</span>(conditions, update, options, callback) <span class="hljs-comment">// executes</span>
-query.<span class="hljs-title function_">findOneAndUpdate</span>(conditions, update, options)  <span class="hljs-comment">// returns Query</span>
-query.<span class="hljs-title function_">findOneAndUpdate</span>(conditions, update, callback) <span class="hljs-comment">// executes</span>
+<pre><code>query.<span class="hljs-title function_">findOneAndUpdate</span>(conditions, update, options)  <span class="hljs-comment">// returns Query</span>
 query.<span class="hljs-title function_">findOneAndUpdate</span>(conditions, update)           <span class="hljs-comment">// returns Query</span>
-query.<span class="hljs-title function_">findOneAndUpdate</span>(update, callback)             <span class="hljs-comment">// returns Query</span>
 query.<span class="hljs-title function_">findOneAndUpdate</span>(update)                       <span class="hljs-comment">// returns Query</span>
-query.<span class="hljs-title function_">findOneAndUpdate</span>(callback)                     <span class="hljs-comment">// executes</span>
 query.<span class="hljs-title function_">findOneAndUpdate</span>()                             <span class="hljs-comment">// returns Query</span>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-geometry"><a href="#query_Query-geometry"><code>Query.prototype.geometry()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>object</code>
@@ -959,7 +866,7 @@ query.<span class="hljs-title function_">getQuery</span>(); <span class="hljs-co
       </a>
     </h4>
 <pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Query</span>();
-query.<span class="hljs-title function_">update</span>({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">a</span>: <span class="hljs-number">5</span> } });
+query.<span class="hljs-title function_">updateOne</span>({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">a</span>: <span class="hljs-number">5</span> } });
 query.<span class="hljs-title function_">getUpdate</span>(); <span class="hljs-comment">// { $set: { a: 5 } }</span>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-gt"><a href="#query_Query-gt"><code>Query.prototype.gt()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
@@ -1039,8 +946,6 @@ This option is only valid for operations that write to the database:</p>
 <li><code>findOneAndDelete()</code></li>
 <li><code>findOneAndReplace()</code></li>
 <li><code>findOneAndUpdate()</code></li>
-<li><code>remove()</code></li>
-<li><code>update()</code></li>
 <li><code>updateOne()</code></li>
 <li><code>updateMany()</code></li>
 </ul>
@@ -1107,21 +1012,6 @@ to use a plugin. See:</p>
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/maxDistance/">$maxDistance</a></span></li></ul><div><p>Specifies a <code>maxDistance</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
-  </div><hr class="separate-api-elements"><h3 id="query_Query-maxScan"><a href="#query_Query-maxScan"><code>Query.prototype.maxScan()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>val</code>
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/v4.0/reference/method/cursor.maxScan/">maxScan</a></span></li></ul><div><p>Specifies the maxScan option.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
-<pre><code>query.<span class="hljs-title function_">maxScan</span>(<span class="hljs-number">100</span>);
-</code></pre>
-<h4 id="note">
-      <a href="#note">
-        Note:
-      </a>
-    </h4>
-<p>Cannot be used with <code>distinct()</code></p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-maxTimeMS"><a href="#query_Query-maxTimeMS"><code>Query.prototype.maxTimeMS()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[ms]</code>
 <span class="method-type">&laquo;Number&raquo;</span> The number of milliseconds</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the <a href="https://www.mongodb.com/docs/manual/reference/method/cursor.maxTimeMS/">maxTimeMS</a>
@@ -1138,7 +1028,6 @@ has been running for more than <code>ms</code> milliseconds.</p>
 <span class="hljs-comment">// &gt;= 1 doc in the queried collection</span>
 <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> query.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">$where</span>: <span class="hljs-string">&#x27;sleep(1000) || true&#x27;</span> }).<span class="hljs-title function_">maxTimeMS</span>(<span class="hljs-number">100</span>);
 </code></pre>
-  </div><hr class="separate-api-elements"><h3 id="query_Query-maxscan"><a href="#query_Query-maxscan"><code>Query.prototype.maxscan()</code></a></h3><span class="deprecated">~DEPRECATED~</span><h5>See:</h5><ul><li><span class="method-type"><a href="#query_Query-maxScan">maxScan</a></span></li></ul><div><p><em>DEPRECATED</em> Alias of <code>maxScan</code></p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-merge"><a href="#query_Query-merge"><code>Query.prototype.merge()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>source</code>
 <span class="method-type">&laquo;Query|Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Merges another Query or conditions object into this one.</p>
 <p>When a Query is passed, conditions, field selection and options are merged.</p>
@@ -1175,7 +1064,7 @@ Below are the current Mongoose-specific options.</p>
 <li><code>populate</code>: an array representing what paths will be populated. Should have one entry for each call to <a href="#query_Query-populate"><code>Query.prototype.populate()</code></a></li>
 <li><code>lean</code>: if truthy, Mongoose will not <a href="/docs/api/model.html#model_Model-hydrate">hydrate</a> any documents that are returned from this query. See <a href="#query_Query-lean"><code>Query.prototype.lean()</code></a> for more information.</li>
 <li><code>strict</code>: controls how Mongoose handles keys that aren&#39;t in the schema for updates. This option is <code>true</code> by default, which means Mongoose will silently strip any paths in the update that aren&#39;t in the schema. See the <a href="/docs/guide.html#strict"><code>strict</code> mode docs</a> for more information.</li>
-<li><code>strictQuery</code>: controls how Mongoose handles keys that aren&#39;t in the schema for the query <code>filter</code>. This option is <code>false</code> by default for backwards compatibility, which means Mongoose will allow <code>Model.find({ foo: &#39;bar&#39; })</code> even if <code>foo</code> is not in the schema. See the <a href="/docs/guide.html#strictQuery"><code>strictQuery</code> docs</a> for more information.</li>
+<li><code>strictQuery</code>: controls how Mongoose handles keys that aren&#39;t in the schema for the query <code>filter</code>. This option is <code>false</code> by default, which means Mongoose will allow <code>Model.find({ foo: &#39;bar&#39; })</code> even if <code>foo</code> is not in the schema. See the <a href="/docs/guide.html#strictQuery"><code>strictQuery</code> docs</a> for more information.</li>
 <li><code>nearSphere</code>: use <code>$nearSphere</code> instead of <code>near()</code>. See the <a href="#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code> docs</a></li>
 </ul>
 <p>Mongoose maintains a separate object for internal options because
@@ -1391,7 +1280,7 @@ q.<span class="hljs-title function_">projection</span>(); <span class="hljs-comm
 q.<span class="hljs-title function_">projection</span>(<span class="hljs-literal">null</span>);
 q.<span class="hljs-title function_">projection</span>(); <span class="hljs-comment">// null</span>
 </code></pre>
-  </div><hr class="separate-api-elements"><h3 id="query_Query-read"><a href="#query_Query-read"><code>Query.prototype.read()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>pref</code>
+  </div><hr class="separate-api-elements"><h3 id="query_Query-read"><a href="#query_Query-read"><code>Query.prototype.read()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>mode</code>
 <span class="method-type">&laquo;String&raquo;</span> one of the listed preference options or aliases</p>
 </li><li class="param"><code>[tags]</code>
 <span class="method-type">&laquo;Array&raquo;</span> optional tags for this query</p>
@@ -1484,56 +1373,6 @@ s   snapshot
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
 <span class="method-type">&laquo;String|RegExp&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/regex/">$regex</a></span></li></ul><div><p>Specifies a <code>$regex</code> query condition.</p>
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
-  </div><hr class="separate-api-elements"><h3 id="query_Query-remove"><a href="#query_Query-remove"><code>Query.prototype.remove()</code></a></h3><span class="deprecated">~DEPRECATED~</span><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
-<span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</p>
-</li><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> optional params are (error, mongooseDeleteResult)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/DeleteResult.html">DeleteResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#remove">remove</a></span></li></ul><div><p>Declare and/or execute this query as a remove() operation. <code>remove()</code> is
-deprecated, you should use <a href="#query_Query-deleteOne"><code>deleteOne()</code></a>
-or <a href="#query_Query-deleteMany"><code>deleteMany()</code></a> instead.</p>
-<p>This function does not trigger any middleware</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
-<pre><code><span class="hljs-title class_">Character</span>.<span class="hljs-title function_">remove</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Stark/</span> }, callback);
-</code></pre>
-<p>This function calls the MongoDB driver&#39;s <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#remove"><code>Collection#remove()</code> function</a>.
-The returned <a href="https://mongoosejs.com/docs/queries.html">promise</a> resolves to an
-object that contains 3 properties:</p>
-<ul>
-<li><code>ok</code>: <code>1</code> if no errors occurred</li>
-<li><code>deletedCount</code>: the number of documents deleted</li>
-<li><code>n</code>: the number of documents deleted. Equal to <code>deletedCount</code>.</li>
-</ul>
-<h4 id="example-1">
-      <a href="#example-1">
-        Example:
-      </a>
-    </h4>
-<pre><code><span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">remove</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Stark/</span> });
-<span class="hljs-comment">// Number of docs deleted</span>
-res.<span class="hljs-property">deletedCount</span>;
-</code></pre>
-<h4 id="note">
-      <a href="#note">
-        Note:
-      </a>
-    </h4>
-<p>Calling <code>remove()</code> creates a <a href="/docs/queries.html">Mongoose query</a>, and a query
-does not execute until you either pass a callback, call <a href="#query_Query-then"><code>Query#then()</code></a>,
-or call <a href="#query_Query-exec"><code>Query#exec()</code></a>.</p>
-<pre><code><span class="hljs-comment">// not executed</span>
-<span class="hljs-keyword">const</span> query = <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">remove</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Stark/</span> });
-
-<span class="hljs-comment">// executed</span>
-<span class="hljs-title class_">Character</span>.<span class="hljs-title function_">remove</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Stark/</span> }, callback);
-<span class="hljs-title class_">Character</span>.<span class="hljs-title function_">remove</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Stark/</span> }).<span class="hljs-title function_">remove</span>(callback);
-
-<span class="hljs-comment">// executed without a callback</span>
-<span class="hljs-title class_">Character</span>.<span class="hljs-title function_">exec</span>();
-</code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-replaceOne"><a href="#query_Query-replaceOne"><code>Query.prototype.replaceOne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[doc]</code>
 <span class="method-type">&laquo;Object&raquo;</span> the update command</p>
@@ -1550,9 +1389,8 @@ or call <a href="#query_Query-exec"><code>Query#exec()</code></a>.</p>
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> params are (error, writeOpResult)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as a replaceOne() operation. Same as
-<code>update()</code>, except MongoDB will replace the existing document and will
-not accept any <a href="https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern">atomic</a> operators (<code>$set</code>, etc.)</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as a replaceOne() operation.
+MongoDB will replace the existing document and will not accept any <a href="https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern">atomic operators</a> (<code>$set</code>, etc.)</p>
 <p><strong>Note</strong> replaceOne will <em>not</em> fire update middleware. Use <code>pre(&#39;replaceOne&#39;)</code>
 and <code>post(&#39;replaceOne&#39;)</code> instead.</p>
 <h4 id="example">
@@ -1669,10 +1507,8 @@ of whether you use <code>updateOne()</code>, <code>updateMany()</code>, <code>fi
 <li><a href="https://www.mongodb.com/docs/manual/applications/replication/#read-preference">readPreference</a></li>
 <li><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.hint/">hint</a></li>
 <li><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.comment/">comment</a></li>
-<li>snapshot</li>
-<li><a href="https://www.mongodb.com/docs/v4.0/reference/method/cursor.maxScan/">maxscan</a></li>
 </ul>
-<p>The following options are only for write operations: <code>update()</code>, <code>updateOne()</code>, <code>updateMany()</code>, <code>replaceOne()</code>, <code>findOneAndUpdate()</code>, and <code>findByIdAndUpdate()</code>:</p>
+<p>The following options are only for write operations: <code>updateOne()</code>, <code>updateMany()</code>, <code>replaceOne()</code>, <code>findOneAndUpdate()</code>, and <code>findByIdAndUpdate()</code>:</p>
 <ul>
 <li><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">upsert</a></li>
 <li><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">writeConcern</a></li>
@@ -1686,7 +1522,7 @@ of whether you use <code>updateOne()</code>, <code>updateMany()</code>, <code>fi
 <li><a href="#query_Query-projection">projection</a></li>
 <li>sanitizeProjection</li>
 </ul>
-<p>The following options are only for all operations <strong>except</strong> <code>update()</code>, <code>updateOne()</code>, <code>updateMany()</code>, <code>remove()</code>, <code>deleteOne()</code>, and <code>deleteMany()</code>:</p>
+<p>The following options are only for all operations <strong>except</strong> <code>updateOne()</code>, <code>updateMany()</code>, <code>deleteOne()</code>, and <code>deleteMany()</code>:</p>
 <ul>
 <li><a href="https://www.mongodb.com/docs/manual/reference/operator/meta/maxTimeMS/">maxTimeMS</a></li>
 </ul>
@@ -1723,7 +1559,7 @@ query.<span class="hljs-title function_">getQuery</span>(); <span class="hljs-co
       </a>
     </h4>
 <pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Query</span>();
-query.<span class="hljs-title function_">update</span>({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">a</span>: <span class="hljs-number">5</span> } });
+query.<span class="hljs-title function_">updateOne</span>({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">a</span>: <span class="hljs-number">5</span> } });
 query.<span class="hljs-title function_">setUpdate</span>({ <span class="hljs-attr">$set</span>: { <span class="hljs-attr">b</span>: <span class="hljs-number">6</span> } });
 query.<span class="hljs-title function_">getUpdate</span>(); <span class="hljs-comment">// { $set: { b: 6 } }</span>
 </code></pre>
@@ -1783,22 +1619,6 @@ query.<span class="hljs-title function_">where</span>(<span class="hljs-string">
 <pre><code> <span class="hljs-comment">// Given `arr`: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
  query.<span class="hljs-title function_">slice</span>(<span class="hljs-string">&#x27;arr&#x27;</span>, [-<span class="hljs-number">20</span>, <span class="hljs-number">5</span>]); <span class="hljs-comment">// Returns [1, 2, 3, 4, 5]</span>
 </code></pre>
-  </div><hr class="separate-api-elements"><h3 id="query_Query-snapshot"><a href="#query_Query-snapshot"><code>Query.prototype.snapshot()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies this query as a <code>snapshot</code> query.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
-<pre><code>query.<span class="hljs-title function_">snapshot</span>(); <span class="hljs-comment">// true</span>
-query.<span class="hljs-title function_">snapshot</span>(<span class="hljs-literal">true</span>);
-query.<span class="hljs-title function_">snapshot</span>(<span class="hljs-literal">false</span>);
-</code></pre>
-<h4 id="note">
-      <a href="#note">
-        Note:
-      </a>
-    </h4>
-<p>Cannot be used with <code>distinct()</code></p>
   </div><hr class="separate-api-elements"><h3 id="query_Query-sort"><a href="#query_Query-sort"><code>Query.prototype.sort()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>arg</code>
 <span class="method-type">&laquo;Object|String|Array&lt;Array&lt;string|number&gt;&gt;&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/cursor.sort/">cursor.sort</a></span></li></ul><div><p>Sets the sort order</p>
 <p>If an object is passed, values allowed are <code>asc</code>, <code>desc</code>, <code>ascending</code>, <code>descending</code>, <code>1</code>, and <code>-1</code>.</p>
@@ -1871,12 +1691,8 @@ resolved with either the doc(s) or rejected with the error.</p>
 <span class="hljs-comment">// create a custom Query constructor based off these settings</span>
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">Adventure</span> = query.<span class="hljs-title function_">toConstructor</span>();
 
-<span class="hljs-comment">// Adventure is now a subclass of mongoose.Query and works the same way but with the</span>
-<span class="hljs-comment">// default query parameters and options set.</span>
-<span class="hljs-title class_">Adventure</span>().<span class="hljs-title function_">exec</span>(callback)
-
 <span class="hljs-comment">// further narrow down our query results while still using the previous settings</span>
-<span class="hljs-title class_">Adventure</span>().<span class="hljs-title function_">where</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/^Life/</span> }).<span class="hljs-title function_">exec</span>(callback);
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Adventure</span>().<span class="hljs-title function_">where</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/^Life/</span> }).<span class="hljs-title function_">exec</span>();
 
 <span class="hljs-comment">// since Adventure is a stand-alone constructor we can also add our own</span>
 <span class="hljs-comment">// helper methods and getters without impacting global queries</span>
@@ -1890,7 +1706,7 @@ resolved with either the doc(s) or rejected with the error.</p>
     <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>;
   }
 })
-<span class="hljs-title class_">Adventure</span>().<span class="hljs-property">highlyRated</span>.<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">&#x27;Life&#x27;</span>).<span class="hljs-title function_">exec</span>(callback)
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Adventure</span>().<span class="hljs-property">highlyRated</span>.<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">&#x27;Life&#x27;</span>).<span class="hljs-title function_">exec</span>();
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-transform"><a href="#query_Query-transform"><code>Query.prototype.transform()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fn</code>
 <span class="method-type">&laquo;Function&raquo;</span> function to run to transform the query result</p>
@@ -1910,98 +1726,6 @@ for the query to resolve to.</p>
     <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">assign</span>(res, { <span class="hljs-attr">loadedAt</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>() });
 });
 </code></pre>
-  </div><hr class="separate-api-elements"><h3 id="query_Query-update"><a href="#query_Query-update"><code>Query.prototype.update()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[doc]</code>
-<span class="method-type">&laquo;Object&raquo;</span> the update command</p>
-</li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.multipleCastError]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> by default, mongoose only returns the first error that occurred in casting the query. Turn on this option to aggregate all the cast errors.</p>
-</li></ul><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
-<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
-</li></ul><ul style="margin-top: 0.5em"><li><code>[options.upsert=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
-</li></ul><ul style="margin-top: 0.5em"><li><code>[options.writeConcern=null]</code>
-<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
-</li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</p>
-</li></ul><li class="param"><code>[callback]</code>
-<span class="method-type">&laquo;Function&raquo;</span> params are (error, writeOpResult)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as an update() operation.</p>
-<p><em>All paths passed that are not <a href="https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern">atomic</a> operations will become <code>$set</code> ops.</em></p>
-<p>This function triggers the following middleware.</p>
-<ul>
-<li><code>update()</code></li>
-</ul>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
-<pre><code><span class="hljs-title class_">Model</span>.<span class="hljs-title function_">where</span>({ <span class="hljs-attr">_id</span>: id }).<span class="hljs-title function_">update</span>({ <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;words&#x27;</span> });
-
-<span class="hljs-comment">// becomes</span>
-
-<span class="hljs-title class_">Model</span>.<span class="hljs-title function_">where</span>({ <span class="hljs-attr">_id</span>: id }).<span class="hljs-title function_">update</span>({ <span class="hljs-attr">$set</span>: { <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;words&#x27;</span> }});
-</code></pre>
-<h4 id="valid-options">
-      <a href="#valid-options">
-        Valid options:
-      </a>
-    </h4>
-<ul>
-<li><code>upsert</code> (boolean) whether to create the doc if it doesn&#39;t match (false)</li>
-<li><code>multi</code> (boolean) whether multiple documents should be updated (false)</li>
-<li><code>runValidators</code> (boolean) if true, runs <a href="/docs/validation.html#update-validators">update validators</a> on this command. Update validators validate the update operation against the model&#39;s schema.</li>
-<li><code>setDefaultsOnInsert</code> (boolean) <code>true</code> by default. If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="https://mongoosejs.com/docs/defaults.html">defaults</a> specified in the model&#39;s schema if a new document is created.</li>
-<li><code>strict</code> (boolean) overrides the <code>strict</code> option for this update</li>
-<li><code>read</code></li>
-<li><code>writeConcern</code></li>
-</ul>
-<h4 id="note">
-      <a href="#note">
-        Note:
-      </a>
-    </h4>
-<p>Passing an empty object <code>{}</code> as the doc will result in a no-op. The update operation will be ignored and the callback executed without sending the command to MongoDB.</p>
-<h4 id="note-1">
-      <a href="#note-1">
-        Note:
-      </a>
-    </h4>
-<p>The operation is only executed when a callback is passed. To force execution without a callback, we must first call update() and then execute it by using the <code>exec()</code> method.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> q = <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">where</span>({ <span class="hljs-attr">_id</span>: id });
-q.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;bob&#x27;</span> }}).<span class="hljs-title function_">update</span>(); <span class="hljs-comment">// not executed</span>
-
-q.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;bob&#x27;</span> }}).<span class="hljs-title function_">exec</span>(); <span class="hljs-comment">// executed</span>
-
-<span class="hljs-comment">// keys that are not [atomic](https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern) ops become `$set`.</span>
-<span class="hljs-comment">// this executes the same command as the previous example.</span>
-q.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;bob&#x27;</span> }).<span class="hljs-title function_">exec</span>();
-
-<span class="hljs-comment">// multi updates</span>
-<span class="hljs-title class_">Model</span>.<span class="hljs-title function_">where</span>()
-     .<span class="hljs-title function_">update</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/^match/</span> }, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">arr</span>: [] }}, { <span class="hljs-attr">multi</span>: <span class="hljs-literal">true</span> }, callback)
-
-<span class="hljs-comment">// more multi updates</span>
-<span class="hljs-title class_">Model</span>.<span class="hljs-title function_">where</span>()
-     .<span class="hljs-title function_">setOptions</span>({ <span class="hljs-attr">multi</span>: <span class="hljs-literal">true</span> })
-     .<span class="hljs-title function_">update</span>({ <span class="hljs-attr">$set</span>: { <span class="hljs-attr">arr</span>: [] }}, callback)
-
-<span class="hljs-comment">// single update by default</span>
-<span class="hljs-title class_">Model</span>.<span class="hljs-title function_">where</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;address@example.com&#x27;</span> })
-     .<span class="hljs-title function_">update</span>({ <span class="hljs-attr">$inc</span>: { <span class="hljs-attr">counter</span>: <span class="hljs-number">1</span> }}, callback)
-</code></pre>
-<p>API summary</p>
-<pre><code class="language-javascript"><span class="hljs-title function_">update</span>(filter, doc, options, cb); <span class="hljs-comment">// executes</span>
-<span class="hljs-title function_">update</span>(filter, doc, options);
-<span class="hljs-title function_">update</span>(filter, doc, cb); <span class="hljs-comment">// executes</span>
-<span class="hljs-title function_">update</span>(filter, doc);
-<span class="hljs-title function_">update</span>(doc, cb); <span class="hljs-comment">// executes</span>
-<span class="hljs-title function_">update</span>(doc);
-<span class="hljs-title function_">update</span>(cb); <span class="hljs-comment">// executes</span>
-<span class="hljs-title function_">update</span>(<span class="hljs-literal">true</span>); <span class="hljs-comment">// executes</span>
-<span class="hljs-title function_">update</span>();
-</code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-updateMany"><a href="#query_Query-updateMany"><code>Query.prototype.updateMany()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[filter]</code>
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[update]</code>
 <span class="method-type">&laquo;Object|Array&raquo;</span> the update command</p>
@@ -2018,10 +1742,8 @@ q.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">nam
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> params are (error, writeOpResult)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as an updateMany() operation. Same as
-<code>update()</code>, except MongoDB will update <em>all</em> documents that match
-<code>filter</code> (as opposed to just the first one) regardless of the value of
-the <code>multi</code> option.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as an updateMany() operation.
+MongoDB will update <em>all</em> documents that match <code>filter</code> (as opposed to just the first one).</p>
 <p><strong>Note</strong> updateMany will <em>not</em> fire update middleware. Use <code>pre(&#39;updateMany&#39;)</code>
 and <code>post(&#39;updateMany&#39;)</code> instead.</p>
 <h4 id="example">
@@ -2053,11 +1775,10 @@ res.<span class="hljs-property">nModified</span>; <span class="hljs-comment">// 
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><li class="param"><code>[callback]</code>
 <span class="method-type">&laquo;Function&raquo;</span> params are (error, writeOpResult)</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as an updateOne() operation. Same as
-<code>update()</code>, except it does not support the <code>multi</code> option.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li><li><span class="method-type"><a href="https://mongoosejs.com/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.update/">update</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li></ul><div><p>Declare and/or execute this query as an updateOne() operation.
+MongoDB will update <em>only</em> the first document that matches <code>filter</code>.</p>
 <ul>
-<li>MongoDB will update <em>only</em> the first document that matches <code>filter</code> regardless of the value of the <code>multi</code> option.</li>
-<li>Use <code>replaceOne()</code> if you want to overwrite an entire document rather than using <a href="https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern">atomic</a> operators like <code>$set</code>.</li>
+<li>Use <code>replaceOne()</code> if you want to overwrite an entire document rather than using <a href="https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern">atomic operators</a> like <code>$set</code>.</li>
 </ul>
 <p><strong>Note</strong> updateOne will <em>not</em> fire update middleware. Use <code>pre(&#39;updateOne&#39;)</code>
 and <code>post(&#39;updateOne&#39;)</code> instead.</p>
@@ -2088,8 +1809,6 @@ This option is only valid for operations that write to the database:</p>
 <li><code>findOneAndDelete()</code></li>
 <li><code>findOneAndReplace()</code></li>
 <li><code>findOneAndUpdate()</code></li>
-<li><code>remove()</code></li>
-<li><code>update()</code></li>
 <li><code>updateOne()</code></li>
 <li><code>updateMany()</code></li>
 </ul>
@@ -2114,7 +1833,7 @@ This option is only valid for operations that write to the database:</p>
       </a>
     </h4>
 <pre><code><span class="hljs-comment">// instead of writing:</span>
-<span class="hljs-title class_">User</span>.<span class="hljs-title function_">find</span>({<span class="hljs-attr">age</span>: {<span class="hljs-attr">$gte</span>: <span class="hljs-number">21</span>, <span class="hljs-attr">$lte</span>: <span class="hljs-number">65</span>}}, callback);
+<span class="hljs-title class_">User</span>.<span class="hljs-title function_">find</span>({<span class="hljs-attr">age</span>: {<span class="hljs-attr">$gte</span>: <span class="hljs-number">21</span>, <span class="hljs-attr">$lte</span>: <span class="hljs-number">65</span>}});
 
 <span class="hljs-comment">// we can instead write:</span>
 <span class="hljs-title class_">User</span>.<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;age&#x27;</span>).<span class="hljs-title function_">gte</span>(<span class="hljs-number">21</span>).<span class="hljs-title function_">lte</span>(<span class="hljs-number">65</span>);
@@ -2127,7 +1846,7 @@ This option is only valid for operations that write to the database:</p>
 .<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;age&#x27;</span>).<span class="hljs-title function_">gte</span>(<span class="hljs-number">21</span>).<span class="hljs-title function_">lte</span>(<span class="hljs-number">65</span>)
 .<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;name&#x27;</span>, <span class="hljs-regexp">/^vonderful/i</span>)
 .<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;friends&#x27;</span>).<span class="hljs-title function_">slice</span>(<span class="hljs-number">10</span>)
-.<span class="hljs-title function_">exec</span>(callback)
+.<span class="hljs-title function_">exec</span>()
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="query_Query-within"><a href="#query_Query-within"><code>Query.prototype.within()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/polygon/">$polygon</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/box/">$box</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/geometry/">$geometry</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/center/">$center</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/operator/centerSphere/">$centerSphere</a></span></li></ul><div><p>Defines a <code>$within</code> or <code>$geoWithin</code> argument for geo-spatial queries.</p>
 <h4 id="example">
@@ -2175,8 +1894,6 @@ query.<span class="hljs-title function_">where</span>(<span class="hljs-string">
 <li><code>findOneAndDelete()</code></li>
 <li><code>findOneAndReplace()</code></li>
 <li><code>findOneAndUpdate()</code></li>
-<li><code>remove()</code></li>
-<li><code>update()</code></li>
 <li><code>updateOne()</code></li>
 <li><code>updateMany()</code></li>
 </ul>
@@ -2204,8 +1921,6 @@ operation fails. The default is <code>0</code>, which means no timeout.</p>
 <li><code>findOneAndDelete()</code></li>
 <li><code>findOneAndReplace()</code></li>
 <li><code>findOneAndUpdate()</code></li>
-<li><code>remove()</code></li>
-<li><code>update()</code></li>
 <li><code>updateOne()</code></li>
 <li><code>updateMany()</code></li>
 </ul>
@@ -2227,4 +1942,14 @@ operation fails. The default is <code>0</code>, which means no timeout.</p>
 <pre><code class="language-javascript">mongoose.<span class="hljs-property">Query</span>.<span class="hljs-property">use$geoWithin</span> = <span class="hljs-literal">false</span>;
 </code></pre>
 <p>MongoDB 2.4 deprecated the use of <code>$within</code>, replacing it with <code>$geoWithin</code>. Mongoose uses <code>$geoWithin</code> by default (which is 100% backward compatible with <code>$within</code>). If you are running an older version of MongoDB, set this flag to <code>false</code> so your <code>within()</code> queries continue to work.</p>
+  </div><hr class="separate-api-elements"><h3 id="tostringtag_toStringTag"><a href="#tostringtag_toStringTag"><code>function Object() { [native code] }.prototype.toStringTag()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;String&raquo;</span> </li></ul><div><p>Returns a string representation of this query.</p>
+<p>More about <a href="https://masteringjs.io/tutorials/fundamentals/tostring"><code>toString()</code> in JavaScript</a>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> q = <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">find</span>();
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(q); <span class="hljs-comment">// Prints &quot;Query { find }&quot;</span>
+</code></pre>
   </div></div></div></div><div id="jobs"><div class="job-listing"><a href="/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/jobs.html#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/jobs.html#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/js/mobile-navbar-toggle.js"></script></div></body></html>

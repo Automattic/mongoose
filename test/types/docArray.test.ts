@@ -51,7 +51,7 @@ function gh13087() {
 
   const pointSchema = new Schema({
     name: { required: true, type: String },
-    location: { required: true, type: locationSchema }
+    location: { required: true, type: String }
   });
 
   const routeSchema = new Schema({

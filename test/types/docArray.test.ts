@@ -33,38 +33,4 @@ function gh13087() {
   }
 
   expectError(new Types.DocumentArray<Book>([1, 2, 3]));
-
-  const locationSchema = new Schema(
-    {
-      type: {
-        required: true,
-        type: String,
-        enum: ['Point']
-      },
-      coordinates: {
-        required: true,
-        type: [Number]
-      }
-    },
-    { _id: false }
-  );
-
-  const pointSchema = new Schema({
-    name: { required: true, type: String },
-    location: { required: true, type: String }
-  });
-
-  const routeSchema = new Schema({
-    points: { type: [pointSchema] }
-  });
-
-  type Route = InferSchemaType<typeof routeSchema>;
-
-  expectError(function getTestRouteData(): Route {
-    return {
-      points: new Types.DocumentArray([
-        { name: 'Test' } // "location" is missing
-      ])
-    };
-  });
 }

@@ -80,7 +80,7 @@
     "docs:copy:tmp:6x": "rimraf ./docs/5.x && ncp ./tmp ./docs/5.x",
     "docs:checkout:gh-pages": "git checkout gh-pages",
     "docs:checkout:5x": "git checkout 5.x",
-    "docs:checkout:6x": "git checkout 5.x",
+    "docs:checkout:6x": "git checkout 6.x",
     "docs:generate": "node ./scripts/website.js",
     "docs:generate:search": "node ./scripts/generateSearch.js",
     "docs:merge:stable": "git merge master",

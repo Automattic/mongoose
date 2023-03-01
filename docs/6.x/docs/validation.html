@@ -1,0 +1,597 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v7.0.0: Validation</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 7.0.0</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x">Version 6.10.0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.16</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/validation.md" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h2 id="validation">
+      <a href="#validation">
+        Validation
+      </a>
+    </h2>
+<script>
+  _native.init("CK7DT53U",{
+    targetClass: 'native-inline'
+  });
+</script>
+
+<div class="native-inline">
+  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+</div>
+
+<p>Before we get into the specifics of validation syntax, please keep the following rules in mind:</p>
+<ul>
+<li>Validation is defined in the <a href="schematypes.html">SchemaType</a></li>
+<li>Validation is <a href="middleware.html">middleware</a>. Mongoose registers validation as a <code>pre(&#39;save&#39;)</code> hook on every schema by default.</li>
+<li>You can disable automatic validation before save by setting the <a href="guide.html#validateBeforeSave">validateBeforeSave</a> option</li>
+<li>You can manually run validation using <code>doc.validate(callback)</code> or <code>doc.validateSync()</code></li>
+<li>You can manually mark a field as invalid (causing validation to fail) by using <a href="api/document.html#document_Document-invalidate"><code>doc.invalidate(...)</code></a></li>
+<li>Validators are not run on undefined values. The only exception is the <a href="api/schematype.html#schematype_SchemaType-required"><code>required</code> validator</a>.</li>
+<li>Validation is asynchronously recursive; when you call <a href="api/model.html#model_Model-save">Model#save</a>, sub-document validation is executed as well. If an error occurs, your <a href="api/model.html#model_Model-save">Model#save</a> callback receives it</li>
+<li>Validation is customizable</li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
+  }
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Cat</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Cat&#x27;</span>, schema);
+
+<span class="hljs-comment">// This cat has no name :(</span>
+<span class="hljs-keyword">const</span> cat = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Cat</span>();
+
+<span class="hljs-keyword">let</span> error;
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-keyword">await</span> cat.<span class="hljs-title function_">save</span>();
+} <span class="hljs-keyword">catch</span> (err) {
+  error = err;
+}
+    
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;name&#x27;</span>].<span class="hljs-property">message</span>,
+  <span class="hljs-string">&#x27;Path `name` is required.&#x27;</span>);
+
+error = cat.<span class="hljs-title function_">validateSync</span>();
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;name&#x27;</span>].<span class="hljs-property">message</span>,
+  <span class="hljs-string">&#x27;Path `name` is required.&#x27;</span>);
+</code></pre>
+<ul>
+<li><a href="#built-in-validators">Built-in Validators</a></li>
+<li><a href="#custom-error-messages">Custom Error Messages</a></li>
+<li><a href="#the-unique-option-is-not-a-validator">The <code>unique</code> Option is Not a Validator</a></li>
+<li><a href="#custom-validators">Custom Validators</a></li>
+<li><a href="#async-custom-validators">Async Custom Validators</a></li>
+<li><a href="#validation-errors">Validation Errors</a></li>
+<li><a href="#cast-errors">Cast Errors</a></li>
+<li><a href="#global-schematype-validation">Global SchemaType Validation</a></li>
+<li><a href="#required-validators-on-nested-objects">Required Validators On Nested Objects</a></li>
+<li><a href="#update-validators">Update Validators</a></li>
+<li><a href="#update-validators-and-this">Update Validators and <code>this</code></a></li>
+<li><a href="#update-validators-only-run-on-updated-paths">Update Validators Only Run On Updated Paths</a></li>
+<li><a href="#update-validators-only-run-for-some-operations">Update Validators Only Run For Some Operations</a></li>
+</ul>
+<h3 id="built-in-validators">
+      <a href="#built-in-validators">
+        Built-in Validators
+      </a>
+    </h3>
+<p>Mongoose has several built-in validators.</p>
+<ul>
+<li>All <a href="schematypes.html">SchemaTypes</a> have the built-in <a href="api/schematype.html#schematype_SchemaType-required">required</a> validator. The required validator uses the <a href="api/schematype.html#schematype_SchemaType-checkRequired">SchemaType&#39;s <code>checkRequired()</code> function</a> to determine if the value satisfies the required validator.</li>
+<li><a href="schematypes.html#numbers">Numbers</a> have <a href="schematypes.html#number-validators"><code>min</code> and <code>max</code></a> validators.</li>
+<li><a href="schematypes.html#strings">Strings</a> have <a href="schematypes.html#string-validators"><code>enum</code>, <code>match</code>, <code>minLength</code>, and <code>maxLength</code></a> validators.</li>
+</ul>
+<p>Each of the validator links above provide more information about how to enable them and customize their error messages.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> breakfastSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">eggs</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>,
+    <span class="hljs-attr">min</span>: [<span class="hljs-number">6</span>, <span class="hljs-string">&#x27;Too few eggs&#x27;</span>],
+    <span class="hljs-attr">max</span>: <span class="hljs-number">12</span>
+  },
+  <span class="hljs-attr">bacon</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>,
+    <span class="hljs-attr">required</span>: [<span class="hljs-literal">true</span>, <span class="hljs-string">&#x27;Why no bacon?&#x27;</span>]
+  },
+  <span class="hljs-attr">drink</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">enum</span>: [<span class="hljs-string">&#x27;Coffee&#x27;</span>, <span class="hljs-string">&#x27;Tea&#x27;</span>],
+    <span class="hljs-attr">required</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+      <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">bacon</span> &gt; <span class="hljs-number">3</span>;
+    }
+  }
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Breakfast</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Breakfast&#x27;</span>, breakfastSchema);
+
+<span class="hljs-keyword">const</span> badBreakfast = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Breakfast</span>({
+  <span class="hljs-attr">eggs</span>: <span class="hljs-number">2</span>,
+  <span class="hljs-attr">bacon</span>: <span class="hljs-number">0</span>,
+  <span class="hljs-attr">drink</span>: <span class="hljs-string">&#x27;Milk&#x27;</span>
+});
+<span class="hljs-keyword">let</span> error = badBreakfast.<span class="hljs-title function_">validateSync</span>();
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;eggs&#x27;</span>].<span class="hljs-property">message</span>,
+  <span class="hljs-string">&#x27;Too few eggs&#x27;</span>);
+assert.<span class="hljs-title function_">ok</span>(!error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;bacon&#x27;</span>]);
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;drink&#x27;</span>].<span class="hljs-property">message</span>,
+  <span class="hljs-string">&#x27;`Milk` is not a valid enum value for path `drink`.&#x27;</span>);
+
+badBreakfast.<span class="hljs-property">bacon</span> = <span class="hljs-number">5</span>;
+badBreakfast.<span class="hljs-property">drink</span> = <span class="hljs-literal">null</span>;
+
+error = badBreakfast.<span class="hljs-title function_">validateSync</span>();
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;drink&#x27;</span>].<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Path `drink` is required.&#x27;</span>);
+
+badBreakfast.<span class="hljs-property">bacon</span> = <span class="hljs-literal">null</span>;
+error = badBreakfast.<span class="hljs-title function_">validateSync</span>();
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;bacon&#x27;</span>].<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Why no bacon?&#x27;</span>);
+</code></pre>
+<h3 id="custom-error-messages">
+      <a href="#custom-error-messages">
+        Custom Error Messages
+      </a>
+    </h3>
+<p>You can configure the error message for individual validators in your schema. There are two equivalent
+ways to set the validator error message:</p>
+<ul>
+<li>Array syntax: <code>min: [6, &#39;Must be at least 6, got {VALUE}&#39;]</code></li>
+<li>Object syntax: <code>enum: { values: [&#39;Coffee&#39;, &#39;Tea&#39;], message: &#39;{VALUE} is not supported&#39; }</code></li>
+</ul>
+<p>Mongoose also supports rudimentary templating for error messages.
+Mongoose replaces <code>{VALUE}</code> with the value being validated.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> breakfastSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">eggs</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>,
+    <span class="hljs-attr">min</span>: [<span class="hljs-number">6</span>, <span class="hljs-string">&#x27;Must be at least 6, got {VALUE}&#x27;</span>],
+    <span class="hljs-attr">max</span>: <span class="hljs-number">12</span>
+  },
+  <span class="hljs-attr">drink</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">enum</span>: {
+      <span class="hljs-attr">values</span>: [<span class="hljs-string">&#x27;Coffee&#x27;</span>, <span class="hljs-string">&#x27;Tea&#x27;</span>],
+      <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;{VALUE} is not supported&#x27;</span>
+    }
+  }
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Breakfast</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Breakfast&#x27;</span>, breakfastSchema);
+
+<span class="hljs-keyword">const</span> badBreakfast = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Breakfast</span>({
+  <span class="hljs-attr">eggs</span>: <span class="hljs-number">2</span>,
+  <span class="hljs-attr">drink</span>: <span class="hljs-string">&#x27;Milk&#x27;</span>
+});
+<span class="hljs-keyword">const</span> error = badBreakfast.<span class="hljs-title function_">validateSync</span>();
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;eggs&#x27;</span>].<span class="hljs-property">message</span>,
+  <span class="hljs-string">&#x27;Must be at least 6, got 2&#x27;</span>);
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;drink&#x27;</span>].<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Milk is not supported&#x27;</span>);
+</code></pre>
+<h3 id="the-unique-option-is-not-a-validator">
+      <a href="#the-unique-option-is-not-a-validator">
+        The <code>unique</code> Option is Not a Validator
+      </a>
+    </h3>
+<p>A common gotcha for beginners is that the <code>unique</code> option for schemas
+is <em>not</em> a validator. It&#39;s a convenient helper for building <a href="https://www.mongodb.com/docs/manual/core/index-unique/">MongoDB unique indexes</a>.
+See the <a href="faq.html">FAQ</a> for more information.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> uniqueUsernameSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">username</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span>
+  }
+});
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">U1</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;U1&#x27;</span>, uniqueUsernameSchema);
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">U2</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;U2&#x27;</span>, uniqueUsernameSchema);
+
+<span class="hljs-keyword">const</span> dup = [{ <span class="hljs-attr">username</span>: <span class="hljs-string">&#x27;Val&#x27;</span> }, { <span class="hljs-attr">username</span>: <span class="hljs-string">&#x27;Val&#x27;</span> }];
+<span class="hljs-variable constant_">U1</span>.<span class="hljs-title function_">create</span>(dup, <span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> {
+  <span class="hljs-comment">// Race condition! This may save successfully, depending on whether</span>
+  <span class="hljs-comment">// MongoDB built the index before writing the 2 docs.</span>
+});
+
+<span class="hljs-comment">// You need to wait for Mongoose to finish building the `unique`</span>
+<span class="hljs-comment">// index before writing. You only need to build indexes once for</span>
+<span class="hljs-comment">// a given collection, so you normally don&#x27;t need to do this</span>
+<span class="hljs-comment">// in production. But, if you drop the database between tests,</span>
+<span class="hljs-comment">// you will need to use `init()` to wait for the index build to finish.</span>
+<span class="hljs-variable constant_">U2</span>.<span class="hljs-title function_">init</span>().
+  <span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable constant_">U2</span>.<span class="hljs-title function_">create</span>(dup)).
+  <span class="hljs-keyword">catch</span>(<span class="hljs-function"><span class="hljs-params">error</span> =&gt;</span> {
+    <span class="hljs-comment">// Will error, but will *not* be a mongoose validation error, it will be</span>
+    <span class="hljs-comment">// a duplicate key error.</span>
+    <span class="hljs-comment">// See: https://masteringjs.io/tutorials/mongoose/e11000-duplicate-key</span>
+    assert.<span class="hljs-title function_">ok</span>(error);
+    assert.<span class="hljs-title function_">ok</span>(!error.<span class="hljs-property">errors</span>);
+    assert.<span class="hljs-title function_">ok</span>(error.<span class="hljs-property">message</span>.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&#x27;duplicate key error&#x27;</span>) !== -<span class="hljs-number">1</span>);
+  });
+</code></pre>
+<h3 id="custom-validators">
+      <a href="#custom-validators">
+        Custom Validators
+      </a>
+    </h3>
+<p>If the built-in validators aren&#39;t enough, you can define custom validators
+to suit your needs.</p>
+<p>Custom validation is declared by passing a validation function.
+You can find detailed instructions on how to do this in the
+<a href="api/schematype.html#schematype_SchemaType-validate"><code>SchemaType#validate()</code> API docs</a>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">phone</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">validate</span>: {
+      <span class="hljs-attr">validator</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) {
+        <span class="hljs-keyword">return</span> <span class="hljs-regexp">/\d{3}-\d{3}-\d{4}/</span>.<span class="hljs-title function_">test</span>(v);
+      },
+      <span class="hljs-attr">message</span>: <span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> <span class="hljs-string">`<span class="hljs-subst">${props.value}</span> is not a valid phone number!`</span>
+    },
+    <span class="hljs-attr">required</span>: [<span class="hljs-literal">true</span>, <span class="hljs-string">&#x27;User phone number required&#x27;</span>]
+  }
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;user&#x27;</span>, userSchema);
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>();
+<span class="hljs-keyword">let</span> error;
+
+user.<span class="hljs-property">phone</span> = <span class="hljs-string">&#x27;555.0123&#x27;</span>;
+error = user.<span class="hljs-title function_">validateSync</span>();
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;phone&#x27;</span>].<span class="hljs-property">message</span>,
+  <span class="hljs-string">&#x27;555.0123 is not a valid phone number!&#x27;</span>);
+
+user.<span class="hljs-property">phone</span> = <span class="hljs-string">&#x27;&#x27;</span>;
+error = user.<span class="hljs-title function_">validateSync</span>();
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;phone&#x27;</span>].<span class="hljs-property">message</span>,
+  <span class="hljs-string">&#x27;User phone number required&#x27;</span>);
+
+user.<span class="hljs-property">phone</span> = <span class="hljs-string">&#x27;201-555-0123&#x27;</span>;
+<span class="hljs-comment">// Validation succeeds! Phone number is defined</span>
+<span class="hljs-comment">// and fits `DDD-DDD-DDDD`</span>
+error = user.<span class="hljs-title function_">validateSync</span>();
+assert.<span class="hljs-title function_">equal</span>(error, <span class="hljs-literal">null</span>);
+</code></pre>
+<h3 id="async-custom-validators">
+      <a href="#async-custom-validators">
+        Async Custom Validators
+      </a>
+    </h3>
+<p>Custom validators can also be asynchronous. If your validator function
+returns a promise (like an <code>async</code> function), mongoose will wait for that
+promise to settle. If the returned promise rejects, or fulfills with
+the value <code>false</code>, Mongoose will consider that a validation error.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-comment">// You can also make a validator async by returning a promise.</span>
+    <span class="hljs-attr">validate</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">reject</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;Oops!&#x27;</span>))
+  },
+  <span class="hljs-attr">email</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-comment">// There are two ways for an promise-based async validator to fail:</span>
+    <span class="hljs-comment">// 1) If the promise rejects, Mongoose assumes the validator failed with the given error.</span>
+    <span class="hljs-comment">// 2) If the promise resolves to `false`, Mongoose assumes the validator failed and creates an error with the given `message`.</span>
+    <span class="hljs-attr">validate</span>: {
+      <span class="hljs-attr">validator</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-literal">false</span>),
+      <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Email validation failed&#x27;</span>
+    }
+  }
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema);
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>();
+
+user.<span class="hljs-property">email</span> = <span class="hljs-string">&#x27;test@test.co&#x27;</span>;
+user.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;test&#x27;</span>;
+
+<span class="hljs-keyword">let</span> error;
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-keyword">await</span> user.<span class="hljs-title function_">validate</span>();
+} <span class="hljs-keyword">catch</span> (err) {
+  error = err;
+}
+assert.<span class="hljs-title function_">ok</span>(error);
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;name&#x27;</span>].<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Oops!&#x27;</span>);
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;email&#x27;</span>].<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Email validation failed&#x27;</span>);
+</code></pre>
+<h3 id="validation-errors">
+      <a href="#validation-errors">
+        Validation Errors
+      </a>
+    </h3>
+<p>Errors returned after failed validation contain an <code>errors</code> object
+whose values are <code>ValidatorError</code> objects. Each
+<a href="api/error.html#error_Error-ValidatorError">ValidatorError</a> has <code>kind</code>, <code>path</code>,
+<code>value</code>, and <code>message</code> properties.
+A ValidatorError also may have a <code>reason</code> property. If an error was
+thrown in the validator, this property will contain the error that was
+thrown.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> toySchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">color</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>
+});
+
+<span class="hljs-keyword">const</span> validator = <span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-regexp">/red|white|gold/i</span>.<span class="hljs-title function_">test</span>(value);
+};
+toySchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;color&#x27;</span>).<span class="hljs-title function_">validate</span>(validator,
+  <span class="hljs-string">&#x27;Color `{VALUE}` not valid&#x27;</span>, <span class="hljs-string">&#x27;Invalid color&#x27;</span>);
+toySchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">validate</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) {
+  <span class="hljs-keyword">if</span> (v !== <span class="hljs-string">&#x27;Turbo Man&#x27;</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;Need to get a Turbo Man for Christmas&#x27;</span>);
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+}, <span class="hljs-string">&#x27;Name `{VALUE}` is not valid&#x27;</span>);
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Toy</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Toy&#x27;</span>, toySchema);
+
+<span class="hljs-keyword">const</span> toy = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Toy</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;Green&#x27;</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Power Ranger&#x27;</span> });
+
+<span class="hljs-keyword">let</span> error;
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-keyword">await</span> toy.<span class="hljs-title function_">save</span>();
+} <span class="hljs-keyword">catch</span>(err) {
+  error = err;
+}
+    
+<span class="hljs-comment">// `error` is a ValidationError object</span>
+<span class="hljs-comment">// `error.errors.color` is a ValidatorError object</span>
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>.<span class="hljs-property">color</span>.<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Color `Green` not valid&#x27;</span>);
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>.<span class="hljs-property">color</span>.<span class="hljs-property">kind</span>, <span class="hljs-string">&#x27;Invalid color&#x27;</span>);
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>.<span class="hljs-property">color</span>.<span class="hljs-property">path</span>, <span class="hljs-string">&#x27;color&#x27;</span>);
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>.<span class="hljs-property">color</span>.<span class="hljs-property">value</span>, <span class="hljs-string">&#x27;Green&#x27;</span>);
+
+<span class="hljs-comment">// If your validator throws an exception, mongoose will use the error</span>
+<span class="hljs-comment">// message. If your validator returns `false`,</span>
+<span class="hljs-comment">// mongoose will use the &#x27;Name `Power Ranger` is not valid&#x27; message.</span>
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>.<span class="hljs-property">name</span>.<span class="hljs-property">message</span>,
+  <span class="hljs-string">&#x27;Need to get a Turbo Man for Christmas&#x27;</span>);
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>.<span class="hljs-property">name</span>.<span class="hljs-property">value</span>, <span class="hljs-string">&#x27;Power Ranger&#x27;</span>);
+<span class="hljs-comment">// If your validator threw an error, the `reason` property will contain</span>
+<span class="hljs-comment">// the original error thrown, including the original stack trace.</span>
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>.<span class="hljs-property">name</span>.<span class="hljs-property">reason</span>.<span class="hljs-property">message</span>,
+  <span class="hljs-string">&#x27;Need to get a Turbo Man for Christmas&#x27;</span>);
+
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">name</span>, <span class="hljs-string">&#x27;ValidationError&#x27;</span>);
+</code></pre>
+<h3 id="cast-errors">
+      <a href="#cast-errors">
+        Cast Errors
+      </a>
+    </h3>
+<p>Before running validators, Mongoose attempts to coerce values to the
+correct type. This process is called <em>casting</em> the document. If
+casting fails for a given path, the <code>error.errors</code> object will contain
+a <code>CastError</code> object.</p>
+<p>Casting runs before validation, and validation does not run if casting
+fails. That means your custom validators may assume <code>v</code> is <code>null</code>,
+<code>undefined</code>, or an instance of the type specified in your schema.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> vehicleSchema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">numWheels</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">18</span> }
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Vehicle</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Vehicle&#x27;</span>, vehicleSchema);
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Vehicle</span>({ <span class="hljs-attr">numWheels</span>: <span class="hljs-string">&#x27;not a number&#x27;</span> });
+<span class="hljs-keyword">const</span> err = doc.<span class="hljs-title function_">validateSync</span>();
+
+err.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;numWheels&#x27;</span>].<span class="hljs-property">name</span>; <span class="hljs-comment">// &#x27;CastError&#x27;</span>
+<span class="hljs-comment">// &#x27;Cast to Number failed for value &quot;not a number&quot; at path &quot;numWheels&quot;&#x27;</span>
+err.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;numWheels&#x27;</span>].<span class="hljs-property">message</span>;
+</code></pre>
+<h3 id="global-schematype-validation">
+      <a href="#global-schematype-validation">
+        Global SchemaType Validation
+      </a>
+    </h3>
+<p>In addition to defining custom validators on individual schema paths, you can also configure a custom validator to run on every instance of a given <code>SchemaType</code>.
+For example, the following code demonstrates how to make empty string <code>&#39;&#39;</code> an invalid value for <em>all</em> string paths.</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Add a custom validator to all strings</span>
+mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">String</span>.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;validate&#x27;</span>, <span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> v == <span class="hljs-literal">null</span> || v &gt; <span class="hljs-number">0</span>);
+
+<span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">email</span>: <span class="hljs-title class_">String</span>
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema);
+
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;&#x27;</span> });
+
+<span class="hljs-keyword">const</span> err = <span class="hljs-keyword">await</span> user.<span class="hljs-title function_">validate</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span>, <span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> err);
+err.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;name&#x27;</span>]; <span class="hljs-comment">// ValidatorError</span>
+err.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;email&#x27;</span>]; <span class="hljs-comment">// ValidatorError</span>
+</code></pre>
+<h3 id="required-validators-on-nested-objects">
+      <a href="#required-validators-on-nested-objects">
+        Required Validators On Nested Objects
+      </a>
+    </h3>
+<p>Defining validators on nested objects in mongoose is tricky, because
+nested objects are not fully fledged paths.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">let</span> personSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: {
+    <span class="hljs-attr">first</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">last</span>: <span class="hljs-title class_">String</span>
+  }
+});
+
+assert.<span class="hljs-title function_">throws</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// This throws an error, because &#x27;name&#x27; isn&#x27;t a full fledged path</span>
+  personSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).required(<span class="hljs-literal">true</span>);
+}, <span class="hljs-regexp">/Cannot.*&#x27;required&#x27;/</span>);
+
+<span class="hljs-comment">// To make a nested object required, use a single nested schema</span>
+<span class="hljs-keyword">const</span> nameSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">first</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">last</span>: <span class="hljs-title class_">String</span>
+});
+
+personSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: {
+    <span class="hljs-attr">type</span>: nameSchema,
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
+  }
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Person</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Person&#x27;</span>, personSchema);
+
+<span class="hljs-keyword">const</span> person = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>();
+<span class="hljs-keyword">const</span> error = person.<span class="hljs-title function_">validateSync</span>();
+assert.<span class="hljs-title function_">ok</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;name&#x27;</span>]);
+</code></pre>
+<h3 id="update-validators">
+      <a href="#update-validators">
+        Update Validators
+      </a>
+    </h3>
+<p>In the above examples, you learned about document validation. Mongoose also
+supports validation for <a href="api/query.html#query_Query-update"><code>update()</code></a>,
+<a href="api/query.html#query_Query-updateOne"><code>updateOne()</code></a>,
+<a href="api/query.html#query_Query-updateMany"><code>updateMany()</code></a>,
+and <a href="api/query.html#query_Query-findOneAndUpdate"><code>findOneAndUpdate()</code></a> operations.
+Update validators are off by default - you need to specify
+the <code>runValidators</code> option.</p>
+<p>To turn on update validators, set the <code>runValidators</code> option for
+<code>update()</code>, <code>updateOne()</code>, <code>updateMany()</code>, or <code>findOneAndUpdate()</code>.
+Be careful: update validators are off by default because they have several
+caveats.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> toySchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">color</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Toy</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Toys&#x27;</span>, toySchema);
+
+<span class="hljs-title class_">Toy</span>.<span class="hljs-property">schema</span>.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;color&#x27;</span>).<span class="hljs-title function_">validate</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-regexp">/red|green|blue/i</span>.<span class="hljs-title function_">test</span>(value);
+}, <span class="hljs-string">&#x27;Invalid color&#x27;</span>);
+
+<span class="hljs-keyword">const</span> opts = { <span class="hljs-attr">runValidators</span>: <span class="hljs-literal">true</span> };
+
+<span class="hljs-keyword">let</span> error;
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-keyword">await</span> <span class="hljs-title class_">Toy</span>.<span class="hljs-title function_">updateOne</span>({}, { <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;not a color&#x27;</span> }, opts);
+} <span class="hljs-keyword">catch</span> (err) {
+  error = err;
+}
+
+assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>.<span class="hljs-property">color</span>.<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Invalid color&#x27;</span>);
+</code></pre>
+<h3 id="update-validators-and-this">
+      <a href="#update-validators-and-this">
+        Update Validators and <code>this</code>
+      </a>
+    </h3>
+<p>There are a couple of key differences between update validators and
+document validators. In the color validation function below, <code>this</code> refers
+to the document being validated when using document validation.
+However, when running update validators, <code>this</code> refers to the query object instead of the document.
+Because queries have a neat <code>.get()</code> function, you can get the updated value of the property you want.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> toySchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">color</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>
+});
+
+toySchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;color&#x27;</span>).<span class="hljs-title function_">validate</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) {
+  <span class="hljs-comment">// When running in `validate()` or `validateSync()`, the</span>
+  <span class="hljs-comment">// validator can access the document using `this`.</span>
+  <span class="hljs-comment">// When running with update validators, `this` is the Query,</span>
+  <span class="hljs-comment">// **not** the document being updated!</span>
+  <span class="hljs-comment">// Queries have a `get()` method that lets you get the</span>
+  <span class="hljs-comment">// updated value.</span>
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;name&#x27;</span>) &amp;&amp; <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">toLowerCase</span>().<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&#x27;red&#x27;</span>) !== -<span class="hljs-number">1</span>) {
+    <span class="hljs-keyword">return</span> value === <span class="hljs-string">&#x27;red&#x27;</span>;
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Toy</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;ActionFigure&#x27;</span>, toySchema);
+
+<span class="hljs-keyword">const</span> toy = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Toy</span>({ <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;green&#x27;</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Red Power Ranger&#x27;</span> });
+<span class="hljs-comment">// Validation failed: color: Validator failed for path `color` with value `green`</span>
+<span class="hljs-keyword">let</span> error = toy.<span class="hljs-title function_">validateSync</span>();
+assert.<span class="hljs-title function_">ok</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;color&#x27;</span>]);
+
+<span class="hljs-keyword">const</span> update = { <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;green&#x27;</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Red Power Ranger&#x27;</span> };
+<span class="hljs-keyword">const</span> opts = { <span class="hljs-attr">runValidators</span>: <span class="hljs-literal">true</span> };
+
+error = <span class="hljs-literal">null</span>;
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-keyword">await</span> <span class="hljs-title class_">Toy</span>.<span class="hljs-title function_">updateOne</span>({}, update, opts);
+} <span class="hljs-keyword">catch</span> (err) {
+  error = err;
+}
+<span class="hljs-comment">// Validation failed: color: Validator failed for path `color` with value `green`</span>
+assert.<span class="hljs-title function_">ok</span>(error);
+</code></pre>
+<h3 id="update-validators-only-run-on-updated-paths">
+      <a href="#update-validators-only-run-on-updated-paths">
+        Update Validators Only Run On Updated Paths
+      </a>
+    </h3>
+<p>The other key difference is that update validators only run on the paths
+specified in the update. For instance, in the below example, because
+&#39;name&#39; is not specified in the update operation, update validation will
+succeed.</p>
+<p>When using update validators, <code>required</code> validators <strong>only</strong> fail when
+you try to explicitly <code>$unset</code> the key.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> kittenSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span>
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Kitten</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Kitten&#x27;</span>, kittenSchema);
+
+<span class="hljs-keyword">const</span> update = { <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;blue&#x27;</span> };
+<span class="hljs-keyword">const</span> opts = { <span class="hljs-attr">runValidators</span>: <span class="hljs-literal">true</span> };
+<span class="hljs-title class_">Kitten</span>.<span class="hljs-title function_">updateOne</span>({}, update, opts, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// Operation succeeds despite the fact that &#x27;name&#x27; is not specified</span>
+});
+
+<span class="hljs-keyword">const</span> unset = { <span class="hljs-attr">$unset</span>: { <span class="hljs-attr">name</span>: <span class="hljs-number">1</span> } };
+<span class="hljs-title class_">Kitten</span>.<span class="hljs-title function_">updateOne</span>({}, unset, opts, <span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) {
+  <span class="hljs-comment">// Operation fails because &#x27;name&#x27; is required</span>
+  assert.<span class="hljs-title function_">ok</span>(err);
+  assert.<span class="hljs-title function_">ok</span>(err.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;name&#x27;</span>]);
+});
+</code></pre>
+<h3 id="update-validators-only-run-for-some-operations">
+      <a href="#update-validators-only-run-for-some-operations">
+        Update Validators Only Run For Some Operations
+      </a>
+    </h3>
+<p>One final detail worth noting: update validators <strong>only</strong> run on the
+following update operators:</p>
+<ul>
+<li><code>$set</code></li>
+<li><code>$unset</code></li>
+<li><code>$push</code></li>
+<li><code>$addToSet</code></li>
+<li><code>$pull</code></li>
+<li><code>$pullAll</code></li>
+</ul>
+<p>For instance, the below update will succeed, regardless of the value of
+<code>number</code>, because update validators ignore <code>$inc</code>.</p>
+<p>Also, <code>$push</code>, <code>$addToSet</code>, <code>$pull</code>, and <code>$pullAll</code> validation does
+<strong>not</strong> run any validation on the array itself, only individual elements
+of the array.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> testSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">number</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">0</span> },
+  <span class="hljs-attr">arr</span>: [{ <span class="hljs-attr">message</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">maxlength</span>: <span class="hljs-number">10</span> } }]
+});
+
+<span class="hljs-comment">// Update validators won&#x27;t check this, so you can still `$push` 2 elements</span>
+<span class="hljs-comment">// onto the array, so long as they don&#x27;t have a `message` that&#x27;s too long.</span>
+testSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;arr&#x27;</span>).<span class="hljs-title function_">validate</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) {
+  <span class="hljs-keyword">return</span> v.<span class="hljs-property">length</span> &lt; <span class="hljs-number">2</span>;
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Test</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, testSchema);
+
+<span class="hljs-keyword">let</span> update = { <span class="hljs-attr">$inc</span>: { <span class="hljs-attr">number</span>: <span class="hljs-number">1</span> } };
+<span class="hljs-keyword">const</span> opts = { <span class="hljs-attr">runValidators</span>: <span class="hljs-literal">true</span> };
+
+<span class="hljs-comment">// There will never be a validation error here</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">updateOne</span>({}, update, opts);
+
+<span class="hljs-comment">// This will never error either even though the array will have at</span>
+<span class="hljs-comment">// least 2 elements.</span>
+update = { <span class="hljs-attr">$push</span>: [{ <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;hello&#x27;</span> }, { <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;world&#x27;</span> }] };
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">updateOne</span>({}, update, opts);
+</code></pre>
+<h3 id="next-up">
+      <a href="#next-up">
+        Next Up
+      </a>
+    </h3>
+<p>Now that we&#39;ve covered <code>Validation</code>, let&#39;s take a look at <a href="middleware.html">Middleware</a>.</p>
+</div></div><div id="jobs"><div class="job-listing"><a href="/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/jobs.html#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/jobs.html#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/js/mobile-navbar-toggle.js"></script></div></body></html>

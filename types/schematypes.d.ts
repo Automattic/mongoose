@@ -1,13 +1,12 @@
 declare module 'mongoose' {
 
-  /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
-  type Date = Schema.Types.Date;
-
   /**
    * The Mongoose BigInt [SchemaType](/docs/schematypes.html).
    */
   type BigInt = Schema.Types.BigInt;
 
+  /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
+  type Date = Schema.Types.Date;
 
   /**
    * The Mongoose Decimal128 [SchemaType](/docs/schematypes.html). Used for

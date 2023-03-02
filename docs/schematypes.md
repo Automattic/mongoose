@@ -53,6 +53,7 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 - [Decimal128](api/mongoose.html#mongoose_Mongoose-Decimal128)
 - [Map](#maps)
 - [Schema](#schemas)
+- [BigInt](#bigint)
 
 <h4>Example</h4>
 
@@ -83,7 +84,8 @@ const schema = new Schema({
   mapOfString: {
     type: Map,
     of: String
-  }
+  },
+  bigint: Schema.Types.BigInt,
 })
 
 // example use
@@ -107,6 +109,7 @@ m.ofBuffer.pop();
 m.ofMixed = [1, [], 'three', { four: 5 }];
 m.nested.stuff = 'good';
 m.map = new Map([['key', 'value']]);
+m.bigint = 1099511627776;
 m.save(callback);
 ```
 
@@ -716,6 +719,18 @@ including what validators it has and what the type is.
   <li><a href="https://masteringjs.io/tutorials/mongoose/schematype">An Introduction to Mongoose SchemaTypes</a></li>
   <li><a href="https://kb.objectrocket.com/mongo-db/mongoose-schema-types-1418">Mongoose Schema Types</a></li>
 </ul>
+
+<h4 id="bigint">BigInt</h4>
+
+To declare a path as a BigInt, you may use either the `mongoose.Schema.Types.BigInt` SchemaType, the `'BigInt'` string, or the `'bigint'` string.
+
+```javascript
+const schema1 = new Schema({ age: mongoose.Schema.Types.BigInt }); // age will be cast to a BigInt
+const schema2 = new Schema({ age: 'BigInt' }); // Equivalent
+const schema3 = new Schema({ age: 'bigint' }); // Equivalent
+
+const Car = mongoose.model('Car', schema2);
+```
 
 ### Next Up
 

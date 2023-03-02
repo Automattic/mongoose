@@ -366,7 +366,7 @@ async function gh13070() {
   const child = model<IChild>('Child', childSchema);
 
   const doc = await parent.findOne();
-  await child.populate<{child: IChild}>(doc, 'child');
+  await child.populate<{ child: IChild }>(doc, 'child');
 
 
 }

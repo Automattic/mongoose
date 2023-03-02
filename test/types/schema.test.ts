@@ -413,6 +413,9 @@ export function autoTypedSchema() {
     decimal1?: Types.Decimal128;
     decimal2?: Types.Decimal128;
     decimal3?: Types.Decimal128;
+    bigint1?: Types.BigInt;
+    bigint2?: Types.BigInt;
+    bigint3?: Types.BigInt;
   };
 
   const TestSchema = new Schema({
@@ -459,7 +462,10 @@ export function autoTypedSchema() {
     array8: { type: [String], default: () => undefined },
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
-    decimal3: 'decimal128'
+    decimal3: 'decimal128',
+    bigint1: Schema.Types.BigInt,
+    bigint2: 'BigInt',
+    bigint3: 'bigint'
   });
 
   type InferredTestSchemaType = InferSchemaType<typeof TestSchema>;
@@ -1117,4 +1123,13 @@ function gh12882() {
       foo: number;
     }[]
   }>({} as rTArrType);
+}
+
+function gh13081() {
+  const testSchema = new Schema({
+    testBigInt: { type: Schema.Types.BigInt }
+  });
+
+  type Example = InferSchemaType<typeof testSchema>;
+  expectType<{ testBigInt?: Types.BigInt }>({} as Example);
 }

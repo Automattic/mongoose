@@ -49,6 +49,8 @@ declare module 'mongoose' {
       unshift(...args: any[]): number;
     }
 
+    class BigInt extends mongodb.Long { }
+
     class Buffer extends NativeBuffer {
       /** Sets the subtype option and marks the buffer modified. */
       subtype(subtype: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 128 | ToObjectOptions): void;

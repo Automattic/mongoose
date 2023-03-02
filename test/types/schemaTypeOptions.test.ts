@@ -61,6 +61,7 @@ function defaultOptions() {
   expectType<Record<string, any>>(new Schema.Types.String('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Boolean('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Array('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.BigInt('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Buffer('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Date('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Decimal128('none').defaultOptions);

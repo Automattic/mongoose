@@ -15,6 +15,7 @@ describe('SchemaType.cast() (gh-7045)', function() {
     original.string = Schema.Types.String.cast();
     original.date = Schema.Types.Date.cast();
     original.decimal128 = Schema.Types.Decimal128.cast();
+    original.bigint = Schema.Types.BigInt.cast();
   });
 
   afterEach(function() {
@@ -23,6 +24,7 @@ describe('SchemaType.cast() (gh-7045)', function() {
     Schema.Types.String.cast(original.string);
     Schema.Types.Date.cast(original.date);
     Schema.Types.Decimal128.cast(original.decimal128);
+    Schema.Types.BigInt.cast(original.bigint);
   });
 
   it('with inheritance', function() {
@@ -204,6 +206,34 @@ describe('SchemaType.cast() (gh-7045)', function() {
 
       assert.doesNotThrow(function() {
         d.cast(original.decimal128('1000'));
+      });
+    });
+  });
+
+  describe('BigInt', function() {
+    it('supports custom cast functions', function() {
+      Schema.Types.BigInt.cast(v => {
+        assert.ok(typeof v !== 'number');
+        return original.date(v);
+      });
+
+      const d = new Schema.Types.BigInt();
+      assert.doesNotThrow(function() {
+        d.cast('1000');
+      });
+
+      assert.throws(() => d.cast(1000), /CastError/);
+    });
+
+    it('supports disabling casting', function() {
+      Schema.Types.BigInt.cast(false);
+
+      const d = new Schema.Types.BigInt();
+      assert.throws(() => d.cast('1000'), /CastError/);
+      assert.throws(() => d.cast(1000), /CastError/);
+
+      assert.doesNotThrow(function() {
+        d.cast(original.bigint('1000'));
       });
     });
   });

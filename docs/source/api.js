@@ -34,6 +34,7 @@ const files = [
   'lib/types/DocumentArray/methods/index.js',
   'lib/types/subdocument.js',
   'lib/types/ArraySubdocument.js',
+  'lib/types/bigint.js',
   'lib/types/buffer.js',
   'lib/types/decimal128.js',
   'lib/types/map.js'

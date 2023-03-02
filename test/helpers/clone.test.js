@@ -7,6 +7,7 @@ const clone = require('../../lib/helpers/clone');
 const symbols = require('../../lib/helpers/symbols');
 const ObjectId = require('../../lib/types/objectid');
 const Decimal = require('../../lib/types/decimal128');
+const BigInt = require('../../lib/types/bigint');
 
 describe('clone', () => {
   describe('falsy', () => {
@@ -216,6 +217,17 @@ describe('clone', () => {
       cloned.myAttr = 'otherAttrVal';
       assert.equal(base.myAttr, 'otherAttrVal');
       assert.equal(cloned.myAttr, 'otherAttrVal');
+    });
+
+    it('BigInt', () => {
+      const base = {
+        _bsontype: 'Long',
+        toString() { return '128'; }
+      };
+      base.constructor = undefined;
+      const cloned = clone(base);
+      const expected = BigInt.fromString(base.toString());
+      assert.deepStrictEqual(cloned, expected);
     });
   });
 

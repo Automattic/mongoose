@@ -1762,6 +1762,20 @@ describe('schema', function() {
 
     });
 
+    it('BigInt type (gh-13081)', function() {
+      const BigInt = mongoose.Schema.Types.BigInt;
+      const schema = new Schema({
+        num: BigInt,
+        nums: ['BigInt']
+      });
+      assert.ok(schema.path('num') instanceof BigInt);
+      assert.ok(schema.path('nums').caster instanceof BigInt);
+
+      const casted = schema.path('num').cast('12903127932193123');
+      assert.ok(casted instanceof mongoose.Types.BigInt);
+      assert.equal(casted.toString(), '12903127932193123');
+    });
+
     describe('clone()', function() {
       it('copies methods, statics, and query helpers (gh-5752)', function() {
         const schema = new Schema({});

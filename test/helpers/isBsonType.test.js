@@ -3,6 +3,7 @@
 const assert = require('assert');
 const isBsonType = require('../../lib/helpers/isBsonType');
 
+const BigInt = require('mongodb').Long;
 const Decimal128 = require('mongodb').Decimal128;
 const ObjectId = require('mongodb').ObjectId;
 
@@ -29,5 +30,9 @@ describe('isBsonType', () => {
 
   it('true for ObjectId', () => {
     assert.ok(isBsonType(new ObjectId(), 'ObjectId'));
+  });
+
+  it('true for BigInt', () => {
+    assert.ok(isBsonType(new BigInt(12), 'Long'));
   });
 });

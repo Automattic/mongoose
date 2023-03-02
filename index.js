@@ -41,6 +41,7 @@ module.exports.ObjectId = mongoose.ObjectId;
 module.exports.isValidObjectId = mongoose.isValidObjectId;
 module.exports.isObjectIdOrHexString = mongoose.isObjectIdOrHexString;
 module.exports.syncIndexes = mongoose.syncIndexes;
+module.exports.BigInt = mongoose.BigInt;
 module.exports.Decimal128 = mongoose.Decimal128;
 module.exports.Mixed = mongoose.Mixed;
 module.exports.Date = mongoose.Date;

@@ -4,6 +4,12 @@ declare module 'mongoose' {
   type Date = Schema.Types.Date;
 
   /**
+   * The Mongoose BigInt [SchemaType](/docs/schematypes.html).
+   */
+  type BigInt = Schema.Types.BigInt;
+
+
+  /**
    * The Mongoose Decimal128 [SchemaType](/docs/schematypes.html). Used for
    * declaring paths in your schema that should be
    * [128-bit decimal floating points](http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-decimal.html).
@@ -305,6 +311,14 @@ declare module 'mongoose' {
          * `SchemaString.prototype.enum()` or `SchemaNumber.prototype.enum()`
          */
         enum(vals: string[] | number[]): this;
+      }
+
+      class BigInt extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'BigInt';
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
       }
 
       class Boolean extends SchemaType {

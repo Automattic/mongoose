@@ -362,11 +362,10 @@ async function gh13070() {
       parent: { type: Schema.Types.ObjectId, ref: 'Parent', required: true }
     });
 
-  const parent = model<IParent>('Parent', parentSchema);
-  const child = model<IChild>('Child', childSchema);
+  const Parent = model<IParent>('Parent', parentSchema);
+  const Child = model<IChild>('Child', childSchema);
 
-  const doc = await parent.findOne();
-  await child.populate<{ child: IChild }>(doc, 'child');
-
-
+  const doc = await Parent.findOne();
+  const doc2 = await Child.populate<{ child: IChild }>(doc, 'child');
+  const name: string = doc.child.name;
 }

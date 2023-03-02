@@ -33,6 +33,6 @@ describe('isBsonType', () => {
   });
 
   it('true for BigInt', () => {
-    assert.ok(isBsonType(new BigInt(12), 'Long'));
+    assert.ok(isBsonType(new BigInt(1099511627776), 'Long'));
   });
 });

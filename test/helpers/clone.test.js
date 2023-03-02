@@ -222,7 +222,7 @@ describe('clone', () => {
     it('BigInt', () => {
       const base = {
         _bsontype: 'Long',
-        toString() { return '128'; }
+        toString() { return '1099511627776'; }
       };
       base.constructor = undefined;
       const cloned = clone(base);

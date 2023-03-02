@@ -229,11 +229,11 @@ describe('SchemaType.cast() (gh-7045)', function() {
       Schema.Types.BigInt.cast(false);
 
       const d = new Schema.Types.BigInt();
-      assert.throws(() => d.cast('1000'), /CastError/);
-      assert.throws(() => d.cast(1000), /CastError/);
+      assert.throws(() => d.cast('1099511627776'), /CastError/);
+      assert.throws(() => d.cast(1099511627776), /CastError/);
 
       assert.doesNotThrow(function() {
-        d.cast(original.bigint('1000'));
+        d.cast(original.bigint('1099511627776'));
       });
     });
   });

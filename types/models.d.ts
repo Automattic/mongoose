@@ -303,7 +303,8 @@ declare module 'mongoose' {
       callback?: Callback<(HydratedDocument<T, TMethodsAndOverrides, TVirtuals>)[]>): Promise<Array<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>>;
     populate(doc: any, options: PopulateOptions | Array<PopulateOptions> | string,
       callback?: Callback<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>): Promise<HydratedDocument<T, TMethodsAndOverrides, TVirtuals>>;
-
+    populate<Paths={}>(docs: Array<any>, options: PopulateOptions | Array<PopulateOptions> | string): Promise<MergeType<this, Paths>>;
+    populate<Paths={}>(docs: any, options: PopulateOptions | Array<PopulateOptions> | string, callback?: Callback<MergeType<this, Paths>>): void;
 
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(callback?: CallbackWithoutResult): Promise<void>;

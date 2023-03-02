@@ -339,3 +339,34 @@ function gh12136() {
   }
 
 }
+
+async function gh13070() {
+  interface IParent {
+    name: string;
+    child: Types.ObjectId;
+  }
+  interface IChild {
+    name: string;
+    parent: Types.ObjectId;
+  }
+
+  const parentSchema = new Schema(
+    {
+      name: { type: String, required: true },
+      child: { type: Schema.Types.ObjectId, ref: 'Child', required: true }
+    });
+
+  const childSchema = new Schema(
+    {
+      name: { type: String, required: true },
+      parent: { type: Schema.Types.ObjectId, ref: 'Parent', required: true }
+    });
+
+  const parent = model<IParent>('Parent', parentSchema);
+  const child = model<IChild>('Child', childSchema);
+
+  const doc = await parent.findOne();
+  await child.populate<{child: IChild}>(doc, 'child');
+
+
+}

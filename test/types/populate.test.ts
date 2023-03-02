@@ -365,7 +365,7 @@ async function gh13070() {
   const Parent = model<IParent>('Parent', parentSchema);
   const Child = model<IChild>('Child', childSchema);
 
-  const doc = await Parent.findOne();
+  const doc = await Parent.findOne().orFail();
   const doc2 = await Child.populate<{ child: IChild }>(doc, 'child');
-  const name: string = doc.child.name;
+  const name: string = doc2.child.name;
 }

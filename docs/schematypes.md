@@ -679,7 +679,7 @@ const schema = new mongoose.Schema({
 });
 ```
 
-<h4 id="bigint">BigInt</h4>
+<h3 id="bigint"><a href="#bigint">BigInt</a></h3>
 
 To declare a path as a BigInt, you may use either the `mongoose.Schema.Types.BigInt` SchemaType, the `'BigInt'` string, or the `'bigint'` string.
 

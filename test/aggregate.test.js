@@ -1242,4 +1242,16 @@ describe('aggregate: ', function() {
     });
   });
 
+  it('should not throw error if database connection has not been established (gh-13125)', async function() {
+    const m = new mongoose.Mongoose();
+    const mySchema = new Schema({ test: String });
+    const M = m.model('Test', mySchema);
+
+    const aggregate = M.aggregate();
+    aggregate.match({ $text: { $search: 'test' } });
+
+    assert.doesNotThrow(async function() {
+      await aggregate.exec();
+    });
+  });
 });

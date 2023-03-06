@@ -41,7 +41,7 @@ jobs:
       matrix:
         node: [14, 16, 18]
         os: [ubuntu-18.04, ubuntu-20.04]
-        mongodb: [4.0.28, 5.0.8, 6.0.0]
+        mongodb: [4.0.28, 5.0.8, 6.0.4]
         include:
           - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
             mongodb: 5.0.11
@@ -51,7 +51,7 @@ jobs:
           - os: ubuntu-18.04 # exclude because nodejs 18 requires higher GLIBC
             node: 18
           - os: ubuntu-18.04 # exclude because there are no builds for this ubuntu-mongodb version combination
-            mongodb: 6.0.0
+            mongodb: 6.0.4
           - os: ubuntu-20.04 # exclude because there are no <4.4 mongodb builds for 2004
             mongodb: 4.0.2
     name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }} OS ${{ matrix.os }}
@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-20.04
     name: Deno tests
     env:
-      MONGOMS_VERSION: 6.0.0
+      MONGOMS_VERSION: 6.0.4
       MONGOMS_PREFER_GLOBAL_PATH: 1
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0

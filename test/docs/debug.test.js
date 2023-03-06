@@ -93,10 +93,20 @@ describe('debug: shell', function() {
   });
 
   it('should avoid sending null session option with document ops (gh-13052)', async function() {
+    let args = [];
+    const m = new mongoose.Mongoose();
+    m.set('debug', function() {
+      args.push([...arguments]);
+    });
+    await m.connect(start.uri);
     const schema = new Schema({ name: String });
-    const Test = db.model('gh_13052', schema);
+    const Test = m.model('gh_13052', schema);
 
     await Test.create({ name: 'foo' });
-    assert.equal(false, lastLog.includes('session'));
+    assert.equal(args.length, 1);
+    assert.equal(args[0][1], 'insertOne');
+    assert.ok(!('session' in args[0][3]));
+
+    await m.disconnect();
   });
 });

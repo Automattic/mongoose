@@ -1248,10 +1248,16 @@ describe('aggregate: ', function() {
     const M = m.model('Test', mySchema);
 
     const aggregate = M.aggregate();
-    aggregate.match({ $text: { $search: 'test' } });
+    aggregate.match({ $match: { foo: 'bar' } });
+    
+    const p = aggregate.exec();
+    
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await m.connect(start.uri);
 
     assert.doesNotThrow(async function() {
-      await aggregate.exec();
+      await p;
     });
+    await m.disconnect();
   });
 });

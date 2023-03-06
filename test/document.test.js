@@ -12162,6 +12162,23 @@ describe('document', function() {
       { $pop: { arr: -1 }, $inc: { __v: 1 } }
     );
   });
+
+  it('avoids setting array default if document array projected out by sibling projection (gh-13003)', async function() {
+    const schema = new mongoose.Schema({
+      name: String,
+      arr: [String],
+      properties: {
+        foo: String,
+        bar: [{ baz: String, qux: Boolean }],
+        baz: String
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({}, { 'properties.foo': 1 });
+    doc.init({ properties: { foo: 'foo' } });
+    assert.strictEqual(doc.properties.bar, undefined);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

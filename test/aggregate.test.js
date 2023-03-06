@@ -1249,9 +1249,9 @@ describe('aggregate: ', function() {
 
     const aggregate = M.aggregate();
     aggregate.match({ foo: 'bar' });
-    
+
     const p = aggregate.exec();
-    
+
     await m.connect(start.uri);
 
     await p;

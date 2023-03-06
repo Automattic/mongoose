@@ -40,7 +40,7 @@ jobs:
       fail-fast: false
       matrix:
         node: [14, 16, 18]
-        os: [ubuntu-18.04, ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-22.04]
         mongodb: [4.4.18, 5.0.14, 6.0.4]
         include:
           - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
@@ -48,12 +48,10 @@ jobs:
             node: 16
             coverage: true
         exclude:
-          - os: ubuntu-18.04 # exclude because nodejs 18 requires higher GLIBC
-            node: 18
-          - os: ubuntu-18.04 # exclude because there are no builds for this ubuntu-mongodb version combination
-            mongodb: 6.0.4
-          # - os: ubuntu-20.04 # exclude because there are no <4.4 mongodb builds for 2004
-          #   mongodb: 4.0.2
+          - os: ubuntu-22.04 # exclude because there are no 4.x mongodb builds for 2204
+            mongodb: 4.4.18
+          - os: ubuntu-22.04 # exclude because there are no 5.x mongodb builds for 2204
+            mongodb: 5.0.14
     name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }} OS ${{ matrix.os }}
     env:
       MONGOMS_VERSION: ${{ matrix.mongodb }}

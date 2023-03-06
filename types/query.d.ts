@@ -594,9 +594,6 @@ declare module 'mongoose' {
     /** Converts this query to a customized, reusable query constructor with all arguments and options retained. */
     toConstructor<RetType = typeof Query>(): RetType;
 
-    /** Declare and/or execute this query as an update() operation. */
-    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions<DocType> | null): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType>;
-
     /**
      * Declare and/or execute this query as an updateMany() operation. Same as
      * `update()`, except MongoDB will update _all_ documents that match

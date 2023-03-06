@@ -1,3 +1,12 @@
+7.0.1 / 2023-03-06
+==================
+ * fix(aggregate): added await to prevent exception in aggregate exec #13126 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): handle Record<string, never> as value for HydratedDocument TOverrides parameter #13123 #13094
+ * fix(types): remove "update" function #13120 [hasezoey](https://github.com/hasezoey)
+ * docs(compatibility): added mongoDB server compatibility for mongoose 7 #13102 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: Updated callback method for Model.findOne() #13096 [Arghyahub](https://github.com/Arghyahub)
+ * chore: update github actions to not use ubuntu-18.04 anymore #13137 [hasezoey](https://github.com/hasezoey)
+
 6.10.1 / 2023-03-03
 ===================
  * fix: avoid removing empty query filters in `$and` and `$or` #13086 #12898

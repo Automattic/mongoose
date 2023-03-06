@@ -762,4 +762,22 @@ describe('types.documentarray', function() {
 
     assert.ok(doc.subDocArray[0]._id instanceof mongoose.Types.ObjectId);
   });
+
+  it('gets correct path when underneath map (gh-12997)', function() {
+    const mapArraySchema = Schema({
+      myMap: {
+        type: Map,
+        of: [Schema({ name: String })]
+      }
+    });
+
+    const Model = db.model('Test', mapArraySchema);
+    const doc = new Model({
+      myMap: {
+        foo: [{ name: 'bar' }]
+      }
+    });
+
+    assert.equal(doc.myMap.get('foo').$path(), 'myMap.foo');
+  });
 });

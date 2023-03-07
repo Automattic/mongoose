@@ -1,3 +1,10 @@
+6.10.2 / 2023-03-07
+===================
+ * fix(document): avoid setting array default if document array projected out by sibling projection #13135 #13043 #13003
+ * fix(documentarray): set correct document array path if making map of document arrays #13133
+ * fix: undo accidental change to `engines` in `package.json` #13124 [lorand-horvath](https://github.com/lorand-horvath)
+ * docs: quick improvement to Model.init() docs #13054
+
 6.10.1 / 2023-03-03
 ===================
  * fix: avoid removing empty query filters in `$and` and `$or` #13086 #12898

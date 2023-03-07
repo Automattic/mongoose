@@ -11995,6 +11995,64 @@ describe('document', function() {
       { $pop: { arr: -1 }, $inc: { __v: 1 } }
     );
   });
+
+  it('avoids setting array default if document array projected out by sibling projection (gh-13003)', async function() {
+    const schema = new mongoose.Schema({
+      name: String,
+      arr: [String],
+      properties: {
+        foo: String,
+        bar: [{ baz: String, qux: Boolean }],
+        baz: String
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({}, { 'properties.foo': 1 });
+    doc.init({ properties: { foo: 'foo' } });
+    assert.strictEqual(doc.properties.bar, undefined);
+  });
+
+  it('avoids overwriting array with sibling projection (gh-13043)', async function() {
+    const testSchema = new mongoose.Schema({
+      str: 'string',
+      obj: {
+        subObj: {
+          str: 'string'
+        },
+        subArr: [{
+          str: 'string'
+        }]
+      },
+      arr: [{
+        str: 'string'
+      }]
+    });
+    const Test = db.model('Test', testSchema);
+    // Create one test document : obj.subArr[0].str === 'subArr.test1'
+    await Test.create({
+      str: 'test1',
+      obj: {
+        subObj: {
+          str: 'subObj.test1'
+        },
+        subArr: [{
+          str: 'subArr.test1'
+        }]
+      },
+      arr: [{ str: 'arr.test1' }]
+    });
+
+    const test = await Test.findOne({ str: 'test1' }, 'str obj.subObj');
+
+    // Update one property
+    test.str = test.str + ' - updated';
+    await test.save();
+
+    const fromDb = await Test.findById(test);
+    assert.equal(fromDb.obj.subArr.length, 1);
+    assert.equal(fromDb.obj.subArr[0].str, 'subArr.test1');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

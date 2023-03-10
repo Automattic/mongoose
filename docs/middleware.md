@@ -136,7 +136,7 @@ Pre middleware functions are executed one after another, when each
 middleware calls `next`.
 
 ```javascript
-const schema = new Schema(..);
+const schema = new Schema({ /* ... */ });
 schema.pre('save', function(next) {
   // do stuff
   next();
@@ -164,12 +164,12 @@ If you use `next()`, the `next()` call does **not** stop the rest of the code in
 to prevent the rest of your middleware function from running when you call `next()`.
 
 ```javascript
-const schema = new Schema(..);
+const schema = new Schema({ /* ... */ });
 schema.pre('save', function(next) {
   if (foo()) {
     console.log('calling next!');
     // `return next();` will make sure the rest of this function doesn't run
-    /*return*/ next();
+    /* return */ next();
   }
   // Unless you comment out the `return` above, 'after next' will print
   console.log('after next');

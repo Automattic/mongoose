@@ -670,7 +670,7 @@ const subSchema = new mongoose.Schema({
 
 const schema = new mongoose.Schema({
   data: {
-    type: subSchema
+    type:    subSchema,
     default: {}
   }
 });

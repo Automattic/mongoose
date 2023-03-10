@@ -76,18 +76,18 @@ If you're using [X509 authentication](https://www.mongodb.com/docs/drivers/node/
 // Do this:
 const username = 'myusername';
 await mongoose.connect(`mongodb://${encodeURIComponent(username)}@127.0.0.1:27017/test`, {
-  ssl: true,
-  sslValidate: true,
-  sslCA: `${__dirname}/rootCA.pem`,
+  ssl:           true,
+  sslValidate:   true,
+  sslCA:         `${__dirname}/rootCA.pem`,
   authMechanism: 'MONGODB-X509'
 });
 
 // Not this:
-await mongoose.connect(`mongodb://127.0.0.1:27017/test`, {
-  ssl: true,
-  sslValidate: true,
-  sslCA: `${__dirname}/rootCA.pem`,
-  authMechanism: 'MONGODB-X509'.
-  auth: { username }
+await mongoose.connect('mongodb://127.0.0.1:27017/test', {
+  ssl:           true,
+  sslValidate:   true,
+  sslCA:         `${__dirname}/rootCA.pem`,
+  authMechanism: 'MONGODB-X509',
+  auth:          { username }
 });
 ```

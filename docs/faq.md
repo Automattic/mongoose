@@ -296,7 +296,7 @@ same name, create a new connection and bind the model to the connection.
 
 ```javascript
 const mongoose = require('mongoose');
-const connection = mongoose.createConnection(..);
+const connection = mongoose.createConnection(/* ... */);
 
 // use mongoose.Schema
 const kittySchema = mongoose.Schema({ name: String });

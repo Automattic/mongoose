@@ -29,6 +29,7 @@ function gh10345() {
     expectError(leanDoc.id = 43);
 
     const doc2 = await UserModel.findOne().orFail().lean();
+    if (!doc2) return;
     expectError(doc2.id = 43);
   })();
 }
@@ -75,6 +76,7 @@ async function gh11118(): Promise<void> {
   const UserModel = model<User>('User', schema);
 
   const docs = await UserModel.find().lean().exec();
+  if (!docs) return;
 
   for (const doc of docs) {
     const _id: Types.ObjectId = doc._id;

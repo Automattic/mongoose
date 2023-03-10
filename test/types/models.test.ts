@@ -12,7 +12,8 @@ import {
   HydratedDocumentFromSchema,
   Query,
   UpdateWriteOpResult,
-  AggregateOptions
+  AggregateOptions,
+  StringSchemaDefinition
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -117,6 +118,7 @@ async function gh10359() {
 
   async function foo(model: Model<User, {}, {}, {}>) {
     const doc = await model.findOne({ groupId: 'test' }).orFail().lean().exec();
+    if (!doc) return;
     expectType<string>(doc.firstName);
     expectType<string>(doc.lastName);
     expectType<Types.ObjectId>(doc._id);
@@ -541,4 +543,25 @@ function aggregateOptionsTest() {
   const TestModel = model('test', new Schema({}));
   const options: AggregateOptions = {};
   TestModel.aggregate(undefined, options);
+}
+
+async function gh13151() {
+  interface ITest {
+    title: string;
+  }
+
+  const TestSchema = new Schema(
+    {
+      title: {
+        type: String,
+        required: true
+      }
+    }
+  );
+
+  const TestModel = model<ITest>('Test', TestSchema);
+  const test = await TestModel.findOne().lean();
+  expectType<ITest & { _id: Types.ObjectId } | null>(test);
+  if (!test) return;
+  expectType<ITest & { _id: Types.ObjectId }>(test);
 }

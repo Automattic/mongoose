@@ -12,7 +12,7 @@ const parentSchema = new Schema({
   // Array of subdocuments
   children: [childSchema],
   // Single nested subdocuments
-  child: childSchema
+  child:    childSchema
 });
 ```
 
@@ -27,7 +27,7 @@ const Child = mongoose.model('Child', childSchema);
 const parentSchema = new Schema({
   child: {
     type: mongoose.ObjectId,
-    ref: 'Child'
+    ref:  'Child'
   }
 });
 const Parent = mongoose.model('Parent', parentSchema);
@@ -59,7 +59,7 @@ document is saved.
 
 ```javascript
 const Parent = mongoose.model('Parent', parentSchema);
-const parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
+const parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] });
 parent.children[0].name = 'Matthew';
 
 // `parent.children[0].save()` is a no-op, it triggers middleware but
@@ -74,7 +74,7 @@ the `save()` middleware for all its subdocuments, and the same for `validate()`
 middleware.
 
 ```javascript
-childSchema.pre('save', function (next) {
+childSchema.pre('save', function(next) {
   if ('invalid' == this.name) {
     return next(new Error('#sadpanda'));
   }
@@ -82,8 +82,8 @@ childSchema.pre('save', function (next) {
 });
 
 const parent = new Parent({ children: [{ name: 'invalid' }] });
-parent.save(function (err) {
-  console.log(err.message) // #sadpanda
+parent.save(function(err) {
+  console.log(err.message); // #sadpanda
 });
 ```
 
@@ -170,8 +170,8 @@ path to a non-nullish value.
 const subdocumentSchema = new mongoose.Schema({
   child: new mongoose.Schema({
     name: String,
-    age: {
-      type: Number,
+    age:  {
+      type:    Number,
       default: 0
     }
   })
@@ -200,14 +200,14 @@ defaults: make the subdocument path default to an empty object.
 ```javascript
 const childSchema = new mongoose.Schema({
   name: String,
-  age: {
-    type: Number,
+  age:  {
+    type:    Number,
     default: 0
   }
 });
 const subdocumentSchema = new mongoose.Schema({
   child: {
-    type: childSchema,
+    type:    childSchema,
     default: () => ({})
   }
 });
@@ -241,11 +241,11 @@ const parent = new Parent();
 // create a comment
 parent.children.push({ name: 'Liesl' });
 const subdoc = parent.children[0];
-console.log(subdoc) // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
+console.log(subdoc); // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
 subdoc.isNew; // true
 
-parent.save(function (err) {
-  if (err) return handleError(err)
+parent.save(function(err) {
+  if (err) return handleError(err);
   console.log('Success!');
 });
 ```
@@ -269,7 +269,7 @@ to setting the subdocument to `null`.
 parent.children.id(_id).remove();
 // Equivalent to `parent.child = null`
 parent.child.remove();
-parent.save(function (err) {
+parent.save(function(err) {
   if (err) return handleError(err);
   console.log('the subdocs were removed');
 });
@@ -282,13 +282,13 @@ parent using the `parent()` function.
 
 ```javascript
 const schema = new Schema({
-  docArr: [{ name: String }],
+  docArr:       [{ name: String }],
   singleNested: new Schema({ name: String })
 });
 const Model = mongoose.model('Test', schema);
 
 const doc = new Model({
-  docArr: [{ name: 'foo' }],
+  docArr:       [{ name: 'foo' }],
   singleNested: { name: 'bar' }
 });
 

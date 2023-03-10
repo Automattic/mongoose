@@ -286,9 +286,9 @@ type HydratedDocument<
   TMethodsAndOverrides = {},
   TVirtuals = {}
 > = Document<unknown, any, DocType> &
-  Require_id<DocType> &
-  TMethodsAndOverrides &
-  TVirtuals;
+Require_id<DocType> &
+TMethodsAndOverrides &
+TVirtuals;
 ```
 
 In Mongoose 7, the new type is as follows.
@@ -299,8 +299,8 @@ type HydratedDocument<
   TOverrides = {},
   TQueryHelpers = {}
 > = Document<unknown, TQueryHelpers, DocType> &
-  Require_id<DocType> &
-  TOverrides;
+Require_id<DocType> &
+TOverrides;
 ```
 
 In Mongoose 7, the first parameter is the raw document interface, the 2nd parameter is any document-specific overrides (usually virtuals and methods), and the 3rd parameter is any query helpers associated with the document's model.

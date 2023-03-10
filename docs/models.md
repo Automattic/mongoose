@@ -41,14 +41,14 @@ them and saving to the database is easy.
 const Tank = mongoose.model('Tank', yourSchema);
 
 const small = new Tank({ size: 'small' });
-small.save(function (err) {
+small.save(function(err) {
   if (err) return handleError(err);
   // saved!
 });
 
 // or
 
-Tank.create({ size: 'small' }, function (err, small) {
+Tank.create({ size: 'small' }, function(err, small) {
   if (err) return handleError(err);
   // saved!
 });
@@ -91,7 +91,7 @@ Models have static `deleteOne()` and `deleteMany()` functions
 for removing all documents matching the given `filter`.
 
 ```javascript
-Tank.deleteOne({ size: 'large' }, function (err) {
+Tank.deleteOne({ size: 'large' }, function(err) {
   if (err) return handleError(err);
   // deleted at most one tank document
 });
@@ -166,7 +166,7 @@ The following example shows how you can create a new `RedactedUser` View on a `U
 // Make sure to disable `autoCreate` and `autoIndex` for Views,
 // because you want to create the collection manually.
 const userSchema = new Schema({
-  name: String,
+  name:  String,
   email: String,
   roles: [String]
 }, { autoCreate: false, autoIndex: false });
@@ -179,11 +179,11 @@ await User.createCollection();
 // Then create the `RedactedUser` model's underlying collection
 // as a View.
 await RedactedUser.createCollection({
-  viewOn: 'users', // Set `viewOn` to the collection name, **not** model name.
+  viewOn:   'users', // Set `viewOn` to the collection name, **not** model name.
   pipeline: [
     {
       $set: {
-        name: { $concat: [{ $substr: ['$name', 0, 3] }, '...'] },
+        name:  { $concat: [{ $substr: ['$name', 0, 3] }, '...'] },
         email: { $concat: [{ $substr: ['$email', 0, 3] }, '...'] }
       }
     }

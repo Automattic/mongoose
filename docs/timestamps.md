@@ -90,7 +90,7 @@ console.log(doc.updatedAt); // 2022-02-26T23:28:54.264Z
 // Similarly, setting `timestamps: false` on a query tells Mongoose to skip updating
 // `updatedAt`.
 doc = await User.findOneAndUpdate({ _id: doc._id }, { name: 'test3' }, {
-  new: true,
+  new:        true,
   timestamps: false
 });
 console.log(doc.updatedAt); // 2022-02-26T23:28:54.264Z
@@ -98,8 +98,8 @@ console.log(doc.updatedAt); // 2022-02-26T23:28:54.264Z
 // Below is how you can disable timestamps on a `bulkWrite()`
 await User.bulkWrite([{
   updateOne: {
-    filter: { _id: doc._id },
-    update: { name: 'test4' },
+    filter:     { _id: doc._id },
+    update:     { name: 'test4' },
     timestamps: false
   }
 }]);
@@ -111,7 +111,7 @@ You can also set the `timestamps` option to an object to configure `createdAt` a
 For example, in the below code, Mongoose sets `createdAt` on `save()` but skips `updatedAt`.
 
 ```javascript
-let doc = new User({ name: 'test' });
+const doc = new User({ name: 'test' });
 
 // Tell Mongoose to set `createdAt`, but skip `updatedAt`.
 await doc.save({ timestamps: { createdAt: true, updatedAt: false } });
@@ -129,7 +129,7 @@ let doc = await User.create({ name: 'test' });
 // To update `updatedAt`, do a `findOneAndUpdate()` with `timestamps: false` and
 // `updatedAt` set to the value you want
 doc = await User.findOneAndUpdate({ _id: doc._id }, { updatedAt: new Date(0) }, {
-  new: true,
+  new:        true,
   timestamps: false
 });
 console.log(doc.updatedAt); // 1970-01-01T00:00:00.000Z
@@ -137,9 +137,9 @@ console.log(doc.updatedAt); // 1970-01-01T00:00:00.000Z
 // To update `createdAt`, you also need to set `strict: false` because `createdAt`
 // is immutable
 doc = await User.findOneAndUpdate({ _id: doc._id }, { createdAt: new Date(0) }, {
-  new: true,
+  new:        true,
   timestamps: false,
-  strict: false
+  strict:     false
 });
 console.log(doc.createdAt); // 1970-01-01T00:00:00.000Z
 ```
@@ -154,7 +154,7 @@ Overwriting a subdocument will also overwrite `createdAt`.
 const roleSchema = new Schema({ value: String }, { timestamps: true });
 const userSchema = new Schema({ name: String, roles: [roleSchema] });
 
-let doc = await User.create({ name: 'test', roles: [{ value: 'admin' }] });
+const doc = await User.create({ name: 'test', roles: [{ value: 'admin' }] });
 console.log(doc.roles[0].createdAt); // 2022-02-27T00:22:53.836Z
 console.log(doc.roles[0].updatedAt); // 2022-02-27T00:22:53.836Z
 
@@ -184,7 +184,7 @@ For example, if you run the below code:
 mongoose.set('debug', true);
 
 const userSchema = new Schema({
-  name: String,
+  name: String
 }, { timestamps: true });
 const User = mongoose.model('User', userSchema);
 

@@ -66,7 +66,7 @@ Below are some of the most noteworthy changes:
 * The result of `deleteOne()` and `deleteMany()` no longer has an `n` property.
 
 ```javascript
-let res = await TestModel.updateMany({}, { someProperty: 'someValue' });
+const res = await TestModel.updateMany({}, { someProperty: 'someValue' });
 
 res.matchedCount; // Number of documents that were found that match the filter. Replaces `res.n`
 res.modifiedCount; // Number of documents modified. Replaces `res.nModified`
@@ -74,7 +74,7 @@ res.upsertedCount; // Number of documents upserted. Replaces `res.upserted`
 ```
 
 ```javascript
-let res = await TestModel.deleteMany({});
+const res = await TestModel.deleteMany({});
 
 // In Mongoose 6: `{ acknowledged: true, deletedCount: 2 }`
 // In Mongoose 5: `{ n: 2, ok: 1, deletedCount: 2 }`
@@ -92,7 +92,7 @@ res.deletedCount; // Number of documents that were deleted. Replaces `res.n`
 mongoose.set('useFindAndModify', false);
 
 await mongoose.connect('mongodb://127.0.0.1:27017/test', {
-  useNewUrlParser: true, // <-- no longer necessary
+  useNewUrlParser:    true, // <-- no longer necessary
   useUnifiedTopology: true // <-- no longer necessary
 });
 ```
@@ -133,7 +133,7 @@ await q.clone(); // Can `clone()` the query to allow executing the query again
 // now `existingUser` will be either `{ _id: ObjectId(...) }` or `null`.
 const existingUser = await User.exists({ name: 'John' });
 if (existingUser) {
-  console.log(existingUser._id); 
+  console.log(existingUser._id);
 }
 ```
 
@@ -214,7 +214,7 @@ const schema = new Schema({
   profile: {
     name: {
       first: String,
-      last: String
+      last:  String
     }
   }
 });
@@ -283,10 +283,10 @@ This may affect you if you pass a function that expects different parameters to 
 
 ```javascript
 const schema = new Schema({
-  name: String,
-  age: Number,
+  name:    String,
+  age:     Number,
   canVote: {
-    type: Boolean,
+    type:    Boolean,
     // Default functions now receive a `doc` parameter, helpful for arrow functions
     default: doc => doc.age >= 18
   }
@@ -328,9 +328,9 @@ When populating a subdocument with a function `ref` or `refPath`, `this` is now 
 const schema = new Schema({
   works: [{
     modelId: String,
-    data: {
+    data:    {
       type: mongoose.ObjectId,
-      ref: function(doc) {
+      ref:  function(doc) {
         // In Mongoose 6, `doc` is the array element, so you can access `modelId`.
         // In Mongoose 5, `doc` was the top-level document.
         return doc.modelId;
@@ -418,9 +418,9 @@ Mongoose now calls setter functions with `priorValue` as the 2nd parameter, rath
 ```js
 const userSchema = new Schema({
   name: {
-    type: String,
+    type:      String,
     trimStart: true,
-    set: trimStartSetter
+    set:       trimStartSetter
   }
 });
 
@@ -475,7 +475,7 @@ In Mongoose 5, calling `populate()` on a mixed type or other path with no `ref` 
 
 ```javascript
 const testSchema = new mongoose.Schema({
-  data: String,
+  data:    String,
   parents: Array // Array of mixed
 });
 

@@ -9,7 +9,7 @@ The following is an example of how query helpers work in JavaScript.
 ProjectSchema.query.byName = function(name) {
   return this.find({ name: name });
 };
-var Project = mongoose.model('Project', ProjectSchema);
+const Project = mongoose.model('Project', ProjectSchema);
 
 // Works. Any Project query, whether it be `find()`, `findOne()`,
 // `findOneAndUpdate()`, `delete()`, etc. now has a `byName()` helper

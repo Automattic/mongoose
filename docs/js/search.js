@@ -1,3 +1,4 @@
+'use strict';
 const root = 'https://mongoosejs.azurewebsites.net/api';
 const pairs = window.location.search.replace(/^\?/, '').split('&');
 
@@ -52,7 +53,7 @@ document.getElementById('search-button').onclick = function() {
 
 q = document.getElementById('search-input').onkeyup = function(ev) {
   if (ev.keyCode === 13) {
-    let q = document.getElementById('search-input').value;
+    const q = document.getElementById('search-input').value;
     window.location.href = 'search.html?q=' + encodeURIComponent(q);
   }
 };

@@ -14,6 +14,6 @@ To create a new schema type, you need to inherit from `mongoose.SchemaType`
 and add the corresponding property to `mongoose.Schema.Types`. The one
 method you need to implement is the `cast()` method.
 
-```javascript
+```acquit
 [require:Creating a Basic Custom Schema Type]
 ```

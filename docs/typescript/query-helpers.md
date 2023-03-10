@@ -52,13 +52,13 @@ const ProjectSchema = new Schema<
   {},
   ProjectQueryHelpers
 >({
-  name: String,
+  name:  String,
   stars: Number
 });
 
 ProjectSchema.query.byName = function byName(
-    this: QueryWithHelpers<any, HydratedDocument<Project>, ProjectQueryHelpers>,
-    name: string
+  this: QueryWithHelpers<any, HydratedDocument<Project>, ProjectQueryHelpers>,
+  name: string
 ) {
   return this.find({ name: name });
 };
@@ -70,7 +70,7 @@ run().catch(err => console.log(err));
 
 async function run(): Promise<void> {
   await connect('mongodb://127.0.0.1:27017/test');
-  
+
   // Equivalent to `ProjectModel.find({ stars: { $gt: 1000 }, name: 'mongoose' })`
   await ProjectModel.find().where('stars').gt(1000).byName('mongoose');
 }
@@ -85,7 +85,7 @@ Query Helpers functions can be defined as following:
 import { Schema, model } from 'mongoose';
 
 const ProjectSchema = new Schema({
-  name: String,
+  name:  String,
   stars: Number
 }, {
   query: {

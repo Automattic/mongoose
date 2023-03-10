@@ -453,7 +453,7 @@ schemas and [subdocuments](subdocs.html), but you can also declare
 nested path aliases inline as long as you use the full nested path
 `nested.myProp` as the alias.
 
-```javascript
+```acquit
 [require:gh-6671]
 ```
 

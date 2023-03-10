@@ -32,7 +32,7 @@ or Mongoose's `Connection#transaction()` function to run a transaction. The `ses
 - Aborting the transaction if your operation throws
 - Retrying in the event of a [transient transaction error](https://stackoverflow.com/questions/52153538/what-is-a-transienttransactionerror-in-mongoose-or-mongodb).
 
-```javascript
+```acquit
 [require:transactions.*withTransaction]
 ```
 
@@ -70,7 +70,7 @@ keep a reference to the session and use that session for [`save()`](api/document
 
 To get/set the session associated with a given document, use [`doc.$session()`](api/document.html#document_Document-$session).
 
-```javascript
+```acquit
 [require:transactions.*save]
 ```
 
@@ -81,7 +81,7 @@ aggregations have a [`session()` helper](api/aggregate.html#aggregate_Aggregate-
 that sets the [`session` option](api/aggregate.html#aggregate_Aggregate-option).
 Below is an example of executing an aggregation within a transaction.
 
-```javascript
+```acquit
 [require:transactions.*aggregate]
 ```
 
@@ -90,12 +90,12 @@ Below is an example of executing an aggregation within a transaction.
 Advanced users who want more fine-grained control over when they commit or abort transactions
 can use `session.startTransaction()` to start a transaction:
 
-```javascript
+```acquit
 [require:transactions.*basic example]
 ```
 
 You can also use `session.abortTransaction()` to abort a transaction:
 
-```javascript
+```acquit
 [require:transactions.*abort]
 ```

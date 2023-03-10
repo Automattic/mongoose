@@ -540,7 +540,7 @@ functions that return promises or receive a `next()` callback. Currently,
 only `init` hooks are synchronous, because the [`init()` function](api/document.html#document_Document-init)
 is synchronous. Below is an example of using pre and post init hooks.
 
-```javascript
+```acquit
 [require:post init hooks.*success]
 ```
 
@@ -548,7 +548,7 @@ To report an error in an init hook, you must throw a **synchronous** error.
 Unlike all other middleware, init middleware does **not** handle promise
 rejections.
 
-```javascript
+```acquit
 [require:post init hooks.*error]
 ```
 

@@ -49,7 +49,7 @@ for (const file of files) {
     combinedFiles.push(comments);
   } catch (err) {
     // show log of which file has thrown a error for easier debugging
-    console.error("Error while trying to parseComments for ", file);
+    console.error('Error while trying to parseComments for ', file);
     throw err;
   }
 }
@@ -140,7 +140,12 @@ function processName(input) {
     fullName: fullName,
     filePath: input,
     docFileName: name.toLowerCase()
-  }
+  };
+}
+
+// helper function to keep translating array types to string consistent
+function convertTypesToString(types) {
+  return Array.isArray(types) ? types.join('|') : types;
 }
 
 function parse() {
@@ -156,25 +161,20 @@ function parse() {
       if (prop.ignore || prop.isPrivate) {
         continue;
       }
-     
+
       /** @type {PropContext} */
       const ctx = prop.ctx || {};
 
       // somehow in "dox", it is named "receiver" sometimes, not "constructor"
       // this is used as a fall-back if the handling below does not overwrite it
-      if ("receiver" in ctx) {
+      if ('receiver' in ctx) {
         ctx.constructor = ctx.receiver;
         delete ctx.receiver;
       }
 
       // in some cases "dox" has "ctx.constructor" defined but set to "undefined", which will later be used for setting "ctx.string"
-      if ("constructor" in ctx && ctx.constructor === undefined) {
+      if ('constructor' in ctx && ctx.constructor === undefined) {
         ctx.constructorWasUndefined = true;
-      }
-
-      // helper function to keep translating array types to string consistent
-      function convertTypesToString(types) {
-        return Array.isArray(types) ? types.join('|') : types
       }
 
       for (const __tag of prop.tags) {
@@ -230,12 +230,12 @@ function parse() {
 
             // dox does not add "void" / "undefined" to types, so in the documentation it would result in a empty "«»"
             if (tag.string.includes('void') || tag.string.includes('undefined')) {
-              tag.types.push("void");
+              tag.types.push('void');
             }
 
             ctx.return = tag;
             break;
-          case 'inherits':
+          case 'inherits': {
             const obj = extractTextUrlFromTag(tag, ctx);
             // try to get the documentation name for the "@inherits" value
             // example: "@inherits SchemaType" -> "schematype.html"
@@ -257,6 +257,7 @@ function parse() {
             }
             ctx.inherits = obj;
             break;
+          }
           case 'event':
           case 'param':
             ctx[tag.type] = (ctx[tag.type] || []);
@@ -318,8 +319,8 @@ function parse() {
       }
 
       // add "()" to the end of the string if function
-      if ((ctx.isFunction || ctx.type === "method") && !ctx.string.endsWith("()")) {
-        ctx.string = ctx.string + "()";
+      if ((ctx.isFunction || ctx.type === 'method') && !ctx.string.endsWith('()')) {
+        ctx.string = ctx.string + '()';
       }
 
       // Backwards compat anchors
@@ -383,7 +384,7 @@ function extractTextUrlFromTag(tag, ctx, warnOnMissingUrl = false) {
   if (textMatches === null || textMatches === undefined) {
     if (warnOnMissingUrl) {
       // warn for the cases where URL should be defined (like in "@see")
-      console.warn(`No Text Matches found in tag for "${ctx.constructor}.${ctx.name}"`)
+      console.warn(`No Text Matches found in tag for "${ctx.constructor}.${ctx.name}"`);
     }
 
     // if no text is found, add text as url and use the url itself as the text
@@ -396,6 +397,6 @@ function extractTextUrlFromTag(tag, ctx, warnOnMissingUrl = false) {
 
   return {
     text: text || 'No Description', // fallback text, so that the final text does not end up as a empty element that cannot be seen
-    url: url || undefined, // change to be "undefined" if text is empty or non-valid
+    url: url || undefined // change to be "undefined" if text is empty or non-valid
   };
 }

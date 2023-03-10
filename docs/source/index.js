@@ -13,7 +13,7 @@ try {
 exports['index.pug'] = require('./home');
 exports['docs/api.pug'] = {
   docs: [],
-  title: 'Redirect to API',
+  title: 'Redirect to API'
 };
 
 exports['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, markdown: true };

@@ -13,27 +13,27 @@ Each of the three functions below retrieves a record from the database, updates 
 ```javascript
 // Works.
 function callbackUpdate() {
-  MyModel.findOne({firstName: 'franklin', lastName: 'roosevelt'}, function(err, doc) {
-    if(err) {
+  MyModel.findOne({ firstName: 'franklin', lastName: 'roosevelt' }, function(err, doc) {
+    if (err) {
       handleError(err);
     }
 
     doc.middleName = 'delano';
 
     doc.save(function(err, updatedDoc) {
-      if(err) {
+      if (err) {
         handleError(err);
       }
 
       // Final logic is 2 callbacks deep
       console.log(updatedDoc);
-    }); 
-  })
+    });
+  });
 }
 
 // Better.
 function thenUpdate() {
-  MyModel.findOne({firstName: 'franklin', lastName: 'roosevelt'})
+  MyModel.findOne({ firstName: 'franklin', lastName: 'roosevelt' })
     .then(function(doc) {
       doc.middleName = 'delano';
       return doc.save();
@@ -42,21 +42,21 @@ function thenUpdate() {
     .catch(function(err) {
       handleError(err);
     });
-};
+}
 
 // Best?
 async function awaitUpdate() {
   try {
     const doc = await MyModel.findOne({
       firstName: 'franklin',
-      lastName: 'roosevelt'
+      lastName:  'roosevelt'
     });
 
     doc.middleName = 'delano';
-        
+
     console.log(await doc.save());
   }
-  catch(err) {
+  catch (err) {
     handleError(err);
   }
 }
@@ -71,34 +71,34 @@ This is true [regardless of the return value we specify in the function body](ht
 
 ```javascript
 async function getUser() {
-  //Inside getUser, we can await an async operation and interact with 
-  //foundUser as a normal, non-promise value...
-  const foundUser = await User.findOne({name: 'bill'});
+  // Inside getUser, we can await an async operation and interact with
+  // foundUser as a normal, non-promise value...
+  const foundUser = await User.findOne({ name: 'bill' });
 
-  console.log(foundUser); //Prints '{name: 'bill', admin: false}'
+  console.log(foundUser); // Prints '{name: 'bill', admin: false}'
   return foundUser;
 }
 
-//However, because async functions always return a promise, 
-//user is a promise.
+// However, because async functions always return a promise,
+// user is a promise.
 const user = getUser();
 
-console.log(user)  //Oops.  Prints '[Promise]'
+console.log(user); // Oops.  Prints '[Promise]'
 ```
 
 Instead, treat the return value of an async function as you would any other promise.  Await its fulfillment inside another async function, or chain onto it using `.then` blocks.
 
 ```javascript
 async function getUser() {
-  const foundUser = await User.findOne({name: 'bill'});
+  const foundUser = await User.findOne({ name: 'bill' });
   return foundUser;
-};
+}
 
 async function doStuffWithUser() {
-  //Await the promise returned from calling getUser.
+  // Await the promise returned from calling getUser.
   const user = await getUser();
 
-  console.log(user);  //Prints '{name: 'bill', admin: false}'
+  console.log(user); // Prints '{name: 'bill', admin: false}'
 }
 ```
 
@@ -114,35 +114,35 @@ Because Queries are also *thenables*, we can interact with a Query using async/a
 ```javascript
 function isPromise(thenable) {
   return thenable instanceof Promise;
-};
+}
 
 // The fulfillment value of the promise returned by user.save() will always be the same,
 // regardless of how, or how often, we observe it.
 async function observePromise() {
-  const user = await User.findOne({firstName: 'franklin', lastName:'roosevelt'});
+  const user = await User.findOne({ firstName: 'franklin', lastName: 'roosevelt' });
 
   user.middleName = 'delano';
 
   // Document.prototype.save() returns a *genuine* promise
   const realPromise = user.save();
 
-  console.log(isPromise(realPromise)); //true
+  console.log(isPromise(realPromise)); // true
 
   const awaitedValue = await realPromise;
 
-  realPromise.then(chainedValue => console.log(chainedValue === awaitedValue));   //true
+  realPromise.then(chainedValue => console.log(chainedValue === awaitedValue)); // true
 }
 
-// By contrast, the value we receive when we try to observe the same Query more than 
+// By contrast, the value we receive when we try to observe the same Query more than
 // once is different every time.  The Query is re-executing.
 async function observeQuery() {
-  const query = User.findOne({firstName: 'leroy', lastName: 'jenkins'});
+  const query = User.findOne({ firstName: 'leroy', lastName: 'jenkins' });
 
-  console.log(isPromise(query));  //false
+  console.log(isPromise(query)); // false
 
   const awaitedValue = await query;
 
-  query.then(chainedValue => console.log(chainedValue === awaitedValue)); //false
+  query.then(chainedValue => console.log(chainedValue === awaitedValue)); // false
 }
 ```
 

@@ -125,10 +125,10 @@ is populated.
 
 ```javascript
 const blogPostSchema = new Schema({
-  title: String,
+  title:  String,
   author: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Author'
+    ref:  'Author'
   }
 });
 const BlogPost = mongoose.model('BlogPost', blogPostSchema);
@@ -141,7 +141,7 @@ console.log(blogPost.author); // '5b207f84e8061d1d2711b421'
 console.log(blogPost.author._id);
 
 await blogPost.populate('author');
-console.log(blogPost.author._id); '5b207f84e8061d1d2711b421'
+console.log(blogPost.author._id); // '5b207f84e8061d1d2711b421'
 ```
 
 As a consequence, checking whether `blogPost.author._id` is [no longer viable as a way to check whether `author` is populated](https://github.com/Automattic/mongoose/issues/6415#issuecomment-388579185). Use `blogPost.populated('author') != null` or `blogPost.author instanceof mongoose.Types.ObjectId` to check whether `author` is populated instead.
@@ -212,16 +212,16 @@ versions. You can use a function like this:
 
 ```javascript
 const uriFormat = require('mongodb-uri');
-function encodeMongoURI (urlString) {
-    if (urlString) {
-      let parsed = uriFormat.parse(urlString);
-      urlString = uriFormat.format(parsed);
-    }
-    return urlString;
+function encodeMongoURI(urlString) {
+  if (urlString) {
+    const parsed = uriFormat.parse(urlString);
+    urlString = uriFormat.format(parsed);
+  }
+  return urlString;
 }
 
 // Your un-encoded string.
-const mongodbConnectString = "mongodb://...";
+const mongodbConnectString = 'mongodb://...';
 mongoose.connect(encodeMongoURI(mongodbConnectString));
 ```
 
@@ -454,10 +454,10 @@ In mongoose 5 the default debug function uses `console.info()` to display messag
 In Mongoose 4.x, overwriting a filter property that's a primitive with one that is an object would silently fail. For example, the below code would ignore the `where()` and be equivalent to `Sport.find({ name: 'baseball' })`
 
 ```javascript
-Sport.find({ name: 'baseball' }).where({name: {$ne: 'softball'}});
+Sport.find({ name: 'baseball' }).where({ name: { $ne: 'softball' } });
 ```
 
-In Mongoose 5.x, the above code will correctly overwrite `'baseball'` with `{ $ne: 'softball' }` 
+In Mongoose 5.x, the above code will correctly overwrite `'baseball'` with `{ $ne: 'softball' }`
 
 <h2 id="bulkwrite-results"><a href="#bulkwrite-results">
   <code>bulkWrite()</code> results

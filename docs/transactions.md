@@ -49,12 +49,12 @@ The `Connection#transaction()` function informs Mongoose change tracking that th
 const doc = new Person({ name: 'Will Riker' });
 
 await db.transaction(async function setRank(session) {
-    doc.name = 'Captain';
-    await doc.save({ session });
-    doc.isNew; // false
+  doc.name = 'Captain';
+  await doc.save({ session });
+  doc.isNew; // false
 
-    // Throw an error to abort the transaction
-    throw new Error('Oops!');
+  // Throw an error to abort the transaction
+  throw new Error('Oops!');
 }, { readPreference: 'primary' }).catch(() => {});
 
 // true, `transaction()` reset the document's state because the

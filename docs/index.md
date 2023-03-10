@@ -33,7 +33,7 @@ main().catch(err => console.log(err));
 
 async function main() {
   await mongoose.connect('mongodb://127.0.0.1:27017/test');
-  
+
   // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
 }
 ```
@@ -71,8 +71,8 @@ to our documents:
 // NOTE: methods must be added to the schema before compiling it with mongoose.model()
 kittySchema.methods.speak = function speak() {
   const greeting = this.name
-    ? "Meow name is " + this.name
-    : "I don't have a name";
+    ? 'Meow name is ' + this.name
+    : 'I don\'t have a name';
   console.log(greeting);
 };
 

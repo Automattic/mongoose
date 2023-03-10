@@ -59,33 +59,33 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 
 ```javascript
 const schema = new Schema({
-  name:    String,
-  binary:  Buffer,
-  living:  Boolean,
-  updated: { type: Date, default: Date.now },
-  age:     { type: Number, min: 18, max: 65 },
-  mixed:   Schema.Types.Mixed,
-  _someId: Schema.Types.ObjectId,
-  decimal: Schema.Types.Decimal128,
-  array: [],
-  ofString: [String],
-  ofNumber: [Number],
-  ofDates: [Date],
-  ofBuffer: [Buffer],
-  ofBoolean: [Boolean],
-  ofMixed: [Schema.Types.Mixed],
-  ofObjectId: [Schema.Types.ObjectId],
-  ofArrays: [[]],
+  name:             String,
+  binary:           Buffer,
+  living:           Boolean,
+  updated:          { type: Date, default: Date.now },
+  age:              { type: Number, min: 18, max: 65 },
+  mixed:            Schema.Types.Mixed,
+  _someId:          Schema.Types.ObjectId,
+  decimal:          Schema.Types.Decimal128,
+  array:            [],
+  ofString:         [String],
+  ofNumber:         [Number],
+  ofDates:          [Date],
+  ofBuffer:         [Buffer],
+  ofBoolean:        [Boolean],
+  ofMixed:          [Schema.Types.Mixed],
+  ofObjectId:       [Schema.Types.ObjectId],
+  ofArrays:         [[]],
   ofArrayOfNumbers: [[Number]],
-  nested: {
+  nested:           {
     stuff: { type: String, lowercase: true, trim: true }
   },
-  map: Map,
+  map:         Map,
   mapOfString: {
     type: Map,
-    of: String
+    of:   String
   }
-})
+});
 
 // example use
 
@@ -101,8 +101,8 @@ m.mixed = { any: { thing: 'i want' } };
 m.markModified('mixed');
 m._someId = new mongoose.Types.ObjectId;
 m.array.push(1);
-m.ofString.push("strings!");
-m.ofNumber.unshift(1,2,3,4);
+m.ofString.push('strings!');
+m.ofNumber.unshift(1, 2, 3, 4);
 m.ofDates.addToSet(new Date);
 m.ofBuffer.pop();
 m.ofMixed = [1, [], 'three', { four: 5 }];
@@ -120,10 +120,10 @@ it needs to define a SchemaType with the given type.
 ```javascript
 // 3 string SchemaTypes: 'name', 'nested.firstName', 'nested.lastName'
 const schema = new Schema({
-  name: { type: String },
+  name:   { type: String },
   nested: {
     firstName: { type: String },
-    lastName: { type: String }
+    lastName:  { type: String }
   }
 });
 ```
@@ -139,7 +139,7 @@ const holdingSchema = new Schema({
   // but unfortunately `type` is special in Mongoose so mongoose
   // interprets this schema to mean that `asset` is a string
   asset: {
-    type: String,
+    type:   String,
     ticker: String
   }
 });
@@ -156,7 +156,7 @@ const holdingSchema = new Schema({
     // Workaround to make sure Mongoose knows `asset` is an object
     // and `asset.type` is a string, rather than thinking `asset`
     // is a string.
-    type: { type: String },
+    type:   { type: String },
     ticker: String
   }
 });
@@ -184,7 +184,7 @@ for a path. For example, if you want to lowercase a string before saving:
 ```javascript
 const schema2 = new Schema({
   test: {
-    type: String,
+    type:      String,
     lowercase: true // Always convert `test` to lowercase
   }
 });
@@ -215,9 +215,9 @@ types.
 ```javascript
 const numberSchema = new Schema({
   integerOnly: {
-    type: Number,
-    get: v => Math.round(v),
-    set: v => Math.round(v),
+    type:  Number,
+    get:   v => Math.round(v),
+    set:   v => Math.round(v),
     alias: 'i'
   }
 });
@@ -245,8 +245,8 @@ using schema type options.
 ```javascript
 const schema2 = new Schema({
   test: {
-    type: String,
-    index: true,
+    type:   String,
+    index:  true,
     unique: true // Unique index. If you specify `unique: true`
     // specifying `index: true` is optional if you do `unique: true`
   }
@@ -342,13 +342,13 @@ will all result in a [CastError](validation.html#cast-errors) once validated, me
 
 ```javascript
 const Assignment = mongoose.model('Assignment', { dueDate: Date });
-Assignment.findOne(function (err, doc) {
+Assignment.findOne(function(err, doc) {
   doc.dueDate.setMonth(3);
   doc.save(callback); // THIS DOES NOT SAVE YOUR CHANGE
 
   doc.markModified('dueDate');
   doc.save(callback); // works
-})
+});
 ```
 
 <h3 id="buffers">Buffer</h3>
@@ -393,7 +393,7 @@ To avoid these side-effects, a [Subdocument](subdocs.html) path may be used
 instead.
 
 ```javascript
-person.anything = { x: [3, 4, { y: "changed" }] };
+person.anything = { x: [3, 4, { y: 'changed' }] };
 person.markModified('anything');
 person.save(); // Mongoose will save changes to `anything`.
 ```
@@ -469,7 +469,7 @@ _document arrays_.
 ```javascript
 const ToySchema = new Schema({ name: String });
 const ToyBoxSchema = new Schema({
-  toys: [ToySchema],
+  toys:    [ToySchema],
   buffers: [Buffer],
   strings: [String],
   numbers: [Number]
@@ -489,7 +489,7 @@ To overwrite this default, you need to set the default value to `undefined`
 ```javascript
 const ToyBoxSchema = new Schema({
   toys: {
-    type: [ToySchema],
+    type:    [ToySchema],
     default: undefined
   }
 });
@@ -519,7 +519,7 @@ const userSchema = new Schema({
   // keys are always strings. You specify the type of values using `of`.
   socialMediaHandles: {
     type: Map,
-    of: String
+    of:   String
   }
 });
 
@@ -527,7 +527,7 @@ const User = mongoose.model('User', userSchema);
 // Map { 'github' => 'vkarpov15', 'twitter' => '@code_barbarian' }
 console.log(new User({
   socialMediaHandles: {
-    github: 'vkarpov15',
+    github:  'vkarpov15',
     twitter: '@code_barbarian'
   }
 }).socialMediaHandles);
@@ -572,11 +572,11 @@ For example, suppose your `socialMediaHandles` map contains a `ref`:
 const userSchema = new Schema({
   socialMediaHandles: {
     type: Map,
-    of: new Schema({
+    of:   new Schema({
       handle: String,
-      oauth: {
+      oauth:  {
         type: ObjectId,
-        ref: 'OAuth'
+        ref:  'OAuth'
       }
     })
   }
@@ -643,10 +643,10 @@ your `userSchema`:
 const root = 'https://s3.amazonaws.com/mybucket';
 
 const userSchema = new Schema({
-  name: String,
+  name:    String,
   picture: {
     type: String,
-    get: v => `${root}${v}`
+    get:  v => `${root}${v}`
   }
 });
 

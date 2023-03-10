@@ -29,13 +29,13 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const blogSchema = new Schema({
-  title:  String, // String is shorthand for {type: String}
-  author: String,
-  body:   String,
+  title:    String, // String is shorthand for {type: String}
+  author:   String,
+  body:     String,
   comments: [{ body: String, date: Date }],
-  date: { type: Date, default: Date.now },
-  hidden: Boolean,
-  meta: {
+  date:     { type: Date, default: Date.now },
+  hidden:   Boolean,
+  meta:     {
     votes: Number,
     favs:  Number
   }
@@ -145,15 +145,15 @@ We may also define our own custom document instance methods.
 ```javascript
 // define a schema
 const animalSchema = new Schema({ name: String, type: String },
-{
+  {
   // Assign a function to the "methods" object of our animalSchema through schema options.
   // By following this approach, there is no need to create a separate TS type to define the type of the instance functions.
-  methods: {
-    findSimilarTypes(cb) {
-      return mongoose.model('Animal').find({ type: this.type }, cb);
+    methods: {
+      findSimilarTypes(cb) {
+        return mongoose.model('Animal').find({ type: this.type }, cb);
+      }
     }
-  }
-});
+  });
 
 // Or, assign a function to the "methods" object of our animalSchema
 animalSchema.methods.findSimilarTypes = function(cb) {
@@ -190,15 +190,15 @@ ways to add a static:
 
 // define a schema
 const animalSchema = new Schema({ name: String, type: String },
-{
+  {
   // Assign a function to the "statics" object of our animalSchema through schema options.
-  // By following this approach, there is no need to create a separate TS type to define the type of the statics functions. 
-  statics: {
-    findByName(name) {
-      return this.find({ name: new RegExp(name, 'i') });
+  // By following this approach, there is no need to create a separate TS type to define the type of the statics functions.
+    statics: {
+      findByName(name) {
+        return this.find({ name: new RegExp(name, 'i') });
+      }
     }
-  }
-});
+  });
 
 // Or, Assign a function to the "statics" object of our animalSchema
 animalSchema.statics.findByName = function(name) {
@@ -224,19 +224,19 @@ but for mongoose queries. Query helper methods let you extend mongoose's
 
 // define a schema
 const animalSchema = new Schema({ name: String, type: String },
-{
+  {
   // Assign a function to the "query" object of our animalSchema through schema options.
-  // By following this approach, there is no need to create a separate TS type to define the type of the query functions. 
-  query:{
-    byName(name){
-      return this.where({ name: new RegExp(name, 'i') })
+  // By following this approach, there is no need to create a separate TS type to define the type of the query functions.
+    query: {
+      byName(name) {
+        return this.where({ name: new RegExp(name, 'i') });
+      }
     }
-  }
-});
+  });
 
 // Or, Assign a function to the "query" object of our animalSchema
 animalSchema.query.byName = function(name) {
-  return this.where({ name: new RegExp(name, 'i') })
+  return this.where({ name: new RegExp(name, 'i') });
 };
 
 const Animal = mongoose.model('Animal', animalSchema);
@@ -315,7 +315,7 @@ de-composing a single value into multiple values for storage.
 const personSchema = new Schema({
   name: {
     first: String,
-    last: String
+    last:  String
   }
 });
 
@@ -346,7 +346,7 @@ define a `fullName` property that won't get persisted to MongoDB.
 const personSchema = new Schema({
   name: {
     first: String,
-    last: String
+    last:  String
   }
 }, {
   virtuals: {
@@ -358,7 +358,7 @@ const personSchema = new Schema({
   }
 });
 
-// Or by using the virtual method as following:  
+// Or by using the virtual method as following:
 personSchema.virtual('fullName').get(function() {
   return this.name.first + ' ' + this.name.last;
 });
@@ -433,7 +433,7 @@ into a longer name for code readability.
 ```javascript
 const personSchema = new Schema({
   n: {
-    type: String,
+    type:  String,
     // Now accessing `name` will get you the value of `n`, and setting `name` will set the value of `n`
     alias: 'name'
   }
@@ -540,7 +540,7 @@ That is because the MongoDB server does not allow changing a collection's option
 ```javascript
 const schema = new Schema({ name: String }, {
   autoCreate: false,
-  capped: { size: 1024 }
+  capped:     { size: 1024 }
 });
 const Test = mongoose.model('Test', schema);
 
@@ -686,13 +686,13 @@ const schema = new Schema({ name: String, inventory: {} });
 const Character = mongoose.model('Character', schema);
 
 // will store `inventory` field if it is not empty
-const frodo = new Character({ name: 'Frodo', inventory: { ringOfPower: 1 }});
+const frodo = new Character({ name: 'Frodo', inventory: { ringOfPower: 1 } });
 await frodo.save();
 let doc = await Character.findOne({ name: 'Frodo' }).lean();
 doc.inventory; // { ringOfPower: 1 }
 
 // will not store `inventory` field if it is empty
-const sam = new Character({ name: 'Sam', inventory: {}});
+const sam = new Character({ name: 'Sam', inventory: {} });
 await sam.save();
 doc = await Character.findOne({ name: 'Sam' }).lean();
 doc.inventory; // undefined
@@ -766,8 +766,8 @@ at the schema level.
 ```javascript
 const schema = new Schema({ name: String }, {
   writeConcern: {
-    w: 'majority',
-    j: true,
+    w:        'majority',
+    j:        true,
     wtimeout: 1000
   }
 });
@@ -864,7 +864,7 @@ Mongoose has a separate `strictQuery` option to toggle strict mode for the `filt
 
 ```javascript
 const mySchema = new Schema({ field: Number }, {
-  strict: true,
+  strict:      true,
   strictQuery: false // Turn off strict mode for query filters
 });
 const MyModel = mongoose.model('Test', mySchema);
@@ -911,7 +911,7 @@ the document's [`toJSON` method](https://thecodebarbarian.com/what-is-the-tojson
 
 ```javascript
 const schema = new Schema({ name: String });
-schema.path('name').get(function (v) {
+schema.path('name').get(function(v) {
   return v + ' is my name';
 });
 schema.set('toJSON', { getters: true, virtuals: false });
@@ -966,7 +966,7 @@ uses to find type declarations, set the 'typeKey' schema option.
 ```javascript
 const schema = new Schema({
   // Mongoose interprets this as 'loc is an object with 2 keys, type and coordinates'
-  loc: { type: String, coordinates: [Number] },
+  loc:  { type: String, coordinates: [Number] },
   // Mongoose interprets this as 'name is a String'
   name: { $type: String }
 }, { typeKey: '$type' }); // A '$type' key means this object is a type declaration
@@ -982,13 +982,13 @@ validation, you can set `validateBeforeSave` to false.
 ```javascript
 const schema = new Schema({ name: String });
 schema.set('validateBeforeSave', false);
-schema.path('name').validate(function (value) {
-    return value != null;
+schema.path('name').validate(function(value) {
+  return value != null;
 });
 const M = mongoose.model('Person', schema);
 const m = new M({ name: null });
 m.validate(function(err) {
-    console.log(err); // Will tell you that null is not allowed.
+  console.log(err); // Will tell you that null is not allowed.
 });
 m.save(); // Succeeds despite being invalid
 ```
@@ -1087,7 +1087,7 @@ async function markApproved(id) {
   if (house.photos.length < 2) {
     throw new Error('House must have at least two photos!');
   }
-  
+
   house.status = 'APPROVED';
   await house.save();
 }
@@ -1164,11 +1164,11 @@ If you set the `timeseries` option on a schema, Mongoose will create a [timeseri
 ```javascript
 const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
   timeseries: {
-    timeField: 'timestamp',
-    metaField: 'metadata',
+    timeField:   'timestamp',
+    metaField:   'metadata',
     granularity: 'hours'
   },
-  autoCreate: false,
+  autoCreate:         false,
   expireAfterSeconds: 86400
 });
 
@@ -1247,7 +1247,7 @@ the current time.
 const schema = Schema({
   createdAt: Number,
   updatedAt: Number,
-  name: String
+  name:      String
 }, {
   // Make Mongoose use Unix time (seconds since Jan 1, 1970)
   timestamps: { currentTime: () => Math.floor(Date.now() / 1000) }
@@ -1298,7 +1298,7 @@ you, unless you explicitly exclude them.
 
 ```javascript
 const bookSchema = new Schema({
-  title: 'String',
+  title:  'String',
   author: { type: 'ObjectId', ref: 'Person' }
 });
 const Book = mongoose.model('Book', bookSchema);
@@ -1315,7 +1315,7 @@ to `false` in your schema.
 
 ```javascript
 const bookSchema = new Schema({
-  title: 'String',
+  title:  'String',
   author: { type: 'ObjectId', ref: 'Person' }
 }, { selectPopulatedPaths: false });
 const Book = mongoose.model('Book', bookSchema);

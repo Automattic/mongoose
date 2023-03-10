@@ -121,12 +121,12 @@ const mainSchema = new mongoose.Schema({
   child: [childSchema]
 });
 
-mainSchema.pre('findOneAndUpdate', function () {
-   console.log('Middleware on parent document'); // Will be executed
+mainSchema.pre('findOneAndUpdate', function() {
+  console.log('Middleware on parent document'); // Will be executed
 });
 
-childSchema.pre('findOneAndUpdate', function () {
-   console.log('Middleware on subdocument'); // Will not be executed
+childSchema.pre('findOneAndUpdate', function() {
+  console.log('Middleware on subdocument'); // Will not be executed
 });
 ```
 
@@ -461,7 +461,7 @@ Error handling middleware can then transform the error however you want.
 ```javascript
 const schema = new Schema({
   name: {
-    type: String,
+    type:   String,
     // Will trigger a MongoServerError with code 11000 when
     // you save a duplicate
     unique: true

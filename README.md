@@ -197,8 +197,8 @@ MyModel.find({}, function(err, docs) {
 You can also `findOne`, `findById`, `update`, etc.
 
 ```js
-const instance = await MyModel.findOne({ ... });
-console.log(instance.my.key);  // 'hello'
+const instance = await MyModel.findOne({ /* ... */ });
+console.log(instance.my.key); // 'hello'
 ```
 
 For more details check out [the docs](http://mongoosejs.com/docs/queries.html).

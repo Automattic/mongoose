@@ -78,10 +78,31 @@
         "node": false,
         "browser": true
       }
+    },
+    {
+      "files": ["**/*.md"],
+      "processor": "markdown/markdown"
+    },
+    {
+      "files": ["**/*.md/*.js", "**/*.md/*.javascript"],
+      "parserOptions": {
+        "ecmaFeatures": {
+          "impliedStrict": true
+        },
+        "sourceType": "module",
+        "ecmaVersion": "latest"
+      },
+      "rules": {
+        "no-undef": "off",
+        "no-unused-expressions": "off",
+        "no-unused-vars": "off",
+        "key-spacing": ["warn", { "align": "value" }]
+      }
     }
   ],
   "plugins": [
-    "mocha-no-only"
+    "mocha-no-only",
+    "markdown"
   ],
   "parserOptions": {
     "ecmaVersion": 2020

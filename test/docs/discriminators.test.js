@@ -107,9 +107,9 @@ describe('discriminator docs', function() {
     event.__t = 'SignedUp';
     // ValidationError: ClickedLink validation failed: __t: Cast to String failed for value "SignedUp" (type string) at path "__t"
     // acquit:ignore:start
-    await assert.rejects(async () => {
+    await assert.rejects(async() => {
     // acquit:ignore:end
-    await event.save();
+      await event.save();
     // acquit:ignore:start
     }, /__t: Cast to String failed/);
     // acquit:ignore:end
@@ -148,7 +148,7 @@ describe('discriminator docs', function() {
 
     await Promise.all([event1.save(), event2.save(), event3.save()]);
     const docs = await ClickedLinkEvent.find({});
-    
+
     assert.equal(docs.length, 1);
     assert.equal(docs[0]._id.toString(), event2._id.toString());
     assert.equal(docs[0].url, 'google.com');
@@ -181,13 +181,13 @@ describe('discriminator docs', function() {
 
     const event1 = new ClickedLinkEvent();
     await event1.validate();
-    
+
     assert.equal(eventSchemaCalls, 1);
     assert.equal(clickedSchemaCalls, 1);
 
     const generic = new Event();
     await generic.validate();
-    
+
     assert.equal(eventSchemaCalls, 2);
     assert.equal(clickedSchemaCalls, 1);
   });

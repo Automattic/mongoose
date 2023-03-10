@@ -51,7 +51,7 @@ describe('validation docs', function() {
     } catch (err) {
       error = err;
     }
-    
+
     assert.equal(error.errors['name'].message,
       'Path `name` is required.');
 
@@ -325,10 +325,10 @@ describe('validation docs', function() {
     let error;
     try {
       await toy.save();
-    } catch(err) {
+    } catch (err) {
       error = err;
     }
-    
+
     // `error` is a ValidationError object
     // `error.errors.color` is a ValidatorError object
     assert.equal(error.errors.color.message, 'Color `Green` not valid');

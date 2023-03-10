@@ -82,33 +82,34 @@ module.exports = {
         node: false,
         browser: true
       }
-    },
-    {
-      files: ['**/*.md'],
-      processor: 'markdown/markdown'
-    },
-    {
-      files: ['**/*.md/*.js', '**/*.md/*.javascript', '**/*.md/*.ts', '**/*.md/*.typescript'],
-      parserOptions: {
-        ecmaFeatures: {
-          impliedStrict: true
-        },
-        sourceType: 'module',
-        ecmaVersion: 'latest'
-      },
-      rules: {
-        'no-undef': 'off',
-        'no-unused-expressions': 'off',
-        'no-unused-vars': 'off',
-        'key-spacing': ['warn', { align: 'value' }],
-        'no-redeclare': 'off',
-        '@typescript-eslint/no-redeclare': 'off'
-      }
     }
+    // eslint-plugin-markdown has been disabled because of out-standing issues, see https://github.com/eslint/eslint-plugin-markdown/issues/214
+    // {
+    //   files: ['**/*.md'],
+    //   processor: 'markdown/markdown'
+    // },
+    // {
+    //   files: ['**/*.md/*.js', '**/*.md/*.javascript', '**/*.md/*.ts', '**/*.md/*.typescript'],
+    //   parserOptions: {
+    //     ecmaFeatures: {
+    //       impliedStrict: true
+    //     },
+    //     sourceType: 'module',
+    //     ecmaVersion: 'latest'
+    //   },
+    //   rules: {
+    //     'no-undef': 'off',
+    //     'no-unused-expressions': 'off',
+    //     'no-unused-vars': 'off',
+    //     'key-spacing': ['warn', { align: 'value' }],
+    //     'no-redeclare': 'off',
+    //     '@typescript-eslint/no-redeclare': 'off'
+    //   }
+    // }
   ],
   plugins: [
-    'mocha-no-only',
-    'markdown'
+    'mocha-no-only'
+    // 'markdown'
   ],
   parserOptions: {
     ecmaVersion: 2020

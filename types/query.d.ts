@@ -109,7 +109,7 @@ declare module 'mongoose' {
     /**
      * If truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document.
      */
-    lean?: boolean | any;
+    lean?: boolean | Record<string, any>;
     limit?: number;
     maxTimeMS?: number;
     multi?: boolean;

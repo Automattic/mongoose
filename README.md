@@ -285,13 +285,13 @@ schema.pre('set', function(next, path, val, typel) {
 Moreover, you can mutate the incoming `method` arguments so that subsequent middleware see different values for those arguments. To do so, just pass the new values to `next`:
 
 ```js
-.pre(method, function firstPre (next, methodArg1, methodArg2) {
+schema.pre(method, function firstPre(next, methodArg1, methodArg2) {
   // Mutate methodArg1
-  next("altered-" + methodArg1.toString(), methodArg2);
+  next('altered-' + methodArg1.toString(), methodArg2);
 });
 
 // pre declaration is chainable
-.pre(method, function secondPre (next, methodArg1, methodArg2) {
+schema.pre(method, function secondPre(next, methodArg1, methodArg2) {
   console.log(methodArg1);
   // => 'altered-originalValOfMethodArg1'
 

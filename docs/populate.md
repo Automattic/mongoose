@@ -212,7 +212,7 @@ What if we wanted to populate multiple paths at the same time?
 
 ```javascript
 Story.
-  find(...).
+  find({ /* ... */ }).
   populate('fans').
   populate('author').
   exec();

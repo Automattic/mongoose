@@ -3,7 +3,6 @@
     "eslint:recommended"
   ],
   "ignorePatterns": [
-    "docs",
     "tools",
     "dist",
     "website.js",

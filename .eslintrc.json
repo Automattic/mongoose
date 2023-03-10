@@ -68,6 +68,15 @@
         ],
         "@typescript-eslint/space-infix-ops": "off"
       }
+    },
+    {
+      "files": [
+        "docs/js/**/*.js"
+      ],
+      "env": {
+        "node": false,
+        "browser": true
+      }
     }
   ],
   "plugins": [

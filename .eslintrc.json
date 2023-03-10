@@ -84,7 +84,7 @@
       "processor": "markdown/markdown"
     },
     {
-      "files": ["**/*.md/*.js", "**/*.md/*.javascript"],
+      "files": ["**/*.md/*.js", "**/*.md/*.javascript", "**/*.md/*.ts", "**/*.md/*.typescript"],
       "parserOptions": {
         "ecmaFeatures": {
           "impliedStrict": true
@@ -96,7 +96,9 @@
         "no-undef": "off",
         "no-unused-expressions": "off",
         "no-unused-vars": "off",
-        "key-spacing": ["warn", { "align": "value" }]
+        "key-spacing": ["warn", { "align": "value" }],
+        "no-redeclare": "off",
+        "@typescript-eslint/no-redeclare": "off"
       }
     }
   ],

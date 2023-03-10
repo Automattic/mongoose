@@ -94,14 +94,14 @@ module.exports = {
     //     ecmaFeatures: {
     //       impliedStrict: true
     //     },
-    //     sourceType: 'module',
-    //     ecmaVersion: 'latest'
+    //     sourceType: 'module', // required to allow "import" statements
+    //     ecmaVersion: 'latest' // required to allow top-level await
     //   },
     //   rules: {
     //     'no-undef': 'off',
     //     'no-unused-expressions': 'off',
     //     'no-unused-vars': 'off',
-    //     'key-spacing': ['warn', { align: 'value' }],
+    //     'key-spacing': ['warn', { align: 'value' }], // align all key-value pairs in objects
     //     'no-redeclare': 'off',
     //     '@typescript-eslint/no-redeclare': 'off'
     //   }

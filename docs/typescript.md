@@ -25,8 +25,8 @@ interface IUser {
 
 // 2. Create a Schema corresponding to the document interface.
 const userSchema = new Schema<IUser>({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
+  name:   { type: String, required: true },
+  email:  { type: String, required: true },
   avatar: String
 });
 
@@ -40,8 +40,8 @@ async function run() {
   await connect('mongodb://127.0.0.1:27017/test');
 
   const user = new User({
-    name: 'Bill',
-    email: 'bill@initech.com',
+    name:   'Bill',
+    email:  'bill@initech.com',
     avatar: 'https://i.imgur.com/dM7Thhn.png'
   });
   await user.save();
@@ -61,8 +61,8 @@ The `User()` constructor returns an instance of `HydratedDocument<IUser>`.
 import { HydratedDocument } from 'mongoose';
 
 const user: HydratedDocument<IUser> = new User({
-  name: 'Bill',
-  email: 'bill@initech.com',
+  name:   'Bill',
+  email:  'bill@initech.com',
   avatar: 'https://i.imgur.com/dM7Thhn.png'
 });
 ```
@@ -84,8 +84,8 @@ interface IUser {
 
 // 2. Create a Schema corresponding to the document interface.
 const userSchema = new Schema<IUser>({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
+  name:         { type: String, required: true },
+  email:        { type: String, required: true },
   // And `Schema.Types.ObjectId` in the schema definition.
   organization: { type: Schema.Types.ObjectId, ref: 'Organization' }
 });

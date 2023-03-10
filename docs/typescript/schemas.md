@@ -17,8 +17,8 @@ interface User {
 
 // Schema
 const schema = new Schema<User>({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
+  name:   { type: String, required: true },
+  email:  { type: String, required: true },
   avatar: String
 });
 ```
@@ -43,13 +43,13 @@ import { Schema, InferSchemaType } from 'mongoose';
 
 // Schema
 const schema = new Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
+  name:   { type: String, required: true },
+  email:  { type: String, required: true },
   avatar: String
 });
 
 type User = InferSchemaType<typeof schema>;
-// InferSchemaType will determine the type as follows: 
+// InferSchemaType will determine the type as follows:
 // type User = {
 //   name: string;
 //   email: string;
@@ -95,7 +95,7 @@ Mongoose wraps `DocType` in a Mongoose document for cases like the `this` parame
 For example:
 
 ```typescript
-schema.pre('save', function (): void {
+schema.pre('save', function(): void {
   console.log(this.name); // TypeScript knows that `this` is a `mongoose.Document & User` by default
 });
 ```
@@ -124,7 +124,7 @@ interface User {
 // Object literal may only specify known properties, but 'emaill' does not exist in type ...
 // Did you mean to write 'email'?
 const schema = new Schema<User>({
-  name: { type: String, required: true },
+  name:   { type: String, required: true },
   emaill: { type: String, required: true },
   avatar: String
 });
@@ -144,9 +144,9 @@ interface User {
 }
 
 const schema = new Schema<User, Model<User>>({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  avatar: String,
+  name:   { type: String, required: true },
+  email:  { type: String, required: true },
+  avatar: String
 });
 ```
 
@@ -170,8 +170,8 @@ interface User {
 }
 
 const schema = new Schema<User, Model<User>>({
-  tags: [String],
-  blogPosts: [{ title: String }],
+  tags:      [String],
+  blogPosts: [{ title: String }]
 });
 ```
 

@@ -7,7 +7,8 @@
     "dist",
     "website.js",
     "test/files/*",
-    "benchmarks"
+    "benchmarks",
+    "*.min.js"
   ],
   "overrides": [
     {

@@ -12,7 +12,7 @@ const parentSchema = new Schema({
   // Array of subdocuments
   children: [childSchema],
   // Single nested subdocuments
-  child:    childSchema
+  child: childSchema
 });
 ```
 
@@ -27,7 +27,7 @@ const Child = mongoose.model('Child', childSchema);
 const parentSchema = new Schema({
   child: {
     type: mongoose.ObjectId,
-    ref:  'Child'
+    ref: 'Child'
   }
 });
 const Parent = mongoose.model('Parent', parentSchema);
@@ -170,8 +170,8 @@ path to a non-nullish value.
 const subdocumentSchema = new mongoose.Schema({
   child: new mongoose.Schema({
     name: String,
-    age:  {
-      type:    Number,
+    age: {
+      type: Number,
       default: 0
     }
   })
@@ -200,14 +200,14 @@ defaults: make the subdocument path default to an empty object.
 ```javascript
 const childSchema = new mongoose.Schema({
   name: String,
-  age:  {
-    type:    Number,
+  age: {
+    type: Number,
     default: 0
   }
 });
 const subdocumentSchema = new mongoose.Schema({
   child: {
-    type:    childSchema,
+    type: childSchema,
     default: () => ({})
   }
 });
@@ -282,13 +282,13 @@ parent using the `parent()` function.
 
 ```javascript
 const schema = new Schema({
-  docArr:       [{ name: String }],
+  docArr: [{ name: String }],
   singleNested: new Schema({ name: String })
 });
 const Model = mongoose.model('Test', schema);
 
 const doc = new Model({
-  docArr:       [{ name: 'foo' }],
+  docArr: [{ name: 'foo' }],
   singleNested: { name: 'bar' }
 });
 

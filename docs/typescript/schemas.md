@@ -17,8 +17,8 @@ interface User {
 
 // Schema
 const schema = new Schema<User>({
-  name:   { type: String, required: true },
-  email:  { type: String, required: true },
+  name: { type: String, required: true },
+  email: { type: String, required: true },
   avatar: String
 });
 ```
@@ -43,8 +43,8 @@ import { Schema, InferSchemaType } from 'mongoose';
 
 // Schema
 const schema = new Schema({
-  name:   { type: String, required: true },
-  email:  { type: String, required: true },
+  name: { type: String, required: true },
+  email: { type: String, required: true },
   avatar: String
 });
 
@@ -124,7 +124,7 @@ interface User {
 // Object literal may only specify known properties, but 'emaill' does not exist in type ...
 // Did you mean to write 'email'?
 const schema = new Schema<User>({
-  name:   { type: String, required: true },
+  name: { type: String, required: true },
   emaill: { type: String, required: true },
   avatar: String
 });
@@ -144,8 +144,8 @@ interface User {
 }
 
 const schema = new Schema<User, Model<User>>({
-  name:   { type: String, required: true },
-  email:  { type: String, required: true },
+  name: { type: String, required: true },
+  email: { type: String, required: true },
   avatar: String
 });
 ```
@@ -170,7 +170,7 @@ interface User {
 }
 
 const schema = new Schema<User, Model<User>>({
-  tags:      [String],
+  tags: [String],
   blogPosts: [{ title: String }]
 });
 ```

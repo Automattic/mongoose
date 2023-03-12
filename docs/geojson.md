@@ -25,15 +25,15 @@ Below is an example of a Mongoose schema where `location` is a point.
 
 ```javascript
 const citySchema = new mongoose.Schema({
-  name:     String,
+  name: String,
   location: {
     type: {
-      type:     String, // Don't do `{ location: { type: String } }`
-      enum:     ['Point'], // 'location.type' must be 'Point'
+      type: String, // Don't do `{ location: { type: String } }`
+      enum: ['Point'], // 'location.type' must be 'Point'
       required: true
     },
     coordinates: {
-      type:     [Number],
+      type: [Number],
       required: true
     }
   }
@@ -45,20 +45,20 @@ Using [subdocuments](subdocs.html), you can define a common `pointSchema` and re
 ```javascript
 const pointSchema = new mongoose.Schema({
   type: {
-    type:     String,
-    enum:     ['Point'],
+    type: String,
+    enum: ['Point'],
     required: true
   },
   coordinates: {
-    type:     [Number],
+    type: [Number],
     required: true
   }
 });
 
 const citySchema = new mongoose.Schema({
-  name:     String,
+  name: String,
   location: {
-    type:     pointSchema,
+    type: pointSchema,
     required: true
   }
 });
@@ -90,18 +90,18 @@ array of numbers.
 ```javascript
 const polygonSchema = new mongoose.Schema({
   type: {
-    type:     String,
-    enum:     ['Polygon'],
+    type: String,
+    enum: ['Polygon'],
     required: true
   },
   coordinates: {
-    type:     [[[Number]]], // Array of arrays of arrays of numbers
+    type: [[[Number]]], // Array of arrays of arrays of numbers
     required: true
   }
 });
 
 const citySchema = new mongoose.Schema({
-  name:     String,
+  name: String,
   location: polygonSchema
 });
 ```

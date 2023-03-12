@@ -125,10 +125,10 @@ is populated.
 
 ```javascript
 const blogPostSchema = new Schema({
-  title:  String,
+  title: String,
   author: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:  'Author'
+    ref: 'Author'
   }
 });
 const BlogPost = mongoose.model('BlogPost', blogPostSchema);

@@ -9,16 +9,16 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const personSchema = Schema({
-  _id:     Schema.Types.ObjectId,
-  name:    String,
-  age:     Number,
+  _id: Schema.Types.ObjectId,
+  name: String,
+  age: Number,
   stories: [{ type: Schema.Types.ObjectId, ref: 'Story' }]
 });
 
 const storySchema = Schema({
   author: { type: Schema.Types.ObjectId, ref: 'Person' },
-  title:  String,
-  fans:   [{ type: Schema.Types.ObjectId, ref: 'Person' }]
+  title: String,
+  fans: [{ type: Schema.Types.ObjectId, ref: 'Person' }]
 });
 
 const Story = mongoose.model('Story', storySchema);
@@ -67,16 +67,16 @@ properties, just assign the `_id` value:
 
 ```javascript
 const author = new Person({
-  _id:  new mongoose.Types.ObjectId(),
+  _id: new mongoose.Types.ObjectId(),
   name: 'Ian Fleming',
-  age:  50
+  age: 50
 });
 
 author.save(function(err) {
   if (err) return handleError(err);
 
   const story1 = new Story({
-    title:  'Casino Royale',
+    title: 'Casino Royale',
     author: author._id // assign the _id from the person
   });
 
@@ -175,7 +175,7 @@ give you an empty array instead.
 ```javascript
 const storySchema = Schema({
   authors: [{ type: Schema.Types.ObjectId, ref: 'Person' }],
-  title:   String
+  title: String
 });
 
 // Later
@@ -241,8 +241,8 @@ select just their names?
 Story.
   find().
   populate({
-    path:   'fans',
-    match:  { age: { $gte: 21 } },
+    path: 'fans',
+    match: { age: { $gte: 21 } },
     // Explicitly exclude `_id`, see http://bit.ly/2aEfTdB
     select: 'name -_id'
   }).
@@ -294,7 +294,7 @@ would find that the 2nd story has 0 fans:
 
 ```javascript
 const stories = await Story.find().populate({
-  path:    'fans',
+  path: 'fans',
   options: { limit: 2 }
 });
 
@@ -315,7 +315,7 @@ for each story, which may cause `populate()` to be slower.
 
 ```javascript
 const stories = await Story.find().populate({
-  path:             'fans',
+  path: 'fans',
   // Special option that tells Mongoose to execute a separate query
   // for each `story` to make sure we get 2 fans for each story.
   perDocumentLimit: 2
@@ -420,7 +420,7 @@ Say you have a user schema which keeps track of the user's friends.
 
 ```javascript
 const userSchema = new Schema({
-  name:    String,
+  name: String,
   friends: [{ type: ObjectId, ref: 'User' }]
 });
 ```
@@ -433,7 +433,7 @@ mongoose to populate the `friends` array of all the user's friends:
 User.
   findOne({ name: 'Val' }).
   populate({
-    path:     'friends',
+    path: 'friends',
     // Get friends of friends - populate the 'friends' array for every friend
     populate: { path: 'friends' }
   });
@@ -452,10 +452,10 @@ const conversationSchema = new Schema({ numMessages: Number });
 const Conversation = db2.model('Conversation', conversationSchema);
 
 const eventSchema = new Schema({
-  name:         String,
+  name: String,
   conversation: {
     type: ObjectId,
-    ref:  Conversation // `ref` is a **Model class**, not a string
+    ref: Conversation // `ref` is a **Model class**, not a string
   }
 });
 const Event = db1.model('Event', eventSchema);
@@ -494,17 +494,17 @@ storing comments. A user may comment on either a blog post or a product.
 ```javascript
 const commentSchema = new Schema({
   body: { type: String, required: true },
-  doc:  {
-    type:     Schema.Types.ObjectId,
+  doc: {
+    type: Schema.Types.ObjectId,
     required: true,
     // Instead of a hardcoded model name in `ref`, `refPath` means Mongoose
     // will look at the `docModel` property to find the right model.
-    refPath:  'docModel'
+    refPath: 'docModel'
   },
   docModel: {
-    type:     String,
+    type: String,
     required: true,
-    enum:     ['BlogPost', 'Product']
+    enum: ['BlogPost', 'Product']
   }
 });
 
@@ -522,14 +522,14 @@ const book = await Product.create({ name: 'The Count of Monte Cristo' });
 const post = await BlogPost.create({ title: 'Top 10 French Novels' });
 
 const commentOnBook = await Comment.create({
-  body:     'Great read',
-  doc:      book._id,
+  body: 'Great read',
+  doc: book._id,
   docModel: 'Product'
 });
 
 const commentOnPost = await Comment.create({
-  body:     'Very informative',
-  doc:      post._id,
+  body: 'Very informative',
+  doc: post._id,
   docModel: 'BlogPost'
 });
 
@@ -544,16 +544,16 @@ An alternative approach is to define separate `blogPost` and `product` propertie
 
 ```javascript
 const commentSchema = new Schema({
-  body:    { type: String, required: true },
+  body: { type: String, required: true },
   product: {
-    type:     Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
-    ref:      'Product'
+    ref: 'Product'
   },
   blogPost: {
-    type:     Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
-    ref:      'BlogPost'
+    ref: 'BlogPost'
   }
 });
 
@@ -585,14 +585,14 @@ For example, suppose you have 2 models: `Author` and `BlogPost`.
 
 ```javascript
 const AuthorSchema = new Schema({
-  name:  String,
+  name: String,
   posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost' }]
 });
 
 const BlogPostSchema = new Schema({
-  title:    String,
+  title: String,
   comments: [{
-    author:  { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
     content: String
   }]
 });
@@ -613,10 +613,10 @@ const AuthorSchema = new Schema({
 });
 
 const BlogPostSchema = new Schema({
-  title:    String,
-  author:   { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
+  title: String,
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
   comments: [{
-    author:  { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
     content: String
   }]
 });
@@ -630,8 +630,8 @@ Virtual populate means calling `populate()` on a virtual property that has a `re
 // Specifying a virtual with a `ref` property is how you enable virtual
 // population
 AuthorSchema.virtual('posts', {
-  ref:          'BlogPost',
-  localField:   '_id',
+  ref: 'BlogPost',
+  localField: '_id',
   foreignField: 'author'
 });
 
@@ -652,7 +652,7 @@ If you want populate virtuals to show up when using functions like Express' [`re
 
 ```javascript
 const authorSchema = new Schema({ name: String }, {
-  toJSON:   { virtuals: true }, // So `res.json()` and other `JSON.stringify()` functions include virtuals
+  toJSON: { virtuals: true }, // So `res.json()` and other `JSON.stringify()` functions include virtuals
   toObject: { virtuals: true } // So `console.log()` and other functions that use `toObject()` include virtuals
 });
 ```
@@ -690,10 +690,10 @@ const BandSchema = new Schema({
   name: String
 });
 BandSchema.virtual('numMembers', {
-  ref:          'Person', // The model to use
-  localField:   'name', // Find people where `localField`
+  ref: 'Person', // The model to use
+  localField: 'name', // Find people where `localField`
   foreignField: 'band', // is equal to `foreignField`
-  count:        true // And only get the number of docs
+  count: true // And only get the number of docs
 });
 
 // Later
@@ -710,10 +710,10 @@ This option adds an extra filter condition to the query Mongoose uses to `popula
 ```javascript
 // Same example as 'Populate Virtuals' section
 AuthorSchema.virtual('posts', {
-  ref:          'BlogPost',
-  localField:   '_id',
+  ref: 'BlogPost',
+  localField: '_id',
   foreignField: 'author',
-  match:        { archived: false } // match option with basic query selector
+  match: { archived: false } // match option with basic query selector
 });
 
 const Author = mongoose.model('Author', AuthorSchema, 'Author');
@@ -731,13 +731,13 @@ For example, suppose you only want to populate blog posts whose `tags` contain o
 
 ```javascript
 AuthorSchema.virtual('posts', {
-  ref:          'BlogPost',
-  localField:   '_id',
+  ref: 'BlogPost',
+  localField: '_id',
   foreignField: 'author',
   // Add an additional filter `{ tags: author.favoriteTags }` to the populate query
   // Mongoose calls the `match` function with the document being populated as the
   // first argument.
-  match:        author => ({ tags: author.favoriteTags })
+  match: author => ({ tags: author.favoriteTags })
 });
 ```
 
@@ -748,12 +748,12 @@ string keys. For example, in the below schema, `members` is a map from strings t
 
 ```javascript
 const BandSchema = new Schema({
-  name:    String,
+  name: String,
   members: {
     type: Map,
-    of:   {
+    of: {
       type: 'ObjectId',
-      ref:  'Person'
+      ref: 'Person'
     }
   }
 });
@@ -768,9 +768,9 @@ const person1 = new Person({ name: 'Vince Neil' });
 const person2 = new Person({ name: 'Mick Mars' });
 
 const band = new Band({
-  name:    'Motley Crue',
+  name: 'Motley Crue',
   members: {
-    singer:    person1._id,
+    singer: person1._id,
     guitarist: person2._id
   }
 });
@@ -790,14 +790,14 @@ have the below `librarySchema`:
 
 ```javascript
 const librarySchema = new Schema({
-  name:  String,
+  name: String,
   books: {
     type: Map,
-    of:   new Schema({
-      title:  String,
+    of: new Schema({
+      title: String,
       author: {
         type: 'ObjectId',
-        ref:  'Person'
+        ref: 'Person'
       }
     })
   }
@@ -851,8 +851,8 @@ Populating multiple paths in middleware can be helpful when you always want to p
 
 ```javascript
 const userSchema = new Schema({
-  email:     String,
-  password:  String,
+  email: String,
+  password: String,
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
@@ -893,7 +893,7 @@ The [original motivation](https://github.com/Automattic/mongoose/issues/3775) fo
 // With `transform`
 doc = await Parent.findById(doc).populate([
   {
-    path:      'child',
+    path: 'child',
     // If `doc` is null, use the original id instead
     transform: (doc, id) => doc == null ? id : doc
   }
@@ -910,7 +910,7 @@ For example, you can use `transform()` to "flatten" populated documents as follo
 let doc = await Parent.create({ children: [{ name: 'Luke' }, { name: 'Leia' }] });
 
 doc = await Parent.findById(doc).populate([{
-  path:      'children',
+  path: 'children',
   transform: doc => doc == null ? null : doc.name
 }]);
 
@@ -932,7 +932,7 @@ const ingredientSchema = new Schema({
   name: {
     type: internationalizedStringSchema,
     // When you access `name`, pull the document's locale
-    get:  function(value) {
+    get: function(value) {
       return value[this.$locals.language || 'en'];
     }
   }
@@ -961,7 +961,7 @@ await Recipe.create({ ingredients: [_id] });
 // Populate with setting `$locals.language` for internationalization
 const language = 'es';
 const recipes = await Recipe.find().populate({
-  path:      'ingredients',
+  path: 'ingredients',
   transform: function(doc) {
     doc.$locals.language = language;
     return doc;

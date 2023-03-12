@@ -31,7 +31,7 @@ To run getters when converting a document to JSON, set the [`toJSON.getters` opt
 const userSchema = new Schema({
   email: {
     type: String,
-    get:  obfuscate
+    get: obfuscate
   }
 }, { toJSON: { getters: true } });
 

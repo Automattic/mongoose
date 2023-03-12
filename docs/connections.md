@@ -80,9 +80,9 @@ to create [capped collections](guide.html#capped) or
 const schema = new Schema({
   name: String
 }, {
-  capped:         { size: 1024 },
+  capped: { size: 1024 },
   bufferCommands: false,
-  autoCreate:     false // disable `autoCreate` since `bufferCommands` is false
+  autoCreate: false // disable `autoCreate` since `bufferCommands` is false
 });
 
 const Model = mongoose.model('Test', schema);
@@ -164,11 +164,11 @@ Example:
 
 ```javascript
 const options = {
-  autoIndex:                false, // Don't build indexes
-  maxPoolSize:              10, // Maintain up to 10 socket connections
+  autoIndex: false, // Don't build indexes
+  maxPoolSize: 10, // Maintain up to 10 socket connections
   serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-  socketTimeoutMS:          45000, // Close sockets after 45 seconds of inactivity
-  family:                   4 // Use IPv4, skip trying IPv6
+  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+  family: 4 // Use IPv4, skip trying IPv6
 };
 mongoose.connect(uri, options);
 ```

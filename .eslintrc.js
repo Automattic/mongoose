@@ -84,7 +84,7 @@ module.exports = {
         browser: true
       }
     }
-    // eslint-plugin-markdown has been disabled because of out-standing issues, see https://github.com/eslint/eslint-plugin-markdown/issues/214
+    // // eslint-plugin-markdown has been disabled because of out-standing issues, see https://github.com/eslint/eslint-plugin-markdown/issues/214
     // {
     //   files: ['**/*.md'],
     //   processor: 'markdown/markdown'
@@ -102,7 +102,6 @@ module.exports = {
     //     'no-undef': 'off',
     //     'no-unused-expressions': 'off',
     //     'no-unused-vars': 'off',
-    //     'key-spacing': ['warn', { align: 'value' }], // align all key-value pairs in objects
     //     'no-redeclare': 'off',
     //     '@typescript-eslint/no-redeclare': 'off'
     //   }

@@ -166,7 +166,7 @@ The following example shows how you can create a new `RedactedUser` View on a `U
 // Make sure to disable `autoCreate` and `autoIndex` for Views,
 // because you want to create the collection manually.
 const userSchema = new Schema({
-  name:  String,
+  name: String,
   email: String,
   roles: [String]
 }, { autoCreate: false, autoIndex: false });
@@ -179,11 +179,11 @@ await User.createCollection();
 // Then create the `RedactedUser` model's underlying collection
 // as a View.
 await RedactedUser.createCollection({
-  viewOn:   'users', // Set `viewOn` to the collection name, **not** model name.
+  viewOn: 'users', // Set `viewOn` to the collection name, **not** model name.
   pipeline: [
     {
       $set: {
-        name:  { $concat: [{ $substr: ['$name', 0, 3] }, '...'] },
+        name: { $concat: [{ $substr: ['$name', 0, 3] }, '...'] },
         email: { $concat: [{ $substr: ['$email', 0, 3] }, '...'] }
       }
     }

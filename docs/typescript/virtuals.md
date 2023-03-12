@@ -13,7 +13,7 @@ import { Schema, Model, model } from 'mongoose';
 const schema = new Schema(
   {
     firstName: String,
-    lastName:  String
+    lastName: String
   },
   {
     virtuals: {
@@ -76,7 +76,7 @@ type UserModel = Model<UserDoc, {}, UserVirtuals>; // <-- add virtuals here...
 
 const schema = new Schema<UserDoc, UserModel, UserVirtuals>({ // <-- and here
   firstName: String,
-  lastName:  String
+  lastName: String
 });
 
 schema.virtual('fullName').get(function() {

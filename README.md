@@ -110,9 +110,9 @@ const ObjectId = Schema.ObjectId;
 
 const BlogPost = new Schema({
   author: ObjectId,
-  title:  String,
-  body:   String,
-  date:   Date
+  title: String,
+  body: String,
+  date: Date
 });
 ```
 
@@ -134,8 +134,8 @@ The following example shows some of these features:
 ```js
 const Comment = new Schema({
   name: { type: String, default: 'hahaha' },
-  age:  { type: Number, min: 18, index: true },
-  bio:  { type: String, match: /[a-z]/ },
+  age: { type: Number, min: 18, index: true },
+  bio: { type: String, match: /[a-z]/ },
   date: { type: Date, default: Date.now },
   buff: Buffer
 });
@@ -313,7 +313,7 @@ schema.pre(method, function secondPre(next, methodArg1, methodArg2) {
 ```js
 new Schema({
   broken: { type: Boolean },
-  asset:  {
+  asset: {
     name: String,
     type: String // uh oh, it broke. asset will be interpreted as String
   }

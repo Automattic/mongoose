@@ -29,15 +29,15 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const blogSchema = new Schema({
-  title:    String, // String is shorthand for {type: String}
-  author:   String,
-  body:     String,
+  title: String, // String is shorthand for {type: String}
+  author: String,
+  body: String,
   comments: [{ body: String, date: Date }],
-  date:     { type: Date, default: Date.now },
-  hidden:   Boolean,
-  meta:     {
+  date: { type: Date, default: Date.now },
+  hidden: Boolean,
+  meta: {
     votes: Number,
-    favs:  Number
+    favs: Number
   }
 });
 ```
@@ -314,7 +314,7 @@ de-composing a single value into multiple values for storage.
 const personSchema = new Schema({
   name: {
     first: String,
-    last:  String
+    last: String
   }
 });
 
@@ -345,7 +345,7 @@ define a `fullName` property that won't get persisted to MongoDB.
 const personSchema = new Schema({
   name: {
     first: String,
-    last:  String
+    last: String
   }
 }, {
   virtuals: {
@@ -384,7 +384,7 @@ first name and last name via the `fullName` virtual.
 const personSchema = new Schema({
   name: {
     first: String,
-    last:  String
+    last: String
   }
 }, {
   virtuals: {
@@ -432,7 +432,7 @@ into a longer name for code readability.
 ```javascript
 const personSchema = new Schema({
   n: {
-    type:  String,
+    type: String,
     // Now accessing `name` will get you the value of `n`, and setting `name` will set the value of `n`
     alias: 'name'
   }
@@ -539,7 +539,7 @@ That is because the MongoDB server does not allow changing a collection's option
 ```javascript
 const schema = new Schema({ name: String }, {
   autoCreate: false,
-  capped:     { size: 1024 }
+  capped: { size: 1024 }
 });
 const Test = mongoose.model('Test', schema);
 
@@ -765,8 +765,8 @@ at the schema level.
 ```javascript
 const schema = new Schema({ name: String }, {
   writeConcern: {
-    w:        'majority',
-    j:        true,
+    w: 'majority',
+    j: true,
     wtimeout: 1000
   }
 });
@@ -863,7 +863,7 @@ Mongoose has a separate `strictQuery` option to toggle strict mode for the `filt
 
 ```javascript
 const mySchema = new Schema({ field: Number }, {
-  strict:      true,
+  strict: true,
   strictQuery: false // Turn off strict mode for query filters
 });
 const MyModel = mongoose.model('Test', mySchema);
@@ -952,7 +952,7 @@ uses to find type declarations, set the 'typeKey' schema option.
 ```javascript
 const schema = new Schema({
   // Mongoose interprets this as 'loc is an object with 2 keys, type and coordinates'
-  loc:  { type: String, coordinates: [Number] },
+  loc: { type: String, coordinates: [Number] },
   // Mongoose interprets this as 'name is a String'
   name: { $type: String }
 }, { typeKey: '$type' }); // A '$type' key means this object is a type declaration
@@ -1150,11 +1150,11 @@ If you set the `timeseries` option on a schema, Mongoose will create a [timeseri
 ```javascript
 const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
   timeseries: {
-    timeField:   'timestamp',
-    metaField:   'metadata',
+    timeField: 'timestamp',
+    metaField: 'metadata',
     granularity: 'hours'
   },
-  autoCreate:         false,
+  autoCreate: false,
   expireAfterSeconds: 86400
 });
 
@@ -1237,7 +1237,7 @@ the current time.
 const schema = Schema({
   createdAt: Number,
   updatedAt: Number,
-  name:      String
+  name: String
 }, {
   // Make Mongoose use Unix time (seconds since Jan 1, 1970)
   timestamps: { currentTime: () => Math.floor(Date.now() / 1000) }
@@ -1288,7 +1288,7 @@ you, unless you explicitly exclude them.
 
 ```javascript
 const bookSchema = new Schema({
-  title:  'String',
+  title: 'String',
   author: { type: 'ObjectId', ref: 'Person' }
 });
 const Book = mongoose.model('Book', bookSchema);
@@ -1305,7 +1305,7 @@ to `false` in your schema.
 
 ```javascript
 const bookSchema = new Schema({
-  title:  'String',
+  title: 'String',
   author: { type: 'ObjectId', ref: 'Person' }
 }, { selectPopulatedPaths: false });
 const Book = mongoose.model('Book', bookSchema);

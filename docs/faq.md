@@ -144,7 +144,7 @@ Mongoose getters/setters depend on `this` to give you access to the document tha
 const schema = new mongoose.Schema({
   propWithGetter: {
     type: String,
-    get:  v => {
+    get: v => {
       // Will **not** be the doc, do **not** use arrow functions for getters/setters
       console.log(this);
       return v;
@@ -170,7 +170,7 @@ const holdingSchema = new Schema({
   // but unfortunately `type` is special in mongoose so mongoose
   // interprets this schema to mean that `asset` is a string
   asset: {
-    type:   String,
+    type: String,
     ticker: String
   }
 });
@@ -198,7 +198,7 @@ const holdingSchema = new Schema({
   // a string property `type`, as opposed to telling mongoose that `asset`
   // is a string.
   asset: {
-    type:   { type: String },
+    type: { type: String },
     ticker: String
   }
 });
@@ -314,7 +314,7 @@ const Kitten = connection.model('Kitten', kittySchema);
 ```javascript
 const CollectionSchema = new Schema({
   field1: {
-    type:    [String],
+    type: [String],
     default: void 0
   }
 });
@@ -329,7 +329,7 @@ const CollectionSchema = new Schema({
 ```javascript
 const CollectionSchema = new Schema({
   field1: {
-    type:    [String],
+    type: [String],
     default: () => { return null; }
   }
 });
@@ -414,7 +414,7 @@ For example, the below code inserts 2 entries into the `tags` array, **not* just
 ```javascript
 const BlogPost = mongoose.model('BlogPost', new Schema({
   title: String,
-  tags:  [String]
+  tags: [String]
 }));
 
 // Because there's both `await` **and** a callback, this `updateOne()` executes twice

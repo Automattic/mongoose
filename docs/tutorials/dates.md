@@ -6,7 +6,7 @@ Here's how you declare a path of type `Date` with a Mongoose schema:
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  name:         String,
+  name: String,
   // `lastActiveAt` is a date
   lastActiveAt: Date
 });

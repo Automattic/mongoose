@@ -49,7 +49,7 @@ async function awaitUpdate() {
   try {
     const doc = await MyModel.findOne({
       firstName: 'franklin',
-      lastName:  'roosevelt'
+      lastName: 'roosevelt'
     });
 
     doc.middleName = 'delano';

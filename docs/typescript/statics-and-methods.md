@@ -27,7 +27,7 @@ type UserModel = Model<IUser, {}, IUserMethods>;
 // And a schema that knows about IUserMethods
 const schema = new Schema<IUser, UserModel, IUserMethods>({
   firstName: { type: String, required: true },
-  lastName:  { type: String, required: true }
+  lastName: { type: String, required: true }
 });
 schema.method('fullName', function fullName() {
   return this.firstName + ' ' + this.lastName;
@@ -108,7 +108,7 @@ interface UserModel extends Model<IUser, {}, IUserMethods> {
 
 const schema = new Schema<IUser, UserModel, IUserMethods>({
   firstName: { type: String, required: true },
-  lastName:  { type: String, required: true }
+  lastName: { type: String, required: true }
 });
 schema.static('createWithFullName', function createWithFullName(name: string) {
   const [firstName, lastName] = name.split(' ');

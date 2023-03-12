@@ -461,7 +461,7 @@ Error handling middleware can then transform the error however you want.
 ```javascript
 const schema = new Schema({
   name: {
-    type:   String,
+    type: String,
     // Will trigger a MongoServerError with code 11000 when
     // you save a duplicate
     unique: true

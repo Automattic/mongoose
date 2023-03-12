@@ -52,7 +52,7 @@ const ProjectSchema = new Schema<
   {},
   ProjectQueryHelpers
 >({
-  name:  String,
+  name: String,
   stars: Number
 });
 
@@ -85,7 +85,7 @@ Query Helpers functions can be defined as following:
 import { Schema, model } from 'mongoose';
 
 const ProjectSchema = new Schema({
-  name:  String,
+  name: String,
   stars: Number
 }, {
   query: {

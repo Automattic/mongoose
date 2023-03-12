@@ -85,10 +85,10 @@ The below 2 examples are equivalent.
 // With a JSON doc
 Person.
   find({
-    occupation:  /host/,
+    occupation: /host/,
     'name.last': 'Ghost',
-    age:         { $gt: 17, $lt: 66 },
-    likes:       { $in: ['vaporizing', 'talking'] }
+    age: { $gt: 17, $lt: 66 },
+    likes: { $in: ['vaporizing', 'talking'] }
   }).
   limit(10).
   sort({ occupation: -1 }).
@@ -144,7 +144,7 @@ For example, the below code inserts 2 entries into the `tags` array, **not** jus
 ```javascript
 const BlogPost = mongoose.model('BlogPost', new Schema({
   title: String,
-  tags:  [String]
+  tags: [String]
 }));
 
 // Because there's both `await` **and** a callback, this `updateOne()` executes twice
@@ -263,8 +263,8 @@ When sorting with mutiple fields, the order of the sort keys determines what key
 
 ```javascript
 const personSchema = new mongoose.Schema({
-  age:    Number,
-  name:   String,
+  age: Number,
+  name: String,
   weight: Number
 });
 
@@ -272,8 +272,8 @@ const Person = mongoose.model('Person', personSchema);
 const iterations = 5;
 for (let i = 0; i < iterations; i++) {
   await Person.create({
-    age:    Math.abs(2 - i),
-    name:   'Test' + i,
+    age: Math.abs(2 - i),
+    name: 'Test' + i,
     weight: Math.floor(Math.random() * 100) + 1
   });
 }
@@ -287,39 +287,39 @@ As you can see, age is sorted from 0 to 2 but when age is equal, sorts by weight
 ```javascript
 [
   {
-    _id:    new ObjectId('63a335a6b9b6a7bfc186cb37'),
-    age:    0,
-    name:   'Test2',
+    _id: new ObjectId('63a335a6b9b6a7bfc186cb37'),
+    age: 0,
+    name: 'Test2',
     weight: 67,
-    __v:    0
+    __v: 0
   },
   {
-    _id:    new ObjectId('63a335a6b9b6a7bfc186cb35'),
-    age:    1,
-    name:   'Test1',
+    _id: new ObjectId('63a335a6b9b6a7bfc186cb35'),
+    age: 1,
+    name: 'Test1',
     weight: 99,
-    __v:    0
+    __v: 0
   },
   {
-    _id:    new ObjectId('63a335a6b9b6a7bfc186cb39'),
-    age:    1,
-    name:   'Test3',
+    _id: new ObjectId('63a335a6b9b6a7bfc186cb39'),
+    age: 1,
+    name: 'Test3',
     weight: 73,
-    __v:    0
+    __v: 0
   },
   {
-    _id:    new ObjectId('63a335a6b9b6a7bfc186cb33'),
-    age:    2,
-    name:   'Test0',
+    _id: new ObjectId('63a335a6b9b6a7bfc186cb33'),
+    age: 2,
+    name: 'Test0',
     weight: 65,
-    __v:    0
+    __v: 0
   },
   {
-    _id:    new ObjectId('63a335a6b9b6a7bfc186cb3b'),
-    age:    2,
-    name:   'Test4',
+    _id: new ObjectId('63a335a6b9b6a7bfc186cb3b'),
+    age: 2,
+    name: 'Test4',
     weight: 62,
-    __v:    0
+    __v: 0
   }
 ];
 ```

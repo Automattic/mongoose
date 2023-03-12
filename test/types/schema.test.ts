@@ -913,7 +913,6 @@ async function gh12593() {
   expectType<Buffer | undefined>(doc2.x);
 
   const doc3 = await Test.findOne({}).orFail().lean();
-  if (!doc3) return;
   expectType<Buffer | undefined>(doc3.x);
 
   const arrSchema = new Schema({ arr: [{ type: Schema.Types.UUID }] });

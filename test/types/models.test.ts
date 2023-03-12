@@ -118,7 +118,6 @@ async function gh10359() {
 
   async function foo(model: Model<User, {}, {}, {}>) {
     const doc = await model.findOne({ groupId: 'test' }).orFail().lean().exec();
-    if (!doc) return;
     expectType<string>(doc.firstName);
     expectType<string>(doc.lastName);
     expectType<Types.ObjectId>(doc._id);

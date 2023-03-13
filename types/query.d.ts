@@ -532,7 +532,7 @@ declare module 'mongoose' {
     replaceOne(filter?: FilterQuery<DocType>, replacement?: DocType | AnyObject, options?: QueryOptions<DocType> | null): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
 
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
-    select(arg: string | any): this;
+    select(arg: string | string[] | Record<string, number | boolean | object>): this;
 
     /** Determines if field selection has been made. */
     selected(): boolean;

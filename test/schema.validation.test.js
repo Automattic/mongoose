@@ -1134,6 +1134,23 @@ describe('schema', function() {
       done();
     });
 
+    it('validateSync validates array elements when setting pathsToValidate (gh-13159)', function() {
+      const schema = new Schema({
+        permissions: [{ type: String, enum: ['users', 'anotherPermission'] }]
+      });
+
+      const Model = mongoose.model('gh13159', schema);
+
+      const doc = new Model({
+        permissions: ['avocado']
+      });
+
+      const error = doc.validateSync('permissions');
+      assert.ok(error);
+      assert.equal(Object.keys(error.errors).length, 1);
+      assert.ok(error.errors['permissions.0']);
+    });
+
     it('adds required validators to the front of the list (gh-2843)', async function() {
       const breakfast = new Schema({ description: { type: String, maxlength: 50, required: true } });
 

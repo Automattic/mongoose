@@ -1,8 +1,6 @@
 (function() {
-  const defaultVersion = '6.x';
-
   const versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
-  const version = versionFromUrl ? versionFromUrl[1] : defaultVersion;
+  const version = versionFromUrl ? versionFromUrl[1] : null;
 
   const searchPrefix = versionFromUrl ? '/docs/' + version + '/docs/' : '/docs/';
 

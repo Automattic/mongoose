@@ -673,7 +673,7 @@ describe('model', function() {
 
       const TestModel = db.model('Test', Test);
       TestModel.syncIndexes().then((results1) => {
-        assert.strictEqual(results1, []);
+        assert.deepEqual(results1, []);
         // second call to syncIndexes should return an empty array, representing 0 deleted indexes
         TestModel.syncIndexes().then((results2) => {
           assert.deepEqual(results2, []);

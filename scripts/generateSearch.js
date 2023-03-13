@@ -1,6 +1,14 @@
 'use strict';
 
-const config = require('../.config');
+let config;
+try {
+  config = require('../.config.js');
+} finally {
+  if (!config || !config.uri) {
+    console.error('No Config or config.URI given, please create a .config.js file with those values in the root of the repository');
+    process.exit(-1);
+  }
+}
 const cheerio = require('cheerio');
 const filemap = require('../docs/source');
 const fs = require('fs');
@@ -120,11 +128,6 @@ run().catch(async error => {
 });
 
 async function run() {
-  if (!config || !config.uri) {
-    console.error('No Config or config.URI given, please create a .config.js file with those values');
-    process.exit(-1);
-  }
-
   await mongoose.connect(config.uri, { dbName: 'mongoose', serverSelectionTimeoutMS: 5000 });
 
   // wait for the index to be created

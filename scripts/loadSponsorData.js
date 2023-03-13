@@ -1,7 +1,15 @@
 'use strict';
 
+let config;
+try {
+  config = require('../.config.js');
+} finally {
+  if (!config || !config.uri) {
+    console.error('No Config or config.URI given, please create a .config.js file with those values in the root of the repository');
+    process.exit(-1);
+  }
+}
 const axios = require('axios');
-const config = require('../.config');
 const fs = require('fs');
 const mongoose = require('../');
 

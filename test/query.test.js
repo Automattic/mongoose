@@ -3953,4 +3953,44 @@ describe('Query', function() {
       $or: [{ tags: 'a' }, { tags: 'b' }]
     });
   });
+
+  it('should avoid sending empty session to MongoDB server (gh-13052)', async function() {
+    const m = new mongoose.Mongoose();
+
+    let lastOptions = {};
+    m.set('debug', function(_coll, _method, ...args) {
+      lastOptions = args[args.length - 1];
+    });
+
+    const connDebug = m.createConnection(start.uri);
+
+    const schema = new Schema({ name: String });
+    const Test = connDebug.model('Test', schema);
+
+    await Test.create({ name: 'foo' });
+    assert.ok(!('session' in lastOptions));
+  });
+
+  it('should avoid sending empty projection to MongoDB server (gh-13065)', async function() {
+    const m = new mongoose.Mongoose();
+
+    let lastOptions = {};
+    m.set('debug', function(_coll, _method, ...args) {
+      lastOptions = args[args.length - 1];
+    });
+
+    const connDebug = m.createConnection(start.uri);
+
+    const schema = new Schema({ name: String });
+    const Test = connDebug.model('Test', schema);
+
+    await Test.findOne();
+    assert.ok(!('projection' in lastOptions));
+
+    await Test.find();
+    assert.ok(!('projection' in lastOptions));
+
+    await Test.findOneAndUpdate({}, { name: 'bar' });
+    assert.ok(!('projection' in lastOptions));
+  });
 });

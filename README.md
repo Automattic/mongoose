@@ -13,7 +13,7 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
 
 The official documentation website is [mongoosejs.com](http://mongoosejs.com/).
 
-Mongoose 6.0.0 was released on August 24, 2021. You can find more details on [backwards breaking changes in 6.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_6.html).
+Mongoose 7.0.0 was released on February 27, 2023. You can find more details on [backwards breaking changes in 7.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_7.html).
 
 ## Support
 

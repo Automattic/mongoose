@@ -8,6 +8,7 @@ const start = require('./common');
 
 const assert = require('assert');
 const random = require('./util').random;
+const { v4: uuidv4 } = require('uuid');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -1467,6 +1468,68 @@ describe('schema', function() {
         // Assert
         assert.ifError(err);
       });
+    });
+
+    it('should validate required UUID fields correctly (gh-12991)', function() {
+      const uuidSchema = new mongoose.Schema({
+        _id: { type: mongoose.Schema.Types.UUID, required: true },
+        name: { type: mongoose.Schema.Types.String, required: true }
+      });
+
+      const uuidRefSchema = new mongoose.Schema({
+        _id: { type: mongoose.Schema.Types.UUID, required: true },
+        uuidRef: { type: mongoose.Schema.Types.UUID, ref: 'UUIDModel', required: true },
+        uuidNonRef: { type: mongoose.Schema.Types.UUID, required: true },
+        uuidRefNonRequired: { type: mongoose.Schema.Types.UUID, ref: 'UUIDModel' },
+        name: { type: mongoose.Schema.Types.String, required: true }
+      });
+
+      const UUIDModel = mongoose.model('UUIDModel', uuidSchema, 'uuids');
+
+      const UUIDRefModel = mongoose.model('UUIDRefModel', uuidRefSchema, 'uuidRefs');
+
+      const uuid = new UUIDModel({ _id: uuidv4(), name: 'uuidName' });
+      assert.ifError(uuid.validateSync());
+
+      const uuidRef = new UUIDRefModel({
+        _id: uuidv4(),
+        uuidRef: uuidv4(),
+        uuidNonRef: uuidv4(),
+        uuidRefNonRequired: uuidv4(),
+        name: 'uuidRefName'
+      });
+      assert.ifError(uuidRef.validateSync());
+
+      const uuidRef2 = new UUIDRefModel({
+        _id: uuidv4(),
+        uuidNonRef: uuidv4(),
+        uuidRefNonRequired: uuidv4(),
+        name: 'uuidRefName'
+      });
+
+      const err2 = uuidRef2.validateSync();
+      assert.ok(err2);
+      assert.ok(err2.errors['uuidRef']);
+
+      const uuidRef3 = new UUIDRefModel({
+        _id: uuidv4(),
+        uuidRef: uuidv4(),
+        uuidRefNonRequired: uuidv4(),
+        name: 'uuidRefName'
+      });
+
+      const err3 = uuidRef3.validateSync();
+      assert.ok(err3);
+      assert.ok(err3.errors['uuidNonRef']);
+
+      const uuidRef4 = new UUIDRefModel({
+        _id: uuidv4(),
+        uuidRef: uuidv4(),
+        uuidNonRef: uuidv4(),
+        name: 'uuidRefName'
+      });
+
+      assert.ifError(uuidRef4.validateSync());
     });
   });
 });

@@ -109,7 +109,7 @@ declare module 'mongoose' {
     /**
      * If truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document.
      */
-    lean?: boolean | any;
+    lean?: boolean | Record<string, any>;
     limit?: number;
     maxTimeMS?: number;
     multi?: boolean;
@@ -532,7 +532,7 @@ declare module 'mongoose' {
     replaceOne(filter?: FilterQuery<DocType>, replacement?: DocType | AnyObject, options?: QueryOptions<DocType> | null): QueryWithHelpers<any, DocType, THelpers, RawDocType>;
 
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
-    select(arg: string | any): this;
+    select(arg: string | string[] | Record<string, number | boolean | object>): this;
 
     /** Determines if field selection has been made. */
     selected(): boolean;
@@ -593,9 +593,6 @@ declare module 'mongoose' {
 
     /** Converts this query to a customized, reusable query constructor with all arguments and options retained. */
     toConstructor<RetType = typeof Query>(): RetType;
-
-    /** Declare and/or execute this query as an update() operation. */
-    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType> | UpdateWithAggregationPipeline, options?: QueryOptions<DocType> | null): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType>;
 
     /**
      * Declare and/or execute this query as an updateMany() operation. Same as

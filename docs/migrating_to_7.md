@@ -17,6 +17,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [Removed `update()`](#removed-update)
 * [Discriminator schemas use base schema options by default](#discriminator-schemas-use-base-schema-options-by-default)
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
+* [Copy schema options in `Schema.prototype.add()`](#copy-schema-options-in-schema-prototype-add)
 * [ObjectId bsontype now has lowercase d](#objectid-bsontype-now-has-lowercase-d)
 * [TypeScript-specific changes](#typescript-specific-changes)
   * [Removed `LeanDocument` and support for `extends Document`](#removed-leandocument-and-support-for-extends-document)
@@ -215,6 +216,26 @@ MySchemaType.prototype.castForQuery = function($conditional, value, context) {
     // Handle casting `value` with no conditional
   }
 };
+```
+
+<h3 id="copy-schema-options-in-schema-prototype-add"><a href="#copy-schema-options-in-schema-prototype-add">Copy Schema options in <code>Schema.prototype.add()</code></a></h3>
+
+Mongoose now copies user defined schema options when adding one schema to another.
+For example, `childSchema` below will get `baseSchema`'s `id` and `toJSON` options.
+
+```javascript
+const baseSchema = new Schema({ created: Date }, { id: true, toJSON: { virtuals: true } });
+const childSchema = new Schema([baseSchema, { name: String }]);
+
+childSchema.options.toJSON; // { virtuals: true } in Mongoose 7. undefined in Mongoose 6.
+```
+
+This applies both when creating a new schema using an array of schemas, as well as when calling `add()` as follows.
+
+```javascript
+childSchema.add(new Schema({}, { toObject: { virtuals: true } }));
+
+childSchema.options.toObject; // { virtuals: true } in Mongoose 7. undefined in Mongoose 6.
 ```
 
 <h3 id="objectid-bsontype-now-has-lowercase-d"><a href="#objectid-bsontype-now-has-lowercase-d">ObjectId bsontype now has lowercase d</a></h3>

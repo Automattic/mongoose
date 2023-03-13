@@ -1,3 +1,42 @@
+6.10.3 / 2023-03-13
+===================
+ * fix(connection): add stub implementation of doClose to base connection class #13157
+ * fix(types): add cursor.eachAsync index parameter #13162 #13153 [hasezoey](https://github.com/hasezoey)
+ * docs: fix 6.x docs sidebar links #13147 #13144 [hasezoey](https://github.com/hasezoey)
+ * docs(validation): clarify that validation runs as first pre(save) middleware #13062
+
+6.10.2 / 2023-03-07
+===================
+ * fix(document): avoid setting array default if document array projected out by sibling projection #13135 #13043 #13003
+ * fix(documentarray): set correct document array path if making map of document arrays #13133
+ * fix: undo accidental change to `engines` in `package.json` #13124 [lorand-horvath](https://github.com/lorand-horvath)
+ * docs: quick improvement to Model.init() docs #13054
+
+7.0.1 / 2023-03-06
+==================
+ * fix(aggregate): added await to prevent exception in aggregate exec #13126 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): handle Record<string, never> as value for HydratedDocument TOverrides parameter #13123 #13094
+ * fix(types): remove "update" function #13120 [hasezoey](https://github.com/hasezoey)
+ * docs(compatibility): added mongoDB server compatibility for mongoose 7 #13102 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: Updated callback method for Model.findOne() #13096 [Arghyahub](https://github.com/Arghyahub)
+ * chore: update github actions to not use ubuntu-18.04 anymore #13137 [hasezoey](https://github.com/hasezoey)
+
+6.10.1 / 2023-03-03
+===================
+ * fix: avoid removing empty query filters in `$and` and `$or` #13086 #12898
+ * fix(schematype): fixed validation for required UUID field #13018 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): add missing Paths generic param to `Model.populate()` #13070
+ * docs(migrating_to_6): added info about removal of reconnectTries and reconnectInterval options #13083 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: fix code in headers for migrating_to_5 #13077 [hasezoey](https://github.com/hasezoey)
+ * docs: backport misc documentation changes into 6.x #13091 [hasezoey](https://github.com/hasezoey)
+
+7.0.0 / 2023-02-27
+==================
+ * BREAKING CHANGE: copy schema options when merging schemas using new Schema() or Schema.prototype.add() #13092
+ * feat(types): export mongodb types more robustly #12948 [simon-abbott](https://github.com/simon-abbott)
+ * docs: fix populate docs #13090 [hasezoey](https://github.com/hasezoey)
+ * docs(migrating_to_6): added info about removal of reconnectTries and reconnectInterval options #13083 [lpizzinidev](https://github.com/lpizzinidev)
+
 7.0.0-rc0 / 2023-02-23
 ======================
  * BREAKING CHANGE: remove support for callbacks #11431

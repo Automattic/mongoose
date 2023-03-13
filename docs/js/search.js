@@ -1,32 +1,72 @@
-var root = 'https://mongoosejs.azurewebsites.net/api';
-var pairs = window.location.search.replace(/^\?/, '').split('&');
+const root = 'https://mongoosejs.azurewebsites.net/api';
 
-var q = null;
-for (var i = 0; i < pairs.length; ++i) {
-  var _pair = pairs[i].split('=');
-  if (_pair[0] === 'q') {
-    q = _pair[1];
+const defaultVersion = '7.x';
+const versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
+const version = versionFromUrl ? versionFromUrl[1] : defaultVersion;
+
+search();
+
+document.getElementById('search-button').onclick = function() {
+  addHistory(document.getElementById('search-input').value);
+};
+
+document.getElementById('search-input').onkeyup = function(ev) {
+  if (ev.keyCode === 13) {
+    addHistory(document.getElementById('search-input').value);
   }
+};
+
+document.getElementById('search-button-nav').onclick = function() {
+  addHistory(document.getElementById('search-input-nav').value);
+};
+
+document.getElementById('search-input-nav').onkeyup = function(ev) {
+  if (ev.keyCode === 13) {
+    addHistory(document.getElementById('search-input-nav').value);
+  }
+};
+
+/** Helper to consistently add history and reload results */
+function addHistory(value) {
+  const url = new URL(window.location.href);
+
+  // use this to only modify the param "q" and not overwrite any other existing params
+  url.searchParams.set("q", value);
+
+  window.history.pushState({}, '', url);
+  search();
 }
 
-var defaultVersion = '6.x';
-var versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
-var version = versionFromUrl ? versionFromUrl[1] : defaultVersion;
+/** (re)load results */
+function search() {
+  const resultsDiv = document.getElementById('results');
 
-if (q != null) {
-  document.getElementById('search-input').value = decodeURIComponent(q);
-  fetch(root + '/search?search=' + q + '&version=' + version).
+  resultsDiv.innerHTML = '<p>Loading...</p';
+
+  const url = new URL(window.location.href);
+
+  if (!url.searchParams || !url.searchParams.has('q')) {
+    resultsDiv.innerHTML = '<p>No Search Parameters</p>';
+    return;
+  }
+
+  const qSearch = url.searchParams.get("q");
+
+  document.getElementById('search-input').value = qSearch;
+  document.getElementById('search-input-nav').value = ""; // set navbar search empty, to encourage big input usage
+
+  fetch(root + '/search?search=' + encodeURIComponent(qSearch) + '&version=' + version).
     then(function(res) { return res.json(); }).
     then(
       function(result) {
         if (result.results.length === 0) {
-          document.getElementById('results').innerHTML = '<h1>No Results</h1>';
+          resultsDiv.innerHTML = '<h1>No Results</h1>';
           return;
         }
-        var html = '';
-        for (var i = 0; i < result.results.length; ++i) {
-          var res = result.results[i];
-          var url = res.url;
+        let html = '';
+        for (let i = 0; i < result.results.length; ++i) {
+          const res = result.results[i];
+          const url = res.url;
           html += '<li>' +
             '<a class="title" href="' + url + '">' +
             res.title +
@@ -36,23 +76,11 @@ if (q != null) {
             '</li>';
         }
 
-        document.getElementById('results').innerHTML = '<ul>' + html + '</ul>';
+        resultsDiv.innerHTML = '<ul>' + html + '</ul>';
       },
       function(error) {
-        document.getElementById('results').innerHTML =
+        resultsDiv.innerHTML =
           '<h3>An error occurred: ' + error.message + '</h3>';
       }
     );
 }
-
-document.getElementById('search-button').onclick = function() {
-  var q = document.getElementById('search-input').value;
-  window.location.href = 'search.html?q=' + encodeURIComponent(q);
-};
-
-var q = document.getElementById('search-input').onkeyup = function(ev) {
-  if (ev.keyCode === 13) {
-    var q = document.getElementById('search-input').value;
-    window.location.href = 'search.html?q=' + encodeURIComponent(q);
-  }
-};

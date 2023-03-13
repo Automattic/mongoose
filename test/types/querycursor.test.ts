@@ -13,3 +13,10 @@ Test.find().cursor().
     expectType<string | undefined>(doc.name);
   }).
   then(() => console.log('Done!'));
+
+Test.find().cursor().
+  eachAsync(async(doc: ITest, i) => {
+    expectType<Types.ObjectId>(doc._id);
+    expectType<number>(i);
+  }).
+  then(() => console.log('Done!'));

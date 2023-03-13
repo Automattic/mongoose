@@ -44,12 +44,13 @@ user and have a good reason for doing so.
   <li><a href="#field-selection">Field Selection</a></li>
   <li><a href="#populating-multiple-paths">Populating Multiple Paths</a></li>
   <li><a href="#query-conditions">Query conditions and other options</a></li>
+  <li><a href="#limit-vs-perDocumentLimit"><code>limit</code> vs. <code>perDocumentLimit</code></a></li>
   <li><a href="#refs-to-children">Refs to children</a></li>
   <li><a href="#populate_an_existing_mongoose_document">Populating an existing document</a></li>
   <li><a href="#populate_multiple_documents">Populating multiple existing documents</a></li>
   <li><a href="#deep-populate">Populating across multiple levels</a></li>
   <li><a href="#cross-db-populate">Populating across Databases</a></li>
-  <li><a href="#dynamic-ref">Dynamic References via `refPath`</a></li>
+  <li><a href="#dynamic-ref">Dynamic References via <code>refPath</code></a></li>
   <li><a href="#populate-virtuals">Populate Virtuals</a></li>
   <li><a href="#count">Populate Virtuals: The Count Option</a></li>
   <li><a href="#match">Populate Virtuals: The Match Option</a></li>
@@ -275,7 +276,7 @@ story; // null
 
 If you want to filter stories by their author's name, you should use [denormalization](https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design-part-3).
 
-<h3 id="limit-vs-perDocumentLimit"><a href="#limit-vs-perDocumentLimit">limit vs. perDocumentLimit</a></h3>
+<h3 id="limit-vs-perDocumentLimit"><a href="#limit-vs-perDocumentLimit"><code>limit</code> vs. <code>perDocumentLimit</code></a></h3>
 
 Populate does support a `limit` option, however, it currently
 does **not** limit on a per-document basis for backwards compatibility. For example,
@@ -485,9 +486,8 @@ const events = await Event.
   populate({ path: 'conversation', model: Conversation });
 ```
 
-<h3 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via `refPath`</a></h3>
-
-Mongoose can also populate from multiple collections based on the value
+<h3 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>refPath</code></a></h3>
+<code>
 of a property in the document. Let's say you're building a schema for
 storing comments. A user may comment on either a blog post or a product.
 

@@ -109,7 +109,7 @@ declare module 'mongoose' {
   export function setDriver(driver: any): Mongoose;
 
   /** The node-mongodb-native driver Mongoose uses. */
-  export const mongo: typeof mongodb;
+  export { mongodb as mongo };
 
   /** Declares a global plugin executed on all Schemas. */
   export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): Mongoose;
@@ -139,12 +139,14 @@ declare module 'mongoose' {
     TOverrides = {},
     TQueryHelpers = {}
   > = IfAny<
-  DocType,
-  any,
-  Document<unknown, TQueryHelpers, DocType> & MergeType<
-  Require_id<DocType>,
-  IfAny<TOverrides, {}>
-  >
+    DocType,
+    any,
+    Document<unknown, TQueryHelpers, DocType> & MergeType<
+      Require_id<DocType>,
+      TOverrides extends Record<string, never> ?
+        {} :
+        IfAny<TOverrides, {}>
+    >
   >;
   export type HydratedSingleSubdocument<DocType, TOverrides = {}> = Types.Subdocument<unknown> & Require_id<DocType> & TOverrides;
   export type HydratedArraySubdocument<DocType, TOverrides = {}> = Types.ArraySubdocument<unknown> & Require_id<DocType> & TOverrides;

@@ -31,7 +31,6 @@ docs['docs/api.md'] = {
   title: 'Redirect to API',
   markdown: true
 };
-docs['docs/api.pug'] = require('./api');
 docs['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, markdown: true };
 docs['docs/validation.md'] = { title: 'Validation', acquit: true, markdown: true };
 docs['docs/customschematypes.md'] = { title: 'Custom Schema Types', acquit: true, markdown: true };

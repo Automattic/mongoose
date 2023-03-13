@@ -676,7 +676,7 @@ describe('model', function() {
         assert.strictEqual(results1, []);
         // second call to syncIndexes should return an empty array, representing 0 deleted indexes
         TestModel.syncIndexes().then((results2) => {
-          assert.strictEqual(results2, []);
+          assert.deepEqual(results2, []);
           done();
         });
       });

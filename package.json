@@ -83,6 +83,7 @@
     "docs:checkout:6x": "git checkout 6.x",
     "docs:generate": "node ./scripts/website.js",
     "docs:generate:search": "node ./scripts/generateSearch.js",
+    "docs:generate:sponsorData": "node ./scripts/loadSponsorData.js",
     "docs:merge:stable": "git merge master",
     "docs:merge:5x": "git merge 5.x",
     "docs:merge:6x": "git merge 6.x",

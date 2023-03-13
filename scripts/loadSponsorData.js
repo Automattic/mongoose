@@ -11,7 +11,7 @@ try {
   }
 }
 const fs = require('fs');
-const mongoose = require('../types');
+const mongoose = require('../');
 
 run().catch(err => {
   console.error(err);

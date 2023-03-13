@@ -24,7 +24,11 @@ try {
  * Separate type from `exports`, because `exports` cannot be typed
  * @type {Object.<string, DocsOptions>}
  */
-const docs = {};
+const docs = {
+  // do sub-directories
+  ...require('./typescript'),
+  ...require('./tutorials')
+};
 
 docs['docs/api.md'] = {
   docs: [],
@@ -82,10 +86,6 @@ docs['docs/jobs.pug'] = {
 docs['docs/change-streams.md'] = { title: 'MongoDB Change Streams in NodeJS with Mongoose', markdown: true };
 docs['docs/lodash.md'] = { title: 'Using Mongoose with Lodash', markdown: true };
 docs['docs/incompatible_packages.md'] = { title: 'Known Incompatible npm Packages', markdown: true };
-
-// do sub-directories
-require('./typescript');
-require('./tutorials');
 
 for (const props of Object.values(docs)) {
   props.jobs = jobs;

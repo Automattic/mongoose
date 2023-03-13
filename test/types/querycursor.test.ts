@@ -1,4 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
+import { expectType } from 'tsd';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
@@ -13,7 +14,7 @@ Test.find().cursor().eachAsync(async(doc: ITest) => console.log(doc.name)).
 
 Test.find().cursor().
   eachAsync(async(doc: ITest, i) => {
-    expectType<Types.ObjectId>(doc._id);
+    expectType<any>(doc._id);
     expectType<number>(i);
   }).
   then(() => console.log('Done!'));

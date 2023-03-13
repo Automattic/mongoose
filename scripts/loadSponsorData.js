@@ -1,7 +1,15 @@
 'use strict';
 
 const axios = require('axios');
-const config = require('../.config');
+let config;
+try {
+  config = require('../.config');
+} finally {
+  if (!config || !config.uri) {
+    console.error('No Config or config.URI given, please create a .config.js file with those values in the root of the repository');
+    process.exit(-1);
+  }
+}
 const fs = require('fs');
 const mongoose = require('../types');
 
@@ -13,11 +21,6 @@ run().catch(err => {
 const docsDir = './docs';
 
 async function run() {
-  if (!config || !config.uri) {
-    console.error('No Config or config.URI given, please create a .config.js file with those values');
-    process.exit(-1);
-  }
-
   await mongoose.connect(config.uri);
 
   const Subscriber = mongoose.model('Subscriber', mongoose.Schema({

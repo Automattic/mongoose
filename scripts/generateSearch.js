@@ -155,5 +155,7 @@ async function run() {
 
   console.log(results.map(res => res.url));
 
+  console.log(`Added ${contents.length} Content`);
+
   process.exit(0);
 }

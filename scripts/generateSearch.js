@@ -30,25 +30,27 @@ const Content = mongoose.model('Content', contentSchema, 'Content');
 
 const contents = [];
 
-for (const [filename, file] of Object.entries(filemap)) {
-  if (file.api) {
-    // API docs are special, raw content is in the `docs` property
-    for (const _class of file.docs) {
-      for (const prop of _class.props) {
-        const content = new Content({
-          title: `API: ${prop.string}`,
-          body: prop.description,
-          url: `api/${_class.fileName}.html#${prop.anchorId}`
-        });
-        const err = content.validateSync();
-        if (err != null) {
-          console.error(content);
-          throw err;
-        }
-        contents.push(content);
-      }
+const api = require('../docs/source/api');
+
+// API docs are special, because they are not added to the file-map individually currently and use different properties
+for (const _class of api.docs) {
+  for (const prop of _class.props) {
+    const content = new Content({
+      title: `API: ${prop.name}`,
+      body: prop.description,
+      url: `api/${_class.fileName}.html#${prop.anchorId}`
+    });
+    const err = content.validateSync();
+    if (err != null) {
+      console.error(content);
+      throw err;
     }
-  } else if (file.markdown) {
+    contents.push(content);
+  }
+}
+
+for (const [filename, file] of Object.entries(filemap)) {
+  if (file.markdown) {
     let text = fs.readFileSync(filename, 'utf8');
     text = markdown.parse(text);
 

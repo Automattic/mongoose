@@ -1,4 +1,4 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Types, InferSchemaType } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
 async function gh10293() {
@@ -23,4 +23,14 @@ async function gh10293() {
     expectType<string[][]>(test.arrayOfArray);
     return test.arrayOfArray; // <-- error here if the issue persisted
   };
+}
+
+function gh13087() {
+  interface Book {
+    author: {
+      name: string;
+    };
+  }
+
+  expectError(new Types.DocumentArray<Book>([1, 2, 3]));
 }

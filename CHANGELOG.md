@@ -1,3 +1,10 @@
+6.10.3 / 2023-03-13
+===================
+ * fix(connection): add stub implementation of doClose to base connection class #13157
+ * fix(types): add cursor.eachAsync index parameter #13162 #13153 [hasezoey](https://github.com/hasezoey)
+ * docs: fix 6.x docs sidebar links #13147 #13144 [hasezoey](https://github.com/hasezoey)
+ * docs(validation): clarify that validation runs as first pre(save) middleware #13062
+
 6.10.2 / 2023-03-07
 ===================
  * fix(document): avoid setting array default if document array projected out by sibling projection #13135 #13043 #13003

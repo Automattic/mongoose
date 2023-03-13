@@ -25,7 +25,8 @@ try {
  * @type {Object.<string, DocsOptions>}
  */
 const docs = {
-  ...require('./tutorials')
+  ...require('./tutorials'),
+  ...require('./typescript')
 };
 
 docs['index.pug'] = require('./home');

@@ -24,7 +24,9 @@ try {
  * Separate type from `exports`, because `exports` cannot be typed
  * @type {Object.<string, DocsOptions>}
  */
-const docs = {};
+const docs = {
+  ...require('./tutorials')
+};
 
 docs['index.pug'] = require('./home');
 docs['docs/api.md'] = {

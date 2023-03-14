@@ -1,3 +1,5 @@
+'use strict';
+
 (function() {
   const versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
   const version = versionFromUrl ? versionFromUrl[1] : null;

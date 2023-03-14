@@ -1410,6 +1410,24 @@ describe('schema', function() {
       assert.deepEqual(s.options.toJSON, { virtuals: true });
       assert.deepEqual(s.options.toObject, { getters: true });
     });
+
+    it('propagates typeKey down to implicitly created single nested schemas (gh-13154)', function() {
+      const TestSchema = {
+        action: {
+          $type: {
+            type: {
+              $type: String,
+              required: true
+            }
+          },
+          required: true
+        }
+      };
+      const s = new Schema(TestSchema, { typeKey: '$type' });
+      assert.equal(s.path('action').constructor.name, 'SubdocumentPath');
+      assert.ok(s.path('action').schema.$implicitlyCreated);
+      assert.equal(s.path('action.type').constructor.name, 'SchemaString');
+    });
   });
 
   describe('property names', function() {

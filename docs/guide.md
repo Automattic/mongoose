@@ -29,15 +29,15 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const blogSchema = new Schema({
-  title:  String, // String is shorthand for {type: String}
+  title: String, // String is shorthand for {type: String}
   author: String,
-  body:   String,
+  body: String,
   comments: [{ body: String, date: Date }],
   date: { type: Date, default: Date.now },
   hidden: Boolean,
   meta: {
     votes: Number,
-    favs:  Number
+    favs: Number
   }
 });
 ```
@@ -144,15 +144,15 @@ We may also define our own custom document instance methods.
 ```javascript
 // define a schema
 const animalSchema = new Schema({ name: String, type: String },
-{
+  {
   // Assign a function to the "methods" object of our animalSchema through schema options.
   // By following this approach, there is no need to create a separate TS type to define the type of the instance functions.
-  methods: {
-    findSimilarTypes(cb) {
-      return mongoose.model('Animal').find({ type: this.type }, cb);
+    methods: {
+      findSimilarTypes(cb) {
+        return mongoose.model('Animal').find({ type: this.type }, cb);
+      }
     }
-  }
-});
+  });
 
 // Or, assign a function to the "methods" object of our animalSchema
 animalSchema.methods.findSimilarTypes = function(cb) {
@@ -189,15 +189,15 @@ ways to add a static:
 
 // define a schema
 const animalSchema = new Schema({ name: String, type: String },
-{
+  {
   // Assign a function to the "statics" object of our animalSchema through schema options.
-  // By following this approach, there is no need to create a separate TS type to define the type of the statics functions. 
-  statics: {
-    findByName(name) {
-      return this.find({ name: new RegExp(name, 'i') });
+  // By following this approach, there is no need to create a separate TS type to define the type of the statics functions.
+    statics: {
+      findByName(name) {
+        return this.find({ name: new RegExp(name, 'i') });
+      }
     }
-  }
-});
+  });
 
 // Or, Assign a function to the "statics" object of our animalSchema
 animalSchema.statics.findByName = function(name) {
@@ -223,19 +223,19 @@ but for mongoose queries. Query helper methods let you extend mongoose's
 
 // define a schema
 const animalSchema = new Schema({ name: String, type: String },
-{
+  {
   // Assign a function to the "query" object of our animalSchema through schema options.
-  // By following this approach, there is no need to create a separate TS type to define the type of the query functions. 
-  query:{
-    byName(name){
-      return this.where({ name: new RegExp(name, 'i') })
+  // By following this approach, there is no need to create a separate TS type to define the type of the query functions.
+    query: {
+      byName(name) {
+        return this.where({ name: new RegExp(name, 'i') });
+      }
     }
-  }
-});
+  });
 
 // Or, Assign a function to the "query" object of our animalSchema
 animalSchema.query.byName = function(name) {
-  return this.where({ name: new RegExp(name, 'i') })
+  return this.where({ name: new RegExp(name, 'i') });
 };
 
 const Animal = mongoose.model('Animal', animalSchema);
@@ -282,7 +282,7 @@ mongoose.set('autoIndex', false);
 // or
 animalSchema.set('autoIndex', false);
 // or
-new Schema({..}, { autoIndex: false });
+new Schema({ /* ... */ }, { autoIndex: false });
 ```
 
 Mongoose will emit an `index` event on the model when indexes are done
@@ -357,7 +357,7 @@ const personSchema = new Schema({
   }
 });
 
-// Or by using the virtual method as following:  
+// Or by using the virtual method as following:
 personSchema.virtual('fullName').get(function() {
   return this.name.first + ' ' + this.name.last;
 });
@@ -391,7 +391,7 @@ const personSchema = new Schema({
     fullName: {
       get() {
         return this.name.first + ' ' + this.name.last;
-      }
+      },
       set(v) {
         this.name.first = v.substr(0, v.indexOf(' '));
         this.name.last = v.substr(v.indexOf(' ') + 1);
@@ -453,7 +453,7 @@ schemas and [subdocuments](subdocs.html), but you can also declare
 nested path aliases inline as long as you use the full nested path
 `nested.myProp` as the alias.
 
-```javascript
+```acquit
 [require:gh-6671]
 ```
 
@@ -463,11 +463,11 @@ Schemas have a few configurable options which can be passed to the
 constructor or to the `set` method:
 
 ```javascript
-new Schema({..}, options);
+new Schema({ /* ... */ }, options);
 
 // or
 
-const schema = new Schema({..});
+const schema = new Schema({ /* ... */ });
 schema.set(option, value);
 ```
 
@@ -515,7 +515,7 @@ significant load on your production database. If you want to manage indexes
 carefully in production, you can set `autoIndex` to false.
 
 ```javascript
-const schema = new Schema({..}, { autoIndex: false });
+const schema = new Schema({ /* ... */ }, { autoIndex: false });
 const Clock = mongoose.model('Clock', schema);
 Clock.ensureIndexes(callback);
 ```
@@ -555,7 +555,7 @@ the driver manages to reconnect. To disable buffering, set `bufferCommands`
 to false.
 
 ```javascript
-const schema = new Schema({..}, { bufferCommands: false });
+const schema = new Schema({ /* ... */ }, { bufferCommands: false });
 ```
 
 The schema `bufferCommands` option overrides the global `bufferCommands` option.
@@ -563,7 +563,7 @@ The schema `bufferCommands` option overrides the global `bufferCommands` option.
 ```javascript
 mongoose.set('bufferCommands', true);
 // Schema option below overrides the above, if the schema option is set.
-const schema = new Schema({..}, { bufferCommands: false });
+const schema = new Schema({ /* ... */ }, { bufferCommands: false });
 ```
 
 <h3 id="bufferTimeoutMS"><a href="#bufferTimeoutMS">option: bufferTimeoutMS</a></h3>
@@ -573,7 +573,7 @@ throwing an error. If not specified, Mongoose will use 10000 (10 seconds).
 
 ```javascript
 // If an operation is buffered for more than 1 second, throw an error.
-const schema = new Schema({..}, { bufferTimeoutMS: 1000 });
+const schema = new Schema({ /* ... */ }, { bufferTimeoutMS: 1000 });
 ```
 
 <h3 id="capped"><a href="#capped">option: capped</a></h3>
@@ -584,7 +584,7 @@ the `capped` option to the maximum size of the collection in
 [bytes](https://www.mongodb.com/docs/manual/core/capped-collections/#create-a-capped-collection).
 
 ```javascript
-new Schema({..}, { capped: 1024 });
+new Schema({ /* ... */ }, { capped: 1024 });
 ```
 
 The `capped` option may also be set to an object if you want to pass
@@ -592,7 +592,7 @@ additional options like [max](https://www.mongodb.com/docs/manual/core/capped-co
 In this case you must explicitly pass the `size` option, which is required.
 
 ```javascript
-new Schema({..}, { capped: { size: 1024, max: 1000, autoIndexId: true } });
+new Schema({ /* ... */ }, { capped: { size: 1024, max: 1000, autoIndexId: true } });
 ```
 
 <h3 id="collection"><a href="#collection">option: collection</a></h3>
@@ -603,7 +603,7 @@ This method pluralizes the name. Set this option if you need a different name
 for your collection.
 
 ```javascript
-const dataSchema = new Schema({..}, { collection: 'data' });
+const dataSchema = new Schema({ /* ... */ }, { collection: 'data' });
 ```
 
 <h3 id="discriminatorKey"><a href="#discriminatorKey">option: discriminatorKey</a></h3>
@@ -685,13 +685,13 @@ const schema = new Schema({ name: String, inventory: {} });
 const Character = mongoose.model('Character', schema);
 
 // will store `inventory` field if it is not empty
-const frodo = new Character({ name: 'Frodo', inventory: { ringOfPower: 1 }});
+const frodo = new Character({ name: 'Frodo', inventory: { ringOfPower: 1 } });
 await frodo.save();
 let doc = await Character.findOne({ name: 'Frodo' }).lean();
 doc.inventory; // { ringOfPower: 1 }
 
 // will not store `inventory` field if it is empty
-const sam = new Character({ name: 'Sam', inventory: {}});
+const sam = new Character({ name: 'Sam', inventory: {} });
 await sam.save();
 doc = await Character.findOne({ name: 'Sam' }).lean();
 doc.inventory; // undefined
@@ -729,11 +729,11 @@ schema level, providing us a way to apply default
 to all queries derived from a model.
 
 ```javascript
-const schema = new Schema({..}, { read: 'primary' });            // also aliased as 'p'
-const schema = new Schema({..}, { read: 'primaryPreferred' });   // aliased as 'pp'
-const schema = new Schema({..}, { read: 'secondary' });          // aliased as 's'
-const schema = new Schema({..}, { read: 'secondaryPreferred' }); // aliased as 'sp'
-const schema = new Schema({..}, { read: 'nearest' });            // aliased as 'n'
+const schema = new Schema({ /* ... */ }, { read: 'primary' });            // also aliased as 'p'
+const schema = new Schema({ /* ... */ }, { read: 'primaryPreferred' });   // aliased as 'pp'
+const schema = new Schema({ /* ... */ }, { read: 'secondary' });          // aliased as 's'
+const schema = new Schema({ /* ... */ }, { read: 'secondaryPreferred' }); // aliased as 'sp'
+const schema = new Schema({ /* ... */ }, { read: 'nearest' });            // aliased as 'n'
 ```
 
 The alias of each pref is also permitted so instead of having to type out
@@ -750,10 +750,10 @@ option when connecting:_
 
 ```javascript
 // pings the replset members periodically to track network latency
-const options = { replset: { strategy: 'ping' }};
+const options = { replset: { strategy: 'ping' } };
 mongoose.connect(uri, options);
 
-const schema = new Schema({..}, { read: ['nearest', { disk: 'ssd' }] });
+const schema = new Schema({ /* ... */ }, { read: ['nearest', { disk: 'ssd' }] });
 mongoose.model('JellyBean', schema);
 ```
 
@@ -780,7 +780,7 @@ insert/update operations. We just need to set this schema option to the same
 shard key and we’ll be all set.
 
 ```javascript
-new Schema({ .. }, { shardKey: { tag: 1, name: 1 }})
+new Schema({ /* ... */ }, { shardKey: { tag: 1, name: 1 } });
 ```
 
 _Note that Mongoose does not send the `shardcollection` command for you. You
@@ -793,13 +793,13 @@ model constructor that were not specified in our schema do not get saved to
 the db.
 
 ```javascript
-const thingSchema = new Schema({..})
+const thingSchema = new Schema({ /* ... */ })
 const Thing = mongoose.model('Thing', thingSchema);
 const thing = new Thing({ iAmNotInTheSchema: true });
 thing.save(); // iAmNotInTheSchema is not saved to the db
 
 // set to false..
-const thingSchema = new Schema({..}, { strict: false });
+const thingSchema = new Schema({ /* ... */ }, { strict: false });
 const thing = new Thing({ iAmNotInTheSchema: true });
 thing.save(); // iAmNotInTheSchema is now saved to the db!!
 ```
@@ -807,7 +807,7 @@ thing.save(); // iAmNotInTheSchema is now saved to the db!!
 This also affects the use of `doc.set()` to set a property value.
 
 ```javascript
-const thingSchema = new Schema({..})
+const thingSchema = new Schema({ /* ... */ });
 const Thing = mongoose.model('Thing', thingSchema);
 const thing = new Thing;
 thing.set('iAmNotInTheSchema', true);
@@ -830,7 +830,7 @@ _NOTE: Any key/val set on the instance that does not exist in your schema
 is always ignored, regardless of schema option._
 
 ```javascript
-const thingSchema = new Schema({..})
+const thingSchema = new Schema({ /* ... */ });
 const Thing = mongoose.model('Thing', thingSchema);
 const thing = new Thing;
 thing.iAmNotInTheSchema = true;
@@ -897,7 +897,7 @@ the document's [`toJSON` method](https://thecodebarbarian.com/what-is-the-tojson
 
 ```javascript
 const schema = new Schema({ name: String });
-schema.path('name').get(function (v) {
+schema.path('name').get(function(v) {
   return v + ' is my name';
 });
 schema.set('toJSON', { getters: true, virtuals: false });
@@ -968,13 +968,13 @@ validation, you can set `validateBeforeSave` to false.
 ```javascript
 const schema = new Schema({ name: String });
 schema.set('validateBeforeSave', false);
-schema.path('name').validate(function (value) {
-    return value != null;
+schema.path('name').validate(function(value) {
+  return value != null;
 });
 const M = mongoose.model('Person', schema);
 const m = new M({ name: null });
 m.validate(function(err) {
-    console.log(err); // Will tell you that null is not allowed.
+  console.log(err); // Will tell you that null is not allowed.
 });
 m.save(); // Succeeds despite being invalid
 ```
@@ -995,7 +995,7 @@ const thing = new Thing({ name: 'mongoose v3' });
 await thing.save(); // { __v: 0, name: 'mongoose v3' }
 
 // customized versionKey
-new Schema({..}, { versionKey: '_somethingElse' })
+new Schema({ /* ... */ }, { versionKey: '_somethingElse' })
 const Thing = mongoose.model('Thing', schema);
 const thing = new Thing({ name: 'mongoose v3' });
 thing.save(); // { _somethingElse: 0, name: 'mongoose v3' }
@@ -1027,7 +1027,7 @@ Document versioning can also be disabled by setting the `versionKey` to
 _DO NOT disable versioning unless you [know what you are doing](http://aaronheckmann.blogspot.com/2012/06/mongoose-v3-part-1-versioning.html)._
 
 ```javascript
-new Schema({..}, { versionKey: false });
+new Schema({ /* ... */ }, { versionKey: false });
 const Thing = mongoose.model('Thing', schema);
 const thing = new Thing({ name: 'no versioning please' });
 thing.save(); // { name: 'no versioning please' }
@@ -1073,7 +1073,7 @@ async function markApproved(id) {
   if (house.photos.length < 2) {
     throw new Error('House must have at least two photos!');
   }
-  
+
   house.status = 'APPROVED';
   await house.save();
 }
@@ -1170,7 +1170,7 @@ do this unless you know what you're doing. For subdocuments, include this
 on the parent document using the fully qualified path.
 
 ```javascript
-new Schema({..}, { skipVersioning: { dontVersionMe: true } });
+new Schema({ /* ... */ }, { skipVersioning: { dontVersionMe: true } });
 thing.dontVersionMe.push('hey');
 thing.save(); // version is not incremented
 ```
@@ -1189,7 +1189,7 @@ The way `timestamps` works under the hood is:
 * If you set `upsert: true` on an update operation, mongoose will use [`$setOnInsert`](https://www.mongodb.com/docs/manual/reference/operator/update/setOnInsert/) operator to add `createdAt` to the document in case the `upsert` operation resulted into a new inserted document.
 
 ```javascript
-const thingSchema = new Schema({..}, { timestamps: { createdAt: 'created_at' } });
+const thingSchema = new Schema({ /* ... */ }, { timestamps: { createdAt: 'created_at' } });
 const Thing = mongoose.model('Thing', thingSchema);
 const thing = new Thing();
 await thing.save(); // `created_at` & `updatedAt` will be included
@@ -1203,19 +1203,23 @@ await Thing.findOneAndUpdate({}, { $set: { name: 'Test2' } });
 // Mongoose also adds timestamps to bulkWrite() operations
 // See https://mongoosejs.com/docs/api/model.html#model_Model-bulkWrite
 await Thing.bulkWrite([
-  insertOne: {
-    document: {
-      name: 'Jean-Luc Picard',
-      ship: 'USS Stargazer'
+  {
+    insertOne: {
+      document: {
+        name: 'Jean-Luc Picard',
+        ship: 'USS Stargazer'
       // Mongoose will add `created_at` and `updatedAt`
+      }
     }
   },
-  updateOne: {
-    filter: { name: 'Jean-Luc Picard' },
-    update: {
-      $set: {
-        ship: 'USS Enterprise'
+  {
+    updateOne: {
+      filter: { name: 'Jean-Luc Picard' },
+      update: {
+        $set: {
+          ship: 'USS Enterprise'
         // Mongoose will add `updatedAt`
+        }
       }
     }
   }

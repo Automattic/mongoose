@@ -1,3 +1,5 @@
+'use strict';
+
 const root = 'https://mongoosejs.azurewebsites.net/api';
 
 const defaultVersion = '7.x';
@@ -31,7 +33,7 @@ function addHistory(value) {
   const url = new URL(window.location.href);
 
   // use this to only modify the param "q" and not overwrite any other existing params
-  url.searchParams.set("q", value);
+  url.searchParams.set('q', value);
 
   window.history.pushState({}, '', url);
   search();
@@ -50,10 +52,10 @@ function search() {
     return;
   }
 
-  const qSearch = url.searchParams.get("q");
+  const qSearch = url.searchParams.get('q');
 
   document.getElementById('search-input').value = qSearch;
-  document.getElementById('search-input-nav').value = ""; // set navbar search empty, to encourage big input usage
+  document.getElementById('search-input-nav').value = ''; // set navbar search empty, to encourage big input usage
 
   fetch(root + '/search?search=' + encodeURIComponent(qSearch) + '&version=' + version).
     then(function(res) { return res.json(); }).

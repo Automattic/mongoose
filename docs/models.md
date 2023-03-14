@@ -41,14 +41,14 @@ them and saving to the database is easy.
 const Tank = mongoose.model('Tank', yourSchema);
 
 const small = new Tank({ size: 'small' });
-small.save(function (err) {
+small.save(function(err) {
   if (err) return handleError(err);
   // saved!
 });
 
 // or
 
-Tank.create({ size: 'small' }, function (err, small) {
+Tank.create({ size: 'small' }, function(err, small) {
   if (err) return handleError(err);
   // saved!
 });
@@ -91,7 +91,7 @@ Models have static `deleteOne()` and `deleteMany()` functions
 for removing all documents matching the given `filter`.
 
 ```javascript
-Tank.deleteOne({ size: 'large' }, function (err) {
+Tank.deleteOne({ size: 'large' }, function(err) {
   if (err) return handleError(err);
   // deleted at most one tank document
 });

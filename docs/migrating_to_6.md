@@ -66,7 +66,7 @@ Below are some of the most noteworthy changes:
 * The result of `deleteOne()` and `deleteMany()` no longer has an `n` property.
 
 ```javascript
-let res = await TestModel.updateMany({}, { someProperty: 'someValue' });
+const res = await TestModel.updateMany({}, { someProperty: 'someValue' });
 
 res.matchedCount; // Number of documents that were found that match the filter. Replaces `res.n`
 res.modifiedCount; // Number of documents modified. Replaces `res.nModified`
@@ -74,7 +74,7 @@ res.upsertedCount; // Number of documents upserted. Replaces `res.upserted`
 ```
 
 ```javascript
-let res = await TestModel.deleteMany({});
+const res = await TestModel.deleteMany({});
 
 // In Mongoose 6: `{ acknowledged: true, deletedCount: 2 }`
 // In Mongoose 5: `{ n: 2, ok: 1, deletedCount: 2 }`
@@ -133,7 +133,7 @@ await q.clone(); // Can `clone()` the query to allow executing the query again
 // now `existingUser` will be either `{ _id: ObjectId(...) }` or `null`.
 const existingUser = await User.exists({ name: 'John' });
 if (existingUser) {
-  console.log(existingUser._id); 
+  console.log(existingUser._id);
 }
 ```
 

@@ -72,15 +72,15 @@ const author = new Person({
   age: 50
 });
 
-author.save(function (err) {
+author.save(function(err) {
   if (err) return handleError(err);
 
   const story1 = new Story({
     title: 'Casino Royale',
-    author: author._id    // assign the _id from the person
+    author: author._id // assign the _id from the person
   });
 
-  story1.save(function (err) {
+  story1.save(function(err) {
     if (err) return handleError(err);
     // that's it!
   });
@@ -97,7 +97,7 @@ So far we haven't done anything much different. We've merely created a
 Story.
   findOne({ title: 'Casino Royale' }).
   populate('author').
-  exec(function (err, story) {
+  exec(function(err, story) {
     if (err) return handleError(err);
     console.log('The author is %s', story.author.name);
     // prints "The author is Ian Fleming"
@@ -195,7 +195,7 @@ to the populate method:
 Story.
   findOne({ title: /casino royale/i }).
   populate('author', 'name'). // only return the Persons name
-  exec(function (err, story) {
+  exec(function(err, story) {
     if (err) return handleError(err);
 
     console.log('The author is %s', story.author.name);
@@ -212,7 +212,7 @@ What if we wanted to populate multiple paths at the same time?
 
 ```javascript
 Story.
-  find(...).
+  find({ /* ... */ }).
   populate('fans').
   populate('author').
   exec();
@@ -341,7 +341,7 @@ But, if you have a good reason to want an array of child pointers, you
 can `push()` documents onto the array as shown below.
 
 ```javascript
-story1.save()
+story1.save();
 
 author.stories.push(story1);
 author.save(callback);
@@ -353,7 +353,7 @@ This allows us to perform a `find` and `populate` combo:
 Person.
   findOne({ name: 'Ian Fleming' }).
   populate('stories'). // only works if we pushed refs to children
-  exec(function (err, person) {
+  exec(function(err, person) {
     if (err) return handleError(err);
     console.log(person);
   });
@@ -366,7 +366,7 @@ stories we are interested in.
 ```javascript
 Story.
   find({ author: author._id }).
-  exec(function (err, stories) {
+  exec(function(err, stories) {
     if (err) return handleError(err);
     console.log('The stories are an array: ', stories);
   });
@@ -722,7 +722,7 @@ const BlogPost = mongoose.model('BlogPost', BlogPostSchema, 'BlogPost');
 // After population
 const author = await Author.findOne().populate('posts');
 
-author.posts // Array of not `archived` posts
+author.posts; // Array of not `archived` posts
 ```
 
 You can also set the `match` option to a function.
@@ -770,8 +770,8 @@ const person2 = new Person({ name: 'Mick Mars' });
 const band = new Band({
   name: 'Motley Crue',
   members: {
-    'singer': person1._id,
-    'guitarist': person2._id
+    singer: person1._id,
+    guitarist: person2._id
   }
 });
 ```
@@ -827,7 +827,7 @@ MySchema.pre('find', function() {
 // Always `populate()` after `find()` calls. Useful if you want to selectively populate
 // based on the docs found.
 MySchema.post('find', async function(docs) {
-  for (let doc of docs) {
+  for (const doc of docs) {
     if (doc.isPublic) {
       await doc.populate('user');
     }
@@ -855,14 +855,14 @@ const userSchema = new Schema({
   password: String,
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
-})
+});
 
-userSchema.pre('find', function (next) {
-  this.populate("followers following");
+userSchema.pre('find', function(next) {
+  this.populate('followers following');
   next();
 });
 
-const User = mongoose.model('User', userSchema)
+const User = mongoose.model('User', userSchema);
 ```
 
 However, this will not work. By default, passing multiple paths to `populate()` in the middleware will trigger an infinite recursion, which means that it will basically trigger the same middleware for all of the paths provided to the `populate()` method - For example, `this.populate('followers following')` will trigger the same middleware for both `followers` and `following` fields and the request will just be left hanging in an infinite loop.
@@ -870,11 +870,11 @@ However, this will not work. By default, passing multiple paths to `populate()` 
 To avoid this, we have to add the `_recursed` option, so that our middleware will avoid populating recursively. The example below will make it work as expected.
 
 ```javascript
-userSchema.pre('find', function (next) {
+userSchema.pre('find', function(next) {
   if (this.options._recursed) {
     return next();
   }
-  this.populate({ path: "followers following", options: { _recursed: true } });
+  this.populate({ path: 'followers following', options: { _recursed: true } });
   next();
 });
 ```
@@ -895,7 +895,7 @@ doc = await Parent.findById(doc).populate([
   {
     path: 'child',
     // If `doc` is null, use the original id instead
-    transform: (doc, id) => doc == null ? id : doc 
+    transform: (doc, id) => doc == null ? id : doc
   }
 ]);
 
@@ -907,7 +907,7 @@ You can return any value from `transform()`.
 For example, you can use `transform()` to "flatten" populated documents as follows.
 
 ```javascript
-let doc = await Parent.create({ children: [ { name: 'Luke' }, { name: 'Leia' } ] });
+let doc = await Parent.create({ children: [{ name: 'Luke' }, { name: 'Leia' }] });
 
 doc = await Parent.findById(doc).populate([{
   path: 'children',

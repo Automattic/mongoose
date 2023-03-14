@@ -59,7 +59,7 @@ document is saved.
 
 ```javascript
 const Parent = mongoose.model('Parent', parentSchema);
-const parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
+const parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] });
 parent.children[0].name = 'Matthew';
 
 // `parent.children[0].save()` is a no-op, it triggers middleware but
@@ -74,7 +74,7 @@ the `save()` middleware for all its subdocuments, and the same for `validate()`
 middleware.
 
 ```javascript
-childSchema.pre('save', function (next) {
+childSchema.pre('save', function(next) {
   if ('invalid' == this.name) {
     return next(new Error('#sadpanda'));
   }
@@ -82,8 +82,8 @@ childSchema.pre('save', function (next) {
 });
 
 const parent = new Parent({ children: [{ name: 'invalid' }] });
-parent.save(function (err) {
-  console.log(err.message) // #sadpanda
+parent.save(function(err) {
+  console.log(err.message); // #sadpanda
 });
 ```
 
@@ -241,11 +241,11 @@ const parent = new Parent();
 // create a comment
 parent.children.push({ name: 'Liesl' });
 const subdoc = parent.children[0];
-console.log(subdoc) // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
+console.log(subdoc); // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
 subdoc.isNew; // true
 
-parent.save(function (err) {
-  if (err) return handleError(err)
+parent.save(function(err) {
+  if (err) return handleError(err);
   console.log('Success!');
 });
 ```
@@ -269,7 +269,7 @@ to setting the subdocument to `null`.
 parent.children.id(_id).remove();
 // Equivalent to `parent.child = null`
 parent.child.remove();
-parent.save(function (err) {
+parent.save(function(err) {
   if (err) return handleError(err);
   console.log('the subdocs were removed');
 });

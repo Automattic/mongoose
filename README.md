@@ -61,7 +61,7 @@ import mongoose from 'mongoose';
 Or, using [Deno's `createRequire()` for CommonJS support](https://deno.land/std@0.113.0/node/README.md?source=#commonjs-modules-loading) as follows.
 
 ```javascript
-import { createRequire } from "https://deno.land/std/node/module.ts";
+import { createRequire } from 'https://deno.land/std/node/module.ts';
 const require = createRequire(import.meta.url);
 
 const mongoose = require('mongoose');
@@ -112,7 +112,7 @@ const BlogPost = new Schema({
   author: ObjectId,
   title: String,
   body: String,
-  date: Date
+  date: Date
 });
 ```
 
@@ -141,12 +141,12 @@ const Comment = new Schema({
 });
 
 // a setter
-Comment.path('name').set(function (v) {
+Comment.path('name').set(function(v) {
   return capitalize(v);
 });
 
 // middleware
-Comment.pre('save', function (next) {
+Comment.pre('save', function(next) {
   notify(this.get('email'));
   next();
 });
@@ -181,7 +181,7 @@ Once we have our model, we can then instantiate it, and save it:
 ```js
 const instance = new MyModel();
 instance.my.key = 'hello';
-instance.save(function (err) {
+instance.save(function(err) {
   //
 });
 ```
@@ -189,7 +189,7 @@ instance.save(function (err) {
 Or we can find documents from the same collection
 
 ```js
-MyModel.find({}, function (err, docs) {
+MyModel.find({}, function(err, docs) {
   // docs.forEach
 });
 ```
@@ -197,8 +197,8 @@ MyModel.find({}, function (err, docs) {
 You can also `findOne`, `findById`, `update`, etc.
 
 ```js
-const instance = await MyModel.findOne({ ... });
-console.log(instance.my.key);  // 'hello'
+const instance = await MyModel.findOne({ /* ... */ });
+console.log(instance.my.key); // 'hello'
 ```
 
 For more details check out [the docs](http://mongoosejs.com/docs/queries.html).
@@ -241,7 +241,7 @@ const post = new BlogPost();
 // create a comment
 post.comments.push({ title: 'My comment' });
 
-post.save(function (err) {
+post.save(function(err) {
   if (!err) console.log('Success!');
 });
 ```
@@ -249,10 +249,10 @@ post.save(function (err) {
 The same goes for removing them:
 
 ```js
-BlogPost.findById(myId, function (err, post) {
+BlogPost.findById(myId, function(err, post) {
   if (!err) {
     post.comments[0].remove();
-    post.save(function (err) {
+    post.save(function(err) {
       // do something
     });
   }
@@ -273,7 +273,7 @@ You can intercept method arguments via middleware.
 For example, this would allow you to broadcast changes about your Documents every time someone `set`s a path in your Document to a new value:
 
 ```js
-schema.pre('set', function (next, path, val, typel) {
+schema.pre('set', function(next, path, val, typel) {
   // `this` is the current Document
   this.emit('set', path, val);
 
@@ -285,13 +285,13 @@ schema.pre('set', function (next, path, val, typel) {
 Moreover, you can mutate the incoming `method` arguments so that subsequent middleware see different values for those arguments. To do so, just pass the new values to `next`:
 
 ```js
-.pre(method, function firstPre (next, methodArg1, methodArg2) {
+schema.pre(method, function firstPre(next, methodArg1, methodArg2) {
   // Mutate methodArg1
-  next("altered-" + methodArg1.toString(), methodArg2);
+  next('altered-' + methodArg1.toString(), methodArg2);
 });
 
 // pre declaration is chainable
-.pre(method, function secondPre (next, methodArg1, methodArg2) {
+schema.pre(method, function secondPre(next, methodArg1, methodArg2) {
   console.log(methodArg1);
   // => 'altered-originalValOfMethodArg1'
 

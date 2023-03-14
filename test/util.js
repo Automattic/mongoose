@@ -9,7 +9,7 @@ exports.random = function() {
 };
 
 exports.clearTestData = function clearTestData(db) {
-  return db.dropDatabase();
+  return db.dropDatabase({ retryWrites: true });
 };
 
 exports.stopRemainingOps = function stopRemainingOps(db) {

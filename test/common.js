@@ -153,7 +153,7 @@ async function dropDBs() {
   this.timeout(60000);
 
   const db = await module.exports({ noErrorListener: true }).asPromise();
-  await db.dropDatabase();
+  await db.dropDatabase({ retryWrites: true });
   await db.close();
 }
 

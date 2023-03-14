@@ -1,27 +1,66 @@
-'use strict';
 const root = 'https://mongoosejs.azurewebsites.net/api';
-const pairs = window.location.search.replace(/^\?/, '').split('&');
-
-let q = null;
-for (let i = 0; i < pairs.length; ++i) {
-  const _pair = pairs[i].split('=');
-  if (_pair[0] === 'q') {
-    q = _pair[1];
-  }
-}
 
 const defaultVersion = '7.x';
 const versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
 const version = versionFromUrl ? versionFromUrl[1] : defaultVersion;
 
-if (q != null) {
-  document.getElementById('search-input').value = decodeURIComponent(q);
-  fetch(root + '/search?search=' + q + '&version=' + version).
+search();
+
+document.getElementById('search-button').onclick = function() {
+  addHistory(document.getElementById('search-input').value);
+};
+
+document.getElementById('search-input').onkeyup = function(ev) {
+  if (ev.keyCode === 13) {
+    addHistory(document.getElementById('search-input').value);
+  }
+};
+
+document.getElementById('search-button-nav').onclick = function() {
+  addHistory(document.getElementById('search-input-nav').value);
+};
+
+document.getElementById('search-input-nav').onkeyup = function(ev) {
+  if (ev.keyCode === 13) {
+    addHistory(document.getElementById('search-input-nav').value);
+  }
+};
+
+/** Helper to consistently add history and reload results */
+function addHistory(value) {
+  const url = new URL(window.location.href);
+
+  // use this to only modify the param "q" and not overwrite any other existing params
+  url.searchParams.set("q", value);
+
+  window.history.pushState({}, '', url);
+  search();
+}
+
+/** (re)load results */
+function search() {
+  const resultsDiv = document.getElementById('results');
+
+  resultsDiv.innerHTML = '<p>Loading...</p';
+
+  const url = new URL(window.location.href);
+
+  if (!url.searchParams || !url.searchParams.has('q')) {
+    resultsDiv.innerHTML = '<p>No Search Parameters</p>';
+    return;
+  }
+
+  const qSearch = url.searchParams.get("q");
+
+  document.getElementById('search-input').value = qSearch;
+  document.getElementById('search-input-nav').value = ""; // set navbar search empty, to encourage big input usage
+
+  fetch(root + '/search?search=' + encodeURIComponent(qSearch) + '&version=' + version).
     then(function(res) { return res.json(); }).
     then(
       function(result) {
         if (result.results.length === 0) {
-          document.getElementById('results').innerHTML = '<h1>No Results</h1>';
+          resultsDiv.innerHTML = '<h1>No Results</h1>';
           return;
         }
         let html = '';
@@ -37,23 +76,11 @@ if (q != null) {
             '</li>';
         }
 
-        document.getElementById('results').innerHTML = '<ul>' + html + '</ul>';
+        resultsDiv.innerHTML = '<ul>' + html + '</ul>';
       },
       function(error) {
-        document.getElementById('results').innerHTML =
+        resultsDiv.innerHTML =
           '<h3>An error occurred: ' + error.message + '</h3>';
       }
     );
 }
-
-document.getElementById('search-button').onclick = function() {
-  const q = document.getElementById('search-input').value;
-  window.location.href = 'search.html?q=' + encodeURIComponent(q);
-};
-
-q = document.getElementById('search-input').onkeyup = function(ev) {
-  if (ev.keyCode === 13) {
-    const q = document.getElementById('search-input').value;
-    window.location.href = 'search.html?q=' + encodeURIComponent(q);
-  }
-};

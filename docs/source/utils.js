@@ -12,18 +12,18 @@ const fs = require('fs');
  * @param {Object} exportsObj The "module.exports" object to apply changes to
  */
 function mapSubDoc(subDoc, options, exportsObj) {
-    const dirName = `docs/${subDoc}`
+  const dirName = `docs/${subDoc}`;
 
-    const files = fs.readdirSync(dirName).filter(file => file.endsWith('.md'));
+  const files = fs.readdirSync(dirName).filter(file => file.endsWith('.md'));
 
-    files.forEach((filename) => {
-      const content = fs.readFileSync(`${dirName}/${filename}`, 'utf8');
-      exportsObj[`${dirName}/${filename}`] = {
-        ...options,
-        title: `${options.title} ${content.split('\n')[0].replace(/^#+/, '').trim()}`
-      };
-    });
-  }
+  files.forEach((filename) => {
+    const content = fs.readFileSync(`${dirName}/${filename}`, 'utf8');
+    exportsObj[`${dirName}/${filename}`] = {
+      ...options,
+      title: `${options.title} ${content.split('\n')[0].replace(/^#+/, '').trim()}`
+    };
+  });
+}
 
 module.exports = mapSubDoc;
 module.exports.mapSubDoc = mapSubDoc;

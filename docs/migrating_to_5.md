@@ -1,4 +1,4 @@
-## Migrating from 4.x to 5.x
+# Migrating from 4.x to 5.x
 
 There are several [backwards-breaking changes](https://github.com/Automattic/mongoose/blob/master/History.md)
 you should be aware of when migrating from Mongoose 4.x to Mongoose 5.x.

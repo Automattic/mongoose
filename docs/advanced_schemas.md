@@ -1,4 +1,4 @@
-## Advanced Schemas
+# Advanced Schemas
 
 ### Creating from ES6 Classes Using `loadClass()`
 

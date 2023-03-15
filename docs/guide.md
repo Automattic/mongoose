@@ -1,4 +1,4 @@
-## Schemas
+# Schemas
 
 If you haven't yet done so, please take a minute to read the [quickstart](index.html) to get an idea of how Mongoose works.
 If you are migrating from 6.x to 7.x please take a moment to read the [migration guide](migrating_to_7.html).

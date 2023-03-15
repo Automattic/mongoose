@@ -1,4 +1,4 @@
-## Subdocuments
+# Subdocuments
 
 Subdocuments are documents embedded in other documents. In Mongoose, this
 means you can nest schemas in other schemas. Mongoose has two

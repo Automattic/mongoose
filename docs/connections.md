@@ -1,4 +1,4 @@
-## Connections
+# Connections
 
 You can connect to MongoDB with the `mongoose.connect()` method.
 

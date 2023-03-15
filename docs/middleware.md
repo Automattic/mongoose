@@ -1,4 +1,4 @@
-## Middleware
+# Middleware
 
 Middleware (also called pre and post *hooks*) are functions which are passed
 control during execution of asynchronous functions. Middleware is specified

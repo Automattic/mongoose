@@ -1,4 +1,4 @@
-## Validation
+# Validation
 
 Before we get into the specifics of validation syntax, please keep the following rules in mind:
 

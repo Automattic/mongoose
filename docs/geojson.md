@@ -1,11 +1,5 @@
 # Using GeoJSON
 
-<script>
-  _native.init("CK7DT53U",{
-    targetClass: 'native-inline'
-  });
-</script>
-
 [GeoJSON](http://geojson.org/) is a format for storing geographic points and
 polygons. [MongoDB has excellent support for geospatial queries](http://thecodebarbarian.com/80-20-guide-to-mongodb-geospatial-queries)
 on GeoJSON objects. Let's take a look at how you can use Mongoose to store

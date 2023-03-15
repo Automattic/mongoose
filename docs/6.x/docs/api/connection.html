@@ -1,0 +1,442 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.10.3: Connection</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/6.x/docs/css/github.css"><link rel="stylesheet" href="/docs/6.x/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><script src="/docs/js/api-bold-current-nav.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.10.3</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs">Version 7.x</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x">Version 6.10.3</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.16</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/6.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/connection.js" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h1>Connection</h1><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"><div id="native-direct"></div><script>(function() {
+if (typeof _bsa !== 'undefined' && _bsa) {
+_bsa.init('custom', 'CK7DT53U', 'placement:mongoosejscom',
+{
+target: '#native-direct',
+template: `
+<div class="native-inline">
+<a rel="sponsored noopener" target="_blank" href="##statlink##" title="##company## — ##tagline##"><span class="sponsor">Sponsor</span> ##company## — ##description##</a>
+</div>
+</a>
+`
+}
+);
+}
+})();</script><div class="api-nav"><div class="api-nav-content"><div class="nav-item" id="nav-Mongoose"><div class="nav-item-title"><a href="mongoose.html">Mongoose</a></div></div><div class="nav-item" id="nav-Schema"><div class="nav-item-title"><a href="schema.html">Schema</a></div></div><div class="nav-item" id="nav-Connection"><div class="nav-item-title" style="font-weight: bold"><a href="connection.html">Connection</a></div><ul class="nav-item-sub"><li><a href="#connection_Connection"><code>Connection()</code></a></li><li><a href="#connection_Connection-asPromise"><code>Connection.prototype.asPromise()</code></a></li><li><a href="#connection_Connection-client"><code>Connection.prototype.client</code></a></li><li><a href="#connection_Connection-close"><code>Connection.prototype.close()</code></a></li><li><a href="#connection_Connection-collection"><code>Connection.prototype.collection()</code></a></li><li><a href="#connection_Connection-collections"><code>Connection.prototype.collections</code></a></li><li><a href="#connection_Connection-config"><code>Connection.prototype.config</code></a></li><li><a href="#connection_Connection-createCollection"><code>Connection.prototype.createCollection()</code></a></li><li><a href="#connection_Connection-db"><code>Connection.prototype.db</code></a></li><li><a href="#connection_Connection-deleteModel"><code>Connection.prototype.deleteModel()</code></a></li><li><a href="#connection_Connection-destroy"><code>Connection.prototype.destroy()</code></a></li><li><a href="#connection_Connection-dropCollection"><code>Connection.prototype.dropCollection()</code></a></li><li><a href="#connection_Connection-dropDatabase"><code>Connection.prototype.dropDatabase()</code></a></li><li><a href="#connection_Connection-get"><code>Connection.prototype.get()</code></a></li><li><a href="#connection_Connection-getClient"><code>Connection.prototype.getClient()</code></a></li><li><a href="#connection_Connection-host"><code>Connection.prototype.host</code></a></li><li><a href="#connection_Connection-id"><code>Connection.prototype.id</code></a></li><li><a href="#connection_Connection-model"><code>Connection.prototype.model()</code></a></li><li><a href="#connection_Connection-modelNames"><code>Connection.prototype.modelNames()</code></a></li><li><a href="#connection_Connection-models"><code>Connection.prototype.models</code></a></li><li><a href="#connection_Connection-name"><code>Connection.prototype.name</code></a></li><li><a href="#connection_Connection-openUri"><code>Connection.prototype.openUri()</code></a></li><li><a href="#connection_Connection-pass"><code>Connection.prototype.pass</code></a></li><li><a href="#connection_Connection-plugin"><code>Connection.prototype.plugin()</code></a></li><li><a href="#connection_Connection-plugins"><code>Connection.prototype.plugins</code></a></li><li><a href="#connection_Connection-port"><code>Connection.prototype.port</code></a></li><li><a href="#connection_Connection-readyState"><code>Connection.prototype.readyState</code></a></li><li><a href="#connection_Connection-set"><code>Connection.prototype.set()</code></a></li><li><a href="#connection_Connection-setClient"><code>Connection.prototype.setClient()</code></a></li><li><a href="#connection_Connection-startSession"><code>Connection.prototype.startSession()</code></a></li><li><a href="#connection_Connection-syncIndexes"><code>Connection.prototype.syncIndexes</code></a></li><li><a href="#connection_Connection-transaction"><code>Connection.prototype.transaction()</code></a></li><li><a href="#connection_Connection-useDb"><code>Connection.prototype.useDb()</code></a></li><li><a href="#connection_Connection-user"><code>Connection.prototype.user</code></a></li><li><a href="#connection_Connection-watch"><code>Connection.prototype.watch()</code></a></li></ul></div><div class="nav-item" id="nav-Document"><div class="nav-item-title"><a href="document.html">Document</a></div></div><div class="nav-item" id="nav-Model"><div class="nav-item-title"><a href="model.html">Model</a></div></div><div class="nav-item" id="nav-Query"><div class="nav-item-title"><a href="query.html">Query</a></div></div><div class="nav-item" id="nav-QueryCursor"><div class="nav-item-title"><a href="querycursor.html">QueryCursor</a></div></div><div class="nav-item" id="nav-Aggregate"><div class="nav-item-title"><a href="aggregate.html">Aggregate</a></div></div><div class="nav-item" id="nav-AggregationCursor"><div class="nav-item-title"><a href="aggregationcursor.html">AggregationCursor</a></div></div><div class="nav-item" id="nav-Schematype"><div class="nav-item-title"><a href="schematype.html">Schematype</a></div></div><div class="nav-item" id="nav-Virtualtype"><div class="nav-item-title"><a href="virtualtype.html">Virtualtype</a></div></div><div class="nav-item" id="nav-Error"><div class="nav-item-title"><a href="error.html">Error</a></div></div><div class="nav-item" id="nav-SchemaArray"><div class="nav-item-title"><a href="schemaarray.html">SchemaArray</a></div></div><div class="nav-item" id="nav-DocumentArrayPath"><div class="nav-item-title"><a href="documentarraypath.html">DocumentArrayPath</a></div></div><div class="nav-item" id="nav-SubdocumentPath"><div class="nav-item-title"><a href="subdocumentpath.html">SubdocumentPath</a></div></div><div class="nav-item" id="nav-MongooseDocumentArray"><div class="nav-item-title"><a href="mongoosedocumentarray.html">MongooseDocumentArray</a></div></div><div class="nav-item" id="nav-Subdocument"><div class="nav-item-title"><a href="subdocument.html">Subdocument</a></div></div><div class="nav-item" id="nav-ArraySubdocument"><div class="nav-item-title"><a href="arraysubdocument.html">ArraySubdocument</a></div></div><div class="nav-item" id="nav-Buffer"><div class="nav-item-title"><a href="buffer.html">Buffer</a></div></div><div class="nav-item" id="nav-Decimal128"><div class="nav-item-title"><a href="decimal128.html">Decimal128</a></div></div><div class="nav-item" id="nav-Map"><div class="nav-item-title"><a href="map.html">Map</a></div></div></div></div><div class="api-content"><ul><li><a href="#connection_Connection"><code>Connection()</code></a></li><li><a href="#connection_Connection-asPromise"><code>Connection.prototype.asPromise()</code></a></li><li><a href="#connection_Connection-client"><code>Connection.prototype.client</code></a></li><li><a href="#connection_Connection-close"><code>Connection.prototype.close()</code></a></li><li><a href="#connection_Connection-collection"><code>Connection.prototype.collection()</code></a></li><li><a href="#connection_Connection-collections"><code>Connection.prototype.collections</code></a></li><li><a href="#connection_Connection-config"><code>Connection.prototype.config</code></a></li><li><a href="#connection_Connection-createCollection"><code>Connection.prototype.createCollection()</code></a></li><li><a href="#connection_Connection-db"><code>Connection.prototype.db</code></a></li><li><a href="#connection_Connection-deleteModel"><code>Connection.prototype.deleteModel()</code></a></li><li><a href="#connection_Connection-destroy"><code>Connection.prototype.destroy()</code></a></li><li><a href="#connection_Connection-dropCollection"><code>Connection.prototype.dropCollection()</code></a></li><li><a href="#connection_Connection-dropDatabase"><code>Connection.prototype.dropDatabase()</code></a></li><li><a href="#connection_Connection-get"><code>Connection.prototype.get()</code></a></li><li><a href="#connection_Connection-getClient"><code>Connection.prototype.getClient()</code></a></li><li><a href="#connection_Connection-host"><code>Connection.prototype.host</code></a></li><li><a href="#connection_Connection-id"><code>Connection.prototype.id</code></a></li><li><a href="#connection_Connection-model"><code>Connection.prototype.model()</code></a></li><li><a href="#connection_Connection-modelNames"><code>Connection.prototype.modelNames()</code></a></li><li><a href="#connection_Connection-models"><code>Connection.prototype.models</code></a></li><li><a href="#connection_Connection-name"><code>Connection.prototype.name</code></a></li><li><a href="#connection_Connection-openUri"><code>Connection.prototype.openUri()</code></a></li><li><a href="#connection_Connection-pass"><code>Connection.prototype.pass</code></a></li><li><a href="#connection_Connection-plugin"><code>Connection.prototype.plugin()</code></a></li><li><a href="#connection_Connection-plugins"><code>Connection.prototype.plugins</code></a></li><li><a href="#connection_Connection-port"><code>Connection.prototype.port</code></a></li><li><a href="#connection_Connection-readyState"><code>Connection.prototype.readyState</code></a></li><li><a href="#connection_Connection-set"><code>Connection.prototype.set()</code></a></li><li><a href="#connection_Connection-setClient"><code>Connection.prototype.setClient()</code></a></li><li><a href="#connection_Connection-startSession"><code>Connection.prototype.startSession()</code></a></li><li><a href="#connection_Connection-syncIndexes"><code>Connection.prototype.syncIndexes</code></a></li><li><a href="#connection_Connection-transaction"><code>Connection.prototype.transaction()</code></a></li><li><a href="#connection_Connection-useDb"><code>Connection.prototype.useDb()</code></a></li><li><a href="#connection_Connection-user"><code>Connection.prototype.user</code></a></li><li><a href="#connection_Connection-watch"><code>Connection.prototype.watch()</code></a></li></ul><hr class="separate-api-elements"><h3 id="connection_Connection"><a href="#connection_Connection"><code>Connection()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>base</code>
+<span class="method-type">&laquo;Mongoose&raquo;</span> a mongoose instance</p>
+</li></ul><h5>Inherits:</h5><ul><li><span class="method-type"><a href="https://nodejs.org/api/events.html#class-eventemitter">&laquo;NodeJS EventEmitter&raquo;</a></span></li></ul><div><p>Connection constructor</p>
+<p>For practical reasons, a Connection equals a Db.</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-asPromise"><a href="#connection_Connection-asPromise"><code>Connection.prototype.asPromise()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Returns a promise that resolves when this connection
+successfully connects to MongoDB, or rejects if this connection failed
+to connect.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> conn = <span class="hljs-keyword">await</span> mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://127.0.0.1:27017/test&#x27;</span>).
+  <span class="hljs-title function_">asPromise</span>();
+conn.<span class="hljs-property">readyState</span>; <span class="hljs-comment">// 1, means Mongoose is connected</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-client"><a href="#connection_Connection-client"><code>Connection.prototype.client</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The MongoClient instance this connection uses to talk to MongoDB. Mongoose automatically sets this property
+when the connection is opened.</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-close"><a href="#connection_Connection-close"><code>Connection.prototype.close()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[force]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> optional</p>
+</li><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> optional</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> Returns a Promise if no <code>callback</code> is given.</li></ul><div><p>Closes the connection</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-collection"><a href="#connection_Connection-collection"><code>Connection.prototype.collection()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
+<span class="method-type">&laquo;String&raquo;</span> of the collection</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> optional collection options</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Collection&raquo;</span> collection instance</li></ul><div><p>Retrieves a collection, creating it if not cached.</p>
+<p>Not typically needed by applications. Just talk to your collection through your model.</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-collections"><a href="#connection_Connection-collections"><code>Connection.prototype.collections</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>A hash of the collections associated with this connection</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-config"><a href="#connection_Connection-config"><code>Connection.prototype.config</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>A hash of the global options that are associated with this connection</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-createCollection"><a href="#connection_Connection-createCollection"><code>Connection.prototype.createCollection()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>collection</code>
+<span class="method-type">&laquo;string&raquo;</span> The collection to create</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> see <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Db.html#createCollection">MongoDB driver docs</a></p>
+</li><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> Returns a Promise if no <code>callback</code> is given.</li></ul><div><p>Helper for <code>createCollection()</code>. Will explicitly create the given collection
+with specified options. Used to create <a href="https://www.mongodb.com/docs/manual/core/capped-collections/">capped collections</a>
+and <a href="https://www.mongodb.com/docs/manual/core/views/">views</a> from mongoose.</p>
+<p>Options are passed down without modification to the <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Db.html#createCollection">MongoDB driver&#39;s <code>createCollection()</code> function</a></p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-db"><a href="#connection_Connection-db"><code>Connection.prototype.db</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The mongodb.Db instance, set when the connection is opened</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-deleteModel"><a href="#connection_Connection-deleteModel"><code>Connection.prototype.deleteModel()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
+<span class="method-type">&laquo;String|RegExp&raquo;</span> if string, the name of the model to remove. If regexp, removes all models whose name matches the regexp.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Connection&raquo;</span> this</li></ul><div><p>Removes the model named <code>name</code> from this connection, if it exists. You can
+use this function to clean up any models you created in your tests to
+prevent OverwriteModelErrors.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>conn.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }));
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(conn.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>)); <span class="hljs-comment">// Model object</span>
+conn.<span class="hljs-title function_">deleteModel</span>(<span class="hljs-string">&#x27;User&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(conn.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>)); <span class="hljs-comment">// undefined</span>
+
+<span class="hljs-comment">// Usually useful in a Mocha `afterEach()` hook</span>
+<span class="hljs-title function_">afterEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  conn.<span class="hljs-title function_">deleteModel</span>(<span class="hljs-regexp">/.+/</span>); <span class="hljs-comment">// Delete every model</span>
+});
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-destroy"><a href="#connection_Connection-destroy"><code>Connection.prototype.destroy()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[force]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> </li><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><div><p>Destory the connection (not just a alias of <a href="#connection_Connection-close"><code>.close</code></a>)</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-dropCollection"><a href="#connection_Connection-dropCollection"><code>Connection.prototype.dropCollection()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>collection</code>
+<span class="method-type">&laquo;string&raquo;</span> The collection to delete</p>
+</li><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> Returns a Promise if no <code>callback</code> is given.</li></ul><div><p>Helper for <code>dropCollection()</code>. Will delete the given collection, including
+all documents and indexes.</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-dropDatabase"><a href="#connection_Connection-dropDatabase"><code>Connection.prototype.dropDatabase()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> Returns a Promise if no <code>callback</code> is given.</li></ul><div><p>Helper for <code>dropDatabase()</code>. Deletes the given database, including all
+collections, documents, and indexes.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> conn = mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://127.0.0.1:27017/mydb&#x27;</span>);
+<span class="hljs-comment">// Deletes the entire &#x27;mydb&#x27; database</span>
+<span class="hljs-keyword">await</span> conn.<span class="hljs-title function_">dropDatabase</span>();
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-get"><a href="#connection_Connection-get"><code>Connection.prototype.get()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>key</code>
+<span class="method-type">&laquo;String&raquo;</span> </li></ul><div><p>Gets the value of the option <code>key</code>. Equivalent to <code>conn.options[key]</code></p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>conn.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;test&#x27;</span>); <span class="hljs-comment">// returns the &#x27;test&#x27; value</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-getClient"><a href="#connection_Connection-getClient"><code>Connection.prototype.getClient()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;MongoClient&raquo;</span> </li></ul><div><p>Returns the <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/MongoClient.html">MongoDB driver <code>MongoClient</code></a> instance
+that this connection uses to talk to MongoDB.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> conn = <span class="hljs-keyword">await</span> mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://127.0.0.1:27017/test&#x27;</span>).
+  <span class="hljs-title function_">asPromise</span>();
+
+conn.<span class="hljs-title function_">getClient</span>(); <span class="hljs-comment">// MongoClient { ... }</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-host"><a href="#connection_Connection-host"><code>Connection.prototype.host</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The host name portion of the URI. If multiple hosts, such as a replica set,
+this will contain the first host name in the URI</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://127.0.0.1:27017/mydb&#x27;</span>).<span class="hljs-property">host</span>; <span class="hljs-comment">// &quot;127.0.0.1&quot;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-id"><a href="#connection_Connection-id"><code>Connection.prototype.id</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>A number identifier for this connection. Used for debugging when
+you have <a href="/docs/connections.html#multiple_connections">multiple connections</a>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// The default connection has `id = 0`</span>
+mongoose.<span class="hljs-property">connection</span>.<span class="hljs-property">id</span>; <span class="hljs-comment">// 0</span>
+
+<span class="hljs-comment">// If you create a new connection, Mongoose increments id</span>
+<span class="hljs-keyword">const</span> conn = mongoose.<span class="hljs-title function_">createConnection</span>();
+conn.<span class="hljs-property">id</span>; <span class="hljs-comment">// 1</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-model"><a href="#connection_Connection-model"><code>Connection.prototype.model()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
+<span class="method-type">&laquo;String|Function&raquo;</span> the model name or class extending Model</p>
+</li><li class="param"><code>[schema]</code>
+<span class="method-type">&laquo;Schema&raquo;</span> a schema. necessary when defining a model</p>
+</li><li class="param"><code>[collection]</code>
+<span class="method-type">&laquo;String&raquo;</span> name of mongodb collection (optional) if not given it will be induced from model name</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.overwriteModels=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If true, overwrite existing models with the same name to avoid <code>OverwriteModelError</code></p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Model&raquo;</span> The compiled model</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#index_Mongoose-model">Mongoose#model</a></span></li></ul><div><p>Defines or retrieves a model.</p>
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;mongoose&#x27;</span>);
+<span class="hljs-keyword">const</span> db = mongoose.<span class="hljs-title function_">createConnection</span>(..);
+db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Venue&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>(..));
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Ticket</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Ticket&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>(..));
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Venue</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Venue&#x27;</span>);
+</code></pre>
+<p><em>When no <code>collection</code> argument is passed, Mongoose produces a collection name by passing the model <code>name</code> to the <a href="#utils_exports-toCollectionName">utils.toCollectionName</a> method. This method pluralizes the name. If you don&#39;t like this behavior, either pass a collection name or set your schemas collection name option.</em></p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }, { <span class="hljs-attr">collection</span>: <span class="hljs-string">&#x27;actor&#x27;</span> });
+
+<span class="hljs-comment">// or</span>
+
+schema.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;collection&#x27;</span>, <span class="hljs-string">&#x27;actor&#x27;</span>);
+
+<span class="hljs-comment">// or</span>
+
+<span class="hljs-keyword">const</span> collectionName = <span class="hljs-string">&#x27;actor&#x27;</span>
+<span class="hljs-keyword">const</span> M = conn.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Actor&#x27;</span>, schema, collectionName)
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-modelNames"><a href="#connection_Connection-modelNames"><code>Connection.prototype.modelNames()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array[String]&raquo;</span> </li></ul><div><p>Returns an array of model names created on this connection.</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-models"><a href="#connection_Connection-models"><code>Connection.prototype.models</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>A <a href="https://masteringjs.io/tutorials/fundamentals/pojo">POJO</a> containing
+a map from model names to models. Contains all models that have been
+added to this connection using <a href="/docs/api/connection.html#connection_Connection-model"><code>Connection#model()</code></a>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> conn = mongoose.<span class="hljs-title function_">createConnection</span>();
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Test</span> = conn.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, mongoose.<span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }));
+
+<span class="hljs-title class_">Object</span>.<span class="hljs-title function_">keys</span>(conn.<span class="hljs-property">models</span>).<span class="hljs-property">length</span>; <span class="hljs-comment">// 1</span>
+conn.<span class="hljs-property">models</span>.<span class="hljs-property">Test</span> === <span class="hljs-title class_">Test</span>; <span class="hljs-comment">// true</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-name"><a href="#connection_Connection-name"><code>Connection.prototype.name</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The name of the database this connection points to.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://127.0.0.1:27017/mydb&#x27;</span>).<span class="hljs-property">name</span>; <span class="hljs-comment">// &quot;mydb&quot;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-openUri"><a href="#connection_Connection-openUri"><code>Connection.prototype.openUri()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>uri</code>
+<span class="method-type">&laquo;String&raquo;</span> The URI to connect with.</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> Passed on to <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/MongoClient.html#connect-1"><code>MongoClient.connect</code></a></p>
+</li><ul style="margin-top: 0.5em"><li><code>[options.bufferCommands=true]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose specific option. Set to false to <a href="https://mongoosejs.com/docs/faq.html#callback_never_executes">disable buffering</a> on all models associated with this connection.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.bufferTimeoutMS=10000]</code>
+<span class="method-type">&laquo;Number&raquo;</span> Mongoose specific option. If <code>bufferCommands</code> is true, Mongoose will throw an error after <code>bufferTimeoutMS</code> if the operation is still buffered.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.dbName]</code>
+<span class="method-type">&laquo;String&raquo;</span> The name of the database we want to use. If not provided, use database name from connection string.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.user]</code>
+<span class="method-type">&laquo;String&raquo;</span> username for authentication, equivalent to <code>options.auth.user</code>. Maintained for backwards compatibility.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.pass]</code>
+<span class="method-type">&laquo;String&raquo;</span> password for authentication, equivalent to <code>options.auth.password</code>. Maintained for backwards compatibility.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.maxPoolSize=100]</code>
+<span class="method-type">&laquo;Number&raquo;</span> The maximum number of sockets the MongoDB driver will keep open for this connection. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See <a href="https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs">Slow Trains in MongoDB and Node.js</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.minPoolSize=0]</code>
+<span class="method-type">&laquo;Number&raquo;</span> The minimum number of sockets the MongoDB driver will keep open for this connection. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See <a href="https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs">Slow Trains in MongoDB and Node.js</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.serverSelectionTimeoutMS]</code>
+<span class="method-type">&laquo;Number&raquo;</span> If <code>useUnifiedTopology = true</code>, the MongoDB driver will try to find a server to send any given operation to, and keep retrying for <code>serverSelectionTimeoutMS</code> milliseconds before erroring out. If not set, the MongoDB driver defaults to using <code>30000</code> (30 seconds).</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.heartbeatFrequencyMS]</code>
+<span class="method-type">&laquo;Number&raquo;</span> If <code>useUnifiedTopology = true</code>, the MongoDB driver sends a heartbeat every <code>heartbeatFrequencyMS</code> to check on the status of the connection. A heartbeat is subject to <code>serverSelectionTimeoutMS</code>, so the MongoDB driver will retry failed heartbeats for up to 30 seconds by default. Mongoose only emits a <code>&#39;disconnected&#39;</code> event after a heartbeat has failed, so you may want to decrease this setting to reduce the time between when your server goes down and when Mongoose emits <code>&#39;disconnected&#39;</code>. We recommend you do <strong>not</strong> set this setting below 1000, too many heartbeats can lead to performance degradation.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.autoIndex=true]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose-specific option. Set to false to disable automatic index creation for all models associated with this connection.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.promiseLibrary]</code>
+<span class="method-type">&laquo;Class&raquo;</span> Sets the <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/MongoClientOptions.html#promiseLibrary">underlying driver&#39;s promise library</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.connectTimeoutMS=30000]</code>
+<span class="method-type">&laquo;Number&raquo;</span> How long the MongoDB driver will wait before killing a socket due to inactivity <em>during initial connection</em>. Defaults to 30000. This option is passed transparently to <a href="https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback">Node.js&#39; <code>socket#setTimeout()</code> function</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.socketTimeoutMS=30000]</code>
+<span class="method-type">&laquo;Number&raquo;</span> How long the MongoDB driver will wait before killing a socket due to inactivity <em>after initial connection</em>. A socket may be inactive because of either no activity or a long-running operation. This is set to <code>30000</code> by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds. This option is passed to <a href="https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback">Node.js <code>socket#setTimeout()</code> function</a> after the MongoDB driver successfully completes.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.family=0]</code>
+<span class="method-type">&laquo;Number&raquo;</span> Passed transparently to <a href="https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback">Node.js&#39; <code>dns.lookup()</code></a> function. May be either <code>0, </code>4<code>, or </code>6<code>. </code>4<code>means use IPv4 only,</code>6<code>means use IPv6 only,</code>0` means try both.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.autoCreate=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> Set to <code>true</code> to make Mongoose automatically call <code>createCollection()</code> on every model created on this connection.</p>
+</li></ul><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><div><p>Opens the connection with a URI using <code>MongoClient.connect()</code>.</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-pass"><a href="#connection_Connection-pass"><code>Connection.prototype.pass</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The password specified in the URI</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://val:psw@127.0.0.1:27017/mydb&#x27;</span>).<span class="hljs-property">pass</span>; <span class="hljs-comment">// &quot;psw&quot;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-plugin"><a href="#connection_Connection-plugin"><code>Connection.prototype.plugin()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fn</code>
+<span class="method-type">&laquo;Function&raquo;</span> plugin callback</p>
+</li><li class="param"><code>[opts]</code>
+<span class="method-type">&laquo;Object&raquo;</span> optional options</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Connection&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/plugins.html">plugins</a></span></li></ul><div><p>Declares a plugin executed on all schemas you pass to <code>conn.model()</code></p>
+<p>Equivalent to calling <code>.plugin(fn)</code> on each schema you create.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> db = mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://127.0.0.1:27017/mydb&#x27;</span>);
+db.<span class="hljs-title function_">plugin</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Applied&#x27;</span>));
+db.<span class="hljs-property">plugins</span>.<span class="hljs-property">length</span>; <span class="hljs-comment">// 1</span>
+
+db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({})); <span class="hljs-comment">// Prints &quot;Applied&quot;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-plugins"><a href="#connection_Connection-plugins"><code>Connection.prototype.plugins</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The plugins that will be applied to all models created on this connection.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> db = mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://127.0.0.1:27017/mydb&#x27;</span>);
+db.<span class="hljs-title function_">plugin</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Applied&#x27;</span>));
+db.<span class="hljs-property">plugins</span>.<span class="hljs-property">length</span>; <span class="hljs-comment">// 1</span>
+
+db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({})); <span class="hljs-comment">// Prints &quot;Applied&quot;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-port"><a href="#connection_Connection-port"><code>Connection.prototype.port</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The port portion of the URI. If multiple hosts, such as a replica set,
+this will contain the port from the first host name in the URI.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://127.0.0.1:27017/mydb&#x27;</span>).<span class="hljs-property">port</span>; <span class="hljs-comment">// 27017</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-readyState"><a href="#connection_Connection-readyState"><code>Connection.prototype.readyState</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Connection ready state</p>
+<ul>
+<li>0 = disconnected</li>
+<li>1 = connected</li>
+<li>2 = connecting</li>
+<li>3 = disconnecting</li>
+</ul>
+<p>Each state change emits its associated event name.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>conn.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;connected&#x27;</span>, callback);
+conn.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;disconnected&#x27;</span>, callback);
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-set"><a href="#connection_Connection-set"><code>Connection.prototype.set()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>key</code>
+<span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>val</code>
+<span class="method-type">&laquo;Any&raquo;</span> </li></ul><div><p>Sets the value of the option <code>key</code>. Equivalent to <code>conn.options[key] = val</code></p>
+<p>Supported options include:</p>
+<ul>
+<li><code>maxTimeMS</code>: Set <a href="/docs/api/query.html#query_Query-maxTimeMS"><code>maxTimeMS</code></a> for all queries on this connection.</li>
+<li>&#39;debug&#39;: If <code>true</code>, prints the operations mongoose sends to MongoDB to the console. If a writable stream is passed, it will log to that stream, without colorization. If a callback function is passed, it will receive the collection name, the method name, then all arugments passed to the method. For example, if you wanted to replicate the default logging, you could output from the callback <code>Mongoose: ${collectionName}.${methodName}(${methodArgs.join(&#39;, &#39;)})</code>.</li>
+</ul>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>conn.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;test&#x27;</span>, <span class="hljs-string">&#x27;foo&#x27;</span>);
+conn.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;test&#x27;</span>); <span class="hljs-comment">// &#x27;foo&#x27;</span>
+conn.<span class="hljs-property">options</span>.<span class="hljs-property">test</span>; <span class="hljs-comment">// &#x27;foo&#x27;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-setClient"><a href="#connection_Connection-setClient"><code>Connection.prototype.setClient()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>client</code>
+<span class="method-type">&laquo;MongClient&raquo;</span> The Client to set to be used.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Connection&raquo;</span> this</li></ul><div><p>Set the <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/MongoClient.html">MongoDB driver <code>MongoClient</code></a> instance
+that this connection uses to talk to MongoDB. This is useful if you already have a MongoClient instance, and want to
+reuse it.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> client = <span class="hljs-keyword">await</span> mongodb.<span class="hljs-property">MongoClient</span>.<span class="hljs-title function_">connect</span>(<span class="hljs-string">&#x27;mongodb://127.0.0.1:27017/test&#x27;</span>);
+
+<span class="hljs-keyword">const</span> conn = mongoose.<span class="hljs-title function_">createConnection</span>().<span class="hljs-title function_">setClient</span>(client);
+
+conn.<span class="hljs-title function_">getClient</span>(); <span class="hljs-comment">// MongoClient { ... }</span>
+conn.<span class="hljs-property">readyState</span>; <span class="hljs-comment">// 1, means &#x27;CONNECTED&#x27;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-startSession"><a href="#connection_Connection-startSession"><code>Connection.prototype.startSession()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> see the <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/MongoClient.html#startSession">mongodb driver options</a></p>
+</li><ul style="margin-top: 0.5em"><li><code>[options.causalConsistency=true]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> set to false to disable causal consistency</p>
+</li></ul><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;ClientSession&gt;&raquo;</span> promise that resolves to a MongoDB driver <code>ClientSession</code></li></ul><div><p><em>Requires MongoDB &gt;= 3.6.0.</em> Starts a <a href="https://www.mongodb.com/docs/manual/release-notes/3.6/#client-sessions">MongoDB session</a>
+for benefits like causal consistency, <a href="https://www.mongodb.com/docs/manual/core/retryable-writes/">retryable writes</a>,
+and <a href="https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html">transactions</a>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> session = <span class="hljs-keyword">await</span> conn.<span class="hljs-title function_">startSession</span>();
+<span class="hljs-keyword">let</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ned Stark&#x27;</span> }, <span class="hljs-literal">null</span>, { session });
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">remove</span>();
+<span class="hljs-comment">// `doc` will always be null, even if reading from a replica set</span>
+<span class="hljs-comment">// secondary. Without causal consistency, it is possible to</span>
+<span class="hljs-comment">// get a doc back from the below query if the query reads from a</span>
+<span class="hljs-comment">// secondary that is experiencing replication lag.</span>
+doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ned Stark&#x27;</span> }, <span class="hljs-literal">null</span>, { session, <span class="hljs-attr">readPreference</span>: <span class="hljs-string">&#x27;secondary&#x27;</span> });
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-syncIndexes"><a href="#connection_Connection-syncIndexes"><code>Connection.prototype.syncIndexes</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.continueOnError]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> <code>false</code> by default. If set to <code>true</code>, mongoose will not throw an error if one model syncing failed, and will return an object where the keys are the names of the models, and the values are the results/errors for each model.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;Object&gt;&raquo;</span> Returns a Promise, when the Promise resolves the value is a list of the dropped indexes.</li></ul><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Syncs all the indexes for the models registered with this connection.</p>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-transaction"><a href="#connection_Connection-transaction"><code>Connection.prototype.transaction()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fn</code>
+<span class="method-type">&laquo;Function&raquo;</span> Function to execute in a transaction</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;[object Object]&raquo;</span> Optional settings for the transaction</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;Any&gt;&raquo;</span> promise that is fulfilled if Mongoose successfully committed the transaction, or rejects if the transaction was aborted or if Mongoose failed to commit the transaction. If fulfilled, the promise resolves to a MongoDB command result.</li></ul><div><p><em>Requires MongoDB &gt;= 3.6.0.</em> Executes the wrapped async function
+in a transaction. Mongoose will commit the transaction if the
+async function executes successfully and attempt to retry if
+there was a retriable error.</p>
+<p>Calls the MongoDB driver&#39;s <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/ClientSession.html#withTransaction"><code>session.withTransaction()</code></a>,
+but also handles resetting Mongoose document state as shown below.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Will Riker&#x27;</span> });
+<span class="hljs-keyword">await</span> db.<span class="hljs-title function_">transaction</span>(<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">setRank</span>(<span class="hljs-params">session</span>) {
+  doc.<span class="hljs-property">rank</span> = <span class="hljs-string">&#x27;Captain&#x27;</span>;
+  <span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>({ session });
+  doc.<span class="hljs-property">isNew</span>; <span class="hljs-comment">// false</span>
+
+  <span class="hljs-comment">// Throw an error to abort the transaction</span>
+  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;Oops!&#x27;</span>);
+},{ <span class="hljs-attr">readPreference</span>: <span class="hljs-string">&#x27;primary&#x27;</span> }).<span class="hljs-title function_">catch</span>(<span class="hljs-function">() =&gt;</span> {});
+
+<span class="hljs-comment">// true, `transaction()` reset the document&#x27;s state because the</span>
+<span class="hljs-comment">// transaction was aborted.</span>
+doc.<span class="hljs-property">isNew</span>;
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-useDb"><a href="#connection_Connection-useDb"><code>Connection.prototype.useDb()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
+<span class="method-type">&laquo;String&raquo;</span> The database name</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.useCache=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If true, cache results so calling <code>useDb()</code> multiple times with the same name only creates 1 connection object.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.noListener=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If true, the connection object will not make the db listen to events on the original connection. See <a href="https://github.com/Automattic/mongoose/issues/9961">issue #9961</a>.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Connection&raquo;</span> New Connection Object</li></ul><div><p>Switches to a different database using the same connection pool.</p>
+<p>Returns a new connection object, with the new db.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// Connect to `initialdb` first</span>
+<span class="hljs-keyword">const</span> conn = <span class="hljs-keyword">await</span> mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://127.0.0.1:27017/initialdb&#x27;</span>).<span class="hljs-title function_">asPromise</span>();
+
+<span class="hljs-comment">// Creates an un-cached connection to `mydb`</span>
+<span class="hljs-keyword">const</span> db = conn.<span class="hljs-title function_">useDb</span>(<span class="hljs-string">&#x27;mydb&#x27;</span>);
+<span class="hljs-comment">// Creates a cached connection to `mydb2`. All calls to `conn.useDb(&#x27;mydb2&#x27;, { useCache: true })` will return the same</span>
+<span class="hljs-comment">// connection instance as opposed to creating a new connection instance</span>
+<span class="hljs-keyword">const</span> db2 = conn.<span class="hljs-title function_">useDb</span>(<span class="hljs-string">&#x27;mydb2&#x27;</span>, { <span class="hljs-attr">useCache</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-user"><a href="#connection_Connection-user"><code>Connection.prototype.user</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The username specified in the URI</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>mongoose.<span class="hljs-title function_">createConnection</span>(<span class="hljs-string">&#x27;mongodb://val:psw@127.0.0.1:27017/mydb&#x27;</span>).<span class="hljs-property">user</span>; <span class="hljs-comment">// &quot;val&quot;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="connection_Connection-watch"><a href="#connection_Connection-watch"><code>Connection.prototype.watch()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[pipeline]</code>
+<span class="method-type">&laquo;Array&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> passed without changes to <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Db.html#watch">the MongoDB driver&#39;s <code>Db#watch()</code> function</a></p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;ChangeStream&raquo;</span> mongoose-specific change stream wrapper, inherits from EventEmitter</li></ul><div><p>Watches the entire underlying database for changes. Similar to
+<a href="/docs/api/model.html#model_Model-watch"><code>Model.watch()</code></a>.</p>
+<p>This function does <strong>not</strong> trigger any middleware. In particular, it
+does <strong>not</strong> trigger aggregate middleware.</p>
+<p>The ChangeStream object is an event emitter that emits the following events:</p>
+<ul>
+<li>&#39;change&#39;: A change occurred, see below example</li>
+<li>&#39;error&#39;: An unrecoverable error occurred. In particular, change streams currently error out if they lose connection to the replica set primary. Follow <a href="https://github.com/Automattic/mongoose/issues/6799">this GitHub issue</a> for updates.</li>
+<li>&#39;end&#39;: Emitted if the underlying stream is closed</li>
+<li>&#39;close&#39;: Emitted if the underlying stream is closed</li>
+</ul>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = conn.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }));
+
+<span class="hljs-keyword">const</span> changeStream = conn.<span class="hljs-title function_">watch</span>().<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;change&#x27;</span>, <span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data));
+
+<span class="hljs-comment">// Triggers a &#x27;change&#x27; event on the change stream.</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test&#x27;</span> });
+</code></pre>
+  </div></div></div></div><div id="jobs"><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/6.x/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/6.x/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/6.x/docs/js/mobile-navbar-toggle.js"></script></div></body></html>

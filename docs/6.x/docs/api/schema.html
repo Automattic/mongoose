@@ -1,0 +1,726 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.10.3: Schema</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/6.x/docs/css/github.css"><link rel="stylesheet" href="/docs/6.x/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><script src="/docs/js/api-bold-current-nav.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.10.3</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs">Version 7.x</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x">Version 6.10.3</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.16</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/6.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/schema.js" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h1>Schema</h1><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"><div id="native-direct"></div><script>(function() {
+if (typeof _bsa !== 'undefined' && _bsa) {
+_bsa.init('custom', 'CK7DT53U', 'placement:mongoosejscom',
+{
+target: '#native-direct',
+template: `
+<div class="native-inline">
+<a rel="sponsored noopener" target="_blank" href="##statlink##" title="##company## — ##tagline##"><span class="sponsor">Sponsor</span> ##company## — ##description##</a>
+</div>
+</a>
+`
+}
+);
+}
+})();</script><div class="api-nav"><div class="api-nav-content"><div class="nav-item" id="nav-Mongoose"><div class="nav-item-title"><a href="mongoose.html">Mongoose</a></div></div><div class="nav-item" id="nav-Schema"><div class="nav-item-title" style="font-weight: bold"><a href="schema.html">Schema</a></div><ul class="nav-item-sub"><li><a href="#schema_Schema"><code>Schema()</code></a></li><li><a href="#schema_Schema-Types"><code>Schema.Types</code></a></li><li><a href="#schema_Schema-indexTypes"><code>Schema.indexTypes</code></a></li><li><a href="#schema_Schema-add"><code>Schema.prototype.add()</code></a></li><li><a href="#schema_Schema-alias"><code>Schema.prototype.alias()</code></a></li><li><a href="#schema_Schema-childSchemas"><code>Schema.prototype.childSchemas</code></a></li><li><a href="#schema_Schema-clearIndexes"><code>Schema.prototype.clearIndexes()</code></a></li><li><a href="#schema_Schema-clone"><code>Schema.prototype.clone()</code></a></li><li><a href="#schema_Schema-discriminator"><code>Schema.prototype.discriminator()</code></a></li><li><a href="#schema_Schema-eachPath"><code>Schema.prototype.eachPath()</code></a></li><li><a href="#schema_Schema-get"><code>Schema.prototype.get()</code></a></li><li><a href="#schema_Schema-index"><code>Schema.prototype.index()</code></a></li><li><a href="#schema_Schema-indexes"><code>Schema.prototype.indexes()</code></a></li><li><a href="#schema_Schema-loadClass"><code>Schema.prototype.loadClass()</code></a></li><li><a href="#schema_Schema-method"><code>Schema.prototype.method()</code></a></li><li><a href="#schema_Schema-obj"><code>Schema.prototype.obj</code></a></li><li><a href="#schema_Schema-omit"><code>Schema.prototype.omit()</code></a></li><li><a href="#schema_Schema-path"><code>Schema.prototype.path()</code></a></li><li><a href="#schema_Schema-pathType"><code>Schema.prototype.pathType()</code></a></li><li><a href="#schema_Schema-paths"><code>Schema.prototype.paths</code></a></li><li><a href="#schema_Schema-pick"><code>Schema.prototype.pick()</code></a></li><li><a href="#schema_Schema-plugin"><code>Schema.prototype.plugin()</code></a></li><li><a href="#schema_Schema-post"><code>Schema.prototype.post()</code></a></li><li><a href="#schema_Schema-pre"><code>Schema.prototype.pre()</code></a></li><li><a href="#schema_Schema-queue"><code>Schema.prototype.queue()</code></a></li><li><a href="#schema_Schema-remove"><code>Schema.prototype.remove()</code></a></li><li><a href="#schema_Schema-removeIndex"><code>Schema.prototype.removeIndex()</code></a></li><li><a href="#schema_Schema-removeVirtual"><code>Schema.prototype.removeVirtual()</code></a></li><li><a href="#schema_Schema-requiredPaths"><code>Schema.prototype.requiredPaths()</code></a></li><li><a href="#schema_Schema-set"><code>Schema.prototype.set()</code></a></li><li><a href="#schema_Schema-static"><code>Schema.prototype.static()</code></a></li><li><a href="#schema_Schema-virtual"><code>Schema.prototype.virtual()</code></a></li><li><a href="#schema_Schema-virtualpath"><code>Schema.prototype.virtualpath()</code></a></li><li><a href="#schema_Schema-virtuals"><code>Schema.prototype.virtuals</code></a></li><li><a href="#schema_Schema-reserved"><code>Schema.reserved</code></a></li></ul></div><div class="nav-item" id="nav-Connection"><div class="nav-item-title"><a href="connection.html">Connection</a></div></div><div class="nav-item" id="nav-Document"><div class="nav-item-title"><a href="document.html">Document</a></div></div><div class="nav-item" id="nav-Model"><div class="nav-item-title"><a href="model.html">Model</a></div></div><div class="nav-item" id="nav-Query"><div class="nav-item-title"><a href="query.html">Query</a></div></div><div class="nav-item" id="nav-QueryCursor"><div class="nav-item-title"><a href="querycursor.html">QueryCursor</a></div></div><div class="nav-item" id="nav-Aggregate"><div class="nav-item-title"><a href="aggregate.html">Aggregate</a></div></div><div class="nav-item" id="nav-AggregationCursor"><div class="nav-item-title"><a href="aggregationcursor.html">AggregationCursor</a></div></div><div class="nav-item" id="nav-Schematype"><div class="nav-item-title"><a href="schematype.html">Schematype</a></div></div><div class="nav-item" id="nav-Virtualtype"><div class="nav-item-title"><a href="virtualtype.html">Virtualtype</a></div></div><div class="nav-item" id="nav-Error"><div class="nav-item-title"><a href="error.html">Error</a></div></div><div class="nav-item" id="nav-SchemaArray"><div class="nav-item-title"><a href="schemaarray.html">SchemaArray</a></div></div><div class="nav-item" id="nav-DocumentArrayPath"><div class="nav-item-title"><a href="documentarraypath.html">DocumentArrayPath</a></div></div><div class="nav-item" id="nav-SubdocumentPath"><div class="nav-item-title"><a href="subdocumentpath.html">SubdocumentPath</a></div></div><div class="nav-item" id="nav-MongooseDocumentArray"><div class="nav-item-title"><a href="mongoosedocumentarray.html">MongooseDocumentArray</a></div></div><div class="nav-item" id="nav-Subdocument"><div class="nav-item-title"><a href="subdocument.html">Subdocument</a></div></div><div class="nav-item" id="nav-ArraySubdocument"><div class="nav-item-title"><a href="arraysubdocument.html">ArraySubdocument</a></div></div><div class="nav-item" id="nav-Buffer"><div class="nav-item-title"><a href="buffer.html">Buffer</a></div></div><div class="nav-item" id="nav-Decimal128"><div class="nav-item-title"><a href="decimal128.html">Decimal128</a></div></div><div class="nav-item" id="nav-Map"><div class="nav-item-title"><a href="map.html">Map</a></div></div></div></div><div class="api-content"><ul><li><a href="#schema_Schema"><code>Schema()</code></a></li><li><a href="#schema_Schema-Types"><code>Schema.Types</code></a></li><li><a href="#schema_Schema-indexTypes"><code>Schema.indexTypes</code></a></li><li><a href="#schema_Schema-add"><code>Schema.prototype.add()</code></a></li><li><a href="#schema_Schema-alias"><code>Schema.prototype.alias()</code></a></li><li><a href="#schema_Schema-childSchemas"><code>Schema.prototype.childSchemas</code></a></li><li><a href="#schema_Schema-clearIndexes"><code>Schema.prototype.clearIndexes()</code></a></li><li><a href="#schema_Schema-clone"><code>Schema.prototype.clone()</code></a></li><li><a href="#schema_Schema-discriminator"><code>Schema.prototype.discriminator()</code></a></li><li><a href="#schema_Schema-eachPath"><code>Schema.prototype.eachPath()</code></a></li><li><a href="#schema_Schema-get"><code>Schema.prototype.get()</code></a></li><li><a href="#schema_Schema-index"><code>Schema.prototype.index()</code></a></li><li><a href="#schema_Schema-indexes"><code>Schema.prototype.indexes()</code></a></li><li><a href="#schema_Schema-loadClass"><code>Schema.prototype.loadClass()</code></a></li><li><a href="#schema_Schema-method"><code>Schema.prototype.method()</code></a></li><li><a href="#schema_Schema-obj"><code>Schema.prototype.obj</code></a></li><li><a href="#schema_Schema-omit"><code>Schema.prototype.omit()</code></a></li><li><a href="#schema_Schema-path"><code>Schema.prototype.path()</code></a></li><li><a href="#schema_Schema-pathType"><code>Schema.prototype.pathType()</code></a></li><li><a href="#schema_Schema-paths"><code>Schema.prototype.paths</code></a></li><li><a href="#schema_Schema-pick"><code>Schema.prototype.pick()</code></a></li><li><a href="#schema_Schema-plugin"><code>Schema.prototype.plugin()</code></a></li><li><a href="#schema_Schema-post"><code>Schema.prototype.post()</code></a></li><li><a href="#schema_Schema-pre"><code>Schema.prototype.pre()</code></a></li><li><a href="#schema_Schema-queue"><code>Schema.prototype.queue()</code></a></li><li><a href="#schema_Schema-remove"><code>Schema.prototype.remove()</code></a></li><li><a href="#schema_Schema-removeIndex"><code>Schema.prototype.removeIndex()</code></a></li><li><a href="#schema_Schema-removeVirtual"><code>Schema.prototype.removeVirtual()</code></a></li><li><a href="#schema_Schema-requiredPaths"><code>Schema.prototype.requiredPaths()</code></a></li><li><a href="#schema_Schema-set"><code>Schema.prototype.set()</code></a></li><li><a href="#schema_Schema-static"><code>Schema.prototype.static()</code></a></li><li><a href="#schema_Schema-virtual"><code>Schema.prototype.virtual()</code></a></li><li><a href="#schema_Schema-virtualpath"><code>Schema.prototype.virtualpath()</code></a></li><li><a href="#schema_Schema-virtuals"><code>Schema.prototype.virtuals</code></a></li><li><a href="#schema_Schema-reserved"><code>Schema.reserved</code></a></li></ul><hr class="separate-api-elements"><h3 id="schema_Schema"><a href="#schema_Schema"><code>Schema()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[definition]</code>
+<span class="method-type">&laquo;Object|Schema|Array&raquo;</span> Can be one of: object describing schema paths, or schema to copy, or array of objects and schemas</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Inherits:</h5><ul><li><span class="method-type"><a href="https://nodejs.org/api/events.html#class-eventemitter">&laquo;NodeJS EventEmitter&raquo;</a></span></li></ul><div><p>Schema constructor.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> child = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span>, <span class="hljs-attr">children</span>: [child] });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Tree</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Tree&#x27;</span>, schema);
+
+<span class="hljs-comment">// setting schema options</span>
+<span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }, { <span class="hljs-attr">_id</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">autoIndex</span>: <span class="hljs-literal">false</span> })
+</code></pre>
+<h4 id="options">
+      <a href="#options">
+        Options:
+      </a>
+    </h4>
+<ul>
+<li><a href="/docs/guide.html#autoIndex">autoIndex</a>: bool - defaults to null (which means use the connection&#39;s autoIndex option)</li>
+<li><a href="/docs/guide.html#autoCreate">autoCreate</a>: bool - defaults to null (which means use the connection&#39;s autoCreate option)</li>
+<li><a href="/docs/guide.html#bufferCommands">bufferCommands</a>: bool - defaults to true</li>
+<li><a href="/docs/guide.html#bufferTimeoutMS">bufferTimeoutMS</a>: number - defaults to 10000 (10 seconds). If <code>bufferCommands</code> is enabled, the amount of time Mongoose will wait for connectivity to be restablished before erroring out.</li>
+<li><a href="/docs/guide.html#capped">capped</a>: bool | number | object - defaults to false</li>
+<li><a href="/docs/guide.html#collection">collection</a>: string - no default</li>
+<li><a href="/docs/guide.html#discriminatorKey">discriminatorKey</a>: string - defaults to <code>__t</code></li>
+<li><a href="/docs/guide.html#id">id</a>: bool - defaults to true</li>
+<li><a href="/docs/guide.html#_id">_id</a>: bool - defaults to true</li>
+<li><a href="/docs/guide.html#minimize">minimize</a>: bool - controls <a href="#document_Document-toObject">document#toObject</a> behavior when called manually - defaults to true</li>
+<li><a href="/docs/guide.html#read">read</a>: string</li>
+<li><a href="/docs/guide.html#writeConcern">writeConcern</a>: object - defaults to null, use to override <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">the MongoDB server&#39;s default write concern settings</a></li>
+<li><a href="/docs/guide.html#shardKey">shardKey</a>: object - defaults to <code>null</code></li>
+<li><a href="/docs/guide.html#strict">strict</a>: bool - defaults to true</li>
+<li><a href="/docs/guide.html#strictQuery">strictQuery</a>: bool - defaults to false</li>
+<li><a href="/docs/guide.html#toJSON">toJSON</a> - object - no default</li>
+<li><a href="/docs/guide.html#toObject">toObject</a> - object - no default</li>
+<li><a href="/docs/guide.html#typeKey">typeKey</a> - string - defaults to &#39;type&#39;</li>
+<li><a href="/docs/guide.html#validateBeforeSave">validateBeforeSave</a> - bool - defaults to <code>true</code></li>
+<li><a href="/docs/guide.html#versionKey">versionKey</a>: string or object - defaults to &quot;__v&quot;</li>
+<li><a href="/docs/guide.html#optimisticConcurrency">optimisticConcurrency</a>: bool - defaults to false. Set to true to enable <a href="https://thecodebarbarian.com/whats-new-in-mongoose-5-10-optimistic-concurrency.html">optimistic concurrency</a>.</li>
+<li><a href="/docs/guide.html#collation">collation</a>: object - defaults to null (which means use no collation)</li>
+<li><a href="/docs/guide.html#timeseries">timeseries</a>: object - defaults to null (which means this schema&#39;s collection won&#39;t be a timeseries collection)</li>
+<li><a href="/docs/guide.html#selectPopulatedPaths">selectPopulatedPaths</a>: boolean - defaults to <code>true</code></li>
+<li><a href="/docs/guide.html#skipVersioning">skipVersioning</a>: object - paths to exclude from versioning</li>
+<li><a href="/docs/guide.html#timestamps">timestamps</a>: object or boolean - defaults to <code>false</code>. If true, Mongoose adds <code>createdAt</code> and <code>updatedAt</code> properties to your schema and manages those properties for you.</li>
+<li><a href="/docs/guide.html#pluginTags">pluginTags</a>: array of strings - defaults to <code>undefined</code>. If set and plugin called with <code>tags</code> option, will only apply that plugin to schemas with a matching tag.</li>
+</ul>
+<h4 id="options-for-nested-schemas">
+      <a href="#options-for-nested-schemas">
+        Options for Nested Schemas:
+      </a>
+    </h4>
+<ul>
+<li><code>excludeIndexes</code>: bool - defaults to <code>false</code>. If <code>true</code>, skip building indexes on this schema&#39;s paths.</li>
+</ul>
+<h4 id="note">
+      <a href="#note">
+        Note:
+      </a>
+    </h4>
+<p><em>When nesting schemas, (<code>children</code> in the example above), always declare the child schema first before passing it into its parent.</em></p>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-Types"><a href="#schema_Schema-Types"><code>Schema.Types</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The various built-in Mongoose Schema Types.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;mongoose&#x27;</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">ObjectId</span> = mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>;
+</code></pre>
+<h4 id="types">
+      <a href="#types">
+        Types:
+      </a>
+    </h4>
+<ul>
+<li><a href="/docs/schematypes.html#strings">String</a></li>
+<li><a href="/docs/schematypes.html#numbers">Number</a></li>
+<li><a href="/docs/schematypes.html#booleans">Boolean</a> | Bool</li>
+<li><a href="/docs/schematypes.html#arrays">Array</a></li>
+<li><a href="/docs/schematypes.html#buffers">Buffer</a></li>
+<li><a href="/docs/schematypes.html#dates">Date</a></li>
+<li><a href="/docs/schematypes.html#objectids">ObjectId</a> | Oid</li>
+<li><a href="/docs/schematypes.html#mixed">Mixed</a></li>
+</ul>
+<p>Using this exposed access to the <code>Mixed</code> SchemaType, we can use them in our schema.</p>
+<pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">Mixed</span> = mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">Mixed</span>;
+<span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">_user</span>: <span class="hljs-title class_">Mixed</span> })
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-indexTypes"><a href="#schema_Schema-indexTypes"><code>Schema.indexTypes</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The allowed index types</p>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-add"><a href="#schema_Schema-add"><code>Schema.prototype.add()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>obj</code>
+<span class="method-type">&laquo;Object|Schema&raquo;</span> plain object with paths to add, or another schema</p>
+</li><li class="param"><code>[prefix]</code>
+<span class="method-type">&laquo;String&raquo;</span> path to prefix the newly added paths with</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Schema&raquo;</span> the Schema instance</li></ul><div><p>Adds key path / schema type pairs to this schema.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">ToySchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>();
+<span class="hljs-title class_">ToySchema</span>.<span class="hljs-title function_">add</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;string&#x27;</span>, <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;string&#x27;</span>, <span class="hljs-attr">price</span>: <span class="hljs-string">&#x27;number&#x27;</span> });
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">TurboManSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>();
+<span class="hljs-comment">// You can also `add()` another schema and copy over all paths, virtuals,</span>
+<span class="hljs-comment">// getters, setters, indexes, methods, and statics.</span>
+<span class="hljs-title class_">TurboManSchema</span>.<span class="hljs-title function_">add</span>(<span class="hljs-title class_">ToySchema</span>).<span class="hljs-title function_">add</span>({ <span class="hljs-attr">year</span>: <span class="hljs-title class_">Number</span> });
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-alias"><a href="#schema_Schema-alias"><code>Schema.prototype.alias()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> real path to alias</p>
+</li><li class="param"><code>alias</code>
+<span class="method-type">&laquo;String|Array[String]&raquo;</span> the path(s) to use as an alias for <code>path</code></p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Schema&raquo;</span> the Schema instance</li></ul><div><p>Add an alias for <code>path</code>. This means getting or setting the <code>alias</code>
+is equivalent to getting or setting the <code>path</code>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> toySchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">n</span>: <span class="hljs-title class_">String</span> });
+
+<span class="hljs-comment">// Make &#x27;name&#x27; an alias for &#x27;n&#x27;</span>
+toySchema.<span class="hljs-title function_">alias</span>(<span class="hljs-string">&#x27;n&#x27;</span>, <span class="hljs-string">&#x27;name&#x27;</span>);
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Toy</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Toy&#x27;</span>, toySchema);
+<span class="hljs-keyword">const</span> turboMan = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Toy</span>({ <span class="hljs-attr">n</span>: <span class="hljs-string">&#x27;Turbo Man&#x27;</span> });
+
+turboMan.<span class="hljs-property">name</span>; <span class="hljs-comment">// &#x27;Turbo Man&#x27;</span>
+turboMan.<span class="hljs-property">n</span>; <span class="hljs-comment">// &#x27;Turbo Man&#x27;</span>
+
+turboMan.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;Turbo Man Action Figure&#x27;</span>;
+turboMan.<span class="hljs-property">n</span>; <span class="hljs-comment">// &#x27;Turbo Man Action Figure&#x27;</span>
+
+<span class="hljs-keyword">await</span> turboMan.<span class="hljs-title function_">save</span>(); <span class="hljs-comment">// Saves { _id: ..., n: &#x27;Turbo Man Action Figure&#x27; }</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-childSchemas"><a href="#schema_Schema-childSchemas"><code>Schema.prototype.childSchemas</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Array of child schemas (from document arrays and single nested subdocs)
+and their corresponding compiled models. Each element of the array is
+an object with 2 properties: <code>schema</code> and <code>model</code>.</p>
+<p>This property is typically only useful for plugin authors and advanced users.
+You do not need to interact with this property at all to use mongoose.</p>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-clearIndexes"><a href="#schema_Schema-clearIndexes"><code>Schema.prototype.clearIndexes()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Schema&raquo;</span> the Schema instance</li></ul><div><p>Remove all indexes from this schema.</p>
+<p>clearIndexes only removes indexes from your schema object. Does <strong>not</strong> affect the indexes
+in MongoDB.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">ToySchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">color</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">price</span>: <span class="hljs-title class_">Number</span> });
+<span class="hljs-title class_">ToySchema</span>.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">name</span>: <span class="hljs-number">1</span> });
+<span class="hljs-title class_">ToySchema</span>.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">color</span>: <span class="hljs-number">1</span> });
+
+<span class="hljs-comment">// Remove all indexes on this schema</span>
+<span class="hljs-title class_">ToySchema</span>.<span class="hljs-title function_">clearIndexes</span>();
+
+<span class="hljs-title class_">ToySchema</span>.<span class="hljs-title function_">indexes</span>(); <span class="hljs-comment">// []</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-clone"><a href="#schema_Schema-clone"><code>Schema.prototype.clone()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Schema&raquo;</span> the cloned schema</li></ul><div><p>Returns a deep copy of the schema</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+<span class="hljs-keyword">const</span> clone = schema.<span class="hljs-title function_">clone</span>();
+clone === schema; <span class="hljs-comment">// false</span>
+clone.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>); <span class="hljs-comment">// SchemaString { ... }</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-discriminator"><a href="#schema_Schema-discriminator"><code>Schema.prototype.discriminator()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
+<span class="method-type">&laquo;String&raquo;</span> the name of the discriminator</p>
+</li><li class="param"><code>schema</code>
+<span class="method-type">&laquo;Schema&raquo;</span> the discriminated Schema</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Schema&raquo;</span> the Schema instance</li></ul><div><p>Inherit a Schema by applying a discriminator on an existing Schema.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> eventSchema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">timestamp</span>: <span class="hljs-title class_">Date</span> }, { <span class="hljs-attr">discriminatorKey</span>: <span class="hljs-string">&#x27;kind&#x27;</span> });
+
+<span class="hljs-keyword">const</span> clickedEventSchema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">element</span>: <span class="hljs-title class_">String</span> }, { <span class="hljs-attr">discriminatorKey</span>: <span class="hljs-string">&#x27;kind&#x27;</span> });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">ClickedModel</span> = eventSchema.<span class="hljs-title function_">discriminator</span>(<span class="hljs-string">&#x27;clicked&#x27;</span>, clickedEventSchema);
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Event</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Event&#x27;</span>, eventSchema);
+
+<span class="hljs-title class_">Event</span>.<span class="hljs-property">discriminators</span>[<span class="hljs-string">&#x27;clicked&#x27;</span>]; <span class="hljs-comment">// Model { clicked }</span>
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Event</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;clicked&#x27;</span>, <span class="hljs-attr">element</span>: <span class="hljs-string">&#x27;#hero&#x27;</span> });
+doc.<span class="hljs-property">element</span>; <span class="hljs-comment">// &#x27;#hero&#x27;</span>
+doc <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">ClickedModel</span>; <span class="hljs-comment">// true</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-eachPath"><a href="#schema_Schema-eachPath"><code>Schema.prototype.eachPath()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fn</code>
+<span class="method-type">&laquo;Function&raquo;</span> callback function</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Schema&raquo;</span> this</li></ul><div><p>Iterates the schemas paths similar to Array#forEach.</p>
+<p>The callback is passed the pathname and the schemaType instance.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">registeredAt</span>: <span class="hljs-title class_">Date</span> });
+userSchema.<span class="hljs-title function_">eachPath</span>(<span class="hljs-function">(<span class="hljs-params">pathname, schematype</span>) =&gt;</span> {
+  <span class="hljs-comment">// Prints twice:</span>
+  <span class="hljs-comment">// name SchemaString { ... }</span>
+  <span class="hljs-comment">// registeredAt SchemaDate { ... }</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(pathname, schematype);
+});
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-get"><a href="#schema_Schema-get"><code>Schema.prototype.get()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>key</code>
+<span class="method-type">&laquo;String&raquo;</span> The name of the Option to get the current value for</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Any&raquo;</span> the option&#39;s value</li></ul><div><p>Gets a schema option.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>schema.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;strict&#x27;</span>); <span class="hljs-comment">// true</span>
+schema.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;strict&#x27;</span>, <span class="hljs-literal">false</span>);
+schema.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;strict&#x27;</span>); <span class="hljs-comment">// false</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-index"><a href="#schema_Schema-index"><code>Schema.prototype.index()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fields</code>
+<span class="method-type">&laquo;Object&raquo;</span> The Fields to index, with the order, available values: <code>1 | -1 | &#39;2d&#39; | &#39;2dsphere&#39; | &#39;geoHaystack&#39; | &#39;hashed&#39; | &#39;text&#39;</code></p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> Options to pass to <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#createIndex">MongoDB driver&#39;s <code>createIndex()</code> function</a></p>
+</li><ul style="margin-top: 0.5em"><li><code>[options.expires=null]</code>
+<span class="method-type">&laquo;String|number&raquo;</span> Mongoose-specific syntactic sugar, uses <a href="https://www.npmjs.com/package/ms">ms</a> to convert <code>expires</code> option into seconds for the <code>expireAfterSeconds</code> in the above link.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.language_override=null]</code>
+<span class="method-type">&laquo;String&raquo;</span> Tells mongodb to use the specified field instead of <code>language</code> for parsing text indexes.</p>
+</li></ul></ul><div><p>Defines an index (most likely compound) for this schema.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>schema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">first</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">last</span>: -<span class="hljs-number">1</span> })
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-indexes"><a href="#schema_Schema-indexes"><code>Schema.prototype.indexes()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> list of indexes defined in the schema</li></ul><div><p>Returns a list of indexes that this schema declares, via <code>schema.index()</code> or by <code>index: true</code> in a path&#39;s options.
+Indexes are expressed as an array <code>[spec, options]</code>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">email</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">registeredAt</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Date</span>, <span class="hljs-attr">index</span>: <span class="hljs-literal">true</span> }
+});
+
+<span class="hljs-comment">// [ [ { email: 1 }, { unique: true, background: true } ],</span>
+<span class="hljs-comment">//   [ { registeredAt: 1 }, { background: true } ] ]</span>
+userSchema.<span class="hljs-title function_">indexes</span>();
+</code></pre>
+<p><a href="/docs/plugins.html">Plugins</a> can use the return value of this function to modify a schema&#39;s indexes.
+For example, the below plugin makes every index unique by default.</p>
+<pre><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">myPlugin</span>(<span class="hljs-params">schema</span>) {
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> index <span class="hljs-keyword">of</span> schema.<span class="hljs-title function_">indexes</span>()) {
+    <span class="hljs-keyword">if</span> (index[<span class="hljs-number">1</span>].<span class="hljs-property">unique</span> === <span class="hljs-literal">undefined</span>) {
+      index[<span class="hljs-number">1</span>].<span class="hljs-property">unique</span> = <span class="hljs-literal">true</span>;
+    }
+  }
+}
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-loadClass"><a href="#schema_Schema-loadClass"><code>Schema.prototype.loadClass()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>model</code>
+<span class="method-type">&laquo;Function&raquo;</span> The Class to load</p>
+</li><li class="param"><code>[virtualsOnly]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if truthy, only pulls virtuals from the class, not methods or statics</p>
+</li></ul><div><p>Loads an ES6 class into a schema. Maps <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set">setters</a> + <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get">getters</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static">static methods</a>,
+and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#Class_body_and_method_definitions">instance methods</a>
+to schema <a href="/docs/guide.html#virtuals">virtuals</a>,
+<a href="/docs/guide.html#statics">statics</a>, and
+<a href="/docs/guide.html#methods">methods</a>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> md5 = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;md5&#x27;</span>);
+<span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">email</span>: <span class="hljs-title class_">String</span> });
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">UserClass</span> {
+  <span class="hljs-comment">// `gravatarImage` becomes a virtual</span>
+  <span class="hljs-keyword">get</span> <span class="hljs-title function_">gravatarImage</span>() {
+    <span class="hljs-keyword">const</span> hash = <span class="hljs-title function_">md5</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">email</span>.<span class="hljs-title function_">toLowerCase</span>());
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`https://www.gravatar.com/avatar/<span class="hljs-subst">${hash}</span>`</span>;
+  }
+
+  <span class="hljs-comment">// `getProfileUrl()` becomes a document method</span>
+  <span class="hljs-title function_">getProfileUrl</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`https://mysite.com/<span class="hljs-subst">${<span class="hljs-variable language_">this</span>.email}</span>`</span>;
+  }
+
+  <span class="hljs-comment">// `findByEmail()` becomes a static</span>
+  <span class="hljs-keyword">static</span> <span class="hljs-title function_">findByEmail</span>(<span class="hljs-params">email</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">findOne</span>({ email });
+  }
+}
+
+<span class="hljs-comment">// `schema` will now have a `gravatarImage` virtual, a `getProfileUrl()` method,</span>
+<span class="hljs-comment">// and a `findByEmail()` static</span>
+userSchema.<span class="hljs-title function_">loadClass</span>(<span class="hljs-title class_">UserClass</span>);
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-method"><a href="#schema_Schema-method"><code>Schema.prototype.method()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
+<span class="method-type">&laquo;String|Object&raquo;</span> The Method Name for a single function, or a Object of &quot;string-function&quot; pairs.</p>
+</li><li class="param"><code>[fn]</code>
+<span class="method-type">&laquo;Function&raquo;</span> The Function in a single-function definition.</p>
+</li></ul><div><p>Adds an instance method to documents constructed from Models compiled from this schema.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = kittySchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>(..);
+
+schema.<span class="hljs-title function_">method</span>(<span class="hljs-string">&#x27;meow&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;meeeeeoooooooooooow&#x27;</span>);
+})
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Kitty</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Kitty&#x27;</span>, schema);
+
+<span class="hljs-keyword">const</span> fizz = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Kitty</span>;
+fizz.<span class="hljs-title function_">meow</span>(); <span class="hljs-comment">// meeeeeooooooooooooow</span>
+</code></pre>
+<p>If a hash of name/fn pairs is passed as the only argument, each name/fn pair will be added as methods.</p>
+<pre><code>schema.<span class="hljs-title function_">method</span>({
+    <span class="hljs-attr">purr</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {}
+  , <span class="hljs-attr">scratch</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {}
+});
+
+<span class="hljs-comment">// later</span>
+<span class="hljs-keyword">const</span> fizz = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Kitty</span>;
+fizz.<span class="hljs-title function_">purr</span>();
+fizz.<span class="hljs-title function_">scratch</span>();
+</code></pre>
+<p>NOTE: <code>Schema.method()</code> adds instance methods to the <code>Schema.methods</code> object. You can also add instance methods directly to the <code>Schema.methods</code> object as seen in the <a href="/docs/guide.html#methods">guide</a></p>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-obj"><a href="#schema_Schema-obj"><code>Schema.prototype.obj</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The original object passed to the schema constructor</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">a</span>: <span class="hljs-title class_">String</span> }).<span class="hljs-title function_">add</span>({ <span class="hljs-attr">b</span>: <span class="hljs-title class_">String</span> });
+schema.<span class="hljs-property">obj</span>; <span class="hljs-comment">// { a: String }</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-omit"><a href="#schema_Schema-omit"><code>Schema.prototype.omit()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>paths</code>
+<span class="method-type">&laquo;Array[String]&raquo;</span> List of Paths to omit for the new Schema</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> Options to pass to the new Schema Constructor (same as <code>new Schema(.., Options)</code>). Defaults to <code>this.options</code> if not set.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Schema&raquo;</span> </li></ul><div><p>Returns a new schema that has the <code>paths</code> from the original schema, minus the omitted ones.</p>
+<p>This method is analagous to <a href="https://lodash.com/docs/#omit">Lodash&#39;s <code>omit()</code> function</a> for Mongoose schemas.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span> });
+<span class="hljs-comment">// Creates a new schema omitting the `age` path</span>
+<span class="hljs-keyword">const</span> newSchema = schema.<span class="hljs-title function_">omit</span>([<span class="hljs-string">&#x27;age&#x27;</span>]);
+
+newSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>); <span class="hljs-comment">// SchemaString { ... }</span>
+newSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;age&#x27;</span>); <span class="hljs-comment">// undefined</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-path"><a href="#schema_Schema-path"><code>Schema.prototype.path()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> The name of the Path to get / set</p>
+</li><li class="param"><code>[obj]</code>
+<span class="method-type">&laquo;Object&raquo;</span> The Type to set the path to, if provided the path will be SET, otherwise the path will be GET</p>
+</li></ul><div><p>Gets/sets schema paths.</p>
+<p>Sets a path (if arity 2)
+Gets a path (if arity 1)</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>) <span class="hljs-comment">// returns a SchemaType</span>
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>, <span class="hljs-title class_">Number</span>) <span class="hljs-comment">// changes the schemaType of `name` to Number</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-pathType"><a href="#schema_Schema-pathType"><code>Schema.prototype.pathType()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;String&raquo;</span> </li></ul><div><p>Returns the pathType of <code>path</code> for this schema.</p>
+<p>Given a path, returns whether it is a real, virtual, nested, or ad-hoc/undefined path.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">nested</span>: { <span class="hljs-attr">foo</span>: <span class="hljs-title class_">String</span> } });
+s.<span class="hljs-title function_">virtual</span>(<span class="hljs-string">&#x27;foo&#x27;</span>).<span class="hljs-title function_">get</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-number">42</span>);
+s.<span class="hljs-title function_">pathType</span>(<span class="hljs-string">&#x27;name&#x27;</span>); <span class="hljs-comment">// &quot;real&quot;</span>
+s.<span class="hljs-title function_">pathType</span>(<span class="hljs-string">&#x27;nested&#x27;</span>); <span class="hljs-comment">// &quot;nested&quot;</span>
+s.<span class="hljs-title function_">pathType</span>(<span class="hljs-string">&#x27;foo&#x27;</span>); <span class="hljs-comment">// &quot;virtual&quot;</span>
+s.<span class="hljs-title function_">pathType</span>(<span class="hljs-string">&#x27;fail&#x27;</span>); <span class="hljs-comment">// &quot;adhocOrUndefined&quot;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-paths"><a href="#schema_Schema-paths"><code>Schema.prototype.paths</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The paths defined on this schema. The keys are the top-level paths
+in this schema, and the values are instances of the SchemaType class.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }, { <span class="hljs-attr">_id</span>: <span class="hljs-literal">false</span> });
+schema.<span class="hljs-property">paths</span>; <span class="hljs-comment">// { name: SchemaString { ... } }</span>
+
+schema.<span class="hljs-title function_">add</span>({ <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span> });
+schema.<span class="hljs-property">paths</span>; <span class="hljs-comment">// { name: SchemaString { ... }, age: SchemaNumber { ... } }</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-pick"><a href="#schema_Schema-pick"><code>Schema.prototype.pick()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>paths</code>
+<span class="method-type">&laquo;Array[String]&raquo;</span> List of Paths to pick for the new Schema</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> Options to pass to the new Schema Constructor (same as <code>new Schema(.., Options)</code>). Defaults to <code>this.options</code> if not set.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Schema&raquo;</span> </li></ul><div><p>Returns a new schema that has the picked <code>paths</code> from this schema.</p>
+<p>This method is analagous to <a href="https://lodash.com/docs/4.17.15#pick">Lodash&#39;s <code>pick()</code> function</a> for Mongoose schemas.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span> });
+<span class="hljs-comment">// Creates a new schema with the same `name` path as `schema`,</span>
+<span class="hljs-comment">// but no `age` path.</span>
+<span class="hljs-keyword">const</span> newSchema = schema.<span class="hljs-title function_">pick</span>([<span class="hljs-string">&#x27;name&#x27;</span>]);
+
+newSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>); <span class="hljs-comment">// SchemaString { ... }</span>
+newSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;age&#x27;</span>); <span class="hljs-comment">// undefined</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-plugin"><a href="#schema_Schema-plugin"><code>Schema.prototype.plugin()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>plugin</code>
+<span class="method-type">&laquo;Function&raquo;</span> The Plugin&#39;s callback</p>
+</li><li class="param"><code>[opts]</code>
+<span class="method-type">&laquo;Object&raquo;</span> Options to pass to the plugin</p>
+</li><ul style="margin-top: 0.5em"><li><code>[opts.deduplicate=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If true, ignore duplicate plugins (same <code>fn</code> argument using <code>===</code>)</p>
+</li></ul></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/plugins.html">plugins</a></span></li></ul><div><p>Registers a plugin for this schema.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+s.<span class="hljs-title function_">plugin</span>(<span class="hljs-function"><span class="hljs-params">schema</span> =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-property">path</span>));
+mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, s); <span class="hljs-comment">// Prints &#x27;name&#x27;</span>
+</code></pre>
+<p>Or with Options:</p>
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+s.<span class="hljs-title function_">plugin</span>(<span class="hljs-function">(<span class="hljs-params">schema, opts</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(opts.<span class="hljs-property">text</span>, schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-property">path</span>), { <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;Schema Path Name:&quot;</span> });
+mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, s); <span class="hljs-comment">// Prints &#x27;Schema Path Name: name&#x27;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-post"><a href="#schema_Schema-post"><code>Schema.prototype.post()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>methodName</code>
+<span class="method-type">&laquo;String|RegExp|Array[String]&raquo;</span> The method name or regular expression to match method name</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.document]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If <code>name</code> is a hook for both document and query middleware, set to <code>true</code> to run on document middleware.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.query]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If <code>name</code> is a hook for both document and query middleware, set to <code>true</code> to run on query middleware.</p>
+</li></ul><li class="param"><code>fn</code>
+<span class="method-type">&laquo;Function&raquo;</span> callback</p>
+</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongoosejs.com/docs/middleware.html">middleware</a></span></li><li><span class="method-type"><a href="https://npmjs.org/package/kareem">kareem</a></span></li></ul><div><p>Defines a post hook for the document</p>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>(..);
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">doc</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this fired after a document was saved&#x27;</span>);
+});
+
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;find&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">docs</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this fired after you ran a find query&#x27;</span>);
+});
+
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-regexp">/Many$/</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">res</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this fired after you ran `updateMany()` or `deleteMany()`&#x27;</span>);
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Model</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Model&#x27;</span>, schema);
+
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Model</span>(..);
+m.<span class="hljs-title function_">save</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this fires after the `post` hook&#x27;</span>);
+});
+
+m.<span class="hljs-title function_">find</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">err, docs</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this fires after the post find hook&#x27;</span>);
+});
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-pre"><a href="#schema_Schema-pre"><code>Schema.prototype.pre()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>methodName</code>
+<span class="method-type">&laquo;String|RegExp|Array[String]&raquo;</span> The method name or regular expression to match method name</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.document]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If <code>name</code> is a hook for both document and query middleware, set to <code>true</code> to run on document middleware. For example, set <code>options.document</code> to <code>true</code> to apply this hook to <code>Document#deleteOne()</code> rather than <code>Query#deleteOne()</code>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.query]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If <code>name</code> is a hook for both document and query middleware, set to <code>true</code> to run on query middleware.</p>
+</li></ul><li class="param"><code>callback</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><div><p>Defines a pre hook for the model.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> toySchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">created</span>: <span class="hljs-title class_">Date</span> });
+
+toySchema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) {
+  <span class="hljs-keyword">if</span> (!<span class="hljs-variable language_">this</span>.<span class="hljs-property">created</span>) <span class="hljs-variable language_">this</span>.<span class="hljs-property">created</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>;
+  <span class="hljs-title function_">next</span>();
+});
+
+toySchema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;validate&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> !== <span class="hljs-string">&#x27;Woody&#x27;</span>) <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;Woody&#x27;</span>;
+  <span class="hljs-title function_">next</span>();
+});
+
+<span class="hljs-comment">// Equivalent to calling `pre()` on `find`, `findOne`, `findOneAndUpdate`.</span>
+toySchema.<span class="hljs-title function_">pre</span>(<span class="hljs-regexp">/^find/</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getFilter</span>());
+});
+
+<span class="hljs-comment">// Equivalent to calling `pre()` on `updateOne`, `findOneAndUpdate`.</span>
+toySchema.<span class="hljs-title function_">pre</span>([<span class="hljs-string">&#x27;updateOne&#x27;</span>, <span class="hljs-string">&#x27;findOneAndUpdate&#x27;</span>], <span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getFilter</span>());
+});
+
+toySchema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;deleteOne&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// Runs when you call `Toy.deleteOne()`</span>
+});
+
+toySchema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;deleteOne&#x27;</span>, { <span class="hljs-attr">document</span>: <span class="hljs-literal">true</span> }, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// Runs when you call `doc.deleteOne()`</span>
+});
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-queue"><a href="#schema_Schema-queue"><code>Schema.prototype.queue()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
+<span class="method-type">&laquo;String&raquo;</span> name of the document method to call later</p>
+</li><li class="param"><code>args</code>
+<span class="method-type">&laquo;Array&raquo;</span> arguments to pass to the method</p>
+</li></ul><div><p>Adds a method call to the queue.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>schema.<span class="hljs-property">methods</span>.<span class="hljs-property">print</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) { <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>); };
+schema.<span class="hljs-title function_">queue</span>(<span class="hljs-string">&#x27;print&#x27;</span>, []); <span class="hljs-comment">// Print the doc every one is instantiated</span>
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Model</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+<span class="hljs-keyword">new</span> <span class="hljs-title class_">Model</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test&#x27;</span> }); <span class="hljs-comment">// Prints &#x27;{&quot;_id&quot;: ..., &quot;name&quot;: &quot;test&quot; }&#x27;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-remove"><a href="#schema_Schema-remove"><code>Schema.prototype.remove()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String|Array&raquo;</span> The Path(s) to remove</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Schema&raquo;</span> the Schema instance</li></ul><div><p>Removes the given <code>path</code> (or [<code>paths</code>]).</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span> });
+schema.<span class="hljs-title function_">remove</span>(<span class="hljs-string">&#x27;name&#x27;</span>);
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>); <span class="hljs-comment">// Undefined</span>
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;age&#x27;</span>); <span class="hljs-comment">// SchemaNumber { ... }</span>
+</code></pre>
+<p>Or as a Array:</p>
+<pre><code>schema.<span class="hljs-title function_">remove</span>([<span class="hljs-string">&#x27;name&#x27;</span>, <span class="hljs-string">&#x27;age&#x27;</span>]);
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>); <span class="hljs-comment">// Undefined</span>
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;age&#x27;</span>); <span class="hljs-comment">// Undefined</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-removeIndex"><a href="#schema_Schema-removeIndex"><code>Schema.prototype.removeIndex()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>index</code>
+<span class="method-type">&laquo;Object|string&raquo;</span> name or index specification</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Schema&raquo;</span> the Schema instance</li></ul><div><p>Remove an index by name or index specification.</p>
+<p>removeIndex only removes indexes from your schema object. Does <strong>not</strong> affect the indexes
+in MongoDB.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">ToySchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">color</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">price</span>: <span class="hljs-title class_">Number</span> });
+
+<span class="hljs-comment">// Add a new index on { name, color }</span>
+<span class="hljs-title class_">ToySchema</span>.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">name</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">color</span>: <span class="hljs-number">1</span> });
+
+<span class="hljs-comment">// Remove index on { name, color }</span>
+<span class="hljs-comment">// Keep in mind that order matters! `removeIndex({ color: 1, name: 1 })` won&#x27;t remove the index</span>
+<span class="hljs-title class_">ToySchema</span>.<span class="hljs-title function_">removeIndex</span>({ <span class="hljs-attr">name</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">color</span>: <span class="hljs-number">1</span> });
+
+<span class="hljs-comment">// Add an index with a custom name</span>
+<span class="hljs-title class_">ToySchema</span>.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">color</span>: <span class="hljs-number">1</span> }, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;my custom index name&#x27;</span> });
+<span class="hljs-comment">// Remove index by name</span>
+<span class="hljs-title class_">ToySchema</span>.<span class="hljs-title function_">removeIndex</span>(<span class="hljs-string">&#x27;my custom index name&#x27;</span>);
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-removeVirtual"><a href="#schema_Schema-removeVirtual"><code>Schema.prototype.removeVirtual()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String|Array&raquo;</span> The virutal path(s) to remove.</p>
+</li></ul><div><p>Removes the given virtual or virtuals from the schema.</p>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-requiredPaths"><a href="#schema_Schema-requiredPaths"><code>Schema.prototype.requiredPaths()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>invalidate</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> Refresh the cache</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns an Array of path strings that are required by this schema.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">age</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">notes</span>: <span class="hljs-title class_">String</span>
+});
+s.requiredPaths(); <span class="hljs-comment">// [ &#x27;age&#x27;, &#x27;name&#x27; ]</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-set"><a href="#schema_Schema-set"><code>Schema.prototype.set()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>key</code>
+<span class="method-type">&laquo;String&raquo;</span> The name of the option to set the value to</p>
+</li><li class="param"><code>[value]</code>
+<span class="method-type">&laquo;Object&raquo;</span> The value to set the option to, if not passed, the option will be reset to default</p>
+</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#schema_Schema">Schema</a></span></li></ul><div><p>Sets a schema option.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>schema.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;strict&#x27;</span>); <span class="hljs-comment">// &#x27;true&#x27; by default</span>
+schema.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;strict&#x27;</span>, <span class="hljs-literal">false</span>); <span class="hljs-comment">// Sets &#x27;strict&#x27; to false</span>
+schema.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;strict&#x27;</span>); <span class="hljs-comment">// &#x27;false&#x27;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-static"><a href="#schema_Schema-static"><code>Schema.prototype.static()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
+<span class="method-type">&laquo;String|Object&raquo;</span> The Method Name for a single function, or a Object of &quot;string-function&quot; pairs.</p>
+</li><li class="param"><code>[fn]</code>
+<span class="method-type">&laquo;Function&raquo;</span> The Function in a single-function definition.</p>
+</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/guide.html#statics">Statics</a></span></li></ul><div><p>Adds static &quot;class&quot; methods to Models compiled from this schema.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>(..);
+<span class="hljs-comment">// Equivalent to `schema.statics.findByName = function(name) {}`;</span>
+schema.<span class="hljs-title function_">static</span>(<span class="hljs-string">&#x27;findByName&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">name</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">name</span>: name });
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Drink</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Drink&#x27;</span>, schema);
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Drink</span>.<span class="hljs-title function_">findByName</span>(<span class="hljs-string">&#x27;LaCroix&#x27;</span>);
+</code></pre>
+<p>If a hash of name/fn pairs is passed as the only argument, each name/fn pair will be added as methods.</p>
+<pre><code>schema.<span class="hljs-title function_">static</span>({
+    <span class="hljs-attr">findByName</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {..}
+  , <span class="hljs-attr">findByCost</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {..}
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Drink</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Drink&#x27;</span>, schema);
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Drink</span>.<span class="hljs-title function_">findByName</span>(<span class="hljs-string">&#x27;LaCroix&#x27;</span>);
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Drink</span>.<span class="hljs-title function_">findByCost</span>(<span class="hljs-number">3</span>);
+</code></pre>
+<p>If a hash of name/fn pairs is passed as the only argument, each name/fn pair will be added as statics.</p>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-virtual"><a href="#schema_Schema-virtual"><code>Schema.prototype.virtual()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
+<span class="method-type">&laquo;String&raquo;</span> The name of the Virtual</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.ref]</code>
+<span class="method-type">&laquo;String|Model&raquo;</span> model name or model instance. Marks this as a <a href="/docs/populate.html#populate-virtuals">populate virtual</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.localField]</code>
+<span class="method-type">&laquo;String|Function&raquo;</span> Required for populate virtuals. See <a href="/docs/populate.html#populate-virtuals">populate virtual docs</a> for more information.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.foreignField]</code>
+<span class="method-type">&laquo;String|Function&raquo;</span> Required for populate virtuals. See <a href="/docs/populate.html#populate-virtuals">populate virtual docs</a> for more information.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.justOne=false]</code>
+<span class="method-type">&laquo;Boolean|Function&raquo;</span> Only works with populate virtuals. If <a href="https://masteringjs.io/tutorials/fundamentals/truthy">truthy</a>, will be a single doc or <code>null</code>. Otherwise, the populate virtual will be an array.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.count=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> Only works with populate virtuals. If <a href="https://masteringjs.io/tutorials/fundamentals/truthy">truthy</a>, this populate virtual will contain the number of documents rather than the documents themselves when you <code>populate()</code>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.get=null]</code>
+<span class="method-type">&laquo;Function|null&raquo;</span> Adds a <a href="/docs/tutorials/getters-setters.html">getter</a> to this virtual to transform the populated doc.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;VirtualType&raquo;</span> </li></ul><div><p>Creates a virtual type with the given name.</p>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-virtualpath"><a href="#schema_Schema-virtualpath"><code>Schema.prototype.virtualpath()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
+<span class="method-type">&laquo;String&raquo;</span> The name of the Virtual to get</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;VirtualType,null&raquo;</span> </li></ul><div><p>Returns the virtual type with the given <code>name</code>.</p>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-virtuals"><a href="#schema_Schema-virtuals"><code>Schema.prototype.virtuals</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Object containing all virtuals defined on this schema.
+The objects&#39; keys are the virtual paths and values are instances of <code>VirtualType</code>.</p>
+<p>This property is typically only useful for plugin authors and advanced users.
+You do not need to interact with this property at all to use mongoose.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({});
+schema.<span class="hljs-title function_">virtual</span>(<span class="hljs-string">&#x27;answer&#x27;</span>).<span class="hljs-title function_">get</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-number">42</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(schema.<span class="hljs-property">virtuals</span>); <span class="hljs-comment">// { answer: VirtualType { path: &#x27;answer&#x27;, ... } }</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(schema.<span class="hljs-property">virtuals</span>[<span class="hljs-string">&#x27;answer&#x27;</span>].<span class="hljs-property">getters</span>[<span class="hljs-number">0</span>].<span class="hljs-title function_">call</span>()); <span class="hljs-comment">// 42</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schema_Schema-reserved"><a href="#schema_Schema-reserved"><code>Schema.reserved</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Reserved document keys.</p>
+<p>Keys in this object are names that are warned in schema declarations
+because they have the potential to break Mongoose/ Mongoose plugins functionality. If you create a schema
+using <code>new Schema()</code> with one of these property names, Mongoose will log a warning.</p>
+<ul>
+<li>_posts</li>
+<li>_pres</li>
+<li>collection</li>
+<li>emit</li>
+<li>errors</li>
+<li>get</li>
+<li>init</li>
+<li>isModified</li>
+<li>isNew</li>
+<li>listeners</li>
+<li>modelName</li>
+<li>on</li>
+<li>once</li>
+<li>populated</li>
+<li>prototype</li>
+<li>remove</li>
+<li>removeListener</li>
+<li>save</li>
+<li>schema</li>
+<li>toObject</li>
+<li>validate</li>
+</ul>
+<p><em>NOTE:</em> Use of these terms as method names is permitted, but play at your own risk, as they may be existing mongoose document methods you are stomping on.</p>
+<pre><code> <span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>(..);
+ schema.<span class="hljs-property">methods</span>.<span class="hljs-property">init</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {} <span class="hljs-comment">// potentially breaking</span>
+</code></pre>
+  </div></div></div></div><div id="jobs"><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/6.x/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/6.x/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/6.x/docs/js/mobile-navbar-toggle.js"></script></div></body></html>

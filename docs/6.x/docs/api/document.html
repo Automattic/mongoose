@@ -1,0 +1,911 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.10.3: Document</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/6.x/docs/css/github.css"><link rel="stylesheet" href="/docs/6.x/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><script src="/docs/js/api-bold-current-nav.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.10.3</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs">Version 7.x</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x">Version 6.10.3</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.16</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/6.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/document.js" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h1>Document</h1><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"><div id="native-direct"></div><script>(function() {
+if (typeof _bsa !== 'undefined' && _bsa) {
+_bsa.init('custom', 'CK7DT53U', 'placement:mongoosejscom',
+{
+target: '#native-direct',
+template: `
+<div class="native-inline">
+<a rel="sponsored noopener" target="_blank" href="##statlink##" title="##company## — ##tagline##"><span class="sponsor">Sponsor</span> ##company## — ##description##</a>
+</div>
+</a>
+`
+}
+);
+}
+})();</script><div class="api-nav"><div class="api-nav-content"><div class="nav-item" id="nav-Mongoose"><div class="nav-item-title"><a href="mongoose.html">Mongoose</a></div></div><div class="nav-item" id="nav-Schema"><div class="nav-item-title"><a href="schema.html">Schema</a></div></div><div class="nav-item" id="nav-Connection"><div class="nav-item-title"><a href="connection.html">Connection</a></div></div><div class="nav-item" id="nav-Document"><div class="nav-item-title" style="font-weight: bold"><a href="document.html">Document</a></div><ul class="nav-item-sub"><li><a href="#document_Document-$assertPopulated"><code>Document.prototype.$assertPopulated()</code></a></li><li><a href="#document_Document-$clone"><code>Document.prototype.$clone()</code></a></li><li><a href="#document_Document-$errors"><code>Document.prototype.$errors</code></a></li><li><a href="#document_Document-$getAllSubdocs"><code>Document.prototype.$getAllSubdocs()</code></a></li><li><a href="#document_Document-$getPopulatedDocs"><code>Document.prototype.$getPopulatedDocs()</code></a></li><li><a href="#document_Document-$ignore"><code>Document.prototype.$ignore()</code></a></li><li><a href="#document_Document-$inc"><code>Document.prototype.$inc()</code></a></li><li><a href="#document_Document-$init"><code>Document.prototype.$init()</code></a></li><li><a href="#document_Document-$isDefault"><code>Document.prototype.$isDefault()</code></a></li><li><a href="#document_Document-$isDeleted"><code>Document.prototype.$isDeleted()</code></a></li><li><a href="#document_Document-$isEmpty"><code>Document.prototype.$isEmpty()</code></a></li><li><a href="#document_Document-$isModified"><code>Document.prototype.$isModified()</code></a></li><li><a href="#document_Document-$isNew"><code>Document.prototype.$isNew</code></a></li><li><a href="#document_Document-$locals"><code>Document.prototype.$locals</code></a></li><li><a href="#document_Document-$markValid"><code>Document.prototype.$markValid()</code></a></li><li><a href="#document_Document-$op"><code>Document.prototype.$op</code></a></li><li><a href="#document_Document-$parent"><code>Document.prototype.$parent()</code></a></li><li><a href="#document_Document-$populated"><code>Document.prototype.$populated()</code></a></li><li><a href="#document_Document-$session"><code>Document.prototype.$session()</code></a></li><li><a href="#document_Document-$set"><code>Document.prototype.$set()</code></a></li><li><a href="#document_Document-$timestamps"><code>Document.prototype.$timestamps()</code></a></li><li><a href="#document_Document-$validate"><code>Document.prototype.$validate()</code></a></li><li><a href="#document_Document-$where"><code>Document.prototype.$where</code></a></li><li><a href="#document_Document-depopulate"><code>Document.prototype.depopulate()</code></a></li><li><a href="#document_Document-directModifiedPaths"><code>Document.prototype.directModifiedPaths()</code></a></li><li><a href="#document_Document-equals"><code>Document.prototype.equals()</code></a></li><li><a href="#document_Document-errors"><code>Document.prototype.errors</code></a></li><li><a href="#document_Document-get"><code>Document.prototype.get()</code></a></li><li><a href="#document_Document-getChanges"><code>Document.prototype.getChanges()</code></a></li><li><a href="#document_Document-id"><code>Document.prototype.id</code></a></li><li><a href="#document_Document-init"><code>Document.prototype.init()</code></a></li><li><a href="#document_Document-inspect"><code>Document.prototype.inspect()</code></a></li><li><a href="#document_Document-invalidate"><code>Document.prototype.invalidate()</code></a></li><li><a href="#document_Document-isDirectModified"><code>Document.prototype.isDirectModified()</code></a></li><li><a href="#document_Document-isDirectSelected"><code>Document.prototype.isDirectSelected()</code></a></li><li><a href="#document_Document-isInit"><code>Document.prototype.isInit()</code></a></li><li><a href="#document_Document-isModified"><code>Document.prototype.isModified()</code></a></li><li><a href="#document_Document-isNew"><code>Document.prototype.isNew</code></a></li><li><a href="#document_Document-isSelected"><code>Document.prototype.isSelected()</code></a></li><li><a href="#document_Document-markModified"><code>Document.prototype.markModified()</code></a></li><li><a href="#document_Document-modifiedPaths"><code>Document.prototype.modifiedPaths()</code></a></li><li><a href="#document_Document-overwrite"><code>Document.prototype.overwrite()</code></a></li><li><a href="#document_Document-parent"><code>Document.prototype.parent()</code></a></li><li><a href="#document_Document-populate"><code>Document.prototype.populate()</code></a></li><li><a href="#document_Document-populated"><code>Document.prototype.populated()</code></a></li><li><a href="#document_Document-replaceOne"><code>Document.prototype.replaceOne()</code></a></li><li><a href="#document_Document-save"><code>Document.prototype.save()</code></a></li><li><a href="#document_Document-schema"><code>Document.prototype.schema</code></a></li><li><a href="#document_Document-set"><code>Document.prototype.set()</code></a></li><li><a href="#document_Document-toJSON"><code>Document.prototype.toJSON()</code></a></li><li><a href="#document_Document-toObject"><code>Document.prototype.toObject()</code></a></li><li><a href="#document_Document-toString"><code>Document.prototype.toString()</code></a></li><li><a href="#document_Document-unmarkModified"><code>Document.prototype.unmarkModified()</code></a></li><li><a href="#document_Document-update"><code>Document.prototype.update()</code></a></li><li><a href="#document_Document-updateOne"><code>Document.prototype.updateOne()</code></a></li><li><a href="#document_Document-validate"><code>Document.prototype.validate()</code></a></li><li><a href="#document_Document-validateSync"><code>Document.prototype.validateSync()</code></a></li></ul></div><div class="nav-item" id="nav-Model"><div class="nav-item-title"><a href="model.html">Model</a></div></div><div class="nav-item" id="nav-Query"><div class="nav-item-title"><a href="query.html">Query</a></div></div><div class="nav-item" id="nav-QueryCursor"><div class="nav-item-title"><a href="querycursor.html">QueryCursor</a></div></div><div class="nav-item" id="nav-Aggregate"><div class="nav-item-title"><a href="aggregate.html">Aggregate</a></div></div><div class="nav-item" id="nav-AggregationCursor"><div class="nav-item-title"><a href="aggregationcursor.html">AggregationCursor</a></div></div><div class="nav-item" id="nav-Schematype"><div class="nav-item-title"><a href="schematype.html">Schematype</a></div></div><div class="nav-item" id="nav-Virtualtype"><div class="nav-item-title"><a href="virtualtype.html">Virtualtype</a></div></div><div class="nav-item" id="nav-Error"><div class="nav-item-title"><a href="error.html">Error</a></div></div><div class="nav-item" id="nav-SchemaArray"><div class="nav-item-title"><a href="schemaarray.html">SchemaArray</a></div></div><div class="nav-item" id="nav-DocumentArrayPath"><div class="nav-item-title"><a href="documentarraypath.html">DocumentArrayPath</a></div></div><div class="nav-item" id="nav-SubdocumentPath"><div class="nav-item-title"><a href="subdocumentpath.html">SubdocumentPath</a></div></div><div class="nav-item" id="nav-MongooseDocumentArray"><div class="nav-item-title"><a href="mongoosedocumentarray.html">MongooseDocumentArray</a></div></div><div class="nav-item" id="nav-Subdocument"><div class="nav-item-title"><a href="subdocument.html">Subdocument</a></div></div><div class="nav-item" id="nav-ArraySubdocument"><div class="nav-item-title"><a href="arraysubdocument.html">ArraySubdocument</a></div></div><div class="nav-item" id="nav-Buffer"><div class="nav-item-title"><a href="buffer.html">Buffer</a></div></div><div class="nav-item" id="nav-Decimal128"><div class="nav-item-title"><a href="decimal128.html">Decimal128</a></div></div><div class="nav-item" id="nav-Map"><div class="nav-item-title"><a href="map.html">Map</a></div></div></div></div><div class="api-content"><ul><li><a href="#document_Document-$assertPopulated"><code>Document.prototype.$assertPopulated()</code></a></li><li><a href="#document_Document-$clone"><code>Document.prototype.$clone()</code></a></li><li><a href="#document_Document-$errors"><code>Document.prototype.$errors</code></a></li><li><a href="#document_Document-$getAllSubdocs"><code>Document.prototype.$getAllSubdocs()</code></a></li><li><a href="#document_Document-$getPopulatedDocs"><code>Document.prototype.$getPopulatedDocs()</code></a></li><li><a href="#document_Document-$ignore"><code>Document.prototype.$ignore()</code></a></li><li><a href="#document_Document-$inc"><code>Document.prototype.$inc()</code></a></li><li><a href="#document_Document-$init"><code>Document.prototype.$init()</code></a></li><li><a href="#document_Document-$isDefault"><code>Document.prototype.$isDefault()</code></a></li><li><a href="#document_Document-$isDeleted"><code>Document.prototype.$isDeleted()</code></a></li><li><a href="#document_Document-$isEmpty"><code>Document.prototype.$isEmpty()</code></a></li><li><a href="#document_Document-$isModified"><code>Document.prototype.$isModified()</code></a></li><li><a href="#document_Document-$isNew"><code>Document.prototype.$isNew</code></a></li><li><a href="#document_Document-$locals"><code>Document.prototype.$locals</code></a></li><li><a href="#document_Document-$markValid"><code>Document.prototype.$markValid()</code></a></li><li><a href="#document_Document-$op"><code>Document.prototype.$op</code></a></li><li><a href="#document_Document-$parent"><code>Document.prototype.$parent()</code></a></li><li><a href="#document_Document-$populated"><code>Document.prototype.$populated()</code></a></li><li><a href="#document_Document-$session"><code>Document.prototype.$session()</code></a></li><li><a href="#document_Document-$set"><code>Document.prototype.$set()</code></a></li><li><a href="#document_Document-$timestamps"><code>Document.prototype.$timestamps()</code></a></li><li><a href="#document_Document-$validate"><code>Document.prototype.$validate()</code></a></li><li><a href="#document_Document-$where"><code>Document.prototype.$where</code></a></li><li><a href="#document_Document-depopulate"><code>Document.prototype.depopulate()</code></a></li><li><a href="#document_Document-directModifiedPaths"><code>Document.prototype.directModifiedPaths()</code></a></li><li><a href="#document_Document-equals"><code>Document.prototype.equals()</code></a></li><li><a href="#document_Document-errors"><code>Document.prototype.errors</code></a></li><li><a href="#document_Document-get"><code>Document.prototype.get()</code></a></li><li><a href="#document_Document-getChanges"><code>Document.prototype.getChanges()</code></a></li><li><a href="#document_Document-id"><code>Document.prototype.id</code></a></li><li><a href="#document_Document-init"><code>Document.prototype.init()</code></a></li><li><a href="#document_Document-inspect"><code>Document.prototype.inspect()</code></a></li><li><a href="#document_Document-invalidate"><code>Document.prototype.invalidate()</code></a></li><li><a href="#document_Document-isDirectModified"><code>Document.prototype.isDirectModified()</code></a></li><li><a href="#document_Document-isDirectSelected"><code>Document.prototype.isDirectSelected()</code></a></li><li><a href="#document_Document-isInit"><code>Document.prototype.isInit()</code></a></li><li><a href="#document_Document-isModified"><code>Document.prototype.isModified()</code></a></li><li><a href="#document_Document-isNew"><code>Document.prototype.isNew</code></a></li><li><a href="#document_Document-isSelected"><code>Document.prototype.isSelected()</code></a></li><li><a href="#document_Document-markModified"><code>Document.prototype.markModified()</code></a></li><li><a href="#document_Document-modifiedPaths"><code>Document.prototype.modifiedPaths()</code></a></li><li><a href="#document_Document-overwrite"><code>Document.prototype.overwrite()</code></a></li><li><a href="#document_Document-parent"><code>Document.prototype.parent()</code></a></li><li><a href="#document_Document-populate"><code>Document.prototype.populate()</code></a></li><li><a href="#document_Document-populated"><code>Document.prototype.populated()</code></a></li><li><a href="#document_Document-replaceOne"><code>Document.prototype.replaceOne()</code></a></li><li><a href="#document_Document-save"><code>Document.prototype.save()</code></a></li><li><a href="#document_Document-schema"><code>Document.prototype.schema</code></a></li><li><a href="#document_Document-set"><code>Document.prototype.set()</code></a></li><li><a href="#document_Document-toJSON"><code>Document.prototype.toJSON()</code></a></li><li><a href="#document_Document-toObject"><code>Document.prototype.toObject()</code></a></li><li><a href="#document_Document-toString"><code>Document.prototype.toString()</code></a></li><li><a href="#document_Document-unmarkModified"><code>Document.prototype.unmarkModified()</code></a></li><li><a href="#document_Document-update"><code>Document.prototype.update()</code></a></li><li><a href="#document_Document-updateOne"><code>Document.prototype.updateOne()</code></a></li><li><a href="#document_Document-validate"><code>Document.prototype.validate()</code></a></li><li><a href="#document_Document-validateSync"><code>Document.prototype.validateSync()</code></a></li></ul><hr class="separate-api-elements"><h3 id="document_Document-$assertPopulated"><a href="#document_Document-$assertPopulated"><code>Document.prototype.$assertPopulated()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String|Array[String]&raquo;</span> path or array of paths to check. <code>$assertPopulated</code> throws if any of the given paths is not populated.</p>
+</li><li class="param"><code>[values]</code>
+<span class="method-type">&laquo;Object&raquo;</span> optional values to <code>$set()</code>. Convenient if you want to manually populate a path and assert that the path was populated in 1 call.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> this</li></ul><div><p>Throws an error if a given path is not populated</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findOne</span>().<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;author&#x27;</span>);
+
+doc.$assertPopulated(<span class="hljs-string">&#x27;author&#x27;</span>); <span class="hljs-comment">// does not throw</span>
+doc.$assertPopulated(<span class="hljs-string">&#x27;other path&#x27;</span>); <span class="hljs-comment">// throws an error</span>
+
+<span class="hljs-comment">// Manually populate and assert in one call. The following does</span>
+<span class="hljs-comment">// `doc.$set({ likes })` before asserting.</span>
+doc.$assertPopulated(<span class="hljs-string">&#x27;likes&#x27;</span>, { likes });
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$clone"><a href="#document_Document-$clone"><code>Document.prototype.$clone()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> a copy of this document</li></ul><div><p>Returns a copy of this document with a deep clone of <code>_doc</code> and <code>$__</code>.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$errors"><a href="#document_Document-$errors"><code>Document.prototype.$errors</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Hash containing current validation $errors.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$getAllSubdocs"><a href="#document_Document-$getAllSubdocs"><code>Document.prototype.$getAllSubdocs()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Get all subdocs (by bfs)</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$getPopulatedDocs"><a href="#document_Document-$getPopulatedDocs"><code>Document.prototype.$getPopulatedDocs()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array[Document]&raquo;</span> array of populated documents. Empty array if there are no populated documents associated with this document.</li></ul><div><p>Gets all populated documents associated with this document.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$ignore"><a href="#document_Document-$ignore"><code>Document.prototype.$ignore()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> the path to ignore</p>
+</li></ul><div><p>Don&#39;t run validation on this path or persist changes to this path.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>doc.<span class="hljs-property">foo</span> = <span class="hljs-literal">null</span>;
+doc.$ignore(<span class="hljs-string">&#x27;foo&#x27;</span>);
+doc.<span class="hljs-title function_">save</span>(); <span class="hljs-comment">// changes to foo will not be persisted and validators won&#x27;t be run</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$inc"><a href="#document_Document-$inc"><code>Document.prototype.$inc()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String|Array&raquo;</span> path or paths to update</p>
+</li><li class="param"><code>val</code>
+<span class="method-type">&laquo;Number&raquo;</span> increment <code>path</code> by this value</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> this</li></ul><div><p>Increments the numeric value at <code>path</code> by the given <code>val</code>.
+When you call <code>save()</code> on this document, Mongoose will send a
+<a href="https://www.mongodb.com/docs/manual/reference/operator/update/inc/"><code>$inc</code></a>
+as opposed to a <code>$set</code>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">counter</span>: <span class="hljs-title class_">Number</span> });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Test</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">counter</span>: <span class="hljs-number">0</span> });
+doc.$inc(<span class="hljs-string">&#x27;counter&#x27;</span>, <span class="hljs-number">2</span>);
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>(); <span class="hljs-comment">// Sends a `{ $inc: { counter: 2 } }` to MongoDB</span>
+doc.<span class="hljs-property">counter</span>; <span class="hljs-comment">// 2</span>
+
+doc.<span class="hljs-property">counter</span> += <span class="hljs-number">2</span>;
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>(); <span class="hljs-comment">// Sends a `{ $set: { counter: 2 } }` to MongoDB</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$init"><a href="#document_Document-$init"><code>Document.prototype.$init()</code></a></h3><div><p>Alias for <a href="#document_Document-init"><code>.init</code></a></p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$isDefault"><a href="#document_Document-$isDefault"><code>Document.prototype.$isDefault()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
+<span class="method-type">&laquo;String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Checks if a path is set to its default.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-title class_">MyModel</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;test&#x27;</span>, { <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">default</span>: <span class="hljs-string">&#x27;Val &#x27;</span>} });
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MyModel</span>();
+m.$isDefault(<span class="hljs-string">&#x27;name&#x27;</span>); <span class="hljs-comment">// true</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$isDeleted"><a href="#document_Document-$isDeleted"><code>Document.prototype.$isDeleted()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[val]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> optional, overrides whether mongoose thinks the doc is deleted</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean,Document&raquo;</span> whether mongoose thinks this doc is deleted.</li></ul><div><p>Getter/setter, determines whether the document was removed or not.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> product = <span class="hljs-keyword">await</span> product.<span class="hljs-title function_">remove</span>();
+product.$isDeleted(); <span class="hljs-comment">// true</span>
+product.<span class="hljs-title function_">remove</span>(); <span class="hljs-comment">// no-op, doesn&#x27;t send anything to the db</span>
+
+product.$isDeleted(<span class="hljs-literal">false</span>);
+product.$isDeleted(); <span class="hljs-comment">// false</span>
+product.<span class="hljs-title function_">remove</span>(); <span class="hljs-comment">// will execute a remove against the db</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$isEmpty"><a href="#document_Document-$isEmpty"><code>Document.prototype.$isEmpty()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
+<span class="method-type">&laquo;String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Returns true if the given path is nullish or only contains empty objects.
+Useful for determining whether this subdoc will get stripped out by the
+<a href="/docs/guide.html#minimize">minimize option</a>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">nested</span>: { <span class="hljs-attr">foo</span>: <span class="hljs-title class_">String</span> } });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Model</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Model</span>({});
+doc.$isEmpty(<span class="hljs-string">&#x27;nested&#x27;</span>); <span class="hljs-comment">// true</span>
+doc.<span class="hljs-property">nested</span>.$isEmpty(); <span class="hljs-comment">// true</span>
+
+doc.<span class="hljs-property">nested</span>.<span class="hljs-property">foo</span> = <span class="hljs-string">&#x27;bar&#x27;</span>;
+doc.$isEmpty(<span class="hljs-string">&#x27;nested&#x27;</span>); <span class="hljs-comment">// false</span>
+doc.<span class="hljs-property">nested</span>.$isEmpty(); <span class="hljs-comment">// false</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$isModified"><a href="#document_Document-$isModified"><code>Document.prototype.$isModified()</code></a></h3><div><p>Alias of <a href="#document_Document-isModified"><code>.isModified</code></a></p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$isNew"><a href="#document_Document-$isNew"><code>Document.prototype.$isNew</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Boolean flag specifying if the document is new. If you create a document
+using <code>new</code>, this document will be considered &quot;new&quot;. <code>$isNew</code> is how
+Mongoose determines whether <code>save()</code> should use <code>insertOne()</code> to create
+a new document or <code>updateOne()</code> to update an existing document.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;John Smith&#x27;</span> });
+user.<span class="hljs-property">$isNew</span>; <span class="hljs-comment">// true</span>
+
+<span class="hljs-keyword">await</span> user.<span class="hljs-title function_">save</span>(); <span class="hljs-comment">// Sends an `insertOne` to MongoDB</span>
+</code></pre>
+<p>On the other hand, if you load an existing document from the database
+using <code>findOne()</code> or another <a href="/docs/queries.html">query operation</a>,
+<code>$isNew</code> will be false.</p>
+<h4 id="example-1">
+      <a href="#example-1">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;John Smith&#x27;</span> });
+user.<span class="hljs-property">$isNew</span>; <span class="hljs-comment">// false</span>
+</code></pre>
+<p>Mongoose sets <code>$isNew</code> to <code>false</code> immediately after <code>save()</code> succeeds.
+That means Mongoose sets <code>$isNew</code> to false <strong>before</strong> <code>post(&#39;save&#39;)</code> hooks run.
+In <code>post(&#39;save&#39;)</code> hooks, <code>$isNew</code> will be <code>false</code> if <code>save()</code> succeeded.</p>
+<h4 id="example-2">
+      <a href="#example-2">
+        Example:
+      </a>
+    </h4>
+<pre><code>userSchema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">this</span>.<span class="hljs-property">$isNew</span>; <span class="hljs-comment">// false</span>
+});
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;John Smith&#x27;</span> });
+</code></pre>
+<p>For subdocuments, <code>$isNew</code> is true if either the parent has <code>$isNew</code> set,
+or if you create a new subdocument.</p>
+<h4 id="example-3">
+      <a href="#example-3">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// Assume `Group` has a document array `users`</span>
+<span class="hljs-keyword">const</span> group = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Group</span>.<span class="hljs-title function_">findOne</span>();
+group.<span class="hljs-property">users</span>[<span class="hljs-number">0</span>].<span class="hljs-property">$isNew</span>; <span class="hljs-comment">// false</span>
+
+group.<span class="hljs-property">users</span>.<span class="hljs-title function_">push</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;John Smith&#x27;</span> });
+group.<span class="hljs-property">users</span>[<span class="hljs-number">1</span>].<span class="hljs-property">$isNew</span>; <span class="hljs-comment">// true</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$locals"><a href="#document_Document-$locals"><code>Document.prototype.$locals</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Empty object that you can use for storing properties on the document. This
+is handy for passing data to middleware without conflicting with Mongoose
+internals.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// Mongoose will set `isNew` to `false` if `save()` succeeds</span>
+  <span class="hljs-variable language_">this</span>.<span class="hljs-property">$locals</span>.<span class="hljs-property">wasNew</span> = <span class="hljs-variable language_">this</span>.<span class="hljs-property">isNew</span>;
+});
+
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// Prints true if `isNew` was set before `save()`</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">$locals</span>.<span class="hljs-property">wasNew</span>);
+});
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$markValid"><a href="#document_Document-$markValid"><code>Document.prototype.$markValid()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> the field to mark as valid</p>
+</li></ul><div><p>Marks a path as valid, removing existing validation errors.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$op"><a href="#document_Document-$op"><code>Document.prototype.$op</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>A string containing the current operation that Mongoose is executing
+on this document. May be <code>null</code>, <code>&#39;save&#39;</code>, <code>&#39;validate&#39;</code>, or <code>&#39;remove&#39;</code>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Model</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test&#x27;</span> });
+doc.<span class="hljs-property">$op</span>; <span class="hljs-comment">// null</span>
+
+<span class="hljs-keyword">const</span> promise = doc.<span class="hljs-title function_">save</span>();
+doc.<span class="hljs-property">$op</span>; <span class="hljs-comment">// &#x27;save&#x27;</span>
+
+<span class="hljs-keyword">await</span> promise;
+doc.<span class="hljs-property">$op</span>; <span class="hljs-comment">// null</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$parent"><a href="#document_Document-$parent"><code>Document.prototype.$parent()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> </li></ul><div><p>Alias for <a href="#document_Document-parent"><code>parent()</code></a>. If this document is a subdocument or populated
+document, returns the document&#39;s parent. Returns <code>undefined</code> otherwise.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$populated"><a href="#document_Document-$populated"><code>Document.prototype.$populated()</code></a></h3><div><p>Alias of <a href="#document_Document-populated"><code>.populated</code></a>.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$session"><a href="#document_Document-$session"><code>Document.prototype.$session()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[session]</code>
+<span class="method-type">&laquo;ClientSession&raquo;</span> overwrite the current session</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;ClientSession&raquo;</span> </li></ul><div><p>Getter/setter around the session associated with this document. Used to
+automatically set <code>session</code> if you <code>save()</code> a doc that you got from a
+query with an associated session.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> session = <span class="hljs-title class_">MyModel</span>.<span class="hljs-title function_">startSession</span>();
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">MyModel</span>.<span class="hljs-title function_">findOne</span>().<span class="hljs-title function_">session</span>(session);
+doc.$session() === session; <span class="hljs-comment">// true</span>
+doc.$session(<span class="hljs-literal">null</span>);
+doc.$session() === <span class="hljs-literal">null</span>; <span class="hljs-comment">// true</span>
+</code></pre>
+<p>If this is a top-level document, setting the session propagates to all child
+docs.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$set"><a href="#document_Document-$set"><code>Document.prototype.$set()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String|Object&raquo;</span> path or object of key/vals to set</p>
+</li><li class="param"><code>val</code>
+<span class="method-type">&laquo;Any&raquo;</span> the value to set</p>
+</li><li class="param"><code>[type]</code>
+<span class="method-type">&laquo;Schema|String|Number|Buffer|[object Object]&raquo;</span> optionally specify a type for &quot;on-the-fly&quot; attributes</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> optionally specify options that modify the behavior of the set</p>
+</li><ul style="margin-top: 0.5em"><li><code>[options.merge=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if true, setting a <a href="/docs/subdocs.html#subdocuments-versus-nested-paths">nested path</a> will merge existing values rather than overwrite the whole object. So <code>doc.set(&#39;nested&#39;, { a: 1, b: 2 })</code> becomes <code>doc.set(&#39;nested.a&#39;, 1); doc.set(&#39;nested.b&#39;, 2);</code></p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> this</li></ul><div><p>Alias for <code>set()</code>, used internally to avoid conflicts</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$timestamps"><a href="#document_Document-$timestamps"><code>Document.prototype.$timestamps()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[value]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> overwrite the current session</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document,boolean,undefined,void&raquo;</span> When used as a getter (no argument), a boolean will be returned indicating the timestamps option state or if unset &quot;undefined&quot; will be used, otherwise will return &quot;this&quot;</li></ul><div><p>Getter/setter around whether this document will apply timestamps by
+default when using <code>save()</code> and <code>bulkSave()</code>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">TestModel</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }, { <span class="hljs-attr">timestamps</span>: <span class="hljs-literal">true</span> }));
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">TestModel</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;John Smith&#x27;</span> });
+
+doc.$timestamps(); <span class="hljs-comment">// true</span>
+
+doc.$timestamps(<span class="hljs-literal">false</span>);
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>(); <span class="hljs-comment">// Does **not** apply timestamps</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$validate"><a href="#document_Document-$validate"><code>Document.prototype.$validate()</code></a></h3><div><p>Alias of <a href="#document_Document-validate"><code>.validate</code></a></p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-$where"><a href="#document_Document-$where"><code>Document.prototype.$where</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Set this property to add additional query filters when Mongoose saves this document and <code>isNew</code> is false.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// Make sure `save()` never updates a soft deleted document.</span>
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">this</span>.<span class="hljs-property">$where</span> = { <span class="hljs-attr">isDeleted</span>: <span class="hljs-literal">false</span> };
+});
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-depopulate"><a href="#document_Document-depopulate"><code>Document.prototype.depopulate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
+<span class="method-type">&laquo;String|Array[String]&raquo;</span> Specific Path to depopulate. If unset, will depopulate all paths on the Document. Or multiple space-delimited paths.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#document_Document-populate">Document.populate</a></span></li></ul><div><p>Takes a populated field and returns it to its unpopulated state.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findOne</span>().<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;author&#x27;</span>).<span class="hljs-title function_">exec</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err, doc</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(doc.<span class="hljs-property">author</span>.<span class="hljs-property">name</span>); <span class="hljs-comment">// Dr.Seuss</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(doc.<span class="hljs-title function_">depopulate</span>(<span class="hljs-string">&#x27;author&#x27;</span>));
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(doc.<span class="hljs-property">author</span>); <span class="hljs-comment">// &#x27;5144cf8050f071d979c118a7&#x27;</span>
+})
+</code></pre>
+<p>If the path was not provided, then all populated fields are returned to their unpopulated state.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-directModifiedPaths"><a href="#document_Document-directModifiedPaths"><code>Document.prototype.directModifiedPaths()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array[String]&raquo;</span> </li></ul><div><p>Returns the list of paths that have been directly modified. A direct
+modified path is a path that you explicitly set, whether via <code>doc.foo = &#39;bar&#39;</code>,
+<code>Object.assign(doc, { foo: &#39;bar&#39; })</code>, or <code>doc.set(&#39;foo&#39;, &#39;bar&#39;)</code>.</p>
+<p>A path <code>a</code> may be in <code>modifiedPaths()</code> but not in <code>directModifiedPaths()</code>
+because a child of <code>a</code> was directly modified.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">foo</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">nested</span>: { <span class="hljs-attr">bar</span>: <span class="hljs-title class_">String</span> } });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Model</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">foo</span>: <span class="hljs-string">&#x27;original&#x27;</span>, <span class="hljs-attr">nested</span>: { <span class="hljs-attr">bar</span>: <span class="hljs-string">&#x27;original&#x27;</span> } });
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findOne</span>();
+doc.<span class="hljs-property">nested</span>.<span class="hljs-property">bar</span> = <span class="hljs-string">&#x27;modified&#x27;</span>;
+doc.<span class="hljs-title function_">directModifiedPaths</span>(); <span class="hljs-comment">// [&#x27;nested.bar&#x27;]</span>
+doc.<span class="hljs-title function_">modifiedPaths</span>(); <span class="hljs-comment">// [&#x27;nested&#x27;, &#x27;nested.bar&#x27;]</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-equals"><a href="#document_Document-equals"><code>Document.prototype.equals()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[doc]</code>
+<span class="method-type">&laquo;Document&raquo;</span> a document to compare. If falsy, will always return &quot;false&quot;.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Returns true if this document is equal to another document.</p>
+<p>Documents are considered equal when they have matching <code>_id</code>s, unless neither
+document has an <code>_id</code>, in which case this function falls back to using
+<code>deepEqual()</code>.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-errors"><a href="#document_Document-errors"><code>Document.prototype.errors</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Hash containing current validation errors.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-get"><a href="#document_Document-get"><code>Document.prototype.get()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>[type]</code>
+<span class="method-type">&laquo;Schema|String|Number|Buffer|[object Object]&raquo;</span> optionally specify a type for on-the-fly attributes</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.virtuals=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> Apply virtuals before getting this path</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.getters=true]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If false, skip applying getters and just get the raw value</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Any&raquo;</span> </li></ul><div><p>Returns the value of a path.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// path</span>
+doc.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;age&#x27;</span>) <span class="hljs-comment">// 47</span>
+
+<span class="hljs-comment">// dynamic casting to a string</span>
+doc.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;age&#x27;</span>, <span class="hljs-title class_">String</span>) <span class="hljs-comment">// &quot;47&quot;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-getChanges"><a href="#document_Document-getChanges"><code>Document.prototype.getChanges()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> </li></ul><div><p>Returns the changes that happened to the document
+in the format that will be sent to MongoDB.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span>,
+  <span class="hljs-attr">country</span>: <span class="hljs-title class_">String</span>
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema);
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">create</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Hafez&#x27;</span>,
+  <span class="hljs-attr">age</span>: <span class="hljs-number">25</span>,
+  <span class="hljs-attr">country</span>: <span class="hljs-string">&#x27;Egypt&#x27;</span>
+});
+
+<span class="hljs-comment">// returns an empty object, no changes happened yet</span>
+user.<span class="hljs-title function_">getChanges</span>(); <span class="hljs-comment">// { }</span>
+
+user.<span class="hljs-property">country</span> = <span class="hljs-literal">undefined</span>;
+user.<span class="hljs-property">age</span> = <span class="hljs-number">26</span>;
+
+user.<span class="hljs-title function_">getChanges</span>(); <span class="hljs-comment">// { $set: { age: 26 }, { $unset: { country: 1 } } }</span>
+
+<span class="hljs-keyword">await</span> user.<span class="hljs-title function_">save</span>();
+
+user.<span class="hljs-title function_">getChanges</span>(); <span class="hljs-comment">// { }</span>
+</code></pre>
+<p>Modifying the object that <code>getChanges()</code> returns does not affect the document&#39;s
+change tracking state. Even if you <code>delete user.getChanges().$set</code>, Mongoose
+will still send a <code>$set</code> to the server.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-id"><a href="#document_Document-id"><code>Document.prototype.id</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/guide.html#options">Schema options</a></span></li></ul><div><p>The string version of this documents _id.</p>
+<h4 id="note">
+      <a href="#note">
+        Note:
+      </a>
+    </h4>
+<p>This getter exists on all documents by default. The getter can be disabled by setting the <code>id</code> <a href="/docs/guide.html#id">option</a> of its <code>Schema</code> to false at construction time.</p>
+<pre><code><span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }, { <span class="hljs-attr">id</span>: <span class="hljs-literal">false</span> });
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-init"><a href="#document_Document-init"><code>Document.prototype.init()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>doc</code>
+<span class="method-type">&laquo;Object&raquo;</span> document returned by mongo</p>
+</li><li class="param"><code>[opts]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[fn]</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><div><p>Initializes the document without setters or marking anything modified.</p>
+<p>Called internally after a document is returned from mongodb. Normally,
+you do <strong>not</strong> need to call this function on your own.</p>
+<p>This function triggers <code>init</code> <a href="/docs/middleware.html">middleware</a>.
+Note that <code>init</code> hooks are <a href="/docs/middleware.html#synchronous">synchronous</a>.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-inspect"><a href="#document_Document-inspect"><code>Document.prototype.inspect()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;String&raquo;</span> </li></ul><div><p>Helper for console.log</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-invalidate"><a href="#document_Document-invalidate"><code>Document.prototype.invalidate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> the field to invalidate. For array elements, use the <code>array.i.field</code> syntax, where <code>i</code> is the 0-based index in the array.</p>
+</li><li class="param"><code>err</code>
+<span class="method-type">&laquo;String|Error&raquo;</span> the error which states the reason <code>path</code> was invalid</p>
+</li><li class="param"><code>val</code>
+<span class="method-type">&laquo;Object|String|Number|any&raquo;</span> optional invalid value</p>
+</li><li class="param"><code>[kind]</code>
+<span class="method-type">&laquo;String&raquo;</span> optional <code>kind</code> property for the error</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;ValidationError&raquo;</span> the current ValidationError, with all currently invalidated paths</li></ul><div><p>Marks a path as invalid, causing validation to fail.</p>
+<p>The <code>errorMsg</code> argument will become the message of the <code>ValidationError</code>.</p>
+<p>The <code>value</code> argument (if passed) will be available through the <code>ValidationError.value</code> property.</p>
+<pre><code>doc.<span class="hljs-title function_">invalidate</span>(<span class="hljs-string">&#x27;size&#x27;</span>, <span class="hljs-string">&#x27;must be less than 20&#x27;</span>, <span class="hljs-number">14</span>);
+
+doc.<span class="hljs-title function_">validate</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(err)
+  <span class="hljs-comment">// prints</span>
+  { <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Validation failed&#x27;</span>,
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;ValidationError&#x27;</span>,
+    <span class="hljs-attr">errors</span>:
+     { <span class="hljs-attr">size</span>:
+        { <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;must be less than 20&#x27;</span>,
+          <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;ValidatorError&#x27;</span>,
+          <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;size&#x27;</span>,
+          <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;user defined&#x27;</span>,
+          <span class="hljs-attr">value</span>: <span class="hljs-number">14</span> } } }
+})
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-isDirectModified"><a href="#document_Document-isDirectModified"><code>Document.prototype.isDirectModified()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
+<span class="method-type">&laquo;String|Array[String]&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Returns true if <code>path</code> was directly set and modified, else false.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>doc.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;documents.0.title&#x27;</span>, <span class="hljs-string">&#x27;changed&#x27;</span>);
+doc.<span class="hljs-title function_">isDirectModified</span>(<span class="hljs-string">&#x27;documents.0.title&#x27;</span>) <span class="hljs-comment">// true</span>
+doc.<span class="hljs-title function_">isDirectModified</span>(<span class="hljs-string">&#x27;documents&#x27;</span>) <span class="hljs-comment">// false</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-isDirectSelected"><a href="#document_Document-isDirectSelected"><code>Document.prototype.isDirectSelected()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Checks if <code>path</code> was explicitly selected. If no projection, always returns
+true.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-title class_">Thing</span>.<span class="hljs-title function_">findOne</span>().<span class="hljs-title function_">select</span>(<span class="hljs-string">&#x27;nested.name&#x27;</span>).<span class="hljs-title function_">exec</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err, doc</span>) {
+   doc.<span class="hljs-title function_">isDirectSelected</span>(<span class="hljs-string">&#x27;nested.name&#x27;</span>) <span class="hljs-comment">// true</span>
+   doc.<span class="hljs-title function_">isDirectSelected</span>(<span class="hljs-string">&#x27;nested.otherName&#x27;</span>) <span class="hljs-comment">// false</span>
+   doc.<span class="hljs-title function_">isDirectSelected</span>(<span class="hljs-string">&#x27;nested&#x27;</span>)  <span class="hljs-comment">// false</span>
+})
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-isInit"><a href="#document_Document-isInit"><code>Document.prototype.isInit()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
+<span class="method-type">&laquo;String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Checks if <code>path</code> is in the <code>init</code> state, that is, it was set by <code>Document#init()</code> and not modified since.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-isModified"><a href="#document_Document-isModified"><code>Document.prototype.isModified()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[path]</code>
+<span class="method-type">&laquo;String&raquo;</span> optional</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Returns true if any of the given paths is modified, else false. If no arguments, returns <code>true</code> if any path
+in this document is modified.</p>
+<p>If <code>path</code> is given, checks if a path or any full path containing <code>path</code> as part of its path chain has been modified.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>doc.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;documents.0.title&#x27;</span>, <span class="hljs-string">&#x27;changed&#x27;</span>);
+doc.<span class="hljs-title function_">isModified</span>()                      <span class="hljs-comment">// true</span>
+doc.<span class="hljs-title function_">isModified</span>(<span class="hljs-string">&#x27;documents&#x27;</span>)           <span class="hljs-comment">// true</span>
+doc.<span class="hljs-title function_">isModified</span>(<span class="hljs-string">&#x27;documents.0.title&#x27;</span>)   <span class="hljs-comment">// true</span>
+doc.<span class="hljs-title function_">isModified</span>(<span class="hljs-string">&#x27;documents otherProp&#x27;</span>) <span class="hljs-comment">// true</span>
+doc.<span class="hljs-title function_">isDirectModified</span>(<span class="hljs-string">&#x27;documents&#x27;</span>)     <span class="hljs-comment">// false</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-isNew"><a href="#document_Document-isNew"><code>Document.prototype.isNew</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#document_Document-$isNew">$isNew</a></span></li></ul><div><p>Legacy alias for <code>$isNew</code>.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-isSelected"><a href="#document_Document-isSelected"><code>Document.prototype.isSelected()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String|Array[String]&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Checks if <code>path</code> was selected in the source query which initialized this document.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Thing</span>.<span class="hljs-title function_">findOne</span>().<span class="hljs-title function_">select</span>(<span class="hljs-string">&#x27;name&#x27;</span>);
+doc.<span class="hljs-title function_">isSelected</span>(<span class="hljs-string">&#x27;name&#x27;</span>) <span class="hljs-comment">// true</span>
+doc.<span class="hljs-title function_">isSelected</span>(<span class="hljs-string">&#x27;age&#x27;</span>)  <span class="hljs-comment">// false</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-markModified"><a href="#document_Document-markModified"><code>Document.prototype.markModified()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> the path to mark modified</p>
+</li><li class="param"><code>[scope]</code>
+<span class="method-type">&laquo;Document&raquo;</span> the scope to run validators with</p>
+</li></ul><div><p>Marks the path as having pending changes to write to the db.</p>
+<p><em>Very helpful when using <a href="https://mongoosejs.com/docs/schematypes.html#mixed">Mixed</a> types.</em></p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>doc.<span class="hljs-property">mixed</span>.<span class="hljs-property">type</span> = <span class="hljs-string">&#x27;changed&#x27;</span>;
+doc.<span class="hljs-title function_">markModified</span>(<span class="hljs-string">&#x27;mixed.type&#x27;</span>);
+doc.<span class="hljs-title function_">save</span>() <span class="hljs-comment">// changes to mixed.type are now persisted</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-modifiedPaths"><a href="#document_Document-modifiedPaths"><code>Document.prototype.modifiedPaths()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.includeChildren=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if true, returns children of modified paths as well. For example, if false, the list of modified paths for <code>doc.colors = { primary: &#39;blue&#39; };</code> will <strong>not</strong> contain <code>colors.primary</code>. If true, <code>modifiedPaths()</code> will return an array that contains <code>colors.primary</code>.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array[String]&raquo;</span> </li></ul><div><p>Returns the list of paths that have been modified.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-overwrite"><a href="#document_Document-overwrite"><code>Document.prototype.overwrite()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>obj</code>
+<span class="method-type">&laquo;Object&raquo;</span> the object to overwrite this document with</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> this</li></ul><div><p>Overwrite all values in this document with the values of <code>obj</code>, except
+for immutable properties. Behaves similarly to <code>set()</code>, except for it
+unsets all properties that aren&#39;t in <code>obj</code>.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-parent"><a href="#document_Document-parent"><code>Document.prototype.parent()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> </li></ul><div><p>If this document is a subdocument or populated document, returns the document&#39;s
+parent. Returns the original document if there is no parent.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-populate"><a href="#document_Document-populate"><code>Document.prototype.populate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String|Object|Array&raquo;</span> either the path to populate or an object specifying all parameters, or either an array of those</p>
+</li><li class="param"><code>[select]</code>
+<span class="method-type">&laquo;Object|String&raquo;</span> Field selection for the population query</p>
+</li><li class="param"><code>[model]</code>
+<span class="method-type">&laquo;Model&raquo;</span> The model you wish to use for population. If not specified, populate will look up the model by the name in the Schema&#39;s <code>ref</code> field.</p>
+</li><li class="param"><code>[match]</code>
+<span class="method-type">&laquo;Object&raquo;</span> Conditions for the population query</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> Options for the population query (sort, etc)</p>
+</li><ul style="margin-top: 0.5em"><li><code>[options.path=null]</code>
+<span class="method-type">&laquo;String&raquo;</span> The path to populate.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.populate=null]</code>
+<span class="method-type">&laquo;string|PopulateOptions&raquo;</span> Recursively populate paths in the populated documents. See <a href="/docs/populate.html#deep-populate">deep populate docs</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.retainNullValues=false]</code>
+<span class="method-type">&laquo;boolean&raquo;</span> by default, Mongoose removes null and undefined values from populated arrays. Use this option to make <code>populate()</code> retain <code>null</code> and <code>undefined</code> array entries.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.getters=false]</code>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, Mongoose will call any getters defined on the <code>localField</code>. By default, Mongoose gets the raw value of <code>localField</code>. For example, you would need to set this option to <code>true</code> if you wanted to <a href="/docs/schematypes.html#schematype-options">add a <code>lowercase</code> getter to your <code>localField</code></a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.clone=false]</code>
+<span class="method-type">&laquo;boolean&raquo;</span> When you do <code>BlogPost.find().populate(&#39;author&#39;)</code>, blog posts with the same author will share 1 copy of an <code>author</code> doc. Enable this option to make Mongoose clone populated docs before assigning them.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.match=null]</code>
+<span class="method-type">&laquo;Object|Function&raquo;</span> Add an additional filter to the populate query. Can be a filter object containing <a href="https://www.mongodb.com/docs/manual/tutorial/query-documents/">MongoDB query syntax</a>, or a function that returns a filter object.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.transform=null]</code>
+<span class="method-type">&laquo;Function&raquo;</span> Function that Mongoose will call on every populated document that allows you to transform the populated document.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.options=null]</code>
+<span class="method-type">&laquo;Object&raquo;</span> Additional options like <code>limit</code> and <code>lean</code>.</p>
+</li></ul><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> Callback</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise,null&raquo;</span> Returns a Promise if no <code>callback</code> is given.</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/populate.html">population</a></span></li><li><span class="method-type"><a href="#query_Query-select">Query#select</a></span></li><li><span class="method-type"><a href="#model_Model-populate">Model.populate</a></span></li></ul><div><p>Populates paths on an existing document.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// Given a document, `populate()` lets you pull in referenced docs</span>
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">populate</span>([
+  <span class="hljs-string">&#x27;stories&#x27;</span>,
+  { <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;fans&#x27;</span>, <span class="hljs-attr">sort</span>: { <span class="hljs-attr">name</span>: -<span class="hljs-number">1</span> } }
+]);
+doc.<span class="hljs-title function_">populated</span>(<span class="hljs-string">&#x27;stories&#x27;</span>); <span class="hljs-comment">// Array of ObjectIds</span>
+doc.<span class="hljs-property">stories</span>[<span class="hljs-number">0</span>].<span class="hljs-property">title</span>; <span class="hljs-comment">// &#x27;Casino Royale&#x27;</span>
+doc.<span class="hljs-title function_">populated</span>(<span class="hljs-string">&#x27;fans&#x27;</span>); <span class="hljs-comment">// Array of ObjectIds</span>
+
+<span class="hljs-comment">// If the referenced doc has been deleted, `populate()` will</span>
+<span class="hljs-comment">// remove that entry from the array.</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Story</span>.<span class="hljs-title function_">delete</span>({ <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Casino Royale&#x27;</span> });
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;stories&#x27;</span>); <span class="hljs-comment">// Empty array</span>
+
+<span class="hljs-comment">// You can also pass additional query options to `populate()`,</span>
+<span class="hljs-comment">// like projections:</span>
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;fans&#x27;</span>, <span class="hljs-string">&#x27;-email&#x27;</span>);
+doc.<span class="hljs-property">fans</span>[<span class="hljs-number">0</span>].<span class="hljs-property">email</span> <span class="hljs-comment">// undefined because of 2nd param `select`</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-populated"><a href="#document_Document-populated"><code>Document.prototype.populated()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>[val]</code>
+<span class="method-type">&laquo;Any&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array,ObjectId,Number,Buffer,String,undefined,void&raquo;</span> </li></ul><div><p>Gets _id(s) used during population of the given <code>path</code>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findOne</span>().<span class="hljs-title function_">populate</span>(<span class="hljs-string">&#x27;author&#x27;</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(doc.<span class="hljs-property">author</span>.<span class="hljs-property">name</span>); <span class="hljs-comment">// Dr.Seuss</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(doc.<span class="hljs-title function_">populated</span>(<span class="hljs-string">&#x27;author&#x27;</span>)); <span class="hljs-comment">// &#x27;5144cf8050f071d979c118a7&#x27;</span>
+</code></pre>
+<p>If the path was not populated, returns <code>undefined</code>.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-replaceOne"><a href="#document_Document-replaceOne"><code>Document.prototype.replaceOne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>doc</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-replaceOne">Model.replaceOne</a></span></li></ul><div><p>Sends a replaceOne command with this document <code>_id</code> as the query selector.</p>
+<h4 id="valid-options">
+      <a href="#valid-options">
+        Valid options:
+      </a>
+    </h4>
+<ul>
+<li>same as in <a href="https://mongoosejs.com/docs/api/model.html#model_Model-replaceOne">Model.replaceOne</a></li>
+</ul>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-save"><a href="#document_Document-save"><code>Document.prototype.save()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> options optional options</p>
+</li><ul style="margin-top: 0.5em"><li><code>[options.session=null]</code>
+<span class="method-type">&laquo;Session&raquo;</span> the <a href="https://www.mongodb.com/docs/manual/reference/server-sessions/">session</a> associated with this save operation. If not specified, defaults to the <a href="#document_Document-$session">document&#39;s associated session</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.safe]</code>
+<span class="method-type">&laquo;Object&raquo;</span> (DEPRECATED) overrides <a href="https://mongoosejs.com//docs/guide.html#safe">schema&#39;s safe option</a>. Use the <code>w</code> option instead.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.validateBeforeSave]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> set to false to save without validating.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.validateModifiedOnly=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If <code>true</code>, Mongoose will only validate modified paths, as opposed to modified paths and <code>required</code> paths.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.w]</code>
+<span class="method-type">&laquo;Number|String&raquo;</span> set the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#w-option">write concern</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a></p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.j]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> set to true for MongoDB to wait until this <code>save()</code> has been <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#j-option">journaled before resolving the returned promise</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a></p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.wtimeout]</code>
+<span class="method-type">&laquo;Number&raquo;</span> sets a <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#wtimeout">timeout for the write concern</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.checkKeys=true]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> the MongoDB driver prevents you from saving keys that start with &#39;$&#39; or contain &#39;.&#39; by default. Set this option to <code>false</code> to skip that check. See <a href="https://www.mongodb.com/docs/manual/reference/limits/#Restrictions-on-Field-Names">restrictions on field names</a></p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=true]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if <code>false</code> and <a href="/docs/guide.html#timestamps">timestamps</a> are enabled, skip timestamps for this <code>save()</code>.</p>
+</li></ul><li class="param"><code>[fn]</code>
+<span class="method-type">&laquo;Function&raquo;</span> optional callback</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise,undefined,void&raquo;</span> Returns undefined if used with callback or a Promise otherwise.</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongoosejs.com/docs/middleware.html">middleware</a></span></li></ul><div><p>Saves this document by inserting a new document into the database if <a href="#document_Document-isNew">document.isNew</a> is <code>true</code>,
+or sends an <a href="#document_Document-updateOne">updateOne</a> operation <strong>only</strong> with the modifications to the database, it does not replace the whole document in the latter case.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>product.<span class="hljs-property">sold</span> = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>();
+product = <span class="hljs-keyword">await</span> product.<span class="hljs-title function_">save</span>();
+</code></pre>
+<p>If save is successful, the returned promise will fulfill with the document
+saved.</p>
+<h4 id="example-1">
+      <a href="#example-1">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> newProduct = <span class="hljs-keyword">await</span> product.<span class="hljs-title function_">save</span>();
+newProduct === product; <span class="hljs-comment">// true</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-schema"><a href="#document_Document-schema"><code>Document.prototype.schema</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The document&#39;s schema.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-set"><a href="#document_Document-set"><code>Document.prototype.set()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String|Object&raquo;</span> path or object of key/vals to set</p>
+</li><li class="param"><code>val</code>
+<span class="method-type">&laquo;Any&raquo;</span> the value to set</p>
+</li><li class="param"><code>[type]</code>
+<span class="method-type">&laquo;Schema|String|Number|Buffer|[object Object]&raquo;</span> optionally specify a type for &quot;on-the-fly&quot; attributes</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> optionally specify options that modify the behavior of the set</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> this</li></ul><div><p>Sets the value of a path, or many paths.
+Alias for <a href="#document_Document-$set"><code>.$set</code></a>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// path, value</span>
+doc.<span class="hljs-title function_">set</span>(path, value)
+
+<span class="hljs-comment">// object</span>
+doc.<span class="hljs-title function_">set</span>({
+    path  : value
+  , path2 : {
+       path  : value
+    }
+})
+
+<span class="hljs-comment">// on-the-fly cast to number</span>
+doc.<span class="hljs-title function_">set</span>(path, value, <span class="hljs-title class_">Number</span>)
+
+<span class="hljs-comment">// on-the-fly cast to string</span>
+doc.<span class="hljs-title function_">set</span>(path, value, <span class="hljs-title class_">String</span>)
+
+<span class="hljs-comment">// changing strict mode behavior</span>
+doc.<span class="hljs-title function_">set</span>(path, value, { <span class="hljs-attr">strict</span>: <span class="hljs-literal">false</span> });
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-toJSON"><a href="#document_Document-toJSON"><code>Document.prototype.toJSON()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>options</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.flattenMaps=true]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if true, convert Maps to <a href="https://masteringjs.io/tutorials/fundamentals/pojo">POJOs</a>. Useful if you want to <code>JSON.stringify()</code> the result.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#document_Document-toObject">Document#toObject</a></span></li><li><span class="method-type"><a href="https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript.html">JSON.stringify() in JavaScript</a></span></li></ul><div><p>The return value of this method is used in calls to <a href="https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript#the-tojson-function"><code>JSON.stringify(doc)</code></a>.</p>
+<p>This method accepts the same options as <a href="#document_Document-toObject">Document#toObject</a>. To apply the options to every document of your schema by default, set your <a href="#schema_Schema">schemas</a> <code>toJSON</code> option to the same argument.</p>
+<pre><code>schema.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;toJSON&#x27;</span>, { <span class="hljs-attr">virtuals</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+<p>There is one difference between <code>toJSON()</code> and <code>toObject()</code> options.
+When you call <code>toJSON()</code>, the <a href="./document.html#document_Document-toObject"><code>flattenMaps</code> option</a> defaults to <code>true</code>, because <code>JSON.stringify()</code> doesn&#39;t convert maps to objects by default.
+When you call <code>toObject()</code>, the <code>flattenMaps</code> option is <code>false</code> by default.</p>
+<p>See <a href="/docs/guide.html#toJSON">schema options</a> for more information on setting <code>toJSON</code> option defaults.</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-toObject"><a href="#document_Document-toObject"><code>Document.prototype.toObject()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.getters=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if true, apply all getters, including virtuals</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.virtuals=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if true, apply virtuals, including aliases. Use <code>{ getters: true, virtuals: false }</code> to just apply getters, not virtuals</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.aliases=true]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if <code>options.virtuals = true</code>, you can set <code>options.aliases = false</code> to skip applying aliases. This option is a no-op if <code>options.virtuals = false</code>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.minimize=true]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if true, omit any empty objects from the output</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.transform=null]</code>
+<span class="method-type">&laquo;Function|null&raquo;</span> if set, mongoose will call this function to allow you to transform the returned object</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.depopulate=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if true, replace any conventionally populated paths with the original id in the output. Has no affect on virtual populated paths.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.versionKey=true]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if false, exclude the version key (<code>__v</code> by default) from the output</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.flattenMaps=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if true, convert Maps to POJOs. Useful if you want to <code>JSON.stringify()</code> the result of <code>toObject()</code>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.useProjection=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> <ul>
+<li>If true, omits fields that are excluded in this document&#39;s projection. Unless you specified a projection, this will omit any field that has <code>select: false</code> in the schema.</li>
+</ul>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> js object (not a POJO)</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Binary.html">mongodb.Binary</a></span></li></ul><div><p>Converts this document into a plain-old JavaScript object (<a href="https://masteringjs.io/tutorials/fundamentals/pojo">POJO</a>).</p>
+<p>Buffers are converted to instances of <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Binary.html">mongodb.Binary</a> for proper storage.</p>
+<h4 id="gettersvirtuals">
+      <a href="#gettersvirtuals">
+        Getters/Virtuals
+      </a>
+    </h4>
+<p>Example of only applying path getters</p>
+<pre><code>doc.<span class="hljs-title function_">toObject</span>({ <span class="hljs-attr">getters</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">virtuals</span>: <span class="hljs-literal">false</span> })
+</code></pre>
+<p>Example of only applying virtual getters</p>
+<pre><code>doc.<span class="hljs-title function_">toObject</span>({ <span class="hljs-attr">virtuals</span>: <span class="hljs-literal">true</span> })
+</code></pre>
+<p>Example of applying both path and virtual getters</p>
+<pre><code>doc.<span class="hljs-title function_">toObject</span>({ <span class="hljs-attr">getters</span>: <span class="hljs-literal">true</span> })
+</code></pre>
+<p>To apply these options to every document of your schema by default, set your <a href="#schema_Schema">schemas</a> <code>toObject</code> option to the same argument.</p>
+<pre><code>schema.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;toObject&#x27;</span>, { <span class="hljs-attr">virtuals</span>: <span class="hljs-literal">true</span> })
+</code></pre>
+<h4 id="transform">
+      <a href="#transform">
+        Transform:
+      </a>
+    </h4>
+<p>We may need to perform a transformation of the resulting object based on some criteria, say to remove some sensitive information or return a custom object. In this case we set the optional <code>transform</code> function.</p>
+<p>Transform functions receive three arguments</p>
+<pre><code><span class="hljs-keyword">function</span> (<span class="hljs-params">doc, ret, options</span>) {}
+</code></pre>
+<ul>
+<li><code>doc</code> The mongoose document which is being converted</li>
+<li><code>ret</code> The plain object representation which has been converted</li>
+<li><code>options</code> The options in use (either schema options or the options passed inline)</li>
+</ul>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// specify the transform schema option</span>
+<span class="hljs-keyword">if</span> (!schema.<span class="hljs-property">options</span>.<span class="hljs-property">toObject</span>) schema.<span class="hljs-property">options</span>.<span class="hljs-property">toObject</span> = {};
+schema.<span class="hljs-property">options</span>.<span class="hljs-property">toObject</span>.<span class="hljs-property">transform</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">doc, ret, options</span>) {
+  <span class="hljs-comment">// remove the _id of every document before returning the result</span>
+  <span class="hljs-keyword">delete</span> ret.<span class="hljs-property">_id</span>;
+  <span class="hljs-keyword">return</span> ret;
+}
+
+<span class="hljs-comment">// without the transformation in the schema</span>
+doc.<span class="hljs-title function_">toObject</span>(); <span class="hljs-comment">// { _id: &#x27;anId&#x27;, name: &#x27;Wreck-it Ralph&#x27; }</span>
+
+<span class="hljs-comment">// with the transformation</span>
+doc.<span class="hljs-title function_">toObject</span>(); <span class="hljs-comment">// { name: &#x27;Wreck-it Ralph&#x27; }</span>
+</code></pre>
+<p>With transformations we can do a lot more than remove properties. We can even return completely new customized objects:</p>
+<pre><code><span class="hljs-keyword">if</span> (!schema.<span class="hljs-property">options</span>.<span class="hljs-property">toObject</span>) schema.<span class="hljs-property">options</span>.<span class="hljs-property">toObject</span> = {};
+schema.<span class="hljs-property">options</span>.<span class="hljs-property">toObject</span>.<span class="hljs-property">transform</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">doc, ret, options</span>) {
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">movie</span>: ret.<span class="hljs-property">name</span> }
+}
+
+<span class="hljs-comment">// without the transformation in the schema</span>
+doc.<span class="hljs-title function_">toObject</span>(); <span class="hljs-comment">// { _id: &#x27;anId&#x27;, name: &#x27;Wreck-it Ralph&#x27; }</span>
+
+<span class="hljs-comment">// with the transformation</span>
+doc.<span class="hljs-title function_">toObject</span>(); <span class="hljs-comment">// { movie: &#x27;Wreck-it Ralph&#x27; }</span>
+</code></pre>
+<p><em>Note: if a transform function returns <code>undefined</code>, the return value will be ignored.</em></p>
+<p>Transformations may also be applied inline, overridding any transform set in the options:</p>
+<pre><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">xform</span> (doc, ret, options) {
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">inline</span>: ret.<span class="hljs-property">name</span>, <span class="hljs-attr">custom</span>: <span class="hljs-literal">true</span> }
+}
+
+<span class="hljs-comment">// pass the transform as an inline option</span>
+doc.<span class="hljs-title function_">toObject</span>({ <span class="hljs-attr">transform</span>: xform }); <span class="hljs-comment">// { inline: &#x27;Wreck-it Ralph&#x27;, custom: true }</span>
+</code></pre>
+<p>If you want to skip transformations, use <code>transform: false</code>:</p>
+<pre><code>schema.<span class="hljs-property">options</span>.<span class="hljs-property">toObject</span>.<span class="hljs-property">hide</span> = <span class="hljs-string">&#x27;_id&#x27;</span>;
+schema.<span class="hljs-property">options</span>.<span class="hljs-property">toObject</span>.<span class="hljs-property">transform</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">doc, ret, options</span>) {
+  <span class="hljs-keyword">if</span> (options.<span class="hljs-property">hide</span>) {
+    options.<span class="hljs-property">hide</span>.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27; &#x27;</span>).<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">prop</span>) {
+      <span class="hljs-keyword">delete</span> ret[prop];
+    });
+  }
+  <span class="hljs-keyword">return</span> ret;
+}
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Doc</span>({ <span class="hljs-attr">_id</span>: <span class="hljs-string">&#x27;anId&#x27;</span>, <span class="hljs-attr">secret</span>: <span class="hljs-number">47</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Wreck-it Ralph&#x27;</span> });
+doc.<span class="hljs-title function_">toObject</span>();                                        <span class="hljs-comment">// { secret: 47, name: &#x27;Wreck-it Ralph&#x27; }</span>
+doc.<span class="hljs-title function_">toObject</span>({ <span class="hljs-attr">hide</span>: <span class="hljs-string">&#x27;secret _id&#x27;</span>, <span class="hljs-attr">transform</span>: <span class="hljs-literal">false</span> });<span class="hljs-comment">// { _id: &#x27;anId&#x27;, secret: 47, name: &#x27;Wreck-it Ralph&#x27; }</span>
+doc.<span class="hljs-title function_">toObject</span>({ <span class="hljs-attr">hide</span>: <span class="hljs-string">&#x27;secret _id&#x27;</span>, <span class="hljs-attr">transform</span>: <span class="hljs-literal">true</span> }); <span class="hljs-comment">// { name: &#x27;Wreck-it Ralph&#x27; }</span>
+</code></pre>
+<p>If you pass a transform in <code>toObject()</code> options, Mongoose will apply the transform
+to <a href="/docs/subdocs.html">subdocuments</a> in addition to the top-level document.
+Similarly, <code>transform: false</code> skips transforms for all subdocuments.
+Note that this behavior is different for transforms defined in the schema:
+if you define a transform in <code>schema.options.toObject.transform</code>, that transform
+will <strong>not</strong> apply to subdocuments.</p>
+<pre><code><span class="hljs-keyword">const</span> memberSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">email</span>: <span class="hljs-title class_">String</span> });
+<span class="hljs-keyword">const</span> groupSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">members</span>: [memberSchema], <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, email });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Group</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Group&#x27;</span>, groupSchema);
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Group</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Engineering&#x27;</span>,
+  <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;dev@mongoosejs.io&#x27;</span>,
+  <span class="hljs-attr">members</span>: [{ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Val&#x27;</span>, <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;val@mongoosejs.io&#x27;</span> }]
+});
+
+<span class="hljs-comment">// Removes `email` from both top-level document **and** array elements</span>
+<span class="hljs-comment">// { name: &#x27;Engineering&#x27;, members: [{ name: &#x27;Val&#x27; }] }</span>
+doc.<span class="hljs-title function_">toObject</span>({ <span class="hljs-attr">transform</span>: <span class="hljs-function">(<span class="hljs-params">doc, ret</span>) =&gt;</span> { <span class="hljs-keyword">delete</span> ret.<span class="hljs-property">email</span>; <span class="hljs-keyword">return</span> ret; } });
+</code></pre>
+<p>Transforms, like all of these options, are also available for <code>toJSON</code>. See <a href="https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript.html">this guide to <code>JSON.stringify()</code></a> to learn why <code>toJSON()</code> and <code>toObject()</code> are separate functions.</p>
+<p>See <a href="/docs/guide.html#toObject">schema options</a> for some more details.</p>
+<p><em>During save, no custom options are applied to the document before being sent to the database.</em></p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-toString"><a href="#document_Document-toString"><code>Document.prototype.toString()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;String&raquo;</span> </li></ul><div><p>Helper for console.log</p>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-unmarkModified"><a href="#document_Document-unmarkModified"><code>Document.prototype.unmarkModified()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> the path to unmark modified</p>
+</li></ul><div><p>Clears the modified state on the specified path.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>doc.<span class="hljs-property">foo</span> = <span class="hljs-string">&#x27;bar&#x27;</span>;
+doc.<span class="hljs-title function_">unmarkModified</span>(<span class="hljs-string">&#x27;foo&#x27;</span>);
+doc.<span class="hljs-title function_">save</span>(); <span class="hljs-comment">// changes to foo will not be persisted</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-update"><a href="#document_Document-update"><code>Document.prototype.update()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>...ops</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-update">Model.update</a></span></li></ul><div><p>Sends an update command with this document <code>_id</code> as the query selector.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>weirdCar.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">$inc</span>: { <span class="hljs-attr">wheels</span>:<span class="hljs-number">1</span> } }, { <span class="hljs-attr">w</span>: <span class="hljs-number">1</span> }, callback);
+</code></pre>
+<h4 id="valid-options">
+      <a href="#valid-options">
+        Valid options:
+      </a>
+    </h4>
+<ul>
+<li>same as in <a href="#model_Model-update">Model.update</a></li>
+</ul>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-updateOne"><a href="#document_Document-updateOne"><code>Document.prototype.updateOne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>doc</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="https://mongoosejs.com/docs/api/query.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
+</li><ul style="margin-top: 0.5em"><li><code>[options.lean]</code>
+<span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api/query.html#query_Query-lean"><code>Query.lean()</code></a> and the <a href="/docs/tutorials/lean.html">Mongoose lean tutorial</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
+<span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="https://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
+</li></ul><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#model_Model-updateOne">Model.updateOne</a></span></li></ul><div><p>Sends an updateOne command with this document <code>_id</code> as the query selector.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>weirdCar.<span class="hljs-title function_">updateOne</span>({<span class="hljs-attr">$inc</span>: {<span class="hljs-attr">wheels</span>:<span class="hljs-number">1</span>}}, { <span class="hljs-attr">w</span>: <span class="hljs-number">1</span> }, callback);
+</code></pre>
+<h4 id="valid-options">
+      <a href="#valid-options">
+        Valid options:
+      </a>
+    </h4>
+<ul>
+<li>same as in <a href="#model_Model-updateOne">Model.updateOne</a></li>
+</ul>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-validate"><a href="#document_Document-validate"><code>Document.prototype.validate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[pathsToValidate]</code>
+<span class="method-type">&laquo;Array|String&raquo;</span> list of paths to validate. If set, Mongoose will validate only the modified paths that are in the given list.</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> internal options</p>
+</li><ul style="margin-top: 0.5em"><li><code>[options.validateModifiedOnly=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> if <code>true</code> mongoose validates only modified paths.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.pathsToSkip]</code>
+<span class="method-type">&laquo;Array|string&raquo;</span> list of paths to skip. If set, Mongoose will validate every modified path that is not in this list.</p>
+</li></ul><li class="param"><code>[callback]</code>
+<span class="method-type">&laquo;Function&raquo;</span> optional callback called after validation completes, passing an error if one occurred</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> Returns a Promise if no <code>callback</code> is given.</li></ul><div><p>Executes registered validation rules for this document.</p>
+<h4 id="note">
+      <a href="#note">
+        Note:
+      </a>
+    </h4>
+<p>This method is called <code>pre</code> save and if a validation rule is violated, <a href="#model_Model-save">save</a> is aborted and the error is returned to your <code>callback</code>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>doc.<span class="hljs-title function_">validate</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) {
+  <span class="hljs-keyword">if</span> (err) <span class="hljs-title function_">handleError</span>(err);
+  <span class="hljs-keyword">else</span> <span class="hljs-comment">// validation passed</span>
+});
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="document_Document-validateSync"><a href="#document_Document-validateSync"><code>Document.prototype.validateSync()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[pathsToValidate]</code>
+<span class="method-type">&laquo;Array|string&raquo;</span> only validate the given paths</p>
+</li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> options for validation</p>
+</li><ul style="margin-top: 0.5em"><li><code>[options.validateModifiedOnly=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If <code>true</code>, Mongoose will only validate modified paths, as opposed to modified paths and <code>required</code> paths.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.pathsToSkip]</code>
+<span class="method-type">&laquo;Array|string&raquo;</span> list of paths to skip. If set, Mongoose will validate every modified path that is not in this list.</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;ValidationError,undefined,void&raquo;</span> ValidationError if there are errors during validation, or undefined if there is no error.</li></ul><div><p>Executes registered validation rules (skipping asynchronous validators) for this document.</p>
+<h4 id="note">
+      <a href="#note">
+        Note:
+      </a>
+    </h4>
+<p>This method is useful if you need synchronous validation.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> err = doc.<span class="hljs-title function_">validateSync</span>();
+<span class="hljs-keyword">if</span> (err) {
+  <span class="hljs-title function_">handleError</span>(err);
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-comment">// validation passed</span>
+}
+</code></pre>
+  </div></div></div></div><div id="jobs"><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/6.x/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/6.x/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/6.x/docs/js/mobile-navbar-toggle.js"></script></div></body></html>

@@ -1,0 +1,645 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.10.3: Schematype</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/6.x/docs/css/github.css"><link rel="stylesheet" href="/docs/6.x/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><script src="/docs/js/api-bold-current-nav.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.10.3</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs">Version 7.x</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x">Version 6.10.3</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.16</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/6.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/schematype.js" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h1>Schematype</h1><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"><div id="native-direct"></div><script>(function() {
+if (typeof _bsa !== 'undefined' && _bsa) {
+_bsa.init('custom', 'CK7DT53U', 'placement:mongoosejscom',
+{
+target: '#native-direct',
+template: `
+<div class="native-inline">
+<a rel="sponsored noopener" target="_blank" href="##statlink##" title="##company## — ##tagline##"><span class="sponsor">Sponsor</span> ##company## — ##description##</a>
+</div>
+</a>
+`
+}
+);
+}
+})();</script><div class="api-nav"><div class="api-nav-content"><div class="nav-item" id="nav-Mongoose"><div class="nav-item-title"><a href="mongoose.html">Mongoose</a></div></div><div class="nav-item" id="nav-Schema"><div class="nav-item-title"><a href="schema.html">Schema</a></div></div><div class="nav-item" id="nav-Connection"><div class="nav-item-title"><a href="connection.html">Connection</a></div></div><div class="nav-item" id="nav-Document"><div class="nav-item-title"><a href="document.html">Document</a></div></div><div class="nav-item" id="nav-Model"><div class="nav-item-title"><a href="model.html">Model</a></div></div><div class="nav-item" id="nav-Query"><div class="nav-item-title"><a href="query.html">Query</a></div></div><div class="nav-item" id="nav-QueryCursor"><div class="nav-item-title"><a href="querycursor.html">QueryCursor</a></div></div><div class="nav-item" id="nav-Aggregate"><div class="nav-item-title"><a href="aggregate.html">Aggregate</a></div></div><div class="nav-item" id="nav-AggregationCursor"><div class="nav-item-title"><a href="aggregationcursor.html">AggregationCursor</a></div></div><div class="nav-item" id="nav-Schematype"><div class="nav-item-title" style="font-weight: bold"><a href="schematype.html">Schematype</a></div><ul class="nav-item-sub"><li><a href="#schematype_SchemaType"><code>SchemaType()</code></a></li><li><a href="#schematype_SchemaType-cast"><code>SchemaType.cast()</code></a></li><li><a href="#schematype_SchemaType-checkRequired"><code>SchemaType.checkRequired()</code></a></li><li><a href="#schematype_SchemaType-get"><code>SchemaType.get()</code></a></li><li><a href="#schematype_SchemaType-cast"><code>SchemaType.prototype.cast()</code></a></li><li><a href="#schematype_SchemaType-castFunction"><code>SchemaType.prototype.castFunction()</code></a></li><li><a href="#schematype_SchemaType-default"><code>SchemaType.prototype.default()</code></a></li><li><a href="#schematype_SchemaType-doValidate"><code>SchemaType.prototype.doValidate()</code></a></li><li><a href="#schematype_SchemaType-get"><code>SchemaType.prototype.get()</code></a></li><li><a href="#schematype_SchemaType-immutable"><code>SchemaType.prototype.immutable()</code></a></li><li><a href="#schematype_SchemaType-index"><code>SchemaType.prototype.index()</code></a></li><li><a href="#schematype_SchemaType-isRequired"><code>SchemaType.prototype.isRequired</code></a></li><li><a href="#schematype_SchemaType-path"><code>SchemaType.prototype.path</code></a></li><li><a href="#schematype_SchemaType-ref"><code>SchemaType.prototype.ref()</code></a></li><li><a href="#schematype_SchemaType-required"><code>SchemaType.prototype.required()</code></a></li><li><a href="#schematype_SchemaType-select"><code>SchemaType.prototype.select()</code></a></li><li><a href="#schematype_SchemaType-set"><code>SchemaType.prototype.set()</code></a></li><li><a href="#schematype_SchemaType-sparse"><code>SchemaType.prototype.sparse()</code></a></li><li><a href="#schematype_SchemaType-text"><code>SchemaType.prototype.text()</code></a></li><li><a href="#schematype_SchemaType-transform"><code>SchemaType.prototype.transform()</code></a></li><li><a href="#schematype_SchemaType-unique"><code>SchemaType.prototype.unique()</code></a></li><li><a href="#schematype_SchemaType-validate"><code>SchemaType.prototype.validate()</code></a></li><li><a href="#schematype_SchemaType-validators"><code>SchemaType.prototype.validators</code></a></li><li><a href="#schematype_SchemaType-set"><code>SchemaType.set()</code></a></li></ul></div><div class="nav-item" id="nav-Virtualtype"><div class="nav-item-title"><a href="virtualtype.html">Virtualtype</a></div></div><div class="nav-item" id="nav-Error"><div class="nav-item-title"><a href="error.html">Error</a></div></div><div class="nav-item" id="nav-SchemaArray"><div class="nav-item-title"><a href="schemaarray.html">SchemaArray</a></div></div><div class="nav-item" id="nav-DocumentArrayPath"><div class="nav-item-title"><a href="documentarraypath.html">DocumentArrayPath</a></div></div><div class="nav-item" id="nav-SubdocumentPath"><div class="nav-item-title"><a href="subdocumentpath.html">SubdocumentPath</a></div></div><div class="nav-item" id="nav-MongooseDocumentArray"><div class="nav-item-title"><a href="mongoosedocumentarray.html">MongooseDocumentArray</a></div></div><div class="nav-item" id="nav-Subdocument"><div class="nav-item-title"><a href="subdocument.html">Subdocument</a></div></div><div class="nav-item" id="nav-ArraySubdocument"><div class="nav-item-title"><a href="arraysubdocument.html">ArraySubdocument</a></div></div><div class="nav-item" id="nav-Buffer"><div class="nav-item-title"><a href="buffer.html">Buffer</a></div></div><div class="nav-item" id="nav-Decimal128"><div class="nav-item-title"><a href="decimal128.html">Decimal128</a></div></div><div class="nav-item" id="nav-Map"><div class="nav-item-title"><a href="map.html">Map</a></div></div></div></div><div class="api-content"><ul><li><a href="#schematype_SchemaType"><code>SchemaType()</code></a></li><li><a href="#schematype_SchemaType-cast"><code>SchemaType.cast()</code></a></li><li><a href="#schematype_SchemaType-checkRequired"><code>SchemaType.checkRequired()</code></a></li><li><a href="#schematype_SchemaType-get"><code>SchemaType.get()</code></a></li><li><a href="#schematype_SchemaType-cast"><code>SchemaType.prototype.cast()</code></a></li><li><a href="#schematype_SchemaType-castFunction"><code>SchemaType.prototype.castFunction()</code></a></li><li><a href="#schematype_SchemaType-default"><code>SchemaType.prototype.default()</code></a></li><li><a href="#schematype_SchemaType-doValidate"><code>SchemaType.prototype.doValidate()</code></a></li><li><a href="#schematype_SchemaType-get"><code>SchemaType.prototype.get()</code></a></li><li><a href="#schematype_SchemaType-immutable"><code>SchemaType.prototype.immutable()</code></a></li><li><a href="#schematype_SchemaType-index"><code>SchemaType.prototype.index()</code></a></li><li><a href="#schematype_SchemaType-isRequired"><code>SchemaType.prototype.isRequired</code></a></li><li><a href="#schematype_SchemaType-path"><code>SchemaType.prototype.path</code></a></li><li><a href="#schematype_SchemaType-ref"><code>SchemaType.prototype.ref()</code></a></li><li><a href="#schematype_SchemaType-required"><code>SchemaType.prototype.required()</code></a></li><li><a href="#schematype_SchemaType-select"><code>SchemaType.prototype.select()</code></a></li><li><a href="#schematype_SchemaType-set"><code>SchemaType.prototype.set()</code></a></li><li><a href="#schematype_SchemaType-sparse"><code>SchemaType.prototype.sparse()</code></a></li><li><a href="#schematype_SchemaType-text"><code>SchemaType.prototype.text()</code></a></li><li><a href="#schematype_SchemaType-transform"><code>SchemaType.prototype.transform()</code></a></li><li><a href="#schematype_SchemaType-unique"><code>SchemaType.prototype.unique()</code></a></li><li><a href="#schematype_SchemaType-validate"><code>SchemaType.prototype.validate()</code></a></li><li><a href="#schematype_SchemaType-validators"><code>SchemaType.prototype.validators</code></a></li><li><a href="#schematype_SchemaType-set"><code>SchemaType.set()</code></a></li></ul><hr class="separate-api-elements"><h3 id="schematype_SchemaType"><a href="#schematype_SchemaType"><code>SchemaType()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
+<span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;SchemaTypeOptions&raquo;</span> See <a href="/docs/api/schematypeoptions.html">SchemaTypeOptions docs</a></p>
+</li><li class="param"><code>[instance]</code>
+<span class="method-type">&laquo;String&raquo;</span> </li></ul><div><p>SchemaType constructor. Do <strong>not</strong> instantiate <code>SchemaType</code> directly.
+Mongoose converts your schema paths into SchemaTypes automatically.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>) <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">SchemaType</span>; <span class="hljs-comment">// true</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-cast"><a href="#schematype_SchemaType-cast"><code>SchemaType.cast()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>caster</code>
+<span class="method-type">&laquo;Function|false&raquo;</span> Function that casts arbitrary values to this type, or throws an error if casting failed</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Function&raquo;</span> </li></ul><div><p>Get/set the function used to cast arbitrary values to this type.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// Disallow `null` for numbers, and don&#x27;t try to cast any values to</span>
+<span class="hljs-comment">// numbers, so even strings like &#x27;123&#x27; will cause a CastError.</span>
+mongoose.<span class="hljs-property">Number</span>.<span class="hljs-title function_">cast</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) {
+  assert.<span class="hljs-title function_">ok</span>(v === <span class="hljs-literal">undefined</span> || <span class="hljs-keyword">typeof</span> v === <span class="hljs-string">&#x27;number&#x27;</span>);
+  <span class="hljs-keyword">return</span> v;
+});
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-checkRequired"><a href="#schematype_SchemaType-checkRequired"><code>SchemaType.checkRequired()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[fn]</code>
+<span class="method-type">&laquo;Function&raquo;</span> If set, will overwrite the current set function</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Function&raquo;</span> The input <code>fn</code> or the already set function</li></ul><div><p>Set &amp; Get the <code>checkRequired</code> function
+Override the function the required validator uses to check whether a value
+passes the <code>required</code> check. Override this on the individual SchemaType.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// Use this to allow empty strings to pass the `required` validator</span>
+mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">String</span>.<span class="hljs-title function_">checkRequired</span>(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> <span class="hljs-keyword">typeof</span> v === <span class="hljs-string">&#x27;string&#x27;</span>);
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-get"><a href="#schematype_SchemaType-get"><code>SchemaType.get()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>getter</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;this&raquo;</span> </li></ul><div><p>Attaches a getter for all instances of this schema type.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// Make all numbers round down</span>
+mongoose.<span class="hljs-property">Number</span>.<span class="hljs-title function_">get</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) { <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(v); });
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-cast"><a href="#schematype_SchemaType-cast"><code>SchemaType.prototype.cast()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>value</code>
+<span class="method-type">&laquo;Object&raquo;</span> value to cast</p>
+</li><li class="param"><code>doc</code>
+<span class="method-type">&laquo;Document&raquo;</span> document that triggers the casting</p>
+</li><li class="param"><code>init</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>The function that Mongoose calls to cast arbitrary values to this SchemaType.</p>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-castFunction"><a href="#schematype_SchemaType-castFunction"><code>SchemaType.prototype.castFunction()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>caster</code>
+<span class="method-type">&laquo;Function|false&raquo;</span> Function that casts arbitrary values to this type, or throws an error if casting failed</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Function&raquo;</span> </li></ul><div><p>Get/set the function used to cast arbitrary values to this particular schematype instance.
+Overrides <code>SchemaType.cast()</code>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// Disallow `null` for numbers, and don&#x27;t try to cast any values to</span>
+<span class="hljs-comment">// numbers, so even strings like &#x27;123&#x27; will cause a CastError.</span>
+<span class="hljs-keyword">const</span> number = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Number</span>(<span class="hljs-string">&#x27;mypath&#x27;</span>, {});
+number.<span class="hljs-title function_">cast</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) {
+  assert.<span class="hljs-title function_">ok</span>(v === <span class="hljs-literal">undefined</span> || <span class="hljs-keyword">typeof</span> v === <span class="hljs-string">&#x27;number&#x27;</span>);
+  <span class="hljs-keyword">return</span> v;
+});
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-default"><a href="#schematype_SchemaType-default"><code>SchemaType.prototype.default()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>val</code>
+<span class="method-type">&laquo;Function|any&raquo;</span> The default value to set</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Any,undefined,void&raquo;</span> Returns the set default value.</li></ul><div><p>Sets a default value for this SchemaType.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">n</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>, <span class="hljs-attr">default</span>: <span class="hljs-number">10</span> })
+<span class="hljs-keyword">const</span> M = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;M&#x27;</span>, schema)
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> M;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(m.<span class="hljs-property">n</span>) <span class="hljs-comment">// 10</span>
+</code></pre>
+<p>Defaults can be either <code>functions</code> which return the value to use as the default or the literal value itself. Either way, the value will be cast based on its schema type before being set during document creation.</p>
+<h4 id="example-1">
+      <a href="#example-1">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// values are cast:</span>
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">aNumber</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>, <span class="hljs-attr">default</span>: <span class="hljs-number">4.815162342</span> }})
+<span class="hljs-keyword">const</span> M = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;M&#x27;</span>, schema)
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> M;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(m.<span class="hljs-property">aNumber</span>) <span class="hljs-comment">// 4.815162342</span>
+
+<span class="hljs-comment">// default unique objects for Mixed types:</span>
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">mixed</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">Mixed</span> });
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;mixed&#x27;</span>).<span class="hljs-title function_">default</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> {};
+});
+
+<span class="hljs-comment">// if we don&#x27;t use a function to return object literals for Mixed defaults,</span>
+<span class="hljs-comment">// each document will receive a reference to the same object literal creating</span>
+<span class="hljs-comment">// a &quot;shared&quot; object instance:</span>
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">mixed</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">Mixed</span> });
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;mixed&#x27;</span>).<span class="hljs-title function_">default</span>({});
+<span class="hljs-keyword">const</span> M = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;M&#x27;</span>, schema);
+<span class="hljs-keyword">const</span> m1 = <span class="hljs-keyword">new</span> M;
+m1.<span class="hljs-property">mixed</span>.<span class="hljs-property">added</span> = <span class="hljs-number">1</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(m1.<span class="hljs-property">mixed</span>); <span class="hljs-comment">// { added: 1 }</span>
+<span class="hljs-keyword">const</span> m2 = <span class="hljs-keyword">new</span> M;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(m2.<span class="hljs-property">mixed</span>); <span class="hljs-comment">// { added: 1 }</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-doValidate"><a href="#schematype_SchemaType-doValidate"><code>SchemaType.prototype.doValidate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>value</code>
+<span class="method-type">&laquo;Any&raquo;</span> </li><li class="param"><code>callback</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li><li class="param"><code>scope</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.path]</code>
+<span class="method-type">&laquo;String&raquo;</span> </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Any&raquo;</span> If no validators, returns the output from calling <code>fn</code>, otherwise no return</li></ul><div><p>Performs a validation of <code>value</code> using the validators declared for this SchemaType.</p>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-get"><a href="#schematype_SchemaType-get"><code>SchemaType.prototype.get()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fn</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Adds a getter to this schematype.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">dob</span> (val) {
+  <span class="hljs-keyword">if</span> (!val) <span class="hljs-keyword">return</span> val;
+  <span class="hljs-keyword">return</span> (val.<span class="hljs-title function_">getMonth</span>() + <span class="hljs-number">1</span>) + <span class="hljs-string">&quot;/&quot;</span> + val.<span class="hljs-title function_">getDate</span>() + <span class="hljs-string">&quot;/&quot;</span> + val.<span class="hljs-title function_">getFullYear</span>();
+}
+
+<span class="hljs-comment">// defining within the schema</span>
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">born</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Date</span>, <span class="hljs-attr">get</span>: dob })
+
+<span class="hljs-comment">// or by retreiving its SchemaType</span>
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">born</span>: <span class="hljs-title class_">Date</span> })
+s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;born&#x27;</span>).<span class="hljs-title function_">get</span>(dob)
+</code></pre>
+<p>Getters allow you to transform the representation of the data as it travels from the raw mongodb document to the value that you see.</p>
+<p>Suppose you are storing credit card numbers and you want to hide everything except the last 4 digits to the mongoose user. You can do so by defining a getter in the following way:</p>
+<pre><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">obfuscate</span> (cc) {
+  <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;****-****-****-&#x27;</span> + cc.<span class="hljs-title function_">slice</span>(cc.<span class="hljs-property">length</span>-<span class="hljs-number">4</span>, cc.<span class="hljs-property">length</span>);
+}
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">AccountSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">creditCardNumber</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">get</span>: obfuscate }
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Account</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Account&#x27;</span>, <span class="hljs-title class_">AccountSchema</span>);
+
+<span class="hljs-title class_">Account</span>.<span class="hljs-title function_">findById</span>(id, <span class="hljs-keyword">function</span> (<span class="hljs-params">err, found</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(found.<span class="hljs-property">creditCardNumber</span>); <span class="hljs-comment">// &#x27;****-****-****-1234&#x27;</span>
+});
+</code></pre>
+<p>Getters are also passed a second argument, the schematype on which the getter was defined. This allows for tailored behavior based on options passed in the schema.</p>
+<pre><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">inspector</span> (val, priorValue, schematype) {
+  <span class="hljs-keyword">if</span> (schematype.<span class="hljs-property">options</span>.<span class="hljs-property">required</span>) {
+    <span class="hljs-keyword">return</span> schematype.<span class="hljs-property">path</span> + <span class="hljs-string">&#x27; is required&#x27;</span>;
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">return</span> schematype.<span class="hljs-property">path</span> + <span class="hljs-string">&#x27; is not&#x27;</span>;
+  }
+}
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">VirusSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">get</span>: inspector },
+  <span class="hljs-attr">taxonomy</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">get</span>: inspector }
+})
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Virus</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Virus&#x27;</span>, <span class="hljs-title class_">VirusSchema</span>);
+
+<span class="hljs-title class_">Virus</span>.<span class="hljs-title function_">findById</span>(id, <span class="hljs-keyword">function</span> (<span class="hljs-params">err, virus</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(virus.<span class="hljs-property">name</span>);     <span class="hljs-comment">// name is required</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(virus.<span class="hljs-property">taxonomy</span>); <span class="hljs-comment">// taxonomy is not</span>
+})
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-immutable"><a href="#schematype_SchemaType-immutable"><code>SchemaType.prototype.immutable()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>bool</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/document.html#document_Document-isNew">isNew</a></span></li></ul><div><p>Defines this path as immutable. Mongoose prevents you from changing
+immutable paths unless the parent document has <a href="/docs/api/document.html#document_Document-isNew"><code>isNew: true</code></a>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">immutable</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span>
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Model</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test&#x27;</span> });
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findOne</span>();
+
+doc.<span class="hljs-property">isNew</span>; <span class="hljs-comment">// false</span>
+doc.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;new name&#x27;</span>;
+doc.<span class="hljs-property">name</span>; <span class="hljs-comment">// &#x27;test&#x27;, because `name` is immutable</span>
+</code></pre>
+<p>Mongoose also prevents changing immutable properties using <code>updateOne()</code>
+and <code>updateMany()</code> based on <a href="/docs/guide.html#strict">strict mode</a>.</p>
+<h4 id="example-1">
+      <a href="#example-1">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// Mongoose will strip out the `name` update, because `name` is immutable</span>
+<span class="hljs-title class_">Model</span>.<span class="hljs-title function_">updateOne</span>({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test2&#x27;</span> }, <span class="hljs-attr">$inc</span>: { <span class="hljs-attr">age</span>: <span class="hljs-number">1</span> } });
+
+<span class="hljs-comment">// If `strict` is set to &#x27;throw&#x27;, Mongoose will throw an error if you</span>
+<span class="hljs-comment">// update `name`</span>
+<span class="hljs-keyword">const</span> err = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">updateOne</span>({}, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test2&#x27;</span> }, { <span class="hljs-attr">strict</span>: <span class="hljs-string">&#x27;throw&#x27;</span> }).
+  <span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span>, <span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> err);
+err.<span class="hljs-property">name</span>; <span class="hljs-comment">// StrictModeError</span>
+
+<span class="hljs-comment">// If `strict` is `false`, Mongoose allows updating `name` even though</span>
+<span class="hljs-comment">// the property is immutable.</span>
+<span class="hljs-title class_">Model</span>.<span class="hljs-title function_">updateOne</span>({}, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test2&#x27;</span> }, { <span class="hljs-attr">strict</span>: <span class="hljs-literal">false</span> });
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-index"><a href="#schematype_SchemaType-index"><code>SchemaType.prototype.index()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>options</code>
+<span class="method-type">&laquo;Object|Boolean|String|Number&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Declares the index options for this schematype.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">index</span>: <span class="hljs-literal">true</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">index</span>: -<span class="hljs-number">1</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">loc</span>: { <span class="hljs-attr">type</span>: [<span class="hljs-title class_">Number</span>], <span class="hljs-attr">index</span>: <span class="hljs-string">&#x27;hashed&#x27;</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">loc</span>: { <span class="hljs-attr">type</span>: [<span class="hljs-title class_">Number</span>], <span class="hljs-attr">index</span>: <span class="hljs-string">&#x27;2d&#x27;</span>, <span class="hljs-attr">sparse</span>: <span class="hljs-literal">true</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">loc</span>: { <span class="hljs-attr">type</span>: [<span class="hljs-title class_">Number</span>], <span class="hljs-attr">index</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;2dsphere&#x27;</span>, <span class="hljs-attr">sparse</span>: <span class="hljs-literal">true</span> }})
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">date</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Date</span>, <span class="hljs-attr">index</span>: { <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">expires</span>: <span class="hljs-string">&#x27;1d&#x27;</span> }})
+s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;my.path&#x27;</span>).<span class="hljs-title function_">index</span>(<span class="hljs-literal">true</span>);
+s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;my.date&#x27;</span>).<span class="hljs-title function_">index</span>({ <span class="hljs-attr">expires</span>: <span class="hljs-number">60</span> });
+s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;my.path&#x27;</span>).<span class="hljs-title function_">index</span>({ <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">sparse</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4 id="note">
+      <a href="#note">
+        Note:
+      </a>
+    </h4>
+<p><em>Indexes are created <a href="https://www.mongodb.com/docs/manual/core/index-creation/#index-creation-background">in the background</a>
+by default. If <code>background</code> is set to <code>false</code>, MongoDB will not execute any
+read/write operations you send until the index build.
+Specify <code>background: false</code> to override Mongoose&#39;s default.</em></p>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-isRequired"><a href="#schematype_SchemaType-isRequired"><code>SchemaType.prototype.isRequired</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>True if this SchemaType has a required validator. False otherwise.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> } });
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-property">isRequired</span>; <span class="hljs-comment">// true</span>
+
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).required(<span class="hljs-literal">false</span>);
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-property">isRequired</span>; <span class="hljs-comment">// false</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-path"><a href="#schematype_SchemaType-path"><code>SchemaType.prototype.path</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The path to this SchemaType in a Schema.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-property">path</span>; <span class="hljs-comment">// &#x27;name&#x27;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-ref"><a href="#schematype_SchemaType-ref"><code>SchemaType.prototype.ref()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>ref</code>
+<span class="method-type">&laquo;String|Model|Function&raquo;</span> either a model name, a <a href="https://mongoosejs.com/docs/models.html">Model</a>, or a function that returns a model name or model.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Set the model that this path refers to. This is the option that <a href="https://mongoosejs.com/docs/populate.html">populate</a>
+looks at to determine the foreign collection it should query.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema);
+
+<span class="hljs-keyword">const</span> postSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">user</span>: mongoose.<span class="hljs-property">ObjectId</span> });
+postSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;user&#x27;</span>).<span class="hljs-title function_">ref</span>(<span class="hljs-string">&#x27;User&#x27;</span>); <span class="hljs-comment">// Can set ref to a model name</span>
+postSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;user&#x27;</span>).<span class="hljs-title function_">ref</span>(<span class="hljs-title class_">User</span>); <span class="hljs-comment">// Or a model class</span>
+postSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;user&#x27;</span>).<span class="hljs-title function_">ref</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-string">&#x27;User&#x27;</span>); <span class="hljs-comment">// Or a function that returns the model name</span>
+postSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;user&#x27;</span>).<span class="hljs-title function_">ref</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title class_">User</span>); <span class="hljs-comment">// Or a function that returns the model class</span>
+
+<span class="hljs-comment">// Or you can just declare the `ref` inline in your schema</span>
+<span class="hljs-keyword">const</span> postSchema2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">user</span>: { <span class="hljs-attr">type</span>: mongoose.<span class="hljs-property">ObjectId</span>, <span class="hljs-attr">ref</span>: <span class="hljs-title class_">User</span> }
+});
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-required"><a href="#schematype_SchemaType-required"><code>SchemaType.prototype.required()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>required</code>
+<span class="method-type">&laquo;Boolean|Function|Object&raquo;</span> enable/disable the validator, or function that returns required boolean, or options object</p>
+</li><ul style="margin-top: 0.5em"><li><code>[options.isRequired]</code>
+<span class="method-type">&laquo;Boolean|Function&raquo;</span> enable/disable the validator, or function that returns required boolean</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[options.ErrorConstructor]</code>
+<span class="method-type">&laquo;Function&raquo;</span> custom error constructor. The constructor receives 1 parameter, an object containing the validator properties.</p>
+</li></ul><li class="param"><code>[message]</code>
+<span class="method-type">&laquo;String&raquo;</span> optional custom error message</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#error_messages_MongooseError-messages">Customized Error Messages</a></span></li><li><span class="method-type"><a href="#schema_array_SchemaArray-checkRequired">SchemaArray#checkRequired</a></span></li><li><span class="method-type"><a href="#schema_boolean_SchemaBoolean-checkRequired">SchemaBoolean#checkRequired</a></span></li><li><span class="method-type"><a href="#schema_buffer_SchemaBuffer-schemaName">SchemaBuffer#checkRequired</a></span></li><li><span class="method-type"><a href="#schema_number_SchemaNumber-min">SchemaNumber#checkRequired</a></span></li><li><span class="method-type"><a href="#schema_objectid_ObjectId-auto">SchemaObjectId#checkRequired</a></span></li><li><span class="method-type"><a href="#schema_string_SchemaString-checkRequired">SchemaString#checkRequired</a></span></li></ul><div><p>Adds a required validator to this SchemaType. The validator gets added
+to the front of this SchemaType&#39;s validators array using <code>unshift()</code>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">born</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Date</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> })
+
+<span class="hljs-comment">// or with custom error message</span>
+
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">born</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Date</span>, <span class="hljs-attr">required</span>: <span class="hljs-string">&#x27;{PATH} is required!&#x27;</span> })
+
+<span class="hljs-comment">// or with a function</span>
+
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">userId</span>: <span class="hljs-title class_">ObjectId</span>,
+  <span class="hljs-attr">username</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">required</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) { <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">userId</span> != <span class="hljs-literal">null</span>; }
+  }
+})
+
+<span class="hljs-comment">// or with a function and a custom message</span>
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">userId</span>: <span class="hljs-title class_">ObjectId</span>,
+  <span class="hljs-attr">username</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">required</span>: [
+      <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) { <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">userId</span> != <span class="hljs-literal">null</span>; },
+      <span class="hljs-string">&#x27;username is required if id is specified&#x27;</span>
+    ]
+  }
+})
+
+<span class="hljs-comment">// or through the path API</span>
+
+s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).required(<span class="hljs-literal">true</span>);
+
+<span class="hljs-comment">// with custom error messaging</span>
+
+s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).required(<span class="hljs-literal">true</span>, <span class="hljs-string">&#x27;grrr :( &#x27;</span>);
+
+<span class="hljs-comment">// or make a path conditionally required based on a function</span>
+<span class="hljs-keyword">const</span> isOver18 = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) { <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">age</span> &gt;= <span class="hljs-number">18</span>; };
+s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;voterRegistrationId&#x27;</span>).required(isOver18);
+</code></pre>
+<p>The required validator uses the SchemaType&#39;s <code>checkRequired</code> function to
+determine whether a given value satisfies the required validator. By default,
+a value satisfies the required validator if <code>val != null</code> (that is, if
+the value is not null nor undefined). However, most built-in mongoose schema
+types override the default <code>checkRequired</code> function:</p>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-select"><a href="#schematype_SchemaType-select"><code>SchemaType.prototype.select()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>val</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Sets default <code>select()</code> behavior for this path.</p>
+<p>Set to <code>true</code> if this path should always be included in the results, <code>false</code> if it should be excluded by default. This setting can be overridden at the query level.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code>T = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;T&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">x</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">select</span>: <span class="hljs-literal">true</span> }}));
+T.<span class="hljs-title function_">find</span>(..); <span class="hljs-comment">// field x will always be selected ..</span>
+<span class="hljs-comment">// .. unless overridden;</span>
+T.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">select</span>(<span class="hljs-string">&#x27;-x&#x27;</span>).<span class="hljs-title function_">exec</span>(callback);
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-set"><a href="#schematype_SchemaType-set"><code>SchemaType.prototype.set()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fn</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Adds a setter to this schematype.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">capitalize</span> (val) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> val !== <span class="hljs-string">&#x27;string&#x27;</span>) val = <span class="hljs-string">&#x27;&#x27;</span>;
+  <span class="hljs-keyword">return</span> val.<span class="hljs-title function_">charAt</span>(<span class="hljs-number">0</span>).<span class="hljs-title function_">toUpperCase</span>() + val.<span class="hljs-title function_">substring</span>(<span class="hljs-number">1</span>);
+}
+
+<span class="hljs-comment">// defining within the schema</span>
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">set</span>: capitalize }});
+
+<span class="hljs-comment">// or with the SchemaType</span>
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> })
+s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">set</span>(capitalize);
+</code></pre>
+<p>Setters allow you to transform the data before it gets to the raw mongodb
+document or query.</p>
+<p>Suppose you are implementing user registration for a website. Users provide
+an email and password, which gets saved to mongodb. The email is a string
+that you will want to normalize to lower case, in order to avoid one email
+having more than one account -- e.g., otherwise, <a href="mailto:&#x61;&#x76;&#101;&#x6e;&#x75;&#x65;&#x40;&#113;&#46;&#x63;&#111;&#x6d;">&#x61;&#x76;&#101;&#x6e;&#x75;&#x65;&#x40;&#113;&#46;&#x63;&#111;&#x6d;</a> can be registered for 2 accounts via <a href="mailto:&#x61;&#x76;&#x65;&#x6e;&#x75;&#101;&#x40;&#113;&#46;&#x63;&#111;&#109;">&#x61;&#x76;&#x65;&#x6e;&#x75;&#101;&#x40;&#113;&#46;&#x63;&#111;&#109;</a> and <a href="mailto:&#x41;&#118;&#x45;&#x6e;&#85;&#101;&#x40;&#81;&#x2e;&#67;&#111;&#77;">&#x41;&#118;&#x45;&#x6e;&#85;&#101;&#x40;&#81;&#x2e;&#67;&#111;&#77;</a>.</p>
+<p>You can set up email lower case normalization easily via a Mongoose setter.</p>
+<pre><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">toLower</span>(<span class="hljs-params">v</span>) {
+  <span class="hljs-keyword">return</span> v.<span class="hljs-title function_">toLowerCase</span>();
+}
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">UserSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">email</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">set</span>: toLower }
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, <span class="hljs-title class_">UserSchema</span>);
+
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>({<span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;AVENUE@Q.COM&#x27;</span>});
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(user.<span class="hljs-property">email</span>); <span class="hljs-comment">// &#x27;avenue@q.com&#x27;</span>
+
+<span class="hljs-comment">// or</span>
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>();
+user.<span class="hljs-property">email</span> = <span class="hljs-string">&#x27;Avenue@Q.com&#x27;</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(user.<span class="hljs-property">email</span>); <span class="hljs-comment">// &#x27;avenue@q.com&#x27;</span>
+<span class="hljs-title class_">User</span>.<span class="hljs-title function_">updateOne</span>({ <span class="hljs-attr">_id</span>: _id }, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;AVENUE@Q.COM&#x27;</span> } }); <span class="hljs-comment">// update to &#x27;avenue@q.com&#x27;</span>
+</code></pre>
+<p>As you can see above, setters allow you to transform the data before it
+stored in MongoDB, or before executing a query.</p>
+<p><em>NOTE: we could have also just used the built-in <code>lowercase: true</code> SchemaType option instead of defining our own function.</em></p>
+<pre><code><span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">email</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">lowercase</span>: <span class="hljs-literal">true</span> }})
+</code></pre>
+<p>Setters are also passed a second argument, the schematype on which the setter was defined. This allows for tailored behavior based on options passed in the schema.</p>
+<pre><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">inspector</span> (val, priorValue, schematype) {
+  <span class="hljs-keyword">if</span> (schematype.<span class="hljs-property">options</span>.<span class="hljs-property">required</span>) {
+    <span class="hljs-keyword">return</span> schematype.<span class="hljs-property">path</span> + <span class="hljs-string">&#x27; is required&#x27;</span>;
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">return</span> val;
+  }
+}
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">VirusSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">set</span>: inspector },
+  <span class="hljs-attr">taxonomy</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">set</span>: inspector }
+})
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Virus</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Virus&#x27;</span>, <span class="hljs-title class_">VirusSchema</span>);
+<span class="hljs-keyword">const</span> v = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Virus</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Parvoviridae&#x27;</span>, <span class="hljs-attr">taxonomy</span>: <span class="hljs-string">&#x27;Parvovirinae&#x27;</span> });
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(v.<span class="hljs-property">name</span>);     <span class="hljs-comment">// name is required</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(v.<span class="hljs-property">taxonomy</span>); <span class="hljs-comment">// Parvovirinae</span>
+</code></pre>
+<p>You can also use setters to modify other properties on the document. If
+you&#39;re setting a property <code>name</code> on a document, the setter will run with
+<code>this</code> as the document. Be careful, in mongoose 5 setters will also run
+when querying by <code>name</code> with <code>this</code> as the query.</p>
+<pre><code><span class="hljs-keyword">const</span> nameSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">keywords</span>: [<span class="hljs-title class_">String</span>] });
+nameSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">set</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) {
+  <span class="hljs-comment">// Need to check if `this` is a document, because in mongoose 5</span>
+  <span class="hljs-comment">// setters will also run on queries, in which case `this` will be a</span>
+  <span class="hljs-comment">// mongoose query object.</span>
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Document</span> &amp;&amp; v != <span class="hljs-literal">null</span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">keywords</span> = v.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27; &#x27;</span>);
+  }
+  <span class="hljs-keyword">return</span> v;
+});
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-sparse"><a href="#schematype_SchemaType-sparse"><code>SchemaType.prototype.sparse()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>bool</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Declares a sparse index.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">sparse</span>: <span class="hljs-literal">true</span> } });
+s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">index</span>({ <span class="hljs-attr">sparse</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-text"><a href="#schematype_SchemaType-text"><code>SchemaType.prototype.text()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>bool</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Declares a full text index.</p>
+<h3 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h3>
+<pre><code> <span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ name : { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, text : <span class="hljs-literal">true</span> } })
+ s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">index</span>({ text : <span class="hljs-literal">true</span> });
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-transform"><a href="#schematype_SchemaType-transform"><code>SchemaType.prototype.transform()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fn</code>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Defines a custom function for transforming this path when converting a document to JSON.</p>
+<p>Mongoose calls this function with one parameter: the current <code>value</code> of the path. Mongoose
+then uses the return value in the JSON output.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">date</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Date</span>, <span class="hljs-attr">transform</span>: <span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> v.<span class="hljs-title function_">getFullYear</span>() }
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Model</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">date</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>(<span class="hljs-string">&#x27;2016-06-01&#x27;</span>) });
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findOne</span>();
+
+doc.<span class="hljs-property">date</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Date</span>; <span class="hljs-comment">// true</span>
+
+doc.<span class="hljs-title function_">toJSON</span>().<span class="hljs-property">date</span>; <span class="hljs-comment">// 2016 as a number</span>
+<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(doc); <span class="hljs-comment">// &#x27;{&quot;_id&quot;:...,&quot;date&quot;:2016}&#x27;</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-unique"><a href="#schematype_SchemaType-unique"><code>SchemaType.prototype.unique()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>bool</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Declares an unique index.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> } });
+s.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">index</span>({ <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+<p><em>NOTE: violating the constraint returns an <code>E11000</code> error from MongoDB when saving, not a Mongoose validation error.</em></p>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-validate"><a href="#schematype_SchemaType-validate"><code>SchemaType.prototype.validate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>obj</code>
+<span class="method-type">&laquo;RegExp|Function|Object&raquo;</span> validator function, or hash describing options</p>
+</li><ul style="margin-top: 0.5em"><li><code>[obj.validator]</code>
+<span class="method-type">&laquo;Function&raquo;</span> validator function. If the validator function returns <code>undefined</code> or a truthy value, validation succeeds. If it returns <a href="https://masteringjs.io/tutorials/fundamentals/falsy">falsy</a> (except <code>undefined</code>) or throws an error, validation fails.</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[obj.message]</code>
+<span class="method-type">&laquo;String|Function&raquo;</span> optional error message. If function, should return the error message as a string</p>
+</li></ul><ul style="margin-top: 0.5em"><li><code>[obj.propsParameter=false]</code>
+<span class="method-type">&laquo;Boolean&raquo;</span> If true, Mongoose will pass the validator properties object (with the <code>validator</code> function, <code>message</code>, etc.) as the 2nd arg to the validator function. This is disabled by default because many validators <a href="https://github.com/chriso/validator.js#validators">rely on positional args</a>, so turning this on may cause unpredictable behavior in external validators.</p>
+</li></ul><li class="param"><code>[errorMsg]</code>
+<span class="method-type">&laquo;String|Function&raquo;</span> optional error message. If function, should return the error message as a string</p>
+</li><li class="param"><code>[type]</code>
+<span class="method-type">&laquo;String&raquo;</span> optional validator type</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Adds validator(s) for this document path.</p>
+<p>Validators always receive the value to validate as their first argument and
+must return <code>Boolean</code>. Returning <code>false</code> or throwing an error means
+validation failed.</p>
+<p>The error message argument is optional. If not passed, the <a href="#error_messages_MongooseError-messages">default generic error message template</a> will be used.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// make sure every value is equal to &quot;something&quot;</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">validator</span> (val) {
+  <span class="hljs-keyword">return</span> val === <span class="hljs-string">&#x27;something&#x27;</span>;
+}
+<span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">validate</span>: validator }});
+
+<span class="hljs-comment">// with a custom error message</span>
+
+<span class="hljs-keyword">const</span> custom = [validator, <span class="hljs-string">&#x27;Uh oh, {PATH} does not equal &quot;something&quot;.&#x27;</span>]
+<span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">validate</span>: custom }});
+
+<span class="hljs-comment">// adding many validators at a time</span>
+
+<span class="hljs-keyword">const</span> many = [
+    { <span class="hljs-attr">validator</span>: validator, <span class="hljs-attr">msg</span>: <span class="hljs-string">&#x27;uh oh&#x27;</span> }
+  , { <span class="hljs-attr">validator</span>: anotherValidator, <span class="hljs-attr">msg</span>: <span class="hljs-string">&#x27;failed&#x27;</span> }
+]
+<span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">validate</span>: many }});
+
+<span class="hljs-comment">// or utilizing SchemaType methods directly:</span>
+
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;string&#x27;</span> });
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">validate</span>(validator, <span class="hljs-string">&#x27;validation of `{PATH}` failed with value `{VALUE}`&#x27;</span>);
+</code></pre>
+<h4 id="error-message-templates">
+      <a href="#error-message-templates">
+        Error message templates:
+      </a>
+    </h4>
+<p>From the examples above, you may have noticed that error messages support
+basic templating. There are a few other template keywords besides <code>{PATH}</code>
+and <code>{VALUE}</code> too. To find out more, details are available
+<a href="#error_messages_MongooseError-messages">here</a>.</p>
+<p>If Mongoose&#39;s built-in error message templating isn&#39;t enough, Mongoose
+supports setting the <code>message</code> property to a function.</p>
+<pre><code>schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">validate</span>({
+  <span class="hljs-attr">validator</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) { <span class="hljs-keyword">return</span> v.<span class="hljs-property">length</span> &gt; <span class="hljs-number">5</span>; },
+  <span class="hljs-comment">// `errors[&#x27;name&#x27;]` will be &quot;name must have length 5, got &#x27;foo&#x27;&quot;</span>
+  <span class="hljs-attr">message</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">props</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${props.path}</span> must have length 5, got &#x27;<span class="hljs-subst">${props.value}</span>&#x27;`</span>;
+  }
+});
+</code></pre>
+<p>To bypass Mongoose&#39;s error messages and just copy the error message that
+the validator throws, do this:</p>
+<pre><code>schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">validate</span>({
+  <span class="hljs-attr">validator</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) { <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;Oops!&#x27;</span>); },
+  <span class="hljs-comment">// `errors[&#x27;name&#x27;]` will be &quot;Oops!&quot;</span>
+  <span class="hljs-attr">message</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">props</span>) { <span class="hljs-keyword">return</span> props.<span class="hljs-property">reason</span>.<span class="hljs-property">message</span>; }
+});
+</code></pre>
+<h4 id="asynchronous-validation">
+      <a href="#asynchronous-validation">
+        Asynchronous validation:
+      </a>
+    </h4>
+<p>Mongoose supports validators that return a promise. A validator that returns
+a promise is called an <em>async validator</em>. Async validators run in
+parallel, and <code>validate()</code> will wait until all async validators have settled.</p>
+<pre><code>schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">validate</span>({
+  <span class="hljs-attr">validator</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">value</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">resolve, reject</span>) {
+      <span class="hljs-title function_">resolve</span>(<span class="hljs-literal">false</span>); <span class="hljs-comment">// validation failed</span>
+    });
+  }
+});
+</code></pre>
+<p>You might use asynchronous validators to retreive other documents from the database to validate against or to meet other I/O bound validation needs.</p>
+<p>Validation occurs <code>pre(&#39;save&#39;)</code> or whenever you manually execute <a href="#document_Document-validate">document#validate</a>.</p>
+<p>If validation fails during <code>pre(&#39;save&#39;)</code> and no callback was passed to receive the error, an <code>error</code> event will be emitted on your Models associated db <a href="#connection_Connection">connection</a>, passing the validation error object along.</p>
+<pre><code><span class="hljs-keyword">const</span> conn = mongoose.<span class="hljs-title function_">createConnection</span>(..);
+conn.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, handleError);
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Product</span> = conn.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Product&#x27;</span>, yourSchema);
+<span class="hljs-keyword">const</span> dvd = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Product</span>(..);
+dvd.<span class="hljs-title function_">save</span>(); <span class="hljs-comment">// emits error on the `conn` above</span>
+</code></pre>
+<p>If you want to handle these errors at the Model level, add an <code>error</code>
+listener to your Model as shown below.</p>
+<pre><code><span class="hljs-comment">// registering an error listener on the Model lets us handle errors more locally</span>
+<span class="hljs-title class_">Product</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, handleError);
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-validators"><a href="#schematype_SchemaType-validators"><code>SchemaType.prototype.validators</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The validators that Mongoose should run to validate properties at this SchemaType&#39;s path.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> } });
+schema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-property">validators</span>.<span class="hljs-property">length</span>; <span class="hljs-comment">// 1, the `required` validator</span>
+</code></pre>
+  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-set"><a href="#schematype_SchemaType-set"><code>SchemaType.set()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>option</code>
+<span class="method-type">&laquo;String&raquo;</span> The name of the option you&#39;d like to set (e.g. trim, lowercase, etc...)</p>
+</li><li class="param"><code>value</code>
+<span class="method-type">&laquo;Any&raquo;</span> The value of the option you&#39;d like to set.</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;void,void&raquo;</span> </li></ul><div><p>Sets a default option for this schema type.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-comment">// Make all strings be trimmed by default</span>
+mongoose.<span class="hljs-property">SchemaTypes</span>.<span class="hljs-property">String</span>.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;trim&#x27;</span>, <span class="hljs-literal">true</span>);
+</code></pre>
+  </div></div></div></div><div id="jobs"><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/6.x/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/6.x/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/6.x/docs/js/mobile-navbar-toggle.js"></script></div></body></html>

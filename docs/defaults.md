@@ -1,4 +1,4 @@
-## Defaults
+# Defaults
 
 ### Declaring Defaults in Your Schema
 

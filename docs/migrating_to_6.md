@@ -1,4 +1,4 @@
-## Migrating from 5.x to 6.x
+# Migrating from 5.x to 6.x
 
 <style>
   ul > li {

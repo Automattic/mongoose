@@ -1,4 +1,4 @@
-## Change Streams
+# Change Streams
 
 [Change streams](https://www.mongodb.com/developer/languages/javascript/nodejs-change-streams-triggers/) let you listen for updates to documents in a given model's collection, or even documents in an entire database.
 Unlike [middleware](middleware.html), change streams are a MongoDB server construct, which means they pick up changes from anywhere.

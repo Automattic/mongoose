@@ -1,4 +1,4 @@
-## Timestamps
+# Timestamps
 
 Mongoose schemas support a `timestamps` option.
 If you set `timestamps: true`, Mongoose will add two properties of type `Date` to your schema:

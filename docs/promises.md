@@ -1,4 +1,4 @@
-## Promises
+# Promises
 
 ### Built-in Promises
 

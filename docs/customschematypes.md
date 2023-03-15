@@ -1,4 +1,4 @@
-## Custom Schema Types
+# Custom Schema Types
 
 ### Creating a Basic Custom Schema Type
 

@@ -1,4 +1,4 @@
-## Plugins
+# Plugins
 
 Schemas are pluggable, that is, they allow for applying pre-packaged capabilities to extend their functionality. This is a very powerful feature.
 

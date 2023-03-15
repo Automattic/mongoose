@@ -1,4 +1,4 @@
-## Discriminators
+# Discriminators
 
 ### The `model.discriminator()` function
 

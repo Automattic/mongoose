@@ -1,4 +1,4 @@
-## Documents
+# Documents
 
 Mongoose [documents](api/document.html) represent a one-to-one mapping
 to documents as stored in MongoDB. Each document is an instance of its

@@ -1,4 +1,4 @@
-## Migrating from 3.x to 4.x
+# Migrating from 3.x to 4.x
 
 There are several [backwards-breaking changes](https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes) to be aware of when migrating from Mongoose 3 to Mongoose 4.
 

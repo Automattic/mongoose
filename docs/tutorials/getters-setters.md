@@ -93,8 +93,7 @@ For example, the following shows how you can use `$locals` to configure the lang
 [require:getters/setters.*localization.*locale]
 ```
 
-Differences vs ES6 Getters/Setters
-----------------------------------
+## Differences vs ES6 Getters/Setters
 
 Mongoose setters are different from [ES6 setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) because they allow you to transform the value being set. With ES6 setters, you
 would need to store an internal `_email` property to use a setter. With Mongoose,

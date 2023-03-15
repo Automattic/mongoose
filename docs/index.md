@@ -113,6 +113,6 @@ await Kitten.find({ name: /^fluff/ });
 This performs a search for all documents with a name property that begins
 with "fluff" and returns the result as an array of kittens to the callback.
 
-### Congratulations
+## Congratulations
 
 That's the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the [guide](guide.html), or [API docs](api/mongoose.html) for more.

@@ -1,6 +1,6 @@
 # Custom Schema Types
 
-### Creating a Basic Custom Schema Type
+## Creating a Basic Custom Schema Type
 
 _New in Mongoose 4.4.0:_ Mongoose supports custom types. Before you
 reach for a custom type, however, know that a custom type is overkill

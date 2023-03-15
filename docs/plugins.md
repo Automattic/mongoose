@@ -9,7 +9,7 @@ Schemas are pluggable, that is, they allow for applying pre-packaged capabilitie
   <li><a href="#official">Officially Supported Plugins</a></li>
 </ul>
 
-<h3 id="example"><a href="#example">Example</a></h3>
+<h2 id="example"><a href="#example">Example</a></h2>
 
 Plugins are a tool for reusing logic in multiple schemas. Suppose you have
 several models in your database and want to add a `loadedAt` property
@@ -46,7 +46,7 @@ playerSchema.plugin(loadedAtPlugin);
 
 We just added last-modified behavior to both our `Game` and `Player` schemas and declared an index on the `lastMod` path of our Games to boot. Not bad for a few lines of code.
 
-<h3 id="global"><a href="#global">Global Plugins</a></h3>
+<h2 id="global"><a href="#global">Global Plugins</a></h2>
 
 Want to register a plugin for all schemas? The mongoose singleton has a
 `.plugin()` function that registers a plugin for every schema. For
@@ -63,7 +63,7 @@ const Game = mongoose.model('Game', gameSchema);
 const Player = mongoose.model('Player', playerSchema);
 ```
 
-<h3 id="apply-plugins-before-compiling-models"><a href="#apply-plugins-before-compiling-models">Apply Plugins Before Compiling Models</a></h3>
+<h2 id="apply-plugins-before-compiling-models"><a href="#apply-plugins-before-compiling-models">Apply Plugins Before Compiling Models</a></h2>
 
 Because many plugins rely on [middleware](middleware.html), you should make sure to apply plugins **before**
 you call `mongoose.model()` or `conn.model()`. Otherwise, [any middleware the plugin registers won't get applied](middleware.html#defining).
@@ -96,7 +96,7 @@ const Game = mongoose.model('Game', gameSchema);
 gameSchema.plugin(loadedAtPlugin);
 ```
 
-<h3 id="official"><a href="#official">Officially Supported Plugins</a></h3>
+<h2 id="official"><a href="#official">Officially Supported Plugins</a></h2>
 
 The Mongoose team maintains several plugins that add cool new features to
 Mongoose. Here's a couple:
@@ -107,7 +107,7 @@ Mongoose. Here's a couple:
 
 You can find a full list of officially supported plugins on [Mongoose's plugins search site](https://plugins.mongoosejs.io/).
 
-### Community!
+## Community!
 
 Not only can you re-use schema functionality in your own projects, but you
 also reap the benefits of the Mongoose community as well. Any plugin

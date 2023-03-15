@@ -48,7 +48,7 @@ doc.child;
   <li><a href="#altsyntaxarrays">Alternate declaration syntax for arrays</a></li>
 </ul>
 
-### What is a Subdocument?
+## What is a Subdocument?
 
 Subdocuments are similar to normal documents. Nested schemas can have
 [middleware](middleware.html), [custom validation logic](validation.html),
@@ -121,7 +121,7 @@ parentSchema.pre('save', function(next) {
 });
 ```
 
-### Subdocuments versus Nested Paths
+## Subdocuments versus Nested Paths
 
 In Mongoose, nested paths are subtly different from subdocuments.
 For example, below are two schemas: one with `child` as a subdocument,
@@ -160,7 +160,7 @@ console.log(doc2.child); // Prints 'MongooseDocument { undefined }'
 doc2.child.name = 'test'; // Works
 ```
 
-### Subdocument Defaults
+## Subdocument Defaults
 
 Subdocument paths are undefined by default, and Mongoose does
 not apply subdocument defaults unless you set the subdocument
@@ -220,7 +220,7 @@ const doc = new Subdoc();
 doc.child; // { age: 0 }
 ```
 
-### Finding a Subdocument
+## Finding a Subdocument
 
 Each subdocument has an `_id` by default. Mongoose document arrays have a
 special [id](api/mongoosedocumentarray.html#mongoosedocumentarray_MongooseDocumentArray-id) method
@@ -230,7 +230,7 @@ for searching a document array to find a document with a given `_id`.
 const doc = parent.children.id(_id);
 ```
 
-### Adding Subdocs to Arrays
+## Adding Subdocs to Arrays
 
 MongooseArray methods such as `push`, `unshift`, `addToSet`, and others cast arguments to their proper types transparently:
 
@@ -256,7 +256,7 @@ You can also create a subdocument without adding it to an array by using the [`c
 const newdoc = parent.children.create({ name: 'Aaron' });
 ```
 
-### Removing Subdocs
+## Removing Subdocs
 
 Each subdocument has its own
 [remove](api/subdocument.html#subdocument_Subdocument-remove) method. For
@@ -275,7 +275,7 @@ parent.save(function (err) {
 });
 ```
 
-<h3 id="subdoc-parents">Parents of Subdocs</h3>
+<h2 id="subdoc-parents">Parents of Subdocs</h2>
 
 Sometimes, you need to get the parent of a subdoc. You can access the
 parent using the `parent()` function.
@@ -316,7 +316,7 @@ doc.level1.level2.parent() === doc.level1; // true
 doc.level1.level2.ownerDocument() === doc; // true
 ```
 
-<h4 id="altsyntaxarrays"><a href="#altsyntaxarrays">Alternate declaration syntax for arrays</a></h4>
+<h3 id="altsyntaxarrays"><a href="#altsyntaxarrays">Alternate declaration syntax for arrays</a></h3>
 
 If you create a schema with an array of objects, Mongoose will automatically
 convert the object to a schema for you:

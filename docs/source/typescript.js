@@ -1,6 +1,7 @@
-const { mapSubDoc } = require("./utils");
+'use strict';
+const { mapSubDoc } = require('./utils');
 
 mapSubDoc('typescript', {
-    title: `Mongoose:`,
-    markdown: true
-  }, module.exports);
+  title: 'Mongoose:',
+  markdown: true
+}, module.exports);

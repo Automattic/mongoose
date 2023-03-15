@@ -437,7 +437,7 @@ module.exports = function connectionFactory() {
   conn.model('User', require('../schemas/user'));
   conn.model('PageView', require('../schemas/pageView'));
 
-  return conn; 
+  return conn;
 };
 ```
 

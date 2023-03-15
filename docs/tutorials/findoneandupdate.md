@@ -11,13 +11,13 @@ The [`findOneAndUpdate()` function in Mongoose](../api/query.html#query_Query-fi
 
 As the name implies, `findOneAndUpdate()` finds the first document that matches a given `filter`, applies an `update`, and returns the document. By default, `findOneAndUpdate()` returns the document as it was **before** `update` was applied.
 
-```javascript
+```acquit
 [require:Tutorial.*findOneAndUpdate.*basic case]
 ```
 
 You should set the `new` option to `true` to return the document **after** `update` was applied.
 
-```javascript
+```acquit
 [require:Tutorial.*findOneAndUpdate.*new option]
 ```
 
@@ -28,7 +28,7 @@ As an alternative to the `new` option, you can also use the `returnOriginal` opt
 exists for consistency with the [the MongoDB Node.js driver's `findOneAndUpdate()`](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findOneAndUpdate),
 which has the same option.
 
-```javascript
+```acquit
 [require:Tutorial.*findOneAndUpdate.*returnOriginal option]
 ```
 
@@ -38,7 +38,7 @@ With the exception of an [unindexed upsert](https://www.mongodb.com/docs/manual/
 
 For example, if you're using `save()` to update a document, the document can change in MongoDB in between when you load the document using `findOne()` and when you save the document using `save()` as show below. For many use cases, the `save()` race condition is a non-issue. But you can work around it with `findOneAndUpdate()` (or [transactions](../transactions.html)) if you need to.
 
-```javascript
+```acquit
 [require:Tutorial.*findOneAndUpdate.*save race condition]
 ```
 
@@ -46,7 +46,7 @@ For example, if you're using `save()` to update a document, the document can cha
 
 Using the `upsert` option, you can use `findOneAndUpdate()` as a find-and-[upsert](https://www.mongodb.com/docs/manual/reference/method/db.collection.update/#db.collection.update) operation. An upsert behaves like a normal `findOneAndUpdate()` if it finds a document that matches `filter`. But, if no document matches `filter`, MongoDB will insert one by combining `filter` and `update` as shown below.
 
-```javascript
+```acquit
 [require:Tutorial.*findOneAndUpdate.*upsert]
 ```
 
@@ -59,7 +59,7 @@ and check whether MongoDB upserted a new document in the same operation,
 you can set the `rawResult` flag to make Mongoose return the raw result
 from MongoDB.
 
-```javascript
+```acquit
 [require:Tutorial.*findOneAndUpdate.*rawResult$]
 ```
 

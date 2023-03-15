@@ -1,7 +1,7 @@
-
-var package = require('./../../package.json')
+'use strict';
+const pkg = require('./../../package.json');
 
 module.exports = {
-    package: package
-  , title: 'ODM'
-}
+  package: pkg,
+  title: 'ODM'
+};

@@ -49,7 +49,7 @@ describe('validation docs', function() {
     } catch (err) {
       error = err;
     }
-    
+
     assert.equal(error.errors['name'].message,
       'Path `name` is required.');
 
@@ -187,7 +187,7 @@ describe('validation docs', function() {
         err;
         --remaining || done();
         // acquit:ignore:end
-    });
+      });
 
     // You need to wait for Mongoose to finish building the `unique`
     // index before writing. You only need to build indexes once for
@@ -329,10 +329,10 @@ describe('validation docs', function() {
     let error;
     try {
       await toy.save();
-    } catch(err) {
+    } catch (err) {
       error = err;
     }
-    
+
     // `error` is a ValidationError object
     // `error.errors.color` is a ValidatorError object
     assert.equal(error.errors.color.message, 'Color `Green` not valid');
@@ -546,9 +546,6 @@ describe('validation docs', function() {
    */
 
   it('Update Validators Only Run On Updated Paths', async function() {
-    // acquit:ignore:start
-    let outstanding = 2;
-    // acquit:ignore:end
     const kittenSchema = new Schema({
       name: { type: String, required: true },
       age: Number

@@ -19,9 +19,9 @@ describe('Date Tutorial', function() {
     return mongoose.connect(start.uri);
   });
 
-  after(async () => {
+  after(async() => {
     await mongoose.disconnect();
-  })
+  });
 
   it('Example 1.2: casts strings to dates', function() {
     const user = new User({

@@ -37,7 +37,7 @@ describe('asyncIterator', function() {
   }
 
   it('supports for/await/of on a query (gh-6737)', async function() {
-    let names = [];
+    const names = [];
     for await (const doc of Movie.find().sort({ name: 1 })) {
       await wait();
       names.push(doc.name);
@@ -47,7 +47,7 @@ describe('asyncIterator', function() {
   });
 
   it('supports for/await/of on a aggregation (gh-6737)', async function() {
-    let names = [];
+    const names = [];
     for await (const doc of Movie.aggregate([{ $sort: { name: -1 } }])) {
       await wait();
       names.push(doc.name);
@@ -57,7 +57,7 @@ describe('asyncIterator', function() {
   });
 
   it('supports for/await/of on a query cursor (gh-9403)', async function() {
-    let names = [];
+    const names = [];
     const cursor = Movie.find().sort({ name: -1 }).cursor();
     for await (const doc of cursor) {
       await wait();
@@ -68,7 +68,7 @@ describe('asyncIterator', function() {
   });
 
   it('supports for/await/of on a aggregation cursor (gh-9403)', async function() {
-    let names = [];
+    const names = [];
     const cursor = Movie.aggregate([{ $sort: { name: -1 } }]).cursor();
     for await (const doc of cursor) {
       await wait();

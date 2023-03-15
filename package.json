@@ -46,6 +46,7 @@
     "dotenv": "16.0.3",
     "dox": "1.0.0",
     "eslint": "8.35.0",
+    "eslint-plugin-markdown": "^3.0.0",
     "eslint-plugin-mocha-no-only": "1.1.1",
     "express": "^4.18.1",
     "highlight.js": "11.7.0",
@@ -96,6 +97,7 @@
     "lint": "eslint .",
     "lint-js": "eslint . --ext .js",
     "lint-ts": "eslint . --ext .ts",
+    "lint-md": "eslint . --ext .md",
     "build-browser": "(rm ./dist/* || true) && node ./scripts/build-browser.js",
     "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",
@@ -113,7 +115,7 @@
   "main": "./index.js",
   "types": "./types/index.d.ts",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.0.0"
   },
   "bugs": {
     "url": "https://github.com/Automattic/mongoose/issues/new"

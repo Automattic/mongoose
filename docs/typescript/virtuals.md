@@ -13,7 +13,7 @@ import { Schema, Model, model } from 'mongoose';
 const schema = new Schema(
   {
     firstName: String,
-    lastName: String,
+    lastName: String
   },
   {
     virtuals: {

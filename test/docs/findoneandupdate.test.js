@@ -26,9 +26,9 @@ describe('Tutorial: findOneAndUpdate()', function() {
     await Character.create({ name: 'Jean-Luc Picard' });
   });
 
-  after(async () => {
+  after(async() => {
     await mongoose.disconnect();
-  })
+  });
 
   it('basic case', async function() {
     // acquit:ignore:start
@@ -68,7 +68,7 @@ describe('Tutorial: findOneAndUpdate()', function() {
 
     // `doc` is the document _after_ `update` was applied because of
     // `new: true`
-    let doc = await Character.findOneAndUpdate(filter, update, {
+    const doc = await Character.findOneAndUpdate(filter, update, {
       new: true
     });
     doc.name; // 'Jean-Luc Picard'
@@ -85,7 +85,7 @@ describe('Tutorial: findOneAndUpdate()', function() {
 
     // `doc` is the document _after_ `update` was applied because of
     // `returnOriginal: false`
-    let doc = await Character.findOneAndUpdate(filter, update, {
+    const doc = await Character.findOneAndUpdate(filter, update, {
       returnOriginal: false
     });
     doc.name; // 'Jean-Luc Picard'
@@ -106,7 +106,7 @@ describe('Tutorial: findOneAndUpdate()', function() {
     await Character.updateOne(filter, { name: 'Will Riker' });
 
     // This will update `doc` age to `59`, even though the doc changed.
-    doc.age = 59;
+    doc.age = update.age;
     await doc.save();
 
     doc = await Character.findOne();
@@ -127,7 +127,7 @@ describe('Tutorial: findOneAndUpdate()', function() {
     assert.equal(await Character.countDocuments(filter), 0);
     // acquit:ignore:end
 
-    let doc = await Character.findOneAndUpdate(filter, update, {
+    const doc = await Character.findOneAndUpdate(filter, update, {
       new: true,
       upsert: true // Make this update into an upsert
     });
@@ -148,7 +148,7 @@ describe('Tutorial: findOneAndUpdate()', function() {
     assert.equal(await Character.countDocuments(filter), 0);
     // acquit:ignore:end
 
-    let res = await Character.findOneAndUpdate(filter, update, {
+    const res = await Character.findOneAndUpdate(filter, update, {
       new: true,
       upsert: true,
       rawResult: true // Return the raw result from the MongoDB driver

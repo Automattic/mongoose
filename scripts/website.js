@@ -152,6 +152,8 @@ async function pugify(filename, options) {
 
   if (options.acquit) {
     contents = transform(contents, tests);
+
+    contents = contents.replaceAll(/^```acquit$/gmi, "```javascript");
   }
   if (options.markdown) {
     const lines = contents.split('\n');

@@ -1,6 +1,14 @@
 'use strict';
 
-const config = require('../.config');
+let config;
+try {
+  config = require('../.config.js');
+} finally {
+  if (!config || !config.uri) {
+    console.error('No Config or config.URI given, please create a .config.js file with those values in the root of the repository');
+    process.exit(-1);
+  }
+}
 const cheerio = require('cheerio');
 const filemap = require('../docs/source');
 const fs = require('fs');
@@ -30,25 +38,27 @@ const Content = mongoose.model('Content', contentSchema, 'Content');
 
 const contents = [];
 
-for (const [filename, file] of Object.entries(filemap)) {
-  if (file.api) {
-    // API docs are special, raw content is in the `docs` property
-    for (const _class of file.docs) {
-      for (const prop of _class.props) {
-        const content = new Content({
-          title: `API: ${prop.string}`,
-          body: prop.description,
-          url: `api/${_class.fileName}.html#${prop.anchorId}`
-        });
-        const err = content.validateSync();
-        if (err != null) {
-          console.error(content);
-          throw err;
-        }
-        contents.push(content);
-      }
+const api = require('../docs/source/api');
+
+// API docs are special, because they are not added to the file-map individually currently and use different properties
+for (const _class of api.docs) {
+  for (const prop of _class.props) {
+    const content = new Content({
+      title: `API: ${prop.name}`,
+      body: prop.description,
+      url: `api/${_class.fileName}.html#${prop.anchorId}`
+    });
+    const err = content.validateSync();
+    if (err != null) {
+      console.error(content);
+      throw err;
     }
-  } else if (file.markdown) {
+    contents.push(content);
+  }
+}
+
+for (const [filename, file] of Object.entries(filemap)) {
+  if (file.markdown) {
     let text = fs.readFileSync(filename, 'utf8');
     text = markdown.parse(text);
 
@@ -120,11 +130,6 @@ run().catch(async error => {
 });
 
 async function run() {
-  if (!config || !config.uri) {
-    console.error('No Config or config.URI given, please create a .config.js file with those values');
-    process.exit(-1);
-  }
-
   await mongoose.connect(config.uri, { dbName: 'mongoose', serverSelectionTimeoutMS: 5000 });
 
   // wait for the index to be created
@@ -151,6 +156,8 @@ async function run() {
     limit(10);
 
   console.log(results.map(res => res.url));
+
+  console.log(`Added ${contents.length} Content`);
 
   process.exit(0);
 }

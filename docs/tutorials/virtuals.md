@@ -20,7 +20,7 @@ want the email's domain. For example, the domain portion of
 Below is one way to implement the `domain` property using a virtual.
 You define virtuals on a schema using the [`Schema#virtual()` function](../api/schema.html#schema_Schema-virtual).
 
-```javascript
+```acquit
 [require:Virtuals.*basic]
 ```
 
@@ -39,7 +39,7 @@ create a virtual property `fullName` that lets you set both of
 these properties at once. The key detail is that, in virtual getters and
 setters, `this` refers to the document the virtual is attached to.
 
-```javascript
+```acquit
 [require:Virtuals.*fullName]
 ```
 
@@ -51,7 +51,7 @@ For example, if you pass a document to [Express'  `res.json()` function](http://
 To include virtuals in `res.json()`, you need to set the
 [`toJSON` schema option](../guide.html#toJSON) to `{ virtuals: true }`.
 
-```javascript
+```acquit
 [require:Virtuals.*toJSON]
 ```
 
@@ -71,7 +71,7 @@ Virtuals are properties on Mongoose documents. If you use the
 rather than full Mongoose documents. That means no virtuals if you use
 [`lean()`](../api/query.html#query_Query-lean).
 
-```javascript
+```acquit
 [require:Virtuals.*lean]
 ```
 
@@ -85,7 +85,7 @@ that decorates lean documents with virtuals.
 Mongoose virtuals are **not** stored in MongoDB, which means you can't query
 based on Mongoose virtuals.
 
-```javascript
+```acquit
 [require:Virtuals.*in query]
 ```
 
@@ -101,7 +101,7 @@ virtual, you need to specify:
 - The `ref` option, which tells Mongoose which model to populate documents from.
 - The `localField` and `foreignField` options. Mongoose will populate documents from the model in `ref` whose `foreignField` matches this document's `localField`.
 
-```javascript
+```acquit
 [require:Virtuals.*populate]
 ```
 

@@ -111,7 +111,7 @@ You can also set the `timestamps` option to an object to configure `createdAt` a
 For example, in the below code, Mongoose sets `createdAt` on `save()` but skips `updatedAt`.
 
 ```javascript
-let doc = new User({ name: 'test' });
+const doc = new User({ name: 'test' });
 
 // Tell Mongoose to set `createdAt`, but skip `updatedAt`.
 await doc.save({ timestamps: { createdAt: true, updatedAt: false } });
@@ -154,7 +154,7 @@ Overwriting a subdocument will also overwrite `createdAt`.
 const roleSchema = new Schema({ value: String }, { timestamps: true });
 const userSchema = new Schema({ name: String, roles: [roleSchema] });
 
-let doc = await User.create({ name: 'test', roles: [{ value: 'admin' }] });
+const doc = await User.create({ name: 'test', roles: [{ value: 'admin' }] });
 console.log(doc.roles[0].createdAt); // 2022-02-27T00:22:53.836Z
 console.log(doc.roles[0].updatedAt); // 2022-02-27T00:22:53.836Z
 
@@ -184,7 +184,7 @@ For example, if you run the below code:
 mongoose.set('debug', true);
 
 const userSchema = new Schema({
-  name: String,
+  name: String
 }, { timestamps: true });
 const User = mongoose.model('User', userSchema);
 

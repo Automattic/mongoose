@@ -8,7 +8,7 @@ a new document without that path set, the default will kick in.
 Note: Mongoose only applies a default if the value of the path is
 strictly `undefined`.
 
-```javascript
+```acquit
 [require:Declaring defaults in your schema]
 ```
 
@@ -17,7 +17,7 @@ strictly `undefined`.
 You can also set the `default` schema option to a function. Mongoose will
 execute that function and use the return value as the default.
 
-```javascript
+```acquit
 [require:Default functions]
 ```
 
@@ -26,7 +26,7 @@ execute that function and use the return value as the default.
 Mongoose also sets defaults on `update()` and `findOneAndUpdate()` when the `upsert` option is set by adding your schema's defaults to a [MongoDB `$setOnInsert` operator](https://www.mongodb.com/docs/manual/reference/operator/update/setOnInsert/).
 You can disable this behavior by setting the `setDefaultsOnInsert` option to `false`.
 
-```javascript
+```acquit
 [require:The `setDefaultsOnInsert` option]
 ```
 
@@ -41,6 +41,6 @@ mongoose.set('setDefaultsOnInsert', false);
 Unless it is running on a query with `setDefaultsOnInsert`, a default
 function's `this` refers to the document.
 
-```javascript
+```acquit
 [require:Default functions and `this`]
 ```

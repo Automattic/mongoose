@@ -4,14 +4,15 @@ Before we get into the specifics of validation syntax, please keep the following
 
 - Validation is defined in the [SchemaType](schematypes.html)
 - Validation is [middleware](middleware.html). Mongoose registers validation as a `pre('save')` hook on every schema by default.
+- Validation always runs as the **first** `pre('save')` hook. This means that validation doesn't run on any changes you make in `pre('save')` hooks.
 - You can disable automatic validation before save by setting the [validateBeforeSave](guide.html#validateBeforeSave) option
-- You can manually run validation using `doc.validate(callback)` or `doc.validateSync()`
+- You can manually run validation using `doc.validate()` or `doc.validateSync()`
 - You can manually mark a field as invalid (causing validation to fail) by using [`doc.invalidate(...)`](api/document.html#document_Document-invalidate)
 - Validators are not run on undefined values. The only exception is the [`required` validator](api/schematype.html#schematype_SchemaType-required).
-- Validation is asynchronously recursive; when you call [Model#save](api/model.html#model_Model-save), sub-document validation is executed as well. If an error occurs, your [Model#save](api/model.html#model_Model-save) callback receives it
+- When you call [Model#save](api/model.html#model_Model-save), Mongoose also runs subdocument validation. If an error occurs, your [Model#save](api/model.html#model_Model-save) promise rejects
 - Validation is customizable
 
-```javascript
+```acquit
 [require:Validation$]
 ```
 
@@ -39,7 +40,7 @@ Mongoose has several built-in validators.
 
 Each of the validator links above provide more information about how to enable them and customize their error messages.
 
-```javascript
+```acquit
 [require:Built-in Validators]
 ```
 
@@ -54,7 +55,7 @@ ways to set the validator error message:
 Mongoose also supports rudimentary templating for error messages.
 Mongoose replaces `{VALUE}` with the value being validated.
 
-```javascript
+```acquit
 [require:Custom Error Messages]
 ```
 
@@ -64,7 +65,7 @@ A common gotcha for beginners is that the `unique` option for schemas
 is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://www.mongodb.com/docs/manual/core/index-unique/).
 See the [FAQ](faq.html) for more information.
 
-```javascript
+```acquit
 [require:The `unique` Option is Not a Validator]
 ```
 
@@ -77,7 +78,7 @@ Custom validation is declared by passing a validation function.
 You can find detailed instructions on how to do this in the
 [`SchemaType#validate()` API docs](api/schematype.html#schematype_SchemaType-validate).
 
-```javascript
+```acquit
 [require:Custom Validators]
 ```
 
@@ -88,7 +89,7 @@ returns a promise (like an `async` function), mongoose will wait for that
 promise to settle. If the returned promise rejects, or fulfills with
 the value `false`, Mongoose will consider that a validation error.
 
-```javascript
+```acquit
 [require:Async Custom Validators]
 ```
 
@@ -102,7 +103,7 @@ A ValidatorError also may have a `reason` property. If an error was
 thrown in the validator, this property will contain the error that was
 thrown.
 
-```javascript
+```acquit
 [require:Validation Errors]
 ```
 
@@ -117,7 +118,7 @@ Casting runs before validation, and validation does not run if casting
 fails. That means your custom validators may assume `v` is `null`,
 `undefined`, or an instance of the type specified in your schema.
 
-```javascript
+```acquit
 [require:Cast Errors]
 ```
 
@@ -126,7 +127,7 @@ fails. That means your custom validators may assume `v` is `null`,
 In addition to defining custom validators on individual schema paths, you can also configure a custom validator to run on every instance of a given `SchemaType`.
 For example, the following code demonstrates how to make empty string `''` an invalid value for _all_ string paths.
 
-```javascript
+```acquit
 [require:Global SchemaType Validation]
 ```
 
@@ -135,7 +136,7 @@ For example, the following code demonstrates how to make empty string `''` an in
 Defining validators on nested objects in mongoose is tricky, because
 nested objects are not fully fledged paths.
 
-```javascript
+```acquit
 [require:Required Validators On Nested Objects]
 ```
 
@@ -154,7 +155,7 @@ To turn on update validators, set the `runValidators` option for
 Be careful: update validators are off by default because they have several
 caveats.
 
-```javascript
+```acquit
 [require:Update Validators$]
 ```
 
@@ -166,7 +167,7 @@ to the document being validated when using document validation.
 However, when running update validators, `this` refers to the query object instead of the document.
 Because queries have a neat `.get()` function, you can get the updated value of the property you want.
 
-```javascript
+```acquit
 [require:Update Validators and `this`]
 ```
 
@@ -180,7 +181,7 @@ succeed.
 When using update validators, `required` validators **only** fail when
 you try to explicitly `$unset` the key.
 
-```javascript
+```acquit
 [require:Update Validators Only Run On Updated Paths]
 ```
 
@@ -203,7 +204,7 @@ Also, `$push`, `$addToSet`, `$pull`, and `$pullAll` validation does
 **not** run any validation on the array itself, only individual elements
 of the array.
 
-```javascript
+```acquit
 [require:Update Validators Only Run For Some Operations]
 ```
 

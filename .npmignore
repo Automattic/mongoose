@@ -46,3 +46,5 @@ webpack.base.config.js
 
 notes.md
 list.out
+
+eslintrc.json

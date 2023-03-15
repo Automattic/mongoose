@@ -38,8 +38,8 @@ declare module 'mongoose' {
      * will wait for the promise to resolve before iterating on to the next one.
      * Returns a promise that resolves when done.
      */
-    eachAsync(fn: (doc: DocType[]) => any, options: EachAsyncOptions & { batchSize: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType) => any, options?: EachAsyncOptions): Promise<void>;
+    eachAsync(fn: (doc: DocType[], i: number) => any, options: EachAsyncOptions & { batchSize: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType, i: number) => any, options?: EachAsyncOptions): Promise<void>;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved

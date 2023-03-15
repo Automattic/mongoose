@@ -49,9 +49,9 @@ describe('defaults docs', function() {
     assert.strictEqual(foo.role, null);
 
     await Person.create(axl, slash);
-    
+
     const docs = await Person.find({ role: 'guitarist' });
-    
+
     assert.equal(docs.length, 1);
     assert.equal(docs[0].name, 'Slash');
   });

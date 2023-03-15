@@ -293,3 +293,22 @@ function gh12290() {
   user.isDirectModified('name age');
   user.isDirectModified('name');
 }
+
+function gh13094() {
+  type UserDocumentNever = HydratedDocument<{ name: string }, Record<string, never>>;
+
+  const doc: UserDocumentNever = null as any;
+  expectType<string>(doc.name);
+
+  // The following currently fails.
+  /* type UserDocumentUnknown = HydratedDocument<{ name: string }, Record<string, unknown>>;
+
+  const doc2: UserDocumentUnknown = null as any;
+  expectType<string>(doc2.name); */
+
+  // The following currently fails.
+  /* type UserDocumentAny = HydratedDocument<{ name: string }, Record<string, any>>;
+
+  const doc3: UserDocumentAny = null as any;
+  expectType<string>(doc3.name); */
+}

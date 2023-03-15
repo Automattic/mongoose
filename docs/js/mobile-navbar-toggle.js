@@ -1,16 +1,17 @@
+'use strict';
 // this js is for mobile, to toggle the navbar
 
-(function (window, document) {
-  const layout   = document.getElementById('layout'),
-        menu     = document.getElementById('menu'),
-        menuLink = document.getElementById('menuLink'),
-        content  = document.getElementById('content');
+(function(window, document) {
+  const layout = document.getElementById('layout'),
+      menu = document.getElementById('menu'),
+      menuLink = document.getElementById('menuLink'),
+      content = document.getElementById('content');
 
   function toggleClass(element, className) {
     const classes = element.className.split(/\s+/),
-          length = classes.length;
+        length = classes.length;
 
-    for(let i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       if (classes[i] === className) {
         classes.splice(i, 1);
         break;
@@ -18,14 +19,14 @@
     }
     // The className is not found
     if (length === classes.length) {
-        classes.push(className);
+      classes.push(className);
     }
 
     element.className = classes.join(' ');
   }
 
   function toggleAll(e) {
-    let active = 'active';
+    const active = 'active';
 
     e.preventDefault();
     toggleClass(layout, active);
@@ -33,7 +34,7 @@
     toggleClass(menuLink, active);
   }
 
-  menuLink.onclick = function (e) {
+  menuLink.onclick = function(e) {
     toggleAll(e);
   };
 

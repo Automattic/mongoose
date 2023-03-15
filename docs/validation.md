@@ -30,7 +30,7 @@ Before we get into the specifics of validation syntax, please keep the following
 - [Update Validators Only Run On Updated Paths](#update-validators-only-run-on-updated-paths)
 - [Update Validators Only Run For Some Operations](#update-validators-only-run-for-some-operations)
 
-### Built-in Validators
+## Built-in Validators
 
 Mongoose has several built-in validators.
 
@@ -44,7 +44,7 @@ Each of the validator links above provide more information about how to enable t
 [require:Built-in Validators]
 ```
 
-### Custom Error Messages
+## Custom Error Messages
 
 You can configure the error message for individual validators in your schema. There are two equivalent
 ways to set the validator error message:
@@ -59,7 +59,7 @@ Mongoose replaces `{VALUE}` with the value being validated.
 [require:Custom Error Messages]
 ```
 
-### The `unique` Option is Not a Validator
+## The `unique` Option is Not a Validator
 
 A common gotcha for beginners is that the `unique` option for schemas
 is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://www.mongodb.com/docs/manual/core/index-unique/).
@@ -69,7 +69,7 @@ See the [FAQ](faq.html) for more information.
 [require:The `unique` Option is Not a Validator]
 ```
 
-### Custom Validators
+## Custom Validators
 
 If the built-in validators aren't enough, you can define custom validators
 to suit your needs.
@@ -82,7 +82,7 @@ You can find detailed instructions on how to do this in the
 [require:Custom Validators]
 ```
 
-### Async Custom Validators
+## Async Custom Validators
 
 Custom validators can also be asynchronous. If your validator function
 returns a promise (like an `async` function), mongoose will wait for that
@@ -93,7 +93,7 @@ the value `false`, Mongoose will consider that a validation error.
 [require:Async Custom Validators]
 ```
 
-### Validation Errors
+## Validation Errors
 
 Errors returned after failed validation contain an `errors` object
 whose values are `ValidatorError` objects. Each
@@ -107,7 +107,7 @@ thrown.
 [require:Validation Errors]
 ```
 
-### Cast Errors
+## Cast Errors
 
 Before running validators, Mongoose attempts to coerce values to the
 correct type. This process is called _casting_ the document. If
@@ -122,7 +122,7 @@ fails. That means your custom validators may assume `v` is `null`,
 [require:Cast Errors]
 ```
 
-### Global SchemaType Validation
+## Global SchemaType Validation
 
 In addition to defining custom validators on individual schema paths, you can also configure a custom validator to run on every instance of a given `SchemaType`.
 For example, the following code demonstrates how to make empty string `''` an invalid value for _all_ string paths.
@@ -131,7 +131,7 @@ For example, the following code demonstrates how to make empty string `''` an in
 [require:Global SchemaType Validation]
 ```
 
-### Required Validators On Nested Objects
+## Required Validators On Nested Objects
 
 Defining validators on nested objects in mongoose is tricky, because
 nested objects are not fully fledged paths.
@@ -140,7 +140,7 @@ nested objects are not fully fledged paths.
 [require:Required Validators On Nested Objects]
 ```
 
-### Update Validators
+## Update Validators
 
 In the above examples, you learned about document validation. Mongoose also
 supports validation for [`update()`](api/query.html#query_Query-update),
@@ -159,7 +159,7 @@ caveats.
 [require:Update Validators$]
 ```
 
-### Update Validators and `this`
+## Update Validators and `this`
 
 There are a couple of key differences between update validators and
 document validators. In the color validation function below, `this` refers
@@ -171,7 +171,7 @@ Because queries have a neat `.get()` function, you can get the updated value of 
 [require:Update Validators and `this`]
 ```
 
-### Update Validators Only Run On Updated Paths
+## Update Validators Only Run On Updated Paths
 
 The other key difference is that update validators only run on the paths
 specified in the update. For instance, in the below example, because
@@ -185,7 +185,7 @@ you try to explicitly `$unset` the key.
 [require:Update Validators Only Run On Updated Paths]
 ```
 
-### Update Validators Only Run For Some Operations
+## Update Validators Only Run For Some Operations
 
 One final detail worth noting: update validators **only** run on the
 following update operators:
@@ -208,6 +208,6 @@ of the array.
 [require:Update Validators Only Run For Some Operations]
 ```
 
-### Next Up
+## Next Up
 
 Now that we've covered `Validation`, let's take a look at [Middleware](middleware.html).

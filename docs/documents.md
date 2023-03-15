@@ -158,7 +158,7 @@ The other way is to use [`Model.replaceOne()`](api/model.html#model_Model-replac
 await Person.replaceOne({ _id }, { name: 'Jean-Luc Picard' });
 ```
 
-### Next Up
+## Next Up
 
 Now that we've covered Documents, let's take a look at
 [Subdocuments](subdocs.html).

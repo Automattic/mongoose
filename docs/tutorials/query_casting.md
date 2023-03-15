@@ -19,8 +19,7 @@ If Mongoose fails to cast the filter to your schema, your query will throw a `Ca
 [require:Cast Tutorial.*cast error]
 ```
 
-The `strictQuery` Option
-------------------------
+## The `strictQuery` Option
 
 By default, Mongoose does **not** cast filter properties that aren't in your schema.
 
@@ -40,8 +39,7 @@ To make Mongoose throw an error if your `filter` has a property that isn't in th
 [require:Cast Tutorial.*strictQuery throw]
 ```
 
-Implicit `$in`
---------------
+## Implicit `$in`
 
 Because of schemas, Mongoose knows what types fields should be, so it can provide some neat syntactic sugar. For example, if you forget to put [`$in`](https://www.mongodb.com/docs/manual/reference/operator/query/in/) on a non-array field, Mongoose will add `$in` for you.
 

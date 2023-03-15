@@ -1,6 +1,6 @@
 # Discriminators
 
-### The `model.discriminator()` function
+## The `model.discriminator()` function
 
 Discriminators are a schema inheritance mechanism. They enable
 you to have multiple models with overlapping schemas on top of the
@@ -18,7 +18,7 @@ is the union of the base schema and the discriminator schema.
 [require:The `model.discriminator\(\)` function]
 ```
 
-### Discriminators save to the Event model's collection
+## Discriminators save to the Event model's collection
 
 Suppose you created another discriminator to track events where
 a new user registered. These `SignedUpEvent` instances will be
@@ -29,7 +29,7 @@ instances.
 [require:Discriminators save to the Event model's collection]
 ```
 
-### Discriminator keys
+## Discriminator keys
 
 The way Mongoose tells the difference between the different discriminator models is by the 'discriminator key', which is `__t` by default.
 Mongoose adds a String path called `__t` to your schemas that it uses to track which discriminator this document is an instance of.
@@ -38,7 +38,7 @@ Mongoose adds a String path called `__t` to your schemas that it uses to track w
 [require:Discriminator keys]
 ```
 
-### Updating the discriminator key
+## Updating the discriminator key
 
 By default, Mongoose doesn't let you update the discriminator key.
 `save()` will throw an error if you attempt to update the discriminator key.

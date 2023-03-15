@@ -1,6 +1,6 @@
 # Advanced Schemas
 
-### Creating from ES6 Classes Using `loadClass()`
+## Creating from ES6 Classes Using `loadClass()`
 
 Mongoose allows creating schemas from [ES6 classes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes).
 The `loadClass()` function lets you pull in methods,

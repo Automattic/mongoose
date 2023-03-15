@@ -11649,6 +11649,51 @@ describe('document', function() {
         assert.equal(res.counter, 2);
       });
 
+      it('calls setters on the value passed to `$inc()` (gh-13158)', async function() {
+        const called = [];
+        const Test2 = db.model('Test2', Schema({
+          counter: {
+            type: Number,
+            set: v => { called.push(v); return v.toFixed(2); }
+          }
+        }));
+        const doc = await Test2.create({ counter: 2 });
+        assert.deepEqual(called, [2]);
+
+        doc.$inc('counter', 1.14159);
+        assert.deepEqual(called, [2, 3.14159]);
+        assert.equal(doc.counter, 3.14);
+        await doc.save();
+
+        const res = await Test2.findById(doc);
+        assert.equal(res.counter, 3.14);
+      });
+
+      it('sets value even if setter fails (gh-13158)', async function() {
+        const called = [];
+        const Test2 = db.model('Test2', Schema({
+          counter: {
+            type: Number,
+            set: v => {
+              called.push(v);
+              if (v > 3) {
+                throw new Error('Oops!');
+              }
+              return v;
+            }
+          }
+        }));
+        const doc = await Test2.create({ counter: 2 });
+        assert.deepEqual(called, [2]);
+
+        doc.$inc('counter', 3);
+        assert.deepEqual(called, [2, 5]);
+        assert.equal(doc.counter, 5);
+        const err = await doc.save().then(() => null, err => err);
+        assert.ok(err);
+        assert.ok(err.errors['counter']);
+      });
+
       it('works as a $set if the document is new', async function() {
         const doc = new Test({ counter: 0 });
         doc.$inc('counter', 2);

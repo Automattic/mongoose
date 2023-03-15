@@ -21,9 +21,9 @@ describe('Lean Tutorial', function() {
     mongoose.deleteModel(/Group/);
   });
 
-  after(async () => {
+  after(async() => {
     await mongoose.disconnect();
-  })
+  });
 
   it('compare sizes lean vs not lean', async function() {
     // acquit:ignore:start
@@ -181,7 +181,7 @@ describe('Lean Tutorial', function() {
 
     // Initialize data
     const g = await Group.create({ name: 'DS9 Characters' });
-    const people = await Person.create([
+    await Person.create([
       { name: 'Benjamin Sisko', groupId: g._id },
       { name: 'Kira Nerys', groupId: g._id }
     ]);

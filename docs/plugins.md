@@ -35,12 +35,12 @@ module.exports = function loadedAtPlugin(schema, options) {
 
 // game-schema.js
 const loadedAtPlugin = require('./loadedAt');
-const gameSchema = new Schema({ ... });
+const gameSchema = new Schema({ /* ... */ });
 gameSchema.plugin(loadedAtPlugin);
 
 // player-schema.js
 const loadedAtPlugin = require('./loadedAt');
-const playerSchema = new Schema({ ... });
+const playerSchema = new Schema({ /* ... */ });
 playerSchema.plugin(loadedAtPlugin);
 ```
 
@@ -56,8 +56,8 @@ example:
 const mongoose = require('mongoose');
 mongoose.plugin(require('./loadedAt'));
 
-const gameSchema = new Schema({ ... });
-const playerSchema = new Schema({ ... });
+const gameSchema = new Schema({ /* ... */ });
+const playerSchema = new Schema({ /* ... */ });
 // `loadedAtPlugin` gets attached to both schemas
 const Game = mongoose.model('Game', gameSchema);
 const Player = mongoose.model('Player', playerSchema);
@@ -88,7 +88,7 @@ module.exports = function loadedAtPlugin(schema, options) {
 
 // game-schema.js
 const loadedAtPlugin = require('./loadedAt');
-const gameSchema = new Schema({ ... });
+const gameSchema = new Schema({ /* ... */ });
 const Game = mongoose.model('Game', gameSchema);
 
 // `find()` and `findOne()` hooks from `loadedAtPlugin()` won't get applied

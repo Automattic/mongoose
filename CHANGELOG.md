@@ -1,3 +1,30 @@
+7.0.2 / 2023-03-15
+==================
+ * fix: validate array elements when passing array path to validateSync() in pathsToValidate #13167 #13159
+ * fix(schema): propagate typeKey down to implicitly created subdocuments #13164 #13154
+ * fix(types): add index param to eachAsync fn #13153 [krosenk729](https://github.com/krosenk729)
+ * fix(types/documentarray): type DocumentArray constructor parameter as object #13089 #13087 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): type query `select()` as string, string[], or record; not `any` #13146 #13142 [rbereziuk](https://github.com/rbereziuk)
+ * fix(types/query): change QueryOptions lean type to Record<string, any> #13150 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: add and run eslint-plugin-markdown #13156 [hasezoey](https://github.com/hasezoey)
+ * docs(generateSearch): fix search generation for API #13161 [hasezoey](https://github.com/hasezoey)
+ * docs(generateSearch): move config missing error to require #13160 [hasezoey](https://github.com/hasezoey)
+ * chore: remove unused docs libraries #13172 [hasezoey](https://github.com/hasezoey)
+
+6.10.3 / 2023-03-13
+===================
+ * fix(connection): add stub implementation of doClose to base connection class #13157
+ * fix(types): add cursor.eachAsync index parameter #13162 #13153 [hasezoey](https://github.com/hasezoey)
+ * docs: fix 6.x docs sidebar links #13147 #13144 [hasezoey](https://github.com/hasezoey)
+ * docs(validation): clarify that validation runs as first pre(save) middleware #13062
+
+6.10.2 / 2023-03-07
+===================
+ * fix(document): avoid setting array default if document array projected out by sibling projection #13135 #13043 #13003
+ * fix(documentarray): set correct document array path if making map of document arrays #13133
+ * fix: undo accidental change to `engines` in `package.json` #13124 [lorand-horvath](https://github.com/lorand-horvath)
+ * docs: quick improvement to Model.init() docs #13054
+
 7.0.1 / 2023-03-06
 ==================
  * fix(aggregate): added await to prevent exception in aggregate exec #13126 [lpizzinidev](https://github.com/lpizzinidev)

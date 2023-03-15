@@ -11,7 +11,10 @@ import {
   FilterQuery,
   UpdateQuery,
   ApplyBasicQueryCasting,
-  QuerySelector
+  QuerySelector,
+  InferSchemaType,
+  ProjectionFields,
+  QueryOptions
 } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { expectError, expectType } from 'tsd';
@@ -432,4 +435,43 @@ async function gh11602(): Promise<void> {
   expectError(ModelType.findOneAndUpdate({}, {}, {
     returnDocument: 'not-before-or-after'
   }));
+}
+
+async function gh13142() {
+  const BlogSchema = new Schema({ title: String });
+
+  type Blog = InferSchemaType<typeof BlogSchema>;
+
+  const BlogModel = model<Blog>('Blog', BlogSchema);
+  class BlogRepository {
+    private readonly blogModel: Model<Blog>;
+
+    constructor() {
+      this.blogModel = BlogModel;
+    }
+
+    findOne<
+      Projection extends ProjectionFields<Blog>,
+      Options extends QueryOptions<Blog>
+    >(
+      filter: FilterQuery<Blog>,
+      projection: Projection,
+      options: Options
+    ): Promise<
+        Options['lean'] extends true
+          ? Pick<Blog, Extract<keyof Projection, keyof Blog>> | null
+          : HydratedDocument<Pick<Blog, Extract<keyof Projection, keyof Blog>>> | null
+    > {
+      return this.blogModel.findOne(filter, projection, options);
+    }
+  }
+
+  const blogRepository = new BlogRepository();
+  const blog = await blogRepository.findOne(
+    { title: 'test' },
+    { content: 1 },
+    { lean: true }
+  );
+  if (!blog) return;
+  expectType<Pick<Blog, Extract<keyof { content: 1 }, keyof Blog>>>(blog);
 }

@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -46,6 +46,7 @@
     "dotenv": "16.0.3",
     "dox": "1.0.0",
     "eslint": "8.35.0",
+    "eslint-plugin-markdown": "^3.0.0",
     "eslint-plugin-mocha-no-only": "1.1.1",
     "express": "^4.18.1",
     "highlight.js": "11.7.0",
@@ -95,6 +96,7 @@
     "lint": "eslint .",
     "lint-js": "eslint . --ext .js",
     "lint-ts": "eslint . --ext .ts",
+    "lint-md": "eslint . --ext .md",
     "build-browser": "(rm ./dist/* || true) && node ./scripts/build-browser.js",
     "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",

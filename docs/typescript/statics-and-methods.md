@@ -77,8 +77,8 @@ const schema = new Schema(
     statics: {
       myStaticMethod() {
         return 42;
-      },
-    },
+      }
+    }
   }
 );
 

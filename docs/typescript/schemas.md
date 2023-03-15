@@ -49,7 +49,7 @@ const schema = new Schema({
 });
 
 type User = InferSchemaType<typeof schema>;
-// InferSchemaType will determine the type as follows: 
+// InferSchemaType will determine the type as follows:
 // type User = {
 //   name: string;
 //   email: string;
@@ -95,7 +95,7 @@ Mongoose wraps `DocType` in a Mongoose document for cases like the `this` parame
 For example:
 
 ```typescript
-schema.pre('save', function (): void {
+schema.pre('save', function(): void {
   console.log(this.name); // TypeScript knows that `this` is a `mongoose.Document & User` by default
 });
 ```
@@ -146,7 +146,7 @@ interface User {
 const schema = new Schema<User, Model<User>>({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  avatar: String,
+  avatar: String
 });
 ```
 
@@ -171,7 +171,7 @@ interface User {
 
 const schema = new Schema<User, Model<User>>({
   tags: [String],
-  blogPosts: [{ title: String }],
+  blogPosts: [{ title: String }]
 });
 ```
 

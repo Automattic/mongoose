@@ -83,11 +83,11 @@ await mongoose.connect(`mongodb://${encodeURIComponent(username)}@127.0.0.1:2701
 });
 
 // Not this:
-await mongoose.connect(`mongodb://127.0.0.1:27017/test`, {
+await mongoose.connect('mongodb://127.0.0.1:27017/test', {
   ssl: true,
   sslValidate: true,
   sslCA: `${__dirname}/rootCA.pem`,
-  authMechanism: 'MONGODB-X509'.
+  authMechanism: 'MONGODB-X509',
   auth: { username }
 });
 ```

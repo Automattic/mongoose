@@ -10,8 +10,8 @@ html(lang='en')
       link(rel="stylesheet", href="https://unpkg.com/purecss@1.0.0/build/pure-min.css", integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w", crossorigin="anonymous")
 
       link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Open+Sans")
-      link(rel="stylesheet", href="/docs/6.x/css/github.css")
-      link(rel="stylesheet", href="/docs/6.x/css/mongoose5.css")
+      link(rel="stylesheet", href="/docs/6.x/docs/css/github.css")
+      link(rel="stylesheet", href="/docs/6.x/docs/css/mongoose5.css")
 
       link(rel='apple-touch-icon', sizes='57x57', href='images/favicon/apple-icon-57x57.png')
       link(rel='apple-touch-icon', sizes='60x60', href='images/favicon/apple-icon-60x60.png')
@@ -39,13 +39,13 @@ html(lang='en')
             span
           #mobile-logo-container
             a(href="/")
-              img#logo(src="/docs/6.x/images/mongoose5_62x30_transparent.png")
+              img#logo(src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png")
               span.logo-text mongoose
         #menu
           .pure-menu
             #logo-container.pure-menu-heading
               a(href="/")
-                img#logo(src="/docs/6.x/images/mongoose5_62x30_transparent.png")
+                img#logo(src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png")
                 span.logo-text mongoose
             ul.pure-menu-list#navbar
               li.pure-menu-horizontal.pure-menu-item.pure-menu-has-children.pure-menu-allow-hover.version
@@ -60,108 +60,108 @@ html(lang='en')
               li.pure-menu-item.search
                 input#search-input-nav(type="text", placeholder="Search")
                 button#search-button-nav
-                  img(src="/docs/6.x/images/search.svg")
+                  img(src="/docs/6.x/docs/images/search.svg")
               li.pure-menu-item
-                a.pure-menu-link(href="/docs/6.x/index.html", class=outputUrl === '/docs/6.x/index.html' ? 'selected' : '') Quick Start
+                a.pure-menu-link(href="/docs/6.x/docs/index.html", class=outputUrl === '/docs/6.x/docs/index.html' ? 'selected' : '') Quick Start
               li.pure-menu-item
-                a.pure-menu-link(href="/docs/6.x/guides.html", class=outputUrl === '/docs/6.x/guides.html' ? 'selected' : '') Guides
+                a.pure-menu-link(href="/docs/6.x/docs/guides.html", class=outputUrl === '/docs/6.x/docs/guides.html' ? 'selected' : '') Guides
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/guide.html", class=outputUrl === '/docs/6.x/schemas.html' ? 'selected' : '') Schemas
+                a.pure-menu-link(href="/docs/6.x/docs/guide.html", class=outputUrl === '/docs/6.x/docs/schemas.html' ? 'selected' : '') Schemas
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/schematypes.html", class=outputUrl === '/docs/6.x/schematypes.html' ? 'selected' : '') SchemaTypes
+                a.pure-menu-link(href="/docs/6.x/docs/schematypes.html", class=outputUrl === '/docs/6.x/docs/schematypes.html' ? 'selected' : '') SchemaTypes
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/connections.html", class=outputUrl === '/docs/6.x/connections.html' ? 'selected' : '') Connections
-              - if (['/docs/6.x/connections', '/docs/6.x/tutorials/ssl'].some(path => outputUrl.startsWith(path)))
+                a.pure-menu-link(href="/docs/6.x/docs/connections.html", class=outputUrl === '/docs/6.x/docs/connections.html' ? 'selected' : '') Connections
+              - if (['/docs/6.x/docs/connections', '/docs/6.x/docs/tutorials/ssl'].some(path => outputUrl.startsWith(path)))
                 li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href="/docs/6.x/tutorials/ssl.html", class=outputUrl === '/docs/6.x/tutorials/ssl.html' ? 'selected' : '') SSL Connections
+                  a.pure-menu-link(href="/docs/6.x/docs/tutorials/ssl.html", class=outputUrl === '/docs/6.x/docs/tutorials/ssl.html' ? 'selected' : '') SSL Connections
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/models.html", class=outputUrl === '/docs/6.x/models.html' ? 'selected' : '') Models
-              - if (['/docs/6.x/models', '/docs/6.x/change-streams'].some(path => outputUrl.startsWith(path)))
+                a.pure-menu-link(href="/docs/6.x/docs/models.html", class=outputUrl === '/docs/6.x/docs/models.html' ? 'selected' : '') Models
+              - if (['/docs/6.x/docs/models', '/docs/6.x/docs/change-streams'].some(path => outputUrl.startsWith(path)))
                 li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href="/docs/6.x/change-streams.html", class=outputUrl === '/docs/6.x/change-streams.html' ? 'selected' : '') Change Streams
+                  a.pure-menu-link(href="/docs/6.x/docs/change-streams.html", class=outputUrl === '/docs/6.x/docs/change-streams.html' ? 'selected' : '') Change Streams
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/documents.html", class=outputUrl === '/docs/6.x/documents.html' ? 'selected' : '') Documents
+                a.pure-menu-link(href="/docs/6.x/docs/documents.html", class=outputUrl === '/docs/6.x/docs/documents.html' ? 'selected' : '') Documents
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/subdocs.html", class=outputUrl === '/docs/6.x/subdocs.html' ? 'selected' : '') Subdocuments
+                a.pure-menu-link(href="/docs/6.x/docs/subdocs.html", class=outputUrl === '/docs/6.x/docs/subdocs.html' ? 'selected' : '') Subdocuments
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/queries.html", class=outputUrl === '/docs/6.x/queries.html' ? 'selected' : '') Queries
-              - if (['/docs/6.x/queries', '/docs/6.x/tutorials/findoneandupdate', '/docs/6.x/tutorials/lean', '/docs/6.x/tutorials/query_casting'].some(path => outputUrl.startsWith(path)))
+                a.pure-menu-link(href="/docs/6.x/docs/queries.html", class=outputUrl === '/docs/6.x/docs/queries.html' ? 'selected' : '') Queries
+              - if (['/docs/6.x/docs/queries', '/docs/6.x/docs/tutorials/findoneandupdate', '/docs/6.x/docs/tutorials/lean', '/docs/6.x/docs/tutorials/query_casting'].some(path => outputUrl.startsWith(path)))
                 li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href="/docs/6.x/tutorials/query_casting.html", class=outputUrl === '/docs/6.x/tutorials/query_casting.html' ? 'selected' : '') Query Casting
+                  a.pure-menu-link(href="/docs/6.x/docs/tutorials/query_casting.html", class=outputUrl === '/docs/6.x/docs/tutorials/query_casting.html' ? 'selected' : '') Query Casting
                 li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href="/docs/6.x/tutorials/findoneandupdate.html", class=outputUrl === '/docs/6.x/tutorials/findoneandupdate.html' ? 'selected' : '') findOneAndUpdate
+                  a.pure-menu-link(href="/docs/6.x/docs/tutorials/findoneandupdate.html", class=outputUrl === '/docs/6.x/docs/tutorials/findoneandupdate.html' ? 'selected' : '') findOneAndUpdate
                 li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href="/docs/6.x/tutorials/lean.html", class=outputUrl === '/docs/6.x/tutorials/lean.html' ? 'selected' : '') The Lean Option
+                  a.pure-menu-link(href="/docs/6.x/docs/tutorials/lean.html", class=outputUrl === '/docs/6.x/docs/tutorials/lean.html' ? 'selected' : '') The Lean Option
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/validation.html", class=outputUrl === '/docs/6.x/validation.html' ? 'selected' : '') Validation
+                a.pure-menu-link(href="/docs/6.x/docs/validation.html", class=outputUrl === '/docs/6.x/docs/validation.html' ? 'selected' : '') Validation
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/middleware.html", class=outputUrl === '/docs/6.x/middleware.html' ? 'selected' : '') Middleware
+                a.pure-menu-link(href="/docs/6.x/docs/middleware.html", class=outputUrl === '/docs/6.x/docs/middleware.html' ? 'selected' : '') Middleware
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/populate.html", class=outputUrl === '/docs/6.x/populate.html' ? 'selected' : '') Populate
+                a.pure-menu-link(href="/docs/6.x/docs/populate.html", class=outputUrl === '/docs/6.x/docs/populate.html' ? 'selected' : '') Populate
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/discriminators.html", class=outputUrl === '/docs/6.x/discriminators.html' ? 'selected' : '') Discriminators
+                a.pure-menu-link(href="/docs/6.x/docs/discriminators.html", class=outputUrl === '/docs/6.x/docs/discriminators.html' ? 'selected' : '') Discriminators
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/plugins.html", class=outputUrl === '/docs/6.x/plugins.html' ? 'selected' : '') Plugins
+                a.pure-menu-link(href="/docs/6.x/docs/plugins.html", class=outputUrl === '/docs/6.x/docs/plugins.html' ? 'selected' : '') Plugins
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/timestamps.html", class=outputUrl === '/docs/6.x/timestamps.html' ? 'selected' : '') Timestamps
+                a.pure-menu-link(href="/docs/6.x/docs/timestamps.html", class=outputUrl === '/docs/6.x/docs/timestamps.html' ? 'selected' : '') Timestamps
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/transactions.html", class=outputUrl === '/docs/6.x/transactions.html' ? 'selected' : '') Transactions
+                a.pure-menu-link(href="/docs/6.x/docs/transactions.html", class=outputUrl === '/docs/6.x/docs/transactions.html' ? 'selected' : '') Transactions
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/typescript.html", class=outputUrl === '/docs/6.x/typescript.html' ? 'selected' : '') TypeScript
-              - if (outputUrl.startsWith('/docs/6.x/typescript'))
+                a.pure-menu-link(href="/docs/6.x/docs/typescript.html", class=outputUrl === '/docs/6.x/docs/typescript.html' ? 'selected' : '') TypeScript
+              - if (outputUrl.startsWith('/docs/6.x/docs/typescript'))
                 li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href="/docs/6.x/typescript/schemas.html", class=outputUrl === '/docs/6.x/typescript/schemas.html' ? 'selected' : '') Schemas
+                  a.pure-menu-link(href="/docs/6.x/docs/typescript/schemas.html", class=outputUrl === '/docs/6.x/docs/typescript/schemas.html' ? 'selected' : '') Schemas
                 li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href="/docs/6.x/typescript/statics-and-methods.html", class=outputUrl === '/docs/6.x/typescript/statics-and-methods.html' ? 'selected' : '') Statics
+                  a.pure-menu-link(href="/docs/6.x/docs/typescript/statics-and-methods.html", class=outputUrl === '/docs/6.x/docs/typescript/statics-and-methods.html' ? 'selected' : '') Statics
                 li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href="/docs/6.x/typescript/query-helpers.html", class=outputUrl === '/docs/6.x/typescript/query-helpers.html' ? 'selected' : '') Query Helpers
+                  a.pure-menu-link(href="/docs/6.x/docs/typescript/query-helpers.html", class=outputUrl === '/docs/6.x/docs/typescript/query-helpers.html' ? 'selected' : '') Query Helpers
                 li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href="/docs/6.x/typescript/populate.html", class=outputUrl === '/docs/6.x/typescript/populate.html' ? 'selected' : '') Populate
+                  a.pure-menu-link(href="/docs/6.x/docs/typescript/populate.html", class=outputUrl === '/docs/6.x/docs/typescript/populate.html' ? 'selected' : '') Populate
                 li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href="/docs/6.x/typescript/subdocuments.html", class=outputUrl === '/docs/6.x/typescript/subdocuments.html' ? 'selected' : '') Subdocuments
+                  a.pure-menu-link(href="/docs/6.x/docs/typescript/subdocuments.html", class=outputUrl === '/docs/6.x/docs/typescript/subdocuments.html' ? 'selected' : '') Subdocuments
               li.pure-menu-item
-                a.pure-menu-link(href="/docs/6.x/api.html", class=outputUrl === '/docs/6.x/api.html' ? 'selected' : '') API
+                a.pure-menu-link(href="/docs/6.x/docs/api.html", class=outputUrl === '/docs/6.x/docs/api.html' ? 'selected' : '') API
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/api/mongoose.html", class=outputUrl === '/docs/6.x/api/mongoose.html' ? 'selected' : '') Mongoose
+                a.pure-menu-link(href="/docs/6.x/docs/api/mongoose.html", class=outputUrl === '/docs/6.x/docs/api/mongoose.html' ? 'selected' : '') Mongoose
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/api/schema.html", class=outputUrl === '/docs/6.x/api/schema.html' ? 'selected' : '') Schema
+                a.pure-menu-link(href="/docs/6.x/docs/api/schema.html", class=outputUrl === '/docs/6.x/docs/api/schema.html' ? 'selected' : '') Schema
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/api/connection.html", class=outputUrl === '/docs/6.x/api/connection.html' ? 'selected' : '') Connection
+                a.pure-menu-link(href="/docs/6.x/docs/api/connection.html", class=outputUrl === '/docs/6.x/docs/api/connection.html' ? 'selected' : '') Connection
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/api/document.html", class=outputUrl === '/docs/6.x/api/document.html' ? 'selected' : '') Document
+                a.pure-menu-link(href="/docs/6.x/docs/api/document.html", class=outputUrl === '/docs/6.x/docs/api/document.html' ? 'selected' : '') Document
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/api/model.html", class=outputUrl === '/docs/6.x/api/model.html' ? 'selected' : '') Model
+                a.pure-menu-link(href="/docs/6.x/docs/api/model.html", class=outputUrl === '/docs/6.x/docs/api/model.html' ? 'selected' : '') Model
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/api/query.html", class=outputUrl === '/docs/6.x/api/query.html' ? 'selected' : '') Query
+                a.pure-menu-link(href="/docs/6.x/docs/api/query.html", class=outputUrl === '/docs/6.x/docs/api/query.html' ? 'selected' : '') Query
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/api/aggregate.html", class=outputUrl === '/docs/6.x/api/aggregate.html' ? 'selected' : '') Aggregate
+                a.pure-menu-link(href="/docs/6.x/docs/api/aggregate.html", class=outputUrl === '/docs/6.x/docs/api/aggregate.html' ? 'selected' : '') Aggregate
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/api/schematype.html", class=outputUrl === '/docs/6.x/api/schematype.html' ? 'selected' : '') SchemaType
+                a.pure-menu-link(href="/docs/6.x/docs/api/schematype.html", class=outputUrl === '/docs/6.x/docs/api/schematype.html' ? 'selected' : '') SchemaType
               li.pure-menu-item.sub-item
-                a.pure-menu-link(href="/docs/6.x/api/virtualtype.html", class=outputUrl === '/docs/6.x/api/virtualtype.html' ? 'selected' : '') VirtualType
+                a.pure-menu-link(href="/docs/6.x/docs/api/virtualtype.html", class=outputUrl === '/docs/6.x/docs/api/virtualtype.html' ? 'selected' : '') VirtualType
               li.pure-menu-item
-                a.pure-menu-link(href="/docs/6.x/migrating_to_6.html", class=outputUrl === '/docs/6.x/migrating_to_6.html' ? 'selected' : '') Migration Guide
+                a.pure-menu-link(href="/docs/6.x/docs/migrating_to_6.html", class=outputUrl === '/docs/6.x/docs/migrating_to_6.html' ? 'selected' : '') Migration Guide
               li.pure-menu-item
-                a.pure-menu-link(href="/docs/6.x/compatibility.html", class=outputUrl === '/docs/6.x/compatibility.html' ? 'selected' : '') Version Compatibility
+                a.pure-menu-link(href="/docs/6.x/docs/compatibility.html", class=outputUrl === '/docs/6.x/docs/compatibility.html' ? 'selected' : '') Version Compatibility
               li.pure-menu-item
-                a.pure-menu-link(href="/docs/6.x/faq.html", class=outputUrl === '/docs/6.x/faq.html' ? 'selected' : '') FAQ
+                a.pure-menu-link(href="/docs/6.x/docs/faq.html", class=outputUrl === '/docs/6.x/docs/faq.html' ? 'selected' : '') FAQ
               li.pure-menu-item
-                a.pure-menu-link(href="/docs/6.x/further_reading.html", class=outputUrl === '/docs/6.x/further_reading.html' ? 'selected' : '') Further Reading
+                a.pure-menu-link(href="/docs/6.x/docs/further_reading.html", class=outputUrl === '/docs/6.x/docs/further_reading.html' ? 'selected' : '') Further Reading
               li.pure-menu-item
-                a.pure-menu-link(href="/docs/6.x/enterprise.html", class=outputUrl === '/docs/6.x/enterprise.html' ? 'selected' : '') For Enterprise
+                a.pure-menu-link(href="/docs/6.x/docs/enterprise.html", class=outputUrl === '/docs/6.x/docs/enterprise.html' ? 'selected' : '') For Enterprise
               li.pure-menu-item
-                a.pure-menu-link(href="/docs/6.x/sponsors.html", , class=outputUrl === '/docs/6.x/sponsors.html' ? 'selected' : '') Sponsors
+                a.pure-menu-link(href="/docs/6.x/docs/sponsors.html", , class=outputUrl === '/docs/6.x/docs/sponsors.html' ? 'selected' : '') Sponsors
             div.cpc-ad
               <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script>
         .container
           #content
             block content
 
-        - if (!outputUrl.startsWith('/docs/6.x/jobs.html'))
+        - if (!outputUrl.startsWith('/docs/6.x/docs/jobs.html'))
           div#jobs
             each job in jobs
               .job-listing
-                a(href='/docs/6.x/jobs.html#' + job._id)
+                a(href='/docs/6.x/docs/jobs.html#' + job._id)
                   .company-logo
                     img(src=job.logo)
                   .description
@@ -169,8 +169,8 @@ html(lang='en')
                     .title #{job.title}
                     .location #{job.location}
             .button.jobs-view-more
-              a(href='/docs/6.x/jobs.html') View more jobs!
+              a(href='/docs/6.x/docs/jobs.html') View more jobs!
     
 
-        script(type="text/javascript" src="/docs/6.x/js/navbar-search.js")
-        script(type="text/javascript" src="/docs/6.x/js/mobile-navbar-toggle.js")
+        script(type="text/javascript" src="/docs/6.x/docs/js/navbar-search.js")
+        script(type="text/javascript" src="/docs/6.x/docs/js/mobile-navbar-toggle.js")

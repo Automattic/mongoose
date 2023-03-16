@@ -11688,7 +11688,7 @@ describe('document', function() {
 
         doc.$inc('counter', 3);
         assert.deepEqual(called, [2, 5]);
-        assert.equal(doc.counter, 5);
+        assert.equal(doc.counter, 2);
         const err = await doc.save().then(() => null, err => err);
         assert.ok(err);
         assert.ok(err.errors['counter']);

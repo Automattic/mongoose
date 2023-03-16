@@ -4857,6 +4857,12 @@ describe('Model', function() {
       assert.ok(!res.mongoose.validationErrors[0].errors['year']);
       assert.ok(res.mongoose.validationErrors[1].errors['year']);
       assert.ok(!res.mongoose.validationErrors[1].errors['name']);
+
+      assert.equal(res.mongoose.results.length, 3);
+      assert.ok(res.mongoose.results[0].errors['name']);
+      assert.ok(res.mongoose.results[1].errors['year']);
+      assert.ok(res.mongoose.results[2].$__);
+      assert.equal(res.mongoose.results[2].name, 'The Empire Strikes Back');
     });
 
     it('insertMany() validation error with ordered false and rawResult for mixed write and validation error (gh-12791)', async function() {
@@ -4886,6 +4892,13 @@ describe('Model', function() {
       assert.ok(!err.mongoose.validationErrors[0].errors['year']);
       assert.ok(err.mongoose.validationErrors[1].errors['year']);
       assert.ok(!err.mongoose.validationErrors[1].errors['name']);
+
+      assert.equal(err.mongoose.results.length, 4);
+      assert.ok(err.mongoose.results[0].errors['name']);
+      assert.ok(err.mongoose.results[1].errors['year']);
+      assert.ok(err.mongoose.results[2].$__);
+      assert.equal(err.mongoose.results[2].name, 'The Empire Strikes Back');
+      assert.ok(err.mongoose.results[3].err);
     });
 
     it('insertMany() populate option (gh-9720)', async function() {

@@ -288,6 +288,15 @@ declare module 'mongoose' {
     insertMany<DocContents = T>(doc: DocContents, callback: Callback<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, Require_id<T>>, TMethodsAndOverrides, TVirtuals>>>): void;
 
     insertMany<DocContents = T>(docs: Array<DocContents | T>, options: InsertManyOptions & { lean: true; }): Promise<Array<MergeType<MergeType<T, DocContents>, Require_id<T>>>>;
+    insertMany<DocContents = T>(
+      doc: DocContents,
+      options: InsertManyOptions & { ordered: false; rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<T> & {
+      mongoose: {
+        validationErrors: Error[];
+        results: Array<Error | Object | HydratedDocument<MergeType<MergeType<T, DocContents>, Require_id<T>>, TMethodsAndOverrides, TVirtuals>>
+      }
+    }>;
     insertMany<DocContents = T>(docs: Array<DocContents | T>, options: InsertManyOptions & { rawResult: true; }): Promise<mongodb.InsertManyResult<T>>;
     insertMany<DocContents = T>(docs: Array<DocContents | T>): Promise<Array<HydratedDocument<MergeType<MergeType<T, DocContents>, Require_id<T>>, TMethodsAndOverrides, TVirtuals>>>;
     insertMany<DocContents = T>(doc: DocContents, options: InsertManyOptions & { lean: true; }): Promise<Array<MergeType<MergeType<T, DocContents>, Require_id<T>>>>;

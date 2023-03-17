@@ -59,7 +59,7 @@ Use `resumeAfter` to track where the last change stream left off, and add a time
 ```javascript
 let resumeAfter = undefined;
 
-exports.handler = async (event, context) => {
+exports.handler = async(event, context) => {
   // add this so that we can re-use any static/global variables between function calls if Lambda
   // happens to re-use existing containers for the invocation.
   context.callbackWaitsForEmptyEventLoop = false;
@@ -70,7 +70,7 @@ exports.handler = async (event, context) => {
 
   // Change stream `next()` will wait forever if there are no changes. So make sure to
   // stop listening to the change stream after a fixed period of time.
-  let timeoutPromise = new Promise(resolve => setTimeout(() => resolve(false), 1000));
+  const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(false), 1000));
   let doc = null;
   while (doc = await Promise.race([changeStream.next(), timeoutPromise])) {
     console.log('Got', doc);

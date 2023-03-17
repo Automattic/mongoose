@@ -14,7 +14,7 @@ using the `model.discriminator()` function. This function takes
 key (defaults to the model name). It returns a model whose schema
 is the union of the base schema and the discriminator schema.
 
-```javascript
+```acquit
 [require:The `model.discriminator\(\)` function]
 ```
 
@@ -25,7 +25,7 @@ a new user registered. These `SignedUpEvent` instances will be
 stored in the same collection as generic events and `ClickedLinkEvent`
 instances.
 
-```javascript
+```acquit
 [require:Discriminators save to the Event model's collection]
 ```
 
@@ -34,7 +34,7 @@ instances.
 The way Mongoose tells the difference between the different discriminator models is by the 'discriminator key', which is `__t` by default.
 Mongoose adds a String path called `__t` to your schemas that it uses to track which discriminator this document is an instance of.
 
-```javascript
+```acquit
 [require:Discriminator keys]
 ```
 
@@ -44,12 +44,12 @@ By default, Mongoose doesn't let you update the discriminator key.
 `save()` will throw an error if you attempt to update the discriminator key.
 And `findOneAndUpdate()`, `updateOne()`, etc. will strip out discriminator key updates.
 
-```javascript
+```acquit
 [require:Update discriminator key]
 ```
 
 To update a document's discriminator key, use `findOneAndUpdate()` or `updateOne()` with the `overwriteDiscriminatorKey` option set as follows.
 
-```javascript
+```acquit
 [require:use overwriteDiscriminatorKey to change discriminator key]
 ```

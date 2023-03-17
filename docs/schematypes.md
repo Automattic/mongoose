@@ -58,12 +58,12 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 
 ```javascript
 const schema = new Schema({
-  name:    String,
-  binary:  Buffer,
-  living:  Boolean,
+  name: String,
+  binary: Buffer,
+  living: Boolean,
   updated: { type: Date, default: Date.now },
-  age:     { type: Number, min: 18, max: 65 },
-  mixed:   Schema.Types.Mixed,
+  age: { type: Number, min: 18, max: 65 },
+  mixed: Schema.Types.Mixed,
   _someId: Schema.Types.ObjectId,
   decimal: Schema.Types.Decimal128,
   array: [],
@@ -84,7 +84,7 @@ const schema = new Schema({
     type: Map,
     of: String
   }
-})
+});
 
 // example use
 
@@ -100,8 +100,8 @@ m.mixed = { any: { thing: 'i want' } };
 m.markModified('mixed');
 m._someId = new mongoose.Types.ObjectId;
 m.array.push(1);
-m.ofString.push("strings!");
-m.ofNumber.unshift(1,2,3,4);
+m.ofString.push('strings!');
+m.ofNumber.unshift(1, 2, 3, 4);
 m.ofDates.addToSet(new Date);
 m.ofBuffer.pop();
 m.ofMixed = [1, [], 'three', { four: 5 }];
@@ -341,13 +341,13 @@ will all result in a [CastError](validation.html#cast-errors) once validated, me
 
 ```javascript
 const Assignment = mongoose.model('Assignment', { dueDate: Date });
-Assignment.findOne(function (err, doc) {
+Assignment.findOne(function(err, doc) {
   doc.dueDate.setMonth(3);
   doc.save(callback); // THIS DOES NOT SAVE YOUR CHANGE
 
   doc.markModified('dueDate');
   doc.save(callback); // works
-})
+});
 ```
 
 <h4 id="buffers">Buffer</h4>
@@ -392,7 +392,7 @@ To avoid these side-effects, a [Subdocument](subdocs.html) path may be used
 instead.
 
 ```javascript
-person.anything = { x: [3, 4, { y: "changed" }] };
+person.anything = { x: [3, 4, { y: 'changed' }] };
 person.markModified('anything');
 person.save(); // Mongoose will save changes to `anything`.
 ```
@@ -670,7 +670,7 @@ const subSchema = new mongoose.Schema({
 
 const schema = new mongoose.Schema({
   data: {
-    type: subSchema
+    type: subSchema,
     default: {}
   }
 });

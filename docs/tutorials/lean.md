@@ -25,7 +25,7 @@ const leanDoc = await MyModel.findOne().lean();
 
 How much smaller are lean documents? Here's a comparison.
 
-```javascript
+```acquit
 [require:Lean Tutorial.*compare sizes]
 ```
 
@@ -33,7 +33,7 @@ Under the hood, after executing a query, Mongoose converts the query results
 from POJOs to Mongoose documents. If you turn on the `lean` option, Mongoose
 skips this step.
 
-```javascript
+```acquit
 [require:Lean Tutorial.*compare types]
 ```
 
@@ -48,7 +48,7 @@ The downside of enabling `lean` is that lean docs don't have:
 For example, the following code sample shows that the `Person` model's getters
 and virtuals don't run if you enable `lean`.
 
-```javascript
+```acquit
 [require:Lean Tutorial.*getters and virtuals]
 ```
 
@@ -59,13 +59,13 @@ use both `populate()` and `lean()`, the `lean` option propagates to the
 populated documents as well. In the below example, both the top-level
 'Group' documents and the populated 'Person' documents will be lean.
 
-```javascript
+```acquit
 [require:Lean Tutorial.*conventional populate]
 ```
 
 [Virtual populate](../populate.html#populate-virtuals) also works with lean.
 
-```javascript
+```acquit
 [require:Lean Tutorial.*virtual populate]
 ```
 

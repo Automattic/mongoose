@@ -58,15 +58,15 @@ async function run() {
 
   try {
     fs.mkdirSync(`${__dirname}/data`);
-  } catch(err) {}
+  } catch (err) {}
 
   const subscribers = await Subscriber.
     find({ companyName: { $exists: true }, description: { $exists: true }, logo: { $exists: true } }).
     sort({ createdAt: 1 }).
     select({ companyName: 1, description: 1, url: 1, logo: 1 });
   fs.writeFileSync(`${__dirname}/data/sponsors.json`, JSON.stringify(subscribers, null, '  '));
-  
-  const jobs = await Job.find().select({ logo: 1, company: 1, title: 1, location: 1, description: 1, url: 1  });
+
+  const jobs = await Job.find().select({ logo: 1, company: 1, title: 1, location: 1, description: 1, url: 1 });
   fs.writeFileSync(`${__dirname}/data/jobs.json`, JSON.stringify(jobs, null, '  '));
 
   const opencollectiveSponsors = await axios.get('https://opencollective.com/mongoose/members.json').
@@ -94,7 +94,7 @@ async function run() {
   for (const sponsor of additionalSponsors) {
     opencollectiveSponsors.push(sponsor);
   }
-  
+
   if (opencollectiveSponsors != null) {
     fs.writeFileSync(`${__dirname}/data/opencollective.json`, JSON.stringify(opencollectiveSponsors, null, '  '));
   }

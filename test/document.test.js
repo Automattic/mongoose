@@ -11669,7 +11669,7 @@ describe('document', function() {
         assert.equal(res.counter, 3.14);
       });
 
-      it('sets value even if setter fails (gh-13158)', async function() {
+      it('avoids updating value if setter fails (gh-13158)', async function() {
         const called = [];
         const Test2 = db.model('Test2', Schema({
           counter: {

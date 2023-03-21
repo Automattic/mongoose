@@ -131,6 +131,11 @@ describe('insertMany()', function() {
     const error = await Movie.insertMany(arr, { ordered: false }).then(() => null, err => err);
 
     assert.equal(error.message.indexOf('E11000'), 0);
+    assert.equal(error.results.length, 3);
+    assert.equal(error.results[0].name, 'Star Wars');
+    assert.ok(error.results[1].err);
+    assert.ok(error.results[1].err.errmsg.includes('E11000'));
+    assert.equal(error.results[2].name, 'The Empire Strikes Back');
     const docs = await Movie.find({}).sort({ name: 1 }).exec();
 
     assert.equal(docs.length, 2);
@@ -228,6 +233,11 @@ describe('insertMany()', function() {
     assert.equal(err.insertedDocs.length, 2);
     assert.equal(err.insertedDocs[0].code, 'test');
     assert.equal(err.insertedDocs[1].code, 'HARD');
+
+    assert.equal(err.results.length, 3);
+    assert.ok(err.results[0].err.errmsg.includes('E11000'));
+    assert.equal(err.results[1].code, 'test');
+    assert.equal(err.results[2].code, 'HARD');
 
     await Question.deleteMany({});
     await Question.create({ code: 'MEDIUM', text: '123' });
@@ -385,6 +395,12 @@ describe('insertMany()', function() {
     assert.ok(!res.mongoose.validationErrors[0].errors['year']);
     assert.ok(res.mongoose.validationErrors[1].errors['year']);
     assert.ok(!res.mongoose.validationErrors[1].errors['name']);
+
+    assert.equal(res.mongoose.results.length, 3);
+    assert.ok(res.mongoose.results[0].errors['name']);
+    assert.ok(res.mongoose.results[1].errors['year']);
+    assert.ok(res.mongoose.results[2].$__);
+    assert.equal(res.mongoose.results[2].name, 'The Empire Strikes Back');
   });
 
   it('insertMany() validation error with ordered false and rawResult for mixed write and validation error (gh-12791)', async function() {

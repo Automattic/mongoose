@@ -1,3 +1,4 @@
+
 <h2 id="schematypes"><a href="#schematypes">SchemaTypes</a></h2>
 
 SchemaTypes handle definition of path
@@ -53,6 +54,7 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 - [Decimal128](api/mongoose.html#mongoose_Mongoose-Decimal128)
 - [Map](#maps)
 - [Schema](#schemas)
+- [UUID](#uuid)
 
 <h4>Example</h4>
 
@@ -506,8 +508,6 @@ const Empty4 = new Schema({ any: [{}] });
 
 <h4 id="maps">Maps</h4>
 
-_New in Mongoose 5.1.0_
-
 A `MongooseMap` is a subclass of [JavaScript's `Map` class](http://thecodebarbarian.com/the-80-20-guide-to-maps-in-javascript.html).
 In these docs, we'll use the terms 'map' and `MongooseMap` interchangeably.
 In Mongoose, maps are how you create a nested document with arbitrary keys.
@@ -590,6 +590,47 @@ on `socialMediaHandles.$*.oauth`:
 
 ```javascript
 const user = await User.findOne().populate('socialMediaHandles.$*.oauth');
+```
+
+<h4 id="uuid">UUID</h4>
+
+Mongoose also supports a UUID type that stores UUID instances as [Node.js buffers](https://thecodebarbarian.com/an-overview-of-buffers-in-node-js.html).
+We recommend using [ObjectIds](#objectids) rather than UUIDs for unique document ids in Mongoose, but you may use UUIDs if you need to.
+
+In Node.js, a UUID is represented as an instance of `bson.Binary` type with a [getter](./tutorials/getters-setters.html) that converts the binary to a string when you access it.
+Mongoose stores UUIDs as [binary data with subtype 4 in MongoDB](https://www.mongodb.com/docs/manual/reference/bson-types/#binary-data).
+
+```javascript
+const authorSchema = new Schema({
+  _id: Schema.Types.UUID, // Can also do `_id: 'UUID'`
+  name: String
+});
+
+const Author = mongoose.model('Author', authorSchema);
+
+const bookSchema = new Schema({ 
+  authorId: { type: Schema.Types.UUID, ref: 'Author' }
+});
+const Book = mongoose.model('Book', bookSchema);
+
+const author = new Author({ name: 'Martin Fowler' });
+console.log(typeof author._id); // 'string'
+console.log(author.toObject()._id instanceof mongoose.mongo.BSON.Binary); // true
+
+const book = new Book({ authorId: '09190f70-3d30-11e5-8814-0f4df9a59c41' });
+```
+
+To create UUIDs, we recommend using [Node's built-in UUIDv4 generator](https://nodejs.org/api/crypto.html#cryptorandomuuidoptions).
+
+```javascript
+const { randomUUID } = require('crypto');
+
+const schema = new mongoose.Schema({
+  docId: {
+    type: 'UUID',
+    default: () => randomUUID()
+  }
+});
 ```
 
 <h3 id="getters"><a href="#getters">Getters</a></h3>

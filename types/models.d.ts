@@ -317,6 +317,24 @@ declare module 'mongoose' {
       options: InsertManyOptions & { lean: true; }
     ): Promise<Array<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>>>;
     insertMany<DocContents = TRawDocType>(
+      doc: DocContents,
+      options: InsertManyOptions & { ordered: false; rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<TRawDocType> & {
+      mongoose: {
+        validationErrors: Error[];
+        results: Array<
+          Error |
+          Object |
+          HydratedDocument<
+            MergeType<
+              MergeType<TRawDocType, DocContents>,
+              Require_id<TRawDocType>
+            >
+          >
+        >
+      }
+    }>;
+    insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>,
       options: InsertManyOptions & { rawResult: true; }
     ): Promise<mongodb.InsertManyResult<TRawDocType>>;

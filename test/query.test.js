@@ -2385,15 +2385,13 @@ describe('Query', function() {
     });
 
     it('findOne()', async function() {
-      let threw = false;
       try {
         await Model.findOne({ name: 'na' }).orFail(() => new Error('Oops!'));
+        assert.ok(false);
       } catch (error) {
         assert.ok(error);
         assert.equal(error.message, 'Oops!');
-        threw = true;
       }
-      assert.ok(threw);
 
       // Shouldn't throw
       const res = await Model.findOne({ name: 'Test' }).orFail(new Error('Oops'));
@@ -2553,6 +2551,16 @@ describe('Query', function() {
       assert.ok(err.message.indexOf('na') !== -1, err.message);
       assert.ok(err.message.indexOf('"Test"') !== -1, err.message);
       assert.deepEqual(err.filter, { name: 'na' });
+    });
+
+    it('does not fire on CastError (gh-13165)', async function() {
+      try {
+        await Model.findOne({ _id: 'bad' }).orFail();
+        assert.ok(false);
+      } catch (error) {
+        assert.ok(error);
+        assert.equal(error.name, 'CastError');
+      }
     });
   });
 

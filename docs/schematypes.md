@@ -594,43 +594,41 @@ const user = await User.findOne().populate('socialMediaHandles.$*.oauth');
 
 <h4 id="uuid">UUID</h4>
 
-Mongoose also supports a UUID type that stores UUID v4 instances as [Node.js buffers](https://thecodebarbarian.com/an-overview-of-buffers-in-node-js.html).
+Mongoose also supports a UUID type that stores UUID instances as [Node.js buffers](https://thecodebarbarian.com/an-overview-of-buffers-in-node-js.html).
 We recommend using [ObjectIds](#objectids) rather than UUIDs for unique document ids in Mongoose, but you may use UUIDs if you need to.
 
 In Node.js, a UUID is represented as an instance of `bson.Binary` type with a [getter](./tutorials/getters-setters.html) that converts the binary to a string when you access it.
 Mongoose stores UUIDs as [binary data with subtype 4 in MongoDB](https://www.mongodb.com/docs/manual/reference/bson-types/#binary-data).
 
 ```javascript
-const schema = new mongoose.Schema({
-  docId: {
-    type: mongoose.Schema.Types.UUID // Can also do `type: 'UUID'`
-  }
-});
-const Test = mongoose.model('Test', schema);
-
-const doc = await Test.create({
-  docId: '09190f70-3d30-11e5-8814-0f4df9a59c41'
+const authorSchema = new Schema({
+  _id: Schema.Types.UUID, // Can also do `_id: 'UUID'`
+  name: String
 });
 
-// 'string'
-console.log(typeof doc.docId);
-// true
-console.log(doc.toObject().docId instanceof mongoose.mongo.BSON.Binary);
+const Author = mongoose.model('Author', authorSchema);
 
-const rawDoc = await Test.collection.findOne({ _id: doc._id });
-// true
-console.log(rawDoc.toObject().docId instanceof mongoose.mongo.BSON.Binary);
+const bookSchema = new Schema({ 
+  authorId: { type: Schema.Types.UUID, ref: 'Author' }
+});
+const Book = mongoose.model('Book', bookSchema);
+
+const author = new Author({ name: 'Martin Fowler' });
+console.log(typeof author._id); // 'string'
+console.log(author.toObject()._id instanceof mongoose.mongo.BSON.Binary); // true
+
+const book = new Book({ authorId: '09190f70-3d30-11e5-8814-0f4df9a59c41' });
 ```
 
-To create UUIDs, we recommend using the [uuid npm package](https://www.npmjs.com/package/uuid).
+To create UUIDs, we recommend using [Node's built-in UUIDv4 generator](https://nodejs.org/api/crypto.html#cryptorandomuuidoptions).
 
 ```javascript
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 
 const schema = new mongoose.Schema({
   docId: {
     type: 'UUID',
-    default: () => uuidv4()
+    default: () => randomUUID()
   }
 });
 ```

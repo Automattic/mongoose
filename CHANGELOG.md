@@ -1,3 +1,9 @@
+6.10.4 / 2023-03-21
+===================
+ * fix(document): apply setters on resulting value when calling Document.prototype.$inc() #13178 #13158
+ * fix(model): add results property to unordered insertMany() to make it easy to identify exactly which documents were inserted #13163 #12791
+ * docs(guide+schematypes): add UUID to schematypes guide #13184
+
 7.0.2 / 2023-03-15
 ==================
  * fix: validate array elements when passing array path to validateSync() in pathsToValidate #13167 #13159

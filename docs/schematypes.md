@@ -585,7 +585,7 @@ const userSchema = new Schema({
 const User = mongoose.model('User', userSchema);
 ```
 
-To populate every `socialMediaHandles` entry's `oauth` property, you should populatex
+To populate every `socialMediaHandles` entry's `oauth` property, you should populate
 on `socialMediaHandles.$*.oauth`:
 
 ```javascript

@@ -7941,12 +7941,12 @@ describe('model: populate:', function() {
           barId: { type: Schema.Types.ObjectId, ref: 'Test' },
           quantity: Number
         }],
-        child: {
+        child: new Schema({
           barId: {
             type: 'ObjectId',
             ref: 'Test'
           }
-        }
+        })
       });
       FooSchema.virtual('children.bar', {
         ref: 'Test',
@@ -7954,11 +7954,10 @@ describe('model: populate:', function() {
         foreignField: '_id',
         justOne: true
       });
-      FooSchema.virtual('child.bar', {
+      FooSchema.virtual('child.bars', {
         ref: 'Test',
         localField: 'child.barId',
-        foreignField: '_id',
-        justOne: true
+        foreignField: '_id'
       });
       const BarSchema = Schema({ name: String });
       const Foo = db.model('Test1', FooSchema);
@@ -7972,13 +7971,13 @@ describe('model: populate:', function() {
           barId: bar._id
         }
       });
-      const foo2 = await Foo.findById(foo._id).populate('children.bar child.bar');
+      const foo2 = await Foo.findById(foo._id).populate('children.bar child.bars');
       assert.equal(foo2.children[0].bar.name, 'bar');
-      assert.equal(foo2.child.bar.name, 'bar');
+      assert.equal(foo2.child.bars[0].name, 'bar');
 
       const asObject = foo2.toObject({ virtuals: true });
       assert.equal(asObject.children[0].bar.name, 'bar');
-      assert.equal(asObject.child.bar.name, 'bar');
+      assert.equal(asObject.child.bars[0].name, 'bar');
     });
 
     describe('gh-8247', function() {

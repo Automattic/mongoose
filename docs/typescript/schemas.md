@@ -3,7 +3,7 @@
 Mongoose [schemas](../guide.html) are how you tell Mongoose what your documents look like.
 Mongoose schemas are separate from TypeScript interfaces, so you need to either define both a _document interface_ and a _schema_; or rely on Mongoose to automatically infer the type from the schema definition.
 
-### Separate document interface definition
+## Separate document interface definition
 
 ```typescript
 import { Schema } from 'mongoose';
@@ -26,7 +26,7 @@ const schema = new Schema<User>({
 By default, Mongoose does **not** check if your document interface lines up with your schema.
 For example, the above code won't throw an error if `email` is optional in the document interface, but `required` in `schema`.
 
-### Automatic type inference
+## Automatic type inference
 
 Mongoose can also automatically infer the document type from your schema definition as follows.
 

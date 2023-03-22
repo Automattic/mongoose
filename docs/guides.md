@@ -1,9 +1,9 @@
-## Guides
+# Guides
 
 Mongoose guides provide detailed tutorials on Mongoose's core concepts and
 integrating Mongoose with external tools and frameworks.
 
-### Mongoose Core Concepts
+## Mongoose Core Concepts
 
 * [Schemas](guide.html)
 * [SchemaTypes](schematypes.html)
@@ -23,14 +23,14 @@ integrating Mongoose with external tools and frameworks.
 * [Getters and Setters](tutorials/getters-setters.html)
 * [Virtuals](tutorials/virtuals.html)
 
-### Advanced Topics
+## Advanced Topics
 
 * [Working with Dates](tutorials/dates.html)
 * [Custom Casting For Built-in Types](tutorials/custom-casting.html)
 * [Custom SchemaTypes](customschematypes.html)
 * [Advanced Schemas](advanced_schemas.html)
 
-### Integrations
+## Integrations
 
 * [Promises](promises.html)
 * [Lodash](lodash.html)
@@ -42,10 +42,9 @@ integrating Mongoose with external tools and frameworks.
 * [Testing with Jest](jest.html)
 * [SSL Connections](tutorials/ssl.html)
 
-### Migration Guides
+## Migration Guides
 
 * [Mongoose 6.x to 7.x](migrating_to_7.html)
 * [Mongoose 5.x to 6.x](migrating_to_6.html)
 * [Mongoose 4.x to 5.x](migrating_to_5.html)
 * [Mongoose 3.x to 4.x](migration.html)
-

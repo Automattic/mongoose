@@ -1,4 +1,4 @@
-## Change Streams
+# Change Streams
 
 [Change streams](https://www.mongodb.com/developer/languages/javascript/nodejs-change-streams-triggers/) let you listen for updates to documents in a given model's collection, or even documents in an entire database.
 Unlike [middleware](middleware.html), change streams are a MongoDB server construct, which means they pick up changes from anywhere.
@@ -48,7 +48,7 @@ MongoServerError: The $changeStream stage is only supported on replica sets
 If you're using `watch()` in production, we recommend using [MongoDB Atlas](https://www.mongodb.com/atlas/database).
 For local development, we recommend [mongodb-memory-server](https://www.npmjs.com/package/mongodb-memory-server) or [run-rs](https://www.npmjs.com/package/run-rs) to start a replica set locally.
 
-### Iterating using `next()`
+## Iterating using `next()`
 
 If you want to iterate through a change stream in a [AWS Lambda function](lambda.html), do **not** use event emitters to listen to the change stream.
 You need to make sure you close your change stream when your Lambda function is done executing, because your change stream may end up in an inconsistent state if Lambda stops your container while the change stream is pulling data from MongoDB.

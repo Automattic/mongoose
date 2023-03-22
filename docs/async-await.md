@@ -4,7 +4,7 @@
 * [Async Functions](#async-functions)
 * [Queries](#queries)
 
-### Basic Use
+## Basic Use
 
 Async/await lets us write asynchronous code as if it were synchronous. 
 This is especially helpful for avoiding callback hell when executing multiple async operations in sequence--a common scenario when working with Mongoose.
@@ -64,7 +64,7 @@ async function awaitUpdate() {
 
 Note that the specific fulfillment values of different Mongoose methods vary, and may be affected by configuration. Please refer to the [API documentation](api/mongoose.html.html) for information about specific methods.
 
-### Async Functions
+## Async Functions
 
 Adding the keyword *async* to a JavaScript function automatically causes it to return a native JavaScript promise.
 This is true [regardless of the return value we specify in the function body](http://thecodebarbarian.com/async-functions-in-javascript.html#an-async-function-always-returns-a-promise).     
@@ -102,7 +102,7 @@ async function doStuffWithUser() {
 }
 ```
 
-<h3 id="queries">Async/Await with Mongoose Queries</h3>
+<h2 id="queries">Async/Await with Mongoose Queries</h2>
 
 Under the hood, [async/await is syntactic sugar](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await) over the Promise API.
 Due to the surprisingly simple way promises are implemented in JavaScript, the keyword `await` will try to unwrap any object with a property whose key is the string ‘then’ and whose value is a function. 

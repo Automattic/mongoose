@@ -329,14 +329,7 @@ function parse() {
         ctx.string = ctx.string + '()';
       }
 
-      // Backwards compat anchors
-      if (typeof ctx.constructor === 'string') {
-        ctx.anchorId = `${ctx.constructor.toLowerCase()}_${ctx.constructor}-${ctx.name}`;
-      } else if (typeof ctx.receiver === 'string') {
-        ctx.anchorId = `${ctx.receiver.toLowerCase()}_${ctx.receiver}.${ctx.name}`;
-      } else {
-        ctx.anchorId = `${ctx.name.toLowerCase()}_${ctx.name}`;
-      }
+      ctx.anchorId = ctx.string;
 
       ctx.description = prop.description.full.
         replace(/<br \/>/ig, ' ').

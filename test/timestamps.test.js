@@ -548,6 +548,19 @@ describe('timestamps', function() {
       assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
     });
 
+    it('sets timestamps on replaceOne (gh-9951)', async function() {
+      await Cat.deleteMany({});
+      const { _id } = await Cat.create({ name: 'notexistname' });
+      await Cat.replaceOne({ name: 'notexistname' }, {});
+      const docs = await Cat.find({});
+      assert.equal(docs.length, 1);
+      const [doc] = docs;
+      assert.equal(doc._id.toHexString(), _id.toHexString());
+      assert.ok(doc.createdAt);
+      assert.ok(doc.updatedAt);
+      assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
+    });
+
     it('should change updatedAt when save', async function() {
       const doc = await Cat.findOne({ name: 'newcat' });
       const old = doc.updatedAt;

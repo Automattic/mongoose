@@ -430,7 +430,7 @@ declare module 'mongoose' {
     j(val: boolean | null): this;
 
     /** Sets the lean option. */
-    lean<LeanResultType = ResultType extends any[] ? Require_id<RawDocType>[] : Require_id<RawDocType>>(val?: boolean | any): QueryWithHelpers<LeanResultType, DocType, THelpers, RawDocType>;
+    lean<LeanResultType = ResultType extends any[] ? Require_id<RawDocType>[] : Require_id<RawDocType>>(val?: boolean | any): QueryWithHelpers<ResultType extends null ? LeanResultType | null : LeanResultType, DocType, THelpers, RawDocType>;
 
     /** Specifies the maximum number of documents the query will return. */
     limit(val: number): this;

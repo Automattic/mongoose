@@ -1,3 +1,22 @@
+6.10.4 / 2023-03-21
+===================
+ * fix(document): apply setters on resulting value when calling Document.prototype.$inc() #13178 #13158
+ * fix(model): add results property to unordered insertMany() to make it easy to identify exactly which documents were inserted #13163 #12791
+ * docs(guide+schematypes): add UUID to schematypes guide #13184
+
+7.0.2 / 2023-03-15
+==================
+ * fix: validate array elements when passing array path to validateSync() in pathsToValidate #13167 #13159
+ * fix(schema): propagate typeKey down to implicitly created subdocuments #13164 #13154
+ * fix(types): add index param to eachAsync fn #13153 [krosenk729](https://github.com/krosenk729)
+ * fix(types/documentarray): type DocumentArray constructor parameter as object #13089 #13087 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): type query `select()` as string, string[], or record; not `any` #13146 #13142 [rbereziuk](https://github.com/rbereziuk)
+ * fix(types/query): change QueryOptions lean type to Record<string, any> #13150 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: add and run eslint-plugin-markdown #13156 [hasezoey](https://github.com/hasezoey)
+ * docs(generateSearch): fix search generation for API #13161 [hasezoey](https://github.com/hasezoey)
+ * docs(generateSearch): move config missing error to require #13160 [hasezoey](https://github.com/hasezoey)
+ * chore: remove unused docs libraries #13172 [hasezoey](https://github.com/hasezoey)
+
 6.10.3 / 2023-03-13
 ===================
  * fix(connection): add stub implementation of doClose to base connection class #13157

@@ -152,6 +152,24 @@ module.exports.mongodVersion = async function() {
 async function dropDBs() {
   this.timeout(60000);
 
+  // retry the "dropDBs" actions if the error is "operation was interrupted", which can often happen in replset CI tests
+  let retries = 5;
+  while (retries > 0) {
+    retries -= 1;
+    try {
+      await _dropDBs();
+    } catch (err) {
+      if (err instanceof mongoose.mongo.MongoWriteConcernError && /operation was interrupted/.test(err.message)) {
+        console.log('DropDB operation interrupted, retrying'); // log that a error was thrown to know that it is going to re-try
+        continue;
+      }
+
+      throw err;
+    }
+  }
+}
+
+async function _dropDBs() {
   const db = await module.exports({ noErrorListener: true }).asPromise();
   await db.dropDatabase();
   await db.close();

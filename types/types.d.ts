@@ -61,7 +61,7 @@ declare module 'mongoose' {
 
     class DocumentArray<T> extends Types.Array<T extends Types.Subdocument ? T : Types.Subdocument<InferId<T>> & T> {
       /** DocumentArray constructor */
-      constructor(values: (AnyKeys<T> & AnyObject)[]);
+      constructor(values: AnyObject[]);
 
       isMongooseDocumentArray: true;
 

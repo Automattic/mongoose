@@ -1,13 +1,13 @@
 'use strict';
 
-const api = require('./source/api');
+const api = require('./api');
 const fs = require('fs');
 const pug = require('pug');
-const pkg = require('../package.json');
+const pkg = require('../../package.json');
 
 let jobs = [];
 try {
-  jobs = require('./data/jobs.json');
+  jobs = require('../data/jobs.json');
 } catch (err) {}
 
 api.docs.forEach(file => {
@@ -21,5 +21,6 @@ api.docs.forEach(file => {
 
   const html = pug.renderFile('./docs/api_split.pug', options);
   console.log('Write', file.name);
+  // path is relative to CWD not __dirname
   fs.writeFileSync(`./docs/api/${file.fileName}.html`, html);
 });

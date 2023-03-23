@@ -12,7 +12,8 @@ import {
   HydratedDocumentFromSchema,
   Query,
   UpdateWriteOpResult,
-  AggregateOptions
+  AggregateOptions,
+  StringSchemaDefinition
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -65,11 +66,11 @@ async function insertManyTest() {
     foo: string;
   }
 
-  const TestSchema = new Schema<ITest & Document>({
+  const TestSchema = new Schema<ITest>({
     foo: { type: String, required: true }
   });
 
-  const Test = connection.model<ITest & Document>('Test', TestSchema);
+  const Test = connection.model<ITest>('Test', TestSchema);
 
   Test.insertMany([{ foo: 'bar' }]).then(async res => {
     res.length;
@@ -77,6 +78,9 @@ async function insertManyTest() {
 
   const res = await Test.insertMany([{ foo: 'bar' }], { rawResult: true });
   expectType<ObjectId>(res.insertedIds[0]);
+
+  const res2 = await Test.insertMany([{ foo: 'bar' }], { ordered: false, rawResult: true });
+  expectAssignable<Error | Object | ReturnType<(typeof Test)['hydrate']>>(res2.mongoose.results[0]);
 }
 
 function gh10074() {
@@ -541,4 +545,25 @@ function aggregateOptionsTest() {
   const TestModel = model('test', new Schema({}));
   const options: AggregateOptions = {};
   TestModel.aggregate(undefined, options);
+}
+
+async function gh13151() {
+  interface ITest {
+    title: string;
+  }
+
+  const TestSchema = new Schema(
+    {
+      title: {
+        type: String,
+        required: true
+      }
+    }
+  );
+
+  const TestModel = model<ITest>('Test', TestSchema);
+  const test = await TestModel.findOne().lean();
+  expectType<ITest & { _id: Types.ObjectId } | null>(test);
+  if (!test) return;
+  expectType<ITest & { _id: Types.ObjectId }>(test);
 }

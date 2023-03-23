@@ -1,4 +1,4 @@
-## FAQ
+# FAQ
 
 <style>
 hr {
@@ -36,6 +36,8 @@ const Test = db.model('Test', schema);
 
 await Test.findOne(); // Will throw "Operation timed out" error because `db` isn't connected to MongoDB
 ```
+
+<hr id="not-local" />
 
 <a class="anchor" href="#not-local"> **Q**</a>. I am able to connect locally but when I try to connect to MongoDB Atlas I get this error. What gives?
 

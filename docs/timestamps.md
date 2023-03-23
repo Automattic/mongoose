@@ -1,4 +1,4 @@
-## Timestamps
+# Timestamps
 
 Mongoose schemas support a `timestamps` option.
 If you set `timestamps: true`, Mongoose will add two properties of type `Date` to your schema:
@@ -56,7 +56,7 @@ console.log(doc.createdAt); // 2022-02-26T17:08:13.930Z
 console.log(doc.updatedAt); // 2022-02-26T17:08:14.008Z
 ```
 
-### Alternate Property Names
+## Alternate Property Names
 
 For the purposes of these docs, we'll always refer to `createdAt` and `updatedAt`.
 But you can overwrite these property names as shown below.
@@ -70,7 +70,7 @@ const userSchema = new Schema({ name: String }, {
 });
 ```
 
-### Disabling Timestamps
+## Disabling Timestamps
 
 `save()`, `updateOne()`, `updateMany()`, `findOneAndUpdate()`, `update()`, `replaceOne()`, and `bulkWrite()` all support a `timestamps` option.
 Set `timestamps: false` to skip setting timestamps for that particular operation.
@@ -144,7 +144,7 @@ doc = await User.findOneAndUpdate({ _id: doc._id }, { createdAt: new Date(0) }, 
 console.log(doc.createdAt); // 1970-01-01T00:00:00.000Z
 ```
 
-### Timestamps on Subdocuments
+## Timestamps on Subdocuments
 
 Mongoose also supports setting timestamps on subdocuments.
 Keep in mind that `createdAt` and `updatedAt` for subdocuments represent when the subdocument was created or updated, not the top level document.
@@ -171,7 +171,7 @@ console.log(doc.roles[0].createdAt); // 2022-02-27T00:22:53.902Z
 console.log(doc.roles[0].updatedAt); // 2022-02-27T00:22:53.909Z
 ```
 
-### Under the Hood
+## Under the Hood
 
 For queries with timestamps, Mongoose adds 2 properties to each update query:
 

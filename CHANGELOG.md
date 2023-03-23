@@ -1,3 +1,19 @@
+7.0.3 / 2023-03-23
+==================
+ * fix(query): avoid executing transforms if query wasn't executed #13185 #13165
+ * fix(schema): make creating top-level virtual underneath subdocument equivalent to creating virtual on the subdocument #13197 #13189
+ * fix(timestamps): set timestamps on empty replaceOne() #13196 #13170
+ * fix(types): change return type of lean() to include null if nullable #13155 #13151 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): fixed type of DocumentArray constructor parameter #13183 #13087 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: refactor header naming to lessen conflicts #12901 [hasezoey](https://github.com/hasezoey)
+ * docs: change header levels to be consistent across files #13173 [hasezoey](https://github.com/hasezoey)
+
+6.10.4 / 2023-03-21
+===================
+ * fix(document): apply setters on resulting value when calling Document.prototype.$inc() #13178 #13158
+ * fix(model): add results property to unordered insertMany() to make it easy to identify exactly which documents were inserted #13163 #12791
+ * docs(guide+schematypes): add UUID to schematypes guide #13184
+
 7.0.2 / 2023-03-15
 ==================
  * fix: validate array elements when passing array path to validateSync() in pathsToValidate #13167 #13159

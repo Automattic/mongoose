@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "7.0.2",
+  "version": "7.0.3",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -76,7 +76,7 @@
     "docs:clean:stable": "rimraf index.html && rimraf -rf ./docs/*.html  && rimraf -rf ./docs/api && rimraf -rf ./docs/tutorials/*.html && rimraf -rf ./docs/typescript/*.html && rimraf -rf ./docs/*.html && rimraf -rf ./docs/source/_docs && rimraf -rf ./tmp",
     "docs:clean:5x": "rimraf index.html && rimraf -rf ./docs/5.x && rimraf -rf ./docs/source/_docs && rimraf -rf ./tmp",
     "docs:clean:6x": "rimraf index.html && rimraf -rf ./docs/6.x && rimraf -rf ./docs/source/_docs && rimraf -rf ./tmp",
-    "docs:copy:tmp": "mkdirp ./tmp/docs/css && mkdirp ./tmp/docs/js && mkdirp ./tmp/docs/images && mkdirp ./tmp/docs/tutorials && mkdirp ./tmp/docs/typescript && ncp ./docs/css ./tmp/docs/css --filter=.css$ && ncp ./docs/js ./tmp/docs/js --filter=.js$ && ncp ./docs/images ./tmp/docs/images && ncp ./docs/tutorials ./tmp/docs/tutorials && ncp ./docs/typescript ./tmp/docs/typescript && cp index.html ./tmp && cp docs/*.html ./tmp/docs/",
+    "docs:copy:tmp": "mkdirp ./tmp/docs/css && mkdirp ./tmp/docs/js && mkdirp ./tmp/docs/images && mkdirp ./tmp/docs/tutorials && mkdirp ./tmp/docs/typescript && mkdirp ./tmp/docs/api && ncp ./docs/css ./tmp/docs/css --filter=.css$ && ncp ./docs/js ./tmp/docs/js --filter=.js$ && ncp ./docs/images ./tmp/docs/images && ncp ./docs/tutorials ./tmp/docs/tutorials && ncp ./docs/typescript ./tmp/docs/typescript && ncp ./docs/api ./tmp/docs/api && cp index.html ./tmp && cp docs/*.html ./tmp/docs/",
     "docs:copy:tmp:5x": "rimraf ./docs/5.x && ncp ./tmp ./docs/5.x",
     "docs:copy:tmp:6x": "rimraf ./docs/6.x && ncp ./tmp ./docs/6.x",
     "docs:checkout:gh-pages": "git checkout gh-pages",
@@ -84,6 +84,7 @@
     "docs:checkout:6x": "git checkout 6.x",
     "docs:generate": "node ./scripts/website.js",
     "docs:generate:search": "node ./scripts/generateSearch.js",
+    "docs:generate:sponsorData": "node ./scripts/loadSponsorData.js",
     "docs:merge:stable": "git merge master",
     "docs:merge:5x": "git merge 5.x",
     "docs:merge:6x": "git merge 6.x",

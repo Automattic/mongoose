@@ -1,11 +1,11 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v7.0.2: Middleware</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
-</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 7.0.2</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x">Version 6.10.3</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.16</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_7.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/middleware.md" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v7.0.3: Middleware</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 7.0.3</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x">Version 6.10.4</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.16</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_7.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/middleware.md" target="_blank">
 <img src="/docs/images/pencil.svg" />
-</a><h2 id="middleware">
+</a><h1 id="middleware">
       <a href="#middleware">
         Middleware
       </a>
-    </h2>
+    </h1>
 <script>
   _native.init("CK7DT53U",{
     targetClass: 'native-inline'
@@ -34,11 +34,11 @@ on the schema level and is useful for writing <a href="plugins.html">plugins</a>
   <li><a href="#synchronous">Synchronous Hooks</a></li>
 </ul>
 
-<h3 id="types-of-middleware">
+<h2 id="types-of-middleware">
       <a href="#types-of-middleware">
         Types of Middleware
       </a>
-    </h3>
+    </h2>
 <p>Mongoose has 4 types
 of middleware: document middleware, model middleware, aggregate middleware, and query middleware.</p>
 <p>Document middleware is supported for the following document functions.
@@ -140,7 +140,7 @@ childSchema.<span class="hljs-title function_">pre</span>(<span class="hljs-stri
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Middleware on subdocument&#x27;</span>); <span class="hljs-comment">// Will not be executed</span>
 });
 </code></pre>
-<h3 id="pre"><a href="#pre">Pre</a></h3>
+<h2 id="pre"><a href="#pre">Pre</a></h2>
 
 <p>Pre middleware functions are executed one after another, when each
 middleware calls <code>next</code>.</p>
@@ -177,7 +177,7 @@ schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;after next&#x27;</span>);
 });
 </code></pre>
-<h4 id="use-cases"><a href="#use-cases">Use Cases</a></h4>
+<h3 id="use-cases"><a href="#use-cases">Use Cases</a></h3>
 
 <p>Middleware are useful for atomizing model logic. Here are some other ideas:</p>
 <ul>
@@ -186,7 +186,7 @@ schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&
 <li>asynchronous defaults</li>
 <li>asynchronous tasks that a certain action triggers</li>
 </ul>
-<h4 id="error-handling"><a href="#error-handling">Errors in Pre Hooks</a></h4>
+<h3 id="error-handling"><a href="#error-handling">Errors in Pre Hooks</a></h3>
 
 <p>If any pre hook errors out, mongoose will not execute subsequent middleware
 or the hooked function. Mongoose will instead pass an error to the callback
@@ -226,7 +226,7 @@ myDoc.<span class="hljs-title function_">save</span>(<span class="hljs-keyword">
 </code></pre>
 <p>Calling <code>next()</code> multiple times is a no-op. If you call <code>next()</code> with an
 error <code>err1</code> and then throw an error <code>err2</code>, mongoose will report <code>err1</code>.</p>
-<h3 id="post"><a href="#post">Post middleware</a></h3>
+<h2 id="post"><a href="#post">Post middleware</a></h2>
 
 <p><a href="api.html#schema_Schema-post">post</a> middleware are executed <em>after</em>
 the hooked method and all of its <code>pre</code> middleware have completed.</p>
@@ -243,7 +243,7 @@ schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;%s has been removed&#x27;</span>, doc.<span class="hljs-property">_id</span>);
 });
 </code></pre>
-<h3 id="post-async"><a href="#post-async">Asynchronous Post Hooks</a></h3>
+<h2 id="post-async"><a href="#post-async">Asynchronous Post Hooks</a></h2>
 
 <p>If your post hook function takes at least 2 parameters, mongoose will
 assume the second parameter is a <code>next()</code> function that you will call to
@@ -263,7 +263,7 @@ schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">
   <span class="hljs-title function_">next</span>();
 });
 </code></pre>
-<h3 id="defining"><a href="#defining">Define Middleware Before Compiling Models</a></h3>
+<h2 id="defining"><a href="#defining">Define Middleware Before Compiling Models</a></h2>
 
 <p>Calling <code>pre()</code> or <code>post()</code> after <a href="models.html#compiling">compiling a model</a>
 does <strong>not</strong> work in Mongoose in general. For example, the below <code>pre(&#39;save&#39;)</code>
@@ -304,7 +304,7 @@ must define <a href="api/mongoose.html#mongoose_Mongoose-plugin">global plugins<
 <span class="hljs-comment">// to this schema.</span>
 <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, schema);
 </code></pre>
-<h3 id="order"><a href="#order">Save/Validate Hooks</a></h3>
+<h2 id="order"><a href="#order">Save/Validate Hooks</a></h2>
 
 <p>The <code>save()</code> function triggers <code>validate()</code> hooks, because mongoose
 has a built-in <code>pre(&#39;save&#39;)</code> hook that calls <code>validate()</code>. This means
@@ -323,7 +323,7 @@ schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this gets printed fourth&#x27;</span>);
 });
 </code></pre>
-<h3 id="naming"><a href="#naming">Naming Conflicts</a></h3>
+<h2 id="naming"><a href="#naming">Naming Conflicts</a></h2>
 
 <p>Mongoose has both query and document hooks for <code>remove()</code>.</p>
 <pre><code class="language-javascript">schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;remove&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) { <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Removing!&#x27;</span>); });
@@ -350,7 +350,7 @@ schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Removing!&#x27;</span>);
 });
 </code></pre>
-<h3 id="notes"><a href="#notes">Notes on findAndUpdate() and Query Middleware</a></h3>
+<h2 id="notes"><a href="#notes">Notes on findAndUpdate() and Query Middleware</a></h2>
 
 <p>Pre and post <code>save()</code> hooks are <strong>not</strong> executed on <code>update()</code>,
 <code>findOneAndUpdate()</code>, etc. You can see a more detailed discussion why in
@@ -404,7 +404,7 @@ rather than <code>Query#updateOne()</code>.</p>
 <span class="hljs-comment">// document middleware.</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">updateOne</span>({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test&#x27;</span> } });
 </code></pre>
-<h3 id="error-handling-middleware"><a href="#error-handling-middleware">Error Handling Middleware</a></h3>
+<h2 id="error-handling-middleware"><a href="#error-handling-middleware">Error Handling Middleware</a></h2>
 
 <p><em>New in 4.5.0</em></p>
 <p>Middleware execution normally stops the first time a piece of middleware
@@ -462,7 +462,7 @@ schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">
 <p>Error handling middleware can transform an error, but it can&#39;t remove the
 error. Even if you call <code>next()</code> with no error as shown above, the
 function call will still error out.</p>
-<h3 id="aggregate"><a href="#aggregate">Aggregation Hooks</a></h3>
+<h2 id="aggregate"><a href="#aggregate">Aggregation Hooks</a></h2>
 
 <p>You can also define hooks for the <a href="api/model.html#model_Model-aggregate"><code>Model.aggregate()</code> function</a>.
 In aggregation middleware functions, <code>this</code> refers to the <a href="api/aggregate.html#Aggregate">Mongoose <code>Aggregate</code> object</a>.
@@ -480,7 +480,7 @@ of each <a href="https://www.mongodb.com/docs/manual/core/aggregation-pipeline/"
 lets you access the MongoDB aggregation pipeline that Mongoose will send to
 the MongoDB server. It is useful for adding stages to the beginning of the
 pipeline from middleware.</p>
-<h3 id="synchronous"><a href="#synchronous">Synchronous Hooks</a></h3>
+<h2 id="synchronous"><a href="#synchronous">Synchronous Hooks</a></h2>
 
 <p>Certain Mongoose hooks are synchronous, which means they do <strong>not</strong> support
 functions that return promises or receive a <code>next()</code> callback. Currently,
@@ -520,7 +520,7 @@ schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">
   <span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">doc</span> =&gt;</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">findById</span>(doc)).
   <span class="hljs-keyword">catch</span>(<span class="hljs-function"><span class="hljs-params">error</span> =&gt;</span> assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;will show&#x27;</span>));
 </code></pre>
-<h3 id="next">Next Up</h3>
+<h2 id="next">Next Up</h2>
 
 <p>Now that we&#39;ve covered middleware, let&#39;s take a look at Mongoose&#39;s approach
 to faking JOINs with its query <a href="populate.html">population</a> helper.</p>

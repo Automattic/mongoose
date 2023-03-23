@@ -136,6 +136,7 @@ They always return promises.
 - `QueryCursor.prototype.next`
 
 If you are using the above functions with callbacks, we recommend switching to async/await, or promises if async functions don't work for you.
+If you need help refactoring a legacy codebase, [this tool from Mastering JS callbacks to async await](https://masteringjs.io/tutorials/tools/callback-to-async-await) using ChatGPT.
 
 ```javascript
 // Before

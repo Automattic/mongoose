@@ -7934,19 +7934,30 @@ describe('model: populate:', function() {
       assert.equal(res.nested.events[0].nestedLayer.users_$[0].name, 'test');
     });
 
-    it('accessing populate virtual prop (gh-8198)', async function() {
+    it('accessing populate virtual prop (gh-13189) (gh-8198)', async function() {
       const FooSchema = new Schema({
         name: String,
         children: [{
           barId: { type: Schema.Types.ObjectId, ref: 'Test' },
           quantity: Number
-        }]
+        }],
+        child: new Schema({
+          barId: {
+            type: 'ObjectId',
+            ref: 'Test'
+          }
+        })
       });
       FooSchema.virtual('children.bar', {
         ref: 'Test',
         localField: 'children.barId',
         foreignField: '_id',
         justOne: true
+      });
+      FooSchema.virtual('child.bars', {
+        ref: 'Test',
+        localField: 'child.barId',
+        foreignField: '_id'
       });
       const BarSchema = Schema({ name: String });
       const Foo = db.model('Test1', FooSchema);
@@ -7955,10 +7966,18 @@ describe('model: populate:', function() {
       const bar = await Bar.create({ name: 'bar' });
       const foo = await Foo.create({
         name: 'foo',
-        children: [{ barId: bar._id, quantity: 1 }]
+        children: [{ barId: bar._id, quantity: 1 }],
+        child: {
+          barId: bar._id
+        }
       });
-      const foo2 = await Foo.findById(foo._id).populate('children.bar');
+      const foo2 = await Foo.findById(foo._id).populate('children.bar child.bars');
       assert.equal(foo2.children[0].bar.name, 'bar');
+      assert.equal(foo2.child.bars[0].name, 'bar');
+
+      const asObject = foo2.toObject({ virtuals: true });
+      assert.equal(asObject.children[0].bar.name, 'bar');
+      assert.equal(asObject.child.bars[0].name, 'bar');
     });
 
     describe('gh-8247', function() {

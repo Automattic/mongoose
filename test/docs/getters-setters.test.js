@@ -17,9 +17,9 @@ describe('getters/setters', function() {
     mongoose.deleteModel(/.*/);
   });
 
-  after(async () => {
+  after(async() => {
     await mongoose.disconnect();
-  })
+  });
 
   describe('getters', function() {
     it('basic example', async function() {
@@ -50,7 +50,7 @@ describe('getters/setters', function() {
       // acquit:ignore:start
       assert.equal(user.email, '**@gmail.com');
       assert.equal(user.toJSON().email, 'ab@gmail.com');
-      
+
       user.email = 'test42@gmail.com';
       assert.equal(user.email, 'te****@gmail.com');
       // acquit:ignore:end
@@ -165,7 +165,9 @@ describe('getters/setters', function() {
       class User {
         // This won't convert the email to lowercase! That's because `email`
         // is just a setter, the actual `email` property doesn't store any data.
+        // also eslint will warn about using "return" on a setter
         set email(v) {
+          // eslint-disable-next-line no-setter-return
           return v.toLowerCase();
         }
       }
@@ -185,7 +187,7 @@ describe('getters/setters', function() {
         en: String,
         es: String
       });
-      
+
       const ingredientSchema = new Schema({
         // Instead of setting `name` to just a string, set `name` to a map
         // of language codes to strings.
@@ -201,7 +203,7 @@ describe('getters/setters', function() {
       const recipeSchema = new Schema({
         ingredients: [{ type: mongoose.ObjectId, ref: 'Ingredient' }]
       });
-      
+
       const Ingredient = mongoose.model('Ingredient', ingredientSchema);
       const Recipe = mongoose.model('Recipe', recipeSchema);
 
@@ -227,5 +229,5 @@ describe('getters/setters', function() {
       // Gets the ingredient's name in Spanish `name.es`
       assert.equal(recipes[0].ingredients[0].name, 'Huevos'); // 'Huevos'
     });
-  })
+  });
 });

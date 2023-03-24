@@ -1,11 +1,5 @@
 # Using GeoJSON
 
-<script>
-  _native.init("CK7DT53U",{
-    targetClass: 'native-inline'
-  });
-</script>
-
 [GeoJSON](http://geojson.org/) is a format for storing geographic points and
 polygons. [MongoDB has excellent support for geospatial queries](http://thecodebarbarian.com/80-20-guide-to-mongodb-geospatial-queries)
 on GeoJSON objects. Let's take a look at how you can use Mongoose to store
@@ -123,14 +117,14 @@ a polygon representing the state of Colorado using
 
 <img src="https://i.imgur.com/i32pWnC.png">
 
-```javascript
+```acquit
 [require:geojson.*driver query]
 ```
 
 Mongoose also has a [`within()` helper](api/query.html#query_Query-within)
 that's a shorthand for `$geoWithin`.
 
-```javascript
+```acquit
 [require:geojson.*within helper]
 ```
 
@@ -140,7 +134,7 @@ MongoDB supports [2dsphere indexes](https://www.mongodb.com/docs/manual/core/2ds
 for speeding up geospatial queries. Here's how you can define
 a 2dsphere index on a GeoJSON point:
 
-```javascript
+```acquit
 [require:geojson.*index$]
 ```
 

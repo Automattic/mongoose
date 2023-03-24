@@ -1,4 +1,4 @@
-## FAQ
+# FAQ
 
 <style>
 hr {
@@ -36,6 +36,8 @@ const Test = db.model('Test', schema);
 
 await Test.findOne(); // Will throw "Operation timed out" error because `db` isn't connected to MongoDB
 ```
+
+<hr id="not-local" />
 
 <a class="anchor" href="#not-local"> **Q**</a>. I am able to connect locally but when I try to connect to MongoDB Atlas I get this error. What gives?
 
@@ -236,13 +238,13 @@ for more information.
 
 ```javascript
 // all executed methods log output to console
-mongoose.set('debug', true)
-    
+mongoose.set('debug', true);
+
 // disable colors in debug mode
-mongoose.set('debug', { color: false })
+mongoose.set('debug', { color: false });
 
 // get mongodb-shell friendly output (ISODate)
-mongoose.set('debug', { shell: true })
+mongoose.set('debug', { shell: true });
 ```
 
 For more debugging options (streams, callbacks), see the ['debug' option under `.set()`](api/mongoose.html#mongoose_Mongoose-set).
@@ -296,7 +298,7 @@ same name, create a new connection and bind the model to the connection.
 
 ```javascript
 const mongoose = require('mongoose');
-const connection = mongoose.createConnection(..);
+const connection = mongoose.createConnection(/* ... */);
 
 // use mongoose.Schema
 const kittySchema = mongoose.Schema({ name: String });

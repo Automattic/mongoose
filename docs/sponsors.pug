@@ -2,7 +2,7 @@ extends layout
 
 block content
   div
-    h2 Mongoose Sponsors
+    h1 Mongoose Sponsors
 
   each sponsor in sponsors
     div(style='position: relative; margin-top: 1em;')
@@ -10,7 +10,7 @@ block content
         a(href=sponsor.url)
           img(src=sponsor.logo)
       div(style='padding-left: 110px; min-height: 100px')
-        h4(style='margin-top: 0.2em; margin-bottom: 0.25em;')
+        h3(style='margin-top: 0.2em; margin-bottom: 0.25em;')
           a(href=sponsor.url) #{sponsor.name}
         div !{sponsor.description}
 

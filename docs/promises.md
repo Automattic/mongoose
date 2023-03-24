@@ -1,6 +1,6 @@
-## Promises
+# Promises
 
-### Built-in Promises
+## Built-in Promises
 
 Mongoose async operations, like `.save()` and queries, return thenables.
 This means that you can do things like `MyModel.findOne({}).then()` and
@@ -10,43 +10,43 @@ This means that you can do things like `MyModel.findOne({}).then()` and
 You can find the return type of specific operations [in the api docs](api/mongoose.html)
 You can also read more about [promises in Mongoose](https://masteringjs.io/tutorials/mongoose/promise).
 
-```javascript
+```acquit
 [require:Built-in Promises]
 ```
 
-### Queries are not promises
+## Queries are not promises
 
 [Mongoose queries](http://mongoosejs.com/docs/queries.html) are **not** promises. They have a `.then()`
 function for [co](https://www.npmjs.com/package/co) and async/await as
 a convenience. If you need
 a fully-fledged promise, use the `.exec()` function.
 
-```javascript
+```acquit
 [require:Queries are not promises]
 ```
 
-### Queries are thenable
+## Queries are thenable
 
 Although queries are not promises, queries are [thenables](https://promisesaplus.com/#terminology).
 That means they have a `.then()` function, so you can use queries as promises with either
 promise chaining or [async await](https://asyncawait.net)
 
-```javascript
+```acquit
 [require:Queries are thenable]
 ```
 
-### Should You Use `exec()` With `await`?
+## Should You Use `exec()` With `await`?
 
 There are two alternatives for using `await` with queries:
 
 - `await Band.findOne();`
 - `await Band.findOne().exec();`
- 
+
 As far as functionality is concerned, these two are equivalent.
 However, we recommend using `.exec()` because that gives you
 better stack traces.
 
-```javascript
+```acquit
 [require:Should You Use `exec\(\)` With `await`]
 ```
 

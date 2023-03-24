@@ -1,4 +1,4 @@
-## Migrating from 4.x to 5.x
+# Migrating from 4.x to 5.x
 
 There are several [backwards-breaking changes](https://github.com/Automattic/mongoose/blob/master/History.md)
 you should be aware of when migrating from Mongoose 4.x to Mongoose 5.x.
@@ -38,13 +38,13 @@ If you're still on Mongoose 3.x, please read the [Mongoose 3.x to 4.x migration 
 * [`bulkWrite()` results](#bulkwrite-results)
 * [Strict SSL validation](#strict-ssl-validation)
 
-<h3 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h3>
+<h2 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h2>
 
 Mongoose now requires Node.js >= 4.0.0 and MongoDB >= 3.0.0.
 [MongoDB 2.6](https://www.mongodb.com/blog/post/mongodb-2-6-end-of-life) and
 [Node.js < 4](https://github.com/nodejs/Release) where both EOL-ed in 2016.
 
-<h3 id="query-middleware"><a href="#query-middleware">Query Middleware</a></h3>
+<h2 id="query-middleware"><a href="#query-middleware">Query Middleware</a></h2>
 
 Query middleware is now compiled when you call `mongoose.model()` or `db.model()`. If you add query middleware after calling `mongoose.model()`, that middleware will **not** get called.
 
@@ -60,9 +60,9 @@ MyModel.find().exec(function() {
 });
 ```
 
-<h3 id="promises-and-callbacks"><a href="#promises-and-callbacks">
+<h2 id="promises-and-callbacks"><a href="#promises-and-callbacks">
   Promises and Callbacks for <code>mongoose.connect()</code>
-</a></h3>
+</a></h2>
 
 `mongoose.connect()` and `mongoose.disconnect()` now return a promise if no callback specified, or `null` otherwise. It does **not** return the mongoose singleton.
 
@@ -77,9 +77,9 @@ mongoose.connect('mongodb://127.0.0.1:27017/test');
 mongoose.model('Test', new Schema({}));
 ```
 
-<h3 id="connection-logic"><a href="#connection-logic">
+<h2 id="connection-logic"><a href="#connection-logic">
   Connection Logic and <code>useMongoClient</code>
-</a></h3>
+</a></h2>
 
 The [`useMongoClient` option](/docs/4.x/docs/connections.html#use-mongo-client) was
 removed in Mongoose 5, it is now always `true`. As a consequence, Mongoose 5
@@ -94,9 +94,9 @@ examples of `mongoose.connect()` calls that do **not** work in Mongoose 5.x.
 In Mongoose 5.x, the first parameter to `mongoose.connect()` and `mongoose.createConnection()`, if specified, **must** be a [MongoDB connection string](https://www.mongodb.com/docs/manual/reference/connection-string/). The
 connection string and options are then passed down to [the MongoDB Node.js driver's `MongoClient.connect()` function](http://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html#.connect). Mongoose does not modify the connection string, although `mongoose.connect()` and `mongoose.createConnection()` support a [few additional options in addition to the ones the MongoDB driver supports](http://mongoosejs.com/docs/connections.html#options).
 
-<h3 id="setter-order"><a href="#setter-order">
+<h2 id="setter-order"><a href="#setter-order">
   Setter Order
-</a></h3>
+</a></h2>
 
 Setters run in reverse order in 4.x:
 
@@ -116,9 +116,9 @@ schema.path('name').
   set(() => console.log('This will print 2nd'));
 ```
 
-<h3 id="id-getter"><a href="#id-getter">
+<h2 id="id-getter"><a href="#id-getter">
   Checking if a path is populated
-</a></h3>
+</a></h2>
 
 Mongoose 5.1.0 introduced an `_id` getter to ObjectIds that lets you get an ObjectId regardless of whether a path
 is populated.
@@ -141,16 +141,16 @@ console.log(blogPost.author); // '5b207f84e8061d1d2711b421'
 console.log(blogPost.author._id);
 
 await blogPost.populate('author');
-console.log(blogPost.author._id); '5b207f84e8061d1d2711b421'
+console.log(blogPost.author._id); // '5b207f84e8061d1d2711b421'
 ```
 
 As a consequence, checking whether `blogPost.author._id` is [no longer viable as a way to check whether `author` is populated](https://github.com/Automattic/mongoose/issues/6415#issuecomment-388579185). Use `blogPost.populated('author') != null` or `blogPost.author instanceof mongoose.Types.ObjectId` to check whether `author` is populated instead.
 
 Note that you can call `mongoose.set('objectIdGetter', false)` to change this behavior.
 
-<h3 id="return-value-for-delete"><a href="#return-value-for-delete">
+<h2 id="return-value-for-delete"><a href="#return-value-for-delete">
   Return Values for <code>remove()</code> and <code>deleteX()</code>
-</a></h3>
+</a></h2>
 
 `deleteOne()`, `deleteMany()`, and `remove()` now resolve to the result object
 rather than the full [driver `WriteOpResult` object](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#~writeOpCallback).
@@ -162,9 +162,9 @@ MyModel.deleteMany().then(res => console.log(res.result.n));
 MyModel.deleteMany().then(res => res.n);
 ```
 
-<h3 id="aggregation-cursors"><a href="#aggregation-cursors">
+<h2 id="aggregation-cursors"><a href="#aggregation-cursors">
   Aggregation Cursors
-</a></h3>
+</a></h2>
 
 The `useMongooseAggCursor` option from 4.x is now always on. This is the new syntax for aggregation cursors in mongoose 5:
 
@@ -182,23 +182,23 @@ const cursorWithOptions = MyModel.
   exec();
 ```
 
-<h3 id="geonear"><a href="#geonear">
+<h2 id="geonear"><a href="#geonear">
   geoNear
-</a></h3>
+</a></h2>
 
 `Model.geoNear()` has been removed because the [MongoDB driver no longer supports it](https://github.com/mongodb/node-mongodb-native/blob/4bac63ce7b9e9fff87c31c5a27d78bcdaca12669/etc/notes/CHANGES_3.0.0.md#geonear-command-helper)
 
-<h3 id="uri-encoding"><a href="#uri-encoding">
+<h2 id="uri-encoding"><a href="#uri-encoding">
   Required URI encoding of connection strings
-</a></h3>
+</a></h2>
 
 Due to changes in the MongoDB driver, connection strings must be URI encoded.
 
 If they are not, connections may fail with an illegal character message.
 
-<h3 id="password-characters"><a href="#password-characters">
+<h2 id="password-characters"><a href="#password-characters">
   Passwords which contain certain characters
-</a></h3>
+</a></h2>
 
 See a [full list of affected characters](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
 
@@ -212,24 +212,24 @@ versions. You can use a function like this:
 
 ```javascript
 const uriFormat = require('mongodb-uri');
-function encodeMongoURI (urlString) {
-    if (urlString) {
-      let parsed = uriFormat.parse(urlString);
-      urlString = uriFormat.format(parsed);
-    }
-    return urlString;
+function encodeMongoURI(urlString) {
+  if (urlString) {
+    const parsed = uriFormat.parse(urlString);
+    urlString = uriFormat.format(parsed);
+  }
+  return urlString;
 }
 
 // Your un-encoded string.
-const mongodbConnectString = "mongodb://...";
+const mongodbConnectString = 'mongodb://...';
 mongoose.connect(encodeMongoURI(mongodbConnectString));
 ```
 
 The function above is safe to use whether the existing string is already encoded or not.
 
-<h3 id="domain-sockets"><a href="#domain-sockets">
+<h2 id="domain-sockets"><a href="#domain-sockets">
   Domain sockets
-</a></h3>
+</a></h2>
 
 Domain sockets must be URI encoded. For example:
 
@@ -244,9 +244,9 @@ const host = encodeURIComponent('/tmp/mongodb-27017.sock');
 mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
 ```
 
-<h3 id="toobject-options"><a href="#toobject-options">
+<h2 id="toobject-options"><a href="#toobject-options">
   <code>toObject()</code> Options
-</a></h3>
+</a></h2>
 
 The `options` parameter to `toObject()` and `toJSON()` merge defaults rather than overwriting them.
 
@@ -264,9 +264,9 @@ const doc = new MyModel({ name: 'test' });
 console.log(doc.toJSON({ minimize: false }).answer);
 ```
 
-<h3 id="aggregate-parameters"><a href="#aggregate-parameters">
+<h2 id="aggregate-parameters"><a href="#aggregate-parameters">
   Aggregate Parameters
-</a></h3>
+</a></h2>
 
 `aggregate()` no longer accepts a spread, you **must** pass your aggregation pipeline as an array. The below code worked in 4.x:
 
@@ -280,9 +280,9 @@ The above code does **not** work in 5.x, you **must** wrap the `$match` and `$sk
 MyModel.aggregate([{ $match: { isDeleted: false } }, { $skip: 10 }]).exec(cb);
 ```
 
-<h3 id="boolean-casting"><a href="#boolean-casting">
+<h2 id="boolean-casting"><a href="#boolean-casting">
   Boolean Casting
-</a></h3>
+</a></h2>
 
 By default, mongoose 4 would coerce any value to a boolean without error.
 
@@ -313,9 +313,9 @@ And the following values to `false`:
 
 All other values will cause a `CastError`
 
-<h3 id="query-casting"><a href="#query-casting">
+<h2 id="query-casting"><a href="#query-casting">
   Query Casting
-</a></h3>
+</a></h2>
 
 Casting for `update()`, `updateOne()`, `updateMany()`, `replaceOne()`,
 `remove()`, `deleteOne()`, and `deleteMany()` doesn't happen until `exec()`.
@@ -331,9 +331,9 @@ _after_ passing in an update.
 User.where({ name: 'Bar' }).update({ name: 'Baz' }).setOptions({ overwrite: true });
 ```
 
-<h3 id="post-save-flow-control"><a href="#post-save-flow-control">
+<h2 id="post-save-flow-control"><a href="#post-save-flow-control">
   Post Save Hooks Get Flow Control
-</a></h3>
+</a></h2>
 
 Post hooks now get flow control, which means async post save hooks and child document post save hooks execute **before** your `save()` callback.
 
@@ -360,21 +360,21 @@ m.save(function() {
 });
 ```
 
-<h3 id="pushall"><a href="#pushall">
+<h2 id="pushall"><a href="#pushall">
   The <code>$pushAll</code> Operator
-</a></h3>
+</a></h2>
 
 `$pushAll` is no longer supported and no longer used internally for `save()`, since it has been [deprecated since MongoDB 2.4](https://www.mongodb.com/docs/manual/reference/operator/update/pushAll/). Use `$push` with `$each` instead.
 
-<h3 id="retain-key-order"><a href="#retain-key-order">
+<h2 id="retain-key-order"><a href="#retain-key-order">
   Always Use Forward Key Order
-</a></h3>
+</a></h2>
 
 The `retainKeyOrder` option was removed, mongoose will now always retain the same key position when cloning objects. If you have queries or indexes that rely on reverse key order, you will have to change them.
 
-<h3 id="run-setters-on-queries"><a href="#run-setters-on-queries">
+<h2 id="run-setters-on-queries"><a href="#run-setters-on-queries">
   Run setters on queries
-</a></h3>
+</a></h2>
 
 Setters now run on queries by default, and the old `runSettersOnQuery` option
 has been removed.
@@ -387,81 +387,81 @@ const Model = mongoose.model('Test', schema);
 Model.find({ email: 'FOO@BAR.BAZ' }); // Converted to `find({ email: 'foo@bar.baz' })`
 ```
 
-<h3 id="browser-bundle"><a href="#browser-bundle">
+<h2 id="browser-bundle"><a href="#browser-bundle">
   Pre-compiled Browser Bundle
-</a></h3>
+</a></h2>
 
 We no longer have a pre-compiled version of mongoose for the browser. If you want to use mongoose schemas in the browser, you need to build your own bundle with browserify/webpack.
 
-<h3 id="save-errors"><a href="#save-errors">
+<h2 id="save-errors"><a href="#save-errors">
   Save Errors
-</a></h3>
+</a></h2>
 
 The `saveErrorIfNotFound` option was removed, mongoose will now always error out from `save()` if the underlying document was not found
 
-<h3 id="init-hooks"><a href="#init-hooks">
+<h2 id="init-hooks"><a href="#init-hooks">
   Init hook signatures
-</a></h3>
+</a></h2>
 
 `init` hooks are now fully synchronous and do not receive `next()` as a parameter.
 
 `Document.prototype.init()` no longer takes a callback as a parameter. It
 was always synchronous, just had a callback for legacy reasons.
 
-<h3 id="save-num-affected"><a href="#save-num-affected">
+<h2 id="save-num-affected"><a href="#save-num-affected">
   <code>numAffected</code> and <code>save()</code>
-</a></h3>
+</a></h2>
 
 `doc.save()` no longer passes `numAffected` as a 3rd param to its callback.
 
-<h3 id="remove-debounce"><a href="#remove-debounce">
+<h2 id="remove-debounce"><a href="#remove-debounce">
   <code>remove()</code> and debouncing
-</a></h3>
+</a></h2>
 
 `doc.remove()` no longer debounces
 
-<h3 id="get-promise-constructor"><a href="#get-promise-constructor">
+<h2 id="get-promise-constructor"><a href="#get-promise-constructor">
   <code>getPromiseConstructor()</code>
-</a></h3>
+</a></h2>
 
 `getPromiseConstructor()` is gone, just use `mongoose.Promise`.
 
-<h3 id="pre-hook-params"><a href="#pre-hook-params">
+<h2 id="pre-hook-params"><a href="#pre-hook-params">
   Passing Parameters from Pre Hooks
-</a></h3>
+</a></h2>
 
 You cannot pass parameters to the next pre middleware in the chain using `next()` in mongoose 5.x. In mongoose 4, `next('Test')` in pre middleware would call the
 next middleware with 'Test' as a parameter. Mongoose 5.x has removed support for this.
 
-<h3 id="array-required"><a href="#array-required">
+<h2 id="array-required"><a href="#array-required">
   <code>required</code> validator for arrays
-</a></h3>
+</a></h2>
 
 In mongoose 5 the `required` validator only verifies if the value is an
 array. That is, it will **not** fail for _empty_ arrays as it would in
 mongoose 4.
 
-<h3 id="debug-output"><a href="#debug-output">
+<h2 id="debug-output"><a href="#debug-output">
   debug output defaults to stdout instead of stderr
-</a></h3>
+</a></h2>
 
 In mongoose 5 the default debug function uses `console.info()` to display messages instead of `console.error()`.
 
-<h3 id="overwrite-filter"><a href="#overwrite-filter">
+<h2 id="overwrite-filter"><a href="#overwrite-filter">
   Overwriting filter properties
-</a></h3>
+</a></h2>
 
 In Mongoose 4.x, overwriting a filter property that's a primitive with one that is an object would silently fail. For example, the below code would ignore the `where()` and be equivalent to `Sport.find({ name: 'baseball' })`
 
 ```javascript
-Sport.find({ name: 'baseball' }).where({name: {$ne: 'softball'}});
+Sport.find({ name: 'baseball' }).where({ name: { $ne: 'softball' } });
 ```
 
-In Mongoose 5.x, the above code will correctly overwrite `'baseball'` with `{ $ne: 'softball' }` 
+In Mongoose 5.x, the above code will correctly overwrite `'baseball'` with `{ $ne: 'softball' }`
 
-<h3 id="bulkwrite-results"><a href="#bulkwrite-results">
+<h2 id="bulkwrite-results"><a href="#bulkwrite-results">
   <code>bulkWrite()</code> results
-</a></h3>
+</a></h2>
 
 Mongoose 5.x uses version 3.x of the [MongoDB Node.js driver](http://npmjs.com/package/mongodb). MongoDB driver 3.x changed the format of
 the result of [`bulkWrite()` calls](api/model.html#model_Model-bulkWrite) so there is no longer a top-level `nInserted`, `nModified`, etc. property. The new result object structure is [described here](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~BulkWriteOpResult).
@@ -533,9 +533,9 @@ BulkWriteResult {
   n: 1 }
 ```
 
-<h3 id="strict-ssl-validation"><a href="#strict-ssl-validation">
+<h2 id="strict-ssl-validation"><a href="#strict-ssl-validation">
   Strict SSL Validation
-</a></h3>
+</a></h2>
 
 The most recent versions of the [MongoDB Node.js driver use strict SSL validation by default](http://mongodb.github.io/node-mongodb-native/3.5/tutorials/connect/tls/),
 which may lead to errors if you're using [self-signed certificates](https://github.com/Automattic/mongoose/issues/9147).

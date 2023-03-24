@@ -106,8 +106,8 @@ try {
   fs.mkdirSync(path.join(cwd, './docs/api'));
 } catch (err) {} // eslint-disable-line no-empty
 
-require('../docs/splitApiDocs');
-const filemap = Object.assign({}, require('../docs/source'), require('../docs/tutorials'), require('../docs/typescript'));
+require('../docs/source/splitApiDocs');
+const filemap = Object.assign({}, require('../docs/source'));
 const files = Object.keys(filemap);
 
 const wrapMarkdown = (md, baseLayout) => `
@@ -152,6 +152,8 @@ async function pugify(filename, options) {
 
   if (options.acquit) {
     contents = transform(contents, tests);
+
+    contents = contents.replaceAll(/^```acquit$/gmi, "```javascript");
   }
   if (options.markdown) {
     const lines = contents.split('\n');

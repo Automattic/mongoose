@@ -6,13 +6,13 @@ One of these new features is the [`SchemaType.cast()` function](../api/schematyp
 For example, by default Mongoose will throw an error if you attempt to cast
 a string that contains a Japanese numeral to a number.
 
-```javascript
+```acquit
 [require:custom casting.*casting error]
 ```
 
 You can overwrite the default casting function for numbers to allow converting
 the string that contains the Japanese numeral "2" to a number as shown below.
 
-```javascript
+```acquit
 [require:custom casting.*casting override]
 ```

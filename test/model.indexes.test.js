@@ -256,19 +256,23 @@ describe('model', function() {
 
     it('error should emit on the model', async function() {
       const schema = new Schema({ name: { type: String } });
-      const Test = db.model('Test', schema);
-
+      const Test = db.model('Test', schema, 'Test');
+      await Test.init();
       await Test.create({ name: 'hi' }, { name: 'hi' });
 
-      Test.schema.index({ name: 1 }, { unique: true });
-      Test.schema.index({ other: 1 });
+      const Test2 = db.model(
+        'Test2',
+        new Schema({
+          name: {
+            type: String,
+            unique: true
+          }
+        }),
+        'Test'
+      );
 
-      const err = await Test.ensureIndexes().then(() => null, err => err);
-
+      const err = await Test2.init().then(() => null, err => err);
       assert.ok(/E11000 duplicate key error/.test(err.message), err);
-
-      delete Test.$init;
-      await Test.init().catch(() => {});
     });
 
     it('when one index creation errors', async function() {

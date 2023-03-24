@@ -4,25 +4,21 @@ const assert = require('assert');
 const mongoose = require('../../');
 const start = require('../common');
 
-describe('promises docs', function () {
+describe('promises docs', function() {
   let Band;
   let db;
 
-  before(function (done) {
+  before(function() {
     db = mongoose.createConnection(start.uri);
 
-    Band = db.model('band-promises', {name: String, members: [String]});
-
-    done();
+    Band = db.model('band-promises', { name: String, members: [String] });
   });
 
-  beforeEach(function (done) {
-    Band.deleteMany({}, done);
+  beforeEach(function() {
+    return Band.deleteMany({});
   });
 
-  after(async function () {
-    mongoose.Promise = global.Promise;
-
+  after(async function() {
     await db.close();
   });
 
@@ -31,21 +27,21 @@ describe('promises docs', function () {
    * This means that you can do things like `MyModel.findOne({}).then()` and
    * `await MyModel.findOne({}).exec()` if you're using
    * [async/await](http://thecodebarbarian.com/80-20-guide-to-async-await-in-node.js.html).
-   * 
+   *
    * You can find the return type of specific operations [in the api docs](https://mongoosejs.com/docs/api.html)
    * You can also read more about [promises in Mongoose](https://masteringjs.io/tutorials/mongoose/promise).
    */
-  it('Built-in Promises', function (done) {
+  it('Built-in Promises', function(done) {
     const gnr = new Band({
-      name: "Guns N' Roses",
+      name: 'Guns N\' Roses',
       members: ['Axl', 'Slash']
     });
 
     const promise = gnr.save();
     assert.ok(promise instanceof Promise);
 
-    promise.then(function (doc) {
-      assert.equal(doc.name, "Guns N' Roses");
+    promise.then(function(doc) {
+      assert.equal(doc.name, 'Guns N\' Roses');
       // acquit:ignore:start
       done();
       // acquit:ignore:end
@@ -58,8 +54,8 @@ describe('promises docs', function () {
    * a convenience. If you need
    * a fully-fledged promise, use the `.exec()` function.
    */
-  it('Queries are not promises', function (done) {
-    const query = Band.findOne({name: "Guns N' Roses"});
+  it('Queries are not promises', function(done) {
+    const query = Band.findOne({ name: 'Guns N\' Roses' });
     assert.ok(!(query instanceof Promise));
 
     // acquit:ignore:start
@@ -76,10 +72,10 @@ describe('promises docs', function () {
     });
 
     // `.exec()` gives you a fully-fledged promise
-    const promise = Band.findOne({name: "Guns N' Roses"}).exec();
+    const promise = Band.findOne({ name: 'Guns N\' Roses' }).exec();
     assert.ok(promise instanceof Promise);
 
-    promise.then(function (doc) {
+    promise.then(function(doc) {
       // use doc
       // acquit:ignore:start
       assert.ok(!doc);
@@ -93,8 +89,8 @@ describe('promises docs', function () {
    * That means they have a `.then()` function, so you can use queries as promises with either
    * promise chaining or [async await](https://asyncawait.net)
    */
-  it('Queries are thenable', function (done) {
-    Band.findOne({name: "Guns N' Roses"}).then(function(doc) {
+  it('Queries are thenable', function(done) {
+    Band.findOne({ name: 'Guns N\' Roses' }).then(function(doc) {
       // use doc
       // acquit:ignore:start
       assert.ok(!doc);
@@ -105,17 +101,25 @@ describe('promises docs', function () {
 
   /**
    * There are two alternatives for using `await` with queries:
-   * 
+   *
    * - `await Band.findOne();`
    * - `await Band.findOne().exec();`
-   * 
+   *
    * As far as functionality is concerned, these two are equivalent.
-   * However, we recommend using `.exec()` because that gives you
+   * In Mongoose 6, we recommended using `.exec()` because that gives you
    * better stack traces.
+   * However, in Mongoose 7+, that is no longer the case.
+   * You may use whichever you prefer: `await Band.findOne()` is more concise,
+   * `await Band.findOne().exec()` is more explicit and ensures that you `await`
+   * on a fully fledged promise.
    */
   it('Should You Use `exec()` With `await`?', async function() {
-    const doc = await Band.findOne({ name: "Guns N' Roses" }); // works
+    const doc = await Band.findOne({ name: 'Guns N\' Roses' }); // works
     // acquit:ignore:start
+    if (typeof Deno !== 'undefined') {
+      // Deno doesn't have V8 async stack traces
+      return this.skip();
+    }
     assert.ok(!doc);
     // acquit:ignore:end
 
@@ -133,7 +137,7 @@ describe('promises docs', function () {
       //   at process._tickCallback (internal/process/next_tick.js:68:7)
       err.stack;
       // acquit:ignore:start
-      assert.ok(!err.stack.includes('promises.test.js'));
+      assert.ok(err.stack.includes('promises.test.js'));
       // acquit:ignore:end
     }
 
@@ -153,35 +157,5 @@ describe('promises docs', function () {
       assert.ok(err.stack.includes('promises.test.js'));
       // acquit:ignore:end
     }
-  });
-  
-  /**
-   * If you're an advanced user, you may want to plug in your own promise
-   * library like [bluebird](https://www.npmjs.com/package/bluebird). Just set
-   * `mongoose.Promise` to your favorite
-   * ES6-style promise constructor and mongoose will use it.
-   */
-  it('Plugging in your own Promises Library', function (done) {
-    // acquit:ignore:start
-    if (!global.Promise) {
-      return done();
-    }
-    // acquit:ignore:end
-    // Use bluebird
-    mongoose.Promise = require('bluebird');
-    const bluebirdPromise = Band.findOne({name: "Guns N' Roses"}).exec();
-    assert.equal(bluebirdPromise.constructor, require('bluebird'));
-
-    // Use q. Note that you **must** use `require('q').Promise`.
-    mongoose.Promise = require('q').Promise;
-    const qPromise = Band.findOne({name: "Guns N' Roses"}).exec();
-    assert.ok(qPromise instanceof require('q').makePromise);
-
-    // acquit:ignore:start
-    // Wait for promises
-    bluebirdPromise.then(qPromise).then(function () {
-      done();
-    });
-    // acquit:ignore:end
   });
 });

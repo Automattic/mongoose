@@ -3,8 +3,6 @@ const assert = require('assert');
 const mongoose = require('../../');
 const start = require('../common');
 
-const Promise = global.Promise || require('bluebird');
-
 describe('validation docs', function() {
   let db;
   const Schema = mongoose.Schema;
@@ -51,7 +49,7 @@ describe('validation docs', function() {
     } catch (err) {
       error = err;
     }
-    
+
     assert.equal(error.errors['name'].message,
       'Path `name` is required.');
 
@@ -157,7 +155,7 @@ describe('validation docs', function() {
 
   /**
    * A common gotcha for beginners is that the `unique` option for schemas
-   * is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://docs.mongodb.com/manual/core/index-unique/).
+   * is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://www.mongodb.com/docs/manual/core/index-unique/).
    * See the [FAQ](/docs/faq.html) for more information.
    */
 
@@ -176,14 +174,20 @@ describe('validation docs', function() {
     // acquit:ignore:end
 
     const dup = [{ username: 'Val' }, { username: 'Val' }];
-    U1.create(dup, err => {
-      // Race condition! This may save successfully, depending on whether
-      // MongoDB built the index before writing the 2 docs.
-      // acquit:ignore:start
-      err;
-      --remaining || done();
-      // acquit:ignore:end
-    });
+    // Race condition! This may save successfully, depending on whether
+    // MongoDB built the index before writing the 2 docs.
+    U1.create(dup).
+      then(() => {
+        // acquit:ignore:start
+        --remaining || done();
+        // acquit:ignore:end
+      }).
+      catch(err => {
+        // acquit:ignore:start
+        err;
+        --remaining || done();
+        // acquit:ignore:end
+      });
 
     // You need to wait for Mongoose to finish building the `unique`
     // index before writing. You only need to build indexes once for
@@ -193,7 +197,7 @@ describe('validation docs', function() {
     U2.init().
       then(() => U2.create(dup)).
       catch(error => {
-        // Will error, but will *not* be a mongoose validation error, it will be
+        // `U2.create()` will error, but will *not* be a mongoose validation error, it will be
         // a duplicate key error.
         // See: https://masteringjs.io/tutorials/mongoose/e11000-duplicate-key
         assert.ok(error);
@@ -325,10 +329,10 @@ describe('validation docs', function() {
     let error;
     try {
       await toy.save();
-    } catch(err) {
+    } catch (err) {
       error = err;
     }
-    
+
     // `error` is a ValidationError object
     // `error.errors.color` is a ValidatorError object
     assert.equal(error.errors.color.message, 'Color `Green` not valid');
@@ -541,10 +545,7 @@ describe('validation docs', function() {
    * you try to explicitly `$unset` the key.
    */
 
-  it('Update Validators Only Run On Updated Paths', function(done) {
-    // acquit:ignore:start
-    let outstanding = 2;
-    // acquit:ignore:end
+  it('Update Validators Only Run On Updated Paths', async function() {
     const kittenSchema = new Schema({
       name: { type: String, required: true },
       age: Number
@@ -554,22 +555,14 @@ describe('validation docs', function() {
 
     const update = { color: 'blue' };
     const opts = { runValidators: true };
-    Kitten.updateOne({}, update, opts, function() {
-      // Operation succeeds despite the fact that 'name' is not specified
-      // acquit:ignore:start
-      --outstanding || done();
-      // acquit:ignore:end
-    });
+    // Operation succeeds despite the fact that 'name' is not specified
+    await Kitten.updateOne({}, update, opts);
 
     const unset = { $unset: { name: 1 } };
-    Kitten.updateOne({}, unset, opts, function(err) {
-      // Operation fails because 'name' is required
-      assert.ok(err);
-      assert.ok(err.errors['name']);
-      // acquit:ignore:start
-      --outstanding || done();
-      // acquit:ignore:end
-    });
+    // Operation fails because 'name' is required
+    const err = await Kitten.updateOne({}, unset, opts).then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['name']);
   });
 
   /**

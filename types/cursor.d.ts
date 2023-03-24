@@ -23,7 +23,6 @@ declare module 'mongoose' {
      * Marks this cursor as closed. Will stop streaming and subsequent calls to
      * `next()` will error.
      */
-    close(callback: CallbackWithoutResult): void;
     close(): Promise<void>;
 
     /**
@@ -39,10 +38,8 @@ declare module 'mongoose' {
      * will wait for the promise to resolve before iterating on to the next one.
      * Returns a promise that resolves when done.
      */
-    eachAsync(fn: (doc: DocType[]) => any, options: EachAsyncOptions & { batchSize: number }, callback: CallbackWithoutResult): void;
-    eachAsync(fn: (doc: DocType) => any, options: EachAsyncOptions, callback: CallbackWithoutResult): void;
-    eachAsync(fn: (doc: DocType[]) => any, options: EachAsyncOptions & { batchSize: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType) => any, options?: EachAsyncOptions): Promise<void>;
+    eachAsync(fn: (doc: DocType[], i: number) => any, options: EachAsyncOptions & { batchSize: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType, i: number) => any, options?: EachAsyncOptions): Promise<void>;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved
@@ -54,7 +51,6 @@ declare module 'mongoose' {
      * Get the next document from this cursor. Will return `null` when there are
      * no documents left.
      */
-    next(callback: Callback<DocType | null>): void;
     next(): Promise<DocType>;
 
     options: Options;

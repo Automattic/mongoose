@@ -108,22 +108,19 @@ expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: false }); // tes
 interface IProfile {
   age: number;
 }
-interface ProfileDoc extends Document, IProfile { }
 const ProfileSchemaDef: SchemaDefinition<IProfile> = { age: Number };
-export const ProfileSchema = new Schema<ProfileDoc, Model<ProfileDoc>, ProfileDoc>(ProfileSchemaDef);
+export const ProfileSchema = new Schema<IProfile, Model<IProfile>>(ProfileSchemaDef);
 
 interface IUser {
   email: string;
-  profile: ProfileDoc;
+  profile: IProfile;
 }
-
-interface UserDoc extends Document, IUser { }
 
 const ProfileSchemaDef2: SchemaDefinition<IProfile> = {
   age: Schema.Types.Number
 };
 
-const ProfileSchema2: Schema<ProfileDoc, Model<ProfileDoc>> = new Schema<ProfileDoc>(ProfileSchemaDef2);
+const ProfileSchema2: Schema<IProfile, Model<IProfile>> = new Schema<IProfile>(ProfileSchemaDef2);
 
 const UserSchemaDef: SchemaDefinition<IUser> = {
   email: String,
@@ -224,7 +221,7 @@ function gh10605() {
 }
 
 function gh10605_2() {
-  interface ITestSchema extends Document {
+  interface ITestSchema {
     someObject: Array<{ id: string }>
   }
 
@@ -305,7 +302,7 @@ function gh11439() {
   const bookSchema = new Schema<Book>({
     collection: String
   }, {
-    supressReservedKeysWarning: true
+    suppressReservedKeysWarning: true
   });
 }
 
@@ -873,6 +870,22 @@ function testInferTimestamps() {
   // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
   // { name?: string | undefined; }"
   expectType<{ createdAt: Date, updatedAt: Date } & { name?: string }>({} as WithTimestamps);
+
+  const schema2 = new Schema({
+    name: String
+  }, {
+    timestamps: true,
+    methods: { myName(): string | undefined {
+      return this.name;
+    } }
+  });
+
+  type WithTimestamps2 = InferSchemaType<typeof schema2>;
+  // For some reason, expectType<{ createdAt: Date, updatedAt: Date, name?: string }> throws
+  // an error "Parameter type { createdAt: Date; updatedAt: Date; name?: string | undefined; }
+  // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
+  // { name?: string | undefined; }"
+  expectType<{ name?: string }>({} as WithTimestamps2);
 }
 
 function gh12431() {
@@ -940,7 +953,8 @@ function gh12590() {
 
   type User = InferSchemaType<typeof UserSchema>;
 
-  expectType<SchemaType<User>>(UserSchema.path('hashed_password'));
+  const path = UserSchema.path('hashed_password');
+  expectType<SchemaType<any, HydratedDocument<User>>>(path);
 
   UserSchema.path('hashed_password').validate(function(v) {
     expectType<HydratedDocument<User>>(this);
@@ -981,4 +995,126 @@ function gh12782() {
 
 function gh12816() {
   const schema = new Schema({}, { overwriteModels: true });
+}
+
+function gh12869() {
+  const dbExampleConst = new Schema(
+    {
+      active: { type: String, enum: ['foo', 'bar'] as const, required: true }
+    }
+  );
+
+  type ExampleConst = InferSchemaType<typeof dbExampleConst>;
+  expectType<'foo' | 'bar'>({} as ExampleConst['active']);
+
+  const dbExample = new Schema(
+    {
+      active: { type: String, enum: ['foo', 'bar'], required: true }
+    }
+  );
+
+  type Example = InferSchemaType<typeof dbExample>;
+  expectType<'foo' | 'bar'>({} as Example['active']);
+}
+
+function gh12882() {
+  // Array of strings
+  const arrString = new Schema({
+    fooArray: {
+      type: [{
+        type: String,
+        required: true
+      }],
+      required: true
+    }
+  });
+  type tArrString = InferSchemaType<typeof arrString>;
+  // Array of numbers using string definition
+  const arrNum = new Schema({
+    fooArray: {
+      type: [{
+        type: 'Number',
+        required: true
+      }],
+      required: true
+    }
+  });
+  type tArrNum = InferSchemaType<typeof arrNum>;
+  expectType<{
+    fooArray: number[]
+  }>({} as tArrNum);
+  // Array of object with key named "type"
+  const arrType = new Schema({
+    fooArray: {
+      type: [{
+        type: {
+          type: String,
+          required: true
+        },
+        foo: {
+          type: Number,
+          required: true
+        }
+      }],
+      required: true
+    }
+  });
+  type tArrType = InferSchemaType<typeof arrType>;
+  expectType<{
+    fooArray: {
+      type: string;
+      foo: number;
+    }[]
+  }>({} as tArrType);
+  // Readonly array of strings
+  const rArrString = new Schema({
+    fooArray: {
+      type: [{
+        type: String,
+        required: true
+      }] as const,
+      required: true
+    }
+  });
+  type rTArrString = InferSchemaType<typeof rArrString>;
+  expectType<{
+    fooArray: string[]
+  }>({} as rTArrString);
+  // Readonly array of numbers using string definition
+  const rArrNum = new Schema({
+    fooArray: {
+      type: [{
+        type: 'Number',
+        required: true
+      }] as const,
+      required: true
+    }
+  });
+  type rTArrNum = InferSchemaType<typeof rArrNum>;
+  expectType<{
+    fooArray: number[]
+  }>({} as rTArrNum);
+  // Readonly array of object with key named "type"
+  const rArrType = new Schema({
+    fooArray: {
+      type: [{
+        type: {
+          type: String,
+          required: true
+        },
+        foo: {
+          type: Number,
+          required: true
+        }
+      }] as const,
+      required: true
+    }
+  });
+  type rTArrType = InferSchemaType<typeof rArrType>;
+  expectType<{
+    fooArray: {
+      type: string;
+      foo: number;
+    }[]
+  }>({} as rTArrType);
 }

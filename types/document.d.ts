@@ -107,13 +107,6 @@ declare module 'mongoose' {
     db: Connection;
 
     /** Removes this document from the db. */
-    delete(options: QueryOptions, callback: Callback): void;
-    delete(callback: Callback): void;
-    delete(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
-
-    /** Removes this document from the db. */
-    deleteOne(options: QueryOptions, callback: Callback): void;
-    deleteOne(callback: Callback): void;
     deleteOne(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
 
     /**
@@ -161,7 +154,7 @@ declare module 'mongoose' {
     * Called internally after a document is returned from mongodb. Normally,
     * you do **not** need to call this function on your own.
     */
-    init(obj: AnyObject, opts?: AnyObject, callback?: Callback<this>): this;
+    init(obj: AnyObject, opts?: AnyObject): this;
 
     /** Marks a path as invalid, causing validation to fail. */
     invalidate(path: string, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
@@ -208,24 +201,15 @@ declare module 'mongoose' {
 
     /** Populates document references. */
     populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<MergeType<this, Paths>>;
-    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[], callback: Callback<MergeType<this, Paths>>): void;
     populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<MergeType<this, Paths>>;
-    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions, callback?: Callback<MergeType<this, Paths>>): void;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
 
-    /** Removes this document from the db. */
-    remove(options: QueryOptions, callback: Callback): void;
-    remove(callback: Callback): void;
-    remove(options?: QueryOptions): Promise<this>;
-
     /** Sends a replaceOne command with this document `_id` as the query selector. */
-    replaceOne(replacement?: AnyObject, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
+    replaceOne(replacement?: AnyObject, options?: QueryOptions | null): Query<any, this>;
 
     /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api/document.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api/document.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
-    save(options: SaveOptions, callback: Callback<this>): void;
-    save(callback: Callback<this>): void;
     save(options?: SaveOptions): Promise<this>;
 
     /** The document's schema. */
@@ -237,25 +221,19 @@ declare module 'mongoose' {
     set(value: any): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON<T = LeanDocument<DocType>>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<T>;
-    toJSON<T = LeanDocument<DocType>>(options: ToObjectOptions & { flattenMaps: false }): T;
+    toJSON<T = Require_id<DocType>>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<T>;
+    toJSON<T = Require_id<DocType>>(options: ToObjectOptions & { flattenMaps: false }): T;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject<T = LeanDocument<DocType>>(options?: ToObjectOptions): Require_id<T>;
+    toObject<T = Require_id<DocType>>(options?: ToObjectOptions): Require_id<T>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string): void;
 
-    /** Sends an update command with this document `_id` as the query selector. */
-    update(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
-
     /** Sends an updateOne command with this document `_id` as the query selector. */
-    updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null, callback?: Callback): Query<any, this>;
+    updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null): Query<any, this>;
 
     /** Executes registered validation rules for this document. */
-    validate(pathsToValidate: pathsToValidate, options: AnyObject, callback: CallbackWithoutResult): void;
-    validate(pathsToValidate: pathsToValidate, callback: CallbackWithoutResult): void;
-    validate(callback: CallbackWithoutResult): void;
     validate(pathsToValidate?: pathsToValidate, options?: AnyObject): Promise<void>;
     validate(options: { pathsToSkip?: pathsToSkip }): Promise<void>;
 

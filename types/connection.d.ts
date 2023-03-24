@@ -9,17 +9,12 @@ declare module 'mongoose' {
   const connections: Connection[];
 
   /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
-  function connect(uri: string, options: ConnectOptions, callback: CallbackWithoutResult): void;
-  function connect(uri: string, callback: CallbackWithoutResult): void;
   function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
 
   /** Creates a Connection instance. */
-  function createConnection(uri: string, options: ConnectOptions, callback: Callback<Connection>): void;
-  function createConnection(uri: string, callback: Callback<Connection>): void;
   function createConnection(uri: string, options?: ConnectOptions): Connection;
   function createConnection(): Connection;
 
-  function disconnect(callback: CallbackWithoutResult): void;
   function disconnect(): Promise<void>;
 
   /**
@@ -62,13 +57,9 @@ declare module 'mongoose' {
     asPromise(): Promise<this>;
 
     /** Closes the connection */
-    close(force: boolean, callback: CallbackWithoutResult): void;
-    close(callback: CallbackWithoutResult): void;
     close(force?: boolean): Promise<void>;
 
     /** Closes and destroys the connection. Connection once destroyed cannot be reopened */
-    destroy(force: boolean, callback: CallbackWithoutResult): void;
-    destroy(callback: CallbackWithoutResult): void;
     destroy(force?: boolean): Promise<void>;
 
     /** Retrieves a collection, creating it if not cached. */
@@ -85,11 +76,9 @@ declare module 'mongoose' {
 
     /**
      * Helper for `createCollection()`. Will explicitly create the given collection
-     * with specified options. Used to create [capped collections](https://docs.mongodb.com/manual/core/capped-collections/)
-     * and [views](https://docs.mongodb.com/manual/core/views/) from mongoose.
+     * with specified options. Used to create [capped collections](https://www.mongodb.com/docs/manual/core/capped-collections/)
+     * and [views](https://www.mongodb.com/docs/manual/core/views/) from mongoose.
      */
-    createCollection<T extends AnyObject = AnyObject>(name: string, options: mongodb.CreateCollectionOptions, callback: Callback<mongodb.Collection<T>>): void;
-    createCollection<T extends AnyObject = AnyObject>(name: string, callback: Callback<mongodb.Collection<T>>): void;
     createCollection<T extends AnyObject = AnyObject>(name: string, options?: mongodb.CreateCollectionOptions): Promise<mongodb.Collection<T>>;
 
     /**
@@ -103,14 +92,12 @@ declare module 'mongoose' {
      * Helper for `dropCollection()`. Will delete the given collection, including
      * all documents and indexes.
      */
-    dropCollection(collection: string, callback: CallbackWithoutResult): void;
     dropCollection(collection: string): Promise<void>;
 
     /**
      * Helper for `dropDatabase()`. Deletes the given database, including all
      * collections, documents, and indexes.
      */
-    dropDatabase(callback: CallbackWithoutResult): void;
     dropDatabase(): Promise<void>;
 
     /** Gets the value of the option `key`. */
@@ -147,14 +134,24 @@ declare module 'mongoose' {
       schema?: TSchema,
       collection?: string,
       options?: CompileModelOptions
-    ): Model<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>, ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>, {}, TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+    ): Model<
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+    {},
+    HydratedDocument<
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
+    >,
+    TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
-      schema?: Schema<T, any, any, TQueryHelpers, any, any>,
+      schema?: Schema<T, any, any, TQueryHelpers, any, any, any>,
       collection?: string,
       options?: CompileModelOptions
     ): U;
-    model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+    model<T>(name: string, schema?: Schema<T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
     /** Returns an array of model names created on this connection. */
     modelNames(): Array<string>;
@@ -163,8 +160,6 @@ declare module 'mongoose' {
     readonly name: string;
 
     /** Opens the connection with a URI using `MongoClient.connect()`. */
-    openUri(uri: string, options: ConnectOptions, callback: Callback<Connection>): Connection;
-    openUri(uri: string, callback: Callback<Connection>): Connection;
     openUri(uri: string, options?: ConnectOptions): Promise<Connection>;
 
     /** The password specified in the URI */
@@ -204,12 +199,10 @@ declare module 'mongoose' {
     setClient(client: mongodb.MongoClient): this;
 
     /**
-     * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
-     * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
+     * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://www.mongodb.com/docs/manual/release-notes/3.6/#client-sessions)
+     * for benefits like causal consistency, [retryable writes](https://www.mongodb.com/docs/manual/core/retryable-writes/),
      * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
      */
-    startSession(options: ClientSessionOptions | undefined | null, callback: Callback<ClientSession>): void;
-    startSession(callback: Callback<ClientSession>): void;
     startSession(options?: ClientSessionOptions): Promise<ClientSession>;
 
     /**
@@ -218,7 +211,6 @@ declare module 'mongoose' {
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-    syncIndexes(options: SyncIndexesOptions | undefined | null, callback: Callback<ConnectionSyncIndexesResult>): void;
     syncIndexes(options?: SyncIndexesOptions): Promise<ConnectionSyncIndexesResult>;
 
     /**

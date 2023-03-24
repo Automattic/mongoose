@@ -27,7 +27,7 @@ exports.handler = async function(event, context) {
       // before erroring out if it isn't connected
       serverSelectionTimeoutMS: 5000
     });
-    
+
     // `await`ing connection after assigning to the `conn` variable
     // to avoid multiple function calls creating new connections
     await conn.asPromise();
@@ -49,8 +49,6 @@ The above code works fine for a single Lambda function, but what if you want to 
 You can export the below function.
 
 ```javascript
-'use strict';
-
 const mongoose = require('mongoose');
 
 let conn = null;
@@ -62,7 +60,7 @@ exports.connect = async function() {
     conn = mongoose.createConnection(uri, {
       serverSelectionTimeoutMS: 5000
     });
-    
+
     // `await`ing connection after assigning to the `conn` variable
     // to avoid multiple function calls creating new connections
     await conn.asPromise();
@@ -77,8 +75,6 @@ exports.connect = async function() {
 You can also use `mongoose.connect()`, so you can use `mongoose.model()` to create models.
 
 ```javascript
-'use strict';
-
 const mongoose = require('mongoose');
 
 let conn = null;
@@ -90,7 +86,7 @@ exports.connect = async function() {
     conn = mongoose.connect(uri, {
       serverSelectionTimeoutMS: 5000
     }).then(() => mongoose);
-    
+
     // `await`ing connection after assigning to the `conn` variable
     // to avoid multiple function calls creating new connections
     await conn;
@@ -99,9 +95,3 @@ exports.connect = async function() {
   return conn;
 };
 ```
-
-*Want to learn how to check whether your favorite JavaScript frameworks, like [Express](http://expressjs.com/) or [React](https://reactjs.org/), work with async/await? Spoiler alert: neither Express nor React support async/await. Chapter 4 of Mastering Async/Await explains the basic principles for determining whether a framework supports async/await. [Get your copy!](http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=lambda)*
-
-<a href="http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=lambda" style="margin-left: 100px">
-  <img src="/docs/images/asyncawait.png" style="width: 650px" />
-</a>

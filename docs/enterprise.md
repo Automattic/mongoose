@@ -1,7 +1,7 @@
 # Mongoose for Enterprise
 
-### Available as part of the Tidelift Subscription
-    
+## Available as part of the Tidelift Subscription
+
 Tidelift is working with the maintainers of Mongoose and thousands of other
 open source projects to deliver commercial support and maintenance for the
 open source dependencies you use to build your applications. Save time,
@@ -15,7 +15,7 @@ exact dependencies you use.
   <button style="border-radius: 3px;padding: 3px;padding-left: 30px;padding-right: 30px;border: 1px solid transparent;color: white;background-color: #800;">Request a Demo</button>
 </a>
 
-### Enterprise-ready open source software—managed for you
+## Enterprise-ready open source software—managed for you
 
 The Tidelift Subscription is a managed open source subscription for application
 dependencies covering millions of open source projects across JavaScript,

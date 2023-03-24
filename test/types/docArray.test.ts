@@ -1,41 +1,10 @@
-import { Schema, model, Document, Types, LeanDocument } from 'mongoose';
+import { Schema, model, Types, InferSchemaType } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
-const schema: Schema = new Schema({ tags: [new Schema({ name: String })] });
-
-interface Subdoc extends Document {
-  name: string
-}
-
-interface ITest extends Document {
-  tags: Types.DocumentArray<Subdoc>
-}
-
-const Test = model<ITest>('Test', schema);
-
-void async function main() {
-  const doc: ITest = await Test.findOne().orFail();
-
-  doc.tags = new Types.DocumentArray<Subdoc>([]);
-  doc.set('tags', []);
-
-  const record: Subdoc = doc.tags.create({ name: 'test' });
-  doc.tags.push(record);
-
-  doc.tags.push({ name: 'test' });
-
-  await doc.save();
-
-  const _doc: LeanDocument<ITest> = await Test.findOne().orFail().lean();
-  _doc.tags[0].name.substring(1);
-  expectError(_doc.tags.create({ name: 'fail' }));
-}();
-
-// https://github.com/Automattic/mongoose/issues/10293
 async function gh10293() {
   interface ITest {
     name: string;
-    arrayOfArray: Types.Array<string[]>; // <-- Array of Array
+    arrayOfArray: string[][]; // <-- Array of Array
   }
 
   const testSchema = new Schema<ITest>({
@@ -54,4 +23,57 @@ async function gh10293() {
     expectType<string[][]>(test.arrayOfArray);
     return test.arrayOfArray; // <-- error here if the issue persisted
   };
+}
+
+function gh13087() {
+  interface Book {
+    author: {
+      name: string;
+    };
+  }
+
+  expectError(new Types.DocumentArray<Book>([1, 2, 3]));
+
+  const locationSchema = new Schema(
+    {
+      type: {
+        required: true,
+        type: String,
+        enum: ['Point']
+      },
+      coordinates: {
+        required: true,
+        type: [Number] // [longitude, latitude]
+      }
+    },
+    { _id: false }
+  );
+
+  const pointSchema = new Schema({
+    name: { required: true, type: String },
+    location: { required: true, type: locationSchema }
+  });
+
+  const routeSchema = new Schema({
+    points: { type: [pointSchema] }
+  });
+
+  type Route = InferSchemaType<typeof routeSchema>;
+
+  function getTestRouteData(): Route {
+    return {
+      points: new Types.DocumentArray([
+        { name: 'Test', location: { type: 'Point', coordinates: [1, 2] } }
+      ])
+    };
+  }
+
+  const { points } = getTestRouteData();
+  expectType<Types.DocumentArray<{
+    name: string;
+    location: {
+      type: 'Point';
+      coordinates: number[];
+    };
+  }>>(points);
 }

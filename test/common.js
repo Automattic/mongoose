@@ -20,31 +20,6 @@ if (process.env.PRINT_COLLECTIONS) {
 }
 
 /**
- * Override all Collection related queries to keep count
- */
-
-[
-  'createIndex',
-  'findAndModify',
-  'findOne',
-  'find',
-  'insert',
-  'save',
-  'update',
-  'remove',
-  'count',
-  'distinct',
-  'isCapped',
-  'options'
-].forEach(function(method) {
-  const oldMethod = Collection.prototype[method];
-
-  Collection.prototype[method] = function() {
-    return oldMethod.apply(this, arguments);
-  };
-});
-
-/**
  * Override Collection#onOpen to keep track of connections
  */
 
@@ -162,32 +137,39 @@ module.exports.mongoose = mongoose;
  */
 
 module.exports.mongodVersion = async function() {
-  return new Promise((resolve, reject) => {
-    const db = module.exports();
+  const db = await module.exports();
 
+  const admin = db.client.db().admin();
 
-    db.on('error', reject);
-
-    db.on('open', function() {
-      const admin = db.db.admin();
-      admin.serverStatus(function(err, info) {
-        if (err) {
-          return reject(err);
-        }
-        const version = info.version.split('.').map(function(n) {
-          return parseInt(n, 10);
-        });
-        db.close(function() {
-          resolve(version);
-        });
-      });
-    });
+  const info = await admin.serverStatus();
+  const version = info.version.split('.').map(function(n) {
+    return parseInt(n, 10);
   });
+  await db.close();
+  return version;
 };
 
 async function dropDBs() {
   this.timeout(60000);
 
+  // retry the "dropDBs" actions if the error is "operation was interrupted", which can often happen in replset CI tests
+  let retries = 5;
+  while (retries > 0) {
+    retries -= 1;
+    try {
+      await _dropDBs();
+    } catch (err) {
+      if (err instanceof mongoose.mongo.MongoWriteConcernError && /operation was interrupted/.test(err.message)) {
+        console.log('DropDB operation interrupted, retrying'); // log that a error was thrown to know that it is going to re-try
+        continue;
+      }
+
+      throw err;
+    }
+  }
+}
+
+async function _dropDBs() {
   const db = await module.exports({ noErrorListener: true }).asPromise();
   await db.dropDatabase();
   await db.close();

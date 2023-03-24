@@ -614,6 +614,7 @@ describe('aggregate: ', function() {
 
   describe('exec', function() {
     beforeEach(async function() {
+      this.timeout(4000); // double the default of 2 seconds
       await setupData(db);
     });
 
@@ -833,40 +834,26 @@ describe('aggregate: ', function() {
         const agg = new Aggregate([], db.model('Employee'));
 
         const promise = agg.exec();
-        assert.ok(promise instanceof mongoose.Promise);
+        assert.ok(promise instanceof Promise);
 
         return promise.catch(error => {
           assert.ok(error);
           assert.ok(error.message.indexOf('empty pipeline') !== -1, error.message);
         });
       });
-
-      it('with a callback', function(done) {
-        const aggregate = new Aggregate([], db.model('Employee'));
-
-        const callback = function(err) {
-          assert.ok(err);
-          assert.equal(err.message, 'Aggregate has empty pipeline');
-          done();
-        };
-
-        aggregate.exec(callback);
-      });
     });
 
     describe('error when not bound to a model', function() {
-      it('with callback', function() {
+      it('with callback', async function() {
         const aggregate = new Aggregate();
 
         aggregate.skip(0);
-        let threw = false;
         try {
-          aggregate.exec();
+          await aggregate.exec();
+          assert.ok(false);
         } catch (error) {
-          threw = true;
           assert.equal(error.message, 'Aggregate not bound to any Model');
         }
-        assert.ok(threw);
       });
     });
 
@@ -1072,7 +1059,7 @@ describe('aggregate: ', function() {
       const schema = new Schema({ name: String }, { read: 'secondary' });
       const M = db.model('Test', schema);
       const a = M.aggregate();
-      assert.equal(a.options.readPreference.mode, 'secondary');
+      assert.equal(a.options.readPreference, 'secondary');
 
       a.read('secondaryPreferred');
 
@@ -1255,4 +1242,19 @@ describe('aggregate: ', function() {
     });
   });
 
+  it('should not throw error if database connection has not been established (gh-13125)', async function() {
+    const m = new mongoose.Mongoose();
+    const mySchema = new Schema({ test: String });
+    const M = m.model('Test', mySchema);
+
+    const aggregate = M.aggregate();
+    aggregate.match({ foo: 'bar' });
+
+    const p = aggregate.exec();
+
+    await m.connect(start.uri);
+
+    await p;
+    await m.disconnect();
+  });
 });

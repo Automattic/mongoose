@@ -1,9 +1,9 @@
-## Queries
+# Queries
 
 Mongoose [models](models.html) provide several static helper functions
 for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
 Each of these functions returns a
-[mongoose `Query` object](query.html#Query).
+[mongoose `Query` object](api/query.html#Query).
 
 - [`Model.deleteMany()`](api.html#model_Model-deleteMany)
 - [`Model.deleteOne()`](api.html#model_Model-deleteOne)
@@ -35,15 +35,15 @@ A query also has a `.then()` function, and thus can be used as a promise.
   <li><a href="#versus-aggregation">Versus Aggregation</a></li>
 </ul>
 
-### Executing
+## Executing
 
-When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://docs.mongodb.org/manual/tutorial/query-documents/).
+When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://www.mongodb.com/docs/manual/tutorial/query-documents/).
 
 ```javascript
 const Person = mongoose.model('Person', yourSchema);
 
 // find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields
-Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function (err, person) {
+Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function(err, person) {
   if (err) return handleError(err);
   // Prints "Space Ghost is a talk show host".
   console.log('%s %s is a %s.', person.name.first, person.name.last,
@@ -69,7 +69,7 @@ const query = Person.findOne({ 'name.last': 'Ghost' });
 query.select('name occupation');
 
 // execute the query at a later time
-query.exec(function (err, person) {
+query.exec(function(err, person) {
   if (err) return handleError(err);
   // Prints "Space Ghost is a talk show host."
   console.log('%s %s is a %s.', person.name.first, person.name.last,
@@ -77,7 +77,7 @@ query.exec(function (err, person) {
 });
 ```
 
-In the above code, the `query` variable is of type [Query](api/query-js.html#query-js).
+In the above code, the `query` variable is of type [Query](api/query.html).
 A `Query` enables you to build up a query using chaining syntax, rather than specifying a JSON object.
 The below 2 examples are equivalent.
 
@@ -107,13 +107,13 @@ Person.
   exec(callback);
 ```
 
-A full list of [Query helper functions can be found in the API docs](api/query-js.html#query-js).
+A full list of [Query helper functions can be found in the API docs](api/query.html).
 
-<h3 id="queries-are-not-promises">
+<h2 id="queries-are-not-promises">
   <a href="#queries-are-not-promises">
     Queries are Not Promises
   </a>
-</h3>
+</h2>
 
 Mongoose queries are **not** promises. They have a `.then()`
 function for [co](https://www.npmjs.com/package/co) and
@@ -155,14 +155,14 @@ await BlogPost.updateOne({ title: 'Introduction to Promises' }, update, (err, re
 });
 ```
 
-<h3 id="refs"><a href="#refs">References to other documents</a></h3>
+<h2 id="refs"><a href="#refs">References to other documents</a></h2>
 
 There are no joins in MongoDB but sometimes we still want references to
 documents in other collections. This is where [population](populate.html)
 comes in. Read more about how to include documents from other collections in
 your query results [here](api/query.html#query_Query-populate).
 
-<h3 id="streaming"><a href="#streaming">Streaming</a></h3>
+<h2 id="streaming"><a href="#streaming">Streaming</a></h2>
 
 You can [stream](http://nodejs.org/api/stream.html) query results from
 MongoDB. You need to call the
@@ -195,13 +195,13 @@ To override this, set the `noCursorTimeout` option on your cursor.
 const cursor = Person.find().cursor().addCursorFlag('noCursorTimeout', true);
 ```
 
-However, cursors can still time out because of [session idle timeouts](https://docs.mongodb.com/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
+However, cursors can still time out because of [session idle timeouts](https://www.mongodb.com/docs/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
 So even a cursor with `noCursorTimeout` set will still time out after 30 minutes
-of inactivity. You can read more about working around session idle timeouts in the [MongoDB documentation](https://docs.mongodb.com/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
+of inactivity. You can read more about working around session idle timeouts in the [MongoDB documentation](https://www.mongodb.com/docs/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
 
-<h3 id="versus-aggregation"><a href="#versus-aggregation">Versus Aggregation</a></h3>
+<h2 id="versus-aggregation"><a href="#versus-aggregation">Versus Aggregation</a></h2>
 
-[Aggregation](aggregate.html#aggregate_Aggregate) can
+[Aggregation](api/aggregate.html#aggregate_Aggregate) can
 do many of the same things that queries can. For example, below is
 how you can use `aggregate()` to find docs where `name.last = 'Ghost'`:
 
@@ -238,9 +238,92 @@ const queryRes = await Person.findOne({ _id: idString });
 
 // Does **not** find the `Person`, because Mongoose doesn't cast aggregation
 // pipelines.
-const aggRes = await Person.aggregate([{ $match: { _id: idString } }])
+const aggRes = await Person.aggregate([{ $match: { _id: idString } }]);
 ```
 
-<h3 id="next"><a href="#next">Next Up</a></h3>
+<h2 id="sorting"><a href="#sorting">Sorting</a></h2>
+
+[Sorting](/docs/api.html#query_Query-sort) is how you can ensure you query results come back in the desired order.
+
+```javascript
+const personSchema = new mongoose.Schema({
+  age: Number
+});
+
+const Person = mongoose.model('Person', personSchema);
+for (let i = 0; i < 10; i++) {
+  await Person.create({ age: i });
+}
+
+await Person.find().sort({ age: -1 }); // returns age starting from 10 as the first entry
+await Person.find().sort({ age: 1 }); // returns age starting from 0 as the first entry
+```
+
+When sorting with mutiple fields, the order of the sort keys determines what key MongoDB server sorts by first.
+
+```javascript
+const personSchema = new mongoose.Schema({
+  age: Number,
+  name: String,
+  weight: Number
+});
+
+const Person = mongoose.model('Person', personSchema);
+const iterations = 5;
+for (let i = 0; i < iterations; i++) {
+  await Person.create({
+    age: Math.abs(2 - i),
+    name: 'Test' + i,
+    weight: Math.floor(Math.random() * 100) + 1
+  });
+}
+
+await Person.find().sort({ age: 1, weight: -1 }); // returns age starting from 0, but while keeping that order will then sort by weight.
+```
+
+You can view the output of a single run of this block below.
+As you can see, age is sorted from 0 to 2 but when age is equal, sorts by weight.
+
+```javascript
+[
+  {
+    _id: new ObjectId('63a335a6b9b6a7bfc186cb37'),
+    age: 0,
+    name: 'Test2',
+    weight: 67,
+    __v: 0
+  },
+  {
+    _id: new ObjectId('63a335a6b9b6a7bfc186cb35'),
+    age: 1,
+    name: 'Test1',
+    weight: 99,
+    __v: 0
+  },
+  {
+    _id: new ObjectId('63a335a6b9b6a7bfc186cb39'),
+    age: 1,
+    name: 'Test3',
+    weight: 73,
+    __v: 0
+  },
+  {
+    _id: new ObjectId('63a335a6b9b6a7bfc186cb33'),
+    age: 2,
+    name: 'Test0',
+    weight: 65,
+    __v: 0
+  },
+  {
+    _id: new ObjectId('63a335a6b9b6a7bfc186cb3b'),
+    age: 2,
+    name: 'Test4',
+    weight: 62,
+    __v: 0
+  }
+];
+```
+
+<h2 id="next"><a href="#next">Next Up</a></h2>
 
 Now that we've covered `Queries`, let's take a look at [Validation](validation.html).

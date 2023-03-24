@@ -19,12 +19,12 @@ const Schema = mongoose.Schema;
 describe('collections: capped:', function() {
   let db;
 
-  before(function() {
-    db = start();
-  });
-
-  after(async function() {
+  afterEach(async function() {
+    if (db == null) {
+      return;
+    }
     await db.close();
+    db = null;
   });
 
   it('schemas should have option size', function() {
@@ -37,6 +37,8 @@ describe('collections: capped:', function() {
 
   it('creation', async function() {
     this.timeout(15000);
+
+    db = start();
 
     await db.dropCollection('Test').catch(() => {});
 
@@ -51,7 +53,7 @@ describe('collections: capped:', function() {
   });
 
   it('skips when setting autoCreate to false (gh-8566)', async function() {
-    const db = start();
+    db = start();
     this.timeout(30000);
     await db.dropDatabase();
 

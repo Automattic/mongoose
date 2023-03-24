@@ -1,7 +1,9 @@
 'use strict';
 
-const Schema = require('../../lib/schema');
 const assert = require('assert');
+
+require('../common'); // required for side-effect setup (so that the default driver is set-up)
+const Schema = require('../../lib/schema');
 const getVirtual = require('../../lib/helpers/populate/getVirtual');
 
 describe('getVirtual', function() {

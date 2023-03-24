@@ -8,40 +8,33 @@ const assert = require('assert');
 const mongoose = start.mongoose;
 
 describe('collections:', function() {
-  it('should buffer commands until connection is established', function(done) {
-    const db = mongoose.createConnection();
-    const collection = db.collection('test-buffering-collection');
-    let connected = false;
-    let insertedId = undefined;
-    let pending = 2;
+  let db = null;
 
-    function finish() {
-      if (--pending) {
-        return;
-      }
-      assert.ok(connected);
-      assert.ok(insertedId !== undefined);
-      collection.findOne({ _id: insertedId }).then(doc => {
-        assert.strictEqual(doc.foo, 'bar');
-        db.close();
-        done();
-      });
+  afterEach(async function() {
+    if (db == null) {
+      return;
     }
-
-    collection.insertOne({ foo: 'bar' }, {}, function(err, result) {
-      assert.ok(connected);
-      insertedId = result.insertedId;
-      finish();
-    });
-
-    const uri = start.uri;
-    db.openUri(process.env.MONGOOSE_TEST_URI || uri, function(err) {
-      connected = !err;
-      finish();
-    });
+    await db.close();
+    db = null;
   });
 
-  it('returns a promise if buffering and no callback (gh-7676)', function(done) {
+  it('should buffer commands until connection is established', async function() {
+    db = mongoose.createConnection();
+    const collection = db.collection('test-buffering-collection');
+
+    const op = collection.insertOne({ foo: 'bar' }, {});
+
+    const uri = start.uri;
+    await db.openUri(process.env.MONGOOSE_TEST_URI || uri);
+
+    const res = await op;
+    assert.ok(res.insertedId);
+    const doc = await collection.findOne({ _id: res.insertedId });
+    assert.strictEqual(doc.foo, 'bar');
+    await db.close();
+  });
+
+  it('returns a promise if buffering and no callback (gh-7676)', async function() {
     const db = mongoose.createConnection();
     const collection = db.collection('gh7676');
 
@@ -52,10 +45,10 @@ describe('collections:', function() {
         assert.strictEqual(doc.foo, 'bar');
       });
 
-    db.openUri(start.uri, function(err) {
-      assert.ifError(err);
-      promise.then(() => done(), done);
-    });
+    await db.openUri(start.uri);
+
+    await promise;
+    await db.close();
   });
 
   it('methods should that throw (unimplemented)', function() {
@@ -73,7 +66,7 @@ describe('collections:', function() {
     thrown = false;
 
     try {
-      collection.update();
+      collection.updateOne();
     } catch (e) {
       assert.ok(/unimplemented/.test(e.message));
       thrown = true;
@@ -143,17 +136,16 @@ describe('collections:', function() {
     thrown = false;
   });
 
-  it('buffers for sync methods (gh-10610)', function(done) {
-    const db = mongoose.createConnection();
+  it('buffers for sync methods (gh-10610)', async function() {
+    db = mongoose.createConnection();
     const collection = db.collection('gh10610');
 
-    collection.find({}, {}, function(err, res) {
-      assert.ifError(err);
-      assert.equal(typeof res.toArray, 'function');
-      done();
-    });
+    const promise = collection.find({}, {});
 
     const uri = start.uri;
-    db.openUri(process.env.MONGOOSE_TEST_URI || uri);
+    await db.openUri(process.env.MONGOOSE_TEST_URI || uri);
+
+    const res = await promise;
+    assert.equal(typeof res.toArray, 'function');
   });
 });

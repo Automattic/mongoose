@@ -64,6 +64,13 @@ declare module 'mongoose' {
     cloneSchemas?: boolean;
 
     /**
+     * Set to `false` to disable the creation of the initial default connection.
+     *
+     * @default true
+     */
+    createInitialConnection?: boolean;
+
+    /**
      * If `true`, prints the operations mongoose sends to MongoDB to the console.
      * If a writable stream is passed, it will log to that stream, without colorization.
      * If a callback function is passed, it will receive the collection name, the method
@@ -93,7 +100,7 @@ declare module 'mongoose' {
      */
     'timestamps.createdAt.immutable'?: boolean
 
-    /** If set, attaches [maxTimeMS](https://docs.mongodb.com/manual/reference/operator/meta/maxTimeMS/) to every query */
+    /** If set, attaches [maxTimeMS](https://www.mongodb.com/docs/manual/reference/operator/meta/maxTimeMS/) to every query */
     maxTimeMS?: number;
 
     /**

@@ -1,6 +1,6 @@
-## Defaults
+# Defaults
 
-### Declaring Defaults in Your Schema
+## Declaring Defaults in Your Schema
 
 Your schemas can define default values for certain paths. If you create
 a new document without that path set, the default will kick in.
@@ -8,25 +8,25 @@ a new document without that path set, the default will kick in.
 Note: Mongoose only applies a default if the value of the path is
 strictly `undefined`.
 
-```javascript
+```acquit
 [require:Declaring defaults in your schema]
 ```
 
-### Default Functions
+## Default Functions
 
 You can also set the `default` schema option to a function. Mongoose will
 execute that function and use the return value as the default.
 
-```javascript
+```acquit
 [require:Default functions]
 ```
 
-### The `setDefaultsOnInsert` Option
+## The `setDefaultsOnInsert` Option
 
-Mongoose also sets defaults on `update()` and `findOneAndUpdate()` when the `upsert` option is set by adding your schema's defaults to a [MongoDB `$setOnInsert` operator](https://docs.mongodb.org/manual/reference/operator/update/setOnInsert/).
+Mongoose also sets defaults on `update()` and `findOneAndUpdate()` when the `upsert` option is set by adding your schema's defaults to a [MongoDB `$setOnInsert` operator](https://www.mongodb.com/docs/manual/reference/operator/update/setOnInsert/).
 You can disable this behavior by setting the `setDefaultsOnInsert` option to `false`.
 
-```javascript
+```acquit
 [require:The `setDefaultsOnInsert` option]
 ```
 
@@ -36,11 +36,11 @@ You can also set `setDefaultsOnInsert` to `false` globally:
 mongoose.set('setDefaultsOnInsert', false);
 ```
 
-### Default functions and `this`
+## Default functions and `this`
 
 Unless it is running on a query with `setDefaultsOnInsert`, a default
 function's `this` refers to the document.
 
-```javascript
+```acquit
 [require:Default functions and `this`]
 ```

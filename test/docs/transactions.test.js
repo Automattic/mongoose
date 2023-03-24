@@ -76,7 +76,6 @@ describe('transactions', function() {
     // acquit:ignore:start
     const Customer = db.model('Customer_withTrans', new Schema({ name: String }));
     // acquit:ignore:end
-
     let session = null;
     return Customer.createCollection().
       then(() => Customer.startSession()).
@@ -316,38 +315,38 @@ describe('transactions', function() {
   it('remove, update, updateOne (gh-7455)', async function() {
     const Character = db.model('gh7455_Character', new Schema({ name: String, title: String }, { versionKey: false }));
 
-      await Character.create({ name: 'Tyrion Lannister' });
-      const session = await db.startSession();
+    await Character.create({ name: 'Tyrion Lannister' });
+    const session = await db.startSession();
 
-      session.startTransaction();
+    session.startTransaction();
 
-      const tyrion = await Character.findOne().session(session);
+    const tyrion = await Character.findOne().session(session);
 
-      await tyrion.updateOne({ title: 'Hand of the King' });
+    await tyrion.updateOne({ title: 'Hand of the King' });
 
-      // Session isn't committed
-      assert.equal(await Character.countDocuments({ title: /hand/i }), 0);
+    // Session isn't committed
+    assert.equal(await Character.countDocuments({ title: /hand/i }), 0);
 
-      await tyrion.remove();
+    await tyrion.remove();
 
-      // Undo both update and delete since doc should pull from `$session()`
-      await session.abortTransaction();
-      session.endSession();
+    // Undo both update and delete since doc should pull from `$session()`
+    await session.abortTransaction();
+    session.endSession();
 
-      const fromDb = await Character.findOne().then(doc => doc.toObject());
-      delete fromDb._id;
-      assert.deepEqual(fromDb, { name: 'Tyrion Lannister' });
+    const fromDb = await Character.findOne().then(doc => doc.toObject());
+    delete fromDb._id;
+    assert.deepEqual(fromDb, { name: 'Tyrion Lannister' });
   });
 
   it('save() with no changes (gh-8571)', async function() {
-      const Test = db.model('Test', Schema({ name: String }));
+    const Test = db.model('Test', Schema({ name: String }));
 
-      await Test.createCollection();
-      const session = await db.startSession();
-      await session.withTransaction(async () => {
-        const test = await Test.create([{}], { session }).then(res => res[0]);
-        await test.save(); // throws DocumentNotFoundError
-      });
-      await session.endSession();
+    await Test.createCollection();
+    const session = await db.startSession();
+    await session.withTransaction(async() => {
+      const test = await Test.create([{}], { session }).then(res => res[0]);
+      await test.save(); // throws DocumentNotFoundError
+    });
+    await session.endSession();
   });
 });

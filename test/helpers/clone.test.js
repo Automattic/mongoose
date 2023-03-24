@@ -1,6 +1,8 @@
 'use strict';
 
 const assert = require('assert');
+
+require('../common'); // required for side-effect setup (so that the default driver is set-up)
 const clone = require('../../lib/helpers/clone');
 const symbols = require('../../lib/helpers/symbols');
 const ObjectId = require('../../lib/types/objectid');
@@ -217,10 +219,6 @@ describe('clone', () => {
     });
   });
 
-  describe('wrapper', () => {
-
-  });
-
   describe('any else', () => {
     it('valueOf', () => {
       let called = false;
@@ -259,5 +257,56 @@ describe('clone', () => {
       assert.equal(typeof cloned, 'object');
       assert.equal(cloned.constructor, Object);
     });
+  });
+
+  it('retains RegExp options gh-1355', function() {
+    const a = new RegExp('hello', 'igm');
+    assert.ok(a.global);
+    assert.ok(a.ignoreCase);
+    assert.ok(a.multiline);
+
+    const b = clone(a);
+    assert.equal(b.source, a.source);
+    assert.equal(a.global, b.global);
+    assert.equal(a.ignoreCase, b.ignoreCase);
+    assert.equal(a.multiline, b.multiline);
+  });
+
+  it('clones objects created with Object.create(null)', function() {
+    const o = Object.create(null);
+    o.a = 0;
+    o.b = '0';
+    o.c = 1;
+    o.d = '1';
+
+    const out = clone(o);
+    assert.strictEqual(0, out.a);
+    assert.strictEqual('0', out.b);
+    assert.strictEqual(1, out.c);
+    assert.strictEqual('1', out.d);
+    assert.equal(Object.keys(out).length, 4);
+  });
+
+  it('doesnt minimize empty objects in arrays to null (gh-7322)', function() {
+    const o = { arr: [{ a: 42 }, {}, {}] };
+
+    const out = clone(o, { minimize: true });
+    assert.deepEqual(out.arr[0], { a: 42 });
+    assert.deepEqual(out.arr[1], {});
+    assert.deepEqual(out.arr[2], {});
+  });
+
+  it('skips cloning types that have `toBSON()` if `bson` is set (gh-8299)', function() {
+    const o = {
+      toBSON() {
+        return 'toBSON';
+      },
+      valueOf() {
+        return 'valueOf()';
+      }
+    };
+
+    const out = clone(o, { bson: true });
+    assert.deepEqual(out, o);
   });
 });

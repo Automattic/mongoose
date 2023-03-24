@@ -1,3 +1,183 @@
+7.0.3 / 2023-03-23
+==================
+ * fix(query): avoid executing transforms if query wasn't executed #13185 #13165
+ * fix(schema): make creating top-level virtual underneath subdocument equivalent to creating virtual on the subdocument #13197 #13189
+ * fix(timestamps): set timestamps on empty replaceOne() #13196 #13170
+ * fix(types): change return type of lean() to include null if nullable #13155 #13151 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): fixed type of DocumentArray constructor parameter #13183 #13087 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: refactor header naming to lessen conflicts #12901 [hasezoey](https://github.com/hasezoey)
+ * docs: change header levels to be consistent across files #13173 [hasezoey](https://github.com/hasezoey)
+
+6.10.4 / 2023-03-21
+===================
+ * fix(document): apply setters on resulting value when calling Document.prototype.$inc() #13178 #13158
+ * fix(model): add results property to unordered insertMany() to make it easy to identify exactly which documents were inserted #13163 #12791
+ * docs(guide+schematypes): add UUID to schematypes guide #13184
+
+7.0.2 / 2023-03-15
+==================
+ * fix: validate array elements when passing array path to validateSync() in pathsToValidate #13167 #13159
+ * fix(schema): propagate typeKey down to implicitly created subdocuments #13164 #13154
+ * fix(types): add index param to eachAsync fn #13153 [krosenk729](https://github.com/krosenk729)
+ * fix(types/documentarray): type DocumentArray constructor parameter as object #13089 #13087 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): type query `select()` as string, string[], or record; not `any` #13146 #13142 [rbereziuk](https://github.com/rbereziuk)
+ * fix(types/query): change QueryOptions lean type to Record<string, any> #13150 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: add and run eslint-plugin-markdown #13156 [hasezoey](https://github.com/hasezoey)
+ * docs(generateSearch): fix search generation for API #13161 [hasezoey](https://github.com/hasezoey)
+ * docs(generateSearch): move config missing error to require #13160 [hasezoey](https://github.com/hasezoey)
+ * chore: remove unused docs libraries #13172 [hasezoey](https://github.com/hasezoey)
+
+6.10.3 / 2023-03-13
+===================
+ * fix(connection): add stub implementation of doClose to base connection class #13157
+ * fix(types): add cursor.eachAsync index parameter #13162 #13153 [hasezoey](https://github.com/hasezoey)
+ * docs: fix 6.x docs sidebar links #13147 #13144 [hasezoey](https://github.com/hasezoey)
+ * docs(validation): clarify that validation runs as first pre(save) middleware #13062
+
+6.10.2 / 2023-03-07
+===================
+ * fix(document): avoid setting array default if document array projected out by sibling projection #13135 #13043 #13003
+ * fix(documentarray): set correct document array path if making map of document arrays #13133
+ * fix: undo accidental change to `engines` in `package.json` #13124 [lorand-horvath](https://github.com/lorand-horvath)
+ * docs: quick improvement to Model.init() docs #13054
+
+7.0.1 / 2023-03-06
+==================
+ * fix(aggregate): added await to prevent exception in aggregate exec #13126 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): handle Record<string, never> as value for HydratedDocument TOverrides parameter #13123 #13094
+ * fix(types): remove "update" function #13120 [hasezoey](https://github.com/hasezoey)
+ * docs(compatibility): added mongoDB server compatibility for mongoose 7 #13102 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: Updated callback method for Model.findOne() #13096 [Arghyahub](https://github.com/Arghyahub)
+ * chore: update github actions to not use ubuntu-18.04 anymore #13137 [hasezoey](https://github.com/hasezoey)
+
+6.10.1 / 2023-03-03
+===================
+ * fix: avoid removing empty query filters in `$and` and `$or` #13086 #12898
+ * fix(schematype): fixed validation for required UUID field #13018 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): add missing Paths generic param to `Model.populate()` #13070
+ * docs(migrating_to_6): added info about removal of reconnectTries and reconnectInterval options #13083 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: fix code in headers for migrating_to_5 #13077 [hasezoey](https://github.com/hasezoey)
+ * docs: backport misc documentation changes into 6.x #13091 [hasezoey](https://github.com/hasezoey)
+
+7.0.0 / 2023-02-27
+==================
+ * BREAKING CHANGE: copy schema options when merging schemas using new Schema() or Schema.prototype.add() #13092
+ * feat(types): export mongodb types more robustly #12948 [simon-abbott](https://github.com/simon-abbott)
+ * docs: fix populate docs #13090 [hasezoey](https://github.com/hasezoey)
+ * docs(migrating_to_6): added info about removal of reconnectTries and reconnectInterval options #13083 [lpizzinidev](https://github.com/lpizzinidev)
+
+7.0.0-rc0 / 2023-02-23
+======================
+ * BREAKING CHANGE: remove support for callbacks #11431
+ * BREAKING CHANGE: upgrade to MongoDB node driver 5.x, bson 5.x #12955
+ * BREAKING CHANGE: make `strictQuery: false` by default #11861 #11807 #11514
+ * BREAKING CHANGE: remove support for setting schema path definitions to primitives, except `_id: false` #12832 #7558 [lpizzinidev](https://github.com/lpizzinidev)
+ * BREAKING CHANGE: discriminator schemas now inherit base schema options by default #12928 #12135
+ * BREAKING CHANGE: orFail() now throws on updateOne() and updateMany() if matchedCount === 0, not modifiedCount === 0 #11620
+ * BREAKING CHANGE: remove support for custom promise libraries #12878 #12872 [lpizzinidev](https://github.com/lpizzinidev)
+ * BREAKING CHANGE: select('name -path') behaves as select('name') if path has schema-level select: true #11694
+ * BREAKING CHANGE(types): remove support for document interfaces that extends Document #11615
+ * BREAKING CHANGE: pluralize 'human' as 'humans', not 'humen' #13037
+ * BREAKING CHANGE: renamed schema option supressReservedKeysWarning -> suppressReservedKeysWarning #11495
+ * BREAKING CHANGE: remove unused DisconnectedError #13028 [lpizzinidev](https://github.com/lpizzinidev)
+ * BREAKING CHANGE: remove unsupported query options maxScan and snapshot #13023 #13022 [hasezoey](https://github.com/hasezoey)
+
+6.10.0 / 2023-02-22
+===================
+ * feat: upgrade to mongodb driver 4.14.0 #13036
+ * feat: added Schema.prototype.omit() function #12939 #12931 [lpizzinidev](https://github.com/lpizzinidev)
+ * feat(index): added createInitialConnection option to Mongoose constructor #13021 #12965 [lpizzinidev](https://github.com/lpizzinidev)
+
+6.9.3 / 2023-02-22
+==================
+ * fix(connection): delay calculating `autoCreate` and `autoIndex` until after initial connection established #13007 #12940 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(discriminator): allows update doc with discriminatorKey #13056 #13055 [abarriel](https://github.com/abarriel)
+ * fix(query): avoid sending unnecessary empty projection to MongoDB server #13059 #13050
+ * fix(model): avoid sending null session option with document operations #13053 #13052 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(types): use MergeTypes for type overrides in HydratedDocument #13066 #13040
+ * docs(middleware): list validate as a potential query middleware #13057 #12680
+ * docs(getters-setters): explain that getters do not run by default on toJSON() #13058 #13049
+ * docs: refactor docs generation scripts #13044 [hasezoey](https://github.com/hasezoey)
+
+5.13.16 / 2023-02-20
+====================
+ * fix: make access to process.versions lazy #12584 [maciasello](https://github.com/maciasello)
+ * fix(types): add missing type definitions for `bulkSave()` #12019
+ * docs: backport documentation URL updates #12692 [hasezoey](https://github.com/hasezoey)
+
+6.9.2 / 2023-02-16
+==================
+ * fix(model): fixed post('save') callback parameter #13030 #13026 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(UUID): added null check to prevent error on binaryToString conversion #13034 #13032 #13029 [lpizzinidev](https://github.com/lpizzinidev) [Freezystem](https://github.com/Freezystem)
+ * fix(query): revert breaking changes introduced by #12797 #12999 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(document): make array $shift() use $pop instead of overwriting array #13004
+ * docs: update & remove old links #13019 [hasezoey](https://github.com/hasezoey)
+ * docs(middleware): describe how to access model from document middleware #13031 [AxeOfMen](https://github.com/AxeOfMen)
+ * docs: update broken & outdated links #13001 [hasezoey](https://github.com/hasezoey)
+ * chore: change deno tests to also use MMS #12918 [hasezoey](https://github.com/hasezoey)
+
+6.9.1 / 2023-02-06
+==================
+ * fix(document): isModified should not be triggered when setting a nested boolean to the same value as previously #12994 [lpizzinidev](https://github.com/lpizzinidev)
+ * fix(document): save newly set defaults underneath single nested subdocuments #13002 #12905
+ * fix(update): handle custom discriminator model name when casting update #12947 [wassil](https://github.com/wassil)
+ * fix(connection): handles unique autoincrement ID for connections #12990 [lpizzinidev](https://github.com/lpizzinidev) 
+ * fix(types): fix type of options of Model.aggregate #12933 [ghost91-](https://github.com/ghost91-)
+ * fix(types): fix "near" aggregation operator input type #12954 [Jokero](https://github.com/Jokero)
+ * fix(types): add missing Top operator to AccumulatorOperator type declaration #12952 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(transactions): added example for Connection.transaction() method #12943 #12934 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs(populate): fix out of date comment referencing onModel property #13000
+ * docs(transactions): fix typo in transactions.md #12995 [Parth86](https://github.com/Parth86)
+
+6.9.0 / 2023-01-25
+==================
+ * feat(schema): add removeVirtual(path) function to schema #12920 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(cast): remove empty `$or` conditions after strict applied #12898 [0x0a0d](https://github.com/0x0a0d)
+ * docs: fixed typo #12946 [Gbengstar](https://github.com/Gbengstar)
+
+6.8.5 / 2023-01-23
+==================
+ * fix(query): correctly pass context when casting $elemMatch #12915 #12909 #12902 [MohOraby](https://github.com/MohOraby)
+
+6.8.4 / 2023-01-17
+==================
+ * fix(collection): handle creating model when connection disconnected with bufferCommands = false #12889
+ * fix(populate): merge instead of overwrite when match is on _id #12891
+ * fix: add guard to stop loadClass copying Document if Document is used as base of loaded class (same hack as implemented for Model already) #12820 [sgpinkus](https://github.com/sgpinkus)
+ * fix(types): correctly infer types on document arrays #12884 #12882 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * fix(types): added omit for ArraySubdocument type in LeanType declaration #12903 [piyushk96](https://github.com/piyushk96)
+ * fix(types): add returnDocument type safety #12906 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(typescript): add notes about virtual context to Mongoose 6 migration and TypeScript virtuals docs #12912 #12806
+ * docs(schematypes): removed dead link and fixed formatting #12897 #12885 [lpizzinidev](https://github.com/lpizzinidev)
+ * docs: fix link to lean api #12910 [manniL](https://github.com/manniL)
+ * docs: list all possible strings for schema.pre in one place #12868 
+ * docs: add list of known incompatible npm packages #12892 [IslandRhythms](https://github.com/IslandRhythms)
+
+6.8.3 / 2023-01-06
+==================
+ * perf: improve performance of assignRawDocsToIdStructure for faster populate on large docs #12867 [Uzlopak](https://github.com/Uzlopak)
+ * fix(model): ensure consistent ordering of validation errors in insertMany() with ordered: false and rawResult: true #12866
+ * fix: avoid passing final callback to pre hook, because calling the callback can mess up hook execution #12836
+ * fix(types): avoid inferring timestamps if methods, virtuals, or statics set #12871
+ * fix(types): correctly infer string enums on const arrays #12870 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * fix(types): allow virtuals to be invoked in the definition of other virtuals #12874 [sffc](https://github.com/sffc)
+ * fix(types): add type def for Aggregate#model without arguments #12864 [hasezoey](https://github.com/hasezoey)
+ * docs(discriminators): add section about changing discriminator key #12861
+ * docs(typescript): explain that virtuals inferred from schema only show up on Model, not raw document type #12860 #12684
+
+6.8.2 / 2022-12-28
+==================
+ * fix(schema): propagate strictQuery to implicitly created schemas for embedded discriminators #12827 #12796
+ * fix(model): respect discriminators with Model.validate() #12824 #12621
+ * fix(query): fix unexpected validation error when doing findOneAndReplace() with a nullish value #12826 #12821
+ * fix(discriminator): apply built-in plugins to discriminator schema even if mergeHooks and mergePlugins are both false #12833 #12696
+ * fix(types): add option "overwriteModels" as a schema option #12817 #12816 [hasezoey](https://github.com/hasezoey)
+ * fix(types): add property "defaultOptions" #12818 [hasezoey](https://github.com/hasezoey)
+ * docs: make search bar respect documentation version, so you can search 5.x docs #12548
+ * docs(typescript): make note about recommending strict mode when using auto typed schemas #12825 #12420
+ * docs: add section on sorting to query docs #12588 [IslandRhythms](https://github.com/IslandRhythms)
+ * test(query.test): add write-concern option #12829 [hasezoey](https://github.com/hasezoey)
+
 6.8.1 / 2022-12-19
 ==================
  * fix(query): avoid throwing circular dependency error if same object is used in multiple properties #12774 [orgads](https://github.com/orgads)
@@ -549,7 +729,7 @@
  * fix(index.d.ts): ValidationError `errors` only contains CastError or ValidationError #11369 [Uzlopak](https://github.com/Uzlopak)
  * fix(index.d.ts): make InsertManyResult.insertedIds return an array of Types.ObjectId by default #11197
  * fix(index.d.ts): allow pre('save') middleware with pre options #11257
- * fix(index.d.ts): add `supressReservedKeysWarning` option to schema #11439 [hiukky](https://github.com/hiukky)
+ * fix(index.d.ts): add `suppressReservedKeysWarning` option to schema #11439 [hiukky](https://github.com/hiukky)
  * docs(connections): improve replica set hostname docs with correct error message and info about `err.reason.servers` #11200
  * docs(populate): add virtual populate match option documentation #11411 [remirobichet](https://github.com/remirobichet)
  * docs(document): add note to API docs that flattenMaps defaults to `true` for `toJSON()` but not `toObject()` #11213

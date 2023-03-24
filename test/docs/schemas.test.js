@@ -60,7 +60,7 @@ describe('Advanced Schemas', function() {
 
     schema.loadClass(PersonClass);
     const Person = db.model('Person', schema);
-    
+
     const doc = await Person.create({
       firstName: 'Jon',
       lastName: 'Snow'
@@ -71,7 +71,7 @@ describe('Advanced Schemas', function() {
     assert.equal(doc.firstName, 'Jon');
     assert.equal(doc.lastName, 'Stark');
     const foundPerson = await Person.findByFullName('Jon Snow');
-    
+
     assert.equal(foundPerson.fullName, 'My name is Jon Snow');
   });
 });

@@ -5,7 +5,6 @@ const start = require('../common');
 
 describe('Date Tutorial', function() {
   let User;
-  // let db;
 
   const mongoose = new start.mongoose.Mongoose();
 
@@ -18,6 +17,10 @@ describe('Date Tutorial', function() {
     User = mongoose.model('User', userSchema);
 
     return mongoose.connect(start.uri);
+  });
+
+  after(async() => {
+    await mongoose.disconnect();
   });
 
   it('Example 1.2: casts strings to dates', function() {
@@ -83,7 +86,6 @@ describe('Date Tutorial', function() {
 
   describe('Example 1.3.1', function() {
     let Episode;
-    let db;
 
     before(async function() {
       const episodeSchema = new mongoose.Schema({
@@ -96,8 +98,7 @@ describe('Date Tutorial', function() {
           max: '1994-05-23'
         }
       });
-      db = await start().asPromise();
-      Episode = db.model('Episode', episodeSchema);
+      Episode = mongoose.model('Episode2', episodeSchema);
 
       await Episode.create([
         { title: 'Encounter at Farpoint', airedAt: '1987-09-28' },

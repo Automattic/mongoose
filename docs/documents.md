@@ -1,4 +1,4 @@
-## Documents
+# Documents
 
 Mongoose [documents](api/document.html) represent a one-to-one mapping
 to documents as stored in MongoDB. Each document is an instance of its
@@ -49,7 +49,7 @@ doc instanceof mongoose.Document; // true
 <h2 id="updating-using-save"><a href="#updating-using-save">Updating Using <code>save()</code></a></h2>
 
 Mongoose documents track changes. You can modify a document using vanilla
-JavaScript assignments and Mongoose will convert it into [MongoDB update operators](https://docs.mongodb.com/manual/reference/operator/update/).
+JavaScript assignments and Mongoose will convert it into [MongoDB update operators](https://www.mongodb.com/docs/manual/reference/operator/update/).
 
 ```javascript
 doc.name = 'foo';
@@ -88,7 +88,7 @@ way to update a document with Mongoose. With `save()`, you get full
 [validation](validation.html) and [middleware](middleware.html).
 
 For cases when `save()` isn't flexible enough, Mongoose lets you create
-your own [MongoDB updates](https://docs.mongodb.com/manual/reference/operator/update/)
+your own [MongoDB updates](https://www.mongodb.com/docs/manual/reference/operator/update/)
 with casting, [middleware](middleware.html#notes), and [limited validation](validation.html#update-validators).
 
 ```javascript
@@ -111,11 +111,11 @@ before saving.
 const schema = new Schema({ name: String, age: { type: Number, min: 0 } });
 const Person = mongoose.model('Person', schema);
 
-let p = new Person({ name: 'foo', age: 'bar' });
+const p = new Person({ name: 'foo', age: 'bar' });
 // Cast to Number failed for value "bar" at path "age"
 await p.validate();
 
-let p2 = new Person({ name: 'foo', age: -1 });
+const p2 = new Person({ name: 'foo', age: -1 });
 // Path `age` (-1) is less than minimum allowed value (0).
 await p2.validate();
 ```
@@ -158,7 +158,7 @@ The other way is to use [`Model.replaceOne()`](api/model.html#model_Model-replac
 await Person.replaceOne({ _id }, { name: 'Jean-Luc Picard' });
 ```
 
-### Next Up
+## Next Up
 
 Now that we've covered Documents, let's take a look at
 [Subdocuments](subdocs.html).

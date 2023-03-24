@@ -3,6 +3,7 @@ extends layout
 append style
   link(rel="stylesheet", href="/docs/css/api.css")
   script(src="/docs/js/api-bold-current-nav.js")
+  script(src="/docs/js/convert-old-anchorid.js")
 
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
@@ -19,7 +20,7 @@ block content
           div.nav-item(id='nav-' + item.name)
             - if (item.name === name)
               div.nav-item-title(style="font-weight: bold")
-                a(href=item.name.toLowerCase() + '.html')
+                a(href=item.fileName + '.html')
                   | #{item.name}
               ul.nav-item-sub
                 each prop in item.props
@@ -28,7 +29,7 @@ block content
                       | <code>#{prop.string}</code>
             - else
               div.nav-item-title
-                a(href=item.name.toLowerCase() + '.html')
+                a(href=item.fileName + '.html')
                   | #{item.name}
 
   div.api-content

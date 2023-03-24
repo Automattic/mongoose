@@ -1,6 +1,6 @@
-## Custom Schema Types
+# Custom Schema Types
 
-### Creating a Basic Custom Schema Type
+## Creating a Basic Custom Schema Type
 
 _New in Mongoose 4.4.0:_ Mongoose supports custom types. Before you
 reach for a custom type, however, know that a custom type is overkill
@@ -14,6 +14,6 @@ To create a new schema type, you need to inherit from `mongoose.SchemaType`
 and add the corresponding property to `mongoose.Schema.Types`. The one
 method you need to implement is the `cast()` method.
 
-```javascript
+```acquit
 [require:Creating a Basic Custom Schema Type]
 ```

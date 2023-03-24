@@ -1,4 +1,4 @@
-## Plugins
+# Plugins
 
 Schemas are pluggable, that is, they allow for applying pre-packaged capabilities to extend their functionality. This is a very powerful feature.
 
@@ -9,7 +9,7 @@ Schemas are pluggable, that is, they allow for applying pre-packaged capabilitie
   <li><a href="#official">Officially Supported Plugins</a></li>
 </ul>
 
-<h3 id="example"><a href="#example">Example</a></h3>
+<h2 id="example"><a href="#example">Example</a></h2>
 
 Plugins are a tool for reusing logic in multiple schemas. Suppose you have
 several models in your database and want to add a `loadedAt` property
@@ -35,18 +35,18 @@ module.exports = function loadedAtPlugin(schema, options) {
 
 // game-schema.js
 const loadedAtPlugin = require('./loadedAt');
-const gameSchema = new Schema({ ... });
+const gameSchema = new Schema({ /* ... */ });
 gameSchema.plugin(loadedAtPlugin);
 
 // player-schema.js
 const loadedAtPlugin = require('./loadedAt');
-const playerSchema = new Schema({ ... });
+const playerSchema = new Schema({ /* ... */ });
 playerSchema.plugin(loadedAtPlugin);
 ```
 
 We just added last-modified behavior to both our `Game` and `Player` schemas and declared an index on the `lastMod` path of our Games to boot. Not bad for a few lines of code.
 
-<h3 id="global"><a href="#global">Global Plugins</a></h3>
+<h2 id="global"><a href="#global">Global Plugins</a></h2>
 
 Want to register a plugin for all schemas? The mongoose singleton has a
 `.plugin()` function that registers a plugin for every schema. For
@@ -56,14 +56,14 @@ example:
 const mongoose = require('mongoose');
 mongoose.plugin(require('./loadedAt'));
 
-const gameSchema = new Schema({ ... });
-const playerSchema = new Schema({ ... });
+const gameSchema = new Schema({ /* ... */ });
+const playerSchema = new Schema({ /* ... */ });
 // `loadedAtPlugin` gets attached to both schemas
 const Game = mongoose.model('Game', gameSchema);
 const Player = mongoose.model('Player', playerSchema);
 ```
 
-<h3 id="apply-plugins-before-compiling-models"><a href="#apply-plugins-before-compiling-models">Apply Plugins Before Compiling Models</a></h3>
+<h2 id="apply-plugins-before-compiling-models"><a href="#apply-plugins-before-compiling-models">Apply Plugins Before Compiling Models</a></h2>
 
 Because many plugins rely on [middleware](middleware.html), you should make sure to apply plugins **before**
 you call `mongoose.model()` or `conn.model()`. Otherwise, [any middleware the plugin registers won't get applied](middleware.html#defining).
@@ -88,7 +88,7 @@ module.exports = function loadedAtPlugin(schema, options) {
 
 // game-schema.js
 const loadedAtPlugin = require('./loadedAt');
-const gameSchema = new Schema({ ... });
+const gameSchema = new Schema({ /* ... */ });
 const Game = mongoose.model('Game', gameSchema);
 
 // `find()` and `findOne()` hooks from `loadedAtPlugin()` won't get applied
@@ -96,18 +96,18 @@ const Game = mongoose.model('Game', gameSchema);
 gameSchema.plugin(loadedAtPlugin);
 ```
 
-<h3 id="official"><a href="#official">Officially Supported Plugins</a></h3>
+<h2 id="official"><a href="#official">Officially Supported Plugins</a></h2>
 
 The Mongoose team maintains several plugins that add cool new features to
 Mongoose. Here's a couple:
 
 * [mongoose-autopopulate](http://plugins.mongoosejs.io/plugins/autopopulate): Always [`populate()`](populate.html) certain fields in your Mongoose schemas.
-* [mongoose-lean-virtuals](http://plugins.mongoosejs.io/plugins/lean-virtuals): Attach virtuals to the results of Mongoose queries when using [`.lean()`](query.html#query_Query-lean).
+* [mongoose-lean-virtuals](http://plugins.mongoosejs.io/plugins/lean-virtuals): Attach virtuals to the results of Mongoose queries when using [`.lean()`](api/query.html#query_Query-lean).
 * [mongoose-cast-aggregation](https://www.npmjs.com/package/mongoose-cast-aggregation)
 
 You can find a full list of officially supported plugins on [Mongoose's plugins search site](https://plugins.mongoosejs.io/).
 
-### Community!
+## Community!
 
 Not only can you re-use schema functionality in your own projects, but you
 also reap the benefits of the Mongoose community as well. Any plugin

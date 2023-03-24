@@ -6,7 +6,7 @@ Mongoose getters and setters allow you to execute custom logic when getting or s
 
 Suppose you have a `User` collection and you want to obfuscate user emails to protect your users' privacy. Below is a basic `userSchema` that obfuscates the user's email address.
 
-```javascript
+```acquit
 [require:getters/setters.*getters.*basic example]
 ```
 
@@ -14,19 +14,18 @@ Keep in mind that getters do **not** impact the underlying data stored in
 MongoDB. If you save `user`, the `email` property will be 'ab@gmail.com' in
 the database.
 
-By default, Mongoose executes getters when converting a document to JSON,
-including [Express' `res.json()` function](http://expressjs.com/en/4x/api.html#res.json).
+By default, Mongoose does **not** execute getters when converting a document to JSON, including [Express' `res.json()` function](http://expressjs.com/en/4x/api.html#res.json).
 
 ```javascript
 app.get(function(req, res) {
   return User.findOne().
-    // The `email` getter will run here
+    // The `email` getter will NOT run here
     then(doc => res.json(doc)).
     catch(err => res.status(500).json({ message: err.message }));
 });
 ```
 
-To disable running getters when converting a document to JSON, set the [`toJSON.getters` option to `false` in your schema](../guide.html#toJSON) as shown below.
+To run getters when converting a document to JSON, set the [`toJSON.getters` option to `true` in your schema](../guide.html#toJSON) as shown below.
 
 ```javascript
 const userSchema = new Schema({
@@ -34,12 +33,23 @@ const userSchema = new Schema({
     type: String,
     get: obfuscate
   }
-}, { toJSON: { getters: false } });
+}, { toJSON: { getters: true } });
+
+// Or, globally
+mongoose.set('toJSON', { getters: true });
+
+// Or, on a one-off basis
+app.get(function(req, res) {
+  return User.findOne().
+    // The `email` getter will run here
+    then(doc => res.json(doc.toJSON({ getters: true }))).
+    catch(err => res.status(500).json({ message: err.message }));
+});
 ```
 
 To skip getters on a one-off basis, use [`user.get()` with the `getters` option set to `false`](../api/document.html#document_Document-get) as shown below.
 
-```javascript
+```acquit
 [require:getters/setters.*getters.*skip]
 ```
 
@@ -49,7 +59,7 @@ Suppose you want to make sure all user emails in your database are lowercased to
 make it easy to search without worrying about case. Below is an example
 `userSchema` that ensures emails are lowercased.
 
-```javascript
+```acquit
 [require:getters/setters.*setters.*basic]
 ```
 
@@ -57,7 +67,7 @@ Mongoose also runs setters on update operations, like [`updateOne()`](../api/que
 [upsert a document](https://masteringjs.io/tutorials/mongoose/upsert) with a
 lowercased `email` in the below example.
 
-```javascript
+```acquit
 [require:getters/setters.*setters.*updates]
 ```
 
@@ -66,7 +76,7 @@ being run. If you don't want your setter to run when you call `updateOne()`,
 you add an if statement that checks if `this` is a Mongoose document as shown
 below.
 
-```javascript
+```acquit
 [require:getters/setters.*setters.*update skip]
 ```
 
@@ -79,18 +89,17 @@ The `$locals` property is the preferred place to store any program-defined data 
 In your getter and setter functions, `this` is the document being accessed, so you set properties on `$locals` and then access those properties in your getters examples.
 For example, the following shows how you can use `$locals` to configure the language for a custom getter that returns a string in different languages.
 
-```javascript
+```acquit
 [require:getters/setters.*localization.*locale]
 ```
 
-Differences vs ES6 Getters/Setters
-----------------------------------
+## Differences vs ES6 Getters/Setters
 
 Mongoose setters are different from [ES6 setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) because they allow you to transform the value being set. With ES6 setters, you
 would need to store an internal `_email` property to use a setter. With Mongoose,
 you do **not** need to define an internal `_email` property or define a 
 corresponding getter for `email`.
 
-```javascript
+```acquit
 [require:getters/setters.*setters.*vs ES6]
 ```

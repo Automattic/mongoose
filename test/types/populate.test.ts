@@ -11,7 +11,7 @@ const childSchema: Schema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
 interface Parent {
-  child: PopulatedDoc<Document<ObjectId> & Child>,
+  child: PopulatedDoc<Child>,
   name?: string
 }
 
@@ -20,22 +20,26 @@ const ParentModel = model<Parent>('Parent', new Schema({
   name: String
 }));
 
-ParentModel.findOne({}).populate('child').orFail().then((doc: Document<ObjectId, {}, Parent> & Parent) => {
-  const child = doc.child;
-  if (child == null || child instanceof ObjectId) {
-    throw new Error('should be populated');
-  } else {
-    useChildDoc(child);
-  }
-  const lean = doc.toObject();
-  const leanChild = lean.child;
-  if (leanChild == null || leanChild instanceof ObjectId) {
-    throw new Error('should be populated');
-  } else {
-    const name = leanChild.name;
-    expectError(leanChild.save());
-  }
-});
+ParentModel.
+  findOne({}).
+  populate<{ child: Document<ObjectId> & Child }>('child').
+  orFail().
+  then((doc: Document<ObjectId, {}, Parent> & Parent) => {
+    const child = doc.child;
+    if (child == null || child instanceof ObjectId) {
+      throw new Error('should be populated');
+    } else {
+      useChildDoc(child);
+    }
+    const lean = doc.toObject<typeof doc>();
+    const leanChild = lean.child;
+    if (leanChild == null || leanChild instanceof ObjectId) {
+      throw new Error('should be populated');
+    } else {
+      const name = leanChild.name;
+      expectError(leanChild.save());
+    }
+  });
 
 function useChildDoc(child: Child): void {
   console.log(child.name.trim());
@@ -139,13 +143,13 @@ function gh11321(): void {
   });
 
   parentSchema.virtual('test', {
-    localField: (doc: HydratedDocument<Parent, {}>): string => {
+    localField: (doc: HydratedDocument<Parent>): string => {
       if (typeof doc.name === 'string') {
         return doc.name;
       }
       return 'foo';
     },
-    foreignField: (doc: HydratedDocument<Parent, {}>): string => {
+    foreignField: (doc: HydratedDocument<Parent>): string => {
       if (typeof doc.name === 'string') {
         return doc.name;
       }
@@ -338,4 +342,34 @@ function gh12136() {
     child: PopulatedDoc<ChildDocument>;
   }
 
+}
+
+async function gh13070() {
+  interface IParent {
+    name: string;
+    child: Types.ObjectId;
+  }
+  interface IChild {
+    name: string;
+    parent: Types.ObjectId;
+  }
+
+  const parentSchema = new Schema(
+    {
+      name: { type: String, required: true },
+      child: { type: Schema.Types.ObjectId, ref: 'Child', required: true }
+    });
+
+  const childSchema = new Schema(
+    {
+      name: { type: String, required: true },
+      parent: { type: Schema.Types.ObjectId, ref: 'Parent', required: true }
+    });
+
+  const Parent = model<IParent>('Parent', parentSchema);
+  const Child = model<IChild>('Child', childSchema);
+
+  const doc = await Parent.findOne().orFail();
+  const doc2 = await Child.populate<{ child: IChild }>(doc, 'child');
+  const name: string = doc2.child.name;
 }

@@ -11,33 +11,13 @@ import {
   HydratedDocument,
   HydratedDocumentFromSchema,
   Query,
-  UpdateWriteOpResult
+  UpdateWriteOpResult,
+  AggregateOptions,
+  StringSchemaDefinition
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 import { UpdateOneModel } from 'mongodb';
-
-function conventionalSyntax(): void {
-  interface ITest extends Document {
-    foo: string;
-  }
-
-  const TestSchema = new Schema<ITest>({
-    foo: { type: String, required: true }
-  });
-
-  const Test = connection.model<ITest>('Test', TestSchema);
-
-  const bar = (SomeModel: Model<ITest>) => console.log(SomeModel);
-
-  bar(Test);
-
-  const doc = new Test({ foo: '42' });
-  console.log(doc.foo);
-  doc.save();
-
-  expectError(new Test<{ foo: string }>({}));
-}
 
 function rawDocSyntax(): void {
   interface ITest {
@@ -86,11 +66,11 @@ async function insertManyTest() {
     foo: string;
   }
 
-  const TestSchema = new Schema<ITest & Document>({
+  const TestSchema = new Schema<ITest>({
     foo: { type: String, required: true }
   });
 
-  const Test = connection.model<ITest & Document>('Test', TestSchema);
+  const Test = connection.model<ITest>('Test', TestSchema);
 
   Test.insertMany([{ foo: 'bar' }]).then(async res => {
     res.length;
@@ -98,23 +78,9 @@ async function insertManyTest() {
 
   const res = await Test.insertMany([{ foo: 'bar' }], { rawResult: true });
   expectType<ObjectId>(res.insertedIds[0]);
-}
 
-function schemaStaticsWithoutGenerics() {
-  const UserSchema = new Schema({});
-  UserSchema.statics.static1 = function() {
-    return '';
-  };
-
-  interface IUserDocument extends Document {
-    instanceField: string;
-  }
-  interface IUserModel extends Model<IUserDocument> {
-    static1: () => string;
-  }
-
-  const UserModel: IUserModel = model<IUserDocument, IUserModel>('User', UserSchema);
-  UserModel.static1();
+  const res2 = await Test.insertMany([{ foo: 'bar' }], { ordered: false, rawResult: true });
+  expectAssignable<Error | Object | ReturnType<(typeof Test)['hydrate']>>(res2.mongoose.results[0]);
 }
 
 function gh10074() {
@@ -154,11 +120,11 @@ async function gh10359() {
   }
 
   async function foo(model: Model<User, {}, {}, {}>) {
-    const doc = await model.findOne({ groupId: 'test' }).lean().exec();
-    expectType<string | undefined>(doc?.firstName);
-    expectType<string | undefined>(doc?.lastName);
-    expectType<Types.ObjectId | undefined>(doc?._id);
-    expectType<string | undefined>(doc?.groupId);
+    const doc = await model.findOne({ groupId: 'test' }).orFail().lean().exec();
+    expectType<string>(doc.firstName);
+    expectType<string>(doc.lastName);
+    expectType<Types.ObjectId>(doc._id);
+    expectType<string>(doc.groupId);
     return doc;
   }
 
@@ -173,16 +139,23 @@ const ExpiresSchema = new Schema({
   }
 });
 
-interface IProject extends Document {
+interface IProject {
   name: string;
+}
+
+interface IProjectInstanceMethods {
   myMethod(): number;
 }
 
-interface ProjectModel extends Model<IProject> {
+interface ProjectModel extends Model<IProject, {}, IProjectInstanceMethods> {
   myStatic(): number;
 }
 
-const projectSchema = new Schema<IProject, ProjectModel>({ name: String });
+const projectSchema = new Schema<
+IProject,
+ProjectModel,
+IProjectInstanceMethods
+>({ name: String });
 
 projectSchema.pre('save', function() {
   // this => IProject
@@ -217,9 +190,6 @@ Project.create({
 Project.exists({ name: 'Hello' }).then(result => {
   result?._id;
 });
-Project.exists({ name: 'Hello' }, (err, result) => {
-  result?._id;
-});
 
 function find() {
   // no args
@@ -246,11 +216,6 @@ function find() {
   Project.find({}, undefined, { limit: 5 });
   Project.find({}, null, { limit: 5 });
   Project.find({}, { name: 1 }, { limit: 5 });
-
-  // filter + projection + options + callback
-  Project.find({}, undefined, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
-  Project.find({}, null, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
-  Project.find({}, { name: 1 }, { limit: 5 }, (error: CallbackError, result: IProject[]) => console.log(error, result));
 }
 
 function inheritance() {
@@ -259,6 +224,9 @@ function inheritance() {
       await this.save();
     }
   }
+
+  const doc = new InteractsWithDatabase();
+  doc instanceof Model;
 
   class SourceProvider extends InteractsWithDatabase {
     static async deleteInstallation(installationId: number): Promise<void> {
@@ -486,7 +454,7 @@ function gh12100() {
 function modelRemoveOptions() {
   const cmodel = model('Test', new Schema());
 
-  cmodel.remove({}, {});
+  cmodel.deleteOne({}, {});
 }
 
 async function gh12286() {
@@ -500,7 +468,10 @@ async function gh12286() {
   const User = model<IUser>('User', schema);
 
   const user = await User.findById('0'.repeat(24), { name: 1 }).lean();
-  expectType<string | undefined>(user?.name);
+  if (user == null) {
+    return;
+  }
+  expectType<string>(user.name);
 }
 
 
@@ -568,4 +539,31 @@ function gh12573ModelAny() {
   expectType<any>(doc);
   const { fieldA } = doc;
   expectType<any>(fieldA);
+}
+
+function aggregateOptionsTest() {
+  const TestModel = model('test', new Schema({}));
+  const options: AggregateOptions = {};
+  TestModel.aggregate(undefined, options);
+}
+
+async function gh13151() {
+  interface ITest {
+    title: string;
+  }
+
+  const TestSchema = new Schema(
+    {
+      title: {
+        type: String,
+        required: true
+      }
+    }
+  );
+
+  const TestModel = model<ITest>('Test', TestSchema);
+  const test = await TestModel.findOne().lean();
+  expectType<ITest & { _id: Types.ObjectId } | null>(test);
+  if (!test) return;
+  expectType<ITest & { _id: Types.ObjectId }>(test);
 }

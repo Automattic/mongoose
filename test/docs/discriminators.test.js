@@ -100,6 +100,42 @@ describe('discriminator docs', function() {
     assert.equal(event3.__t, 'SignedUp');
   });
 
+  it('Update discriminator key', async function() {
+    let event = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    await event.save();
+
+    event.__t = 'SignedUp';
+    // ValidationError: ClickedLink validation failed: __t: Cast to String failed for value "SignedUp" (type string) at path "__t"
+    // acquit:ignore:start
+    await assert.rejects(async() => {
+    // acquit:ignore:end
+      await event.save();
+    // acquit:ignore:start
+    }, /__t: Cast to String failed/);
+    // acquit:ignore:end
+
+    event = await ClickedLinkEvent.findByIdAndUpdate(event._id, { __t: 'SignedUp' }, { new: true });
+    event.__t; // 'ClickedLink', update was a no-op
+    // acquit:ignore:start
+    assert.equal(event.__t, 'ClickedLink');
+    // acquit:ignore:end
+  });
+
+  it('use overwriteDiscriminatorKey to change discriminator key', async function() {
+    let event = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    await event.save();
+
+    event = await ClickedLinkEvent.findByIdAndUpdate(
+      event._id,
+      { __t: 'SignedUp' },
+      { overwriteDiscriminatorKey: true, new: true }
+    );
+    event.__t; // 'SignedUp', updated discriminator key
+    // acquit:ignore:start
+    assert.equal(event.__t, 'SignedUp');
+    // acquit:ignore:end
+  });
+
   /**
    * Discriminator models are special; they attach the discriminator key
    * to queries. In other words, `find()`, `count()`, `aggregate()`, etc.
@@ -112,7 +148,7 @@ describe('discriminator docs', function() {
 
     await Promise.all([event1.save(), event2.save(), event3.save()]);
     const docs = await ClickedLinkEvent.find({});
-    
+
     assert.equal(docs.length, 1);
     assert.equal(docs[0]._id.toString(), event2._id.toString());
     assert.equal(docs[0].url, 'google.com');
@@ -145,13 +181,13 @@ describe('discriminator docs', function() {
 
     const event1 = new ClickedLinkEvent();
     await event1.validate();
-    
+
     assert.equal(eventSchemaCalls, 1);
     assert.equal(clickedSchemaCalls, 1);
 
     const generic = new Event();
     await generic.validate();
-    
+
     assert.equal(eventSchemaCalls, 2);
     assert.equal(clickedSchemaCalls, 1);
   });
@@ -178,7 +214,7 @@ describe('discriminator docs', function() {
     // The discriminator schema has a String `time` and an
     // implicitly added ObjectId `_id`.
     assert.ok(clickedLinkSchema.path('_id'));
-    assert.equal(clickedLinkSchema.path('_id').instance, 'ObjectID');
+    assert.equal(clickedLinkSchema.path('_id').instance, 'ObjectId');
     const ClickedLinkEvent = Event.discriminator('ChildEventBad',
       clickedLinkSchema);
 

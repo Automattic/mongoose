@@ -11,7 +11,10 @@ import {
   FilterQuery,
   UpdateQuery,
   ApplyBasicQueryCasting,
-  QuerySelector
+  QuerySelector,
+  InferSchemaType,
+  ProjectionFields,
+  QueryOptions
 } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { expectError, expectType } from 'tsd';
@@ -46,17 +49,17 @@ schema.query.byName = function(name: string): QueryWithHelpers<any, ITest, Query
 interface Child {
   name: string;
 }
-interface ISubdoc extends Document {
+interface ISubdoc {
   myId?: Types.ObjectId;
   id?: number;
   tags?: string[];
 }
 
-interface ITest extends Document {
+interface ITest {
   name?: string;
   age?: number;
   parent?: Types.ObjectId;
-  child?: PopulatedDoc<Child & Document<ObjectId>>,
+  child?: PopulatedDoc<HydratedDocument<Child>>,
   tags?: string[];
   docs?: ISubdoc[];
   endDate?: Date;
@@ -136,9 +139,6 @@ Test.findByIdAndUpdate({ name: 'test' }, { name: 'test2' }, (err: any, doc) => c
 
 Test.findOneAndUpdate({ name: 'test' }, { 'docs.0.myId': '0'.repeat(24) });
 
-const query: Query<ITest | null, ITest> = Test.findOne();
-query instanceof Query;
-
 // Chaining
 Test.findOne().where({ name: 'test' });
 Test.where().find({ name: 'test' });
@@ -182,10 +182,10 @@ function testGenericQuery(): void {
 
 function eachAsync(): void {
   Test.find().cursor().eachAsync((doc) => {
-    expectType<(ITest & { _id: Types.ObjectId; })>(doc);
+    expectType<HydratedDocument<ITest, {}, QueryHelpers>>(doc);
   });
   Test.find().cursor().eachAsync((docs) => {
-    expectType<(ITest & { _id: Types.ObjectId; })[]>(docs);
+    expectType<HydratedDocument<ITest, {}, QueryHelpers>[]>(docs);
   }, { batchSize: 2 });
 }
 
@@ -296,17 +296,6 @@ async function gh11306(): Promise<void> {
 
   expectType<any[]>(await MyModel.distinct('name'));
   expectType<string[]>(await MyModel.distinct<string>('name'));
-}
-
-async function gh11602(): Promise<void> {
-  const updateResult = await Model.findOneAndUpdate(query, { $inc: { occurence: 1 } }, {
-    upsert: true,
-    returnDocument: 'after',
-    rawResult: true
-  });
-  expectError(updateResult.lastErrorObject?.modifiedCount);
-  expectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
-  expectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
 }
 
 function autoTypedQuery() {
@@ -421,4 +410,68 @@ async function gh12342_auto() {
   expectType<HydratedDocument<Project>[]>(
     await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
   );
+}
+
+async function gh11602(): Promise<void> {
+  const query: Query<ITest | null, ITest> = Test.findOne();
+  query instanceof Query;
+
+  const ModelType = model<ITest>('foo', schema);
+
+  const updateResult = await ModelType.findOneAndUpdate(query, { $inc: { occurence: 1 } }, {
+    upsert: true,
+    returnDocument: 'after',
+    rawResult: true
+  });
+
+  expectError(updateResult.lastErrorObject?.modifiedCount);
+  expectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
+
+  ModelType.findOneAndUpdate({}, {}, { returnDocument: 'before' });
+  ModelType.findOneAndUpdate({}, {}, { returnDocument: 'after' });
+  ModelType.findOneAndUpdate({}, {}, { returnDocument: undefined });
+  ModelType.findOneAndUpdate({}, {}, {});
+  expectError(ModelType.findOneAndUpdate({}, {}, {
+    returnDocument: 'not-before-or-after'
+  }));
+}
+
+async function gh13142() {
+  const BlogSchema = new Schema({ title: String });
+
+  type Blog = InferSchemaType<typeof BlogSchema>;
+
+  const BlogModel = model<Blog>('Blog', BlogSchema);
+  class BlogRepository {
+    private readonly blogModel: Model<Blog>;
+
+    constructor() {
+      this.blogModel = BlogModel;
+    }
+
+    findOne<
+      Projection extends ProjectionFields<Blog>,
+      Options extends QueryOptions<Blog>
+    >(
+      filter: FilterQuery<Blog>,
+      projection: Projection,
+      options: Options
+    ): Promise<
+        Options['lean'] extends true
+          ? Pick<Blog, Extract<keyof Projection, keyof Blog>> | null
+          : HydratedDocument<Pick<Blog, Extract<keyof Projection, keyof Blog>>> | null
+    > {
+      return this.blogModel.findOne(filter, projection, options);
+    }
+  }
+
+  const blogRepository = new BlogRepository();
+  const blog = await blogRepository.findOne(
+    { title: 'test' },
+    { content: 1 },
+    { lean: true }
+  );
+  if (!blog) return;
+  expectType<Pick<Blog, Extract<keyof { content: 1 }, keyof Blog>>>(blog);
 }

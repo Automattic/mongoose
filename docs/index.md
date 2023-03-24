@@ -1,4 +1,4 @@
-## Getting Started
+# Getting Started
 
 <style>
   hr {
@@ -33,7 +33,7 @@ main().catch(err => console.log(err));
 
 async function main() {
   await mongoose.connect('mongodb://127.0.0.1:27017/test');
-  
+
   // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
 }
 ```
@@ -71,8 +71,8 @@ to our documents:
 // NOTE: methods must be added to the schema before compiling it with mongoose.model()
 kittySchema.methods.speak = function speak() {
   const greeting = this.name
-    ? "Meow name is " + this.name
-    : "I don't have a name";
+    ? 'Meow name is ' + this.name
+    : 'I don\'t have a name';
   console.log(greeting);
 };
 
@@ -88,7 +88,7 @@ fluffy.speak(); // "Meow name is fluffy"
 ```
 
 We have talking kittens! But we still haven't saved anything to MongoDB.
-Each document can be saved to the database by calling its [save](model.html#model_Model-save) method. The first argument to the callback will be an error if any occurred.
+Each document can be saved to the database by calling its [save](api/model.html#model_Model-save) method. The first argument to the callback will be an error if any occurred.
 
 ```javascript
 await fluffy.save();
@@ -113,6 +113,6 @@ await Kitten.find({ name: /^fluff/ });
 This performs a search for all documents with a name property that begins
 with "fluff" and returns the result as an array of kittens to the callback.
 
-### Congratulations
+## Congratulations
 
 That's the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the [guide](guide.html), or [API docs](api/mongoose.html) for more.

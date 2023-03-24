@@ -93,7 +93,7 @@ describe('debug: shell', function() {
   });
 
   it('should avoid sending null session option with document ops (gh-13052)', async function() {
-    let args = [];
+    const args = [];
     const m = new mongoose.Mongoose();
     m.set('debug', function() {
       args.push([...arguments]);

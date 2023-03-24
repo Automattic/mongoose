@@ -8,19 +8,19 @@ describe('promises docs', function() {
   let Band;
   let db;
 
-  before(function (done) {
+  before(function(done) {
     db = mongoose.createConnection(start.uri);
 
-    Band = db.model('band-promises', {name: String, members: [String]});
+    Band = db.model('band-promises', { name: String, members: [String] });
 
     done();
   });
 
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     Band.deleteMany({}, done);
   });
 
-  after(async function () {
+  after(async function() {
     mongoose.Promise = global.Promise;
 
     await db.close();
@@ -154,14 +154,14 @@ describe('promises docs', function() {
       // acquit:ignore:end
     }
   });
-  
+
   /**
    * If you're an advanced user, you may want to plug in your own promise
    * library like [bluebird](https://www.npmjs.com/package/bluebird). Just set
    * `mongoose.Promise` to your favorite
    * ES6-style promise constructor and mongoose will use it.
    */
-  it('Plugging in your own Promises Library', function (done) {
+  it('Plugging in your own Promises Library', function(done) {
     // acquit:ignore:start
     if (!global.Promise) {
       return done();
@@ -169,17 +169,17 @@ describe('promises docs', function() {
     // acquit:ignore:end
     // Use bluebird
     mongoose.Promise = require('bluebird');
-    const bluebirdPromise = Band.findOne({name: "Guns N' Roses"}).exec();
+    const bluebirdPromise = Band.findOne({ name: 'Guns N\' Roses' }).exec();
     assert.equal(bluebirdPromise.constructor, require('bluebird'));
 
     // Use q. Note that you **must** use `require('q').Promise`.
     mongoose.Promise = require('q').Promise;
-    const qPromise = Band.findOne({name: "Guns N' Roses"}).exec();
+    const qPromise = Band.findOne({ name: 'Guns N\' Roses' }).exec();
     assert.ok(qPromise instanceof require('q').makePromise);
 
     // acquit:ignore:start
     // Wait for promises
-    bluebirdPromise.then(qPromise).then(function () {
+    bluebirdPromise.then(qPromise).then(function() {
       done();
     });
     // acquit:ignore:end

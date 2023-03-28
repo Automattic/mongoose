@@ -1,12 +1,12 @@
 declare module 'mongoose' {
 
-  type MongooseQueryAndDocumentMiddleware = 'remove' | 'updateOne' | 'deleteOne';
+  type MongooseQueryAndDocumentMiddleware = /*'remove' |*/ 'updateOne' | 'deleteOne' | 'validate';
 
-  type MongooseDistinctDocumentMiddleware = 'validate' | 'save' | 'init';
-  type MongooseDefaultDocumentMiddleware = MongooseDistinctDocumentMiddleware | 'remove';
+  type MongooseDistinctDocumentMiddleware = 'save' | 'init';
+  type MongooseDefaultDocumentMiddleware = MongooseDistinctDocumentMiddleware /*| 'remove' */; // remove this type completely
   type MongooseDocumentMiddleware = MongooseDistinctDocumentMiddleware | MongooseQueryAndDocumentMiddleware;
 
-  type MongooseDistinctQueryMiddleware = 'count' | 'estimatedDocumentCount' | 'countDocuments' | 'deleteMany' | 'distinct' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndReplace' | 'findOneAndUpdate' | 'replaceOne' | 'update' | 'updateMany';
+  type MongooseDistinctQueryMiddleware = 'count' | 'estimatedDocumentCount' | 'countDocuments' | 'deleteMany' | 'distinct' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndReplace' | 'findOneAndUpdate' | 'replaceOne' /*| 'update'*/ | 'updateMany';
   type MongooseDefaultQueryMiddleware = MongooseDistinctQueryMiddleware | 'updateOne' | 'deleteOne';
   type MongooseQueryMiddleware = MongooseDistinctQueryMiddleware | MongooseQueryAndDocumentMiddleware;
 

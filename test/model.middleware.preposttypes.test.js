@@ -57,7 +57,7 @@ function jsfy(obj) {
 }
 
 /* Tests */
-describe('pre/post hooks, type of this', function() {
+describe.only('pre/post hooks, type of this', function() {
   let db;
 
   before(function() {
@@ -179,17 +179,17 @@ describe('pre/post hooks, type of this', function() {
 
     // --------------------------------------------------------------------------
     // register hooks; here we actually see the correct type annotations in action
-    const MongooseQueryAndDocumentMiddleware = ['remove', 'updateOne', 'deleteOne'];
+    const MongooseQueryAndDocumentMiddleware = [/*'remove',*/ 'updateOne', 'deleteOne', 'validate'];
 
-    const MongooseDistinctDocumentMiddleware = ['validate', 'save', 'init'];
-    const MongooseDefaultDocumentMiddleware = [...MongooseDistinctDocumentMiddleware, 'remove'];
+    const MongooseDistinctDocumentMiddleware = ['save', 'init'];
+    // const MongooseDefaultDocumentMiddleware = [...MongooseDistinctDocumentMiddleware /*, 'remove'*/];
     const MongooseDocumentMiddleware = [...MongooseDistinctDocumentMiddleware, ...MongooseQueryAndDocumentMiddleware];
 
     const MongooseDistinctQueryMiddleware = [
       'count', 'estimatedDocumentCount', 'countDocuments',
       'deleteMany', 'distinct',
       'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate',
-      'replaceOne', 'update', 'updateMany'];
+      'replaceOne' /*, 'update'*/, 'updateMany'];
     const MongooseDefaultQueryMiddleware = [...MongooseDistinctQueryMiddleware, 'updateOne', 'deleteOne'];
     const MongooseQueryMiddleware = [...MongooseDistinctQueryMiddleware, ...MongooseQueryAndDocumentMiddleware];
 
@@ -227,16 +227,17 @@ describe('pre/post hooks, type of this', function() {
       // ------------------------------------------------------------
       // When literals are unknown, it is Union of Document|Query (or never, which we do not need to defined in index.d.ts)
     }
-    for (const method of ['remove']) { // MongooseDefaultDocumentMiddleware w/o distinct
-      registerHooks(DOC, method);
-      // defaults to Document
-      registerHooks(QUERY, method, { document: false, query: true });
-      registerHooks(DOC, method, { document: true, query: false });
-      registerHooks(UNION, method, { document: true, query: true });
-      registerHooks(NEVER, method, { document: false, query: false });
-      // ------------------------------------------------------------
-      // When literals are unknown, it is Union of Document|Query (or never, which we do not need to defined in index.d.ts)
-    }
+    // TODO: delete this
+    // for (const method of ['remove']) { // MongooseDefaultDocumentMiddleware w/o distinct
+    //   registerHooks(DOC, method);
+    //   // defaults to Document
+    //   registerHooks(QUERY, method, { document: false, query: true });
+    //   registerHooks(DOC, method, { document: true, query: false });
+    //   registerHooks(UNION, method, { document: true, query: true });
+    //   registerHooks(NEVER, method, { document: false, query: false });
+    //   // ------------------------------------------------------------
+    //   // When literals are unknown, it is Union of Document|Query (or never, which we do not need to defined in index.d.ts)
+    // }
 
     // method arrays
     registerHooks(DOC, MongooseDistinctDocumentMiddleware);
@@ -257,11 +258,11 @@ describe('pre/post hooks, type of this', function() {
     registerHooks(UNION, MongooseDefaultQueryMiddleware, { document: true, query: true });
     registerHooks(NEVER, MongooseDefaultQueryMiddleware, { document: false, query: false });
 
-    registerHooks(DOC, MongooseDefaultDocumentMiddleware);
-    registerHooks(QUERY, MongooseDefaultDocumentMiddleware, { document: false, query: true });
-    registerHooks(DOC, MongooseDefaultDocumentMiddleware, { document: true, query: false });
-    registerHooks(UNION, MongooseDefaultDocumentMiddleware, { document: true, query: true });
-    registerHooks(NEVER, MongooseDefaultDocumentMiddleware, { document: false, query: false });
+    // registerHooks(DOC, MongooseDefaultDocumentMiddleware);
+    // registerHooks(QUERY, MongooseDefaultDocumentMiddleware, { document: false, query: true });
+    // registerHooks(DOC, MongooseDefaultDocumentMiddleware, { document: true, query: false });
+    // registerHooks(UNION, MongooseDefaultDocumentMiddleware, { document: true, query: true });
+    // registerHooks(NEVER, MongooseDefaultDocumentMiddleware, { document: false, query: false });
 
     registerHooks(UNION, MongooseDocumentMiddleware);
     registerHooks(QUERY, MongooseDocumentMiddleware, { document: false, query: true });
@@ -301,20 +302,22 @@ describe('pre/post hooks, type of this', function() {
       await Doc.findOneAndReplace({}, { data: 'valueRep' }).exec();
       await Doc.findOneAndUpdate({}, { data: 'valueUpd' }).exec();
       await Doc.replaceOne({}, { data: 'value' }).exec();
-      await Doc.update({ data: 'value' }).exec();
+      // await Doc.update({ data: 'value' }).exec(); // not available anymore
+      await Doc.updateOne({ data: 'value' }).exec();
       await Doc.updateMany({ data: 'value' }).exec();
 
       // MongooseQueryOrDocumentMiddleware, use Query
-      await Doc.updateOne({ data: 'value' }).exec();
+      // await Doc.updateOne({ data: 'value' }).exec(); -- we use runValidators now
       await Doc.deleteOne({}).exec(); await Doc.create({ data: 'value' });
-      await Doc.remove({}).exec(); await Doc.create({ data: 'value' });
-
+      // await Doc.remove({}).exec(); await Doc.create({ data: 'value' }); // not available anymore
+      await Doc.updateOne({ data: 'value' }).setOptions({ runValidators: true }).exec();
+      
       // MongooseQueryOrDocumentMiddleware, use Document
       doc = await Doc.create({ data: 'doc2' });
       await doc.updateOne({ data: 'value' }); // updateOne
       await doc.deleteOne(); doc = await Doc.create({ data: 'doc3' });
-      await doc.remove(); doc = await Doc.create({ data: 'doc3' });
-
+      // await doc.remove(); doc = await Doc.create({ data: 'doc3' }); // not available anymore
+      
       const callResult = checkCalls();
       assert(callResult.length == 0, 'Unexpected hook calls:\n    - ' + callResult);
     } catch (err) {

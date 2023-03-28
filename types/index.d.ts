@@ -315,7 +315,7 @@ declare module 'mongoose' {
     post<T = never>(method: MongooseDistinctQueryMiddleware|MongooseDistinctQueryMiddleware[], options: SchemaPostOptions & { document: boolean, query: false }, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
     post<T = never>(method: MongooseDistinctDocumentMiddleware | MongooseDistinctDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { document: false, query: true }, fn: PostMiddlewareFunction<T, T>): this;
     // this = Document
-    post<T = THydratedDocumentType>(method: MongooseDefaultDocumentMiddleware|MongooseDefaultDocumentMiddleware[], fn: PostMiddlewareFunction<T, T>): this;
+    post<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], fn: PostMiddlewareFunction<T, T>): this;
     post<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPostOptions & SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
     post<T = THydratedDocumentType>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { document: true, query: false }, fn: PostMiddlewareFunction<T, T>): this;
     // this = Query
@@ -332,7 +332,7 @@ declare module 'mongoose' {
     post<T = never>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPostOptions & { document: false, query: boolean }, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T = never>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { document: false, query: false }, fn: ErrorHandlingMiddlewareFunction<T>): this;
     // this = Document
-    post<T = THydratedDocumentType>(method: MongooseDefaultDocumentMiddleware|MongooseDefaultDocumentMiddleware[], fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
     post<T = THydratedDocumentType>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { document: true, query: false }, fn: ErrorHandlingMiddlewareFunction<T>): this;
     // this = Query
@@ -364,7 +364,7 @@ declare module 'mongoose' {
     // this = Document
     pre<T = THydratedDocumentType>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: 'save', options: SchemaPreOptions, fn: PreSaveMiddlewareFunction<T>): this;
-    pre<T = THydratedDocumentType>(method: MongooseDefaultDocumentMiddleware|MongooseDefaultDocumentMiddleware[], fn: PreMiddlewareFunction<T>): this;
+    pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], fn: PreMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPreOptions & { document: true, query: false }, fn: PreMiddlewareFunction<T>): this;
     // this = Query

@@ -39,6 +39,7 @@ const files = [
   'lib/types/map.js'
 ];
 
+/** @type {DocsObj[]} */
 const out = module.exports.docs = [];
 
 const combinedFiles = [];
@@ -104,6 +105,16 @@ parse();
  */
 
 /**
+ * @typedef {Object} DocsObj
+ * @property {string} name The Title of the page
+ * @property {string} fileName The name of the resulting file
+ * @property {PropContext[]} props All the functions and values
+ * @property {string} file The original file (relative to the root of the repository)
+ * @property {string} editLink The link used for edits
+ * @property {boolean} [hideFromNav] Indicate that the entry should not be listed in the navigation
+ */
+
+/**
  * Process a file name to a documentation name
  * @param {string} input
  * @returns {NameObj}
@@ -151,6 +162,7 @@ function convertTypesToString(types) {
 function parse() {
   for (const props of combinedFiles) {
     const { docName: name, docFileName } = processName(props.file);
+    /** @type {DocsObj} */
     const data = {
       name: name,
       fileName: docFileName,

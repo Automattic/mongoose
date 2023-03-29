@@ -304,6 +304,12 @@ async function pugify(filename, options) {
   }
 
   newfile = newfile || filename.replace('.pug', '.html');
+
+  if (versionObj.versionedDeploy) {
+    newfile = path.resolve(cwd, path.join('.', versionObj.versionedPath), path.relative(cwd, newfile));
+    await fs.promises.mkdir(path.dirname(newfile), {recursive:true});
+  }
+
   options.outputUrl = newfile.replace(cwd, '');
   options.jobs = jobs;
   options.versions = versionObj;
@@ -371,14 +377,39 @@ async function pugifyAllFiles(noWatch) {
   }
 }
 
+/** Set which static paths to fully copy over to versioned docs */
+const pathsToCopy = [
+  'docs/js',
+  'docs/css',
+  'docs/images'
+]
+
+/** Copy all static files when versionedDeploy is used */
+async function copyAllRequiredFiles() {
+  // dont copy files to themself
+  if (!versionObj.versionedDeploy) {
+    return;
+  }
+
+  const fsextra = require('fs-extra');
+  await Promise.all(pathsToCopy.map(async v => {
+    const resultPath = path.resolve(cwd, path.join('.', versionObj.versionedPath, v));
+    await fsextra.copy(v, resultPath);
+  }))
+}
+
 exports.default = pugify;
 exports.pugify = pugify;
 exports.startWatch = startWatch;
 exports.pugifyAllFiles = pugifyAllFiles;
+exports.copyAllRequiredFiles = copyAllRequiredFiles;
+exports.versionObj = versionObj;
 exports.cwd = cwd;
 
 // only run the following code if this file is the main module / entry file
 if (isMain) {
   console.log(`Processing ~${files.length} files`);
-  pugifyAllFiles();
+  Promise.all([pugifyAllFiles(), copyAllRequiredFiles()]).then(() => {
+    console.log("Done Processing");
+  })
 }

@@ -180,7 +180,7 @@ function getCurrentVersion() {
     versionToUse = getLatestVersion();
   }
 
-  return {listed: versionToUse, path: '' };
+  return {listed: versionToUse, path: stringifySemverNumber(parseVersion(versionToUse), true) };
 }
 
 // execute function to get all tags from git
@@ -209,9 +209,9 @@ const versionObj = (() => {
       getLatestVersionOf(5),
     ]
   };
-  const versionedDeploy = process.env.DOCS_DEPLOY === "true" ? base.currentVersion === base.latestVersion : false;
+  const versionedDeploy = process.env.DOCS_DEPLOY === "true" ? !(base.currentVersion.listed === base.latestVersion.listed) : false;
 
-  const versionedPath = versionedDeploy ? `/docs/${stringifySemverNumber(parseVersion(base.currentVersion), true)}` : '';
+  const versionedPath = versionedDeploy ? `/docs/${base.currentVersion.path}` : '';
 
   return {
     ...base,

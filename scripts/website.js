@@ -205,11 +205,17 @@ async function pugify(filename, options) {
 
 // extra function to start watching for file-changes, without having to call this file directly with "watch"
 function startWatch() {
-  files.forEach((file) => {
-    const filepath = path.resolve(cwd, file);
-    fs.watchFile(filepath, { interval: 1000 }, (cur, prev) => {
+  Object.entries(docsFilemap.fileMap).forEach(([file, fileValue]) => {
+    let watchPath = path.resolve(cwd, file);
+    const notifyPath = path.resolve(cwd, file);
+
+    if (fileValue.api) {
+      watchPath = path.resolve(cwd, fileValue.file);
+    }
+
+    fs.watchFile(watchPath, { interval: 1000 }, (cur, prev) => {
       if (cur.mtime > prev.mtime) {
-        pugify(filepath, docsFilemap.fileMap[file]);
+        pugify(notifyPath, docsFilemap.fileMap[file]);
       }
     });
   });
@@ -218,6 +224,16 @@ function startWatch() {
     if (cur.mtime > prev.mtime) {
       console.log('docs/layout.pug modified, reloading all files');
       pugifyAllFiles(true);
+    }
+  });
+
+  fs.watchFile(path.join(cwd, 'docs/api_split.pug'), {interval: 1000}, (cur, prev) => {
+    if (cur.mtime > prev.mtime) {
+      console.log('docs/api_split.pug modified, reloading all api files');
+      Promise.all(files.filter(v=> v.startsWith('docs/api')).map(async (file) => {
+        const filename = path.join(cwd, file);
+        await pugify(filename, docsFilemap.fileMap[file]);
+      }));
     }
   });
 }

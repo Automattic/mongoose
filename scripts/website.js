@@ -127,6 +127,11 @@ function getVersions() {
     }
     return b[0] - a[0];
   });
+
+  if (filteredTags.length === 0) {
+    console.error("no tags found!");
+    filteredTags.push([0,0,0]);
+  }
 }
 
 /**

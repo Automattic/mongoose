@@ -35,8 +35,11 @@ html(lang='en')
                 span.logo-text mongoose
             ul.pure-menu-list#navbar
               li.pure-menu-horizontal.pure-menu-item.pure-menu-has-children.pure-menu-allow-hover.version
-                a(href=`${versions.versionedPath}/docs/index.html`).pure-menu-link Version #{versions.latestVersion}
+                a(href=`${versions.versionedPath}/docs/index.html`).pure-menu-link Version #{versions.currentVersion.listed}
                 ul.pure-menu-children
+                  - if (versions.currentVersion.listed !== versions.latestVersion.listed)
+                    li.pure-menu-item
+                      a.pure-menu-link(href=`${versions.latestVersion.path}/docs/index.html`) Version #{versions.latestVersion.listed}
                   each pastVersion in versions.pastVersions 
                     li.pure-menu-item
                       a.pure-menu-link(href=`/docs/${pastVersion.path}/index.html`) Version #{pastVersion.listed}

@@ -259,5 +259,6 @@ exports.cwd = cwd;
 
 // only run the following code if this file is the main module / entry file
 if (isMain) {
-   pugifyAllFiles();
+  console.log(`Processing ~${files.length} files`);
+  pugifyAllFiles();
 }

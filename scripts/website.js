@@ -139,6 +139,9 @@ const cpc = `
 </div>
 `;
 
+/** Alias to not execute "promisify" often */
+const pugRender = promisify(pug.render);
+
 async function pugify(filename, options) {
   let newfile = undefined;
   options = options || {};
@@ -176,7 +179,7 @@ async function pugify(filename, options) {
 
   options.opencollectiveSponsors = opencollectiveSponsors;
 
-  const str = await promisify(pug.render)(contents, options).catch(console.error);
+  const str = await pugRender(contents, options).catch(console.error);
 
   if (typeof str !== "string") {
     return;

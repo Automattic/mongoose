@@ -232,14 +232,14 @@ const wrapMarkdown = (md, baseLayout) => `
 extends ${baseLayout}
 
 append style
-  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="/docs/js/native.js")
+  link(rel="stylesheet", href="#{versions.versionedPath}/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="#{versions.versionedPath}/docs/js/native.js")
   style.
     p { line-height: 1.5em }
 
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
-    <img src="/docs/images/pencil.svg" />
+    <img src="#{versions.versionedPath}/docs/images/pencil.svg" />
   </a>
   :markdown
 ${md.split('\n').map(line => '    ' + line).join('\n')}

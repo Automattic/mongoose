@@ -8,19 +8,19 @@ block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
-  h1 #{name}
+  h1 #{title}
 
   include includes/native
 
   div.api-nav
     div.api-nav-content
       each item in docs
-        - if (!item.hideFromNav || item.name === name)
-          div.nav-item(id='nav-' + item.name)
-            - if (item.name === name)
+        - if (!item.hideFromNav || item.title === title)
+          div.nav-item(id='nav-' + item.title)
+            - if (item.title === title)
               div.nav-item-title(style="font-weight: bold")
                 a(href=item.fileName + '.html')
-                  | #{item.name}
+                  | #{item.title}
               ul.nav-item-sub
                 each prop in item.props
                   li
@@ -29,7 +29,7 @@ block content
             - else
               div.nav-item-title
                 a(href=item.fileName + '.html')
-                  | #{item.name}
+                  | #{item.title}
 
   div.api-content
     ul

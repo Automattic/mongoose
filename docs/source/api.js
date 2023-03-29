@@ -113,7 +113,7 @@ parse();
 
 /**
  * @typedef {Object} DocsObj
- * @property {string} name The Title of the page
+ * @property {string} title The Title of the page
  * @property {string} fileName The name of the resulting file
  * @property {PropContext[]} props All the functions and values
  * @property {string} file The original file (relative to the root of the repository)
@@ -171,7 +171,7 @@ function parse() {
     const { docName: name, docFileName } = processName(props.file);
     /** @type {DocsObj} */
     const data = {
-      name: name,
+      title: name,
       fileName: docFileName,
       props: []
     };

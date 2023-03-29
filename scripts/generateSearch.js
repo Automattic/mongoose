@@ -2,7 +2,7 @@
 
 const config = require('../.config');
 const cheerio = require('cheerio');
-const filemap = require('../docs/source');
+const filemap = require('../docs/source').fileMap;
 const fs = require('fs');
 const pug = require('pug');
 const mongoose = require('../');

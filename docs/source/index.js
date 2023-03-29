@@ -87,4 +87,4 @@ for (const props of Object.values(docs)) {
   props.jobs = jobs;
 }
 
-module.exports = docs;
+module.exports.fileMap = docs;

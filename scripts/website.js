@@ -106,9 +106,8 @@ try {
   fs.mkdirSync(path.join(cwd, './docs/api'));
 } catch (err) {} // eslint-disable-line no-empty
 
-require('../docs/source/splitApiDocs');
-const filemap = Object.assign({}, require('../docs/source').fileMap);
-const files = Object.keys(filemap);
+const docsFilemap = require('../docs/source/index');
+const files = Object.keys(docsFilemap.fileMap);
 
 const wrapMarkdown = (md, baseLayout) => `
 extends ${baseLayout}
@@ -151,7 +150,14 @@ async function pugify(filename, options) {
     filename.replace(cwd, '');
   options.editLink = options.editLink || _editLink;
 
-  let contents = fs.readFileSync(path.resolve(cwd, filename)).toString();
+  /** Set which path to read, also pug uses this to resolve relative includes from */
+  let inputFile = filename;
+
+  if (options.api) {
+    inputFile = path.resolve(cwd, 'docs/api_split.pug');
+  }
+
+  let contents = fs.readFileSync(path.resolve(cwd, inputFile)).toString();
 
   if (options.acquit) {
     contents = transform(contents, tests);
@@ -166,12 +172,17 @@ async function pugify(filename, options) {
     newfile = filename.replace('.md', '.html');
   }
 
-  options.filename = filename;
+  options.filename = inputFile;
   options.filters = {
     markdown: function(block) {
       return markdown.parse(block);
     }
   };
+
+  if (options.api) {
+    newfile = path.resolve(cwd, filename);
+    options.docs = docsFilemap.apiDocs;
+  }
 
   newfile = newfile || filename.replace('.pug', '.html');
   options.outputUrl = newfile.replace(cwd, '');
@@ -198,7 +209,7 @@ function startWatch() {
     const filepath = path.resolve(cwd, file);
     fs.watchFile(filepath, { interval: 1000 }, (cur, prev) => {
       if (cur.mtime > prev.mtime) {
-        pugify(filepath, filemap[file]);
+        pugify(filepath, docsFilemap.fileMap[file]);
       }
     });
   });
@@ -214,7 +225,7 @@ function startWatch() {
 async function pugifyAllFiles(noWatch) {
   await Promise.all(files.map(async (file) => {
     const filename = path.join(cwd, file);
-    await pugify(filename, filemap[file]);
+    await pugify(filename, docsFilemap.fileMap[file]);
   }));
 
   // enable watch after all files have been done once, and not in the loop to use less-code

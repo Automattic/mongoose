@@ -2,7 +2,7 @@
 
 const config = require('../.config');
 const cheerio = require('cheerio');
-const filemap = require('../docs/source').fileMap;
+const docsFilemap = require('../docs/source');
 const fs = require('fs');
 const pug = require('pug');
 const mongoose = require('../');
@@ -30,23 +30,20 @@ const Content = mongoose.model('Content', contentSchema, 'Content');
 
 const contents = [];
 
-for (const [filename, file] of Object.entries(filemap)) {
+for (const [filename, file] of Object.entries(docsFilemap.fileMap)) {
   if (file.api) {
-    // API docs are special, raw content is in the `docs` property
-    for (const _class of file.docs) {
-      for (const prop of _class.props) {
-        const content = new Content({
-          title: `API: ${prop.string}`,
-          body: prop.description,
-          url: `api/${_class.fileName}.html#${prop.anchorId}`
-        });
-        const err = content.validateSync();
-        if (err != null) {
-          console.error(content);
-          throw err;
-        }
-        contents.push(content);
+    for (const prop of file.props) {
+      const content = new Content({
+        title: `API: ${prop.name}`,
+        body: prop.description,
+        url: `api/${file.fileName}.html#${prop.anchorId}`
+      });
+      const err = content.validateSync();
+      if (err != null) {
+        console.error(content);
+        throw err;
       }
+      contents.push(content);
     }
   } else if (file.markdown) {
     let text = fs.readFileSync(filename, 'utf8');

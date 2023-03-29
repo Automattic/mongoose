@@ -1,12 +1,12 @@
 extends layout
 
 append style
-  link(rel="stylesheet", href="/docs/css/api.css")
-  script(src="/docs/js/api-bold-current-nav.js")
+  link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/api.css`)
+  script(src=`${versions.versionedPath}/docs/js/api-bold-current-nav.js`)
 
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
-    <img src="/docs/images/pencil.svg" />
+    <img src="#{versions.versionedPath}/docs/images/pencil.svg" />
   </a>
   h1 #{title}
 

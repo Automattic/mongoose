@@ -57,7 +57,7 @@ block content
     div.search-bar
       input#search-input(type="text", placeholder="Search")
       button#search-button
-        img(src="/docs/images/search.svg")
+        img(src=`${versions.versionedPath}/docs/images/search.svg`)
     div#results
 
-    script(type="text/javascript" src="/docs/js/search.js")
+    script(type="text/javascript" src=`${versions.versionedPath}/docs/js/search.js`)

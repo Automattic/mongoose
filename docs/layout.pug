@@ -35,12 +35,11 @@ html(lang='en')
                 span.logo-text mongoose
             ul.pure-menu-list#navbar
               li.pure-menu-horizontal.pure-menu-item.pure-menu-has-children.pure-menu-allow-hover.version
-                a(href="#").pure-menu-link Version #{package.version}
+                a(href="#").pure-menu-link Version #{versions.latestVersion}
                 ul.pure-menu-children
-                  li.pure-menu-item
-                    a.pure-menu-link(href="/docs/6.x") Version #{package.latest6x}
-                  li.pure-menu-item
-                    a.pure-menu-link(href="/docs/5.x") Version #{package.latest5x}
+                  each pastVersion in versions.pastVersions 
+                    li.pure-menu-item
+                      a.pure-menu-link(href=`/docs/${pastVersion.path}`) Version #{pastVersion.listed}
               li.pure-menu-item.search
                 input#search-input-nav(type="text", placeholder="Search")
                 button#search-button-nav

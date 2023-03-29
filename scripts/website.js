@@ -8,6 +8,7 @@ const path = require('path');
 const pug = require('pug');
 const pkg = require('../package.json');
 const transform = require('acquit-require');
+const childProcess = require("child_process");
 
 // using "__dirname" and ".." to have a consistent CWD, this script should not be runnable, even when not being in the root of the project
 // also a consistent root path so that it is easy to change later when the script should be moved
@@ -75,31 +76,149 @@ const tests = [
   ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schemas.test.js')).toString())
 ];
 
-function getVersion() {
-  return require('../package.json').version;
-}
+/** 
+ * Array of array of semver numbers, sorted with highest number first
+ * @example
+ * [[1,2,3], [0,1,2]]
+ * @type {number[][]} 
+ */
+let filteredTags = [];
 
-function getLatestLegacyVersion(startsWith) {
-  const hist = fs.readFileSync(path.join(cwd, 'CHANGELOG.md'), 'utf8').replace(/\r/g, '\n').split('\n');
+/**
+ * Parse a given semver version string to a number array
+ * @param {string} str The string to parse
+ * @returns number array or undefined
+ */
+function parseVersion(str) {
+  const versionReg = /^v?(\d+)\.(\d+)\.(\d+)$/i;
 
-  for (const rawLine of hist) {
-    const line = (rawLine || '').trim();
-    if (!line) {
-      continue;
+  const match = versionReg.exec(str);
+
+  if (!!match) {
+    const parsed = [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])]
+
+    // fallback just in case some number did not parse
+    if (Number.isNaN(parsed[0]) || Number.isNaN(parsed[1]) || Number.isNaN(parsed[2])) {
+      console.log(`some version was matched but did not parse to int! "${str}"`);
+      return undefined;
     }
-    const match = /^\s*([^\s]+)\s/.exec(line);
-    if (match && match[1] && match[1].startsWith(startsWith)) {
-      return match[1];
-    }
+    return parsed;
   }
 
-  throw new Error('no match found');
+  return undefined;
 }
 
-// use last release
-pkg.version = getVersion();
-pkg.latest6x = getLatestLegacyVersion('6.');
-pkg.latest5x = getLatestLegacyVersion('5.');
+function getVersions() {
+  // get all tags from git
+  const res = childProcess.execSync("git tag").toString();
+
+  filteredTags = res.split('\n')
+  // map all gotten tags if they match the regular expression
+  .map(parseVersion)
+  // filter out all null / undefined / falsy values
+  .filter(v => !!v)
+  // sort tags with latest (highest) first
+  .sort((a, b) => {
+    if (a[0] === b[0]) {
+      if (a[1] === b[1]) {
+        return b[2] - a[2];
+      }
+      return b[1] - a[1];
+    }
+    return b[0] - a[0];
+  });
+}
+
+/**
+ * Stringify a semver number array
+ * @param {number[]} arr The array to stringify
+ * @param {boolean} dotX If "true", return "5.X" instead of "5.5.5"
+ * @returns 
+ */
+function stringifySemverNumber(arr, dotX) {
+  if (dotX) {
+    return `${arr[0]}.x`;  
+  }
+  return `${arr[0]}.${arr[1]}.${arr[2]}`;
+}
+
+/** 
+ * Get the latest version available
+ * @returns {Version}
+ */
+function getLatestVersion() {
+  return { listed: stringifySemverNumber(filteredTags[0]), path: '' };
+}
+
+/**
+ * Get the latest version for the provided major version
+ * @param {number} version major version to search for
+ * @returns {Version}
+ */
+function getLatestVersionOf(version) {
+  let foundVersion = filteredTags.find(v => v[0] === version);
+
+  // fallback to "0" in case a version cannot be found
+  if (!foundVersion) {
+    console.error(`Could not find a version for major "${version}"`);
+    foundVersion = [0, 0, 0];
+  }
+
+  return {listed: stringifySemverNumber(foundVersion), path: stringifySemverNumber(foundVersion, true)};
+}
+
+/**
+ * Try to get the current version on the checked-out branch
+ * @returns {Version}
+ */
+function getCurrentVersion() {
+  let versionToUse = pkg.version;
+
+  // i dont think this will ever happen, but just in case
+  if (!pkg.version) {
+    console.log("no version from package?");
+    versionToUse = getLatestVersion();
+  }
+
+  return {listed: versionToUse, path: '' };
+}
+
+// execute function to get all tags from git
+getVersions();
+
+/**
+ * @typedef {Object} Version
+ * @property {string} listed The string it is displayed as
+ * @property {string} path The path to use for the actual url
+ */
+
+/**
+ * Object for all version information
+ * @property {Version} currentVersion The current version this branch is built for
+ * @property {string} latestVersion The latest version available across the repository
+ * @property {Version[]} pastVersions The latest versions of past major versions to include as selectable
+ * @property {boolean} versionedDeploy Indicates wheter to build for a version or as latest (no prefix)
+ * @property {string} versionedPath The path to use for versioned deploy (empty string when "versionedDeploy" is false)
+ */
+const versionObj = (() => {
+  const base = {
+    currentVersion: getCurrentVersion(),
+    latestVersion: getLatestVersion(),
+    pastVersions: [
+      getLatestVersionOf(6),
+      getLatestVersionOf(5),
+    ]
+  };
+  const versionedDeploy = process.env.DOCS_DEPLOY === "true" ? base.currentVersion === base.latestVersion : false;
+
+  const versionedPath = versionedDeploy ? `/docs/${stringifySemverNumber(parseVersion(base.currentVersion), true)}` : '';
+
+  return {
+    ...base,
+    versionedDeploy,
+    versionedPath
+  };
+})();
 
 // Create api dir if it doesn't already exist
 try {
@@ -187,6 +306,7 @@ async function pugify(filename, options) {
   newfile = newfile || filename.replace('.pug', '.html');
   options.outputUrl = newfile.replace(cwd, '');
   options.jobs = jobs;
+  options.versions = versionObj;
 
   options.opencollectiveSponsors = opencollectiveSponsors;
 

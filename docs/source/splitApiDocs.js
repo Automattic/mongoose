@@ -16,11 +16,11 @@ api.docs.forEach(file => {
     docs: api.docs,
     outputUrl: `/docs/api/${file.fileName}.html`,
     jobs,
-    title: file.name
+    title: file.title
   });
 
   const html = pug.renderFile('./docs/api_split.pug', options);
-  console.log('Write', file.name);
+  console.log('Write', file.title);
   // path is relative to CWD not __dirname
   fs.writeFileSync(`./docs/api/${file.fileName}.html`, html);
 });

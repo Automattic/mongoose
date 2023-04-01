@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint JS-Files
     steps:
-      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
 
       - name: Setup node
         uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
@@ -57,7 +57,7 @@ jobs:
       MONGOMS_VERSION: ${{ matrix.mongodb }}
       MONGOMS_PREFER_GLOBAL_PATH: 1
     steps:
-      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
 
       - name: Setup node
         uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
@@ -92,7 +92,7 @@ jobs:
       MONGOMS_VERSION: 6.0.4
       MONGOMS_PREFER_GLOBAL_PATH: 1
     steps:
-      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
       - name: Setup node
         uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
         with:
@@ -118,7 +118,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Replica Set tests
     steps:
-      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
       - name: Setup node
         uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
         with:
@@ -135,6 +135,6 @@ jobs:
       contents: read
     steps:
       - name: Check out repo
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
       - name: Dependency review
         uses: actions/dependency-review-action@v3

@@ -2112,4 +2112,72 @@ describe('model', function() {
     const Test = Base.discriminator('model-discriminator-custom1', childSchema);
     assert.deepEqual(Test.schema.options.toJSON, { virtuals: true, getters: true });
   });
+  it('uses "value" over "name" for multi-dimensonal arrays (gh-13201)', function() {
+    const buildingSchema = new mongoose.Schema(
+      {
+        width: {
+          type: Number,
+          default: 100
+        },
+        type: {
+          type: String,
+          enum: ['G', 'S']
+        }
+      },
+      { discriminatorKey: 'type', _id: false }
+    );
+
+    const garageSchema = buildingSchema.clone();
+    garageSchema.add({
+      slotsForCars: {
+        type: Number,
+        default: 10
+      }
+    });
+
+    const summerSchema = buildingSchema.clone();
+    summerSchema.add({
+      distanceToLake: {
+        type: Number,
+        default: 100
+      }
+    });
+
+    const areaSchema = new mongoose.Schema({
+      buildings: {
+        type: [
+          [
+            {
+              type: buildingSchema
+            }
+          ]
+        ]
+      }
+    });
+
+    garageSchema.paths['type'].options.$skipDiscriminatorCheck = true;
+    summerSchema.paths['type'].options.$skipDiscriminatorCheck = true;
+    const path = areaSchema.path('buildings');
+
+    path.discriminator('Garage', garageSchema, 'G');
+    path.discriminator('Summer', summerSchema, 'S');
+
+    const AreaModel = mongoose.model('Area', areaSchema);
+
+    const area = new AreaModel({
+      buildings: [
+        [
+          { type: 'S', distanceToLake: 100 },
+          { type: 'G', slotsForCars: 20 }
+        ]
+      ]
+    });
+
+    assert.ok(area.buildings[0][0].distanceToLake);
+    assert.ok(area.buildings[0][1].slotsForCars);
+
+    const innerBuildingsPath = AreaModel.schema.path('buildings.$');
+    assert.ok(innerBuildingsPath.schemaOptions.type.discriminators.Garage);
+    assert.equal(innerBuildingsPath.schemaOptions.type.discriminators.Garage.discriminatorMapping.value, 'G');
+  });
 });

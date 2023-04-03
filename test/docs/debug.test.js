@@ -91,4 +91,22 @@ describe('debug: shell', function() {
     // Last log should not have been overwritten
     assert.equal(storedLog, lastLog);
   });
+
+  it('should avoid sending null session option with document ops (gh-13052)', async function() {
+    const args = [];
+    const m = new mongoose.Mongoose();
+    m.set('debug', function() {
+      args.push([...arguments]);
+    });
+    await m.connect(start.uri);
+    const schema = new Schema({ name: String });
+    const Test = m.model('gh_13052', schema);
+
+    await Test.create({ name: 'foo' });
+    assert.equal(args.length, 1);
+    assert.equal(args[0][1], 'insertOne');
+    assert.ok(!('session' in args[0][3]));
+
+    await m.disconnect();
+  });
 });

@@ -30,15 +30,7 @@ const docs = {
 };
 
 docs['index.pug'] = require('./home');
-<<<<<<< HEAD
-docs['docs/api.md'] = {
-  docs: [],
-  title: 'Redirect to API',
-  markdown: true
-};
-=======
 docs['docs/api.pug'] = require('./api');
->>>>>>> 6.x
 
 docs['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, markdown: true };
 docs['docs/validation.md'] = { title: 'Validation', acquit: true, markdown: true };

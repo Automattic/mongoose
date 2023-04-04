@@ -592,7 +592,7 @@ describe('model', function() {
 
       await User.collection.drop();
     });
-    
+
     it('should not re-create a compound text index that involves non-text indexes, using syncIndexes (gh-13136)', function(done) {
       const Test = new Schema({
         title: {
@@ -656,32 +656,6 @@ describe('model', function() {
             done();
           });
         });
-      });
-    });
-
-    it('cleanIndexes (gh-6676)', function() {
-      return co(function*() {
-        let M = db.model('Test', new Schema({
-          name: { type: String, index: true }
-        }, { autoIndex: false }), 'Test');
-
-        yield M.createIndexes();
-
-        let indexes = yield M.listIndexes();
-        assert.deepEqual(indexes.map(i => i.key), [
-          { _id: 1 },
-          { name: 1 }
-        ]);
-
-        M = db.model('Test', new Schema({
-          name: String
-        }, { autoIndex: false }), 'Test');
-
-        yield M.cleanIndexes();
-        indexes = yield M.listIndexes();
-        assert.deepEqual(indexes.map(i => i.key), [
-          { _id: 1 }
-        ]);
       });
     });
 

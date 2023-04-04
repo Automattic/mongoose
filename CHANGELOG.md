@@ -1,3 +1,8 @@
+5.13.17 / 2023-04-04
+====================
+ * fix: backport fix for array filters handling $or and $and #13195 #13192 #10696 [raj-goguardian](https://github.com/raj-goguardian)
+ * fix: update the isIndexEqual function to take into account non-text indexes when checking compound indexes that include both text and non-text indexes #13138 #13136 [rdeavila94](https://github.com/rdeavila94)
+
 7.0.3 / 2023-03-23
 ==================
  * fix(query): avoid executing transforms if query wasn't executed #13185 #13165

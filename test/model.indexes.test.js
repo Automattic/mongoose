@@ -592,6 +592,98 @@ describe('model', function() {
 
       await User.collection.drop();
     });
+    
+    it('should not re-create a compound text index that involves non-text indexes, using syncIndexes (gh-13136)', function(done) {
+      const Test = new Schema({
+        title: {
+          type: String
+        },
+        description: {
+          type: String
+        },
+        age: {
+          type: Number
+        }
+      }, {
+        autoIndex: false
+      });
+
+      Test.index({
+        title: 'text',
+        description: 'text',
+        age: 1
+      });
+
+      const TestModel = db.model('Test', Test);
+      TestModel.syncIndexes().then((results1) => {
+        assert.deepEqual(results1, []);
+        // second call to syncIndexes should return an empty array, representing 0 deleted indexes
+        TestModel.syncIndexes().then((results2) => {
+          assert.deepEqual(results2, []);
+          done();
+        });
+      });
+    });
+
+    it('should not find a diff when calling diffIndexes after syncIndexes involving a text and non-text compound index (gh-13136)', function(done) {
+      const Test = new Schema({
+        title: {
+          type: String
+        },
+        description: {
+          type: String
+        },
+        age: {
+          type: Number
+        }
+      }, {
+        autoIndex: false
+      });
+
+      Test.index({
+        title: 'text',
+        description: 'text',
+        age: 1
+      });
+
+      const TestModel = db.model('Test', Test);
+
+      TestModel.diffIndexes().then((diff) => {
+        assert.deepEqual(diff, { toCreate: [{ age: 1, title: 'text', description: 'text' }], toDrop: [] });
+        TestModel.syncIndexes().then(() => {
+          TestModel.diffIndexes().then((diff2) => {
+            assert.deepEqual(diff2, { toCreate: [], toDrop: [] });
+            done();
+          });
+        });
+      });
+    });
+
+    it('cleanIndexes (gh-6676)', function() {
+      return co(function*() {
+        let M = db.model('Test', new Schema({
+          name: { type: String, index: true }
+        }, { autoIndex: false }), 'Test');
+
+        yield M.createIndexes();
+
+        let indexes = yield M.listIndexes();
+        assert.deepEqual(indexes.map(i => i.key), [
+          { _id: 1 },
+          { name: 1 }
+        ]);
+
+        M = db.model('Test', new Schema({
+          name: String
+        }, { autoIndex: false }), 'Test');
+
+        yield M.cleanIndexes();
+        indexes = yield M.listIndexes();
+        assert.deepEqual(indexes.map(i => i.key), [
+          { _id: 1 }
+        ]);
+      });
+    });
 
     it('cleanIndexes (gh-6676)', async function() {
 

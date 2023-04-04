@@ -5,7 +5,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // only operate on the old id's
   if (!/^#\w+_\w+(?:-\w+)?$/i.test(anchor)) {
-    return;
+    return fixNoAsyncFn();
   }
 
   // in case there is no anchor, return without modifying the anchor
@@ -66,6 +66,27 @@ window.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector(`h3[id="${test}"]`);
     if (header) {
       window.location.hash = `#${test}`;
+    }
+  }
+
+  // function to fix dox not recognizing async functions and resulting in inproper anchors
+  function fixNoAsyncFn() {
+    const anchorSlice = anchor.slice(1);
+    // dont modify anchor if it already exists
+    if (document.querySelector(`h3[id="${anchorSlice}"`)) {
+      return;
+    }
+
+    const tests = [
+      `${anchorSlice}()`
+    ];
+
+    for (const test of tests) {
+      // have to use the "[id=]" selector because "#Something()" is not a valid selector (the "()" part)
+      const header = document.querySelector(`h3[id="${test}"]`);
+      if (header) {
+        window.location.hash = `#${test}`;
+      }
     }
   }
 }, { once: true });

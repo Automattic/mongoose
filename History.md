@@ -1,3 +1,8 @@
+5.13.17 / 2023-04-04
+====================
+ * fix: backport fix for array filters handling $or and $and #13195 #13192 #10696 [raj-goguardian](https://github.com/raj-goguardian)
+ * fix: update the isIndexEqual function to take into account non-text indexes when checking compound indexes that include both text and non-text indexes #13138 #13136 [rdeavila94](https://github.com/rdeavila94)
+
 5.13.16 / 2023-02-20
 ====================
  * fix: make access to process.versions lazy #12584 [maciasello](https://github.com/maciasello)

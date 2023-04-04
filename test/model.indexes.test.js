@@ -629,7 +629,7 @@ describe('model', function() {
       });
     });
 
-    it('should not find a diff when calling diffIndexes after syncIndexes involving a text and non-text compound index (gh-13136)', function(done) {
+    it('should not find a diff when calling diffIndexes after syncIndexes involving a text and non-text compound index (gh-13136)', async function() {
       const Test = new Schema({
         title: {
           type: String
@@ -651,16 +651,14 @@ describe('model', function() {
       });
 
       const TestModel = db.model('Test', Test);
+      await TestModel.init();
 
-      TestModel.diffIndexes().then((diff) => {
-        assert.deepEqual(diff, { toCreate: [{ age: 1, title: 'text', description: 'text' }], toDrop: [] });
-        TestModel.syncIndexes().then(() => {
-          TestModel.diffIndexes().then((diff2) => {
-            assert.deepEqual(diff2, { toCreate: [], toDrop: [] });
-            done();
-          });
-        });
-      });
+      const diff = await TestModel.diffIndexes();
+      assert.deepEqual(diff, { toCreate: [{ age: 1, title: 'text', description: 'text' }], toDrop: [] });
+      await TestModel.syncIndexes();
+
+      const diff2 = await TestModel.diffIndexes();
+      assert.deepEqual(diff2, { toCreate: [], toDrop: [] });
     });
 
     it('cleanIndexes (gh-6676)', async function() {

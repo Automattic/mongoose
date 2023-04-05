@@ -3322,15 +3322,6 @@ describe('Model', function() {
     });
 
     describe('3.6 features', function() {
-      before(async function() {
-        const version = await start.mongodVersion();
-        const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
-
-        if (!mongo36) {
-          this.skip();
-        }
-      });
-
       it('arrayFilter (gh-5965)', async function() {
 
         const MyModel = db.model('Test', new Schema({

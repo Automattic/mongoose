@@ -42,6 +42,10 @@ integrating Mongoose with external tools and frameworks.
 * [Testing with Jest](jest.html)
 * [SSL Connections](tutorials/ssl.html)
 
+## Other Guides
+
+* [How to Check Your Mongoose Version](check-version.html)
+
 ## Migration Guides
 
 * [Mongoose 5.x to 6.x](migrating_to_6.html)

@@ -4381,6 +4381,6 @@ describe('Query', function() {
     const Error = db.model('error', testSchema);
     await assert.rejects(async() => {
       await Error.find().sort('-');
-    }, { message: 'Invalid arguent passed to sort()' });
+    }, { message: 'Invalid field "" passed to sort()' });
   });
 });

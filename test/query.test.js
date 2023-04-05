@@ -4373,4 +4373,14 @@ describe('Query', function() {
 
     assert.strictEqual(books.length, 1);
   });
+  it('should provide a clearer error message when sorting with empty string', async function() {
+    const testSchema = new Schema({
+      name: { type: String }
+    });
+
+    const Error = db.model('error', testSchema);
+    await assert.rejects(async() => {
+      await Error.find().sort('-');
+    }, { message: 'Invalid field "" passed to sort()' });
+  });
 });

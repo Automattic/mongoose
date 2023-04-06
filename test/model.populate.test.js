@@ -10230,6 +10230,61 @@ describe('model: populate:', function() {
     assert.equal(person.stories[0].title, 'Casino Royale');
   });
 
+  it('supports removing and then recreating populate virtual using schema clone (gh-13085)', async function() {
+    const personSch = new mongoose.Schema(
+      {
+        firstName: { type: mongoose.SchemaTypes.String, required: true },
+        surname: { type: mongoose.SchemaTypes.String, trim: true },
+        nat: { type: mongoose.SchemaTypes.String, required: true, uppercase: true, minLength: 2, maxLength: 2 }
+      },
+      { strict: true, timestamps: true }
+    );
+    personSch.virtual('nationality', {
+      localField: 'nat',
+      foreignField: 'key',
+      ref: 'Nat',
+      justOne: true
+    });
+    let Person = db.model('Person', personSch.clone(), 'people');
+
+    const natSch = new mongoose.Schema(
+      {
+        key: { type: mongoose.SchemaTypes.String, uppercase: true, index: true, minLength: 2, maxLength: 2 },
+        desc: { type: mongoose.SchemaTypes.String, trim: true }
+      },
+      { strict: true }
+    );
+    const Nat = db.model('Nat', natSch);
+    let n = new Nat({ key: 'ES', desc: 'Spain' });
+    await n.save();
+    n = new Nat({ key: 'IT', desc: 'Italy' });
+    await n.save();
+    n = new Nat({ key: 'FR', desc: 'French' });
+    await n.save();
+
+    let p = new Person({ firstName: 'Pepe', surname: 'Pérez', nat: 'it' });
+    await p.save();
+    p = new Person({ firstName: 'Paco', surname: 'Matinez', nat: 'es' });
+    await p.save();
+    p = new Person({ firstName: 'John', surname: 'Doe', nat: 'us' });
+    await p.save();
+
+    personSch.removeVirtual('nationality');
+    personSch.virtual('nationality', {
+      localField: 'nat',
+      foreignField: 'key',
+      ref: 'Nat',
+      justOne: true
+    });
+    Person = db.model('Person', personSch.clone(), 'people', { overwriteModels: true });
+
+    const peopleList = await Person.find().
+      sort({ firstName: 1 }).
+      populate({ path: 'nationality', match: { desc: 'Spain' } });
+    assert.deepStrictEqual(peopleList.map(p => p.nationality?.key), [undefined, 'ES', undefined]);
+
+  });
+
 
   describe('strictPopulate', function() {
     it('reports full path when throwing `strictPopulate` error with deep populate (gh-10923)', async function() {

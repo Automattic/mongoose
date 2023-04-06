@@ -1,6 +1,7 @@
 'use strict';
 
-import { createRequire } from "https://deno.land/std@0.177.0/node/module.ts";
+import { createRequire } from "node:module";
+import process from "node:process";
 
 // Workaround for Mocha getting terminal width, which currently requires `--unstable`
 Object.defineProperty(process.stdout, 'getWindowSize', {

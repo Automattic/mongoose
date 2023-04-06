@@ -3,13 +3,6 @@
 import { createRequire } from "node:module";
 import process from "node:process";
 
-// Workaround for Mocha getting terminal width, which currently requires `--unstable`
-Object.defineProperty(process.stdout, 'getWindowSize', {
-  value: function() {
-    return [75, 40];
-  }
-});
-
 import { parse } from "https://deno.land/std/flags/mod.ts"
 const args = parse(Deno.args);
 

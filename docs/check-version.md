@@ -24,8 +24,6 @@ You can also [get the installed version of the Mongoose npm package](https://mas
 $ npm list mongoose
 test@ /path/to/test
 └── mongoose@7.0.3 
-
-$ 
 ```
 
 `npm list` is helpful because it can identify if you have multiple versions of Mongoose installed.

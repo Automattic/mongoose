@@ -269,6 +269,7 @@ async function pugify(filename, options) {
   let newfile = undefined;
   options = options || {};
   options.package = pkg;
+  const isAPI = options.api && !filename.endsWith('docs/api.pug');
 
   const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
     filename.replace(cwd, '');
@@ -277,7 +278,7 @@ async function pugify(filename, options) {
   /** Set which path to read, also pug uses this to resolve relative includes from */
   let inputFile = filename;
 
-  if (options.api) {
+  if (isAPI) {
     inputFile = path.resolve(cwd, 'docs/api_split.pug');
   }
 
@@ -303,7 +304,7 @@ async function pugify(filename, options) {
     }
   };
 
-  if (options.api) {
+  if (isAPI) {
     newfile = path.resolve(cwd, filename);
     options.docs = docsFilemap.apiDocs;
   }
@@ -340,7 +341,8 @@ function startWatch() {
     let watchPath = path.resolve(cwd, file);
     const notifyPath = path.resolve(cwd, file);
 
-    if (fileValue.api) {
+    // exclude "api.pug" from changing the watchpath
+    if (fileValue.api && !file.endsWith('docs/api.pug')) {
       watchPath = path.resolve(cwd, fileValue.file);
     }
 

@@ -4126,6 +4126,69 @@ describe('Model', function() {
           }
         }]);
       });
+
+      it('sends valid ops if ordered = false (gh-13176)', async function() {
+        const testSchema = new mongoose.Schema({
+          num: Number
+        });
+        const Test = db.model('Test', testSchema);
+
+        const res = await Test.bulkWrite([
+          {
+            updateOne: {
+              filter: {},
+              update: { $set: { num: 'not a number' } },
+              upsert: true
+            }
+          },
+          {
+            updateOne: {
+              filter: {},
+              update: { $set: { num: 42 } }
+            }
+          }
+        ], { ordered: false });
+        assert.ok(res.mongoose);
+        assert.equal(res.mongoose.validationErrors.length, 1);
+        assert.strictEqual(res.result.nUpserted, 0);
+      });
+
+      it('decorates write error with validation errors if unordered fails (gh-13176)', async function() {
+        const testSchema = new mongoose.Schema({
+          num: Number
+        });
+        const Test = db.model('Test', testSchema);
+
+        await Test.deleteMany({});
+        const { _id } = await Test.create({ num: 42 });
+
+        const err = await Test.bulkWrite([
+          {
+            updateOne: {
+              filter: {},
+              update: { $set: { num: 'not a number' } },
+              upsert: true
+            }
+          },
+          {
+            updateOne: {
+              filter: {},
+              update: { $push: { num: 42 } }
+            }
+          },
+          {
+            updateOne: {
+              filter: {},
+              update: { $inc: { num: 57 } }
+            }
+          }
+        ], { ordered: false }).then(() => null, err => err);
+        assert.ok(err);
+        assert.equal(err.mongoose.validationErrors.length, 1);
+
+        const { num } = await Test.findById(_id);
+        assert.equal(num, 99);
+      });
     });
 
     it('deleteOne with cast error (gh-5323)', async function() {

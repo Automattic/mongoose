@@ -1,3 +1,10 @@
+6.10.5 / 2023-04-06
+===================
+ * fix(model): execute valid write operations if calling bulkWrite() with ordered: false #13218 #13176
+ * fix(array): pass-through all parameters #13202 #13201 [hasezoey](https://github.com/hasezoey)
+ * fix: improve error message when sorting by empty string #13249 #10182
+ * docs: add version support and check version docs #13251 #13193
+
 5.13.17 / 2023-04-04
 ====================
  * fix: backport fix for array filters handling $or and $and #13195 #13192 #10696 [raj-goguardian](https://github.com/raj-goguardian)

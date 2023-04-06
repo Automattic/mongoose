@@ -173,7 +173,14 @@ declare module 'mongoose' {
      * if you use `create()`) because with `bulkWrite()` there is only one network
      * round trip to the MongoDB server.
      */
-    bulkWrite(writes: Array<mongodb.AnyBulkWriteOperation<TRawDocType extends Document ? any : (TRawDocType extends {} ? TRawDocType : any)>>, options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions): Promise<mongodb.BulkWriteResult>;
+    bulkWrite(
+      writes: Array<mongodb.AnyBulkWriteOperation<TRawDocType extends Document ? any : (TRawDocType extends {} ? TRawDocType : any)>>,
+      options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions & { ordered: false }
+    ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[] } }>;
+    bulkWrite(
+      writes: Array<mongodb.AnyBulkWriteOperation<TRawDocType extends Document ? any : (TRawDocType extends {} ? TRawDocType : any)>>,
+      options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
+    ): Promise<mongodb.BulkWriteResult>;
 
     /**
      * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than

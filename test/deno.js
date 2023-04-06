@@ -12,6 +12,8 @@ Object.defineProperty(process.stdout, 'getWindowSize', {
 import { parse } from "https://deno.land/std/flags/mod.ts"
 const args = parse(Deno.args);
 
+Error.stackTraceLimit = 100;
+
 const require = createRequire(import.meta.url);
 
 const Mocha = require('mocha');

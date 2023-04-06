@@ -1,5 +1,8 @@
 # Migrating from 4.x to 5.x
 
+Please note: we plan to discontinue Mongoose 5 support on March 1, 2024.
+Please see our [version support guide](./version-support.html).
+
 There are several [backwards-breaking changes](https://github.com/Automattic/mongoose/blob/master/History.md)
 you should be aware of when migrating from Mongoose 4.x to Mongoose 5.x.
 

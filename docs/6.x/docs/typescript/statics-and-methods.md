@@ -77,8 +77,8 @@ const schema = new Schema(
     statics: {
       myStaticMethod() {
         return 42;
-      },
-    },
+      }
+    }
   }
 );
 
@@ -86,6 +86,7 @@ const User = model('User', schema);
 
 const answer = User.myStaticMethod(); // 42
 ```
+
 ## Both Methods and Statics
 
 Below is how you can define a model that has both methods and statics.

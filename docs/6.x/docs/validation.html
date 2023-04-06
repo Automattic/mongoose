@@ -1,11 +1,11 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.10.4: Validation</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/6.x/docs/css/github.css"><link rel="stylesheet" href="/docs/6.x/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
-</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.10.4</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs">Version 7.x</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x">Version 6.10.4</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.16</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/6.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/validation.md" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v6.10.5: Validation</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/6.x/docs/css/github.css"><link rel="stylesheet" href="/docs/6.x/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/6.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 6.10.5</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs">Version 7.x</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x">Version 6.10.5</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x">Version 5.13.17</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/6.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/typescript.html">TypeScript</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/6.x/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/migrating_to_6.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/validation.md" target="_blank">
 <img src="/docs/images/pencil.svg" />
-</a><h2 id="validation">
+</a><h1 id="validation">
       <a href="#validation">
         Validation
       </a>
-    </h2>
+    </h1>
 <script>
   _native.init("CK7DT53U",{
     targetClass: 'native-inline'
@@ -45,7 +45,7 @@
 } <span class="hljs-keyword">catch</span> (err) {
   error = err;
 }
-    
+
 assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;name&#x27;</span>].<span class="hljs-property">message</span>,
   <span class="hljs-string">&#x27;Path `name` is required.&#x27;</span>);
 
@@ -68,11 +68,11 @@ assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-p
 <li><a href="#update-validators-only-run-on-updated-paths">Update Validators Only Run On Updated Paths</a></li>
 <li><a href="#update-validators-only-run-for-some-operations">Update Validators Only Run For Some Operations</a></li>
 </ul>
-<h3 id="built-in-validators">
+<h2 id="built-in-validators">
       <a href="#built-in-validators">
         Built-in Validators
       </a>
-    </h3>
+    </h2>
 <p>Mongoose has several built-in validators.</p>
 <ul>
 <li>All <a href="schematypes.html">SchemaTypes</a> have the built-in <a href="api/schematype.html#schematype_SchemaType-required">required</a> validator. The required validator uses the <a href="api/schematype.html#schematype_SchemaType-checkRequired">SchemaType&#39;s <code>checkRequired()</code> function</a> to determine if the value satisfies the required validator.</li>
@@ -122,11 +122,11 @@ badBreakfast.<span class="hljs-property">bacon</span> = <span class="hljs-litera
 error = badBreakfast.<span class="hljs-title function_">validateSync</span>();
 assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;bacon&#x27;</span>].<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Why no bacon?&#x27;</span>);
 </code></pre>
-<h3 id="custom-error-messages">
+<h2 id="custom-error-messages">
       <a href="#custom-error-messages">
         Custom Error Messages
       </a>
-    </h3>
+    </h2>
 <p>You can configure the error message for individual validators in your schema. There are two equivalent
 ways to set the validator error message:</p>
 <ul>
@@ -160,11 +160,11 @@ assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-p
   <span class="hljs-string">&#x27;Must be at least 6, got 2&#x27;</span>);
 assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;drink&#x27;</span>].<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Milk is not supported&#x27;</span>);
 </code></pre>
-<h3 id="the-unique-option-is-not-a-validator">
+<h2 id="the-unique-option-is-not-a-validator">
       <a href="#the-unique-option-is-not-a-validator">
         The <code>unique</code> Option is Not a Validator
       </a>
-    </h3>
+    </h2>
 <p>A common gotcha for beginners is that the <code>unique</code> option for schemas
 is <em>not</em> a validator. It&#39;s a convenient helper for building <a href="https://www.mongodb.com/docs/manual/core/index-unique/">MongoDB unique indexes</a>.
 See the <a href="faq.html">FAQ</a> for more information.</p>
@@ -199,11 +199,11 @@ See the <a href="faq.html">FAQ</a> for more information.</p>
     assert.<span class="hljs-title function_">ok</span>(error.<span class="hljs-property">message</span>.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&#x27;duplicate key error&#x27;</span>) !== -<span class="hljs-number">1</span>);
   });
 </code></pre>
-<h3 id="custom-validators">
+<h2 id="custom-validators">
       <a href="#custom-validators">
         Custom Validators
       </a>
-    </h3>
+    </h2>
 <p>If the built-in validators aren&#39;t enough, you can define custom validators
 to suit your needs.</p>
 <p>Custom validation is declared by passing a validation function.
@@ -242,11 +242,11 @@ user.<span class="hljs-property">phone</span> = <span class="hljs-string">&#x27;
 error = user.<span class="hljs-title function_">validateSync</span>();
 assert.<span class="hljs-title function_">equal</span>(error, <span class="hljs-literal">null</span>);
 </code></pre>
-<h3 id="async-custom-validators">
+<h2 id="async-custom-validators">
       <a href="#async-custom-validators">
         Async Custom Validators
       </a>
-    </h3>
+    </h2>
 <p>Custom validators can also be asynchronous. If your validator function
 returns a promise (like an <code>async</code> function), mongoose will wait for that
 promise to settle. If the returned promise rejects, or fulfills with
@@ -285,11 +285,11 @@ assert.<span class="hljs-title function_">ok</span>(error);
 assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;name&#x27;</span>].<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Oops!&#x27;</span>);
 assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;email&#x27;</span>].<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Email validation failed&#x27;</span>);
 </code></pre>
-<h3 id="validation-errors">
+<h2 id="validation-errors">
       <a href="#validation-errors">
         Validation Errors
       </a>
-    </h3>
+    </h2>
 <p>Errors returned after failed validation contain an <code>errors</code> object
 whose values are <code>ValidatorError</code> objects. Each
 <a href="api/error.html#error_Error-ValidatorError">ValidatorError</a> has <code>kind</code>, <code>path</code>,
@@ -321,10 +321,10 @@ toySchema.<span class="hljs-title function_">path</span>(<span class="hljs-strin
 <span class="hljs-keyword">let</span> error;
 <span class="hljs-keyword">try</span> {
   <span class="hljs-keyword">await</span> toy.<span class="hljs-title function_">save</span>();
-} <span class="hljs-keyword">catch</span>(err) {
+} <span class="hljs-keyword">catch</span> (err) {
   error = err;
 }
-    
+
 <span class="hljs-comment">// `error` is a ValidationError object</span>
 <span class="hljs-comment">// `error.errors.color` is a ValidatorError object</span>
 assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>.<span class="hljs-property">color</span>.<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Color `Green` not valid&#x27;</span>);
@@ -345,11 +345,11 @@ assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-p
 
 assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">name</span>, <span class="hljs-string">&#x27;ValidationError&#x27;</span>);
 </code></pre>
-<h3 id="cast-errors">
+<h2 id="cast-errors">
       <a href="#cast-errors">
         Cast Errors
       </a>
-    </h3>
+    </h2>
 <p>Before running validators, Mongoose attempts to coerce values to the
 correct type. This process is called <em>casting</em> the document. If
 casting fails for a given path, the <code>error.errors</code> object will contain
@@ -369,11 +369,11 @@ err.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;nu
 <span class="hljs-comment">// &#x27;Cast to Number failed for value &quot;not a number&quot; at path &quot;numWheels&quot;&#x27;</span>
 err.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;numWheels&#x27;</span>].<span class="hljs-property">message</span>;
 </code></pre>
-<h3 id="global-schematype-validation">
+<h2 id="global-schematype-validation">
       <a href="#global-schematype-validation">
         Global SchemaType Validation
       </a>
-    </h3>
+    </h2>
 <p>In addition to defining custom validators on individual schema paths, you can also configure a custom validator to run on every instance of a given <code>SchemaType</code>.
 For example, the following code demonstrates how to make empty string <code>&#39;&#39;</code> an invalid value for <em>all</em> string paths.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Add a custom validator to all strings</span>
@@ -391,11 +391,11 @@ mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">T
 err.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;name&#x27;</span>]; <span class="hljs-comment">// ValidatorError</span>
 err.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;email&#x27;</span>]; <span class="hljs-comment">// ValidatorError</span>
 </code></pre>
-<h3 id="required-validators-on-nested-objects">
+<h2 id="required-validators-on-nested-objects">
       <a href="#required-validators-on-nested-objects">
         Required Validators On Nested Objects
       </a>
-    </h3>
+    </h2>
 <p>Defining validators on nested objects in mongoose is tricky, because
 nested objects are not fully fledged paths.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">let</span> personSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
@@ -429,11 +429,11 @@ personSchema = <span class="hljs-keyword">new</span> <span class="hljs-title cla
 <span class="hljs-keyword">const</span> error = person.<span class="hljs-title function_">validateSync</span>();
 assert.<span class="hljs-title function_">ok</span>(error.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;name&#x27;</span>]);
 </code></pre>
-<h3 id="update-validators">
+<h2 id="update-validators">
       <a href="#update-validators">
         Update Validators
       </a>
-    </h3>
+    </h2>
 <p>In the above examples, you learned about document validation. Mongoose also
 supports validation for <a href="api/query.html#query_Query-update"><code>update()</code></a>,
 <a href="api/query.html#query_Query-updateOne"><code>updateOne()</code></a>,
@@ -467,11 +467,11 @@ caveats.</p>
 
 assert.<span class="hljs-title function_">equal</span>(error.<span class="hljs-property">errors</span>.<span class="hljs-property">color</span>.<span class="hljs-property">message</span>, <span class="hljs-string">&#x27;Invalid color&#x27;</span>);
 </code></pre>
-<h3 id="update-validators-and-this">
+<h2 id="update-validators-and-this">
       <a href="#update-validators-and-this">
         Update Validators and <code>this</code>
       </a>
-    </h3>
+    </h2>
 <p>There are a couple of key differences between update validators and
 document validators. In the color validation function below, <code>this</code> refers
 to the document being validated when using document validation.
@@ -514,11 +514,11 @@ error = <span class="hljs-literal">null</span>;
 <span class="hljs-comment">// Validation failed: color: Validator failed for path `color` with value `green`</span>
 assert.<span class="hljs-title function_">ok</span>(error);
 </code></pre>
-<h3 id="update-validators-only-run-on-updated-paths">
+<h2 id="update-validators-only-run-on-updated-paths">
       <a href="#update-validators-only-run-on-updated-paths">
         Update Validators Only Run On Updated Paths
       </a>
-    </h3>
+    </h2>
 <p>The other key difference is that update validators only run on the paths
 specified in the update. For instance, in the below example, because
 &#39;name&#39; is not specified in the update operation, update validation will
@@ -545,11 +545,11 @@ you try to explicitly <code>$unset</code> the key.</p>
   assert.<span class="hljs-title function_">ok</span>(err.<span class="hljs-property">errors</span>[<span class="hljs-string">&#x27;name&#x27;</span>]);
 });
 </code></pre>
-<h3 id="update-validators-only-run-for-some-operations">
+<h2 id="update-validators-only-run-for-some-operations">
       <a href="#update-validators-only-run-for-some-operations">
         Update Validators Only Run For Some Operations
       </a>
-    </h3>
+    </h2>
 <p>One final detail worth noting: update validators <strong>only</strong> run on the
 following update operators:</p>
 <ul>
@@ -589,10 +589,10 @@ testSchema.<span class="hljs-title function_">path</span>(<span class="hljs-stri
 update = { <span class="hljs-attr">$push</span>: [{ <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;hello&#x27;</span> }, { <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;world&#x27;</span> }] };
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">updateOne</span>({}, update, opts);
 </code></pre>
-<h3 id="next-up">
+<h2 id="next-up">
       <a href="#next-up">
         Next Up
       </a>
-    </h3>
+    </h2>
 <p>Now that we&#39;ve covered <code>Validation</code>, let&#39;s take a look at <a href="middleware.html">Middleware</a>.</p>
 </div></div><div id="jobs"><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="//images.ctfassets.net/3ouphkrynjol/3mfb7HH2YowrPxX9C6ik6H/723034bcb4e99349663c4bc8223fb8b6/localizejs.com.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#62c288992e788eb5404ba57d"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Lead Backend Developer [110'000 - 150'000 USD]</div><div class="location">100% Remote</div></div></a></div><div class="job-listing"><a href="/docs/6.x/docs/jobs.html#62c288992e788eb5404ba57e"><div class="company-logo"><img src="https://static.devitjobs.uk/logo-images/devit-logo-square.png"></div><div class="description"><div class="company">DevITjobs.us</div><div class="title">Senior Full Stack Engineer [100'000 - 115'000 CHF]</div><div class="location">100% Remote</div></div></a></div><div class="button jobs-view-more"><a href="/docs/6.x/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/6.x/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/6.x/docs/js/mobile-navbar-toggle.js"></script></div></body></html>

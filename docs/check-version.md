@@ -27,3 +27,8 @@ test@ /path/to/test
 ```
 
 `npm list` is helpful because it can identify if you have multiple versions of Mongoose installed.
+
+Other package managers also support similar functions:
+
+- [`yarn list --pattern "mongoose"`](https://classic.yarnpkg.com/lang/en/docs/cli/list/)
+- [`pnpm list "mongoose"`](https://pnpm.io/cli/list)

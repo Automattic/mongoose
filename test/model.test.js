@@ -4189,6 +4189,43 @@ describe('Model', function() {
         const { num } = await Test.findById(_id);
         assert.equal(num, 99);
       });
+
+      it('bulkWrite should throw an error if there were operations that failed validation, ' +
+        'but all operations that passed validation succeeded (gh-13256)', async function() {
+        const userSchema = new Schema({ age: { type: Number } });
+        const User = db.model('User', userSchema);
+
+        const createdUser = await User.create({ name: 'Test' });
+
+        const err = await User.bulkWrite([
+          {
+            updateOne: {
+              filter: { _id: createdUser._id },
+              update: { $set: { age: 'NaN' } },
+              upsert: true
+            }
+          },
+          {
+            updateOne: {
+              filter: { _id: createdUser._id },
+              update: { $set: { age: 13 } },
+              upsert: true
+            }
+          },
+          {
+            updateOne: {
+              filter: { _id: createdUser._id },
+              update: { $set: { age: 12 } },
+              upsert: true
+            }
+          }
+        ], { ordered: false, throwOnValidationError: true })
+          .then(() => null)
+          .catch(err => err);
+
+        assert.ok(err);
+        assert.equal(err.message, 'throwOnValidationError');
+      });
     });
 
     it('deleteOne with cast error (gh-5323)', async function() {
@@ -6144,6 +6181,26 @@ describe('Model', function() {
         ]
       );
 
+    });
+
+    it('insertMany should throw an error if there were operations that failed validation, ' +
+        'but all operations that passed validation succeeded (gh-13256)', async function() {
+      const userSchema = new Schema({
+        age: { type: Number }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const err = await User.insertMany([
+        new User({ age: 12 }),
+        new User({ age: 12 }),
+        new User({ age: 'NaN' })
+      ], { ordered: false, throwOnValidationError: true })
+        .then(() => null)
+        .catch(err => err);
+
+      assert.ok(err);
+      assert.equal(err.message, 'throwOnValidationError');
     });
 
     it('returns writeResult on success', async() => {

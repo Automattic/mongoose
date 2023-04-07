@@ -105,7 +105,7 @@
     "release-5x": "git pull origin 5.x && git push origin 5.x && git push origin 5.x --tags && npm publish --tag 5x",
     "release-6x": "git pull origin 6.x && git push origin 6.x && git push origin 6.x --tags && npm publish --tag legacy",
     "mongo": "node ./tools/repl.js",
-    "test": "mocha --exit ./test/query.test.js",
+    "test": "mocha --exit ./test/*.test.js",
     "test-deno": "deno run --allow-env --allow-read --allow-net --allow-run --allow-sys --allow-write ./test/deno.js",
     "test-rs": "START_REPLICA_SET=1 mocha --timeout 30000 --exit ./test/*.test.js",
     "test-tsd": "node ./test/types/check-types-filename && tsd",

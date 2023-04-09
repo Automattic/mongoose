@@ -19,7 +19,7 @@ When you call `mongoose.model()` on a schema, Mongoose _compiles_ a model
 for you.
 
 ```javascript
-const schema = new mongoose.Schema({ name: 'string', size: 'string' });
+const schema = new mongoose.Schema({ name: String, size: String });
 const Tank = mongoose.model('Tank', schema);
 ```
 

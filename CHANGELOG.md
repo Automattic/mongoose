@@ -1,3 +1,13 @@
+7.0.4 / 2023-04-17
+==================
+ * fix(schema): fix dangling reference to virtual in tree after removeVirtual() #13255 #13085
+ * fix(query): cast query filters on `findOneAndUpdate()` #13220 #13219 [dermasmid](https://github.com/dermasmid)
+ * types(model): aligned watch() type for mongodb 4.6.0 #13208 #13206
+ * docs: fix async function anchors #13226 [hasezoey](https://github.com/hasezoey)
+ * docs: fix schema syntax in exemple #13262 [c-marc](https://github.com/c-marc)
+ * docs: rework scripts to allow easier setting of current and past versions #13222
+#13148 [hasezoey](https://github.com/hasezoey)
+
 6.10.5 / 2023-04-06
 ===================
  * fix(model): execute valid write operations if calling bulkWrite() with ordered: false #13218 #13176

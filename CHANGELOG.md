@@ -1,5 +1,6 @@
 6.10.5 / 2023-04-06
 ===================
+ * perf(document): avoid unnecessary loops, conditionals, string manipulation on Document.prototype.get() for 10x speedup on top-level properties #12953
  * fix(model): execute valid write operations if calling bulkWrite() with ordered: false #13218 #13176
  * fix(array): pass-through all parameters #13202 #13201 [hasezoey](https://github.com/hasezoey)
  * fix: improve error message when sorting by empty string #13249 #10182

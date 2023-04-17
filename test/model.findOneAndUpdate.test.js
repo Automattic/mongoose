@@ -2061,4 +2061,24 @@ describe('model: findOneAndUpdate:', function() {
 
     assert.ifError(err);
   });
+
+  it('casts array filters (gh-13219)', async function() {
+    const MyModel = db.model('Test', new Schema({
+      _id: Number,
+      grades: [Number]
+    }));
+
+    await MyModel.create([
+      { _id: 1, grades: [95, 102, 90] }
+    ]);
+
+    await MyModel.findOneAndUpdate(
+      {},
+      { $set: { 'grades.$[element]': 100 } },
+      { arrayFilters: [{ element: { $gt: '100' } }] }
+    );
+
+    const doc = await MyModel.findOne();
+    assert.deepEqual(doc.toObject().grades, [95, 100, 90]);
+  });
 });

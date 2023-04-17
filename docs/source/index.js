@@ -10,9 +10,12 @@ try {
   jobs = require('../data/jobs.json');
 } catch (err) {}
 
+const api = require('./api');
+
 /**
  * @typedef {Object} DocsOptions
  * @property {String} title Title of the page
+ * @property {Boolean} [api] Indicate that the page is for API
  * @property {Boolean} [acquit] Enable test parsing and insertion
  * @property {Boolean} [markdown] Enable markdown processing
  * @property {Boolean} [guide] Indicate the page is a guide
@@ -28,6 +31,10 @@ const docs = {
   ...require('./tutorials'),
   ...require('./typescript')
 };
+
+for (const apidoc of api.docs) {
+  docs[`docs/api/${apidoc.fileName}.html`] = { ...apidoc, api: true };
+}
 
 docs['index.pug'] = require('./home');
 docs['docs/api.md'] = {
@@ -87,9 +94,13 @@ docs['docs/jobs.pug'] = {
 docs['docs/change-streams.md'] = { title: 'MongoDB Change Streams in NodeJS with Mongoose', markdown: true };
 docs['docs/lodash.md'] = { title: 'Using Mongoose with Lodash', markdown: true };
 docs['docs/incompatible_packages.md'] = { title: 'Known Incompatible npm Packages', markdown: true };
+docs['docs/check-version.md'] = { title: 'How to Check Your Mongoose Version', markdown: true };
+docs['docs/version-support.md'] = { title: 'Version Support', markdown: true };
 
 for (const props of Object.values(docs)) {
   props.jobs = jobs;
 }
 
-module.exports = docs;
+module.exports.fileMap = docs;
+/** Re-export for nav without extra filtering */
+module.exports.apiDocs = api.docs;

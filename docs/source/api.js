@@ -39,7 +39,55 @@ const files = [
   'lib/types/map.js'
 ];
 
+/** @type {DocsObj[]} */
 const out = module.exports.docs = [];
+
+// add custom matchers to dox, to recognize things it does not know about
+// see https://github.com/tj/dox/issues/198
+{
+  // Some matchers need to be in a specific order, like the "prototype" matcher must be before the static matcher (and inverted because "unshift")
+
+  // "unshift" is used, because the first function to return a object from "contextPatternMatchers" is used (and we need to "overwrite" those specific functions)
+
+  // push a matcher to recognize "Class.fn = async function" as a method
+  dox.contextPatternMatchers.unshift(function(str) {
+    const match = /^\s*([\w$.]+)\s*\.\s*([\w$]+)\s*=\s*(?:async\s+)?function/.exec(str);
+    if (match) {
+      return {
+        type: 'method',
+        receiver: match[1],
+        name: match[2],
+        string: match[1] + '.' + match[2] + '()'
+      };
+    }
+  });
+
+  // push a matcher to recognize "Class.prototype.fn = async function" as a method
+  dox.contextPatternMatchers.unshift(function(str) {
+    const match = /^\s*([\w$.]+)\s*\.\s*prototype\s*\.\s*([\w$]+)\s*=\s*(?:async\s+)?function/.exec(str);
+    if (match) {
+      return {
+        type: 'method',
+        constructor: match[1],
+        cons: match[1],
+        name: match[2],
+        string: match[1] + '.prototype.' + match[2] + '()'
+      };
+    }
+  });
+
+  // push a matcher to recognize "async function" as a function
+  dox.contextPatternMatchers.unshift(function(str) {
+    const match = /^\s*(export(\s+default)?\s+)?(?:async\s+)?function\s+([\w$]+)\s*\(/.exec(str);
+    if (match) {
+      return {
+        type: 'function',
+        name: match[3],
+        string: match[3] + '()'
+      };
+    }
+  });
+}
 
 const combinedFiles = [];
 for (const file of files) {
@@ -104,6 +152,16 @@ parse();
  */
 
 /**
+ * @typedef {Object} DocsObj
+ * @property {string} title The Title of the page
+ * @property {string} fileName The name of the resulting file
+ * @property {PropContext[]} props All the functions and values
+ * @property {string} file The original file (relative to the root of the repository)
+ * @property {string} editLink The link used for edits
+ * @property {boolean} [hideFromNav] Indicate that the entry should not be listed in the navigation
+ */
+
+/**
  * Process a file name to a documentation name
  * @param {string} input
  * @returns {NameObj}
@@ -151,8 +209,9 @@ function convertTypesToString(types) {
 function parse() {
   for (const props of combinedFiles) {
     const { docName: name, docFileName } = processName(props.file);
+    /** @type {DocsObj} */
     const data = {
-      name: name,
+      title: name,
       fileName: docFileName,
       props: []
     };

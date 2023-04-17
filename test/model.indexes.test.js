@@ -256,19 +256,23 @@ describe('model', function() {
 
     it('error should emit on the model', async function() {
       const schema = new Schema({ name: { type: String } });
-      const Test = db.model('Test', schema);
-
+      const Test = db.model('Test', schema, 'Test');
+      await Test.init();
       await Test.create({ name: 'hi' }, { name: 'hi' });
 
-      Test.schema.index({ name: 1 }, { unique: true });
-      Test.schema.index({ other: 1 });
+      const Test2 = db.model(
+        'Test2',
+        new Schema({
+          name: {
+            type: String,
+            unique: true
+          }
+        }),
+        'Test'
+      );
 
-      const err = await Test.ensureIndexes().then(() => null, err => err);
-
+      const err = await Test2.init().then(() => null, err => err);
       assert.ok(/E11000 duplicate key error/.test(err.message), err);
-
-      delete Test.$init;
-      await Test.init().catch(() => {});
     });
 
     it('when one index creation errors', async function() {
@@ -591,6 +595,70 @@ describe('model', function() {
       assert.deepEqual(indexes[1].key, { email: 1 });
 
       await User.collection.drop();
+    });
+
+    it('should not re-create a compound text index that involves non-text indexes, using syncIndexes (gh-13136)', function(done) {
+      const Test = new Schema({
+        title: {
+          type: String
+        },
+        description: {
+          type: String
+        },
+        age: {
+          type: Number
+        }
+      }, {
+        autoIndex: false
+      });
+
+      Test.index({
+        title: 'text',
+        description: 'text',
+        age: 1
+      });
+
+      const TestModel = db.model('Test', Test);
+      TestModel.syncIndexes().then((results1) => {
+        assert.deepEqual(results1, []);
+        // second call to syncIndexes should return an empty array, representing 0 deleted indexes
+        TestModel.syncIndexes().then((results2) => {
+          assert.deepEqual(results2, []);
+          done();
+        });
+      });
+    });
+
+    it('should not find a diff when calling diffIndexes after syncIndexes involving a text and non-text compound index (gh-13136)', async function() {
+      const Test = new Schema({
+        title: {
+          type: String
+        },
+        description: {
+          type: String
+        },
+        age: {
+          type: Number
+        }
+      }, {
+        autoIndex: false
+      });
+
+      Test.index({
+        title: 'text',
+        description: 'text',
+        age: 1
+      });
+
+      const TestModel = db.model('Test', Test);
+      await TestModel.init();
+
+      const diff = await TestModel.diffIndexes();
+      assert.deepEqual(diff, { toCreate: [{ age: 1, title: 'text', description: 'text' }], toDrop: [] });
+      await TestModel.syncIndexes();
+
+      const diff2 = await TestModel.diffIndexes();
+      assert.deepEqual(diff2, { toCreate: [], toDrop: [] });
     });
 
     it('cleanIndexes (gh-6676)', async function() {

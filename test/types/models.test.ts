@@ -17,7 +17,7 @@ import {
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
-import { UpdateOneModel } from 'mongodb';
+import { UpdateOneModel, ChangeStreamInsertDocument } from 'mongodb';
 
 function rawDocSyntax(): void {
   interface ITest {
@@ -566,4 +566,15 @@ async function gh13151() {
   expectType<ITest & { _id: Types.ObjectId } | null>(test);
   if (!test) return;
   expectType<ITest & { _id: Types.ObjectId }>(test);
+}
+
+function gh13206() {
+  interface ITest {
+    name: string;
+  }
+  const TestSchema = new Schema({ name: String });
+  const TestModel = model<ITest>('Test', TestSchema);
+  TestModel.watch<ITest, ChangeStreamInsertDocument<ITest>>([], { fullDocument: 'updateLookup' }).on('change', (change) => {
+    expectType<ChangeStreamInsertDocument<ITest>>(change);
+  });
 }

@@ -49,6 +49,8 @@ package-lock.json
 #docs/tutorials/*.html
 #docs/typescript/*.html
 #docs/api/*.html
+# the below excludes things like "0test.x" too, but gitignore does not have something like js regex "[0-9]+", so this is the best for future versions
+# docs/[0-9]*.x/
 #index.html
 
 # Local Netlify folder

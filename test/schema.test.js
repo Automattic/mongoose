@@ -2988,9 +2988,13 @@ describe('schema', function() {
     assert.ok(schema.virtuals.foo);
     schema.removeVirtual('foo');
     assert.ok(!schema.virtuals.foo);
+    assert.ok(!schema.tree.foo);
+
+    schema.virtual('foo').get(v => v || 99);
+
     const Test = db.model('gh-8397', schema);
     const doc = new Test({ name: 'Test' });
-    assert.equal(doc.foo, undefined);
+    assert.equal(doc.foo, 99);
   });
 
   it('should allow deleting multiple virtuals gh-8397', async function() {

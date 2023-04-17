@@ -10,7 +10,7 @@ try {
   }
 }
 const cheerio = require('cheerio');
-const filemap = require('../docs/source');
+const docsFilemap = require('../docs/source');
 const fs = require('fs');
 const pug = require('pug');
 const mongoose = require('../');
@@ -38,27 +38,22 @@ const Content = mongoose.model('Content', contentSchema, 'Content');
 
 const contents = [];
 
-const api = require('../docs/source/api');
-
-// API docs are special, because they are not added to the file-map individually currently and use different properties
-for (const _class of api.docs) {
-  for (const prop of _class.props) {
-    const content = new Content({
-      title: `API: ${prop.name}`,
-      body: prop.description,
-      url: `api/${_class.fileName}.html#${prop.anchorId}`
-    });
-    const err = content.validateSync();
-    if (err != null) {
-      console.error(content);
-      throw err;
+for (const [filename, file] of Object.entries(docsFilemap.fileMap)) {
+  if (file.api) {
+    for (const prop of file.props) {
+      const content = new Content({
+        title: `API: ${prop.name}`,
+        body: prop.description,
+        url: `${filename}#${prop.anchorId}`
+      });
+      const err = content.validateSync();
+      if (err != null) {
+        console.error(content);
+        throw err;
+      }
+      contents.push(content);
     }
-    contents.push(content);
-  }
-}
-
-for (const [filename, file] of Object.entries(filemap)) {
-  if (file.markdown) {
+  } else if (file.markdown) {
     let text = fs.readFileSync(filename, 'utf8');
     text = markdown.parse(text);
 

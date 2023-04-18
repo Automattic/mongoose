@@ -10,7 +10,7 @@ import {
   Query,
   model,
   HydratedDocument,
-  SchemaOptions,
+  ResolveSchemaOptions,
   ObtainDocumentType,
   ObtainSchemaGeneric
 } from 'mongoose';
@@ -634,7 +634,8 @@ function gh12003() {
 
   type BaseSchemaType = InferSchemaType<typeof BaseSchema>;
 
-  expectType<'type'>({} as ObtainSchemaGeneric<typeof BaseSchema, 'TSchemaOptions'>['typeKey']);
+  type TSchemaOptions = ResolveSchemaOptions<ObtainSchemaGeneric<typeof BaseSchema, 'TSchemaOptions'>>;
+  expectType<'type'>({} as TSchemaOptions['typeKey']);
 
   expectType<{ name?: string }>({} as BaseSchemaType);
 }

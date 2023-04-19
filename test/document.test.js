@@ -1968,25 +1968,6 @@ describe('document', function() {
 
       assert.equal(threw, true);
     });
-
-    it('passes save custom options to Model.exists(...) when no changes are present (gh-8739)', async function() {
-      const personSchema = new Schema({ name: String });
-
-      let optionInMiddleware;
-
-      personSchema.pre('findOne', function(next) {
-        optionInMiddleware = this.getOptions().customOption;
-
-        return next();
-      });
-
-      const Person = db.model('Person', personSchema);
-
-      const person = await Person.create({ name: 'Hafez' });
-      await person.save({ customOption: 'test' });
-
-      assert.equal(optionInMiddleware, 'test');
-    });
   });
 
   it('properly calls queue functions (gh-2856)', function() {

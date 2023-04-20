@@ -90,9 +90,9 @@ declare module 'mongoose' {
     $session(session?: ClientSession | null): ClientSession | null;
 
     /** Alias for `set()`, used internally to avoid conflicts */
-    $set(path: string, val: any, type: any, options?: DocumentSetOptions): this;
-    $set(path: string, val: any, options?: DocumentSetOptions): this;
-    $set(value: any): this;
+    $set(path: string | Record<string, any>, val: any, type: any, options?: DocumentSetOptions): this;
+    $set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
+    $set(value: string | Record<string, any>): this;
 
     /** Set this property to add additional query filters when Mongoose saves this document and `isNew` is false. */
     $where: Record<string, unknown>;
@@ -216,9 +216,9 @@ declare module 'mongoose' {
     schema: Schema;
 
     /** Sets the value of a path, or many paths. */
-    set(path: string, val: any, type: any, options?: any): this;
-    set(path: string, val: any, options?: any): this;
-    set(value: any): this;
+    set(path: string | Record<string, any>, val: any, type: any, options?: DocumentSetOptions): this;
+    set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
+    set(value: string | Record<string, any>): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
     toJSON<T = Require_id<DocType>>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<T>;

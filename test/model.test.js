@@ -6885,6 +6885,25 @@ describe('Model', function() {
       assert.equal(TestModel.staticFn(), 'Returned from staticFn');
     });
   });
+
+  describe('Bypass middleware', function() {
+    it('should bypass middleware if save is called on a document with no changes gh-13250', async function() {
+      const testSchema = new Schema({
+        name: String
+      });
+      let bypass = true;
+      testSchema.pre('findOne', function(next) {
+        bypass = false;
+        next();
+      });
+      const Test = db.model('gh13250', testSchema);
+      const doc = await Test.create({
+        name: 'Test Testerson'
+      });
+      await doc.save();
+      assert(bypass);
+    });
+  });
 });
 
 

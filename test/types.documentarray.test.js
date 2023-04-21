@@ -754,4 +754,40 @@ describe('types.documentarray', function() {
 
     assert.equal(doc.myMap.get('foo').$path(), 'myMap.foo');
   });
+
+  it('can remove() a subdocument (gh-13284)', async function() {
+    const authorSchema = new mongoose.Schema({
+      name: String,
+      bio: String,
+      website: String
+    });
+
+    const Author = db.model('Author', authorSchema);
+
+    const Course = db.model(
+      'Test',
+      new mongoose.Schema({
+        name: String,
+        authors: [authorSchema]
+      })
+    );
+
+    const author = await Author.create({
+      name: 'author', bio: 'authorbio', website: 'google.com'
+    });
+
+    const course = await Course.create({
+      name: 'Course',
+      authors: [author]
+    });
+    assert.equal(course.authors.length, 1);
+
+    const theAuthor = course.authors.id(author._id);
+    theAuthor.remove();
+    assert.equal(course.authors.length, 0);
+    await course.save();
+
+    const { authors } = await Course.findById(course);
+    assert.equal(authors.length, 0);
+  });
 });

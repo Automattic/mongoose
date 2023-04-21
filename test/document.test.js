@@ -11867,6 +11867,18 @@ describe('document', function() {
       assert.ok(err);
       assert.equal(err.errors['prop'].name, 'CastError');
     });
+    it('should correctly increment even if the document has not saved after each increment gh-13274', async function() {
+      const schema = new Schema({
+        coin: Number
+      });
+      const Test = db.model('gh13274', schema);
+      await Test.create({ coins: 0 });
+      const doc = await Test.findOne();
+      doc.$inc('coins', 1000);
+      doc.$inc('coins', 2000);
+      await doc.save();
+      assert.equal(doc.coins, 3000);
+    });
   });
 
   it('supports virtuals named `isValid` (gh-12124) (gh-6262)', async function() {

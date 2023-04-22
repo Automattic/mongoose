@@ -174,20 +174,29 @@ function processName(input) {
     replace('/methods', '');
   const lastSlash = name.lastIndexOf('/');
   const fullName = name;
-  name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
-  if (name === 'core_array') {
+  const basename = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
+  name = basename;
+  if (basename === 'core_array') {
     name = 'array';
   }
-  if (fullName === 'schema/array') {
-    name = 'SchemaArray';
+  if (fullName.startsWith('schema/')) {
+    name = 'Schema';
+    if (basename.charAt(0) !== basename.charAt(0).toUpperCase()) {
+      name += basename.charAt(0).toUpperCase() + basename.substring(1);
+    } else {
+      name += basename;
+    }
   }
-  if (name === 'documentarray') {
+  if (basename === 'SubdocumentPath') {
+    name = 'SubdocumentPath';
+  }
+  if (basename === 'documentarray') {
     name = 'DocumentArrayPath';
   }
-  if (name === 'DocumentArray') {
+  if (basename === 'DocumentArray') {
     name = 'MongooseDocumentArray';
   }
-  if (name === 'index') {
+  if (basename === 'index') {
     name = 'Mongoose';
   }
 

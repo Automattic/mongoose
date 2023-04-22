@@ -434,8 +434,10 @@ function extractTextUrlFromTag(tag, ctx, warnOnMissingUrl = false) {
   // "No Href" -> "No Href"
   // "https://someurl.com" -> "" (fallback added)
   // "Some#Method #something" -> "Some#Method"
+  // "Test ./somewhere" -> "Test"
+  // "Test2 ./somewhere#andsomewhere" -> "Test2"
   // The remainder is simply taken by a call to "slice" (also the text is trimmed later)
-  const textMatches = /^(.*? (?=#|\/|(?:https?:)|$))/i.exec(tag.string);
+  const textMatches = /^(.*? (?=#|\/|(?:https?:)|\.\/|$))/i.exec(tag.string);
 
   let text = undefined;
   let url = undefined;

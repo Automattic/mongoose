@@ -89,20 +89,7 @@ const out = module.exports.docs = new Map();
   });
 }
 
-const combinedFiles = [];
-for (const file of files) {
-  try {
-    const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'), { raw: true });
-    comments.file = file;
-    combinedFiles.push(comments);
-  } catch (err) {
-    // show log of which file has thrown a error for easier debugging
-    console.error('Error while trying to parseComments for ', file);
-    throw err;
-  }
-}
-
-parse();
+parseAllFiles();
 
 /**
  * @typedef {Object} TagObject
@@ -206,216 +193,242 @@ function convertTypesToString(types) {
   return Array.isArray(types) ? types.join('|') : types;
 }
 
-function parse() {
-  for (const props of combinedFiles) {
-    const { docName: name, docFileName } = processName(props.file);
-    /** @type {DocsObj} */
-    const data = {
-      title: name,
-      fileName: docFileName,
-      props: []
-    };
+/**
+ * Parse all files defined in "files"
+ */
+function parseAllFiles() {
+  for (const file of files) {
+    parseFile(file, true);
+  }
+}
 
-    for (const prop of props) {
-      if (prop.ignore || prop.isPrivate) {
-        continue;
-      }
+/**
+ * Parse a specific file
+ * @param {String} file The file to parse
+ * @param {Boolean} throwErr throw the error if one is encountered?
+ */
+function parseFile(file, throwErr = true) {
+  try {
+    const comments = dox.parseComments(fs.readFileSync(file, 'utf8'), { raw: true });
+    comments.file = file;
+    processFile(comments);
+  } catch (err) {
+  // show log of which file has thrown a error for easier debugging
+    console.error('Error while trying to parseComments for ', file);
+    if (throwErr) {
+      throw err;
+    }
+  }
+}
 
-      /** @type {PropContext} */
-      const ctx = prop.ctx || {};
+function processFile(props) {
+  const { docName: name, docFileName } = processName(props.file);
+  /** @type {DocsObj} */
+  const data = {
+    title: name,
+    fileName: docFileName,
+    props: []
+  };
 
-      // somehow in "dox", it is named "receiver" sometimes, not "constructor"
-      // this is used as a fall-back if the handling below does not overwrite it
-      if ('receiver' in ctx) {
-        ctx.constructor = ctx.receiver;
-        delete ctx.receiver;
-      }
+  for (const prop of props) {
+    if (prop.ignore || prop.isPrivate) {
+      continue;
+    }
 
-      // in some cases "dox" has "ctx.constructor" defined but set to "undefined", which will later be used for setting "ctx.string"
-      if ('constructor' in ctx && ctx.constructor === undefined) {
-        ctx.constructorWasUndefined = true;
-      }
+    /** @type {PropContext} */
+    const ctx = prop.ctx || {};
 
-      for (const __tag of prop.tags) {
-        // the following has been done, because otherwise no type could be applied for intellisense
-        /** @type {TagObject} */
-        const tag = __tag;
-        switch (tag.type) {
-          case 'see':
-            if (!Array.isArray(ctx.see)) {
-              ctx.see = [];
-            }
+    // somehow in "dox", it is named "receiver" sometimes, not "constructor"
+    // this is used as a fall-back if the handling below does not overwrite it
+    if ('receiver' in ctx) {
+      ctx.constructor = ctx.receiver;
+      delete ctx.receiver;
+    }
 
-            // for this type, it needs to be parsed from the string itself to support more than 1 word
-            // this is required because "@see" is kinda badly defined and mongoose uses a slightly customized way (longer text and different kinds of links)
+    // in some cases "dox" has "ctx.constructor" defined but set to "undefined", which will later be used for setting "ctx.string"
+    if ('constructor' in ctx && ctx.constructor === undefined) {
+      ctx.constructorWasUndefined = true;
+    }
 
-            ctx.see.push(extractTextUrlFromTag(tag, ctx, true));
-            break;
-          case 'receiver':
-            console.warn(`Found "@receiver" tag in ${ctx.constructor} ${ctx.name}`);
-            break;
-          case 'property':
-            ctx.type = 'property';
-
-            // using "name" over "string" because "string" also contains the type and maybe other stuff
-            ctx.name = tag.name;
-            // only assign "type" if there are types
-            if (tag.types.length > 0) {
-              ctx.type = convertTypesToString(tag.types);
-            }
-
-            break;
-          case 'type':
-            ctx.type = convertTypesToString(tag.types);
-            break;
-          case 'static':
-            ctx.type = 'property';
-            ctx.isStatic = true;
-            // dont take "string" as "name" from here, because jsdoc definitions of "static" do not have parameters, also its defined elsewhere anyway
-            // ctx.name = tag.string;
-            break;
-          case 'function':
-            ctx.type = 'function';
-            ctx.isStatic = true;
-            ctx.name = tag.string;
-            // extra parameter to make function definitions independant of where "@function" is defined
-            // like "@static" could have overwritten "ctx.string" again if defined after "@function"
-            ctx.isFunction = true;
-            break;
-          case 'return':
-            tag.description = tag.description ?
-              md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>\n?$/, '') :
-              '';
-
-            // dox does not add "void" / "undefined" to types, so in the documentation it would result in a empty "«»"
-            if (tag.string.includes('void') || tag.string.includes('undefined')) {
-              tag.types.push('void');
-            }
-
-            ctx.return = tag;
-            break;
-          case 'inherits': {
-            const obj = extractTextUrlFromTag(tag, ctx);
-            // try to get the documentation name for the "@inherits" value
-            // example: "@inherits SchemaType" -> "schematype.html"
-            if (!obj.url || obj.url === obj.text) {
-              let match = undefined;
-              for (const file of files) {
-                const { docName, docFileName } = processName(file);
-                if (docName.toLowerCase().includes(obj.text.toLowerCase())) {
-                  match = docFileName;
-                  break;
-                }
-              }
-
-              if (match) {
-                obj.url = match + '.html';
-              } else {
-                console.warn(`no match found in files for inherits "${obj.text}" on "${ctx.constructor}.${ctx.name}"`);
-              }
-            }
-            ctx.inherits = obj;
-            break;
+    for (const __tag of prop.tags) {
+      // the following has been done, because otherwise no type could be applied for intellisense
+      /** @type {TagObject} */
+      const tag = __tag;
+      switch (tag.type) {
+        case 'see':
+          if (!Array.isArray(ctx.see)) {
+            ctx.see = [];
           }
-          case 'event':
-          case 'param':
-            ctx[tag.type] = (ctx[tag.type] || []);
-            // the following is required, because in newer "dox" version "null" is not included in "types" anymore, but a seperate property
-            if (tag.nullable) {
-              tag.types.push('null');
-            }
-            if (tag.types) {
-              tag.types = convertTypesToString(tag.types);
-            }
-            ctx[tag.type].push(tag);
-            if (tag.name != null && tag.name.startsWith('[') && tag.name.endsWith(']') && tag.name.includes('.')) {
-              tag.nested = true;
-            }
-            if (tag.variable) {
-              if (tag.name.startsWith('[')) {
-                tag.name = '[...' + tag.name.slice(1);
-              } else {
-                tag.name = '...' + tag.name;
+
+          // for this type, it needs to be parsed from the string itself to support more than 1 word
+          // this is required because "@see" is kinda badly defined and mongoose uses a slightly customized way (longer text and different kinds of links)
+
+          ctx.see.push(extractTextUrlFromTag(tag, ctx, true));
+          break;
+        case 'receiver':
+          console.warn(`Found "@receiver" tag in ${ctx.constructor} ${ctx.name}`);
+          break;
+        case 'property':
+          ctx.type = 'property';
+
+          // using "name" over "string" because "string" also contains the type and maybe other stuff
+          ctx.name = tag.name;
+          // only assign "type" if there are types
+          if (tag.types.length > 0) {
+            ctx.type = convertTypesToString(tag.types);
+          }
+
+          break;
+        case 'type':
+          ctx.type = convertTypesToString(tag.types);
+          break;
+        case 'static':
+          ctx.type = 'property';
+          ctx.isStatic = true;
+          // dont take "string" as "name" from here, because jsdoc definitions of "static" do not have parameters, also its defined elsewhere anyway
+          // ctx.name = tag.string;
+          break;
+        case 'function':
+          ctx.type = 'function';
+          ctx.isStatic = true;
+          ctx.name = tag.string;
+          // extra parameter to make function definitions independant of where "@function" is defined
+          // like "@static" could have overwritten "ctx.string" again if defined after "@function"
+          ctx.isFunction = true;
+          break;
+        case 'return':
+          tag.description = tag.description ?
+            md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>\n?$/, '') :
+            '';
+
+          // dox does not add "void" / "undefined" to types, so in the documentation it would result in a empty "«»"
+          if (tag.string.includes('void') || tag.string.includes('undefined')) {
+            tag.types.push('void');
+          }
+
+          ctx.return = tag;
+          break;
+        case 'inherits': {
+          const obj = extractTextUrlFromTag(tag, ctx);
+          // try to get the documentation name for the "@inherits" value
+          // example: "@inherits SchemaType" -> "schematype.html"
+          if (!obj.url || obj.url === obj.text) {
+            let match = undefined;
+            for (const file of files) {
+              const { docName, docFileName } = processName(file);
+              if (docName.toLowerCase().includes(obj.text.toLowerCase())) {
+                match = docFileName;
+                break;
               }
             }
-            tag.description = tag.description ?
-              md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
-              '';
-            break;
-          case 'method':
-            ctx.type = 'method';
-            ctx.name = tag.string;
-            ctx.isFunction = true;
-            break;
-          case 'memberOf':
-            ctx.constructor = tag.parent;
-            break;
-          case 'constructor':
-            ctx.string = tag.string;
-            ctx.name = tag.string;
-            ctx.isFunction = true;
-            break;
-          case 'instance':
-            ctx.isInstance = true;
-            break;
-          case 'deprecated':
-            ctx.deprecated = true;
-            break;
+
+            if (match) {
+              obj.url = match + '.html';
+            } else {
+              console.warn(`no match found in files for inherits "${obj.text}" on "${ctx.constructor}.${ctx.name}"`);
+            }
+          }
+          ctx.inherits = obj;
+          break;
         }
+        case 'event':
+        case 'param':
+          ctx[tag.type] = (ctx[tag.type] || []);
+          // the following is required, because in newer "dox" version "null" is not included in "types" anymore, but a seperate property
+          if (tag.nullable) {
+            tag.types.push('null');
+          }
+          if (tag.types) {
+            tag.types = convertTypesToString(tag.types);
+          }
+          ctx[tag.type].push(tag);
+          if (tag.name != null && tag.name.startsWith('[') && tag.name.endsWith(']') && tag.name.includes('.')) {
+            tag.nested = true;
+          }
+          if (tag.variable) {
+            if (tag.name.startsWith('[')) {
+              tag.name = '[...' + tag.name.slice(1);
+            } else {
+              tag.name = '...' + tag.name;
+            }
+          }
+          tag.description = tag.description ?
+            md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
+            '';
+          break;
+        case 'method':
+          ctx.type = 'method';
+          ctx.name = tag.string;
+          ctx.isFunction = true;
+          break;
+        case 'memberOf':
+          ctx.constructor = tag.parent;
+          break;
+        case 'constructor':
+          ctx.string = tag.string;
+          ctx.name = tag.string;
+          ctx.isFunction = true;
+          break;
+        case 'instance':
+          ctx.isInstance = true;
+          break;
+        case 'deprecated':
+          ctx.deprecated = true;
+          break;
       }
-
-      if (ctx.isInstance && ctx.isStatic) {
-        console.warn(`Property "${ctx.name}" in "${ctx.constructor}" has both instance and static JSDOC markings (most likely both @instance and @static)! (File: "${props.file}")`);
-      }
-
-      // the following if-else-if statement is in this order, because there are more "instance" methods thans static
-      // the following condition will be true if "isInstance = true" or if "isInstance = false && isStatic = false" AND "ctx.string" are empty or not defined
-      // if "isStatic" and "isInstance" are falsy and "ctx.string" is not falsy, then rely on the "ctx.string" set by "dox"
-      if (ctx.isInstance || (!ctx.isStatic && !ctx.isInstance && (!ctx.string || ctx.constructorWasUndefined))) {
-        // to transform things like "[Symbol.toStringTag]" to ".prototype[Symbol.toStringTag]" instead of ".prototype.[Symbol.toStringTag]"
-        if (ctx.name.startsWith('[')) {
-          ctx.string = `${ctx.constructor}.prototype${ctx.name}`;
-
-        } else {
-          ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
-        }
-      } else if (ctx.isStatic) {
-        ctx.string = `${ctx.constructor}.${ctx.name}`;
-      }
-
-      // add "()" to the end of the string if function
-      if ((ctx.isFunction || ctx.type === 'method') && !ctx.string.endsWith('()')) {
-        ctx.string = ctx.string + '()';
-      }
-
-      ctx.anchorId = ctx.string;
-
-      ctx.description = prop.description.full.
-        replace(/<br \/>/ig, ' ').
-        replace(/&gt;/ig, '>');
-      ctx.description = md.parse(ctx.description);
-
-      data.props.push(ctx);
     }
 
-    data.props.sort(function(a, b) {
-      if (a.string < b.string) {
-        return -1;
+    if (ctx.isInstance && ctx.isStatic) {
+      console.warn(`Property "${ctx.name}" in "${ctx.constructor}" has both instance and static JSDOC markings (most likely both @instance and @static)! (File: "${props.file}")`);
+    }
+
+    // the following if-else-if statement is in this order, because there are more "instance" methods thans static
+    // the following condition will be true if "isInstance = true" or if "isInstance = false && isStatic = false" AND "ctx.string" are empty or not defined
+    // if "isStatic" and "isInstance" are falsy and "ctx.string" is not falsy, then rely on the "ctx.string" set by "dox"
+    if (ctx.isInstance || (!ctx.isStatic && !ctx.isInstance && (!ctx.string || ctx.constructorWasUndefined))) {
+      // to transform things like "[Symbol.toStringTag]" to ".prototype[Symbol.toStringTag]" instead of ".prototype.[Symbol.toStringTag]"
+      if (ctx.name.startsWith('[')) {
+        ctx.string = `${ctx.constructor}.prototype${ctx.name}`;
+
       } else {
-        return 1;
+        ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
       }
-    });
-
-    if (props.file.startsWith('lib/options')) {
-      data.hideFromNav = true;
+    } else if (ctx.isStatic) {
+      ctx.string = `${ctx.constructor}.${ctx.name}`;
     }
 
-    data.file = props.file;
-    data.editLink = 'https://github.com/Automattic/mongoose/blob/master/' +
+    // add "()" to the end of the string if function
+    if ((ctx.isFunction || ctx.type === 'method') && !ctx.string.endsWith('()')) {
+      ctx.string = ctx.string + '()';
+    }
+
+    ctx.anchorId = ctx.string;
+
+    ctx.description = prop.description.full.
+      replace(/<br \/>/ig, ' ').
+      replace(/&gt;/ig, '>');
+    ctx.description = md.parse(ctx.description);
+
+    data.props.push(ctx);
+  }
+
+  data.props.sort(function(a, b) {
+    if (a.string < b.string) {
+      return -1;
+    } else {
+      return 1;
+    }
+  });
+
+  if (props.file.startsWith('lib/options')) {
+    data.hideFromNav = true;
+  }
+
+  data.file = props.file;
+  data.editLink = 'https://github.com/Automattic/mongoose/blob/master/' +
       props.file;
 
-    out.set(data.file, data);
-  }
+  out.set(data.file, data);
 }
 
 /**
@@ -458,3 +471,6 @@ function extractTextUrlFromTag(tag, ctx, warnOnMissingUrl = false) {
     url: url || undefined // change to be "undefined" if text is empty or non-valid
   };
 }
+
+module.exports.parseFile = parseFile;
+module.exports.parseAllFiles = parseAllFiles;

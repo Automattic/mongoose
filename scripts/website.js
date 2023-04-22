@@ -232,6 +232,8 @@ try {
 
 const docsFilemap = require('../docs/source/index');
 const files = Object.keys(docsFilemap.fileMap);
+// api explicitly imported for specific file loading
+const apiReq = require('../docs/source/api');
 
 const wrapMarkdown = (md, baseLayout) => `
 extends ${baseLayout}
@@ -265,7 +267,7 @@ const cpc = `
 /** Alias to not execute "promisify" often */
 const pugRender = promisify(pug.render);
 
-async function pugify(filename, options) {
+async function pugify(filename, options, isReload = false) {
   let newfile = undefined;
   options = options || {};
   options.package = pkg;
@@ -278,6 +280,12 @@ async function pugify(filename, options) {
   let inputFile = filename;
 
   if (options.api) {
+    // only re-parse the api file when in a reload, because it is done once at file load
+    if (isReload) {
+      apiReq.parseFile(options.file);
+      // overwrite original options because of reload
+      options = {...options, ...apiReq.docs.get(options.file)};
+    }
     inputFile = path.resolve(cwd, 'docs/api_split.pug');
   }
 
@@ -346,7 +354,7 @@ function startWatch() {
 
     fs.watchFile(watchPath, { interval: 1000 }, (cur, prev) => {
       if (cur.mtime > prev.mtime) {
-        pugify(notifyPath, docsFilemap.fileMap[file]);
+        pugify(notifyPath, docsFilemap.fileMap[file], true);
       }
     });
   });
@@ -354,7 +362,7 @@ function startWatch() {
   fs.watchFile(path.join(cwd, 'docs/layout.pug'), { interval: 1000 }, (cur, prev) => {
     if (cur.mtime > prev.mtime) {
       console.log('docs/layout.pug modified, reloading all files');
-      pugifyAllFiles(true);
+      pugifyAllFiles(true, true);
     }
   });
 
@@ -363,16 +371,16 @@ function startWatch() {
       console.log('docs/api_split.pug modified, reloading all api files');
       Promise.all(files.filter(v=> v.startsWith('docs/api')).map(async (file) => {
         const filename = path.join(cwd, file);
-        await pugify(filename, docsFilemap.fileMap[file]);
+        await pugify(filename, docsFilemap.fileMap[file], true);
       }));
     }
   });
 }
 
-async function pugifyAllFiles(noWatch) {
+async function pugifyAllFiles(noWatch, isReload = false) {
   await Promise.all(files.map(async (file) => {
     const filename = path.join(cwd, file);
-    await pugify(filename, docsFilemap.fileMap[file]);
+    await pugify(filename, docsFilemap.fileMap[file], isReload);
   }));
 
   // enable watch after all files have been done once, and not in the loop to use less-code

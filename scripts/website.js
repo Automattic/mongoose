@@ -267,6 +267,13 @@ const cpc = `
 /** Alias to not execute "promisify" often */
 const pugRender = promisify(pug.render);
 
+/**
+ * Render a given file with the given options
+ * @param {String} filename The documentation file path to render
+ * @param {import("../docs/source/index").DocsOptions} options The options to use to render the file (api may be overwritten at reload)
+ * @param {Boolean} isReload Indicate this is a reload of the file
+ * @returns 
+ */
 async function pugify(filename, options, isReload = false) {
   let newfile = undefined;
   options = options || {};
@@ -377,6 +384,11 @@ function startWatch() {
   });
 }
 
+/**
+ * Render all files at once
+ * @param {Boolean} noWatch Set whether to start file watchers for reload
+ * @param {Boolean} isReload Indicate this is a reload of all files
+ */
 async function pugifyAllFiles(noWatch, isReload = false) {
   await Promise.all(files.map(async (file) => {
     const filename = path.join(cwd, file);

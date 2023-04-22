@@ -305,7 +305,7 @@ async function pugify(filename, options) {
 
   if (options.api) {
     newfile = path.resolve(cwd, filename);
-    options.docs = docsFilemap.apiDocs;
+    options.docs = Array.from(docsFilemap.apiDocs.values());
   }
 
   newfile = newfile || filename.replace('.pug', '.html');

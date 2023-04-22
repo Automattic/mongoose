@@ -39,8 +39,8 @@ const files = [
   'lib/types/map.js'
 ];
 
-/** @type {DocsObj[]} */
-const out = module.exports.docs = [];
+/** @type {Map.<string, DocsObj>} */
+const out = module.exports.docs = new Map();
 
 // add custom matchers to dox, to recognize things it does not know about
 // see https://github.com/tj/dox/issues/198
@@ -414,7 +414,7 @@ function parse() {
     data.editLink = 'https://github.com/Automattic/mongoose/blob/master/' +
       props.file;
 
-    out.push(data);
+    out.set(data.file, data);
   }
 }
 

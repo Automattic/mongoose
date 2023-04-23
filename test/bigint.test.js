@@ -49,7 +49,7 @@ describe('BigInt', function() {
       bigint: 'foo bar'
     });
     assert.strictEqual(doc.bigint, undefined);
-    
+
     const err = await doc.validate().then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.errors['bigint']);
@@ -78,27 +78,44 @@ describe('BigInt', function() {
       await db.close();
     });
 
-    beforeEach(async () => {
+    beforeEach(async() => {
       await Test.deleteMany({});
     });
 
     it('is stored as a long in MongoDB', async function() {
       await Test.create({ myBigInt: 42n });
-  
+
       const doc = await Test.findOne({ myBigInt: { $type: 'long' } });
       assert.ok(doc);
       assert.strictEqual(doc.myBigInt, 42n);
     });
 
-    it('becomes a bigint with lean using useBigInt64', async function() {  
+    it('becomes a bigint with lean using useBigInt64', async function() {
       await Test.create({ myBigInt: 7n });
-  
+
       const doc = await Test.
         findOne({ myBigInt: 7n }).
         setOptions({ useBigInt64: true }).
         lean();
       assert.ok(doc);
       assert.strictEqual(doc.myBigInt, 7n);
+    });
+
+    it('can query with comparison operators', async function() {
+      await Test.create([
+        { myBigInt: 1n },
+        { myBigInt: 2n },
+        { myBigInt: 3n },
+        { myBigInt: 4n }
+      ]);
+
+      let docs = await Test.find({ myBigInt: { $gte: 3n } }).sort({ myBigInt: 1 });
+      assert.equal(docs.length, 2);
+      assert.deepStrictEqual(docs.map(doc => doc.myBigInt), [3n, 4n]);
+
+      docs = await Test.find({ myBigInt: { $lt: 3n } }).sort({ myBigInt: -1 });
+      assert.equal(docs.length, 2);
+      assert.deepStrictEqual(docs.map(doc => doc.myBigInt), [2n, 1n]);
     });
   });
 });

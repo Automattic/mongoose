@@ -60,6 +60,29 @@ describe('BigInt', function() {
     );
   });
 
+  it('supports required', async function() {
+    const schema = new Schema({
+      bigint: {
+        type: BigInt,
+        required: true
+      }
+    });
+    const Test = mongoose.model('Test', schema);
+
+    const doc = new Test({
+      bigint: null
+    });
+
+    const err = await doc.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['bigint']);
+    assert.equal(err.errors['bigint'].name, 'ValidatorError');
+    assert.equal(
+      err.errors['bigint'].message,
+      'Path `bigint` is required.'
+    );
+  });
+
   describe('MongoDB integration', function() {
     let db;
     let Test;
@@ -116,6 +139,28 @@ describe('BigInt', function() {
       docs = await Test.find({ myBigInt: { $lt: 3n } }).sort({ myBigInt: -1 });
       assert.equal(docs.length, 2);
       assert.deepStrictEqual(docs.map(doc => doc.myBigInt), [2n, 1n]);
+    });
+
+    it('supports populate()', async function() {
+      const parentSchema = new Schema({
+        child: {
+          type: BigInt,
+          ref: 'Child'
+        }
+      });
+      const childSchema = new Schema({
+        _id: BigInt,
+        name: String
+      });
+      const Parent = db.model('Parent', parentSchema);
+      const Child = db.model('Child', childSchema);
+
+      const { _id } = await Parent.create({ child: 42n });
+      await Child.create({ _id: 42n, name: 'test-bigint-populate' });
+
+      const doc = await Parent.findById(_id).populate('child');
+      assert.ok(doc);
+      assert.equal(doc.child.name, 'test-bigint-populate');
     });
   });
 });

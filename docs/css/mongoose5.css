@@ -91,6 +91,12 @@ pre code {
   padding-bottom: 2px;
 }
 
+/* change sub-item lists to be more dense */
+.sub-item > .pure-menu-link {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
 .pure-menu-link:hover, .pure-menu-link.selected {
   background-color: rgba(0,0,0, 0.1);
 }

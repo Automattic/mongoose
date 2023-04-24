@@ -91,6 +91,10 @@ pre code {
   padding-top: 2px;
 }
 
+.pure-menu-link:hover, .pure-menu-link.selected {
+  background-color: rgba(0,0,0, 0.1);
+}
+
 li.sub-item {
   height: 23px;
   font-size: 11pt;

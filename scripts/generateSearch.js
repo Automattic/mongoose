@@ -31,7 +31,8 @@ const contentSchema = new mongoose.Schema({
   title: { type: String, required: true },
   body: { type: String, required: true },
   url: { type: String, required: true },
-  version: { type: String, required: true, default: version }
+  version: { type: String, required: true, default: version },
+  versionNumber: { type: Number, required: true, default: version.replace(/\.x$/, '') }
 });
 contentSchema.index({ title: 'text', body: 'text' });
 const Content = mongoose.model('Content', contentSchema, 'Content');

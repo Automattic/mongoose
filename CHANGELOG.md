@@ -1,3 +1,14 @@
+7.0.5 / 2023-04-24
+==================
+ * fix(schema): correctly handle uuids with populate() #13317 #13267
+ * fix(schema): add clusteredIndex to schema options #13286 [jakesjews](https://github.com/jakesjews)
+ * fix(document): use collection.findOne() for saving docs with no changes to avoid firing findOne middleware #13298
+ * types(schema): avoid circular constraint in TSchemaOptions with --incremental by deferring ResolveSchemaOptions<> #13291 #13129
+ * docs(subdocs): fix mention of subdocument ".remove" function #13312 [hasezoey](https://github.com/hasezoey)
+ * docs: add mongoose.Promise removal to migrating to 7 guide #13295
+ * docs: updated formatting of Error Handling section to better highlight the two kinds of possible errors #13279 [Ankit-Mandal](https://github.com/Ankit-Mandal)
+ * docs: fix broken link #13301 #13281
+
 7.0.4 / 2023-04-17
 ==================
  * fix(schema): fix dangling reference to virtual in tree after removeVirtual() #13255 #13085
@@ -10,6 +21,7 @@
 
 6.10.5 / 2023-04-06
 ===================
+ * perf(document): avoid unnecessary loops, conditionals, string manipulation on Document.prototype.get() for 10x speedup on top-level properties #12953
  * fix(model): execute valid write operations if calling bulkWrite() with ordered: false #13218 #13176
  * fix(array): pass-through all parameters #13202 #13201 [hasezoey](https://github.com/hasezoey)
  * fix: improve error message when sorting by empty string #13249 #10182

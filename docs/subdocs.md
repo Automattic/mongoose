@@ -259,16 +259,16 @@ const newdoc = parent.children.create({ name: 'Aaron' });
 ## Removing Subdocs
 
 Each subdocument has its own
-[remove](api/subdocument.html#subdocument_Subdocument-remove) method. For
+[deleteOne](api/subdocument.html#Subdocument.prototype.deleteOne()) method. For
 an array subdocument, this is equivalent to calling `.pull()` on the
-subdocument. For a single nested subdocument, `remove()` is equivalent
+subdocument. For a single nested subdocument, `deleteOne()` is equivalent
 to setting the subdocument to `null`.
 
 ```javascript
 // Equivalent to `parent.children.pull(_id)`
-parent.children.id(_id).remove();
+parent.children.id(_id).deleteOne();
 // Equivalent to `parent.child = null`
-parent.child.remove();
+parent.child.deleteOne();
 parent.save(function(err) {
   if (err) return handleError(err);
   console.log('the subdocs were removed');

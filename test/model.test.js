@@ -5122,6 +5122,37 @@ describe('Model', function() {
       assert.ok(collOptions.timeseries);
     });
 
+    it('createCollection() respects clusteredIndex', async function() {
+      const version = await start.mongodVersion();
+      if (version[0] < 6) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        clusteredIndex: {
+          key: { _id: 1 },
+          name: 'clustered test'
+        },
+        autoCreate: false,
+        autoIndex: false
+      });
+
+      const Test = db.model('Test', schema, 'Test');
+      await Test.init();
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection();
+
+      const collections = await Test.db.db.listCollections().toArray();
+      const coll = collections.find(coll => coll.name === 'Test');
+      assert.ok(coll);
+      assert.deepEqual(coll.options.clusteredIndex.key, { _id: 1 });
+      assert.equal(coll.options.clusteredIndex.name, 'clustered test');
+
+      await Test.collection.drop().catch(() => {});
+    });
+
     it('mongodb actually removes expired documents (gh-11229)', async function() {
       this.timeout(1000 * 80); // 80 seconds, see later comments on why
       const version = await start.mongodVersion();
@@ -6883,6 +6914,25 @@ describe('Model', function() {
       const testSchema = new Schema({}, { statics: { staticFn() { return 'Returned from staticFn'; } } });
       const TestModel = db.model('TestModel', testSchema);
       assert.equal(TestModel.staticFn(), 'Returned from staticFn');
+    });
+  });
+
+  describe('Bypass middleware', function() {
+    it('should bypass middleware if save is called on a document with no changes gh-13250', async function() {
+      const testSchema = new Schema({
+        name: String
+      });
+      let bypass = true;
+      testSchema.pre('findOne', function(next) {
+        bypass = false;
+        next();
+      });
+      const Test = db.model('gh13250', testSchema);
+      const doc = await Test.create({
+        name: 'Test Testerson'
+      });
+      await doc.save();
+      assert(bypass);
     });
   });
 });

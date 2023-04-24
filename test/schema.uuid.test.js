@@ -145,6 +145,7 @@ describe('SchemaUUID', function() {
 
     const pop = await User.findById(_id).populate('createdBy').orFail();
     assert.equal(pop.createdBy.name, 'admin');
+    assert.equal(pop.createdBy._id.toString(), u1._id.toString());
 
     await pop.save();
   });

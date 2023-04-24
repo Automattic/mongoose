@@ -11869,7 +11869,7 @@ describe('document', function() {
     });
     it('should correctly increment even if the document has not saved after each increment gh-13274', async function() {
       const schema = new Schema({
-        coin: Number
+        coins: Number
       });
       const Test = db.model('gh13274', schema);
       await Test.create({ coins: 0 });
@@ -11877,7 +11877,8 @@ describe('document', function() {
       doc.$inc('coins', 1000);
       doc.$inc('coins', 2000);
       await doc.save();
-      assert.equal(doc.coins, 3000);
+      const check = await Test.findOne();
+      assert.equal(check.coins, 3000);
     });
   });
 

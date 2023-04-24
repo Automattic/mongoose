@@ -82,13 +82,13 @@ pre code {
 }
 
 .pure-menu-item {
-  height: 28px;
   font-size: 12pt;
   padding-top: 0px;
 }
 
 .pure-menu-link {
   padding-top: 2px;
+  padding-bottom: 2px;
 }
 
 .pure-menu-link:hover, .pure-menu-link.selected {
@@ -96,7 +96,6 @@ pre code {
 }
 
 li.sub-item {
-  height: 23px;
   font-size: 11pt;
   margin-left: 15px;
 }
@@ -209,6 +208,10 @@ pre {
 
 .pure-menu-link.selected {
   font-weight: bold;
+}
+
+.pure-menu-item:not(:first-child), .pure-menu-item.sub-item {
+  margin-top: 2px;
 }
 
 /* Mobile */
@@ -327,7 +330,12 @@ pre {
 }
 
 .pure-menu-item:last-of-type {
-  padding-bottom: 20px;
+  padding-bottom: 5px;
+}
+
+/* dont add padding if it also has other elements (like a sub-list) */
+.pure-menu-link:not(:last-child) {
+  padding-bottom: 0px;
 }
 
 /* CPM ads */

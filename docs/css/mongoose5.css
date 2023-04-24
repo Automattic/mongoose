@@ -245,7 +245,7 @@ pre {
 
   #menu {
     display: none;
-    position: absolute;
+    position: fixed;
     top: 45px;
     border-top: 1px solid #ddd;
     border-right: 1px solid #ddd;
@@ -263,6 +263,9 @@ pre {
     height: 45px;
     background-color: #eee;
     border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
   #logo {

@@ -292,7 +292,6 @@ pre {
     top: 0px;
     left: 0;
     background-color: #eee;
-    font-size: 10px; /* change this value to increase/decrease button size */
     z-index: 10;
     width: 2em;
     height: 3px;
@@ -304,28 +303,11 @@ pre {
     background: #ddd;
   }
 
-  .menu-link span {
-    position: relative;
-    display: block;
-  }
-
-  .menu-link span,
-  .menu-link span:before,
-  .menu-link span:after {
-    background-color: #333;
-    width: 100%;
-    height: 0.2em;
-  }
-
-  .menu-link span:before,
-  .menu-link span:after {
-    position: absolute;
-    margin-top: -0.6em;
-    content: " ";
-  }
-
-  .menu-link span:after {
-    margin-top: 0.6em;
+  #menuLink {
+    width: 40px;
+    height: 40px;
+    padding: 2.5px;
+    color: rgb(0,0,0);
   }
 
   .active {

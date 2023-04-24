@@ -144,7 +144,7 @@ describe('SchemaUUID', function() {
     assert.ok(_id);
     assert.equal(typeof _id, 'string');
     assert.equal(_id, uuid.toString());
-  
+
     ({ _id } = await Test.findById(uuid));
     assert.ok(_id);
     assert.equal(typeof _id, 'string');

@@ -143,7 +143,7 @@ describe('SchemaUUID', function() {
     const u1 = await User.create({ name: 'admin' });
     const { _id } = await User.create({ name: 'created', createdBy: u1._id });
 
-    const pop = await User.findById(_id).populate('createdBy');
+    const pop = await User.findById(_id).populate('createdBy').orFail();
     assert.equal(pop.createdBy.name, 'admin');
 
     await pop.save();

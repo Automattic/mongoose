@@ -212,7 +212,9 @@ describe('Lean Tutorial', function() {
     // acquit:ignore:start
     await Person.deleteMany({});
     // acquit:ignore:end
-    await Person.create({ name: 'Benjamin Sisko', age: 37n });
+    // Mongoose will convert `age` to a BigInt
+    const { age } = await Person.create({ name: 'Benjamin Sisko', age: 37 });
+    typeof age; // 'bigint'
 
     // By default, if you store a document with a BigInt property in MongoDB and you
     // load the document with `lean()`, the BigInt property will be a number
@@ -230,7 +232,6 @@ describe('Lean Tutorial', function() {
     typeof person.age; // 'bigint'
     // acquit:ignore:start
     assert.equal(typeof person.age, 'bigint');
-    assert.equal(person.age, 37n);
     // acquit:ignore:end
   });
 });

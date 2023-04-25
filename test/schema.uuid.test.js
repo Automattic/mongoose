@@ -149,6 +149,28 @@ describe('SchemaUUID', function() {
 
     await pop.save();
   });
+  
+  it('handles built-in UUID type (gh-13103)', async function() {
+    const schema = new Schema({
+      _id: {
+        type: Schema.Types.UUID
+      }
+    }, { _id: false });
+
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', schema);
+
+    const uuid = new mongoose.Types.UUID();
+    let { _id } = await Test.create({ _id: uuid });
+    assert.ok(_id);
+    assert.equal(typeof _id, 'string');
+    assert.equal(_id, uuid.toString());
+
+    ({ _id } = await Test.findById(uuid));
+    assert.ok(_id);
+    assert.equal(typeof _id, 'string');
+    assert.equal(_id, uuid.toString());
+  });
 
   // the following are TODOs based on SchemaUUID.prototype.$conditionalHandlers which are not tested yet
   it('should work with $bits* operators');

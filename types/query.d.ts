@@ -162,6 +162,7 @@ declare module 'mongoose' {
      */
     timestamps?: boolean | QueryTimestampsConfig;
     upsert?: boolean;
+    useBigInt64?: boolean;
     writeConcern?: mongodb.WriteConcern;
 
     [other: string]: any;

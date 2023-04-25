@@ -2,7 +2,7 @@
 const fs = require('fs');
 
 /**
- * @typedef {import("./docsIndex").DocsOptions} DocsOptions
+ * @typedef {import("./index").DocsOptions} DocsOptions
  */
 
 /**

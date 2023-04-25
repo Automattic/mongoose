@@ -32,7 +32,7 @@ const docs = {
   ...require('./typescript')
 };
 
-for (const apidoc of api.docs) {
+for (const apidoc of api.docs.values()) {
   docs[`docs/api/${apidoc.fileName}.html`] = { ...apidoc, api: true };
 }
 

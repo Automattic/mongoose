@@ -161,6 +161,7 @@ describe('BigInt', function() {
       const doc = await Parent.findById(_id).populate('child');
       assert.ok(doc);
       assert.equal(doc.child.name, 'test-bigint-populate');
+      assert.equal(doc.child._id, 42n);
     });
   });
 });

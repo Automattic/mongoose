@@ -22,13 +22,13 @@ html(lang='en')
       #layout
         #mobile-menu
           a#menuLink.menu-link(href='#menu')
-            span
+            <svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg>
           #mobile-logo-container
             a(href="/")
               img#logo(src=`${versions.versionedPath}/docs/images/mongoose5_62x30_transparent.png`)
               span.logo-text mongoose
         #menu
-          .pure-menu
+          nav.pure-menu
             #logo-container.pure-menu-heading
               a(href="/")
                 img#logo(src=`${versions.versionedPath}/docs/images/mongoose5_62x30_transparent.png`)
@@ -51,80 +51,86 @@ html(lang='en')
                 a.pure-menu-link(href=`${versions.versionedPath}/docs/index.html`, class=outputUrl === `${versions.versionedPath}/docs/index.html` ? 'selected' : '') Quick Start
               li.pure-menu-item
                 a.pure-menu-link(href=`${versions.versionedPath}/docs/guides.html`, class=outputUrl === `${versions.versionedPath}/docs/guides.html` ? 'selected' : '') Guides
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/guide.html`, class=outputUrl === `${versions.versionedPath}/docs/schemas.html` ? 'selected' : '') Schemas
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/schematypes.html`, class=outputUrl === `${versions.versionedPath}/docs/schematypes.html` ? 'selected' : '') SchemaTypes
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/connections.html`, class=outputUrl === `${versions.versionedPath}/docs/connections.html` ? 'selected' : '') Connections
-              - if ([`${versions.versionedPath}/docs/connections`, `${versions.versionedPath}/docs/tutorials/ssl`].some(path => outputUrl.startsWith(path)))
-                li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/ssl.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/ssl.html` ? 'selected' : '') SSL Connections
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/models.html`, class=outputUrl === `${versions.versionedPath}/docs/models.html` ? 'selected' : '') Models
-              - if ([`${versions.versionedPath}/docs/models`, `${versions.versionedPath}/docs/change-streams`].some(path => outputUrl.startsWith(path)))
-                li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href=`${versions.versionedPath}/docs/change-streams.html`, class=outputUrl === `${versions.versionedPath}/docs/change-streams.html` ? 'selected' : '') Change Streams
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/documents.html`, class=outputUrl === `${versions.versionedPath}/docs/documents.html` ? 'selected' : '') Documents
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/subdocs.html`, class=outputUrl === `${versions.versionedPath}/docs/subdocs.html` ? 'selected' : '') Subdocuments
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/queries.html`, class=outputUrl === `${versions.versionedPath}/docs/queries.html` ? 'selected' : '') Queries
-              - if ([`${versions.versionedPath}/docs/queries`, `${versions.versionedPath}/docs/tutorials/findoneandupdate`, `${versions.versionedPath}/docs/tutorials/lean`, `${versions.versionedPath}/docs/tutorials/query_casting`].some(path => outputUrl.startsWith(path)))
-                li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/query_casting.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/query_casting.html` ? 'selected' : '') Query Casting
-                li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/findoneandupdate.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/findoneandupdate.html` ? 'selected' : '') findOneAndUpdate
-                li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/lean.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/lean.html` ? 'selected' : '') The Lean Option
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/validation.html`, class=outputUrl === `${versions.versionedPath}/docs/validation.html` ? 'selected' : '') Validation
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/middleware.html`, class=outputUrl === `${versions.versionedPath}/docs/middleware.html` ? 'selected' : '') Middleware
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/populate.html`, class=outputUrl === `${versions.versionedPath}/docs/populate.html` ? 'selected' : '') Populate
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/discriminators.html`, class=outputUrl === `${versions.versionedPath}/docs/discriminators.html` ? 'selected' : '') Discriminators
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/plugins.html`, class=outputUrl === `${versions.versionedPath}/docs/plugins.html` ? 'selected' : '') Plugins
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/timestamps.html`, class=outputUrl === `${versions.versionedPath}/docs/timestamps.html` ? 'selected' : '') Timestamps
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/transactions.html`, class=outputUrl === `${versions.versionedPath}/docs/transactions.html` ? 'selected' : '') Transactions
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript.html` ? 'selected' : '') TypeScript
-              - if (outputUrl.startsWith(`${versions.versionedPath}/docs/typescript`))
-                li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/schemas.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/schemas.html` ? 'selected' : '') Schemas
-                li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/statics-and-methods.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/statics-and-methods.html` ? 'selected' : '') Statics
-                li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/query-helpers.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/query-helpers.html` ? 'selected' : '') Query Helpers
-                li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/populate.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/populate.html` ? 'selected' : '') Populate
-                li.pure-menu-item.tertiary-item
-                  a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/subdocuments.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/subdocuments.html` ? 'selected' : '') Subdocuments
+                ul.pure-menu-list
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/guide.html`, class=outputUrl === `${versions.versionedPath}/docs/schemas.html` ? 'selected' : '') Schemas
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/schematypes.html`, class=outputUrl === `${versions.versionedPath}/docs/schematypes.html` ? 'selected' : '') SchemaTypes
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/connections.html`, class=outputUrl === `${versions.versionedPath}/docs/connections.html` ? 'selected' : '') Connections
+                    - if ([`${versions.versionedPath}/docs/connections`, `${versions.versionedPath}/docs/tutorials/ssl`].some(path => outputUrl.startsWith(path)))
+                      ul.pure-menu-list
+                        li.pure-menu-item.tertiary-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/ssl.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/ssl.html` ? 'selected' : '') SSL Connections
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/models.html`, class=outputUrl === `${versions.versionedPath}/docs/models.html` ? 'selected' : '') Models
+                    - if ([`${versions.versionedPath}/docs/models`, `${versions.versionedPath}/docs/change-streams`].some(path => outputUrl.startsWith(path)))
+                      ul.pure-menu-list
+                        li.pure-menu-item.tertiary-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/change-streams.html`, class=outputUrl === `${versions.versionedPath}/docs/change-streams.html` ? 'selected' : '') Change Streams
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/documents.html`, class=outputUrl === `${versions.versionedPath}/docs/documents.html` ? 'selected' : '') Documents
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/subdocs.html`, class=outputUrl === `${versions.versionedPath}/docs/subdocs.html` ? 'selected' : '') Subdocuments
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/queries.html`, class=outputUrl === `${versions.versionedPath}/docs/queries.html` ? 'selected' : '') Queries
+                    - if ([`${versions.versionedPath}/docs/queries`, `${versions.versionedPath}/docs/tutorials/findoneandupdate`, `${versions.versionedPath}/docs/tutorials/lean`, `${versions.versionedPath}/docs/tutorials/query_casting`].some(path => outputUrl.startsWith(path)))
+                      ul.pure-menu-list
+                        li.pure-menu-item.tertiary-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/query_casting.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/query_casting.html` ? 'selected' : '') Query Casting
+                        li.pure-menu-item.tertiary-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/findoneandupdate.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/findoneandupdate.html` ? 'selected' : '') findOneAndUpdate
+                        li.pure-menu-item.tertiary-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/lean.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/lean.html` ? 'selected' : '') The Lean Option
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/validation.html`, class=outputUrl === `${versions.versionedPath}/docs/validation.html` ? 'selected' : '') Validation
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/middleware.html`, class=outputUrl === `${versions.versionedPath}/docs/middleware.html` ? 'selected' : '') Middleware
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/populate.html`, class=outputUrl === `${versions.versionedPath}/docs/populate.html` ? 'selected' : '') Populate
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/discriminators.html`, class=outputUrl === `${versions.versionedPath}/docs/discriminators.html` ? 'selected' : '') Discriminators
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/plugins.html`, class=outputUrl === `${versions.versionedPath}/docs/plugins.html` ? 'selected' : '') Plugins
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/timestamps.html`, class=outputUrl === `${versions.versionedPath}/docs/timestamps.html` ? 'selected' : '') Timestamps
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/transactions.html`, class=outputUrl === `${versions.versionedPath}/docs/transactions.html` ? 'selected' : '') Transactions
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript.html` ? 'selected' : '') TypeScript
+                    - if (outputUrl.startsWith(`${versions.versionedPath}/docs/typescript`))
+                      ul.pure-menu-list
+                        li.pure-menu-item.tertiary-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/schemas.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/schemas.html` ? 'selected' : '') Schemas
+                        li.pure-menu-item.tertiary-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/statics-and-methods.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/statics-and-methods.html` ? 'selected' : '') Statics
+                        li.pure-menu-item.tertiary-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/query-helpers.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/query-helpers.html` ? 'selected' : '') Query Helpers
+                        li.pure-menu-item.tertiary-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/populate.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/populate.html` ? 'selected' : '') Populate
+                        li.pure-menu-item.tertiary-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/subdocuments.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/subdocuments.html` ? 'selected' : '') Subdocuments
               li.pure-menu-item
                 a.pure-menu-link(href=`${versions.versionedPath}/docs/api/mongoose.html`, class=outputUrl === `${versions.versionedPath}/docs/api/mongoose.html` ? 'selected' : '') API
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/api/mongoose.html`, class=outputUrl === `${versions.versionedPath}/docs/api/mongoose.html` ? 'selected' : '') Mongoose
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/api/schema.html`, class=outputUrl === `${versions.versionedPath}/docs/api/schema.html` ? 'selected' : '') Schema
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/api/connection.html`, class=outputUrl === `${versions.versionedPath}/docs/api/connection.html` ? 'selected' : '') Connection
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/api/document.html`, class=outputUrl === `${versions.versionedPath}/docs/api/document.html` ? 'selected' : '') Document
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/api/model.html`, class=outputUrl === `${versions.versionedPath}/docs/api/model.html` ? 'selected' : '') Model
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/api/query.html`, class=outputUrl === `${versions.versionedPath}/docs/api/query.html` ? 'selected' : '') Query
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/api/aggregate.html`, class=outputUrl === `${versions.versionedPath}/docs/api/aggregate.html` ? 'selected' : '') Aggregate
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/api/schematype.html`, class=outputUrl === `${versions.versionedPath}/docs/api/schematype.html` ? 'selected' : '') SchemaType
-              li.pure-menu-item.sub-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/api/virtualtype.html`, class=outputUrl === `${versions.versionedPath}/docs/api/virtualtype.html` ? 'selected' : '') VirtualType
+                ul.pure-menu-list
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/mongoose.html`, class=outputUrl === `${versions.versionedPath}/docs/api/mongoose.html` ? 'selected' : '') Mongoose
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/schema.html`, class=outputUrl === `${versions.versionedPath}/docs/api/schema.html` ? 'selected' : '') Schema
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/connection.html`, class=outputUrl === `${versions.versionedPath}/docs/api/connection.html` ? 'selected' : '') Connection
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/document.html`, class=outputUrl === `${versions.versionedPath}/docs/api/document.html` ? 'selected' : '') Document
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/model.html`, class=outputUrl === `${versions.versionedPath}/docs/api/model.html` ? 'selected' : '') Model
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/query.html`, class=outputUrl === `${versions.versionedPath}/docs/api/query.html` ? 'selected' : '') Query
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/aggregate.html`, class=outputUrl === `${versions.versionedPath}/docs/api/aggregate.html` ? 'selected' : '') Aggregate
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/schematype.html`, class=outputUrl === `${versions.versionedPath}/docs/api/schematype.html` ? 'selected' : '') SchemaType
+                  li.pure-menu-item.sub-item
+                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/virtualtype.html`, class=outputUrl === `${versions.versionedPath}/docs/api/virtualtype.html` ? 'selected' : '') VirtualType
               li.pure-menu-item
                 a.pure-menu-link(href=`${versions.versionedPath}/docs/migrating_to_7.html`, class=outputUrl === `${versions.versionedPath}/docs/migrating_to_7.html` ? 'selected' : '') Migration Guide
               li.pure-menu-item

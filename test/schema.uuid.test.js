@@ -149,7 +149,7 @@ describe('SchemaUUID', function() {
 
     await pop.save();
   });
-  
+
   it('handles built-in UUID type (gh-13103)', async function() {
     const schema = new Schema({
       _id: {

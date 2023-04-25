@@ -265,7 +265,64 @@ const cpc = `
 /** Alias to not execute "promisify" often */
 const pugRender = promisify(pug.render);
 
+/** Find all urls that are href's and start with "https://mongoosejs.com" */
+const mongooseComRegex = /(?:href=")(https:\/\/mongoosejs\.com\/?)/g;
+/** Regex to detect a versioned path */
+const versionedDocs = /docs\/\d/;
+
+/**
+ * Map urls (https://mongoosejs.com/) to local paths
+ * @param {String} block The String block to look for urls
+ * @param {String} currentUrl The URL the block is for (non-versioned)
+ */
+function mapURLs(block, currentUrl) {
+  let match;
+
+  let out = '';
+  let lastIndex = 0;
+
+  while ((match = mongooseComRegex.exec(block)) !== null) {
+    // console.log("match", match);
+    // cant just use "match.index" byitself, because of the extra "href=\"" condition, which is not factored in in "match.index"
+    let startIndex = match.index + match[0].length - match[1].length;
+    out += block.slice(lastIndex, startIndex);
+    lastIndex = startIndex + match[1].length;
+
+    // somewhat primitive gathering of the url, but should be enough for now
+    let fullUrl = /^\/[^"]+/.exec(block.slice(lastIndex-1));
+
+    let noPrefix = false;
+
+    if (fullUrl) {
+      // extra processing to only use "#otherId" instead of using full url for the same page
+      // at least firefox does not make a difference between a full path and just "#", but it makes debugging paths easier
+      if (fullUrl[0].startsWith(currentUrl)) {
+        let indexMatch = /#/.exec(fullUrl);
+
+        if (indexMatch) {
+          lastIndex += indexMatch.index - 1;
+          noPrefix = true;
+        }
+      }
+    }
+
+    if (!noPrefix) {
+      // map all to the versioned-path, unless a explicit version is given
+      if (!versionedDocs.test(block.slice(lastIndex, lastIndex+10))) {
+        out += versionObj.versionedPath + "/";
+      } else {
+        out += "/";
+      }
+    }
+  }
+
+  out += block.slice(lastIndex);
+
+  return out;
+}
+
 async function pugify(filename, options) {
+  /** Path for the output file */
   let newfile = undefined;
   options = options || {};
   options.package = pkg;
@@ -310,6 +367,9 @@ async function pugify(filename, options) {
 
   newfile = newfile || filename.replace('.pug', '.html');
 
+  /** Unversioned final documentation path */
+  const docsPath = newfile;
+
   if (versionObj.versionedDeploy) {
     newfile = path.resolve(cwd, path.join('.', versionObj.versionedPath), path.relative(cwd, newfile));
     await fs.promises.mkdir(path.dirname(newfile), {recursive:true});
@@ -321,11 +381,13 @@ async function pugify(filename, options) {
 
   options.opencollectiveSponsors = opencollectiveSponsors;
 
-  const str = await pugRender(contents, options).catch(console.error);
+  let str = await pugRender(contents, options).catch(console.error);
 
   if (typeof str !== "string") {
     return;
   }
+
+  str = mapURLs(str, '/' + path.relative(cwd, docsPath))
   
   await fs.promises.writeFile(newfile, str).catch((err) => {
     console.error('could not write', err.stack);

@@ -41,7 +41,8 @@ const files = [
   'lib/types/ArraySubdocument.js',
   'lib/types/buffer.js',
   'lib/types/decimal128.js',
-  'lib/types/map.js'
+  'lib/types/map.js',
+  'lib/types/array/methods/index.js'
 ];
 
 /** @type {Map.<string, DocsObj>} */
@@ -178,6 +179,9 @@ function processName(input) {
     } else {
       name += basename;
     }
+  }
+  if (fullName === 'types/array/methods/index') {
+    name = 'Array';
   }
   if (basename === 'SubdocumentPath') {
     name = 'SubdocumentPath';

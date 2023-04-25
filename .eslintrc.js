@@ -11,7 +11,7 @@ module.exports = {
     'test/files/*',
     'benchmarks',
     '*.min.js',
-    'docs/js/native.js'
+    '**/docs/js/native.js'
   ],
   overrides: [
     {
@@ -77,7 +77,7 @@ module.exports = {
     },
     {
       files: [
-        'docs/js/**/*.js'
+        '**/docs/js/**/*.js'
       ],
       env: {
         node: false,

@@ -82,23 +82,31 @@ pre code {
 }
 
 .pure-menu-item {
-  height: 28px;
   font-size: 12pt;
   padding-top: 0px;
 }
 
 .pure-menu-link {
   padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+/* change sub-item lists to be more dense */
+.sub-item > .pure-menu-link, .tertiary-item > .pure-menu-link {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.pure-menu-link:hover, .pure-menu-link.selected {
+  background-color: rgba(0,0,0, 0.1);
 }
 
 li.sub-item {
-  height: 23px;
   font-size: 11pt;
   margin-left: 15px;
 }
 
 li.tertiary-item {
-  height: 23px;
   font-size: 11pt;
   margin-left: 30px;
 }
@@ -207,6 +215,10 @@ pre {
   font-weight: bold;
 }
 
+.pure-menu-item:not(:first-child), .pure-menu-item.sub-item, .pure-menu-item.tertiary-item {
+  margin-top: 2px;
+}
+
 /* Mobile */
 
 #mobile-menu {
@@ -233,7 +245,7 @@ pre {
 
   #menu {
     display: none;
-    position: absolute;
+    position: fixed;
     top: 45px;
     border-top: 1px solid #ddd;
     border-right: 1px solid #ddd;
@@ -251,6 +263,9 @@ pre {
     height: 45px;
     background-color: #eee;
     border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
   #logo {
@@ -277,7 +292,6 @@ pre {
     top: 0px;
     left: 0;
     background-color: #eee;
-    font-size: 10px; /* change this value to increase/decrease button size */
     z-index: 10;
     width: 2em;
     height: 3px;
@@ -289,28 +303,11 @@ pre {
     background: #ddd;
   }
 
-  .menu-link span {
-    position: relative;
-    display: block;
-  }
-
-  .menu-link span,
-  .menu-link span:before,
-  .menu-link span:after {
-    background-color: #333;
-    width: 100%;
-    height: 0.2em;
-  }
-
-  .menu-link span:before,
-  .menu-link span:after {
-    position: absolute;
-    margin-top: -0.6em;
-    content: " ";
-  }
-
-  .menu-link span:after {
-    margin-top: 0.6em;
+  #menuLink {
+    width: 40px;
+    height: 40px;
+    padding: 2.5px;
+    color: rgb(0,0,0);
   }
 
   .active {
@@ -323,7 +320,12 @@ pre {
 }
 
 .pure-menu-item:last-of-type {
-  padding-bottom: 20px;
+  padding-bottom: 5px;
+}
+
+/* dont add padding if it also has other elements (like a sub-list) */
+.pure-menu-link:not(:last-child) {
+  padding-bottom: 0px;
 }
 
 /* CPM ads */

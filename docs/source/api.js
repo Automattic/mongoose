@@ -24,6 +24,11 @@ const files = [
   'lib/schema/array.js',
   'lib/schema/documentarray.js',
   'lib/schema/SubdocumentPath.js',
+  'lib/schema/boolean.js',
+  'lib/schema/buffer.js',
+  'lib/schema/number.js',
+  'lib/schema/objectid.js',
+  'lib/schema/string.js',
   'lib/options/SchemaTypeOptions.js',
   'lib/options/SchemaArrayOptions.js',
   'lib/options/SchemaBufferOptions.js',
@@ -174,20 +179,29 @@ function processName(input) {
     replace('/methods', '');
   const lastSlash = name.lastIndexOf('/');
   const fullName = name;
-  name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
-  if (name === 'core_array') {
+  const basename = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
+  name = basename;
+  if (basename === 'core_array') {
     name = 'array';
   }
-  if (fullName === 'schema/array') {
-    name = 'SchemaArray';
+  if (fullName.startsWith('schema/')) {
+    name = 'Schema';
+    if (basename.charAt(0) !== basename.charAt(0).toUpperCase()) {
+      name += basename.charAt(0).toUpperCase() + basename.substring(1);
+    } else {
+      name += basename;
+    }
   }
-  if (name === 'documentarray') {
+  if (basename === 'SubdocumentPath') {
+    name = 'SubdocumentPath';
+  }
+  if (basename === 'documentarray') {
     name = 'DocumentArrayPath';
   }
-  if (name === 'DocumentArray') {
+  if (basename === 'DocumentArray') {
     name = 'MongooseDocumentArray';
   }
-  if (name === 'index') {
+  if (basename === 'index') {
     name = 'Mongoose';
   }
 
@@ -434,8 +448,10 @@ function extractTextUrlFromTag(tag, ctx, warnOnMissingUrl = false) {
   // "No Href" -> "No Href"
   // "https://someurl.com" -> "" (fallback added)
   // "Some#Method #something" -> "Some#Method"
+  // "Test ./somewhere" -> "Test"
+  // "Test2 ./somewhere#andsomewhere" -> "Test2"
   // The remainder is simply taken by a call to "slice" (also the text is trimmed later)
-  const textMatches = /^(.*? (?=#|\/|(?:https?:)|$))/i.exec(tag.string);
+  const textMatches = /^(.*? (?=#|\/|(?:https?:)|\.\/|$))/i.exec(tag.string);
 
   let text = undefined;
   let url = undefined;

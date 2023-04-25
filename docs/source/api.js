@@ -36,7 +36,8 @@ const files = [
   'lib/types/ArraySubdocument.js',
   'lib/types/buffer.js',
   'lib/types/decimal128.js',
-  'lib/types/map.js'
+  'lib/types/map.js',
+  'lib/types/array/methods/index.js'
 ];
 
 /** @type {DocsObj[]} */
@@ -180,6 +181,9 @@ function processName(input) {
   }
   if (fullName === 'schema/array') {
     name = 'SchemaArray';
+  }
+  if (fullName === 'types/array/methods/index') {
+    name = 'Array';
   }
   if (name === 'documentarray') {
     name = 'DocumentArrayPath';

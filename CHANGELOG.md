@@ -1,3 +1,37 @@
+7.0.5 / 2023-04-24
+==================
+ * fix(schema): correctly handle uuids with populate() #13317 #13267
+ * fix(schema): add clusteredIndex to schema options #13286 [jakesjews](https://github.com/jakesjews)
+ * fix(document): use collection.findOne() for saving docs with no changes to avoid firing findOne middleware #13298
+ * types(schema): avoid circular constraint in TSchemaOptions with --incremental by deferring ResolveSchemaOptions<> #13291 #13129
+ * docs(subdocs): fix mention of subdocument ".remove" function #13312 [hasezoey](https://github.com/hasezoey)
+ * docs: add mongoose.Promise removal to migrating to 7 guide #13295
+ * docs: updated formatting of Error Handling section to better highlight the two kinds of possible errors #13279 [Ankit-Mandal](https://github.com/Ankit-Mandal)
+ * docs: fix broken link #13301 #13281
+
+7.0.4 / 2023-04-17
+==================
+ * fix(schema): fix dangling reference to virtual in tree after removeVirtual() #13255 #13085
+ * fix(query): cast query filters on `findOneAndUpdate()` #13220 #13219 [dermasmid](https://github.com/dermasmid)
+ * types(model): aligned watch() type for mongodb 4.6.0 #13208 #13206
+ * docs: fix async function anchors #13226 [hasezoey](https://github.com/hasezoey)
+ * docs: fix schema syntax in exemple #13262 [c-marc](https://github.com/c-marc)
+ * docs: rework scripts to allow easier setting of current and past versions #13222
+#13148 [hasezoey](https://github.com/hasezoey)
+
+6.10.5 / 2023-04-06
+===================
+ * perf(document): avoid unnecessary loops, conditionals, string manipulation on Document.prototype.get() for 10x speedup on top-level properties #12953
+ * fix(model): execute valid write operations if calling bulkWrite() with ordered: false #13218 #13176
+ * fix(array): pass-through all parameters #13202 #13201 [hasezoey](https://github.com/hasezoey)
+ * fix: improve error message when sorting by empty string #13249 #10182
+ * docs: add version support and check version docs #13251 #13193
+
+5.13.17 / 2023-04-04
+====================
+ * fix: backport fix for array filters handling $or and $and #13195 #13192 #10696 [raj-goguardian](https://github.com/raj-goguardian)
+ * fix: update the isIndexEqual function to take into account non-text indexes when checking compound indexes that include both text and non-text indexes #13138 #13136 [rdeavila94](https://github.com/rdeavila94)
+
 7.0.3 / 2023-03-23
 ==================
  * fix(query): avoid executing transforms if query wasn't executed #13185 #13165

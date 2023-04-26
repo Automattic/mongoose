@@ -95,8 +95,8 @@ await Model.createCollection();
 
 There are two classes of errors that can occur with a Mongoose connection.
 
-- Error on initial connection. If initial connection fails, Mongoose will emit an 'error' event and the promise `mongoose.connect()` returns will reject. However, Mongoose will **not** automatically try to reconnect.
-- Error after initial connection was established. Mongoose will attempt to reconnect, and it will emit an 'error' event.
+- **Error on initial connection**: If initial connection fails, Mongoose will emit an 'error' event and the promise `mongoose.connect()` returns will reject. However, Mongoose will **not** automatically try to reconnect.
+- **Error after initial connection was established**: Mongoose will attempt to reconnect, and it will emit an 'error' event.
 
 To handle initial connection errors, you should use `.catch()` or `try/catch` with async/await.
 

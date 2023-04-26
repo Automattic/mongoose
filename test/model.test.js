@@ -3322,15 +3322,6 @@ describe('Model', function() {
     });
 
     describe('3.6 features', function() {
-      before(async function() {
-        const version = await start.mongodVersion();
-        const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
-
-        if (!mongo36) {
-          this.skip();
-        }
-      });
-
       it('arrayFilter (gh-5965)', async function() {
 
         const MyModel = db.model('Test', new Schema({
@@ -4134,6 +4125,69 @@ describe('Model', function() {
             update: { $set: { 'someArray.1': { __proto__: null, message: 'test' } } }
           }
         }]);
+      });
+
+      it('sends valid ops if ordered = false (gh-13176)', async function() {
+        const testSchema = new mongoose.Schema({
+          num: Number
+        });
+        const Test = db.model('Test', testSchema);
+
+        const res = await Test.bulkWrite([
+          {
+            updateOne: {
+              filter: {},
+              update: { $set: { num: 'not a number' } },
+              upsert: true
+            }
+          },
+          {
+            updateOne: {
+              filter: {},
+              update: { $set: { num: 42 } }
+            }
+          }
+        ], { ordered: false });
+        assert.ok(res.mongoose);
+        assert.equal(res.mongoose.validationErrors.length, 1);
+        assert.strictEqual(res.result.nUpserted, 0);
+      });
+
+      it('decorates write error with validation errors if unordered fails (gh-13176)', async function() {
+        const testSchema = new mongoose.Schema({
+          num: Number
+        });
+        const Test = db.model('Test', testSchema);
+
+        await Test.deleteMany({});
+        const { _id } = await Test.create({ num: 42 });
+
+        const err = await Test.bulkWrite([
+          {
+            updateOne: {
+              filter: {},
+              update: { $set: { num: 'not a number' } },
+              upsert: true
+            }
+          },
+          {
+            updateOne: {
+              filter: {},
+              update: { $push: { num: 42 } }
+            }
+          },
+          {
+            updateOne: {
+              filter: {},
+              update: { $inc: { num: 57 } }
+            }
+          }
+        ], { ordered: false }).then(() => null, err => err);
+        assert.ok(err);
+        assert.equal(err.mongoose.validationErrors.length, 1);
+
+        const { num } = await Test.findById(_id);
+        assert.equal(num, 99);
       });
     });
 
@@ -5066,6 +5120,37 @@ describe('Model', function() {
       assert.ok(collOptions);
       assert.equal(collOptions.expireAfterSeconds, 5);
       assert.ok(collOptions.timeseries);
+    });
+
+    it('createCollection() respects clusteredIndex', async function() {
+      const version = await start.mongodVersion();
+      if (version[0] < 6) {
+        this.skip();
+        return;
+      }
+
+      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
+        clusteredIndex: {
+          key: { _id: 1 },
+          name: 'clustered test'
+        },
+        autoCreate: false,
+        autoIndex: false
+      });
+
+      const Test = db.model('Test', schema, 'Test');
+      await Test.init();
+
+      await Test.collection.drop().catch(() => {});
+      await Test.createCollection();
+
+      const collections = await Test.db.db.listCollections().toArray();
+      const coll = collections.find(coll => coll.name === 'Test');
+      assert.ok(coll);
+      assert.deepEqual(coll.options.clusteredIndex.key, { _id: 1 });
+      assert.equal(coll.options.clusteredIndex.name, 'clustered test');
+
+      await Test.collection.drop().catch(() => {});
     });
 
     it('mongodb actually removes expired documents (gh-11229)', async function() {
@@ -6829,6 +6914,25 @@ describe('Model', function() {
       const testSchema = new Schema({}, { statics: { staticFn() { return 'Returned from staticFn'; } } });
       const TestModel = db.model('TestModel', testSchema);
       assert.equal(TestModel.staticFn(), 'Returned from staticFn');
+    });
+  });
+
+  describe('Bypass middleware', function() {
+    it('should bypass middleware if save is called on a document with no changes gh-13250', async function() {
+      const testSchema = new Schema({
+        name: String
+      });
+      let bypass = true;
+      testSchema.pre('findOne', function(next) {
+        bypass = false;
+        next();
+      });
+      const Test = db.model('gh13250', testSchema);
+      const doc = await Test.create({
+        name: 'Test Testerson'
+      });
+      await doc.save();
+      assert(bypass);
     });
   });
 });

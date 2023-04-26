@@ -10,14 +10,23 @@ const port = process.env.PORT
   : 8089;
 
 async function main() {
-  await website.pugifyAllFiles();
+  await Promise.all([
+    website.copyAllRequiredFiles(),
+    website.pugifyAllFiles()
+  ]);
   // start watching for file changes and re-compile them, so that they can be served directly
   website.startWatch();
 
   app.use('/', express.static(website.cwd));
 
   app.listen(port, () => {
-    console.log(`now listening on http://127.0.0.1:${port}`);
+    let urlPath = '/';
+
+    if (website.versionObj.versionedDeploy) {
+      urlPath = website.versionObj.versionedPath;
+    }
+
+    console.log(`now listening on http://127.0.0.1:${port}${urlPath}`);
   });
 }
 

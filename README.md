@@ -61,7 +61,7 @@ import mongoose from 'mongoose';
 Or, using [Deno's `createRequire()` for CommonJS support](https://deno.land/std@0.113.0/node/README.md?source=#commonjs-modules-loading) as follows.
 
 ```javascript
-import { createRequire } from 'https://deno.land/std/node/module.ts';
+import { createRequire } from 'https://deno.land/std@0.177.0/node/module.ts';
 const require = createRequire(import.meta.url);
 
 const mongoose = require('mongoose');

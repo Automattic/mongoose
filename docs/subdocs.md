@@ -65,7 +65,7 @@ parent.children[0].name = 'Matthew';
 // `parent.children[0].save()` is a no-op, it triggers middleware but
 // does **not** actually save the subdocument. You need to save the parent
 // doc.
-parent.save(callback);
+await parent.save();
 ```
 
 Subdocuments have `save` and `validate` [middleware](middleware.html)
@@ -82,9 +82,11 @@ childSchema.pre('save', function(next) {
 });
 
 const parent = new Parent({ children: [{ name: 'invalid' }] });
-parent.save(function(err) {
-  console.log(err.message); // #sadpanda
-});
+try {
+  await parent.save();
+} catch (err) {
+  err.message; // '#sadpanda'
+}
 ```
 
 Subdocuments' `pre('save')` and `pre('validate')` middleware execute
@@ -244,10 +246,8 @@ const subdoc = parent.children[0];
 console.log(subdoc); // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
 subdoc.isNew; // true
 
-parent.save(function(err) {
-  if (err) return handleError(err);
-  console.log('Success!');
-});
+await parent.save();
+console.log('Success!');
 ```
 
 You can also create a subdocument without adding it to an array by using the [`create()` method](api/mongoosedocumentarray.html#mongoosedocumentarray_MongooseDocumentArray-create) of Document Arrays.
@@ -258,21 +258,18 @@ const newdoc = parent.children.create({ name: 'Aaron' });
 
 ## Removing Subdocs
 
-Each subdocument has its own
-[deleteOne](api/subdocument.html#Subdocument.prototype.deleteOne()) method. For
-an array subdocument, this is equivalent to calling `.pull()` on the
-subdocument. For a single nested subdocument, `deleteOne()` is equivalent
-to setting the subdocument to `null`.
+Each subdocument has its own [deleteOne](api/subdocument.html#Subdocument.prototype.deleteOne()) method.
+For an array subdocument, this is equivalent to calling `.pull()` on the subdocument.
+For a single nested subdocument, `deleteOne()` is equivalent to setting the subdocument to [`null`](https://masteringjs.io/tutorials/fundamentals/null).
 
 ```javascript
 // Equivalent to `parent.children.pull(_id)`
 parent.children.id(_id).deleteOne();
 // Equivalent to `parent.child = null`
 parent.child.deleteOne();
-parent.save(function(err) {
-  if (err) return handleError(err);
-  console.log('the subdocs were removed');
-});
+
+await parent.save();
+console.log('the subdocs were removed');
 ```
 
 <h2 id="subdoc-parents">Parents of Subdocs</h2>
@@ -318,8 +315,7 @@ doc.level1.level2.ownerDocument() === doc; // true
 
 <h3 id="altsyntaxarrays"><a href="#altsyntaxarrays">Alternate declaration syntax for arrays</a></h3>
 
-If you create a schema with an array of objects, Mongoose will automatically
-convert the object to a schema for you:
+If you create a schema with an array of objects, Mongoose will automatically convert the object to a schema for you:
 
 ```javascript
 const parentSchema = new Schema({

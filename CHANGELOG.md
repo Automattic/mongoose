@@ -1,3 +1,19 @@
+7.1.0 / 2023-04-27
+==================
+ * feat: upgrade mongodb -> 5.3.0
+ * feat(schema): add BigInt support, upgrade mongodb -> 5.3.0 #13318 #13081 #6936
+ * feat: handle MongoDB's new UUID type, export mongoose.Types.UUID #13323 #13103
+ * feat: implement createCollections() #13324
+ * feat(query): add isPathSelectedInclusive function on query #13177
+ * types: added overloads for Schema.pre/post with different values for SchemaPreOptions #12680 [jpilgrim](https://github.com/jpilgrim)
+ * types(query): make lean() flatten out inferred maps into Record<string, V> #13326 #13010
+ * docs: update README deno url #13332
+ * docs: update jsdoc to use full URLs instead of non-prefix absolute urls (also fix some urls) #13328 [hasezoey](https://github.com/hasezoey)
+ * docs: reload api js files on change #13313 [hasezoey](https://github.com/hasezoey)
+ * docs: update website sidebar to be better use-able #13321 [hasezoey](https://github.com/hasezoey)
+ * docs: fix schematype @see links #13310 [hasezoey](https://github.com/hasezoey)
+ * docs(subdocuments): remove callback usage, use deleteOne() rather than remove() re: #13284 #13316
+
 7.0.5 / 2023-04-24
 ==================
  * fix(schema): correctly handle uuids with populate() #13317 #13267

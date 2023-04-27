@@ -10,9 +10,12 @@ try {
   jobs = require('../data/jobs.json');
 } catch (err) {}
 
+const api = require('./api');
+
 /**
  * @typedef {Object} DocsOptions
  * @property {String} title Title of the page
+ * @property {Boolean} [api] Indicate that the page is for API
  * @property {Boolean} [acquit] Enable test parsing and insertion
  * @property {Boolean} [markdown] Enable markdown processing
  * @property {Boolean} [guide] Indicate the page is a guide
@@ -28,6 +31,10 @@ const docs = {
   ...require('./tutorials'),
   ...require('./typescript')
 };
+
+for (const apidoc of api.docs) {
+  docs[`docs/api/${apidoc.fileName}.html`] = { ...apidoc, api: true };
+}
 
 docs['index.pug'] = require('./home');
 docs['docs/api.pug'] = require('./api');
@@ -89,4 +96,6 @@ for (const props of Object.values(docs)) {
   props.jobs = jobs;
 }
 
-module.exports = docs;
+module.exports.fileMap = docs;
+/** Re-export for nav without extra filtering */
+module.exports.apiDocs = api.docs;

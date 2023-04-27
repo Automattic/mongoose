@@ -13,14 +13,14 @@ block content
     div.api-nav-content
       each item in docs
         - if (!item.hideFromNav)
-          div.nav-item(id='nav-' + item.name)
+          div.nav-item(id='nav-' + item.title)
             div.nav-item-title
-              a(href='./api/' + item.name.toLowerCase() + '.html')
-                | #{item.name}
+              a(href='./api/' + item.title.toLowerCase() + '.html')
+                | #{item.title}
             ul.nav-item-sub
               each prop in item.props
                 li
-                  a(href='./api/' + item.name.toLowerCase() + '.html#' + prop.anchorId)
+                  a(href='./api/' + item.title.toLowerCase() + '.html#' + prop.anchorId)
                     | #{prop.string}
 
   each item in docs
@@ -29,9 +29,9 @@ block content
       <a class="edit-docs-link" href="#{item.editLink}" target="_blank">
         <img src="/docs/images/pencil.svg" />
       </a>
-      h2(id=item.name, class="item-header")
-        a(href='#' + item.name)
-          | #{item.name}
+      h2(id=item.title, class="item-header")
+        a(href='#' + item.title)
+          | #{item.title}
     ul
       each prop in item.props
         li

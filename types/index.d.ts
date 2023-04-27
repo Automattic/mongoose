@@ -594,13 +594,13 @@ declare module 'mongoose' {
   export type UpdateQuery<T> = _UpdateQuery<T> & AnyObject;
 
   export type FlattenMaps<T> = {
-    [K in keyof T]: T[K] extends Map<any, any>
-      ? AnyObject : T[K] extends TreatAsPrimitives
+    [K in keyof T]: T[K] extends Map<any, infer V>
+      ? Record<string, V> : T[K] extends TreatAsPrimitives
         ? T[K] : FlattenMaps<T[K]>;
   };
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
-  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId;
+  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 

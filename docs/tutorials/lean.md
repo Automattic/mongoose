@@ -10,6 +10,7 @@ In this tutorial, you'll learn more about the tradeoffs of using `lean()`.
 * [Lean and Populate](#lean-and-populate)
 * [When to Use Lean](#when-to-use-lean)
 * [Plugins](#plugins)
+* [BigInts](#bigints)
 
 <h2 id="using-lean"><a href="#using-lean">Using Lean</a></h2>
 
@@ -139,4 +140,13 @@ schema.virtual('lowercase', function() {
   this.name; // Works
   this.get('name'); // Crashes because `this` is not a Mongoose document.
 });
+```
+
+## BigInts
+
+By default, the MongoDB Node driver converts longs stored in MongoDB into JavaScript numbers, **not** [BigInts](https://thecodebarbarian.com/an-overview-of-bigint-in-node-js.html).
+Set the `useBigInt64` option on your `lean()` queries to inflate longs into BigInts.
+
+```acquit
+[require:Lean Tutorial.*bigint]
 ```

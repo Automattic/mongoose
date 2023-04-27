@@ -54,6 +54,7 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 - [Map](#maps)
 - [Schema](#schemas)
 - [UUID](#uuid)
+- [BigInt](#bigint)
 
 <h3>Example</h3>
 
@@ -630,6 +631,21 @@ const schema = new mongoose.Schema({
     default: () => randomUUID()
   }
 });
+```
+
+<h3 id="bigint">BigInt</h3>
+
+Mongoose supports [JavaScript BigInts](https://thecodebarbarian.com/an-overview-of-bigint-in-node-js.html) as a SchemaType.
+BigInts are stored as [64-bit integers in MongoDB (BSON type "long")](https://www.mongodb.com/docs/manual/reference/bson-types/).
+
+```javascript
+const questionSchema = new Schema({
+  answer: BigInt
+});
+const Question = mongoose.model('Question', questionSchema);
+
+const question = new Question({ answer: 42n });
+typeof question.answer; // 'bigint'
 ```
 
 <h2 id="getters"><a href="#getters">Getters</a></h2>

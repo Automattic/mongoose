@@ -235,18 +235,18 @@ const files = Object.keys(docsFilemap.fileMap);
 // api explicitly imported for specific file loading
 const apiReq = require('../docs/source/api');
 
-const wrapMarkdown = (md, baseLayout) => `
+const wrapMarkdown = (md, baseLayout, versionedPath) => `
 extends ${baseLayout}
 
 append style
-  link(rel="stylesheet", href="#{versions.versionedPath}/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="#{versions.versionedPath}/docs/js/native.js")
+  link(rel="stylesheet", href="${versionedPath}/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="${versionedPath}/docs/js/native.js")
   style.
     p { line-height: 1.5em }
 
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
-    <img src="#{versions.versionedPath}/docs/images/pencil.svg" />
+    <img src="${versionedPath}/docs/images/pencil.svg" />
   </a>
   :markdown
 ${md.split('\n').map(line => '    ' + line).join('\n')}
@@ -364,7 +364,11 @@ async function pugify(filename, options, isReload = false) {
     const lines = contents.split('\n');
     lines.splice(2, 0, cpc);
     contents = lines.join('\n');
-    contents = wrapMarkdown(contents, path.relative(path.dirname(filename), path.join(cwd, 'docs/layout')));
+    contents = wrapMarkdown(
+      contents,
+      path.relative(path.dirname(filename), path.join(cwd, 'docs/layout')),
+      versionObj.versionedPath
+    );
     newfile = filename.replace('.md', '.html');
   }
 

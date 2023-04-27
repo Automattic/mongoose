@@ -1,8 +1,8 @@
 declare module 'mongoose' {
 
-  type MongooseQueryAndDocumentMiddleware = 'updateOne' | 'deleteOne' | 'validate';
+  type MongooseQueryAndDocumentMiddleware = 'updateOne' | 'deleteOne';
 
-  type MongooseDistinctDocumentMiddleware = 'save' | 'init';
+  type MongooseDistinctDocumentMiddleware = 'save' | 'init' | 'validate';
   type MongooseDocumentMiddleware = MongooseDistinctDocumentMiddleware | MongooseQueryAndDocumentMiddleware;
 
   type MongooseDistinctQueryMiddleware = 'count' | 'estimatedDocumentCount' | 'countDocuments' | 'deleteMany' | 'distinct' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndReplace' | 'findOneAndUpdate' | 'replaceOne' | 'updateMany';

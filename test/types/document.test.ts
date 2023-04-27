@@ -172,9 +172,7 @@ function gh11435() {
   const ItemSchema = new Schema<Item>({ name: String });
 
   ItemSchema.pre('validate', function preValidate() {
-    if (!(this instanceof Query)) {
-      expectType<Model<unknown>>(this.$model('Item1'));
-    }
+    expectType<Model<unknown>>(this.$model('Item1'));
   });
 }
 

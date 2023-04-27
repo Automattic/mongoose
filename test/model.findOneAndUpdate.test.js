@@ -2403,4 +2403,14 @@ describe('model: findOneAndUpdate:', function() {
 
     assert.ifError(err);
   });
+
+  it('throws error if filter is not an object (gh-13264)', async function() {
+    const schema = new Schema({ name: String });
+    const Model = db.model('Test', schema);
+
+    const err = await Model.findOneAndUpdate('foobar', { name: 'foo' }).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'ObjectParameterError');
+  });
+
 });

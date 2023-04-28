@@ -37,7 +37,7 @@ for (const [filename, file] of Object.entries(docsFilemap.fileMap)) {
       const content = new Content({
         title: `API: ${prop.name}`,
         body: prop.description,
-        url: `${filename}#${prop.anchorId}`
+        url: `${filename.replace(/^docs/, '')}#${prop.anchorId}`
       });
       const err = content.validateSync();
       if (err != null) {

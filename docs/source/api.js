@@ -42,8 +42,7 @@ const files = [
 module.exports = {
   docs: [],
   github: 'https://github.com/Automattic/mongoose/blob/',
-  title: 'API docs',
-  api: true
+  title: 'API docs'
 };
 
 /** @type {DocsObj[]} */

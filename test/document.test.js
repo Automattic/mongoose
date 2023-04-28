@@ -12082,11 +12082,7 @@ describe('document', function() {
 
   it('can set() from top-level on nested schema with strict: false (gh-13327)', async function() {
     const testSchema = new Schema({
-      d: new Schema({}, {
-        strict: false,
-        _id: false
-      }
-      )
+      d: new Schema({}, { strict: false, _id: false })
     });
     const Test = db.model('Test', testSchema);
 

@@ -12079,6 +12079,25 @@ describe('document', function() {
     assert.equal(fromDb.obj.subArr.length, 1);
     assert.equal(fromDb.obj.subArr[0].str, 'subArr.test1');
   });
+
+  it('can set() from top-level on nested schema with strict: false (gh-13327)', async function() {
+    const testSchema = new Schema({
+      d: new Schema({}, {
+        strict: false,
+        _id: false
+      }
+      )
+    });
+    const Test = db.model('Test', testSchema);
+
+    const x = new Test();
+    x.set('d.x.y', 1);
+    assert.strictEqual(x.get('d.x.y'), 1);
+    await x.save();
+
+    const fromDb = await Test.findById(x._id).lean();
+    assert.equal(fromDb.d.x.y, 1);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

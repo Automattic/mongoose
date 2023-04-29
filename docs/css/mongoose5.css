@@ -96,7 +96,7 @@ pre code {
 }
 
 /* change sub-item lists to be more dense */
-.sub-item > .pure-menu-link, .tertiary-item > .pure-menu-link {
+.sub-item > .pure-menu-link {
   padding-top: 0px;
   padding-bottom: 0px;
 }
@@ -108,11 +108,6 @@ pre code {
 li.sub-item {
   font-size: 11pt;
   margin-left: 15px;
-}
-
-li.tertiary-item {
-  font-size: 11pt;
-  margin-left: 30px;
 }
 
 li.version {
@@ -229,7 +224,7 @@ pre {
   font-weight: bold;
 }
 
-.pure-menu-item:not(:first-child), .pure-menu-item.sub-item, .pure-menu-item.tertiary-item {
+.pure-menu-item:not(:first-child), .pure-menu-item.sub-item {
   margin-top: 2px;
 }
 

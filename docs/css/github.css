@@ -1,3 +1,33 @@
+code {
+  background-color: #eee;
+  padding: 2px 4px;
+  font-size: 0.9em;
+  color: #800;
+  border-radius: 4px;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 1em;
+  color: #222;
+}
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 10px 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #333;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+}
+
 /*
 
 github.com style (c) Vasily Polovnyov <vast@whiteants.net>

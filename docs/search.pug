@@ -2,30 +2,6 @@ extends layout
 
 append style
   style.
-    .search-bar {
-      margin-top: 1em;
-    }
-
-    .search-bar input {
-      width: 810px;
-      border: 1px solid #ddd;
-      padding: 0.25em;
-      border-radius: 3px;
-    }
-
-    .search-bar button {
-      background-color: #777;
-      color: white;
-      border: 1px solid transparent;
-      border-radius: 3px;
-      height: 30px;
-      width: 30px;
-      padding: 0px;
-      position: relative;
-      top: 7px;
-      left: 1px;
-    }
-
     .title {
       font-size: 1.5em;
     }
@@ -51,7 +27,7 @@ block content
 
     include includes/native
 
-    div.search-bar
+    div.search
       input#search-input(type="text", placeholder="Search")
       button#search-button
         img(src=`${versions.versionedPath}/docs/images/search.svg`)

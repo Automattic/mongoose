@@ -169,16 +169,21 @@ pre {
 /* Search */
 
 .search {
-  margin-top: 0.25em;
+  margin-top: 0.25em !important; /* important, because regardless of order, the ":not(:first-child)" rule takes precedence */
   margin-bottom: 0.75em;
+  display: flex;
 }
 
 .search input {
   border: 1px solid #ddd;
-  margin-left: 1em;
   padding: 0.25em;
   width: 170px;
   border-radius: 3px;
+  flex: 1;
+}
+
+#search-input-nav {
+  margin-left: 1em;
 }
 
 .search button {
@@ -189,9 +194,11 @@ pre {
   height: 30px;
   width: 30px;
   padding: 0px;
-  position: relative;
-  top: 5px;
-  left: 1px;
+  flex: 0 0 auto;
+}
+
+#search-button-nav {
+  margin-right: 1em;
 }
 
 .search button img {

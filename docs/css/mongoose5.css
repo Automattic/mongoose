@@ -15,6 +15,10 @@ a {
   color: #0971B2;
 }
 
+p {
+  line-height: 1.5em;
+}
+
 h1 a::before,
 h2 a::before,
 h3 a::before,

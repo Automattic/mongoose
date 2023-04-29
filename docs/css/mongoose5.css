@@ -125,10 +125,13 @@ li.version ul.pure-menu-children {
 }
 
 #logo-container {
-  position: relative;
-  top: -4px;
+  padding-top: 0;
   padding-bottom: 6px;
   border-bottom: 1px solid #ddd;
+}
+
+#logo-container > a {
+  display: block;
 }
 
 #menu {

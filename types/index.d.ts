@@ -596,7 +596,8 @@ declare module 'mongoose' {
   export type FlattenMaps<T> = {
     [K in keyof T]: T[K] extends Map<any, infer V>
       ? Record<string, V> : T[K] extends TreatAsPrimitives
-        ? T[K] : FlattenMaps<T[K]>;
+        ? T[K] : T[K] extends Types.DocumentArray<infer ItemType>
+          ? Types.DocumentArray<FlattenMaps<ItemType>> : FlattenMaps<T[K]>;
   };
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;

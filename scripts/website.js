@@ -133,6 +133,7 @@ function getVersions() {
     filteredTags.push([0,0,0]);
   }
 }
+<<<<<<< HEAD
 
 /**
  * Stringify a semver number array
@@ -155,6 +156,30 @@ function getLatestVersion() {
   return { listed: stringifySemverNumber(filteredTags[0]), path: '' };
 }
 
+=======
+
+/**
+ * Stringify a semver number array
+ * @param {number[]} arr The array to stringify
+ * @param {boolean} dotX If "true", return "5.X" instead of "5.5.5"
+ * @returns 
+ */
+function stringifySemverNumber(arr, dotX) {
+  if (dotX) {
+    return `${arr[0]}.x`;  
+  }
+  return `${arr[0]}.${arr[1]}.${arr[2]}`;
+}
+
+/** 
+ * Get the latest version available
+ * @returns {Version}
+ */
+function getLatestVersion() {
+  return { listed: stringifySemverNumber(filteredTags[0]), path: '' };
+}
+
+>>>>>>> 6.x
 /**
  * Get the latest version for the provided major version
  * @param {number} version major version to search for
@@ -232,21 +257,33 @@ try {
 
 const docsFilemap = require('../docs/source/index');
 const files = Object.keys(docsFilemap.fileMap);
+<<<<<<< HEAD
 // api explicitly imported for specific file loading
 const apiReq = require('../docs/source/api');
+=======
+>>>>>>> 6.x
 
 const wrapMarkdown = (md, baseLayout, versionedPath) => `
 extends ${baseLayout}
 
 append style
+<<<<<<< HEAD
   link(rel="stylesheet", href="${versionedPath}/docs/css/inlinecpc.css")
   script(type="text/javascript" src="${versionedPath}/docs/js/native.js")
+=======
+  link(rel="stylesheet", href="#{versions.versionedPath}/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="#{versions.versionedPath}/docs/js/native.js")
+>>>>>>> 6.x
   style.
     p { line-height: 1.5em }
 
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
+<<<<<<< HEAD
     <img src="${versionedPath}/docs/images/pencil.svg" />
+=======
+    <img src="#{versions.versionedPath}/docs/images/pencil.svg" />
+>>>>>>> 6.x
   </a>
   :markdown
 ${md.split('\n').map(line => '    ' + line).join('\n')}
@@ -335,6 +372,7 @@ async function pugify(filename, options, isReload = false) {
   let newfile = undefined;
   options = options || {};
   options.package = pkg;
+  const isAPI = options.api && !filename.endsWith('docs/api.pug');
 
   const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
     filename.replace(cwd, '');
@@ -445,6 +483,16 @@ function startWatch() {
       Promise.all(files.filter(v=> v.startsWith('docs/api')).map(async (file) => {
         const filename = path.join(cwd, file);
         await pugify(filename, docsFilemap.fileMap[file], true);
+      }));
+    }
+  });
+
+  fs.watchFile(path.join(cwd, 'docs/api_split.pug'), {interval: 1000}, (cur, prev) => {
+    if (cur.mtime > prev.mtime) {
+      console.log('docs/api_split.pug modified, reloading all api files');
+      Promise.all(files.filter(v=> v.startsWith('docs/api')).map(async (file) => {
+        const filename = path.join(cwd, file);
+        await pugify(filename, docsFilemap.fileMap[file]);
       }));
     }
   });

@@ -42,7 +42,10 @@ html(lang='en')
                       a.pure-menu-link(href=`${versions.latestVersion.path}/docs/index.html`) Version #{versions.latestVersion.listed}
                   each pastVersion in versions.pastVersions 
                     li.pure-menu-item
-                      a.pure-menu-link(href=`/docs/${pastVersion.path}/index.html`) Version #{pastVersion.listed}
+                      - if ((pastVersion.listed != versions.currentVersion.listed) || versions.versionedDeploy)
+                        a.pure-menu-link(href=`/docs/${pastVersion.path}/index.html`) Version #{pastVersion.listed}
+                      - else
+                        a.pure-menu-link(href=`/docs/index.html`) Version #{pastVersion.listed}
               li.pure-menu-item.search
                 input#search-input-nav(type="text", placeholder="Search")
                 button#search-button-nav

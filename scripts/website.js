@@ -233,12 +233,12 @@ try {
 const docsFilemap = require('../docs/source/index');
 const files = Object.keys(docsFilemap.fileMap);
 
-const wrapMarkdown = (md, baseLayout) => `
+const wrapMarkdown = (md, baseLayout, versionedPath) => `
 extends ${baseLayout}
 
 append style
-  link(rel="stylesheet", href="#{versions.versionedPath}/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="#{versions.versionedPath}/docs/js/native.js")
+  link(rel="stylesheet", href="${versionedPath}/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="${versionedPath}/docs/js/native.js")
   style.
     p { line-height: 1.5em }
 
@@ -293,7 +293,11 @@ async function pugify(filename, options) {
     const lines = contents.split('\n');
     lines.splice(2, 0, cpc);
     contents = lines.join('\n');
-    contents = wrapMarkdown(contents, path.relative(path.dirname(filename), path.join(cwd, 'docs/layout')));
+    contents = wrapMarkdown(
+      contents,
+      path.relative(path.dirname(filename), path.join(cwd, 'docs/layout')),
+      versionObj.versionedPath
+    );
     newfile = filename.replace('.md', '.html');
   }
 

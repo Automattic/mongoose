@@ -48,9 +48,9 @@ module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
 
 module.exports.mochaGlobalTeardown = async function mochaGlobalTeardown() {
   if (mongoinstance) {
-    await mongoinstance.stop();
+    await mongoinstance.stop().catch(() => {});
   }
   if (mongorreplset) {
-    await mongorreplset.stop();
+    await mongorreplset.stop().catch(() => {});
   }
 };

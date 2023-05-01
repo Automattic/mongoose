@@ -1,3 +1,12 @@
+6.11.0 / 2023-05-01
+===================
+ * feat: upgrade to mongodb 4.16.0 for Deno+Atlas connection fix #13337 #13075
+ * perf: speed up creating maps of subdocuments #13280 #13191 #13271
+ * fix(query): set ObjectParameterError if calling findOneAndX() with filter as non-object #13338
+ * fix(document): merge Document $inc calls instead of overwriting #13322
+ * fix(update): handle casting doubly nested arrays with $pullAll #13285
+ * docs: backport documentation versioning changes to 6.x #13253 #13190 [hasezoey](https://github.com/hasezoey)
+
 6.10.5 / 2023-04-06
 ===================
  * perf(document): avoid unnecessary loops, conditionals, string manipulation on Document.prototype.get() for 10x speedup on top-level properties #12953

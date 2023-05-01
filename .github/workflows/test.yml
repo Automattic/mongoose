@@ -78,21 +78,23 @@ jobs:
   test-deno:
     runs-on: ubuntu-20.04
     name: Deno tests
-    env:
-      MONGOMS_VERSION: 6.0.0
-      MONGOMS_PREFER_GLOBAL_PATH: 1
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
       - name: Setup node
         uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
         with:
           node-version: 16
-      - name: Load MongoDB binary cache
-        id: cache-mongodb-binaries
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/mongodb-binaries
-          key: deno-${{ env.MONGOMS_VERSION }}
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.0.2
+      - name: Setup
+        run: |
+          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-6.0.0.tgz
+          tar xf mongodb-linux-x86_64-ubuntu2004-6.0.0.tgz
+          mkdir -p ./data/db/27017 ./data/db/27000
+          printf "\ntimeout: 8000" >> ./.mocharc.yml
+          ./mongodb-linux-x86_64-ubuntu2004-6.0.0/bin/mongod --setParameter ttlMonitorSleepSecs=1 --fork --dbpath ./data/db/27017 --syslog --port 27017
+          sleep 2
+          mongod --version
+          echo `pwd`/mongodb-linux-x86_64-ubuntu2004-6.0.0/bin >> $GITHUB_PATH
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:

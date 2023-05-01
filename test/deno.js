@@ -14,7 +14,7 @@ const Mocha = require('mocha');
 const fs = require('fs');
 const path = require('path');
 
-const fixtures = require('./mocha-fixtures.js')
+// const fixtures = require('./mocha-fixtures.js');
 
 const mocha = new Mocha({
   timeout: 8000,
@@ -22,8 +22,8 @@ const mocha = new Mocha({
 });
 
 // the following is required because mocha somehow does not load "require" options and so needs to be manually set-up
-mocha.globalSetup(fixtures.mochaGlobalSetup);
-mocha.globalTeardown(fixtures.mochaGlobalTeardown);
+// mocha.globalSetup(fixtures.mochaGlobalSetup);
+// mocha.globalTeardown(fixtures.mochaGlobalTeardown);
 
 const testDir = 'test';
 

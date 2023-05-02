@@ -371,7 +371,6 @@ describe('model: findOneAndReplace:', function() {
     const schema = new Schema({ name: String, age: { type: Number, select: false } });
     const Model = db.model('Test', schema);
 
-
     const doc = await Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, {
       upsert: true,
       returnOriginal: false

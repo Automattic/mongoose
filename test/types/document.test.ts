@@ -39,7 +39,7 @@ const Test = model<ITest>('Test', schema);
 void async function main() {
   const doc = await Test.findOne().orFail();
 
-  expectType<Query<any, TestDocument>>(doc.deleteOne());
+  expectType<Promise<TestDocument>>(doc.deleteOne());
 }();
 
 

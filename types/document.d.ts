@@ -107,7 +107,7 @@ declare module 'mongoose' {
     db: Connection;
 
     /** Removes this document from the db. */
-    deleteOne(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
+    deleteOne(options?: QueryOptions): Promise<this>;
 
     /**
      * Takes a populated field and returns it to its unpopulated state. If called with

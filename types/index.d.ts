@@ -594,10 +594,17 @@ declare module 'mongoose' {
   export type UpdateQuery<T> = _UpdateQuery<T> & AnyObject;
 
   export type FlattenMaps<T> = {
-    [K in keyof T]: T[K] extends Map<any, infer V>
-      ? Record<string, V> : T[K] extends TreatAsPrimitives
-        ? T[K] : FlattenMaps<T[K]>;
+    [K in keyof T]: FlattenProperty<T[K]>;
   };
+
+  /**
+   * Separate type is needed for properties of union type (for example, Types.DocumentArray | undefined) to apply conditional check to each member of it
+   * https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types
+   */
+  type FlattenProperty<T> = T extends Map<any, infer V>
+    ? Record<string, V> : T extends TreatAsPrimitives
+      ? T : T extends Types.DocumentArray<infer ItemType>
+        ? Types.DocumentArray<FlattenMaps<ItemType>> : FlattenMaps<T>;
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function;

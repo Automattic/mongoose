@@ -241,8 +241,6 @@ extends ${baseLayout}
 append style
   link(rel="stylesheet", href="${versionedPath}/docs/css/inlinecpc.css")
   script(type="text/javascript" src="${versionedPath}/docs/js/native.js")
-  style.
-    p { line-height: 1.5em }
 
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">

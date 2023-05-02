@@ -1,0 +1,32 @@
+/* CPM ads */
+
+.carbonad{
+  margin-top:0!important;
+  margin-bottom:-3rem!important
+}
+
+#carbonads {
+  position:fixed;
+  right: 0px;
+  bottom: 0px;
+  display:block;
+  width:160px;
+  padding:15px 15px 15px 150px;
+  overflow:hidden;
+  font-size:13px;
+  line-height:1.4;
+  text-align:left;
+  background-color: #fafafa;
+}
+
+@media (max-width: 1170px) {
+  #carbonads {
+    display: none !important;
+  }
+}
+
+#carbonads a{color:#333;text-decoration:none}
+
+.carbon-img{float:left;margin-left:-145px}
+
+.carbon-poweredby{display:block;color:#777!important}

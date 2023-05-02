@@ -352,6 +352,50 @@ async function gh12277() {
   ]);
 }
 
+async function overwriteBulkWriteContents() {
+  type DocumentType<T> = Document<any, any, T> & T;
+
+  interface BaseModelClassDoc {
+    firstname: string;
+  }
+
+  const baseModelClassSchema = new Schema({
+    firstname: String
+  });
+
+  const BaseModel = model<BaseModelClassDoc>('test', baseModelClassSchema);
+
+  expectError(BaseModel.bulkWrite<{ testy: string }>([
+    {
+      insertOne: {
+        document: {
+          test: 'hello'
+        }
+      }
+    }
+  ]));
+
+  BaseModel.bulkWrite<{ testy: string }>([
+    {
+      insertOne: {
+        document: {
+          testy: 'hello'
+        }
+      }
+    }
+  ]);
+
+  BaseModel.bulkWrite([
+    {
+      insertOne: {
+        document: {
+          randomPropertyNotInTypes: 'hello'
+        }
+      }
+    }
+  ]);
+}
+
 export function autoTypedModel() {
   const AutoTypedSchema = autoTypedSchema();
   const AutoTypedModel = model('AutoTypeModel', AutoTypedSchema);

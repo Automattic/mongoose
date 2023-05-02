@@ -5,9 +5,9 @@ html(lang='en')
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
     title Mongoose ODM v#{package.version}
     link(href="//fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700", rel="stylesheet", type="text/css")
-    link(href="docs/css/default.css", rel="stylesheet")
     link(href="docs/css/style.css", rel="stylesheet")
     link(href="docs/css/github.css", rel="stylesheet")
+    link(href="docs/css/carbonads.css", rel="stylesheet")
 
     include ./docs/includes/favicon
 
@@ -16,8 +16,9 @@ html(lang='en')
     meta(name='theme-color', content='#ffffff')
 
     style.
-      code {
+      pre {
         font-size: 1em;
+        line-height: 1;
       }
 
       .sponsor {
@@ -34,37 +35,6 @@ html(lang='en')
       .sponsors a {
         text-decoration: none;
       }
-
-      .carbonad{
-        margin-top:0!important;
-        margin-bottom:-3rem!important
-      }
-
-      #carbonads {
-        position:fixed;
-        right: 0px;
-        bottom: 0px;
-        display:block;
-        width:200px;
-        padding:15px 15px 15px 160px;
-        overflow:hidden;
-        font-size:13px;
-        line-height:1.4;
-        text-align:left;
-        background-color: #fafafa;
-      }
-
-      @media (max-width: 1160px) {
-        #carbonads {
-          display: none !important;
-        }
-      }
-
-      #carbonads a{color:#333;text-decoration:none}
-
-      .carbon-img{float:left;margin-left:-145px}
-
-      .carbon-poweredby{display:block;color:#777!important}
 
       img.sponsor {
         margin-right: 10px;

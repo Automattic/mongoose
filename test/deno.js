@@ -2,46 +2,39 @@
 
 import { createRequire } from "node:module";
 import process from "node:process";
+import { resolve } from "node:path";
+import {fileURLToPath} from "node:url";
 
-import { parse } from "https://deno.land/std/flags/mod.ts"
-const args = parse(Deno.args);
+import { spawn } from "node:child_process";
 
 Error.stackTraceLimit = 100;
 
 const require = createRequire(import.meta.url);
 
-const Mocha = require('mocha');
-const fs = require('fs');
-const path = require('path');
+const fixtures = require('./mocha-fixtures.js')
 
-// const fixtures = require('./mocha-fixtures.js');
+await fixtures.mochaGlobalSetup();
 
-const mocha = new Mocha({
-  timeout: 8000,
-  ...(args.g ? { fgrep: '' + args.g } : {})
+const child_args = [
+  // args is required to be set manually, because there is currently no way to get all arguments from deno
+  '--allow-env', '--allow-read', '--allow-net', '--allow-run', '--allow-sys', '--allow-write',
+  ...Deno.args,
+  resolve(fileURLToPath(import.meta.url), '../deno_mocha.js')
+];
+
+const child = spawn(process.execPath, child_args, { stdio: 'inherit' });
+
+child.on('exit', (code, signal) => {
+  signal ? doExit(-100) : doExit(code);
 });
 
-// the following is required because mocha somehow does not load "require" options and so needs to be manually set-up
-// mocha.globalSetup(fixtures.mochaGlobalSetup);
-// mocha.globalTeardown(fixtures.mochaGlobalTeardown);
+Deno.addSignalListener("SIGINT", () => {
+  console.log("SIGINT");
+  child.kill("SIGINT");
+  doExit(-2);
+});
 
-const testDir = 'test';
-
-const files = fs.readdirSync(testDir).
-  concat(fs.readdirSync(path.join(testDir, 'docs')).map(file => path.join('docs', file))).
-  concat(fs.readdirSync(path.join(testDir, 'helpers')).map(file => path.join('helpers', file)));
-
-const ignoreFiles = new Set(['browser.test.js']);
-
-for (const file of files) {
-  if (!file.endsWith('.test.js') || ignoreFiles.has(file)) {
-    continue;
-  }
-
-  mocha.addFile(path.join(testDir, file));
+async function doExit(code) {
+  await fixtures.mochaGlobalTeardown();
+  Deno.exit(code);
 }
-
-mocha.run(function(failures) {
-  process.exitCode = failures ? 1 : 0;  // exit with non-zero status if there were failures
-  process.exit(process.exitCode);
-});

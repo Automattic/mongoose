@@ -1,4 +1,4 @@
-import { Schema, model, Document, Types, InferSchemaType, FlattenMaps } from 'mongoose';
+import { Schema, model, Types, InferSchemaType, FlattenMaps } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 
 function gh10345() {
@@ -178,4 +178,21 @@ async function gh13345_2() {
   const place = await PlaceModel.findOne().lean().orFail().exec();
   expectAssignable<FlattenMaps<Place>>(place);
   expectType<Record<string, string>>(place.images[0].description);
+}
+
+async function gh13345_3() {
+  const imageSchema = new Schema({
+    url: { required: true, type: String }
+  });
+
+  const placeSchema = new Schema({
+    images: { type: [imageSchema], default: undefined }
+  });
+
+  type Place = InferSchemaType<typeof placeSchema>;
+
+  const PlaceModel = model('Place', placeSchema);
+
+  const place = await PlaceModel.findOne().lean().orFail().exec();
+  expectAssignable<Place>(place);
 }

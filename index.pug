@@ -15,6 +15,8 @@ html(lang='en')
     meta(name='msapplication-TileImage', content='docs/images/favicon/ms-icon-144x144.png')
     meta(name='theme-color', content='#ffffff')
 
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css")
+
     style.
       pre {
         font-size: 1em;
@@ -43,8 +45,8 @@ html(lang='en')
       }
 
   body
-    a#forkbanner(href="http://github.com/Automattic/mongoose")
-      img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
+    a(class="github-fork-ribbon" href="https://github.com/Automattic/mongoose" data-ribbon="Fork me on GitHub" title="Fork me on GitHub" target="_blank").
+      Fork me on GitHub
     #wrap.homepage
       #header
         h1

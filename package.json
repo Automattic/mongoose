@@ -45,7 +45,7 @@
     "crypto-browserify": "3.12.0",
     "dotenv": "16.0.3",
     "dox": "1.0.0",
-    "eslint": "8.37.0",
+    "eslint": "8.39.0",
     "eslint-plugin-markdown": "^3.0.0",
     "eslint-plugin-mocha-no-only": "1.1.1",
     "express": "^4.18.1",

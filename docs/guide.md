@@ -627,7 +627,7 @@ const doc = new PersonModel({ name: 'James T. Kirk' });
 doc.type; // 'Person'
 ```
 
-<h2 id="excludeIndexes"><a href="#excludeIndexes">option: excludeIndexes</h2>
+<h2 id="excludeIndexes"><a href="#excludeIndexes">option: excludeIndexes</a></h2>
 
 `excludeIndexes` is a nested schema exclusive option. Defaults to `false`. When `true`,
 prevents indexes from being created on that subdocument schema.

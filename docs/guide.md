@@ -481,6 +481,7 @@ Valid options:
 - [capped](#capped)
 - [collection](#collection)
 - [discriminatorKey](#discriminatorKey)
+- [excludeIndexes](#excludeIndexes)
 - [id](#id)
 - [_id](#_id)
 - [minimize](#minimize)
@@ -624,6 +625,45 @@ const doc = new PersonModel({ name: 'James T. Kirk' });
 // Without `discriminatorKey`, Mongoose would store the discriminator
 // key in `__t` instead of `type`
 doc.type; // 'Person'
+```
+
+<h2 id="excludeIndexes"><a href="#excludeIndexes">option: excludeIndexes</h2>
+
+`excludeIndexes` is a nested schema exclusive option. Defaults to `false`. When `true`,
+prevents indexes from being created on that subdocument schema.
+
+```javascript
+const BlogPost = Schema({
+  _id: { type: ObjectId },
+  title: { type: String, index: true },
+  desc: String
+});
+const otherSchema = Schema({
+  name: { type: String, index: true }
+}, { excludeIndexes: true });
+
+const User = new Schema({
+  name: { type: String, index: true },
+  blogposts: {
+    type: [BlogPost],
+    excludeIndexes: true
+  },
+  otherblogposts: [{ type: BlogPost, excludeIndexes: true }],
+  blogpost: {
+    type: BlogPost,
+    excludeIndexes: true
+  },
+  otherArr: [otherSchema]
+});
+
+const UserModel = db.model('Test', User);
+await UserModel.init();
+
+const indexes = await UserModel.collection.getIndexes();
+
+// Should only have _id and name indexes
+const indexNames = Object.keys(indexes);
+assert.deepEqual(indexNames.sort(), ['_id_', 'name_1']);
 ```
 
 <h2 id="id"><a href="#id">option: id</a></h2>

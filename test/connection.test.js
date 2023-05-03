@@ -1547,4 +1547,12 @@ describe('connections:', function() {
       // currently cannot write test for continueOnError or errors in general.
     });
   });
+  describe('processConnectionOptions', function() {
+    it('should not throw an error when attempting to mutate unmutable options object gh-13335', async function() {
+      const m = new mongoose.Mongoose();
+      const opts = Object.preventExtensions({});
+      const conn = await m.connect('mongodb://localhost:27017/db?retryWrites=true&w=majority&readPreference=secondaryPreferred', opts);
+      assert.ok(conn);
+    });
+  });
 });

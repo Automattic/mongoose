@@ -629,41 +629,26 @@ doc.type; // 'Person'
 
 <h2 id="excludeIndexes"><a href="#excludeIndexes">option: excludeIndexes</a></h2>
 
-`excludeIndexes` is a nested schema exclusive option. Defaults to `false`. When `true`,
-prevents indexes from being created on that subdocument schema.
+When `excludeIndexes` is `true`, Mongoose will not create indexes from the given subdocument schema.
+This option only works when the schema is used in a subdocument path or document array path, Mongoose ignores this option if set on the top-level schema for a model.
+Defaults to `false`.
 
 ```javascript
-const BlogPost = Schema({
-  _id: { type: ObjectId },
-  title: { type: String, index: true },
-  desc: String
+const childSchema1 = Schema({
+  name: { type: String, index: true }
 });
-const otherSchema = Schema({
+
+const childSchema2 = Schema({
   name: { type: String, index: true }
 }, { excludeIndexes: true });
 
+// Mongoose will create an index on `child1.name`, but **not** `child2.name`, because `excludeIndexes`
+// is true on `childSchema2`
 const User = new Schema({
   name: { type: String, index: true },
-  blogposts: {
-    type: [BlogPost],
-    excludeIndexes: true
-  },
-  otherblogposts: [{ type: BlogPost, excludeIndexes: true }],
-  blogpost: {
-    type: BlogPost,
-    excludeIndexes: true
-  },
-  otherArr: [otherSchema]
+  child1: childSchema1,
+  child2: childSchema2
 });
-
-const UserModel = db.model('Test', User);
-await UserModel.init();
-
-const indexes = await UserModel.collection.getIndexes();
-
-// Should only have _id and name indexes
-const indexNames = Object.keys(indexes);
-assert.deepEqual(indexNames.sort(), ['_id_', 'name_1']);
 ```
 
 <h2 id="id"><a href="#id">option: id</a></h2>

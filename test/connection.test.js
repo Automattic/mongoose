@@ -1554,8 +1554,8 @@ describe('connections:', function() {
     });
     it('should not throw an error when attempting to mutate unmutable options object gh-13335', async function() {
       m = new mongoose.Mongoose();
-      const opts = Object.preventExtensions({});
-      const conn = await m.connect(start.uri + '?retryWrites=true&w=majority&readPreference=secondaryPreferred', opts);
+      const opts = Object.preventExtensions({ readPreference: 'secondaryPreferred' });
+      const conn = await m.connect(start.uri, opts);
       assert.ok(conn);
     });
   });

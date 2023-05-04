@@ -1551,7 +1551,7 @@ describe('connections:', function() {
     let m = null;
     after(async() => {
       await m.disconnect();
-    })
+    });
     it('should not throw an error when attempting to mutate unmutable options object gh-13335', async function() {
       m = new mongoose.Mongoose();
       const opts = Object.preventExtensions({});

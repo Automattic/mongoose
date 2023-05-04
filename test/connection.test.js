@@ -1548,8 +1548,12 @@ describe('connections:', function() {
     });
   });
   describe('processConnectionOptions', function() {
+    let m = null;
+    after(async() => {
+      await m.disconnect();
+    })
     it('should not throw an error when attempting to mutate unmutable options object gh-13335', async function() {
-      const m = new mongoose.Mongoose();
+      m = new mongoose.Mongoose();
       const opts = Object.preventExtensions({});
       const conn = await m.connect(start.uri + '?retryWrites=true&w=majority&readPreference=secondaryPreferred', opts);
       assert.ok(conn);

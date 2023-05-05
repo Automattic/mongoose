@@ -1706,4 +1706,16 @@ describe('model: querying:', function() {
     res[0].testProp = 'something else 42';
     assert.strictEqual(res[0].testProp, '42');
   });
+  it('should not send overwrite option to MongoDB', async function(){
+    const testSchema = new Schema({
+      name: String
+    });
+    mongoose.set('debug', true);
+    const Test = db.model('Test', testSchema);
+    await Test.collection.insertOne({ name: 'Test Testerson' });
+    await Test.findOneAndReplace({}, { name: 'Test' }, { returnDocument: 'before' })
+    const res = Test.findOneAndReplace({}, { name: 'Test' }, { returnDocument: 'before' });
+    mongoose.set('debug', false);
+    assert.equal(res.getOptions().overwrite, undefined);
+  });
 });

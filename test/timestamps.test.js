@@ -542,7 +542,7 @@ describe('timestamps', function() {
     });
 
     it('sets timestamps on findOneAndReplace (gh-9951)', async function() {
-      const doc = await Cat.findOneAndReplace({ name: 'notexistname' }, {}, { upsert: true, new: true });
+      const doc = await Cat.findOneAndReplace({ name: 'notexistname' }, {}, { upsert: true, new: true, overwrite: true });
       assert.ok(doc.createdAt);
       assert.ok(doc.updatedAt);
       assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());

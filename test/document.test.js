@@ -6721,6 +6721,40 @@ describe('document', function() {
     assert.equal(mapTest.toObject({}).test.key1.name, 'value1');
   });
 
+  it('flattenObjectIds option for toObject() (gh-13341) (gh-2790)', function() {
+    const schema = new Schema({
+      _id: 'ObjectId',
+      nested: {
+        id: 'ObjectId'
+      },
+      subdocument: new Schema({}),
+      documentArray: [new Schema({})]
+    }, { versionKey: false });
+
+    let Test = db.model('Test', schema);
+
+    const doc = new Test({
+      _id: new mongoose.Types.ObjectId('0'.repeat(24)),
+      nested: {
+        id: new mongoose.Types.ObjectId('1'.repeat(24))
+      },
+      subdocument: {
+        _id: new mongoose.Types.ObjectId('2'.repeat(24))
+      },
+      documentArray: [{ _id: new mongoose.Types.ObjectId('3'.repeat(24)) }]
+    });
+    assert.deepStrictEqual(doc.toObject({ flattenObjectIds: true }), {
+      _id: '0'.repeat(24),
+      nested: {
+        id: '1'.repeat(24)
+      },
+      subdocument: {
+        _id: '2'.repeat(24)
+      },
+      documentArray: [{ _id: '3'.repeat(24) }]
+    });
+  });
+
   it('`collection` property with strict: false (gh-7276)', async function() {
     const schema = new Schema({}, { strict: false, versionKey: false });
     const Model = db.model('Test', schema);

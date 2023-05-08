@@ -1,3 +1,9 @@
+6.11.1 / 2023-05-08
+===================
+ * fix(query): apply schema-level paths before calculating projection for findOneAndUpdate() #13348 #13340
+ * fix: add SUPPRESS_JEST_WARNINGS environment variable to hide jest warnings #13384 #13373
+ * types(model): allow overwriting expected param type for bulkWrite() #13292 [hasezoey](https://github.com/hasezoey)
+
 6.11.0 / 2023-05-01
 ===================
  * feat: upgrade to mongodb 4.16.0 for Deno+Atlas connection fix #13337 #13075

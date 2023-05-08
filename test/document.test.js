@@ -12107,6 +12107,24 @@ describe('document', function() {
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb.d.x.y, 1);
   });
+
+  it('can set() from top-level on path underneath map of mixed (gh-13327)', async function() {
+    const testSchema = new Schema({
+      c: {
+        type: Map,
+        of: 'Mixed'
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const x = new Test();
+    x.set('c.x.y', 1);
+    assert.strictEqual(x.get('c.x.y'), 1);
+    await x.save();
+
+    const fromDb = await Test.findById(x._id).lean();
+    assert.equal(fromDb.c.x.y, 1);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

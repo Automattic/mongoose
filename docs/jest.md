@@ -4,6 +4,12 @@ Jest is a JavaScript runtime developed by Facebook that is usually used for test
 Because Jest is designed primarily for testing React applications, using it to test Node.js server-side applications comes with a lot of caveats.
 We strongly recommend using a different testing framework, like [Mocha](https://mochajs.org/).
 
+To suppress any Jest warnings from Mongoose, set the `SUPPRESS_JEST_WARNINGS` environment variable:
+
+```
+env SUPPRESS_JEST_WARNINGS=1 npm test
+```
+
 If you choose to delve into dangerous waters and test Mongoose apps with Jest, here's what you need to know:
 
 <h2 id="recommended-testenvironment"><a href="#recommended-testenvironment">Recommended <code>testEnvironment</code></a></h2>

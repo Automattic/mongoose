@@ -2081,4 +2081,14 @@ describe('model: findOneAndUpdate:', function() {
     const doc = await MyModel.findOne();
     assert.deepEqual(doc.toObject().grades, [95, 100, 90]);
   });
+
+  it('throws error if filter is not an object (gh-13264)', async function() {
+    const schema = new Schema({ name: String });
+    const Model = db.model('Test', schema);
+
+    const err = await Model.findOneAndUpdate('foobar', { name: 'foo' }).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'ObjectParameterError');
+  });
+
 });

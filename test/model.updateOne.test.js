@@ -2900,6 +2900,35 @@ describe('model: updateOne: ', function() {
     assert.equal(fromDb.children[0].name, 'Luke Skywalker');
   });
 
+  it('works with doubly nested arrays with $pullAll (gh-13190)', async function() {
+    const multiArraySchema = new Schema({
+      _id: false,
+      label: String,
+      arr: [Number]
+    });
+
+    const baseTestSchema = new Schema({
+      baseLabel: String,
+      mArr: [[multiArraySchema]]
+    });
+
+    const Test = db.model('Test', baseTestSchema);
+
+    const arrB = new Test({
+      baseLabel: 'testx',
+      mArr: [[{ label: 'testInner', arr: [1, 2, 3, 4] }]]
+    });
+    await arrB.save();
+    const res = await Test.updateOne(
+      { baseLabel: 'testx' },
+      { $pullAll: { 'mArr.0.0.arr': [1, 2] } }
+    );
+    assert.equal(res.modifiedCount, 1);
+
+    const { mArr } = await Test.findById(arrB).lean().orFail();
+    assert.deepStrictEqual(mArr, [[{ label: 'testInner', arr: [3, 4] }]]);
+  });
+
   describe('converts dot separated paths to nested structure (gh-10200)', () => {
     it('works with new Model(...)', () => {
       const Payment = getPaymentModel();

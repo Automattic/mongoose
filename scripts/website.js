@@ -333,6 +333,7 @@ async function pugify(filename, options, isReload = false) {
   let newfile = undefined;
   options = options || {};
   options.package = pkg;
+  const isAPI = options.api && !filename.endsWith('docs/api.pug');
 
   const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
     filename.replace(cwd, '');
@@ -443,6 +444,16 @@ function startWatch() {
       Promise.all(files.filter(v=> v.startsWith('docs/api')).map(async (file) => {
         const filename = path.join(cwd, file);
         await pugify(filename, docsFilemap.fileMap[file], true);
+      }));
+    }
+  });
+
+  fs.watchFile(path.join(cwd, 'docs/api_split.pug'), {interval: 1000}, (cur, prev) => {
+    if (cur.mtime > prev.mtime) {
+      console.log('docs/api_split.pug modified, reloading all api files');
+      Promise.all(files.filter(v=> v.startsWith('docs/api')).map(async (file) => {
+        const filename = path.join(cwd, file);
+        await pugify(filename, docsFilemap.fileMap[file]);
       }));
     }
   });

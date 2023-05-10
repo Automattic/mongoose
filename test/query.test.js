@@ -1200,7 +1200,7 @@ describe('Query', function() {
       const q = new Query();
       q.hint(hint);
 
-      const options = q._optionsForExec({ schema: { options: {} } });
+      const options = q._optionsForExec();
       assert.equal(JSON.stringify(options), a);
     });
 

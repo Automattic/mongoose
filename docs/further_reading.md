@@ -15,10 +15,6 @@
     font-size: 1.5em;
   }
 
-  p {
-    line-height: 1.5em;
-  }
-
   hr {
     clear: both;
   }

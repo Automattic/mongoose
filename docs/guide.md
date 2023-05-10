@@ -481,6 +481,7 @@ Valid options:
 - [capped](#capped)
 - [collection](#collection)
 - [discriminatorKey](#discriminatorKey)
+- [excludeIndexes](#excludeIndexes)
 - [id](#id)
 - [_id](#_id)
 - [minimize](#minimize)
@@ -624,6 +625,30 @@ const doc = new PersonModel({ name: 'James T. Kirk' });
 // Without `discriminatorKey`, Mongoose would store the discriminator
 // key in `__t` instead of `type`
 doc.type; // 'Person'
+```
+
+<h2 id="excludeIndexes"><a href="#excludeIndexes">option: excludeIndexes</a></h2>
+
+When `excludeIndexes` is `true`, Mongoose will not create indexes from the given subdocument schema.
+This option only works when the schema is used in a subdocument path or document array path, Mongoose ignores this option if set on the top-level schema for a model.
+Defaults to `false`.
+
+```javascript
+const childSchema1 = Schema({
+  name: { type: String, index: true }
+});
+
+const childSchema2 = Schema({
+  name: { type: String, index: true }
+}, { excludeIndexes: true });
+
+// Mongoose will create an index on `child1.name`, but **not** `child2.name`, because `excludeIndexes`
+// is true on `childSchema2`
+const User = new Schema({
+  name: { type: String, index: true },
+  child1: childSchema1,
+  child2: childSchema2
+});
 ```
 
 <h2 id="id"><a href="#id">option: id</a></h2>

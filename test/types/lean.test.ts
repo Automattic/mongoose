@@ -196,3 +196,13 @@ async function gh13345_3() {
   const place = await PlaceModel.findOne().lean().orFail().exec();
   expectAssignable<Place>(place);
 }
+
+async function gh13382() {
+  const schema = new Schema({
+    name: String
+  });
+  const Test = model('Test', schema);
+
+  const res = await Test.updateOne({}, { name: 'bar' }).lean();
+  expectAssignable<{ matchedCount: number, modifiedCount: number }>(res);
+}

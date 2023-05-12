@@ -6731,7 +6731,7 @@ describe('document', function() {
       documentArray: [new Schema({})]
     }, { versionKey: false });
 
-    let Test = db.model('Test', schema);
+    const Test = db.model('Test', schema);
 
     const doc = new Test({
       _id: new mongoose.Types.ObjectId('0'.repeat(24)),

@@ -3034,4 +3034,21 @@ describe('schema', function() {
       schema.removeVirtual('foo');
     }, { message: 'Attempting to remove virtual "foo" that does not exist.' });
   });
+  it('should throw an error if using schema with "timeseries" option as a nested schema asdf1234', function() {
+    const subSchema = new Schema({
+      name: String
+    }, { timeseries: { timeField: 'timestamp', metaField: 'metadata', granularity: 'hours' } });
+    assert.throws(() => {
+      new Schema({
+        name: String,
+        array: [subSchema]
+      });
+    }, { message: 'Cannot create subschema on key array because it has option timeseries enabled.' });
+    assert.throws(() => {
+      new Schema({
+        name: String,
+        subdoc: subSchema
+      });
+    }, { message: 'Cannot create subschema on key subdoc because it has option timeseries enabled.' });
+  });
 });

@@ -5,3 +5,4 @@ rules:
   no-self-assign: off
 ignorePatterns:
   - deno.js
+  - deno*.js

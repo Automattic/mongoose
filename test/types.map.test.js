@@ -956,6 +956,7 @@ describe('Map', function() {
     });
     doc.myMap.set('abc', { myValue: 'some value' });
     const changes = doc.getChanges();
+
     assert.ok(!changes.$unset);
     assert.deepEqual(changes, { $set: { 'myMap.abc': { myValue: 'some value' } } });
   });

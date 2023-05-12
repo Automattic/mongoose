@@ -11715,6 +11715,19 @@ describe('document', function() {
       assert.ok(err);
       assert.equal(err.errors['prop'].name, 'CastError');
     });
+    it('should correctly increment even if the document has not saved after each increment gh-13274', async function() {
+      const schema = new Schema({
+        coins: Number
+      });
+      const Test = db.model('gh13274', schema);
+      await Test.create({ coins: 0 });
+      const doc = await Test.findOne();
+      doc.$inc('coins', 1000);
+      doc.$inc('coins', 2000);
+      await doc.save();
+      const check = await Test.findOne();
+      assert.equal(check.coins, 3000);
+    });
   });
 
   it('supports virtuals named `isValid` (gh-12124) (gh-6262)', async function() {
@@ -12127,6 +12140,24 @@ describe('document', function() {
 
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb.d.x.y, 1);
+  });
+
+  it('can set() from top-level on path underneath map of mixed (gh-13327)', async function() {
+    const testSchema = new Schema({
+      c: {
+        type: Map,
+        of: 'Mixed'
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const x = new Test();
+    x.set('c.x.y', 1);
+    assert.strictEqual(x.get('c.x.y'), 1);
+    await x.save();
+
+    const fromDb = await Test.findById(x._id).lean();
+    assert.equal(fromDb.c.x.y, 1);
   });
 });
 

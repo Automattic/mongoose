@@ -796,47 +796,19 @@ describe('document', function() {
     it('should propogate toObject to implicitly created schemas gh-13325', async function() {
       const userSchema = Schema({
         firstName: String,
-        companies: {
-          type: [{ companyId: { type: Schema.Types.ObjectId }, companyName: String }] }
+        company: {
+          type: { companyId: { type: Schema.Types.ObjectId }, companyName: String }
+        }
       }, {
         toObject: { virtuals: true }
       });
 
-      userSchema.virtual('companies.details', {
-        ref: 'company',
-        localField: 'companies.companyId',
-        foreignField: '_id',
-        justOne: true
-      });
-
-      userSchema.set('collection', 'users');
+      userSchema.virtual('company.details').get(() => 42);
 
       const User = db.model('User', userSchema);
-      const companySchema = Schema({
-        name: {
-          type: String
-        },
-        legalName: {
-          type: String,
-          required: true
-        }
-      });
-      companySchema.set('collection', 'companies');
-      const Company = db.model('company', companySchema);
-
-      const comp = await Company.create({
-        name: 'Google',
-        legalName: 'Alphabet Inc'
-      });
-      await User.create({
-        firstName: 'Test',
-        companies: [{ companyId: comp._id, companyName: 'Google' }]
-      });
-      const check = await User.findOne().populate('companies.details');
-      // have to do it like this because doing it directly in the assert causes an error.
-      const res = check.companies[0].details;
-      assert(res);
-
+      const user = new User({ firstName: 'test', company: { companyName: 'foo' } });
+      const obj = user.toObject();
+      assert.strictEqual(obj.company.details, 42);
     });
   });
 
@@ -1027,47 +999,23 @@ describe('document', function() {
     it('should propogate toJSON to implicitly created schemas gh-13325', async function() {
       const userSchema = Schema({
         firstName: String,
-        companies: {
-          type: [{ companyId: { type: Schema.Types.ObjectId }, companyName: String }] }
+        company: {
+          type: { companyId: { type: Schema.Types.ObjectId }, companyName: String }
+        }
       }, {
+        id: false,
         toJSON: { virtuals: true }
       });
 
-      userSchema.virtual('companies.details', {
-        ref: 'company',
-        localField: 'companies.companyId',
-        foreignField: '_id',
-        justOne: true
-      });
-
-      userSchema.set('collection', 'users');
+      userSchema.virtual('company.details').get(() => 'foo');
 
       const User = db.model('User', userSchema);
-      const companySchema = Schema({
-        name: {
-          type: String
-        },
-        legalName: {
-          type: String,
-          required: true
-        }
+      const doc = new User({
+        firstName: 'test',
+        company: { companyName: 'Acme Inc' }
       });
-      companySchema.set('collection', 'companies');
-      const Company = db.model('company', companySchema);
-
-      const comp = await Company.create({
-        name: 'Google',
-        legalName: 'Alphabet Inc'
-      });
-      await User.create({
-        firstName: 'Test',
-        companies: [{ companyId: comp._id, companyName: 'Google' }]
-      });
-      const check = await User.findOne().populate('companies.details');
-      // have to do it like this because doing it directly in the assert causes an error.
-      const res = check.companies[0].details;
-      console.log(res);
-      assert(res);
+      const obj = doc.toJSON();
+      assert.strictEqual(obj.company.details, 'foo');
     });
   });
 

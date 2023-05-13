@@ -3034,7 +3034,7 @@ describe('schema', function() {
       schema.removeVirtual('foo');
     }, { message: 'Attempting to remove virtual "foo" that does not exist.' });
   });
-  it('should throw an error if using schema with "timeseries" option as a nested schema asdf1234', function() {
+  it('should throw an error if using schema with "timeseries" option as a nested schema', function() {
     const subSchema = new Schema({
       name: String
     }, { timeseries: { timeField: 'timestamp', metaField: 'metadata', granularity: 'hours' } });
@@ -3043,12 +3043,12 @@ describe('schema', function() {
         name: String,
         array: [subSchema]
       });
-    }, { message: 'Cannot create subschema on key array because it has option timeseries enabled.' });
+    }, { message: 'Cannot create use schema for property "array" because the schema has the timeseries option enabled.' });
     assert.throws(() => {
       new Schema({
         name: String,
         subdoc: subSchema
       });
-    }, { message: 'Cannot create subschema on key subdoc because it has option timeseries enabled.' });
+    }, { message: 'Cannot create use schema for property "subdoc" because the schema has the timeseries option enabled.' });
   });
 });

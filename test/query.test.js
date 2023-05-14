@@ -3708,8 +3708,37 @@ describe('Query', function() {
     );
     assert.strictEqual(res.modifiedCount, 1);
 
-    res = await Test.deleteMany({ n: 'baz' }, { translateAliases: true });
+    res = await Test.updateOne(
+      { n: 'baz' },
+      { name: 'qux' },
+      { translateAliases: true }
+    );
+    assert.strictEqual(res.modifiedCount, 1);
+
+    res = await Test.deleteMany({ n: 'qux' }, { translateAliases: true });
     assert.deepStrictEqual(res.deletedCount, 1);
+  });
+
+  it('translateAliases throws error on conflicting properties (gh-7511)', async function() {
+    const testSchema = new Schema({
+      name: {
+        type: String,
+        alias: 'n'
+      },
+      age: {
+        type: Number
+      }
+    });
+    const Test = db.model('Test', testSchema);
+    await Test.create({ name: 'foo', age: 99 });
+
+    await assert.rejects(async() => {
+      await Test.findOne(
+        { name: 'foo', n: 'bar' },
+        null,
+        { translateAliases: true }
+      );
+    }, /Provided object has both field "n" and its alias "name"/);
   });
 
   it('schema level translateAliases option (gh-7511)', async function() {

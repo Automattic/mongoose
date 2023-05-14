@@ -3703,14 +3703,14 @@ describe('Query', function() {
 
     res = await Test.updateOne(
       { n: 'bar' },
-      { n: 'baz' },
+      { $set: { age: 44 }, n: 'baz' },
       { translateAliases: true }
     );
     assert.strictEqual(res.modifiedCount, 1);
 
     res = await Test.updateOne(
-      { n: 'baz' },
-      { name: 'qux' },
+      { name: 'baz' },
+      { $set: { n: 'qux' } },
       { translateAliases: true }
     );
     assert.strictEqual(res.modifiedCount, 1);

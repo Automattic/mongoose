@@ -161,6 +161,11 @@ declare module 'mongoose' {
      * timestamps. Does nothing if schema-level timestamps are not set.
      */
     timestamps?: boolean | QueryTimestampsConfig;
+    /**
+     * If `true`, convert any aliases in filter, projection, update, and distinct
+     * to their database property names. Defaults to false.
+     */
+    translateAliases?: boolean;
     upsert?: boolean;
     useBigInt64?: boolean;
     writeConcern?: mongodb.WriteConcern;

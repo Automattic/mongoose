@@ -41,7 +41,7 @@ declare module 'mongoose' {
 
   class SchemaTypeOptions<T> {
     type?:
-    T extends string ? StringSchemaDefinition :
+    T extends string ? StringSchemaDefinition | ObjectIdSchemaDefinition :
       T extends number ? NumberSchemaDefinition :
         T extends boolean ? BooleanSchemaDefinition :
           T extends NativeDate ? DateSchemaDefinition :

@@ -46,6 +46,7 @@ module.exports.Mixed = mongoose.Mixed;
 module.exports.Date = mongoose.Date;
 module.exports.Number = mongoose.Number;
 module.exports.Error = mongoose.Error;
+module.exports.MongooseError = mongoose.MongooseError;
 module.exports.now = mongoose.now;
 module.exports.CastError = mongoose.CastError;
 module.exports.SchemaTypeOptions = mongoose.SchemaTypeOptions;

@@ -6,7 +6,7 @@ declare module 'mongoose' {
   type CastError = Error.CastError;
   type SyncIndexesError = Error.SyncIndexesError;
 
-  class MongooseError extends global.Error {
+  export class MongooseError extends global.Error {
     constructor(msg: string);
 
     /** The type of error. "MongooseError" for generic errors. */

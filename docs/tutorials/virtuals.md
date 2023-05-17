@@ -105,6 +105,20 @@ virtual, you need to specify:
 [require:Virtuals.*populate]
 ```
 
+## Virtuals via schema options
+
+Virtuals can also be defined in the schema-options directly without having to use [`.virtual`](../api/schema.html#Schema.prototype.virtual):
+
+```acquit
+[require:Virtuals.*schema-options fullName]
+```
+
+The same also goes for virtual options, like virtual populate:
+
+```acquit
+[require:Virtuals.*schema-options populate]
+```
+
 ## Further Reading
 
 * [Virtuals in Mongoose Schemas](../guide.html#virtuals)

@@ -9,6 +9,7 @@ Virtuals are typically used for computed properties on documents.
 * [Virtuals with Lean](#virtuals-with-lean)
 * [Limitations](#limitations)
 * [Populate](#populate)
+* [Virtuals via schema options](#virtuals-via-schema-options)
 * [Further Reading](#further-reading)
 
 ## Your First Virtual

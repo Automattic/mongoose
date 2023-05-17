@@ -15,6 +15,10 @@ a {
   color: #0971B2;
 }
 
+p {
+  line-height: 1.5em;
+}
+
 h1 a::before,
 h2 a::before,
 h3 a::before,
@@ -50,21 +54,6 @@ h4 a {
   color: #000;
 }
 
-code {
-  background-color: #eee;
-  padding: 2px 4px;
-  font-size: 0.9em;
-  color: #800;
-  border-radius: 4px;
-}
-
-pre code {
-  background-color: transparent;
-  padding: 0;
-  font-size: 1em;
-  color: #222;
-}
-
 #logo {
   width: 62px;
   height: 30px;
@@ -82,25 +71,28 @@ pre code {
 }
 
 .pure-menu-item {
-  height: 28px;
   font-size: 12pt;
   padding-top: 0px;
 }
 
 .pure-menu-link {
   padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+/* change sub-item lists to be more dense */
+.sub-item > .pure-menu-link {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.pure-menu-link:hover, .pure-menu-link.selected {
+  background-color: rgba(0,0,0, 0.1);
 }
 
 li.sub-item {
-  height: 23px;
   font-size: 11pt;
   margin-left: 15px;
-}
-
-li.tertiary-item {
-  height: 23px;
-  font-size: 11pt;
-  margin-left: 30px;
 }
 
 li.version {
@@ -113,10 +105,13 @@ li.version ul.pure-menu-children {
 }
 
 #logo-container {
-  position: relative;
-  top: -4px;
+  padding-top: 0;
   padding-bottom: 6px;
   border-bottom: 1px solid #ddd;
+}
+
+#logo-container > a {
+  display: block;
 }
 
 #menu {
@@ -136,37 +131,27 @@ li.version ul.pure-menu-children {
   left: 250px;
   padding-left: 50px;
   width: 850px;
-  margin-bottom: 250px;
-}
-
-pre {
-  display: block;
-  padding: 9.5px;
-  margin: 10px 0 10px;
-  font-size: 13px;
-  line-height: 1.42857143;
-  color: #333;
-  word-break: break-all;
-  word-wrap: break-word;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+  margin-bottom: 30lvh;
 }
 
 /* Search */
 
 .search {
-  margin-top: 0.25em;
+  margin-top: 0.25em !important; /* important, because regardless of order, the ":not(:first-child)" rule takes precedence */
   margin-bottom: 0.75em;
+  display: flex;
 }
 
 .search input {
   border: 1px solid #ddd;
-  margin-left: 1em;
   padding: 0.25em;
   width: 170px;
   border-radius: 3px;
+  flex: 1;
+}
+
+#search-input-nav {
+  margin-left: 1em;
 }
 
 .search button {
@@ -177,9 +162,11 @@ pre {
   height: 30px;
   width: 30px;
   padding: 0px;
-  position: relative;
-  top: 5px;
-  left: 1px;
+  flex: 0 0 auto;
+}
+
+#search-button-nav {
+  margin-right: 1em;
 }
 
 .search button img {
@@ -205,6 +192,10 @@ pre {
 
 .pure-menu-link.selected {
   font-weight: bold;
+}
+
+.pure-menu-item:not(:first-child), .pure-menu-item.sub-item {
+  margin-top: 2px;
 }
 
 /* Mobile */
@@ -233,7 +224,7 @@ pre {
 
   #menu {
     display: none;
-    position: absolute;
+    position: fixed;
     top: 45px;
     border-top: 1px solid #ddd;
     border-right: 1px solid #ddd;
@@ -251,6 +242,9 @@ pre {
     height: 45px;
     background-color: #eee;
     border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
   #logo {
@@ -277,7 +271,6 @@ pre {
     top: 0px;
     left: 0;
     background-color: #eee;
-    font-size: 10px; /* change this value to increase/decrease button size */
     z-index: 10;
     width: 2em;
     height: 3px;
@@ -289,28 +282,11 @@ pre {
     background: #ddd;
   }
 
-  .menu-link span {
-    position: relative;
-    display: block;
-  }
-
-  .menu-link span,
-  .menu-link span:before,
-  .menu-link span:after {
-    background-color: #333;
-    width: 100%;
-    height: 0.2em;
-  }
-
-  .menu-link span:before,
-  .menu-link span:after {
-    position: absolute;
-    margin-top: -0.6em;
-    content: " ";
-  }
-
-  .menu-link span:after {
-    margin-top: 0.6em;
+  #menuLink {
+    width: 40px;
+    height: 40px;
+    padding: 2.5px;
+    color: rgb(0,0,0);
   }
 
   .active {
@@ -323,47 +299,13 @@ pre {
 }
 
 .pure-menu-item:last-of-type {
-  padding-bottom: 20px;
+  padding-bottom: 5px;
 }
 
-/* CPM ads */
-
-.carbonad{
-  margin-top:0!important;
-  margin-bottom:-3rem!important
+/* dont add padding if it also has other elements (like a sub-list) */
+.pure-menu-link:not(:last-child) {
+  padding-bottom: 0px;
 }
-
-#carbonads {
-  position:fixed;
-  right: 0px;
-  bottom: 0px;
-  display:block;
-  width:160px;
-  padding:15px 15px 15px 150px;
-  overflow:hidden;
-  font-size:13px;
-  line-height:1.4;
-  text-align:left;
-  background-color: #fafafa;
-}
-
-@media (max-width: 1170px) {
-  #carbonads {
-    display: none !important;
-  }
-}
-
-@media (max-width: 1360px) {
-  #jobs {
-    display: none !important;
-  }
-}
-
-#carbonads a{color:#333;text-decoration:none}
-
-.carbon-img{float:left;margin-left:-145px}
-
-.carbon-poweredby{display:block;color:#777!important}
 
 /* job board */
 
@@ -422,4 +364,10 @@ pre {
 
 #jobs .jobs-view-more a {
   color: black;
+}
+
+@media (max-width: 1360px) {
+  #jobs {
+    display: none !important;
+  }
 }

@@ -3,6 +3,12 @@
 const mms = require('mongodb-memory-server');
 
 /*
+
+Note: dont use any mocha-specific things in this file, it may or may not be called without mocha (see deno.js)
+
+*/
+
+/*
  * Default MMS mongodb version is used, unless MONGOMS_VERSION is set (which is set with the matrix in test.yml for CI)
  */
 

@@ -4,6 +4,7 @@
  * Test dependencies.
  */
 
+const sinon = require('sinon');
 const start = require('./common');
 
 const assert = require('assert');
@@ -309,7 +310,6 @@ describe('model: findOneAndReplace:', function() {
     const schema = new Schema({ name: String, age: { type: Number, select: false } });
     const Model = db.model('Test', schema);
 
-
     const doc = await Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, {
       upsert: true,
       returnOriginal: false
@@ -370,5 +370,25 @@ describe('model: findOneAndReplace:', function() {
 
     const doc = await Test.findById(entry);
     assert.strictEqual(doc.name, undefined);
+  });
+
+  it('does not send overwrite or timestamps option to MongoDB', async function() {
+    const testSchema = new Schema({
+      name: String
+    });
+    const Test = db.model('Test', testSchema);
+
+    sinon.stub(Test.collection, 'findOneAndReplace').callsFake(() => Promise.resolve({}));
+
+    await Test.findOneAndReplace(
+      { name: 'Test' },
+      {},
+      { timestamps: true }
+    );
+
+    assert.ok(Test.collection.findOneAndReplace.calledOnce);
+    const opts = Test.collection.findOneAndReplace.getCalls()[0].args[2];
+    assert.ok(!Object.keys(opts).includes('overwrite'));
+    assert.ok(!Object.keys(opts).includes('timestamps'));
   });
 });

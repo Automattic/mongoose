@@ -19,6 +19,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
 * [Copy schema options in `Schema.prototype.add()`](#copy-schema-options-in-schema-prototype-add)
 * [ObjectId bsontype now has lowercase d](#objectid-bsontype-now-has-lowercase-d)
+* [Removed support for custom promise libraries](#removed-support-for-custom-promise-libraries)
 * [TypeScript-specific changes](#typescript-specific-changes)
   * [Removed `LeanDocument` and support for `extends Document`](#removed-leandocument-and-support-for-extends-document)
   * [New parameters for `HydratedDocument`](#new-parameters-for-hydrateddocument)
@@ -251,6 +252,23 @@ oid._bsontype; // 'ObjectId' in Mongoose 7, 'ObjectID' in older versions of Mong
 
 Please update any places where you use `_bsontype` to check if an object is an ObjectId.
 This may also affect libraries that use Mongoose.
+
+<h2 id="removed-support-for-custom-promise-libraries"><a href="#removed-support-for-custom-promise-libraries">Removed Support for custom promise libraries</a></h2>
+
+Mongoose 7 no longer supports plugging in custom promise libraries. So the following no longer makes Mongoose return Bluebird promises in Mongoose 7.
+
+```javascript
+const mongoose = require('mongoose');
+
+// No-op on Mongoose 7
+mongoose.Promise = require('bluebird');
+```
+
+If you want to use Bluebird for all promises globally, you can do the following:
+
+```javascript
+global.Promise = require('bluebird');
+```
 
 <h2 id="typescript-specific-changes"><a href="#typescript-specific-changes">TypeScript-specific Changes</a></h2>
 

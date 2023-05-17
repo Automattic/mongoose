@@ -1529,4 +1529,34 @@ describe('connections:', function() {
     });
     assert.deepEqual(m.connections.length, 0);
   });
+  describe('createCollections()', function() {
+    it('should create collections for all models on the connection with the createCollections() function (gh-13300)', async function() {
+      const m = new mongoose.Mongoose();
+      const schema = new Schema({ name: String });
+      const A = m.model('gh13300A', schema, 'gh13300A');
+      const B = m.model('gh13300B', schema, 'gh13300B');
+      const C = m.model('gh13300C', schema, 'gh13300C');
+      await m.connect(start.uri);
+      await m.connection.createCollections();
+      const collections = await m.connection.db.listCollections().toArray();
+      assert.equal(collections.length, 3);
+      const collectionNames = collections.map(inner => Object.values(inner)[0]);
+      assert.equal(collectionNames.includes(A.modelName), true);
+      assert.equal(collectionNames.includes(B.modelName), true);
+      assert.equal(collectionNames.includes(C.modelName), true);
+      // currently cannot write test for continueOnError or errors in general.
+    });
+  });
+  describe('processConnectionOptions', function() {
+    let m = null;
+    after(async() => {
+      await m.disconnect();
+    });
+    it('should not throw an error when attempting to mutate unmutable options object gh-13335', async function() {
+      m = new mongoose.Mongoose();
+      const opts = Object.preventExtensions({ readPreference: 'secondaryPreferred' });
+      const conn = await m.connect(start.uri, opts);
+      assert.ok(conn);
+    });
+  });
 });

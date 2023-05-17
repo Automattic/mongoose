@@ -1,5 +1,69 @@
+7.1.1 / 2023-05-10
+==================
+ * fix(document): handle set() from top-level underneath a map of mixed #13386
+ * fix: don't modify passed options object to `createConnection()` #13376
+ * types: make lean() not clobber result type for updateOne(), etc. #13389 #13382
+ * types: handle union types in FlattenMaps #13368 #13346 [Jokero](https://github.com/Jokero)
+ * types(document): correct return type for Model.prototype.deleteOne(): promise, not query #13367 #13223
+ * types: update document.d.ts $set function params to match set #13304 [jeffersonlipsky](https://github.com/jeffersonlipsky)
+ * docs: add excludeIndexes to the guide schema options list #13377 #13287
+ * docs: fix broken "fork me" on home page #13336
+
+6.11.1 / 2023-05-08
+===================
+ * fix(query): apply schema-level paths before calculating projection for findOneAndUpdate() #13348 #13340
+ * fix: add SUPPRESS_JEST_WARNINGS environment variable to hide jest warnings #13384 #13373
+ * types(model): allow overwriting expected param type for bulkWrite() #13292 [hasezoey](https://github.com/hasezoey)
+
+6.11.0 / 2023-05-01
+===================
+ * feat: upgrade to mongodb 4.16.0 for Deno+Atlas connection fix #13337 #13075
+ * perf: speed up creating maps of subdocuments #13280 #13191 #13271
+ * fix(query): set ObjectParameterError if calling findOneAndX() with filter as non-object #13338
+ * fix(document): merge Document $inc calls instead of overwriting #13322
+ * fix(update): handle casting doubly nested arrays with $pullAll #13285
+ * docs: backport documentation versioning changes to 6.x #13253 #13190 [hasezoey](https://github.com/hasezoey)
+
+7.1.0 / 2023-04-27
+==================
+ * feat: upgrade mongodb -> 5.3.0
+ * feat(schema): add BigInt support, upgrade mongodb -> 5.3.0 #13318 #13081 #6936
+ * feat: handle MongoDB's new UUID type, export mongoose.Types.UUID #13323 #13103
+ * feat: implement createCollections() #13324
+ * feat(query): add isPathSelectedInclusive function on query #13177
+ * types: added overloads for Schema.pre/post with different values for SchemaPreOptions #12680 [jpilgrim](https://github.com/jpilgrim)
+ * types(query): make lean() flatten out inferred maps into Record<string, V> #13326 #13010
+ * docs: update README deno url #13332
+ * docs: update jsdoc to use full URLs instead of non-prefix absolute urls (also fix some urls) #13328 [hasezoey](https://github.com/hasezoey)
+ * docs: reload api js files on change #13313 [hasezoey](https://github.com/hasezoey)
+ * docs: update website sidebar to be better use-able #13321 [hasezoey](https://github.com/hasezoey)
+ * docs: fix schematype @see links #13310 [hasezoey](https://github.com/hasezoey)
+ * docs(subdocuments): remove callback usage, use deleteOne() rather than remove() re: #13284 #13316
+
+7.0.5 / 2023-04-24
+==================
+ * fix(schema): correctly handle uuids with populate() #13317 #13267
+ * fix(schema): add clusteredIndex to schema options #13286 [jakesjews](https://github.com/jakesjews)
+ * fix(document): use collection.findOne() for saving docs with no changes to avoid firing findOne middleware #13298
+ * types(schema): avoid circular constraint in TSchemaOptions with --incremental by deferring ResolveSchemaOptions<> #13291 #13129
+ * docs(subdocs): fix mention of subdocument ".remove" function #13312 [hasezoey](https://github.com/hasezoey)
+ * docs: add mongoose.Promise removal to migrating to 7 guide #13295
+ * docs: updated formatting of Error Handling section to better highlight the two kinds of possible errors #13279 [Ankit-Mandal](https://github.com/Ankit-Mandal)
+ * docs: fix broken link #13301 #13281
+
+7.0.4 / 2023-04-17
+==================
+ * fix(schema): fix dangling reference to virtual in tree after removeVirtual() #13255 #13085
+ * fix(query): cast query filters on `findOneAndUpdate()` #13220 #13219 [dermasmid](https://github.com/dermasmid)
+ * types(model): aligned watch() type for mongodb 4.6.0 #13208 #13206
+ * docs: fix async function anchors #13226 [hasezoey](https://github.com/hasezoey)
+ * docs: fix schema syntax in exemple #13262 [c-marc](https://github.com/c-marc)
+ * docs: rework scripts to allow easier setting of current and past versions #13222
+#13148 [hasezoey](https://github.com/hasezoey)
+
 6.10.5 / 2023-04-06
 ===================
+ * perf(document): avoid unnecessary loops, conditionals, string manipulation on Document.prototype.get() for 10x speedup on top-level properties #12953
  * fix(model): execute valid write operations if calling bulkWrite() with ordered: false #13218 #13176
  * fix(array): pass-through all parameters #13202 #13201 [hasezoey](https://github.com/hasezoey)
  * fix: improve error message when sorting by empty string #13249 #10182

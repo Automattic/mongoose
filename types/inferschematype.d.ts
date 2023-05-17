@@ -46,7 +46,7 @@ declare module 'mongoose' {
    * @param {TSchema} TSchema A generic of schema type instance.
    * @param {alias} alias Targeted generic alias.
    */
-   type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TSchemaOptions' | 'DocType'> =
+  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TSchemaOptions' | 'DocType'> =
    TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TStaticMethods, infer TSchemaOptions, infer DocType>
      ? {
        EnforcedDocType: EnforcedDocType;
@@ -60,8 +60,7 @@ declare module 'mongoose' {
      }[alias]
      : unknown;
 
-  // Without Omit, this gives us a "Type parameter 'TSchemaOptions' has a circular constraint."
-  type ResolveSchemaOptions<T> = Omit<MergeType<DefaultSchemaOptions, T>, 'fakepropertyname'>;
+  type ResolveSchemaOptions<T> = MergeType<DefaultSchemaOptions, T>;
 
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 

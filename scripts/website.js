@@ -232,19 +232,19 @@ try {
 
 const docsFilemap = require('../docs/source/index');
 const files = Object.keys(docsFilemap.fileMap);
+// api explicitly imported for specific file loading
+const apiReq = require('../docs/source/api');
 
-const wrapMarkdown = (md, baseLayout) => `
+const wrapMarkdown = (md, baseLayout, versionedPath) => `
 extends ${baseLayout}
 
 append style
-  link(rel="stylesheet", href="#{versions.versionedPath}/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="#{versions.versionedPath}/docs/js/native.js")
-  style.
-    p { line-height: 1.5em }
+  link(rel="stylesheet", href="${versionedPath}/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="${versionedPath}/docs/js/native.js")
 
 block content
   <a class="edit-docs-link" href="#{editLink}" target="_blank">
-    <img src="#{versions.versionedPath}/docs/images/pencil.svg" />
+    <img src="${versionedPath}/docs/images/pencil.svg" />
   </a>
   :markdown
 ${md.split('\n').map(line => '    ' + line).join('\n')}
@@ -265,10 +265,75 @@ const cpc = `
 /** Alias to not execute "promisify" often */
 const pugRender = promisify(pug.render);
 
-async function pugify(filename, options) {
+/** Find all urls that are href's and start with "https://mongoosejs.com" */
+const mongooseComRegex = /(?:href=")(https:\/\/mongoosejs\.com\/?)/g;
+/** Regex to detect a versioned path */
+const versionedDocs = /docs\/\d/;
+
+/**
+ * Map urls (https://mongoosejs.com/) to local paths
+ * @param {String} block The String block to look for urls
+ * @param {String} currentUrl The URL the block is for (non-versioned)
+ */
+function mapURLs(block, currentUrl) {
+  let match;
+
+  let out = '';
+  let lastIndex = 0;
+
+  while ((match = mongooseComRegex.exec(block)) !== null) {
+    // console.log("match", match);
+    // cant just use "match.index" byitself, because of the extra "href=\"" condition, which is not factored in in "match.index"
+    let startIndex = match.index + match[0].length - match[1].length;
+    out += block.slice(lastIndex, startIndex);
+    lastIndex = startIndex + match[1].length;
+
+    // somewhat primitive gathering of the url, but should be enough for now
+    let fullUrl = /^\/[^"]+/.exec(block.slice(lastIndex-1));
+
+    let noPrefix = false;
+
+    if (fullUrl) {
+      // extra processing to only use "#otherId" instead of using full url for the same page
+      // at least firefox does not make a difference between a full path and just "#", but it makes debugging paths easier
+      if (fullUrl[0].startsWith(currentUrl)) {
+        let indexMatch = /#/.exec(fullUrl);
+
+        if (indexMatch) {
+          lastIndex += indexMatch.index - 1;
+          noPrefix = true;
+        }
+      }
+    }
+
+    if (!noPrefix) {
+      // map all to the versioned-path, unless a explicit version is given
+      if (!versionedDocs.test(block.slice(lastIndex, lastIndex+10))) {
+        out += versionObj.versionedPath + "/";
+      } else {
+        out += "/";
+      }
+    }
+  }
+
+  out += block.slice(lastIndex);
+
+  return out;
+}
+
+/**
+ * Render a given file with the given options
+ * @param {String} filename The documentation file path to render
+ * @param {import("../docs/source/index").DocsOptions} options The options to use to render the file (api may be overwritten at reload)
+ * @param {Boolean} isReload Indicate this is a reload of the file
+ * @returns 
+ */
+async function pugify(filename, options, isReload = false) {
+  /** Path for the output file */
   let newfile = undefined;
   options = options || {};
   options.package = pkg;
+  const isAPI = options.api && !filename.endsWith('docs/api.pug');
 
   const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
     filename.replace(cwd, '');
@@ -278,6 +343,12 @@ async function pugify(filename, options) {
   let inputFile = filename;
 
   if (options.api) {
+    // only re-parse the api file when in a reload, because it is done once at file load
+    if (isReload) {
+      apiReq.parseFile(options.file);
+      // overwrite original options because of reload
+      options = {...options, ...apiReq.docs.get(options.file)};
+    }
     inputFile = path.resolve(cwd, 'docs/api_split.pug');
   }
 
@@ -292,7 +363,11 @@ async function pugify(filename, options) {
     const lines = contents.split('\n');
     lines.splice(2, 0, cpc);
     contents = lines.join('\n');
-    contents = wrapMarkdown(contents, path.relative(path.dirname(filename), path.join(cwd, 'docs/layout')));
+    contents = wrapMarkdown(
+      contents,
+      path.relative(path.dirname(filename), path.join(cwd, 'docs/layout')),
+      versionObj.versionedPath
+    );
     newfile = filename.replace('.md', '.html');
   }
 
@@ -305,10 +380,13 @@ async function pugify(filename, options) {
 
   if (options.api) {
     newfile = path.resolve(cwd, filename);
-    options.docs = docsFilemap.apiDocs;
+    options.docs = Array.from(docsFilemap.apiDocs.values());
   }
 
   newfile = newfile || filename.replace('.pug', '.html');
+
+  /** Unversioned final documentation path */
+  const docsPath = newfile;
 
   if (versionObj.versionedDeploy) {
     newfile = path.resolve(cwd, path.join('.', versionObj.versionedPath), path.relative(cwd, newfile));
@@ -321,11 +399,13 @@ async function pugify(filename, options) {
 
   options.opencollectiveSponsors = opencollectiveSponsors;
 
-  const str = await pugRender(contents, options).catch(console.error);
+  let str = await pugRender(contents, options).catch(console.error);
 
   if (typeof str !== "string") {
     return;
   }
+
+  str = mapURLs(str, '/' + path.relative(cwd, docsPath))
   
   await fs.promises.writeFile(newfile, str).catch((err) => {
     console.error('could not write', err.stack);
@@ -346,7 +426,7 @@ function startWatch() {
 
     fs.watchFile(watchPath, { interval: 1000 }, (cur, prev) => {
       if (cur.mtime > prev.mtime) {
-        pugify(notifyPath, docsFilemap.fileMap[file]);
+        pugify(notifyPath, docsFilemap.fileMap[file], true);
       }
     });
   });
@@ -354,7 +434,17 @@ function startWatch() {
   fs.watchFile(path.join(cwd, 'docs/layout.pug'), { interval: 1000 }, (cur, prev) => {
     if (cur.mtime > prev.mtime) {
       console.log('docs/layout.pug modified, reloading all files');
-      pugifyAllFiles(true);
+      pugifyAllFiles(true, true);
+    }
+  });
+
+  fs.watchFile(path.join(cwd, 'docs/api_split.pug'), {interval: 1000}, (cur, prev) => {
+    if (cur.mtime > prev.mtime) {
+      console.log('docs/api_split.pug modified, reloading all api files');
+      Promise.all(files.filter(v=> v.startsWith('docs/api')).map(async (file) => {
+        const filename = path.join(cwd, file);
+        await pugify(filename, docsFilemap.fileMap[file], true);
+      }));
     }
   });
 
@@ -369,10 +459,15 @@ function startWatch() {
   });
 }
 
-async function pugifyAllFiles(noWatch) {
+/**
+ * Render all files at once
+ * @param {Boolean} noWatch Set whether to start file watchers for reload
+ * @param {Boolean} isReload Indicate this is a reload of all files
+ */
+async function pugifyAllFiles(noWatch, isReload = false) {
   await Promise.all(files.map(async (file) => {
     const filename = path.join(cwd, file);
-    await pugify(filename, docsFilemap.fileMap[file]);
+    await pugify(filename, docsFilemap.fileMap[file], isReload);
   }));
 
   // enable watch after all files have been done once, and not in the loop to use less-code

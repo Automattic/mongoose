@@ -203,4 +203,35 @@ describe('Lean Tutorial', function() {
     assert.equal(group.members[1].name, 'Kira Nerys');
     // acquit:ignore:end
   });
+
+  it('bigint', async function() {
+    const Person = mongoose.model('Person', new mongoose.Schema({
+      name: String,
+      age: BigInt
+    }));
+    // acquit:ignore:start
+    await Person.deleteMany({});
+    // acquit:ignore:end
+    // Mongoose will convert `age` to a BigInt
+    const { age } = await Person.create({ name: 'Benjamin Sisko', age: 37 });
+    typeof age; // 'bigint'
+
+    // By default, if you store a document with a BigInt property in MongoDB and you
+    // load the document with `lean()`, the BigInt property will be a number
+    let person = await Person.findOne({ name: 'Benjamin Sisko' }).lean();
+    typeof person.age; // 'number'
+    // acquit:ignore:start
+    assert.equal(typeof person.age, 'number');
+    assert.equal(person.age, 37);
+    // acquit:ignore:end
+
+    // Set the `useBigInt64` option to opt in to converting MongoDB longs to BigInts.
+    person = await Person.findOne({ name: 'Benjamin Sisko' }).
+      setOptions({ useBigInt64: true }).
+      lean();
+    typeof person.age; // 'bigint'
+    // acquit:ignore:start
+    assert.equal(typeof person.age, 'bigint');
+    // acquit:ignore:end
+  });
 });

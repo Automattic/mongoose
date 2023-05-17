@@ -1,5 +1,5 @@
-import { Schema, model, Document, Types } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { Schema, model, Types, InferSchemaType, FlattenMaps } from 'mongoose';
+import { expectAssignable, expectError, expectType } from 'tsd';
 
 function gh10345() {
   (function() {
@@ -124,4 +124,85 @@ async function _11767() {
   // expectError(examFound2Obj.questions.$pop);
   // expectError(examFound2Obj.questions[0].populated);
   expectType<string[]>(examFound2Obj.questions[0].answers);
+}
+
+async function gh13010() {
+  const schema = new Schema({
+    name: { required: true, type: Map, of: String }
+  });
+
+  const CountryModel = model('Country', schema);
+
+  await CountryModel.create({
+    name: {
+      en: 'Croatia',
+      ru: 'Хорватия'
+    }
+  });
+
+  const country = await CountryModel.findOne().lean().orFail().exec();
+  expectType<Record<string, string>>(country.name);
+}
+
+async function gh13345_1() {
+  const imageSchema = new Schema({
+    url: { required: true, type: String }
+  });
+
+  const placeSchema = new Schema({
+    images: { required: true, type: [imageSchema] }
+  });
+
+  type Place = InferSchemaType<typeof placeSchema>;
+
+  const PlaceModel = model('Place', placeSchema);
+
+  const place = await PlaceModel.findOne().lean().orFail().exec();
+  expectAssignable<Place>(place);
+}
+
+async function gh13345_2() {
+  const imageSchema = new Schema({
+    description: { required: true, type: Map, of: String },
+    url: { required: true, type: String }
+  });
+
+  const placeSchema = new Schema({
+    images: { required: true, type: [imageSchema] }
+  });
+
+  type Place = InferSchemaType<typeof placeSchema>;
+
+  const PlaceModel = model('Place', placeSchema);
+
+  const place = await PlaceModel.findOne().lean().orFail().exec();
+  expectAssignable<FlattenMaps<Place>>(place);
+  expectType<Record<string, string>>(place.images[0].description);
+}
+
+async function gh13345_3() {
+  const imageSchema = new Schema({
+    url: { required: true, type: String }
+  });
+
+  const placeSchema = new Schema({
+    images: { type: [imageSchema], default: undefined }
+  });
+
+  type Place = InferSchemaType<typeof placeSchema>;
+
+  const PlaceModel = model('Place', placeSchema);
+
+  const place = await PlaceModel.findOne().lean().orFail().exec();
+  expectAssignable<Place>(place);
+}
+
+async function gh13382() {
+  const schema = new Schema({
+    name: String
+  });
+  const Test = model('Test', schema);
+
+  const res = await Test.updateOne({}, { name: 'bar' }).lean();
+  expectAssignable<{ matchedCount: number, modifiedCount: number }>(res);
 }

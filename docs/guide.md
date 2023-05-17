@@ -371,11 +371,34 @@ Now, mongoose will call your getter function every time you access the
 console.log(axl.fullName); // Axl Rose
 ```
 
-If you use `toJSON()` or `toObject()` mongoose will *not* include virtuals
-by default. This includes the output of calling [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
-on a Mongoose document, because [`JSON.stringify()` calls `toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description).
-Pass `{ virtuals: true }` to either
-[`toObject()`](api/document.html#document_Document-toObject) or [`toJSON()`](api/document.html#document_Document-toJSON).
+If you use `toJSON()` or `toObject()` Mongoose will *not* include virtuals by default.
+Pass `{ virtuals: true }` to [`toJSON()`](api/document.html#document_Document-toJSON) or `toObject()` to include virtuals.
+
+```javascript
+// Convert `doc` to a POJO, with virtuals attached
+doc.toObject({ virtuals: true });
+
+// Equivalent:
+doc.toJSON({ virtuals: true });
+```
+
+The above caveat for `toJSON()` also includes the output of calling [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) on a Mongoose document, because [`JSON.stringify()` calls `toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description).
+To include virtuals in `JSON.stringify()` output, you can either call `toObject({ virtuals: true })` on the document before calling `JSON.stringify()`, or set the `toJSON: { virtuals: true }` option on your schema.
+
+```javascript
+// Explicitly add virtuals to `JSON.stringify()` output
+JSON.stringify(doc.toObject({ virtuals: true }));
+
+// Or, to automatically attach virtuals to `JSON.stringify()` output:
+const personSchema = new Schema({
+  name: {
+    first: String,
+    last: String
+  }
+}, {
+  toJSON: { virtuals: true } // <-- include virtuals in `JSON.stringify()`
+});
+```
 
 You can also add a custom setter to your virtual that will let you set both
 first name and last name via the `fullName` virtual.
@@ -481,6 +504,7 @@ Valid options:
 - [capped](#capped)
 - [collection](#collection)
 - [discriminatorKey](#discriminatorKey)
+- [excludeIndexes](#excludeIndexes)
 - [id](#id)
 - [_id](#_id)
 - [minimize](#minimize)
@@ -624,6 +648,30 @@ const doc = new PersonModel({ name: 'James T. Kirk' });
 // Without `discriminatorKey`, Mongoose would store the discriminator
 // key in `__t` instead of `type`
 doc.type; // 'Person'
+```
+
+<h2 id="excludeIndexes"><a href="#excludeIndexes">option: excludeIndexes</a></h2>
+
+When `excludeIndexes` is `true`, Mongoose will not create indexes from the given subdocument schema.
+This option only works when the schema is used in a subdocument path or document array path, Mongoose ignores this option if set on the top-level schema for a model.
+Defaults to `false`.
+
+```javascript
+const childSchema1 = Schema({
+  name: { type: String, index: true }
+});
+
+const childSchema2 = Schema({
+  name: { type: String, index: true }
+}, { excludeIndexes: true });
+
+// Mongoose will create an index on `child1.name`, but **not** `child2.name`, because `excludeIndexes`
+// is true on `childSchema2`
+const User = new Schema({
+  name: { type: String, index: true },
+  child1: childSchema1,
+  child2: childSchema2
+});
 ```
 
 <h2 id="id"><a href="#id">option: id</a></h2>

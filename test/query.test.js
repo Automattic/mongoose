@@ -3985,7 +3985,6 @@ describe('Query', function() {
     let lastOptions = {};
     m.set('debug', function(_coll, _method, ...args) {
       lastOptions = args[args.length - 2];
-      console.log('what is lastOptions', lastOptions)
     });
 
     const connDebug = m.createConnection(start.uri);

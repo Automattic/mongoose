@@ -90,6 +90,19 @@ describe('mongoose module:', function() {
     await mongoose.disconnect();
   });
 
+  it('should collect the args correctly gh-13364', async function() {
+    const util = require('util');
+    const mongoose = new Mongoose();
+    const conn = await mongoose.connect(start.uri);
+    let actual = '';
+    mongoose.set('debug', (collectionName, methodName, ...methodArgs) => {
+      actual = `${collectionName}.${methodName}(${util.inspect(methodArgs).slice(2, -2)})`;
+    });
+    const user = conn.connection.collection('User');
+    await user.findOne({ key: 'value' });
+    assert.equal(`User.findOne({ key: 'value' })`, actual);
+  });
+
   it('{g,s}etting options', function() {
     const mongoose = new Mongoose();
 

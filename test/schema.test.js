@@ -3038,7 +3038,7 @@ describe('schema', function() {
     const ImageSchema = new Schema({
       dimensions: {
         type: new Schema({
-          width: { type: Number, required: true},
+          width: { type: Number, required: true },
           height: { type: Number, required: true }
         }, { timestamps: true }),
         required: true
@@ -3050,7 +3050,6 @@ describe('schema', function() {
     });
 
     const Test = db.model('gh13343', DataSchema);
-    
     const res = await Test.insertMany([
       {
         tags: {
@@ -3058,7 +3057,8 @@ describe('schema', function() {
         }
       }
     ]);
-
     assert.ok(res);
+    assert.ok(res[0].tags.createdAt);
+    assert.ok(res[0].tags.updatedAt);
   });
 });

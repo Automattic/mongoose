@@ -6237,6 +6237,9 @@ describe('Model', function() {
       assert.equal(err.validationErrors[0].errors['age'].name, 'CastError');
       assert.ok(err.results[2] instanceof Error);
       assert.equal(err.results[2].errors['age'].name, 'CastError');
+
+      const docs = await User.find();
+      assert.deepStrictEqual(docs.map(doc => doc.age), [12, 12]);
     });
 
     it('returns writeResult on success', async() => {

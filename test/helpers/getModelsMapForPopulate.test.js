@@ -36,6 +36,6 @@ describe('getModelsMapForPopulate', function() {
 
     const doc = await model.create({ test: new mongoose.Types.ObjectId() });
 
-    await assert.rejects(() => model.findById(doc._id).populate('someVirtual').exec(), /If you are populating a virtual, you must set the localField and foreignField options \(Model: Test\)/);
+    await assert.rejects(() => model.findById(doc._id).populate('someVirtual').exec(), /Cannot populate virtual `someVirtual` on model `Test`, because options `localField` and \/ or `foreignField` are missing/);
   });
 });

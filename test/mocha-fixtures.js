@@ -27,6 +27,7 @@ module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
   let replseturi;
 
   process.env.RUNTIME_DOWNLOAD = '1'; // ensure MMS is able to download binaries in this context
+  process.env.MONGOMS_MD5_CHECK = '1';
 
   // set some options when running in a CI
   if (process.env.CI) {

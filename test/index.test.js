@@ -100,7 +100,7 @@ describe('mongoose module:', function() {
     });
     const user = conn.connection.collection('User');
     await user.findOne({ key: 'value' });
-    assert.equal(`User.findOne({ key: 'value' })`, actual);
+    assert.equal('User.findOne({ key: \'value\' })', actual);
   });
 
   it('{g,s}etting options', function() {

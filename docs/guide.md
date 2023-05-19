@@ -371,11 +371,34 @@ Now, mongoose will call your getter function every time you access the
 console.log(axl.fullName); // Axl Rose
 ```
 
-If you use `toJSON()` or `toObject()` mongoose will *not* include virtuals
-by default. This includes the output of calling [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
-on a Mongoose document, because [`JSON.stringify()` calls `toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description).
-Pass `{ virtuals: true }` to either
-[`toObject()`](api/document.html#document_Document-toObject) or [`toJSON()`](api/document.html#document_Document-toJSON).
+If you use `toJSON()` or `toObject()` Mongoose will *not* include virtuals by default.
+Pass `{ virtuals: true }` to [`toJSON()`](api/document.html#document_Document-toJSON) or `toObject()` to include virtuals.
+
+```javascript
+// Convert `doc` to a POJO, with virtuals attached
+doc.toObject({ virtuals: true });
+
+// Equivalent:
+doc.toJSON({ virtuals: true });
+```
+
+The above caveat for `toJSON()` also includes the output of calling [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) on a Mongoose document, because [`JSON.stringify()` calls `toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description).
+To include virtuals in `JSON.stringify()` output, you can either call `toObject({ virtuals: true })` on the document before calling `JSON.stringify()`, or set the `toJSON: { virtuals: true }` option on your schema.
+
+```javascript
+// Explicitly add virtuals to `JSON.stringify()` output
+JSON.stringify(doc.toObject({ virtuals: true }));
+
+// Or, to automatically attach virtuals to `JSON.stringify()` output:
+const personSchema = new Schema({
+  name: {
+    first: String,
+    last: String
+  }
+}, {
+  toJSON: { virtuals: true } // <-- include virtuals in `JSON.stringify()`
+});
+```
 
 You can also add a custom setter to your virtual that will let you set both
 first name and last name via the `fullName` virtual.

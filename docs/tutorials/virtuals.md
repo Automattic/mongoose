@@ -9,6 +9,7 @@ Virtuals are typically used for computed properties on documents.
 * [Virtuals with Lean](#virtuals-with-lean)
 * [Limitations](#limitations)
 * [Populate](#populate)
+* [Virtuals via schema options](#virtuals-via-schema-options)
 * [Further Reading](#further-reading)
 
 ## Your First Virtual
@@ -103,6 +104,20 @@ virtual, you need to specify:
 
 ```acquit
 [require:Virtuals.*populate]
+```
+
+## Virtuals via schema options
+
+Virtuals can also be defined in the schema-options directly without having to use [`.virtual`](../api/schema.html#Schema.prototype.virtual):
+
+```acquit
+[require:Virtuals.*schema-options fullName]
+```
+
+The same also goes for virtual options, like virtual populate:
+
+```acquit
+[require:Virtuals.*schema-options populate]
 ```
 
 ## Further Reading

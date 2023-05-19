@@ -3051,4 +3051,31 @@ describe('schema', function() {
       });
     }, { message: 'Cannot create use schema for property "subdoc" because the schema has the timeseries option enabled.' });
   });
+  it('should allow timestamps on a sub document when having _id field in the main document gh-13343', async function() {
+    const ImageSchema = new Schema({
+      dimensions: {
+        type: new Schema({
+          width: { type: Number, required: true },
+          height: { type: Number, required: true }
+        }, { timestamps: true }),
+        required: true
+      }
+    }, { timestamps: true });
+
+    const DataSchema = new Schema({
+      tags: { type: ImageSchema, required: false, _id: false }
+    });
+
+    const Test = db.model('gh13343', DataSchema);
+    const res = await Test.insertMany([
+      {
+        tags: {
+          dimensions: { width: 960, height: 589 }
+        }
+      }
+    ]);
+    assert.ok(res);
+    assert.ok(res[0].tags.createdAt);
+    assert.ok(res[0].tags.updatedAt);
+  });
 });

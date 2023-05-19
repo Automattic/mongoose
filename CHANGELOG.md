@@ -1,3 +1,11 @@
+7.1.2 / 2023-05-18
+==================
+ * fix: set timestamps on single nested subdoc in insertMany() #13416 #13343
+ * fix: mention model name in missing virtual option in getModelsMapForPopulate #13408 #13406 [hasezoey](https://github.com/hasezoey)
+ * fix: custom debug function not processing all args #13418 #13364
+ * docs: add virtuals schema options #13407 [hasezoey](https://github.com/hasezoey)
+ * docs: clarify `JSON.stringify()` virtuals docs #13273 [iatenine](https://github.com/iatenine)
+
 7.1.1 / 2023-05-10
 ==================
  * fix(document): handle set() from top-level underneath a map of mixed #13386

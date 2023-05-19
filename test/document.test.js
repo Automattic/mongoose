@@ -792,6 +792,24 @@ describe('document', function() {
 
       assert.strictEqual(myModel.toObject().foo, void 0);
     });
+
+    it('should propogate toObject to implicitly created schemas gh-13325', async function() {
+      const userSchema = Schema({
+        firstName: String,
+        company: {
+          type: { companyId: { type: Schema.Types.ObjectId }, companyName: String }
+        }
+      }, {
+        toObject: { virtuals: true }
+      });
+
+      userSchema.virtual('company.details').get(() => 42);
+
+      const User = db.model('User', userSchema);
+      const user = new User({ firstName: 'test', company: { companyName: 'foo' } });
+      const obj = user.toObject();
+      assert.strictEqual(obj.company.details, 42);
+    });
   });
 
   describe('toJSON', function() {
@@ -977,6 +995,27 @@ describe('document', function() {
       const foundAlicJson = foundAlice.toJSON();
       assert.equal(foundAlicJson.friends, undefined);
       assert.equal(foundAlicJson.name, 'Alic');
+    });
+    it('should propogate toJSON to implicitly created schemas gh-13325', async function() {
+      const userSchema = Schema({
+        firstName: String,
+        company: {
+          type: { companyId: { type: Schema.Types.ObjectId }, companyName: String }
+        }
+      }, {
+        id: false,
+        toJSON: { virtuals: true }
+      });
+
+      userSchema.virtual('company.details').get(() => 'foo');
+
+      const User = db.model('User', userSchema);
+      const doc = new User({
+        firstName: 'test',
+        company: { companyName: 'Acme Inc' }
+      });
+      const obj = doc.toJSON();
+      assert.strictEqual(obj.company.details, 'foo');
     });
   });
 
@@ -6719,6 +6758,40 @@ describe('document', function() {
     mapTest = new Test({});
     mapTest.test.set('key1', { name: 'value1' });
     assert.equal(mapTest.toObject({}).test.key1.name, 'value1');
+  });
+
+  it('flattenObjectIds option for toObject() (gh-13341) (gh-2790)', function() {
+    const schema = new Schema({
+      _id: 'ObjectId',
+      nested: {
+        id: 'ObjectId'
+      },
+      subdocument: new Schema({}),
+      documentArray: [new Schema({})]
+    }, { versionKey: false });
+
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({
+      _id: new mongoose.Types.ObjectId('0'.repeat(24)),
+      nested: {
+        id: new mongoose.Types.ObjectId('1'.repeat(24))
+      },
+      subdocument: {
+        _id: new mongoose.Types.ObjectId('2'.repeat(24))
+      },
+      documentArray: [{ _id: new mongoose.Types.ObjectId('3'.repeat(24)) }]
+    });
+    assert.deepStrictEqual(doc.toObject({ flattenObjectIds: true }), {
+      _id: '0'.repeat(24),
+      nested: {
+        id: '1'.repeat(24)
+      },
+      subdocument: {
+        _id: '2'.repeat(24)
+      },
+      documentArray: [{ _id: '3'.repeat(24) }]
+    });
   });
 
   it('`collection` property with strict: false (gh-7276)', async function() {

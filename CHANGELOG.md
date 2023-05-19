@@ -1,3 +1,12 @@
+7.2.0 / 2023-05-19
+==================
+ * feat: upgrade mongodb -> 5.5.0
+ * feat(document): add flattenObjectIds option to toObject() and toJSON() #13383 #13341
+ * feat(query): add translateAliases option to automatically call translate aliases on query fields #13397 #8678 #7511
+ * feat(schema): propagate toObject and toJSON options to implicitly created schemas #13325
+ * feat(model): add throwOnValidationError option for opting into getting MongooseBulkWriteError if all valid operations succeed in bulkWrite() and insertMany() #13410 #13256
+ * feat(types+mongoose): export MongooseError #13403 #13387 [ramos-ph](https://github.com/ramos-ph)
+
 7.1.2 / 2023-05-18
 ==================
  * fix: set timestamps on single nested subdoc in insertMany() #13416 #13343

@@ -178,6 +178,8 @@ declare module 'mongoose' {
     versionKey?: boolean;
     /** if true, convert Maps to POJOs. Useful if you want to `JSON.stringify()` the result of `toObject()`. */
     flattenMaps?: boolean;
+    /** if true, convert any ObjectIds in the result to 24 character hex strings. */
+    flattenObjectIds?: boolean;
     /** If true, omits fields that are excluded in this document's projection. Unless you specified a projection, this will omit any field that has `select: false` in the schema. */
     useProjection?: boolean;
   }

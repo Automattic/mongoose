@@ -10308,6 +10308,51 @@ describe('model: populate:', function() {
       assert.ok(err.message.indexOf('l1.l22') !== -1, err.message);
     });
 
+    it('propagates toObject options to populate virtuals (gh-13325)', async function() {
+      const userSchema = Schema({
+        firstName: String,
+        companies: {
+          type: [{ companyId: { type: Schema.Types.ObjectId }, companyName: String }]
+        }
+      }, {
+        toObject: { virtuals: true },
+        toJSON: { virtuals: true }
+      });
+
+      userSchema.virtual('companies.details', {
+        ref: 'company',
+        localField: 'companies.companyId',
+        foreignField: '_id',
+        justOne: true
+      });
+
+      const User = db.model('User', userSchema);
+      const companySchema = Schema({
+        name: {
+          type: String
+        },
+        legalName: {
+          type: String,
+          required: true
+        }
+      });
+      const Company = db.model('company', companySchema);
+
+      const comp = await Company.create({
+        name: 'Google',
+        legalName: 'Alphabet Inc'
+      });
+      await User.create({
+        firstName: 'Test',
+        companies: [{ companyId: comp._id, companyName: 'Google' }]
+      });
+      const doc = await User.findOne().populate('companies.details');
+      let obj = doc.toObject();
+      assert.equal(obj.companies[0].details.name, 'Google');
+      obj = doc.toJSON();
+      assert.equal(obj.companies[0].details.name, 'Google');
+    });
+
     it('respects strictPopulate schema option (gh-11290)', async function() {
       const kittySchema = Schema({ name: String }, { strictPopulate: false });
 

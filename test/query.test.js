@@ -3666,6 +3666,99 @@ describe('Query', function() {
 
   });
 
+  it('translateAliases option (gh-7511)', async function() {
+    const testSchema = new Schema({
+      name: {
+        type: String,
+        alias: 'n'
+      },
+      age: {
+        type: Number
+      }
+    });
+    const Test = db.model('Test', testSchema);
+    await Test.create({ name: 'foo', age: 99 });
+
+    let res = await Test.findOne({ n: 'foo' }, { n: 1 }, { translateAliases: true });
+    assert.equal(res.name, 'foo');
+    assert.strictEqual(res.age, void 0);
+
+    res = await Test.find({ n: 'foo' }, { n: 1 }, { translateAliases: true });
+    assert.equal(res.length, 1);
+    assert.equal(res[0].name, 'foo');
+    assert.strictEqual(res[0].age, void 0);
+
+    res = await Test.countDocuments({ n: 'foo' }, { translateAliases: true });
+    assert.strictEqual(res, 1);
+
+    res = await Test.distinct('n').setOptions({ translateAliases: true });
+    assert.deepStrictEqual(res, ['foo']);
+
+    res = await Test.findOneAndUpdate(
+      { n: 'foo' },
+      { n: 'bar' },
+      { returnDocument: 'after', translateAliases: true }
+    );
+    assert.strictEqual(res.name, 'bar');
+
+    res = await Test.updateOne(
+      { n: 'bar' },
+      { $set: { age: 44 }, n: 'baz' },
+      { translateAliases: true }
+    );
+    assert.strictEqual(res.modifiedCount, 1);
+
+    res = await Test.updateOne(
+      { name: 'baz' },
+      { $set: { n: 'qux' } },
+      { translateAliases: true }
+    );
+    assert.strictEqual(res.modifiedCount, 1);
+
+    res = await Test.deleteMany({ n: 'qux' }, { translateAliases: true });
+    assert.deepStrictEqual(res.deletedCount, 1);
+  });
+
+  it('translateAliases throws error on conflicting properties (gh-7511)', async function() {
+    const testSchema = new Schema({
+      name: {
+        type: String,
+        alias: 'n'
+      },
+      age: {
+        type: Number
+      }
+    });
+    const Test = db.model('Test', testSchema);
+    await Test.create({ name: 'foo', age: 99 });
+
+    await assert.rejects(async() => {
+      await Test.findOne(
+        { name: 'foo', n: 'bar' },
+        null,
+        { translateAliases: true }
+      );
+    }, /Provided object has both field "n" and its alias "name"/);
+  });
+
+  it('schema level translateAliases option (gh-7511)', async function() {
+    const testSchema = new Schema({
+      name: {
+        type: String,
+        alias: 'n'
+      },
+      age: {
+        type: Number
+      }
+    }, { translateAliases: true });
+    const Test = db.model('Test', testSchema);
+    await Test.deleteMany({});
+    await Test.create({ name: 'foo', age: 99 });
+
+    const res = await Test.findOne({ n: 'foo' });
+    assert.equal(res.name, 'foo');
+  });
+
   describe('set()', function() {
     it('overwrites top-level keys if setting to undefined (gh-12155)', function() {
       const testSchema = new mongoose.Schema({

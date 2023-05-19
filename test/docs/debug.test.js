@@ -105,7 +105,7 @@ describe('debug: shell', function() {
     await Test.create({ name: 'foo' });
     assert.equal(args.length, 1);
     assert.equal(args[0][1], 'insertOne');
-    assert.strictEqual(args[0][3], undefined);
+    assert.strictEqual(args[0][4], undefined);
 
     await m.disconnect();
   });

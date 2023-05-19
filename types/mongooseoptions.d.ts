@@ -202,5 +202,11 @@ declare module 'mongoose' {
      * @default { transform: true, flattenDecimals: true }
      */
     toObject?: ToObjectOptions;
+
+    /**
+     * If `true`, convert any aliases in filter, projection, update, and distinct
+     * to their database property names. Defaults to false.
+     */
+    translateAliases?: boolean;
   }
 }

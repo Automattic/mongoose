@@ -1899,4 +1899,18 @@ describe('types array', function() {
 
     m.Schema.Types.Array.options.castNonArrays = true;
   });
+
+  it('supports setting nested arrays directly (gh-13372)', async function() {
+    const Test = db.model('Test', new Schema({ intArr: [[Number]] }));
+
+    const intArr = [[1, 2], [3, 4]];
+    const doc = Test.hydrate({ intArr });
+
+    doc.intArr[1][1] = 5;
+    assert.deepStrictEqual(doc.getChanges(), {
+      $set: {
+        'intArr.1.1': 5
+      }
+    });
+  });
 });

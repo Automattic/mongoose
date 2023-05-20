@@ -2562,7 +2562,7 @@ describe('schema', function() {
     });
 
     const casted = schema.path('ids').cast([[]]);
-    assert.equal(casted[0].$path(), 'ids.$');
+    assert.equal(casted[0].$path(), 'ids.0');
   });
 
   describe('cast option (gh-8407)', function() {

@@ -1036,8 +1036,11 @@ describe('timestamps', function() {
     await Test.updateMany({}, [{ $set: { updateCounter: 1 } }]);
     // oddly enough, the null property is not accessible. Doing check.null doesn't return anything even though
     // if you were to console.log() the output of a findOne you would be able to see it. This is the workaround.
-    const check = await Test.countDocuments({ null: { $exists: true } });
-    assert.equal(check, 0);
+    const test = await Test.countDocuments({ null: { $exists: true } });
+    assert.equal(test, 0);
+    // now we need to make sure that the solution didn't prevent the updateCounter addition
+    const check = await Test.findOne();
+    assert(check.toString().includes('updateCounter: 1'));
   });
 });
 

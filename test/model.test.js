@@ -3945,7 +3945,14 @@ describe('Model', function() {
 
         const doc = await Parent.findOne();
         assert.ok(doc.children[0].updatedAt.valueOf() > end);
+      });
 
+      it('throws readable error if invalid op', async function() {
+        const Test = db.model('Test', Schema({ name: String }));
+        await assert.rejects(
+          () => Test.bulkWrite([Promise.resolve(42)]),
+          'MongooseError: Invalid op passed to `bulkWrite()`: Promise { 42 }'
+        );
       });
 
       it('with timestamps and replaceOne (gh-5708)', async function() {

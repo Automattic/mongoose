@@ -1009,6 +1009,36 @@ describe('timestamps', function() {
       assert.deepStrictEqual(keys, ['location', '_id', 'createdAt', 'updatedAt']);
     }
   });
+  it('should avoid setting null update when updating document with timestamps gh-13379', async function() {
+
+    const subWithTimestampSchema = new Schema({
+      subName: {
+        type: String,
+        default: 'anonymous',
+        required: true
+      }
+    });
+
+    subWithTimestampSchema.set('timestamps', true);
+
+    const testSchema = new Schema({
+      name: String,
+      sub: { type: subWithTimestampSchema }
+    });
+
+    const Test = db.model('gh13379', testSchema);
+
+    const doc = new Test({
+      name: 'Test Testerson',
+      sub: { subName: 'John' }
+    });
+    await doc.save();
+    await Test.updateMany({}, [{ $set: { updateCounter: 1 } }]);
+    // oddly enough, the null property is not accessible. Doing check.null doesn't return anything even though
+    // if you were to console.log() the output of a findOne you would be able to see it. This is the workaround.
+    const check = await Test.countDocuments({ null: { $exists: true } });
+    assert.equal(check, 0);
+  });
 });
 
 async function delay(ms) {

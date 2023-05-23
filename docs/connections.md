@@ -249,19 +249,9 @@ replica set, Mongoose will emit 'disconnected' if it loses connectivity to the r
 
 <h2 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h2>
 
-For long running applications, it is often prudent to enable `keepAlive`
-with a number of milliseconds. Without it, after some period of time
-you may start to see `"connection closed"` errors for what seems like
-no reason. If so, after
-[reading this](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html),
-you may decide to enable `keepAlive`:
-
-```javascript
-mongoose.connect(uri, { keepAlive: true, keepAliveInitialDelay: 300000 });
-```
-
-`keepAliveInitialDelay` is the number of milliseconds to wait before initiating `keepAlive` on the socket.
-`keepAlive` is true by default since mongoose 5.2.0.
+Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors errors.
+However, `keepAlive` has been `true` by default since Mongoose 5.2.0, and the `keepAlive` is deprecated as of Mongoose 7.2.0.
+Please remove `keepAlive` and `keepAliveInitialDelay` options from your Mongoose connections.
 
 <h2 id="replicaset_connections"><a href="#replicaset_connections">Replica Set Connections</a></h2>
 

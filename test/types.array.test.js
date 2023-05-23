@@ -1900,7 +1900,7 @@ describe('types array', function() {
     m.Schema.Types.Array.options.castNonArrays = true;
   });
 
-  it('supports setting nested arrays directly (gh-13372)', async function() {
+  it('supports setting nested arrays directly (gh-13372)', function() {
     const Test = db.model('Test', new Schema({ intArr: [[Number]] }));
 
     const intArr = [[1, 2], [3, 4]];

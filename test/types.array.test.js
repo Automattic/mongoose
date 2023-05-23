@@ -1906,9 +1906,11 @@ describe('types array', function() {
     const intArr = [[1, 2], [3, 4]];
     const doc = Test.hydrate({ intArr });
 
+    doc.intArr[0][0] = 2;
     doc.intArr[1][1] = 5;
     assert.deepStrictEqual(doc.getChanges(), {
       $set: {
+        'intArr.0.0': 2,
         'intArr.1.1': 5
       }
     });

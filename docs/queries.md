@@ -61,7 +61,7 @@ const query = Person.findOne({ 'name.last': 'Ghost' });
 query.select('name occupation');
 
 // execute the query at a later time
-const person = query.exec();
+const person = await query.exec();
  // Prints "Space Ghost is a talk show host."
 console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation);
 ```

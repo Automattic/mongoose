@@ -85,7 +85,7 @@ await Person.
   exec();
 
 // Using query builder
-Person.
+await Person.
   find({ occupation: /host/ }).
   where('name.last').equals('Ghost').
   where('age').gt(17).lt(66).

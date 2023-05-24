@@ -1,3 +1,14 @@
+7.2.1 / 2023-05-24
+==================
+ * fix(array): track correct changes when setting nested array of primitives #13422 #13372
+ * fix(query): handle plus path in projection with findOneAndUpdate() #13437 #13413
+ * fix(cursor): handle calling skipMiddlewareFunction() in pre('find') middleware with cursors #13436 #13411
+ * fix(model): include inspect output in castBulkWrite() error #13426
+ * fix: avoid setting null property when updating using update pipeline with child timestamps but no top-level timestamps #13427 #13379
+ * docs: remove callback based examples #13433 #13401
+ * docs(connections): add details about keepAlive deprecation #13431
+ * docs: add list of supported patterns for error message templating #13425 #13311
+
 7.2.0 / 2023-05-19
 ==================
  * feat: upgrade mongodb -> 5.5.0

@@ -2091,4 +2091,32 @@ describe('model: findOneAndUpdate:', function() {
     assert.equal(err.name, 'ObjectParameterError');
   });
 
+  it('handles plus path in projection (gh-13413)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: String,
+      nickName: {
+        type: String,
+        select: false
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const entry = await Test.create({
+      name: 'Test Testerson',
+      nickName: 'Quiz'
+    });
+
+    let res = await Test.findOneAndUpdate(
+      { _id: entry._id },
+      { $set: { name: 'Test' } },
+      { projection: '+nickName', returnDocument: 'after' }
+    );
+    assert.equal(res.nickName, 'Quiz');
+
+    res = await Test.findOneAndDelete(
+      { _id: entry._id },
+      { projection: '+nickName', returnDocument: 'before' }
+    );
+    assert.equal(res.nickName, 'Quiz');
+  });
 });

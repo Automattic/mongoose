@@ -805,6 +805,73 @@ describe('QueryCursor', function() {
     const docs = await Example.find().sort('foo');
     assert.deepStrictEqual(docs.map(d => d.foo), ['example1', 'example2']);
   });
+  it('should allow middleware to run before applying _optionsForExec() gh-13417', async function() {
+    const testSchema = new Schema({
+      a: Number,
+      b: Number,
+      c: Number
+    });
+    testSchema.pre('find', function() {
+      this.select('-c');
+    });
+    const Test = db.model('gh13417', testSchema);
+    await Test.create([{ a: 1, b: 1, c: 1 }, { a: 2, b: 2, c: 2 }]);
+    const cursorMiddleSelect = [];
+    let r;
+    const cursor = Test.find().select('-b').sort({ a: 1 }).cursor();
+    // eslint-disable-next-line no-cond-assign
+    while (r = await cursor.next()) {
+      cursorMiddleSelect.push(r);
+    }
+    assert.equal(typeof cursorMiddleSelect[0].b, 'undefined');
+    assert.equal(typeof cursorMiddleSelect[1].b, 'undefined');
+    assert.equal(typeof cursorMiddleSelect[0].c, 'undefined');
+    assert.equal(typeof cursorMiddleSelect[1].c, 'undefined');
+  });
+
+  it('handles skipMiddlewareFunction() (gh-13411)', async function() {
+    const schema = new mongoose.Schema({ name: String });
+
+    schema.pre('find', async() => {
+      throw mongoose.skipMiddlewareFunction();
+    });
+
+    const Movie = db.model('Movie', schema);
+
+    await Movie.deleteMany({});
+    await Movie.create([
+      { name: 'Kickboxer' },
+      { name: 'Ip Man' },
+      { name: 'Enter the Dragon' }
+    ]);
+
+    const arr = [];
+    await Movie.find({}).cursor().eachAsync(doc => arr.push(doc.name));
+    assert.strictEqual(arr.length, 0);
+  });
+
+  it('throws if calling skipMiddlewareFunction() with non-empty array (gh-13411)', async function() {
+    const schema = new mongoose.Schema({ name: String });
+
+    schema.pre('find', (next) => {
+      next(mongoose.skipMiddlewareFunction([{ name: 'bar' }]));
+    });
+
+    const Movie = db.model('Movie', schema);
+
+    await Movie.deleteMany({});
+    await Movie.create([
+      { name: 'Kickboxer' },
+      { name: 'Ip Man' },
+      { name: 'Enter the Dragon' }
+    ]);
+
+    const err = await Movie.find().cursor().
+      eachAsync(() => {}).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.message.includes('skipMiddlewareFunction'), err.message);
+  });
 });
 
 async function delay(ms) {

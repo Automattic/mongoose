@@ -343,13 +343,12 @@ will all result in a [CastError](validation.html#cast-errors) once validated, me
 
 ```javascript
 const Assignment = mongoose.model('Assignment', { dueDate: Date });
-Assignment.findOne(function(err, doc) {
-  doc.dueDate.setMonth(3);
-  doc.save(callback); // THIS DOES NOT SAVE YOUR CHANGE
+const doc = await Assignment.findOne();
+doc.dueDate.setMonth(3);
+await doc.save(); // THIS DOES NOT SAVE YOUR CHANGE
 
-  doc.markModified('dueDate');
-  doc.save(callback); // works
-});
+doc.markModified('dueDate');
+await doc.save(); // works
 ```
 
 <h3 id="buffers">Buffer</h3>

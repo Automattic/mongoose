@@ -828,6 +828,50 @@ describe('QueryCursor', function() {
     assert.equal(typeof cursorMiddleSelect[0].c, 'undefined');
     assert.equal(typeof cursorMiddleSelect[1].c, 'undefined');
   });
+
+  it('handles skipMiddlewareFunction() (gh-13411)', async function() {
+    const schema = new mongoose.Schema({ name: String });
+
+    schema.pre('find', async() => {
+      throw mongoose.skipMiddlewareFunction();
+    });
+
+    const Movie = db.model('Movie', schema);
+
+    await Movie.deleteMany({});
+    await Movie.create([
+      { name: 'Kickboxer' },
+      { name: 'Ip Man' },
+      { name: 'Enter the Dragon' }
+    ]);
+
+    const arr = [];
+    await Movie.find({}).cursor().eachAsync(doc => arr.push(doc.name));
+    assert.strictEqual(arr.length, 0);
+  });
+
+  it('throws if calling skipMiddlewareFunction() with non-empty array (gh-13411)', async function() {
+    const schema = new mongoose.Schema({ name: String });
+
+    schema.pre('find', (next) => {
+      next(mongoose.skipMiddlewareFunction([{ name: 'bar' }]));
+    });
+
+    const Movie = db.model('Movie', schema);
+
+    await Movie.deleteMany({});
+    await Movie.create([
+      { name: 'Kickboxer' },
+      { name: 'Ip Man' },
+      { name: 'Enter the Dragon' }
+    ]);
+
+    const err = await Movie.find().cursor().
+      eachAsync(() => {}).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.message.includes('skipMiddlewareFunction'), err.message);
+  });
 });
 
 async function delay(ms) {

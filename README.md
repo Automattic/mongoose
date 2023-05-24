@@ -181,17 +181,13 @@ Once we have our model, we can then instantiate it, and save it:
 ```js
 const instance = new MyModel();
 instance.my.key = 'hello';
-instance.save(function(err) {
-  //
-});
+await instance.save();
 ```
 
 Or we can find documents from the same collection
 
 ```js
-MyModel.find({}, function(err, docs) {
-  // docs.forEach
-});
+await MyModel.find({});
 ```
 
 You can also `findOne`, `findById`, `update`, etc.
@@ -208,8 +204,8 @@ For more details check out [the docs](http://mongoosejs.com/docs/queries.html).
 ```js
 const conn = mongoose.createConnection('your connection string');
 const MyModel = conn.model('ModelName', schema);
-const m = new MyModel;
-m.save(); // works
+const m = new MyModel();
+await m.save(); // works
 ```
 
 vs
@@ -217,8 +213,8 @@ vs
 ```js
 const conn = mongoose.createConnection('your connection string');
 const MyModel = mongoose.model('ModelName', schema);
-const m = new MyModel;
-m.save(); // does not work b/c the default connection object was never connected
+const m = new MyModel();
+await m.save(); // does not work b/c the default connection object was never connected
 ```
 
 ### Embedded Documents
@@ -241,25 +237,18 @@ const post = new BlogPost();
 // create a comment
 post.comments.push({ title: 'My comment' });
 
-post.save(function(err) {
-  if (!err) console.log('Success!');
-});
+await post.save();
 ```
 
 The same goes for removing them:
 
 ```js
-BlogPost.findById(myId, function(err, post) {
-  if (!err) {
-    post.comments[0].remove();
-    post.save(function(err) {
-      // do something
-    });
-  }
-});
+const post = await BlogPost.findById(myId);
+post.comments[0].deleteOne();
+await post.save();
 ```
 
-Embedded documents enjoy all the same features as your models. Defaults, validators, middleware. Whenever an error occurs, it's bubbled to the `save()` error callback, so error handling is a snap!
+Embedded documents enjoy all the same features as your models. Defaults, validators, middleware.
 
 
 ### Middleware

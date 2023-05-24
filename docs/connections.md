@@ -42,7 +42,7 @@ mongoose to establish a connection to MongoDB.
 mongoose.connect('mongodb://127.0.0.1:27017/myapp');
 const MyModel = mongoose.model('Test', new Schema({ name: String }));
 // Works
-MyModel.findOne(function(error, result) { /* ... */ });
+await MyModel.findOne();
 ```
 
 That's because mongoose buffers model function calls internally. This
@@ -52,12 +52,14 @@ connecting.
 
 ```javascript
 const MyModel = mongoose.model('Test', new Schema({ name: String }));
-// Will just hang until mongoose successfully connects
-MyModel.findOne(function(error, result) { /* ... */ });
+const promise = MyModel.findOne();
 
 setTimeout(function() {
   mongoose.connect('mongodb://127.0.0.1:27017/myapp');
 }, 60000);
+
+// Will just hang until mongoose successfully connects
+await promise;
 ```
 
 To disable buffering, turn off the [`bufferCommands` option on your schema](guide.html#bufferCommands).

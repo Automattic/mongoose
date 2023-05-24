@@ -832,7 +832,7 @@ describe('QueryCursor', function() {
   it('handles skipMiddlewareFunction() (gh-13411)', async function() {
     const schema = new mongoose.Schema({ name: String });
 
-    schema.pre('find', async () => {
+    schema.pre('find', async() => {
       throw mongoose.skipMiddlewareFunction();
     });
 

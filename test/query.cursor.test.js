@@ -818,7 +818,8 @@ describe('QueryCursor', function() {
     await Test.create([{ a: 1, b: 1, c: 1 }, { a: 2, b: 2, c: 2 }]);
     const cursorMiddleSelect = [];
     let r;
-    let cursor = Test.find().select('-b').sort({ a: 1 }).cursor();
+    const cursor = Test.find().select('-b').sort({ a: 1 }).cursor();
+    // eslint-disable-next-line no-cond-assign
     while (r = await cursor.next()) {
       cursorMiddleSelect.push(r);
     }

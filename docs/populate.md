@@ -94,14 +94,12 @@ So far we haven't done anything much different. We've merely created a
 `author` using the query builder:
 
 ```javascript
-Story.
+const story = await Story.
   findOne({ title: 'Casino Royale' }).
   populate('author').
-  exec(function(err, story) {
-    if (err) return handleError(err);
-    console.log('The author is %s', story.author.name);
-    // prints "The author is Ian Fleming"
-  });
+  exec();
+// prints "The author is Ian Fleming"
+console.log('The author is %s', story.author.name);
 ```
 
 Populated paths are no longer set to their original `_id` , their value
@@ -118,13 +116,9 @@ You can manually populate a property by setting it to a document. The document
 must be an instance of the model your `ref` property refers to.
 
 ```javascript
-Story.findOne({ title: 'Casino Royale' }, function(error, story) {
-  if (error) {
-    return handleError(error);
-  }
-  story.author = author;
-  console.log(story.author.name); // prints "Ian Fleming"
-});
+const story = await Story.findOne({ title: 'Casino Royale' });
+story.author = author;
+console.log(story.author.name); // prints "Ian Fleming"
 ```
 
 <h2 id="checking-populated"><a href="#checking-populated">Checking Whether a Field is Populated</a></h2>
@@ -192,18 +186,14 @@ documents? This can be accomplished by passing the usual
 to the populate method:
 
 ```javascript
-Story.
+const story = await Story.
   findOne({ title: /casino royale/i }).
-  populate('author', 'name'). // only return the Persons name
-  exec(function(err, story) {
-    if (err) return handleError(err);
-
-    console.log('The author is %s', story.author.name);
-    // prints "The author is Ian Fleming"
-
-    console.log('The authors age is %s', story.author.age);
-    // prints "The authors age is null"
-  });
+  populate('author', 'name').
+  exec(); // only return the Persons name
+// prints "The author is Ian Fleming"
+console.log('The author is %s', story.author.name);
+// prints "The authors age is null"
+console.log('The authors age is %s', story.author.age);
 ```
 
 <h2 id="populating-multiple-paths"><a href="#populating-multiple-paths">Populating Multiple Paths</a></h2>
@@ -211,7 +201,7 @@ Story.
 What if we wanted to populate multiple paths at the same time?
 
 ```javascript
-Story.
+await Story.
   find({ /* ... */ }).
   populate('fans').
   populate('author').
@@ -224,12 +214,12 @@ one will take effect.
 ```javascript
 // The 2nd `populate()` call below overwrites the first because they
 // both populate 'fans'.
-Story.
+await Story.
   find().
   populate({ path: 'fans', select: 'name' }).
   populate({ path: 'fans', select: 'email' });
 // The above is equivalent to:
-Story.find().populate({ path: 'fans', select: 'email' });
+await Story.find().populate({ path: 'fans', select: 'email' });
 ```
 
 <h2 id="query-conditions"><a href="#query-conditions">Query conditions and other options</a></h2>
@@ -238,7 +228,7 @@ What if we wanted to populate our fans array based on their age and
 select just their names?
 
 ```javascript
-Story.
+await Story.
   find().
   populate({
     path: 'fans',
@@ -283,7 +273,7 @@ does **not** limit on a per-document basis for backwards compatibility. For exam
 suppose you have 2 stories:
 
 ```javascript
-Story.create([
+await Story.create([
   { title: 'Casino Royale', fans: [1, 2, 3, 4, 5, 6, 7, 8] },
   { title: 'Live and Let Die', fans: [9, 10] }
 ]);
@@ -341,22 +331,20 @@ But, if you have a good reason to want an array of child pointers, you
 can `push()` documents onto the array as shown below.
 
 ```javascript
-story1.save();
+await story1.save();
 
 author.stories.push(story1);
-author.save(callback);
+await author.save();
 ```
 
 This allows us to perform a `find` and `populate` combo:
 
 ```javascript
-Person.
+const person = await Person.
   findOne({ name: 'Ian Fleming' }).
-  populate('stories'). // only works if we pushed refs to children
-  exec(function(err, person) {
-    if (err) return handleError(err);
-    console.log(person);
-  });
+  populate('stories').
+  exec(); // only works if we pushed refs to children
+console.log(person);
 ```
 
 It is debatable that we really want two sets of pointers as they may get
@@ -364,12 +352,10 @@ out of sync. Instead we could skip populating and directly `find()` the
 stories we are interested in.
 
 ```javascript
-Story.
+const stories = await Story.
   find({ author: author._id }).
-  exec(function(err, stories) {
-    if (err) return handleError(err);
-    console.log('The stories are an array: ', stories);
-  });
+  exec();
+console.log('The stories are an array: ', stories);
 ```
 
 The documents returned from
@@ -430,7 +416,7 @@ wanted a user's friends of friends? Specify the `populate` option to tell
 mongoose to populate the `friends` array of all the user's friends:
 
 ```javascript
-User.
+await User.
   findOne({ name: 'Val' }).
   populate({
     path: 'friends',

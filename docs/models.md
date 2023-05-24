@@ -41,22 +41,14 @@ them and saving to the database is easy.
 const Tank = mongoose.model('Tank', yourSchema);
 
 const small = new Tank({ size: 'small' });
-small.save(function(err) {
-  if (err) return handleError(err);
-  // saved!
-});
+await small.save();
 
 // or
 
-Tank.create({ size: 'small' }, function(err, small) {
-  if (err) return handleError(err);
-  // saved!
-});
+await Tank.create({ size: 'small' });
 
 // or, for inserting large batches of documents
-Tank.insertMany([{ size: 'small' }], function(err) {
-
-});
+await Tank.insertMany([{ size: 'small' }]);
 ```
 
 Note that no tanks will be created/removed until the connection your model
@@ -64,7 +56,7 @@ uses is open. Every model has an associated connection. When you use
 `mongoose.model()`, your model will use the default mongoose connection.
 
 ```javascript
-mongoose.connect('mongodb://127.0.0.1/gettingstarted');
+await mongoose.connect('mongodb://127.0.0.1/gettingstarted');
 ```
 
 If you create a custom connection, use that connection's `model()` function
@@ -80,7 +72,7 @@ Finding documents is easy with Mongoose, which supports the [rich](https://www.m
 Documents can be retrieved using a `model`'s [find](api/model.html#model_Model-find), [findById](api/model.html#model_Model-findById), [findOne](api/model.html#model_Model-findOne), or [where](api/model.html#model_Model-where) static functions.
 
 ```javascript
-Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
+await Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec();
 ```
 
 See the chapter on [queries](queries.html) for more details on how to use the [Query](api/query.html) api.
@@ -91,10 +83,7 @@ Models have static `deleteOne()` and `deleteMany()` functions
 for removing all documents matching the given `filter`.
 
 ```javascript
-Tank.deleteOne({ size: 'large' }, function(err) {
-  if (err) return handleError(err);
-  // deleted at most one tank document
-});
+await Tank.deleteOne({ size: 'large' });
 ```
 
 ## Updating
@@ -104,10 +93,9 @@ database without returning them to your application. See the
 [API](api/model.html#model_Model-updateOne) docs for more detail.
 
 ```javascript
-Tank.updateOne({ size: 'large' }, { name: 'T-90' }, function(err, res) {
-  // Updated at most one doc, `res.nModified` contains the number
-  // of docs that MongoDB updated
-});
+// Updated at most one doc, `res.nModified` contains the number
+// of docs that MongoDB updated
+await Tank.updateOne({ size: 'large' }, { name: 'T-90' });
 ```
 
 _If you want to update a single document in the db and return it to your

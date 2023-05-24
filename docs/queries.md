@@ -37,29 +37,21 @@ A query also has a `.then()` function, and thus can be used as a promise.
 
 ## Executing
 
-When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://www.mongodb.com/docs/manual/tutorial/query-documents/).
+When executing a query, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://www.mongodb.com/docs/manual/tutorial/query-documents/).
 
 ```javascript
 const Person = mongoose.model('Person', yourSchema);
 
 // find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields
-Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function(err, person) {
-  if (err) return handleError(err);
-  // Prints "Space Ghost is a talk show host".
-  console.log('%s %s is a %s.', person.name.first, person.name.last,
-    person.occupation);
-});
+const person = await Person.findOne({ 'name.last': 'Ghost' }, 'name occupation');
+// Prints "Space Ghost is a talk show host".
+console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation);
 ```
 
-Mongoose executed the query and passed the results to `callback`. All callbacks in Mongoose use the pattern:
-`callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result`
-will be null. If the query is successful, the `error` parameter will be null, and the `result` will be populated with the results of the query.
+What `person` is depends on the operation: For `findOne()` it is a [potentially-null single document](api/model.html#model_Model-findOne), `find()` a [list of documents](api/model.html#model_Model-find), `count()` [the number of documents](api/model.html#model_Model-count), `update()` the [number of documents affected](api/model.html#model_Model-update), etc.
+The [API docs for Models](api/model.html) provide more details.
 
-Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern `callback(error, results)`.
-What `results` is depends on the operation: For `findOne()` it is a [potentially-null single document](api/model.html#model_Model-findOne), `find()` a [list of documents](api/model.html#model_Model-find), `count()` [the number of documents](api/model.html#model_Model-count), `update()` the [number of documents affected](api/model.html#model_Model-update), etc.
-The [API docs for Models](api/model.html) provide more detail on what is passed to the callbacks.
-
-Now let's look at what happens when no `callback` is passed:
+Now let's look at what happens when no `await` is used:
 
 ```javascript
 // find each person with a last name matching 'Ghost'
@@ -69,12 +61,9 @@ const query = Person.findOne({ 'name.last': 'Ghost' });
 query.select('name occupation');
 
 // execute the query at a later time
-query.exec(function(err, person) {
-  if (err) return handleError(err);
-  // Prints "Space Ghost is a talk show host."
-  console.log('%s %s is a %s.', person.name.first, person.name.last,
-    person.occupation);
-});
+const person = query.exec();
+ // Prints "Space Ghost is a talk show host."
+console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation);
 ```
 
 In the above code, the `query` variable is of type [Query](api/query.html).
@@ -83,7 +72,7 @@ The below 2 examples are equivalent.
 
 ```javascript
 // With a JSON doc
-Person.
+await Person.
   find({
     occupation: /host/,
     'name.last': 'Ghost',
@@ -93,7 +82,7 @@ Person.
   limit(10).
   sort({ occupation: -1 }).
   select({ name: 1, occupation: 1 }).
-  exec(callback);
+  exec();
 
 // Using query builder
 Person.
@@ -104,7 +93,7 @@ Person.
   limit(10).
   sort('-occupation').
   select('name occupation').
-  exec(callback);
+  exec();
 ```
 
 A full list of [Query helper functions can be found in the API docs](api/query.html).

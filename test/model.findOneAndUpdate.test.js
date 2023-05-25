@@ -2111,12 +2111,14 @@ describe('model: findOneAndUpdate:', function() {
       { $set: { name: 'Test' } },
       { projection: '+nickName', returnDocument: 'after' }
     );
+    assert.equal(res.name, 'Test');
     assert.equal(res.nickName, 'Quiz');
 
     res = await Test.findOneAndDelete(
       { _id: entry._id },
       { projection: '+nickName', returnDocument: 'before' }
     );
+    assert.equal(res.name, 'Test');
     assert.equal(res.nickName, 'Quiz');
   });
 });

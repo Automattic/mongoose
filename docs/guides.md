@@ -35,6 +35,7 @@ integrating Mongoose with external tools and frameworks.
 * [Promises](promises.html)
 * [Lodash](lodash.html)
 * [AWS Lambda](lambda.html)
+* [Next.js](nextjs.html)
 * [Browser Library](browser.html)
 * [GeoJSON](geojson.html)
 * [Transactions](transactions.html)

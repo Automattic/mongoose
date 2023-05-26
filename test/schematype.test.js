@@ -198,6 +198,14 @@ describe('schematype', function() {
     });
   });
 
+  describe('get()', function() {
+    Object.values(mongoose.SchemaTypes).forEach(schemaType => {
+      it(`${schemaType.name} has a \`get\` method`, () => {
+        assert.strictEqual(typeof schemaType.get, 'function');
+      });
+    });
+  });
+
   describe('set()', function() {
     describe('SchemaType.set()', function() {
       it('SchemaType.set, is a function', () => {
@@ -205,18 +213,10 @@ describe('schematype', function() {
       });
     });
 
-    [
-      mongoose.SchemaTypes.String,
-      mongoose.SchemaTypes.Number,
-      mongoose.SchemaTypes.Boolean,
-      mongoose.SchemaTypes.Array,
-      mongoose.SchemaTypes.Buffer,
-      mongoose.SchemaTypes.Date,
-      mongoose.SchemaTypes.ObjectId,
-      mongoose.SchemaTypes.Mixed,
-      mongoose.SchemaTypes.Decimal128,
-      mongoose.SchemaTypes.Map
-    ].forEach((type) => {
+    const typesToTest = Object.values(mongoose.SchemaTypes).
+      filter(t => t.name !== 'SubdocumentPath' && t.name !== 'DocumentArrayPath');
+
+    typesToTest.forEach((type) => {
       it(type.name + ', when given a default option, set its', () => {
         // Act
         type.set('someRandomOption', true);

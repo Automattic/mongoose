@@ -3960,7 +3960,6 @@ describe('Model', function() {
 
         const M = db.model('Test', schema);
 
-
         await M.create({ num: 42 });
 
         await new Promise((resolve) => setTimeout(resolve, 10));
@@ -3978,7 +3977,29 @@ describe('Model', function() {
         assert.ok(doc.createdAt.valueOf() >= now.valueOf());
         assert.ok(doc.updatedAt);
         assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+      });
 
+      it('with timestamps from merged schema (gh-13409)', async function() {
+        const schema = new Schema({ num: Number });
+        schema.add(new Schema({}, { timestamps: true }));
+
+        const M = db.model('Test', schema);
+
+        await M.create({ num: 42 });
+
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        const now = Date.now();
+
+        await M.bulkWrite([{
+          updateOne: {
+            filter: { num: 42 },
+            update: { num: 100 }
+          }
+        }]);
+
+        const doc = await M.findOne({ num: 100 });
+        assert.ok(doc.updatedAt);
+        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
       });
 
       it('with child timestamps (gh-7032)', async function() {

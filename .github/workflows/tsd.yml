@@ -45,7 +45,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
         with:
-          node-version: 12
+          node-version: 14
 
       - run: npm install
 

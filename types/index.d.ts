@@ -161,7 +161,7 @@ declare module 'mongoose' {
     [k: string]: string;
   }
 
-  export interface ToObjectOptions {
+  export interface ToObjectOptions<THydratedDocumentType = HydratedDocument<unknown>> {
     /** apply all getters (path and virtual getters) */
     getters?: boolean;
     /** apply virtual getters (can override getters option) */
@@ -171,7 +171,11 @@ declare module 'mongoose' {
     /** remove empty objects (defaults to true) */
     minimize?: boolean;
     /** if set, mongoose will call this function to allow you to transform the returned object */
-    transform?: boolean | ((doc: any, ret: any, options: any) => any);
+    transform?: boolean | ((
+      doc: THydratedDocumentType,
+      ret: Record<string, any>,
+      options: ToObjectOptions<THydratedDocumentType>
+    ) => any);
     /** if true, replace any conventionally populated paths with the original id in the output. Has no affect on virtual populated paths. */
     depopulate?: boolean;
     /** if false, exclude the version key (`__v` by default) from the output */

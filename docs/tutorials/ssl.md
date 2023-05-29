@@ -68,9 +68,9 @@ MongooseServerSelectionError: Hostname/IP does not match certificate's altnames:
 The SSL certificate's [common name](https://knowledge.digicert.com/solution/SO7239.html) **must** line up with the host name
 in your connection string. If the SSL certificate is for `hostname2.mydomain.com`, your connection string must connect to `hostname2.mydomain.com`, not any other hostname or IP address that may be equivalent to `hostname2.mydomain.com`. For replica sets, this also means that the SSL certificate's common name must line up with the [machine's `hostname`](../connections.html#replicaset-hostnames).
 
-## X509 Auth
+## X.509 Authentication
 
-If you're using [X509 authentication](https://www.mongodb.com/docs/drivers/node/current/fundamentals/authentication/mechanisms/#x.509), you should set the user name in the connection string, **not** the `connect()` options.
+If you're using [X.509 authentication](https://www.mongodb.com/docs/drivers/node/current/fundamentals/authentication/mechanisms/#x.509), you should set the user name in the connection string, **not** the `connect()` options.
 
 ```javascript
 // Do this:
@@ -91,3 +91,24 @@ await mongoose.connect('mongodb://127.0.0.1:27017/test', {
   auth: { username }
 });
 ```
+## X.509 Authentication with MongoDB Atlas
+
+With MongoDB Atlas, X.509 certificates are not Root CA certificates and will not work with the `sslCA` parameter as self-signed certificates would. If the `sslCA` parameter is used an error similar to the following would be raised:
+
+```no-highlight
+MongoServerSelectionError: unable to get local issuer certificate
+```
+
+To connect to a MongoDB Atlas cluster using X.509 authentication the correct option to set is `tlsCertificateKeyFile`, as well as the necessary options to . In addition to enabling SSL Validation and authenticatio mechanism, we get a full example:
+
+```javascript
+const url = "mongodb+srv://xyz.mongodb.net/test?authSource=%24external&authMechanism=MONGODB-X509"
+await mongoose.connect(url, {
+    sslValidate: true,
+    tlsCertificateKeyFile: /path/to/certificate.pem,
+    authMechanism: 'MONGODB-X509',
+    authSource: '$external'
+});
+```
+
+**Note** The connection string options must be URL escaped correctly.

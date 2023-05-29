@@ -99,7 +99,7 @@ With MongoDB Atlas, X.509 certificates are not Root CA certificates and will not
 MongoServerSelectionError: unable to get local issuer certificate
 ```
 
-To connect to a MongoDB Atlas cluster using X.509 authentication the correct option to set is `tlsCertificateKeyFile`, as well as the necessary options to . In addition to enabling SSL Validation and authenticatio mechanism, we get a full example:
+To connect to a MongoDB Atlas cluster using X.509 authentication the correct option to set is `tlsCertificateKeyFile`. The connection string already specifies the `authSource` and `authMechanism`, and the DNS `TXT` record would supply the parameter and value for `sslValidate`, however they're included below as `connect()` options for completeness:
 
 ```javascript
 const url = "mongodb+srv://xyz.mongodb.net/test?authSource=%24external&authMechanism=MONGODB-X509"

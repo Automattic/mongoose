@@ -1,3 +1,13 @@
+7.2.2 / 2023-05-30
+==================
+ * fix(schema): make bulkWrite updateOne() and updateMany() respect timestamps option when set by merging schemas #13445
+ * fix(schema): recursively copy schemas from different modules when calling new Schema() #13441 #13275
+ * fix(update): allow setting paths with dots under non-strict paths #13450 #13434
+ * types: improve function parameter types for ToObjectOptions transform option #13446 #13421
+ * docs: add nextjs page with link to next starter app and couple FAQs #13444 #13430
+ * docs(connections): add section on multi tenant #13449 #11187
+ * docs(connection+model): expand docs on accessors for underlying collections #13448 #13334
+
 7.2.1 / 2023-05-24
 ==================
  * fix(array): track correct changes when setting nested array of primitives #13422 #13372

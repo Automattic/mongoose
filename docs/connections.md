@@ -31,6 +31,7 @@ See the [mongodb connection string spec](http://www.mongodb.com/docs/manual/refe
   <li><a href="#mongos_connections">Multi-mongos support</a></li>
   <li><a href="#multiple_connections">Multiple connections</a></li>
   <li><a href="#connection_pools">Connection Pools</a></li>
+  <li><a href="#multi-tenant-connections">Multi Tenant Connections</a></li>
 </ul>
 
 <h2 id="buffering"><a href="#buffering">Operation Buffering</a></h2>
@@ -447,6 +448,91 @@ mongoose.createConnection(uri, { maxPoolSize: 10 });
 // With connection string options
 const uri = 'mongodb://127.0.0.1:27017/test?maxPoolSize=10';
 mongoose.createConnection(uri);
+```
+
+The connection pool size is important because [MongoDB currently can only process one operation per socket](https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs).
+So `maxPoolSize` functions as a cap on the number of concurrent operations.
+
+<h2 id="multi-tenant-connections"><a href="#multi-tenant-connections">Multi Tenant Connections</a></h2>
+
+In the context of Mongoose, a multi-tenant architecture typically means a case where multiple different clients talk to MongoDB through a single Mongoose application.
+This typically means each client makes queries and executes updates through a single Mongoose application, but has a distinct MongoDB database within the same MongoDB cluster.
+
+We recommend reading [this article about multi-tenancy with Mongoose](https://medium.com/brightlab-techblog/multitenant-node-js-application-with-mongoose-mongodb-f8841a285b4f); it has a good description of how we define multi-tenancy and a more detailed overview of our recommended patterns.
+
+There are two patterns we recommend for multi-tenancy in Mongoose:
+
+1. Maintain one connection pool, switch between tenants using the [`Connection.prototype.useDb()` method](https://mongoosejs.com/docs/api/connection.html#Connection.prototype.useDb()).
+2. Maintain a separate connection pool per tenant, store connections in a map or [POJO](https://masteringjs.io/tutorials/fundamentals/pojo).
+
+The following is an example of pattern (1).
+We recommend pattern (1) for cases where you have a small number of tenants, or if each individual tenant's workload is light (approximately < 1 request per second, all requests take < 10ms of database processing time).
+Pattern (1) is simpler to implement and simpler to manage in production, because there is only 1 connection pool.
+But, under high load, you will likely run into issues where some tenants' operations slow down other tenants' operations due to [slow trains](https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs).
+
+```javascript
+const express = require('express');
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://127.0.0.1:27017/main');
+mongoose.set('debug', true);
+
+mongoose.model('User', mongoose.Schema({ name: String }));
+
+const app = express();
+
+app.get('/users/:tenantId', function(req, res) {
+  const db = mongoose.connection.useDb(`tenant_${req.params.tenantId}`, {
+    // `useCache` tells Mongoose to cache connections by database name, so
+    // `mongoose.connection.useDb('foo', { useCache: true })` returns the
+    // same reference each time.
+    useCache: true
+  });
+  // Need to register models every time a new connection is created
+  if (!db.models['User']) {
+    db.model('User', mongoose.Schema({ name: String }));
+  }
+  console.log('Find users from', db.name);
+  db.model('User').find().
+    then(users => res.json({ users })).
+    catch(err => res.status(500).json({ message: err.message }));
+});
+
+app.listen(3000);
+```
+
+The following is an example of pattern (2).
+Pattern (2) is more flexible and better for use cases with > 10k tenants and > 1 requests/second.
+Because each tenant has a separate connection pool, one tenants' slow operations will have minimal impact on other tenants.
+However, this pattern is harder to implement and manage in production.
+In particular, [MongoDB does have a limit on the number of open connections](https://www.mongodb.com/blog/post/tuning-mongodb--linux-to-allow-for-tens-of-thousands-connections), and [MongoDB Atlas has separate limits on the number of open connections](https://www.mongodb.com/docs/atlas/reference/atlas-limits), so you need to make sure the total number of sockets in your connection pools doesn't go over MongoDB's limits.
+
+```javascript
+const express = require('express');
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://127.0.0.1:27017/main');
+
+const tenantIdToConnection = {};
+
+const app = express();
+
+app.get('/users/:tenantId', function(req, res) {
+  let initialConnection = Promise.resolve();
+  const { tenantId } = req.params;
+  if (!tenantIdToConnection[tenantId]) {
+    tenantIdToConnection[tenantId] = mongoose.createConnection(`mongodb://127.0.0.1:27017/tenant_${tenantId}`);
+    tenantIdToConnection[tenantId].model('User', mongoose.Schema({ name: String }));
+    initialConnection = tenantIdToConnection[tenantId].asPromise();
+  }
+  const db = tenantIdToConnection[tenantId];
+  initialConnection.
+    then(() => db.model('User').find()).
+    then(users => res.json({ users })).
+    catch(err => res.status(500).json({ message: err.message }));
+});
+
+app.listen(3000);
 ```
 
 <h2 id="next">Next Up</h2>

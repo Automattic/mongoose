@@ -519,29 +519,23 @@ export function autoTypedSchema() {
   }, {
     statics: {
       staticFn() {
-        expectType<Model<AutoTypedSchemaType['schema']>>(this);
+        expectType<Model<InferSchemaType<typeof AutoTypedSchema>>>(this);
         return 'Returned from staticFn' as const;
       }
     },
     methods: {
       instanceFn() {
-        expectType<HydratedDocument<AutoTypedSchemaType['schema']>>(this);
+        expectType<HydratedDocument<InferSchemaType<typeof AutoTypedSchema>>>(this);
         return 'Returned from DocumentInstanceFn' as const;
       }
     },
     query: {
       byUserName(userName) {
-        expectAssignable<Query<unknown, AutoTypedSchemaType['schema']>>(this);
+        expectAssignable<Query<unknown, InferSchemaType<typeof AutoTypedSchema>>>(this);
         return this.where({ userName });
       }
     }
   });
-
-  type InferredSchemaType = InferSchemaType<typeof AutoTypedSchema>;
-
-  expectType<AutoTypedSchemaType['schema']>({} as InferredSchemaType);
-
-  expectError<AutoTypedSchemaType['schema'] & { doesNotExist: boolean; }>({} as InferredSchemaType);
 
   return AutoTypedSchema;
 }

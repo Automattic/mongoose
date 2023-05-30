@@ -2111,12 +2111,36 @@ describe('model: findOneAndUpdate:', function() {
       { $set: { name: 'Test' } },
       { projection: '+nickName', returnDocument: 'after' }
     );
+    assert.equal(res.name, 'Test');
     assert.equal(res.nickName, 'Quiz');
 
     res = await Test.findOneAndDelete(
       { _id: entry._id },
       { projection: '+nickName', returnDocument: 'before' }
     );
+    assert.equal(res.name, 'Test');
     assert.equal(res.nickName, 'Quiz');
+  });
+
+  it('allows setting paths with dots in non-strict paths (gh-13434) (gh-10200)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: String,
+      info: Object
+    }, { strict: false });
+    const Test = db.model('Test', testSchema);
+
+    const doc = await Test.findOneAndUpdate(
+      {},
+      {
+        name: 'Test Testerson',
+        info: { 'second.name': 'Quiz' },
+        info2: { 'second.name': 'Quiz' }
+      },
+      { new: true, upsert: true }
+    ).lean();
+
+    assert.ok(doc);
+    assert.equal(doc.info['second.name'], 'Quiz');
+    assert.equal(doc.info2['second.name'], 'Quiz');
   });
 });

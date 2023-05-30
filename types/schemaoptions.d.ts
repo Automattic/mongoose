@@ -133,14 +133,14 @@ declare module 'mongoose' {
      */
     strictQuery?: boolean | 'throw';
     /** Exactly the same as the toObject option but only applies when the document's toJSON method is called. */
-    toJSON?: ToObjectOptions;
+    toJSON?: ToObjectOptions<THydratedDocumentType>;
     /**
      * Documents have a toObject method which converts the mongoose document into a plain JavaScript object.
      * This method accepts a few options. Instead of applying these options on a per-document basis, we may
      * declare the options at the schema level and have them applied to all of the schema's documents by
      * default.
      */
-    toObject?: ToObjectOptions;
+    toObject?: ToObjectOptions<THydratedDocumentType>;
     /**
      * By default, if you have an object with key 'type' in your schema, mongoose will interpret it as a
      * type declaration. However, for applications like geoJSON, the 'type' property is important. If you want to

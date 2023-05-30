@@ -72,6 +72,7 @@ docs['docs/transactions.md'] = { guide: true, title: 'Transactions', acquit: tru
 docs['docs/deprecations.md'] = { guide: true, title: 'Deprecation Warnings', markdown: true };
 docs['docs/further_reading.md'] = { title: 'Further Reading', markdown: true };
 docs['docs/jest.md'] = { title: 'Testing Mongoose with Jest', markdown: true };
+docs['docs/nextjs.md'] = { title: 'Using Mongoose With Next.js', markdown: true };
 docs['docs/faq.md'] = { guide: true, title: 'FAQ', markdown: true };
 docs['docs/typescript.md'] = { guide: true, title: 'Using TypeScript with Mongoose', markdown: true };
 docs['docs/compatibility.md'] = {

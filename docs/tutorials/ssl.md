@@ -105,7 +105,7 @@ To connect to a MongoDB Atlas cluster using X.509 authentication the correct opt
 const url = "mongodb+srv://xyz.mongodb.net/test?authSource=%24external&authMechanism=MONGODB-X509"
 await mongoose.connect(url, {
     sslValidate: true,
-    tlsCertificateKeyFile: /path/to/certificate.pem,
+    tlsCertificateKeyFile: "/path/to/certificate.pem",
     authMechanism: 'MONGODB-X509',
     authSource: '$external'
 });

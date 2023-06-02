@@ -511,8 +511,6 @@ In particular, [MongoDB does have a limit on the number of open connections](htt
 const express = require('express');
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://127.0.0.1:27017/main');
-
 const tenantIdToConnection = {};
 
 const app = express();

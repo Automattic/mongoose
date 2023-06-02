@@ -123,6 +123,7 @@ declare module 'mongoose' {
     SessionOption {
     checkKeys?: boolean;
     j?: boolean;
+    ordered?: boolean;
     safe?: boolean | WriteConcern;
     timestamps?: boolean | QueryTimestampsConfig;
     validateBeforeSave?: boolean;

@@ -136,3 +136,19 @@ function gh12311() {
     }
   };
 }
+
+function gh13060() {
+  const schema = new Schema({ status: String });
+  const documentModel = model('Document', schema);
+
+  documentModel.aggregate([{
+    $group: {
+      _id: '$_id',
+      merged: {
+        $mergeObjects: {
+          status: '$status'
+        }
+      }
+    }
+  }]);
+}

@@ -167,5 +167,28 @@ describe('model', function() {
           });
       });
     });
+    describe('ordered', function() {
+      it('runs the document insertion in a series when using the ordered option gh-4038', async function() {
+        const countSchema = new Schema({ n: Number });
+        const testSchema = new Schema({ name: { type: String, unique: true }, reference: Number });
+
+        const Count = db.model('gh4038', countSchema);
+
+        testSchema.pre('save', async function(next) {
+          const doc = await Count.findOneAndUpdate({}, { $inc: { n: 1 } }, { new: true, upsert: true });
+          this.reference = doc.n;
+          next();
+        });
+
+        const Test = db.model('gh4038Test', testSchema);
+        const data = [];
+        for (let i = 0; i < 11; i++) {
+          data.push({ name: 'Test' + Math.abs(i - 4) });
+        }
+        await Test.create(data, { ordered: true }).catch(err => err);
+        const docs = await Test.find();
+        assert.equal(docs.length, 5);
+      });
+    });
   });
 });

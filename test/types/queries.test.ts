@@ -475,3 +475,14 @@ async function gh13142() {
   if (!blog) return;
   expectType<Pick<Blog, Extract<keyof { content: 1 }, keyof Blog>>>(blog);
 }
+
+async function gh13224() {
+  const userSchema = new Schema({ name: String, age: Number });
+  const UserModel = model('User', userSchema);
+
+  const u = await UserModel.findOne().select<{ name: string }>(['name']).orFail();
+  expectType<string>(u.name);
+  expectError(u.age);
+
+  expectError(UserModel.findOne().select<{ notInSchema: string }>(['name']).orFail());
+}

@@ -622,7 +622,15 @@ declare module 'mongoose' {
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'replaceOne'>;
 
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
-    select(arg: string | string[] | Record<string, number | boolean | object>): this;
+    select<Paths extends { [P in keyof ResultType]?: any } = {}>(
+      arg: string | string[] | Record<string, number | boolean | object>
+    ): QueryWithHelpers<
+      UnpackedIntersection<{}, Paths>,
+      DocType,
+      THelpers,
+      UnpackedIntersection<{}, Paths>,
+      QueryOp
+    >;
 
     /** Determines if field selection has been made. */
     selected(): boolean;

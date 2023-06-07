@@ -512,7 +512,7 @@ declare module 'mongoose' {
     count?: boolean;
 
     /** Add an extra match condition to `populate()`. */
-    match?: FilterQuery<any> | Function;
+    match?: FilterQuery<any> | ((doc: Record<string, any>, virtual?: this) => Record<string, any> | null);
 
     /** Add a default `limit` to the `populate()` query. */
     limit?: number;

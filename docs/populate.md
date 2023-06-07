@@ -727,6 +727,29 @@ AuthorSchema.virtual('posts', {
 });
 ```
 
+You can overwrite the `match` option when calling `populate()` as follows.
+
+```javascript
+// Overwrite the `match` option specified in `AuthorSchema.virtual()` for this
+// single `populate()` call.
+await Author.findOne().populate({ path: posts, match: {} });
+```
+
+You can also set the `match` option to a function in your `populate()` call.
+If you want to merge your `populate()` match option, rather than overwriting, use the following.
+
+```javascript
+await Author.findOne().populate({
+  path: posts,
+  // Add `isDeleted: false` to the virtual's default `match`, so the `match`
+  // option would be `{ tags: author.favoriteTags, isDeleted: false }`
+  match: (author, virtual) => ({
+    ...virtual.options.match(author),
+    isDeleted: false
+  })
+});
+```
+
 <h2 id="populating-maps"><a href="#populating-maps">Populating Maps</a></h2>
 
 [Maps](schematypes.html#maps) are a type that represents an object with arbitrary

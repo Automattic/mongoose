@@ -473,7 +473,8 @@ const events = await Event.
 ```
 
 <h2 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>refPath</code></a></h2>
-<code>
+
+Mongoose can also populate from multiple collections based on the value
 of a property in the document. Let's say you're building a schema for
 storing comments. A user may comment on either a blog post or a product.
 

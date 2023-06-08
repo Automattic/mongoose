@@ -1,3 +1,7 @@
+6.11.2 / 2023-06-08
+===================
+ * fix(cursor): allow find middleware to modify query cursor options #13476 #13453 #13435
+
 7.2.2 / 2023-05-30
 ==================
  * fix(schema): make bulkWrite updateOne() and updateMany() respect timestamps option when set by merging schemas #13445

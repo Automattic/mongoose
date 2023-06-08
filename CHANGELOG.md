@@ -1,3 +1,7 @@
+6.11.2 / 2023-06-08
+===================
+ * fix(cursor): allow find middleware to modify query cursor options #13476 #13453 #13435
+
 6.11.1 / 2023-05-08
 ===================
  * fix(query): apply schema-level paths before calculating projection for findOneAndUpdate() #13348 #13340

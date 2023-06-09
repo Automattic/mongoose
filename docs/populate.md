@@ -31,10 +31,6 @@ what tells Mongoose which model to use during population, in our case
 the `Story` model. All `_id`s we store here must be document `_id`s from
 the `Story` model.
 
-**Note**: `ObjectId`, `Number`, `String`, and `Buffer` are valid for use
-as refs. However, you should use `ObjectId` unless you are an advanced
-user and have a good reason for doing so.
-
 <ul class="toc">
   <li><a href="#saving-refs">Saving Refs</a></li>
   <li><a href="#population">Population</a></li>
@@ -72,20 +68,21 @@ const author = new Person({
   age: 50
 });
 
-author.save(function(err) {
-  if (err) return handleError(err);
+await author.save();
 
-  const story1 = new Story({
-    title: 'Casino Royale',
-    author: author._id // assign the _id from the person
-  });
-
-  story1.save(function(err) {
-    if (err) return handleError(err);
-    // that's it!
-  });
+const story1 = new Story({
+  title: 'Casino Royale',
+  author: author._id // assign the _id from the person
 });
+
+await author.save();
+// that's it!
 ```
+
+You can set the `ref` option on `ObjectId`, `Number`, `String`, and `Buffer` paths.
+`populate()` works with ObjectIds, numbers, strings, and buffers.
+However, we recommend using ObjectIds as `_id` properties (and thus ObjectIds for `ref` properties) unless you have a good reason not to.
+That is because MongoDB will set `_id` to an ObjectId if you create a new document without an `_id` property, so if you make your `_id` property a Number, you need to be extra careful not to insert a document without a numeric `_id`.
 
 <h2 id="population"><a href="#population">Population</a></h2>
 
@@ -473,7 +470,8 @@ const events = await Event.
 ```
 
 <h2 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>refPath</code></a></h2>
-<code>
+
+Mongoose can also populate from multiple collections based on the value
 of a property in the document. Let's say you're building a schema for
 storing comments. A user may comment on either a blog post or a product.
 

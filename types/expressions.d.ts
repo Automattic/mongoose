@@ -1793,7 +1793,7 @@ declare module 'mongoose' {
        * @version 3.6
        * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#mongodb-expression-exp.-mergeObjects
        */
-      $mergeObjects: ObjectExpression | ObjectExpression[] | ArrayExpression;
+      $mergeObjects: ObjectExpression | ObjectExpression[] | ArrayExpression | Record<string, string>;
     }
 
     export interface SetField {

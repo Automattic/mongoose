@@ -166,6 +166,14 @@ describe('model', function() {
             assert.ok(doc._id);
           });
       });
+
+      it('ignores undefined last arg (gh-13487)', async function() {
+        await B.deleteMany({});
+        await B.create({ title: 'foo' }, void 0);
+        const docs = await B.find();
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].title, 'foo');
+      });
     });
   });
 });

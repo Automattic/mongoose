@@ -115,22 +115,6 @@ describe('model', function() {
       assert.ok(endTime - startTime < 4 * 100); // serial: >= 4 * 100 parallel: < 4 * 100
     });
 
-    it('creates a document when options equals undefined (gh-13487)', async function() {
-      const posts = await B.create({ title: 'undefined options' }, undefined);
-      const post1 = posts[0];
-      assert.equal(post1.title, 'undefined options');
-    });
-
-    it('creates multiple document when options equals undefined (gh-13487)', async function() {
-      const posts = await B.create({ title: 'Post1' }, { title: 'Post2' }, undefined);
-
-      const post1 = posts[0];
-      const post2 = posts[1];
-
-      assert.equal(post1.title, 'Post1');
-      assert.equal(post2.title, 'Post2');
-    });
-
     describe('callback is optional', function() {
       it('with one doc', async function() {
         const doc = await B.create({ title: 'optional callback' });

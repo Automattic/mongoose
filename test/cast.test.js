@@ -193,4 +193,34 @@ describe('cast: ', function() {
       name: 'foo'
     });
   });
+
+  it('handles $in with discriminators if $in has exactly 1 element (gh-13492)', function() {
+    const itemStateFooSchema = new Schema({
+      fieldFoo: String
+    });
+
+    const itemSchema = new Schema({
+      state: new Schema(
+        {
+          field: String
+        },
+        {
+          discriminatorKey: 'type'
+        }
+      )
+    });
+
+    itemSchema.path('state').discriminator('FOO', itemStateFooSchema);
+
+    const res = cast(itemSchema, {
+      'state.type': {
+        $in: ['FOO']
+      },
+      'state.fieldFoo': 44
+    });
+    assert.deepStrictEqual(res, {
+      'state.type': { $in: ['FOO'] },
+      'state.fieldFoo': '44'
+    });
+  });
 });

@@ -12198,7 +12198,7 @@ describe('document', function() {
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb.c.x.y, 1);
   });
-  it('should use schema-level validateModifiedOnly option if not in options asdf', async function() {
+  it('should use schema-level validateModifiedOnly option if not in options', async function() {
     const testSchema = new Schema({ title: { type: String, required: true }, other: String }, { validateModifiedOnly: true });
 
     const Test = db.model('Test', testSchema);

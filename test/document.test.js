@@ -12198,6 +12198,19 @@ describe('document', function() {
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb.c.x.y, 1);
   });
+  it('should use schema-level validateModifiedOnly option if not in options asdf', async function() {
+    const testSchema = new Schema({ title: { type: String, required: true }, other: String }, { validateModifiedOnly: true });
+
+    const Test = db.model('Test', testSchema);
+
+    const docs = await Test.create([{ }], { validateBeforeSave: false });
+
+    const doc = docs[0];
+    doc.other = 'hello world';
+    assert.equal(doc.validateSync(), undefined);
+    const error = await doc.save().then(() => null, err => err);
+    assert.equal(error, null);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {
@@ -12208,3 +12221,4 @@ describe('Check if instance function that is supplied in schema option is availa
     assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
   });
 });
+

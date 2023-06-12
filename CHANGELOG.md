@@ -1,3 +1,7 @@
+7.2.4 / 2023-06-12
+==================
+ * fix(query): handle non-string discriminator key values in query #13496 #13492
+
 7.2.3 / 2023-06-09
 ==================
  * fix(model): ignore falsy last argument to create() for backwards compatibility #13493 #13491 #13487 [MohOraby](https://github.com/MohOraby)

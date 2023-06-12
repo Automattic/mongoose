@@ -1,3 +1,17 @@
+7.2.4 / 2023-06-12
+==================
+ * fix(query): handle non-string discriminator key values in query #13496 #13492
+
+7.2.3 / 2023-06-09
+==================
+ * fix(model): ignore falsy last argument to create() for backwards compatibility #13493 #13491 #13487 [MohOraby](https://github.com/MohOraby)
+ * types: remove generic param that's causing issues for typegoose #13494 #13482
+ * types(aggregate): allow object syntax for $mergeObjects #13470 #13060
+ * docs(connection): clarify how Connection.prototype.destroy() is different from close() #13475
+ * docs(populate): fix accidental removal of text #13480
+ * docs: add additional notes for Atlas X.509 authentication #13452 [alexbevi](https://github.com/alexbevi)
+ * docs(populate): add a little more info on why we recommend using ObjectId for _id #13474 #13400
+
 6.11.2 / 2023-06-08
 ===================
  * fix(cursor): allow find middleware to modify query cursor options #13476 #13453 #13435

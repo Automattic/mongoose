@@ -2463,6 +2463,20 @@ describe('document', function() {
       await doc.save();
     });
 
+    it('should use schema-level validateModifiedOnly option if not in options', async function() {
+      const testSchema = new Schema({ title: { type: String, required: true }, other: String }, { validateModifiedOnly: true });
+  
+      const Test = db.model('Test', testSchema);
+  
+      const docs = await Test.create([{ }], { validateBeforeSave: false });
+  
+      const doc = docs[0];
+      doc.other = 'hello world';
+      assert.equal(doc.validateSync(), undefined);
+      const error = await doc.save().then(() => null, err => err);
+      assert.equal(error, null);
+    });
+
     it('handles non-errors', async function() {
       const schema = new Schema({
         name: { type: String, required: true }
@@ -12197,19 +12211,6 @@ describe('document', function() {
 
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb.c.x.y, 1);
-  });
-  it('should use schema-level validateModifiedOnly option if not in options', async function() {
-    const testSchema = new Schema({ title: { type: String, required: true }, other: String }, { validateModifiedOnly: true });
-
-    const Test = db.model('Test', testSchema);
-
-    const docs = await Test.create([{ }], { validateBeforeSave: false });
-
-    const doc = docs[0];
-    doc.other = 'hello world';
-    assert.equal(doc.validateSync(), undefined);
-    const error = await doc.save().then(() => null, err => err);
-    assert.equal(error, null);
   });
 });
 

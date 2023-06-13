@@ -42,7 +42,7 @@ declare module 'mongoose' {
       shift(): T;
 
       /** Returns a native js Array. */
-      toObject(options?: ToObjectOptions<T>): any;
+      toObject(options?: ToObjectOptions): any;
       toObject<T>(options?: ToObjectOptions<T>): T;
 
       /** Wraps [`Array#unshift`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/unshift) with proper change tracking. */

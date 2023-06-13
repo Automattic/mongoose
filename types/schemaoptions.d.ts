@@ -155,6 +155,11 @@ declare module 'mongoose' {
      */
     validateBeforeSave?: boolean;
     /**
+     * By default, validation will run on all paths before saving to the database. You can choose to have it run
+     * only on paths that were modified by setting validateModifiedOnly to true.
+     */
+    validateModifiedOnly?: boolean;
+    /**
      * The versionKey is a property set on each document when first created by Mongoose. This keys value
      * contains the internal revision of the document. The versionKey option is a string that represents
      * the path to use for versioning. The default is '__v'.

@@ -155,8 +155,8 @@ declare module 'mongoose' {
      */
     validateBeforeSave?: boolean;
     /**
-     * By default, validation will run on all paths before saving to the database. You can choose to have it run
-     * only on paths that were modified by setting validateModifiedOnly to true.
+     * By default, validation will run on modified and required paths before saving to the database.
+     * You can choose to have Mongoose only validate modified paths by setting validateModifiedOnly to true.
      */
     validateModifiedOnly?: boolean;
     /**

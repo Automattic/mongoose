@@ -1,11 +1,6 @@
 # Further Reading
 
 <style>
-  img {
-    width: auto;
-    border: none;
-  }
-
   .pluralsight-link {
     float: left;
     margin-right: 0.5em;

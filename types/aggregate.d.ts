@@ -16,6 +16,9 @@ declare module 'mongoose' {
      */
     [Symbol.asyncIterator](): AsyncIterableIterator<Unpacked<ResultType>>;
 
+    // Returns a string representation of this aggregation.
+    [Symbol.toStringTag]: string;
+
     options: AggregateOptions;
 
     /**
@@ -72,6 +75,12 @@ declare module 'mongoose' {
 
     /** Appends a new $fill operator to this aggregate pipeline */
     fill(arg: PipelineStage.Fill['$fill']): this;
+
+    /**
+     * Executes the aggregation returning a `Promise` which will be
+     * resolved with `.finally()` chained.
+     */
+    finally: Promise<ResultType>['finally'];
 
     /** Appends new custom $graphLookup operator(s) to this aggregate pipeline, performing a recursive search on a collection. */
     graphLookup(options: PipelineStage.GraphLookup['$graphLookup']): this;

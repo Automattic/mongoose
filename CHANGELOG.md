@@ -1,3 +1,21 @@
+7.3.0 / 2023-06-14
+==================
+ * feat: upgrade mongodb -> 5.6.0 #13455 [lorand-horvath](https://github.com/lorand-horvath)
+ * feat(aggregate): add Aggregate.prototype.finally() to be consistent with Promise API for TypeScript #13509
+ * feat(schema): support selecting subset of fields to apply optimistic concurrency to #13506 #10591
+ * feat(model): add `ordered` option to `Model.create()` #13472 #4038
+ * feat(schema): consistently add .get() function to all SchemaType classes
+ * feat(populate): pass virtual to match function to allow merging match options #13477 #12443
+ * types: allow overwriting Paths in select() to tell TypeScript which fields are projected #13478 #13224
+ * types(schema): add validateModifiedOnly as schema option #13503 #10153
+ * docs: add note about validateModifiedOnly as a schema option #13503 #10153
+ * docs(migrating_to_7): update migrating_to_7.md to include Model.countDocuments #13508 [Climax777](https://github.com/Climax777)
+ * docs(further_reading): remove style for "img" [hasezoey](https://github.com/hasezoey)
+
+7.2.4 / 2023-06-12
+==================
+ * fix(query): handle non-string discriminator key values in query #13496 #13492
+
 7.2.3 / 2023-06-09
 ==================
  * fix(model): ignore falsy last argument to create() for backwards compatibility #13493 #13491 #13487 [MohOraby](https://github.com/MohOraby)

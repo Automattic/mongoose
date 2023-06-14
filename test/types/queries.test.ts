@@ -17,7 +17,7 @@ import {
   QueryOptions
 } from 'mongoose';
 import { ObjectId } from 'mongodb';
-import { expectError, expectType } from 'tsd';
+import { expectAssignable, expectError, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { AutoTypedSchemaType } from './schema.test';
 
@@ -474,4 +474,27 @@ async function gh13142() {
   );
   if (!blog) return;
   expectType<Pick<Blog, Extract<keyof { content: 1 }, keyof Blog>>>(blog);
+}
+
+async function gh13224() {
+  const userSchema = new Schema({ name: String, age: Number });
+  const UserModel = model('User', userSchema);
+
+  const u1 = await UserModel.findOne().select(['name']).orFail();
+  expectType<string | undefined>(u1.name);
+  expectType<number | undefined>(u1.age);
+  expectAssignable<Function>(u1.toObject);
+
+  const u2 = await UserModel.findOne().select<{ name?: string }>(['name']).orFail();
+  expectType<string | undefined>(u2.name);
+  expectError(u2.age);
+  expectAssignable<Function>(u2.toObject);
+
+  const users = await UserModel.find().select<{ name?: string }>(['name']);
+  const u3 = users[0];
+  expectType<string | undefined>(u3!.name);
+  expectError(u3!.age);
+  expectAssignable<Function>(u3.toObject);
+
+  expectError(UserModel.findOne().select<{ notInSchema: string }>(['name']).orFail());
 }

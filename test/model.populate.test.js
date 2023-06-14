@@ -10454,4 +10454,54 @@ describe('model: populate:', function() {
       assert.equal(normal.test.length, 0);
     });
   });
+
+  it('calls match function with virtual as parameter (gh-12443)', async function() {
+    const parentSchema = mongoose.Schema({ name: String });
+    parentSchema.virtual('children', {
+      ref: 'Child',
+      localField: '_id',
+      foreignField: 'parentId',
+      justOne: false,
+      match: {
+        isDeleted: false
+      }
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const childSchema = mongoose.Schema({
+      name: String,
+      parentId: 'ObjectId',
+      isDeleted: Boolean
+    });
+    const Child = db.model('Child', childSchema);
+
+    const { _id } = await Parent.create({ name: 'Darth Vader' });
+    await Child.create([
+      { name: 'Luke', parentId: _id, isDeleted: false },
+      { name: 'Leia', parentId: _id, isDeleted: false },
+      { name: 'Chad', parentId: _id, isDeleted: true }
+    ]);
+
+    let doc = await Parent.findById(_id).populate({
+      path: 'children'
+    });
+    assert.deepStrictEqual(doc.children.map(c => c.name).sort(), ['Leia', 'Luke']);
+
+    doc = await Parent.findById(_id).populate({
+      path: 'children',
+      match: (_doc, virtual) => ({
+        ...virtual.options.match,
+        name: /(Luke|Chad)/
+      })
+    });
+    assert.deepStrictEqual(doc.children.map(c => c.name).sort(), ['Luke']);
+
+    doc = await Parent.findById(_id).populate({
+      path: 'children',
+      match: () => ({
+        name: /(Luke|Chad)/
+      })
+    });
+    assert.deepStrictEqual(doc.children.map(c => c.name).sort(), ['Chad', 'Luke']);
+  });
 });

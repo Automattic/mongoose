@@ -512,6 +512,23 @@ describe('versioning', function() {
     assert.equal(err.name, 'VersionError');
   });
 
+  it('should support optimisticConcurrency being an array of strings', async function() {
+    const thingSchema = new Schema({ price: Number, name: String }, { optimisticConcurrency: ['price', 'name'] });
+    const Thing = db.model('Thing', thingSchema);
+
+    const thing = await Thing.create({ price: 1, name: 'Test' });
+    await thing.save();
+    assert.equal(thing.__v, 0);
+    const thing_1 = await Thing.findById(thing.id);
+    const thing_2 = await Thing.findById(thing.id);
+    thing_1.set({ price: 2, name: 'Testerson' });
+    await thing_1.save();
+    assert.equal(thing_1.__v, 1);
+    thing_2.set({ price: 1, name: 'Test' });
+    const err = await thing_2.save().then(() => null, err => err);
+    assert.ok(!err);
+  });
+
   it('gh-1898', async function() {
     const schema = new Schema({ tags: [String], name: String });
 

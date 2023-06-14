@@ -526,7 +526,7 @@ describe('versioning', function() {
     assert.equal(thing_1.__v, 1);
     thing_2.set({ price: 1, name: 'Test' });
     const err = await thing_2.save().then(() => null, err => err);
-    assert.ok(!err)
+    assert.ok(!err);
   });
 
   it('gh-1898', async function() {

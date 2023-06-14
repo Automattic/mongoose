@@ -100,6 +100,7 @@ They always return promises.
 - `Model.aggregate`
 - `Model.bulkWrite`
 - `Model.cleanIndexes`
+- `Model.countDocuments`
 - `Model.create`
 - `Model.createCollection`
 - `Model.createIndexes`

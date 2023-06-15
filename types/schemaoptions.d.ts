@@ -49,6 +49,9 @@ declare module 'mongoose' {
     /** Sets a default collation for every query and aggregation. */
     collation?: mongodb.CollationOptions;
 
+    /** Arbitrary options passed to `createCollection()` */
+    collectionOptions?: Record<string, any>;
+
     /** The timeseries option to use when creating the model's collection. */
     timeseries?: mongodb.TimeSeriesCollectionOptions;
 

@@ -380,6 +380,18 @@ describe('connections:', function() {
     }
   });
 
+  it('should destroy the connection gh-11821', async function() {
+    const opts = {};
+    const conn1 = await mongoose.createConnection(start.uri, opts).asPromise();
+    const conn2 = conn1.useDb('test-db');
+    await conn2.destroy();
+    try {
+      await conn1.openUri(start.uri)
+    } catch (error) {
+      assert.equal(error.message, 'Connection has been closed and destroyed, and cannot be used for re-opening the connection. Please create a new connection with `mongoose.createConnection()` or `mongoose.connect()`.');
+    }
+  })
+
   it('verify that attempt to re-open destroyed connection throws error, via callback', async function() {
     const opts = {};
     const conn = await mongoose.createConnection(start.uri, opts).asPromise();

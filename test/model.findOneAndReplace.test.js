@@ -354,7 +354,7 @@ describe('model: findOneAndReplace:', function() {
     const testSchema = new Schema({
       name: {
         type: String,
-        required: true // you had a typo here
+        required: true
       }
     });
     const Test = db.model('Test', testSchema);
@@ -370,6 +370,66 @@ describe('model: findOneAndReplace:', function() {
 
     const doc = await Test.findById(entry);
     assert.strictEqual(doc.name, undefined);
+  });
+
+  it('respects query-level strict option (gh-13507)', async function() {
+    const testSchema = new Schema({
+      name: {
+        type: String,
+        required: true
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    let err = await Test.findOneAndReplace(
+      { name: 'Test' },
+      { name: 'Bar', notInSchema: 'foo' },
+      { strict: 'throw' }
+    ).then(() => null, err => err);
+
+    assert.ok(err);
+    assert.ok(err.errors['notInSchema']);
+    assert.equal(err.errors['notInSchema'].name, 'StrictModeError');
+
+    err = await Test.findOneAndReplace(
+      { name: 'Test' },
+      { name: 'Bar', notInSchema: 'foo' },
+      { strict: 'throw', runValidators: true }
+    ).then(() => null, err => err);
+
+    assert.ok(err);
+    assert.ok(err.errors['notInSchema']);
+    assert.equal(err.errors['notInSchema'].name, 'StrictModeError');
+  });
+
+  it('respects schema-level strict option (gh-13507)', async function() {
+    const testSchema = new Schema({
+      name: {
+        type: String,
+        required: true
+      }
+    }, { strict: 'throw' });
+    const Test = db.model('Test', testSchema);
+
+    let err = await Test.findOneAndReplace(
+      { name: 'Test' },
+      { name: 'Bar', notInSchema: 'foo' },
+      {}
+    ).then(() => null, err => err);
+
+    assert.ok(err);
+    assert.ok(err.errors['notInSchema']);
+    assert.equal(err.errors['notInSchema'].name, 'StrictModeError');
+
+    err = await Test.findOneAndReplace(
+      { name: 'Test' },
+      { name: 'Bar', notInSchema: 'foo' },
+      { runValidators: true }
+    ).then(() => null, err => err);
+
+    assert.ok(err);
+    assert.ok(err.errors['notInSchema']);
+    assert.equal(err.errors['notInSchema'].name, 'StrictModeError');
   });
 
   it('does not send overwrite or timestamps option to MongoDB', async function() {

@@ -12212,6 +12212,18 @@ describe('document', function() {
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb.c.x.y, 1);
   });
+  it('can change the value of the id property on documents gh-10096', async function() {
+    const testSchema = new Schema({
+      name: String
+    });
+    const Test = db.model('Test', testSchema);
+    const doc = new Test({ name: 'Test Testerson ' });
+    const oldVal = doc.id;
+    doc.id = '648b8aa6a97549b03835c0b3';
+    await doc.save();
+    assert.notEqual(oldVal, doc.id);
+    assert.equal(doc.id, '648b8aa6a97549b03835c0b3');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

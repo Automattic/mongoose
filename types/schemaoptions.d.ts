@@ -50,7 +50,7 @@ declare module 'mongoose' {
     collation?: mongodb.CollationOptions;
 
     /** Arbitrary options passed to `createCollection()` */
-    collectionOptions?: Record<string, any>;
+    collectionOptions?: mongodb.CreateCollectionOptions;
 
     /** The timeseries option to use when creating the model's collection. */
     timeseries?: mongodb.TimeSeriesCollectionOptions;

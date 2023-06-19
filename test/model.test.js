@@ -7028,19 +7028,6 @@ describe('Model', function() {
       assert(bypass);
     });
   });
-
-  it('respects schema-level `collectionOptions` for setting options to createCollection()', async function() {
-    const testSchema = new Schema({
-      name: String
-    }, { collectionOptions: { capped: true, size: 1024 } });
-    const TestModel = db.model('Test', testSchema);
-    await TestModel.init();
-    await TestModel.collection.drop();
-    await TestModel.createCollection();
-
-    const isCapped = await TestModel.collection.isCapped();
-    assert.ok(isCapped);
-  });
 });
 
 

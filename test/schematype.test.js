@@ -211,6 +211,19 @@ describe('schematype', function() {
       it('SchemaType.set, is a function', () => {
         assert.equal(typeof mongoose.SchemaType.set, 'function');
       });
+      it('should allow setting values to a given property gh-13510', async function() {
+        assert(mongoose.Schema.Types.Date);
+        mongoose.Schema.Types.Date.setters.push(v => typeof v === 'string' && /^\d{8}$/.test(v) ? new Date(v.slice(0, 4), +v.slice(4, 6) - 1, v.slice(6, 8)) : v);
+        const testSchema = new Schema({
+          myDate: Date
+        });
+        const Test = mongoose.model('Test', testSchema);
+        const doc = new Test();
+        doc.myDate = '20220601';
+        await doc.save();
+        console.log('what is doc', doc);
+        assert(doc.myDate);
+      });
     });
 
     const typesToTest = Object.values(mongoose.SchemaTypes).

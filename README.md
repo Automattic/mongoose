@@ -106,7 +106,7 @@ Models are defined through the `Schema` interface.
 
 ```js
 const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
+const ObjectId = Schema.Types.ObjectId;
 
 const BlogPost = new Schema({
   author: ObjectId,

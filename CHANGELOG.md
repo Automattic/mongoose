@@ -1,3 +1,11 @@
+7.3.1 / 2023-06-21
+==================
+ * fix(query): respect query-level strict option on findOneAndReplace() #13516 #13507
+ * docs(connections): expand docs on serverSelectionTimeoutMS #13533 #12967
+ * docs: add example of accessing save options in pre save #13498
+ * docs(connections+faq): add info on localhost vs 127.0.0.1
+ * docs(SchemaType): validate members are validator & message (not msg) #13521 [lorand-horvath](https://github.com/lorand-horvath)
+
 7.3.0 / 2023-06-14
 ==================
  * feat: upgrade mongodb -> 5.6.0 #13455 [lorand-horvath](https://github.com/lorand-horvath)

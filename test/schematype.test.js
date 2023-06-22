@@ -213,7 +213,7 @@ describe('schematype', function() {
       });
       it('should allow setting values to a given property gh-13510', function() {
         const m = new mongoose.Mongoose();
-        m.SchemaTypes.Date.set(v => typeof v === 'string' && /^\d{8}$/.test(v) ? new Date(v.slice(0, 4), +v.slice(4, 6) - 1, v.slice(6, 8)) : v);
+        m.SchemaTypes.Date.setters.push(v => typeof v === 'string' && /^\d{8}$/.test(v) ? new Date(v.slice(0, 4), +v.slice(4, 6) - 1, v.slice(6, 8)) : v);
         const testSchema = new m.Schema({
           myDate: Date
         });

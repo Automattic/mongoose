@@ -1,3 +1,7 @@
+5.13.18 / 2023-06-22
+====================
+ * fix: bump mongodb driver to 3.7.4 #13535 [lorand-horvath](https://github.com/lorand-horvath)
+
 5.13.17 / 2023-04-04
 ====================
  * fix: backport fix for array filters handling $or and $and #13195 #13192 #10696 [raj-goguardian](https://github.com/raj-goguardian)

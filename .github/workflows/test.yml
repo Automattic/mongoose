@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [8, 9, 10, 12, 14, 15, 16]
+        node: [4, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16]
     name: Node ${{ matrix.node }}
     steps:
       - uses: actions/checkout@v2
@@ -17,6 +17,14 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
+
+      - name: Upgrade Node <= 5 npm
+        run: npm install -g npm@3
+        if: ${{ matrix.node <= 5 }}
+
+      - name: Upgrade Node 7 npm
+        run: npm install -g npm@6
+        if: ${{ matrix.node == 7 }}
 
       - run: npm install
 

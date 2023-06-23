@@ -223,6 +223,7 @@ describe('schematype', function() {
         const doc = new Test();
         doc.myDate = '20220601';
         await doc.save();
+        await m.connections[0].close();
         assert(doc.myDate instanceof Date);
       });
     });

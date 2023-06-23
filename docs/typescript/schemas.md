@@ -72,7 +72,7 @@ If automatic type inference doesn't work for you, you can always fall back to do
 
 The Mongoose `Schema` class in TypeScript has 4 [generic parameters](https://www.typescriptlang.org/docs/handbook/2/generics.html):
 
-- `DocType` - An interface descibing how the data is saved in MongoDB
+- `DocType` - An interface describing how the data is saved in MongoDB
 - `M` - The Mongoose model type. Can be omitted if there are no query helpers or instance methods to be defined.
   - default: `Model<DocType, any, any>`
 - `TInstanceMethods` - An interface containing the methods for the schema.

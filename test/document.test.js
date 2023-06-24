@@ -12212,6 +12212,27 @@ describe('document', function() {
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb.c.x.y, 1);
   });
+
+  it('should allow storing keys with dots in name in mixed under nested (gh-13530)', async function() {
+    const TestModelSchema = new mongoose.Schema({
+      metadata:
+        {
+          labels: mongoose.Schema.Types.Mixed
+        }
+    });
+    const TestModel = db.model('Test', TestModelSchema);
+    const { _id } = await TestModel.create({
+      metadata: {
+        labels: { 'my.label.com': 'true' }
+      }
+    });
+    const doc = await TestModel.findById(_id).lean();
+    assert.deepStrictEqual(doc.metadata, {
+      labels: {
+        'my.label.com': 'true'
+      }
+    });
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

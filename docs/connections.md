@@ -22,6 +22,7 @@ See the [mongodb connection string spec](http://www.mongodb.com/docs/manual/refe
   <li><a href="#buffering">Buffering</a></li>
   <li><a href="#error-handling">Error Handling</a></li>
   <li><a href="#options">Options</a></li>
+  <li><a href="#serverselectiontimeoutms">serverSelectionTimeoutMS</a></li>
   <li><a href="#connection-string-options">Connection String Options</a></li>
   <li><a href="#connection-events">Connection Events</a></li>
   <li><a href="#keepAlive">A note about keepAlive</a></li>
@@ -157,26 +158,55 @@ Below are some of the options that are important for tuning Mongoose.
 * `serverSelectionTimeoutMS` - The MongoDB driver will try to find a server to send any given operation to, and keep retrying for `serverSelectionTimeoutMS` milliseconds. If not set, the MongoDB driver defaults to using `30000` (30 seconds).
 * `heartbeatFrequencyMS` - The MongoDB driver sends a heartbeat every `heartbeatFrequencyMS` to check on the status of the connection. A heartbeat is subject to `serverSelectionTimeoutMS`, so the MongoDB driver will retry failed heartbeats for up to 30 seconds by default. Mongoose only emits a `'disconnected'` event after a heartbeat has failed, so you may want to decrease this setting to reduce the time between when your server goes down and when Mongoose emits `'disconnected'`. We recommend you do **not** set this setting below 1000, too many heartbeats can lead to performance degradation.
 
-The `serverSelectionTimeoutMS` option also handles how long `mongoose.connect()` will
-retry initial connection before erroring out. `mongoose.connect()`
-will retry for 30 seconds by default (default `serverSelectionTimeoutMS`) before
-erroring out. To get faster feedback on failed operations, you can reduce `serverSelectionTimeoutMS`
-to 5000 as shown below.
+<h2 id="serverselectiontimeoutms"><a href="#serverselectiontimeoutms">serverSelectionTimeoutMS</a></h2>
 
-Example:
+The `serverSelectionTimeoutMS` option is extremely important: it controls how long the MongoDB Node.js driver will attempt to retry any operation before erroring out.
+This includes initial connection, like `await mongoose.connect()`, as well as any operations that make requests to MongoDB, like `save()` or `find()`.
+
+By default, `serverSelectionTimeoutMS` is 30000 (30 seconds).
+This means that, for example, if you call `mongoose.connect()` when your standalone MongoDB server is down, your `mongoose.connect()` call will only throw an error after 30 seconds.
 
 ```javascript
-const options = {
-  autoIndex: false, // Don't build indexes
-  maxPoolSize: 10, // Maintain up to 10 socket connections
-  serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-  family: 4 // Use IPv4, skip trying IPv6
-};
-mongoose.connect(uri, options);
+// Throws an error "getaddrinfo ENOTFOUND doesnt.exist" after 30 seconds
+await mongoose.connect('mongodb://doesnt.exist:27017/test');
 ```
 
-See [this page](http://mongodb.github.io/node-mongodb-native/3.1/reference/faq/) for more information about `connectTimeoutMS` and `socketTimeoutMS`
+Similarly, if your standalone MongoDB server goes down after initial connection, any `find()` or `save()` calls will error out after 30 seconds, unless your MongoDB server is restarted.
+
+While 30 seconds seems like a long time, `serverSelectionTimeoutMS` means you're unlikely to see any interruptions during a [replica set failover](https://www.mongodb.com/docs/manual/replication/#automatic-failover).
+If you lose your replica set primary, the MongoDB Node driver will ensure that any operations you send during the replica set election will eventually execute, assuming that the replica set election takes less than `serverSelectionTimeoutMS`.
+
+To get faster feedback on failed connections, you can reduce `serverSelectionTimeoutMS` to 5000 as follows.
+We don't recommend reducing `serverSelectionTimeoutMS` unless you are running a standalone MongoDB server rather than a replica set, or unless you are using a serverless runtime like [AWS Lambda](lambda.html).
+
+```javascript
+mongoose.connect(uri, {
+  serverSelectionTimeoutMS: 5000
+});
+```
+
+There is no way to tune `serverSelectionTimeoutMS` independently for `mongoose.connect()` vs for queries.
+If you want to reduce `serverSelectionTimeoutMS` for queries and other operations, but still retry `mongoose.connect()` for longer, you are responsible for retrying the `connect()` calls yourself using a `for` loop or [a tool like p-retry](https://github.com/Automattic/mongoose/issues/12967#issuecomment-1411227968).
+
+```javascript
+const serverSelectionTimeoutMS = 5000;
+
+// Prints "Failed 0", "Failed 1", "Failed 2" and then throws an
+// error. Exits after approximately 15 seconds.
+for (let i = 0; i < 3; ++i) {
+  try {
+    await mongoose.connect('mongodb://doesnt.exist:27017/test', {
+      serverSelectionTimeoutMS
+    });
+    break;
+  } catch (err) {
+    console.log('Failed', i);
+    if (i >= 2) {
+      throw err;
+    }
+  }
+}
+```
 
 <h2 id="callback"><a href="#callback">Callback</a></h2>
 

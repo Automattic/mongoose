@@ -12,6 +12,7 @@ on the schema level and is useful for writing [plugins](plugins.html).
   <li><a href="#post-async">Asynchronous Post Hooks</a></li>
   <li><a href="#defining">Define Middleware Before Compiling Models</a></li>
   <li><a href="#order">Save/Validate Hooks</a></li>
+  <li><a href="#accessing-parameters-in-middleware">Accessing Parameters in Middleware</a></li>
   <li><a href="#naming">Naming Conflicts</a></li>
   <li><a href="#notes">Notes on findAndUpdate() and Query Middleware</a></li>
   <li><a href="#error-handling-middleware">Error Handling Middleware</a></li>
@@ -342,6 +343,39 @@ schema.pre('save', function() {
 schema.post('save', function() {
   console.log('this gets printed fourth');
 });
+```
+
+<h2 id="accessing-parameters-in-middleware"><a href="#accessing-parameters-in-middleware">Accessing Parameters in Middleware</a></h2>
+
+Mongoose provides 2 ways to get information about the function call that triggered the middleware.
+For query middleware, we recommend using `this`, which will be a [Mongoose Query instance](api/query.html).
+
+```javascript
+const userSchema = new Schema({ name: String, age: Number });
+userSchema.pre('findOneAndUpdate', function() {
+  console.log(this.getFilter()); // { name: 'John' }
+  console.log(this.getUpdate()); // { age: 30 }
+});
+const User = mongoose.model('User', userSchema);
+
+await User.findOneAndUpdate({ name: 'John' }, { $set: { age: 30 } });
+```
+
+For document middleware, like `pre('save')`, Mongoose passes the 1st parameter to `save()` as the 2nd argument to your `pre('save')` callback.
+You should use the 2nd argument to get access to the `save()` call's `options`, because Mongoose documents don't store all the options you can pass to `save()`.
+
+```javascript
+const userSchema = new Schema({ name: String, age: Number });
+userSchema.pre('save', function(next, options) {
+  options.validateModifiedOnly; // true
+
+  // Remember to call `next()` unless you're using an async function or returning a promise
+  next();
+});
+const User = mongoose.model('User', userSchema);
+
+const doc = new User({ name: 'John', age: 30 });
+await doc.save({ validateModifiedOnly: true });
 ```
 
 <h2 id="naming"><a href="#naming">Naming Conflicts</a></h2>

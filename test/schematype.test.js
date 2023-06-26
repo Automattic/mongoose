@@ -4,7 +4,9 @@
  * Module dependencies.
  */
 
-const mongoose = require('./common').mongoose;
+const start = require('./common');
+
+const mongoose = start.mongoose;
 
 const assert = require('assert');
 
@@ -213,7 +215,7 @@ describe('schematype', function() {
       });
       it('should allow setting values to a given property gh-13510', async function() {
         const m = new mongoose.Mongoose();
-        await m.connect('mongodb://127.0.0.1:27017/gh13510');
+        await m.connect(start.uri);
         m.SchemaTypes.Date.setters.push(v => typeof v === 'string' && /^\d{8}$/.test(v) ? new Date(v.slice(0, 4), +v.slice(4, 6) - 1, v.slice(6, 8)) : v);
         const testSchema = new m.Schema({
           myDate: Date

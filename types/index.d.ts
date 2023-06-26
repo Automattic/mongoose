@@ -430,6 +430,8 @@ declare module 'mongoose' {
 
     /** Returns the virtual type with the given `name`. */
     virtualpath<T = THydratedDocumentType>(name: string): VirtualType<T> | null;
+
+    static ObjectId: typeof Schema.Types.ObjectId;
   }
 
   export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;

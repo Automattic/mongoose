@@ -197,6 +197,52 @@ describe('model', function() {
         const docs = await Test.find();
         assert.equal(docs.length, 5);
       });
+
+      it('should return the first error immediately if "immediateError" is not explicitly set (ordered)', async function() {
+        const testSchema = new Schema({ name: { type: String, required: true } });
+
+        const TestModel = db.model('gh1731-1', testSchema);
+
+        const res = await TestModel.create([{ name: 'test' }, {}, { name: 'another' }], { ordered: true }).then(null).catch(err => err);
+
+        assert.ok(res instanceof mongoose.Error.ValidationError);
+      });
+
+      it('should not return errors immediately if "immediateError" is "false" (ordered)', async function() {
+        const testSchema = new Schema({ name: { type: String, required: true } });
+
+        const TestModel = db.model('gh1731-2', testSchema);
+
+        const res = await TestModel.create([{ name: 'test' }, {}, { name: 'another' }], { ordered: true, immediateError: false });
+
+        assert.equal(res.length, 3);
+        assert.ok(res[0] instanceof mongoose.Document);
+        assert.ok(res[1] instanceof mongoose.Error.ValidationError);
+        assert.ok(res[2] instanceof mongoose.Document);
+      });
+    });
+
+    it('should return the first error immediately if "immediateError" is not explicitly set', async function() {
+      const testSchema = new Schema({ name: { type: String, required: true } });
+
+      const TestModel = db.model('gh1731-3', testSchema);
+
+      const res = await TestModel.create([{ name: 'test' }, {}, { name: 'another' }], {}).then(null).catch(err => err);
+
+      assert.ok(res instanceof mongoose.Error.ValidationError);
+    });
+
+    it('should not return errors immediately if "immediateError" is "false"', async function() {
+      const testSchema = new Schema({ name: { type: String, required: true } });
+
+      const TestModel = db.model('gh1731-4', testSchema);
+
+      const res = await TestModel.create([{ name: 'test' }, {}, { name: 'another' }], { immediateError: false });
+
+      assert.equal(res.length, 3);
+      assert.ok(res[0] instanceof mongoose.Document);
+      assert.ok(res[1] instanceof mongoose.Error.ValidationError);
+      assert.ok(res[2] instanceof mongoose.Document);
     });
   });
 });

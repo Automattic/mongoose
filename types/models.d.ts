@@ -132,6 +132,10 @@ declare module 'mongoose' {
     wtimeout?: number;
   }
 
+  interface CreateOptions extends SaveOptions {
+    immediateError?: boolean;
+  }
+
   interface RemoveOptions extends SessionOption, Omit<mongodb.DeleteOptions, 'session'> {}
 
   const Model: Model<any>;
@@ -217,7 +221,7 @@ declare module 'mongoose' {
     >;
 
     /** Creates a new document or documents */
-    create<DocContents = AnyKeys<TRawDocType>>(docs: Array<TRawDocType | DocContents>, options?: SaveOptions): Promise<THydratedDocumentType[]>;
+    create<DocContents = AnyKeys<TRawDocType>>(docs: Array<TRawDocType | DocContents>, options?: CreateOptions): Promise<THydratedDocumentType[]>;
     create<DocContents = AnyKeys<TRawDocType>>(doc: DocContents | TRawDocType): Promise<THydratedDocumentType>;
     create<DocContents = AnyKeys<TRawDocType>>(...docs: Array<TRawDocType | DocContents>): Promise<THydratedDocumentType[]>;
 

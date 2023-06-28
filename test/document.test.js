@@ -7615,7 +7615,11 @@ describe('document', function() {
 
       schema.path('createdAt').immutable(true);
       assert.ok(schema.path('createdAt').$immutable);
-      assert.equal(schema.path('createdAt').setters.length, 1);
+      assert.equal(
+        schema.path('createdAt').setters.length,
+        1,
+        schema.path('createdAt').setters.map(setter => setter.toString())
+      );
 
       schema.path('createdAt').immutable(false);
       assert.ok(!schema.path('createdAt').$immutable);

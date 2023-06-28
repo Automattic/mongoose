@@ -228,6 +228,10 @@ describe('schematype', function() {
         await m.connections[0].close();
         assert(doc.myDate instanceof Date);
       });
+
+      after(() => {
+        mongoose.SchemaTypes.Date.setters = [];
+      });
     });
 
     const typesToTest = Object.values(mongoose.SchemaTypes).

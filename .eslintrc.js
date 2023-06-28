@@ -11,7 +11,9 @@ module.exports = {
     'test/files/*',
     'benchmarks',
     '*.min.js',
-    '**/docs/js/native.js'
+    '**/docs/js/native.js',
+    '!.*',
+    'node_modules'
   ],
   overrides: [
     {

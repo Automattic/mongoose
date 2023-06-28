@@ -62,7 +62,7 @@ query.select('name occupation');
 
 // execute the query at a later time
 const person = await query.exec();
- // Prints "Space Ghost is a talk show host."
+// Prints "Space Ghost is a talk show host."
 console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation);
 ```
 

@@ -24,6 +24,26 @@ permissions:
   contents: read
 
 jobs:
+  lint-documentation:
+    runs-on: ubuntu-latest
+    name: Lint Markdown files
+    steps:
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+
+      - name: Setup node
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+        with:
+          node-version: 16
+
+      - run: npm install
+
+      - name: Lint MD-Files # run markdownlint
+        run: npm run lint-md
+
+      # enable when "eslint-markdown" can be used without errors
+      # - name: Lint JS-Files # run eslint to lint the code-blocks themself
+      #   run: npm run lint-js
+
   test-documentation:
     runs-on: ubuntu-20.04
     name: Test Generating Docs

@@ -1,4 +1,4 @@
-<h1 id="schematypes"><a href="#schematypes">SchemaTypes</a></h1>
+# SchemaTypes
 
 SchemaTypes handle definition of path
 [defaults](api/schematype.html#schematype_SchemaType-default),

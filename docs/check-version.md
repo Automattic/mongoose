@@ -30,5 +30,5 @@ test@ /path/to/test
 
 Other package managers also support similar functions:
 
-- [`yarn list --pattern "mongoose"`](https://classic.yarnpkg.com/lang/en/docs/cli/list/)
-- [`pnpm list "mongoose"`](https://pnpm.io/cli/list)
+* [`yarn list --pattern "mongoose"`](https://classic.yarnpkg.com/lang/en/docs/cli/list/)
+* [`pnpm list "mongoose"`](https://pnpm.io/cli/list)

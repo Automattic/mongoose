@@ -28,7 +28,7 @@ deleteMany, or bulkWrite instead.
 ```
 
 To remove this deprecation warning, replace any usage of `remove()` with
-`deleteMany()`, _unless_ you specify the [`single` option to `remove()`](api/model.html#model_Model-remove). The `single`
+`deleteMany()`, *unless* you specify the [`single` option to `remove()`](api/model.html#model_Model-remove). The `single`
 option limited `remove()` to deleting at most one document, so you should
 replace `remove(filter, { single: true })` with `deleteOne(filter)`.
 
@@ -87,7 +87,7 @@ parameter like [`find()`](#query_Query-find). The `estimatedDocumentCount()`
 function is faster, but can only tell you the total number of documents in
 a collection. You cannot pass a `filter` to `estimatedDocumentCount()`.
 
-To migrate, replace `count()` with `countDocuments()` _unless_ you do not
+To migrate, replace `count()` with `countDocuments()` *unless* you do not
 pass any arguments to `count()`. If you use `count()` to count all documents
 in a collection as opposed to counting documents that match a query, use
 `estimatedDocumentCount()` instead of `countDocuments()`.

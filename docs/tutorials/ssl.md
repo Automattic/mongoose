@@ -91,6 +91,7 @@ await mongoose.connect('mongodb://127.0.0.1:27017/test', {
   auth: { username }
 });
 ```
+
 ## X.509 Authentication with MongoDB Atlas
 
 With MongoDB Atlas, X.509 certificates are not Root CA certificates and will not work with the `sslCA` parameter as self-signed certificates would. If the `sslCA` parameter is used an error similar to the following would be raised:

@@ -2,41 +2,41 @@
 
 Before we get into the specifics of validation syntax, please keep the following rules in mind:
 
-- Validation is defined in the [SchemaType](schematypes.html)
-- Validation is [middleware](middleware.html). Mongoose registers validation as a `pre('save')` hook on every schema by default.
-- Validation always runs as the **first** `pre('save')` hook. This means that validation doesn't run on any changes you make in `pre('save')` hooks.
-- You can disable automatic validation before save by setting the [validateBeforeSave](guide.html#validateBeforeSave) option
-- You can manually run validation using `doc.validate()` or `doc.validateSync()`
-- You can manually mark a field as invalid (causing validation to fail) by using [`doc.invalidate(...)`](api/document.html#document_Document-invalidate)
-- Validators are not run on undefined values. The only exception is the [`required` validator](api/schematype.html#schematype_SchemaType-required).
-- When you call [Model#save](api/model.html#model_Model-save), Mongoose also runs subdocument validation. If an error occurs, your [Model#save](api/model.html#model_Model-save) promise rejects
-- Validation is customizable
+* Validation is defined in the [SchemaType](schematypes.html)
+* Validation is [middleware](middleware.html). Mongoose registers validation as a `pre('save')` hook on every schema by default.
+* Validation always runs as the **first** `pre('save')` hook. This means that validation doesn't run on any changes you make in `pre('save')` hooks.
+* You can disable automatic validation before save by setting the [validateBeforeSave](guide.html#validateBeforeSave) option
+* You can manually run validation using `doc.validate()` or `doc.validateSync()`
+* You can manually mark a field as invalid (causing validation to fail) by using [`doc.invalidate(...)`](api/document.html#document_Document-invalidate)
+* Validators are not run on undefined values. The only exception is the [`required` validator](api/schematype.html#schematype_SchemaType-required).
+* When you call [Model#save](api/model.html#model_Model-save), Mongoose also runs subdocument validation. If an error occurs, your [Model#save](api/model.html#model_Model-save) promise rejects
+* Validation is customizable
 
 ```acquit
 [require:Validation$]
 ```
 
-- [Built-in Validators](#built-in-validators)
-- [Custom Error Messages](#custom-error-messages)
-- [The `unique` Option is Not a Validator](#the-unique-option-is-not-a-validator)
-- [Custom Validators](#custom-validators)
-- [Async Custom Validators](#async-custom-validators)
-- [Validation Errors](#validation-errors)
-- [Cast Errors](#cast-errors)
-- [Global SchemaType Validation](#global-schematype-validation)
-- [Required Validators On Nested Objects](#required-validators-on-nested-objects)
-- [Update Validators](#update-validators)
-- [Update Validators and `this`](#update-validators-and-this)
-- [Update Validators Only Run On Updated Paths](#update-validators-only-run-on-updated-paths)
-- [Update Validators Only Run For Some Operations](#update-validators-only-run-for-some-operations)
+* [Built-in Validators](#built-in-validators)
+* [Custom Error Messages](#custom-error-messages)
+* [The `unique` Option is Not a Validator](#the-unique-option-is-not-a-validator)
+* [Custom Validators](#custom-validators)
+* [Async Custom Validators](#async-custom-validators)
+* [Validation Errors](#validation-errors)
+* [Cast Errors](#cast-errors)
+* [Global SchemaType Validation](#global-schematype-validation)
+* [Required Validators On Nested Objects](#required-validators-on-nested-objects)
+* [Update Validators](#update-validators)
+* [Update Validators and `this`](#update-validators-and-this)
+* [Update Validators Only Run On Updated Paths](#update-validators-only-run-on-updated-paths)
+* [Update Validators Only Run For Some Operations](#update-validators-only-run-for-some-operations)
 
 ## Built-in Validators
 
 Mongoose has several built-in validators.
 
-- All [SchemaTypes](schematypes.html) have the built-in [required](api/schematype.html#schematype_SchemaType-required) validator. The required validator uses the [SchemaType's `checkRequired()` function](api/schematype.html#schematype_SchemaType-checkRequired) to determine if the value satisfies the required validator.
-- [Numbers](schematypes.html#numbers) have [`min` and `max`](schematypes.html#number-validators) validators.
-- [Strings](schematypes.html#strings) have [`enum`, `match`, `minLength`, and `maxLength`](schematypes.html#string-validators) validators.
+* All [SchemaTypes](schematypes.html) have the built-in [required](api/schematype.html#schematype_SchemaType-required) validator. The required validator uses the [SchemaType's `checkRequired()` function](api/schematype.html#schematype_SchemaType-checkRequired) to determine if the value satisfies the required validator.
+* [Numbers](schematypes.html#numbers) have [`min` and `max`](schematypes.html#number-validators) validators.
+* [Strings](schematypes.html#strings) have [`enum`, `match`, `minLength`, and `maxLength`](schematypes.html#string-validators) validators.
 
 Each of the validator links above provide more information about how to enable them and customize their error messages.
 
@@ -49,8 +49,8 @@ Each of the validator links above provide more information about how to enable t
 You can configure the error message for individual validators in your schema. There are two equivalent
 ways to set the validator error message:
 
-- Array syntax: `min: [6, 'Must be at least 6, got {VALUE}']`
-- Object syntax: `enum: { values: ['Coffee', 'Tea'], message: '{VALUE} is not supported' }`
+* Array syntax: `min: [6, 'Must be at least 6, got {VALUE}']`
+* Object syntax: `enum: { values: ['Coffee', 'Tea'], message: '{VALUE} is not supported' }`
 
 Mongoose also supports rudimentary templating for error messages.
 Mongoose replaces `{VALUE}` with the value being validated.
@@ -110,7 +110,7 @@ thrown.
 ## Cast Errors
 
 Before running validators, Mongoose attempts to coerce values to the
-correct type. This process is called _casting_ the document. If
+correct type. This process is called *casting* the document. If
 casting fails for a given path, the `error.errors` object will contain
 a `CastError` object.
 
@@ -125,7 +125,7 @@ fails. That means your custom validators may assume `v` is `null`,
 ## Global SchemaType Validation
 
 In addition to defining custom validators on individual schema paths, you can also configure a custom validator to run on every instance of a given `SchemaType`.
-For example, the following code demonstrates how to make empty string `''` an invalid value for _all_ string paths.
+For example, the following code demonstrates how to make empty string `''` an invalid value for *all* string paths.
 
 ```acquit
 [require:Global SchemaType Validation]
@@ -190,12 +190,12 @@ you try to explicitly `$unset` the key.
 One final detail worth noting: update validators **only** run on the
 following update operators:
 
-- `$set`
-- `$unset`
-- `$push`
-- `$addToSet`
-- `$pull`
-- `$pullAll`
+* `$set`
+* `$unset`
+* `$push`
+* `$addToSet`
+* `$pull`
+* `$pullAll`
 
 For instance, the below update will succeed, regardless of the value of
 `number`, because update validators ignore `$inc`.

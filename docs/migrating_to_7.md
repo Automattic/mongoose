@@ -82,60 +82,60 @@ schema.pre('deleteOne', { document: true, query: false }, function() {
 The following functions no longer accept callbacks.
 They always return promises.
 
-- `Aggregate.prototype.exec`
-- `Aggregate.prototype.explain`
-- `AggregationCursor.prototype.close`
-- `Connection.prototype.startSession`
-- `Connection.prototype.dropCollection`
-- `Connection.prototype.createCollection`
-- `Connection.prototype.dropDatabase`
-- `Connection.prototype.openUri`
-- `Connection.prototype.close`
-- `Connection.prototype.destroy`
-- `Document.prototype.populate`
-- `Document.prototype.validate`
-- `Mongoose.prototype.connect`
-- `Mongoose.prototype.createConnection`
-- `Model.prototype.save`
-- `Model.aggregate`
-- `Model.bulkWrite`
-- `Model.cleanIndexes`
-- `Model.countDocuments`
-- `Model.create`
-- `Model.createCollection`
-- `Model.createIndexes`
-- `Model.deleteOne`
-- `Model.deleteMany`
-- `Model.distinct`
-- `Model.ensureIndexes`
-- `Model.estimatedDocumentCount`
-- `Model.exists`
-- `Model.find`
-- `Model.findById`
-- `Model.findByIdAndUpdate`
-- `Model.findByIdAndReplace`
-- `Model.findOne`
-- `Model.findOneAndDelete`
-- `Model.findOneAndUpdate`
-- `Model.findOneAndRemove`
-- `Model.insertMany`
-- `Model.listIndexes`
-- `Model.replaceOne`
-- `Model.syncIndexes`
-- `Model.updateMany`
-- `Model.updateOne`
-- `Query.prototype.find`
-- `Query.prototype.findOne`
-- `Query.prototype.findOneAndDelete`
-- `Query.prototype.findOneAndUpdate`
-- `Query.prototype.findOneAndRemove`
-- `Query.prototype.findOneAndReplace`
-- `Query.prototype.validate`
-- `Query.prototype.deleteOne`
-- `Query.prototype.deleteMany`
-- `Query.prototype.exec`
-- `QueryCursor.prototype.close`
-- `QueryCursor.prototype.next`
+* `Aggregate.prototype.exec`
+* `Aggregate.prototype.explain`
+* `AggregationCursor.prototype.close`
+* `Connection.prototype.startSession`
+* `Connection.prototype.dropCollection`
+* `Connection.prototype.createCollection`
+* `Connection.prototype.dropDatabase`
+* `Connection.prototype.openUri`
+* `Connection.prototype.close`
+* `Connection.prototype.destroy`
+* `Document.prototype.populate`
+* `Document.prototype.validate`
+* `Mongoose.prototype.connect`
+* `Mongoose.prototype.createConnection`
+* `Model.prototype.save`
+* `Model.aggregate`
+* `Model.bulkWrite`
+* `Model.cleanIndexes`
+* `Model.countDocuments`
+* `Model.create`
+* `Model.createCollection`
+* `Model.createIndexes`
+* `Model.deleteOne`
+* `Model.deleteMany`
+* `Model.distinct`
+* `Model.ensureIndexes`
+* `Model.estimatedDocumentCount`
+* `Model.exists`
+* `Model.find`
+* `Model.findById`
+* `Model.findByIdAndUpdate`
+* `Model.findByIdAndReplace`
+* `Model.findOne`
+* `Model.findOneAndDelete`
+* `Model.findOneAndUpdate`
+* `Model.findOneAndRemove`
+* `Model.insertMany`
+* `Model.listIndexes`
+* `Model.replaceOne`
+* `Model.syncIndexes`
+* `Model.updateMany`
+* `Model.updateOne`
+* `Query.prototype.find`
+* `Query.prototype.findOne`
+* `Query.prototype.findOneAndDelete`
+* `Query.prototype.findOneAndUpdate`
+* `Query.prototype.findOneAndRemove`
+* `Query.prototype.findOneAndReplace`
+* `Query.prototype.validate`
+* `Query.prototype.deleteOne`
+* `Query.prototype.deleteMany`
+* `Query.prototype.exec`
+* `QueryCursor.prototype.close`
+* `QueryCursor.prototype.next`
 
 If you are using the above functions with callbacks, we recommend switching to async/await, or promises if async functions don't work for you.
 If you need help refactoring a legacy codebase, [this tool from Mastering JS callbacks to async await](https://masteringjs.io/tutorials/tools/callback-to-async-await) using ChatGPT.
@@ -325,8 +325,8 @@ TOverrides;
 
 In Mongoose 7, the first parameter is the raw document interface, the 2nd parameter is any document-specific overrides (usually virtuals and methods), and the 3rd parameter is any query helpers associated with the document's model.
 
-The key difference is that, in Mongoose 6, the 3rd generic param was the document's _virtuals_.
-In Mongoose 7, the 3rd generic param is the document's _query helpers_.
+The key difference is that, in Mongoose 6, the 3rd generic param was the document's *virtuals*.
+In Mongoose 7, the 3rd generic param is the document's *query helpers*.
 
 ```ts
 // Mongoose 6 version:

@@ -25,10 +25,10 @@ This page has a list of video courses, books, and blog posts curated by
 Mongoose maintainers. We've gone through every course, book, and article
 on this page to make sure it is high quality.
 
-- [Further Reading](#further-reading)
-  - [Video Courses](#video-courses)
-  - [Books](#books)
-  - [Blog Posts](#blog-posts)
+* [Further Reading](#further-reading)
+  * [Video Courses](#video-courses)
+  * [Books](#books)
+  * [Blog Posts](#blog-posts)
 
 <div class="clear"></div>
 
@@ -77,7 +77,7 @@ RESTful API with Express and Mongoose from scratch.
 
 Know someone who wants to get started building Node.js apps but doesn't have
 a lot of software development experience?
-This course is more beginner-friendly than _API Design_ and is a great
+This course is more beginner-friendly than *API Design* and is a great
 resource for beginners looking to get started.
 
 <hr/>
@@ -93,8 +93,8 @@ resource for beginners looking to get started.
 
 Looking for a course to take you from zero to Express + Mongoose
 REST API fast? This is the one. This course is halfway
-between _API Design_ and _Introduction to Mongoose_. It focuses more on
-[Express](http://expressjs.com/), but also doesn't go into as much detail as _API Design_.
+between *API Design* and *Introduction to Mongoose*. It focuses more on
+[Express](http://expressjs.com/), but also doesn't go into as much detail as *API Design*.
 
 <hr/>
 
@@ -141,7 +141,7 @@ so you can upgrade with confidence.
 </a>
 
 This is the book on Mongoose. Even though it is from 2013,
-_Mongoose for Application Development_ has stood the test of time. This
+*Mongoose for Application Development* has stood the test of time. This
 book does an excellent job summarizing the core ideas that make Mongoose so
 powerful. Just sub out callbacks for promises.
 

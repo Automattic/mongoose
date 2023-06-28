@@ -147,4 +147,4 @@ citySchema.index({ location: '2dsphere' });
 
 MongoDB's [`$near` query operator](https://www.mongodb.com/docs/manual/reference/operator/query/near/)
 and [`$geoNear` aggregation stage](https://www.mongodb.com/docs/manual/reference/operator/aggregation/geoNear/#pipe._S_geoNear)
-_require_ a 2dsphere index. 
+*require* a 2dsphere index.

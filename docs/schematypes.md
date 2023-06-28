@@ -365,7 +365,7 @@ const Data = mongoose.model('Data', schema2);
 
 Mongoose will successfully cast the below values to buffers.
 
-```
+```js
 const file1 = new Data({ binData: 'test'}); // {"type":"Buffer","data":[116,101,115,116]}
 const file2 = new Data({ binData: 72987 }); // {"type":"Buffer","data":[27]}
 const file4 = new Data({ binData: { type: 'Buffer', data: [1, 2, 3]}}); // {"type":"Buffer","data":[1,2,3]}

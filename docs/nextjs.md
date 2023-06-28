@@ -11,7 +11,7 @@ There are a few common issues when working with Next.js that you should be aware
 
 You can fix this issue by adding the following to your `next.config.js`:
 
-```
+```js
 const nextConfig = {
   experimental: {
     esmExternals: "loose", // <-- add this

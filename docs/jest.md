@@ -6,7 +6,7 @@ We strongly recommend using a different testing framework, like [Mocha](https://
 
 To suppress any Jest warnings from Mongoose, set the `SUPPRESS_JEST_WARNINGS` environment variable:
 
-```
+```sh
 env SUPPRESS_JEST_WARNINGS=1 npm test
 ```
 

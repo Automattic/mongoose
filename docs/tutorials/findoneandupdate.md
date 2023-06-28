@@ -66,7 +66,7 @@ from MongoDB.
 
 Here's what the `res` object from the above example looks like:
 
-```
+```txt
 { lastErrorObject:
    { n: 1,
      updatedExisting: false,

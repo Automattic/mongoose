@@ -348,7 +348,7 @@ MongoDB replica sets rely on being able to reliably figure out the domain name f
 On Linux and OSX, the MongoDB server uses the output of the [`hostname` command](https://linux.die.net/man/1/hostname) to figure out the domain name to report to the replica set.
 This can cause confusing errors if you're connecting to a remote MongoDB replica set running on a machine that reports its `hostname` as `localhost`:
 
-```
+```txt
 // Can get this error even if your connection string doesn't include
 // `localhost` if `rs.conf()` reports that one replica set member has
 // `localhost` as its host name.
@@ -361,7 +361,7 @@ Follow [this page's instructions to change a replica set member's host name](htt
 You can also check the `reason.servers` property of `MongooseServerSelectionError` to see what the MongoDB Node driver thinks the state of your replica set is.
 The `reason.servers` property contains a [map](https://masteringjs.io/tutorials/fundamentals/map) of server descriptions.
 
-```
+```js
 if (err.name === 'MongooseServerSelectionError') {
   // Contains a Map describing the state of your replica set. For example:
   // Map(1) {

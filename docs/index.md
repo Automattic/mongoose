@@ -16,7 +16,7 @@
 
 Next install Mongoose from the command line using `npm`:
 
-```
+```sh
 npm install mongoose --save
 ```
 

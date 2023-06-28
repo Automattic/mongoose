@@ -72,7 +72,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/test')
 
 You can then run the above script using the following.
 
-```
+```sh
 deno run --allow-net --allow-read --allow-sys --allow-env mongoose-test.js
 ```
 
@@ -221,7 +221,7 @@ await m.save(); // does not work b/c the default connection object was never con
 
 In the first example snippet, we defined a key in the Schema that looks like:
 
-```
+```txt
 comments: [Comment]
 ```
 

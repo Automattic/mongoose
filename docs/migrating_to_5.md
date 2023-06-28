@@ -479,7 +479,7 @@ console.log(res);
 
 In Mongoose 4.x, the above will print:
 
-```
+```txt
 BulkWriteResult {
   ok: [Getter],
   nInserted: [Getter],
@@ -512,7 +512,7 @@ BulkWriteResult {
 
 In Mongoose 5.x, the script will print:
 
-```
+```txt
 BulkWriteResult {
   result: 
   { ok: 1,

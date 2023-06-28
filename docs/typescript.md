@@ -98,7 +98,7 @@ That's because `Schema.Types.ObjectId` is a [class that inherits from SchemaType
 If Mongoose's built-in `index.d.ts` file does not work for you, you can remove it in a postinstall script in your `package.json` as shown below.
 However, before you do, please [open an issue on Mongoose's GitHub page](https://github.com/Automattic/mongoose/issues/new) and describe the issue you're experiencing.
 
-```
+```json
 {
   "postinstall": "rm ./node_modules/mongoose/index.d.ts"
 }

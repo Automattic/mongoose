@@ -22,7 +22,7 @@ the [MongoDB CRUD specification](https://github.com/mongodb/specifications/blob/
 which aims to provide a consistent API for CRUD operations across all MongoDB
 drivers.
 
-```
+```txt
 DeprecationWarning: collection.remove is deprecated. Use deleteOne,
 deleteMany, or bulkWrite instead.
 ```
@@ -50,7 +50,7 @@ Like `remove()`, the [`update()` function](api/model.html#model_Model-update) is
 of the more explicit [`updateOne()`](api/model.html#model_Model-updateOne), [`updateMany()`](api/model.html#model_Model-updateMany), and [`replaceOne()`](api/model.html#model_Model-replaceOne) functions. You should replace
 `update()` with `updateOne()`, unless you use the [`multi` or `overwrite` options](api/model.html#model_Model-update).
 
-```
+```txt
 collection.update is deprecated. Use updateOne, updateMany, or bulkWrite
 instead.
 ```
@@ -78,7 +78,7 @@ The MongoDB server has deprecated the `count()` function in favor of two
 separate functions, [`countDocuments()`](#query_Query-countDocuments) and
 [`estimatedDocumentCount()`](#query_Query-estimatedDocumentCount).
 
-```
+```txt
 DeprecationWarning: collection.count is deprecated, and will be removed in a future version. Use collection.countDocuments or collection.estimatedDocumentCount instead
 ```
 

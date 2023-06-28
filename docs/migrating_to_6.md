@@ -380,7 +380,7 @@ However, Mongoose 6 does **not** buffer commands while a connection is disconnec
 * Replace `await doc.populate('path1').populate('path2').execPopulate();` with `await doc.populate(['path1', 'path2']);`
 * Replace `await doc.populate('path1', 'select1').populate('path2', 'select2').execPopulate();` with
 
-  ```
+  ```js
   await doc.populate([{path: 'path1', select: 'select1'}, {path: 'path2', select: 'select2'}]);
   ```
 

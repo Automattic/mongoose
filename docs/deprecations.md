@@ -75,15 +75,15 @@ MyModel.updateMany(filter, update);
 <h2 id="count"><a href="#count"><code>count()</code></a></h2>
 
 The MongoDB server has deprecated the `count()` function in favor of two
-separate functions, [`countDocuments()`](#query_Query-countDocuments) and
-[`estimatedDocumentCount()`](#query_Query-estimatedDocumentCount).
+separate functions, [`countDocuments()`](api/query.html#Query.prototype.countDocuments()) and
+[`estimatedDocumentCount()`](api/query.html#Query.prototype.estimatedDocumentCount()).
 
 ```txt
 DeprecationWarning: collection.count is deprecated, and will be removed in a future version. Use collection.countDocuments or collection.estimatedDocumentCount instead
 ```
 
 The difference between the two is `countDocuments()` can accept a filter
-parameter like [`find()`](#query_Query-find). The `estimatedDocumentCount()`
+parameter like [`find()`](api/query.html#Query.prototype.find()). The `estimatedDocumentCount()`
 function is faster, but can only tell you the total number of documents in
 a collection. You cannot pass a `filter` to `estimatedDocumentCount()`.
 

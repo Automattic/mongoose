@@ -480,8 +480,6 @@ await Model.updateOne({}, { $set: { name: 'test' } });
 
 <h2 id="error-handling-middleware"><a href="#error-handling-middleware">Error Handling Middleware</a></h2>
 
-*New in 4.5.0*
-
 Middleware execution normally stops the first time a piece of middleware
 calls `next()` with an error. However, there is a special kind of post
 middleware called "error handling middleware" that executes specifically

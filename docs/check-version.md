@@ -11,7 +11,7 @@ console.log(mongoose.version); // '7.x.x'
 We recommend printing the Mongoose version from Node.js, because that better handles cases where you have multiple versions of Mongoose installed.
 You can also execute the above logic from your terminal using Node.js' `-e` flag as follows.
 
-```
+```sh
 # Prints current Mongoose version, e.g. 7.0.3
 node -e "console.log(require('mongoose').version)"
 ```
@@ -20,7 +20,7 @@ node -e "console.log(require('mongoose').version)"
 
 You can also [get the installed version of the Mongoose npm package](https://masteringjs.io/tutorials/npm/version) using `npm list`.
 
-```
+```sh
 $ npm list mongoose
 test@ /path/to/test
 └── mongoose@7.0.3 
@@ -30,5 +30,5 @@ test@ /path/to/test
 
 Other package managers also support similar functions:
 
-- [`yarn list --pattern "mongoose"`](https://classic.yarnpkg.com/lang/en/docs/cli/list/)
-- [`pnpm list "mongoose"`](https://pnpm.io/cli/list)
+* [`yarn list --pattern "mongoose"`](https://classic.yarnpkg.com/lang/en/docs/cli/list/)
+* [`pnpm list "mongoose"`](https://pnpm.io/cli/list)

@@ -17,11 +17,11 @@ Mongoose 7.0.0 was released on February 27, 2023. You can find more details on [
 
 ## Support
 
-  - [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
-  - [Bug Reports](https://github.com/Automattic/mongoose/issues/)
-  - [Mongoose Slack Channel](http://slack.mongoosejs.io/)
-  - [Help Forum](http://groups.google.com/group/mongoose-orm)
-  - [MongoDB Support](https://www.mongodb.com/docs/manual/support/)
+* [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
+* [Bug Reports](https://github.com/Automattic/mongoose/issues/)
+* [Mongoose Slack Channel](http://slack.mongoosejs.io/)
+* [Help Forum](http://groups.google.com/group/mongoose-orm)
+* [MongoDB Support](https://www.mongodb.com/docs/manual/support/)
 
 ## Plugins
 
@@ -43,7 +43,7 @@ View all 400+ [contributors](https://github.com/Automattic/mongoose/graphs/contr
 First install [Node.js](http://nodejs.org/) and [MongoDB](https://www.mongodb.org/downloads). Then:
 
 ```sh
-$ npm install mongoose
+npm install mongoose
 ```
 
 Mongoose 6.8.0 also includes alpha support for [Deno](https://deno.land/).
@@ -72,7 +72,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/test')
 
 You can then run the above script using the following.
 
-```
+```sh
 deno run --allow-net --allow-read --allow-sys --allow-env mongoose-test.js
 ```
 
@@ -96,7 +96,7 @@ await mongoose.connect('mongodb://127.0.0.1/my_database');
 
 Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`.
 
-**Note:** _If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed._
+**Note:** *If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed.*
 
 **Important!** Mongoose buffers all the commands until it's connected to the database. This means that you don't have to wait until it connects to MongoDB in order to define models, run queries, etc.
 
@@ -168,13 +168,13 @@ Or just do it all at once
 const MyModel = mongoose.model('ModelName', mySchema);
 ```
 
-The first argument is the _singular_ name of the collection your model is for. **Mongoose automatically looks for the _plural_ version of your model name.** For example, if you use
+The first argument is the *singular* name of the collection your model is for. **Mongoose automatically looks for the *plural* version of your model name.** For example, if you use
 
 ```js
 const MyModel = mongoose.model('Ticket', mySchema);
 ```
 
-Then `MyModel` will use the __tickets__ collection, not the __ticket__ collection. For more details read the [model docs](https://mongoosejs.com/docs/api/mongoose.html#mongoose_Mongoose-model).
+Then `MyModel` will use the **tickets** collection, not the **ticket** collection. For more details read the [model docs](https://mongoosejs.com/docs/api/mongoose.html#mongoose_Mongoose-model).
 
 Once we have our model, we can then instantiate it, and save it:
 
@@ -221,7 +221,7 @@ await m.save(); // does not work b/c the default connection object was never con
 
 In the first example snippet, we defined a key in the Schema that looks like:
 
-```
+```txt
 comments: [Comment]
 ```
 
@@ -249,7 +249,6 @@ await post.save();
 ```
 
 Embedded documents enjoy all the same features as your models. Defaults, validators, middleware.
-
 
 ### Middleware
 
@@ -331,26 +330,26 @@ and [acquit](https://github.com/vkarpov15/acquit).
 
 ## Related Projects
 
-#### MongoDB Runners
+### MongoDB Runners
 
-- [run-rs](https://www.npmjs.com/package/run-rs)
-- [mongodb-memory-server](https://www.npmjs.com/package/mongodb-memory-server)
-- [mongodb-topology-manager](https://www.npmjs.com/package/mongodb-topology-manager)
+* [run-rs](https://www.npmjs.com/package/run-rs)
+* [mongodb-memory-server](https://www.npmjs.com/package/mongodb-memory-server)
+* [mongodb-topology-manager](https://www.npmjs.com/package/mongodb-topology-manager)
 
-#### Unofficial CLIs
+### Unofficial CLIs
 
-- [mongoosejs-cli](https://www.npmjs.com/package/mongoosejs-cli)
+* [mongoosejs-cli](https://www.npmjs.com/package/mongoosejs-cli)
 
-#### Data Seeding
+### Data Seeding
 
-- [dookie](https://www.npmjs.com/package/dookie)
-- [seedgoose](https://www.npmjs.com/package/seedgoose)
-- [mongoose-data-seed](https://www.npmjs.com/package/mongoose-data-seed)
+* [dookie](https://www.npmjs.com/package/dookie)
+* [seedgoose](https://www.npmjs.com/package/seedgoose)
+* [mongoose-data-seed](https://www.npmjs.com/package/mongoose-data-seed)
 
-#### Express Session Stores
+### Express Session Stores
 
-- [connect-mongodb-session](https://www.npmjs.com/package/connect-mongodb-session)
-- [connect-mongo](https://www.npmjs.com/package/connect-mongo)
+* [connect-mongodb-session](https://www.npmjs.com/package/connect-mongodb-session)
+* [connect-mongo](https://www.npmjs.com/package/connect-mongo)
 
 ## License
 

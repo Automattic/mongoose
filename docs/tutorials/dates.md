@@ -48,7 +48,7 @@ examples of querying by dates, date ranges, and sorting by date:
 
 ## Casting Edge Cases
 
-Date casting has a couple small cases where it differs from JavaScript's 
+Date casting has a couple small cases where it differs from JavaScript's
 native date parsing. First, Mongoose looks for a [`valueOf()` function](https://www.w3schools.com/jsref/jsref_valueof_string.asp) on the given object,
 and calls `valueOf()` before casting the date. This means Mongoose can cast
 [moment objects](http://npmjs.com/package/moment) to dates automatically.

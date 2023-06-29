@@ -607,7 +607,7 @@ const authorSchema = new Schema({
 
 const Author = mongoose.model('Author', authorSchema);
 
-const bookSchema = new Schema({ 
+const bookSchema = new Schema({
   authorId: { type: Schema.Types.UUID, ref: 'Author' }
 });
 const Book = mongoose.model('Book', bookSchema);

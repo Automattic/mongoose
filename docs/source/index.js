@@ -69,7 +69,6 @@ docs['docs/connections.md'] = { guide: true, title: 'Connecting to MongoDB', mar
 docs['docs/lambda.md'] = { guide: true, title: 'Using Mongoose With AWS Lambda', markdown: true };
 docs['docs/geojson.md'] = { guide: true, title: 'Using GeoJSON', acquit: true, markdown: true };
 docs['docs/transactions.md'] = { guide: true, title: 'Transactions', acquit: true, markdown: true };
-docs['docs/deprecations.md'] = { guide: true, title: 'Deprecation Warnings', markdown: true };
 docs['docs/further_reading.md'] = { title: 'Further Reading', markdown: true };
 docs['docs/jest.md'] = { title: 'Testing Mongoose with Jest', markdown: true };
 docs['docs/nextjs.md'] = { title: 'Using Mongoose With Next.js', markdown: true };

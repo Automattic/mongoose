@@ -39,7 +39,6 @@ integrating Mongoose with external tools and frameworks.
 * [Browser Library](browser.html)
 * [GeoJSON](geojson.html)
 * [Transactions](transactions.html)
-* [MongoDB Driver Deprecation Warnings](deprecations.html)
 * [Testing with Jest](jest.html)
 * [SSL Connections](tutorials/ssl.html)
 

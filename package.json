@@ -67,7 +67,7 @@
     "sinon": "15.2.0",
     "stream-browserify": "3.0.0",
     "tsd": "0.28.1",
-    "typescript": "5.1.3",
+    "typescript": "5.1.6",
     "uuid": "9.0.0",
     "webpack": "5.88.1"
   },

@@ -257,7 +257,7 @@ This may also affect libraries that use Mongoose.
 
 <h2 id="removed-mapreduce"><a href="#removed-mapreduce">Removed mapReduce</a></h2>
 
-MongoDB no longer supports `mapReduce`, so Mongoose 7 no has a `Model.mapReduce()` function.
+MongoDB no longer supports `mapReduce`, so Mongoose 7 no longer has a `Model.mapReduce()` function.
 Use the aggregation framework as a replacement for `mapReduce()`.
 
 ```javascript

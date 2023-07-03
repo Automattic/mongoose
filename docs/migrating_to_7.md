@@ -20,6 +20,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [Copy schema options in `Schema.prototype.add()`](#copy-schema-options-in-schema-prototype-add)
 * [ObjectId bsontype now has lowercase d](#objectid-bsontype-now-has-lowercase-d)
 * [Removed support for custom promise libraries](#removed-support-for-custom-promise-libraries)
+* [Removed mapReduce](#removed-mapreduce)
 * [TypeScript-specific changes](#typescript-specific-changes)
   * [Removed `LeanDocument` and support for `extends Document`](#removed-leandocument-and-support-for-extends-document)
   * [New parameters for `HydratedDocument`](#new-parameters-for-hydrateddocument)
@@ -253,6 +254,25 @@ oid._bsontype; // 'ObjectId' in Mongoose 7, 'ObjectID' in older versions of Mong
 
 Please update any places where you use `_bsontype` to check if an object is an ObjectId.
 This may also affect libraries that use Mongoose.
+
+<h2 id="removed-mapreduce"><a href="#removed-mapreduce">Removed mapReduce</a></h2>
+
+MongoDB no longer supports `mapReduce`, so Mongoose 7 no longer has a `Model.mapReduce()` function.
+Use the aggregation framework as a replacement for `mapReduce()`.
+
+```javascript
+// The following no longer works in Mongoose 7.
+const o = {
+  map: function() {
+    emit(this.author, 1);
+  },
+  reduce: function(k, vals) {
+    return vals.length;
+  }
+};
+
+await MR.mapReduce(o);
+```
 
 <h2 id="removed-support-for-custom-promise-libraries"><a href="#removed-support-for-custom-promise-libraries">Removed Support for custom promise libraries</a></h2>
 

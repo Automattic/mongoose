@@ -152,7 +152,7 @@ Below are some of the options that are important for tuning Mongoose.
 * `promiseLibrary`    - Sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html).
 * `maxPoolSize`       - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `maxPoolSize` is 100. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See [Slow Trains in MongoDB and Node.js](http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs). You may want to decrease `maxPoolSize` if you are running into [connection limits](https://www.mongodb.com/docs/atlas/reference/atlas-limits/#connection-limits-and-cluster-tier).
 * `minPoolSize`       - The minimum number of sockets the MongoDB driver will keep open for this connection. The MongoDB driver may close sockets that have been inactive for some time. You may want to increase `minPoolSize` if you expect your app to go through long idle times and want to make sure your sockets stay open to avoid slow trains when activity picks up.
-* `socketTimeoutMS`   - How long the MongoDB driver will wait before killing a socket due to inactivity *after initial connection*. A socket may be inactive because of either no activity or a long-running operation. This is set to `30000` by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
+* `socketTimeoutMS`   - How long the MongoDB driver will wait before killing a socket due to inactivity *after initial connection*. A socket may be inactive because of either no activity or a long-running operation. `socketTimeoutMS` defaults to 0, which means Node.js will not time out the socket due to inactivity. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
 * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
 * `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://www.mongodb.com/docs/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
 * `serverSelectionTimeoutMS` - The MongoDB driver will try to find a server to send any given operation to, and keep retrying for `serverSelectionTimeoutMS` milliseconds. If not set, the MongoDB driver defaults to using `30000` (30 seconds).
@@ -234,10 +234,10 @@ driver. You **can't** set Mongoose-specific options like `bufferCommands`
 in the query string.
 
 ```javascript
-mongoose.connect('mongodb://127.0.0.1:27017/test?connectTimeoutMS=1000&bufferCommands=false&authSource=otherdb');
+mongoose.connect('mongodb://127.0.0.1:27017/test?socketTimeoutMS=1000&bufferCommands=false&authSource=otherdb');
 // The above is equivalent to:
 mongoose.connect('mongodb://127.0.0.1:27017/test', {
-  connectTimeoutMS: 1000
+  socketTimeoutMS: 1000
   // Note that mongoose will **not** pull `bufferCommands` from the query string
 });
 ```
@@ -245,10 +245,10 @@ mongoose.connect('mongodb://127.0.0.1:27017/test', {
 The disadvantage of putting options in the query string is that query
 string options are harder to read. The advantage is that you only need a
 single configuration option, the URI, rather than separate options for
-`socketTimeoutMS`, `connectTimeoutMS`, etc. Best practice is to put options
+`socketTimeoutMS`, etc. Best practice is to put options
 that likely differ between development and production, like `replicaSet`
 or `ssl`, in the connection string, and options that should remain constant,
-like `connectTimeoutMS` or `maxPoolSize`, in the options object.
+like `socketTimeoutMS` or `maxPoolSize`, in the options object.
 
 The MongoDB docs have a full list of
 [supported connection string options](https://www.mongodb.com/docs/manual/reference/connection-string/).

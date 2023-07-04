@@ -622,3 +622,21 @@ function gh13206() {
     expectType<ChangeStreamInsertDocument<ITest>>(change);
   });
 }
+
+function gh13529() {
+  interface ResourceDoc {
+    foo: string;
+  }
+
+  type ResourceIdT<ResourceIdField extends string> = {
+    [key in ResourceIdField]: string;
+  };
+  type ResourceDocWithId<ResourceIdField extends string> = ResourceDoc & ResourceIdT<ResourceIdField>;
+
+  function test<
+    ResourceType extends string,
+    DocT extends ResourceDocWithId<`${ResourceType}Id`>>(dbModel: Model<DocT>) {
+    const resourceDoc = new dbModel();
+    resourceDoc.foo = 'bar';
+  }
+}

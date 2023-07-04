@@ -6,13 +6,12 @@ declare module 'mongoose' {
     U :
     T extends ReadonlyArray<infer U> ? U : T;
 
+  type MergeType<A, B> = Omit<A, keyof B> & B;
+  type MergeUnlessEmpty<A, B> = keyof B extends never ? A : Omit<A, keyof B> & B;
+
   type UnpackedIntersection<T, U> = T extends null ? null : T extends (infer A)[]
     ? (Omit<A, keyof U> & U)[]
-    : keyof U extends never
-      ? T
-      : Omit<T, keyof U> & U;
-
-  type MergeType<A, B> = Omit<A, keyof B> & B;
+    : MergeUnlessEmpty<T, U>;
 
   /**
    * @summary Converts Unions to one record "object".

@@ -141,7 +141,7 @@ declare module 'mongoose' {
   > = IfAny<
     DocType,
     any,
-    Document<unknown, TQueryHelpers, DocType> & MergeType<
+    Document<unknown, TQueryHelpers, DocType> & MergeUnlessEmpty<
       Require_id<DocType>,
       TOverrides extends Record<string, never> ?
         {} :

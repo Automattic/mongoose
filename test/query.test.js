@@ -4131,7 +4131,6 @@ describe('Query', function() {
       /Query must have `op` before executing/
     );
   });
-    
   it('converts findOneAndUpdate to findOneAndReplace if overwrite set (gh-13550)', async function() {
     const testSchema = new Schema({
       name: { type: String }

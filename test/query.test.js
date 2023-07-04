@@ -4106,7 +4106,7 @@ describe('Query', function() {
     }, { message: 'Invalid field "" passed to sort()' });
   });
 
-  it('throws a readable error when creating Query instance without a model (gh-13570)', async function() {
+  it('throws a readable error when executing Query instance without a model (gh-13570)', async function() {
     const schema = new Schema({ name: String });
     const M = db.model('Test', schema, 'Test');
     await M.deleteMany({});
@@ -4116,6 +4116,19 @@ describe('Query', function() {
     await assert.rejects(
       () => Q.collection('Test').find().lean(),
       /Query must have an associated model before executing/
+    );
+  });
+
+  it('throws a readable error when executing Query instance without an op (gh-13570)', async function() {
+    const schema = new Schema({ name: String });
+    const M = db.model('Test', schema, 'Test');
+    await M.deleteMany({});
+    await M.create({ name: 'gh13570' });
+
+    const Q = new M.Query();
+    await assert.rejects(
+      () => Q.lean(),
+      /Query must have `op` before executing/
     );
   });
 });

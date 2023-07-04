@@ -204,10 +204,10 @@ declare module 'mongoose' {
      * Model Statics methods.
      */
     statics?: IfEquals<
-    TStaticMethods,
-    {},
-    Record<any, (this: Model<DocType>, ...args: any) => unknown>,
-    TStaticMethods
+      TStaticMethods,
+      {},
+      { [name: string]: (this: Model<DocType>, ...args: any[]) => unknown },
+      { [F in keyof TStaticMethods]: TStaticMethods[F] }
     >
 
     /**

@@ -11,7 +11,7 @@ The most simple structure in GeoJSON is a point. Below is an example point
 representing the approximate location of [San Francisco](https://www.google.com/maps/@37.7,-122.5,9z).
 Note that longitude comes first in a GeoJSON coordinate array, **not** latitude.
 
-```
+```json
 {
   "type" : "Point",
   "coordinates" : [
@@ -70,7 +70,7 @@ GeoJSON polygons let you define an arbitrary shape on a map. For example,
 the below polygon is a GeoJSON rectangle that approximates the border
 of the state of Colorado.
 
-```
+```json
 {
   "type": "Polygon",
   "coordinates": [[
@@ -147,4 +147,4 @@ citySchema.index({ location: '2dsphere' });
 
 MongoDB's [`$near` query operator](https://www.mongodb.com/docs/manual/reference/operator/query/near/)
 and [`$geoNear` aggregation stage](https://www.mongodb.com/docs/manual/reference/operator/aggregation/geoNear/#pipe._S_geoNear)
-_require_ a 2dsphere index. 
+*require* a 2dsphere index.

@@ -65,7 +65,7 @@ In aggregate middleware, `this` refers to the [aggregation object](api/model.htm
 * [aggregate](api/model.html#model_Model-aggregate)
 
 Model middleware is supported for the following model functions.
-Don't confuse model middleware and document middleware: model middleware hooks into _static_ functions on a `Model` class, document middleware hooks into _methods_ on a `Model` class.
+Don't confuse model middleware and document middleware: model middleware hooks into *static* functions on a `Model` class, document middleware hooks into *methods* on a `Model` class.
 In model middleware functions, `this` refers to the model.
 
 * [insertMany](api/model.html#model_Model-insertMany)
@@ -232,7 +232,7 @@ error `err1` and then throw an error `err2`, mongoose will report `err1`.
 
 <h2 id="post"><a href="#post">Post middleware</a></h2>
 
-[post](api.html#schema_Schema-post) middleware are executed _after_
+[post](api.html#schema_Schema-post) middleware are executed *after*
 the hooked method and all of its `pre` middleware have completed.
 
 ```javascript
@@ -479,8 +479,6 @@ await Model.updateOne({}, { $set: { name: 'test' } });
 ```
 
 <h2 id="error-handling-middleware"><a href="#error-handling-middleware">Error Handling Middleware</a></h2>
-
-_New in 4.5.0_
 
 Middleware execution normally stops the first time a piece of middleware
 calls `next()` with an error. However, there is a special kind of post

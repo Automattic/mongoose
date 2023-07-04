@@ -1113,3 +1113,13 @@ function gh12882() {
     }[]
   }>({} as rTArrType);
 }
+
+function gh13534() {
+  const schema = new Schema({
+    myId: { type: Schema.ObjectId, required: true }
+  });
+  const Test = model('Test', schema);
+
+  const doc = new Test({ myId: '0'.repeat(24) });
+  expectType<Types.ObjectId>(doc.myId);
+}

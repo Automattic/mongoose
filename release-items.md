@@ -1,14 +1,16 @@
+# Release prodecure
+
 ## mongoose release procedure
 
-1.  tests must pass
-2.  update `package.json` and `package-lock.json` version
-3.  update `CHANGELOG.md`. Add #<TICKET_NUMBER> as well as a link to the github user who fixed it if applicable.
-4.  git commit -a -m 'release x.x.x'
-5.  git tag x.x.x
-6.  `npm run release`, or `npm run release-legacy` for 4.x
-7.  update mongoosejs.com (see "updating the website" below)
-8.  tweet changelog link from [@mongoosejs](https://twitter.com/mongoosejs)
-9.  Announce on mongoosejsteam slack channel
+1. tests must pass
+2. update `package.json` and `package-lock.json` version
+3. update `CHANGELOG.md`. Add #<TICKET_NUMBER> as well as a link to the github user who fixed it if applicable.
+4. git commit -a -m 'release x.x.x'
+5. git tag x.x.x
+6. `npm run release`, or `npm run release-legacy` for 4.x
+7. update mongoosejs.com (see "updating the website" below)
+8. tweet changelog link from [@mongoosejs](https://twitter.com/mongoosejs)
+9. Announce on mongoosejsteam slack channel
 10. if this is a legacy release, `git merge` changes into master.
 
 ## updating the website

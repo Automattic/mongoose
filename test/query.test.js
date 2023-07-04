@@ -4134,4 +4134,14 @@ describe('Query', function() {
     assert.ok(doc);
     assert.equal(doc.title, 'test-defaults-disabled');
   });
+  it('converts findOneAndUpdate to findOneAndReplace if overwrite set (gh-13550)', async function() {
+    const testSchema = new Schema({
+      name: { type: String }
+    });
+
+    const Test = db.model('Test', testSchema);
+    const q = Test.findOneAndUpdate({}, { name: 'bar' }, { overwrite: true });
+    await q.exec();
+    assert.equal(q.op, 'findOneAndReplace');
+  });
 });

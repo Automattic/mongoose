@@ -336,7 +336,7 @@ const CollectionSchema = new Schema({
 ```
 
 <hr id="initialize-array-path-null" />
-    
+
 <a class="anchor" href="#initialize-array-path-null">**Q**</a>. How can I initialize an array path to `null`?
 
 **A**. You can set the default of the array to a function that returns `null`.

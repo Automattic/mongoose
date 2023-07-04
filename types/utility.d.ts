@@ -14,13 +14,6 @@ declare module 'mongoose' {
 
   type MergeType<A, B> = Omit<A, keyof B> & B;
 
-  /**
-   * @summary Converts Unions to one record "object".
-   * @description It makes intellisense dialog box easier to read as a single object instead of showing that in multiple object unions.
-   * @param {T} T The type to be converted.
-   */
-   type FlatRecord<T> = { [K in keyof T]: T[K] };
-
    /**
  * @summary Checks if a type is "Record" or "any".
  * @description It Helps to check if user has provided schema type "EnforcedDocType"

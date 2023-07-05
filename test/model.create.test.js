@@ -198,7 +198,7 @@ describe('model', function() {
         assert.equal(docs.length, 5);
       });
 
-      it('should return the first error immediately if "immediateError" is not explicitly set (ordered)', async function() {
+      it('should return the first error immediately if "aggregateErrors" is not explicitly set (ordered)', async function() {
         const testSchema = new Schema({ name: { type: String, required: true } });
 
         const TestModel = db.model('gh1731-1', testSchema);
@@ -208,12 +208,12 @@ describe('model', function() {
         assert.ok(res instanceof mongoose.Error.ValidationError);
       });
 
-      it('should not return errors immediately if "immediateError" is "false" (ordered)', async function() {
+      it('should not return errors immediately if "aggregateErrors" is "true" (ordered)', async function() {
         const testSchema = new Schema({ name: { type: String, required: true } });
 
         const TestModel = db.model('gh1731-2', testSchema);
 
-        const res = await TestModel.create([{ name: 'test' }, {}, { name: 'another' }], { ordered: true, immediateError: false });
+        const res = await TestModel.create([{ name: 'test' }, {}, { name: 'another' }], { ordered: true, aggregateErrors: true });
 
         assert.equal(res.length, 3);
         assert.ok(res[0] instanceof mongoose.Document);
@@ -222,7 +222,7 @@ describe('model', function() {
       });
     });
 
-    it('should return the first error immediately if "immediateError" is not explicitly set', async function() {
+    it('should return the first error immediately if "aggregateErrors" is not explicitly set', async function() {
       const testSchema = new Schema({ name: { type: String, required: true } });
 
       const TestModel = db.model('gh1731-3', testSchema);
@@ -232,12 +232,12 @@ describe('model', function() {
       assert.ok(res instanceof mongoose.Error.ValidationError);
     });
 
-    it('should not return errors immediately if "immediateError" is "false"', async function() {
+    it('should not return errors immediately if "aggregateErrors" is "true"', async function() {
       const testSchema = new Schema({ name: { type: String, required: true } });
 
       const TestModel = db.model('gh1731-4', testSchema);
 
-      const res = await TestModel.create([{ name: 'test' }, {}, { name: 'another' }], { immediateError: false });
+      const res = await TestModel.create([{ name: 'test' }, {}, { name: 'another' }], { aggregateErrors: true });
 
       assert.equal(res.length, 3);
       assert.ok(res[0] instanceof mongoose.Document);

@@ -133,7 +133,7 @@ declare module 'mongoose' {
 
   interface CreateOptions extends SaveOptions {
     ordered?: boolean;
-    immediateError?: boolean;
+    aggregateErrors?: boolean;
   }
 
   interface RemoveOptions extends SessionOption, Omit<mongodb.DeleteOptions, 'session'> {}

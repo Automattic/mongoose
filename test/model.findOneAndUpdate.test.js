@@ -2153,7 +2153,9 @@ describe('model: findOneAndUpdate:', function() {
     });
     const doc = await Test.findOneAndUpdate({ name: 'Test' }, { name: 'Test Testerson' }, { new: true, upsert: true, includeResultMetadata: false });
     assert.equal(doc.ok, undefined);
+    assert.equal(doc.name, 'Test Testerson');
     const data = await Test.findOneAndUpdate({ name: 'Test Testerson' }, { name: 'Test' }, { new: true, upsert: true, includeResultMetadata: true });
     assert(data.ok);
+    assert.equal(data.value.name, 'Test');
   });
 });

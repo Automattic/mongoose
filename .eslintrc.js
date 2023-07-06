@@ -15,7 +15,9 @@ module.exports = {
     '**/docs/2.*/*',
     '**/docs/3.*/*',
     '**/docs/4.x/*',
-    '**/docs/5.x/*'
+    '**/docs/5.x/*',
+    '!.*',
+    'node_modules'
   ],
   overrides: [
     {

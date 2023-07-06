@@ -7,11 +7,11 @@ Furthermore, if you are using Next.js with [Vercel Serverless Functions](https:/
 
 There are a few common issues when working with Next.js that you should be aware of.
 
-### TypeError: Cannot read properties of undefined (reading 'prototype')
+## TypeError: Cannot read properties of undefined (reading 'prototype')
 
 You can fix this issue by adding the following to your `next.config.js`:
 
-```
+```js
 const nextConfig = {
   experimental: {
     esmExternals: "loose", // <-- add this
@@ -31,7 +31,7 @@ This issue is caused by [this change in MongoDB's bson parser](https://github.co
 MongoDB's bson parser uses top-level await and dynamic import in ESM mode to avoid some Webpack bundling issues.
 And Next.js forces ESM mode.
 
-### Next.js Edge Runtime
+## Next.js Edge Runtime
 
 Mongoose does **not** currently support [Next.js Edge Runtime](https://nextjs.org/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes#edge-runtime).
 While you can import Mongoose in Edge Runtime, you'll get [Mongoose's browser library](browser.html).

@@ -5,21 +5,21 @@ for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_del
 Each of these functions returns a
 [mongoose `Query` object](api/query.html#Query).
 
-- [`Model.deleteMany()`](api.html#model_Model-deleteMany)
-- [`Model.deleteOne()`](api.html#model_Model-deleteOne)
-- [`Model.find()`](api.html#model_Model-find)
-- [`Model.findById()`](api.html#model_Model-findById)
-- [`Model.findByIdAndDelete()`](api.html#model_Model-findByIdAndDelete)
-- [`Model.findByIdAndRemove()`](api.html#model_Model-findByIdAndRemove)
-- [`Model.findByIdAndUpdate()`](api.html#model_Model-findByIdAndUpdate)
-- [`Model.findOne()`](api.html#model_Model-findOne)
-- [`Model.findOneAndDelete()`](api.html#model_Model-findOneAndDelete)
-- [`Model.findOneAndRemove()`](api.html#model_Model-findOneAndRemove)
-- [`Model.findOneAndReplace()`](api.html#model_Model-findOneAndReplace)
-- [`Model.findOneAndUpdate()`](api.html#model_Model-findOneAndUpdate)
-- [`Model.replaceOne()`](api.html#model_Model-replaceOne)
-- [`Model.updateMany()`](api.html#model_Model-updateMany)
-- [`Model.updateOne()`](api.html#model_Model-updateOne)
+* [`Model.deleteMany()`](api.html#model_Model-deleteMany)
+* [`Model.deleteOne()`](api.html#model_Model-deleteOne)
+* [`Model.find()`](api.html#model_Model-find)
+* [`Model.findById()`](api.html#model_Model-findById)
+* [`Model.findByIdAndDelete()`](api.html#model_Model-findByIdAndDelete)
+* [`Model.findByIdAndRemove()`](api.html#model_Model-findByIdAndRemove)
+* [`Model.findByIdAndUpdate()`](api.html#model_Model-findByIdAndUpdate)
+* [`Model.findOne()`](api.html#model_Model-findOne)
+* [`Model.findOneAndDelete()`](api.html#model_Model-findOneAndDelete)
+* [`Model.findOneAndRemove()`](api.html#model_Model-findOneAndRemove)
+* [`Model.findOneAndReplace()`](api.html#model_Model-findOneAndReplace)
+* [`Model.findOneAndUpdate()`](api.html#model_Model-findOneAndUpdate)
+* [`Model.replaceOne()`](api.html#model_Model-replaceOne)
+* [`Model.updateMany()`](api.html#model_Model-updateMany)
+* [`Model.updateOne()`](api.html#model_Model-updateOne)
 
 A mongoose query can be executed in one of two ways. First, if you
 pass in a `callback` function, Mongoose will execute the query asynchronously
@@ -62,7 +62,7 @@ query.select('name occupation');
 
 // execute the query at a later time
 const person = await query.exec();
- // Prints "Space Ghost is a talk show host."
+// Prints "Space Ghost is a talk show host."
 console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation);
 ```
 

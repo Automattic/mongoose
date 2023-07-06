@@ -8,6 +8,7 @@ This guide will get you started using transactions with Mongoose.
 <h2 id="getting-started-with-transactions"><a href="#getting-started-with-transactions">Getting Started with Transactions</a></h2>
 
 If you haven't already, import mongoose:
+
 ```javascript
 import mongoose from 'mongoose';
 ```
@@ -27,10 +28,10 @@ const session = await db.startSession();
 In practice, you should use either the [`session.withTransaction()` helper](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html#withTransaction)
 or Mongoose's `Connection#transaction()` function to run a transaction. The `session.withTransaction()` helper handles:
 
-- Creating a transaction
-- Committing the transaction if it succeeds
-- Aborting the transaction if your operation throws
-- Retrying in the event of a [transient transaction error](https://stackoverflow.com/questions/52153538/what-is-a-transienttransactionerror-in-mongoose-or-mongodb).
+* Creating a transaction
+* Committing the transaction if it succeeds
+* Aborting the transaction if your operation throws
+* Retrying in the event of a [transient transaction error](https://stackoverflow.com/questions/52153538/what-is-a-transienttransactionerror-in-mongoose-or-mongodb).
 
 ```acquit
 [require:transactions.*withTransaction]

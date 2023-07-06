@@ -123,9 +123,9 @@ Using `lean()` bypasses all Mongoose features, including [virtuals](virtuals.htm
 and [defaults](../api/schematype.html#schematype_SchemaType-default). If you want to
 use these features with `lean()`, you need to use the corresponding plugin:
 
-- [mongoose-lean-virtuals](https://plugins.mongoosejs.io/plugins/lean-virtuals)
-- [mongoose-lean-getters](https://plugins.mongoosejs.io/plugins/lean-getters)
-- [mongoose-lean-defaults](https://www.npmjs.com/package/mongoose-lean-defaults)
+* [mongoose-lean-virtuals](https://plugins.mongoosejs.io/plugins/lean-virtuals)
+* [mongoose-lean-getters](https://plugins.mongoosejs.io/plugins/lean-getters)
+* [mongoose-lean-defaults](https://www.npmjs.com/package/mongoose-lean-defaults)
 
 However, you need to keep in mind that Mongoose does not hydrate lean documents,
 so `this` will be a POJO in virtuals, getters, and default functions.

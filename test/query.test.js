@@ -4094,6 +4094,7 @@ describe('Query', function() {
     await Test.findOneAndUpdate({}, { name: 'bar' });
     assert.ok(!('projection' in lastOptions));
   });
+
   it('should provide a clearer error message when sorting with empty string', async function() {
     const testSchema = new Schema({
       name: { type: String }
@@ -4103,5 +4104,41 @@ describe('Query', function() {
     await assert.rejects(async() => {
       await Error.find().sort('-');
     }, { message: 'Invalid field "" passed to sort()' });
+  });
+
+  it('throws a readable error when executing Query instance without a model (gh-13570)', async function() {
+    const schema = new Schema({ name: String });
+    const M = db.model('Test', schema, 'Test');
+    await M.deleteMany({});
+    await M.create({ name: 'gh13570' });
+
+    const Q = new mongoose.Query();
+    await assert.rejects(
+      () => Q.collection('Test').find().lean(),
+      /Query must have an associated model before executing/
+    );
+  });
+
+  it('throws a readable error when executing Query instance without an op (gh-13570)', async function() {
+    const schema = new Schema({ name: String });
+    const M = db.model('Test', schema, 'Test');
+    await M.deleteMany({});
+    await M.create({ name: 'gh13570' });
+
+    const Q = new M.Query();
+    await assert.rejects(
+      () => Q.lean(),
+      /Query must have `op` before executing/
+    );
+  });
+  it('converts findOneAndUpdate to findOneAndReplace if overwrite set (gh-13550)', async function() {
+    const testSchema = new Schema({
+      name: { type: String }
+    });
+
+    const Test = db.model('Test', testSchema);
+    const q = Test.findOneAndUpdate({}, { name: 'bar' }, { overwrite: true });
+    await q.exec();
+    assert.equal(q.op, 'findOneAndReplace');
   });
 });

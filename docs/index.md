@@ -12,12 +12,12 @@
   }
 </style>
 
-_First be sure you have [MongoDB](http://www.mongodb.org/downloads) and [Node.js](http://nodejs.org/) installed._
+*First be sure you have [MongoDB](http://www.mongodb.org/downloads) and [Node.js](http://nodejs.org/) installed.*
 
 Next install Mongoose from the command line using `npm`:
 
-```
-$ npm install mongoose --save
+```sh
+npm install mongoose --save
 ```
 
 Now say we like fuzzy kittens and want to record every kitten we ever meet

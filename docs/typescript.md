@@ -6,7 +6,7 @@ This guide describes Mongoose's recommended approach to working with Mongoose in
 
 ## Creating Your First Document
 
-To get started with Mongoose in TypeScript, you need to: 
+To get started with Mongoose in TypeScript, you need to:
 
 1. Create an interface representing a document in MongoDB.
 2. Create a [Schema](guide.html) corresponding to the document interface.
@@ -54,7 +54,7 @@ You as the developer are responsible for ensuring that your document interface l
 For example, Mongoose won't report an error if `email` is `required` in your Mongoose schema but optional in your document interface.
 
 The `User()` constructor returns an instance of `HydratedDocument<IUser>`.
-`IUser` is a _document interface_, it represents the raw object structure that `IUser` objects look like in MongoDB.
+`IUser` is a *document interface*, it represents the raw object structure that `IUser` objects look like in MongoDB.
 `HydratedDocument<IUser>` represents a hydrated Mongoose document, with methods, virtuals, and other Mongoose-specific features.
 
 ```ts
@@ -98,7 +98,7 @@ That's because `Schema.Types.ObjectId` is a [class that inherits from SchemaType
 If Mongoose's built-in `index.d.ts` file does not work for you, you can remove it in a postinstall script in your `package.json` as shown below.
 However, before you do, please [open an issue on Mongoose's GitHub page](https://github.com/Automattic/mongoose/issues/new) and describe the issue you're experiencing.
 
-```
+```json
 {
   "postinstall": "rm ./node_modules/mongoose/index.d.ts"
 }

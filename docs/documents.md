@@ -96,9 +96,9 @@ with casting, [middleware](middleware.html#notes), and [limited validation](vali
 await MyModel.updateMany({}, { $set: { name: 'foo' } });
 ```
 
-_Note that `update()`, `updateMany()`, `findOneAndUpdate()`, etc. do *not*
+*Note that `update()`, `updateMany()`, `findOneAndUpdate()`, etc. do **not**
 execute `save()` middleware. If you need save middleware and full validation,
-first query for the document and then `save()` it._
+first query for the document and then `save()` it.*
 
 <h2 id="validating"><a href="#validating">Validating</a></h2>
 
@@ -122,7 +122,7 @@ await p2.validate();
 
 Mongoose also supports limited validation on updates using the [`runValidators` option](validation.html#update-validators).
 Mongoose casts parameters to query functions like `findOne()`, `updateOne()`
-by default. However, Mongoose does _not_ run validation on query function
+by default. However, Mongoose does *not* run validation on query function
 parameters by default. You need to set `runValidators: true` for Mongoose
 to validate.
 

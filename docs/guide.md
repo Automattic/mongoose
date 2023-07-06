@@ -182,9 +182,9 @@ dog.findSimilarTypes((err, dogs) => {
 You can also add static functions to your model. There are three equivalent
 ways to add a static:
 
-- Add a function property to the second argument of the schema-constructor (`statics`)
-- Add a function property to `schema.statics`
-- Call the [`Schema#static()` function](api/schema.html#schema_Schema-static)
+* Add a function property to the second argument of the schema-constructor (`statics`)
+* Add a function property to `schema.statics`
+* Call the [`Schema#static()` function](api/schema.html#schema_Schema-static)
 
 ```javascript
 
@@ -497,37 +497,37 @@ schema.set(option, value);
 
 Valid options:
 
-- [autoIndex](#autoIndex)
-- [autoCreate](#autoCreate)
-- [bufferCommands](#bufferCommands)
-- [bufferTimeoutMS](#bufferTimeoutMS)
-- [capped](#capped)
-- [collection](#collection)
-- [discriminatorKey](#discriminatorKey)
-- [excludeIndexes](#excludeIndexes)
-- [id](#id)
-- [_id](#_id)
-- [minimize](#minimize)
-- [read](#read)
-- [writeConcern](#writeConcern)
-- [shardKey](#shardKey)
-- [statics](#statics)
-- [strict](#strict)
-- [strictQuery](#strictQuery)
-- [toJSON](#toJSON)
-- [toObject](#toObject)
-- [typeKey](#typeKey)
-- [validateBeforeSave](#validateBeforeSave)
-- [versionKey](#versionKey)
-- [optimisticConcurrency](#optimisticConcurrency)
-- [collation](#collation)
-- [timeseries](#timeseries)
-- [selectPopulatedPaths](#selectPopulatedPaths)
-- [skipVersioning](#skipVersioning)
-- [timestamps](#timestamps)
-- [storeSubdocValidationError](#storeSubdocValidationError)
-- [methods](#methods)
-- [query](#query-helpers)
+* [autoIndex](#autoIndex)
+* [autoCreate](#autoCreate)
+* [bufferCommands](#bufferCommands)
+* [bufferTimeoutMS](#bufferTimeoutMS)
+* [capped](#capped)
+* [collection](#collection)
+* [discriminatorKey](#discriminatorKey)
+* [excludeIndexes](#excludeIndexes)
+* [id](#id)
+* [_id](#_id)
+* [minimize](#minimize)
+* [read](#read)
+* [writeConcern](#writeConcern)
+* [shardKey](#shardKey)
+* [statics](#statics)
+* [strict](#strict)
+* [strictQuery](#strictQuery)
+* [toJSON](#toJSON)
+* [toObject](#toObject)
+* [typeKey](#typeKey)
+* [validateBeforeSave](#validateBeforeSave)
+* [versionKey](#versionKey)
+* [optimisticConcurrency](#optimisticConcurrency)
+* [collation](#collation)
+* [timeseries](#timeseries)
+* [selectPopulatedPaths](#selectPopulatedPaths)
+* [skipVersioning](#skipVersioning)
+* [timestamps](#timestamps)
+* [storeSubdocValidationError](#storeSubdocValidationError)
+* [methods](#methods)
+* [query](#query-helpers)
 
 <h2 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h2>
 
@@ -788,14 +788,14 @@ const schema = new Schema({ /* ... */ }, { read: 'nearest' });            // ali
 The alias of each pref is also permitted so instead of having to type out
 'secondaryPreferred' and getting the spelling wrong, we can simply pass 'sp'.
 
-The read option also allows us to specify _tag sets_. These tell the
+The read option also allows us to specify *tag sets*. These tell the
 [driver](https://github.com/mongodb/node-mongodb-native/) from which members
 of the replica-set it should attempt to read. Read more about tag sets
 [here](http://www.mongodb.com/docs/manual/applications/replication/#tag-sets) and
 [here](https://www.mongodb.com/docs/manual/core/read-preference).
 
-_NOTE: you may also specify the driver read preference [strategy](https://www.mongodb.com/docs/manual/core/read-preference/#read-preference-modes)
-option when connecting:_
+*NOTE: you may also specify the driver read preference [strategy](https://www.mongodb.com/docs/manual/core/read-preference/#read-preference-modes)
+option when connecting:*
 
 ```javascript
 // pings the replset members periodically to track network latency
@@ -832,8 +832,8 @@ shard key and we’ll be all set.
 new Schema({ /* ... */ }, { shardKey: { tag: 1, name: 1 } });
 ```
 
-_Note that Mongoose does not send the `shardcollection` command for you. You
-must configure your shards yourself._
+*Note that Mongoose does not send the `shardcollection` command for you. You
+must configure your shards yourself.*
 
 <h2 id="strict"><a href="#strict">option: strict</a></h2>
 
@@ -875,8 +875,8 @@ const thing = new Thing(doc, false); // disables strict mode
 The `strict` option may also be set to `"throw"` which will cause errors
 to be produced instead of dropping the bad data.
 
-_NOTE: Any key/val set on the instance that does not exist in your schema
-is always ignored, regardless of schema option._
+*NOTE: Any key/val set on the instance that does not exist in your schema
+is always ignored, regardless of schema option.*
 
 ```javascript
 const thingSchema = new Schema({ /* ... */ });
@@ -937,7 +937,6 @@ However, you can override this behavior globally:
 // Set `strictQuery` to `true` to omit unknown fields in queries.
 mongoose.set('strictQuery', true);
 ```
-
 
 <h2 id="toJSON"><a href="#toJSON">option: toJSON</a></h2>
 
@@ -1073,7 +1072,7 @@ If you need optimistic concurrency support for `save()`, you can set the [`optim
 
 Document versioning can also be disabled by setting the `versionKey` to
 `false`.
-_DO NOT disable versioning unless you [know what you are doing](http://aaronheckmann.blogspot.com/2012/06/mongoose-v3-part-1-versioning.html)._
+*DO NOT disable versioning unless you [know what you are doing](http://aaronheckmann.blogspot.com/2012/06/mongoose-v3-part-1-versioning.html).*
 
 ```javascript
 new Schema({ /* ... */ }, { versionKey: false });
@@ -1082,7 +1081,7 @@ const thing = new Thing({ name: 'no versioning please' });
 thing.save(); // { name: 'no versioning please' }
 ```
 
-Mongoose _only_ updates the version key when you use [`save()`](api/document.html#document_Document-save).
+Mongoose *only* updates the version key when you use [`save()`](api/document.html#document_Document-save).
 If you use `update()`, `findOneAndUpdate()`, etc. Mongoose will **not**
 update the version key. As a workaround, you can use the below middleware.
 
@@ -1233,6 +1232,7 @@ By default, the names of the fields are `createdAt` and `updatedAt`. Customize
 the field names by setting `timestamps.createdAt` and `timestamps.updatedAt`.
 
 The way `timestamps` works under the hood is:
+
 * If you create a new document, mongoose simply sets `createdAt`, and `updatedAt` to the time of creation.
 * If you update a document, mongoose will add `updatedAt` to the `$set` object.
 * If you set `upsert: true` on an update operation, mongoose will use [`$setOnInsert`](https://www.mongodb.com/docs/manual/reference/operator/update/setOnInsert/) operator to add `createdAt` to the document in case the `upsert` operation resulted into a new inserted document.
@@ -1437,12 +1437,12 @@ Here's an [alternative introduction to Mongoose schemas](https://masteringjs.io/
 To get the most out of MongoDB, you need to learn the basics of MongoDB schema design.
 SQL schema design (third normal form) was designed to [minimize storage costs](https://en.wikipedia.org/wiki/Third_normal_form),
 whereas MongoDB schema design is about making common queries as fast as possible.
-The [_6 Rules of Thumb for MongoDB Schema Design_ blog series](https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design-part-1)
+The [*6 Rules of Thumb for MongoDB Schema Design* blog series](https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design-part-1)
 is an excellent resource for learning the basic rules for making your queries
 fast.
 
 Users looking to master MongoDB schema design in Node.js should look into
-[_The Little MongoDB Schema Design Book_](http://bit.ly/mongodb-schema-design)
+[*The Little MongoDB Schema Design Book*](http://bit.ly/mongodb-schema-design)
 by Christian Kvalheim, the original author of the [MongoDB Node.js driver](http://npmjs.com/package/mongodb).
 This book shows you how to implement performant schemas for a laundry list
 of use cases, including e-commerce, wikis, and appointment bookings.

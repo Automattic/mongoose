@@ -2143,4 +2143,19 @@ describe('model: findOneAndUpdate:', function() {
     assert.equal(doc.info['second.name'], 'Quiz');
     assert.equal(doc.info2['second.name'], 'Quiz');
   });
+  it('supports the `includeResultMetadata` option (gh-13539)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: String
+    });
+    const Test = db.model('Test', testSchema);
+    await Test.create({
+      name: 'Test'
+    });
+    const doc = await Test.findOneAndUpdate({ name: 'Test' }, { name: 'Test Testerson' }, { new: true, upsert: true, includeResultMetadata: false });
+    assert.equal(doc.ok, undefined);
+    assert.equal(doc.name, 'Test Testerson');
+    const data = await Test.findOneAndUpdate({ name: 'Test Testerson' }, { name: 'Test' }, { new: true, upsert: true, includeResultMetadata: true });
+    assert(data.ok);
+    assert.equal(data.value.name, 'Test');
+  });
 });

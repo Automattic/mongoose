@@ -379,7 +379,8 @@ However, Mongoose 6 does **not** buffer commands while a connection is disconnec
 
 * Replace `await doc.populate('path1').populate('path2').execPopulate();` with `await doc.populate(['path1', 'path2']);`
 * Replace `await doc.populate('path1', 'select1').populate('path2', 'select2').execPopulate();` with
-  ```
+
+  ```js
   await doc.populate([{path: 'path1', select: 'select1'}, {path: 'path2', select: 'select2'}]);
   ```
 
@@ -416,7 +417,6 @@ If you set `timestamps: true`, Mongoose will now make the `createdAt` property `
 <h2 id="schematype-set-parameters"><a href="#schematype-set-parameters">SchemaType <code>set</code> parameters</a></h2>
 
 Mongoose now calls setter functions with `priorValue` as the 2nd parameter, rather than `schemaType` in Mongoose 5.
-
 
 ```js
 const userSchema = new Schema({

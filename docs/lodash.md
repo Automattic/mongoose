@@ -8,7 +8,7 @@ However, there are a few caveats that you should know about.
 ## `cloneDeep()`
 
 You should not use [Lodash's `cloneDeep()` function](https://lodash.com/docs/4.17.15#cloneDeep) on any Mongoose objects.
-This includes [connections](connections.html), [model classes](models.html), and [queries](queries.html), but is _especially_ important for [documents](documents.html).
+This includes [connections](connections.html), [model classes](models.html), and [queries](queries.html), but is *especially* important for [documents](documents.html).
 For example, you may be tempted to do the following:
 
 ```javascript

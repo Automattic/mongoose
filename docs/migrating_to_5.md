@@ -325,7 +325,7 @@ Casting for `update()`, `updateOne()`, `updateMany()`, `replaceOne()`,
 This makes it easier for hooks and custom query helpers to modify data, because
 mongoose won't restructure the data you passed in until after your hooks and
 query helpers have ran. It also makes it possible to set the `overwrite` option
-_after_ passing in an update.
+*after* passing in an update.
 
 ```javascript
 // In mongoose 4.x, this becomes `{ $set: { name: 'Baz' } }` despite the `overwrite`
@@ -441,7 +441,7 @@ next middleware with 'Test' as a parameter. Mongoose 5.x has removed support for
 </a></h2>
 
 In mongoose 5 the `required` validator only verifies if the value is an
-array. That is, it will **not** fail for _empty_ arrays as it would in
+array. That is, it will **not** fail for *empty* arrays as it would in
 mongoose 4.
 
 <h2 id="debug-output"><a href="#debug-output">
@@ -479,7 +479,7 @@ console.log(res);
 
 In Mongoose 4.x, the above will print:
 
-```
+```txt
 BulkWriteResult {
   ok: [Getter],
   nInserted: [Getter],
@@ -512,7 +512,7 @@ BulkWriteResult {
 
 In Mongoose 5.x, the script will print:
 
-```
+```txt
 BulkWriteResult {
   result: 
   { ok: 1,

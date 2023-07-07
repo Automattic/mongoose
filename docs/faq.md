@@ -12,6 +12,19 @@ hr {
 }
 </style>
 
+<hr id="localhost-ipv6" />
+
+<a class="anchor" href="#localhost-ipv6">**Q**</a>. I get an error `connect ECONNREFUSED ::1:27017` when connecting to `localhost`. Why?
+
+The easy solution is to replace `localhost` with `127.0.0.1`.
+
+The reason why this error happens is that Node.js 18 and up prefer IPv6 addresses over IPv4 by default.
+And, most Linux and OSX machines have a `::1     localhost` entry in `/etc/hosts` by default.
+That means that Node.js 18 will assume that `localhost` means the IPv6 `::1` address.
+And MongoDB doesn't accept IPv6 connections by default.
+
+You can also fix this error by [enabling IPv6 support on your MongoDB server](https://www.mongodb.com/docs/manual/core/security-mongodb-configuration/).
+
 <hr id="operation-buffering-timed-out" />
 
 <a class="anchor" href="#operation-buffering-timed-out">**Q**</a>. Operation `...` timed out after 10000 ms. What gives?
@@ -323,7 +336,7 @@ const CollectionSchema = new Schema({
 ```
 
 <hr id="initialize-array-path-null" />
-    
+
 <a class="anchor" href="#initialize-array-path-null">**Q**</a>. How can I initialize an array path to `null`?
 
 **A**. You can set the default of the array to a function that returns `null`.

@@ -7615,7 +7615,11 @@ describe('document', function() {
 
       schema.path('createdAt').immutable(true);
       assert.ok(schema.path('createdAt').$immutable);
-      assert.equal(schema.path('createdAt').setters.length, 1);
+      assert.equal(
+        schema.path('createdAt').setters.length,
+        1,
+        schema.path('createdAt').setters.map(setter => setter.toString())
+      );
 
       schema.path('createdAt').immutable(false);
       assert.ok(!schema.path('createdAt').$immutable);
@@ -12212,6 +12216,7 @@ describe('document', function() {
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb.c.x.y, 1);
   });
+
   it('can change the value of the id property on documents gh-10096', async function() {
     const testSchema = new Schema({
       name: String
@@ -12223,6 +12228,27 @@ describe('document', function() {
     await doc.save();
     assert.notEqual(oldVal, doc.id);
     assert.equal(doc.id, '648b8aa6a97549b03835c0b3');
+  });
+
+  it('should allow storing keys with dots in name in mixed under nested (gh-13530)', async function() {
+    const TestModelSchema = new mongoose.Schema({
+      metadata:
+        {
+          labels: mongoose.Schema.Types.Mixed
+        }
+    });
+    const TestModel = db.model('Test', TestModelSchema);
+    const { _id } = await TestModel.create({
+      metadata: {
+        labels: { 'my.label.com': 'true' }
+      }
+    });
+    const doc = await TestModel.findById(_id).lean();
+    assert.deepStrictEqual(doc.metadata, {
+      labels: {
+        'my.label.com': 'true'
+      }
+    });
   });
 });
 

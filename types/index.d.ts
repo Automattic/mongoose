@@ -22,6 +22,7 @@
 /// <reference path="./validation.d.ts" />
 /// <reference path="./inferschematype.d.ts" />
 /// <reference path="./virtuals.d.ts" />
+/// <reference path="./augmentations.d.ts" />
 
 declare class NativeDate extends global.Date { }
 
@@ -197,7 +198,7 @@ declare module 'mongoose' {
 
   export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods, DisSchema> =
     DisSchema extends Schema<infer DisSchemaEDocType, infer DisSchemaM, infer DisSchemaInstanceMethods, infer DisSchemaQueryhelpers, infer DisSchemaVirtuals, infer DisSchemaStatics>
-      ? Schema<Omit<DocType, keyof DisSchemaEDocType> & DisSchemaEDocType, DiscriminatorModel<DisSchemaM, M>, DisSchemaInstanceMethods | TInstanceMethods, DisSchemaQueryhelpers | TQueryHelpers, DisSchemaVirtuals | TVirtuals, DisSchemaStatics & TStaticMethods>
+      ? Schema<MergeType<DocType, DisSchemaEDocType>, DiscriminatorModel<DisSchemaM, M>, DisSchemaInstanceMethods | TInstanceMethods, DisSchemaQueryhelpers | TQueryHelpers, DisSchemaVirtuals | TVirtuals, DisSchemaStatics & TStaticMethods>
       : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>;
 
   type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
@@ -430,6 +431,8 @@ declare module 'mongoose' {
 
     /** Returns the virtual type with the given `name`. */
     virtualpath<T = THydratedDocumentType>(name: string): VirtualType<T> | null;
+
+    static ObjectId: typeof Schema.Types.ObjectId;
   }
 
   export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;

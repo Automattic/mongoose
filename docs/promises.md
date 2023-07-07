@@ -39,8 +39,8 @@ promise chaining or [async await](https://asyncawait.net)
 
 There are two alternatives for using `await` with queries:
 
-- `await Band.findOne();`
-- `await Band.findOne().exec();`
+* `await Band.findOne();`
+* `await Band.findOne().exec();`
 
 As far as functionality is concerned, these two are equivalent.
 However, we recommend using `.exec()` because that gives you

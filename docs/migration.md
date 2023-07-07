@@ -38,4 +38,4 @@ otherwise returning a mongoose query from a promise.
 
 Related blog posts:
 
-- [Introducing Version 4.0 of the Mongoose NodeJS ODM](http://www.mongodb.com/blog/post/introducing-version-40-mongoose-nodejs-odm)
+* [Introducing Version 4.0 of the Mongoose NodeJS ODM](http://www.mongodb.com/blog/post/introducing-version-40-mongoose-nodejs-odm)

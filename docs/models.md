@@ -15,7 +15,7 @@ reading documents from the underlying MongoDB database.
 
 <h2 id="compiling"><a href="#compiling">Compiling your first model</a></h2>
 
-When you call `mongoose.model()` on a schema, Mongoose _compiles_ a model
+When you call `mongoose.model()` on a schema, Mongoose *compiles* a model
 for you.
 
 ```javascript
@@ -23,7 +23,7 @@ const schema = new mongoose.Schema({ name: String, size: String });
 const Tank = mongoose.model('Tank', schema);
 ```
 
-The first argument is the _singular_ name of the collection your model is
+The first argument is the *singular* name of the collection your model is
 for. **Mongoose automatically looks for the plural, lowercased version of your model name.**
 Thus, for the example above, the model Tank is for the **tanks** collection
 in the database.
@@ -61,6 +61,7 @@ await mongoose.connect('mongodb://127.0.0.1/gettingstarted');
 
 If you create a custom connection, use that connection's `model()` function
 instead.
+
 ```javascript
 const connection = mongoose.createConnection('mongodb://127.0.0.1:27017/test');
 const Tank = connection.model('Tank', yourSchema);
@@ -98,9 +99,9 @@ database without returning them to your application. See the
 await Tank.updateOne({ size: 'large' }, { name: 'T-90' });
 ```
 
-_If you want to update a single document in the db and return it to your
+*If you want to update a single document in the db and return it to your
 application, use [findOneAndUpdate](api/model.html#model_Model-findOneAndUpdate)
-instead._
+instead.*
 
 ## Change Streams
 

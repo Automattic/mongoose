@@ -4104,4 +4104,44 @@ describe('Query', function() {
       await Error.find().sort('-');
     }, { message: 'Invalid field "" passed to sort()' });
   });
+  it('allows executing a find() with a subdocument with defaults disabled (gh-13512)', async function() {
+    const schema = mongoose.Schema({
+      title: String,
+      bookHolder: mongoose.Schema({
+        isReading: Boolean,
+        tags: [String]
+      })
+    });
+    const Test = db.model('Test', schema);
+
+    const BookHolder = schema.path('bookHolder').caster;
+
+    await Test.collection.insertOne({
+      title: 'test-defaults-disabled',
+      bookHolder: { isReading: true }
+    });
+
+    // Create a new BookHolder subdocument, skip applying defaults
+    // Otherwise, default `[]` for `tags` would cause this query to
+    // return no results.
+    const bookHolder = new BookHolder(
+      { isReading: true },
+      null,
+      null,
+      { defaults: false }
+    );
+    const doc = await Test.findOne({ bookHolder });
+    assert.ok(doc);
+    assert.equal(doc.title, 'test-defaults-disabled');
+  });
+  it('converts findOneAndUpdate to findOneAndReplace if overwrite set (gh-13550)', async function() {
+    const testSchema = new Schema({
+      name: { type: String }
+    });
+
+    const Test = db.model('Test', testSchema);
+    const q = Test.findOneAndUpdate({}, { name: 'bar' }, { overwrite: true });
+    await q.exec();
+    assert.equal(q.op, 'findOneAndReplace');
+  });
 });

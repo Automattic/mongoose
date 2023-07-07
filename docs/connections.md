@@ -6,9 +6,9 @@ You can connect to MongoDB with the `mongoose.connect()` method.
 mongoose.connect('mongodb://127.0.0.1:27017/myapp');
 ```
 
-This is the minimum needed to connect the `myapp` database running locally
-on the default port (27017). If connecting fails on your machine, try using
-`127.0.0.1` instead of `localhost`.
+This is the minimum needed to connect the `myapp` database running locally on the default port (27017).
+For local MongoDB databases, we recommend using `127.0.0.1` instead of `localhost`.
+That is because Node.js 18 and up prefer IPv6 addresses, which means, on many machines, Node.js will resolve `localhost` to the IPv6 address `::1` and Mongoose will be unable to connect, unless the mongodb instance is running with ipv6 enabled.
 
 You can also specify several more parameters in the `uri`:
 
@@ -22,6 +22,7 @@ See the [mongodb connection string spec](http://www.mongodb.com/docs/manual/refe
   <li><a href="#buffering">Buffering</a></li>
   <li><a href="#error-handling">Error Handling</a></li>
   <li><a href="#options">Options</a></li>
+  <li><a href="#serverselectiontimeoutms">serverSelectionTimeoutMS</a></li>
   <li><a href="#connection-string-options">Connection String Options</a></li>
   <li><a href="#connection-events">Connection Events</a></li>
   <li><a href="#keepAlive">A note about keepAlive</a></li>
@@ -98,8 +99,8 @@ await Model.createCollection();
 
 There are two classes of errors that can occur with a Mongoose connection.
 
-- **Error on initial connection**: If initial connection fails, Mongoose will emit an 'error' event and the promise `mongoose.connect()` returns will reject. However, Mongoose will **not** automatically try to reconnect.
-- **Error after initial connection was established**: Mongoose will attempt to reconnect, and it will emit an 'error' event.
+* **Error on initial connection**: If initial connection fails, Mongoose will emit an 'error' event and the promise `mongoose.connect()` returns will reject. However, Mongoose will **not** automatically try to reconnect.
+* **Error after initial connection was established**: Mongoose will attempt to reconnect, and it will emit an 'error' event.
 
 To handle initial connection errors, you should use `.catch()` or `try/catch` with async/await.
 
@@ -151,32 +152,61 @@ Below are some of the options that are important for tuning Mongoose.
 * `promiseLibrary`    - Sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html).
 * `maxPoolSize`       - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `maxPoolSize` is 100. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See [Slow Trains in MongoDB and Node.js](http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs). You may want to decrease `maxPoolSize` if you are running into [connection limits](https://www.mongodb.com/docs/atlas/reference/atlas-limits/#connection-limits-and-cluster-tier).
 * `minPoolSize`       - The minimum number of sockets the MongoDB driver will keep open for this connection. The MongoDB driver may close sockets that have been inactive for some time. You may want to increase `minPoolSize` if you expect your app to go through long idle times and want to make sure your sockets stay open to avoid slow trains when activity picks up.
-* `socketTimeoutMS`   - How long the MongoDB driver will wait before killing a socket due to inactivity _after initial connection_. A socket may be inactive because of either no activity or a long-running operation. This is set to `30000` by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
+* `socketTimeoutMS`   - How long the MongoDB driver will wait before killing a socket due to inactivity *after initial connection*. A socket may be inactive because of either no activity or a long-running operation. `socketTimeoutMS` defaults to 0, which means Node.js will not time out the socket due to inactivity. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
 * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
 * `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://www.mongodb.com/docs/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
 * `serverSelectionTimeoutMS` - The MongoDB driver will try to find a server to send any given operation to, and keep retrying for `serverSelectionTimeoutMS` milliseconds. If not set, the MongoDB driver defaults to using `30000` (30 seconds).
 * `heartbeatFrequencyMS` - The MongoDB driver sends a heartbeat every `heartbeatFrequencyMS` to check on the status of the connection. A heartbeat is subject to `serverSelectionTimeoutMS`, so the MongoDB driver will retry failed heartbeats for up to 30 seconds by default. Mongoose only emits a `'disconnected'` event after a heartbeat has failed, so you may want to decrease this setting to reduce the time between when your server goes down and when Mongoose emits `'disconnected'`. We recommend you do **not** set this setting below 1000, too many heartbeats can lead to performance degradation.
 
-The `serverSelectionTimeoutMS` option also handles how long `mongoose.connect()` will
-retry initial connection before erroring out. `mongoose.connect()`
-will retry for 30 seconds by default (default `serverSelectionTimeoutMS`) before
-erroring out. To get faster feedback on failed operations, you can reduce `serverSelectionTimeoutMS`
-to 5000 as shown below.
+<h2 id="serverselectiontimeoutms"><a href="#serverselectiontimeoutms">serverSelectionTimeoutMS</a></h2>
 
-Example:
+The `serverSelectionTimeoutMS` option is extremely important: it controls how long the MongoDB Node.js driver will attempt to retry any operation before erroring out.
+This includes initial connection, like `await mongoose.connect()`, as well as any operations that make requests to MongoDB, like `save()` or `find()`.
+
+By default, `serverSelectionTimeoutMS` is 30000 (30 seconds).
+This means that, for example, if you call `mongoose.connect()` when your standalone MongoDB server is down, your `mongoose.connect()` call will only throw an error after 30 seconds.
 
 ```javascript
-const options = {
-  autoIndex: false, // Don't build indexes
-  maxPoolSize: 10, // Maintain up to 10 socket connections
-  serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-  family: 4 // Use IPv4, skip trying IPv6
-};
-mongoose.connect(uri, options);
+// Throws an error "getaddrinfo ENOTFOUND doesnt.exist" after 30 seconds
+await mongoose.connect('mongodb://doesnt.exist:27017/test');
 ```
 
-See [this page](http://mongodb.github.io/node-mongodb-native/3.1/reference/faq/) for more information about `connectTimeoutMS` and `socketTimeoutMS`
+Similarly, if your standalone MongoDB server goes down after initial connection, any `find()` or `save()` calls will error out after 30 seconds, unless your MongoDB server is restarted.
+
+While 30 seconds seems like a long time, `serverSelectionTimeoutMS` means you're unlikely to see any interruptions during a [replica set failover](https://www.mongodb.com/docs/manual/replication/#automatic-failover).
+If you lose your replica set primary, the MongoDB Node driver will ensure that any operations you send during the replica set election will eventually execute, assuming that the replica set election takes less than `serverSelectionTimeoutMS`.
+
+To get faster feedback on failed connections, you can reduce `serverSelectionTimeoutMS` to 5000 as follows.
+We don't recommend reducing `serverSelectionTimeoutMS` unless you are running a standalone MongoDB server rather than a replica set, or unless you are using a serverless runtime like [AWS Lambda](lambda.html).
+
+```javascript
+mongoose.connect(uri, {
+  serverSelectionTimeoutMS: 5000
+});
+```
+
+There is no way to tune `serverSelectionTimeoutMS` independently for `mongoose.connect()` vs for queries.
+If you want to reduce `serverSelectionTimeoutMS` for queries and other operations, but still retry `mongoose.connect()` for longer, you are responsible for retrying the `connect()` calls yourself using a `for` loop or [a tool like p-retry](https://github.com/Automattic/mongoose/issues/12967#issuecomment-1411227968).
+
+```javascript
+const serverSelectionTimeoutMS = 5000;
+
+// Prints "Failed 0", "Failed 1", "Failed 2" and then throws an
+// error. Exits after approximately 15 seconds.
+for (let i = 0; i < 3; ++i) {
+  try {
+    await mongoose.connect('mongodb://doesnt.exist:27017/test', {
+      serverSelectionTimeoutMS
+    });
+    break;
+  } catch (err) {
+    console.log('Failed', i);
+    if (i >= 2) {
+      throw err;
+    }
+  }
+}
+```
 
 <h2 id="callback"><a href="#callback">Callback</a></h2>
 
@@ -204,10 +234,10 @@ driver. You **can't** set Mongoose-specific options like `bufferCommands`
 in the query string.
 
 ```javascript
-mongoose.connect('mongodb://127.0.0.1:27017/test?connectTimeoutMS=1000&bufferCommands=false&authSource=otherdb');
+mongoose.connect('mongodb://127.0.0.1:27017/test?socketTimeoutMS=1000&bufferCommands=false&authSource=otherdb');
 // The above is equivalent to:
 mongoose.connect('mongodb://127.0.0.1:27017/test', {
-  connectTimeoutMS: 1000
+  socketTimeoutMS: 1000
   // Note that mongoose will **not** pull `bufferCommands` from the query string
 });
 ```
@@ -215,10 +245,10 @@ mongoose.connect('mongodb://127.0.0.1:27017/test', {
 The disadvantage of putting options in the query string is that query
 string options are harder to read. The advantage is that you only need a
 single configuration option, the URI, rather than separate options for
-`socketTimeoutMS`, `connectTimeoutMS`, etc. Best practice is to put options
+`socketTimeoutMS`, etc. Best practice is to put options
 that likely differ between development and production, like `replicaSet`
 or `ssl`, in the connection string, and options that should remain constant,
-like `connectTimeoutMS` or `maxPoolSize`, in the options object.
+like `socketTimeoutMS` or `maxPoolSize`, in the options object.
 
 The MongoDB docs have a full list of
 [supported connection string options](https://www.mongodb.com/docs/manual/reference/connection-string/).
@@ -314,11 +344,11 @@ mongoose.connect(uri, {
 
 <h2 id="replicaset-hostnames"><a href="#replicaset-hostnames">Replica Set Host Names</a></h2>
 
-MongoDB replica sets rely on being able to reliably figure out the domain name for each member. 
+MongoDB replica sets rely on being able to reliably figure out the domain name for each member.  
 On Linux and OSX, the MongoDB server uses the output of the [`hostname` command](https://linux.die.net/man/1/hostname) to figure out the domain name to report to the replica set.
 This can cause confusing errors if you're connecting to a remote MongoDB replica set running on a machine that reports its `hostname` as `localhost`:
 
-```
+```txt
 // Can get this error even if your connection string doesn't include
 // `localhost` if `rs.conf()` reports that one replica set member has
 // `localhost` as its host name.
@@ -331,7 +361,7 @@ Follow [this page's instructions to change a replica set member's host name](htt
 You can also check the `reason.servers` property of `MongooseServerSelectionError` to see what the MongoDB Node driver thinks the state of your replica set is.
 The `reason.servers` property contains a [map](https://masteringjs.io/tutorials/fundamentals/map) of server descriptions.
 
-```
+```js
 if (err.name === 'MongooseServerSelectionError') {
   // Contains a Map describing the state of your replica set. For example:
   // Map(1) {
@@ -359,7 +389,7 @@ mongoose.connect('mongodb://mongosA:27501,mongosB:27501', cb);
 <h2 id="multiple_connections"><a href="#multiple_connections">Multiple connections</a></h2>
 
 So far we've seen how to connect to MongoDB using Mongoose's default
-connection. Mongoose creates a _default connection_ when you call `mongoose.connect()`.
+connection. Mongoose creates a *default connection* when you call `mongoose.connect()`.
 You can access the default connection using `mongoose.connection`.
 
 You may need multiple connections to MongoDB for several reasons.
@@ -381,7 +411,7 @@ const UserModel = conn.model('User', userSchema);
 ```
 
 If you use multiple connections, you should make sure you export schemas,
-**not** models. Exporting a model from a file is called the _export model pattern_.
+**not** models. Exporting a model from a file is called the *export model pattern*.
 The export model pattern is limited because you can only use one connection.
 
 ```javascript

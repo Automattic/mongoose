@@ -1,6 +1,6 @@
 # Mongoose Virtuals
 
-In Mongoose, a virtual is a property that is **not** stored in MongoDB. 
+In Mongoose, a virtual is a property that is **not** stored in MongoDB.
 Virtuals are typically used for computed properties on documents.
 
 * [Your First Virtual](#your-first-virtual)
@@ -15,7 +15,7 @@ Virtuals are typically used for computed properties on documents.
 ## Your First Virtual
 
 Suppose you have a `User` model. Every user has an `email`, but you also
-want the email's domain. For example, the domain portion of 
+want the email's domain. For example, the domain portion of
 'test@gmail.com' is 'gmail.com'.
 
 Below is one way to implement the `domain` property using a virtual.
@@ -99,8 +99,8 @@ Mongoose also supports [populating virtuals](../populate.html). A populated
 virtual contains documents from another collection. To define a populated
 virtual, you need to specify:
 
-- The `ref` option, which tells Mongoose which model to populate documents from.
-- The `localField` and `foreignField` options. Mongoose will populate documents from the model in `ref` whose `foreignField` matches this document's `localField`.
+* The `ref` option, which tells Mongoose which model to populate documents from.
+* The `localField` and `foreignField` options. Mongoose will populate documents from the model in `ref` whose `foreignField` matches this document's `localField`.
 
 ```acquit
 [require:Virtuals.*populate]

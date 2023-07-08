@@ -6285,7 +6285,9 @@ describe('document', function() {
             name: String,
             folders: {
               type: [{ folderId: String }],
-              validate: v => assert.ok(v.length === new Set(v.map(el => el.folderId)).size, 'Duplicate')
+              validate: v => {
+                assert.ok(v.length === new Set(v.map(el => el.folderId)).size, 'Duplicate');
+              }
             }
           }]
         }
@@ -12211,6 +12213,25 @@ describe('document', function() {
 
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb.c.x.y, 1);
+  });
+
+  it('cleans up all array subdocs modified state on save (gh-13582)', async function() {
+    const ElementSchema = new mongoose.Schema({
+      elementName: String
+    });
+
+    const MyDocSchema = new mongoose.Schema({
+      docName: String,
+      elements: [ElementSchema]
+    });
+
+    const Test = db.model('Test', MyDocSchema);
+    let doc = new Test({ docName: 'MyDocName' });
+    doc.elements.push({ elementName: 'ElementName1' });
+    doc.elements.push({ elementName: 'ElementName2' });
+    doc = await doc.save();
+    assert.deepStrictEqual(doc.elements[0].modifiedPaths(), []);
+    assert.deepStrictEqual(doc.elements[1].modifiedPaths(), []);
   });
 });
 

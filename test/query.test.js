@@ -4094,6 +4094,7 @@ describe('Query', function() {
     await Test.findOneAndUpdate({}, { name: 'bar' });
     assert.ok(!('projection' in lastOptions));
   });
+
   it('should provide a clearer error message when sorting with empty string', async function() {
     const testSchema = new Schema({
       name: { type: String }
@@ -4133,6 +4134,31 @@ describe('Query', function() {
     const doc = await Test.findOne({ bookHolder });
     assert.ok(doc);
     assert.equal(doc.title, 'test-defaults-disabled');
+  });
+  it('throws a readable error when executing Query instance without a model (gh-13570)', async function() {
+    const schema = new Schema({ name: String });
+    const M = db.model('Test', schema, 'Test');
+    await M.deleteMany({});
+    await M.create({ name: 'gh13570' });
+
+    const Q = new mongoose.Query();
+    await assert.rejects(
+      () => Q.collection('Test').find().lean(),
+      /Query must have an associated model before executing/
+    );
+  });
+
+  it('throws a readable error when executing Query instance without an op (gh-13570)', async function() {
+    const schema = new Schema({ name: String });
+    const M = db.model('Test', schema, 'Test');
+    await M.deleteMany({});
+    await M.create({ name: 'gh13570' });
+
+    const Q = new M.Query();
+    await assert.rejects(
+      () => Q.lean(),
+      /Query must have `op` before executing/
+    );
   });
   it('converts findOneAndUpdate to findOneAndReplace if overwrite set (gh-13550)', async function() {
     const testSchema = new Schema({

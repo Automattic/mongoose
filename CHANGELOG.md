@@ -1,3 +1,13 @@
+7.3.2 / 2023-07-06
+==================
+ * fix(model): avoid TypeError if insertMany() fails with error that does not have writeErrors property #13579 #13531
+ * fix(query): convert findOneAndUpdate to findOneAndReplace when overwrite set for backwards compat with Mongoose 6 #13572 #13550
+ * fix(query): throw readable error when executing a Query instance without an associated model #13571 #13570
+ * types: support mongoose.Schema.ObjectId as alias for mongoose.Schema.Types.ObjectId #13543 #13534
+ * docs(connections): clarify that socketTimeoutMS now defaults to 0 #13576 #13537
+ * docs(migrating_to_7): add mapReduce() removal to migration guide #13568 #13548
+ * docs(schemas): fix typo in schemas.md #13540 [Metehan-Altuntekin](https://github.com/Metehan-Altuntekin)
+
 7.3.1 / 2023-06-21
 ==================
  * fix(query): respect query-level strict option on findOneAndReplace() #13516 #13507

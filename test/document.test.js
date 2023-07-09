@@ -10528,4 +10528,24 @@ describe('document', function() {
       assert.ok(!band.embeddedMembers[0].member.name);
     });
   });
+
+  it('avoids prototype pollution on init', function() {
+    const Example = db.model('Example', new Schema({ hello: String }));
+
+    return co(function*() {
+      const example = yield new Example({ hello: 'world!' }).save();
+      yield Example.findByIdAndUpdate(example._id, {
+        $rename: {
+          hello: '__proto__.polluted'
+        }
+      });
+
+      // this is what causes the pollution
+      yield Example.find();
+
+      const test = {};
+      assert.strictEqual(test.polluted, undefined);
+      assert.strictEqual(Object.prototype.polluted, undefined);
+    });
+  });
 });

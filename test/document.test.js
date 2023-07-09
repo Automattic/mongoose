@@ -12217,6 +12217,19 @@ describe('document', function() {
     assert.equal(fromDb.c.x.y, 1);
   });
 
+  it('can change the value of the id property on documents gh-10096', async function() {
+    const testSchema = new Schema({
+      name: String
+    });
+    const Test = db.model('Test', testSchema);
+    const doc = new Test({ name: 'Test Testerson ' });
+    const oldVal = doc.id;
+    doc.id = '648b8aa6a97549b03835c0b3';
+    await doc.save();
+    assert.notEqual(oldVal, doc.id);
+    assert.equal(doc.id, '648b8aa6a97549b03835c0b3');
+  });
+
   it('should allow storing keys with dots in name in mixed under nested (gh-13530)', async function() {
     const TestModelSchema = new mongoose.Schema({
       metadata:

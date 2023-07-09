@@ -2151,11 +2151,37 @@ describe('model: findOneAndUpdate:', function() {
     await Test.create({
       name: 'Test'
     });
-    const doc = await Test.findOneAndUpdate({ name: 'Test' }, { name: 'Test Testerson' }, { new: true, upsert: true, includeResultMetadata: false });
+    const doc = await Test.findOneAndUpdate(
+      { name: 'Test' },
+      { name: 'Test Testerson' },
+      { new: true, upsert: true, includeResultMetadata: false }
+    );
     assert.equal(doc.ok, undefined);
     assert.equal(doc.name, 'Test Testerson');
-    const data = await Test.findOneAndUpdate({ name: 'Test Testerson' }, { name: 'Test' }, { new: true, upsert: true, includeResultMetadata: true });
+
+    let data = await Test.findOneAndUpdate(
+      { name: 'Test Testerson' },
+      { name: 'Test' },
+      { new: true, upsert: true, includeResultMetadata: true }
+    );
     assert(data.ok);
     assert.equal(data.value.name, 'Test');
+
+    data = await Test.findOneAndUpdate(
+      { name: 'Test Testerson' },
+      { name: 'Test' },
+      { new: true, upsert: true, includeResultMetadata: true, rawResult: true }
+    );
+    assert(data.ok);
+    assert.equal(data.value.name, 'Test');
+
+    await assert.rejects(
+      () => Test.findOneAndUpdate(
+        { name: 'Test Testerson' },
+        { name: 'Test' },
+        { new: true, upsert: true, includeResultMetadata: false, rawResult: true }
+      ),
+      /Cannot set `rawResult` option when `includeResultMetadata` is false/
+    );
   });
 });

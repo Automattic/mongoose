@@ -10504,4 +10504,39 @@ describe('model: populate:', function() {
     });
     assert.deepStrictEqual(doc.children.map(c => c.name).sort(), ['Chad', 'Luke']);
   });
+
+  it('allows pushing to model populated in a query cursor (gh-13575)', async function() {
+    const Company = db.model('Company', Schema({ name: String }));
+    const User = db.model(
+      'User',
+      Schema({ name: String, companies: [{ type: Schema.Types.ObjectId, ref: 'Company' }] })
+    );
+
+    await User.deleteMany({});
+    await Company.insertMany([{ name: 'Company 1' }, { name: 'Company 2' }]);
+    const company = await Company.findOne({ name: 'Company 1' });
+    const company2 = await Company.findOne({ name: 'Company 2' });
+
+    await User.insertMany([{ name: 'User 1', companies: [company.id] }]);
+
+    await User.find()
+      .populate('companies')
+      .cursor()
+      .eachAsync(async(user) => {
+        if (!user.populated('companies')) {
+          await user.populate('companies');
+        }
+
+        user.companies.push(company2);
+
+        await user.save();
+      });
+
+    const user = await User.findOne();
+    assert.equal(user.name, 'User 1');
+    assert.deepEqual(
+      user.toObject().companies.sort().map(v => v.toString()),
+      [company._id.toString(), company2._id.toString()]
+    );
+  });
 });

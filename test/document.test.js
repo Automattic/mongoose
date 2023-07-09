@@ -12229,6 +12229,18 @@ describe('document', function() {
     const test = {};
     assert.strictEqual(test.polluted, undefined);
     assert.strictEqual(Object.prototype.polluted, undefined);
+
+    const example2 = await new Example({ hello: 'world!' }).save();
+    await Example.findByIdAndUpdate(example2._id, {
+      $rename: {
+        hello: 'constructor.polluted'
+      }
+    });
+
+    await Example.find();
+    const test2 = {};
+    assert.strictEqual(test2.constructor.polluted, undefined);
+    assert.strictEqual(Object.polluted, undefined);
   });
 });
 

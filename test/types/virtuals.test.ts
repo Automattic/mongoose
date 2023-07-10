@@ -1,4 +1,4 @@
-import { Document, Model, Schema, model, InferSchemaType, FlatRecord, ObtainSchemaGeneric } from 'mongoose';
+import { Document, Model, Schema, model, InferSchemaType, ObtainSchemaGeneric } from 'mongoose';
 import { expectType } from 'tsd';
 
 interface IPerson {
@@ -90,7 +90,7 @@ function gh11543() {
 async function autoTypedVirtuals() {
   type AutoTypedSchemaType = InferSchemaType<typeof testSchema>;
   type VirtualsType = { domain: string };
-  type InferredDocType = FlatRecord<AutoTypedSchemaType & ObtainSchemaGeneric<typeof testSchema, 'TVirtuals'>>;
+  type InferredDocType = AutoTypedSchemaType & ObtainSchemaGeneric<typeof testSchema, 'TVirtuals'>;
 
   const testSchema = new Schema({
     email: {
@@ -118,7 +118,7 @@ async function autoTypedVirtuals() {
   const doc = new TestModel();
   expectType<string>(doc.domain);
 
-  expectType<FlatRecord<AutoTypedSchemaType & VirtualsType >>({} as InferredDocType);
+  expectType<AutoTypedSchemaType & VirtualsType>({} as InferredDocType);
 
   const doc2 = await TestModel.findOne().orFail();
   expectType<string>(doc2.domain);

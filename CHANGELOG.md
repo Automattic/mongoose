@@ -1,3 +1,9 @@
+7.3.3 / 2023-07-10
+==================
+ * fix: avoid prototype pollution on init
+ * fix(document): clean up all array subdocument modified paths on save() #13589 #13582
+ * types: avoid unnecessary MergeType<> if TOverrides not set, clean up statics and insertMany() type issues #13577 #13529
+
 7.3.2 / 2023-07-06
 ==================
  * fix(model): avoid TypeError if insertMany() fails with error that does not have writeErrors property #13579 #13531

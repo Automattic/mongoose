@@ -6285,7 +6285,9 @@ describe('document', function() {
             name: String,
             folders: {
               type: [{ folderId: String }],
-              validate: v => assert.ok(v.length === new Set(v.map(el => el.folderId)).size, 'Duplicate')
+              validate: v => {
+                assert.ok(v.length === new Set(v.map(el => el.folderId)).size, 'Duplicate');
+              }
             }
           }]
         }
@@ -12211,6 +12213,55 @@ describe('document', function() {
 
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb.c.x.y, 1);
+  });
+
+  it('cleans up all array subdocs modified state on save (gh-13582)', async function() {
+    const ElementSchema = new mongoose.Schema({
+      elementName: String
+    });
+
+    const MyDocSchema = new mongoose.Schema({
+      docName: String,
+      elements: [ElementSchema]
+    });
+
+    const Test = db.model('Test', MyDocSchema);
+    let doc = new Test({ docName: 'MyDocName' });
+    doc.elements.push({ elementName: 'ElementName1' });
+    doc.elements.push({ elementName: 'ElementName2' });
+    doc = await doc.save();
+    assert.deepStrictEqual(doc.elements[0].modifiedPaths(), []);
+    assert.deepStrictEqual(doc.elements[1].modifiedPaths(), []);
+  });
+
+  it('avoids prototype pollution on init', async function() {
+    const Example = db.model('Example', new Schema({ hello: String }));
+
+    const example = await new Example({ hello: 'world!' }).save();
+    await Example.findByIdAndUpdate(example._id, {
+      $rename: {
+        hello: '__proto__.polluted'
+      }
+    });
+
+    // this is what causes the pollution
+    await Example.find();
+
+    const test = {};
+    assert.strictEqual(test.polluted, undefined);
+    assert.strictEqual(Object.prototype.polluted, undefined);
+
+    const example2 = await new Example({ hello: 'world!' }).save();
+    await Example.findByIdAndUpdate(example2._id, {
+      $rename: {
+        hello: 'constructor.polluted'
+      }
+    });
+
+    await Example.find();
+    const test2 = {};
+    assert.strictEqual(test2.constructor.polluted, undefined);
+    assert.strictEqual(Object.polluted, undefined);
   });
 });
 

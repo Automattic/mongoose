@@ -12233,6 +12233,36 @@ describe('document', function() {
     assert.deepStrictEqual(doc.elements[0].modifiedPaths(), []);
     assert.deepStrictEqual(doc.elements[1].modifiedPaths(), []);
   });
+  
+  it('avoids prototype pollution on init', async function() {
+    const Example = db.model('Example', new Schema({ hello: String }));
+
+    const example = await new Example({ hello: 'world!' }).save();
+    await Example.findByIdAndUpdate(example._id, {
+      $rename: {
+        hello: '__proto__.polluted'
+      }
+    });
+
+    // this is what causes the pollution
+    await Example.find();
+
+    const test = {};
+    assert.strictEqual(test.polluted, undefined);
+    assert.strictEqual(Object.prototype.polluted, undefined);
+
+    const example2 = await new Example({ hello: 'world!' }).save();
+    await Example.findByIdAndUpdate(example2._id, {
+      $rename: {
+        hello: 'constructor.polluted'
+      }
+    });
+
+    await Example.find();
+    const test2 = {};
+    assert.strictEqual(test2.constructor.polluted, undefined);
+    assert.strictEqual(Object.polluted, undefined);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

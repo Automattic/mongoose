@@ -526,7 +526,7 @@ Valid options:
 * [skipVersioning](#skipVersioning)
 * [timestamps](#timestamps)
 * [storeSubdocValidationError](#storeSubdocValidationError)
-- [collectionOptions](#collectionOptions)
+* [collectionOptions](#collectionOptions)
 * [methods](#methods)
 * [query](#query-helpers)
 

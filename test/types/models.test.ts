@@ -1,4 +1,3 @@
-import { ObjectId } from 'bson';
 import {
   Schema,
   Document,
@@ -77,7 +76,7 @@ async function insertManyTest() {
   });
 
   const res = await Test.insertMany([{ foo: 'bar' }], { rawResult: true });
-  expectType<ObjectId>(res.insertedIds[0]);
+  expectType<Types.ObjectId>(res.insertedIds[0]);
 
   const res2 = await Test.insertMany([{ foo: 'bar' }], { ordered: false, rawResult: true });
   expectAssignable<Error | Object | ReturnType<(typeof Test)['hydrate']>>(res2.mongoose.results[0]);
@@ -621,4 +620,22 @@ function gh13206() {
   TestModel.watch<ITest, ChangeStreamInsertDocument<ITest>>([], { fullDocument: 'updateLookup' }).on('change', (change) => {
     expectType<ChangeStreamInsertDocument<ITest>>(change);
   });
+}
+
+function gh13529() {
+  interface ResourceDoc {
+    foo: string;
+  }
+
+  type ResourceIdT<ResourceIdField extends string> = {
+    [key in ResourceIdField]: string;
+  };
+  type ResourceDocWithId<ResourceIdField extends string> = ResourceDoc & ResourceIdT<ResourceIdField>;
+
+  function test<
+    ResourceType extends string,
+    DocT extends ResourceDocWithId<`${ResourceType}Id`>>(dbModel: Model<DocT>) {
+    const resourceDoc = new dbModel();
+    resourceDoc.foo = 'bar';
+  }
 }

@@ -21,7 +21,7 @@ declare module 'mongoose' {
    */
   type FlatRecord<T> = { [K in keyof T]: T[K] };
 
-   /**
+  /**
     * @summary Checks if a type is "Record" or "any".
     * @description It Helps to check if user has provided schema type "EnforcedDocType"
     * @param {T} T A generic type to be checked.

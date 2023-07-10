@@ -12233,7 +12233,7 @@ describe('document', function() {
     assert.deepStrictEqual(doc.elements[0].modifiedPaths(), []);
     assert.deepStrictEqual(doc.elements[1].modifiedPaths(), []);
   });
-  
+
   it('avoids prototype pollution on init', async function() {
     const Example = db.model('Example', new Schema({ hello: String }));
 

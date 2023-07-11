@@ -1,3 +1,8 @@
+6.11.3 / 2023-07-11
+===================
+ * fix: avoid prototype pollution on init
+ * fix(schema): correctly handle uuids with populate() #13317 #13595
+
 6.11.2 / 2023-06-08
 ===================
  * fix(cursor): allow find middleware to modify query cursor options #13476 #13453 #13435

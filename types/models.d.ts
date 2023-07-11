@@ -123,13 +123,17 @@ declare module 'mongoose' {
     SessionOption {
     checkKeys?: boolean;
     j?: boolean;
-    ordered?: boolean;
     safe?: boolean | WriteConcern;
     timestamps?: boolean | QueryTimestampsConfig;
     validateBeforeSave?: boolean;
     validateModifiedOnly?: boolean;
     w?: number | string;
     wtimeout?: number;
+  }
+
+  interface CreateOptions extends SaveOptions {
+    ordered?: boolean;
+    aggregateErrors?: boolean;
   }
 
   interface RemoveOptions extends SessionOption, Omit<mongodb.DeleteOptions, 'session'> {}
@@ -217,7 +221,8 @@ declare module 'mongoose' {
     >;
 
     /** Creates a new document or documents */
-    create<DocContents = AnyKeys<TRawDocType>>(docs: Array<TRawDocType | DocContents>, options?: SaveOptions): Promise<THydratedDocumentType[]>;
+    create<DocContents = AnyKeys<TRawDocType>>(docs: Array<TRawDocType | DocContents>, options: CreateOptions & { aggregateErrors: true }): Promise<(THydratedDocumentType | Error)[]>;
+    create<DocContents = AnyKeys<TRawDocType>>(docs: Array<TRawDocType | DocContents>, options?: CreateOptions): Promise<THydratedDocumentType[]>;
     create<DocContents = AnyKeys<TRawDocType>>(doc: DocContents | TRawDocType): Promise<THydratedDocumentType>;
     create<DocContents = AnyKeys<TRawDocType>>(...docs: Array<TRawDocType | DocContents>): Promise<THydratedDocumentType[]>;
 

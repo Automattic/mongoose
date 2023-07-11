@@ -5,7 +5,6 @@ const util = require('./util');
 
 const assert = require('assert');
 const bson = require('bson');
-const { randomUUID } = require('crypto');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -131,7 +130,7 @@ describe('SchemaUUID', function() {
 
   it('works with populate (gh-13267)', async function() {
     const userSchema = new mongoose.Schema({
-      _id: { type: 'UUID', default: () => randomUUID() },
+      _id: { type: 'UUID', default: () => uuidv4() },
       name: String,
       createdBy: {
         type: 'UUID',

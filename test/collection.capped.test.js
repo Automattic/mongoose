@@ -46,6 +46,7 @@ describe('collections: capped:', function() {
     capped.set('capped', { size: 1000 });
     const Capped = db.model('Test', capped, 'Test');
     await Capped.init();
+    await Capped.createCollection();
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     const isCapped = await Capped.collection.isCapped();

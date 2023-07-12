@@ -1,3 +1,7 @@
+5.13.20 / 2023-07-12
+====================
+ * fix: avoid prototype pollution on init
+
 5.13.19 / 2023-06-22
 ====================
  * fix: remove accidental tarball in publish output

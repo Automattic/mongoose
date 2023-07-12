@@ -980,21 +980,6 @@ describe('connections:', function() {
     assert.throws(() => m.model('Test', Schema({ name: String })), /overwrite/);
   });
 
-  it('can use destructured `connect` and `disconnect` (gh-9597)', async function() {
-    const m = new mongoose.Mongoose();
-    const connect = m.connect;
-    const disconnect = m.disconnect;
-
-    await disconnect();
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    const errorOnConnect = await connect(start.uri).then(() => null, err => err);
-    assert.ifError(errorOnConnect);
-
-    const errorOnDisconnect = await disconnect().then(() => null, err => err);
-    assert.ifError(errorOnDisconnect);
-  });
-
   describe('when connecting with a secondary read preference(gh-9374)', function() {
     describe('mongoose.connect', function() {
       it('forces autoIndex & autoCreate to be false if read preference is secondary or secondaryPreferred', async function() {

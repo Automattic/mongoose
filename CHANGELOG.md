@@ -1,3 +1,18 @@
+7.3.4 / 2023-07-12
+==================
+ * chore: release 7.4.4 to overwrite accidental publish of 5.13.20 to latest tag
+
+6.11.3 / 2023-07-11
+===================
+ * fix: avoid prototype pollution on init
+ * fix(schema): correctly handle uuids with populate() #13317 #13595
+
+7.3.3 / 2023-07-10
+==================
+ * fix: avoid prototype pollution on init
+ * fix(document): clean up all array subdocument modified paths on save() #13589 #13582
+ * types: avoid unnecessary MergeType<> if TOverrides not set, clean up statics and insertMany() type issues #13577 #13529
+
 7.3.2 / 2023-07-06
 ==================
  * fix(model): avoid TypeError if insertMany() fails with error that does not have writeErrors property #13579 #13531

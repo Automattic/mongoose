@@ -75,7 +75,7 @@ const story1 = new Story({
   author: author._id // assign the _id from the person
 });
 
-await author.save();
+await story1.save();
 // that's it!
 ```
 

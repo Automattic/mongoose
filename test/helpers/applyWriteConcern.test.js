@@ -15,14 +15,19 @@ describe('applyWriteConcern', function() {
   });
   it('should not overwrite user specified writeConcern options gh-13592', async function() {
     const options = { writeConcern: { w: 'majority' } };
-    const testSchema = new mongoose.Schema({ name: String });
+    const testSchema = new mongoose.Schema({ name: String }, { writeConcern: { w: 0 } });
     const Test = db.model('Test', testSchema);
     await Test.create({ name: 'Test Testerson' });
     applyWriteConcern(testSchema, options);
-    console.log('=========================')
-    await Test.deleteOne();
-    console.log('=========================')
+    assert.deepStrictEqual({ writeConcern: { w:'majority' } }, options);
     await Test.deleteMany({}, options);
-    console.log('what is options after the fact', options);
+    assert.deepStrictEqual({ writeConcern: { w:'majority' } }, options);
+    await Test.deleteMany({});
+    /**
+     * Because no options were passed in, it is using the schema level writeConcern options.
+     * However, because we are ensuring that user specified options are not being overwritten,
+     * this is the only reasonable way to test this case as our options object should not match the schema options.
+     */
+    assert.deepStrictEqual({ writeConcern: { w:'majority' } }, options);
   });
 });

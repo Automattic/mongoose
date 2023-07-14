@@ -384,6 +384,53 @@ describe('validation docs', function() {
     // acquit:ignore:end
   });
 
+  it('Cast Error Message Overwrite', function() {
+    const vehicleSchema = new mongoose.Schema({
+      numWheels: {
+        type: Number,
+        cast: '{VALUE} is not a number'
+      }
+    });
+    const Vehicle = db.model('Vehicle', vehicleSchema);
+
+    const doc = new Vehicle({ numWheels: 'pie' });
+    const err = doc.validateSync();
+
+    err.errors['numWheels'].name; // 'CastError'
+    // "pie" is not a number
+    err.errors['numWheels'].message;
+    // acquit:ignore:start
+    assert.equal(err.errors['numWheels'].name, 'CastError');
+    assert.equal(err.errors['numWheels'].message,
+      '"pie" is not a number');
+    db.deleteModel(/Vehicle/);
+    // acquit:ignore:end
+  });
+
+  /* eslint-disable no-unused-vars */
+  it('Cast Error Message Function Overwrite', function() {
+    const vehicleSchema = new mongoose.Schema({
+      numWheels: {
+        type: Number,
+        cast: [null, (value, path, model, kind) => `"${value}" is not a number`]
+      }
+    });
+    const Vehicle = db.model('Vehicle', vehicleSchema);
+
+    const doc = new Vehicle({ numWheels: 'pie' });
+    const err = doc.validateSync();
+
+    err.errors['numWheels'].name; // 'CastError'
+    // "pie" is not a number
+    err.errors['numWheels'].message;
+    // acquit:ignore:start
+    assert.equal(err.errors['numWheels'].name, 'CastError');
+    assert.equal(err.errors['numWheels'].message,
+      '"pie" is not a number');
+    db.deleteModel(/Vehicle/);
+    // acquit:ignore:end
+  });
+
   it('Global SchemaType Validation', async function() {
     // Add a custom validator to all strings
     mongoose.Schema.Types.String.set('validate', v => v == null || v > 0);

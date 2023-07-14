@@ -14,6 +14,8 @@ describe('validation docs', function() {
     });
   });
 
+  beforeEach(() => db.deleteModel(/Vehicle/));
+
   after(async function() {
     await db.close();
   });

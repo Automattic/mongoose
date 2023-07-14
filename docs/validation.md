@@ -128,9 +128,9 @@ You can overwrite Mongoose's default cast error message by the `cast` option on 
 
 Mongoose's cast error message templating supports the following parameters:
 
-- `{PATH}`: the path that failed to cast
-- `{VALUE}`: a string representation of the value that failed to cast
-- `{KIND}`: the type that Mongoose attempted to cast to, like `'String'` or `'Number'`
+* `{PATH}`: the path that failed to cast
+* `{VALUE}`: a string representation of the value that failed to cast
+* `{KIND}`: the type that Mongoose attempted to cast to, like `'String'` or `'Number'`
 
 You can also define a function that Mongoose will call to get the cast error message as follows.
 

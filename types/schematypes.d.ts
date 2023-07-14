@@ -67,7 +67,7 @@ declare module 'mongoose' {
     boolean |
     ((value: any) => T) |
     [(value: any) => T, string] |
-    [((value: any) => T) | null, (value: any, path: string, model: Model<T>, kind: string) => string];
+    [((value: any) => T) | null, (value: any, path: string, model: Model<any>, kind: string) => string];
 
     /**
      * If true, attach a required validator to this path, which ensures this path

@@ -3,9 +3,8 @@
 const start = require('./common');
 const util = require('./util');
 
-const bson = require('bson');
-
 const assert = require('assert');
+const bson = require('bson');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -127,6 +126,27 @@ describe('SchemaUUID', function() {
 
     assert.equal(name, 'test');
     assert.equal(organization, undefined);
+  });
+
+  it('works with populate (gh-13267)', async function() {
+    const userSchema = new mongoose.Schema({
+      _id: { type: 'UUID', default: () => uuidv4() },
+      name: String,
+      createdBy: {
+        type: 'UUID',
+        ref: 'User'
+      }
+    });
+    const User = db.model('User', userSchema);
+
+    const u1 = await User.create({ name: 'admin' });
+    const { _id } = await User.create({ name: 'created', createdBy: u1._id });
+
+    const pop = await User.findById(_id).populate('createdBy').orFail();
+    assert.equal(pop.createdBy.name, 'admin');
+    assert.equal(pop.createdBy._id.toString(), u1._id.toString());
+
+    await pop.save();
   });
 
   // the following are TODOs based on SchemaUUID.prototype.$conditionalHandlers which are not tested yet

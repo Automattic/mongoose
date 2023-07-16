@@ -336,46 +336,47 @@ declare module 'mongoose' {
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>,
       options: InsertManyOptions & { lean: true; }
-    ): Promise<Array<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>>>;
+    ): Promise<Array<Require_id<DocContents>>>;
     insertMany<DocContents = TRawDocType>(
-      doc: DocContents,
+      docs: DocContents | TRawDocType,
+      options: InsertManyOptions & { lean: true; }
+    ): Promise<Array<Require_id<DocContents>>>;
+    insertMany<DocContents = TRawDocType>(
+      doc: DocContents | TRawDocType,
       options: InsertManyOptions & { ordered: false; rawResult: true; }
-    ): Promise<mongodb.InsertManyResult<TRawDocType> & {
+    ): Promise<mongodb.InsertManyResult<Require_id<DocContents>> & {
       mongoose: {
         validationErrors: Error[];
         results: Array<
           Error |
           Object |
-          HydratedDocument<
-            MergeType<
-              MergeType<TRawDocType, DocContents>,
-              Require_id<TRawDocType>
-            >
-          >
+          MergeType<THydratedDocumentType, DocContents>
         >
       }
     }>;
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>,
       options: InsertManyOptions & { rawResult: true; }
-    ): Promise<mongodb.InsertManyResult<TRawDocType>>;
+    ): Promise<mongodb.InsertManyResult<Require_id<DocContents>>>;
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>
-    ): Promise<Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods, TQueryHelpers>>>;
+    ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
     insertMany<DocContents = TRawDocType>(
       doc: DocContents,
       options: InsertManyOptions & { lean: true; }
-    ): Promise<Array<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>>>;
+    ): Promise<Array<Require_id<DocContents>>>;
     insertMany<DocContents = TRawDocType>(
       doc: DocContents,
       options: InsertManyOptions & { rawResult: true; }
-    ): Promise<mongodb.InsertManyResult<TRawDocType>>;
+    ): Promise<mongodb.InsertManyResult<Require_id<DocContents>>>;
     insertMany<DocContents = TRawDocType>(
       doc: DocContents,
       options: InsertManyOptions
-    ): Promise<Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods, TQueryHelpers>>>;
-    insertMany<DocContents = TRawDocType>(doc: DocContents): Promise<
-    Array<HydratedDocument<MergeType<MergeType<TRawDocType, DocContents>, Require_id<TRawDocType>>, TVirtuals & TInstanceMethods, TQueryHelpers>>
+    ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
+    insertMany<DocContents = TRawDocType>(
+      doc: DocContents
+    ): Promise<
+      Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>
     >;
 
     /** The name of the model */

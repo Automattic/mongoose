@@ -1,4 +1,4 @@
-<h1 id="schematypes"><a href="#schematypes">SchemaTypes</a></h1>
+# SchemaTypes
 
 SchemaTypes handle definition of path
 [defaults](api/schematype.html#schematype_SchemaType-default),
@@ -42,19 +42,19 @@ The following are all the valid SchemaTypes in Mongoose. Mongoose plugins
 can also add custom SchemaTypes like [int32](http://plugins.mongoosejs.io/plugins/int32).
 Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plugins.
 
-- [String](#strings)
-- [Number](#numbers)
-- [Date](#dates)
-- [Buffer](#buffers)
-- [Boolean](#booleans)
-- [Mixed](#mixed)
-- [ObjectId](#objectids)
-- [Array](#arrays)
-- [Decimal128](api/mongoose.html#mongoose_Mongoose-Decimal128)
-- [Map](#maps)
-- [Schema](#schemas)
-- [UUID](#uuid)
-- [BigInt](#bigint)
+* [String](#strings)
+* [Number](#numbers)
+* [Date](#dates)
+* [Buffer](#buffers)
+* [Boolean](#booleans)
+* [Mixed](#mixed)
+* [ObjectId](#objectids)
+* [Array](#arrays)
+* [Decimal128](api/mongoose.html#mongoose_Mongoose-Decimal128)
+* [Map](#maps)
+* [Schema](#schemas)
+* [UUID](#uuid)
+* [BigInt](#bigint)
 
 <h3>Example</h3>
 
@@ -339,7 +339,7 @@ will all result in a [CastError](validation.html#cast-errors) once validated, me
 
 <h3 id="dates">Dates</h3>
 
-[Built-in `Date` methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) are [__not__ hooked into](https://github.com/Automattic/mongoose/issues/1598) the mongoose change tracking logic which in English means that if you use a `Date` in your document and modify it with a method like `setMonth()`, mongoose will be unaware of this change and `doc.save()` will not persist this modification. If you must modify `Date` types using built-in methods, tell mongoose about the change with `doc.markModified('pathToYourDate')` before saving.
+[Built-in `Date` methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) are [**not** hooked into](https://github.com/Automattic/mongoose/issues/1598) the mongoose change tracking logic which in English means that if you use a `Date` in your document and modify it with a method like `setMonth()`, mongoose will be unaware of this change and `doc.save()` will not persist this modification. If you must modify `Date` types using built-in methods, tell mongoose about the change with `doc.markModified('pathToYourDate')` before saving.
 
 ```javascript
 const Assignment = mongoose.model('Assignment', { dueDate: Date });
@@ -365,7 +365,7 @@ const Data = mongoose.model('Data', schema2);
 
 Mongoose will successfully cast the below values to buffers.
 
-```
+```js
 const file1 = new Data({ binData: 'test'}); // {"type":"Buffer","data":[116,101,115,116]}
 const file2 = new Data({ binData: 72987 }); // {"type":"Buffer","data":[27]}
 const file4 = new Data({ binData: { type: 'Buffer', data: [1, 2, 3]}}); // {"type":"Buffer","data":[1,2,3]}
@@ -463,8 +463,8 @@ console.log(new M({ b: 'nay' }).b); // false
 
 Mongoose supports arrays of [SchemaTypes](api/schema.html#schema_Schema-Types)
 and arrays of [subdocuments](subdocs.html). Arrays of SchemaTypes are
-also called _primitive arrays_, and arrays of subdocuments are also called
-_document arrays_.
+also called *primitive arrays*, and arrays of subdocuments are also called
+*document arrays*.
 
 ```javascript
 const ToySchema = new Schema({ name: String });
@@ -607,7 +607,7 @@ const authorSchema = new Schema({
 
 const Author = mongoose.model('Author', authorSchema);
 
-const bookSchema = new Schema({ 
+const bookSchema = new Schema({
   authorId: { type: Schema.Types.UUID, ref: 'Author' }
 });
 const Book = mongoose.model('Book', bookSchema);

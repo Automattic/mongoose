@@ -7,7 +7,7 @@ In older content this parameter is sometimes called `query` or `conditions`. For
 [require:Cast Tutorial.*get and set]
 ```
 
-When you execute the query using [`Query#exec()`](../api/query.html#query_Query-exec) or [`Query#then()`](../api/query.html#query_Query-then), Mongoose _casts_ the filter to match your schema.
+When you execute the query using [`Query#exec()`](../api/query.html#query_Query-exec) or [`Query#then()`](../api/query.html#query_Query-then), Mongoose *casts* the filter to match your schema.
 
 ```acquit
 [require:Cast Tutorial.*cast values]

@@ -55,7 +55,7 @@ To skip getters on a one-off basis, use [`user.get()` with the `getters` option 
 
 ## Setters
 
-Suppose you want to make sure all user emails in your database are lowercased to 
+Suppose you want to make sure all user emails in your database are lowercased to
 make it easy to search without worrying about case. Below is an example
 `userSchema` that ensures emails are lowercased.
 
@@ -97,7 +97,7 @@ For example, the following shows how you can use `$locals` to configure the lang
 
 Mongoose setters are different from [ES6 setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) because they allow you to transform the value being set. With ES6 setters, you
 would need to store an internal `_email` property to use a setter. With Mongoose,
-you do **not** need to define an internal `_email` property or define a 
+you do **not** need to define an internal `_email` property or define a
 corresponding getter for `email`.
 
 ```acquit

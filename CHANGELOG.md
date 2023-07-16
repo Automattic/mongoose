@@ -1,3 +1,36 @@
+7.3.4 / 2023-07-12
+==================
+ * chore: release 7.4.4 to overwrite accidental publish of 5.13.20 to latest tag
+
+6.11.3 / 2023-07-11
+===================
+ * fix: avoid prototype pollution on init
+ * fix(schema): correctly handle uuids with populate() #13317 #13595
+
+7.3.3 / 2023-07-10
+==================
+ * fix: avoid prototype pollution on init
+ * fix(document): clean up all array subdocument modified paths on save() #13589 #13582
+ * types: avoid unnecessary MergeType<> if TOverrides not set, clean up statics and insertMany() type issues #13577 #13529
+
+7.3.2 / 2023-07-06
+==================
+ * fix(model): avoid TypeError if insertMany() fails with error that does not have writeErrors property #13579 #13531
+ * fix(query): convert findOneAndUpdate to findOneAndReplace when overwrite set for backwards compat with Mongoose 6 #13572 #13550
+ * fix(query): throw readable error when executing a Query instance without an associated model #13571 #13570
+ * types: support mongoose.Schema.ObjectId as alias for mongoose.Schema.Types.ObjectId #13543 #13534
+ * docs(connections): clarify that socketTimeoutMS now defaults to 0 #13576 #13537
+ * docs(migrating_to_7): add mapReduce() removal to migration guide #13568 #13548
+ * docs(schemas): fix typo in schemas.md #13540 [Metehan-Altuntekin](https://github.com/Metehan-Altuntekin)
+
+7.3.1 / 2023-06-21
+==================
+ * fix(query): respect query-level strict option on findOneAndReplace() #13516 #13507
+ * docs(connections): expand docs on serverSelectionTimeoutMS #13533 #12967
+ * docs: add example of accessing save options in pre save #13498
+ * docs(connections+faq): add info on localhost vs 127.0.0.1
+ * docs(SchemaType): validate members are validator & message (not msg) #13521 [lorand-horvath](https://github.com/lorand-horvath)
+
 7.3.0 / 2023-06-14
 ==================
  * feat: upgrade mongodb -> 5.6.0 #13455 [lorand-horvath](https://github.com/lorand-horvath)

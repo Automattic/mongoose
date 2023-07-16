@@ -20,6 +20,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [Copy schema options in `Schema.prototype.add()`](#copy-schema-options-in-schema-prototype-add)
 * [ObjectId bsontype now has lowercase d](#objectid-bsontype-now-has-lowercase-d)
 * [Removed support for custom promise libraries](#removed-support-for-custom-promise-libraries)
+* [Removed mapReduce](#removed-mapreduce)
 * [TypeScript-specific changes](#typescript-specific-changes)
   * [Removed `LeanDocument` and support for `extends Document`](#removed-leandocument-and-support-for-extends-document)
   * [New parameters for `HydratedDocument`](#new-parameters-for-hydrateddocument)
@@ -82,60 +83,60 @@ schema.pre('deleteOne', { document: true, query: false }, function() {
 The following functions no longer accept callbacks.
 They always return promises.
 
-- `Aggregate.prototype.exec`
-- `Aggregate.prototype.explain`
-- `AggregationCursor.prototype.close`
-- `Connection.prototype.startSession`
-- `Connection.prototype.dropCollection`
-- `Connection.prototype.createCollection`
-- `Connection.prototype.dropDatabase`
-- `Connection.prototype.openUri`
-- `Connection.prototype.close`
-- `Connection.prototype.destroy`
-- `Document.prototype.populate`
-- `Document.prototype.validate`
-- `Mongoose.prototype.connect`
-- `Mongoose.prototype.createConnection`
-- `Model.prototype.save`
-- `Model.aggregate`
-- `Model.bulkWrite`
-- `Model.cleanIndexes`
-- `Model.countDocuments`
-- `Model.create`
-- `Model.createCollection`
-- `Model.createIndexes`
-- `Model.deleteOne`
-- `Model.deleteMany`
-- `Model.distinct`
-- `Model.ensureIndexes`
-- `Model.estimatedDocumentCount`
-- `Model.exists`
-- `Model.find`
-- `Model.findById`
-- `Model.findByIdAndUpdate`
-- `Model.findByIdAndReplace`
-- `Model.findOne`
-- `Model.findOneAndDelete`
-- `Model.findOneAndUpdate`
-- `Model.findOneAndRemove`
-- `Model.insertMany`
-- `Model.listIndexes`
-- `Model.replaceOne`
-- `Model.syncIndexes`
-- `Model.updateMany`
-- `Model.updateOne`
-- `Query.prototype.find`
-- `Query.prototype.findOne`
-- `Query.prototype.findOneAndDelete`
-- `Query.prototype.findOneAndUpdate`
-- `Query.prototype.findOneAndRemove`
-- `Query.prototype.findOneAndReplace`
-- `Query.prototype.validate`
-- `Query.prototype.deleteOne`
-- `Query.prototype.deleteMany`
-- `Query.prototype.exec`
-- `QueryCursor.prototype.close`
-- `QueryCursor.prototype.next`
+* `Aggregate.prototype.exec`
+* `Aggregate.prototype.explain`
+* `AggregationCursor.prototype.close`
+* `Connection.prototype.startSession`
+* `Connection.prototype.dropCollection`
+* `Connection.prototype.createCollection`
+* `Connection.prototype.dropDatabase`
+* `Connection.prototype.openUri`
+* `Connection.prototype.close`
+* `Connection.prototype.destroy`
+* `Document.prototype.populate`
+* `Document.prototype.validate`
+* `Mongoose.prototype.connect`
+* `Mongoose.prototype.createConnection`
+* `Model.prototype.save`
+* `Model.aggregate`
+* `Model.bulkWrite`
+* `Model.cleanIndexes`
+* `Model.countDocuments`
+* `Model.create`
+* `Model.createCollection`
+* `Model.createIndexes`
+* `Model.deleteOne`
+* `Model.deleteMany`
+* `Model.distinct`
+* `Model.ensureIndexes`
+* `Model.estimatedDocumentCount`
+* `Model.exists`
+* `Model.find`
+* `Model.findById`
+* `Model.findByIdAndUpdate`
+* `Model.findByIdAndReplace`
+* `Model.findOne`
+* `Model.findOneAndDelete`
+* `Model.findOneAndUpdate`
+* `Model.findOneAndRemove`
+* `Model.insertMany`
+* `Model.listIndexes`
+* `Model.replaceOne`
+* `Model.syncIndexes`
+* `Model.updateMany`
+* `Model.updateOne`
+* `Query.prototype.find`
+* `Query.prototype.findOne`
+* `Query.prototype.findOneAndDelete`
+* `Query.prototype.findOneAndUpdate`
+* `Query.prototype.findOneAndRemove`
+* `Query.prototype.findOneAndReplace`
+* `Query.prototype.validate`
+* `Query.prototype.deleteOne`
+* `Query.prototype.deleteMany`
+* `Query.prototype.exec`
+* `QueryCursor.prototype.close`
+* `QueryCursor.prototype.next`
 
 If you are using the above functions with callbacks, we recommend switching to async/await, or promises if async functions don't work for you.
 If you need help refactoring a legacy codebase, [this tool from Mastering JS callbacks to async await](https://masteringjs.io/tutorials/tools/callback-to-async-await) using ChatGPT.
@@ -254,6 +255,25 @@ oid._bsontype; // 'ObjectId' in Mongoose 7, 'ObjectID' in older versions of Mong
 Please update any places where you use `_bsontype` to check if an object is an ObjectId.
 This may also affect libraries that use Mongoose.
 
+<h2 id="removed-mapreduce"><a href="#removed-mapreduce">Removed mapReduce</a></h2>
+
+MongoDB no longer supports `mapReduce`, so Mongoose 7 no longer has a `Model.mapReduce()` function.
+Use the aggregation framework as a replacement for `mapReduce()`.
+
+```javascript
+// The following no longer works in Mongoose 7.
+const o = {
+  map: function() {
+    emit(this.author, 1);
+  },
+  reduce: function(k, vals) {
+    return vals.length;
+  }
+};
+
+await MR.mapReduce(o);
+```
+
 <h2 id="removed-support-for-custom-promise-libraries"><a href="#removed-support-for-custom-promise-libraries">Removed Support for custom promise libraries</a></h2>
 
 Mongoose 7 no longer supports plugging in custom promise libraries. So the following no longer makes Mongoose return Bluebird promises in Mongoose 7.
@@ -325,8 +345,8 @@ TOverrides;
 
 In Mongoose 7, the first parameter is the raw document interface, the 2nd parameter is any document-specific overrides (usually virtuals and methods), and the 3rd parameter is any query helpers associated with the document's model.
 
-The key difference is that, in Mongoose 6, the 3rd generic param was the document's _virtuals_.
-In Mongoose 7, the 3rd generic param is the document's _query helpers_.
+The key difference is that, in Mongoose 6, the 3rd generic param was the document's *virtuals*.
+In Mongoose 7, the 3rd generic param is the document's *query helpers*.
 
 ```ts
 // Mongoose 6 version:

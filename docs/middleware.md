@@ -12,6 +12,7 @@ on the schema level and is useful for writing [plugins](plugins.html).
   <li><a href="#post-async">Asynchronous Post Hooks</a></li>
   <li><a href="#defining">Define Middleware Before Compiling Models</a></li>
   <li><a href="#order">Save/Validate Hooks</a></li>
+  <li><a href="#accessing-parameters-in-middleware">Accessing Parameters in Middleware</a></li>
   <li><a href="#naming">Naming Conflicts</a></li>
   <li><a href="#notes">Notes on findAndUpdate() and Query Middleware</a></li>
   <li><a href="#error-handling-middleware">Error Handling Middleware</a></li>
@@ -64,7 +65,7 @@ In aggregate middleware, `this` refers to the [aggregation object](api/model.htm
 * [aggregate](api/model.html#model_Model-aggregate)
 
 Model middleware is supported for the following model functions.
-Don't confuse model middleware and document middleware: model middleware hooks into _static_ functions on a `Model` class, document middleware hooks into _methods_ on a `Model` class.
+Don't confuse model middleware and document middleware: model middleware hooks into *static* functions on a `Model` class, document middleware hooks into *methods* on a `Model` class.
 In model middleware functions, `this` refers to the model.
 
 * [insertMany](api/model.html#model_Model-insertMany)
@@ -231,7 +232,7 @@ error `err1` and then throw an error `err2`, mongoose will report `err1`.
 
 <h2 id="post"><a href="#post">Post middleware</a></h2>
 
-[post](api.html#schema_Schema-post) middleware are executed _after_
+[post](api.html#schema_Schema-post) middleware are executed *after*
 the hooked method and all of its `pre` middleware have completed.
 
 ```javascript
@@ -344,6 +345,39 @@ schema.post('save', function() {
 });
 ```
 
+<h2 id="accessing-parameters-in-middleware"><a href="#accessing-parameters-in-middleware">Accessing Parameters in Middleware</a></h2>
+
+Mongoose provides 2 ways to get information about the function call that triggered the middleware.
+For query middleware, we recommend using `this`, which will be a [Mongoose Query instance](api/query.html).
+
+```javascript
+const userSchema = new Schema({ name: String, age: Number });
+userSchema.pre('findOneAndUpdate', function() {
+  console.log(this.getFilter()); // { name: 'John' }
+  console.log(this.getUpdate()); // { age: 30 }
+});
+const User = mongoose.model('User', userSchema);
+
+await User.findOneAndUpdate({ name: 'John' }, { $set: { age: 30 } });
+```
+
+For document middleware, like `pre('save')`, Mongoose passes the 1st parameter to `save()` as the 2nd argument to your `pre('save')` callback.
+You should use the 2nd argument to get access to the `save()` call's `options`, because Mongoose documents don't store all the options you can pass to `save()`.
+
+```javascript
+const userSchema = new Schema({ name: String, age: Number });
+userSchema.pre('save', function(next, options) {
+  options.validateModifiedOnly; // true
+
+  // Remember to call `next()` unless you're using an async function or returning a promise
+  next();
+});
+const User = mongoose.model('User', userSchema);
+
+const doc = new User({ name: 'John', age: 30 });
+await doc.save({ validateModifiedOnly: true });
+```
+
 <h2 id="naming"><a href="#naming">Naming Conflicts</a></h2>
 
 Mongoose has both query and document hooks for `remove()`.
@@ -445,8 +479,6 @@ await Model.updateOne({}, { $set: { name: 'test' } });
 ```
 
 <h2 id="error-handling-middleware"><a href="#error-handling-middleware">Error Handling Middleware</a></h2>
-
-_New in 4.5.0_
 
 Middleware execution normally stops the first time a piece of middleware
 calls `next()` with an error. However, there is a special kind of post

@@ -19,15 +19,15 @@ declare module 'mongoose' {
    * @description It makes intellisense dialog box easier to read as a single object instead of showing that in multiple object unions.
    * @param {T} T The type to be converted.
    */
-   type FlatRecord<T> = { [K in keyof T]: T[K] };
+  type FlatRecord<T> = { [K in keyof T]: T[K] };
 
-   /**
- * @summary Checks if a type is "Record" or "any".
- * @description It Helps to check if user has provided schema type "EnforcedDocType"
- * @param {T} T A generic type to be checked.
- * @returns true if {@link T} is Record OR false if {@link T} is of any type.
- */
-type IsItRecordAndNotAny<T> = IfEquals<T, any, false, T extends Record<any, any> ? true : false>;
+  /**
+    * @summary Checks if a type is "Record" or "any".
+    * @description It Helps to check if user has provided schema type "EnforcedDocType"
+    * @param {T} T A generic type to be checked.
+    * @returns true if {@link T} is Record OR false if {@link T} is of any type.
+    */
+  type IsItRecordAndNotAny<T> = IfEquals<T, any, false, T extends Record<any, any> ? true : false>;
 
 /**
  * @summary Checks if two types are identical.

@@ -75,7 +75,7 @@ const story1 = new Story({
   author: author._id // assign the _id from the person
 });
 
-await author.save();
+await story1.save();
 // that's it!
 ```
 
@@ -105,7 +105,7 @@ performing a separate query before returning the results.
 
 Arrays of refs work the same way. Just call the
 [populate](api/query.html#query_Query-populate) method on the query and an
-array of documents will be returned _in place_ of the original `_id`s.
+array of documents will be returned *in place* of the original `_id`s.
 
 <h2 id="setting-populated-fields"><a href="#setting-populated-fields">Setting Populated Fields</a></h2>
 
@@ -392,7 +392,7 @@ person.populated('fans'); // Array of ObjectIds
 <h2 id="populate_multiple_documents"><a href="#populate_multiple_documents">Populating multiple existing documents</a></h2>
 
 If we have one or many mongoose documents or even plain objects
-(_like [mapReduce](api/model.html#model_Model-mapReduce) output_), we may
+(*like [mapReduce](api/model.html#model_Model-mapReduce) output*), we may
 populate them using the [Model.populate()](api/model.html#model_Model-populate)
 method. This is what `Document#populate()`
 and `Query#populate()` use to populate documents.
@@ -607,7 +607,7 @@ const BlogPostSchema = new Schema({
 ```
 
 Unfortunately, these two schemas, as written, don't support populating an author's list of blog posts.
-That's where _virtual populate_ comes in.
+That's where *virtual populate* comes in.
 Virtual populate means calling `populate()` on a virtual property that has a `ref` option as shown below.
 
 ```javascript
@@ -631,7 +631,7 @@ const author = await Author.findOne().populate('posts');
 author.posts[0].title; // Title of the first blog post
 ```
 
-Keep in mind that virtuals are _not_ included in `toJSON()` and `toObject()` output by default.
+Keep in mind that virtuals are *not* included in `toJSON()` and `toObject()` output by default.
 If you want populate virtuals to show up when using functions like Express' [`res.json()` function](https://masteringjs.io/tutorials/express/json) or `console.log()`, set the `virtuals: true` option on your schema's `toJSON` and `toObject()` options.
 
 ```javascript
@@ -885,6 +885,7 @@ userSchema.pre('find', function(next) {
   next();
 });
 ```
+
 Alternatively, you can check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
 
 <h2 id="transform-populated-documents"><a href="#transform-populated-documents">Transform populated documents</a></h2>

@@ -1,7 +1,7 @@
 # Schemas in TypeScript
 
 Mongoose [schemas](../guide.html) are how you tell Mongoose what your documents look like.
-Mongoose schemas are separate from TypeScript interfaces, so you need to either define both a _document interface_ and a _schema_; or rely on Mongoose to automatically infer the type from the schema definition.
+Mongoose schemas are separate from TypeScript interfaces, so you need to either define both a *document interface* and a *schema*; or rely on Mongoose to automatically infer the type from the schema definition.
 
 ## Separate document interface definition
 
@@ -64,7 +64,7 @@ There are a few caveats for using automatic type inference:
 
 1. You need to set `strictNullChecks: true` or `strict: true` in your `tsconfig.json`. Or, if you're setting flags at the command line, `--strictNullChecks` or `--strict`. There are [known issues](https://github.com/Automattic/mongoose/issues/12420) with automatic type inference with strict mode disabled.
 2. You need to define your schema in the `new Schema()` call. Don't assign your schema definition to a temporary variable. Doing something like `const schemaDefinition = { name: String }; const schema = new Schema(schemaDefinition);` will not work.
-3. Mongoose adds `createdAt` and `updatedAt` to your schema if you specify the `timestamps` option in your schema, _except_ if you also specify `methods`, `virtuals`, or `statics`. There is a [known issue](https://github.com/Automattic/mongoose/issues/12807) with type inference with timestamps and methods/virtuals/statics options. If you use methods, virtuals, and statics, you're responsible for adding `createdAt` and `updatedAt` to your schema definition.
+3. Mongoose adds `createdAt` and `updatedAt` to your schema if you specify the `timestamps` option in your schema, *except* if you also specify `methods`, `virtuals`, or `statics`. There is a [known issue](https://github.com/Automattic/mongoose/issues/12807) with type inference with timestamps and methods/virtuals/statics options. If you use methods, virtuals, and statics, you're responsible for adding `createdAt` and `updatedAt` to your schema definition.
 
 If automatic type inference doesn't work for you, you can always fall back to document interface definitions.
 
@@ -72,16 +72,16 @@ If automatic type inference doesn't work for you, you can always fall back to do
 
 The Mongoose `Schema` class in TypeScript has 4 [generic parameters](https://www.typescriptlang.org/docs/handbook/2/generics.html):
 
-- `DocType` - An interface descibing how the data is saved in MongoDB
-- `M` - The Mongoose model type. Can be omitted if there are no query helpers or instance methods to be defined.
-  - default: `Model<DocType, any, any>`
-- `TInstanceMethods` - An interface containing the methods for the schema.
-  - default: `{}`
-- `TQueryHelpers` - An interface containing query helpers defined on the schema. Defaults to `{}`.
+* `DocType` - An interface describing how the data is saved in MongoDB
+* `M` - The Mongoose model type. Can be omitted if there are no query helpers or instance methods to be defined.
+  * default: `Model<DocType, any, any>`
+* `TInstanceMethods` - An interface containing the methods for the schema.
+  * default: `{}`
+* `TQueryHelpers` - An interface containing query helpers defined on the schema. Defaults to `{}`.
 
 <details>
   <summary>View TypeScript definition</summary>
-    
+
   ```typescript
   class Schema<DocType = any, M = Model<DocType, any, any>, TInstanceMethods = {}, TQueryHelpers = {}> extends events.EventEmitter {
     // ...

@@ -1,3 +1,7 @@
+6.11.4 / 2023-07-17
+===================
+ * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614
+
 6.11.3 / 2023-07-11
 ===================
  * fix: avoid prototype pollution on init

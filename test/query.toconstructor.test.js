@@ -162,6 +162,7 @@ describe('Query:', function() {
       });
 
       const Test = db.model('Test', schema);
+      await Test.init();
       await Test.deleteMany({});
       const test = new Test({ name: 'Romero' });
       const Q = Test.findOne({}).toConstructor();

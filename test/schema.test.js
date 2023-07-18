@@ -2396,6 +2396,25 @@ describe('schema', function() {
       assert.ok(threw);
     });
 
+    it('with function cast error format', function() {
+      const schema = Schema({
+        num: {
+          type: Number,
+          cast: [null, value => `${value} isn't a number`]
+        }
+      });
+
+      let threw = false;
+      try {
+        schema.path('num').cast('horseradish');
+      } catch (err) {
+        threw = true;
+        assert.equal(err.name, 'CastError');
+        assert.equal(err.message, 'horseradish isn\'t a number');
+      }
+      assert.ok(threw);
+    });
+
     it('with objectids', function() {
       const schema = Schema({
         userId: {

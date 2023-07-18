@@ -197,6 +197,27 @@ describe('model', function() {
         const docs = await Test.find();
         assert.equal(docs.length, 5);
       });
+      it('should throw an error only after all the documents have finished saving gh-4628', async function() {
+        const countSchema = new Schema({ n: Number });
+        const testSchema = new Schema({ name: { type: String, unique: true }, reference: Number });
+
+        const Count = db.model('gh4628', countSchema);
+
+        testSchema.pre('save', async function(next) {
+          const doc = await Count.findOneAndUpdate({}, { $inc: { n: 1 } }, { new: true, upsert: true });
+          this.reference = doc.n;
+          next();
+        });
+
+        const Test = db.model('gh4628Test', testSchema);
+        const data = [];
+        for (let i = 0; i < 11; i++) {
+          data.push({ name: 'Test' + Math.abs(i - 4) });
+        }
+        const res = await Test.create(data, { ordered: false }).catch(err => err);
+        const docs = await Test.find();
+        assert.equal(docs.length, 7); // docs 1,2,3,4 should not go through 11-4 == 7
+      })
     });
   });
 });

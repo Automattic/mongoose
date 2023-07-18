@@ -1916,7 +1916,6 @@ describe('Query', function() {
       const TestSchema = new Schema({ name: String });
 
       const ops = [
-        'count',
         'find',
         'findOne',
         'findOneAndRemove',

@@ -214,10 +214,10 @@ describe('model', function() {
         for (let i = 0; i < 11; i++) {
           data.push({ name: 'Test' + Math.abs(i - 4) });
         }
-        const res = await Test.create(data, { ordered: false }).catch(err => err);
+        await Test.create(data, { ordered: false }).catch(err => err);
         const docs = await Test.find();
         assert.equal(docs.length, 7); // docs 1,2,3,4 should not go through 11-4 == 7
-      })
+      });
     });
   });
 });

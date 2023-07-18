@@ -608,12 +608,13 @@ describe('timestamps', function() {
     });
 
     it('should change updatedAt when findOneAndUpdate', async function() {
+      await Cat.deleteMany({});
       await Cat.create({ name: 'test123' });
       let doc = await Cat.findOne({ name: 'test123' });
       const old = doc.updatedAt;
+      await new Promise(resolve => setTimeout(resolve, 10));
       doc = await Cat.findOneAndUpdate({ name: 'test123' }, { $set: { hobby: 'fish' } }, { new: true });
-      assert.ok(doc.updatedAt.getTime() > old.getTime());
-
+      assert.ok(doc.updatedAt.getTime() > old.getTime(), `Expected ${doc.updatedAt} > ${old}`);
     });
 
     it('insertMany with createdAt off (gh-6381)', async function() {

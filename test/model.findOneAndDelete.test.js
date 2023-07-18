@@ -335,4 +335,42 @@ describe('model: findOneAndDelete:', function() {
       assert.equal(postCount, 1);
     });
   });
+
+  it('supports the `includeResultMetadata` option (gh-13539)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: String
+    });
+    const Test = db.model('Test', testSchema);
+    await Test.create({ name: 'Test' });
+    const doc = await Test.findOneAndDelete(
+      { name: 'Test' },
+      { includeResultMetadata: false }
+    );
+    assert.equal(doc.ok, undefined);
+    assert.equal(doc.name, 'Test');
+
+    await Test.create({ name: 'Test' });
+    let data = await Test.findOneAndDelete(
+      { name: 'Test' },
+      { includeResultMetadata: true }
+    );
+    assert(data.ok);
+    assert.equal(data.value.name, 'Test');
+
+    await Test.create({ name: 'Test' });
+    data = await Test.findOneAndDelete(
+      { name: 'Test' },
+      { includeResultMetadata: true, rawResult: true }
+    );
+    assert(data.ok);
+    assert.equal(data.value.name, 'Test');
+
+    await assert.rejects(
+      () => Test.findOneAndDelete(
+        { name: 'Test' },
+        { includeResultMetadata: false, rawResult: true }
+      ),
+      /Cannot set `rawResult` option when `includeResultMetadata` is false/
+    );
+  });
 });

@@ -208,8 +208,8 @@ describe('Model', function() {
       describe('defaults', function() {
         it('to a non-empty array', function() {
           const DefaultArraySchema = new Schema({
-            arr: { type: Array, cast: String, default: ['a', 'b', 'c'] },
-            single: { type: Array, cast: String, default: ['a'] }
+            arr: { type: Array, default: ['a', 'b', 'c'] },
+            single: { type: Array, default: ['a'] }
           });
           const DefaultArray = db.model('Test', DefaultArraySchema);
           const arr = new DefaultArray();
@@ -223,7 +223,7 @@ describe('Model', function() {
 
         it('empty', function() {
           const DefaultZeroCardArraySchema = new Schema({
-            arr: { type: Array, cast: String, default: [] },
+            arr: { type: Array, default: [] },
             auto: [Number]
           });
           const DefaultZeroCardArray = db.model('Test', DefaultZeroCardArraySchema);
@@ -7027,6 +7027,19 @@ describe('Model', function() {
       await doc.save();
       assert(bypass);
     });
+  });
+
+  it('respects schema-level `collectionOptions` for setting options to createCollection()', async function() {
+    const testSchema = new Schema({
+      name: String
+    }, { collectionOptions: { capped: true, size: 1024 } });
+    const TestModel = db.model('Test', testSchema);
+    await TestModel.init();
+    await TestModel.collection.drop();
+    await TestModel.createCollection();
+
+    const isCapped = await TestModel.collection.isCapped();
+    assert.ok(isCapped);
   });
 });
 

@@ -6,6 +6,7 @@
 
 const start = require('./common');
 
+const STATES = require('../lib/connectionstate');
 const Q = require('q');
 const assert = require('assert');
 const mongodb = require('mongodb');
@@ -745,6 +746,35 @@ describe('connections:', function() {
 
       assert.strictEqual(db2, db3);
       return db.close();
+    });
+
+    it('supports removing db (gh-11821)', async function() {
+      const db = await mongoose.createConnection(start.uri).asPromise();
+
+      const schema = mongoose.Schema({ name: String }, { autoCreate: false, autoIndex: false });
+      const Test = db.model('Test', schema);
+      await Test.deleteMany({});
+      await Test.create({ name: 'gh-11821' });
+
+      const db2 = db.useDb(start.databases[1]);
+      const Test2 = db2.model('Test', schema);
+
+      await Test2.deleteMany({});
+      let doc = await Test2.findOne();
+      assert.equal(doc, null);
+
+      db.removeDb(start.databases[1]);
+      assert.equal(db2.readyState, STATES.disconnected);
+      assert.equal(db.readyState, STATES.connected);
+      await assert.rejects(
+        () => Test2.findOne(),
+        /Connection was force closed/
+      );
+
+      doc = await Test.findOne();
+      assert.equal(doc.name, 'gh-11821');
+
+      await db.close();
     });
   });
 

@@ -837,7 +837,7 @@ describe('schema', function() {
       const Test = mongoose.model('allow-null' + random(), testSchema);
       const a = new Test({ name: null });
       const err = await a.validate().then(() => null, err => err);
-      assert.equal(err, null)
+      assert.equal(err, null);
     });
 
     it('should allow an array of subdocuments with enums (gh-3521)', async function() {

@@ -831,7 +831,7 @@ describe('schema', function() {
       const testSchema = new Schema({
         name: {
           type: String,
-          enum: ['test', null]
+          enum: ['test']
         }
       });
       const Test = mongoose.model('allow-null' + random(), testSchema);

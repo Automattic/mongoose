@@ -1,5 +1,8 @@
+6.11.4 / 2023-07-17
+===================
+ * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614
+
 7.3.4 / 2023-07-12
-==================
  * chore: release 7.4.4 to overwrite accidental publish of 5.13.20 to latest tag
 
 6.11.3 / 2023-07-11

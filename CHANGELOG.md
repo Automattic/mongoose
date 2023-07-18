@@ -1,3 +1,19 @@
+7.4.0 / 2023-07-18
+==================
+ * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614
+ * feat: upgrade to MongoDB Node.js driver 5.7.0 #13591
+ * feat: support generating custom cast error message with a function #13608 #3162
+ * feat(query): support MongoDB driver's includeResultMetadata option for findOneAndUpdate #13584 #13539
+ * feat(connection): add Connection.prototype.removeDb() for removing a related connection #13580 #11821
+ * feat(query): delay converting documents into POJOs until query execution, allow querying subdocuments with defaults disabled #13522
+ * feat(model): add option "aggregateErrors" for create() #13544 [hasezoey](https://github.com/hasezoey)
+ * feat(schema): add collectionOptions option to schemas #13513
+ * fix: move all MongoDB-specific connection logic into driver layer, add createClient() method to handle creating MongoClient #13542
+ * fix(document): allow setting keys with dots in mixed paths underneath nested paths #13536
+ * types: augment bson.ObjectId instead of adding on own type #13515 #12537 [hasezoey](https://github.com/hasezoey)
+ * docs(guide): fix md lint #13593 [hasezoey](https://github.com/hasezoey)
+ * docs: changed the code from 'await author.save()' to 'await story1.save()' #13596 [SomSingh23](https://github.com/SomSingh23)
+
 6.11.4 / 2023-07-17
 ===================
  * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614

@@ -605,7 +605,7 @@ declare module 'mongoose' {
    * { age: 30 }
    * ```
    */
-  export type UpdateQuery<T> = _UpdateQuery<T> & AnyObject;
+  export type UpdateQuery<T = AnyObject> = _UpdateQuery<T> & Partial<T>;
 
   export type FlattenMaps<T> = {
     [K in keyof T]: FlattenProperty<T[K]>;

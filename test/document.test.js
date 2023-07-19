@@ -793,14 +793,21 @@ describe('document', function() {
       assert.strictEqual(myModel.toObject().foo, void 0);
     });
 
-    it('should propogate toObject to implicitly created schemas gh-13325', async function() {
+    it('should propogate toObject to implicitly created schemas (gh-13599) (gh-13325)', async function() {
+      let transformCalls = [];
       const userSchema = Schema({
         firstName: String,
         company: {
           type: { companyId: { type: Schema.Types.ObjectId }, companyName: String }
         }
       }, {
-        toObject: { virtuals: true }
+        toObject: {
+          virtuals: true,
+          transform(doc, ret) {
+            transformCalls.push(doc);
+            return ret;
+          }
+        }
       });
 
       userSchema.virtual('company.details').get(() => 42);
@@ -809,6 +816,8 @@ describe('document', function() {
       const user = new User({ firstName: 'test', company: { companyName: 'foo' } });
       const obj = user.toObject();
       assert.strictEqual(obj.company.details, 42);
+      assert.equal(transformCalls.length, 1);
+      assert.strictEqual(transformCalls[0], user);
     });
   });
 
@@ -996,7 +1005,8 @@ describe('document', function() {
       assert.equal(foundAlicJson.friends, undefined);
       assert.equal(foundAlicJson.name, 'Alic');
     });
-    it('should propogate toJSON to implicitly created schemas gh-13325', async function() {
+    it('should propogate toJSON to implicitly created schemas (gh-13599) (gh-13325)', async function() {
+      let transformCalls = [];
       const userSchema = Schema({
         firstName: String,
         company: {
@@ -1004,7 +1014,13 @@ describe('document', function() {
         }
       }, {
         id: false,
-        toJSON: { virtuals: true }
+        toJSON: {
+          virtuals: true,
+          transform(doc, ret) {
+            transformCalls.push(doc);
+            return ret;
+          }
+        }
       });
 
       userSchema.virtual('company.details').get(() => 'foo');
@@ -1016,6 +1032,8 @@ describe('document', function() {
       });
       const obj = doc.toJSON();
       assert.strictEqual(obj.company.details, 'foo');
+      assert.equal(transformCalls.length, 1);
+      assert.strictEqual(transformCalls[0], doc);
     });
   });
 

@@ -532,11 +532,10 @@ schema.post('update', function(error, res, next) {
 });
 
 const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
-Person.create(people, function(error) {
-  Person.update({ name: 'Slash' }, { $set: { name: 'Axl Rose' } }, function(error) {
-    // `error.message` will be "There was a duplicate key error"
-  });
-});
+await Person.create(people); function(error) {
+
+// Throws "There was a duplicate key error"
+await Person.update({ name: 'Slash' }, { $set: { name: 'Axl Rose' } });
 ```
 
 Error handling middleware can transform an error, but it can't remove the

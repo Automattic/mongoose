@@ -79,9 +79,8 @@ const schema = new mongoose.Schema({
 });
 const Model = db.model('Test', schema);
 
-Model.create([{ name: 'Val' }, { name: 'Val' }], function(err) {
-  console.log(err); // No error, unless index was already built
-});
+// No error, unless index was already built
+await Model.create([{ name: 'Val' }, { name: 'Val' }]);
 ```
 
 However, if you wait for the index to build using the `Model.on('index')` event, attempts to save duplicates will correctly error.
@@ -92,21 +91,12 @@ const schema = new mongoose.Schema({
 });
 const Model = db.model('Test', schema);
 
-Model.on('index', function(err) { // <-- Wait for model's indexes to finish
-  assert.ifError(err);
-  Model.create([{ name: 'Val' }, { name: 'Val' }], function(err) {
-    console.log(err);
-  });
-});
-
-// Promise based alternative. `init()` returns a promise that resolves
-// when the indexes have finished building successfully. The `init()`
+// Wait for model's indexes to finish. The `init()`
 // function is idempotent, so don't worry about triggering an index rebuild.
-Model.init().then(function() {
-  Model.create([{ name: 'Val' }, { name: 'Val' }], function(err) {
-    console.log(err);
-  });
-});
+await Model.init();
+
+// Throws a duplicate key error
+await Model.create([{ name: 'Val' }, { name: 'Val' }]);
 ```
 
 MongoDB persists indexes, so you only need to rebuild indexes if you're starting

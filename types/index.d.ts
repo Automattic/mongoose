@@ -378,11 +378,22 @@ declare module 'mongoose' {
     pre<T = never>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPreOptions & { document: false, query: false }, fn: PreMiddlewareFunction<T>): this;
     pre<T = never>(method: MongooseDistinctQueryMiddleware|MongooseDistinctQueryMiddleware[], options: SchemaPreOptions & { document: boolean, query: false }, fn: PreMiddlewareFunction<T>): this;
     pre<T = never>(method: MongooseDistinctDocumentMiddleware | MongooseDistinctDocumentMiddleware[] | RegExp, options: SchemaPreOptions & { document: false, query: boolean }, fn: PreMiddlewareFunction<T>): this;
+    // this = Union of Document and Query, could be called with any of them
+    pre<T = THydratedDocumentType | Query<any, any>>(
+      method: MongooseQueryAndDocumentMiddleware | MongooseQueryAndDocumentMiddleware[] | RegExp,
+      options: SchemaPreOptions & { document: true, query: true },
+      fn: PreMiddlewareFunction<T>
+    ): this;
     // this = Document
     pre<T = THydratedDocumentType>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: 'save', options: SchemaPreOptions, fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], fn: PreMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
+    pre<T = THydratedDocumentType>(
+      method: MongooseQueryAndDocumentMiddleware | MongooseQueryAndDocumentMiddleware[] | RegExp,
+      options: SchemaPreOptions & { document: true },
+      fn: PreMiddlewareFunction<T>
+    ): this;
     pre<T = THydratedDocumentType>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPreOptions & { document: true, query: false }, fn: PreMiddlewareFunction<T>): this;
     // this = Query
     pre<T = Query<any, any>>(method: MongooseDefaultQueryMiddleware|MongooseDefaultQueryMiddleware[], fn: PreMiddlewareFunction<T>): this;

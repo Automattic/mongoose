@@ -198,18 +198,11 @@ describe('model', function() {
         assert.equal(docs.length, 5);
       });
       it('should throw an error only after all the documents have finished saving gh-4628', async function() {
-        const countSchema = new Schema({ n: Number });
-        const testSchema = new Schema({ name: { type: String, unique: true }, reference: Number });
+        const testSchema = new Schema({ name: { type: String, unique: true } });
 
-        const Count = db.model('gh4628', countSchema);
-
-        testSchema.pre('save', async function(next) {
-          const doc = await Count.findOneAndUpdate({}, { $inc: { n: 1 } }, { new: true, upsert: true });
-          this.reference = doc.n;
-          next();
-        });
 
         const Test = db.model('gh4628Test', testSchema);
+        await Test.init();
         const data = [];
         for (let i = 0; i < 11; i++) {
           data.push({ name: 'Test' + Math.abs(i - 4) });

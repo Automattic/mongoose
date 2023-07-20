@@ -1006,7 +1006,7 @@ describe('document', function() {
       assert.equal(foundAlicJson.name, 'Alic');
     });
     it('should propogate toJSON to implicitly created schemas (gh-13599) (gh-13325)', async function() {
-      let transformCalls = [];
+      const transformCalls = [];
       const userSchema = Schema({
         firstName: String,
         company: {

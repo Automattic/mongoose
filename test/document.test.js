@@ -794,7 +794,7 @@ describe('document', function() {
     });
 
     it('should propogate toObject to implicitly created schemas (gh-13599) (gh-13325)', async function() {
-      let transformCalls = [];
+      const transformCalls = [];
       const userSchema = Schema({
         firstName: String,
         company: {

@@ -136,6 +136,10 @@ declare module 'mongoose' {
      * Another alias for the `new` option. `returnOriginal` is deprecated so this should be used.
      */
     returnDocument?: 'before' | 'after';
+    /**
+     * Set to true to enable `update validators`
+     * (https://mongoosejs.com/docs/validation.html#update-validators). Defaults to false.
+     */
     runValidators?: boolean;
     /* Set to `true` to automatically sanitize potentially unsafe user-generated query projections */
     sanitizeProjection?: boolean;

@@ -532,7 +532,7 @@ schema.post('update', function(error, res, next) {
 });
 
 const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
-await Person.create(people); function(error) {
+await Person.create(people);
 
 // Throws "There was a duplicate key error"
 await Person.update({ name: 'Slash' }, { $set: { name: 'Axl Rose' } });

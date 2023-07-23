@@ -12290,6 +12290,29 @@ describe('document', function() {
     assert.deepStrictEqual(doc.elements[1].modifiedPaths(), []);
   });
 
+  it('cleans up all nested subdocs modified state on save (gh-13609)', async function() {
+    const TwoElementSchema = new mongoose.Schema({
+      elementName: String
+    });
+
+    const TwoNestedSchema = new mongoose.Schema({
+      nestedName: String,
+      elements: [TwoElementSchema]
+    });
+
+    const TwoDocDefaultSchema = new mongoose.Schema({
+      docName: String,
+      nested: { type: TwoNestedSchema, default: {} }
+    });
+
+    const Test = db.model('Test', TwoDocDefaultSchema);
+    const doc = new Test({ docName: 'MyDocName' });
+    doc.nested.nestedName = 'qdwqwd';
+    doc.nested.elements.push({ elementName: 'ElementName1' });
+    await doc.save();
+    assert.deepStrictEqual(doc.nested.modifiedPaths(), []);
+  });
+
   it('avoids prototype pollution on init', async function() {
     const Example = db.model('Example', new Schema({ hello: String }));
 

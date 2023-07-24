@@ -5754,7 +5754,7 @@ describe('Model', function() {
       isDeleted: false
     });
     const initialTime = entry.posts[0].updatedAt;
-    await delay(5000);
+    await delay(500);
 
     await User.bulkWrite([{
       updateMany: {
@@ -5776,7 +5776,7 @@ describe('Model', function() {
     const res = await User.findOne({ _id: entry._id });
     const currentTime = res.posts[0].updatedAt;
     assert.equal(initialTime.getTime(), currentTime.getTime());
-  }).timeout(7000);
+  });
 
   it('bulkWrite can overwrite schema `strict` option for filters and updates (gh-8778)', async function() {
     // Arrange

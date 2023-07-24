@@ -104,44 +104,16 @@ A full list of [Query helper functions can be found in the API docs](api/query.h
   </a>
 </h2>
 
-Mongoose queries are **not** promises. They have a `.then()`
-function for [co](https://www.npmjs.com/package/co) and
-[async/await](http://thecodebarbarian.com/common-async-await-design-patterns-in-node.js.html)
-as a convenience. However, unlike promises, calling a query's `.then()`
-can execute the query multiple times.
-
-For example, the below code will execute 3 `updateMany()` calls, one
-because of the callback, and two because `.then()` is called twice.
+Mongoose queries are **not** promises.
+Queries are [thenables](https://masteringjs.io/tutorials/fundamentals/thenable), meaning they have a `.then()` method for [async/await](http://thecodebarbarian.com/common-async-await-design-patterns-in-node.js.html) as a convenience.
+However, unlike promises, calling a query's `.then()` executes the query, so calling `then()` multiple times will throw an error.
 
 ```javascript
-const q = MyModel.updateMany({}, { isDeleted: true }, function() {
-  console.log('Update 1');
-});
+const q = MyModel.updateMany({}, { isDeleted: true });
 
-q.then(() => console.log('Update 2'));
-q.then(() => console.log('Update 3'));
-```
-
-Don't mix using callbacks and promises with queries, or you may end up
-with duplicate operations. That's because passing a callback to a query function
-immediately executes the query, and calling [`then()`](https://masteringjs.io/tutorials/fundamentals/then)
-executes the query again.
-
-Mixing promises and callbacks can lead to duplicate entries in arrays.
-For example, the below code inserts 2 entries into the `tags` array, **not** just 1.
-
-```javascript
-const BlogPost = mongoose.model('BlogPost', new Schema({
-  title: String,
-  tags: [String]
-}));
-
-// Because there's both `await` **and** a callback, this `updateOne()` executes twice
-// and thus pushes the same string into `tags` twice.
-const update = { $push: { tags: ['javascript'] } };
-await BlogPost.updateOne({ title: 'Introduction to Promises' }, update, (err, res) => {
-  console.log(res);
-});
+await q.then(() => console.log('Update 2'));
+// Throws "Query was already executed: Test.updateMany({}, { isDeleted: true })"
+await q.then(() => console.log('Update 3'));
 ```
 
 <h2 id="refs"><a href="#refs">References to other documents</a></h2>

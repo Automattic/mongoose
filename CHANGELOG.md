@@ -1,3 +1,14 @@
+7.4.1 / 2023-07-24
+==================
+ * fix(document): correctly clean up nested subdocs modified state on save() #13644 #13609
+ * fix(schema): avoid propagating toObject.transform and toJSON.transform option to implicitly created schemas #13634 #13599
+ * fix: prevent schema options overwriting user defined writeConcern #13612 #13592
+ * types: correctly handle pre('deleteOne', { document: true }) #13632
+ * types(schema): handle type: Schema.Types.Map in TypeScript #13628
+ * types: Add inline comment to to tell the default value of the runValidator flag in the queryOptions types #13636 [omran95](https://github.com/omran95)
+ * docs: rework several code examples that still use callbacks #13635 #13616
+ * docs: remove callbacks from validation description #13638 #13501
+
 7.4.0 / 2023-07-18
 ==================
  * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614

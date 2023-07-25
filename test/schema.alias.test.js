@@ -185,15 +185,11 @@ describe('schema alias option', function() {
   });
   it('should disable the id virtual entirely if there\'s a field with alias `id` gh-13650', async function() {
 
-    const removeMultipleSpaces = (val) => {
-      return val.replace(/\s+/g, ' ');
-    };
-
     const testSchema = new Schema({
       _id: {
         type: String,
         required: true,
-        set: removeMultipleSpaces,
+        set: (val) => val.replace(/\s+/g, ' '),
         alias: 'id'
       }
     });

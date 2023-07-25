@@ -188,7 +188,7 @@ describe('schema alias option', function() {
     const removeMultipleSpaces = (val) => {
       return val.replace(/\s+/g, ' ');
     };
-    
+
     const testSchema = new Schema({
       _id: {
         type: String,

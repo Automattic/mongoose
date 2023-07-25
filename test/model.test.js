@@ -5754,7 +5754,7 @@ describe('Model', function() {
       isDeleted: false
     });
     const initialTime = entry.posts[0].updatedAt;
-    await delay(500);
+    await delay(10);
 
     await User.bulkWrite([{
       updateMany: {

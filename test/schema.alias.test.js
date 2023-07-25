@@ -183,4 +183,25 @@ describe('schema alias option', function() {
     assert.ok(schema.virtuals['name1']);
     assert.ok(schema.virtuals['name2']);
   });
+  it('should disable the id virtual entirely if there\'s a field with alias `id` gh-13650', async function() {
+
+    const removeMultipleSpaces = (val) => {
+      return val.replace(/\s+/g, ' ');
+    };
+    
+    const testSchema = new Schema({
+      _id: {
+        type: String,
+        required: true,
+        set: removeMultipleSpaces,
+        alias: 'id'
+      }
+    });
+    const Test = db.model('gh13650', testSchema);
+    const doc = new Test({
+      id: 'H-1'
+    });
+    await doc.save();
+    assert.ok(doc);
+  });
 });

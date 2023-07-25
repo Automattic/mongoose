@@ -5732,6 +5732,52 @@ describe('Model', function() {
 
   });
 
+  it('bulkwrite should not change updatedAt on subdocs when timestamps set to false (gh-13611)', async function() {
+
+    const postSchema = new Schema({
+      title: String,
+      category: String,
+      isDeleted: Boolean
+    }, { timestamps: true });
+
+    const userSchema = new Schema({
+      name: String,
+      isDeleted: Boolean,
+      posts: { type: [postSchema] }
+    }, { timestamps: true });
+
+    const User = db.model('gh13611User', userSchema);
+
+    const entry = await User.create({
+      name: 'Test Testerson',
+      posts: [{ title: 'title a', category: 'a', isDeleted: false }, { title: 'title b', category: 'b', isDeleted: false }],
+      isDeleted: false
+    });
+    const initialTime = entry.posts[0].updatedAt;
+    await delay(10);
+
+    await User.bulkWrite([{
+      updateMany: {
+        filter: {
+          isDeleted: false
+        },
+        update: {
+          'posts.$[post].isDeleted': true
+        },
+        arrayFilters: [
+          {
+            'post.category': { $eq: 'a' }
+          }
+        ],
+        upsert: false,
+        timestamps: false
+      }
+    }]);
+    const res = await User.findOne({ _id: entry._id });
+    const currentTime = res.posts[0].updatedAt;
+    assert.equal(initialTime.getTime(), currentTime.getTime());
+  });
+
   it('bulkWrite can overwrite schema `strict` option for filters and updates (gh-8778)', async function() {
     // Arrange
     const userSchema = new Schema({

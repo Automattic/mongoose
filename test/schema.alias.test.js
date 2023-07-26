@@ -183,4 +183,16 @@ describe('schema alias option', function() {
     assert.ok(schema.virtuals['name1']);
     assert.ok(schema.virtuals['name2']);
   });
+  it('supports passing the alias name for an index (gh-13276)', function() {
+    const testSchema = new Schema({
+      fullName: {
+        type: String,
+        alias: 'short'
+      }
+    });
+    testSchema.index({ short: 1 });
+    const indexes = testSchema.indexes();
+    assert.equal(indexes[0][0].fullName, 1);
+
+  });
 });

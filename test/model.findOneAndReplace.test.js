@@ -451,4 +451,46 @@ describe('model: findOneAndReplace:', function() {
     assert.ok(!Object.keys(opts).includes('overwrite'));
     assert.ok(!Object.keys(opts).includes('timestamps'));
   });
+
+  it('supports the `includeResultMetadata` option (gh-13539)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: String
+    });
+    const Test = db.model('Test', testSchema);
+    await Test.create({
+      name: 'Test'
+    });
+    const doc = await Test.findOneAndReplace(
+      { name: 'Test' },
+      { name: 'Test Testerson' },
+      { new: true, upsert: true, includeResultMetadata: false }
+    );
+    assert.equal(doc.ok, undefined);
+    assert.equal(doc.name, 'Test Testerson');
+
+    let data = await Test.findOneAndReplace(
+      { name: 'Test Testerson' },
+      { name: 'Test' },
+      { new: true, upsert: true, includeResultMetadata: true }
+    );
+    assert(data.ok);
+    assert.equal(data.value.name, 'Test');
+
+    data = await Test.findOneAndReplace(
+      { name: 'Test Testerson' },
+      { name: 'Test' },
+      { new: true, upsert: true, includeResultMetadata: true, rawResult: true }
+    );
+    assert(data.ok);
+    assert.equal(data.value.name, 'Test');
+
+    await assert.rejects(
+      () => Test.findOneAndReplace(
+        { name: 'Test Testerson' },
+        { name: 'Test' },
+        { new: true, upsert: true, includeResultMetadata: false, rawResult: true }
+      ),
+      /Cannot set `rawResult` option when `includeResultMetadata` is false/
+    );
+  });
 });

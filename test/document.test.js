@@ -793,14 +793,21 @@ describe('document', function() {
       assert.strictEqual(myModel.toObject().foo, void 0);
     });
 
-    it('should propogate toObject to implicitly created schemas gh-13325', async function() {
+    it('should propogate toObject to implicitly created schemas (gh-13599) (gh-13325)', async function() {
+      const transformCalls = [];
       const userSchema = Schema({
         firstName: String,
         company: {
           type: { companyId: { type: Schema.Types.ObjectId }, companyName: String }
         }
       }, {
-        toObject: { virtuals: true }
+        toObject: {
+          virtuals: true,
+          transform(doc, ret) {
+            transformCalls.push(doc);
+            return ret;
+          }
+        }
       });
 
       userSchema.virtual('company.details').get(() => 42);
@@ -809,6 +816,8 @@ describe('document', function() {
       const user = new User({ firstName: 'test', company: { companyName: 'foo' } });
       const obj = user.toObject();
       assert.strictEqual(obj.company.details, 42);
+      assert.equal(transformCalls.length, 1);
+      assert.strictEqual(transformCalls[0], user);
     });
   });
 
@@ -996,7 +1005,8 @@ describe('document', function() {
       assert.equal(foundAlicJson.friends, undefined);
       assert.equal(foundAlicJson.name, 'Alic');
     });
-    it('should propogate toJSON to implicitly created schemas gh-13325', async function() {
+    it('should propogate toJSON to implicitly created schemas (gh-13599) (gh-13325)', async function() {
+      const transformCalls = [];
       const userSchema = Schema({
         firstName: String,
         company: {
@@ -1004,7 +1014,13 @@ describe('document', function() {
         }
       }, {
         id: false,
-        toJSON: { virtuals: true }
+        toJSON: {
+          virtuals: true,
+          transform(doc, ret) {
+            transformCalls.push(doc);
+            return ret;
+          }
+        }
       });
 
       userSchema.virtual('company.details').get(() => 'foo');
@@ -1016,6 +1032,8 @@ describe('document', function() {
       });
       const obj = doc.toJSON();
       assert.strictEqual(obj.company.details, 'foo');
+      assert.equal(transformCalls.length, 1);
+      assert.strictEqual(transformCalls[0], doc);
     });
   });
 
@@ -7617,7 +7635,11 @@ describe('document', function() {
 
       schema.path('createdAt').immutable(true);
       assert.ok(schema.path('createdAt').$immutable);
-      assert.equal(schema.path('createdAt').setters.length, 1);
+      assert.equal(
+        schema.path('createdAt').setters.length,
+        1,
+        schema.path('createdAt').setters.map(setter => setter.toString())
+      );
 
       schema.path('createdAt').immutable(false);
       assert.ok(!schema.path('createdAt').$immutable);
@@ -12215,6 +12237,40 @@ describe('document', function() {
     assert.equal(fromDb.c.x.y, 1);
   });
 
+  it('can change the value of the id property on documents gh-10096', async function() {
+    const testSchema = new Schema({
+      name: String
+    });
+    const Test = db.model('Test', testSchema);
+    const doc = new Test({ name: 'Test Testerson ' });
+    const oldVal = doc.id;
+    doc.id = '648b8aa6a97549b03835c0b3';
+    await doc.save();
+    assert.notEqual(oldVal, doc.id);
+    assert.equal(doc.id, '648b8aa6a97549b03835c0b3');
+  });
+
+  it('should allow storing keys with dots in name in mixed under nested (gh-13530)', async function() {
+    const TestModelSchema = new mongoose.Schema({
+      metadata:
+        {
+          labels: mongoose.Schema.Types.Mixed
+        }
+    });
+    const TestModel = db.model('Test', TestModelSchema);
+    const { _id } = await TestModel.create({
+      metadata: {
+        labels: { 'my.label.com': 'true' }
+      }
+    });
+    const doc = await TestModel.findById(_id).lean();
+    assert.deepStrictEqual(doc.metadata, {
+      labels: {
+        'my.label.com': 'true'
+      }
+    });
+  });
+
   it('cleans up all array subdocs modified state on save (gh-13582)', async function() {
     const ElementSchema = new mongoose.Schema({
       elementName: String
@@ -12232,6 +12288,29 @@ describe('document', function() {
     doc = await doc.save();
     assert.deepStrictEqual(doc.elements[0].modifiedPaths(), []);
     assert.deepStrictEqual(doc.elements[1].modifiedPaths(), []);
+  });
+
+  it('cleans up all nested subdocs modified state on save (gh-13609)', async function() {
+    const TwoElementSchema = new mongoose.Schema({
+      elementName: String
+    });
+
+    const TwoNestedSchema = new mongoose.Schema({
+      nestedName: String,
+      elements: [TwoElementSchema]
+    });
+
+    const TwoDocDefaultSchema = new mongoose.Schema({
+      docName: String,
+      nested: { type: TwoNestedSchema, default: {} }
+    });
+
+    const Test = db.model('Test', TwoDocDefaultSchema);
+    const doc = new Test({ docName: 'MyDocName' });
+    doc.nested.nestedName = 'qdwqwd';
+    doc.nested.elements.push({ elementName: 'ElementName1' });
+    await doc.save();
+    assert.deepStrictEqual(doc.nested.modifiedPaths(), []);
   });
 
   it('avoids prototype pollution on init', async function() {

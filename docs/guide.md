@@ -526,6 +526,7 @@ Valid options:
 * [skipVersioning](#skipVersioning)
 * [timestamps](#timestamps)
 * [storeSubdocValidationError](#storeSubdocValidationError)
+* [collectionOptions](#collectionOptions)
 * [methods](#methods)
 * [query](#query-helpers)
 
@@ -1397,6 +1398,30 @@ const Parent = mongoose.model('Parent', parentSchema);
 
 // Will only contain an error for 'child.name'
 new Parent({ child: {} }).validateSync().errors;
+```
+
+<h2 id="collectionOptions">
+  <a href="#collectionOptions">
+    option: collectionOptions
+  </a>
+</h2>
+
+Options like [`collation`](#collation) and [`capped`](#capped) affect the options Mongoose passes to MongoDB when creating a new collection.
+Mongoose schemas support most [MongoDB `createCollection()` options](https://www.mongodb.com/docs/manual/reference/method/db.createCollection/), but not all.
+You can use the `collectionOptions` option to set any `createCollection()` options; Mongoose will use `collectionOptions` as the default values when calling `createCollection()` for your schema.
+
+```javascript
+const schema = new Schema({ name: String }, {
+  autoCreate: false,
+  collectionOptions: {
+    capped: true,
+    max: 1000
+  }
+});
+const Test = mongoose.model('Test', schema);
+
+// Equivalent to `createCollection({ capped: true, max: 1000 })`
+await Test.createCollection();
 ```
 
 <h2 id="es6-classes"><a href="#es6-classes">With ES6 Classes</a></h2>

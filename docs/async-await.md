@@ -11,27 +11,7 @@ This is especially helpful for avoiding callback hell when executing multiple as
 Each of the three functions below retrieves a record from the database, updates it, and prints the updated record to the console.
 
 ```javascript
-// Works.
-function callbackUpdate() {
-  MyModel.findOne({ firstName: 'franklin', lastName: 'roosevelt' }, function(err, doc) {
-    if (err) {
-      handleError(err);
-    }
-
-    doc.middleName = 'delano';
-
-    doc.save(function(err, updatedDoc) {
-      if (err) {
-        handleError(err);
-      }
-
-      // Final logic is 2 callbacks deep
-      console.log(updatedDoc);
-    });
-  });
-}
-
-// Better.
+// Using promise chaining
 function thenUpdate() {
   MyModel.findOne({ firstName: 'franklin', lastName: 'roosevelt' })
     .then(function(doc) {
@@ -44,7 +24,7 @@ function thenUpdate() {
     });
 }
 
-// Best?
+// Using async/await
 async function awaitUpdate() {
   try {
     const doc = await MyModel.findOne({

@@ -63,7 +63,11 @@ declare module 'mongoose' {
     validate?: SchemaValidator<T> | AnyArray<SchemaValidator<T>>;
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
-    cast?: string;
+    cast?: string |
+    boolean |
+    ((value: any) => T) |
+    [(value: any) => T, string] |
+    [((value: any) => T) | null, (value: any, path: string, model: Model<any>, kind: string) => string];
 
     /**
      * If true, attach a required validator to this path, which ensures this path

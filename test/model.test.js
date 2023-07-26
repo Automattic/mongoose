@@ -208,8 +208,8 @@ describe('Model', function() {
       describe('defaults', function() {
         it('to a non-empty array', function() {
           const DefaultArraySchema = new Schema({
-            arr: { type: Array, cast: String, default: ['a', 'b', 'c'] },
-            single: { type: Array, cast: String, default: ['a'] }
+            arr: { type: Array, default: ['a', 'b', 'c'] },
+            single: { type: Array, default: ['a'] }
           });
           const DefaultArray = db.model('Test', DefaultArraySchema);
           const arr = new DefaultArray();
@@ -223,7 +223,7 @@ describe('Model', function() {
 
         it('empty', function() {
           const DefaultZeroCardArraySchema = new Schema({
-            arr: { type: Array, cast: String, default: [] },
+            arr: { type: Array, default: [] },
             auto: [Number]
           });
           const DefaultZeroCardArray = db.model('Test', DefaultZeroCardArraySchema);
@@ -2319,7 +2319,7 @@ describe('Model', function() {
       const title = 'interop ad-hoc as promise';
 
       const created = await BlogPost.create({ title: title });
-      const query = BlogPost.count({ title: title });
+      const query = BlogPost.countDocuments({ title: title });
       const found = await query.exec('findOne');
       assert.equal(found.id, created.id);
     });
@@ -5304,7 +5304,7 @@ describe('Model', function() {
         }
       ]);
 
-      const beforeExpirationCount = await Test.count({});
+      const beforeExpirationCount = await Test.countDocuments({});
       assert.ok(beforeExpirationCount === 12);
 
       let intervalid;
@@ -5318,7 +5318,7 @@ describe('Model', function() {
         // in case it happens faster, to reduce test time
         new Promise(resolve => {
           intervalid = setInterval(async() => {
-            const count = await Test.count({});
+            const count = await Test.countDocuments({});
             if (count === 0) {
               resolve();
             }
@@ -5328,7 +5328,7 @@ describe('Model', function() {
 
       clearInterval(intervalid);
 
-      const afterExpirationCount = await Test.count({});
+      const afterExpirationCount = await Test.countDocuments({});
       assert.equal(afterExpirationCount, 0);
     });
 
@@ -5730,6 +5730,52 @@ describe('Model', function() {
     assert.deepEqual(users[0].updatedAt, usersAfterUpdate[0].updatedAt);
     assert.deepEqual(users[1].updatedAt, usersAfterUpdate[1].updatedAt);
 
+  });
+
+  it('bulkwrite should not change updatedAt on subdocs when timestamps set to false (gh-13611)', async function() {
+
+    const postSchema = new Schema({
+      title: String,
+      category: String,
+      isDeleted: Boolean
+    }, { timestamps: true });
+
+    const userSchema = new Schema({
+      name: String,
+      isDeleted: Boolean,
+      posts: { type: [postSchema] }
+    }, { timestamps: true });
+
+    const User = db.model('gh13611User', userSchema);
+
+    const entry = await User.create({
+      name: 'Test Testerson',
+      posts: [{ title: 'title a', category: 'a', isDeleted: false }, { title: 'title b', category: 'b', isDeleted: false }],
+      isDeleted: false
+    });
+    const initialTime = entry.posts[0].updatedAt;
+    await delay(10);
+
+    await User.bulkWrite([{
+      updateMany: {
+        filter: {
+          isDeleted: false
+        },
+        update: {
+          'posts.$[post].isDeleted': true
+        },
+        arrayFilters: [
+          {
+            'post.category': { $eq: 'a' }
+          }
+        ],
+        upsert: false,
+        timestamps: false
+      }
+    }]);
+    const res = await User.findOne({ _id: entry._id });
+    const currentTime = res.posts[0].updatedAt;
+    assert.equal(initialTime.getTime(), currentTime.getTime());
   });
 
   it('bulkWrite can overwrite schema `strict` option for filters and updates (gh-8778)', async function() {
@@ -7027,6 +7073,19 @@ describe('Model', function() {
       await doc.save();
       assert(bypass);
     });
+  });
+
+  it('respects schema-level `collectionOptions` for setting options to createCollection()', async function() {
+    const testSchema = new Schema({
+      name: String
+    }, { collectionOptions: { capped: true, size: 1024 } });
+    const TestModel = db.model('Test', testSchema);
+    await TestModel.init();
+    await TestModel.collection.drop();
+    await TestModel.createCollection();
+
+    const isCapped = await TestModel.collection.isCapped();
+    assert.ok(isCapped);
   });
 });
 

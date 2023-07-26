@@ -1,4 +1,4 @@
-import { Schema, model, Types, CallbackError } from 'mongoose';
+import { Schema, model, Types, HydratedDocument } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
 const schema = new Schema({ name: { type: 'String' } });
@@ -118,3 +118,10 @@ Test.insertMany({ _id: new Types.ObjectId('000000000000000000000000'), name: 'te
   (await Test.create([{ name: 'test' }]))[0];
   (await Test.create({ name: 'test' }))._id;
 })();
+
+async function createWithAggregateErrors() {
+  expectType<(HydratedDocument<ITest>)[]>(await Test.create([{}]));
+  expectType<(HydratedDocument<ITest> | Error)[]>(await Test.create([{}], { aggregateErrors: true }));
+}
+
+createWithAggregateErrors();

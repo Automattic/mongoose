@@ -26,8 +26,7 @@ describe('insertMany()', function() {
     const Movie = db.model('Movie', schema);
     const start = Date.now();
 
-    const arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
-    return Movie.insertMany(arr).
+    return Movie.insertMany([{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }]).
       then(docs => {
         assert.equal(docs.length, 2);
         assert.ok(!docs[0].isNew);
@@ -93,8 +92,7 @@ describe('insertMany()', function() {
     }, { timestamps: true });
     const Movie = db.model('Movie', schema);
 
-    const arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
-    let docs = await Movie.insertMany(arr);
+    let docs = await Movie.insertMany([{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }]);
     assert.equal(docs.length, 2);
     assert.ok(!docs[0].isNew);
     assert.ok(!docs[1].isNew);
@@ -299,8 +297,7 @@ describe('insertMany()', function() {
     });
     const Movie = db.model('Movie', schema);
 
-    const arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
-    let docs = await Movie.insertMany(arr);
+    let docs = await Movie.insertMany([{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }]);
     assert.equal(docs.length, 2);
     assert.equal(calledPre, 2);
     assert.equal(calledPost, 1);

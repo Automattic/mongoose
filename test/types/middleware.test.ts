@@ -1,5 +1,5 @@
 import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction } from 'mongoose';
-import { expectError, expectType, expectNotType } from 'tsd';
+import { expectError, expectType, expectNotType, expectAssignable } from 'tsd';
 
 const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(next, opts) {
   this.$markValid('name');
@@ -171,5 +171,15 @@ function gh11257() {
 
   schema.pre('updateOne', { document: false, query: true }, function() {
     this.find();
+  });
+}
+
+function gh13601() {
+  const testSchema = new Schema({
+    name: String
+  });
+
+  testSchema.pre('deleteOne', { document: true }, function() {
+    expectAssignable<Document>(this);
   });
 }

@@ -1,5 +1,35 @@
-7.3.4 / 2023-07-12
+7.4.1 / 2023-07-24
 ==================
+ * fix(document): correctly clean up nested subdocs modified state on save() #13644 #13609
+ * fix(schema): avoid propagating toObject.transform and toJSON.transform option to implicitly created schemas #13634 #13599
+ * fix: prevent schema options overwriting user defined writeConcern #13612 #13592
+ * types: correctly handle pre('deleteOne', { document: true }) #13632
+ * types(schema): handle type: Schema.Types.Map in TypeScript #13628
+ * types: Add inline comment to to tell the default value of the runValidator flag in the queryOptions types #13636 [omran95](https://github.com/omran95)
+ * docs: rework several code examples that still use callbacks #13635 #13616
+ * docs: remove callbacks from validation description #13638 #13501
+
+7.4.0 / 2023-07-18
+==================
+ * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614
+ * feat: upgrade to MongoDB Node.js driver 5.7.0 #13591
+ * feat: support generating custom cast error message with a function #13608 #3162
+ * feat(query): support MongoDB driver's includeResultMetadata option for findOneAndUpdate #13584 #13539
+ * feat(connection): add Connection.prototype.removeDb() for removing a related connection #13580 #11821
+ * feat(query): delay converting documents into POJOs until query execution, allow querying subdocuments with defaults disabled #13522
+ * feat(model): add option "aggregateErrors" for create() #13544 [hasezoey](https://github.com/hasezoey)
+ * feat(schema): add collectionOptions option to schemas #13513
+ * fix: move all MongoDB-specific connection logic into driver layer, add createClient() method to handle creating MongoClient #13542
+ * fix(document): allow setting keys with dots in mixed paths underneath nested paths #13536
+ * types: augment bson.ObjectId instead of adding on own type #13515 #12537 [hasezoey](https://github.com/hasezoey)
+ * docs(guide): fix md lint #13593 [hasezoey](https://github.com/hasezoey)
+ * docs: changed the code from 'await author.save()' to 'await story1.save()' #13596 [SomSingh23](https://github.com/SomSingh23)
+
+6.11.4 / 2023-07-17
+===================
+ * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614
+
+7.3.4 / 2023-07-12
  * chore: release 7.4.4 to overwrite accidental publish of 5.13.20 to latest tag
 
 6.11.3 / 2023-07-11

@@ -3097,4 +3097,14 @@ describe('schema', function() {
     assert.ok(res[0].tags.createdAt);
     assert.ok(res[0].tags.updatedAt);
   });
+  it('should not have side effects when enabling the `flattenObjectIds` option gh-13648', async function() {
+    const testSchema = new Schema({
+      name: String
+    }, { toObject: { flattenObjectIds: true } });
+    const Test = db.model('gh13648', testSchema);
+
+    const doc = await Test.create({ name: 'Test Testerson' });
+    const res = await Test.findById(doc._id);
+    assert.equal(res.name, 'Test Testerson');
+  });
 });

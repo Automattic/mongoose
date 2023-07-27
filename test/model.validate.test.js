@@ -168,19 +168,19 @@ describe('model: validate: ', function() {
 
     let test = { obj: 1, docs: 'a doc' };
     let pathsOrOptions = { pathsToSkip: ['obj'] };
-    await assert.rejects(async () => {
+    await assert.rejects(async() => {
       await Test.validate(test, pathsOrOptions);
-    }, { message: 'Validation failed: docs: Validator failed for path `docs` with value `a doc`' })
+    }, { message: 'Validation failed: docs: Validator failed for path `docs` with value `a doc`' });
     test = { arr: 1, docs: 'a doc' };
     pathsOrOptions = ['arr'];
-    await assert.rejects(async () => {
+    await assert.rejects(async() => {
       await Test.validate(test, pathsOrOptions);
-    }, { message: 'Validation failed: arr: Validator failed for path `arr` with value `1`' })
+    }, { message: 'Validation failed: arr: Validator failed for path `arr` with value `1`' });
     test = { name: 1, docs: 'a doc' };
     pathsOrOptions = 'name';
-    await assert.rejects(async () => {
+    await assert.rejects(async() => {
       await Test.validate(test, pathsOrOptions);
-    }, { message: 'Validation failed: name: Validator failed for path `name` with value `1`' })
-    
+    }, { message: 'Validation failed: name: Validator failed for path `name` with value `1`' });
+
   });
 });

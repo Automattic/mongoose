@@ -144,4 +144,26 @@ describe('model: validate: ', function() {
     const err2 = await User.validate({ name: 'Sam' }).then(() => null, err => err);
     assert.ok(err2 === null);
   });
+  it('Model.validate(...) supports passing in an object, array or string (gh-10353)', async function() {
+    const testSchema = new Schema({
+      docs: String,
+      name: String,
+      age: Number,
+      weight: Number
+    });
+
+    const Test = mongoose.model('Test', testSchema);
+
+    const test = { name: 1, docs: 'a doc' };
+    let pathsOrOptions = { pathsToSkip: ['name'] };
+
+    const err = await Test.validate(test, pathsOrOptions);
+    assert.ifError(err);
+    pathsOrOptions = ['name'];
+    const arrayCheck = await Test.validate(test, pathsOrOptions);
+    assert.ifError(arrayCheck);
+    pathsOrOptions = 'name';
+    const stringCheck = await Test.validate(test, pathsOrOptions);
+    assert.ifError(stringCheck);
+  });
 });

@@ -1225,6 +1225,7 @@ declare module 'mongoose' {
       minDistance?: number;
       query?: AnyObject;
       spherical?: boolean;
+      uniqueDocs?: boolean;
       /**
        * Deprecated. Use only with MondoDB below 4.2 (removed in 4.2)
        * @deprecated

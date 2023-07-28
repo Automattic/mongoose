@@ -1213,6 +1213,26 @@ declare module 'mongoose' {
     lean?: boolean;
   }
 
+  interface GeoNear {
+      /** [`$geoNear` reference](https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/) */
+      $geoNear: {
+      near: { type: 'Point'; coordinates: [number, number] } | [number, number];
+      distanceField: string;
+      distanceMultiplier?: number;
+      includeLocs?: string;
+      key?: string;
+      maxDistance?: number;
+      minDistance?: number;
+      query?: AnyObject;
+      spherical?: boolean;
+      /**
+       * Deprecated. Use only with MondoDB below 4.2 (removed in 4.2)
+       * @deprecated
+       */
+      num?: number;
+    }
+  }
+
   interface PopulateOptions {
     /** space delimited path(s) to populate */
     path: string;
@@ -2754,10 +2774,10 @@ declare module 'mongoose' {
     model(model: any): this;
 
     /**
-     * Append a new $near operator to this aggregation pipeline
-     * @param arg $near operator contents
+     * Append a new $geoNear operator to this aggregation pipeline
+     * @param arg $geoNear operator contents
      */
-    near(arg: { near?: number[]; distanceField: string; maxDistance?: number; query?: Record<string, any>; includeLocs?: string; num?: number; uniqueDocs?: boolean }): this;
+    near(arg: GeoNear['$geoNear']): this;
 
     /** Returns the current pipeline */
     pipeline(): any[];

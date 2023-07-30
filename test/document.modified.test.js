@@ -165,6 +165,23 @@ describe('document modified', function() {
       assert.equal(post.isModified('title'), false);
     });
 
+    it('should support passing a string of keys separated by a blank space as the first argument', function() {
+      const post = new BlogPost();
+      post.init({
+        title: 'Test',
+        slug: 'test',
+        date: new Date()
+      });
+
+      assert.equal(post.isModified('title'), false);
+      post.set('title', 'modified title');
+      assert.equal(post.isModified('title'), true);
+      assert.equal(post.isModified('slug'), false);
+      assert.equal(post.isModified('title slug'), true);
+    });
+
+
+
     describe('on DocumentArray', function() {
       it('work', function() {
         const post = new BlogPost();

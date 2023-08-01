@@ -245,8 +245,8 @@ schema.post('validate', function(doc) {
 schema.post('save', function(doc) {
   console.log('%s has been saved', doc._id);
 });
-schema.post('remove', function(doc) {
-  console.log('%s has been removed', doc._id);
+schema.post('deleteOne', function(doc) {
+  console.log('%s has been deleted', doc._id);
 });
 ```
 

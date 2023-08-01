@@ -1,7 +1,7 @@
 import { Model, Document } from 'mongoose';
 
 class Repository<T> {
-  private readonly Model: Model<T & Document>
+  private readonly Model: Model<T & Document>;
 
   findById(id:string): Promise<T & Document> {
     return Model.findById(id).exec();
@@ -9,7 +9,7 @@ class Repository<T> {
 }
 
 class Foo {
-  name: string
+  name: string;
 }
 
 type Test = Repository<Foo>;

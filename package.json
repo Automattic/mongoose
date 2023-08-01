@@ -55,7 +55,7 @@
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",
     "markdownlint-cli2": "^0.8.1",
-    "marked": "4.3.0",
+    "marked": "6.0.0",
     "mkdirp": "^3.0.1",
     "mocha": "10.2.0",
     "moment": "2.x",

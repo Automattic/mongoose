@@ -144,4 +144,43 @@ describe('model: validate: ', function() {
     const err2 = await User.validate({ name: 'Sam' }).then(() => null, err => err);
     assert.ok(err2 === null);
   });
+  it('Model.validate(...) supports passing in an object, array or string (gh-10353)', async function() {
+    const testSchema = new Schema({
+      docs: {
+        type: String,
+        validate: () => false
+      },
+      name: {
+        type: String,
+        validate: () => false
+      },
+      obj: {
+        type: String,
+        validate: () => false
+      },
+      arr: {
+        type: String,
+        validate: () => false
+      }
+    });
+
+    const Test = mongoose.model('Test', testSchema);
+
+    let test = { obj: 1, docs: 'a doc' };
+    let pathsOrOptions = { pathsToSkip: ['obj'] };
+    await assert.rejects(async() => {
+      await Test.validate(test, pathsOrOptions);
+    }, { message: 'Validation failed: docs: Validator failed for path `docs` with value `a doc`' });
+    test = { arr: 1, docs: 'a doc' };
+    pathsOrOptions = ['arr'];
+    await assert.rejects(async() => {
+      await Test.validate(test, pathsOrOptions);
+    }, { message: 'Validation failed: arr: Validator failed for path `arr` with value `1`' });
+    test = { name: 1, docs: 'a doc' };
+    pathsOrOptions = 'name';
+    await assert.rejects(async() => {
+      await Test.validate(test, pathsOrOptions);
+    }, { message: 'Validation failed: name: Validator failed for path `name` with value `1`' });
+
+  });
 });

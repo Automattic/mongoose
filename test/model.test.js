@@ -1177,8 +1177,12 @@ describe('Model', function() {
     it('errors when id deselected (gh-3118)', async function() {
       await BlogPost.create({ title: 1 }, { title: 2 });
       const doc = await BlogPost.findOne({ title: 1 }, { _id: 0 });
-      const err = await doc.deleteOne().then(() => null, err => err);
-      assert.equal(err.message, 'No _id found on document!');
+      try {
+        await doc.deleteOne();
+        assert.ok(false);
+      } catch (err) {
+        assert.equal(err.message, 'No _id found on document!');
+      }
     });
 
     it('should not remove any records when deleting by id undefined', async function() {
@@ -5458,7 +5462,6 @@ describe('Model', function() {
     await doc.deleteOne({ session });
     assert.equal(sessions.length, 1);
     assert.strictEqual(sessions[0], session);
-
   });
 
   it('set $session() before pre validate hooks run on bulkWrite and insertMany (gh-7769)', async function() {

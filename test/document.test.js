@@ -153,10 +153,11 @@ describe('document', function() {
 
       const test = new Test({ x: 'test' });
       const doc = await test.save();
-      await doc.deleteOne();
+      const q = doc.deleteOne();
+      assert.ok(q instanceof mongoose.Query, `Expected query, got ${q.constructor.name}`);
+      await q;
       const found = await Test.findOne({ _id: doc._id });
       assert.strictEqual(found, null);
-
     });
   });
 
@@ -9819,7 +9820,7 @@ describe('document', function() {
     assert.ok(doc);
   });
 
-  it('Makes sure pre remove hook is executed gh-9885', async function() {
+  it('Makes sure pre deleteOne hook is executed (gh-9885)', async function() {
     const SubSchema = new Schema({
       myValue: {
         type: String

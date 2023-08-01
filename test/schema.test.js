@@ -2022,6 +2022,21 @@ describe('schema', function() {
         const test2 = test.clone();
         assert.equal(test2.localTest(), 42);
       });
+
+      it('avoids creating duplicate array constructors when cloning doc array underneath subdoc (gh-13626)', function() {
+        const schema = new mongoose.Schema({
+          config: {
+            type: new mongoose.Schema({
+              attributes: [{ value: 'Mixed' }]
+            })
+          }
+        }).clone();
+
+        assert.strictEqual(
+          schema.paths['config'].schema.paths['attributes'].Constructor,
+          schema.singleNestedPaths['config.attributes'].Constructor
+        );
+      });
     });
 
     it('childSchemas prop (gh-5695)', function(done) {

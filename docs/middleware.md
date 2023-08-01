@@ -97,12 +97,7 @@ Here are the possible strings that can be passed to `pre()`
 All middleware types support pre and post hooks.
 How pre and post hooks work is described in more detail below.
 
-**Note:** If you specify `schema.pre('remove')`, Mongoose will register this
-middleware for [`doc.remove()`](api/model.html#model_Model-remove) by default. If you
-want your middleware to run on [`Query.remove()`](api/query.html#query_Query-remove)
-use [`schema.pre('remove', { query: true, document: false }, fn)`](api/schema.html#schema_Schema-pre).
-
-**Note:** Unlike `schema.pre('remove')`, Mongoose registers `updateOne` and
+**Note:** Mongoose registers `updateOne` and
 `deleteOne` middleware on `Query#updateOne()` and `Query#deleteOne()` by default.
 This means that both `doc.updateOne()` and `Model.updateOne()` trigger
 `updateOne` hooks, but `this` refers to a query, not a document. To register
@@ -380,34 +375,33 @@ await doc.save({ validateModifiedOnly: true });
 
 <h2 id="naming"><a href="#naming">Naming Conflicts</a></h2>
 
-Mongoose has both query and document hooks for `remove()`.
+Mongoose has both query and document hooks for `deleteOne()`.
 
 ```javascript
-schema.pre('remove', function() { console.log('Removing!'); });
+schema.pre('deleteOne', function() { console.log('Removing!'); });
+
+// Does **not** print "Removing!". Document middleware for `remove` is not executed by default
+await doc.deleteOne();
 
 // Prints "Removing!"
-doc.remove();
-
-// Does **not** print "Removing!". Query middleware for `remove` is not
-// executed by default.
 Model.remove();
 ```
 
 You can pass options to [`Schema.pre()`](api.html#schema_Schema-pre)
 and [`Schema.post()`](api.html#schema_Schema-post) to switch whether
-Mongoose calls your `remove()` hook for [`Document.remove()`](api/model.html#model_Model-remove)
-or [`Model.remove()`](api/model.html#model_Model-remove). Note here that you need to set both `document` and `query` properties in the passed object:
+Mongoose calls your `deleteOne()` hook for [`Document.prototype.deleteOne()`](api/model.html#Model.prototype.deleteOne())
+or [`Query.prototype.deleteOne()`](api/query.html#Query.prototype.deleteOne()). Note here that you need to set both `document` and `query` properties in the passed object:
 
 ```javascript
 // Only document middleware
-schema.pre('remove', { document: true, query: false }, function() {
-  console.log('Removing doc!');
+schema.pre('deleteOne', { document: true, query: false }, function() {
+  console.log('Deleting doc!');
 });
 
 // Only query middleware. This will get called when you do `Model.remove()`
 // but not `doc.remove()`.
-schema.pre('remove', { query: true, document: false }, function() {
-  console.log('Removing!');
+schema.pre('deleteOne', { query: true, document: false }, function() {
+  console.log('Deleting!');
 });
 ```
 

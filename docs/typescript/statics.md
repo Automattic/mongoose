@@ -29,9 +29,9 @@ doc.updateName('foo');
 UserModel.createWithName('bar');
 ```
 
-### With Generics
+## With Generics
 
-While we recommend using Mongoose's automatic type inference where possible, you may need to override method and static types using generic parameters.
+We recommend using Mongoose's automatic type inference where possible, but you can use `Schema` and `Model` generics to set up type inference for your statics and methods.
 Mongoose [models](../models.html) do **not** have an explicit generic parameter for [statics](guide.html#statics).
 If your model has statics, we recommend creating an interface that [extends](https://www.typescriptlang.org/docs/handbook/interfaces.html) Mongoose's `Model` interface as shown below.
 

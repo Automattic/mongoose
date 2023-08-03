@@ -1139,7 +1139,10 @@ function gh13514() {
   const schema = new Schema({
     email: {
       type: String,
-      required: [true, 'email is required']
+      required: {
+        isRequired: true,
+        message: 'Email is required'
+      } as const
     }
   });
   const Test = model('Test', schema);

@@ -1,3 +1,8 @@
+6.11.5 / 2023-08-01
+===================
+ * fix(schema): make Schema.prototype.clone() avoid creating different copies of subdocuments and single nested paths underneath single nested paths #13671 #13626
+ * fix: custom debug function not processing all args #13418
+
 7.4.1 / 2023-07-24
 ==================
  * fix(document): correctly clean up nested subdocs modified state on save() #13644 #13609

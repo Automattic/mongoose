@@ -1134,3 +1134,19 @@ function maps() {
   expectType<Map<string, number>>(doc.myMap);
   expectType<number | undefined>(doc.myMap!.get('answer'));
 }
+
+function gh13514() {
+  const schema = new Schema({
+    email: {
+      type: String,
+      required: {
+        isRequired: true,
+        message: 'Email is required'
+      } as const
+    }
+  });
+  const Test = model('Test', schema);
+
+  const doc = new Test({ email: 'bar' });
+  const str: string = doc.email;
+}

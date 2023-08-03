@@ -1253,7 +1253,7 @@ describe('schema', function() {
       }
     });
 
-    it('enums on arrays (gh-6102) (gh-8449)', function() {
+    it('enums on arrays (gh-6102) (gh-8449)', async function() {
       assert.throws(function() {
         new Schema({
           array: {
@@ -1284,10 +1284,10 @@ describe('schema', function() {
       Model = mongoose.model('gh6102', MySchema);
       const doc2 = new Model({ array: [1, 2, 3] });
 
-      return doc1.validate().
-        then(() => assert.ok(false), err => assert.equal(err.name, 'ValidationError')).
-        then(() => doc2.validate()).
-        then(() => assert.ok(false), err => assert.equal(err.name, 'ValidationError'));
+      let err = await doc1.validate().then(() => null, err => err);
+      assert.equal(err.name, 'ValidationError');
+      err = await doc2.validate().then(() => null, err => err);
+      assert.equal(err.name, 'ValidationError', err);
     });
 
     it('skips conditional required (gh-3539)', async function() {

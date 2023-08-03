@@ -10,6 +10,7 @@ import {
   PopulatedDoc,
   FilterQuery,
   UpdateQuery,
+  UpdateQueryKnownOnly,
   ApplyBasicQueryCasting,
   QuerySelector,
   InferSchemaType,
@@ -17,7 +18,7 @@ import {
   QueryOptions
 } from 'mongoose';
 import { ObjectId } from 'mongodb';
-import { expectAssignable, expectError, expectType } from 'tsd';
+import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { AutoTypedSchemaType } from './schema.test';
 
@@ -497,4 +498,23 @@ async function gh13224() {
   expectAssignable<Function>(u3.toObject);
 
   expectError(UserModel.findOne().select<{ notInSchema: string }>(['name']).orFail());
+}
+
+function gh13630() {
+  interface User {
+    phone?: string;
+    name?: string;
+    nested?: {
+      test?: string;
+    }
+  }
+
+  expectAssignable<UpdateQueryKnownOnly<User>>({ $set: { name: 'John' } });
+  expectAssignable<UpdateQueryKnownOnly<User>>({ $unset: { phone: 'test' } });
+  expectAssignable<UpdateQueryKnownOnly<User>>({ $set: { nested: { test: 'foo' } } });
+  expectNotAssignable<UpdateQueryKnownOnly<User>>({ $set: { namee: 'foo' } });
+  expectNotAssignable<UpdateQueryKnownOnly<User>>({ $set: { 'nested.test': 'foo' } });
+
+  const x: UpdateQueryKnownOnly<User> = { $set: { name: 'John' } };
+  expectAssignable<UpdateQuery<User>>(x);
 }

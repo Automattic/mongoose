@@ -1,3 +1,13 @@
+7.4.2 / 2023-08-03
+==================
+ * fix(model): avoid hanging on empty bulkWrite() with ordered: false #13684 #13664
+ * fix: Document.prototype.isModified support for a string of keys as first parameter #13674 #13667 [gastoncasini](https://github.com/gastoncasini)
+ * fix: disable id virtual if alias:id set #13654 #13650
+ * fix: support timestamps:false on bulkWrite with updateOne and updateMany #13649 #13611
+ * docs(typescript): highlight auto type inference for methods and statics, add info on using methods with generics #13696 #12942
+ * docs(middleware): fix old example using post('remove') #13683 #13518
+ * docs(deprecations): quick fix for includeResultMetadata docs #13695
+
 6.11.5 / 2023-08-01
 ===================
  * fix(schema): make Schema.prototype.clone() avoid creating different copies of subdocuments and single nested paths underneath single nested paths #13671 #13626

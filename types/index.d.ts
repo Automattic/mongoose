@@ -622,8 +622,10 @@ declare module 'mongoose' {
    * A more strict form of UpdateQuery that enforces updating only
    * known top-level properties.
    * @example
-   * ```js
-   * { age: 30 }
+   * ```ts
+   * function updateUser(_id: mongoose.Types.ObjectId, update: UpdateQueryKnownOnly<IUser>) {
+   *   return User.updateOne({ _id }, update);
+   * }
    * ```
    */
   export type UpdateQueryKnownOnly<T> = _UpdateQuery<T, {}>;

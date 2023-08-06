@@ -7852,6 +7852,15 @@ describe('Model', function() {
 
   });
 
+  it('Model.bulkWrite(...) does not hang with empty array and ordered: false (gh-13664)', async function() {
+    const userSchema = new Schema({ name: String });
+    const User = db.model('User', userSchema);
+
+    const err = await User.bulkWrite([], { ordered: false }).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'MongoInvalidArgumentError');
+  });
+
   it('allows calling `create()` after `bulkWrite()` (gh-9350)', async function() {
     const schema = Schema({ foo: Boolean });
     const Model = db.model('Test', schema);

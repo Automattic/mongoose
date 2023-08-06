@@ -109,17 +109,33 @@ thrown.
 
 ## Cast Errors
 
-Before running validators, Mongoose attempts to coerce values to the
-correct type. This process is called *casting* the document. If
-casting fails for a given path, the `error.errors` object will contain
-a `CastError` object.
+Before running validators, Mongoose attempts to coerce values to the correct type. This process is called *casting* the document.
+If casting fails for a given path, the `error.errors` object will contain a `CastError` object.
 
-Casting runs before validation, and validation does not run if casting
-fails. That means your custom validators may assume `v` is `null`,
-`undefined`, or an instance of the type specified in your schema.
+Casting runs before validation, and validation does not run if casting fails.
+That means your custom validators may assume `v` is `null`, `undefined`, or an instance of the type specified in your schema.
 
 ```acquit
 [require:Cast Errors]
+```
+
+By default, Mongoose cast error messages look like `Cast to Number failed for value "pie" at path "numWheels"`.
+You can overwrite Mongoose's default cast error message by the `cast` option on your SchemaType to a string as follows.
+
+```acquit
+[require:Cast Error Message Overwrite]
+```
+
+Mongoose's cast error message templating supports the following parameters:
+
+* `{PATH}`: the path that failed to cast
+* `{VALUE}`: a string representation of the value that failed to cast
+* `{KIND}`: the type that Mongoose attempted to cast to, like `'String'` or `'Number'`
+
+You can also define a function that Mongoose will call to get the cast error message as follows.
+
+```acquit
+[require:Cast Error Message Function Overwrite]
 ```
 
 ## Global SchemaType Validation

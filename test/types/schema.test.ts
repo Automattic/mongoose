@@ -1123,3 +1123,30 @@ function gh13534() {
   const doc = new Test({ myId: '0'.repeat(24) });
   expectType<Types.ObjectId>(doc.myId);
 }
+
+function maps() {
+  const schema = new Schema({
+    myMap: { type: Schema.Types.Map, of: Number, required: true }
+  });
+  const Test = model('Test', schema);
+
+  const doc = new Test({ myMap: { answer: 42 } });
+  expectType<Map<string, number>>(doc.myMap);
+  expectType<number | undefined>(doc.myMap!.get('answer'));
+}
+
+function gh13514() {
+  const schema = new Schema({
+    email: {
+      type: String,
+      required: {
+        isRequired: true,
+        message: 'Email is required'
+      } as const
+    }
+  });
+  const Test = model('Test', schema);
+
+  const doc = new Test({ email: 'bar' });
+  const str: string = doc.email;
+}

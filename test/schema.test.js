@@ -1984,6 +1984,21 @@ describe('schema', function() {
         const test2 = test.clone();
         assert.equal(test2.localTest(), 42);
       });
+
+      it('avoids creating duplicate array constructors when cloning doc array underneath subdoc (gh-13626)', function() {
+        const schema = new mongoose.Schema({
+          config: {
+            type: new mongoose.Schema({
+              attributes: [{ value: 'Mixed' }]
+            })
+          }
+        }).clone();
+
+        assert.strictEqual(
+          schema.paths['config'].schema.paths['attributes'].Constructor,
+          schema.singleNestedPaths['config.attributes'].Constructor
+        );
+      });
     });
 
     it('childSchemas prop (gh-5695)', function() {
@@ -2392,6 +2407,25 @@ describe('schema', function() {
         threw = true;
         assert.equal(err.name, 'CastError');
         assert.equal(err.message, '"horseradish" is not a number');
+      }
+      assert.ok(threw);
+    });
+
+    it('with function cast error format', function() {
+      const schema = Schema({
+        num: {
+          type: Number,
+          cast: [null, value => `${value} isn't a number`]
+        }
+      });
+
+      let threw = false;
+      try {
+        schema.path('num').cast('horseradish');
+      } catch (err) {
+        threw = true;
+        assert.equal(err.name, 'CastError');
+        assert.equal(err.message, 'horseradish isn\'t a number');
       }
       assert.ok(threw);
     });
@@ -3077,5 +3111,15 @@ describe('schema', function() {
     assert.ok(res);
     assert.ok(res[0].tags.createdAt);
     assert.ok(res[0].tags.updatedAt);
+  });
+  it('should not save objectids as strings when using the `flattenObjectIds` option (gh-13648)', async function() {
+    const testSchema = new Schema({
+      name: String
+    }, { toObject: { flattenObjectIds: true } });
+    const Test = db.model('gh13648', testSchema);
+
+    const doc = await Test.create({ name: 'Test Testerson' });
+    const res = await Test.findOne({ _id: { $eq: doc._id, $type: 'objectId' } });
+    assert.equal(res.name, 'Test Testerson');
   });
 });

@@ -208,8 +208,8 @@ describe('Model', function() {
       describe('defaults', function() {
         it('to a non-empty array', function() {
           const DefaultArraySchema = new Schema({
-            arr: { type: Array, cast: String, default: ['a', 'b', 'c'] },
-            single: { type: Array, cast: String, default: ['a'] }
+            arr: { type: Array, default: ['a', 'b', 'c'] },
+            single: { type: Array, default: ['a'] }
           });
           const DefaultArray = db.model('Test', DefaultArraySchema);
           const arr = new DefaultArray();
@@ -223,7 +223,7 @@ describe('Model', function() {
 
         it('empty', function() {
           const DefaultZeroCardArraySchema = new Schema({
-            arr: { type: Array, cast: String, default: [] },
+            arr: { type: Array, default: [] },
             auto: [Number]
           });
           const DefaultZeroCardArray = db.model('Test', DefaultZeroCardArraySchema);
@@ -5732,6 +5732,52 @@ describe('Model', function() {
 
   });
 
+  it('bulkwrite should not change updatedAt on subdocs when timestamps set to false (gh-13611)', async function() {
+
+    const postSchema = new Schema({
+      title: String,
+      category: String,
+      isDeleted: Boolean
+    }, { timestamps: true });
+
+    const userSchema = new Schema({
+      name: String,
+      isDeleted: Boolean,
+      posts: { type: [postSchema] }
+    }, { timestamps: true });
+
+    const User = db.model('gh13611User', userSchema);
+
+    const entry = await User.create({
+      name: 'Test Testerson',
+      posts: [{ title: 'title a', category: 'a', isDeleted: false }, { title: 'title b', category: 'b', isDeleted: false }],
+      isDeleted: false
+    });
+    const initialTime = entry.posts[0].updatedAt;
+    await delay(10);
+
+    await User.bulkWrite([{
+      updateMany: {
+        filter: {
+          isDeleted: false
+        },
+        update: {
+          'posts.$[post].isDeleted': true
+        },
+        arrayFilters: [
+          {
+            'post.category': { $eq: 'a' }
+          }
+        ],
+        upsert: false,
+        timestamps: false
+      }
+    }]);
+    const res = await User.findOne({ _id: entry._id });
+    const currentTime = res.posts[0].updatedAt;
+    assert.equal(initialTime.getTime(), currentTime.getTime());
+  });
+
   it('bulkWrite can overwrite schema `strict` option for filters and updates (gh-8778)', async function() {
     // Arrange
     const userSchema = new Schema({
@@ -5875,6 +5921,15 @@ describe('Model', function() {
     assert.equal(user.age, 25);
     assert.deepEqual(user.friends, ['Sam']);
 
+  });
+
+  it('Model.bulkWrite(...) does not hang with empty array and ordered: false (gh-13664)', async function() {
+    const userSchema = new Schema({ name: String });
+    const User = db.model('User', userSchema);
+
+    const err = await User.bulkWrite([], { ordered: false }).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'MongoInvalidArgumentError');
   });
 
   it('allows calling `create()` after `bulkWrite()` (gh-9350)', async function() {
@@ -7027,6 +7082,19 @@ describe('Model', function() {
       await doc.save();
       assert(bypass);
     });
+  });
+
+  it('respects schema-level `collectionOptions` for setting options to createCollection()', async function() {
+    const testSchema = new Schema({
+      name: String
+    }, { collectionOptions: { capped: true, size: 1024 } });
+    const TestModel = db.model('Test', testSchema);
+    await TestModel.init();
+    await TestModel.collection.drop();
+    await TestModel.createCollection();
+
+    const isCapped = await TestModel.collection.isCapped();
+    assert.ok(isCapped);
   });
 });
 

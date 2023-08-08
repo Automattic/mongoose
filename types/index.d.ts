@@ -578,24 +578,24 @@ declare module 'mongoose' {
 
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
-  type _UpdateQuery<TSchema> = {
+  type _UpdateQuery<TSchema, AdditionalProperties = AnyObject> = {
     /** @see https://www.mongodb.com/docs/manual/reference/operator/update-field/ */
-    $currentDate?: AnyKeys<TSchema> & AnyObject;
-    $inc?: AnyKeys<TSchema> & AnyObject;
-    $min?: AnyKeys<TSchema> & AnyObject;
-    $max?: AnyKeys<TSchema> & AnyObject;
-    $mul?: AnyKeys<TSchema> & AnyObject;
+    $currentDate?: AnyKeys<TSchema> & AdditionalProperties;
+    $inc?: AnyKeys<TSchema> & AdditionalProperties;
+    $min?: AnyKeys<TSchema> & AdditionalProperties;
+    $max?: AnyKeys<TSchema> & AdditionalProperties;
+    $mul?: AnyKeys<TSchema> & AdditionalProperties;
     $rename?: Record<string, string>;
-    $set?: AnyKeys<TSchema> & AnyObject;
-    $setOnInsert?: AnyKeys<TSchema> & AnyObject;
-    $unset?: AnyKeys<TSchema> & AnyObject;
+    $set?: AnyKeys<TSchema> & AdditionalProperties;
+    $setOnInsert?: AnyKeys<TSchema> & AdditionalProperties;
+    $unset?: AnyKeys<TSchema> & AdditionalProperties;
 
     /** @see https://www.mongodb.com/docs/manual/reference/operator/update-array/ */
-    $addToSet?: AnyKeys<TSchema> & AnyObject;
-    $pop?: AnyKeys<TSchema> & AnyObject;
-    $pull?: AnyKeys<TSchema> & AnyObject;
-    $push?: AnyKeys<TSchema> & AnyObject;
-    $pullAll?: AnyKeys<TSchema> & AnyObject;
+    $addToSet?: AnyKeys<TSchema> & AdditionalProperties;
+    $pop?: AnyKeys<TSchema> & AdditionalProperties;
+    $pull?: AnyKeys<TSchema> & AdditionalProperties;
+    $push?: AnyKeys<TSchema> & AdditionalProperties;
+    $pullAll?: AnyKeys<TSchema> & AdditionalProperties;
 
     /** @see https://www.mongodb.com/docs/manual/reference/operator/update-bitwise/ */
     $bit?: AnyKeys<TSchema>;
@@ -617,6 +617,18 @@ declare module 'mongoose' {
    * ```
    */
   export type UpdateQuery<T> = _UpdateQuery<T> & AnyObject;
+
+  /**
+   * A more strict form of UpdateQuery that enforces updating only
+   * known top-level properties.
+   * @example
+   * ```ts
+   * function updateUser(_id: mongoose.Types.ObjectId, update: UpdateQueryKnownOnly<IUser>) {
+   *   return User.updateOne({ _id }, update);
+   * }
+   * ```
+   */
+  export type UpdateQueryKnownOnly<T> = _UpdateQuery<T, {}>;
 
   export type FlattenMaps<T> = {
     [K in keyof T]: FlattenProperty<T[K]>;

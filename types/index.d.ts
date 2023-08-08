@@ -406,8 +406,25 @@ declare module 'mongoose' {
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     /* method insertMany */
-    pre<T = TModelType>(method: 'insertMany' | RegExp, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
-    pre<T = TModelType>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
+    pre<T = TModelType>(
+      method: 'insertMany' | RegExp,
+      fn: (
+        this: T,
+        next: (err?: CallbackError) => void,
+        docs: any | Array<any>,
+        options?: InsertManyOptions & { lean?: boolean }
+      ) => void | Promise<void>
+    ): this;
+    pre<T = TModelType>(
+      method: 'insertMany' | RegExp,
+      options: SchemaPreOptions,
+      fn: (
+        this: T,
+        next: (err?: CallbackError) => void,
+        docs: any | Array<any>,
+        options?: InsertManyOptions & { lean?: boolean }
+      ) => void | Promise<void>
+    ): this;
 
     /** Object of currently defined query helpers on this schema. */
     query: TQueryHelpers;

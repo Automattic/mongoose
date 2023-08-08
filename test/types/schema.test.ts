@@ -12,7 +12,8 @@ import {
   HydratedDocument,
   ResolveSchemaOptions,
   ObtainDocumentType,
-  ObtainSchemaGeneric
+  ObtainSchemaGeneric,
+  InsertManyOptions
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
@@ -1149,4 +1150,23 @@ function gh13514() {
 
   const doc = new Test({ email: 'bar' });
   const str: string = doc.email;
+}
+
+function gh13633() {
+  const schema = new Schema({ name: String });
+
+  schema.pre('updateOne', { document: true, query: false }, function(next) {
+  });
+
+  schema.pre('updateOne', { document: true, query: false }, function(next, options) {
+    expectType<Record<string, any> | undefined>(options);
+  });
+
+  schema.post('save', function(res, next) {
+  });
+  schema.pre('insertMany', function(next, docs) {
+  });
+  schema.pre('insertMany', function(next, docs, options) {
+    expectType<(InsertManyOptions & { lean?: boolean }) | undefined>(options);
+  });
 }

@@ -1,19 +1,21 @@
 import {
   Schema,
   Document,
+  HydratedDocument,
+  IndexDefinition,
+  IndexOptions,
+  InferSchemaType,
+  InsertManyOptions,
+  ObtainDocumentType,
+  ObtainSchemaGeneric,
+  ResolveSchemaOptions,
   SchemaDefinition,
   SchemaTypeOptions,
   Model,
-  Types,
-  InferSchemaType,
   SchemaType,
+  Types,
   Query,
-  model,
-  HydratedDocument,
-  ResolveSchemaOptions,
-  ObtainDocumentType,
-  ObtainSchemaGeneric,
-  InsertManyOptions
+  model
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
@@ -1169,4 +1171,9 @@ function gh13633() {
   schema.pre('insertMany', function(next, docs, options) {
     expectType<(InsertManyOptions & { lean?: boolean }) | undefined>(options);
   });
+}
+
+function gh13702() {
+  const schema = new Schema({ name: String });
+  expectType<[IndexDefinition, IndexOptions][]>(schema.indexes());
 }

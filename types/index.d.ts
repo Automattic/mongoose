@@ -278,7 +278,7 @@ declare module 'mongoose' {
      * Returns a list of indexes that this schema declares, via `schema.index()`
      * or by `index: true` in a path's options.
      */
-    indexes(): Array<IndexDefinition>;
+    indexes(): Array<[IndexDefinition, IndexOptions]>;
 
     /** Gets a schema option. */
     get<K extends keyof SchemaOptions>(key: K): SchemaOptions[K];

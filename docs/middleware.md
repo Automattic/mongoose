@@ -97,12 +97,14 @@ Here are the possible strings that can be passed to `pre()`
 All middleware types support pre and post hooks.
 How pre and post hooks work is described in more detail below.
 
-**Note:** Mongoose registers `updateOne` and
-`deleteOne` middleware on `Query#updateOne()` and `Query#deleteOne()` by default.
-This means that both `doc.updateOne()` and `Model.updateOne()` trigger
-`updateOne` hooks, but `this` refers to a query, not a document. To register
-`updateOne` or `deleteOne` middleware as document middleware, use
-`schema.pre('updateOne', { document: true, query: false })`.
+**Note:** Mongoose registers `updateOne` middleware on `Query.prototype.updateOne()` by default.
+This means that both `doc.updateOne()` and `Model.updateOne()` trigger `updateOne` hooks, but `this` refers to a query, not a document.
+To register `updateOne` middleware as document middleware, use `schema.pre('updateOne', { document: true, query: false })`.
+
+**Note:** Like `updateOne`, Mongoose registers `deleteOne` middleware on `Query.prototype.deleteOne` by default.
+That means that `Model.deleteOne()` will trigger `deleteOne` hooks, and `this` will refer to a query.
+However, `doc.deleteOne()` does **not** fire `deleteOne` query middleware for legacy reasons.
+To register `deleteOne` middleware as document middleware, use `schema.pre('deleteOne', { document: true, query: false })`.
 
 **Note:** The [`create()`](./api/model.html#model_Model-create) function fires `save()` hooks.
 

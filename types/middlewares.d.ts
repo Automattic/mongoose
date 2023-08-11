@@ -31,8 +31,16 @@ declare module 'mongoose' {
   type SchemaPreOptions = MiddlewareOptions;
   type SchemaPostOptions = MiddlewareOptions;
 
-  type PreMiddlewareFunction<ThisType = any> = (this: ThisType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
-  type PreSaveMiddlewareFunction<ThisType = any> = (this: ThisType, next: CallbackWithoutResultAndOptionalError, opts: SaveOptions) => void | Promise<void>;
+  type PreMiddlewareFunction<ThisType = any> = (
+    this: ThisType,
+    next: CallbackWithoutResultAndOptionalError,
+    opts?: Record<string, any>
+  ) => void | Promise<void>;
+  type PreSaveMiddlewareFunction<ThisType = any> = (
+    this: ThisType,
+    next: CallbackWithoutResultAndOptionalError,
+    opts: SaveOptions
+  ) => void | Promise<void>;
   type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;
   type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
   type ErrorHandlingMiddlewareWithOption<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType | null, next: CallbackWithoutResultAndOptionalError) => void | Promise<void>;

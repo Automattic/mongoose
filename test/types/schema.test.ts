@@ -1,18 +1,21 @@
 import {
   Schema,
   Document,
+  HydratedDocument,
+  IndexDefinition,
+  IndexOptions,
+  InferSchemaType,
+  InsertManyOptions,
+  ObtainDocumentType,
+  ObtainSchemaGeneric,
+  ResolveSchemaOptions,
   SchemaDefinition,
   SchemaTypeOptions,
   Model,
-  Types,
-  InferSchemaType,
   SchemaType,
+  Types,
   Query,
-  model,
-  HydratedDocument,
-  ResolveSchemaOptions,
-  ObtainDocumentType,
-  ObtainSchemaGeneric
+  model
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
@@ -1133,4 +1136,44 @@ function maps() {
   const doc = new Test({ myMap: { answer: 42 } });
   expectType<Map<string, number>>(doc.myMap);
   expectType<number | undefined>(doc.myMap!.get('answer'));
+}
+
+function gh13514() {
+  const schema = new Schema({
+    email: {
+      type: String,
+      required: {
+        isRequired: true,
+        message: 'Email is required'
+      } as const
+    }
+  });
+  const Test = model('Test', schema);
+
+  const doc = new Test({ email: 'bar' });
+  const str: string = doc.email;
+}
+
+function gh13633() {
+  const schema = new Schema({ name: String });
+
+  schema.pre('updateOne', { document: true, query: false }, function(next) {
+  });
+
+  schema.pre('updateOne', { document: true, query: false }, function(next, options) {
+    expectType<Record<string, any> | undefined>(options);
+  });
+
+  schema.post('save', function(res, next) {
+  });
+  schema.pre('insertMany', function(next, docs) {
+  });
+  schema.pre('insertMany', function(next, docs, options) {
+    expectType<(InsertManyOptions & { lean?: boolean }) | undefined>(options);
+  });
+}
+
+function gh13702() {
+  const schema = new Schema({ name: String });
+  expectType<[IndexDefinition, IndexOptions][]>(schema.indexes());
 }

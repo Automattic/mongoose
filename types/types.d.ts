@@ -80,7 +80,7 @@ declare module 'mongoose' {
     }
 
     class ObjectId extends mongodb.ObjectId {
-      _id: this;
+
     }
 
     class Subdocument<IdType = any> extends Document<IdType> {

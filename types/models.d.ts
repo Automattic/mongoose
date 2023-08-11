@@ -299,6 +299,17 @@ declare module 'mongoose' {
      */
     findById<ResultDoc = THydratedDocumentType>(
       id: any,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType, 'findOne'> | null,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOne'
+    >;
+    findById<ResultDoc = THydratedDocumentType>(
+      id: any,
       projection?: ProjectionType<TRawDocType> | null,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOne'>;
@@ -308,6 +319,17 @@ declare module 'mongoose' {
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOne'>;
 
     /** Finds one document. */
+    findOne<ResultDoc = THydratedDocumentType>(
+      filter: FilterQuery<TRawDocType>,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType, 'findOne'> | null,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOne'
+    >;
     findOne<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       projection?: ProjectionType<TRawDocType> | null,
@@ -462,6 +484,17 @@ declare module 'mongoose' {
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType[], 'find'>,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'find'
+    >;
+    find<ResultDoc = THydratedDocumentType>(
+      filter: FilterQuery<TRawDocType>,
       projection?: ProjectionType<TRawDocType> | null | undefined,
       options?: QueryOptions<TRawDocType> | null | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'find'>;
@@ -477,17 +510,48 @@ declare module 'mongoose' {
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete<ResultDoc = THydratedDocumentType>(
+      id: mongodb.ObjectId | any,
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndDelete'> | null,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOneAndDelete'
+    >;
+    findByIdAndDelete<ResultDoc = THydratedDocumentType>(
       id?: mongodb.ObjectId | any,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
 
     /** Creates a `findByIdAndRemove` query, filtering by the given `_id`. */
     findByIdAndRemove<ResultDoc = THydratedDocumentType>(
+      id: mongodb.ObjectId | any,
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndDelete'> | null,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOneAndDelete'
+    >;
+    findByIdAndRemove<ResultDoc = THydratedDocumentType>(
       id?: mongodb.ObjectId | any,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
+    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
+      id: mongodb.ObjectId | any,
+      update: UpdateQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndUpdate'> | null,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOneAndUpdate'
+    >;
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
       update: UpdateQuery<TRawDocType>,
@@ -510,6 +574,16 @@ declare module 'mongoose' {
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
+      filter: FilterQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndDelete'> | null,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOneAndDelete'
+    >;
+    findOneAndDelete<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
@@ -521,6 +595,17 @@ declare module 'mongoose' {
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndRemove'>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
+    findOneAndReplace<ResultDoc = THydratedDocumentType>(
+      filter: FilterQuery<TRawDocType>,
+      replacement: TRawDocType | AnyObject,
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndReplace'> | null,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOneAndReplace'
+    >;
     findOneAndReplace<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       replacement: TRawDocType | AnyObject,
@@ -538,6 +623,17 @@ declare module 'mongoose' {
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndReplace'>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
+    findOneAndUpdate<ResultDoc = THydratedDocumentType>(
+      filter: FilterQuery<TRawDocType>,
+      update: UpdateQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndUpdate'> | null,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOneAndUpdate'
+    >;
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       update: UpdateQuery<TRawDocType>,

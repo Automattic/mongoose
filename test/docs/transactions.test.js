@@ -357,11 +357,11 @@ describe('transactions', function() {
 
     await Test.createCollection();
     await Test.deleteMany({});
-    
+
     const doc = new Test({ name: 'test' });
     assert.ok(doc.$isNew);
     await assert.rejects(
-      db.transaction(async (session) => {
+      db.transaction(async(session) => {
         await doc.save({ session });
         throw new Error('Oops!');
       }),
@@ -378,20 +378,20 @@ describe('transactions', function() {
 
     await Test.createCollection();
     await Test.deleteMany({});
-    
+
     const doc = new Test({ name: 'test' });
     assert.ok(doc.$isNew);
     let retryCount = 0;
-    await db.transaction(async (session) => {
+    await db.transaction(async(session) => {
       assert.ok(doc.$isNew);
       await doc.save({ session });
       if (++retryCount < 3) {
         throw new mongoose.mongo.MongoServerError({
-          errorLabels: ["TransientTransactionError"],
+          errorLabels: ['TransientTransactionError']
         });
       }
     });
-    
+
     const docs = await Test.find();
     assert.equal(docs.length, 1);
     assert.equal(docs[0].name, 'test');

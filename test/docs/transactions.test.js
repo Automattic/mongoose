@@ -327,6 +327,7 @@ describe('transactions', function() {
     // Session isn't committed
     assert.equal(await Character.countDocuments({ title: /hand/i }), 0);
 
+    await tyrion.doesNotExist();
     await tyrion.deleteOne();
 
     // Undo both update and delete since doc should pull from `$session()`

@@ -4,7 +4,9 @@ Client Side Field Level Encryption, or CSFLE for short, is a tool for storing yo
 For example, instead of storing the `name` property as a plain-text string, CSFLE means MongoDB will store your document with `name` as an encrypted buffer.
 The resulting document will look similar to the following to a client that doesn't have access to decrypt the data.
 
-```
+<!--Using "js" as language, because "bson" does not exist and "js" has the better highlighting than "json"-->
+
+```js
 {
   "_id" : ObjectId("647a3207661e3a3a1bc3e614"),
   "name" : BinData(6,"ASrIv7XfokKwiCUJEjckOdgCG+u6IqavcOWX8hINz29MLvcKDZ4nnjCnPFZG+0ftVxMdWgzu6Vdh7ys1uIK1WiaPN0SqpmmtL2rPoqT9gfhADpGDmI60+vm0bJepXNY1Gv0="),
@@ -23,7 +25,7 @@ Mongoose schemas currently don't support CSFLE configuration.
 First, you need to install the [mongodb-client-encryption npm package](https://www.npmjs.com/package/mongodb-client-encryption).
 This is MongoDB's official package for setting up encryption keys.
 
-```
+```sh
 npm install mongodb-client-encryption
 ```
 

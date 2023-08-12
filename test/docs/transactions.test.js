@@ -327,7 +327,7 @@ describe('transactions', function() {
     // Session isn't committed
     assert.equal(await Character.countDocuments({ title: /hand/i }), 0);
 
-    await tyrion.remove();
+    await tyrion.deleteOne();
 
     // Undo both update and delete since doc should pull from `$session()`
     await session.abortTransaction();
@@ -339,6 +339,7 @@ describe('transactions', function() {
   });
 
   it('save() with no changes (gh-8571)', async function() {
+    db.deleteModel(/Test/);
     const Test = db.model('Test', Schema({ name: String }));
 
     await Test.createCollection();
@@ -348,5 +349,51 @@ describe('transactions', function() {
       await test.save(); // throws DocumentNotFoundError
     });
     await session.endSession();
+  });
+
+  it('transaction() resets $isNew on error', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ name: String }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+    
+    const doc = new Test({ name: 'test' });
+    assert.ok(doc.$isNew);
+    await assert.rejects(
+      db.transaction(async (session) => {
+        await doc.save({ session });
+        throw new Error('Oops!');
+      }),
+      /Oops!/
+    );
+    assert.ok(doc.$isNew);
+    const exists = await Test.exists({ _id: doc._id });
+    assert.ok(!exists);
+  });
+
+  it('transaction() resets $isNew between retries (gh-13698)', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ name: String }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+    
+    const doc = new Test({ name: 'test' });
+    assert.ok(doc.$isNew);
+    let retryCount = 0;
+    await db.transaction(async (session) => {
+      assert.ok(doc.$isNew);
+      await doc.save({ session });
+      if (++retryCount < 3) {
+        throw new mongoose.mongo.MongoServerError({
+          errorLabels: ["TransientTransactionError"],
+        });
+      }
+    });
+    
+    const docs = await Test.find();
+    assert.equal(docs.length, 1);
+    assert.equal(docs[0].name, 'test');
   });
 });

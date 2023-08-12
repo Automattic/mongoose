@@ -12,11 +12,11 @@ describe('transactions', function() {
   this.timeout(10000);
 
   before(async function() {
-    if (!process.env.REPLICA_SET) {
+    if (!process.env.REPLICA_SET && !process.env.START_REPLICA_SET) {
       _skipped = true;
       this.skip();
     }
-    db = start({ replicaSet: process.env.REPLICA_SET });
+    db = start(process.env.REPLICA_SET ? { replicaSet: process.env.REPLICA_SET } : {});
     try {
       await db.asPromise();
 
@@ -327,7 +327,6 @@ describe('transactions', function() {
     // Session isn't committed
     assert.equal(await Character.countDocuments({ title: /hand/i }), 0);
 
-    await tyrion.doesNotExist();
     await tyrion.deleteOne();
 
     // Undo both update and delete since doc should pull from `$session()`

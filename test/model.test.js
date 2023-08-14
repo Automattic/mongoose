@@ -3404,7 +3404,7 @@ describe('Model', function() {
         let listener;
 
         before(function() {
-          if (!process.env.REPLICA_SET) {
+          if (!process.env.REPLICA_SET && !process.env.START_REPLICA_SET) {
             this.skip();
           }
         });
@@ -3434,6 +3434,20 @@ describe('Model', function() {
           assert.equal(changeData.operationType, 'insert');
           assert.equal(changeData.fullDocument._id.toHexString(),
             doc._id.toHexString());
+        });
+
+        it('bubbles up resumeTokenChanged events (gh-13607)', async function() {
+          const MyModel = db.model('Test', new Schema({ name: String }));
+
+          const resumeTokenChangedEvent = new Promise(resolve => {
+            changeStream = MyModel.watch();
+            listener = data => resolve(data);
+            changeStream.once('resumeTokenChanged', listener);
+          });
+
+          await MyModel.create({ name: 'test' });
+          const { _data } = await resumeTokenChangedEvent;
+          assert.ok(_data);
         });
 
         it('using next() and hasNext() (gh-11527)', async function() {

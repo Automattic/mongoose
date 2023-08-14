@@ -407,6 +407,28 @@ schema.pre('deleteOne', { query: true, document: false }, function() {
 });
 ```
 
+Mongoose also has both query and document hooks for `validate()`.
+Unlike `deleteOne` and `updateOne`, `validate` middleware applies to `Document.prototype.validate` by default.
+
+```javascript
+const schema = new mongoose.Schema({ name: String });
+schema.pre('validate', function() {
+  console.log('Document validate');
+});
+schema.pre('validate', { query: true, document: false }, function() {
+  console.log('Query validate');
+});
+const Test = mongoose.model('Test', schema);
+
+const doc = new Test({ name: 'foo' });
+
+// Prints "Document validate"
+await doc.validate();
+
+// Prints "Query validate"
+await Test.find().validate();
+```
+
 <h2 id="notes"><a href="#notes">Notes on findAndUpdate() and Query Middleware</a></h2>
 
 Pre and post `save()` hooks are **not** executed on `update()`,

@@ -7087,6 +7087,16 @@ describe('Model', function() {
     const isCapped = await TestModel.collection.isCapped();
     assert.ok(isCapped);
   });
+  it('should support `skipNestedIndexes` option for schema (gh-12344)', async function() {
+    const m = new mongoose.Mongoose();
+    m.plugin(schema => {
+      schema.set('timestamps', true);
+      schema.index({ createdAt: -1 });
+    });
+    const testSchema = new m.Schema({ name: String, friends: [{ name: String }] }, { skipNestedIndexes: true });
+    m.model('Test', testSchema);
+    assert.equal(testSchema.indexes().length, 1);
+  });
 });
 
 

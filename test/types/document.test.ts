@@ -342,7 +342,5 @@ function gh13738() {
 
   expectType<number>(person.get('age'));
   expectType<Date>(person.get('dob'));
-  expectType<string>(person.get('settings.theme'));
-  expectType<boolean>(person.get('settings.alerts.sms'));
-  expectType<{ sms: boolean }>(person.get('settings.alerts'));
+  expectType<{ theme: string; alerts: { sms: boolean } }>(person.get('settings'));
 }

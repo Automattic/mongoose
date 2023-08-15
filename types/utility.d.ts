@@ -40,34 +40,4 @@ type IfEquals<T, U, Y = true, N = false> =
     (<G>() => G extends T ? 1 : 0) extends
     (<G>() => G extends U ? 1 : 0) ? Y : N;
 
-type IsAny<T> = unknown extends T ? ([keyof T] extends [never] ? false : true) : false;
-
-type FlatPath<T> = keyof {
-  [key in keyof Required<T> as NonNullable<T[key]> extends Record<any, any>
-    ? Required<T>[key] extends Array<any>
-      ? never
-      : Required<T>[key] extends Date | Types.ObjectId | Buffer
-        ? key
-        : IsAny<Required<T>[key]> extends true
-          ? key
-          : `${key extends string ? key : ''}.${FlatPath<Required<T>[key]> extends string
-            ? FlatPath<Required<T>[key]>
-            : ''}`
-    : keyof Required<T>]: 1;
-};
-
-
-type ExtractFromPath<
-  Obj,
-  Path extends FlatPath<Obj>,
-> = Path extends `${infer A}.${infer B}`
-  ? A extends keyof Required<Obj>
-    ? B extends FlatPath<Required<Obj>[A]>
-      ? ExtractFromPath<Required<Obj>[A], B>
-      : never
-    : never
-  : Path extends keyof Required<Obj>
-    ? Required<Obj>[Path]
-    : never;
-
 }

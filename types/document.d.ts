@@ -135,7 +135,8 @@ declare module 'mongoose' {
     errors?: Error.ValidationError;
 
     /** Returns the value of a path. */
-    get<T extends FlatPath<DocType>>(path: T, type?: any, options?: any): ExtractFromPath<DocType, T>;
+    get<T extends keyof DocType>(path: T, type?: any, options?: any): DocType[T];
+    get(path: string, type?: any, options?: any): any;
 
     /**
      * Returns the changes that happened to the document
@@ -157,33 +158,38 @@ declare module 'mongoose' {
     init(obj: AnyObject, opts?: AnyObject): this;
 
     /** Marks a path as invalid, causing validation to fail. */
-    invalidate<T extends FlatPath<DocType>>(path: T, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
+    invalidate<T extends keyof DocType>(path: T, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
+    invalidate(path: string, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
 
     /** Returns true if `path` was directly set and modified, else false. */
+    isDirectModified<T extends keyof DocType>(path: T | Array<T>): boolean;
     isDirectModified(path: string | Array<string>): boolean;
-    isDirectModified<T extends FlatPath<DocType>>(path: T): boolean;
 
     /** Checks if `path` was explicitly selected. If no projection, always returns true. */
-    isDirectSelected<T extends FlatPath<DocType>>(path: T): boolean;
+    isDirectSelected<T extends keyof DocType>(path: T): boolean;
+    isDirectSelected(path: string): boolean;
 
     /** Checks if `path` is in the `init` state, that is, it was set by `Document#init()` and not modified since. */
     isInit<T extends keyof DocType>(path: T): boolean;
+    isInit(path: string): boolean;
 
     /**
      * Returns true if any of the given paths are modified, else false. If no arguments, returns `true` if any path
      * in this document is modified.
      */
+    isModified<T extends keyof DocType>(path?: T | Array<T>): boolean;
     isModified(path?: string | Array<string>): boolean;
-    isModified<T extends FlatPath<DocType>>(path?: T | Array<T>): boolean;
 
     /** Boolean flag specifying if the document is new. */
     isNew: boolean;
 
     /** Checks if `path` was selected in the source query which initialized this document. */
-    isSelected<T extends FlatPath<DocType>>(path: T): boolean;
+    isSelected<T extends keyof DocType>(path: T): boolean;
+    isSelected(path: string): boolean;
 
     /** Marks the path as having pending changes to write to the db. */
-    markModified<T extends FlatPath<DocType>>(path: T, scope?: any): void;
+    markModified<T extends keyof DocType>(path: T, scope?: any): void;
+    markModified(path: string, scope?: any): void;
 
     /** Returns the list of paths that have been modified. */
     modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;
@@ -193,7 +199,7 @@ declare module 'mongoose' {
      * for immutable properties. Behaves similarly to `set()`, except for it
      * unsets all properties that aren't in `obj`.
      */
-    overwrite(obj: Partial<Omit<DocType, '_id'>>): this;
+    overwrite(obj: AnyObject): this;
 
     /**
      * If this document is a subdocument or populated document, returns the
@@ -209,7 +215,7 @@ declare module 'mongoose' {
     populated(path: string): any;
 
     /** Sends a replaceOne command with this document `_id` as the query selector. */
-    replaceOne(replacement?: Partial<Omit<DocType, '_id'>>, options?: QueryOptions | null): Query<any, this>;
+    replaceOne(replacement?: AnyObject, options?: QueryOptions | null): Query<any, this>;
 
     /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api/document.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api/document.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
     save(options?: SaveOptions): Promise<this>;
@@ -218,9 +224,10 @@ declare module 'mongoose' {
     schema: Schema;
 
     /** Sets the value of a path, or many paths. */
-    set<T extends FlatPath<DocType>>(path: T, val: ExtractFromPath<DocType, T>, type: any, options?: DocumentSetOptions): this;
-    set<T extends FlatPath<DocType>>(path: T, val: ExtractFromPath<DocType, T>, options?: DocumentSetOptions): this;
-    set(value: Partial<Omit<DocType, '_id'>>, options?: DocumentSetOptions): this;
+    set<T extends keyof DocType>(path: T, val: DocType[T], type: any, options?: DocumentSetOptions): this;
+    set(path: string | Record<string, any>, val: any, type: any, options?: DocumentSetOptions): this;
+    set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
+    set(value: string | Record<string, any>): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
     toJSON<T = Require_id<DocType>>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<T>;
@@ -230,17 +237,20 @@ declare module 'mongoose' {
     toObject<T = Require_id<DocType>>(options?: ToObjectOptions): Require_id<T>;
 
     /** Clears the modified state on the specified path. */
-    unmarkModified<T extends FlatPath<DocType>>(path: T): void;
+    unmarkModified<T extends keyof DocType>(path: T): void;
+    unmarkModified(path: string): void;
 
     /** Sends an updateOne command with this document `_id` as the query selector. */
     updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null): Query<any, this>;
 
     /** Executes registered validation rules for this document. */
-    validate<T extends FlatPath<DocType>>(pathsToValidate?: T | T[], options?: AnyObject): Promise<void>;
+    validate<T extends keyof DocType>(pathsToValidate?: T | T[], options?: AnyObject): Promise<void>;
+    validate(pathsToValidate?: pathsToValidate, options?: AnyObject): Promise<void>;
     validate(options: { pathsToSkip?: pathsToSkip }): Promise<void>;
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
     validateSync(options: { pathsToSkip?: pathsToSkip, [k: string]: any }): Error.ValidationError | null;
-    validateSync<T extends FlatPath<DocType>>(pathsToValidate?: T | T[], options?: AnyObject): Error.ValidationError | null;
+    validateSync<T extends keyof DocType>(pathsToValidate?: T | T[], options?: AnyObject): Error.ValidationError | null;
+    validateSync(pathsToValidate?: pathsToValidate, options?: AnyObject): Error.ValidationError | null;
   }
 }

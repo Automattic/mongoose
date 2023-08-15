@@ -52,6 +52,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [`toObject()` and `toJSON()` Use Nested Schema `minimize`](#toobject-and-tojson-use-nested-schema-minimize)
 * [TypeScript changes](#typescript-changes)
 * [Removed `reconnectTries` and `reconnectInterval` options](#removed-reconnecttries-and-reconnectinterval-options)
+* [MongoDB Driver's New URL Parser Incompatible with Some npm Packages](#mongodb-drivers-new-url-parser-incompatible-with-some-npm-packages)
 
 <h2 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h2>
 
@@ -496,6 +497,12 @@ In Mongoose 6, populating a path with no `ref`, `refPath`, or `model` is a no-op
 // The below `populate()` does nothing.
 await Test.findOne().populate('parents');
 ```
+
+<h2 id="mongodb-drivers-new-url-parser-incompatible-with-some-npm-packages"><a href="#mongodb-drivers-new-url-parser-incompatible-with-some-npm-packages">MongoDB Driver's New URL Parser Incompatible with Some npm Packages</a></h2>
+
+The MongoDB Node driver version that Mongoose 6 uses relies on a [URL parser module](https://npmjs.com/package/whatwg-url) that has several known compatibility issues with other npm packages.
+This can lead to errors like `Invalid URL: mongodb+srv://username:password@development.xyz.mongodb.net/abc` if you use one of the incompatible packages.
+[You can find a list of incompatible packages here](https://mongoosejs.com/docs/incompatible_packages).
 
 ## TypeScript changes
 

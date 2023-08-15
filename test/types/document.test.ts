@@ -312,3 +312,37 @@ function gh13094() {
   const doc3: UserDocumentAny = null as any;
   expectType<string>(doc3.name); */
 }
+
+function gh13738() {
+  interface IPerson {
+    age: number;
+    dob: Date;
+    settings: {
+      theme: string;
+      alerts: {
+        sms: boolean;
+      }
+    }
+  }
+
+  const schema = new Schema<IPerson>({
+    age: Number,
+    dob: Date,
+    settings: {
+      theme: String,
+      alerts: {
+        sms: Boolean
+      }
+    }
+  });
+
+  const Person = model<IPerson>('Person', schema);
+
+  const person = new Person({ name: 'person', dob: new Date(), settings: { alerts: { sms: true }, theme: 'light' } });
+
+  expectType<number>(person.get('age'));
+  expectType<Date>(person.get('dob'));
+  expectType<string>(person.get('settings.theme'));
+  expectType<boolean>(person.get('settings.alerts.sms'));
+  expectType<{ sms: boolean }>(person.get('settings.alerts'));
+}

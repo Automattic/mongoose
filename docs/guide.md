@@ -527,6 +527,7 @@ Valid options:
 * [timestamps](#timestamps)
 * [storeSubdocValidationError](#storeSubdocValidationError)
 * [collectionOptions](#collectionOptions)
+* [skipNestedIndexes](#skipNestedIndexes)
 * [methods](#methods)
 * [query](#query-helpers)
 
@@ -1423,6 +1424,34 @@ const Test = mongoose.model('Test', schema);
 // Equivalent to `createCollection({ capped: true, max: 1000 })`
 await Test.createCollection();
 ```
+
+<h2 id="skipNestedIndexes">
+  <a href="#skipNestedIndexes">
+    option: skipNestedIndexes
+  </a>
+</h2>
+
+By default, Mongoose's automatic index building logic builds indexes from nested schemas, which can lead to unnecessary indexes if you are reusing schemas.
+You can set `skipNestedIndexes` to tell Mongoose to skip nested schema indexes for all nested schemas as follows.
+
+```javascript
+// Will build an index on `user.email`
+const userSchema = new Schema(
+  { email: { type: String, index: true } },
+  { autoIndex: true }
+);
+const UserModel = mongoose.model('User', userSchema);
+
+// Would normally build 2 indexes: one on `title` and one on `user.email`.
+// But will only build `title` index because of `skipNestedIndexes`.
+const eventSchema = new Schema(
+  { title: { type: String, index: true }, user: userSchema },
+  { autoIndex: true, skipNestedIndexes: true }
+);
+const UserModel = mongoose.model('User', userSchema);
+```
+
+If you want to `skipNestedIndexes`, but just for one schema, you can use [`excludeIndexes` instead](#excludeIndexes)
 
 <h2 id="es6-classes"><a href="#es6-classes">With ES6 Classes</a></h2>
 

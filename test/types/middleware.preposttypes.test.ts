@@ -468,51 +468,6 @@ schema.post('findOneAndDelete', { document: false, query: false }, function(res)
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre('findOneAndRemove', function() {
-  expectType<Query<any, any>>(this);
-});
-
-schema.post('findOneAndRemove', function(res) {
-  expectType<Query<any, any>>(this);
-  expectNotType<Query<any, any>>(res);
-});
-
-schema.pre('findOneAndRemove', { document: false, query: true }, function() {
-  expectType<Query<any, any>>(this);
-});
-
-schema.post('findOneAndRemove', { document: false, query: true }, function(res) {
-  expectType<Query<any, any>>(this);
-  expectNotType<Query<any, any>>(res);
-});
-
-schema.pre('findOneAndRemove', { document: true, query: true }, function() {
-  expectType<Query<any, any>>(this);
-});
-
-schema.post('findOneAndRemove', { document: true, query: true }, function(res) {
-  expectType<Query<any, any>>(this);
-  expectNotType<Query<any, any>>(res);
-});
-
-schema.pre('findOneAndRemove', { document: true, query: false }, function() {
-  expectType<never>(this);
-});
-
-schema.post('findOneAndRemove', { document: true, query: false }, function(res) {
-  expectType<never>(this);
-  expectNotType<Query<any, any>>(res);
-});
-
-schema.pre('findOneAndRemove', { document: false, query: false }, function() {
-  expectType<never>(this);
-});
-
-schema.post('findOneAndRemove', { document: false, query: false }, function(res) {
-  expectType<never>(this);
-  expectNotType<Query<any, any>>(res);
-});
-
 schema.pre('findOneAndReplace', function() {
   expectType<Query<any, any>>(this);
 });
@@ -828,92 +783,92 @@ schema.post(['save', 'init'], { document: false, query: false }, function(res) {
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], function() {
   expectType<Query<any, any>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], function(res) {
-  expectType<Query<any, any>>(this);
-  expectNotType<Query<any, any>>(res);
-});
-
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: true }, function() {
-  expectType<Query<any, any>>(this);
-});
-
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: true }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], function(res) {
   expectType<Query<any, any>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: true }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: true }, function() {
   expectType<Query<any, any>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: true }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: true }, function(res) {
   expectType<Query<any, any>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: false }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: true }, function() {
+  expectType<Query<any, any>>(this);
+});
+
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: true }, function(res) {
+  expectType<Query<any, any>>(this);
+  expectNotType<Query<any, any>>(res);
+});
+
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: false }, function() {
   expectType<never>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: false }, function(res) {
-  expectType<never>(this);
-  expectNotType<Query<any, any>>(res);
-});
-
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: false }, function() {
-  expectType<never>(this);
-});
-
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: false }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: false }, function(res) {
   expectType<never>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: false }, function() {
+  expectType<never>(this);
+});
+
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: false }, function(res) {
+  expectType<never>(this);
+  expectNotType<Query<any, any>>(res);
+});
+
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], function() {
   expectType<Query<any, any>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], function(res) {
   expectType<Query<any, any>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: true }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: true }, function() {
   expectType<Query<any, any>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: true }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: true }, function(res) {
   expectType<Query<any, any>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: false }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: false }, function() {
   expectType<HydratedDocument<IDocument>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: false }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: false }, function(res) {
   expectType<HydratedDocument<IDocument>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: true }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: true }, function() {
   expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: true }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: true }, function(res) {
   expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: false }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: false }, function() {
   expectType<never>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: false }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: false }, function(res) {
   expectType<never>(this);
   expectNotType<Query<any, any>>(res);
 });
@@ -963,92 +918,92 @@ schema.post(['save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: 
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], function() {
   expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], function(res) {
   expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function() {
   expectType<Query<any, any>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function(res) {
   expectType<Query<any, any>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function() {
   expectType<HydratedDocument<IDocument>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function(res) {
   expectType<HydratedDocument<IDocument>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function() {
   expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function(res) {
   expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function() {
   expectType<never>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function(res) {
   expectType<never>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], function() {
   expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], function(res) {
   expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function() {
   expectType<Query<any, any>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function(res) {
   expectType<Query<any, any>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function() {
   expectType<HydratedDocument<IDocument>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function(res) {
   expectType<HydratedDocument<IDocument>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function() {
   expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function(res) {
   expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
   expectNotType<Query<any, any>>(res);
 });
 
-schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function() {
+schema.pre(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function() {
   expectType<never>(this);
 });
 
-schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function(res) {
+schema.post(['count', 'estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'init', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function(res) {
   expectType<never>(this);
   expectNotType<Query<any, any>>(res);
 });

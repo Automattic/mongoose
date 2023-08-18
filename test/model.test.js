@@ -5050,10 +5050,6 @@ describe('Model', function() {
       await Model.createCollection();
       const collectionName = Model.collection.name;
 
-      // If the collection is not created, the following will throw
-      // MongoServerError: Collection [mongoose_test.User] not found.
-      await db.collection(collectionName).stats();
-
       await Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
 
       // Ensure that the default collation is set. Mongoose will set the

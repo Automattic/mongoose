@@ -1918,7 +1918,7 @@ describe('Query', function() {
       const ops = [
         'find',
         'findOne',
-        'findOneAndRemove',
+        'findOneAndDelete',
         'findOneAndUpdate',
         'replaceOne',
         'updateOne',

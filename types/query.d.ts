@@ -124,9 +124,9 @@ declare module 'mongoose' {
     overwriteDiscriminatorKey?: boolean;
     projection?: ProjectionType<DocType>;
     /**
-     * if true, returns the raw result from the MongoDB driver
+     * if true, returns the full ModifyResult rather than just the document
      */
-    rawResult?: boolean;
+    includeResultMetadata?: boolean;
     readPreference?: string | mongodb.ReadPreferenceMode;
     /**
      * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
@@ -392,17 +392,11 @@ declare module 'mongoose' {
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndDelete'>;
 
-    /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
-    findOneAndRemove(
-      filter?: FilterQuery<DocType>,
-      options?: QueryOptions<DocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndRemove'>;
-
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
     findOneAndUpdate(
       filter: FilterQuery<DocType>,
       update: UpdateQuery<DocType>,
-      options: QueryOptions<DocType> & { rawResult: true }
+      options: QueryOptions<DocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndUpdate'>;
     findOneAndUpdate(
       filter: FilterQuery<DocType>,
@@ -439,7 +433,7 @@ declare module 'mongoose' {
     findByIdAndUpdate(
       id: mongodb.ObjectId | any,
       update: UpdateQuery<DocType>,
-      options: QueryOptions<DocType> & { rawResult: true }
+      options: QueryOptions<DocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'findOneAndUpdate'>;
     findByIdAndUpdate(
       id: mongodb.ObjectId | any,

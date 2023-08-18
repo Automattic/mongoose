@@ -14,7 +14,6 @@ Each of these functions returns a
 * [`Model.findByIdAndUpdate()`](api.html#model_Model-findByIdAndUpdate)
 * [`Model.findOne()`](api.html#model_Model-findOne)
 * [`Model.findOneAndDelete()`](api.html#model_Model-findOneAndDelete)
-* [`Model.findOneAndRemove()`](api.html#model_Model-findOneAndRemove)
 * [`Model.findOneAndReplace()`](api.html#model_Model-findOneAndReplace)
 * [`Model.findOneAndUpdate()`](api.html#model_Model-findOneAndUpdate)
 * [`Model.replaceOne()`](api.html#model_Model-replaceOne)

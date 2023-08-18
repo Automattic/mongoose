@@ -1945,7 +1945,7 @@ describe('document', function() {
       const Person = db.model('Person', personSchema);
 
       const createdPerson = await Person.create({ name: 'Hafez' });
-      const removedPerson = await Person.findOneAndRemove({ _id: createdPerson._id });
+      const removedPerson = await Person.findOneAndDelete({ _id: createdPerson._id });
 
       removedPerson.isNew = true;
 

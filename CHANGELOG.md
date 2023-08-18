@@ -1,3 +1,24 @@
+7.4.3 / 2023-08-11
+==================
+ * fix: avoid applying map property getters when saving #13704 #13657
+ * fix(query): allow deselecting discriminator key #13722 #13679
+ * types(models+query): return lean type when passing QueryOptions with lean: true to relevant model functions like find() and findOne() #13721 #13705
+ * types(schema): correct return type for Schema.prototype.indexes() #13718 #13702
+ * types: allow accessing options from pre middleware #13708 #13633
+ * types: add UpdateQueryKnownOnly type for stricter UpdateQuery type checking #13699 #13630
+ * types(schema): support required: { isRequired: true } syntax in schema definition #13680
+ * docs(middleware): clarify that doc.deleteOne() doesn't run query middleware currently #13707 #13669
+
+7.4.2 / 2023-08-03
+==================
+ * fix(model): avoid hanging on empty bulkWrite() with ordered: false #13684 #13664
+ * fix: Document.prototype.isModified support for a string of keys as first parameter #13674 #13667 [gastoncasini](https://github.com/gastoncasini)
+ * fix: disable id virtual if alias:id set #13654 #13650
+ * fix: support timestamps:false on bulkWrite with updateOne and updateMany #13649 #13611
+ * docs(typescript): highlight auto type inference for methods and statics, add info on using methods with generics #13696 #12942
+ * docs(middleware): fix old example using post('remove') #13683 #13518
+ * docs(deprecations): quick fix for includeResultMetadata docs #13695
+
 6.11.5 / 2023-08-01
 ===================
  * fix(schema): make Schema.prototype.clone() avoid creating different copies of subdocuments and single nested paths underneath single nested paths #13671 #13626

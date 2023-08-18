@@ -179,6 +179,10 @@ declare module 'mongoose' {
 
   type QueryOpThatReturnsDocument = 'find' | 'findOne' | 'findOneAndUpdate' | 'findOneAndReplace' | 'findOneAndDelete';
 
+  type GetLeanResultType<RawDocType, ResultType, QueryOp> = QueryOp extends QueryOpThatReturnsDocument
+    ? (ResultType extends any[] ? Require_id<FlattenMaps<RawDocType>>[] : Require_id<FlattenMaps<RawDocType>>)
+    : ResultType;
+
   class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType, QueryOp = 'find'> implements SessionOperation {
     _mongooseOptions: MongooseQueryOptions<DocType>;
 
@@ -499,9 +503,19 @@ declare module 'mongoose' {
     j(val: boolean | null): this;
 
     /** Sets the lean option. */
-    lean<LeanResultType = QueryOp extends QueryOpThatReturnsDocument ? (ResultType extends any[] ? Require_id<FlattenMaps<RawDocType>>[] : Require_id<FlattenMaps<RawDocType>>) : ResultType>(
+    lean<
+      LeanResultType = GetLeanResultType<RawDocType, ResultType, QueryOp>
+    >(
       val?: boolean | any
-    ): QueryWithHelpers<ResultType extends null ? LeanResultType | null : LeanResultType, DocType, THelpers, RawDocType, QueryOp>;
+    ): QueryWithHelpers<
+      ResultType extends null
+        ? LeanResultType | null
+        : LeanResultType,
+      DocType,
+      THelpers,
+      RawDocType,
+      QueryOp
+      >;
 
     /** Specifies the maximum number of documents the query will return. */
     limit(val: number): this;

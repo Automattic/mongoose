@@ -4169,4 +4169,15 @@ describe('Query', function() {
     await q.exec();
     assert.equal(q.op, 'findOneAndReplace');
   });
+
+  it('allows deselecting discriminator key (gh-13679)', async function() {
+    const testSchema = new Schema({ name: String });
+    const Test = db.model('Test', testSchema);
+    const Test2 = Test.discriminator('Test2', new Schema({ test: String }));
+
+    const { _id } = await Test2.create({ name: 'test1', test: 'test2' });
+    const { name, __t } = await Test.findById(_id).select({ __t: 0 });
+    assert.strictEqual(name, 'test1');
+    assert.strictEqual(__t, undefined);
+  });
 });

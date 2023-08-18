@@ -53,3 +53,27 @@ To update a document's discriminator key, use `findOneAndUpdate()` or `updateOne
 ```acquit
 [require:use overwriteDiscriminatorKey to change discriminator key]
 ```
+
+## Embedded discriminators in arrays
+
+You can also define discriminators on embedded document arrays.
+Embedded discriminators are different because the different discriminator types are stored in the same document array (within a document) rather than the same collection.
+In other words, embedded discriminators let you store subdocuments matching different schemas in the same array.
+
+As a general best practice, make sure you declare any hooks on your schemas **before** you use them.
+You should **not** call `pre()` or `post()` after calling `discriminator()`.
+
+```acquit
+[require:Embedded discriminators in arrays]
+```
+
+## Single nested discriminators
+
+You can also define discriminators on single nested subdocuments, similar to how you can define discriminators on arrays of subdocuments.
+
+As a general best practice, make sure you declare any hooks on your schemas **before** you use them.
+You should **not** call `pre()` or `post()` after calling `discriminator()`.
+
+```acquit
+[require:Single nested discriminators]
+```

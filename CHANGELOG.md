@@ -1,3 +1,8 @@
+6.11.6 / 2023-08-21
+===================
+ * fix(model): avoid hanging on empty bulkWrite() with ordered: false #13701 #13684 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * types: augment bson.ObjectId instead of adding on own type #13515 #12537 [hasezoey](https://github.com/hasezoey)
+
 6.11.5 / 2023-08-01
 ===================
  * fix(schema): make Schema.prototype.clone() avoid creating different copies of subdocuments and single nested paths underneath single nested paths #13671 #13626

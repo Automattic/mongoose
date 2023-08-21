@@ -6,4 +6,8 @@ declare module 'bson' {
     /** Mongoose automatically adds a conveniency "_id" getter on the base ObjectId class */
     _id: this;
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6.x

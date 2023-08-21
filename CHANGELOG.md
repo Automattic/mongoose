@@ -1,3 +1,8 @@
+6.11.6 / 2023-08-21
+===================
+ * fix(model): avoid hanging on empty bulkWrite() with ordered: false #13701 #13684 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * types: augment bson.ObjectId instead of adding on own type #13515 #12537 [hasezoey](https://github.com/hasezoey)
+
 7.4.3 / 2023-08-11
 ==================
  * fix: avoid applying map property getters when saving #13704 #13657

@@ -69,8 +69,8 @@ describe('model: findByIdAndUpdate:', function() {
 
     schema.path('shape').discriminator('gh8378_Circle',
       Schema({ radius: String, color: String }));
-    // schema.path('shape').discriminator('gh8378_Square',
-    //   Schema({ side: Number, color: String }));
+    schema.path('shape').discriminator('gh8378_Square',
+      Schema({ side: Number, color: String }));
 
     const MyModel = db.model('Test', schema);
 
@@ -89,11 +89,11 @@ describe('model: findByIdAndUpdate:', function() {
       'shape.name': 'after',
       'shape.side': 4,
       'shape.color': 'white'
-    }, { new: true });
+    }, { new: true, overwriteDiscriminatorKey: true });
 
     assert.equal(doc.shape.kind, 'gh8378_Square');
     assert.equal(doc.shape.name, 'after');
-    assert.equal(doc.shape.side, 4); // this assertion is failing, this property is not updated
+    assert.equal(doc.shape.side, 4);
     assert.equal(doc.shape.color, 'white');
   });
 });

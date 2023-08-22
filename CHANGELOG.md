@@ -1,3 +1,18 @@
+7.4.4 / 2023-08-22
+==================
+ * fix(connection): reset document state in between transaction retries #13726 #13698
+ * fix(cursor): bubble up resumeTokenChanged event from change streams #13736 #13607
+ * fix(query+populate): add refPath to projection by default, unless explicitly excluded #13758
+ * fix(schema): support 'ascending', 'asc', 'descending', 'desc' for index direction #13761 #13725
+ * fix(ChangeStream): add _bindEvents to addListener function for observable support #13759 [yury-ivaniutsenka](https://github.com/yury-ivaniutsenka)
+ * types: infer return type when using `get()`, `markModified()`, etc. with known property name literal #13739 [maybesmurf](https://github.com/maybesmurf)
+ * types: add missing typings for option includeResultMetadata #13747 #13746 [Idnan](https://github.com/Idnan)
+ * types: export InferSchemaType #13737
+ * docs(middleware): clarify that query middleware applies to document by default #13734 #13713
+ * docs: add brief note on TypeScript generic usage for embedded discriminator path() calls #13728 #10435
+ * docs: link v7 migration guide #13742 [Cooldogyum](https://github.com/Cooldogyum)
+ * docs(migrating_to_6): add note about incompatible packages #13733
+
 6.11.6 / 2023-08-21
 ===================
  * fix(model): avoid hanging on empty bulkWrite() with ordered: false #13701 #13684 [JavaScriptBach](https://github.com/JavaScriptBach)

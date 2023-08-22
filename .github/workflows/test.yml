@@ -41,7 +41,7 @@ jobs:
       matrix:
         node: [14, 16, 18, 20]
         os: [ubuntu-20.04, ubuntu-22.04]
-        mongodb: [4.4.22, 5.0.19, 6.0.9]
+        mongodb: [4.4.22, 5.0.19, 6.0.9, 7.0.0]
         include:
           - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
             mongodb: 5.0.14

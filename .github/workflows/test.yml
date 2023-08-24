@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [14, 16, 18]
+        node: [14, 16, 18, 20]
         os: [ubuntu-20.04, ubuntu-22.04]
         mongodb: [4.4.18, 5.0.14, 6.0.4]
         include:

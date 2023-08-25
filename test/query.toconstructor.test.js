@@ -180,7 +180,7 @@ describe('Query:', function() {
       const query = Model.find().sort([['name', 1]]);
       const Query = query.toConstructor();
       const q = new Query();
-      assert.deepEqual(q.options.sort, [['name', 1]]);
+      assert.deepEqual(q.options.sort, { name: 1 });
     });
   });
 });

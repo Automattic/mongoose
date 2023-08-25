@@ -12342,6 +12342,22 @@ describe('document', function() {
     assert.strictEqual(test2.constructor.polluted, undefined);
     assert.strictEqual(Object.polluted, undefined);
   });
+
+  it('sets defaults on subdocs with subdoc projection (gh-13720)', async function() {
+    const subSchema = new mongoose.Schema({
+      propertyA: { type: String, default: 'A' },
+      propertyB: { type: String, default: 'B' }
+    });
+    const userSchema = new mongoose.Schema({
+      name: String,
+      sub: { type: subSchema, default: () => ({}) }
+    });
+    const User = db.model('User', userSchema);
+    await User.insertMany([{ name: 'user' }]);
+    await User.updateMany({}, { $unset: { 'sub.propertyA': '' } });
+    const nestedProjectionDoc = await User.findOne({}, { name: 1, 'sub.propertyA': 1, 'sub.propertyB': 1 });
+    assert.strictEqual(nestedProjectionDoc.sub.propertyA, 'A');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

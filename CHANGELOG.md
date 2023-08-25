@@ -1,3 +1,9 @@
+6.12.0 / 2023-08-24
+===================
+ * feat: use mongodb driver v4.17.1
+ * fix(model): make Model.bulkWrite() with empty array and ordered false not throw an error #13664
+ * fix(document): correctly handle inclusive/exclusive projections when applying subdocument defaults #13763 #13720
+
 7.4.4 / 2023-08-22
 ==================
  * fix(connection): reset document state in between transaction retries #13726 #13698

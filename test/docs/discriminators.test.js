@@ -273,6 +273,7 @@ describe('discriminator docs', function() {
     const batchSchema = new Schema({ events: [eventSchema] });
 
     // `batchSchema.path('events')` gets the mongoose `DocumentArray`
+    // For TypeScript, use `schema.path<Schema.Types.DocumentArray>('events')`
     const docArray = batchSchema.path('events');
 
     // The `events` array can contain 2 different types of events, a
@@ -391,6 +392,7 @@ describe('discriminator docs', function() {
     const shapeSchema = Schema({ name: String }, { discriminatorKey: 'kind' });
     const schema = Schema({ shape: shapeSchema });
 
+    // For TypeScript, use `schema.path<Schema.Types.Subdocument>('shape').discriminator(...)`
     schema.path('shape').discriminator('Circle', Schema({ radius: String }));
     schema.path('shape').discriminator('Square', Schema({ side: Number }));
 

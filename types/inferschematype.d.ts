@@ -30,7 +30,7 @@ declare module 'mongoose' {
      OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)]: ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>;
    };
 
-  /**
+   /**
    * @summary Obtains document schema type from Schema instance.
    * @param {Schema} TSchema `typeof` a schema instance.
    * @example
@@ -39,7 +39,7 @@ declare module 'mongoose' {
    * // result
    * type UserType = {userName?: string}
    */
-  type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
+   export type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.
@@ -86,7 +86,7 @@ type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined } 
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  */
 type IsPathRequired<P, TypeKey extends string = DefaultTypeKey> =
-  P extends { required: true | [true, string | undefined] } | ArrayConstructor | any[]
+  P extends { required: true | [true, string | undefined] | { isRequired: true } } | ArrayConstructor | any[]
     ? true
     : P extends { required: boolean }
       ? P extends { required: false }

@@ -3404,7 +3404,7 @@ describe('Model', function() {
         let listener;
 
         before(function() {
-          if (!process.env.REPLICA_SET) {
+          if (!process.env.REPLICA_SET && !process.env.START_REPLICA_SET) {
             this.skip();
           }
         });
@@ -3434,6 +3434,20 @@ describe('Model', function() {
           assert.equal(changeData.operationType, 'insert');
           assert.equal(changeData.fullDocument._id.toHexString(),
             doc._id.toHexString());
+        });
+
+        it('bubbles up resumeTokenChanged events (gh-13607)', async function() {
+          const MyModel = db.model('Test', new Schema({ name: String }));
+
+          const resumeTokenChangedEvent = new Promise(resolve => {
+            changeStream = MyModel.watch();
+            listener = data => resolve(data);
+            changeStream.once('resumeTokenChanged', listener);
+          });
+
+          await MyModel.create({ name: 'test' });
+          const { _data } = await resumeTokenChangedEvent;
+          assert.ok(_data);
         });
 
         it('using next() and hasNext() (gh-11527)', async function() {
@@ -5921,6 +5935,15 @@ describe('Model', function() {
     assert.equal(user.age, 25);
     assert.deepEqual(user.friends, ['Sam']);
 
+  });
+
+  it('Model.bulkWrite(...) does not hang with empty array and ordered: false (gh-13664)', async function() {
+    const userSchema = new Schema({ name: String });
+    const User = db.model('User', userSchema);
+
+    const err = await User.bulkWrite([], { ordered: false }).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'MongoInvalidArgumentError');
   });
 
   it('allows calling `create()` after `bulkWrite()` (gh-9350)', async function() {

@@ -856,6 +856,21 @@ describe('schema', function() {
         assert.deepEqual(indexes[1][0], { prop2: 1 });
       });
 
+      it('using "ascending" and "descending" for order (gh-13725)', function() {
+        const testSchema = new Schema({
+          prop1: { type: String, index: 'ascending' },
+          prop2: { type: Number, index: 'descending' },
+          prop3: { type: String }
+        });
+        testSchema.index({ prop3: 'desc' }, { unique: true });
+
+        const indexes = testSchema.indexes();
+        assert.equal(indexes.length, 3);
+        assert.deepEqual(indexes[0][0], { prop1: 1 });
+        assert.deepEqual(indexes[1][0], { prop2: -1 });
+        assert.deepEqual(indexes[2][0], { prop3: -1 });
+      });
+
       it('with single nested doc (gh-6113)', function() {
         const pointSchema = new Schema({
           type: {
@@ -873,8 +888,6 @@ describe('schema', function() {
         assert.deepEqual(schema.indexes(), [
           [{ point: '2dsphere' }, { background: true }]
         ]);
-
-
       });
 
       it('with embedded discriminator (gh-6485)', function() {
@@ -1983,6 +1996,21 @@ describe('schema', function() {
 
         const test2 = test.clone();
         assert.equal(test2.localTest(), 42);
+      });
+
+      it('avoids creating duplicate array constructors when cloning doc array underneath subdoc (gh-13626)', function() {
+        const schema = new mongoose.Schema({
+          config: {
+            type: new mongoose.Schema({
+              attributes: [{ value: 'Mixed' }]
+            })
+          }
+        }).clone();
+
+        assert.strictEqual(
+          schema.paths['config'].schema.paths['attributes'].Constructor,
+          schema.singleNestedPaths['config.attributes'].Constructor
+        );
       });
     });
 

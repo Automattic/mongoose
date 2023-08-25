@@ -30,7 +30,7 @@ const doc = await Test.findOneAndUpdate(
 const doc = await Test.findOneAndUpdate(
   { name: 'Test' },
   { name: 'Test Testerson' },
-  { includeResultMetadata: false }
+  { includeResultMetadata: true }
 );
 ```
 

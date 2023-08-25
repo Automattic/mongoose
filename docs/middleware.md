@@ -97,17 +97,14 @@ Here are the possible strings that can be passed to `pre()`
 All middleware types support pre and post hooks.
 How pre and post hooks work is described in more detail below.
 
-**Note:** If you specify `schema.pre('remove')`, Mongoose will register this
-middleware for [`doc.remove()`](api/model.html#model_Model-remove) by default. If you
-want your middleware to run on [`Query.remove()`](api/query.html#query_Query-remove)
-use [`schema.pre('remove', { query: true, document: false }, fn)`](api/schema.html#schema_Schema-pre).
+**Note:** Mongoose registers `updateOne` middleware on `Query.prototype.updateOne()` by default.
+This means that both `doc.updateOne()` and `Model.updateOne()` trigger `updateOne` hooks, but `this` refers to a query, not a document.
+To register `updateOne` middleware as document middleware, use `schema.pre('updateOne', { document: true, query: false })`.
 
-**Note:** Unlike `schema.pre('remove')`, Mongoose registers `updateOne` and
-`deleteOne` middleware on `Query#updateOne()` and `Query#deleteOne()` by default.
-This means that both `doc.updateOne()` and `Model.updateOne()` trigger
-`updateOne` hooks, but `this` refers to a query, not a document. To register
-`updateOne` or `deleteOne` middleware as document middleware, use
-`schema.pre('updateOne', { document: true, query: false })`.
+**Note:** Like `updateOne`, Mongoose registers `deleteOne` middleware on `Query.prototype.deleteOne` by default.
+That means that `Model.deleteOne()` will trigger `deleteOne` hooks, and `this` will refer to a query.
+However, `doc.deleteOne()` does **not** fire `deleteOne` query middleware for legacy reasons.
+To register `deleteOne` middleware as document middleware, use `schema.pre('deleteOne', { document: true, query: false })`.
 
 **Note:** The [`create()`](./api/model.html#model_Model-create) function fires `save()` hooks.
 
@@ -245,8 +242,8 @@ schema.post('validate', function(doc) {
 schema.post('save', function(doc) {
   console.log('%s has been saved', doc._id);
 });
-schema.post('remove', function(doc) {
-  console.log('%s has been removed', doc._id);
+schema.post('deleteOne', function(doc) {
+  console.log('%s has been deleted', doc._id);
 });
 ```
 
@@ -380,35 +377,56 @@ await doc.save({ validateModifiedOnly: true });
 
 <h2 id="naming"><a href="#naming">Naming Conflicts</a></h2>
 
-Mongoose has both query and document hooks for `remove()`.
+Mongoose has both query and document hooks for `deleteOne()`.
 
 ```javascript
-schema.pre('remove', function() { console.log('Removing!'); });
+schema.pre('deleteOne', function() { console.log('Removing!'); });
+
+// Does **not** print "Removing!". Document middleware for `remove` is not executed by default
+await doc.deleteOne();
 
 // Prints "Removing!"
-doc.remove();
-
-// Does **not** print "Removing!". Query middleware for `remove` is not
-// executed by default.
 Model.remove();
 ```
 
 You can pass options to [`Schema.pre()`](api.html#schema_Schema-pre)
 and [`Schema.post()`](api.html#schema_Schema-post) to switch whether
-Mongoose calls your `remove()` hook for [`Document.remove()`](api/model.html#model_Model-remove)
-or [`Model.remove()`](api/model.html#model_Model-remove). Note here that you need to set both `document` and `query` properties in the passed object:
+Mongoose calls your `deleteOne()` hook for [`Document.prototype.deleteOne()`](api/model.html#Model.prototype.deleteOne())
+or [`Query.prototype.deleteOne()`](api/query.html#Query.prototype.deleteOne()). Note here that you need to set both `document` and `query` properties in the passed object:
 
 ```javascript
 // Only document middleware
-schema.pre('remove', { document: true, query: false }, function() {
-  console.log('Removing doc!');
+schema.pre('deleteOne', { document: true, query: false }, function() {
+  console.log('Deleting doc!');
 });
 
 // Only query middleware. This will get called when you do `Model.remove()`
 // but not `doc.remove()`.
-schema.pre('remove', { query: true, document: false }, function() {
-  console.log('Removing!');
+schema.pre('deleteOne', { query: true, document: false }, function() {
+  console.log('Deleting!');
 });
+```
+
+Mongoose also has both query and document hooks for `validate()`.
+Unlike `deleteOne` and `updateOne`, `validate` middleware applies to `Document.prototype.validate` by default.
+
+```javascript
+const schema = new mongoose.Schema({ name: String });
+schema.pre('validate', function() {
+  console.log('Document validate');
+});
+schema.pre('validate', { query: true, document: false }, function() {
+  console.log('Query validate');
+});
+const Test = mongoose.model('Test', schema);
+
+const doc = new Test({ name: 'foo' });
+
+// Prints "Document validate"
+await doc.validate();
+
+// Prints "Query validate"
+await Test.find().validate();
 ```
 
 <h2 id="notes"><a href="#notes">Notes on findAndUpdate() and Query Middleware</a></h2>

@@ -1,3 +1,9 @@
+7.4.5 / 2023-08-25
+==================
+ * fix(debug): avoid putting virtuals and getters in debug output #13778
+ * fix(model): make Model.bulkWrite() with empty array and ordered false not throw an error #13664
+ * fix(document): correctly handle inclusive/exclusive projections when applying subdocument defaults #13763 #13720
+
 6.12.0 / 2023-08-24
 ===================
  * feat: use mongodb driver v4.17.1

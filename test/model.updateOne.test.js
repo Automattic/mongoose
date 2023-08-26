@@ -3051,6 +3051,18 @@ describe('model: updateOne: ', function() {
       await Person.updateOne({ name: 'Anakin' }, { name: 'The Chosen One' }).orFail();
     }, { message: 'No document found for query "{ name: \'Anakin\' }" on model "gh-11620"' });
   });
+  it('updateOne with top level key that starts with $ (gh-13786)', async function() {
+    const schema = new mongoose.Schema({
+      $myKey: String
+    });
+
+    const Test = db.model('Test', schema);
+
+    const _id = new mongoose.Types.ObjectId();
+    await Test.updateOne({ _id }, { $myKey: 'gh13786' }, { upsert: true });
+    const doc = await Test.findById(_id);
+    assert.equal(doc.$myKey, 'gh13786');
+  });
 });
 
 async function delay(ms) {

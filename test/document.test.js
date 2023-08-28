@@ -5564,6 +5564,7 @@ describe('document', function() {
       const Test = db.model('Test', testSchema);
 
       const doc = new Test({ arr: [new mongoose.Types.ObjectId()] });
+      assert.equal(called, 0);
       assert.deepEqual(doc.toObject({ getters: true }).arr, [42]);
       assert.equal(called, 1);
     });
@@ -5581,7 +5582,6 @@ describe('document', function() {
       });
 
       const Test = db.model('Test', testSchema);
-
 
       let doc = await Test.create({ arr: [new mongoose.Types.ObjectId()] });
       assert.equal(called, 1);
@@ -12341,6 +12341,51 @@ describe('document', function() {
     const test2 = {};
     assert.strictEqual(test2.constructor.polluted, undefined);
     assert.strictEqual(Object.polluted, undefined);
+  });
+
+  it('does not modify array when calling getters (gh-13748)', async function() {
+    // create simple setter to add a sufix
+    const addSufix = (name) => {
+      return name + '-sufix';
+    };
+
+    // create simple gettrer to remove last 6 letters (should be "-sufix")
+    const removeSufix = (name) => {
+      return ('' + name).slice(0, -6);
+    };
+
+    const userSchema = new mongoose.Schema(
+      {
+        name: String,
+        age: Number,
+        profession: {
+          type: String,
+          get: removeSufix,
+          set: addSufix
+        },
+        hobbies: [{ type: String, get: removeSufix, set: addSufix }]
+      },
+      {
+        toObject: { getters: true },
+        toJSON: { getters: true }
+      }
+    );
+    const User = db.model('User', userSchema);
+
+    const usr = await User.create({
+      name: 'John',
+      age: 18,
+      profession: 'teacher',
+      hobbies: ['swimming', 'football']
+    });
+
+    const oneUser = await User.findById(usr._id).orFail();
+    assert.equal(oneUser.profession, 'teacher');
+    assert.equal(oneUser.profession, 'teacher');
+    assert.equal(oneUser.profession, 'teacher');
+    assert.equal(oneUser.hobbies[0], 'swimming');
+    assert.equal(oneUser.hobbies[0], 'swimming');
+    assert.equal(oneUser.hobbies[0], 'swimming');
   });
 
   it('sets defaults on subdocs with subdoc projection (gh-13720)', async function() {

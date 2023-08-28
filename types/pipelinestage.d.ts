@@ -241,7 +241,7 @@ declare module 'mongoose' {
     }
 
     export interface SearchMeta {
-      /** [`$search` reference](https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/) */
+      /** [`$searchMeta` reference](https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/#mongodb-pipeline-pipe.-searchMeta) */
       $searchMeta: {
         index?: string;
         highlight?: {

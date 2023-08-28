@@ -12386,6 +12386,10 @@ describe('document', function() {
     assert.equal(oneUser.hobbies[0], 'swimming');
     assert.equal(oneUser.hobbies[0], 'swimming');
     assert.equal(oneUser.hobbies[0], 'swimming');
+
+    assert.equal(oneUser.get('hobbies.0'), 'swimming');
+    assert.equal(oneUser.get('hobbies.0'), 'swimming');
+    assert.equal(oneUser.get('hobbies.0'), 'swimming');
   });
 
   it('sets defaults on subdocs with subdoc projection (gh-13720)', async function() {

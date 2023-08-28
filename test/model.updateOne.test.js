@@ -3052,6 +3052,11 @@ describe('model: updateOne: ', function() {
     }, { message: 'No document found for query "{ name: \'Anakin\' }" on model "gh-11620"' });
   });
   it('updateOne with top level key that starts with $ (gh-13786)', async function() {
+    const [major] = await start.mongodVersion();
+    if (major < 5) {
+      return this.skip();
+    }
+
     const schema = new mongoose.Schema({
       $myKey: String
     });

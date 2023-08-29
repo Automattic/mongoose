@@ -215,14 +215,16 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                   PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
                                     IfEquals<PathValueType, Schema.Types.Decimal128> extends true ? Types.Decimal128 :
                                       IfEquals<PathValueType, Types.Decimal128> extends true ? Types.Decimal128 :
-                                        PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
-                                          IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
-                                            PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
-                                              IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
-                                                PathValueType extends ArrayConstructor ? any[] :
-                                                  PathValueType extends typeof Schema.Types.Mixed ? any:
-                                                    IfEquals<PathValueType, ObjectConstructor> extends true ? any:
-                                                      IfEquals<PathValueType, {}> extends true ? any:
-                                                        PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                          PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
-                                                            unknown;
+                                        IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint :
+                                          PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt ? bigint :
+                                            PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
+                                              IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
+                                                PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
+                                                  IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
+                                                    PathValueType extends ArrayConstructor ? any[] :
+                                                      PathValueType extends typeof Schema.Types.Mixed ? any:
+                                                        IfEquals<PathValueType, ObjectConstructor> extends true ? any:
+                                                          IfEquals<PathValueType, {}> extends true ? any:
+                                                            PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+                                                              PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
+                                                                unknown;

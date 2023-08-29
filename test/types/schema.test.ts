@@ -1177,3 +1177,9 @@ function gh13702() {
   const schema = new Schema({ name: String });
   expectType<[IndexDefinition, IndexOptions][]>(schema.indexes());
 }
+
+function gh13780() {
+  const schema = new Schema({ num: Schema.Types.BigInt });
+  type InferredType = InferSchemaType<typeof schema>;
+  expectType<bigint | undefined>(null as unknown as InferredType['num']);
+}

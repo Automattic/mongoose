@@ -3053,6 +3053,7 @@ describe('model: updateOne: ', function() {
   });
   it('updateOne with top level key that starts with $ (gh-13786)', async function() {
     const [major] = await start.mongodVersion();
+    // Top-level dollar key support was added in MongoDB 5
     if (major < 5) {
       return this.skip();
     }

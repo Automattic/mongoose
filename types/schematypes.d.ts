@@ -311,6 +311,14 @@ declare module 'mongoose' {
         enum(vals: string[] | number[]): this;
       }
 
+      class BigInt extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'BigInt';
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
+      }
+
       class Boolean extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Boolean';

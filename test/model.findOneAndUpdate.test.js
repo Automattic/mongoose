@@ -2198,6 +2198,6 @@ describe('model: findOneAndUpdate:', function() {
       { upsert: true, returnDocument: 'after', returnOriginal: false }
     );
     assert.ok(document);
-    assert.ok(document.name, 'test');
+    assert.equal(document.name, 'test');
   });
 });

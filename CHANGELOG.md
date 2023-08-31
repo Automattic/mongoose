@@ -1,3 +1,26 @@
+7.5.0 / 2023-08-29
+==================
+ * feat: allow top level dollar keys with findOneAndUpdate(), update() for MongoDB 5 #13786
+ * fix(document): make array getters avoid unintentionally modifying array, defer getters until index access instead #13774
+ * feat: deprecate `overwrite` option for findOneAndUpdate() #13578
+ * feat: add pathsToSkip option for Model.validate #13663 #10353
+ * feat: support alias when declaring index #13659 #13276
+ * fix(query): remove unnecessary check for atomic operators in findOneAndReplace() #13678
+ * types: add SearchMeta Interface for Atlas Search #13792 [mreouven](https://github.com/mreouven)
+ * types(schematypes): add missing BigInt SchemaType #13787
+
+7.4.5 / 2023-08-25
+==================
+ * fix(debug): avoid putting virtuals and getters in debug output #13778
+ * fix(model): make Model.bulkWrite() with empty array and ordered false not throw an error #13664
+ * fix(document): correctly handle inclusive/exclusive projections when applying subdocument defaults #13763 #13720
+
+6.12.0 / 2023-08-24
+===================
+ * feat: use mongodb driver v4.17.1
+ * fix(model): make Model.bulkWrite() with empty array and ordered false not throw an error #13664
+ * fix(document): correctly handle inclusive/exclusive projections when applying subdocument defaults #13763 #13720
+
 7.4.4 / 2023-08-22
 ==================
  * fix(connection): reset document state in between transaction retries #13726 #13698

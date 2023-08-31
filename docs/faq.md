@@ -293,7 +293,7 @@ compiled" when I use nodemon / a testing framework?
 **A**. `mongoose.model('ModelName', schema)` requires 'ModelName' to be
 unique, so you can access the model by using `mongoose.model('ModelName')`.
 If you put `mongoose.model('ModelName', schema);` in a
-[mocha `beforeEach()` hook](https://mochajs.org/#hooks), this code will
+[mocha `beforeEach()` hook](https://masteringjs.io/tutorials/mocha/beforeeach), this code will
 attempt to create a new model named 'ModelName' before **every** test,
 and so you will get an error. Make sure you only create a new model with
 a given name **once**. If you need to create multiple models with the

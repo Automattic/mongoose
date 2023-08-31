@@ -6,14 +6,10 @@
         Getters/Setters in Mongoose
       </a>
     </h1>
-<script>
-  _native.init("CK7DT53U",{
-    targetClass: 'native-inline'
-  });
-</script>
-
-<div class="native-inline">
-  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+<div class="sponsored-ad">
+  <a href="https://localizejs.com/?utm_campaign=Mongoose&utm_source=mongoose&utm_medium=banner">
+    <img src="/docs/images/localize-mongoose-ad-banner-2x.jpg">
+  </a>
 </div>
 
 <p>Mongoose getters and setters allow you to execute custom logic when getting or setting a property on a <a href="../documents.html">Mongoose document</a>. Getters let you transform data in MongoDB into a more user friendly form, and setters let you transform user data before it gets to MongoDB.</p>
@@ -49,7 +45,7 @@
 user.<span class="hljs-property">email</span>; <span class="hljs-comment">// **@gmail.com</span>
 </code></pre>
 <p>Keep in mind that getters do <strong>not</strong> impact the underlying data stored in
-MongoDB. If you save <code>user</code>, the <code>email</code> property will be &#39;<a href="mailto:&#97;&#98;&#x40;&#x67;&#109;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#109;">&#97;&#98;&#x40;&#x67;&#109;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#109;</a>&#39; in
+MongoDB. If you save <code>user</code>, the <code>email</code> property will be &#39;<a href="mailto:&#x61;&#x62;&#64;&#103;&#x6d;&#97;&#x69;&#x6c;&#46;&#x63;&#111;&#x6d;">&#x61;&#x62;&#64;&#103;&#x6d;&#97;&#x69;&#x6c;&#46;&#x63;&#111;&#x6d;</a>&#39; in
 the database.</p>
 <p>By default, Mongoose does <strong>not</strong> execute getters when converting a document to JSON, including <a href="http://expressjs.com/en/4x/api.html#res.json">Express&#39; <code>res.json()</code> function</a>.</p>
 <pre><code class="language-javascript">app.<span class="hljs-title function_">get</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">req, res</span>) {

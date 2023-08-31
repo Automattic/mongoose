@@ -772,12 +772,9 @@ describe('Query', function() {
       query.sort({ a: 1, c: -1, b: 'asc', e: 'descending', f: 'ascending' });
       assert.deepEqual(query.options.sort, { a: 1, c: -1, b: 1, e: -1, f: 1 });
 
-      if (typeof global.Map !== 'undefined') {
-        query = new Query({});
-        query.sort(new global.Map().set('a', 1).set('b', 1));
-        assert.equal(query.options.sort.get('a'), 1);
-        assert.equal(query.options.sort.get('b'), 1);
-      }
+      query = new Query({});
+      query.sort(new Map().set('a', 1).set('b', 1));
+      assert.deepStrictEqual(query.options.sort, { a: 1, b: 1 });
 
       query = new Query({});
       let e;

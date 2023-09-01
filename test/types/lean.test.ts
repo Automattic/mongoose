@@ -176,7 +176,7 @@ async function gh13345_2() {
   const PlaceModel = model('Place', placeSchema);
 
   const place = await PlaceModel.findOne().lean().orFail().exec();
-  expectAssignable<FlattenMaps<Place>>(place);
+  expectAssignable<Place>(place);
   expectType<Record<string, string>>(place.images[0].description);
 }
 

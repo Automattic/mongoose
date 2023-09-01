@@ -24,13 +24,24 @@ declare module 'mongoose' {
    * @param {EnforcedDocType} EnforcedDocType A generic type enforced by user "provided before schema constructor".
    * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
    */
-   type ObtainDocumentType<DocDefinition, EnforcedDocType = any, TSchemaOptions extends Record<any, any> = DefaultSchemaOptions> =
-   IsItRecordAndNotAny<EnforcedDocType> extends true ? EnforcedDocType : {
-     [K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
-     OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)]: ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>;
-   };
+  type ObtainDocumentType<
+    DocDefinition,
+    EnforcedDocType = any,
+    TSchemaOptions extends Record<any, any> = DefaultSchemaOptions,
+    UseHydratedType = false
+  > =
+  IsItRecordAndNotAny<EnforcedDocType> extends true ? EnforcedDocType : {
+    [
+    K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
+    OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)
+    ]: ObtainDocumentPathType<
+      DocDefinition[K],
+      TSchemaOptions['typeKey'],
+      UseHydratedType
+    >;
+  };
 
-   /**
+  /**
    * @summary Obtains document schema type from Schema instance.
    * @param {Schema} TSchema `typeof` a schema instance.
    * @example
@@ -39,7 +50,24 @@ declare module 'mongoose' {
    * // result
    * type UserType = {userName?: string}
    */
-   export type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
+  export type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
+
+  /**
+   * @summary Obtains document schema type from Schema instance.
+   * @param {Schema} TSchema `typeof` a schema instance.
+   * @example
+   * const userSchema = new Schema({userName:String});
+   * type UserType = InferSchemaType<typeof userSchema>;
+   * // result
+   * type UserType = {userName?: string}
+   */
+  export type InferHydratedDocumentType<
+    DocDefinition,
+    EnforcedDocType = any,
+    TSchemaOptions extends Record<any, any> = DefaultSchemaOptions
+  > = HydratedDocument<
+    ObtainDocumentType<DocDefinition, EnforcedDocType, TSchemaOptions, true>
+  >;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.
@@ -155,10 +183,15 @@ type OptionalPaths<T, TypeKey extends string = DefaultTypeKey> = {
  * @param {PathValueType} PathValueType Document definition path type.
  * @param {TypeKey} TypeKey A generic refers to document definition.
  */
-type ObtainDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeKey> = ResolvePathType<
-PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
-PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {},
-TypeKey
+type ObtainDocumentPathType<
+  PathValueType,
+  TypeKey extends string = DefaultTypeKey,
+  UseHydratedType = false
+> = ResolvePathType<
+  PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
+  PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {},
+  TypeKey,
+  UseHydratedType
 >;
 
 /**
@@ -174,7 +207,12 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends R
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  * @returns Number, "Number" or "number" will be resolved to number type.
  */
-type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey']> =
+type ResolvePathType<
+  PathValueType,
+  Options extends SchemaTypeOptions<PathValueType> = {},
+  TypeKey extends string = DefaultSchemaOptions['typeKey'],
+  UseHydratedType = false
+> =
   PathValueType extends Schema ? InferSchemaType<PathValueType> :
     PathValueType extends (infer Item)[] ?
       IfEquals<Item, never, any[], Item extends Schema ?
@@ -219,8 +257,8 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                           PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt ? bigint :
                                             PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
                                               IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
-                                                PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
-                                                  IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
+                                                PathValueType extends MapConstructor ? (UseHydratedType extends true ? Map<string, ResolvePathType<Options['of'], {}, DefaultSchemaOptions['typeKey'], UseHydratedType>> : Record<string, ResolvePathType<Options['of'], {}, DefaultSchemaOptions['typeKey'], UseHydratedType>>) :
+                                                  IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? (UseHydratedType extends true ? Map<string, ResolvePathType<Options['of'], {}, DefaultSchemaOptions['typeKey'], UseHydratedType>> : Record<string, ResolvePathType<Options['of'], {}, DefaultSchemaOptions['typeKey'], UseHydratedType>>) :
                                                     PathValueType extends ArrayConstructor ? any[] :
                                                       PathValueType extends typeof Schema.Types.Mixed ? any:
                                                         IfEquals<PathValueType, ObjectConstructor> extends true ? any:

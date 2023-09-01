@@ -180,7 +180,7 @@ declare module 'mongoose' {
   type QueryOpThatReturnsDocument = 'find' | 'findOne' | 'findOneAndUpdate' | 'findOneAndReplace' | 'findOneAndDelete';
 
   type GetLeanResultType<RawDocType, ResultType, QueryOp> = QueryOp extends QueryOpThatReturnsDocument
-    ? (ResultType extends any[] ? Require_id<FlattenMaps<RawDocType>>[] : Require_id<FlattenMaps<RawDocType>>)
+    ? (ResultType extends any[] ? Require_id<RawDocType>[] : Require_id<RawDocType>)
     : ResultType;
 
   class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType, QueryOp = 'find'> implements SessionOperation {

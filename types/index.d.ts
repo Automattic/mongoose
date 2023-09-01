@@ -79,16 +79,16 @@ declare module 'mongoose' {
     collection?: string,
     options?: CompileModelOptions
   ): Model<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-  HydratedDocument<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
-  >,
-  TSchema
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    HydratedDocument<
+      InferSchemaType<TSchema>,
+      ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+      ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
+    >,
+    TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
@@ -230,7 +230,11 @@ declare module 'mongoose' {
       ObtainDocumentType<any, EnforcedDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
-    THydratedDocumentType = HydratedDocument<DocType, TVirtuals & TInstanceMethods>
+    THydratedDocumentType = InferHydratedDocumentType<
+      DocType,
+      EnforcedDocType,
+      ResolveSchemaOptions<TSchemaOptions>
+    > //HydratedDocument<DocType, TVirtuals & TInstanceMethods>
   >
     extends events.EventEmitter {
     /**
@@ -658,7 +662,7 @@ declare module 'mongoose' {
   type FlattenProperty<T> = T extends Map<any, infer V>
     ? Record<string, V> : T extends TreatAsPrimitives
       ? T : T extends Types.DocumentArray<infer ItemType>
-        ? Types.DocumentArray<FlattenMaps<ItemType>> : FlattenMaps<T>;
+        ? Types.DocumentArray<ItemType> : T;
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function;

@@ -15,7 +15,8 @@ import {
   SchemaType,
   Types,
   Query,
-  model
+  model,
+  InferHydratedDocumentType
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
@@ -403,8 +404,8 @@ export function autoTypedSchema() {
     objectId2?: Types.ObjectId;
     objectId3?: Types.ObjectId;
     customSchema?: Int8;
-    map1?: Map<string, string>;
-    map2?: Map<string, number>;
+    map1?: Record<string, string>;
+    map2?: Record<string, number>;
     array1: string[];
     array2: any[];
     array3: any[];
@@ -1132,6 +1133,11 @@ function maps() {
     myMap: { type: Schema.Types.Map, of: Number, required: true }
   });
   const Test = model('Test', schema);
+
+  type Test1 = ObtainSchemaGeneric<typeof schema, 'DocType'>;
+  expectType<Record<string, number>>({} as Test1['myMap']);
+  type THydratedDocumentType = InferHydratedDocumentType<typeof schema>;
+  expectType<Map<string, number>>({} as THydratedDocumentType['myMap']);
 
   const doc = new Test({ myMap: { answer: 42 } });
   expectType<Map<string, number>>(doc.myMap);

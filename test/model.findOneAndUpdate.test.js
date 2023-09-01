@@ -2184,4 +2184,20 @@ describe('model: findOneAndUpdate:', function() {
       /Cannot set `rawResult` option when `includeResultMetadata` is false/
     );
   });
+
+  it('successfully runs findOneAndUpdate with no update and versionKey set to false (gh-13783)', async function() {
+    const exampleSchema = new mongoose.Schema({
+      name: String
+    }, { versionKey: false });
+
+    const ExampleModel = db.model('Example', exampleSchema);
+
+    const document = await ExampleModel.findOneAndUpdate(
+      { name: 'test' },
+      {},
+      { upsert: true, returnDocument: 'after', returnOriginal: false }
+    );
+    assert.ok(document);
+    assert.equal(document.name, 'test');
+  });
 });

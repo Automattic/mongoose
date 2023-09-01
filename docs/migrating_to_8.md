@@ -34,7 +34,7 @@ const res = await Character.findOneAndUpdate(filter, update, {
 
 `includeResultMetadata` in Mongoose 8 behaves identically to `rawResult`.
 
-<h2 id="mongodb-node-driver-6"><a href="#mongodb-node-driver-6">Changed behavior for <code>findOneAndUpdate()</code> with <code>orFail()</code> and upsert</a></h2>
+<h2 id="changed-behavior-for-findoneandupdate-with-orfail-and-upsert"><a href="#changed-behavior-for-findoneandupdate-with-orfail-and-upsert">Changed behavior for <code>findOneAndUpdate()</code> with <code>orFail()</code> and upsert</a></h2>
 
 In Mongoose 7, `findOneAndUpdate(filter, update, { upsert: true }).orFail()` would throw a `DocumentNotFoundError` if a new document was upserted.
 In other words, `findOneAndUpdate().orFail()` always threw an error if no document was found, even if a new document was upserted.

@@ -1007,7 +1007,7 @@ function gh12869() {
 
   const dbExample = new Schema(
     {
-      active: { type: String, enum: ['foo', 'bar'], required: true }
+      active: { type: String, enum: ['foo', 'bar'] as ['foo', 'bar'], required: true }
     }
   );
 
@@ -1031,7 +1031,7 @@ function gh12882() {
   const arrNum = new Schema({
     fooArray: {
       type: [{
-        type: 'Number',
+        type: 'Number' as const,
         required: true
       }],
       required: true

@@ -79,16 +79,16 @@ declare module 'mongoose' {
     collection?: string,
     options?: CompileModelOptions
   ): Model<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-  HydratedDocument<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
-  >,
-  TSchema
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    HydratedDocument<
+      InferSchemaType<TSchema>,
+      ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+      ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
+    >,
+    TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
@@ -223,11 +223,12 @@ declare module 'mongoose' {
     TVirtuals = {},
     TStaticMethods = {},
     TSchemaOptions = DefaultSchemaOptions,
+    TSchemaDefinition = any,
     DocType extends ApplySchemaOptions<
-      ObtainDocumentType<DocType, EnforcedDocType, ResolveSchemaOptions<TSchemaOptions>>,
+      ObtainDocumentType<TSchemaDefinition, EnforcedDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     > = ApplySchemaOptions<
-      ObtainDocumentType<any, EnforcedDocType, ResolveSchemaOptions<TSchemaOptions>>,
+      ObtainDocumentType<TSchemaDefinition, EnforcedDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
     THydratedDocumentType = HydratedDocument<DocType, TVirtuals & TInstanceMethods>
@@ -236,7 +237,7 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<DocType, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
+    constructor(definition?: TSchemaDefinition, options?: SchemaOptions<DocType, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
@@ -300,7 +301,7 @@ declare module 'mongoose' {
     methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] } & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>>;
+    obj: TSchemaDefinition;
 
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType<any, THydratedDocumentType>>(path: string): ResultType;

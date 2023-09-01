@@ -1,7 +1,7 @@
 import { Schema, model, Model, Types } from 'mongoose';
 import { expectType } from 'tsd';
 
-const schema = new Schema({ name: { type: 'String' } });
+const schema = new Schema({ name: { type: 'String' as const } });
 
 const Test = model('Test', schema);
 
@@ -20,3 +20,5 @@ Test.find().cursor().
     expectType<number>(i);
   }).
   then(() => console.log('Done!'));
+
+expectType<{ name: { type: 'String' } }>(schema.obj);

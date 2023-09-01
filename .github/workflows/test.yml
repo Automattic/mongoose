@@ -56,6 +56,7 @@ jobs:
     env:
       MONGOMS_VERSION: ${{ matrix.mongodb }}
       MONGOMS_PREFER_GLOBAL_PATH: 1
+      FORCE_COLOR: true
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
@@ -91,6 +92,7 @@ jobs:
     env:
       MONGOMS_VERSION: 6.0.4
       MONGOMS_PREFER_GLOBAL_PATH: 1
+      FORCE_COLOR: true
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       - name: Setup node
@@ -117,6 +119,8 @@ jobs:
       - test
     runs-on: ubuntu-latest
     name: Replica Set tests
+    env:
+      FORCE_COLOR: true
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       - name: Setup node

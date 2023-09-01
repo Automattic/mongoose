@@ -28,6 +28,7 @@ declare module 'mongoose' {
     | PipelineStage.ReplaceWith
     | PipelineStage.Sample
     | PipelineStage.Search
+    | PipelineStage.SearchMeta
     | PipelineStage.Set
     | PipelineStage.SetWindowFields
     | PipelineStage.Skip
@@ -228,6 +229,20 @@ declare module 'mongoose' {
     export interface Search {
       /** [`$search` reference](https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/) */
       $search: {
+        index?: string;
+        highlight?: {
+          /** [`highlightPath` reference](https://docs.atlas.mongodb.com/atlas-search/path-construction/#multiple-field-search) */
+          path: string | string[] | { value: string, multi: string };
+          maxCharsToExamine?: number;
+          maxNumPassages?: number;
+        };
+        [operator: string]: any;
+      }
+    }
+
+    export interface SearchMeta {
+      /** [`$searchMeta` reference](https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/#mongodb-pipeline-pipe.-searchMeta) */
+      $searchMeta: {
         index?: string;
         highlight?: {
           /** [`highlightPath` reference](https://docs.atlas.mongodb.com/atlas-search/path-construction/#multiple-field-search) */

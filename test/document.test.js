@@ -3188,13 +3188,6 @@ describe('document', function() {
       assert.equal(doc.child.name, 'Anakin');
     });
 
-    it('strings of length 12 are valid oids (gh-3365)', async function() {
-      const schema = new Schema({ myId: mongoose.Schema.Types.ObjectId });
-      const M = db.model('Test', schema);
-      const doc = new M({ myId: 'blablablabla' });
-      await doc.validate();
-    });
-
     it('set() empty obj unmodifies subpaths (gh-4182)', async function() {
       const omeletteSchema = new Schema({
         topping: {

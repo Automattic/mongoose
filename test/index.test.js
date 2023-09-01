@@ -466,7 +466,7 @@ describe('mongoose module:', function() {
 
     const M = mongoose.model('gh6760', schema);
 
-    const doc = new M({ testId: 'length12str0', testNum: 123, mixed: {} });
+    const doc = new M({ testId: '0'.repeat(24), testNum: 123, mixed: {} });
 
     assert.ok(doc.testId instanceof mongoose.Types.ObjectId);
     assert.ok(doc.testNum instanceof mongoose.Types.Decimal128);
@@ -920,7 +920,7 @@ describe('mongoose module:', function() {
       const goodIdString = '1'.repeat(24);
       assert.deepStrictEqual(mongoose.isValidObjectId(goodIdString), true);
       const goodIdString2 = '1'.repeat(12);
-      assert.deepStrictEqual(mongoose.isValidObjectId(goodIdString2), true);
+      assert.deepStrictEqual(mongoose.isValidObjectId(goodIdString2), false);
     });
     it('Allows a syncIndexes shorthand mongoose.syncIndexes (gh-10893)', async function() {
       const m = new mongoose.Mongoose();

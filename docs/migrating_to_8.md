@@ -16,7 +16,7 @@ If you're still on Mongoose 6.x or earlier, please read the [Mongoose 6.x to 7.x
 * [MongoDB Node Driver 6.0](#mongodb-node-driver-6)
 * [Removed `findOneAndRemove()`](#removed-findoneandremove)
 
-<h2 id="removed-rawresult-option-for-findoneandupdate"><a href="#removed-rawresult-option-for-findoneandupdate">Removed `rawResult` option for <code>findOneAndUpdate()</code></a></h2>
+<h2 id="removed-rawresult-option-for-findoneandupdate"><a href="#removed-rawresult-option-for-findoneandupdate">Removed <code>rawResult</code> option for <code>findOneAndUpdate()</code></a></h2>
 
 The `rawResult` option for `findOneAndUpdate()`, `findOneAndReplace()`, and `findOneAndDelete()` has been replaced by the `includeResultMetadata` option.
 

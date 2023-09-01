@@ -41,7 +41,7 @@ describe('SchemaType.cast() (gh-7045)', function() {
 
     let threw = false;
     try {
-      objectid.cast('special');
+      baseObjectId.cast('special');
     } catch (error) {
       threw = true;
       assert.equal(error.name, 'CastError');
@@ -49,7 +49,7 @@ describe('SchemaType.cast() (gh-7045)', function() {
 
     assert.doesNotThrow(function() {
       objectid.cast('000000000000000000000000');
-      baseObjectId.cast('special');
+      objectid.cast('special');
       baseObjectId.cast('000000000000000000000000');
     });
 

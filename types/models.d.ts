@@ -473,13 +473,6 @@ declare module 'mongoose' {
       TRawDocType,
       'findOne'
     >;
-    exists(filter: FilterQuery<TRawDocType>): QueryWithHelpers<
-      { _id: InferId<TRawDocType> } | null,
-      THydratedDocumentType,
-      TQueryHelpers,
-      TRawDocType,
-      'findOne'
-    >;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find<ResultDoc = THydratedDocumentType>(

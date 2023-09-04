@@ -1183,3 +1183,34 @@ function gh13780() {
   type InferredType = InferSchemaType<typeof schema>;
   expectType<bigint | undefined>(null as unknown as InferredType['num']);
 }
+
+function gh13800() {
+  interface IUser {
+    firstName: string;
+    lastName: string;
+    someOtherField: string;
+  }
+  interface IUserMethods {
+    fullName(): string;
+  }
+  type UserModel = Model<IUser, {}, IUserMethods>;
+
+  // Typed Schema
+  const schema = new Schema<IUser, UserModel, IUserMethods>({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true }
+  });
+  schema.method('fullName', function fullName() {
+     type This = typeof this;
+     expectType<IUser>(this);
+  });
+
+  // Auto Typed Schema
+  const autoTypedSchema = new Schema({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true }
+  });
+  autoTypedSchema.method('fullName', function fullName() {
+    expectType<Omit<IUser, 'someOtherField'>>(this);
+  });
+}

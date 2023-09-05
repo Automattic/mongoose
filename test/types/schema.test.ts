@@ -1201,7 +1201,10 @@ function gh13800() {
     lastName: { type: String, required: true }
   });
   schema.method('fullName', function fullName() {
-    expectType<IUser>(this);
+    expectType<string>(this.firstName);
+    expectType<string>(this.lastName);
+    expectType<string>(this.someOtherField);
+    expectType<IUserMethods['fullName']>(this.fullName);
   });
 
   // Auto Typed Schema
@@ -1210,6 +1213,8 @@ function gh13800() {
     lastName: { type: String, required: true }
   });
   autoTypedSchema.method('fullName', function fullName() {
-    expectType<Omit<IUser, 'someOtherField'>>(this);
+    expectType<string>(this.firstName);
+    expectType<string>(this.lastName);
+    expectError<string>(this.someOtherField);
   });
 }

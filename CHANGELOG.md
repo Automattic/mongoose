@@ -1,5 +1,6 @@
 7.5.0 / 2023-08-29
 ==================
+ * feat: use mongodb driver v5.18.1
  * feat: allow top level dollar keys with findOneAndUpdate(), update() for MongoDB 5 #13786
  * fix(document): make array getters avoid unintentionally modifying array, defer getters until index access instead #13774
  * feat: deprecate `overwrite` option for findOneAndUpdate() #13578

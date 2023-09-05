@@ -1201,8 +1201,7 @@ function gh13800() {
     lastName: { type: String, required: true }
   });
   schema.method('fullName', function fullName() {
-     type This = typeof this;
-     expectType<IUser>(this);
+    expectType<IUser>(this);
   });
 
   // Auto Typed Schema

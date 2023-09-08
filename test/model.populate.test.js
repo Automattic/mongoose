@@ -10291,8 +10291,8 @@ describe('model: populate:', function() {
         {
           doc: { type: mongoose.Schema.Types.ObjectId, ref: 'Child' },
           name: String
-        },
-    ]
+        }
+      ]
     });
     const Parent = db.model('Parent', schema);
     const Child = db.model('Child', new Schema({ name: String }));

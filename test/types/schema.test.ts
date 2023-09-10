@@ -1223,5 +1223,10 @@ async function gh13797() {
   interface IUser {
     name: string;
   }
-  const schema2 = new Schema<IUser>({ name: { type: String, required: function () { expectType<IUser>(this); return true } } });
+  new Schema<IUser>({ name: { type: String, required: function() {
+    expectType<IUser>(this); return true;
+  } } });
+  new Schema<IUser>({ name: { type: String, default: function() {
+    expectType<IUser>(this); return '';
+  } } });
 }

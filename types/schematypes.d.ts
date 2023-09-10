@@ -39,7 +39,7 @@ declare module 'mongoose' {
 
   type DefaultType<T> = T extends Schema.Types.Mixed ? any : Partial<ExtractMongooseArray<T>>;
 
-  class SchemaTypeOptions<T, EnforcedDocType = {}> {
+  class SchemaTypeOptions<T, EnforcedDocType = any> {
     type?:
     T extends string ? StringSchemaDefinition :
       T extends number ? NumberSchemaDefinition :

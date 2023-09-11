@@ -56,11 +56,9 @@ module.exports = function(options) {
   } else {
     uri = module.exports.uri;
   }
-
   const noErrorListener = !!options.noErrorListener;
   delete options.noErrorListener;
   options.enableUtf8Validation = false;
-
   const conn = mongoose.createConnection(uri, options);
 
   const model = conn.model;

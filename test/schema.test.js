@@ -3135,4 +3135,21 @@ describe('schema', function() {
     const res = await Test.findOne({ _id: { $eq: doc._id, $type: 'objectId' } });
     assert.equal(res.name, 'Test Testerson');
   });
+  it('should not persist an empty object property to the db (gh-13782)', async function() {
+    const testSchema = new Schema({
+      metadata: {
+        type: {},
+        default: {},
+        required: true,
+        _id: false
+      }
+    }, { minimize: true });
+    const Test = db.model('gh13728', testSchema);
+    const doc = new Test({ metadata: {} });
+    await doc.save();
+    const res = await Test.findById(doc._id).exec();
+    res.metadata = {};
+    await res.save();
+    assert.equal(res.$isEmpty('metadata'), true);
+  });
 });

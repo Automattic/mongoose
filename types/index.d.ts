@@ -293,7 +293,7 @@ declare module 'mongoose' {
     loadClass(model: Function, onlyVirtuals?: boolean): this;
 
     /** Adds an instance method to documents constructed from Models compiled from this schema. */
-    method<Context = any>(name: string, fn: (this: Context, ...args: any[]) => any, opts?: any): this;
+    method<Context = THydratedDocumentType>(name: string, fn: (this: Context, ...args: any[]) => any, opts?: any): this;
     method(obj: Partial<TInstanceMethods>): this;
 
     /** Object of currently defined methods on this schema. */

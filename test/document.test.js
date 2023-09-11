@@ -12408,7 +12408,7 @@ describe('document', function() {
     assert.strictEqual(nestedProjectionDoc.sub.propertyA, 'A');
   });
 
-  it('should ignore `id` if the object contains `id` and `_id` as keys (gh-13762)', async function () {
+  it('should ignore `id` if the object contains `id` and `_id` as keys (gh-13762)', async function() {
     const testSchema = new Schema({
       _id: {
         type: Number
@@ -12416,7 +12416,7 @@ describe('document', function() {
     });
     const Test = db.model('Test', testSchema);
 
-    const x = new Test({ _id: 1, id: 2});
+    const x = new Test({ _id: 1, id: 2 });
     await x.save();
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb._id, 1);
@@ -12435,7 +12435,7 @@ describe('document', function() {
 
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb._id, 1);
-  })
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

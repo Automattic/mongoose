@@ -12413,7 +12413,7 @@ describe('document', function() {
       _id: {
         type: Number
       }
-    }, { _id: false, id: false });
+    });
     const Test = db.model('Test', testSchema);
 
     const x = new Test({ _id: 1, id: 2});
@@ -12421,6 +12421,21 @@ describe('document', function() {
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb._id, 1);
   });
+  it('should ignore `id` if settings with an object that contains `_id` and `id` (gh-13672)', async function() {
+    const testSchema = new Schema({
+      _id: {
+        type: Number
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const x = new Test();
+    x.set('_id', { _id: 1, id: 2 });
+    await x.save();
+
+    const fromDb = await Test.findById(x._id).lean();
+    assert.equal(fromDb._id, 1);
+  })
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

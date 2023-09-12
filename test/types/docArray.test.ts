@@ -45,7 +45,7 @@ function gh13087() {
         required: true,
         type: [Number] // [longitude, latitude]
       }
-    },
+    } as const,
     { _id: false }
   );
 

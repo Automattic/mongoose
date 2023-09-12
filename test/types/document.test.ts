@@ -230,6 +230,12 @@ async function gh11960() {
 
   type ParentModelType = Model<Parent, {}, {}, {}, ParentDocument>;
 
+  const schemaDefinition = {
+    username: { type: String },
+    map: { type: Map, of: String },
+    nested: { type: NestedSchema },
+    nestedArray: [{ type: NestedSchema }]
+  } as const;
   const ParentSchema = new Schema<
   Parent,
   ParentModelType,
@@ -238,6 +244,7 @@ async function gh11960() {
   {},
   {},
   DefaultSchemaOptions,
+  typeof schemaDefinition,
   Parent,
   ParentDocument
   >({

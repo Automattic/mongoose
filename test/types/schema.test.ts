@@ -463,7 +463,7 @@ export function autoTypedSchema() {
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
     decimal3: 'decimal128'
-  });
+  } as const);
 
   type InferredTestSchemaType = InferSchemaType<typeof TestSchema>;
 
@@ -483,7 +483,7 @@ export function autoTypedSchema() {
   const AutoTypedSchema = new Schema({
     userName: {
       type: String,
-      required: [true, 'userName is required']
+      required: [true, 'userName is required'] as [true, string]
     },
     description: String,
     nested: new Schema({
@@ -519,7 +519,7 @@ export function autoTypedSchema() {
         })
       ]
     }
-  }, {
+  } as const, {
     statics: {
       staticFn() {
         expectType<Model<InferSchemaType<typeof AutoTypedSchema>>>(this);
@@ -558,8 +558,8 @@ export type AutoTypedSchemaType = {
       date: Date;
       messages?: number;
     }>
-  }
-  , statics: {
+  },
+  statics: {
     staticFn: () => 'Returned from staticFn'
   },
   methods: {
@@ -760,7 +760,7 @@ function pluginOptions() {
   }
 
   const schema = new Schema({});
-  expectType<Schema<any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
+  expectAssignable<Schema<any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
 
   // could not add strict tests that the parameters are inferred correctly, because i dont know how this would be done in tsd
 

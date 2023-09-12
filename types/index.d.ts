@@ -223,7 +223,7 @@ declare module 'mongoose' {
     TVirtuals = {},
     TStaticMethods = {},
     TSchemaOptions = DefaultSchemaOptions,
-    TSchemaDefinition = any,
+    TSchemaDefinition extends SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> = any,
     DocType extends ApplySchemaOptions<
       ObtainDocumentType<TSchemaDefinition, EnforcedDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>

@@ -95,14 +95,15 @@ async function autoTypedVirtuals() {
   const testSchema = new Schema({
     email: {
       type: String,
-      required: [true, 'email is required']
+      required: [true, 'email is required'] as [true, string]
     }
   }, {
     virtuals: {
       domain: {
         get() {
           expectType<Document<any, any, { email: string }> & AutoTypedSchemaType>(this);
-          return this.email.slice(this.email.indexOf('@') + 1);
+          const email = this.email;
+          return email.slice(email.indexOf('@') + 1);
         },
         set() {
           expectType<Document<any, any, AutoTypedSchemaType> & AutoTypedSchemaType>(this);

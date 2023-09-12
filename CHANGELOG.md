@@ -1,3 +1,12 @@
+7.5.1 / 2023-09-11
+==================
+ * fix: set default value for _update when no update object is provided and versionKey is set to false #13795 #13783 [MohOraby](https://github.com/MohOraby)
+ * fix: avoid unexpected error when accessing null array element on discriminator array when populating #13716 [ZSabakh](https://github.com/ZSabakh)
+ * types(schematypes): use DocType for instance method this #13822 #13800 [pshaddel](https://github.com/pshaddel)
+ * types: remove duplicated 'exists' method in Model interface in models.d.ts #13818 [ohzeno](https://github.com/ohzeno)
+ * docs(model): replace outdated docs on deprecated findOneAndUpdate() overwrite option #13821 #13715
+ * docs: add example of using `virtuals.pathsToSkip` option for `toObject()` and `toJSON()` #13798 [RobertHunter-Pluto](https://github.com/RobertHunter-Pluto)
+
 7.5.0 / 2023-08-29
 ==================
  * feat: use mongodb driver v5.18.1

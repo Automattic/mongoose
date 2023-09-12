@@ -77,7 +77,7 @@ declare module 'mongoose' {
 
 type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined } ?
   true :
-  PathType extends { default: (...args: any[]) => undefined } ?
+  PathType extends { default: (this: any, ...args: any[]) => undefined } ?
     true :
     false;
 

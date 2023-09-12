@@ -596,17 +596,24 @@ function gh11828() {
     }
   };
 
-  new Schema<IUser>({
+  const schema = new Schema<IUser>({
     name: { type: String, default: () => 'Hafez' },
     age: { type: Number, default: () => 27 },
     bornAt: { type: Date, default: () => new Date() },
     isActive: {
       type: Boolean,
-      default(): boolean {
+      default(this: HydratedDocument<IUser>): boolean {
         return this.name === 'Hafez';
       }
     }
   });
+
+  const UserModel = model<IUser>('User', schema);
+  const doc = new UserModel();
+  expectType<string>(doc.name);
+  expectType<number>(doc.age);
+  expectType<Date>(doc.bornAt);
+  expectType<boolean>(doc.isActive);
 }
 
 function gh11997() {
@@ -1151,6 +1158,32 @@ function gh13514() {
   const Test = model('Test', schema);
 
   const doc = new Test({ email: 'bar' });
+  const str: string = doc.email;
+}
+
+function defaultFn() {
+  const schema = new Schema({
+    name: String,
+    email: {
+      type: String,
+      default() {
+        return this.name + '@test.com';
+      }
+    }
+  });
+  type X = ObtainSchemaGeneric<typeof schema, 'DocType'>;
+  const x: X = {
+    name: String,
+    email: {
+      type: String,
+      default() {
+        return this.name + '@test.com';
+      }
+    }
+  }
+  const Test = model('Test', schema);
+
+  const doc = new Test({ name: 'john' });
   const str: string = doc.email;
 }
 

@@ -16,6 +16,9 @@ async function gh10293() {
   });
 
   const TestModel = model('gh10293TestModel', testSchema);
+  const doc = new TestModel();
+  expectType<string>(doc.name);
+  expectType<string[][]>(doc.arrayOfArray);
 
   testSchema.methods.getArrayOfArray = function(this: InstanceType<typeof TestModel>): string[][] { // <-- function to return Array of Array
     const test = this.toObject();

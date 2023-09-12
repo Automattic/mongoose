@@ -1166,21 +1166,12 @@ function defaultFn() {
     name: String,
     email: {
       type: String,
-      default() {
+      // Requires `this: any` even in 7.0.
+      default(this: any) {
         return this.name + '@test.com';
       }
     }
   });
-  type X = ObtainSchemaGeneric<typeof schema, 'DocType'>;
-  const x: X = {
-    name: String,
-    email: {
-      type: String,
-      default() {
-        return this.name + '@test.com';
-      }
-    }
-  }
   const Test = model('Test', schema);
 
   const doc = new Test({ name: 'john' });

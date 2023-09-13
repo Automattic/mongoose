@@ -3145,11 +3145,14 @@ describe('schema', function() {
       }
     }, { minimize: true });
     const Test = db.model('gh13728', testSchema);
+    console.log('before creation')
     const doc = new Test({ metadata: {} });
     await doc.save();
+    console.log('after save1');
     const res = await Test.findById(doc._id).exec();
     res.metadata = {};
     await res.save();
+    console.log('after save 2')
     assert.equal(res.$isEmpty('metadata'), true);
   });
 });

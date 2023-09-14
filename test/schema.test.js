@@ -1437,7 +1437,7 @@ describe('schema', function() {
         }
       };
       const s = new Schema(TestSchema, { typeKey: '$type' });
-      assert.equal(s.path('action').constructor.name, 'SubdocumentPath');
+      assert.equal(s.path('action').constructor.name, 'SchemaSubdocument');
       assert.ok(s.path('action').schema.$implicitlyCreated);
       assert.equal(s.path('action.type').constructor.name, 'SchemaString');
     });

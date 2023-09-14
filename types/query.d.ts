@@ -317,10 +317,10 @@ declare module 'mongoose' {
     deleteOne(): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne'>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct<ReturnType = any>(
-      field: string,
+    distinct<DocKey extends string, ResultType = unknown>(
+      field: DocKey,
       filter?: FilterQuery<DocType>
-    ): QueryWithHelpers<Array<ReturnType>, DocType, THelpers, RawDocType, 'distinct'>;
+    ): QueryWithHelpers<Array<DocKey extends keyof DocType ? DocType[DocKey] : ResultType>, DocType, THelpers, RawDocType, 'distinct'>;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     elemMatch<K = string>(path: K, val: any): this;

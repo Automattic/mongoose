@@ -6,7 +6,7 @@
 
 const start = require('./common');
 
-const STATES = require('../lib/connectionstate');
+const STATES = require('../lib/connectionState');
 const Q = require('q');
 const assert = require('assert');
 const mongodb = require('mongodb');

@@ -12407,6 +12407,35 @@ describe('document', function() {
     const nestedProjectionDoc = await User.findOne({}, { name: 1, 'sub.propertyA': 1, 'sub.propertyB': 1 });
     assert.strictEqual(nestedProjectionDoc.sub.propertyA, 'A');
   });
+
+  it('should ignore `id` if the object contains `id` and `_id` as keys (gh-13762)', async function() {
+    const testSchema = new Schema({
+      _id: {
+        type: Number
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const x = new Test({ _id: 1, id: 2 });
+    await x.save();
+    const fromDb = await Test.findById(x._id).lean();
+    assert.equal(fromDb._id, 1);
+  });
+  it('should ignore `id` if settings with an object that contains `_id` and `id` (gh-13672)', async function() {
+    const testSchema = new Schema({
+      _id: {
+        type: Number
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const x = new Test();
+    x.set('_id', { _id: 1, id: 2 });
+    await x.save();
+
+    const fromDb = await Test.findById(x._id).lean();
+    assert.equal(fromDb._id, 1);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

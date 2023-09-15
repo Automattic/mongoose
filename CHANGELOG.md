@@ -1,3 +1,10 @@
+7.5.2 / 2023-09-15
+==================
+ * fix(schema): handle number discriminator keys when using Schema.prototype.discriminator() #13858 #13788
+ * fix: ignore `id` property when calling `set()` with both `id` and `_id` specified to avoid `id` setter overwriting #13762
+ * types: pass correct document type to required and default function #13851 #13797
+ * docs(model): add examples of using diffIndexes() to syncIndexes()and diffIndexes() api docs #13850 #13771
+
 7.5.1 / 2023-09-11
 ==================
  * fix: set default value for _update when no update object is provided and versionKey is set to false #13795 #13783 [MohOraby](https://github.com/MohOraby)

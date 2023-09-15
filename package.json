@@ -19,9 +19,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "bson": "^5.4.0",
+    "bson": "^6.0.0",
     "kareem": "2.5.1",
-    "mongodb": "5.8.1",
+    "mongodb": "6.0.0",
     "mpath": "0.9.0",
     "mquery": "5.0.0",
     "ms": "2.1.3",
@@ -119,7 +119,7 @@
   "main": "./index.js",
   "types": "./types/index.d.ts",
   "engines": {
-    "node": ">=14.20.1"
+    "node": ">=16.20.1"
   },
   "bugs": {
     "url": "https://github.com/Automattic/mongoose/issues/new"

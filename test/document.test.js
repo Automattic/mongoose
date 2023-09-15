@@ -1945,7 +1945,7 @@ describe('document', function() {
       const Person = db.model('Person', personSchema);
 
       const createdPerson = await Person.create({ name: 'Hafez' });
-      const removedPerson = await Person.findOneAndRemove({ _id: createdPerson._id });
+      const removedPerson = await Person.findOneAndDelete({ _id: createdPerson._id });
 
       removedPerson.isNew = true;
 
@@ -3186,13 +3186,6 @@ describe('document', function() {
       const arr = doc.children.toObject().map(function(v) { return v.name; });
       assert.deepEqual(arr, ['Jacen', 'Jaina']);
       assert.equal(doc.child.name, 'Anakin');
-    });
-
-    it('strings of length 12 are valid oids (gh-3365)', async function() {
-      const schema = new Schema({ myId: mongoose.Schema.Types.ObjectId });
-      const M = db.model('Test', schema);
-      const doc = new M({ myId: 'blablablabla' });
-      await doc.validate();
     });
 
     it('set() empty obj unmodifies subpaths (gh-4182)', async function() {

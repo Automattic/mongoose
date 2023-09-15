@@ -2895,7 +2895,6 @@ describe('schema', function() {
     NumberTyped.type = 2;
 
     class StringTyped extends BaseClass {
-
       whoAmI() {
         return 'I am StringTyped';
       }

@@ -443,8 +443,11 @@ declare module 'mongoose' {
     translateAliases(raw: any): any;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct<ReturnType = any>(field: string, filter?: FilterQuery<TRawDocType>): QueryWithHelpers<
-      Array<ReturnType>,
+    distinct<DocKey extends string, ResultType = unknown>(
+      field: DocKey,
+      filter?: FilterQuery<TRawDocType>
+    ): QueryWithHelpers<
+      Array<DocKey extends keyof TRawDocType ? TRawDocType[DocKey] : ResultType>,
       THydratedDocumentType,
       TQueryHelpers,
       TRawDocType,
@@ -467,13 +470,6 @@ declare module 'mongoose' {
     exists(
       filter: FilterQuery<TRawDocType>
     ): QueryWithHelpers<
-      { _id: InferId<TRawDocType> } | null,
-      THydratedDocumentType,
-      TQueryHelpers,
-      TRawDocType,
-      'findOne'
-    >;
-    exists(filter: FilterQuery<TRawDocType>): QueryWithHelpers<
       { _id: InferId<TRawDocType> } | null,
       THydratedDocumentType,
       TQueryHelpers,

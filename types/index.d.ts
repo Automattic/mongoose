@@ -236,7 +236,7 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<DocType, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>, EnforcedDocType> | DocType, options?: SchemaOptions<DocType, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
@@ -293,14 +293,14 @@ declare module 'mongoose' {
     loadClass(model: Function, onlyVirtuals?: boolean): this;
 
     /** Adds an instance method to documents constructed from Models compiled from this schema. */
-    method<Context = any>(name: string, fn: (this: Context, ...args: any[]) => any, opts?: any): this;
+    method<Context = THydratedDocumentType>(name: string, fn: (this: Context, ...args: any[]) => any, opts?: any): this;
     method(obj: Partial<TInstanceMethods>): this;
 
     /** Object of currently defined methods on this schema. */
     methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] } & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>>;
+    obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>, EnforcedDocType>;
 
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType<any, THydratedDocumentType>>(path: string): ResultType;
@@ -484,26 +484,26 @@ declare module 'mongoose' {
           ? DateSchemaDefinition
           : (Function | string);
 
-  export type SchemaDefinitionProperty<T = undefined> = SchemaDefinitionWithBuiltInClass<T> |
-  SchemaTypeOptions<T extends undefined ? any : T> |
+  export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any> = SchemaDefinitionWithBuiltInClass<T> |
+  SchemaTypeOptions<T extends undefined ? any : T, EnforcedDocType> |
     typeof SchemaType |
   Schema<any, any, any> |
   Schema<any, any, any>[] |
-  SchemaTypeOptions<T extends undefined ? any : Unpacked<T>>[] |
+  SchemaTypeOptions<T extends undefined ? any : Unpacked<T>, EnforcedDocType>[] |
   Function[] |
-  SchemaDefinition<T> |
-  SchemaDefinition<Unpacked<T>>[] |
+  SchemaDefinition<T, EnforcedDocType> |
+  SchemaDefinition<Unpacked<T>, EnforcedDocType>[] |
     typeof Schema.Types.Mixed |
-  MixedSchemaTypeOptions;
+  MixedSchemaTypeOptions<EnforcedDocType>;
 
-  export type SchemaDefinition<T = undefined> = T extends undefined
+  export type SchemaDefinition<T = undefined, EnforcedDocType = any> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
-    : { [path in keyof T]?: SchemaDefinitionProperty<T[path]>; };
+    : { [path in keyof T]?: SchemaDefinitionProperty<T[path], EnforcedDocType>; };
 
   export type AnyArray<T> = T[] | ReadonlyArray<T>;
   export type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;
 
-  export interface MixedSchemaTypeOptions extends SchemaTypeOptions<Schema.Types.Mixed> {
+  export interface MixedSchemaTypeOptions<EnforcedDocType> extends SchemaTypeOptions<Schema.Types.Mixed, EnforcedDocType> {
     type: typeof Schema.Types.Mixed;
   }
 

@@ -295,8 +295,9 @@ async function gh11306(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  expectType<any[]>(await MyModel.distinct('name'));
-  expectType<string[]>(await MyModel.distinct<string>('name'));
+  expectType<unknown[]>(await MyModel.distinct('notThereInSchema'));
+  expectType<string[]>(await MyModel.distinct('name'));
+  expectType<number[]>(await MyModel.distinct<'overrideTest', number>('overrideTest'));
 }
 
 function autoTypedQuery() {

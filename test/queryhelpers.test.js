@@ -4,7 +4,7 @@ require('./common');
 
 const Schema = require('../lib/schema');
 const assert = require('assert');
-const queryhelpers = require('../lib/queryhelpers');
+const queryhelpers = require('../lib/queryHelpers');
 
 describe('queryhelpers', function() {
   describe('applyPaths', function() {

@@ -153,10 +153,11 @@ describe('document', function() {
 
       const test = new Test({ x: 'test' });
       const doc = await test.save();
-      await doc.deleteOne();
+      const q = doc.deleteOne();
+      assert.ok(q instanceof mongoose.Query, `Expected query, got ${q.constructor.name}`);
+      await q;
       const found = await Test.findOne({ _id: doc._id });
       assert.strictEqual(found, null);
-
     });
   });
 
@@ -9819,7 +9820,7 @@ describe('document', function() {
     assert.ok(doc);
   });
 
-  it('Makes sure pre remove hook is executed gh-9885', async function() {
+  it('Makes sure pre deleteOne hook is executed (gh-9885)', async function() {
     const SubSchema = new Schema({
       myValue: {
         type: String
@@ -12406,6 +12407,35 @@ describe('document', function() {
     await User.updateMany({}, { $unset: { 'sub.propertyA': '' } });
     const nestedProjectionDoc = await User.findOne({}, { name: 1, 'sub.propertyA': 1, 'sub.propertyB': 1 });
     assert.strictEqual(nestedProjectionDoc.sub.propertyA, 'A');
+  });
+
+  it('should ignore `id` if the object contains `id` and `_id` as keys (gh-13762)', async function() {
+    const testSchema = new Schema({
+      _id: {
+        type: Number
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const x = new Test({ _id: 1, id: 2 });
+    await x.save();
+    const fromDb = await Test.findById(x._id).lean();
+    assert.equal(fromDb._id, 1);
+  });
+  it('should ignore `id` if settings with an object that contains `_id` and `id` (gh-13672)', async function() {
+    const testSchema = new Schema({
+      _id: {
+        type: Number
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const x = new Test();
+    x.set('_id', { _id: 1, id: 2 });
+    await x.save();
+
+    const fromDb = await Test.findById(x._id).lean();
+    assert.equal(fromDb._id, 1);
   });
 });
 

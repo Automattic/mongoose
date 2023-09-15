@@ -1218,3 +1218,15 @@ function gh13800() {
     expectError<string>(this.someOtherField);
   });
 }
+
+async function gh13797() {
+  interface IUser {
+    name: string;
+  }
+  new Schema<IUser>({ name: { type: String, required: function() {
+    expectType<IUser>(this); return true;
+  } } });
+  new Schema<IUser>({ name: { type: String, default: function() {
+    expectType<IUser>(this); return '';
+  } } });
+}

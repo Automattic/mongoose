@@ -1177,8 +1177,12 @@ describe('Model', function() {
     it('errors when id deselected (gh-3118)', async function() {
       await BlogPost.create({ title: 1 }, { title: 2 });
       const doc = await BlogPost.findOne({ title: 1 }, { _id: 0 });
-      const err = await doc.deleteOne().then(() => null, err => err);
-      assert.equal(err.message, 'No _id found on document!');
+      try {
+        await doc.deleteOne();
+        assert.ok(false);
+      } catch (err) {
+        assert.equal(err.message, 'No _id found on document!');
+      }
     });
 
     it('should not remove any records when deleting by id undefined', async function() {
@@ -2319,7 +2323,7 @@ describe('Model', function() {
       const title = 'interop ad-hoc as promise';
 
       const created = await BlogPost.create({ title: title });
-      const query = BlogPost.count({ title: title });
+      const query = BlogPost.countDocuments({ title: title });
       const found = await query.exec('findOne');
       assert.equal(found.id, created.id);
     });
@@ -5318,7 +5322,7 @@ describe('Model', function() {
         }
       ]);
 
-      const beforeExpirationCount = await Test.count({});
+      const beforeExpirationCount = await Test.countDocuments({});
       assert.ok(beforeExpirationCount === 12);
 
       let intervalid;
@@ -5332,7 +5336,7 @@ describe('Model', function() {
         // in case it happens faster, to reduce test time
         new Promise(resolve => {
           intervalid = setInterval(async() => {
-            const count = await Test.count({});
+            const count = await Test.countDocuments({});
             if (count === 0) {
               resolve();
             }
@@ -5342,7 +5346,7 @@ describe('Model', function() {
 
       clearInterval(intervalid);
 
-      const afterExpirationCount = await Test.count({});
+      const afterExpirationCount = await Test.countDocuments({});
       assert.equal(afterExpirationCount, 0);
     });
 
@@ -5472,7 +5476,6 @@ describe('Model', function() {
     await doc.deleteOne({ session });
     assert.equal(sessions.length, 1);
     assert.strictEqual(sessions[0], session);
-
   });
 
   it('set $session() before pre validate hooks run on bulkWrite and insertMany (gh-7769)', async function() {

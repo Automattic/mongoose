@@ -185,7 +185,7 @@ describe('pre/post hooks, type of this', function() {
     const MongooseDocumentMiddleware = [...MongooseDistinctDocumentMiddleware, ...MongooseQueryAndDocumentMiddleware];
 
     const MongooseDistinctQueryMiddleware = [
-      'count', 'estimatedDocumentCount', 'countDocuments',
+      'estimatedDocumentCount', 'countDocuments',
       'deleteMany', 'distinct',
       'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate',
       'replaceOne', 'updateMany'];
@@ -278,7 +278,6 @@ describe('pre/post hooks, type of this', function() {
       await doc.save(); // triggers save and validate hooks
 
       // MongooseDistinctQueryMiddleware
-      await Doc.count().exec();
       await Doc.estimatedDocumentCount().exec();
       await Doc.countDocuments().exec();
       await Doc.deleteMany().exec(); await Doc.create({ data: 'value' });

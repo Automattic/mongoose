@@ -388,7 +388,16 @@ Behaves like <code>remove()</code>, but deletes at most one document regardless 
 <p>This function triggers <code>deleteOne</code> query hooks. Read the
 <a href="/docs/middleware.html#naming">middleware docs</a> to learn more.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.diffIndexes()"><a href="#Model.diffIndexes()"><code>Model.diffIndexes()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><div><p>Does a dry-run of <code>Model.syncIndexes()</code>, returning the indexes that <code>syncIndexes()</code> would drop and create if you were to run <code>syncIndexes()</code>.</p>
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;Object&gt;&raquo;</span> contains the indexes that would be dropped in MongoDB and indexes that would be created in MongoDB as <code>{ toDrop: string[], toCreate: string[] }</code>.</li></ul><div><p>Does a dry-run of <code>Model.syncIndexes()</code>, returning the indexes that <code>syncIndexes()</code> would drop and create if you were to run <code>syncIndexes()</code>.</p>
+<h4 id="example">
+      <a href="#example">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> { toDrop, toCreate } = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">diffIndexes</span>();
+toDrop; <span class="hljs-comment">// Array of strings containing names of indexes that `syncIndexes()` will drop</span>
+toCreate; <span class="hljs-comment">// Array of strings containing names of indexes that `syncIndexes()` will create</span>
+</code></pre>
   </div><hr class="separate-api-elements"><h3 id="Model.discriminator()"><a href="#Model.discriminator()"><code>Model.discriminator()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
 <span class="method-type">&laquo;String&raquo;</span> discriminator model name</p>
 </li><li class="param"><code>schema</code>
@@ -1268,6 +1277,19 @@ for more information.</p>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Customer</span>.<span class="hljs-property">collection</span>.<span class="hljs-title function_">createIndex</span>({ <span class="hljs-attr">age</span>: <span class="hljs-number">1</span> }); <span class="hljs-comment">// Index is not in schema</span>
 <span class="hljs-comment">// Will drop the &#x27;age&#x27; index and create an index on `name`</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Customer</span>.<span class="hljs-title function_">syncIndexes</span>();
+</code></pre>
+<p>You should be careful about running <code>syncIndexes()</code> on production applications under heavy load,
+because index builds are expensive operations, and unexpected index drops can lead to degraded
+performance. Before running <code>syncIndexes()</code>, you can use the <a href="#Model.diffIndexes()"><code>diffIndexes()</code> function</a>
+to check what indexes <code>syncIndexes()</code> will drop and create.</p>
+<h4 id="example-1">
+      <a href="#example-1">
+        Example:
+      </a>
+    </h4>
+<pre><code><span class="hljs-keyword">const</span> { toDrop, toCreate } = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">diffIndexes</span>();
+toDrop; <span class="hljs-comment">// Array of strings containing names of indexes that `syncIndexes()` will drop</span>
+toCreate; <span class="hljs-comment">// Array of strings containing names of indexes that `syncIndexes()` will create</span>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="Model.translateAliases()"><a href="#Model.translateAliases()"><code>Model.translateAliases()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fields</code>
 <span class="method-type">&laquo;Object&raquo;</span> fields/conditions that may contain aliased keys</p>

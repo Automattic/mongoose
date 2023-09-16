@@ -15,7 +15,8 @@ import {
   QuerySelector,
   InferSchemaType,
   ProjectionFields,
-  QueryOptions
+  QueryOptions,
+  ProjectionType
 } from 'mongoose';
 import { ModifyResult, ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
@@ -160,6 +161,17 @@ const p1: Record<string, number> = Test.find().projection('age docs.id');
 const p2: Record<string, number> | null = Test.find().projection();
 const p3: null = Test.find().projection(null);
 
+expectError(Test.find({ }, { name: 'ss' })); // Only 0 and 1 are allowed
+expectError(Test.find({ }, { name: 3 })); // Only 0 and 1 are allowed
+expectError(Test.find({ }, { name: true, age: false, endDate: true, tags: 1 })); // Exclusion in a inclusion projection is not allowed
+expectError(Test.find({ }, { name: true, age: false, endDate: true })); // Inclusion in a exclusion projection is not allowed
+expectError(Test.find({ }, { name: false, age: false, tags: false, child: { name: false }, docs: { myId: false, id: true } })); // Inclusion in a exclusion projection is not allowed in nested objects and arrays
+expectError(Test.find({ }, { tags: { something: 1 } })); // array of strings or numbers should only be allowed to be a boolean or 1 and 0
+Test.find({}, { name: true, age: true, endDate: true, tags: 1, child: { name: true }, docs: { myId: true, id: true } }); // This should be allowed
+Test.find({}, { name: 1, age: 1, endDate: 1, tags: 1, child: { name: 1 }, docs: { myId: 1, id: 1 } }); // This should be allowed
+Test.find({}, { _id: 0, name: 1, age: 1, endDate: 1, tags: 1, child: 1, docs: 1 }); // _id is an exception and should be allowed to be excluded
+Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: 0, docs: 0 }); // This should be allowed
+Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: { name: 0 }, docs: { myId: 0, id: 0 } }); // This should be allowed
 // Sorting
 Test.find().sort();
 Test.find().sort('-name');

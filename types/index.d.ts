@@ -651,8 +651,27 @@ declare module 'mongoose' {
 
   export type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
 
-  export type ProjectionElementType = number | string;
-  export type ProjectionType<T> = { [P in keyof T]?: ProjectionElementType } | AnyObject | string;
+  type Projector<T, Element> = T extends Array<infer U> ? Projector<U, Element> : T extends object ? {
+    [K in keyof T]?: T[K] extends object ? Projector<T[K], Element> | Element : Element;
+  } : Element;
+  type InclusionProjection<T> = Projector<T, true | 1> & { _id?: true | 1 | false | 0 };
+  type ExclusionProjection<T> = Projector<T, false | 0> & { _id?: false | 0 };
+
+  type NestedRequired<T> = T extends Array<infer U>
+  ? Array<NestedRequired<U>>
+  : T extends object
+  ? {
+      [K in keyof T]-?: NestedRequired<T[K]>;
+    }
+  : T;
+  type NestedPartial<T> = T extends object
+  ? {
+      [K in keyof T]?: NestedPartial<T[K]>;
+    }
+  : T;
+
+  // Bazi vaghta chizaye chert o pert pas midan
+  export type ProjectionType<T> = NestedPartial<InclusionProjection<NestedRequired<T>>> | NestedPartial<ExclusionProjection<NestedRequired<T>>> | string | string[] | ((...agrs: any) => any);
 
   export type SortValues = SortOrder;
 

@@ -12436,6 +12436,18 @@ describe('document', function() {
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb._id, 1);
   });
+  it('handles bigint (gh-13791)', async function() {
+    const testSchema = new mongoose.Schema({
+      n: Number,
+      reward: BigInt
+    });
+    const Test = db.model('Test', testSchema);
+
+    const a = await Test.create({ n: 1, reward: 14055648105137340n });
+    const b = await Test.findOne({ n: 1 });
+    assert.equal(a.reward, 14055648105137340n);
+    assert.equal(b.reward, 14055648105137340n);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

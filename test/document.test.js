@@ -12478,6 +12478,28 @@ describe('document', function() {
     await doc.save();
     assert.ok(doc);
   });
+
+  it('bulkSave() picks up changes in pre("save") middleware (gh-13799)', async() => {
+    const schema = new Schema({ name: String, _age: { type: Number, min: 0, default: 0 } });
+    schema.pre('save', function() {
+      this._age = this._age + 1;
+    });
+
+    const Person = db.model('Person', schema, 'Persons');
+    const person = new Person({ name: 'Jean-Luc Picard', _age: 59 });
+
+    await Person.bulkSave([person]);
+
+    let updatedPerson = await Person.findById(person._id);
+
+    assert.equal(updatedPerson?._age, 60);
+
+    await Person.bulkSave([updatedPerson]);
+
+    updatedPerson = await Person.findById(person._id);
+
+    assert.equal(updatedPerson?._age, 61);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

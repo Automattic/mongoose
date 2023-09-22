@@ -9,7 +9,7 @@ cause any problems for your application. Please [report any issues on GitHub](ht
 
 To fix all deprecation warnings, follow the below steps:
 
-* Replace `rawResult: true` with `includeResultMetadata: false` in `findOneAndUpdate()`, `findOneAndReplace()`, `findOneAndDelete()` calls.
+* Replace `rawResult: true` with `includeResultMetadata: true` in `findOneAndUpdate()`, `findOneAndReplace()`, `findOneAndDelete()` calls.
 
 Read below for more a more detailed description of each deprecation warning.
 

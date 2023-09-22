@@ -754,7 +754,7 @@ describe('model query casting', function() {
         assert.strictEqual(doc.outerArray[0].innerArray[0], 'onetwothree');
       });
   });
-  it('should not throw a cast error when dealing with an array of an array of strings in combinatino with $elemMach and $not (gh-13880)', async function() {
+  it('should not throw a cast error when dealing with an array of an array of strings in combination with $elemMach and $not (gh-13880)', async function() {
     const testSchema = new Schema({
       arr: [[String]]
     });
@@ -763,7 +763,8 @@ describe('model query casting', function() {
     await doc.save();
     const query = { arr: { $elemMatch: { $not: { $elemMatch: { $eq: '1' } } } } };
     const res = await Test.find(query);
-    assert.ok(res);
+    assert(res);
+    assert(res[0].arr)
   });
 });
 

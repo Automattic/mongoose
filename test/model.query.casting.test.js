@@ -759,12 +759,12 @@ describe('model query casting', function() {
       arr: [[String]]
     });
     const Test = db.model('Test', testSchema);
-    const doc = new Test({ arr: [[1,2,3], [2,3,4]]});
+    const doc = new Test({ arr: [[1, 2, 3], [2, 3, 4]] });
     await doc.save();
     const query = { arr: { $elemMatch: { $not: { $elemMatch: { $eq: '1' } } } } };
     const res = await Test.find(query);
     assert(res);
-    assert(res[0].arr)
+    assert(res[0].arr);
   });
 });
 

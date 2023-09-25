@@ -12500,6 +12500,33 @@ describe('document', function() {
 
     assert.equal(updatedPerson?._age, 61);
   });
+    
+  it('handles default embedded discriminator values (gh-13835)', async function() {
+    const childAbstractSchema = new Schema(
+      { kind: { type: Schema.Types.String, enum: ['concreteKind'], required: true, default: 'concreteKind' } },
+      { discriminatorKey: 'kind', _id: false }
+    );
+    const childConcreteSchema = new Schema({ concreteProp: { type: Number, required: true } });
+
+    const parentSchema = new Schema(
+      {
+        child: {
+          type: childAbstractSchema,
+          required: true
+        }
+      },
+      { _id: false }
+    );
+
+    parentSchema.path('child').discriminator('concreteKind', childConcreteSchema);
+
+    const ParentModel = db.model('Test', parentSchema);
+
+    const parent = new ParentModel({ child: { concreteProp: 123 } });
+    assert.strictEqual(parent.child.concreteProp, 123);
+    assert.strictEqual(parent.get('child.concreteProp'), 123);
+    assert.strictEqual(parent.toObject().child.concreteProp, 123);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

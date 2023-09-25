@@ -115,10 +115,10 @@ Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, new: 
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, returnOriginal: false }).then((res: ITest) => {
   res.name = 'test4';
 });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { rawResult: true }).then((res: any) => {
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { includeResultMetadata: true }).then((res: any) => {
   console.log(res.ok);
 });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, rawResult: true }).then((res: any) => {
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, includeResultMetadata: true }).then((res: any) => {
   console.log(res.ok);
 });
 
@@ -295,8 +295,9 @@ async function gh11306(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  expectType<any[]>(await MyModel.distinct('name'));
-  expectType<string[]>(await MyModel.distinct<string>('name'));
+  expectType<unknown[]>(await MyModel.distinct('notThereInSchema'));
+  expectType<string[]>(await MyModel.distinct('name'));
+  expectType<number[]>(await MyModel.distinct<'overrideTest', number>('overrideTest'));
 }
 
 function autoTypedQuery() {
@@ -422,7 +423,7 @@ async function gh11602(): Promise<void> {
   const updateResult = await ModelType.findOneAndUpdate(query, { $inc: { occurence: 1 } }, {
     upsert: true,
     returnDocument: 'after',
-    rawResult: true
+    includeResultMetadata: true
   });
 
   expectError(updateResult.lastErrorObject?.modifiedCount);

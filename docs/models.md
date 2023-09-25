@@ -193,7 +193,7 @@ If you attempt to `save()` a document from a View, you will get an error from th
 
 ## Yet more
 
-The [API docs](api/model.html#model_Model) cover many additional methods available like [count](api/model.html#model_Model-count), [mapReduce](api/model.html#model_Model-mapReduce), [aggregate](api/model.html#model_Model-aggregate), and [more](api/model.html#model_Model-findOneAndRemove).
+The [API docs](api/model.html#model_Model) cover many additional methods available like [count](api/model.html#model_Model-count), [mapReduce](api/model.html#model_Model-mapReduce), [aggregate](api/model.html#model_Model-aggregate), and more.
 
 ## Next Up
 

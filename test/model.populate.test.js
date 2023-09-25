@@ -10285,6 +10285,28 @@ describe('model: populate:', function() {
 
   });
 
+  it('handles populating underneath document arrays that have null (gh-13839)', async function() {
+    const schema = new Schema({
+      children: [
+        {
+          doc: { type: mongoose.Schema.Types.ObjectId, ref: 'Child' },
+          name: String
+        }
+      ]
+    });
+    const Parent = db.model('Parent', schema);
+    const Child = db.model('Child', new Schema({ name: String }));
+
+    const child = new Child({ name: 'gh-13839-test' });
+    await child.save();
+    let parent = new Parent({ children: [{ doc: child._id, name: 'foo' }, null] });
+    await parent.save();
+
+    parent = await Parent.findById(parent._id).populate('children.doc');
+    assert.equal(parent.children.length, 2);
+    assert.equal(parent.children[0].doc.name, 'gh-13839-test');
+    assert.equal(parent.children[1], null);
+  });
 
   describe('strictPopulate', function() {
     it('reports full path when throwing `strictPopulate` error with deep populate (gh-10923)', async function() {

@@ -1014,8 +1014,8 @@ function gh12869() {
 
   const dbExample = new Schema(
     {
-      active: { type: String, enum: ['foo', 'bar'] as ['foo', 'bar'], required: true }
-    }
+      active: { type: String, enum: ['foo', 'bar'], required: true }
+    } as const
   );
 
   type Example = InferSchemaType<typeof dbExample>;
@@ -1247,10 +1247,22 @@ async function gh13797() {
   interface IUser {
     name: string;
   }
-  new Schema<IUser>({ name: { type: String, required: function() {
-    expectType<IUser>(this); return true;
-  } } });
-  new Schema<IUser>({ name: { type: String, default: function() {
-    expectType<IUser>(this); return '';
-  } } });
+  new Schema<IUser>({
+    name: {
+      type: String,
+      required: function() {
+        expectType<IUser>(this);
+        return true;
+      }
+    }
+  });
+  new Schema<IUser>({
+    name: {
+      type: String,
+      default: function() {
+        expectType<IUser>(this);
+        return '';
+      }
+    }
+  });
 }

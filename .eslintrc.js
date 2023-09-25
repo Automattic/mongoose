@@ -13,7 +13,8 @@ module.exports = {
     '*.min.js',
     '**/docs/js/native.js',
     '!.*',
-    'node_modules'
+    'node_modules',
+    '.git'
   ],
   overrides: [
     {

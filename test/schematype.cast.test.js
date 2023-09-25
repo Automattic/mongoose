@@ -29,6 +29,9 @@ describe('SchemaType.cast() (gh-7045)', function() {
     class CustomObjectId extends Schema.ObjectId {}
 
     CustomObjectId.cast(v => {
+      if (v === 'special') {
+        return original.objectid('0'.repeat(24));
+      }
       assert.ok(v == null || (typeof v === 'string' && v.length === 24));
       return original.objectid(v);
     });
@@ -38,7 +41,7 @@ describe('SchemaType.cast() (gh-7045)', function() {
 
     let threw = false;
     try {
-      objectid.cast('12charstring');
+      baseObjectId.cast('special');
     } catch (error) {
       threw = true;
       assert.equal(error.name, 'CastError');
@@ -46,7 +49,7 @@ describe('SchemaType.cast() (gh-7045)', function() {
 
     assert.doesNotThrow(function() {
       objectid.cast('000000000000000000000000');
-      baseObjectId.cast('12charstring');
+      objectid.cast('special');
       baseObjectId.cast('000000000000000000000000');
     });
 

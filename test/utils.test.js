@@ -8,7 +8,7 @@ const start = require('./common');
 
 const MongooseBuffer = require('../lib/types/buffer');
 const ObjectId = require('../lib/types/objectid');
-const StateMachine = require('../lib/statemachine');
+const StateMachine = require('../lib/stateMachine');
 const assert = require('assert');
 const utils = require('../lib/utils');
 

@@ -468,29 +468,12 @@ describe('model: findOneAndReplace:', function() {
     assert.equal(doc.ok, undefined);
     assert.equal(doc.name, 'Test Testerson');
 
-    let data = await Test.findOneAndReplace(
+    const data = await Test.findOneAndReplace(
       { name: 'Test Testerson' },
       { name: 'Test' },
       { new: true, upsert: true, includeResultMetadata: true }
     );
     assert(data.ok);
     assert.equal(data.value.name, 'Test');
-
-    data = await Test.findOneAndReplace(
-      { name: 'Test Testerson' },
-      { name: 'Test' },
-      { new: true, upsert: true, includeResultMetadata: true, rawResult: true }
-    );
-    assert(data.ok);
-    assert.equal(data.value.name, 'Test');
-
-    await assert.rejects(
-      () => Test.findOneAndReplace(
-        { name: 'Test Testerson' },
-        { name: 'Test' },
-        { new: true, upsert: true, includeResultMetadata: false, rawResult: true }
-      ),
-      /Cannot set `rawResult` option when `includeResultMetadata` is false/
-    );
   });
 });

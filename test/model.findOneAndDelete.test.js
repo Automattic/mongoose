@@ -350,27 +350,11 @@ describe('model: findOneAndDelete:', function() {
     assert.equal(doc.name, 'Test');
 
     await Test.create({ name: 'Test' });
-    let data = await Test.findOneAndDelete(
+    const data = await Test.findOneAndDelete(
       { name: 'Test' },
       { includeResultMetadata: true }
     );
     assert(data.ok);
     assert.equal(data.value.name, 'Test');
-
-    await Test.create({ name: 'Test' });
-    data = await Test.findOneAndDelete(
-      { name: 'Test' },
-      { includeResultMetadata: true, rawResult: true }
-    );
-    assert(data.ok);
-    assert.equal(data.value.name, 'Test');
-
-    await assert.rejects(
-      () => Test.findOneAndDelete(
-        { name: 'Test' },
-        { includeResultMetadata: false, rawResult: true }
-      ),
-      /Cannot set `rawResult` option when `includeResultMetadata` is false/
-    );
   });
 });

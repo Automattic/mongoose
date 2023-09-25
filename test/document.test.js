@@ -12500,7 +12500,7 @@ describe('document', function() {
 
     assert.equal(updatedPerson?._age, 61);
   });
-    
+
   it('handles default embedded discriminator values (gh-13835)', async function() {
     const childAbstractSchema = new Schema(
       { kind: { type: Schema.Types.String, enum: ['concreteKind'], required: true, default: 'concreteKind' } },

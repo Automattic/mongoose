@@ -5658,6 +5658,39 @@ describe('Model', function() {
 
   });
 
+  it('bulkWrite skips defaults based on global setDefaultsOnInsert (gh-13823)', async function() {
+    const m = new mongoose.Mongoose();
+    m.set('setDefaultsOnInsert', false);
+    await m.connect(start.uri);
+
+    const Test = m.model('Test', Schema({
+      name: String,
+      age: Number,
+      status: {
+        type: Number,
+        enum: [1, 2],
+        default: 1
+      }
+    }));
+    await Test.bulkWrite([{
+      updateOne: {
+        filter: {
+          name: 'test1'
+        },
+        update: {
+          $set: {
+            age: 19
+          }
+        },
+        upsert: true
+      }
+    }]);
+    const doc = await Test.findOne({ name: 'test1' }).lean();
+    assert.ok(!doc.status);
+
+    await m.disconnect();
+  });
+
   it('bulkWrite upsert works when update casts to empty (gh-8698)', async function() {
     const userSchema = new Schema({
       name: String

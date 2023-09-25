@@ -17,7 +17,8 @@ module.exports = {
     '**/docs/4.x/*',
     '**/docs/5.x/*',
     '!.*',
-    'node_modules'
+    'node_modules',
+    '.git'
   ],
   overrides: [
     {

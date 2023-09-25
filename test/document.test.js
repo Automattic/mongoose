@@ -12478,6 +12478,55 @@ describe('document', function() {
     await doc.save();
     assert.ok(doc);
   });
+
+  it('bulkSave() picks up changes in pre("save") middleware (gh-13799)', async() => {
+    const schema = new Schema({ name: String, _age: { type: Number, min: 0, default: 0 } });
+    schema.pre('save', function() {
+      this._age = this._age + 1;
+    });
+
+    const Person = db.model('Person', schema, 'Persons');
+    const person = new Person({ name: 'Jean-Luc Picard', _age: 59 });
+
+    await Person.bulkSave([person]);
+
+    let updatedPerson = await Person.findById(person._id);
+
+    assert.equal(updatedPerson?._age, 60);
+
+    await Person.bulkSave([updatedPerson]);
+
+    updatedPerson = await Person.findById(person._id);
+
+    assert.equal(updatedPerson?._age, 61);
+  });
+
+  it('handles default embedded discriminator values (gh-13835)', async function() {
+    const childAbstractSchema = new Schema(
+      { kind: { type: Schema.Types.String, enum: ['concreteKind'], required: true, default: 'concreteKind' } },
+      { discriminatorKey: 'kind', _id: false }
+    );
+    const childConcreteSchema = new Schema({ concreteProp: { type: Number, required: true } });
+
+    const parentSchema = new Schema(
+      {
+        child: {
+          type: childAbstractSchema,
+          required: true
+        }
+      },
+      { _id: false }
+    );
+
+    parentSchema.path('child').discriminator('concreteKind', childConcreteSchema);
+
+    const ParentModel = db.model('Test', parentSchema);
+
+    const parent = new ParentModel({ child: { concreteProp: 123 } });
+    assert.strictEqual(parent.child.concreteProp, 123);
+    assert.strictEqual(parent.get('child.concreteProp'), 123);
+    assert.strictEqual(parent.toObject().child.concreteProp, 123);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

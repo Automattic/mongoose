@@ -12402,6 +12402,97 @@ describe('document', function() {
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb._id, 1);
   });
+  it('handles bigint (gh-13791)', async function() {
+    const testSchema = new mongoose.Schema({
+      n: Number,
+      reward: BigInt
+    });
+    const Test = db.model('Test', testSchema);
+
+    const a = await Test.create({ n: 1, reward: 14055648105137340n });
+    const b = await Test.findOne({ n: 1 });
+    assert.equal(a.reward, 14055648105137340n);
+    assert.equal(b.reward, 14055648105137340n);
+  });
+  it('should allow null values in list in self assignment (gh-13859)', async function() {
+    const objSchema = new Schema({
+      date: Date,
+      value: Number
+    });
+
+    const testSchema = new Schema({
+      intArray: [Number],
+      strArray: [String],
+      objArray: [objSchema]
+    });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test({
+      intArray: [1, 2, 3, null],
+      strArray: ['b', null, 'c'],
+      objArray: [
+        { date: new Date(1000), value: 1 },
+        null,
+        { date: new Date(3000), value: 3 }
+      ]
+    });
+    await doc.save();
+    doc.intArray = doc.intArray;
+    doc.strArray = doc.strArray;
+    doc.objArray = doc.objArray; // this is the trigger for the error
+    assert.ok(doc);
+    await doc.save();
+    assert.ok(doc);
+  });
+
+  it('bulkSave() picks up changes in pre("save") middleware (gh-13799)', async() => {
+    const schema = new Schema({ name: String, _age: { type: Number, min: 0, default: 0 } });
+    schema.pre('save', function() {
+      this._age = this._age + 1;
+    });
+
+    const Person = db.model('Person', schema, 'Persons');
+    const person = new Person({ name: 'Jean-Luc Picard', _age: 59 });
+
+    await Person.bulkSave([person]);
+
+    let updatedPerson = await Person.findById(person._id);
+
+    assert.equal(updatedPerson?._age, 60);
+
+    await Person.bulkSave([updatedPerson]);
+
+    updatedPerson = await Person.findById(person._id);
+
+    assert.equal(updatedPerson?._age, 61);
+  });
+
+  it('handles default embedded discriminator values (gh-13835)', async function() {
+    const childAbstractSchema = new Schema(
+      { kind: { type: Schema.Types.String, enum: ['concreteKind'], required: true, default: 'concreteKind' } },
+      { discriminatorKey: 'kind', _id: false }
+    );
+    const childConcreteSchema = new Schema({ concreteProp: { type: Number, required: true } });
+
+    const parentSchema = new Schema(
+      {
+        child: {
+          type: childAbstractSchema,
+          required: true
+        }
+      },
+      { _id: false }
+    );
+
+    parentSchema.path('child').discriminator('concreteKind', childConcreteSchema);
+
+    const ParentModel = db.model('Test', parentSchema);
+
+    const parent = new ParentModel({ child: { concreteProp: 123 } });
+    assert.strictEqual(parent.child.concreteProp, 123);
+    assert.strictEqual(parent.get('child.concreteProp'), 123);
+    assert.strictEqual(parent.toObject().child.concreteProp, 123);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

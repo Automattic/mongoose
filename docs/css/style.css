@@ -46,6 +46,7 @@ pre {
   background: #eee;
   padding: 5px;
   border-radius: 3px;
+  overflow-x: auto;
 }
 code {
   color: #333;

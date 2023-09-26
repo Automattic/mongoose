@@ -16,6 +16,7 @@ If you're still on Mongoose 6.x or earlier, please read the [Mongoose 6.x to 7.x
 * [MongoDB Node Driver 6.0](#mongodb-node-driver-6)
 * [Removed `findOneAndRemove()`](#removed-findoneandremove)
 * [Removed id Setter](#removed-id-setter)
+* [Allow `null` For Optional Fields in TypeScript](#allow-null-for-optional-fields-in-typescript)
 
 <h2 id="removed-rawresult-option-for-findoneandupdate"><a href="#removed-rawresult-option-for-findoneandupdate">Removed <code>rawResult</code> option for <code>findOneAndUpdate()</code></a></h2>
 
@@ -60,3 +61,19 @@ Use `findOneAndDelete()` instead.
 
 In Mongoose 7.4, Mongoose introduced an `id` setter that made `doc.id = '0'.repeat(24)` equivalent to `doc._id = '0'.repeat(24)`.
 In Mongoose 8, that setter is now removed.
+
+<h2 id="allow-null-for-optional-fields-in-typescript"><a href="#allow-null-for-optional-fields-in-typescript">Allow <code>null</code> For Optional Fields in TypeScript</a></h2>
+
+In Mongoose 8, automatically inferred schema types in TypeScript allow `null` for optional fields.
+In Mongoose 7, optional fields only allowed `undefined`, not `null`.
+
+```typescript
+const schema = new Schema({ name: String });
+const TestModel = model('Test', schema);
+
+const doc = new TestModel();
+
+// In Mongoose 8, this type is `string | null | undefined`.
+// In Mongoose 7, this type is `string | undefined`
+doc.name;
+```

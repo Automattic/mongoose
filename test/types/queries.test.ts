@@ -10,6 +10,7 @@ import {
   PopulatedDoc,
   FilterQuery,
   UpdateQuery,
+  UpdateQueryKnownOnly,
   ApplyBasicQueryCasting,
   QuerySelector,
   InferSchemaType,
@@ -17,7 +18,7 @@ import {
   QueryOptions
 } from 'mongoose';
 import { ObjectId } from 'mongodb';
-import { expectAssignable, expectError, expectType } from 'tsd';
+import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { AutoTypedSchemaType } from './schema.test';
 
@@ -114,10 +115,10 @@ Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, new: 
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, returnOriginal: false }).then((res: ITest) => {
   res.name = 'test4';
 });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { rawResult: true }).then((res: any) => {
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { includeResultMetadata: true }).then((res: any) => {
   console.log(res.ok);
 });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, rawResult: true }).then((res: any) => {
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, includeResultMetadata: true }).then((res: any) => {
   console.log(res.ok);
 });
 
@@ -294,8 +295,9 @@ async function gh11306(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  expectType<any[]>(await MyModel.distinct('name'));
-  expectType<string[]>(await MyModel.distinct<string>('name'));
+  expectType<unknown[]>(await MyModel.distinct('notThereInSchema'));
+  expectType<string[]>(await MyModel.distinct('name'));
+  expectType<number[]>(await MyModel.distinct<'overrideTest', number>('overrideTest'));
 }
 
 function autoTypedQuery() {
@@ -421,7 +423,7 @@ async function gh11602(): Promise<void> {
   const updateResult = await ModelType.findOneAndUpdate(query, { $inc: { occurence: 1 } }, {
     upsert: true,
     returnDocument: 'after',
-    rawResult: true
+    includeResultMetadata: true
   });
 
   expectError(updateResult.lastErrorObject?.modifiedCount);
@@ -497,4 +499,23 @@ async function gh13224() {
   expectAssignable<Function>(u3.toObject);
 
   expectError(UserModel.findOne().select<{ notInSchema: string }>(['name']).orFail());
+}
+
+function gh13630() {
+  interface User {
+    phone?: string;
+    name?: string;
+    nested?: {
+      test?: string;
+    }
+  }
+
+  expectAssignable<UpdateQueryKnownOnly<User>>({ $set: { name: 'John' } });
+  expectAssignable<UpdateQueryKnownOnly<User>>({ $unset: { phone: 'test' } });
+  expectAssignable<UpdateQueryKnownOnly<User>>({ $set: { nested: { test: 'foo' } } });
+  expectNotAssignable<UpdateQueryKnownOnly<User>>({ $set: { namee: 'foo' } });
+  expectNotAssignable<UpdateQueryKnownOnly<User>>({ $set: { 'nested.test': 'foo' } });
+
+  const x: UpdateQueryKnownOnly<User> = { $set: { name: 'John' } };
+  expectAssignable<UpdateQuery<User>>(x);
 }

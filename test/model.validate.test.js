@@ -57,7 +57,7 @@ describe('model: validate: ', function() {
     assert.deepEqual(Object.keys(err.errors), ['comments.name']);
 
     obj = { age: '42' };
-    await Model.validate(obj, ['age']);
+    obj = await Model.validate(obj, ['age']);
     assert.strictEqual(obj.age, 42);
   });
 
@@ -106,7 +106,7 @@ describe('model: validate: ', function() {
 
     const test = { docs: ['6132655f2cdb9d94eaebc09b'] };
 
-    const err = await Test.validate(test);
+    const err = await Test.validate(test).then(() => null, err => err);
     assert.ifError(err);
   });
 
@@ -124,7 +124,7 @@ describe('model: validate: ', function() {
     const User = mongoose.model('User', userSchema);
 
     const user = new User({ name: 'test', nameRequired: false });
-    const err = await User.validate(user).catch(err => err);
+    const err = await User.validate(user).then(() => null, err => err);
 
     assert.ifError(err);
 
@@ -143,5 +143,67 @@ describe('model: validate: ', function() {
 
     const err2 = await User.validate({ name: 'Sam' }).then(() => null, err => err);
     assert.ok(err2 === null);
+  });
+  it('Model.validate(...) supports passing in an object, array or string (gh-10353)', async function() {
+    const testSchema = new Schema({
+      docs: {
+        type: String,
+        validate: () => false
+      },
+      name: {
+        type: String,
+        validate: () => false
+      },
+      obj: {
+        type: String,
+        validate: () => false
+      },
+      arr: {
+        type: String,
+        validate: () => false
+      }
+    });
+
+    const Test = mongoose.model('Test', testSchema);
+
+    let test = { obj: 1, docs: 'a doc' };
+    let pathsOrOptions = { pathsToSkip: ['obj'] };
+    await assert.rejects(async() => {
+      await Test.validate(test, pathsOrOptions);
+    }, { message: 'Validation failed: docs: Validator failed for path `docs` with value `a doc`' });
+    test = { arr: 1, docs: 'a doc' };
+    pathsOrOptions = ['arr'];
+    await assert.rejects(async() => {
+      await Test.validate(test, pathsOrOptions);
+    }, { message: 'Validation failed: arr: Validator failed for path `arr` with value `1`' });
+    test = { name: 1, docs: 'a doc' };
+    pathsOrOptions = 'name';
+    await assert.rejects(async() => {
+      await Test.validate(test, pathsOrOptions);
+    }, { message: 'Validation failed: name: Validator failed for path `name` with value `1`' });
+  });
+
+  it('runs validation on casted paths even if cast error happened', async function() {
+    const Model = mongoose.model('Test', new Schema({
+      invalid1: {
+        type: String,
+        validate: () => false
+      },
+      myNumber: {
+        type: Number,
+        required: true
+      },
+      invalid2: {
+        type: String,
+        validate: () => false
+      }
+    }));
+
+    const err = await Model.validate({ invalid1: 'foo', myNumber: 'not a number', invalid2: 'bar' }).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.deepEqual(Object.keys(err.errors).sort(), ['invalid1', 'invalid2', 'myNumber']);
+    assert.equal(err.errors['myNumber'].name, 'CastError');
+    assert.equal(err.errors['invalid1'].name, 'ValidatorError');
   });
 });

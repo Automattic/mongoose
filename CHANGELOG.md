@@ -1,3 +1,67 @@
+7.5.1 / 2023-09-11
+==================
+ * fix: set default value for _update when no update object is provided and versionKey is set to false #13795 #13783 [MohOraby](https://github.com/MohOraby)
+ * fix: avoid unexpected error when accessing null array element on discriminator array when populating #13716 [ZSabakh](https://github.com/ZSabakh)
+ * types(schematypes): use DocType for instance method this #13822 #13800 [pshaddel](https://github.com/pshaddel)
+ * types: remove duplicated 'exists' method in Model interface in models.d.ts #13818 [ohzeno](https://github.com/ohzeno)
+ * docs(model): replace outdated docs on deprecated findOneAndUpdate() overwrite option #13821 #13715
+ * docs: add example of using `virtuals.pathsToSkip` option for `toObject()` and `toJSON()` #13798 [RobertHunter-Pluto](https://github.com/RobertHunter-Pluto)
+
+7.5.0 / 2023-08-29
+==================
+ * feat: use mongodb driver v5.18.1
+ * feat: allow top level dollar keys with findOneAndUpdate(), update() for MongoDB 5 #13786
+ * fix(document): make array getters avoid unintentionally modifying array, defer getters until index access instead #13774
+ * feat: deprecate `overwrite` option for findOneAndUpdate() #13578
+ * feat: add pathsToSkip option for Model.validate #13663 #10353
+ * feat: support alias when declaring index #13659 #13276
+ * fix(query): remove unnecessary check for atomic operators in findOneAndReplace() #13678
+ * types: add SearchMeta Interface for Atlas Search #13792 [mreouven](https://github.com/mreouven)
+ * types(schematypes): add missing BigInt SchemaType #13787
+
+7.4.5 / 2023-08-25
+==================
+ * fix(debug): avoid putting virtuals and getters in debug output #13778
+ * fix(model): make Model.bulkWrite() with empty array and ordered false not throw an error #13664
+ * fix(document): correctly handle inclusive/exclusive projections when applying subdocument defaults #13763 #13720
+
+6.12.0 / 2023-08-24
+===================
+ * feat: use mongodb driver v4.17.1
+ * fix(model): make Model.bulkWrite() with empty array and ordered false not throw an error #13664
+ * fix(document): correctly handle inclusive/exclusive projections when applying subdocument defaults #13763 #13720
+
+7.4.4 / 2023-08-22
+==================
+ * fix(connection): reset document state in between transaction retries #13726 #13698
+ * fix(cursor): bubble up resumeTokenChanged event from change streams #13736 #13607
+ * fix(query+populate): add refPath to projection by default, unless explicitly excluded #13758
+ * fix(schema): support 'ascending', 'asc', 'descending', 'desc' for index direction #13761 #13725
+ * fix(ChangeStream): add _bindEvents to addListener function for observable support #13759 [yury-ivaniutsenka](https://github.com/yury-ivaniutsenka)
+ * types: infer return type when using `get()`, `markModified()`, etc. with known property name literal #13739 [maybesmurf](https://github.com/maybesmurf)
+ * types: add missing typings for option includeResultMetadata #13747 #13746 [Idnan](https://github.com/Idnan)
+ * types: export InferSchemaType #13737
+ * docs(middleware): clarify that query middleware applies to document by default #13734 #13713
+ * docs: add brief note on TypeScript generic usage for embedded discriminator path() calls #13728 #10435
+ * docs: link v7 migration guide #13742 [Cooldogyum](https://github.com/Cooldogyum)
+ * docs(migrating_to_6): add note about incompatible packages #13733
+
+6.11.6 / 2023-08-21
+===================
+ * fix(model): avoid hanging on empty bulkWrite() with ordered: false #13701 #13684 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * types: augment bson.ObjectId instead of adding on own type #13515 #12537 [hasezoey](https://github.com/hasezoey)
+
+7.4.3 / 2023-08-11
+==================
+ * fix: avoid applying map property getters when saving #13704 #13657
+ * fix(query): allow deselecting discriminator key #13722 #13679
+ * types(models+query): return lean type when passing QueryOptions with lean: true to relevant model functions like find() and findOne() #13721 #13705
+ * types(schema): correct return type for Schema.prototype.indexes() #13718 #13702
+ * types: allow accessing options from pre middleware #13708 #13633
+ * types: add UpdateQueryKnownOnly type for stricter UpdateQuery type checking #13699 #13630
+ * types(schema): support required: { isRequired: true } syntax in schema definition #13680
+ * docs(middleware): clarify that doc.deleteOne() doesn't run query middleware currently #13707 #13669
+
 7.4.2 / 2023-08-03
 ==================
  * fix(model): avoid hanging on empty bulkWrite() with ordered: false #13684 #13664

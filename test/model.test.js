@@ -1177,8 +1177,12 @@ describe('Model', function() {
     it('errors when id deselected (gh-3118)', async function() {
       await BlogPost.create({ title: 1 }, { title: 2 });
       const doc = await BlogPost.findOne({ title: 1 }, { _id: 0 });
-      const err = await doc.deleteOne().then(() => null, err => err);
-      assert.equal(err.message, 'No _id found on document!');
+      try {
+        await doc.deleteOne();
+        assert.ok(false);
+      } catch (err) {
+        assert.equal(err.message, 'No _id found on document!');
+      }
     });
 
     it('should not remove any records when deleting by id undefined', async function() {
@@ -2319,7 +2323,7 @@ describe('Model', function() {
       const title = 'interop ad-hoc as promise';
 
       const created = await BlogPost.create({ title: title });
-      const query = BlogPost.count({ title: title });
+      const query = BlogPost.countDocuments({ title: title });
       const found = await query.exec('findOne');
       assert.equal(found.id, created.id);
     });
@@ -3404,7 +3408,7 @@ describe('Model', function() {
         let listener;
 
         before(function() {
-          if (!process.env.REPLICA_SET) {
+          if (!process.env.REPLICA_SET && !process.env.START_REPLICA_SET) {
             this.skip();
           }
         });
@@ -3434,6 +3438,20 @@ describe('Model', function() {
           assert.equal(changeData.operationType, 'insert');
           assert.equal(changeData.fullDocument._id.toHexString(),
             doc._id.toHexString());
+        });
+
+        it('bubbles up resumeTokenChanged events (gh-13607)', async function() {
+          const MyModel = db.model('Test', new Schema({ name: String }));
+
+          const resumeTokenChangedEvent = new Promise(resolve => {
+            changeStream = MyModel.watch();
+            listener = data => resolve(data);
+            changeStream.once('resumeTokenChanged', listener);
+          });
+
+          await MyModel.create({ name: 'test' });
+          const { _data } = await resumeTokenChangedEvent;
+          assert.ok(_data);
         });
 
         it('using next() and hasNext() (gh-11527)', async function() {
@@ -5032,10 +5050,6 @@ describe('Model', function() {
       await Model.createCollection();
       const collectionName = Model.collection.name;
 
-      // If the collection is not created, the following will throw
-      // MongoServerError: Collection [mongoose_test.User] not found.
-      await db.collection(collectionName).stats();
-
       await Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
 
       // Ensure that the default collation is set. Mongoose will set the
@@ -5304,7 +5318,7 @@ describe('Model', function() {
         }
       ]);
 
-      const beforeExpirationCount = await Test.count({});
+      const beforeExpirationCount = await Test.countDocuments({});
       assert.ok(beforeExpirationCount === 12);
 
       let intervalid;
@@ -5318,7 +5332,7 @@ describe('Model', function() {
         // in case it happens faster, to reduce test time
         new Promise(resolve => {
           intervalid = setInterval(async() => {
-            const count = await Test.count({});
+            const count = await Test.countDocuments({});
             if (count === 0) {
               resolve();
             }
@@ -5328,7 +5342,7 @@ describe('Model', function() {
 
       clearInterval(intervalid);
 
-      const afterExpirationCount = await Test.count({});
+      const afterExpirationCount = await Test.countDocuments({});
       assert.equal(afterExpirationCount, 0);
     });
 
@@ -5458,7 +5472,6 @@ describe('Model', function() {
     await doc.deleteOne({ session });
     assert.equal(sessions.length, 1);
     assert.strictEqual(sessions[0], session);
-
   });
 
   it('set $session() before pre validate hooks run on bulkWrite and insertMany (gh-7769)', async function() {
@@ -5927,9 +5940,32 @@ describe('Model', function() {
     const userSchema = new Schema({ name: String });
     const User = db.model('User', userSchema);
 
-    const err = await User.bulkWrite([], { ordered: false }).then(() => null, err => err);
-    assert.ok(err);
-    assert.equal(err.name, 'MongoInvalidArgumentError');
+    const res = await User.bulkWrite([], { ordered: false });
+    assert.deepEqual(
+      res,
+      {
+        result: {
+          ok: 1,
+          writeErrors: [],
+          writeConcernErrors: [],
+          insertedIds: [],
+          nInserted: 0,
+          nUpserted: 0,
+          nMatched: 0,
+          nModified: 0,
+          nRemoved: 0,
+          upserted: []
+        },
+        insertedCount: 0,
+        matchedCount: 0,
+        modifiedCount: 0,
+        deletedCount: 0,
+        upsertedCount: 0,
+        upsertedIds: {},
+        insertedIds: {},
+        n: 0
+      }
+    );
   });
 
   it('allows calling `create()` after `bulkWrite()` (gh-9350)', async function() {

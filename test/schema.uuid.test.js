@@ -172,6 +172,37 @@ describe('SchemaUUID', function() {
     assert.equal(_id, uuid.toString());
   });
 
+  it('avoids converting maps of uuids to strings (gh-13657)', async function() {
+    const schema = new mongoose.Schema(
+      {
+        doc_map: {
+          type: mongoose.Schema.Types.Map,
+          of: mongoose.Schema.Types.UUID
+        }
+      }
+    );
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', schema);
+    await Test.deleteMany({});
+
+    const user = new Test({
+      doc_map: new Map([
+        ['role_1', new mongoose.Types.UUID()],
+        ['role_2', new mongoose.Types.UUID()]
+      ])
+    });
+
+    await user.save();
+
+    user.doc_map.set('role_1', new mongoose.Types.UUID());
+    await user.save();
+
+    const exists = await Test.findOne({ 'doc_map.role_1': { $type: 'binData' } });
+    assert.ok(exists);
+
+    assert.equal(typeof user.get('doc_map.role_1'), 'string');
+  });
+
   // the following are TODOs based on SchemaUUID.prototype.$conditionalHandlers which are not tested yet
   it('should work with $bits* operators');
   it('should work with $all operator');

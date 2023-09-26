@@ -1,18 +1,21 @@
 import {
   Schema,
   Document,
+  HydratedDocument,
+  IndexDefinition,
+  IndexOptions,
+  InferSchemaType,
+  InsertManyOptions,
+  ObtainDocumentType,
+  ObtainSchemaGeneric,
+  ResolveSchemaOptions,
   SchemaDefinition,
   SchemaTypeOptions,
   Model,
-  Types,
-  InferSchemaType,
   SchemaType,
+  Types,
   Query,
-  model,
-  HydratedDocument,
-  ResolveSchemaOptions,
-  ObtainDocumentType,
-  ObtainSchemaGeneric
+  model
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
@@ -1149,4 +1152,81 @@ function gh13514() {
 
   const doc = new Test({ email: 'bar' });
   const str: string = doc.email;
+}
+
+function gh13633() {
+  const schema = new Schema({ name: String });
+
+  schema.pre('updateOne', { document: true, query: false }, function(next) {
+  });
+
+  schema.pre('updateOne', { document: true, query: false }, function(next, options) {
+    expectType<Record<string, any> | undefined>(options);
+  });
+
+  schema.post('save', function(res, next) {
+  });
+  schema.pre('insertMany', function(next, docs) {
+  });
+  schema.pre('insertMany', function(next, docs, options) {
+    expectType<(InsertManyOptions & { lean?: boolean }) | undefined>(options);
+  });
+}
+
+function gh13702() {
+  const schema = new Schema({ name: String });
+  expectType<[IndexDefinition, IndexOptions][]>(schema.indexes());
+}
+
+function gh13780() {
+  const schema = new Schema({ num: Schema.Types.BigInt });
+  type InferredType = InferSchemaType<typeof schema>;
+  expectType<bigint | undefined>(null as unknown as InferredType['num']);
+}
+
+function gh13800() {
+  interface IUser {
+    firstName: string;
+    lastName: string;
+    someOtherField: string;
+  }
+  interface IUserMethods {
+    fullName(): string;
+  }
+  type UserModel = Model<IUser, {}, IUserMethods>;
+
+  // Typed Schema
+  const schema = new Schema<IUser, UserModel, IUserMethods>({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true }
+  });
+  schema.method('fullName', function fullName() {
+    expectType<string>(this.firstName);
+    expectType<string>(this.lastName);
+    expectType<string>(this.someOtherField);
+    expectType<IUserMethods['fullName']>(this.fullName);
+  });
+
+  // Auto Typed Schema
+  const autoTypedSchema = new Schema({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true }
+  });
+  autoTypedSchema.method('fullName', function fullName() {
+    expectType<string>(this.firstName);
+    expectType<string>(this.lastName);
+    expectError<string>(this.someOtherField);
+  });
+}
+
+async function gh13797() {
+  interface IUser {
+    name: string;
+  }
+  new Schema<IUser>({ name: { type: String, required: function() {
+    expectType<IUser>(this); return true;
+  } } });
+  new Schema<IUser>({ name: { type: String, default: function() {
+    expectType<IUser>(this); return '';
+  } } });
 }

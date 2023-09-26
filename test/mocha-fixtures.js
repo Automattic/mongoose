@@ -20,7 +20,7 @@ let mongorreplset;
 
 // decide whether to start MMS instances or use the existing URI's
 const startMemoryInstance = !process.env.MONGOOSE_TEST_URI;
-const startMemoryReplset = !process.env.MONGOOSE_REPLSET_URI;
+const startMemoryReplset = !process.env.MONGOOSE_REPLSET_URI && !!process.env.START_REPLICA_SET;
 
 module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
   let instanceuri;

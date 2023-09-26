@@ -135,6 +135,7 @@ declare module 'mongoose' {
     errors?: Error.ValidationError;
 
     /** Returns the value of a path. */
+    get<T extends keyof DocType>(path: T, type?: any, options?: any): DocType[T];
     get(path: string, type?: any, options?: any): any;
 
     /**
@@ -157,30 +158,37 @@ declare module 'mongoose' {
     init(obj: AnyObject, opts?: AnyObject): this;
 
     /** Marks a path as invalid, causing validation to fail. */
+    invalidate<T extends keyof DocType>(path: T, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
     invalidate(path: string, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
 
     /** Returns true if `path` was directly set and modified, else false. */
+    isDirectModified<T extends keyof DocType>(path: T | Array<T>): boolean;
     isDirectModified(path: string | Array<string>): boolean;
 
     /** Checks if `path` was explicitly selected. If no projection, always returns true. */
+    isDirectSelected<T extends keyof DocType>(path: T): boolean;
     isDirectSelected(path: string): boolean;
 
     /** Checks if `path` is in the `init` state, that is, it was set by `Document#init()` and not modified since. */
+    isInit<T extends keyof DocType>(path: T): boolean;
     isInit(path: string): boolean;
 
     /**
      * Returns true if any of the given paths are modified, else false. If no arguments, returns `true` if any path
      * in this document is modified.
      */
+    isModified<T extends keyof DocType>(path?: T | Array<T>): boolean;
     isModified(path?: string | Array<string>): boolean;
 
     /** Boolean flag specifying if the document is new. */
     isNew: boolean;
 
     /** Checks if `path` was selected in the source query which initialized this document. */
+    isSelected<T extends keyof DocType>(path: T): boolean;
     isSelected(path: string): boolean;
 
     /** Marks the path as having pending changes to write to the db. */
+    markModified<T extends keyof DocType>(path: T, scope?: any): void;
     markModified(path: string, scope?: any): void;
 
     /** Returns the list of paths that have been modified. */
@@ -216,6 +224,7 @@ declare module 'mongoose' {
     schema: Schema;
 
     /** Sets the value of a path, or many paths. */
+    set<T extends keyof DocType>(path: T, val: DocType[T], type: any, options?: DocumentSetOptions): this;
     set(path: string | Record<string, any>, val: any, type: any, options?: DocumentSetOptions): this;
     set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
     set(value: string | Record<string, any>): this;
@@ -228,17 +237,20 @@ declare module 'mongoose' {
     toObject<T = Require_id<DocType>>(options?: ToObjectOptions): Require_id<T>;
 
     /** Clears the modified state on the specified path. */
+    unmarkModified<T extends keyof DocType>(path: T): void;
     unmarkModified(path: string): void;
 
     /** Sends an updateOne command with this document `_id` as the query selector. */
     updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null): Query<any, this>;
 
     /** Executes registered validation rules for this document. */
+    validate<T extends keyof DocType>(pathsToValidate?: T | T[], options?: AnyObject): Promise<void>;
     validate(pathsToValidate?: pathsToValidate, options?: AnyObject): Promise<void>;
     validate(options: { pathsToSkip?: pathsToSkip }): Promise<void>;
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
     validateSync(options: { pathsToSkip?: pathsToSkip, [k: string]: any }): Error.ValidationError | null;
+    validateSync<T extends keyof DocType>(pathsToValidate?: T | T[], options?: AnyObject): Error.ValidationError | null;
     validateSync(pathsToValidate?: pathsToValidate, options?: AnyObject): Error.ValidationError | null;
   }
 }

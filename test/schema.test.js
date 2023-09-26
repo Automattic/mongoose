@@ -856,6 +856,21 @@ describe('schema', function() {
         assert.deepEqual(indexes[1][0], { prop2: 1 });
       });
 
+      it('using "ascending" and "descending" for order (gh-13725)', function() {
+        const testSchema = new Schema({
+          prop1: { type: String, index: 'ascending' },
+          prop2: { type: Number, index: 'descending' },
+          prop3: { type: String }
+        });
+        testSchema.index({ prop3: 'desc' }, { unique: true });
+
+        const indexes = testSchema.indexes();
+        assert.equal(indexes.length, 3);
+        assert.deepEqual(indexes[0][0], { prop1: 1 });
+        assert.deepEqual(indexes[1][0], { prop2: -1 });
+        assert.deepEqual(indexes[2][0], { prop3: -1 });
+      });
+
       it('with single nested doc (gh-6113)', function() {
         const pointSchema = new Schema({
           type: {
@@ -873,8 +888,6 @@ describe('schema', function() {
         assert.deepEqual(schema.indexes(), [
           [{ point: '2dsphere' }, { background: true }]
         ]);
-
-
       });
 
       it('with embedded discriminator (gh-6485)', function() {
@@ -1424,7 +1437,7 @@ describe('schema', function() {
         }
       };
       const s = new Schema(TestSchema, { typeKey: '$type' });
-      assert.equal(s.path('action').constructor.name, 'SubdocumentPath');
+      assert.equal(s.path('action').constructor.name, 'SchemaSubdocument');
       assert.ok(s.path('action').schema.$implicitlyCreated);
       assert.equal(s.path('action.type').constructor.name, 'SchemaString');
     });
@@ -2637,7 +2650,7 @@ describe('schema', function() {
         myStr: { type: String, cast: v => '' + v }
       });
 
-      assert.equal(schema.path('myId').cast('12charstring').toHexString(), '313263686172737472696e67');
+      assert.equal(schema.path('myId').cast('0'.repeat(24)).toHexString(), '0'.repeat(24));
       assert.equal(schema.path('myNum').cast(3.14), 4);
       assert.equal(schema.path('myDate').cast('2012-06-01').getFullYear(), 2012);
       assert.equal(schema.path('myBool').cast('hello'), true);

@@ -236,7 +236,7 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | DocType, options?: SchemaOptions<DocType, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>, EnforcedDocType> | DocType, options?: SchemaOptions<DocType, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
@@ -278,7 +278,7 @@ declare module 'mongoose' {
      * Returns a list of indexes that this schema declares, via `schema.index()`
      * or by `index: true` in a path's options.
      */
-    indexes(): Array<IndexDefinition>;
+    indexes(): Array<[IndexDefinition, IndexOptions]>;
 
     /** Gets a schema option. */
     get<K extends keyof SchemaOptions>(key: K): SchemaOptions[K];
@@ -293,14 +293,14 @@ declare module 'mongoose' {
     loadClass(model: Function, onlyVirtuals?: boolean): this;
 
     /** Adds an instance method to documents constructed from Models compiled from this schema. */
-    method<Context = any>(name: string, fn: (this: Context, ...args: any[]) => any, opts?: any): this;
+    method<Context = THydratedDocumentType>(name: string, fn: (this: Context, ...args: any[]) => any, opts?: any): this;
     method(obj: Partial<TInstanceMethods>): this;
 
     /** Object of currently defined methods on this schema. */
     methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] } & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>>;
+    obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>, EnforcedDocType>;
 
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType<any, THydratedDocumentType>>(path: string): ResultType;
@@ -406,8 +406,25 @@ declare module 'mongoose' {
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     /* method insertMany */
-    pre<T = TModelType>(method: 'insertMany' | RegExp, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
-    pre<T = TModelType>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void | Promise<void>): this;
+    pre<T = TModelType>(
+      method: 'insertMany' | RegExp,
+      fn: (
+        this: T,
+        next: (err?: CallbackError) => void,
+        docs: any | Array<any>,
+        options?: InsertManyOptions & { lean?: boolean }
+      ) => void | Promise<void>
+    ): this;
+    pre<T = TModelType>(
+      method: 'insertMany' | RegExp,
+      options: SchemaPreOptions,
+      fn: (
+        this: T,
+        next: (err?: CallbackError) => void,
+        docs: any | Array<any>,
+        options?: InsertManyOptions & { lean?: boolean }
+      ) => void | Promise<void>
+    ): this;
 
     /** Object of currently defined query helpers on this schema. */
     query: TQueryHelpers;
@@ -467,26 +484,26 @@ declare module 'mongoose' {
           ? DateSchemaDefinition
           : (Function | string);
 
-  export type SchemaDefinitionProperty<T = undefined> = SchemaDefinitionWithBuiltInClass<T> |
-  SchemaTypeOptions<T extends undefined ? any : T> |
+  export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any> = SchemaDefinitionWithBuiltInClass<T> |
+  SchemaTypeOptions<T extends undefined ? any : T, EnforcedDocType> |
     typeof SchemaType |
   Schema<any, any, any> |
   Schema<any, any, any>[] |
-  SchemaTypeOptions<T extends undefined ? any : Unpacked<T>>[] |
+  SchemaTypeOptions<T extends undefined ? any : Unpacked<T>, EnforcedDocType>[] |
   Function[] |
-  SchemaDefinition<T> |
-  SchemaDefinition<Unpacked<T>>[] |
+  SchemaDefinition<T, EnforcedDocType> |
+  SchemaDefinition<Unpacked<T>, EnforcedDocType>[] |
     typeof Schema.Types.Mixed |
-  MixedSchemaTypeOptions;
+  MixedSchemaTypeOptions<EnforcedDocType>;
 
-  export type SchemaDefinition<T = undefined> = T extends undefined
+  export type SchemaDefinition<T = undefined, EnforcedDocType = any> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
-    : { [path in keyof T]?: SchemaDefinitionProperty<T[path]>; };
+    : { [path in keyof T]?: SchemaDefinitionProperty<T[path], EnforcedDocType>; };
 
   export type AnyArray<T> = T[] | ReadonlyArray<T>;
   export type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;
 
-  export interface MixedSchemaTypeOptions extends SchemaTypeOptions<Schema.Types.Mixed> {
+  export interface MixedSchemaTypeOptions<EnforcedDocType> extends SchemaTypeOptions<Schema.Types.Mixed, EnforcedDocType> {
     type: typeof Schema.Types.Mixed;
   }
 
@@ -578,24 +595,24 @@ declare module 'mongoose' {
 
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
-  type _UpdateQuery<TSchema> = {
+  type _UpdateQuery<TSchema, AdditionalProperties = AnyObject> = {
     /** @see https://www.mongodb.com/docs/manual/reference/operator/update-field/ */
-    $currentDate?: AnyKeys<TSchema> & AnyObject;
-    $inc?: AnyKeys<TSchema> & AnyObject;
-    $min?: AnyKeys<TSchema> & AnyObject;
-    $max?: AnyKeys<TSchema> & AnyObject;
-    $mul?: AnyKeys<TSchema> & AnyObject;
+    $currentDate?: AnyKeys<TSchema> & AdditionalProperties;
+    $inc?: AnyKeys<TSchema> & AdditionalProperties;
+    $min?: AnyKeys<TSchema> & AdditionalProperties;
+    $max?: AnyKeys<TSchema> & AdditionalProperties;
+    $mul?: AnyKeys<TSchema> & AdditionalProperties;
     $rename?: Record<string, string>;
-    $set?: AnyKeys<TSchema> & AnyObject;
-    $setOnInsert?: AnyKeys<TSchema> & AnyObject;
-    $unset?: AnyKeys<TSchema> & AnyObject;
+    $set?: AnyKeys<TSchema> & AdditionalProperties;
+    $setOnInsert?: AnyKeys<TSchema> & AdditionalProperties;
+    $unset?: AnyKeys<TSchema> & AdditionalProperties;
 
     /** @see https://www.mongodb.com/docs/manual/reference/operator/update-array/ */
-    $addToSet?: AnyKeys<TSchema> & AnyObject;
-    $pop?: AnyKeys<TSchema> & AnyObject;
-    $pull?: AnyKeys<TSchema> & AnyObject;
-    $push?: AnyKeys<TSchema> & AnyObject;
-    $pullAll?: AnyKeys<TSchema> & AnyObject;
+    $addToSet?: AnyKeys<TSchema> & AdditionalProperties;
+    $pop?: AnyKeys<TSchema> & AdditionalProperties;
+    $pull?: AnyKeys<TSchema> & AdditionalProperties;
+    $push?: AnyKeys<TSchema> & AdditionalProperties;
+    $pullAll?: AnyKeys<TSchema> & AdditionalProperties;
 
     /** @see https://www.mongodb.com/docs/manual/reference/operator/update-bitwise/ */
     $bit?: AnyKeys<TSchema>;
@@ -617,6 +634,18 @@ declare module 'mongoose' {
    * ```
    */
   export type UpdateQuery<T> = _UpdateQuery<T> & AnyObject;
+
+  /**
+   * A more strict form of UpdateQuery that enforces updating only
+   * known top-level properties.
+   * @example
+   * ```ts
+   * function updateUser(_id: mongoose.Types.ObjectId, update: UpdateQueryKnownOnly<IUser>) {
+   *   return User.updateOne({ _id }, update);
+   * }
+   * ```
+   */
+  export type UpdateQueryKnownOnly<T> = _UpdateQuery<T, {}>;
 
   export type FlattenMaps<T> = {
     [K in keyof T]: FlattenProperty<T[K]>;

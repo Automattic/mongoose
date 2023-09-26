@@ -1,4 +1,4 @@
-import {
+import mongoose, {
   Schema,
   Document,
   Model,
@@ -16,7 +16,7 @@ import {
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
-import { UpdateOneModel, ChangeStreamInsertDocument } from 'mongodb';
+import { UpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
 
 function rawDocSyntax(): void {
   interface ITest {
@@ -638,4 +638,60 @@ function gh13529() {
     const resourceDoc = new dbModel();
     resourceDoc.foo = 'bar';
   }
+}
+
+async function gh13705() {
+  const schema = new Schema({ name: String });
+  const TestModel = model('Test', schema);
+
+  type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string }> & { _id: mongoose.Types.ObjectId });
+
+  const findByIdRes = await TestModel.findById('0'.repeat(24), undefined, { lean: true });
+  expectType<ExpectedLeanDoc | null>(findByIdRes);
+
+  const findOneRes = await TestModel.findOne({ _id: '0'.repeat(24) }, undefined, { lean: true });
+  expectType<ExpectedLeanDoc | null>(findOneRes);
+
+  const findRes = await TestModel.find({ _id: '0'.repeat(24) }, undefined, { lean: true });
+  expectType<ExpectedLeanDoc[]>(findRes);
+
+  const findByIdAndDeleteRes = await TestModel.findByIdAndDelete('0'.repeat(24), { lean: true });
+  expectType<ExpectedLeanDoc | null>(findByIdAndDeleteRes);
+
+  const findByIdAndRemoveRes = await TestModel.findByIdAndRemove('0'.repeat(24), { lean: true });
+  expectType<ExpectedLeanDoc | null>(findByIdAndRemoveRes);
+
+  const findByIdAndUpdateRes = await TestModel.findByIdAndUpdate('0'.repeat(24), {}, { lean: true });
+  expectType<ExpectedLeanDoc | null>(findByIdAndUpdateRes);
+
+  const findOneAndDeleteRes = await TestModel.findOneAndDelete({ _id: '0'.repeat(24) }, { lean: true });
+  expectType<ExpectedLeanDoc | null>(findOneAndDeleteRes);
+
+  const findOneAndReplaceRes = await TestModel.findOneAndReplace({ _id: '0'.repeat(24) }, {}, { lean: true });
+  expectType<ExpectedLeanDoc | null>(findOneAndReplaceRes);
+
+  const findOneAndUpdateRes = await TestModel.findOneAndUpdate({}, {}, { lean: true });
+  expectType<ExpectedLeanDoc | null>(findOneAndUpdateRes);
+}
+
+async function gh13746() {
+  const schema = new Schema({ name: String });
+  const TestModel = model('Test', schema);
+
+  type OkType = 0 | 1;
+
+  const findByIdAndUpdateRes = await TestModel.findByIdAndUpdate('0'.repeat(24), {}, { includeResultMetadata: true });
+  expectType<boolean | undefined>(findByIdAndUpdateRes.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(findByIdAndUpdateRes.lastErrorObject?.upserted);
+  expectType<OkType>(findByIdAndUpdateRes.ok);
+
+  const findOneAndReplaceRes = await TestModel.findOneAndReplace({ _id: '0'.repeat(24) }, {}, { includeResultMetadata: true });
+  expectType<boolean | undefined>(findOneAndReplaceRes.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(findOneAndReplaceRes.lastErrorObject?.upserted);
+  expectType<OkType>(findOneAndReplaceRes.ok);
+
+  const findOneAndUpdateRes = await TestModel.findOneAndUpdate({ _id: '0'.repeat(24) }, {}, { includeResultMetadata: true });
+  expectType<boolean | undefined>(findOneAndUpdateRes.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(findOneAndUpdateRes.lastErrorObject?.upserted);
+  expectType<OkType>(findOneAndUpdateRes.ok);
 }

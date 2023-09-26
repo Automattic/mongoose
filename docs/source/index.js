@@ -65,6 +65,7 @@ docs['docs/migration.md'] = { guide: true, title: 'Migration Guide', markdown: t
 docs['docs/migrating_to_5.md'] = { guide: true, title: 'Migrating to Mongoose 5', markdown: true };
 docs['docs/migrating_to_6.md'] = { guide: true, title: 'Migrating to Mongoose 6', markdown: true };
 docs['docs/migrating_to_7.md'] = { guide: true, title: 'Migrating to Mongoose 7', markdown: true };
+docs['docs/migrating_to_8.md'] = { guide: true, title: 'Migrating to Mongoose 8', markdown: true };
 docs['docs/connections.md'] = { guide: true, title: 'Connecting to MongoDB', markdown: true };
 docs['docs/lambda.md'] = { guide: true, title: 'Using Mongoose With AWS Lambda', markdown: true };
 docs['docs/geojson.md'] = { guide: true, title: 'Using GeoJSON', acquit: true, markdown: true };
@@ -80,6 +81,7 @@ docs['docs/compatibility.md'] = {
   guide: true,
   markdown: true
 };
+docs['docs/field-level-encryption.md'] = { guide: true, title: 'Field Level Encryption', markdown: true };
 docs['docs/timestamps.md'] = { title: 'Mongoose Timestamps', markdown: true };
 docs['docs/search.pug'] = { title: 'Search' };
 docs['docs/enterprise.md'] = { title: 'Mongoose for Enterprise', markdown: true };

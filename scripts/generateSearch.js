@@ -132,6 +132,7 @@ async function run() {
   await Content.init();
 
   await Content.deleteMany({ version });
+  let count = 0;
   for (const content of contents) {
     if (version === '7.x') {
       let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
@@ -143,6 +144,7 @@ async function run() {
       const url = content.url.startsWith('/') ? content.url : `/${content.url}`;
       content.url = `/docs/${version}/docs${url}`;
     }
+    console.log(`${++count} / ${contents.length}`);
     await content.save();
   }
 

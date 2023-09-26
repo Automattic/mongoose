@@ -15,6 +15,7 @@ If you're still on Mongoose 6.x or earlier, please read the [Mongoose 6.x to 7.x
 * [Changed behavior for `findOneAndUpdate()` with `orFail()` and upsert](#changed-behavior-for-findoneandupdate-with-orfail-and-upsert)
 * [MongoDB Node Driver 6.0](#mongodb-node-driver-6)
 * [Removed `findOneAndRemove()`](#removed-findoneandremove)
+* [Removed id Setter](#removed-id-setter)
 
 <h2 id="removed-rawresult-option-for-findoneandupdate"><a href="#removed-rawresult-option-for-findoneandupdate">Removed <code>rawResult</code> option for <code>findOneAndUpdate()</code></a></h2>
 
@@ -54,3 +55,8 @@ There's a few noteable changes in MongoDB Node driver v6 that affect Mongoose:
 In Mongoose 7, `findOneAndRemove()` was an alias for `findOneAndDelete()` that Mongoose supported for backwards compatibility.
 Mongoose 8 no longer supports `findOneAndRemove()`.
 Use `findOneAndDelete()` instead.
+
+<h2 id="removed-id-setter"><a href="#removed-id-setter">Removed id Setter</a></h2>
+
+In Mongoose 7.4, Mongoose introduced an `id` setter that made `doc.id = '0'.repeat(24)` equivalent to `doc._id = '0'.repeat(24)`.
+In Mongoose 8, that setter is now removed.

@@ -24,10 +24,19 @@ declare module 'mongoose' {
    * @param {EnforcedDocType} EnforcedDocType A generic type enforced by user "provided before schema constructor".
    * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
    */
-   type ObtainDocumentType<DocDefinition, EnforcedDocType = any, TSchemaOptions extends Record<any, any> = DefaultSchemaOptions> =
-   IsItRecordAndNotAny<EnforcedDocType> extends true ? EnforcedDocType : {
-     [K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
-     OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)]: ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>;
+  type ObtainDocumentType<
+    DocDefinition,
+    EnforcedDocType = any,
+    TSchemaOptions extends Record<any, any> = DefaultSchemaOptions
+  > = IsItRecordAndNotAny<EnforcedDocType> extends true ?
+    EnforcedDocType :
+    {
+      [
+        K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
+        OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)
+      ]: IsPathRequired<DocDefinition[K], TSchemaOptions['typeKey']> extends true ?
+        ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> :
+        ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
    };
 
    /**

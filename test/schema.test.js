@@ -1437,7 +1437,7 @@ describe('schema', function() {
         }
       };
       const s = new Schema(TestSchema, { typeKey: '$type' });
-      assert.equal(s.path('action').constructor.name, 'SubdocumentPath');
+      assert.equal(s.path('action').constructor.name, 'SchemaSubdocument');
       assert.ok(s.path('action').schema.$implicitlyCreated);
       assert.equal(s.path('action.type').constructor.name, 'SchemaString');
     });
@@ -2650,7 +2650,7 @@ describe('schema', function() {
         myStr: { type: String, cast: v => '' + v }
       });
 
-      assert.equal(schema.path('myId').cast('12charstring').toHexString(), '313263686172737472696e67');
+      assert.equal(schema.path('myId').cast('0'.repeat(24)).toHexString(), '0'.repeat(24));
       assert.equal(schema.path('myNum').cast(3.14), 4);
       assert.equal(schema.path('myDate').cast('2012-06-01').getFullYear(), 2012);
       assert.equal(schema.path('myBool').cast('hello'), true);

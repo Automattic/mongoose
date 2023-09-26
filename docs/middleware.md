@@ -48,7 +48,6 @@ In query middleware functions, `this` refers to the query.
 * [find](api/query.html#query_Query-find)
 * [findOne](api/query.html#query_Query-findOne)
 * [findOneAndDelete](api/query.html#query_Query-findOneAndDelete)
-* [findOneAndRemove](api/query.html#query_Query-findOneAndRemove)
 * [findOneAndReplace](api/query.html#query_Query-findOneAndReplace)
 * [findOneAndUpdate](api/query.html#query_Query-findOneAndUpdate)
 * [remove](api/model.html#model_Model-remove)
@@ -81,7 +80,6 @@ Here are the possible strings that can be passed to `pre()`
 * find
 * findOne
 * findOneAndDelete
-* findOneAndRemove
 * findOneAndReplace
 * findOneAndUpdate
 * init

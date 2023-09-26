@@ -4,6 +4,7 @@ import {
   HydratedDocument,
   IndexDefinition,
   IndexOptions,
+  InferRawDocType,
   InferSchemaType,
   InsertManyOptions,
   ObtainDocumentType,
@@ -1229,4 +1230,14 @@ async function gh13797() {
   new Schema<IUser>({ name: { type: String, default: function() {
     expectType<IUser>(this); return '';
   } } });
+}
+
+function gh13772() {
+  const schemaDefinition = {
+    name: String,
+    docArr: [{ name: String }]
+  };
+  const schema = new Schema(schemaDefinition);
+  type RawDocType = InferRawDocType<typeof schemaDefinition>;
+  expectAssignable<{ name?: string, docArr?: Array<{ name?: string }> }>({} as RawDocType);
 }

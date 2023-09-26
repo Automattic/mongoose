@@ -3243,7 +3243,7 @@ describe('document', function() {
             field1: { type: Number, default: 1 }
           }
         }
-      });
+      }, { minimize: false });
 
       const MyModel = db.model('Test', schema);
 
@@ -3262,7 +3262,7 @@ describe('document', function() {
             field1: { type: Number, default: 1 }
           }
         }
-      });
+      }, { minimize: false });
 
       const MyModel = db.model('Test', schema);
 
@@ -5002,7 +5002,7 @@ describe('document', function() {
         }).
         then(function(doc) {
           doc.child = {};
-          return doc.save();
+          return Parent.updateOne({ _id: doc._id }, { $set: { child: {} } }, { minimize: false });
         }).
         then(function() {
           return Parent.findOne();

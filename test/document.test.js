@@ -1298,16 +1298,6 @@ describe('document', function() {
     await user1.save();
     const user2 = await User.findById(user1).select('name').exec();
 
-    user2.req = undefined;
-    let err = await user2.save().then(() => null, err => err);
-    err = String(err);
-
-    const invalid = /Path `req` is required./.test(err);
-    assert.ok(invalid);
-
-    user2.req = 'it works again';
-    await user2.save();
-
     const user3 = await User.findById(user2).select('_id').exec();
     await user3.save();
   });
@@ -9406,7 +9396,7 @@ describe('document', function() {
     await doc.save();
 
     const fromDb = await Test.findById(doc._id);
-    assert.deepEqual(fromDb.toObject().arr, [{ val: 2 }, { val: 2 }]);
+    assert.deepEqual(fromDb.toObject().arr, [{ val: 1 }, { val: 2 }]);
   });
 
   it('ignore getters when diffing objects for change tracking (gh-9501)', async function() {
@@ -12492,6 +12482,44 @@ describe('document', function() {
     assert.strictEqual(parent.child.concreteProp, 123);
     assert.strictEqual(parent.get('child.concreteProp'), 123);
     assert.strictEqual(parent.toObject().child.concreteProp, 123);
+  });
+
+  it('avoids saving changes to deselected paths (gh-13145) (gh-13062)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: { type: String, required: true },
+      age: { type: Number, required: true, select: false },
+      links: { type: String, required: true, select: false }
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    const { _id } = await Test.create({
+      name: 'Test Testerson',
+      age: 0,
+      links: 'some init links'
+    });
+
+    let doc = await Test.findById(_id);
+    doc.links = undefined;
+    await doc.save();
+
+    let fromDb = await Test.findById(_id).select('+links');
+    assert.equal(fromDb.links, 'some init links');
+
+    doc = await Test.findById(_id);
+    doc.links = 'new links';
+    doc.markModified('links');
+    await doc.save();
+
+    fromDb = await Test.findById(_id).select('+links');
+    assert.equal(fromDb.links, 'new links');
+
+    doc = await Test.findById(_id);
+    doc.links = undefined;
+    doc.markModified('links');
+    const err = await doc.save().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['links']);
   });
 });
 

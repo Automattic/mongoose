@@ -12493,6 +12493,29 @@ describe('document', function() {
     assert.strictEqual(parent.get('child.concreteProp'), 123);
     assert.strictEqual(parent.toObject().child.concreteProp, 123);
   });
+
+  it('avoids saving changes to deselected paths (gh-13145) (gh-13062)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: { type: String, required: true },
+      age: { type: Number, required: true, select: false },
+      links: { type: String, required: true, select: false }
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    const { _id } = await Test.create({
+      name: 'Test Testerson',
+      age: 0,
+      links: 'some init links'
+    });
+
+    const doc = await Test.findById(_id);
+    doc.links = undefined;
+    const err = await doc.save().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['links']);
+    assert.equal(err.errors['links'].message, 'Path `links` is required.');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

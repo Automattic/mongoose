@@ -11,7 +11,7 @@ const assert = require('assert');
 const mongoose = start.mongoose;
 const ArraySubdocument = require('../lib/types/arraySubdocument');
 const EventEmitter = require('events').EventEmitter;
-const DocumentArray = require('../lib/types/DocumentArray');
+const DocumentArray = require('../lib/types/documentArray');
 const Schema = mongoose.Schema;
 const ValidationError = mongoose.Document.ValidationError;
 

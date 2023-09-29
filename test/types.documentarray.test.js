@@ -6,7 +6,7 @@
 
 const start = require('./common');
 
-const DocumentArray = require('../lib/types/DocumentArray');
+const DocumentArray = require('../lib/types/documentArray');
 const ArraySubdocument = require('../lib/types/arraySubdocument');
 const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');

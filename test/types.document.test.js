@@ -9,7 +9,7 @@ const start = require('./common');
 
 const assert = require('assert');
 const mongoose = start.mongoose;
-const ArraySubdocument = require('../lib/types/ArraySubdocument');
+const ArraySubdocument = require('../lib/types/arraySubdocument');
 const EventEmitter = require('events').EventEmitter;
 const DocumentArray = require('../lib/types/DocumentArray');
 const Schema = mongoose.Schema;

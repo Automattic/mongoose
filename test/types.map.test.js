@@ -6,7 +6,7 @@
 
 const start = require('./common');
 
-const SchemaMapOptions = require('../lib/options/SchemaMapOptions');
+const SchemaMapOptions = require('../lib/options/schemaMapOptions');
 const assert = require('assert');
 
 const mongoose = start.mongoose;

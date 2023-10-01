@@ -8,7 +8,7 @@ const start = require('./common');
 
 const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
-const ArraySubdocument = require('../lib/types/ArraySubdocument');
+const ArraySubdocument = require('../lib/types/arraySubdocument');
 const Query = require('../lib/query');
 const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');

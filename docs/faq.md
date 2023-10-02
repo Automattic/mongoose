@@ -139,7 +139,7 @@ is undefined on the underlying [POJO](guide.html#minimize).
 
 <a class="anchor" href="#arrow-functions">**Q**</a>. I'm using an arrow function for a [virtual](guide.html#virtuals), [middleware](middleware.html), [getter](api/schematype.html#schematype_SchemaType-get)/[setter](api/schematype.html#schematype_SchemaType-set), or [method](guide.html#methods) and the value of `this` is wrong.
 
-**A**. Arrow functions [handle the `this` keyword much differently than conventional functions](https://masteringjs.io/tutorials/fundamentals/arrow#why-not-arrow-functions).
+**A**. Arrow functions [handle the `this` keyword very differently to conventional functions](https://masteringjs.io/tutorials/fundamentals/arrow#why-not-arrow-functions).
 Mongoose getters/setters depend on `this` to give you access to the document that you're writing to, but this functionality does not work with arrow functions. Do **not** use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.
 
 ```javascript

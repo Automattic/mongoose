@@ -12391,22 +12391,6 @@ describe('document', function() {
     assert.strictEqual(nestedProjectionDoc.sub.propertyA, 'A');
   });
 
-<<<<<<< HEAD
-  it('should ignore `id` if the object contains `id` and `_id` as keys (gh-13762)', async function() {
-    const testSchema = new Schema({
-      _id: {
-        type: Number
-      }
-    });
-    const Test = db.model('Test', testSchema);
-
-    const x = new Test({ _id: 1, id: 2 });
-    await x.save();
-    const fromDb = await Test.findById(x._id).lean();
-    assert.equal(fromDb._id, 1);
-  });
-=======
->>>>>>> master
   it('handles bigint (gh-13791)', async function() {
     const testSchema = new mongoose.Schema({
       n: Number,

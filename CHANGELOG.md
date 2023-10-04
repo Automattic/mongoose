@@ -1,3 +1,22 @@
+7.5.3 / 2023-09-25
+==================
+ * fix(document): handle MongoDB Long when casting BigInts #13869 #13791
+ * fix(model): make bulkSave() persist changes that happen in pre('save') middleware #13885 #13799
+ * fix: handle casting $elemMatch underneath $not underneath another $elemMatch #13893 #13880
+ * fix(model): make bulkWrite casting respect global setDefaultsOnInsert #13870 #13823
+ * fix(document): handle default values for discriminator key with embedded discriminators #13891 #13835
+ * fix: account for null values when assigning isNew property within document array #13883
+ * types: avoid "interface can only extend object types with statically known members" error in TypeScript 4 #13871
+ * docs(deprecations): fix typo in includeResultMetadata deprecation docs #13884 #13844
+ * docs: fix pre element overflow in home page #13868 [ghoshRitesh12](https://github.com/ghoshRitesh12)
+
+7.5.2 / 2023-09-15
+==================
+ * fix(schema): handle number discriminator keys when using Schema.prototype.discriminator() #13858 #13788
+ * fix: ignore `id` property when calling `set()` with both `id` and `_id` specified to avoid `id` setter overwriting #13762
+ * types: pass correct document type to required and default function #13851 #13797
+ * docs(model): add examples of using diffIndexes() to syncIndexes()and diffIndexes() api docs #13850 #13771
+
 7.5.1 / 2023-09-11
 ==================
  * fix: set default value for _update when no update object is provided and versionKey is set to false #13795 #13783 [MohOraby](https://github.com/MohOraby)

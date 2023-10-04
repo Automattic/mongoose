@@ -2166,7 +2166,7 @@ describe('schema', function() {
   });
 
   it('SchemaStringOptions line up with schema/string (gh-8256)', function() {
-    const SchemaStringOptions = require('../lib/options/SchemaStringOptions');
+    const SchemaStringOptions = require('../lib/options/schemaStringOptions');
     const keys = Object.keys(SchemaStringOptions.prototype).
       filter(key => key !== 'constructor' && key !== 'populate');
     const functions = Object.keys(Schema.Types.String.prototype).
@@ -2871,6 +2871,43 @@ describe('schema', function() {
       kind: 'event'
     });
     assert(batch.message);
+  });
+
+  it('supports numbers with Schema.discriminator() (gh-13788)', async() => {
+    const baseClassSchema = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class BaseClass {
+      whoAmI() {
+        return 'I am base';
+      }
+    }
+    BaseClass.type = 1;
+
+    baseClassSchema.loadClass(BaseClass);
+
+    class NumberTyped extends BaseClass {
+      whoAmI() {
+        return 'I am NumberTyped';
+      }
+    }
+    NumberTyped.type = 2;
+
+    class StringTyped extends BaseClass {
+      whoAmI() {
+        return 'I am StringTyped';
+      }
+    }
+    StringTyped.type = '3';
+
+    baseClassSchema.discriminator(2, new Schema({}).loadClass(NumberTyped));
+    baseClassSchema.discriminator('3', new Schema({}).loadClass(StringTyped));
+    const Test = db.model('Test', { item: baseClassSchema });
+    let doc = await Test.create({ item: { type: 2 } });
+    assert.equal(doc.item.whoAmI(), 'I am NumberTyped');
+    doc = await Test.create({ item: { type: '3' } });
+    assert.equal(doc.item.whoAmI(), 'I am StringTyped');
   });
 
   it('can use on as a schema property (gh-11580)', async() => {

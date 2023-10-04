@@ -123,7 +123,7 @@ is undefined on the underlying <a href="guide.html#minimize">POJO</a>.</p>
 <hr id="arrow-functions" />
 
 <p><a class="anchor" href="#arrow-functions"><strong>Q</strong></a>. I&#39;m using an arrow function for a <a href="guide.html#virtuals">virtual</a>, <a href="middleware.html">middleware</a>, <a href="api/schematype.html#schematype_SchemaType-get">getter</a>/<a href="api/schematype.html#schematype_SchemaType-set">setter</a>, or <a href="guide.html#methods">method</a> and the value of <code>this</code> is wrong.</p>
-<p><strong>A</strong>. Arrow functions <a href="https://masteringjs.io/tutorials/fundamentals/arrow#why-not-arrow-functions">handle the <code>this</code> keyword much differently than conventional functions</a>.
+<p><strong>A</strong>. Arrow functions <a href="https://masteringjs.io/tutorials/fundamentals/arrow#why-not-arrow-functions">handle the <code>this</code> keyword differently than conventional functions</a>.
 Mongoose getters/setters depend on <code>this</code> to give you access to the document that you&#39;re writing to, but this functionality does not work with arrow functions. Do <strong>not</strong> use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Do **NOT** use arrow functions as shown below unless you&#x27;re certain</span>
 <span class="hljs-comment">// that&#x27;s what you want. If you&#x27;re reading this FAQ, odds are you should</span>

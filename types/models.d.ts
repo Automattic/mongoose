@@ -401,6 +401,10 @@ declare module 'mongoose' {
       options: InsertManyOptions
     ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
     insertMany<DocContents = TRawDocType>(
+      docs: Array<DocContents | TRawDocType>,
+      options: InsertManyOptions
+    ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
+    insertMany<DocContents = TRawDocType>(
       doc: DocContents
     ): Promise<
       Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>

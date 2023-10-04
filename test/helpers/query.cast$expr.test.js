@@ -112,7 +112,10 @@ describe('castexpr', function() {
   it('casts $round (gh-13881)', function() {
     const testSchema = new Schema({ value: Number });
 
-    const res = cast$expr({ $eq: [{ $round: ['$value', '00'] }, 2] }, testSchema);
+    let res = cast$expr({ $eq: [{ $round: ['$value', '00'] }, 2] }, testSchema);
     assert.deepStrictEqual(res, { $eq: [{ $round: ['$value', 0] }, 2] });
+
+    res = cast$expr({ $eq: [{ $round: ['$value'] }, 2] }, testSchema);
+    assert.deepStrictEqual(res, { $eq: [{ $round: ['$value'] }, 2] });
   });
 });

@@ -466,10 +466,12 @@ describe('QueryCursor', function() {
     assert.equal(docs.length, 100);
   });
 
-  it('pulls schema-level readPreference (gh-8421)', function() {
+  it('pulls schema-level readPreference (gh-8421)', async function() {
     const read = 'secondaryPreferred';
     const User = db.model('User', Schema({ name: String }, { read }));
     const cursor = User.find().cursor();
+
+    await new Promise(resolve => cursor.once('cursor', resolve));
 
     assert.equal(cursor.options.readPreference, read);
   });
@@ -848,6 +850,32 @@ describe('QueryCursor', function() {
     const arr = [];
     await Movie.find({}).cursor().eachAsync(doc => arr.push(doc.name));
     assert.strictEqual(arr.length, 0);
+  });
+
+  it('supports including fields using plus path that have select: false in schema (gh-13773)', async function() {
+    const kittySchema = new mongoose.Schema({
+      name: String,
+      age: {
+        select: false,
+        type: Number
+      }
+    });
+
+    db.deleteModel(/Test/);
+    const Kitten = db.model('Test', kittySchema);
+    await Kitten.deleteMany({});
+    const silence = new Kitten({ name: 'Silence', age: 2 });
+    await silence.save();
+
+    const cursor = Kitten.find().select('+age').cursor();
+
+    const kittens = [];
+    for await (const kitten of cursor) {
+      kittens.push(kitten);
+    }
+    assert.strictEqual(kittens.length, 1);
+    assert.strictEqual(kittens[0].name, 'Silence');
+    assert.strictEqual(kittens[0].age, 2);
   });
 
   it('throws if calling skipMiddlewareFunction() with non-empty array (gh-13411)', async function() {

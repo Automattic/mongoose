@@ -359,7 +359,7 @@ describe('query middleware', function() {
     assert.equal(postCount, 1);
   });
 
-  it('error handlers XYZ (gh-2284)', async function() {
+  it('error handlers (gh-2284)', async function() {
     const testSchema = new Schema({ title: { type: String, unique: true } });
 
     testSchema.post('updateOne', function(error, res, next) {

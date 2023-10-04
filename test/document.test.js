@@ -12206,6 +12206,8 @@ describe('document', function() {
 
     const x = new Test();
     x.set('d.x.y', 1);
+    assert.strictEqual(x.d.x.y, 1);
+    assert.deepStrictEqual(x.get('d.x'), { y: 1 });
     assert.strictEqual(x.get('d.x.y'), 1);
     await x.save();
 
@@ -12389,6 +12391,7 @@ describe('document', function() {
     assert.strictEqual(nestedProjectionDoc.sub.propertyA, 'A');
   });
 
+<<<<<<< HEAD
   it('should ignore `id` if the object contains `id` and `_id` as keys (gh-13762)', async function() {
     const testSchema = new Schema({
       _id: {
@@ -12402,6 +12405,8 @@ describe('document', function() {
     const fromDb = await Test.findById(x._id).lean();
     assert.equal(fromDb._id, 1);
   });
+=======
+>>>>>>> master
   it('handles bigint (gh-13791)', async function() {
     const testSchema = new mongoose.Schema({
       n: Number,
@@ -12515,6 +12520,25 @@ describe('document', function() {
     assert.ok(err);
     assert.ok(err.errors['links']);
     assert.equal(err.errors['links'].message, 'Path `links` is required.');
+  });
+
+  it('fires pre validate hooks on 4 level single nested subdocs (gh-13876)', async function() {
+    let attachmentSchemaPreValidateCalls = 0;
+    const attachmentSchema = new Schema({ name: String });
+    attachmentSchema.pre('validate', () => { ++attachmentSchemaPreValidateCalls; });
+
+    const richImageSchema = new Schema({ attachment: { type: attachmentSchema, required: false } });
+    const brandingSchema = new Schema({ logo: richImageSchema });
+    const instanceSchema = new Schema({ branding: brandingSchema });
+    const TestModel = db.model('Test', instanceSchema);
+
+    const instance = await TestModel.create({ branding: { logo: {} } });
+    assert.strictEqual(attachmentSchemaPreValidateCalls, 0);
+    const doc = await TestModel.findById(instance._id);
+
+    doc.set('branding.logo.attachment', { name: 'coolLogo' });
+    await doc.save();
+    assert.strictEqual(attachmentSchemaPreValidateCalls, 1);
   });
 });
 

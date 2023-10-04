@@ -82,6 +82,20 @@ async function insertManyTest() {
   expectAssignable<Error | Object | ReturnType<(typeof Test)['hydrate']>>(res2.mongoose.results[0]);
 }
 
+function gh13930() {
+  interface ITest {
+    foo: string;
+  }
+
+  const TestSchema = new Schema<ITest>({
+    foo: { type: String, required: true }
+  });
+
+  const Test = connection.model<ITest>('Test', TestSchema);
+
+  Test.insertMany<{ foo: string }>([{ foo: 'bar' }], { });
+}
+
 function gh10074() {
   interface IDog {
     breed: string;

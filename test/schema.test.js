@@ -2166,7 +2166,7 @@ describe('schema', function() {
   });
 
   it('SchemaStringOptions line up with schema/string (gh-8256)', function() {
-    const SchemaStringOptions = require('../lib/options/SchemaStringOptions');
+    const SchemaStringOptions = require('../lib/options/schemaStringOptions');
     const keys = Object.keys(SchemaStringOptions.prototype).
       filter(key => key !== 'constructor' && key !== 'populate');
     const functions = Object.keys(Schema.Types.String.prototype).

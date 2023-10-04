@@ -393,7 +393,8 @@ async function gh12342_manual() {
 
 async function gh12342_auto() {
   interface Project {
-    name?: string, stars?: number
+    name?: string | null,
+    stars?: number | null
   }
 
   const ProjectSchema = new Schema({
@@ -483,8 +484,8 @@ async function gh13224() {
   const UserModel = model('User', userSchema);
 
   const u1 = await UserModel.findOne().select(['name']).orFail();
-  expectType<string | undefined>(u1.name);
-  expectType<number | undefined>(u1.age);
+  expectType<string | undefined | null>(u1.name);
+  expectType<number | undefined | null>(u1.age);
   expectAssignable<Function>(u1.toObject);
 
   const u2 = await UserModel.findOne().select<{ name?: string }>(['name']).orFail();

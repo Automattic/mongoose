@@ -8,7 +8,7 @@ const start = require('./common');
 
 const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
-const ArraySubdocument = require('../lib/types/ArraySubdocument');
+const ArraySubdocument = require('../lib/types/arraySubdocument');
 const Query = require('../lib/query');
 const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
@@ -12206,6 +12206,8 @@ describe('document', function() {
 
     const x = new Test();
     x.set('d.x.y', 1);
+    assert.strictEqual(x.d.x.y, 1);
+    assert.deepStrictEqual(x.get('d.x'), { y: 1 });
     assert.strictEqual(x.get('d.x.y'), 1);
     await x.save();
 
@@ -12389,19 +12391,6 @@ describe('document', function() {
     assert.strictEqual(nestedProjectionDoc.sub.propertyA, 'A');
   });
 
-  it('should ignore `id` if the object contains `id` and `_id` as keys (gh-13762)', async function() {
-    const testSchema = new Schema({
-      _id: {
-        type: Number
-      }
-    });
-    const Test = db.model('Test', testSchema);
-
-    const x = new Test({ _id: 1, id: 2 });
-    await x.save();
-    const fromDb = await Test.findById(x._id).lean();
-    assert.equal(fromDb._id, 1);
-  });
   it('handles bigint (gh-13791)', async function() {
     const testSchema = new mongoose.Schema({
       n: Number,
@@ -12492,6 +12481,48 @@ describe('document', function() {
     assert.strictEqual(parent.child.concreteProp, 123);
     assert.strictEqual(parent.get('child.concreteProp'), 123);
     assert.strictEqual(parent.toObject().child.concreteProp, 123);
+  });
+
+  it('avoids saving changes to deselected paths (gh-13145) (gh-13062)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: { type: String, required: true },
+      age: { type: Number, required: true, select: false },
+      links: { type: String, required: true, select: false }
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    const { _id } = await Test.create({
+      name: 'Test Testerson',
+      age: 0,
+      links: 'some init links'
+    });
+
+    const doc = await Test.findById(_id);
+    doc.links = undefined;
+    const err = await doc.save().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['links']);
+    assert.equal(err.errors['links'].message, 'Path `links` is required.');
+  });
+
+  it('fires pre validate hooks on 4 level single nested subdocs (gh-13876)', async function() {
+    let attachmentSchemaPreValidateCalls = 0;
+    const attachmentSchema = new Schema({ name: String });
+    attachmentSchema.pre('validate', () => { ++attachmentSchemaPreValidateCalls; });
+
+    const richImageSchema = new Schema({ attachment: { type: attachmentSchema, required: false } });
+    const brandingSchema = new Schema({ logo: richImageSchema });
+    const instanceSchema = new Schema({ branding: brandingSchema });
+    const TestModel = db.model('Test', instanceSchema);
+
+    const instance = await TestModel.create({ branding: { logo: {} } });
+    assert.strictEqual(attachmentSchemaPreValidateCalls, 0);
+    const doc = await TestModel.findById(instance._id);
+
+    doc.set('branding.logo.attachment', { name: 'coolLogo' });
+    await doc.save();
+    assert.strictEqual(attachmentSchemaPreValidateCalls, 1);
   });
 });
 

@@ -1,3 +1,15 @@
+7.5.4 / 2023-10-04
+==================
+ * fix: avoid stripping out `id` property when `_id` is set #13933 #13892 #13867
+ * fix(QueryCursor): avoid double-applying schema paths so you can include select: false fields with + projection using cursors #13932 #13773
+ * fix(query): allow deselecting discriminator key using - syntax #13929 #13760
+ * fix(query): handle $round in $expr as array #13928 #13881
+ * fix(document): call pre('validate') hooks when modifying a path underneath triply nested subdoc #13912 #13876
+ * fix(mongoose): correctly handle global applyPluginsToChildSchemas option #13911 #13887
+ * types: add insertMany array overload with options #13931 [t1bb4r](https://github.com/t1bb4r)
+ * docs(compatibility): add Mongoose 7 support to compatibility matrix #13875
+ * docs: amend some awkward FAQ wording #13925 [peteboere](https://github.com/peteboere)
+
 7.5.3 / 2023-09-25
 ==================
  * fix(document): handle MongoDB Long when casting BigInts #13869 #13791

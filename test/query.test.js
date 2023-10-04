@@ -4167,8 +4167,8 @@ describe('Query', function() {
     assert.equal(q.op, 'findOneAndReplace');
   });
 
-  it('allows deselecting discriminator key (gh-13679)', async function() {
-    const testSchema = new Schema({ name: String });
+  it('allows deselecting discriminator key (gh-13760) (gh-13679)', async function() {
+    const testSchema = new Schema({ name: String, age: Number });
     const Test = db.model('Test', testSchema);
     const Test2 = Test.discriminator('Test2', new Schema({ test: String }));
 
@@ -4176,5 +4176,13 @@ describe('Query', function() {
     const { name, __t } = await Test.findById(_id).select({ __t: 0 });
     assert.strictEqual(name, 'test1');
     assert.strictEqual(__t, undefined);
+
+    let doc = await Test.findById(_id).select({ __t: 0, age: 0 });
+    assert.strictEqual(doc.name, 'test1');
+    assert.strictEqual(doc.__t, undefined);
+
+    doc = await Test.findById(_id).select(['-__t', '-age']);
+    assert.strictEqual(doc.name, 'test1');
+    assert.strictEqual(doc.__t, undefined);
   });
 });

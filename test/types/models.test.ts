@@ -93,7 +93,7 @@ function gh13930() {
 
   const Test = connection.model<ITest>('Test', TestSchema);
 
-  Test.insertMany<{foo: string}>([{ foo: 'bar' }], { });
+  Test.insertMany<{ foo: string }>([{ foo: 'bar' }], { });
 }
 
 function gh10074() {

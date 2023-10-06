@@ -2180,4 +2180,34 @@ describe('model', function() {
     assert.ok(innerBuildingsPath.schemaOptions.type.discriminators.Garage);
     assert.equal(innerBuildingsPath.schemaOptions.type.discriminators.Garage.discriminatorMapping.value, 'G');
   });
+  it('should not fail when using a discriminator key multiple times (gh-13906)', async function() {
+    const options = { discriminatorKey: 'type' };
+    const eventSchema = new Schema({ date: Schema.Types.Date }, options);
+    const Event = db.model('gh-13906-event', eventSchema);
+
+
+    const clickedLinkEventSchema = new Schema({ url: String }, options);
+    const ClickedLinkEvent = Event.discriminator('ClickedLinkEvent', clickedLinkEventSchema, 'clickedLinkEvent');
+
+
+    const clickedImageEventSchema = new Schema({ image: String }, options);
+    const ClickedImageEvent = Event.discriminator('ClickedImageEvent', clickedImageEventSchema, 'clickedImageEvent');
+
+    const clickedLinkEvent = new ClickedLinkEvent({ url: 'https://clicked-link.com' });
+    assert.equal(clickedLinkEvent.type, 'clickedLinkEvent');
+    assert.equal(clickedLinkEvent.url, 'https://clicked-link.com');
+
+    const clickedImageEvent = new ClickedImageEvent({ image: 'clicked-image.png' });
+    assert.equal(clickedImageEvent.type, 'clickedImageEvent');
+    assert.equal(clickedImageEvent.image, 'clicked-image.png');
+    const query = {
+      type: 'clickedLinkEvent',
+      $or: [
+        { type: 'clickedImageEvent' }
+      ]
+    };
+    const result = await Event.find(query).exec();
+    assert(result);
+
+  });
 });

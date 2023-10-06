@@ -1,3 +1,8 @@
+7.6.0 / 2023-10-06
+==================
+ * feat: upgrade mongodb node driver -> 5.9.0 #13927 #13926 [sanguineti](https://github.com/sanguineti)
+ * fix: avoid CastError when passing different value of discriminator key in `$or` #13938 #13906
+
 7.5.4 / 2023-10-04
 ==================
  * fix: avoid stripping out `id` property when `_id` is set #13933 #13892 #13867

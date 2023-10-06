@@ -192,7 +192,6 @@ describe('document modified', function() {
     });
 
 
-
     describe('on DocumentArray', function() {
       it('work', function() {
         const post = new BlogPost();

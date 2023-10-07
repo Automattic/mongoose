@@ -130,14 +130,6 @@
   },
   "homepage": "https://mongoosejs.com",
   "browser": "./dist/browser.umd.js",
-  "mocha": {
-    "extension": [
-      "test.js"
-    ],
-    "watch-files": [
-      "test/**/*.js"
-    ]
-  },
   "config": {
     "mongodbMemoryServer": {
       "disablePostinstall": true

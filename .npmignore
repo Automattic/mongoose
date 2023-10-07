@@ -52,6 +52,7 @@ lgtm.yml
 .mocharc.yml
 .eslintrc.js
 .markdownlint-cli2.cjs
+tsconfig.json
 
 # scripts
 scripts/

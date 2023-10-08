@@ -12520,6 +12520,36 @@ describe('document', function() {
     await doc.save();
     assert.strictEqual(attachmentSchemaPreValidateCalls, 1);
   });
+
+  it('avoids creating separate subpaths entry for every element in array (gh-13874)', async function() {
+    const tradeSchema = new mongoose.Schema({ tradeId: Number, content: String });
+
+    const testSchema = new mongoose.Schema(
+      {
+        userId: Number,
+        tradeMap: {
+          type: Map,
+          of: tradeSchema
+        }
+      }
+    );
+
+    const TestModel = db.model('Test', testSchema);
+
+
+    const userId = 100;
+    const user = await TestModel.create({ userId, tradeMap: new Map() });
+
+    // add subDoc
+    for (let id = 1; id <= 10; id++) {
+      const trade = { tradeId: id, content: 'test' };
+      user.tradeMap.set(trade.tradeId.toString(), trade);
+    }
+    await user.save();
+    await TestModel.deleteOne({ userId });
+
+    assert.equal(Object.keys(TestModel.schema.subpaths).length, 3);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

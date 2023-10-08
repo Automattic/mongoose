@@ -430,6 +430,25 @@ describe('mongoose module:', function() {
     return Promise.resolve();
   });
 
+  it('global plugins with applyPluginsToChildSchemas (gh-13887)', function() {
+    const m = new Mongoose();
+    m.set('applyPluginsToChildSchemas', false);
+
+    const called = [];
+    m.plugin(function(s) {
+      called.push(s);
+    });
+
+    const schema = new m.Schema({
+      subdoc: new m.Schema({ name: String }),
+      arr: [new m.Schema({ name: String })]
+    });
+
+    m.model('Test', schema);
+    assert.equal(called.length, 1);
+    assert.ok(called.indexOf(schema) !== -1);
+  });
+
   it('global plugins recompile schemas (gh-7572)', function() {
     function helloPlugin(schema) {
       schema.virtual('greeting').get(() => 'hello');

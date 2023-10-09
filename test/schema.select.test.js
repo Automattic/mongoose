@@ -27,7 +27,7 @@ describe('schema select option', function() {
 
   it('excluding paths through schematype', async function() {
     // data clearing is required for this test, because in deno some other test leaks a "_id: immutable" index
-    await require('./util').clearTestData(db);
+    await db.dropDatabase();
 
     const schema = new Schema({
       thin: Boolean,

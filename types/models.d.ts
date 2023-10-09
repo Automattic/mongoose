@@ -32,7 +32,9 @@ declare module 'mongoose' {
     PopulateOption,
     SessionOption {
     limit?: number;
+    // @deprecated, use includeResultMetadata instead
     rawResult?: boolean;
+    includeResultMetadata?: boolean;
     ordered?: boolean;
     lean?: boolean;
     throwOnValidationError?: boolean;

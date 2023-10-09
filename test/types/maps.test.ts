@@ -71,3 +71,19 @@ function gh10872(): void {
 
   doc.toJSON().map1.foo;
 }
+
+function gh13755() {
+  class Test {
+    instance: Map<string, string>;
+    constructor() {
+      this.instance = new Map<string, string>();
+    }
+  }
+
+  const testSchema = new Schema<Test>({
+    instance: {
+      type: 'Map',
+      of: 'Mixed'
+    }
+  });
+}

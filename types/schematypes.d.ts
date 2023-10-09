@@ -45,7 +45,7 @@ declare module 'mongoose' {
       T extends number ? NumberSchemaDefinition :
         T extends boolean ? BooleanSchemaDefinition :
           T extends NativeDate ? DateSchemaDefinition :
-            T extends Map<any, any> ? SchemaDefinition<typeof Map> :
+            T extends Map<any, any> ? SchemaDefinition<typeof Map> | SchemaDefinition<'Map'> :
               T extends Buffer ? SchemaDefinition<typeof Buffer> :
                 T extends Types.ObjectId ? ObjectIdSchemaDefinition :
                   T extends Types.ObjectId[] ? AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId, EnforcedDocType>> :

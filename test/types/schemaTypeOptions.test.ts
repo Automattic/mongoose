@@ -22,7 +22,7 @@ expectType<BooleanSchemaDefinition | undefined>(new SchemaTypeOptions<boolean>()
 expectType<NumberSchemaDefinition | undefined>(new SchemaTypeOptions<number>().type);
 expectType<DateSchemaDefinition | undefined>(new SchemaTypeOptions<Date>().type);
 expectType<StringSchemaDefinition | undefined>(new SchemaTypeOptions<string>().type);
-expectType<SchemaDefinition<typeof Map> | undefined>(new SchemaTypeOptions<Map<any, any>>().type);
+expectType<SchemaDefinition<typeof Map> | SchemaDefinition<'Map'> | undefined>(new SchemaTypeOptions<Map<any, any>>().type);
 expectType<SchemaDefinition<typeof Buffer> | undefined>(new SchemaTypeOptions<Buffer>().type);
 expectType<ObjectIdSchemaDefinition | undefined>(new SchemaTypeOptions<Types.ObjectId>().type);
 expectType<AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId>> | undefined>(new SchemaTypeOptions<Types.ObjectId[]>().type);

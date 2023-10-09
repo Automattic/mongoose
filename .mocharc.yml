@@ -2,3 +2,7 @@ reporter: spec # better to identify failing / slow tests than "dot"
 ui: bdd # explicitly setting, even though it is mocha default
 require:
   - test/mocha-fixtures.js
+extension:
+  - test.js
+watch-files:
+  - test/**/*.js

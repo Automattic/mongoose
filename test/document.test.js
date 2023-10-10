@@ -12550,6 +12550,56 @@ describe('document', function() {
 
     assert.equal(Object.keys(TestModel.schema.subpaths).length, 3);
   });
+    
+  it('handles embedded discriminators defined using Schema.prototype.discriminator (gh-13898)', async function() {
+    const baseNestedDiscriminated = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class BaseClass {
+      whoAmI() {
+        return 'I am baseNestedDiscriminated';
+      }
+    }
+    BaseClass.type = 1;
+
+    baseNestedDiscriminated.loadClass(BaseClass);
+
+    class NumberTyped extends BaseClass {
+      whoAmI() {
+        return 'I am NumberTyped';
+      }
+    }
+    NumberTyped.type = 3;
+
+    class StringTyped extends BaseClass {
+      whoAmI() {
+        return 'I am StringTyped';
+      }
+    }
+    StringTyped.type = 4;
+
+    baseNestedDiscriminated.discriminator(1, new Schema({}).loadClass(NumberTyped));
+    baseNestedDiscriminated.discriminator('3', new Schema({}).loadClass(StringTyped));
+
+    const containsNestedSchema = new Schema({
+      nestedDiscriminatedTypes: { type: [baseNestedDiscriminated], required: true }
+    });
+
+    class ContainsNested {
+      whoAmI() {
+        return 'I am ContainsNested';
+      }
+    }
+    containsNestedSchema.loadClass(ContainsNested);
+
+    const Test = db.model('Test', containsNestedSchema);
+    const instance = await Test.create({ type: 1, nestedDiscriminatedTypes: [{ type: 1 }, { type: '3' }] });
+    assert.deepStrictEqual(
+      instance.nestedDiscriminatedTypes.map(i => i.whoAmI()),
+      ['I am NumberTyped', 'I am StringTyped']
+    );
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

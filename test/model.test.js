@@ -6239,6 +6239,27 @@ describe('Model', function() {
       assert.equal(writeOperations.length, 3);
     });
 
+    it('saves changes in discriminators if calling `bulkSave()` on base model (gh-13907)', async() => {
+      const schema = new mongoose.Schema(
+        { value: String },
+        { discriminatorKey: 'type' }
+      );
+      const typeASchema = new mongoose.Schema({ aValue: String });
+      schema.discriminator('A', typeASchema);
+
+      const TestModel = db.model('Test', schema);
+      const testData = { value: 'initValue', type: 'A', aValue: 'initAValue' };
+      const doc = await TestModel.create(testData);
+
+      doc.value = 'updatedValue1';
+      doc.aValue = 'updatedValue2';
+      await TestModel.bulkSave([doc]);
+
+      const findDoc = await TestModel.findById(doc._id);
+      assert.strictEqual(findDoc.value, 'updatedValue1');
+      assert.strictEqual(findDoc.aValue, 'updatedValue2');
+    });
+
     it('accepts `timestamps: false` (gh-12059)', async() => {
       // Arrange
       const userSchema = new Schema({

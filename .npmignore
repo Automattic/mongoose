@@ -47,4 +47,13 @@ webpack.base.config.js
 notes.md
 list.out
 
-eslintrc.json
+# config files
+lgtm.yml
+.mocharc.yml
+.eslintrc.js
+.markdownlint-cli2.cjs
+tsconfig.json
+
+# scripts
+scripts/
+tools/

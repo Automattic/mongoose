@@ -1,3 +1,11 @@
+7.6.1 / 2023-10-09
+==================
+ * fix: bump bson to match mongodb@5.9.0 exactly #13947 [hasezoey](https://github.com/hasezoey)
+ * fix: raw result deprecation message #13954 [simllll](https://github.com/simllll)
+ * type: add types for includeResultMetadata #13955 [simllll](https://github.com/simllll)
+ * perf(npmignore): ignore newer files #13946 [hasezoey](https://github.com/hasezoey)
+ * perf: move mocha config from package.json to mocharc #13948 [hasezoey](https://github.com/hasezoey)
+
 7.6.0 / 2023-10-06
 ==================
  * feat: upgrade mongodb node driver -> 5.9.0 #13927 #13926 [sanguineti](https://github.com/sanguineti)

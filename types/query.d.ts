@@ -124,9 +124,14 @@ declare module 'mongoose' {
     overwriteDiscriminatorKey?: boolean;
     projection?: ProjectionType<DocType>;
     /**
+     * @deprecated use includeResultMetadata instead.
      * if true, returns the raw result from the MongoDB driver
      */
     rawResult?: boolean;
+    /**
+     * if ture, includes meta data for the result from the MongoDB driver
+     */
+    includeResultMetadata?: boolean;
     readPreference?: string | mongodb.ReadPreferenceMode;
     /**
      * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.

@@ -219,7 +219,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                           PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt ? bigint :
                                             PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
                                               IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
-                                                PathValueType extends MapConstructor ? Map<string, ResolvePathType<Options['of']>> :
+                                                PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>> :
                                                   IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
                                                     PathValueType extends ArrayConstructor ? any[] :
                                                       PathValueType extends typeof Schema.Types.Mixed ? any:

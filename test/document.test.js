@@ -12550,7 +12550,7 @@ describe('document', function() {
 
     assert.equal(Object.keys(TestModel.schema.subpaths).length, 3);
   });
-    
+
   it('handles embedded discriminators defined using Schema.prototype.discriminator (gh-13898)', async function() {
     const baseNestedDiscriminated = new Schema({
       type: { type: Number, required: true }

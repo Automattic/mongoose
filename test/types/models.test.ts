@@ -717,10 +717,10 @@ function gh13904() {
   interface ITest {
     name?: string;
   }
-  const Test = model<ITest>("Test", schema);
+  const Test = model<ITest>('Test', schema);
 
   expectAssignable<Promise<InsertManyResult<ITest>>>(Test.insertMany(
-    [{ name: "test" }],
+    [{ name: 'test' }],
     {
       ordered: false,
       rawResult: true

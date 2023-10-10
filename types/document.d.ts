@@ -75,6 +75,7 @@ declare module 'mongoose' {
 
     /** Returns the model with the given name on this document's associated connection. */
     $model<ModelType = Model<unknown>>(name: string): ModelType;
+    $model<ModelType = Model<DocType>>(): ModelType;
 
     /**
      * A string containing the current operation that Mongoose is executing

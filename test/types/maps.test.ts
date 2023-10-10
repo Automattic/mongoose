@@ -1,4 +1,5 @@
 import { Schema, model, Document, Model, Types } from 'mongoose';
+import { expectType } from 'tsd';
 
 interface ITest {
   map1: Map<string, number>,
@@ -73,17 +74,14 @@ function gh10872(): void {
 }
 
 function gh13755() {
-  class Test {
-    instance: Map<string, string>;
-    constructor() {
-      this.instance = new Map<string, string>();
-    }
-  }
-
-  const testSchema = new Schema<Test>({
+  const testSchema = new Schema({
     instance: {
       type: 'Map',
-      of: 'Mixed'
+      of: String
     }
-  });
+  } as const);
+
+  const TestModel = model('Test', testSchema);
+  const doc = new TestModel();
+  expectType<Map<string, string> | undefined>(doc.instance);
 }

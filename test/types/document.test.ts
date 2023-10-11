@@ -302,6 +302,7 @@ function gh13878() {
   const User = model('User', schema);
   const user = new User({ name: 'John', age: 30 });
   expectType<typeof User>(user.$model());
+  expectType<typeof User>(user.model());
 }
 
 function gh13094() {

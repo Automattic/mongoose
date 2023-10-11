@@ -192,6 +192,10 @@ declare module 'mongoose' {
     markModified<T extends keyof DocType>(path: T, scope?: any): void;
     markModified(path: string, scope?: any): void;
 
+    /** Returns the model with the given name on this document's associated connection. */
+    model<ModelType = Model<unknown>>(name: string): ModelType;
+    model<ModelType = Model<DocType>>(): ModelType;
+
     /** Returns the list of paths that have been modified. */
     modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;
 

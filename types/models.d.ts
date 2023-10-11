@@ -374,7 +374,7 @@ declare module 'mongoose' {
       options: InsertManyOptions & { ordered: false; rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>> & {
       mongoose: {
-        validationErrors: Error[];
+        validationErrors: (CastError | Error.ValidatorError)[];
         results: Array<
           Error |
           Object |
@@ -403,7 +403,7 @@ declare module 'mongoose' {
       options: InsertManyOptions & { ordered: false; rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<DocContents>> & {
       mongoose: {
-        validationErrors: Error[];
+        validationErrors: (CastError | Error.ValidatorError)[];
         results: Array<
           Error |
           Object |

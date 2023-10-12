@@ -12521,6 +12521,14 @@ describe('document', function() {
     assert.strictEqual(attachmentSchemaPreValidateCalls, 1);
   });
 
+  it('returns constructor if using $model() with no args (gh-13878)', async function() {
+    const testSchema = new Schema({ name: String });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test();
+    assert.strictEqual(doc.$model(), Test);
+  });
+
   it('avoids creating separate subpaths entry for every element in array (gh-13874)', async function() {
     const tradeSchema = new mongoose.Schema({ tradeId: Number, content: String });
 

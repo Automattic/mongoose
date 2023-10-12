@@ -1,3 +1,8 @@
+6.12.1 / 2023-10-12
+===================
+ * fix(mongoose): correctly handle global applyPluginsToChildSchemas option #13945 #13887 [hasezoey](https://github.com/hasezoey)
+ * fix: Document.prototype.isModified support for a string of keys as first parameter #13940 #13674 [k-chop](https://github.com/k-chop)
+
 6.12.0 / 2023-08-24
 ===================
  * feat: use mongodb driver v4.17.1

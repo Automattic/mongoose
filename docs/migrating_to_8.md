@@ -12,6 +12,7 @@ you should be aware of when migrating from Mongoose 7.x to Mongoose 8.x.
 If you're still on Mongoose 6.x or earlier, please read the [Mongoose 6.x to 7.x migration guide](migrating_to_7.html) and upgrade to Mongoose 7.x first before upgrading to Mongoose 8.
 
 * [Removed `rawResult` option for `findOneAndUpdate()`](#removed-rawresult-option-for-findoneandupdate)
+* [`Document.prototype.deleteOne()` now returns a query](#document-prototype-deleteone-now-returns-a-query)
 * [Changed behavior for `findOneAndUpdate()` with `orFail()` and upsert](#changed-behavior-for-findoneandupdate-with-orfail-and-upsert)
 * [MongoDB Node Driver 6.0](#mongodb-node-driver-6)
 * [Removed `findOneAndRemove()`](#removed-findoneandremove)
@@ -35,6 +36,23 @@ const res = await Character.findOneAndUpdate(filter, update, {
 ```
 
 `includeResultMetadata` in Mongoose 8 behaves identically to `rawResult`.
+
+<h2 id="document-prototype-deleteone-now-returns-a-query"><a href="#document-prototype-deleteone-now-returns-a-query"><code>Document.prototype.deleteOne</code> now returns a query</a></h2>
+
+In Mongoose 7, `doc.deleteOne()` returned a promise that resolved to `doc`.
+In Mongoose 8, `doc.deleteOne()` returns a query for easier chaining, as well as consistency with `doc.updateOne()`.
+
+```javascript
+const numberOne = await Character.findOne({ name: 'Will Riker' });
+
+// In Mongoose 7, q is a Promise that resolves to `numberOne`
+// In Mongoose 8, q is a Query.
+const q = numberOne.deleteOne();
+
+// In Mongoose 7, `res === numberOne`
+// In Mongoose 8, `res` is a `DeleteResult`.
+const res = await q;
+```
 
 <h2 id="changed-behavior-for-findoneandupdate-with-orfail-and-upsert"><a href="#changed-behavior-for-findoneandupdate-with-orfail-and-upsert">Changed behavior for <code>findOneAndUpdate()</code> with <code>orFail()</code> and upsert</a></h2>
 

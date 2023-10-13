@@ -32,7 +32,9 @@ declare module 'mongoose' {
     PopulateOption,
     SessionOption {
     limit?: number;
+    // @deprecated, use includeResultMetadata instead
     rawResult?: boolean;
+    includeResultMetadata?: boolean;
     ordered?: boolean;
     lean?: boolean;
     throwOnValidationError?: boolean;
@@ -360,6 +362,34 @@ declare module 'mongoose' {
     init(): Promise<THydratedDocumentType>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
+    insertMany(
+      docs: Array<TRawDocType>
+    ): Promise<Array<THydratedDocumentType>>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { lean: true; }
+    ): Promise<Array<Require_id<TRawDocType>>>;
+    insertMany(
+      doc: Array<TRawDocType>,
+      options: InsertManyOptions & { ordered: false; rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>> & {
+      mongoose: {
+        validationErrors: (CastError | Error.ValidatorError)[];
+        results: Array<
+          Error |
+          Object |
+          THydratedDocumentType
+        >
+      }
+    }>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { lean: true, rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>>>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<THydratedDocumentType>>>;
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>,
       options: InsertManyOptions & { lean: true; }
@@ -373,7 +403,7 @@ declare module 'mongoose' {
       options: InsertManyOptions & { ordered: false; rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<DocContents>> & {
       mongoose: {
-        validationErrors: Error[];
+        validationErrors: (CastError | Error.ValidatorError)[];
         results: Array<
           Error |
           Object |

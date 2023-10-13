@@ -12524,6 +12524,106 @@ describe('document', function() {
     await doc.save();
     assert.strictEqual(attachmentSchemaPreValidateCalls, 1);
   });
+
+  it('returns constructor if using $model() with no args (gh-13878)', async function() {
+    const testSchema = new Schema({ name: String });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test();
+    assert.strictEqual(doc.$model(), Test);
+  });
+
+  it('avoids creating separate subpaths entry for every element in array (gh-13874)', async function() {
+    const tradeSchema = new mongoose.Schema({ tradeId: Number, content: String });
+
+    const testSchema = new mongoose.Schema(
+      {
+        userId: Number,
+        tradeMap: {
+          type: Map,
+          of: tradeSchema
+        }
+      }
+    );
+
+    const TestModel = db.model('Test', testSchema);
+
+
+    const userId = 100;
+    const user = await TestModel.create({ userId, tradeMap: new Map() });
+
+    // add subDoc
+    for (let id = 1; id <= 10; id++) {
+      const trade = { tradeId: id, content: 'test' };
+      user.tradeMap.set(trade.tradeId.toString(), trade);
+    }
+    await user.save();
+    await TestModel.deleteOne({ userId });
+
+    assert.equal(Object.keys(TestModel.schema.subpaths).length, 3);
+  });
+
+  it('handles embedded discriminators defined using Schema.prototype.discriminator (gh-13898)', async function() {
+    const baseNestedDiscriminated = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class BaseClass {
+      whoAmI() {
+        return 'I am baseNestedDiscriminated';
+      }
+    }
+    BaseClass.type = 1;
+
+    baseNestedDiscriminated.loadClass(BaseClass);
+
+    class NumberTyped extends BaseClass {
+      whoAmI() {
+        return 'I am NumberTyped';
+      }
+    }
+    NumberTyped.type = 3;
+
+    class StringTyped extends BaseClass {
+      whoAmI() {
+        return 'I am StringTyped';
+      }
+    }
+    StringTyped.type = 4;
+
+    baseNestedDiscriminated.discriminator(1, new Schema({}).loadClass(NumberTyped));
+    baseNestedDiscriminated.discriminator('3', new Schema({}).loadClass(StringTyped));
+
+    const containsNestedSchema = new Schema({
+      nestedDiscriminatedTypes: { type: [baseNestedDiscriminated], required: true }
+    });
+
+    class ContainsNested {
+      whoAmI() {
+        return 'I am ContainsNested';
+      }
+    }
+    containsNestedSchema.loadClass(ContainsNested);
+
+    const Test = db.model('Test', containsNestedSchema);
+    const instance = await Test.create({ type: 1, nestedDiscriminatedTypes: [{ type: 1 }, { type: '3' }] });
+    assert.deepStrictEqual(
+      instance.nestedDiscriminatedTypes.map(i => i.whoAmI()),
+      ['I am NumberTyped', 'I am StringTyped']
+    );
+  });
+
+  it('can use `collection` as schema name (gh-13956)', async function() {
+    const schema = new mongoose.Schema({ name: String, collection: String });
+    const Test = db.model('Test', schema);
+
+    const doc = await Test.create({ name: 'foo', collection: 'bar' });
+    assert.strictEqual(doc.collection, 'bar');
+    doc.collection = 'baz';
+    await doc.save();
+    const { collection } = await Test.findById(doc);
+    assert.strictEqual(collection, 'baz');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

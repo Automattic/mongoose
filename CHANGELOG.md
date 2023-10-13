@@ -1,3 +1,27 @@
+7.6.2 / 2023-10-13
+==================
+ * perf: avoid storing a separate entry in schema subpaths for every element in an array #13953 #13874
+ * fix(document): avoid triggering setter when initializing Model.prototype.collection to allow defining collection as a schema path name #13968 #13956
+ * fix(model): make bulkSave() save changes in discriminator paths if calling bulkSave() on base model #13959 #13907
+ * fix(document): allow calling $model() with no args for TypeScript #13963 #13878
+ * fix(schema): handle embedded discriminators defined using Schema.prototype.discriminator() #13958 #13898
+ * types(model): make InsertManyResult consistent with return type of insertMany #13965 #13904
+ * types(models): add cleaner type definitions for insertMany() with no generics to prevent errors when using insertMany() in generic classes #13964 #13957
+ * types(schematypes): allow defining map path using type: 'Map' in addition to type: Map #13960 #13755
+
+7.6.1 / 2023-10-09
+==================
+ * fix: bump bson to match mongodb@5.9.0 exactly #13947 [hasezoey](https://github.com/hasezoey)
+ * fix: raw result deprecation message #13954 [simllll](https://github.com/simllll)
+ * type: add types for includeResultMetadata #13955 [simllll](https://github.com/simllll)
+ * perf(npmignore): ignore newer files #13946 [hasezoey](https://github.com/hasezoey)
+ * perf: move mocha config from package.json to mocharc #13948 [hasezoey](https://github.com/hasezoey)
+
+7.6.0 / 2023-10-06
+==================
+ * feat: upgrade mongodb node driver -> 5.9.0 #13927 #13926 [sanguineti](https://github.com/sanguineti)
+ * fix: avoid CastError when passing different value of discriminator key in `$or` #13938 #13906
+
 7.5.4 / 2023-10-04
 ==================
  * fix: avoid stripping out `id` property when `_id` is set #13933 #13892 #13867

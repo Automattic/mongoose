@@ -12608,6 +12608,18 @@ describe('document', function() {
       ['I am NumberTyped', 'I am StringTyped']
     );
   });
+
+  it('can use `collection` as schema name (gh-13956)', async function() {
+    const schema = new mongoose.Schema({ name: String, collection: String });
+    const Test = db.model('Test', schema);
+
+    const doc = await Test.create({ name: 'foo', collection: 'bar' });
+    assert.strictEqual(doc.collection, 'bar');
+    doc.collection = 'baz';
+    await doc.save();
+    const { collection } = await Test.findById(doc);
+    assert.strictEqual(collection, 'baz');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

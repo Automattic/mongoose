@@ -260,7 +260,7 @@ declare module 'mongoose' {
     /** Returns a copy of this schema */
     clone<T = this>(): T;
 
-    discriminator<DisSchema = Schema>(name: string, schema: DisSchema): this;
+    discriminator<DisSchema = Schema>(name: string | number, schema: DisSchema): this;
 
     /** Returns a new schema that has the picked `paths` from this schema. */
     pick<T = this>(paths: string[], options?: SchemaOptions): T;

@@ -2200,4 +2200,21 @@ describe('model: findOneAndUpdate:', function() {
     assert.ok(document);
     assert.equal(document.name, 'test');
   });
+
+  it('skips adding defaults to filter when passing empty update (gh-13962)', async function() {
+    const schema = new Schema({
+      myField: Number,
+      defaultField: { type: String, default: 'default' }
+    }, { versionKey: false });
+    const Test = db.model('Test', schema);
+
+    await Test.create({ myField: 1, defaultField: 'some non-default value' });
+
+    const updated = await Test.findOneAndUpdate(
+      { myField: 1 },
+      {},
+      { upsert: true, returnDocument: 'after' }
+    );
+    assert.equal(updated.defaultField, 'some non-default value');
+  });
 });

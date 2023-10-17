@@ -32,14 +32,14 @@ declare module 'mongoose' {
     EnforcedDocType :
     {
       [
-        K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
-        OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)
+      K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
+      OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)
       ]: IsPathRequired<DocDefinition[K], TSchemaOptions['typeKey']> extends true ?
         ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> :
         ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
-   };
+    };
 
-   /**
+  /**
    * @summary Obtains document schema type from Schema instance.
    * @param {Schema} TSchema `typeof` a schema instance.
    * @example
@@ -48,7 +48,7 @@ declare module 'mongoose' {
    * // result
    * type UserType = {userName?: string}
    */
-   export type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
+  export type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.

@@ -1,3 +1,10 @@
+7.6.3 / 2023-10-17
+==================
+ * fix(populate): handle multiple spaces when specifying paths to populate using space-delimited paths #13984 #13951
+ * fix(update): avoid applying defaults on query filter when upserting with empty update #13983 #13962
+ * fix(model): add versionKey to bulkWrite when inserting or upserting #13981 #13944
+ * docs: fix typo in timestamps docs #13976 [danielcoker](https://github.com/danielcoker)
+
 7.6.2 / 2023-10-13
 ==================
  * perf: avoid storing a separate entry in schema subpaths for every element in an array #13953 #13874

@@ -4043,6 +4043,49 @@ describe('Model', function() {
 
       });
 
+      it('sets version key (gh-13944)', async function() {
+        const userSchema = new Schema({
+          firstName: { type: String, required: true },
+          lastName: { type: String }
+        });
+        const User = db.model('User', userSchema);
+
+        await User.bulkWrite([
+          {
+            updateOne: {
+              filter: { lastName: 'Gibbons' },
+              update: { firstName: 'Peter' },
+              upsert: true
+            }
+          },
+          {
+            insertOne: {
+              document: {
+                firstName: 'Michael',
+                lastName: 'Bolton'
+              }
+            }
+          },
+          {
+            replaceOne: {
+              filter: { lastName: 'Lumbergh' },
+              replacement: { firstName: 'Bill', lastName: 'Lumbergh' },
+              upsert: true
+            }
+          }
+        ], { ordered: false });
+
+        const users = await User.find();
+        assert.deepStrictEqual(
+          users.map(user => user.firstName).sort(),
+          ['Bill', 'Michael', 'Peter']
+        );
+        assert.deepStrictEqual(
+          users.map(user => user.__v),
+          [0, 0, 0]
+        );
+      });
+
       it('with single nested and setOnInsert (gh-7534)', function() {
         const nested = new Schema({ name: String });
         const schema = new Schema({ nested: nested });
@@ -6237,6 +6280,27 @@ describe('Model', function() {
       const writeOperations = User.buildBulkWriteOperations(users, { skipValidation: true });
 
       assert.equal(writeOperations.length, 3);
+    });
+
+    it('saves changes in discriminators if calling `bulkSave()` on base model (gh-13907)', async() => {
+      const schema = new mongoose.Schema(
+        { value: String },
+        { discriminatorKey: 'type' }
+      );
+      const typeASchema = new mongoose.Schema({ aValue: String });
+      schema.discriminator('A', typeASchema);
+
+      const TestModel = db.model('Test', schema);
+      const testData = { value: 'initValue', type: 'A', aValue: 'initAValue' };
+      const doc = await TestModel.create(testData);
+
+      doc.value = 'updatedValue1';
+      doc.aValue = 'updatedValue2';
+      await TestModel.bulkSave([doc]);
+
+      const findDoc = await TestModel.findById(doc._id);
+      assert.strictEqual(findDoc.value, 'updatedValue1');
+      assert.strictEqual(findDoc.aValue, 'updatedValue2');
     });
 
     it('accepts `timestamps: false` (gh-12059)', async() => {

@@ -1,3 +1,21 @@
+7.6.3 / 2023-10-17
+==================
+ * fix(populate): handle multiple spaces when specifying paths to populate using space-delimited paths #13984 #13951
+ * fix(update): avoid applying defaults on query filter when upserting with empty update #13983 #13962
+ * fix(model): add versionKey to bulkWrite when inserting or upserting #13981 #13944
+ * docs: fix typo in timestamps docs #13976 [danielcoker](https://github.com/danielcoker)
+
+7.6.2 / 2023-10-13
+==================
+ * perf: avoid storing a separate entry in schema subpaths for every element in an array #13953 #13874
+ * fix(document): avoid triggering setter when initializing Model.prototype.collection to allow defining collection as a schema path name #13968 #13956
+ * fix(model): make bulkSave() save changes in discriminator paths if calling bulkSave() on base model #13959 #13907
+ * fix(document): allow calling $model() with no args for TypeScript #13963 #13878
+ * fix(schema): handle embedded discriminators defined using Schema.prototype.discriminator() #13958 #13898
+ * types(model): make InsertManyResult consistent with return type of insertMany #13965 #13904
+ * types(models): add cleaner type definitions for insertMany() with no generics to prevent errors when using insertMany() in generic classes #13964 #13957
+ * types(schematypes): allow defining map path using type: 'Map' in addition to type: Map #13960 #13755
+
 7.6.1 / 2023-10-09
 ==================
  * fix: bump bson to match mongodb@5.9.0 exactly #13947 [hasezoey](https://github.com/hasezoey)

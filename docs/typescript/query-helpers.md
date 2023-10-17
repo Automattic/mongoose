@@ -29,7 +29,7 @@ The 2nd generic parameter, `TQueryHelpers`, should be an interface that contains
 Below is an example of creating a `ProjectModel` with a `byName` query helper.
 
 ```typescript
-import { HydratedDocument, Model, Query, Schema, model } from 'mongoose';
+import { HydratedDocument, Model, QueryWithHelpers, Schema, model, connect } from 'mongoose';
 
 interface Project {
   name?: string;
@@ -64,7 +64,7 @@ ProjectSchema.query.byName = function byName(
 };
 
 // 2nd param to `model()` is the Model class to return.
-const ProjectModel = model<Project, ProjectModelType>('Project', schema);
+const ProjectModel = model<Project, ProjectModelType>('Project', ProjectSchema);
 
 run().catch(err => console.log(err));
 

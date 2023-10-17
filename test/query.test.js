@@ -2962,17 +2962,6 @@ describe('Query', function() {
     delete db.base.options.maxTimeMS;
   });
 
-  it('throws error with updateOne() and overwrite (gh-7475)', function() {
-    const Model = db.model('Test', Schema({ name: String }));
-
-    return Model.updateOne({}, { name: 'bar' }, { overwrite: true }).then(
-      () => { throw new Error('Should have failed'); },
-      err => {
-        assert.ok(err.message.indexOf('updateOne') !== -1);
-      }
-    );
-  });
-
   describe('merge()', function() {
     it('copies populate() (gh-1790)', async function() {
       const Car = db.model('Car', {

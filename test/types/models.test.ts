@@ -769,4 +769,5 @@ function gh13897() {
   const Document = model<IDocument>('Document', documentSchema);
   const doc = new Document({ name: 'foo' });
   expectType<Date>(doc.createdAt);
+  expectError(new Document<IDocument>({ name: 'foo' }));
 }

@@ -614,7 +614,7 @@ declare module 'mongoose' {
     >;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
-    projection(fields?: ProjectionFields<DocType> | string): ProjectionFields<DocType>; //
+    projection(fields?: ProjectionFields<DocType> | string): ProjectionFields<DocType>;
     projection(fields: null): null;
     projection(): ProjectionFields<DocType> | null;
 

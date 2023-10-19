@@ -19,7 +19,7 @@ declare module 'mongoose' {
 
   type MongooseQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, 'populate' | 'lean' | 'strict' | 'sanitizeProjection' | 'sanitizeFilter'>;
 
-  type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>; // Test
+  type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;
 
   type QueryWithHelpers<ResultType, DocType, THelpers = {}, RawDocType = DocType, QueryOp = 'find'> = Query<ResultType, DocType, THelpers, RawDocType, QueryOp> & THelpers;
 

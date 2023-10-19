@@ -4047,6 +4047,49 @@ describe('Model', function() {
 
       });
 
+      it('sets version key (gh-13944)', async function() {
+        const userSchema = new Schema({
+          firstName: { type: String, required: true },
+          lastName: { type: String }
+        });
+        const User = db.model('User', userSchema);
+
+        await User.bulkWrite([
+          {
+            updateOne: {
+              filter: { lastName: 'Gibbons' },
+              update: { firstName: 'Peter' },
+              upsert: true
+            }
+          },
+          {
+            insertOne: {
+              document: {
+                firstName: 'Michael',
+                lastName: 'Bolton'
+              }
+            }
+          },
+          {
+            replaceOne: {
+              filter: { lastName: 'Lumbergh' },
+              replacement: { firstName: 'Bill', lastName: 'Lumbergh' },
+              upsert: true
+            }
+          }
+        ], { ordered: false });
+
+        const users = await User.find();
+        assert.deepStrictEqual(
+          users.map(user => user.firstName).sort(),
+          ['Bill', 'Michael', 'Peter']
+        );
+        assert.deepStrictEqual(
+          users.map(user => user.__v),
+          [0, 0, 0]
+        );
+      });
+
       it('with single nested and setOnInsert (gh-7534)', function() {
         const nested = new Schema({ name: String });
         const schema = new Schema({ nested: nested });

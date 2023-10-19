@@ -1,3 +1,7 @@
+5.13.21 / 2023-10-19
+====================
+ * types: fix "near" aggregation operator input type #12954 [Jokero](https://github.com/Jokero)
+
 5.13.20 / 2023-07-12
 ====================
  * fix: avoid prototype pollution on init

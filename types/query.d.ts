@@ -45,7 +45,7 @@ declare module 'mongoose' {
     MongooseBaseQueryOptionKeys | 'timestamps'
   >;
 
-  type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>; // Test
+  type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;
 
   type QueryWithHelpers<
     ResultType,

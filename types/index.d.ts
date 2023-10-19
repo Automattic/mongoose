@@ -654,24 +654,24 @@ declare module 'mongoose' {
   type Projector<T, Element> = T extends Array<infer U> ? Projector<U, Element> : T extends object ? {
     [K in keyof T]?: T[K] extends object ? Projector<T[K], Element> | Element : Element;
   } : Element;
-  type InclusionProjection<T> = Projector<T, true | 1> & { _id?: true | 1 | false | 0 };
-  type ExclusionProjection<T> = Projector<T, false | 0> & { _id?: false | 0 };
+  type _IDType = { _id?: boolean | 1 | 0 };
+  type InclusionProjection<T> = NestedPartial<Projector<NestedRequired<T>, true | 1> & _IDType>;
+  type ExclusionProjection<T> = NestedPartial<Projector<NestedRequired<T>, false | 0> & _IDType>;
 
   type NestedRequired<T> = T extends Array<infer U>
-  ? Array<NestedRequired<U>>
-  : T extends object
-  ? {
-      [K in keyof T]-?: NestedRequired<T[K]>;
-    }
-  : T;
+    ? Array<NestedRequired<U>>
+    : T extends object
+      ? {
+        [K in keyof T]-?: NestedRequired<T[K]>;
+      }
+      : T;
   type NestedPartial<T> = T extends object
-  ? {
+    ? {
       [K in keyof T]?: NestedPartial<T[K]>;
     }
-  : T;
+    : T;
 
-  // Bazi vaghta chizaye chert o pert pas midan
-  export type ProjectionType<T> = NestedPartial<InclusionProjection<NestedRequired<T>>> | NestedPartial<ExclusionProjection<NestedRequired<T>>> | string | string[] | ((...agrs: any) => any);
+  export type ProjectionType<T> = (InclusionProjection<T> | ExclusionProjection<T>) & AnyObject | string | ((...agrs: any) => any);
 
   export type SortValues = SortOrder;
 

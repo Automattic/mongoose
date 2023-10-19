@@ -128,7 +128,7 @@ declare module 'mongoose' {
     updatedAt?: boolean;
   }
 
-  interface QueryOptions<DocType = unknown> extends
+  interface QueryOptions<DocType = any> extends
     PopulateOption,
     SessionOption {
     arrayFilters?: { [key: string]: any }[];
@@ -160,7 +160,7 @@ declare module 'mongoose' {
      * Set `overwriteImmutable` to `true` to allow updating immutable properties using other update operators.
      */
     overwriteImmutable?: boolean;
-    projection?: ProjectionType<DocType>;
+    projection?: ProjectionType<any>;
     /**
      * if true, returns the full ModifyResult rather than just the document
      */

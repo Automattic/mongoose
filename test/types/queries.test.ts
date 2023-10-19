@@ -172,6 +172,7 @@ Test.find({}, { name: 1, age: 1, endDate: 1, tags: 1, child: { name: 1 }, docs: 
 Test.find({}, { _id: 0, name: 1, age: 1, endDate: 1, tags: 1, child: 1, docs: 1 }); // _id is an exception and should be allowed to be excluded
 Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: 0, docs: 0 }); // This should be allowed
 Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: { name: 0 }, docs: { myId: 0, id: 0 } }); // This should be allowed
+Test.find({}, { name: 1, age: 1, _id: 0 }); // This should be allowed since _id is an exception
 // Sorting
 Test.find().sort();
 Test.find().sort('-name');

@@ -588,7 +588,8 @@ declare module 'mongoose' {
 
   export type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
 
-  type Projector<T, Element> = T extends Array<infer U> ? Projector<U, Element> : T extends object ? {
+  type ArrayOperators = { $slice: number | [number, number], $elemMatch?: undefined } | { $elemMatch: object, $slice?: undefined }
+  type Projector<T, Element> = T extends Array<infer U> ? Projector<U, Element> | ArrayOperators : T extends object ? {
     [K in keyof T]?: T[K] extends object ? Projector<T[K], Element> | Element : Element;
   } : Element;
   type _IDType = { _id?: boolean | 1 | 0 };

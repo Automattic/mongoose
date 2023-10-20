@@ -20,6 +20,7 @@ If you're still on Mongoose 6.x or earlier, please read the [Mongoose 6.x to 7.x
 * [`null` is valid for non-required string enums](#null-is-valid-for-non-required-string-enums)
 * [Apply minimize when `save()` updates an existing document](#apply-minimize-when-save-updates-an-existing-document)
 * [Apply base schema paths before discriminator paths](#apply-base-schema-paths-before-discriminator-paths)
+* [Removed `overwrite` option for `findOneAndUpdate()`](#removed-overwrite-option-for-findoneandupdate)
 * [Changed behavior for `findOneAndUpdate()` with `orFail()` and upsert](#changed-behavior-for-findoneandupdate-with-orfail-and-upsert)
 * [`create()` waits until all saves are done before throwing any error](#create-waits-until-all-saves-are-done-before-throwing-any-error)
 * [`Model.validate()` returns copy of object](#model-validate-returns-copy-of-object)
@@ -164,6 +165,15 @@ const doc = new D({ name: 'test', otherProp: 'test' });
 // In Mongoose 7, prints "Discriminator schema getter" followed by "Base schema getter"
 console.log(doc.toObject({ getters: true }));
 ```
+
+<h2 id="removed-overwrite-option-for-findoneandupdate"><a href="#removed-overwrite-option-for-findoneandupdate">Removed <code>overwrite</code> option for <code>findOneAndUpdate()</code></a></h2>
+
+Mongoose 7 and earlier supported an `overwrite` option for `findOneAndUpdate()`, `updateOne()`, and `update()`.
+Before Mongoose 7, `overwrite` would skip wrapping the `update` parameter in `$set`, which meant that `findOneAndUpdate()` and `update()` would overwrite the matched document.
+In Mongoose 7, setting `overwrite` would convert `findOneAndUpdate()` to `findOneAndReplace()` and `updateOne()` to `replaceOne()` to retain backwards compatibility.
+
+In Mongoose 8, the `overwrite` option is no longer supported.
+If you want to overwrite the entire document, use `findOneAndReplace()` or `replaceOne()`.
 
 <h2 id="changed-behavior-for-findoneandupdate-with-orfail-and-upsert"><a href="#changed-behavior-for-findoneandupdate-with-orfail-and-upsert">Changed behavior for <code>findOneAndUpdate()</code> with <code>orFail()</code> and upsert</a></h2>
 

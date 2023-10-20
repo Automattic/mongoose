@@ -2819,7 +2819,28 @@ describe('model: populate:', function() {
 
       assert.equal(blogposts[0].user.name, 'Fan 1');
       assert.equal(blogposts[0].title, 'Test 1');
+    });
 
+    it('handles multiple spaces in between paths to populate (gh-13951)', async function() {
+      const BlogPost = db.model('BlogPost', new Schema({
+        title: String,
+        user: { type: ObjectId, ref: 'User' },
+        fans: [{ type: ObjectId, ref: 'User' }]
+      }));
+      const User = db.model('User', new Schema({ name: String }));
+
+      const fans = await User.create([{ name: 'Fan 1' }]);
+      const posts = [
+        { title: 'Test 1', user: fans[0]._id, fans: [fans[0]._id] }
+      ];
+      await BlogPost.create(posts);
+      const blogPost = await BlogPost.
+        findOne({ title: 'Test 1' }).
+        populate('user   \t fans');
+
+      assert.equal(blogPost.user.name, 'Fan 1');
+      assert.equal(blogPost.fans[0].name, 'Fan 1');
+      assert.equal(blogPost.title, 'Test 1');
     });
 
     it('maps results back to correct document (gh-1444)', async function() {

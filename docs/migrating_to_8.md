@@ -134,8 +134,8 @@ rawDoc.nested; // undefined in Mongoose 8, {} in Mongoose 7
 
 <h2 id="apply-base-schema-paths-before-discriminator-paths"><a href="#apply-base-schema-paths-before-discriminator-paths">Apply base schema paths before discriminator paths</a></h2>
 
-This means that, in Mongoose 8, getters and setters on discriminator paths run _after_ getters and setters on base paths.
-In Mongoose 7, getters and setters on discriminator paths ran _before_ getters and setters on base paths.
+This means that, in Mongoose 8, getters and setters on discriminator paths run *after* getters and setters on base paths.
+In Mongoose 7, getters and setters on discriminator paths ran *before* getters and setters on base paths.
 
 ```javascript
 
@@ -264,3 +264,4 @@ const schema = new Schema<User>({
 // Works in Mongoose 8. Compile error in Mongoose 7.
 const names: string[] = await MyModel.distinct('name');
 ```
+

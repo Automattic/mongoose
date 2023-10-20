@@ -744,9 +744,9 @@ function gh13957() {
   }
 
   interface ITest {
-    name?: string
+    name: string
   }
-  const schema = new Schema({ name: String });
+  const schema = new Schema({ name: { type: String, required: true } });
   const TestModel = model('Test', schema);
   const repository = new RepositoryBase<ITest>(TestModel);
   expectType<Promise<ITest[]>>(repository.insertMany([{ name: 'test' }]));

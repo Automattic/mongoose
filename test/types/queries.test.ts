@@ -167,6 +167,7 @@ Test.find({}, { _id: 0, name: 1, age: 1, endDate: 1, tags: 1, child: 1, docs: 1 
 Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: 0, docs: 0 }); // This should be allowed
 Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: { name: 0 }, docs: { myId: 0, id: 0 } }); // This should be allowed
 Test.find({}, { name: 1, age: 1, _id: 0 }); // This should be allowed since _id is an exception
+Test.find({}, { someOtherField: 1 }); // This should be allowed since it's not a field in the schema
 // Sorting
 Test.find().sort();
 Test.find().sort('-name');

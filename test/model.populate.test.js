@@ -10331,117 +10331,64 @@ describe('model: populate:', function() {
 
   describe('strictPopulate', function() {
     it('does not throw an error when using strictPopulate on a nested path (gh-13863)', async function() {
-      const testSchema = new mongoose.Schema({
-        name: String,
-        location: String,
-        occupation: String
+      const l4Schema = new mongoose.Schema({
+        name: String
       });
 
-      const ASchema = new mongoose.Schema({
-        name: String,
-        age: Number,
-        weight: Number,
-        dModel: {
+      const l3aSchema = new mongoose.Schema({
+        l4: {
           type: 'ObjectId',
-          ref: 'gh13863DModel'
+          ref: 'L4'
+        }
+      });
+      const l3bSchema = new mongoose.Schema({
+        otherProp: String
+      });
+
+      const l2Schema = new mongoose.Schema({
+        l3a: {
+          type: 'ObjectId',
+          ref: 'L3A'
         },
-        fModel: {
+        l3b: {
           type: 'ObjectId',
-          ref: 'gh13863FModel'
+          ref: 'L3B'
         }
       });
 
-      const XSchema = new mongoose.Schema({
-        name: String,
-        car: String,
-        make: String,
-        model: String,
-        aModel: {
+      const l1Schema = new mongoose.Schema({
+        l2: {
           type: 'ObjectId',
-          ref: 'gh13863AModel'
-        },
-        testModel: {
-          type: 'ObjectId',
-          ref: 'gh13863Test'
-        },
-        cModel: {
-          type: 'ObjectId',
-          ref: 'gh13863CModel'
+          ref: 'L2'
         }
       });
 
-      const CSchema = new Schema({
-        name: String,
-        hobbies: String
-      });
+      const L1 = db.model('L1', l1Schema);
+      const L2 = db.model('L2', l2Schema);
+      const L3A = db.model('L3A', l3aSchema);
+      const L3B = db.model('L3B', l3bSchema);
+      const L4 = db.model('L4', l4Schema);
 
-      const DSchema = new Schema({
-        name: String
-      });
+      const { _id: l4 } = await L4.create({ name: 'test l4' });
+      const { _id: l3a } = await L3A.create({ l4 });
+      const { _id: l3b } = await L3B.create({ name: 'test l3' });
+      const { _id: l2 } = await L2.create({ l3a, l3b });
+      const { _id: l1 } = await L1.create({ l2 });
 
-      const FSchema = new Schema({
-        name: String
-      });
-
-      const GSchema = new Schema({
-        name: String
-      });
-
-      const Test = db.model('gh13863Test', testSchema);
-      const AModel = db.model('gh13863AModel', ASchema);
-      const XModel = db.model('gh13863XModel', XSchema);
-      const CModel = db.model('gh13863CModel', CSchema);
-      const DModel = db.model('gh13863DModel', DSchema);
-      const FModel = db.model('gh13863FModel', FSchema);
-      const GModel = db.model('gh13863GModel', GSchema);
-
-      await GModel.create({
-        name: 'G-Man'
-      });
-      const dDoc = await DModel.create({
-        name: 'Dirty Dan'
-      });
-
-      const fDoc = await FModel.create({
-        name: 'Filthy Frank'
-      });
-
-      const testDoc = await Test.create({
-        name: 'Test Testserson',
-        location: 'Florida',
-        occupation: 'Tester'
-      });
-
-      const aDoc = await AModel.create({
-        name: 'A-men',
-        age: 4,
-        weight: 404,
-        dModel: dDoc._id,
-        fModel: fDoc._id
-      });
-
-      const cDoc = await CModel.create({
-        name: 'C-ya',
-        hobbies: 'Leaving'
-      });
-
-      await XModel.create({
-        name: 'XCOM',
-        aModel: aDoc._id,
-        cModel: cDoc._id,
-        testModel: testDoc._id
-      });
-
-      const res = await XModel.find().populate({
-        path: 'aModel testModel cModel',
+      const res = await L1.findById(l1).populate({
+        path: 'l2',
         populate: {
-          path: 'dModel fModel',
-          populate: 'gModel',
-          strictPopulate: false
+          path: 'l3a l3b',
+          populate: {
+            path: 'l4',
+            options: {
+              strictPopulate: false
+            }
+          }
         }
       });
-
-      assert.ok(res);
+      assert.equal(res.l2.l3a.l4.name, 'test l4');
+      assert.equal(res.l2.l3b.l4, undefined);
     });
     it('reports full path when throwing `strictPopulate` error with deep populate (gh-10923)', async function() {
       const L2 = db.model('Test', new Schema({ name: String }));

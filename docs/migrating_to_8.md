@@ -264,4 +264,3 @@ const schema = new Schema<User>({
 // Works in Mongoose 8. Compile error in Mongoose 7.
 const names: string[] = await MyModel.distinct('name');
 ```
-

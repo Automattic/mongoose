@@ -10334,9 +10334,9 @@ describe('model: populate:', function() {
       const testSchema = new mongoose.Schema({
         name: String,
         location: String,
-        occupation: String,
+        occupation: String
       });
-      
+
       const ASchema = new mongoose.Schema({
         name: String,
         age: Number,
@@ -10350,7 +10350,7 @@ describe('model: populate:', function() {
           ref: 'gh13863FModel'
         }
       });
-      
+
       const XSchema = new mongoose.Schema({
         name: String,
         car: String,
@@ -10369,20 +10369,20 @@ describe('model: populate:', function() {
           ref: 'gh13863CModel'
         }
       });
-      
+
       const CSchema = new Schema({
         name: String,
         hobbies: String
-      })
-      
+      });
+
       const DSchema = new Schema({
-        name: String,
+        name: String
       });
-      
+
       const FSchema = new Schema({
-        name: String,
+        name: String
       });
-      
+
       const GSchema = new Schema({
         name: String
       });
@@ -10395,23 +10395,23 @@ describe('model: populate:', function() {
       const FModel = db.model('gh13863FModel', FSchema);
       const GModel = db.model('gh13863GModel', GSchema);
 
-      const gDoc = await GModel.create({
+      await GModel.create({
         name: 'G-Man'
       });
       const dDoc = await DModel.create({
-        name: 'Dirty Dan',
+        name: 'Dirty Dan'
       });
-    
+
       const fDoc = await FModel.create({
-        name: 'Filthy Frank',
+        name: 'Filthy Frank'
       });
-    
+
       const testDoc = await Test.create({
         name: 'Test Testserson',
         location: 'Florida',
         occupation: 'Tester'
       });
-    
+
       const aDoc = await AModel.create({
         name: 'A-men',
         age: 4,
@@ -10419,19 +10419,19 @@ describe('model: populate:', function() {
         dModel: dDoc._id,
         fModel: fDoc._id
       });
-    
+
       const cDoc = await CModel.create({
         name: 'C-ya',
         hobbies: 'Leaving'
       });
-    
+
       await XModel.create({
         name: 'XCOM',
         aModel: aDoc._id,
         cModel: cDoc._id,
         testModel: testDoc._id
       });
-    
+
       const res = await XModel.find().populate({
         path: 'aModel testModel cModel',
         populate: {

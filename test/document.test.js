@@ -1985,7 +1985,7 @@ describe('document', function() {
 
       const err = await person.save().then(() => null, err => err);
       assert.equal(err instanceof DocumentNotFoundError, true);
-      assert.equal(err.message, `No document found for query "{ _id: new ObjectId("${person._id}") }" on model "Person"`);
+      assert.equal(err.message, `No document found for query "{ _id: new ObjectId('${person._id}') }" on model "Person"`);
     });
 
     it('saving a document when version bump required, throws a VersionError when document is not found (gh-10974)', async function() {
@@ -2020,7 +2020,7 @@ describe('document', function() {
       }
       catch (err) {
         assert.equal(err instanceof DocumentNotFoundError, true);
-        assert.equal(err.message, `No document found for query "{ _id: new ObjectId("${person._id}") }" on model "Person"`);
+        assert.equal(err.message, `No document found for query "{ _id: new ObjectId('${person._id}') }" on model "Person"`);
         threw = true;
       }
 

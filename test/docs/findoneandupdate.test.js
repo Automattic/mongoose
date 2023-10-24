@@ -139,7 +139,7 @@ describe('Tutorial: findOneAndUpdate()', function() {
     // acquit:ignore:end
   });
 
-  it('rawResult', async function() {
+  it('includeResultMetadata', async function() {
     const filter = { name: 'Will Riker' };
     const update = { age: 29 };
 
@@ -151,7 +151,8 @@ describe('Tutorial: findOneAndUpdate()', function() {
     const res = await Character.findOneAndUpdate(filter, update, {
       new: true,
       upsert: true,
-      rawResult: true // Return the raw result from the MongoDB driver
+      // Return additional properties about the operation, not just the document
+      includeResultMetadata: true
     });
 
     res.value instanceof Character; // true

@@ -185,9 +185,9 @@ describe('pre/post hooks, type of this', function() {
     const MongooseDocumentMiddleware = [...MongooseDistinctDocumentMiddleware, ...MongooseQueryAndDocumentMiddleware];
 
     const MongooseDistinctQueryMiddleware = [
-      'count', 'estimatedDocumentCount', 'countDocuments',
+      'estimatedDocumentCount', 'countDocuments',
       'deleteMany', 'distinct',
-      'find', 'findOne', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'findOneAndUpdate',
+      'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate',
       'replaceOne', 'updateMany'];
     const MongooseDefaultQueryMiddleware = [...MongooseDistinctQueryMiddleware, 'updateOne', 'deleteOne'];
     const MongooseQueryMiddleware = [...MongooseDistinctQueryMiddleware, ...MongooseQueryAndDocumentMiddleware];
@@ -278,7 +278,6 @@ describe('pre/post hooks, type of this', function() {
       await doc.save(); // triggers save and validate hooks
 
       // MongooseDistinctQueryMiddleware
-      await Doc.count().exec();
       await Doc.estimatedDocumentCount().exec();
       await Doc.countDocuments().exec();
       await Doc.deleteMany().exec(); await Doc.create({ data: 'value' });
@@ -286,7 +285,6 @@ describe('pre/post hooks, type of this', function() {
       await Doc.find({}).exec();
       await Doc.findOne({}).exec();
       await Doc.findOneAndDelete({}).exec(); await Doc.create({ data: 'value' });
-      await Doc.findOneAndRemove({}).exec(); await Doc.create({ data: 'value' });
       await Doc.findOneAndReplace({}, { data: 'valueRep' }).exec();
       await Doc.findOneAndUpdate({}, { data: 'valueUpd' }).exec();
       await Doc.replaceOne({}, { data: 'value' }).exec();

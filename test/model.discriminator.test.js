@@ -2180,6 +2180,30 @@ describe('model', function() {
     assert.ok(innerBuildingsPath.schemaOptions.type.discriminators.Garage);
     assert.equal(innerBuildingsPath.schemaOptions.type.discriminators.Garage.discriminatorMapping.value, 'G');
   });
+
+  it('runs base schema paths validators and setters before child schema validators and setters (gh-13794)', async function() {
+    const baseSchema = new Schema({
+      f1: {
+        type: Number,
+        set() {
+          return 1;
+        }
+      }
+    });
+    const childSchema = new Schema({
+      f2: {
+        type: Number,
+        set() {
+          return this.f1;
+        }
+      }
+    });
+    const Test = db.model('Test', baseSchema);
+    const Child = Test.discriminator('Child', childSchema);
+    const doc = new Child({ f1: 2, f2: 2 });
+    assert.strictEqual(doc.f2, 1);
+  });
+
   it('should not fail when using a discriminator key multiple times (gh-13906)', async function() {
     const options = { discriminatorKey: 'type' };
     const eventSchema = new Schema({ date: Schema.Types.Date }, options);

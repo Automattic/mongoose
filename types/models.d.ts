@@ -158,7 +158,7 @@ declare module 'mongoose' {
     AcceptsDiscriminator,
     IndexManager,
     SessionStarter {
-    new <DocType = TRawDocType>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): THydratedDocumentType;
+    new <DocType = Partial<TRawDocType>>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): THydratedDocumentType;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: AggregateOptions): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[]): Aggregate<Array<R>>;

@@ -751,3 +751,23 @@ function gh13957() {
   const repository = new RepositoryBase<ITest>(TestModel);
   expectType<Promise<ITest[]>>(repository.insertMany([{ name: 'test' }]));
 }
+
+function gh13897() {
+  interface IDocument {
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }
+
+  const documentSchema = new Schema<IDocument>({
+    name: { type: String, required: true }
+  },
+  {
+    timestamps: true
+  });
+
+  const Document = model<IDocument>('Document', documentSchema);
+  const doc = new Document({ name: 'foo' });
+  expectType<Date>(doc.createdAt);
+  expectError(new Document<IDocument>({ name: 'foo' }));
+}

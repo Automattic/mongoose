@@ -25,6 +25,7 @@ If you're still on Mongoose 6.x or earlier, please read the [Mongoose 6.x to 7.x
 * [`create()` waits until all saves are done before throwing any error](#create-waits-until-all-saves-are-done-before-throwing-any-error)
 * [`Model.validate()` returns copy of object](#model-validate-returns-copy-of-object)
 * [Allow `null` For Optional Fields in TypeScript](#allow-null-for-optional-fields-in-typescript)
+* [Model constructor properties are all optional in TypeScript](#model-constructor-properties-are-all-optional-in-typescript)
 * [Infer `distinct()` return types from schema](#infer-distinct-return-types-from-schema)
 
 <h2 id="removed-rawresult-option-for-findoneandupdate"><a href="#removed-rawresult-option-for-findoneandupdate">Removed <code>rawResult</code> option for <code>findOneAndUpdate()</code></a></h2>
@@ -245,6 +246,39 @@ const doc = new TestModel();
 // In Mongoose 8, this type is `string | null | undefined`.
 // In Mongoose 7, this type is `string | undefined`
 doc.name;
+```
+
+<h2 id="model-constructor-properties-are-all-optional-in-typescript"><a href="#model-constructor-properties-are-all-optional-in-typescript">Model constructor properties are all optional in TypeScript</a></h2>
+
+In Mongoose 8, no properties are required on model constructors by default.
+
+```ts
+import {Schema, model, Model} from 'mongoose';
+
+interface IDocument {
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const documentSchema = new Schema<IDocument>(
+  { name: { type: String, required: true } },
+  { timestamps: true }
+);
+
+const TestModel = model<IDocument>('Document', documentSchema);
+
+// Would throw a compile error in Mongoose 7, compiles in Mongoose 8
+const newDoc = new TestModel({
+  name: 'Foo'
+});
+
+// Explicitly pass generic param to constructor to specify the expected
+// type of the model constructor param. The following will cause TS
+// to complain about missing `createdAt` and `updatedAt` in Mongoose 8.
+const newDoc2 = new TestModel<IDocument>({
+  name: 'Foo'
+});
 ```
 
 <h2 id="infer-distinct-return-types-from-schema"><a href="#infer-distinct-return-types-from-schema">Infer <code>distinct()</code> return types from schema</a></h2>

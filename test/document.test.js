@@ -8,7 +8,7 @@ const start = require('./common');
 
 const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
-const ArraySubdocument = require('../lib/types/ArraySubdocument');
+const ArraySubdocument = require('../lib/types/arraySubdocument');
 const Query = require('../lib/query');
 const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
@@ -153,10 +153,11 @@ describe('document', function() {
 
       const test = new Test({ x: 'test' });
       const doc = await test.save();
-      await doc.deleteOne();
+      const q = doc.deleteOne();
+      assert.ok(q instanceof mongoose.Query, `Expected query, got ${q.constructor.name}`);
+      await q;
       const found = await Test.findOne({ _id: doc._id });
       assert.strictEqual(found, null);
-
     });
   });
 
@@ -1944,7 +1945,7 @@ describe('document', function() {
       const Person = db.model('Person', personSchema);
 
       const createdPerson = await Person.create({ name: 'Hafez' });
-      const removedPerson = await Person.findOneAndRemove({ _id: createdPerson._id });
+      const removedPerson = await Person.findOneAndDelete({ _id: createdPerson._id });
 
       removedPerson.isNew = true;
 
@@ -1984,7 +1985,7 @@ describe('document', function() {
 
       const err = await person.save().then(() => null, err => err);
       assert.equal(err instanceof DocumentNotFoundError, true);
-      assert.equal(err.message, `No document found for query "{ _id: new ObjectId("${person._id}") }" on model "Person"`);
+      assert.equal(err.message, `No document found for query "{ _id: new ObjectId('${person._id}') }" on model "Person"`);
     });
 
     it('saving a document when version bump required, throws a VersionError when document is not found (gh-10974)', async function() {
@@ -2019,7 +2020,7 @@ describe('document', function() {
       }
       catch (err) {
         assert.equal(err instanceof DocumentNotFoundError, true);
-        assert.equal(err.message, `No document found for query "{ _id: new ObjectId("${person._id}") }" on model "Person"`);
+        assert.equal(err.message, `No document found for query "{ _id: new ObjectId('${person._id}') }" on model "Person"`);
         threw = true;
       }
 
@@ -3187,13 +3188,6 @@ describe('document', function() {
       assert.equal(doc.child.name, 'Anakin');
     });
 
-    it('strings of length 12 are valid oids (gh-3365)', async function() {
-      const schema = new Schema({ myId: mongoose.Schema.Types.ObjectId });
-      const M = db.model('Test', schema);
-      const doc = new M({ myId: 'blablablabla' });
-      await doc.validate();
-    });
-
     it('set() empty obj unmodifies subpaths (gh-4182)', async function() {
       const omeletteSchema = new Schema({
         topping: {
@@ -3249,7 +3243,7 @@ describe('document', function() {
             field1: { type: Number, default: 1 }
           }
         }
-      });
+      }, { minimize: false });
 
       const MyModel = db.model('Test', schema);
 
@@ -3268,7 +3262,7 @@ describe('document', function() {
             field1: { type: Number, default: 1 }
           }
         }
-      });
+      }, { minimize: false });
 
       const MyModel = db.model('Test', schema);
 
@@ -5008,7 +5002,7 @@ describe('document', function() {
         }).
         then(function(doc) {
           doc.child = {};
-          return doc.save();
+          return Parent.updateOne({ _id: doc._id }, { $set: { child: {} } }, { minimize: false });
         }).
         then(function() {
           return Parent.findOne();
@@ -9819,7 +9813,7 @@ describe('document', function() {
     assert.ok(doc);
   });
 
-  it('Makes sure pre remove hook is executed gh-9885', async function() {
+  it('Makes sure pre deleteOne hook is executed (gh-9885)', async function() {
     const SubSchema = new Schema({
       myValue: {
         type: String
@@ -12239,19 +12233,6 @@ describe('document', function() {
     assert.equal(fromDb.c.x.y, 1);
   });
 
-  it('can change the value of the id property on documents gh-10096', async function() {
-    const testSchema = new Schema({
-      name: String
-    });
-    const Test = db.model('Test', testSchema);
-    const doc = new Test({ name: 'Test Testerson ' });
-    const oldVal = doc.id;
-    doc.id = '648b8aa6a97549b03835c0b3';
-    await doc.save();
-    assert.notEqual(oldVal, doc.id);
-    assert.equal(doc.id, '648b8aa6a97549b03835c0b3');
-  });
-
   it('should allow storing keys with dots in name in mixed under nested (gh-13530)', async function() {
     const TestModelSchema = new mongoose.Schema({
       metadata:
@@ -12500,6 +12481,29 @@ describe('document', function() {
     assert.strictEqual(parent.child.concreteProp, 123);
     assert.strictEqual(parent.get('child.concreteProp'), 123);
     assert.strictEqual(parent.toObject().child.concreteProp, 123);
+  });
+
+  it('avoids saving changes to deselected paths (gh-13145) (gh-13062)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: { type: String, required: true },
+      age: { type: Number, required: true, select: false },
+      links: { type: String, required: true, select: false }
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    const { _id } = await Test.create({
+      name: 'Test Testerson',
+      age: 0,
+      links: 'some init links'
+    });
+
+    const doc = await Test.findById(_id);
+    doc.links = undefined;
+    const err = await doc.save().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['links']);
+    assert.equal(err.errors['links'].message, 'Path `links` is required.');
   });
 
   it('fires pre validate hooks on 4 level single nested subdocs (gh-13876)', async function() {

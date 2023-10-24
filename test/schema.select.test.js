@@ -57,10 +57,10 @@ describe('schema select option', function() {
     assert.equal(findUpdateDoc.isSelected('name'), false);
     assert.equal(findUpdateDoc.isSelected('docs.name'), false);
     assert.strictEqual(undefined, findUpdateDoc.name);
-    const findAndRemoveDoc = await Test.findOneAndRemove({ _id: doc._id });
-    assert.equal(findAndRemoveDoc.isSelected('name'), false);
-    assert.equal(findAndRemoveDoc.isSelected('docs.name'), false);
-    assert.strictEqual(undefined, findAndRemoveDoc.name);
+    const findAndDeleteDoc = await Test.findOneAndDelete({ _id: doc._id });
+    assert.equal(findAndDeleteDoc.isSelected('name'), false);
+    assert.equal(findAndDeleteDoc.isSelected('docs.name'), false);
+    assert.strictEqual(undefined, findAndDeleteDoc.name);
   });
 
   it('including paths through schematype', async function() {
@@ -87,10 +87,10 @@ describe('schema select option', function() {
     assert.strictEqual(true, findOneAndUpdateDoc.isSelected('name'));
     assert.strictEqual(true, findOneAndUpdateDoc.isSelected('docs.name'));
     assert.equal(findOneAndUpdateDoc.name, 'the included');
-    const findOneAndRemoveDoc = await S.findOneAndRemove({ _id: doc._id });
-    assert.strictEqual(true, findOneAndRemoveDoc.isSelected('name'));
-    assert.strictEqual(true, findOneAndRemoveDoc.isSelected('docs.name'));
-    assert.equal(findOneAndRemoveDoc.name, 'the included');
+    const findOneAndDeleteDoc = await S.findOneAndDelete({ _id: doc._id });
+    assert.strictEqual(true, findOneAndDeleteDoc.isSelected('name'));
+    assert.strictEqual(true, findOneAndDeleteDoc.isSelected('docs.name'));
+    assert.equal(findOneAndDeleteDoc.name, 'the included');
   });
 
   describe('overriding schematype select options', function() {
@@ -210,16 +210,16 @@ describe('schema select option', function() {
           assert.ok(findOneAndUpdateDoc.thin);
           assert.ok(findOneAndUpdateDoc.docs[0].bool);
         });
-        it('with findOneAndRemove', async function() {
-          const findOneAndRemoveDoc = await E.findOneAndRemove({ _id: exclusionDoc._id }).select('-name -docs.name');
-          assert.equal(findOneAndRemoveDoc.isSelected('name'), false);
-          assert.equal(findOneAndRemoveDoc.isSelected('thin'), true);
-          assert.equal(findOneAndRemoveDoc.isSelected('docs.name'), false);
-          assert.equal(findOneAndRemoveDoc.isSelected('docs.bool'), true);
-          assert.strictEqual(undefined, findOneAndRemoveDoc.name);
-          assert.strictEqual(undefined, findOneAndRemoveDoc.docs[0].name);
-          assert.strictEqual(true, findOneAndRemoveDoc.thin);
-          assert.strictEqual(true, findOneAndRemoveDoc.docs[0].bool);
+        it('with findOneAndDelete', async function() {
+          const findOneAndDeleteDoc = await E.findOneAndDelete({ _id: exclusionDoc._id }).select('-name -docs.name');
+          assert.equal(findOneAndDeleteDoc.isSelected('name'), false);
+          assert.equal(findOneAndDeleteDoc.isSelected('thin'), true);
+          assert.equal(findOneAndDeleteDoc.isSelected('docs.name'), false);
+          assert.equal(findOneAndDeleteDoc.isSelected('docs.bool'), true);
+          assert.strictEqual(undefined, findOneAndDeleteDoc.name);
+          assert.strictEqual(undefined, findOneAndDeleteDoc.docs[0].name);
+          assert.strictEqual(true, findOneAndDeleteDoc.thin);
+          assert.strictEqual(true, findOneAndDeleteDoc.docs[0].bool);
         });
       });
     });

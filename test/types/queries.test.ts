@@ -55,6 +55,9 @@ interface ISubdoc {
   myId?: Types.ObjectId;
   id?: number;
   tags?: string[];
+  profiles: {
+    name?: string
+  }
 }
 
 interface ITest {
@@ -178,6 +181,13 @@ Test.find({}, { age: 1, tags: { $slice: 5 } }); // $slice should be allowed in i
 Test.find({}, { age: 0, tags: { $slice: 5 } }); // $slice should be allowed in exclusion projection
 Test.find({}, { age: 1, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in inclusion projection
 Test.find({}, { age: 0, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in exclusion projection
+expectError(Test.find({}, { 'docs.id': 11 })); // Dot notation should be allowed and does not accept any
+expectError(Test.find({}, { docs: { id: '1' } })); // Dot notation should be able to use a combination with objects
+Test.find({}, { docs: { id: false } }); // Dot notation should be allowed with valid values - should correctly handle arrays
+Test.find({}, { docs: { id: true } }); // Dot notation should be allowed with valid values - should correctly handle arrays
+Test.find({}, { child: 1 }); // Dot notation should be able to use a combination with objects
+Test.find({}, { 'docs.profiles': { name: 1 } }); // should support a combination of dot notation and objects
+expectError(Test.find({}, { 'docs.profiles': { name: 'aa' } })); // should support a combination of dot notation and objects
 // Sorting
 Test.find().sort();
 Test.find().sort('-name');

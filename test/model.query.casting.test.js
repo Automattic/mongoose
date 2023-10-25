@@ -754,7 +754,7 @@ describe('model query casting', function() {
         assert.strictEqual(doc.outerArray[0].innerArray[0], 'onetwothree');
       });
   });
-  it('should not throw a cast error when dealing with an array of an array of strings in combination with $elemMach and $not (gh-13880)', async function() {
+  it('should not throw a cast error when dealing with an array of an array of strings in combination with $elemMatch and $not (gh-13880)', async function() {
     const testSchema = new Schema({
       arr: [[String]]
     });
@@ -766,6 +766,30 @@ describe('model query casting', function() {
     assert(res);
     assert(res[0].arr);
   });
+  it('should not throw a cast error when dealing with an array of objects in combination with $elemMatch', async function() {
+    const testSchema = new Schema({
+      arr: [Object]
+    });
+
+    const Test = db.model('Test', testSchema);
+    const obj1 = new Test({ arr: [{ id: 'one'}, { id: 'two' }] });
+    await obj1.save();
+
+    const obj2 = new Test({ arr: [{ id: 'two'}, { id: 'three' }] });
+    await obj2.save();
+
+    const obj3 = new Test({ arr: [{ id: 'three'}, { id: 'four' }] });
+    await obj3.save();
+
+    const res = await Test.find({
+      arr: {
+        $elemMatch: {
+          $or: [{ id: 'one' }, { id: 'two' }],
+        },
+      },
+    });
+    assert.ok(res);
+  })
 });
 
 function _geojsonPoint(coordinates) {

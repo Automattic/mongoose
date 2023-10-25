@@ -1,3 +1,7 @@
+6.12.2 / 2023-10-25
+===================
+ * fix: add fullPath to ValidatorProps #13995 [Freezystem](https://github.com/Freezystem)
+
 6.12.1 / 2023-10-12
 ===================
  * fix(mongoose): correctly handle global applyPluginsToChildSchemas option #13945 #13887 [hasezoey](https://github.com/hasezoey)

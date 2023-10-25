@@ -772,24 +772,24 @@ describe('model query casting', function() {
     });
 
     const Test = db.model('Test', testSchema);
-    const obj1 = new Test({ arr: [{ id: 'one'}, { id: 'two' }] });
+    const obj1 = new Test({ arr: [{ id: 'one' }, { id: 'two' }] });
     await obj1.save();
 
-    const obj2 = new Test({ arr: [{ id: 'two'}, { id: 'three' }] });
+    const obj2 = new Test({ arr: [{ id: 'two' }, { id: 'three' }] });
     await obj2.save();
 
-    const obj3 = new Test({ arr: [{ id: 'three'}, { id: 'four' }] });
+    const obj3 = new Test({ arr: [{ id: 'three' }, { id: 'four' }] });
     await obj3.save();
 
     const res = await Test.find({
       arr: {
         $elemMatch: {
-          $or: [{ id: 'one' }, { id: 'two' }],
-        },
-      },
+          $or: [{ id: 'one' }, { id: 'two' }]
+        }
+      }
     });
     assert.ok(res);
-  })
+  });
 });
 
 function _geojsonPoint(coordinates) {

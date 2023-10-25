@@ -766,7 +766,7 @@ describe('model query casting', function() {
     assert(res);
     assert(res[0].arr);
   });
-  it('should not throw a cast error when dealing with an array of objects in combination with $elemMatch', async function() {
+  it('should not throw a cast error when dealing with an array of objects in combination with $elemMatch (gh-13974)', async function() {
     const testSchema = new Schema({
       arr: [Object]
     });

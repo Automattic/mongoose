@@ -10330,6 +10330,66 @@ describe('model: populate:', function() {
   });
 
   describe('strictPopulate', function() {
+    it('does not throw an error when using strictPopulate on a nested path (gh-13863)', async function() {
+      const l4Schema = new mongoose.Schema({
+        name: String
+      });
+
+      const l3aSchema = new mongoose.Schema({
+        l4: {
+          type: 'ObjectId',
+          ref: 'L4'
+        }
+      });
+      const l3bSchema = new mongoose.Schema({
+        otherProp: String
+      });
+
+      const l2Schema = new mongoose.Schema({
+        l3a: {
+          type: 'ObjectId',
+          ref: 'L3A'
+        },
+        l3b: {
+          type: 'ObjectId',
+          ref: 'L3B'
+        }
+      });
+
+      const l1Schema = new mongoose.Schema({
+        l2: {
+          type: 'ObjectId',
+          ref: 'L2'
+        }
+      });
+
+      const L1 = db.model('L1', l1Schema);
+      const L2 = db.model('L2', l2Schema);
+      const L3A = db.model('L3A', l3aSchema);
+      const L3B = db.model('L3B', l3bSchema);
+      const L4 = db.model('L4', l4Schema);
+
+      const { _id: l4 } = await L4.create({ name: 'test l4' });
+      const { _id: l3a } = await L3A.create({ l4 });
+      const { _id: l3b } = await L3B.create({ name: 'test l3' });
+      const { _id: l2 } = await L2.create({ l3a, l3b });
+      const { _id: l1 } = await L1.create({ l2 });
+
+      const res = await L1.findById(l1).populate({
+        path: 'l2',
+        populate: {
+          path: 'l3a l3b',
+          populate: {
+            path: 'l4',
+            options: {
+              strictPopulate: false
+            }
+          }
+        }
+      });
+      assert.equal(res.l2.l3a.l4.name, 'test l4');
+      assert.equal(res.l2.l3b.l4, undefined);
+    });
     it('reports full path when throwing `strictPopulate` error with deep populate (gh-10923)', async function() {
       const L2 = db.model('Test', new Schema({ name: String }));
 

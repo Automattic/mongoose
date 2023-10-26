@@ -787,8 +787,9 @@ describe('model query casting', function() {
           $or: [{ id: 'one' }, { id: 'two' }]
         }
       }
-    });
+    }).sort({ _id: 1 });
     assert.ok(res);
+    assert.deepStrictEqual(res.map(doc => doc.arr[1].id), ['two', 'three']);
   });
 });
 

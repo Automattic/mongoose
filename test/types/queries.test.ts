@@ -194,6 +194,7 @@ Test.find({}, { docs: { id: true } }); // Dot notation should be allowed with va
 Test.find({}, { child: 1 }); // Dot notation should be able to use a combination with objects
 Test.find({}, { 'docs.profiles': { name: 1 } }); // should support a combination of dot notation and objects
 expectError(Test.find({}, { 'docs.profiles': { name: 'aa' } })); // should support a combination of dot notation and objects
+expectError(Test.find({}, { endDate: { toString: 1 } }));
 // Sorting
 Test.find().sort();
 Test.find().sort('-name');

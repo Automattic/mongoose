@@ -668,7 +668,7 @@ declare module 'mongoose' {
    * ObjectId is also similar.
    */
   type ReplaceSpecialTypes<T> = T extends SpecialTypes
-    ? string
+    ? Replacer<T>
     : T extends Array<infer U>
       ? Array<ReplaceSpecialTypes<U>>
       : T extends object

@@ -397,7 +397,7 @@ describe('transactions', function() {
     assert.equal(docs[0].name, 'test');
   });
 
-  it('transaction() retains modified status for documents created outside the transaction (gh-13973)', async function() {
+  it('transaction() retains modified status for documents created outside of the transaction then modified inside the transaction (gh-13973)', async function() {
     db.deleteModel(/Test/);
     const Test = db.model('Test', Schema({ status: String }));
 

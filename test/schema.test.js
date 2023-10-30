@@ -3183,7 +3183,7 @@ describe('schema', function() {
     });
 
     base.discriminator(1, recursive);
-    const TestModel = db.model('Test', base);
+    const TestModel = db.model('gh13978', base);
 
     const doc = new TestModel({ type: 1, self: { type: 1 } });
     assert.strictEqual(doc.self.type, 1);

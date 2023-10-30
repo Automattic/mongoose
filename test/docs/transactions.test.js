@@ -396,4 +396,29 @@ describe('transactions', function() {
     assert.equal(docs.length, 1);
     assert.equal(docs[0].name, 'test');
   });
+
+  it('transaction() retains modified status for documents created outside of the transaction then modified inside the transaction (gh-13973)', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ status: String }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    const { _id } = await Test.create({ status: 'test' });
+    const doc = await Test.findById(_id);
+
+    let i = 0;
+    await db.transaction(async(session) => {
+      doc.status = 'test2';
+      assert.ok(doc.$isModified('status'));
+      await doc.save({ session });
+      if (++i < 3) {
+        throw new mongoose.mongo.MongoServerError({
+          errorLabels: ['TransientTransactionError']
+        });
+      }
+    });
+
+    assert.equal(i, 3);
+  });
 });

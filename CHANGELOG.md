@@ -1,3 +1,12 @@
+7.6.4 / 2023-10-30
+==================
+ * fix(connection): retain modified status for documents created outside a transaction during transaction retries #14017 #13973
+ * fix(schema): handle recursive schemas in discriminator definitions #14011 #13978
+ * fix: handle casting $or underneath $elemMatch #14007 #13974
+ * fix(populate): allow using options: { strictPopulate: false } to disable strict populate #13863
+ * docs: fix differences between sample codes and documentation #13998 [suzuki](https://github.com/suzuki)
+ * docs: fix missing import and change wrong variable name #13992 [suzuki](https://github.com/suzuki)
+
 7.6.3 / 2023-10-17
 ==================
  * fix(populate): handle multiple spaces when specifying paths to populate using space-delimited paths #13984 #13951

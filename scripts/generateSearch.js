@@ -134,7 +134,7 @@ async function run() {
   await Content.deleteMany({ version });
   let count = 0;
   for (const content of contents) {
-    if (version === '7.x') {
+    if (version === '8.x') {
       let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
       if (!url.startsWith('/docs')) {
         url = '/docs' + url;

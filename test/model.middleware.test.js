@@ -447,13 +447,13 @@ describe('model middleware', function() {
 
     await doc.deleteOne();
 
-    assert.equal(queryPreCalled, 0);
+    assert.equal(queryPreCalled, 1);
     assert.equal(preCalled, 1);
     assert.equal(postCalled, 1);
 
     await Model.deleteOne();
 
-    assert.equal(queryPreCalled, 1);
+    assert.equal(queryPreCalled, 2);
     assert.equal(preCalled, 1);
     assert.equal(postCalled, 1);
   });

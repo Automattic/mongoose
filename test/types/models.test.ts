@@ -492,7 +492,7 @@ function gh12100() {
   const TestModel = model('test', schema_with_string_id);
   const obj = new TestModel();
 
-  expectType<string>(obj._id);
+  expectType<string | null>(obj._id);
 })();
 
 (async function gh12094() {
@@ -659,7 +659,7 @@ async function gh13705() {
   const schema = new Schema({ name: String });
   const TestModel = model('Test', schema);
 
-  type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string }> & { _id: mongoose.Types.ObjectId });
+  type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string | null }> & { _id: mongoose.Types.ObjectId });
 
   const findByIdRes = await TestModel.findById('0'.repeat(24), undefined, { lean: true });
   expectType<ExpectedLeanDoc | null>(findByIdRes);
@@ -744,10 +744,30 @@ function gh13957() {
   }
 
   interface ITest {
-    name?: string
+    name: string
   }
-  const schema = new Schema({ name: String });
+  const schema = new Schema({ name: { type: String, required: true } });
   const TestModel = model('Test', schema);
   const repository = new RepositoryBase<ITest>(TestModel);
   expectType<Promise<ITest[]>>(repository.insertMany([{ name: 'test' }]));
+}
+
+function gh13897() {
+  interface IDocument {
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }
+
+  const documentSchema = new Schema<IDocument>({
+    name: { type: String, required: true }
+  },
+  {
+    timestamps: true
+  });
+
+  const Document = model<IDocument>('Document', documentSchema);
+  const doc = new Document({ name: 'foo' });
+  expectType<Date>(doc.createdAt);
+  expectError(new Document<IDocument>({ name: 'foo' }));
 }

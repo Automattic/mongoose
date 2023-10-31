@@ -1,3 +1,7 @@
+8.0.0 / 2023-10-31
+==================
+ * docs: add version support notes for Mongoose 8, including EOL date for Mongoose 6
+
 7.6.4 / 2023-10-30
 ==================
  * fix(connection): retain modified status for documents created outside a transaction during transaction retries #14017 #13973
@@ -6,6 +10,23 @@
  * fix(populate): allow using options: { strictPopulate: false } to disable strict populate #13863
  * docs: fix differences between sample codes and documentation #13998 [suzuki](https://github.com/suzuki)
  * docs: fix missing import and change wrong variable name #13992 [suzuki](https://github.com/suzuki)
+
+8.0.0-rc0 / 2023-10-24
+======================
+ * BREAKING CHANGE: use MongoDB node driver 6, drop support for rawResult option and findOneAndRemove() #13753
+ * BREAKING CHANGE: apply minimize by default when updating document #13843
+ * BREAKING CHANGE: remove `id` setter #13784
+ * BREAKING CHANGE: remove overwrite option for updateOne(), findOneAndUpdate(), etc. #13989 #13578
+ * BREAKING CHANGE: make model.prototype.deleteOne() return query, not promise #13660 #13369
+ * BREAKING CHANGE: remove `Model.count()`, `Query.prototype.count()` #13618 #13598
+ * BREAKING CHANGE: allow null values for string enum #13620 #3044
+ * BREAKING CHANGE: make base schema paths come before discriminator schema paths when running setters, validators, etc. #13846 #13794
+ * BREAKING CHANGE: make Model.validate() use Model.castObject() to cast, and return casted copy of object instead of modifying in place #13287 #12668
+ * BREAKING CHANGE: make internal file names all camelCase #13950 #13909 #13308
+ * BREAKING CHANGE: make create() wait for all documents to finish inserting or error out before throwing an error if ordered = false #13621 #4628
+ * BREAKING CHANGE: refactor out `mongoose/lib/mongoose.js` file to allow importing Mongoose without MongoDB driver #13905
+ * BREAKING CHANGE(types): allow `null` for optional fields #13901
+ * BREAKING CHANGE(types): infer return types types for Model.distinct and Query.distinct #13836 [kaulshashank](https://github.com/kaulshashank)
 
 7.6.3 / 2023-10-17
 ==================

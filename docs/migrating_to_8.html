@@ -1,0 +1,276 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v8.0.0: Migrating to Mongoose 8</title><link rel="apple-touch-icon" sizes="57x57" href="/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="stylesheet" href="/docs/css/carbonads.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/index.html">Version 8.0.0</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.12.2</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/index.html">Version 5.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_7.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/migrating_to_8.md" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a><h1 id="migrating-from-7x-to-8x">
+      <a href="#migrating-from-7x-to-8x">
+        Migrating from 7.x to 8.x
+      </a>
+    </h1>
+<div class="sponsored-ad">
+  <a href="https://localizejs.com/?utm_campaign=Mongoose&utm_source=mongoose&utm_medium=banner">
+    <img src="/docs/images/localize-mongoose-ad-banner-2x.jpg">
+  </a>
+</div>
+
+<style>
+  ul > li {
+    padding: 4px 0px;
+  }
+</style>
+
+<p>There are several backwards-breaking changes
+you should be aware of when migrating from Mongoose 7.x to Mongoose 8.x.</p>
+<p>If you&#39;re still on Mongoose 6.x or earlier, please read the <a href="migrating_to_7.html">Mongoose 6.x to 7.x migration guide</a> and upgrade to Mongoose 7.x first before upgrading to Mongoose 8.</p>
+<ul>
+<li><a href="#removed-rawresult-option-for-findoneandupdate">Removed <code>rawResult</code> option for <code>findOneAndUpdate()</code></a></li>
+<li><a href="#document-prototype-deleteone-now-returns-a-query"><code>Document.prototype.deleteOne()</code> now returns a query</a></li>
+<li><a href="#mongodb-node-driver-6">MongoDB Node Driver 6.0</a></li>
+<li><a href="#removed-findoneandremove">Removed <code>findOneAndRemove()</code></a></li>
+<li><a href="#removed-count">Removed <code>count()</code></a></li>
+<li><a href="#removed-id-setter">Removed id Setter</a></li>
+<li><a href="#null-is-valid-for-non-required-string-enums"><code>null</code> is valid for non-required string enums</a></li>
+<li><a href="#apply-minimize-when-save-updates-an-existing-document">Apply minimize when <code>save()</code> updates an existing document</a></li>
+<li><a href="#apply-base-schema-paths-before-discriminator-paths">Apply base schema paths before discriminator paths</a></li>
+<li><a href="#removed-overwrite-option-for-findoneandupdate">Removed <code>overwrite</code> option for <code>findOneAndUpdate()</code></a></li>
+<li><a href="#changed-behavior-for-findoneandupdate-with-orfail-and-upsert">Changed behavior for <code>findOneAndUpdate()</code> with <code>orFail()</code> and upsert</a></li>
+<li><a href="#create-waits-until-all-saves-are-done-before-throwing-any-error"><code>create()</code> waits until all saves are done before throwing any error</a></li>
+<li><a href="#model-validate-returns-copy-of-object"><code>Model.validate()</code> returns copy of object</a></li>
+<li><a href="#allow-null-for-optional-fields-in-typescript">Allow <code>null</code> For Optional Fields in TypeScript</a></li>
+<li><a href="#model-constructor-properties-are-all-optional-in-typescript">Model constructor properties are all optional in TypeScript</a></li>
+<li><a href="#infer-distinct-return-types-from-schema">Infer <code>distinct()</code> return types from schema</a></li>
+</ul>
+<h2 id="removed-rawresult-option-for-findoneandupdate"><a href="#removed-rawresult-option-for-findoneandupdate">Removed <code>rawResult</code> option for <code>findOneAndUpdate()</code></a></h2>
+
+<p>The <code>rawResult</code> option for <code>findOneAndUpdate()</code>, <code>findOneAndReplace()</code>, and <code>findOneAndDelete()</code> has been replaced by the <code>includeResultMetadata</code> option.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> filter = { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Will Riker&#x27;</span> };
+<span class="hljs-keyword">const</span> update = { <span class="hljs-attr">age</span>: <span class="hljs-number">29</span> };
+
+<span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">findOneAndUpdate</span>(filter, update, {
+  <span class="hljs-attr">new</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">upsert</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-comment">// Replace `rawResult: true` with `includeResultMetadata: true`</span>
+  <span class="hljs-attr">includeResultMetadata</span>: <span class="hljs-literal">true</span>
+});
+</code></pre>
+<p><code>includeResultMetadata</code> in Mongoose 8 behaves identically to <code>rawResult</code>.</p>
+<h2 id="document-prototype-deleteone-now-returns-a-query"><a href="#document-prototype-deleteone-now-returns-a-query"><code>Document.prototype.deleteOne</code> now returns a query</a></h2>
+
+<p>In Mongoose 7, <code>doc.deleteOne()</code> returned a promise that resolved to <code>doc</code>.
+In Mongoose 8, <code>doc.deleteOne()</code> returns a query for easier chaining, as well as consistency with <code>doc.updateOne()</code>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> numberOne = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Will Riker&#x27;</span> });
+
+<span class="hljs-comment">// In Mongoose 7, q is a Promise that resolves to `numberOne`</span>
+<span class="hljs-comment">// In Mongoose 8, q is a Query.</span>
+<span class="hljs-keyword">const</span> q = numberOne.<span class="hljs-title function_">deleteOne</span>();
+
+<span class="hljs-comment">// In Mongoose 7, `res === numberOne`</span>
+<span class="hljs-comment">// In Mongoose 8, `res` is a `DeleteResult`.</span>
+<span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> q;
+</code></pre>
+<h2 id="mongodb-node-driver-6"><a href="#mongodb-node-driver-6">MongoDB Node Driver 6</a></h2>
+
+<p>Mongoose 8 uses <a href="https://github.com/mongodb/node-mongodb-native/blob/main/HISTORY.md#600-2023-08-28">v6.x of the MongoDB Node driver</a>.
+There&#39;s a few noteable changes in MongoDB Node driver v6 that affect Mongoose:</p>
+<ol>
+<li>The <code>ObjectId</code> constructor no longer accepts strings of length 12. In Mongoose 7, <code>new mongoose.Types.ObjectId(&#39;12charstring&#39;)</code> was perfectly valid. In Mongoose 8, <code>new mongoose.Types.ObjectId(&#39;12charstring&#39;)</code> throws an error.</li>
+</ol>
+<h2 id="removed-findoneandremove"><a href="#removed-findoneandremove">Removed <code>findOneAndRemove()</code></a></h2>
+
+<p>In Mongoose 7, <code>findOneAndRemove()</code> was an alias for <code>findOneAndDelete()</code> that Mongoose supported for backwards compatibility.
+Mongoose 8 no longer supports <code>findOneAndRemove()</code>.
+Use <code>findOneAndDelete()</code> instead.</p>
+<h2 id="removed-count"><a href="#removed-count">Removed <code>count()</code></a></h2>
+
+<p><code>Model.count()</code> and <code>Query.prototype.count()</code> were removed in Mongoose 8. Use <code>Model.countDocuments()</code> and <code>Query.prototype.countDocuments()</code> instead.</p>
+<h2 id="removed-id-setter"><a href="#removed-id-setter">Removed id Setter</a></h2>
+
+<p>In Mongoose 7.4, Mongoose introduced an <code>id</code> setter that made <code>doc.id = &#39;0&#39;.repeat(24)</code> equivalent to <code>doc._id = &#39;0&#39;.repeat(24)</code>.
+In Mongoose 8, that setter is now removed.</p>
+<h2 id="null-is-valid-for-non-required-string-enums"><a href="#null-is-valid-for-non-required-string-enums"><code>null</code> is valid for non-required string enums</a></h2>
+
+<p>Before Mongoose 8, setting a string path with an <code>enum</code> to <code>null</code> would lead to a validation error, even if that path wasn&#39;t <code>required</code>.
+In Mongoose 8, it is valid to set a string path to <code>null</code> if <code>required</code> is not set, even with <code>enum</code>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">status</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">enum</span>: [<span class="hljs-string">&#x27;on&#x27;</span>, <span class="hljs-string">&#x27;off&#x27;</span>]
+  }
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Test</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+
+<span class="hljs-comment">// Works fine in Mongoose 8</span>
+<span class="hljs-comment">// Throws a `ValidationError` in Mongoose 7</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">status</span>: <span class="hljs-literal">null</span> });
+</code></pre>
+<h2 id="apply-minimize-when-save-updates-an-existing-document"><a href="#apply-minimize-when-save-updates-an-existing-document">Apply minimize when <code>save()</code> updates an existing document</a></h2>
+
+<p>In Mongoose 7, Mongoose would only apply minimize when saving a new document, not when updating an existing document.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">nested</span>: {
+    <span class="hljs-attr">field1</span>: <span class="hljs-title class_">Number</span>
+  }
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Test</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+
+<span class="hljs-comment">// Both Mongoose 7 and Mongoose 8 strip out empty objects when saving</span>
+<span class="hljs-comment">// a new document in MongoDB by default</span>
+<span class="hljs-keyword">const</span> { _id } = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">nested</span>: {} });
+<span class="hljs-keyword">let</span> rawDoc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">findById</span>(_id).<span class="hljs-title function_">lean</span>();
+rawDoc.<span class="hljs-property">nested</span>; <span class="hljs-comment">// undefined</span>
+
+<span class="hljs-comment">// Mongoose 8 will also strip out empty objects when saving an</span>
+<span class="hljs-comment">// existing document in MongoDB</span>
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">findById</span>(_id);
+doc.<span class="hljs-property">nested</span> = {};
+doc.<span class="hljs-title function_">markModified</span>(<span class="hljs-string">&#x27;nested&#x27;</span>);
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>();
+
+<span class="hljs-keyword">let</span> rawDoc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">findById</span>(_id).<span class="hljs-title function_">lean</span>();
+rawDoc.<span class="hljs-property">nested</span>; <span class="hljs-comment">// undefined in Mongoose 8, {} in Mongoose 7</span>
+</code></pre>
+<h2 id="apply-base-schema-paths-before-discriminator-paths"><a href="#apply-base-schema-paths-before-discriminator-paths">Apply base schema paths before discriminator paths</a></h2>
+
+<p>This means that, in Mongoose 8, getters and setters on discriminator paths run <em>after</em> getters and setters on base paths.
+In Mongoose 7, getters and setters on discriminator paths ran <em>before</em> getters and setters on base paths.</p>
+<pre><code class="language-javascript">
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-title function_">get</span>(<span class="hljs-params">v</span>) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Base schema getter&#x27;</span>);
+      <span class="hljs-keyword">return</span> v;
+    }
+  }
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Test</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+<span class="hljs-keyword">const</span> D = <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">discriminator</span>(<span class="hljs-string">&#x27;D&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">otherProp</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-title function_">get</span>(<span class="hljs-params">v</span>) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Discriminator schema getter&#x27;</span>);
+      <span class="hljs-keyword">return</span> v;
+    }
+  }
+}));
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title function_">D</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test&#x27;</span>, <span class="hljs-attr">otherProp</span>: <span class="hljs-string">&#x27;test&#x27;</span> });
+<span class="hljs-comment">// In Mongoose 8, prints &quot;Base schema getter&quot; followed by &quot;Discriminator schema getter&quot;</span>
+<span class="hljs-comment">// In Mongoose 7, prints &quot;Discriminator schema getter&quot; followed by &quot;Base schema getter&quot;</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(doc.<span class="hljs-title function_">toObject</span>({ <span class="hljs-attr">getters</span>: <span class="hljs-literal">true</span> }));
+</code></pre>
+<h2 id="removed-overwrite-option-for-findoneandupdate"><a href="#removed-overwrite-option-for-findoneandupdate">Removed <code>overwrite</code> option for <code>findOneAndUpdate()</code></a></h2>
+
+<p>Mongoose 7 and earlier supported an <code>overwrite</code> option for <code>findOneAndUpdate()</code>, <code>updateOne()</code>, and <code>update()</code>.
+Before Mongoose 7, <code>overwrite</code> would skip wrapping the <code>update</code> parameter in <code>$set</code>, which meant that <code>findOneAndUpdate()</code> and <code>update()</code> would overwrite the matched document.
+In Mongoose 7, setting <code>overwrite</code> would convert <code>findOneAndUpdate()</code> to <code>findOneAndReplace()</code> and <code>updateOne()</code> to <code>replaceOne()</code> to retain backwards compatibility.</p>
+<p>In Mongoose 8, the <code>overwrite</code> option is no longer supported.
+If you want to overwrite the entire document, use <code>findOneAndReplace()</code> or <code>replaceOne()</code>.</p>
+<h2 id="changed-behavior-for-findoneandupdate-with-orfail-and-upsert"><a href="#changed-behavior-for-findoneandupdate-with-orfail-and-upsert">Changed behavior for <code>findOneAndUpdate()</code> with <code>orFail()</code> and upsert</a></h2>
+
+<p>In Mongoose 7, <code>findOneAndUpdate(filter, update, { upsert: true }).orFail()</code> would throw a <code>DocumentNotFoundError</code> if a new document was upserted.
+In other words, <code>findOneAndUpdate().orFail()</code> always threw an error if no document was found, even if a new document was upserted.</p>
+<p>In Mongoose 8, <code>findOneAndUpdate(filter, update, { upsert: true }).orFail()</code> always succeeds.
+<code>findOneAndUpdate().orFail()</code> now throws a <code>DocumentNotFoundError</code> if there&#39;s no document returned, rather than if no document was found.</p>
+<h2 id="create-waits-until-all-saves-are-done-before-throwing-any-error"><a href="#create-waits-until-all-saves-are-done-before-throwing-any-error"><code>create()</code> waits until all saves are done before throwing any error</a></h2>
+
+<p>In Mongoose 7, <code>create()</code> would immediately throw if any <code>save()</code> threw an error by default.
+Mongoose 8 instead waits for all <code>save()</code> calls to finish before throwing the first error that occurred.
+So <code>create()</code> will throw the same error in both Mongoose 7 and Mongoose 8, Mongoose 8 just may take longer to throw the error.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">enum</span>: [<span class="hljs-string">&#x27;Badger&#x27;</span>, <span class="hljs-string">&#x27;Mushroom&#x27;</span>]
+  }
+});
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function"><span class="hljs-params">resolve</span> =&gt;</span> <span class="hljs-built_in">setTimeout</span>(resolve, <span class="hljs-number">1000</span>));
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Test</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+
+<span class="hljs-keyword">const</span> err = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">create</span>([
+  { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Badger&#x27;</span> },
+  { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Mushroom&#x27;</span> },
+  { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Cow&#x27;</span> }
+]).<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span>, <span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> err);
+err; <span class="hljs-comment">// ValidationError</span>
+
+<span class="hljs-comment">// In Mongoose 7, there would be 0 documents, because `Test.create()`</span>
+<span class="hljs-comment">// would throw before &#x27;Badger&#x27; and &#x27;Mushroom&#x27; are inserted</span>
+<span class="hljs-comment">// In Mongoose 8, there will be 2 documents. `Test.create()` waits until</span>
+<span class="hljs-comment">// &#x27;Badger&#x27; and &#x27;Mushroom&#x27; are inserted before throwing.</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">countDocuments</span>();
+</code></pre>
+<h2 id="model-validate-returns-copy-of-object"><a href="#model-validate-returns-copy-of-object"><code>Model.validate()</code> returns copy of object</a></h2>
+
+<p>In Mongoose 7, <code>Model.validate()</code> would potentially modify the passed in object.
+Mongoose 8 instead copies the passed in object first.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">answer</span>: <span class="hljs-title class_">Number</span> });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Test</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+
+<span class="hljs-keyword">const</span> obj = { <span class="hljs-attr">answer</span>: <span class="hljs-string">&#x27;42&#x27;</span> };
+<span class="hljs-keyword">const</span> res = <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">validate</span>(obj);
+
+<span class="hljs-keyword">typeof</span> obj.<span class="hljs-property">answer</span>; <span class="hljs-comment">// &#x27;string&#x27; in Mongoose 8, &#x27;number&#x27; in Mongoose 7 </span>
+<span class="hljs-keyword">typeof</span> res.<span class="hljs-property">answer</span>; <span class="hljs-comment">// &#x27;number&#x27; in both Mongoose 7 and Mongoose 8</span>
+</code></pre>
+<h2 id="allow-null-for-optional-fields-in-typescript"><a href="#allow-null-for-optional-fields-in-typescript">Allow <code>null</code> For Optional Fields in TypeScript</a></h2>
+
+<p>In Mongoose 8, automatically inferred schema types in TypeScript allow <code>null</code> for optional fields.
+In Mongoose 7, optional fields only allowed <code>undefined</code>, not <code>null</code>.</p>
+<pre><code class="language-typescript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">TestModel</span> = <span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">TestModel</span>();
+
+<span class="hljs-comment">// In Mongoose 8, this type is `string | null | undefined`.</span>
+<span class="hljs-comment">// In Mongoose 7, this type is `string | undefined`</span>
+doc.<span class="hljs-property">name</span>;
+</code></pre>
+<h2 id="model-constructor-properties-are-all-optional-in-typescript"><a href="#model-constructor-properties-are-all-optional-in-typescript">Model constructor properties are all optional in TypeScript</a></h2>
+
+<p>In Mongoose 8, no properties are required on model constructors by default.</p>
+<pre><code class="language-ts"><span class="hljs-keyword">import</span> {<span class="hljs-title class_">Schema</span>, model, <span class="hljs-title class_">Model</span>} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mongoose&#x27;</span>;
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">IDocument</span> {
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">createdAt</span>: <span class="hljs-title class_">Date</span>;
+  <span class="hljs-attr">updatedAt</span>: <span class="hljs-title class_">Date</span>;
+}
+
+<span class="hljs-keyword">const</span> documentSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>&lt;<span class="hljs-title class_">IDocument</span>&gt;(
+  { <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> } },
+  { <span class="hljs-attr">timestamps</span>: <span class="hljs-literal">true</span> }
+);
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">TestModel</span> = model&lt;<span class="hljs-title class_">IDocument</span>&gt;(<span class="hljs-string">&#x27;Document&#x27;</span>, documentSchema);
+
+<span class="hljs-comment">// Would throw a compile error in Mongoose 7, compiles in Mongoose 8</span>
+<span class="hljs-keyword">const</span> newDoc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">TestModel</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Foo&#x27;</span>
+});
+
+<span class="hljs-comment">// Explicitly pass generic param to constructor to specify the expected</span>
+<span class="hljs-comment">// type of the model constructor param. The following will cause TS</span>
+<span class="hljs-comment">// to complain about missing `createdAt` and `updatedAt` in Mongoose 8.</span>
+<span class="hljs-keyword">const</span> newDoc2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">TestModel</span>&lt;<span class="hljs-title class_">IDocument</span>&gt;({
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Foo&#x27;</span>
+});
+</code></pre>
+<h2 id="infer-distinct-return-types-from-schema"><a href="#infer-distinct-return-types-from-schema">Infer <code>distinct()</code> return types from schema</a></h2>
+
+<pre><code class="language-ts"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">User</span> {
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">email</span>: <span class="hljs-built_in">string</span>;
+  avatar?: <span class="hljs-built_in">string</span>;
+}
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>&lt;<span class="hljs-title class_">User</span>&gt;({
+  <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">email</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">avatar</span>: <span class="hljs-title class_">String</span>
+});
+
+<span class="hljs-comment">// Works in Mongoose 8. Compile error in Mongoose 7.</span>
+<span class="hljs-keyword">const</span> <span class="hljs-attr">names</span>: <span class="hljs-built_in">string</span>[] = <span class="hljs-keyword">await</span> <span class="hljs-title class_">MyModel</span>.<span class="hljs-title function_">distinct</span>(<span class="hljs-string">&#x27;name&#x27;</span>);
+</code></pre>
+</div></div><div id="jobs"><div class="job-listing"><a href="/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="https://assets.localizecdn.com/uploads/1689251999716.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="button jobs-view-more"><a href="/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/js/mobile-navbar-toggle.js"></script></div></body></html>

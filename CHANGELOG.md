@@ -1,3 +1,7 @@
+8.0.0 / 2023-10-31
+==================
+ * docs: add version support notes for Mongoose 8, including EOL date for Mongoose 6
+
 8.0.0-rc0 / 2023-10-24
 ======================
  * BREAKING CHANGE: use MongoDB node driver 6, drop support for rawResult option and findOneAndRemove() #13753

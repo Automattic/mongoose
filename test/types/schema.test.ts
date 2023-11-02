@@ -1230,3 +1230,88 @@ async function gh13797() {
     expectType<IUser>(this); return '';
   } } });
 }
+
+async function gh14028() {
+  // Methods that have access to `this` should have access to typing of other methods on the schema
+  interface IUser {
+    firstName: string;
+    lastName: string;
+    age: number;
+  }
+  interface IUserMethods {
+    fullName(): string;
+    isAdult(): boolean;
+  }
+  type UserModel = Model<IUser, {}, IUserMethods>;
+
+  // Define methods on schema
+  const schema = new Schema<IUser, UserModel, IUserMethods>({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    age: { type: Number, required: true }
+  }, {
+    methods: {
+      fullName() {
+        // Expect type of `this` to have fullName method
+        expectType<IUserMethods['fullName']>(this.fullName);
+        return this.firstName + ' ' + this.lastName;
+      },
+      isAdult() {
+        // Expect type of `this` to have isAdult method
+        expectType<IUserMethods['isAdult']>(this.isAdult);
+        return this.age >= 18;
+      }
+    }
+  });
+
+  const User = model('User', schema);
+  const user = new User({ firstName: 'John', lastName: 'Doe', age: 20 });
+  // Trigger type assertions inside methods
+  user.fullName();
+  user.isAdult();
+
+  // Expect type of methods to be inferred if accessed directly
+  expectType<IUserMethods['fullName']>(schema.methods.fullName);
+  expectType<IUserMethods['isAdult']>(schema.methods.isAdult);
+
+  // Define methods outside of schema
+  const schema2 = new Schema<IUser, UserModel, IUserMethods>({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    age: { type: Number, required: true }
+  });
+
+  schema2.methods.fullName = function fullName() {
+    expectType<IUserMethods['fullName']>(this.fullName);
+    return this.firstName + ' ' + this.lastName;
+  };
+
+  schema2.methods.isAdult = function isAdult() {
+    expectType<IUserMethods['isAdult']>(this.isAdult);
+    return true;
+  };
+
+  const User2 = model('User2', schema2);
+  const user2 = new User2({ firstName: 'John', lastName: 'Doe', age: 20 });
+  user2.fullName();
+  user2.isAdult();
+
+  // Skip InstanceMethods
+  const schema3 = new Schema<IUser, UserModel>({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    age: { type: Number, required: true }
+  }, {
+    methods: {
+      fullName() {
+        // As InstanceMethods type is not specified, expect type of this.fullName to be undefined
+        expectError<IUserMethods['fullName']>(this.fullName);
+        return this.firstName + ' ' + this.lastName;
+      }
+    }
+  });
+
+  const User3 = model('User2', schema3);
+  const user3 = new User3({ firstName: 'John', lastName: 'Doe', age: 20 });
+  expectError<string>(user3.fullName());
+}

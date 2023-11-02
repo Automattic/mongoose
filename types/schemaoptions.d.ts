@@ -220,7 +220,7 @@ declare module 'mongoose' {
     TInstanceMethods,
     {},
     Record<any, (this: THydratedDocumentType, ...args: any) => unknown>,
-    AddThisParameter<TInstanceMethods, THydratedDocumentType>
+    AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject
     >
 
     /**

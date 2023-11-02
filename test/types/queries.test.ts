@@ -520,3 +520,16 @@ function gh13630() {
   const x: UpdateQueryKnownOnly<User> = { $set: { name: 'John' } };
   expectAssignable<UpdateQuery<User>>(x);
 }
+
+async function gh14026() {
+  interface Foo {
+    bar: string[];
+  }
+  const FooModel = model<Foo>('Foo', new Schema<Foo>({ bar: [String ]}))
+  await FooModel.create({ bar: ['a', 'b'] })
+  await FooModel.create({ bar: ['c','d']});
+  await FooModel.create({ bar: ['e','f']})
+
+  const distinctBar = await FooModel.distinct('bar');
+  expectType<string[]>(distinctBar);
+}

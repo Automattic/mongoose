@@ -8,7 +8,7 @@ export class RepositoryBase<T> {
     }
 
     async insertMany(elems: T[]): Promise<T[]> {
-        elems = await this.model.insertMany(elems);
+        elems = await this.model.insertMany(elems) as T[];
         return elems;
     }
 }

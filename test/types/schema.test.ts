@@ -1231,7 +1231,7 @@ async function gh13797() {
   } } });
 }
 
-async function gh14028() {
+function gh14028_methods() {
   // Methods that have access to `this` should have access to typing of other methods on the schema
   interface IUser {
     firstName: string;
@@ -1296,14 +1296,17 @@ async function gh14028() {
   user2.fullName();
   user2.isAdult();
 
+  type UserModelWithoutMethods = Model<IUser>;
   // Skip InstanceMethods
-  const schema3 = new Schema<IUser, UserModel>({
+  const schema3 = new Schema<IUser, UserModelWithoutMethods>({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     age: { type: Number, required: true }
   }, {
     methods: {
       fullName() {
+        // Expect methods to still have access to `this` type
+        expectType<string>(this.firstName);
         // As InstanceMethods type is not specified, expect type of this.fullName to be undefined
         expectError<IUserMethods['fullName']>(this.fullName);
         return this.firstName + ' ' + this.lastName;
@@ -1314,4 +1317,37 @@ async function gh14028() {
   const User3 = model('User2', schema3);
   const user3 = new User3({ firstName: 'John', lastName: 'Doe', age: 20 });
   expectError<string>(user3.fullName());
+}
+
+function gh14028_statics() {
+  // Methods that have access to `this` should have access to typing of other methods on the schema
+  interface IUser {
+    firstName: string;
+    lastName: string;
+    age: number;
+  }
+  interface IUserStatics {
+    createWithFullName(name: string): Promise<IUser>;
+  }
+  type UserModel = Model<IUser, {}>;
+
+  // Define statics on schema
+  const schema = new Schema<IUser, UserModel, {}, {}, {}, IUserStatics>({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    age: { type: Number, required: true }
+  }, {
+    statics: {
+      createWithFullName(name: string) {
+        expectType<IUserStatics['createWithFullName']>(schema.statics.createWithFullName);
+        expectType<UserModel['create']>(this.create);
+
+        const [firstName, lastName] = name.split(' ');
+        return this.create({ firstName, lastName });
+      }
+    }
+  });
+
+  // Trigger type assertions inside statics
+  schema.statics.createWithFullName('John Doe');
 }

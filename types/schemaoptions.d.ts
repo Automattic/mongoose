@@ -210,7 +210,7 @@ declare module 'mongoose' {
       TStaticMethods,
       {},
       { [name: string]: (this: Model<DocType>, ...args: any[]) => unknown },
-      { [F in keyof TStaticMethods]: TStaticMethods[F] }
+      AddThisParameter<TStaticMethods, Model<DocType>>
     >
 
     /**

@@ -781,4 +781,11 @@ async function gh14026() {
 
   const distinctBar = await FooModel.distinct('bar');
   expectType<string[]>(distinctBar);
+
+  const TestModel = mongoose.model(
+    'Test',
+    new mongoose.Schema({ bar: [String] })
+  );
+
+  expectType<string[]>(await TestModel.distinct('bar'));
 }

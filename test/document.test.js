@@ -3731,6 +3731,11 @@ describe('document', function() {
 
       assert.deepEqual(
         kitty.modifiedPaths(),
+        ['surnames']
+      );
+
+      assert.deepEqual(
+        kitty.modifiedPaths({ includeChildren: true }),
         ['surnames', 'surnames.docarray']
       );
     });
@@ -12354,6 +12359,29 @@ describe('document', function() {
     await User.updateMany({}, { $unset: { 'sub.propertyA': '' } });
     const nestedProjectionDoc = await User.findOne({}, { name: 1, 'sub.propertyA': 1, 'sub.propertyB': 1 });
     assert.strictEqual(nestedProjectionDoc.sub.propertyA, 'A');
+  });
+
+  it('avoids adding nested paths to markModified() output if adding a new field (gh-14024)', async function() {
+    const eventSchema = new Schema({
+      name: { type: String },
+      __stateBeforeSuspension: {
+        field1: { type: String },
+        field2: { type: String },
+        jsonField: {
+          name: { type: String },
+          name1: { type: String }
+        }
+      }
+    });
+    const Event = db.model('Event', eventSchema);
+    const eventObj = new Event({ name: 'event object', __stateBeforeSuspension: { field1: 'test', jsonField: { name: 'test3' } } });
+    await eventObj.save();
+    const newObject = { field1: 'test', jsonField: { name: 'test3', name1: 'test4' } };
+    eventObj.set('__stateBeforeSuspension', newObject);
+    assert.deepEqual(
+      eventObj.modifiedPaths(),
+      ['__stateBeforeSuspension', '__stateBeforeSuspension.jsonField']
+    );
   });
 });
 

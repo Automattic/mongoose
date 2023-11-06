@@ -5369,13 +5369,11 @@ describe('Model', function() {
 
           const doc = await MyModel.create({ name: 'Ned Stark' });
 
-          const changes = [];
           const p = new Promise((resolve) => {
             MyModel.watch([], {
               fullDocument: 'updateLookup',
               hydrate: true
             }).on('change', change => {
-              changes.push(change);
               resolve(change);
             });
           });

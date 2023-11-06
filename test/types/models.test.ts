@@ -771,3 +771,21 @@ function gh13897() {
   expectType<Date>(doc.createdAt);
   expectError(new Document<IDocument>({ name: 'foo' }));
 }
+
+async function gh14026() {
+  interface Foo {
+    bar: string[];
+  }
+
+  const FooModel = mongoose.model<Foo>('Foo', new mongoose.Schema<Foo>({ bar: [String] }));
+
+  const distinctBar = await FooModel.distinct('bar');
+  expectType<string[]>(distinctBar);
+
+  const TestModel = mongoose.model(
+    'Test',
+    new mongoose.Schema({ bar: [String] })
+  );
+
+  expectType<string[]>(await TestModel.distinct('bar'));
+}

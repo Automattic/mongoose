@@ -1,3 +1,10 @@
+6.12.3 / 2023-11-07
+===================
+ * fix(ChangeStream): correctly handle hydrate option when using change stream as stream instead of iterator #14052
+ * fix(schema): fix dangling reference to virtual in tree after `removeVirtual()` #14019 #13085
+ * fix(document): avoid unmarking modified on nested path if no initial value stored and already modified #14053 #14024
+ * fix(document): consistently avoid marking subpaths of nested paths as modified #14053 #14022
+
 7.6.4 / 2023-10-30
 ==================
  * fix(connection): retain modified status for documents created outside a transaction during transaction retries #14017 #13973
@@ -6,6 +13,10 @@
  * fix(populate): allow using options: { strictPopulate: false } to disable strict populate #13863
  * docs: fix differences between sample codes and documentation #13998 [suzuki](https://github.com/suzuki)
  * docs: fix missing import and change wrong variable name #13992 [suzuki](https://github.com/suzuki)
+
+6.12.2 / 2023-10-25
+===================
+ * fix: add fullPath to ValidatorProps #13995 [Freezystem](https://github.com/Freezystem)
 
 7.6.3 / 2023-10-17
 ==================
@@ -24,6 +35,11 @@
  * types(model): make InsertManyResult consistent with return type of insertMany #13965 #13904
  * types(models): add cleaner type definitions for insertMany() with no generics to prevent errors when using insertMany() in generic classes #13964 #13957
  * types(schematypes): allow defining map path using type: 'Map' in addition to type: Map #13960 #13755
+
+6.12.1 / 2023-10-12
+===================
+ * fix(mongoose): correctly handle global applyPluginsToChildSchemas option #13945 #13887 [hasezoey](https://github.com/hasezoey)
+ * fix: Document.prototype.isModified support for a string of keys as first parameter #13940 #13674 [k-chop](https://github.com/k-chop)
 
 7.6.1 / 2023-10-09
 ==================

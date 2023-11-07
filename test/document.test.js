@@ -3701,6 +3701,11 @@ describe('document', function() {
 
       assert.deepEqual(
         kitty.modifiedPaths(),
+        ['surnames']
+      );
+
+      assert.deepEqual(
+        kitty.modifiedPaths({ includeChildren: true }),
         ['surnames', 'surnames.docarray']
       );
     });
@@ -9198,6 +9203,49 @@ describe('document', function() {
     assert.ok(foo.isModified('subdoc.bar'));
   });
 
+  it('does not unmark modified if there is no initial value (gh-9396)', async function() {
+    const IClientSchema = new Schema({
+      jwt: {
+        token_crypt: { type: String, template: false, maxSize: 8 * 1024 },
+        token_salt: { type: String, template: false }
+      }
+    });
+
+    const encrypt = function(doc, path, value) {
+      doc.set(path + '_crypt', value + '_crypt');
+      doc.set(path + '_salt', value + '_salt');
+    };
+
+    const decrypt = function(doc, path) {
+      return doc.get(path + '_crypt').replace('_crypt', '');
+    };
+
+    IClientSchema.virtual('jwt.token')
+      .get(function() {
+        return decrypt(this, 'jwt.token');
+      })
+      .set(function(value) {
+        encrypt(this, 'jwt.token', value);
+      });
+
+
+    const iclient = db.model('Test', IClientSchema);
+    const test = new iclient({
+      jwt: {
+        token: 'firstToken'
+      }
+    });
+
+    await test.save();
+    const entry = await iclient.findById(test._id).orFail();
+    entry.set('jwt.token', 'secondToken');
+    entry.set(entry.toJSON());
+    await entry.save();
+
+    const { jwt } = await iclient.findById(test._id).orFail();
+    assert.strictEqual(jwt.token, 'secondToken');
+  });
+
   it('correctly tracks saved state for deeply nested objects (gh-10773) (gh-9396)', async function() {
     const PaymentSchema = Schema({ status: String }, { _id: false });
     const OrderSchema = new Schema({
@@ -12619,6 +12667,28 @@ describe('document', function() {
     await doc.save();
     const { collection } = await Test.findById(doc);
     assert.strictEqual(collection, 'baz');
+  });
+  it('avoids adding nested paths to markModified() output if adding a new field (gh-14024)', async function() {
+    const eventSchema = new Schema({
+      name: { type: String },
+      __stateBeforeSuspension: {
+        field1: { type: String },
+        field2: { type: String },
+        jsonField: {
+          name: { type: String },
+          name1: { type: String }
+        }
+      }
+    });
+    const Event = db.model('Event', eventSchema);
+    const eventObj = new Event({ name: 'event object', __stateBeforeSuspension: { field1: 'test', jsonField: { name: 'test3' } } });
+    await eventObj.save();
+    const newObject = { field1: 'test', jsonField: { name: 'test3', name1: 'test4' } };
+    eventObj.set('__stateBeforeSuspension', newObject);
+    assert.deepEqual(
+      eventObj.modifiedPaths(),
+      ['__stateBeforeSuspension', '__stateBeforeSuspension.jsonField']
+    );
   });
 });
 

@@ -11017,9 +11017,9 @@ describe('model: populate:', function() {
     const peopleList = await Person.find().
       sort({ firstName: 1 }).
       populate({ path: 'nationality', match: { desc: 'Spain' } });
-    assert.deepStrictEqual(peopleList.map(
-      p => p.nationality ? p.nationality.key : undefined),
-    [undefined, 'ES', undefined]
+    assert.deepStrictEqual(
+      peopleList.map(p => p.nationality ? p.nationality.key : undefined),
+      [undefined, 'ES', undefined]
     );
   });
 

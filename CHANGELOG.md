@@ -1,3 +1,10 @@
+6.12.3 / 2023-11-07
+===================
+ * fix(ChangeStream): correctly handle hydrate option when using change stream as stream instead of iterator #14052
+ * fix(schema): fix dangling reference to virtual in tree after `removeVirtual()` #14019 #13085
+ * fix(document): avoid unmarking modified on nested path if no initial value stored and already modified #14053 #14024
+ * fix(document): consistently avoid marking subpaths of nested paths as modified #14053 #14022
+
 6.12.2 / 2023-10-25
 ===================
  * fix: add fullPath to ValidatorProps #13995 [Freezystem](https://github.com/Freezystem)

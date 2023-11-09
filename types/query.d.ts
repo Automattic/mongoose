@@ -259,15 +259,6 @@ declare module 'mongoose' {
     /** Specifies the `comment` option. */
     comment(val: string): this;
 
-    /** Specifies this query as a `count` query. */
-    count(criteria?: FilterQuery<DocType>): QueryWithHelpers<
-      number,
-      DocType,
-      THelpers,
-      RawDocType,
-      'count'
-    >;
-
     /** Specifies this query as a `countDocuments` query. */
     countDocuments(
       criteria?: FilterQuery<DocType>,

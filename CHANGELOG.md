@@ -1,3 +1,10 @@
+7.6.5 / 2023-11-14
+==================
+ * fix: handle update validators and single nested doc with numeric paths #14066 #13977
+ * fix: handle recursive schema array in discriminator definition #14068 #14055
+ * fix: diffIndexes treats namespace error as empty #14048 #14029
+ * docs(migrating_to_7): add note about requiring new with ObjectId #14021 #14020
+
 6.12.3 / 2023-11-07
 ===================
  * fix(ChangeStream): correctly handle hydrate option when using change stream as stream instead of iterator #14052

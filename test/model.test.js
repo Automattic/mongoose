@@ -3489,6 +3489,30 @@ describe('Model', function() {
           assert.equal(changeData.fullDocument.get('name'), 'Tony Stark');
         });
 
+        it('fullDocument with immediate watcher and hydrate (gh-14049)', async function() {
+          const MyModel = db.model('Test', new Schema({ name: String }));
+
+          const doc = await MyModel.create({ name: 'Ned Stark' });
+
+          const p = new Promise((resolve) => {
+            MyModel.watch([], {
+              fullDocument: 'updateLookup',
+              hydrate: true
+            }).on('change', change => {
+              resolve(change);
+            });
+          });
+
+          await MyModel.updateOne({ _id: doc._id }, { name: 'Tony Stark' });
+
+          const changeData = await p;
+          assert.equal(changeData.operationType, 'update');
+          assert.equal(changeData.fullDocument._id.toHexString(),
+            doc._id.toHexString());
+          assert.ok(changeData.fullDocument.$__);
+          assert.equal(changeData.fullDocument.get('name'), 'Tony Stark');
+        });
+
         it('respects discriminators (gh-11007)', async function() {
           const BaseModel = db.model('Test', new Schema({ name: String }));
           const ChildModel = BaseModel.discriminator('Test1', new Schema({ email: String }));

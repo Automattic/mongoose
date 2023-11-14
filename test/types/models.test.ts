@@ -673,9 +673,6 @@ async function gh13705() {
   const findByIdAndDeleteRes = await TestModel.findByIdAndDelete('0'.repeat(24), { lean: true });
   expectType<ExpectedLeanDoc | null>(findByIdAndDeleteRes);
 
-  const findByIdAndRemoveRes = await TestModel.findByIdAndRemove('0'.repeat(24), { lean: true });
-  expectType<ExpectedLeanDoc | null>(findByIdAndRemoveRes);
-
   const findByIdAndUpdateRes = await TestModel.findByIdAndUpdate('0'.repeat(24), {}, { lean: true });
   expectType<ExpectedLeanDoc | null>(findByIdAndUpdateRes);
 
@@ -709,6 +706,16 @@ async function gh13746() {
   expectType<boolean | undefined>(findOneAndUpdateRes.lastErrorObject?.updatedExisting);
   expectType<ObjectId | undefined>(findOneAndUpdateRes.lastErrorObject?.upserted);
   expectType<OkType>(findOneAndUpdateRes.ok);
+
+  const findOneAndDeleteRes = await TestModel.findOneAndDelete({ _id: '0'.repeat(24) }, { includeResultMetadata: true });
+  expectType<boolean | undefined>(findOneAndDeleteRes.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(findOneAndDeleteRes.lastErrorObject?.upserted);
+  expectType<OkType>(findOneAndDeleteRes.ok);
+
+  const findByIdAndDeleteRes = await TestModel.findByIdAndDelete('0'.repeat(24), { includeResultMetadata: true });
+  expectType<boolean | undefined>(findByIdAndDeleteRes.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(findByIdAndDeleteRes.lastErrorObject?.upserted);
+  expectType<OkType>(findByIdAndDeleteRes.ok);
 }
 
 function gh13904() {

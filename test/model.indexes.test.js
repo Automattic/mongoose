@@ -714,5 +714,15 @@ describe('model', function() {
       assert.deepStrictEqual(result.toDrop, ['age_1', 'weight_1']);
       assert.deepStrictEqual(result.toCreate, [{ password: 1 }, { email: 1 }]);
     });
+
+    it('running diffIndexes with a non-existent collection should not throw an error (gh-14010)', async function() {
+      const testSchema = new mongoose.Schema({
+        name: String
+      });
+
+      const Test = db.model('gh14010', testSchema);
+      const res = await Test.diffIndexes();
+      assert.ok(res);
+    });
   });
 });

@@ -481,7 +481,7 @@ declare module 'mongoose' {
       field: DocKey,
       filter?: FilterQuery<TRawDocType>
     ): QueryWithHelpers<
-      Array<DocKey extends keyof TRawDocType ? TRawDocType[DocKey] : ResultType>,
+      Array<DocKey extends keyof TRawDocType ? Unpacked<TRawDocType[DocKey]> : ResultType>,
       THydratedDocumentType,
       TQueryHelpers,
       TRawDocType,

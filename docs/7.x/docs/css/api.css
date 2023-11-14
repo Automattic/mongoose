@@ -1,0 +1,169 @@
+.method-type {
+  color: #1485CC;
+  margin-left: 0.25em;
+  margin-right: 0.25em;
+}
+
+.api-nav {
+  position: fixed;
+  left: 1160px;
+  top: 0px;
+  width: 300px;
+  height: 100%;
+  padding-bottom: 10px;
+  overflow-y: auto;
+}
+
+.api-nav .nav-item-title {
+  font-size: 0.9em;
+}
+
+.api-nav-content {
+  margin-top: 10px;
+  margin-bottom: 35px;
+}
+
+.api-nav a {
+  color: #777;
+}
+
+.api-nav .nav-item-sub {
+  display: block;
+  font-size: 0.66em;
+}
+
+.nav-item-sub > li {
+  padding: 2px 0px;
+}
+
+.api-nav ul {
+  margin-top: 0.25em;
+  padding-left: 1em;
+}
+
+.api-nav ul li {
+  margin-bottom: 0.1em;
+  list-style-type: none;
+}
+
+.item-header-wrap {
+  position: relative;
+}
+
+.api-content {
+  margin-top: 3em;
+}
+
+@media (max-width: 1785px) {
+  .api-nav {
+    display: none;
+  }
+}
+
+ul {
+  margin-top: -10px;
+}
+
+li {
+  margin-bottom: 0.5em;
+}
+
+hr.separate-api-elements {
+  border: 0;
+  height: 1px;
+  background: -webkit-gradient(linear, left top, right top, from(rgba(221, 221, 221, 0.0)), color-stop(0.5, rgba(221, 221, 221, 0.33)), to(rgba(221, 221, 221, 0.0)));
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 45px;
+  margin-bottom: 35px;
+}
+
+hr.separate-api {
+  margin-top: 55px;
+  margin-bottom: 45px;
+  border: 0;
+  height: 3px;
+  background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0.0)), color-stop(0.5, rgba(0, 0, 0, 0.33)), to(rgba(0, 0, 0, 0.0)));
+}
+
+/* CPC ad */
+
+#api-carbon-ad {
+  width: 250px;
+  margin-top: 75px;
+}
+
+.native-ad img {
+  width: auto !important;
+}
+
+.native-ad {
+  visibility: hidden;
+  position: relative;
+  transition: all .25s ease-in-out;
+  line-height: 1.5;
+  border-radius: 3px;
+  opacity: 0;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+.native-show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.native-ad a {
+  color: #111;
+  display: block;
+  text-decoration: none;
+}
+
+.native-ad span {
+  display: block;
+}
+
+.native-banner { position: relative; }
+.native-cta {
+  position: absolute;
+  bottom: 0;
+  border-bottom: solid 1px #eee;
+  width: 100%;
+  font-size: 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  padding: 6px 0;
+  text-align: center;
+  letter-spacing: .5px;
+}
+
+.native-img {
+  display: block;
+  padding: 44px 60px 68px;
+  height: 50px;
+}
+
+.native-desc {
+  font-size: 14px;
+  padding: 8px 10px;
+  margin-bottom: 30px;
+}
+
+.native-desc strong {
+  font-weight: 600;
+}
+
+.native-sponsor {
+  font-size: 9px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+   background: repeating-linear-gradient(-45deg, transparent, transparent 5px, hsla(0, 0%, 0%, .025) 5px, hsla(0, 0%, 0%, .025) 10px) hsla(203, 11%, 90%, 0.3);
+  padding: 8px 10px;
+  text-transform: uppercase;
+  letter-spacing: .2px;
+}
+
+.deprecated {
+  color: #ff0000;
+}

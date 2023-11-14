@@ -1,0 +1,43 @@
+.native-inline {
+  visibility: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu,
+  Cantarell, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  opacity: 0;
+  transition: all .25s ease-in-out;
+}
+
+.native-show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.native-inline {
+  display: block;
+  margin-top: 1.5em;
+  padding: 10px 20px;
+  border-radius: 4px;
+  background: repeating-linear-gradient(-45deg, transparent, transparent 5px, hsla(0, 0%, 0%, .03) 5px, hsla(0, 0%, 0%, .03) 10px) hsla(0, 0%, 0%, .03);
+}
+
+.native-inline a {
+  display: block;
+  text-decoration: none;
+  line-height: 1.5;
+}
+
+
+.native-inline .sponsor {
+  position: relative;
+  top: -1px;
+  margin-right: 4px;
+  padding: 2px 6px 3px;
+  border: solid 1px currentColor;
+  border-radius: 2px;
+  color: currentColor;
+  content: "Sponsor";
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 1;
+}

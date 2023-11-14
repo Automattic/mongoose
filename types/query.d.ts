@@ -259,15 +259,6 @@ declare module 'mongoose' {
     /** Specifies the `comment` option. */
     comment(val: string): this;
 
-    /** Specifies this query as a `count` query. */
-    count(criteria?: FilterQuery<DocType>): QueryWithHelpers<
-      number,
-      DocType,
-      THelpers,
-      RawDocType,
-      'count'
-    >;
-
     /** Specifies this query as a `countDocuments` query. */
     countDocuments(
       criteria?: FilterQuery<DocType>,
@@ -320,7 +311,7 @@ declare module 'mongoose' {
     distinct<DocKey extends string, ResultType = unknown>(
       field: DocKey,
       filter?: FilterQuery<DocType>
-    ): QueryWithHelpers<Array<DocKey extends keyof DocType ? DocType[DocKey] : ResultType>, DocType, THelpers, RawDocType, 'distinct'>;
+    ): QueryWithHelpers<Array<DocKey extends keyof DocType ? Unpacked<DocType[DocKey]> : ResultType>, DocType, THelpers, RawDocType, 'distinct'>;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     elemMatch<K = string>(path: K, val: any): this;

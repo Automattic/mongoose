@@ -201,15 +201,6 @@ declare module 'mongoose' {
     /** Collection the model uses. */
     collection: Collection;
 
-    /** Creates a `count` query: counts the number of documents that match `filter`. */
-    count(filter?: FilterQuery<TRawDocType>): QueryWithHelpers<
-      number,
-      THydratedDocumentType,
-      TQueryHelpers,
-      TRawDocType,
-      'count'
-    >;
-
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
     countDocuments(
       filter?: FilterQuery<TRawDocType>,
@@ -481,7 +472,7 @@ declare module 'mongoose' {
       field: DocKey,
       filter?: FilterQuery<TRawDocType>
     ): QueryWithHelpers<
-      Array<DocKey extends keyof TRawDocType ? TRawDocType[DocKey] : ResultType>,
+      Array<DocKey extends keyof TRawDocType ? Unpacked<TRawDocType[DocKey]> : ResultType>,
       THydratedDocumentType,
       TQueryHelpers,
       TRawDocType,

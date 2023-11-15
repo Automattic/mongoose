@@ -1,3 +1,14 @@
+8.0.1 / 2023-11-15
+==================
+ * fix: retain key order with aliases when creating indexes with alias #14042 [meabed](https://github.com/meabed)
+ * fix: handle nonexistent collection with diffIndexes #14029 #14010
+ * types(model+query): correctly remove count from TypeScript types to reflect removal of runtime support #14076 #14067 #14062
+ * types: correct `this` parameter for methods and statics #14028 #14027 [ruxxzebre](https://github.com/ruxxzebre)
+ * types(model+query): unpack arrays in distinct return type #14047 #14026
+ * types: add missing Types.UUID typings #14023 #13103 [k725](https://github.com/k725)
+ * docs: add mongoose 8 to mongodb server compatibility guide #14064
+ * docs: fix typo in queries.md #14065 [MuhibAhmed](https://github.com/MuhibAhmed)
+
 7.6.5 / 2023-11-14
 ==================
  * fix: handle update validators and single nested doc with numeric paths #14066 #13977

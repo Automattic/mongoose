@@ -1,6 +1,33 @@
+7.6.5 / 2023-11-14
+==================
+ * fix: handle update validators and single nested doc with numeric paths #14066 #13977
+ * fix: handle recursive schema array in discriminator definition #14068 #14055
+ * fix: diffIndexes treats namespace error as empty #14048 #14029
+ * docs(migrating_to_7): add note about requiring new with ObjectId #14021 #14020
+
+6.12.3 / 2023-11-07
+===================
+ * fix(ChangeStream): correctly handle hydrate option when using change stream as stream instead of iterator #14052
+ * fix(schema): fix dangling reference to virtual in tree after `removeVirtual()` #14019 #13085
+ * fix(document): avoid unmarking modified on nested path if no initial value stored and already modified #14053 #14024
+ * fix(document): consistently avoid marking subpaths of nested paths as modified #14053 #14022
+
 8.0.0 / 2023-10-31
 ==================
  * docs: add version support notes for Mongoose 8, including EOL date for Mongoose 6
+
+7.6.4 / 2023-10-30
+==================
+ * fix(connection): retain modified status for documents created outside a transaction during transaction retries #14017 #13973
+ * fix(schema): handle recursive schemas in discriminator definitions #14011 #13978
+ * fix: handle casting $or underneath $elemMatch #14007 #13974
+ * fix(populate): allow using options: { strictPopulate: false } to disable strict populate #13863
+ * docs: fix differences between sample codes and documentation #13998 [suzuki](https://github.com/suzuki)
+ * docs: fix missing import and change wrong variable name #13992 [suzuki](https://github.com/suzuki)
+
+6.12.2 / 2023-10-25
+===================
+ * fix: add fullPath to ValidatorProps #13995 [Freezystem](https://github.com/Freezystem)
 
 8.0.0-rc0 / 2023-10-24
 ======================
@@ -36,6 +63,11 @@
  * types(model): make InsertManyResult consistent with return type of insertMany #13965 #13904
  * types(models): add cleaner type definitions for insertMany() with no generics to prevent errors when using insertMany() in generic classes #13964 #13957
  * types(schematypes): allow defining map path using type: 'Map' in addition to type: Map #13960 #13755
+
+6.12.1 / 2023-10-12
+===================
+ * fix(mongoose): correctly handle global applyPluginsToChildSchemas option #13945 #13887 [hasezoey](https://github.com/hasezoey)
+ * fix: Document.prototype.isModified support for a string of keys as first parameter #13940 #13674 [k-chop](https://github.com/k-chop)
 
 7.6.1 / 2023-10-09
 ==================

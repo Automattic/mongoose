@@ -3001,6 +3001,22 @@ describe('model: updateOne: ', function() {
     const doc = await Test.findById(_id);
     assert.equal(doc.$myKey, 'gh13786');
   });
+  it('works with update validators and single nested doc with numberic paths (gh-13977)', async function() {
+    const subdoc = new mongoose.Schema({
+      1: { type: String, required: true, validate: () => true }
+    });
+    const schema = new mongoose.Schema({ subdoc });
+    const Test = db.model('Test', schema);
+
+    const _id = new mongoose.Types.ObjectId();
+    await Test.updateOne(
+      { _id },
+      { subdoc: { 1: 'foobar' } },
+      { upsert: true, runValidators: true }
+    );
+    const doc = await Test.findById(_id);
+    assert.equal(doc.subdoc['1'], 'foobar');
+  });
 });
 
 async function delay(ms) {

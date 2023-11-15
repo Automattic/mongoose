@@ -297,7 +297,7 @@ declare module 'mongoose' {
     method(obj: Partial<TInstanceMethods>): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: { [F in keyof TInstanceMethods]: TInstanceMethods[F] } & AnyObject;
+    methods: AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject;
 
     /** The original object passed to the schema constructor */
     obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>, EnforcedDocType>;

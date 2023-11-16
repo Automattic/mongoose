@@ -555,6 +555,18 @@ declare module 'mongoose' {
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
 
+    /** Creates a `findByIdAndRemove` query, filtering by the given `_id`. */
+    findByIdAndRemove<ResultDoc = THydratedDocumentType>(
+      id: mongodb.ObjectId | any,
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndDelete'> | null,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOneAndDelete'
+    >;
+
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
@@ -571,6 +583,11 @@ declare module 'mongoose' {
       id: mongodb.ObjectId | any,
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { rawResult: true }
+    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndUpdate'>;
+    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
+      id: mongodb.ObjectId | any,
+      update: UpdateQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndUpdate'>;
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
@@ -629,6 +646,11 @@ declare module 'mongoose' {
       filter: FilterQuery<TRawDocType>,
       replacement: TRawDocType | AnyObject,
       options: QueryOptions<TRawDocType> & { rawResult: true }
+    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndReplace'>;
+    findOneAndReplace<ResultDoc = THydratedDocumentType>(
+      filter: FilterQuery<TRawDocType>,
+      replacement: TRawDocType | AnyObject,
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndReplace'>;
     findOneAndReplace<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,

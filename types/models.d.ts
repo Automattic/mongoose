@@ -542,21 +542,9 @@ declare module 'mongoose' {
     >;
     findByIdAndDelete<ResultDoc = THydratedDocumentType>(
       id?: mongodb.ObjectId | any,
-      options?: QueryOptions<TRawDocType> | null
-    ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
-
-    /** Creates a `findByIdAndRemove` query, filtering by the given `_id`. */
-    findByIdAndRemove<ResultDoc = THydratedDocumentType>(
-      id: mongodb.ObjectId | any,
-      options: QueryOptions<TRawDocType> & { lean: true }
-    ): QueryWithHelpers<
-      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndDelete'> | null,
-      ResultDoc,
-      TQueryHelpers,
-      TRawDocType,
-      'findOneAndDelete'
-    >;
-    findByIdAndRemove<ResultDoc = THydratedDocumentType>(
+      options?: QueryOptions<TRawDocType> & { includeResultMetadata: true }
+    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
+    findByIdAndDelete<ResultDoc = THydratedDocumentType>(
       id?: mongodb.ObjectId | any,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
@@ -573,11 +561,6 @@ declare module 'mongoose' {
       TRawDocType,
       'findOneAndUpdate'
     >;
-    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
-      id: mongodb.ObjectId | any,
-      update: UpdateQuery<TRawDocType>,
-      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
-    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndUpdate'>;
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
       update: UpdateQuery<TRawDocType>,
@@ -611,6 +594,10 @@ declare module 'mongoose' {
     >;
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
+      options?: QueryOptions<TRawDocType> & { includeResultMetadata: true }
+    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
+    findOneAndDelete<ResultDoc = THydratedDocumentType>(
+      filter?: FilterQuery<TRawDocType>,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
 
@@ -626,11 +613,6 @@ declare module 'mongoose' {
       TRawDocType,
       'findOneAndReplace'
     >;
-    findOneAndReplace<ResultDoc = THydratedDocumentType>(
-      filter: FilterQuery<TRawDocType>,
-      replacement: TRawDocType | AnyObject,
-      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
-    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndReplace'>;
     findOneAndReplace<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       replacement: TRawDocType | AnyObject,

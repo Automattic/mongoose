@@ -1,4 +1,4 @@
-import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction } from 'mongoose';
+import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction, ModifyResult } from 'mongoose';
 import { expectError, expectType, expectNotType, expectAssignable } from 'tsd';
 
 const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(next, opts) {
@@ -103,7 +103,17 @@ schema.post<Query<number, any>>('countDocuments', function(count, next) {
 });
 
 schema.post<Query<ITest, ITest>>('findOneAndDelete', function(res, next) {
-  expectType<ITest>(res);
+  expectType<ITest | ModifyResult<ITest> | null>(res);
+  next();
+});
+
+schema.post<Query<ITest, ITest>>('findOneAndUpdate', function(res, next) {
+  expectType<ITest | ModifyResult<ITest> | null>(res);
+  next();
+});
+
+schema.post<Query<ITest, ITest>>('findOneAndReplace', function(res, next) {
+  expectType<ITest | ModifyResult<ITest> | null>(res);
   next();
 });
 

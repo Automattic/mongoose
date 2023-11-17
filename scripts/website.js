@@ -76,6 +76,38 @@ const tests = [
   ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schemas.test.js')).toString())
 ];
 
+function refreshDocs() {
+  deleteAllHtmlFiles();
+  if (process.env.DOCS_DEPLOY) {
+    moveDocsToTemp();
+  }
+}
+
+function deleteAllHtmlFiles() {
+  fs.unlinkSync('../index.html');
+  const locations = ['../docs','../docs/tutorials', '../docs/typescript']
+  for (let i = 0; i < locations.length; i++) {
+    const files = fs.readdirSync(locations[i]);
+    for (let index = 0; index < files.length; index++) {
+      if (files[index].endsWith('.html')) {
+        fs.unlinkSync(files[index]);
+      }
+    }
+  }
+  const folders =  ['../docs/api', '../docs/source/_docs', '../tmp'];
+  for (let i = 0; i < folders.length; i++) {
+    fs.rmdirSync(folders[i])
+  }
+}
+
+function moveDocsToTemp() {
+  const folder = '../docs/7.x';
+  const directory = fs.readdirSync(folder);
+  for (let i = 0; i < directory.length; i++) {
+    fs.renameSync(`${folder}/${directory[i]}`, `./tmp/${directory[i]}`);
+  }
+}
+
 /** 
  * Array of array of semver numbers, sorted with highest number first
  * @example

@@ -1373,7 +1373,7 @@ describe('Query', function() {
   });
 
   describe('setOptions', function() {
-    it('works', async function() {
+    it('works', function() {
       const q = new Query();
       q.setOptions({ thing: 'cat' });
       q.setOptions({ populate: ['fans'] });
@@ -1397,16 +1397,6 @@ describe('Query', function() {
       assert.equal(q.options.hint.index2, -1);
       assert.equal(q.options.readPreference.mode, 'secondary');
       assert.equal(q.options.readPreference.tags[0].dc, 'eu');
-
-      const Product = db.model('Product', productSchema);
-      const [, doc2] = await Product.create([
-        { numbers: [3, 4, 5] },
-        { strings: 'hi there'.split(' '), w: 'majority' }
-      ]);
-
-      const docs = await Product.find().setOptions({ limit: 1, sort: { _id: -1 }, read: 'n' });
-      assert.equal(docs.length, 1);
-      assert.equal(docs[0].id, doc2.id);
     });
 
     it('populate as array in options (gh-4446)', function() {

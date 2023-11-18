@@ -77,3 +77,19 @@ function gh13087() {
     };
   }>>(points);
 }
+
+async function gh13424() {
+  const subDoc = {
+    name: { type: String, required: true },
+    controls: { type: String, required: true }
+  };
+
+  const testSchema = new Schema({
+    question: { type: String, required: true },
+    subDocArray: { type: [subDoc], required: true }
+  });
+  const TestModel = model('Test', testSchema);
+
+  const doc = new TestModel();
+  expectType<Types.ObjectId | undefined>(doc.subDocArray[0]._id);
+}

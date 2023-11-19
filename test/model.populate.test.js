@@ -8259,6 +8259,58 @@ describe('model: populate:', function() {
       assert.deepEqual(populatedRides[1].files, []);
     });
 
+    it('doesnt insert empty document when lean populating a path within an underneath non-existent document array (gh-14098)', async function() {
+      const userSchema = new mongoose.Schema({
+        fullName: String,
+        company: String
+      });
+      const User = db.model('User', userSchema);
+
+      const fileSchema = new mongoose.Schema({
+        _id: String,
+        uploaderId: {
+          type: mongoose.ObjectId,
+          ref: 'User'
+        }
+      }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+      fileSchema.virtual('uploadedBy', {
+        ref: 'User',
+        localField: 'uploaderId',
+        foreignField: '_id',
+        justOne: true
+      });
+
+      const contentSchema = new mongoose.Schema({
+        memo: String,
+        files: { type: [fileSchema], default: [] }
+      }, { toObject: { virtuals: true }, toJSON: { virtuals: true }, _id: false });
+
+      const postSchema = new mongoose.Schema({
+        title: String,
+        content: { type: contentSchema }
+      }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+      const Post = db.model('Test1', postSchema);
+
+      const user = await User.create({ fullName: 'John Doe', company: 'GitHub' });
+      await Post.create([
+        { title: 'London-Paris' },
+        {
+          title: 'Berlin-Moscow',
+          content: {
+            memo: 'Not Easy',
+            files: [{ _id: '123', uploaderId: user._id }]
+          }
+        }
+      ]);
+      await Post.updateMany({}, { $unset: { 'content.files': 1 } });
+      const populatedRides = await Post.find({}).populate({
+        path: 'content.files.uploadedBy',
+        justOne: true
+      }).lean();
+      assert.equal(populatedRides[0].content.files, undefined);
+      assert.equal(populatedRides[1].content.files, undefined);
+    });
+
     it('sets empty array if populating undefined path (gh-8455)', async function() {
       const TestSchema = new Schema({
         thingIds: [mongoose.ObjectId]

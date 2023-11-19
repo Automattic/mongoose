@@ -8308,10 +8308,7 @@ describe('model: populate:', function() {
         path: 'content.files.uploadedBy',
         justOne: true
       }).lean();
-
-      console.log(populatedRides[0].content);
-      console.log(populatedRides[1].content);
-
+      
       assert.equal(populatedRides[0].content.files, undefined);
       assert.equal(populatedRides[1].content.files, undefined);
     })

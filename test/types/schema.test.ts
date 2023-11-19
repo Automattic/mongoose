@@ -408,7 +408,7 @@ export function autoTypedSchema() {
     array1: string[];
     array2: any[];
     array3: any[];
-    // array4: any[];
+    array4: any[];
     array5: any[];
     array6: string[];
     array7?: string[] | null;
@@ -455,7 +455,7 @@ export function autoTypedSchema() {
     array1: [String],
     array2: Array,
     array3: [Schema.Types.Mixed],
-    // array4: [{}],
+    array4: [{}],
     array5: [],
     array6: { type: [String] },
     array7: { type: [String], default: undefined },

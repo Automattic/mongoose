@@ -225,7 +225,9 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
           IsSchemaTypeFromBuiltinClass<Item> extends true ?
             ObtainDocumentPathType<Item, TypeKey>[] :
             IsItRecordAndNotAny<Item> extends true ?
-              Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
+              Item extends Record<string, never> ?
+                ObtainDocumentPathType<Item, TypeKey>[] :
+                Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
               ObtainDocumentPathType<Item, TypeKey>[]
       >:
       PathValueType extends ReadonlyArray<infer Item> ?
@@ -238,7 +240,9 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
             IsSchemaTypeFromBuiltinClass<Item> extends true ?
               ObtainDocumentPathType<Item, TypeKey>[] :
               IsItRecordAndNotAny<Item> extends true ?
-                Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
+                Item extends Record<string, never> ?
+                  ObtainDocumentPathType<Item, TypeKey>[] :
+                  Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
                 ObtainDocumentPathType<Item, TypeKey>[]
         >:
         PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :

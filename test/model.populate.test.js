@@ -8255,7 +8255,7 @@ describe('model: populate:', function() {
           justOne: true
         }
       }).lean();
-      console.log(populatedRides)
+
       assert.deepEqual(populatedRides[0].files, []);
       assert.deepEqual(populatedRides[1].files, []);
     });
@@ -8308,10 +8308,9 @@ describe('model: populate:', function() {
         path: 'content.files.uploadedBy',
         justOne: true
       }).lean();
-      
       assert.equal(populatedRides[0].content.files, undefined);
       assert.equal(populatedRides[1].content.files, undefined);
-    })
+    });
 
     it('sets empty array if populating undefined path (gh-8455)', async function() {
       const TestSchema = new Schema({

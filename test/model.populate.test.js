@@ -8254,8 +8254,7 @@ describe('model: populate:', function() {
           path: 'companyId',
           justOne: true
         }
-      }).lean();
-
+      });
       assert.deepEqual(populatedRides[0].files, []);
       assert.deepEqual(populatedRides[1].files, []);
     });

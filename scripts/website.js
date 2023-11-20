@@ -4,9 +4,11 @@ Error.stackTraceLimit = Infinity;
 
 const acquit = require('acquit');
 const fs = require('fs');
+const fsextra = require('fs-extra');
 const path = require('path');
 const pug = require('pug');
 const pkg = require('../package.json');
+const rimraf = require('rimraf');
 const transform = require('acquit-require');
 const childProcess = require("child_process");
 
@@ -76,35 +78,45 @@ const tests = [
   ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schemas.test.js')).toString())
 ];
 
-function refreshDocs() {
-  deleteAllHtmlFiles();
-  if (process.env.DOCS_DEPLOY) {
-    moveDocsToTemp();
-  }
-}
-
 function deleteAllHtmlFiles() {
-  fs.unlinkSync('../index.html');
-  const locations = ['../docs','../docs/tutorials', '../docs/typescript']
-  for (let i = 0; i < locations.length; i++) {
-    const files = fs.readdirSync(locations[i]);
-    for (let index = 0; index < files.length; index++) {
-      if (files[index].endsWith('.html')) {
-        fs.unlinkSync(files[index]);
-      }
+  try {
+    fs.unlinkSync('./index.html');
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
     }
   }
-  const folders =  ['../docs/api', '../docs/source/_docs', '../tmp'];
-  for (let i = 0; i < folders.length; i++) {
-    fs.rmdirSync(folders[i])
+  const foldersToClean = [
+    './docs',
+    './docs/tutorials',
+    './docs/typescript',
+    './docs/api',
+    './docs/source/_docs',
+    './tmp'
+  ];
+  for (const folder of foldersToClean) {
+    let files = [];
+    try {
+      files = fs.readdirSync(folder);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        continue;
+      }
+    }
+    for (let index = 0; index < files.length; index++) {
+      if (files[index].endsWith('.html')) {
+        fs.unlinkSync(`${folder}/${files[index]}`);
+      }
+    }
   }
 }
 
 function moveDocsToTemp() {
-  const folder = '../docs/7.x';
+  rimraf.sync('./tmp');
+  const folder = `./docs/7.x`;
   const directory = fs.readdirSync(folder);
   for (let i = 0; i < directory.length; i++) {
-    fs.renameSync(`${folder}/${directory[i]}`, `./tmp/${directory[i]}`);
+    fsextra.moveSync(`${folder}/${directory[i]}`, `./tmp/${directory[i]}`);
   }
 }
 
@@ -520,7 +532,6 @@ async function copyAllRequiredFiles() {
     return;
   }
 
-  const fsextra = require('fs-extra');
   await Promise.all(pathsToCopy.map(async v => {
     const resultPath = path.resolve(cwd, path.join('.', versionObj.versionedPath, v));
     await fsextra.copy(v, resultPath);
@@ -537,8 +548,16 @@ exports.cwd = cwd;
 
 // only run the following code if this file is the main module / entry file
 if (isMain) {
-  console.log(`Processing ~${files.length} files`);
-  Promise.all([pugifyAllFiles(), copyAllRequiredFiles()]).then(() => {
-    console.log("Done Processing");
-  })
+  (async function main() {
+    console.log(`Processing ~${files.length} files`);
+
+    await deleteAllHtmlFiles();
+    await pugifyAllFiles();
+    await copyAllRequiredFiles();
+    if (process.env.DOCS_DEPLOY) {
+      await moveDocsToTemp();
+    }
+
+    console.log('Done Processing');
+  })();
 }

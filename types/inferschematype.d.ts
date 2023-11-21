@@ -13,7 +13,8 @@ import {
   DefaultTypeKey,
   ObjectIdSchemaDefinition,
   IfEquals,
-  DefaultSchemaOptions
+  DefaultSchemaOptions,
+  IsItRecordAndNotAny
 } from 'mongoose';
 
 declare module 'mongoose' {
@@ -176,6 +177,30 @@ TypeKey
  */
 type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends ReadonlyArray<infer E> ? E : T extends { values: any } ? PathEnumOrString<T['values']> : string;
 
+type IsSchemaTypeFromBuiltinClass<T> = T extends (typeof String)
+  ? true
+  : T extends (typeof Number)
+    ? true
+    : T extends (typeof Boolean)
+      ? true
+      : T extends (typeof Buffer)
+        ? true
+        : T extends (typeof Schema.Types.ObjectId)
+          ? true
+          : T extends (typeof Schema.Types.UUID)
+            ? true
+            : T extends (typeof Schema.Types.Decimal128)
+              ? true
+              : T extends Types.ObjectId
+                ? true
+                : T extends Types.Decimal128
+                  ? true
+                  : T extends Buffer
+                    ? true
+                    : T extends (typeof Schema.Types.Mixed)
+                      ? true
+                      : IfEquals<T, Schema.Types.ObjectId, true, false>;
+
 /**
  * @summary Resolve path type by returning the corresponding type.
  * @param {PathValueType} PathValueType Document definition path type.
@@ -189,15 +214,21 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
       IfEquals<Item, never, any[], Item extends Schema ?
         // If Item is a schema, infer its type.
         Types.DocumentArray<InferSchemaType<Item>> :
-        Item extends Record<TypeKey, any>?
+        Item extends Record<TypeKey, any> ?
           Item[TypeKey] extends Function | String ?
             // If Item has a type key that's a string or a callable, it must be a scalar,
             // so we can directly obtain its path type.
             ObtainDocumentPathType<Item, TypeKey>[] :
             // If the type key isn't callable, then this is an array of objects, in which case
             // we need to call ObtainDocumentType to correctly infer its type.
-            ObtainDocumentType<Item, any, { typeKey: TypeKey }>[]:
-          ObtainDocumentPathType<Item, TypeKey>[]
+            ObtainDocumentType<Item, any, { typeKey: TypeKey }>[] :
+          IsSchemaTypeFromBuiltinClass<Item> extends true ?
+            ObtainDocumentPathType<Item, TypeKey>[] :
+            IsItRecordAndNotAny<Item> extends true ?
+              Item extends Record<string, never> ?
+                ObtainDocumentPathType<Item, TypeKey>[] :
+                Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
+              ObtainDocumentPathType<Item, TypeKey>[]
       >:
       PathValueType extends ReadonlyArray<infer Item> ?
         IfEquals<Item, never, any[], Item extends Schema ?
@@ -206,7 +237,13 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
             Item[TypeKey] extends Function | String ?
               ObtainDocumentPathType<Item, TypeKey>[] :
               ObtainDocumentType<Item, any, { typeKey: TypeKey }>[]:
-            ObtainDocumentPathType<Item, TypeKey>[]
+            IsSchemaTypeFromBuiltinClass<Item> extends true ?
+              ObtainDocumentPathType<Item, TypeKey>[] :
+              IsItRecordAndNotAny<Item> extends true ?
+                Item extends Record<string, never> ?
+                  ObtainDocumentPathType<Item, TypeKey>[] :
+                  Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
+                ObtainDocumentPathType<Item, TypeKey>[]
         >:
         PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
           IfEquals<PathValueType, Schema.Types.String> extends true ? PathEnumOrString<Options['enum']> :

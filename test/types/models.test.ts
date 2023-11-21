@@ -758,3 +758,11 @@ function gh13957() {
   const repository = new RepositoryBase<ITest>(TestModel);
   expectType<Promise<ITest[]>>(repository.insertMany([{ name: 'test' }]));
 }
+
+async function gh14003() {
+  const schema = new Schema({ name: String });
+  const TestModel = model('Test', schema);
+
+  await TestModel.validate({ name: 'foo' }, ['name']);
+  await TestModel.validate({ name: 'foo' }, { pathsToSkip: ['name'] });
+}

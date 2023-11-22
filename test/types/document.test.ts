@@ -9,6 +9,7 @@ import {
   HydratedSingleSubdocument,
   DefaultSchemaOptions
 } from 'mongoose';
+import { DeleteResult } from 'mongodb';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { autoTypedModelConnection } from './connection.test';
@@ -39,7 +40,9 @@ const Test = model<ITest>('Test', schema);
 void async function main() {
   const doc = await Test.findOne().orFail();
 
-  expectType<Promise<TestDocument>>(doc.deleteOne());
+  expectType<DeleteResult>(await doc.deleteOne());
+  expectType<TestDocument | null>(await doc.deleteOne().findOne());
+  expectType<{ _id: Types.ObjectId, name?: string } | null>(await doc.deleteOne().findOne().lean());
 }();
 
 

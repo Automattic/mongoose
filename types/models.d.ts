@@ -26,6 +26,12 @@ declare module 'mongoose' {
   interface MongooseBulkWriteOptions {
     skipValidation?: boolean;
     throwOnValidationError?: boolean;
+    timestamps?: boolean;
+  }
+
+  interface MongooseBulkWritePerWriteOptions {
+    timestamps?: boolean;
+    strict?: boolean;
   }
 
   interface InsertManyOptions extends
@@ -183,11 +189,17 @@ declare module 'mongoose' {
      * round trip to the MongoDB server.
      */
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<mongodb.AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
+      writes: Array<
+        mongodb.AnyBulkWriteOperation<
+          DocContents extends mongodb.Document ? DocContents : any
+        > & MongooseBulkWritePerWriteOptions>,
       options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions & { ordered: false }
     ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[] } }>;
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<mongodb.AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
+      writes: Array<
+        mongodb.AnyBulkWriteOperation<
+          DocContents extends mongodb.Document ? DocContents : any
+        > & MongooseBulkWritePerWriteOptions>,
       options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
     ): Promise<mongodb.BulkWriteResult>;
 

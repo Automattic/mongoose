@@ -32,6 +32,8 @@ declare module 'mongoose' {
   interface MongooseBulkWritePerWriteOptions {
     timestamps?: boolean;
     strict?: boolean;
+    session?: ClientSession;
+    skipValidation?: boolean;
   }
 
   interface InsertManyOptions extends

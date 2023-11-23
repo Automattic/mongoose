@@ -8,7 +8,6 @@ const fsextra = require('fs-extra');
 const path = require('path');
 const pug = require('pug');
 const pkg = require('../package.json');
-const rimraf = require('rimraf');
 const transform = require('acquit-require');
 const childProcess = require("child_process");
 
@@ -103,20 +102,20 @@ function deleteAllHtmlFiles() {
         continue;
       }
     }
-    for (let index = 0; index < files.length; index++) {
-      if (files[index].endsWith('.html')) {
-        fs.unlinkSync(`${folder}/${files[index]}`);
+    for (const file of files) {
+      if (file.endsWith('.html')) {
+        fs.unlinkSync(`${folder}/${file}`);
       }
     }
   }
 }
 
 function moveDocsToTemp() {
-  rimraf.sync('./tmp');
-  const folder = `./docs/7.x`;
+  fs.rmSync('./tmp', { recursive: true });
+  const folder = versionObj.versionedPath.replace(/^\//, '');
   const directory = fs.readdirSync(folder);
-  for (let i = 0; i < directory.length; i++) {
-    fsextra.moveSync(`${folder}/${directory[i]}`, `./tmp/${directory[i]}`);
+  for (const file of directory) {
+    fsextra.moveSync(`${folder}/${file}`, `./tmp/${file}`);
   }
 }
 

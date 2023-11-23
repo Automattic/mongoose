@@ -53,7 +53,7 @@ markdown.setOptions({
   }
 });
 
-const testPath = path.resolve(cwd, 'test')
+const testPath = path.resolve(cwd, 'test');
 
 /** additional test files to scan, relative to `test/` */
 const additionalTestFiles = [
@@ -503,7 +503,7 @@ const pathsToCopy = [
   'docs/js',
   'docs/css',
   'docs/images'
-]
+];
 
 /** Copy all static files when versionedDeploy is used */
 async function copyAllRequiredFiles() {

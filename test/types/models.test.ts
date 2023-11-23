@@ -796,3 +796,52 @@ async function gh14026() {
 
   expectType<string[]>(await TestModel.distinct('bar'));
 }
+
+async function gh14072() {
+  type Test = {
+    _id: mongoose.Types.ObjectId;
+    num: number;
+    created_at: number;
+    updated_at: number;
+  };
+
+  const schema = new mongoose.Schema<Test>(
+    {
+      num: { type: Number },
+      created_at: { type: Number },
+      updated_at: { type: Number }
+    },
+    {
+      timestamps: {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+        currentTime: () => new Date().valueOf() / 1000
+      }
+    }
+  );
+
+  const M = mongoose.model<Test>('Test', schema);
+  const bulkWriteArray = [
+    {
+      insertOne: {
+        document: { num: 3 }
+      }
+    },
+    {
+      updateOne: {
+        filter: { num: 6 },
+        update: { num: 8 },
+        timestamps: false
+      }
+    },
+    {
+      updateMany: {
+        filter: { num: 5 },
+        update: { num: 10 },
+        timestamps: false
+      }
+    }
+  ];
+
+  await M.bulkWrite(bulkWriteArray);
+}

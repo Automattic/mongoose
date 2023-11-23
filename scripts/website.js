@@ -55,25 +55,50 @@ markdown.setOptions({
 
 const testPath = path.resolve(cwd, 'test')
 
-const tests = [
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'geojson.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/transactions.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'schema.alias.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'model.middleware.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/date.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/lean.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/cast.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/findoneandupdate.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/custom-casting.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/getters-setters.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/virtuals.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/defaults.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/discriminators.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/promises.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schematypes.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/validation.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schemas.test.js')).toString())
+/** additional test files to scan, relative to `test/` */
+const additionalTestFiles = [
+  'geojson.test.js',
+  'schema.alias.test.js'
 ];
+/** ignored files from `test/docs/` */
+const ignoredTestFiles = [
+  // ignored because acquit does not like "for await"
+  'asyncIterator.test.js'
+];
+
+/**
+ * Load all test file contents with acquit
+ * @returns {Object[]} acquit ast array
+ */
+async function getTests() {
+  const promiseArray = [];
+
+  for (const file of additionalTestFiles) {
+    const filePath = path.join(testPath, file);
+    promiseArray.push(fs.promises.readFile(filePath).then(v => ({value: v.toString(), path: filePath})));
+  }
+
+  const testDocs = path.resolve(testPath, 'docs');
+
+  for (const file of await fs.promises.readdir(testDocs)) {
+    if (ignoredTestFiles.includes(file)) {
+      continue;
+    }
+
+    const filePath = path.join(testDocs, file);
+    promiseArray.push(fs.promises.readFile(filePath).then(v => ({value: v.toString(), path: filePath})));
+  }
+
+  return (await Promise.all(promiseArray)).flatMap(v => {
+    try {
+      return acquit.parse(v.value);
+    } catch (err) {
+      // add a file path to a acquit error, for better debugging
+      err.filePath = v.path;
+      throw err;
+    }
+  })
+}
 
 /** 
  * Array of array of semver numbers, sorted with highest number first
@@ -351,7 +376,7 @@ async function pugify(filename, options, isReload = false) {
   let contents = fs.readFileSync(path.resolve(cwd, inputFile)).toString();
 
   if (options.acquit) {
-    contents = transform(contents, tests);
+    contents = transform(contents, await getTests());
 
     contents = contents.replaceAll(/^```acquit$/gmi, "```javascript");
   }

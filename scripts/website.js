@@ -31,7 +31,7 @@ require('acquit-ignore')();
 const { marked: markdown } = require('marked');
 const highlight = require('highlight.js');
 const { promisify } = require("util");
-const renderer = {
+markdown.use({
   heading: function(text, level, raw, slugger) {
     const slug = slugger.slug(raw);
     return `<h${level} id="${slug}">
@@ -40,7 +40,7 @@ const renderer = {
       </a>
     </h${level}>\n`;
   }
-};
+});
 markdown.setOptions({
   highlight: function(code, language) {
     if (!language) {
@@ -52,7 +52,6 @@ markdown.setOptions({
     return highlight.highlight(code, { language }).value;
   }
 });
-markdown.use({ renderer });
 
 const testPath = path.resolve(cwd, 'test')
 

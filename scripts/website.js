@@ -435,7 +435,7 @@ async function pugify(filename, options, isReload = false) {
   });
 }
 
-// extra function to start watching for file-changes, without having to call this file directly with "watch"
+/** extra function to start watching for file-changes, without having to call this file directly with "watch" */
 function startWatch() {
   Object.entries(docsFilemap.fileMap).forEach(([file, fileValue]) => {
     let watchPath = path.resolve(cwd, file);

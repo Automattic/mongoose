@@ -760,7 +760,7 @@ function pluginOptions() {
   }
 
   const schema = new Schema({});
-  expectType<Schema<any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
+  expectType<typeof schema>(schema.plugin(pluginFunction)); // test that chaining would be possible
 
   // could not add strict tests that the parameters are inferred correctly, because i dont know how this would be done in tsd
 

@@ -634,7 +634,7 @@ declare module 'mongoose' {
    * { age: 30 }
    * ```
    */
-  export type UpdateQuery<T> = _UpdateQuery<T> & AnyObject;
+  export type UpdateQuery<T> = AnyKeys<T> & _UpdateQuery<T> & AnyObject;
 
   /**
    * A more strict form of UpdateQuery that enforces updating only

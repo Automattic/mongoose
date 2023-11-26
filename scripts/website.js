@@ -111,7 +111,16 @@ function deleteAllHtmlFiles() {
 }
 
 function moveDocsToTemp() {
-  fs.rmSync('./tmp', { recursive: true });
+  if (!versionObj.versionedPath) {
+    throw new Error('Cannot move unversioned deploy to /tmp');
+  }
+  try {
+    fs.rmSync('./tmp', { recursive: true });
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+  }
   const folder = versionObj.versionedPath.replace(/^\//, '');
   const directory = fs.readdirSync(folder);
   for (const file of directory) {
@@ -258,7 +267,7 @@ const versionObj = (() => {
       getLatestVersionOf(5),
     ]
   };
-  const versionedDeploy = process.env.DOCS_DEPLOY === "true" ? !(base.currentVersion.listed === base.latestVersion.listed) : false;
+  const versionedDeploy = !!process.env.DOCS_DEPLOY ? !(base.currentVersion.listed === base.latestVersion.listed) : false;
 
   const versionedPath = versionedDeploy ? `/docs/${base.currentVersion.path}` : '';
 

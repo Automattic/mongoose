@@ -70,34 +70,26 @@ const ignoredTestFiles = [
  * Load all test file contents with acquit
  * @returns {Object[]} acquit ast array
  */
-async function getTests() {
-  const promiseArray = [];
-
-  for (const file of additionalTestFiles) {
-    const filePath = path.join(testPath, file);
-    promiseArray.push(fs.promises.readFile(filePath).then(v => ({value: v.toString(), path: filePath})));
-  }
-
+function getTests() {
   const testDocs = path.resolve(testPath, 'docs');
+  const filesToScan = [
+    ...additionalTestFiles.map(v => path.join(testPath, v)),
+    ...fs.readdirSync(testDocs).filter(v => !ignoredTestFiles.includes(v)).map(v => path.join(testDocs, v))
+  ];
 
-  for (const file of await fs.promises.readdir(testDocs)) {
-    if (ignoredTestFiles.includes(file)) {
-      continue;
-    }
+  const retArray = [];
 
-    const filePath = path.join(testDocs, file);
-    promiseArray.push(fs.promises.readFile(filePath).then(v => ({value: v.toString(), path: filePath})));
-  }
-
-  return (await Promise.all(promiseArray)).flatMap(v => {
+  for (const file of filesToScan) {
     try {
-      return acquit.parse(v.value);
+      retArray.push(acquit.parse(fs.readFileSync(file).toString()));
     } catch (err) {
       // add a file path to a acquit error, for better debugging
-      err.filePath = v.path;
+      err.filePath = file;
       throw err;
     }
-  })
+  }
+
+  return retArray.flat();
 }
 
 /** 
@@ -376,7 +368,7 @@ async function pugify(filename, options, isReload = false) {
   let contents = fs.readFileSync(path.resolve(cwd, inputFile)).toString();
 
   if (options.acquit) {
-    contents = transform(contents, await getTests());
+    contents = transform(contents, getTests());
 
     contents = contents.replaceAll(/^```acquit$/gmi, "```javascript");
   }

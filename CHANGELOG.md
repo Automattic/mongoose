@@ -1,3 +1,15 @@
+7.6.6 / 2023-11-27
+==================
+ * perf: avoid double-running setter logic when calling `push()` #14120 #11380
+ * fix(populate): set populated docs in correct order when populating virtual underneath doc array with justOne #14105 #14018
+ * fix: bump mongodb driver -> 5.9.1 #14084 #13829 [lorand-horvath](https://github.com/lorand-horvath)
+ * types: allow defining document array using [{ prop: String }] syntax #14095 #13424
+ * types: correct types for when includeResultMetadata: true is set #14078 #13987 [prathamVaidya](https://github.com/prathamVaidya)
+ * types(query): base filters and projections off of RawDocType instead of DocType so autocomplete doesn't show populate #14118 #14077
+ * types: make property names show up in intellisense for UpdateQuery #14123 #14090
+ * types(model): support calling Model.validate() with pathsToSkip option #14088 #14003
+ * docs: remove "DEPRECATED" warning mistakenly added to read() tags param #13980
+
 7.6.5 / 2023-11-14
 ==================
  * fix: handle update validators and single nested doc with numeric paths #14066 #13977

@@ -562,7 +562,7 @@ if (isMain) {
     await deleteAllHtmlFiles();
     await pugifyAllFiles();
     await copyAllRequiredFiles();
-    if (process.env.DOCS_DEPLOY) {
+    if (!!process.env.DOCS_DEPLOY && !!versionObj.versionedPath) {
       await moveDocsToTemp();
     }
 

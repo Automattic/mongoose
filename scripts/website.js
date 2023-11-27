@@ -79,22 +79,24 @@ const tests = [
 
 function deleteAllHtmlFiles() {
   try {
-    fs.unlinkSync('./index.html');
+    console.log('Delete', path.join(versionObj.versionedPath, 'index.html'));
+    fs.unlinkSync(path.join(versionObj.versionedPath, 'index.html'));
   } catch (err) {
     if (err.code !== 'ENOENT') {
       throw err;
     }
   }
   const foldersToClean = [
-    './docs',
-    './docs/tutorials',
-    './docs/typescript',
-    './docs/api',
-    './docs/source/_docs',
+    path.join('.', versionObj.versionedPath, 'docs'),
+    path.join('.', versionObj.versionedPath, 'docs', 'tutorials'),
+    path.join('.', versionObj.versionedPath, 'docs', 'typescript'),
+    path.join('.', versionObj.versionedPath, 'docs', 'api'),
+    path.join('.', versionObj.versionedPath, 'docs', 'source', '_docs'),
     './tmp'
   ];
   for (const folder of foldersToClean) {
     let files = [];
+
     try {
       files = fs.readdirSync(folder);
     } catch (err) {
@@ -104,7 +106,8 @@ function deleteAllHtmlFiles() {
     }
     for (const file of files) {
       if (file.endsWith('.html')) {
-        fs.unlinkSync(`${folder}/${file}`);
+        console.log('Delete', path.join(folder, file));
+        fs.unlinkSync(path.join(folder, file));
       }
     }
   }

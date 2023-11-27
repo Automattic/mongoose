@@ -4,6 +4,7 @@ Error.stackTraceLimit = Infinity;
 
 const acquit = require('acquit');
 const fs = require('fs');
+const fsextra = require('fs-extra');
 const path = require('path');
 const pug = require('pug');
 const pkg = require('../package.json');
@@ -75,6 +76,60 @@ const tests = [
   ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/validation.test.js')).toString()),
   ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schemas.test.js')).toString())
 ];
+
+function deleteAllHtmlFiles() {
+  try {
+    console.log('Delete', path.join(versionObj.versionedPath, 'index.html'));
+    fs.unlinkSync(path.join(versionObj.versionedPath, 'index.html'));
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+  }
+  const foldersToClean = [
+    path.join('.', versionObj.versionedPath, 'docs'),
+    path.join('.', versionObj.versionedPath, 'docs', 'tutorials'),
+    path.join('.', versionObj.versionedPath, 'docs', 'typescript'),
+    path.join('.', versionObj.versionedPath, 'docs', 'api'),
+    path.join('.', versionObj.versionedPath, 'docs', 'source', '_docs'),
+    './tmp'
+  ];
+  for (const folder of foldersToClean) {
+    let files = [];
+
+    try {
+      files = fs.readdirSync(folder);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        continue;
+      }
+    }
+    for (const file of files) {
+      if (file.endsWith('.html')) {
+        console.log('Delete', path.join(folder, file));
+        fs.unlinkSync(path.join(folder, file));
+      }
+    }
+  }
+}
+
+function moveDocsToTemp() {
+  if (!versionObj.versionedPath) {
+    throw new Error('Cannot move unversioned deploy to /tmp');
+  }
+  try {
+    fs.rmSync('./tmp', { recursive: true });
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+  }
+  const folder = versionObj.versionedPath.replace(/^\//, '');
+  const directory = fs.readdirSync(folder);
+  for (const file of directory) {
+    fsextra.moveSync(`${folder}/${file}`, `./tmp/${file}`);
+  }
+}
 
 /** 
  * Array of array of semver numbers, sorted with highest number first
@@ -215,7 +270,7 @@ const versionObj = (() => {
       getLatestVersionOf(5),
     ]
   };
-  const versionedDeploy = process.env.DOCS_DEPLOY === "true" ? !(base.currentVersion.listed === base.latestVersion.listed) : false;
+  const versionedDeploy = !!process.env.DOCS_DEPLOY ? !(base.currentVersion.listed === base.latestVersion.listed) : false;
 
   const versionedPath = versionedDeploy ? `/docs/${base.currentVersion.path}` : '';
 
@@ -488,7 +543,6 @@ async function copyAllRequiredFiles() {
     return;
   }
 
-  const fsextra = require('fs-extra');
   await Promise.all(pathsToCopy.map(async v => {
     const resultPath = path.resolve(cwd, path.join('.', versionObj.versionedPath, v));
     await fsextra.copy(v, resultPath);
@@ -505,8 +559,16 @@ exports.cwd = cwd;
 
 // only run the following code if this file is the main module / entry file
 if (isMain) {
-  console.log(`Processing ~${files.length} files`);
-  Promise.all([pugifyAllFiles(), copyAllRequiredFiles()]).then(() => {
-    console.log("Done Processing");
-  })
+  (async function main() {
+    console.log(`Processing ~${files.length} files`);
+
+    await deleteAllHtmlFiles();
+    await pugifyAllFiles();
+    await copyAllRequiredFiles();
+    if (!!process.env.DOCS_DEPLOY && !!versionObj.versionedPath) {
+      await moveDocsToTemp();
+    }
+
+    console.log('Done Processing');
+  })();
 }

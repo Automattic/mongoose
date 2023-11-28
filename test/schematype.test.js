@@ -210,11 +210,15 @@ describe('schematype', function() {
 
   it('merges default validators (gh-14070)', function() {
     class TestSchemaType extends mongoose.SchemaType {}
-    TestSchemaType.set('validate', v => typeof v === 'string');
+    TestSchemaType.set('validate', checkIfString);
 
     const schemaType = new TestSchemaType('test-path', {
-      validate: v => v.length === 2
+      validate: checkIfLength2
     });
+
+    assert.equal(schemaType.validators.length, 2);
+    assert.equal(schemaType.validators[0].validator, checkIfString);
+    assert.equal(schemaType.validators[1].validator, checkIfLength2);
 
     let err = schemaType.doValidateSync([1, 2]);
     assert.ok(err);
@@ -226,6 +230,13 @@ describe('schematype', function() {
 
     err = schemaType.doValidateSync('ab');
     assert.ifError(err);
+
+    function checkIfString(v) {
+      return typeof v === 'string';
+    }
+    function checkIfLength2(v) {
+      return v.length === 2;
+    }
   });
 
   describe('set()', function() {

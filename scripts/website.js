@@ -32,7 +32,7 @@ require('acquit-ignore')();
 const { marked: markdown } = require('marked');
 const highlight = require('highlight.js');
 const { promisify } = require("util");
-const renderer = {
+markdown.use({
   heading: function(text, level, raw, slugger) {
     const slug = slugger.slug(raw);
     return `<h${level} id="${slug}">
@@ -41,7 +41,7 @@ const renderer = {
       </a>
     </h${level}>\n`;
   }
-};
+});
 markdown.setOptions({
   highlight: function(code, language) {
     if (!language) {
@@ -53,29 +53,45 @@ markdown.setOptions({
     return highlight.highlight(code, { language }).value;
   }
 });
-markdown.use({ renderer });
 
-const testPath = path.resolve(cwd, 'test')
+const testPath = path.resolve(cwd, 'test');
 
-const tests = [
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'geojson.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/transactions.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'schema.alias.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'model.middleware.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/date.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/lean.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/cast.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/findoneandupdate.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/custom-casting.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/getters-setters.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/virtuals.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/defaults.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/discriminators.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/promises.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schematypes.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/validation.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schemas.test.js')).toString())
+/** additional test files to scan, relative to `test/` */
+const additionalTestFiles = [
+  'geojson.test.js',
+  'schema.alias.test.js'
 ];
+/** ignored files from `test/docs/` */
+const ignoredTestFiles = [
+  // ignored because acquit does not like "for await"
+  'asyncIterator.test.js'
+];
+
+/**
+ * Load all test file contents with acquit
+ * @returns {Object[]} acquit ast array
+ */
+function getTests() {
+  const testDocs = path.resolve(testPath, 'docs');
+  const filesToScan = [
+    ...additionalTestFiles.map(v => path.join(testPath, v)),
+    ...fs.readdirSync(testDocs).filter(v => !ignoredTestFiles.includes(v)).map(v => path.join(testDocs, v))
+  ];
+
+  const retArray = [];
+
+  for (const file of filesToScan) {
+    try {
+      retArray.push(acquit.parse(fs.readFileSync(file).toString()));
+    } catch (err) {
+      // add a file path to a acquit error, for better debugging
+      err.filePath = file;
+      throw err;
+    }
+  }
+
+  return retArray.flat();
+}
 
 function deleteAllHtmlFiles() {
   try {
@@ -407,7 +423,7 @@ async function pugify(filename, options, isReload = false) {
   let contents = fs.readFileSync(path.resolve(cwd, inputFile)).toString();
 
   if (options.acquit) {
-    contents = transform(contents, tests);
+    contents = transform(contents, getTests());
 
     contents = contents.replaceAll(/^```acquit$/gmi, "```javascript");
   }
@@ -466,7 +482,7 @@ async function pugify(filename, options, isReload = false) {
   });
 }
 
-// extra function to start watching for file-changes, without having to call this file directly with "watch"
+/** extra function to start watching for file-changes, without having to call this file directly with "watch" */
 function startWatch() {
   Object.entries(docsFilemap.fileMap).forEach(([file, fileValue]) => {
     let watchPath = path.resolve(cwd, file);
@@ -534,7 +550,7 @@ const pathsToCopy = [
   'docs/js',
   'docs/css',
   'docs/images'
-]
+];
 
 /** Copy all static files when versionedDeploy is used */
 async function copyAllRequiredFiles() {

@@ -1,3 +1,15 @@
+8.0.2 / 2023-11-28
+==================
+ * fix(populate): set populated docs in correct order when populating virtual underneath doc array with justOne #14105
+ * fix(populate): fix curPath to update appropriately #14099 #14098 [csy1204](https://github.com/csy1204)
+ * types: make property names show up in intellisense for UpdateQuery #14123 #14090
+ * types(document): correct return type for doc.deleteOne() re: Mongoose 8 breaking change #14110 #14081
+ * types: correct types for when includeResultMetadata: true is set #14078
+ * types(models): allow specifying timestamps as inline option for bulkWrite() operations #14112 #14072
+ * docs: fix rendering of 7.x server compatibility #14086 [laupow](https://github.com/laupow)
+ * docs(source/api): fix "index.js" -> "mongoose.js" rename #14125
+ * docs(README): update breaking change version #14126
+
 7.6.6 / 2023-11-27
 ==================
  * perf: avoid double-running setter logic when calling `push()` #14120 #11380

@@ -1,3 +1,38 @@
+8.0.2 / 2023-11-28
+==================
+ * fix(populate): set populated docs in correct order when populating virtual underneath doc array with justOne #14105
+ * fix(populate): fix curPath to update appropriately #14099 #14098 [csy1204](https://github.com/csy1204)
+ * types: make property names show up in intellisense for UpdateQuery #14123 #14090
+ * types(document): correct return type for doc.deleteOne() re: Mongoose 8 breaking change #14110 #14081
+ * types: correct types for when includeResultMetadata: true is set #14078
+ * types(models): allow specifying timestamps as inline option for bulkWrite() operations #14112 #14072
+ * docs: fix rendering of 7.x server compatibility #14086 [laupow](https://github.com/laupow)
+ * docs(source/api): fix "index.js" -> "mongoose.js" rename #14125
+ * docs(README): update breaking change version #14126
+
+7.6.6 / 2023-11-27
+==================
+ * perf: avoid double-running setter logic when calling `push()` #14120 #11380
+ * fix(populate): set populated docs in correct order when populating virtual underneath doc array with justOne #14105 #14018
+ * fix: bump mongodb driver -> 5.9.1 #14084 #13829 [lorand-horvath](https://github.com/lorand-horvath)
+ * types: allow defining document array using [{ prop: String }] syntax #14095 #13424
+ * types: correct types for when includeResultMetadata: true is set #14078 #13987 [prathamVaidya](https://github.com/prathamVaidya)
+ * types(query): base filters and projections off of RawDocType instead of DocType so autocomplete doesn't show populate #14118 #14077
+ * types: make property names show up in intellisense for UpdateQuery #14123 #14090
+ * types(model): support calling Model.validate() with pathsToSkip option #14088 #14003
+ * docs: remove "DEPRECATED" warning mistakenly added to read() tags param #13980
+
+8.0.1 / 2023-11-15
+==================
+ * fix: retain key order with aliases when creating indexes with alias #14042 [meabed](https://github.com/meabed)
+ * fix: handle nonexistent collection with diffIndexes #14029 #14010
+ * types(model+query): correctly remove count from TypeScript types to reflect removal of runtime support #14076 #14067 #14062
+ * types: correct `this` parameter for methods and statics #14028 #14027 [ruxxzebre](https://github.com/ruxxzebre)
+ * types(model+query): unpack arrays in distinct return type #14047 #14026
+ * types: add missing Types.UUID typings #14023 #13103 [k725](https://github.com/k725)
+ * docs: add mongoose 8 to mongodb server compatibility guide #14064
+ * docs: fix typo in queries.md #14065 [MuhibAhmed](https://github.com/MuhibAhmed)
+
 7.6.5 / 2023-11-14
 ==================
  * fix: handle update validators and single nested doc with numeric paths #14066 #13977

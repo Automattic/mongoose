@@ -669,9 +669,9 @@ function gh12030() {
       username: { type: String }
     }
   ]>;
-  expectType<{
+  expectType<Types.DocumentArray<{
     username?: string | null
-  }[]>({} as A);
+  }>>({} as A);
 
   type B = ObtainDocumentType<{
     users: [
@@ -681,15 +681,15 @@ function gh12030() {
     ]
   }>;
   expectType<{
-    users: {
+    users: Types.DocumentArray<{
       username?: string | null
-    }[];
+    }>;
   }>({} as B);
 
   expectType<{
-    users: {
+    users: Types.DocumentArray<{
       username?: string | null
-    }[];
+    }>;
   }>({} as InferSchemaType<typeof Schema1>);
 
   const Schema2 = new Schema({
@@ -1350,4 +1350,21 @@ function gh14028_statics() {
 
   // Trigger type assertions inside statics
   schema.statics.createWithFullName('John Doe');
+}
+
+function gh13424() {
+  const subDoc = {
+    name: { type: String, required: true },
+    controls: { type: String, required: true }
+  };
+
+  const testSchema = {
+    question: { type: String, required: true },
+    subDocArray: { type: [subDoc], required: true }
+  };
+
+  const TestModel = model('TestModel', new Schema(testSchema));
+
+  const doc = new TestModel({});
+  expectType<Types.ObjectId | undefined>(doc.subDocArray[0]._id);
 }

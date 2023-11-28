@@ -336,6 +336,7 @@ declare module 'mongoose' {
     post<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPostOptions & SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
     post<T = THydratedDocumentType>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { document: true, query: false }, fn: PostMiddlewareFunction<T, T>): this;
     // this = Query
+    post<T = Query<any, any>>(method: MongooseRawResultQueryMiddleware|MongooseRawResultQueryMiddleware[], fn: PostMiddlewareFunction<T, null | QueryResultType<T> | ModifyResult<QueryResultType<T>>>): this;
     post<T = Query<any, any>>(method: MongooseDefaultQueryMiddleware|MongooseDefaultQueryMiddleware[], fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
     post<T = Query<any, any>>(method: MongooseDistinctQueryMiddleware|MongooseDistinctQueryMiddleware[], options: SchemaPostOptions, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
     post<T = Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { document: false, query: true }, fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
@@ -633,7 +634,7 @@ declare module 'mongoose' {
    * { age: 30 }
    * ```
    */
-  export type UpdateQuery<T> = _UpdateQuery<T> & AnyObject;
+  export type UpdateQuery<T> = AnyKeys<T> & _UpdateQuery<T> & AnyObject;
 
   /**
    * A more strict form of UpdateQuery that enforces updating only

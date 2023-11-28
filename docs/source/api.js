@@ -9,7 +9,7 @@ const fs = require('fs');
 const md = require('marked');
 
 const files = [
-  'lib/index.js',
+  'lib/mongoose.js',
   'lib/schema.js',
   'lib/connection.js',
   'lib/document.js',

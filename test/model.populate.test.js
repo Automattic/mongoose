@@ -8259,6 +8259,58 @@ describe('model: populate:', function() {
       assert.deepEqual(populatedRides[1].files, []);
     });
 
+    it('doesnt insert empty document when lean populating a path within an underneath non-existent document array (gh-14098)', async function() {
+      const userSchema = new mongoose.Schema({
+        fullName: String,
+        company: String
+      });
+      const User = db.model('User', userSchema);
+
+      const fileSchema = new mongoose.Schema({
+        _id: String,
+        uploaderId: {
+          type: mongoose.ObjectId,
+          ref: 'User'
+        }
+      }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+      fileSchema.virtual('uploadedBy', {
+        ref: 'User',
+        localField: 'uploaderId',
+        foreignField: '_id',
+        justOne: true
+      });
+
+      const contentSchema = new mongoose.Schema({
+        memo: String,
+        files: { type: [fileSchema], default: [] }
+      }, { toObject: { virtuals: true }, toJSON: { virtuals: true }, _id: false });
+
+      const postSchema = new mongoose.Schema({
+        title: String,
+        content: { type: contentSchema }
+      }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+      const Post = db.model('Test1', postSchema);
+
+      const user = await User.create({ fullName: 'John Doe', company: 'GitHub' });
+      await Post.create([
+        { title: 'London-Paris' },
+        {
+          title: 'Berlin-Moscow',
+          content: {
+            memo: 'Not Easy',
+            files: [{ _id: '123', uploaderId: user._id }]
+          }
+        }
+      ]);
+      await Post.updateMany({}, { $unset: { 'content.files': 1 } });
+      const populatedRides = await Post.find({}).populate({
+        path: 'content.files.uploadedBy',
+        justOne: true
+      }).lean();
+      assert.equal(populatedRides[0].content.files, undefined);
+      assert.equal(populatedRides[1].content.files, undefined);
+    });
+
     it('sets empty array if populating undefined path (gh-8455)', async function() {
       const TestSchema = new Schema({
         thingIds: [mongoose.ObjectId]
@@ -10640,6 +10692,88 @@ describe('model: populate:', function() {
     assert.deepEqual(
       user.toObject().companies.sort().map(v => v.toString()),
       [company._id.toString(), company2._id.toString()]
+    );
+  });
+
+  it('sets populated docs in correct order when populating virtual underneath document array with justOne (gh-14018)', async function() {
+    const shiftSchema = new mongoose.Schema({
+      employeeId: mongoose.Types.ObjectId,
+      startedAt: Date,
+      endedAt: Date
+    });
+    const Shift = db.model('Shift', shiftSchema);
+
+    const employeeSchema = new mongoose.Schema({
+      name: String
+    });
+    employeeSchema.virtual('mostRecentShift', {
+      ref: Shift,
+      localField: '_id',
+      foreignField: 'employeeId',
+      options: {
+        sort: { startedAt: -1 }
+      },
+      justOne: true
+    });
+    const storeSchema = new mongoose.Schema({
+      location: String,
+      employees: [employeeSchema]
+    });
+    const Store = db.model('Store', storeSchema);
+
+    const store = await Store.create({
+      location: 'Tashbaan',
+      employees: [
+        { _id: '0'.repeat(24), name: 'Aravis' },
+        { _id: '1'.repeat(24), name: 'Shasta' }
+      ]
+    });
+
+    const employeeAravis = store.employees
+      .find(({ name }) => name === 'Aravis');
+    const employeeShasta = store.employees
+      .find(({ name }) => name === 'Shasta');
+
+    await Shift.insertMany([
+      { employeeId: employeeAravis._id, startedAt: new Date('2011-06-01'), endedAt: new Date('2011-06-02') },
+      { employeeId: employeeAravis._id, startedAt: new Date('2013-06-01'), endedAt: new Date('2013-06-02') },
+      { employeeId: employeeShasta._id, startedAt: new Date('2015-06-01'), endedAt: new Date('2015-06-02') }
+    ]);
+
+    const storeWithMostRecentShifts = await Store.findOne({ location: 'Tashbaan' })
+      .populate('employees.mostRecentShift')
+      .select('-__v')
+      .exec();
+    assert.equal(
+      storeWithMostRecentShifts.employees[0].mostRecentShift.employeeId.toHexString(),
+      '0'.repeat(24)
+    );
+    assert.equal(
+      storeWithMostRecentShifts.employees[1].mostRecentShift.employeeId.toHexString(),
+      '1'.repeat(24)
+    );
+
+    await Shift.findOne({ employeeId: employeeAravis._id }).sort({ startedAt: 1 }).then((s) => s.deleteOne());
+
+    const storeWithMostRecentShiftsNew = await Store.findOne({ location: 'Tashbaan' })
+      .populate('employees.mostRecentShift')
+      .select('-__v')
+      .exec();
+    assert.equal(
+      storeWithMostRecentShiftsNew.employees[0].mostRecentShift.employeeId.toHexString(),
+      '0'.repeat(24)
+    );
+    assert.equal(
+      storeWithMostRecentShiftsNew.employees[0].mostRecentShift.startedAt.toString(),
+      new Date('2013-06-01').toString()
+    );
+    assert.equal(
+      storeWithMostRecentShiftsNew.employees[1].mostRecentShift.employeeId.toHexString(),
+      '1'.repeat(24)
+    );
+    assert.equal(
+      storeWithMostRecentShiftsNew.employees[1].mostRecentShift.startedAt.toString(),
+      new Date('2015-06-01').toString()
     );
   });
 });

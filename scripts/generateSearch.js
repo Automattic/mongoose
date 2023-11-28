@@ -141,8 +141,11 @@ async function run() {
       }
       content.url = url;
     } else {
-      const url = content.url.startsWith('/') ? content.url : `/${content.url}`;
-      content.url = `/docs/${version}/docs${url}`;
+      let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
+      if (!url.startsWith('/docs')) {
+        url = '/docs' + url;
+      }
+      content.url = `/docs/${version}${url}`;
     }
     console.log(`${++count} / ${contents.length}`);
     await content.save();

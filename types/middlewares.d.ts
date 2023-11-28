@@ -5,7 +5,9 @@ declare module 'mongoose' {
   type MongooseDistinctDocumentMiddleware = 'save' | 'init' | 'validate';
   type MongooseDocumentMiddleware = MongooseDistinctDocumentMiddleware | MongooseQueryAndDocumentMiddleware;
 
+  type MongooseRawResultQueryMiddleware = 'findOneAndUpdate' | 'findOneAndReplace' | 'findOneAndDelete';
   type MongooseDistinctQueryMiddleware = 'estimatedDocumentCount' | 'countDocuments' | 'deleteMany' | 'distinct' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndReplace' | 'findOneAndUpdate' | 'replaceOne' | 'updateMany';
+
   type MongooseDefaultQueryMiddleware = MongooseDistinctQueryMiddleware | 'updateOne' | 'deleteOne';
   type MongooseQueryMiddleware = MongooseDistinctQueryMiddleware | MongooseQueryAndDocumentMiddleware;
 

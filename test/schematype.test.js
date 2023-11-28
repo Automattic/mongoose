@@ -212,8 +212,9 @@ describe('schematype', function() {
     class TestSchemaType extends mongoose.SchemaType {}
     TestSchemaType.set('validate', v => typeof v === 'string');
 
-    const schemaType = new TestSchemaType();
-    schemaType.validate(v => v.length === 2);
+    const schemaType = new TestSchemaType('test-path', {
+      validate: v => v.length === 2
+    });
 
     let err = schemaType.doValidateSync([1, 2]);
     assert.ok(err);

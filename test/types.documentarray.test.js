@@ -754,4 +754,28 @@ describe('types.documentarray', function() {
 
     assert.equal(doc.myMap.get('foo').$path(), 'myMap.foo');
   });
+
+  it('bubbles up validation errors from doubly nested doc arrays (gh-14101)', async function() {
+    const optionsSchema = new mongoose.Schema({
+      val: {
+        type: Number,
+        required: true
+      }
+    });
+
+    const testSchema = new mongoose.Schema({
+      name: String,
+      options: {
+        type: [[optionsSchema]],
+        required: true
+      }
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    await assert.rejects(
+      Test.create({ name: 'test', options: [[{ val: null }]] }),
+      /options.0.0.val: Path `val` is required./
+    );
+  });
 });

@@ -6,10 +6,11 @@
   }
 </style>
 
-There are several backwards-breaking changes
-you should be aware of when migrating from Mongoose 7.x to Mongoose 8.x.
+There are several backwards-breaking changes you should be aware of when migrating from Mongoose 7.x to Mongoose 8.x.
 
 If you're still on Mongoose 6.x or earlier, please read the [Mongoose 6.x to 7.x migration guide](migrating_to_7.html) and upgrade to Mongoose 7.x first before upgrading to Mongoose 8.
+
+We also recommend reviewing the [MongoDB Node.js driver's release notes for v6.0.0](https://github.com/mongodb/node-mongodb-native/releases/tag/v6.0.0) before upgrading to Mongoose 8.
 
 * [Removed `rawResult` option for `findOneAndUpdate()`](#removed-rawresult-option-for-findoneandupdate)
 * [`Document.prototype.deleteOne()` now returns a query](#document-prototype-deleteone-now-returns-a-query)
@@ -65,7 +66,7 @@ const res = await q;
 
 <h2 id="mongodb-node-driver-6"><a href="#mongodb-node-driver-6">MongoDB Node Driver 6</a></h2>
 
-Mongoose 8 uses [v6.x of the MongoDB Node driver](https://github.com/mongodb/node-mongodb-native/blob/main/HISTORY.md#600-2023-08-28).
+Mongoose 8 uses [v6.x of the MongoDB Node driver](https://github.com/mongodb/node-mongodb-native/releases/tag/v6.0.0).
 There's a few noteable changes in MongoDB Node driver v6 that affect Mongoose:
 
 1. The `ObjectId` constructor no longer accepts strings of length 12. In Mongoose 7, `new mongoose.Types.ObjectId('12charstring')` was perfectly valid. In Mongoose 8, `new mongoose.Types.ObjectId('12charstring')` throws an error.

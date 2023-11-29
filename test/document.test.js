@@ -12708,6 +12708,58 @@ describe('document', function() {
     );
   });
 
+  it('handles embedded discriminators on nested path defined using Schema.prototype.discriminator (gh-14109) (gh-13898)', async function() {
+    const baseNestedDiscriminated = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class BaseClass {
+      whoAmI() {
+        return 'I am baseNestedDiscriminated';
+      }
+    }
+    BaseClass.type = 1;
+
+    baseNestedDiscriminated.loadClass(BaseClass);
+
+    class NumberTyped extends BaseClass {
+      whoAmI() {
+        return 'I am NumberTyped';
+      }
+    }
+    NumberTyped.type = 3;
+
+    class StringTyped extends BaseClass {
+      whoAmI() {
+        return 'I am StringTyped';
+      }
+    }
+    StringTyped.type = 4;
+
+    const containsNestedSchema = new Schema({
+      nestedDiscriminatedTypes: { type: [baseNestedDiscriminated], required: true }
+    });
+
+    baseNestedDiscriminated.discriminator(1, new Schema({}).loadClass(NumberTyped));
+    baseNestedDiscriminated.discriminator('3', new Schema({}).loadClass(StringTyped));
+
+    const l2Schema = new Schema({ l3: containsNestedSchema });
+    const l1Schema = new Schema({ l2: l2Schema });
+
+    const Test = db.model('Test', l1Schema);
+    const instance = await Test.create({
+      l2: {
+        l3: {
+          nestedDiscriminatedTypes: [{ type: 1 }, { type: '3' }]
+        }
+      }
+    });
+    assert.deepStrictEqual(
+      instance.l2.l3.nestedDiscriminatedTypes.map(i => i.whoAmI()),
+      ['I am NumberTyped', 'I am StringTyped']
+    );
+  });
+
   it('can use `collection` as schema name (gh-13956)', async function() {
     const schema = new mongoose.Schema({ name: String, collection: String });
     const Test = db.model('Test', schema);

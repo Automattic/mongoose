@@ -14,9 +14,9 @@
   }
 </style>
 
-<p>There are several backwards-breaking changes
-you should be aware of when migrating from Mongoose 7.x to Mongoose 8.x.</p>
+<p>There are several backwards-breaking changes you should be aware of when migrating from Mongoose 7.x to Mongoose 8.x.</p>
 <p>If you&#39;re still on Mongoose 6.x or earlier, please read the <a href="migrating_to_7.html">Mongoose 6.x to 7.x migration guide</a> and upgrade to Mongoose 7.x first before upgrading to Mongoose 8.</p>
+<p>We also recommend reviewing the <a href="https://github.com/mongodb/node-mongodb-native/releases/tag/v6.0.0">MongoDB Node.js driver&#39;s release notes for v6.0.0</a> before upgrading to Mongoose 8.</p>
 <ul>
 <li><a href="#removed-rawresult-option-for-findoneandupdate">Removed <code>rawResult</code> option for <code>findOneAndUpdate()</code></a></li>
 <li><a href="#document-prototype-deleteone-now-returns-a-query"><code>Document.prototype.deleteOne()</code> now returns a query</a></li>
@@ -65,7 +65,7 @@ In Mongoose 8, <code>doc.deleteOne()</code> returns a query for easier chaining,
 </code></pre>
 <h2 id="mongodb-node-driver-6"><a href="#mongodb-node-driver-6">MongoDB Node Driver 6</a></h2>
 
-<p>Mongoose 8 uses <a href="https://github.com/mongodb/node-mongodb-native/blob/main/HISTORY.md#600-2023-08-28">v6.x of the MongoDB Node driver</a>.
+<p>Mongoose 8 uses <a href="https://github.com/mongodb/node-mongodb-native/releases/tag/v6.0.0">v6.x of the MongoDB Node driver</a>.
 There&#39;s a few noteable changes in MongoDB Node driver v6 that affect Mongoose:</p>
 <ol>
 <li>The <code>ObjectId</code> constructor no longer accepts strings of length 12. In Mongoose 7, <code>new mongoose.Types.ObjectId(&#39;12charstring&#39;)</code> was perfectly valid. In Mongoose 8, <code>new mongoose.Types.ObjectId(&#39;12charstring&#39;)</code> throws an error.</li>

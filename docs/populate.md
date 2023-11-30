@@ -563,7 +563,7 @@ const commentSchema = new Schema({
   doc: {
     type: Schema.Types.ObjectId,
     required: true,
-    refPath: () => {
+    refPath: function () {
       return this.docModel; // 'this' refers to the document being populated
     }
   },
@@ -605,7 +605,7 @@ regardless of how many models your `commentSchema` can point to.
 
 <h2 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>ref</code></a></h2>
 
-Just like `refPath`, `ref` can also be assigned a function
+Just like `refPath`, `ref` can also be assigned a function.
 
 ```javascript
 const commentSchema = new Schema({
@@ -614,7 +614,7 @@ const commentSchema = new Schema({
   doc: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: () => {
+    ref: function() {
       return this.verifiedBuyer ? 'Product' : 'BlogPost'; // 'this' refers to the document being populated
     }
   },

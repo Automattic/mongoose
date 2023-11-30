@@ -47,7 +47,7 @@ the `Story` model.
   <li><a href="#deep-populate">Populating across multiple levels</a></li>
   <li><a href="#cross-db-populate">Populating across Databases</a></li>
   <li><a href="#dynamic-refpath">Dynamic References via <code>refPath</code></a></li>
-    <li><a href="#dynamic-ref">Dynamic References via <code>ref</code></a></li>
+  <li><a href="#dynamic-ref">Dynamic References via <code>ref</code></a></li>
   <li><a href="#populate-virtuals">Populate Virtuals</a></li>
   <li><a href="#count">Populate Virtuals: The Count Option</a></li>
   <li><a href="#match">Populate Virtuals: The Match Option</a></li>

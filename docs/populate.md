@@ -560,22 +560,30 @@ selects a refpath depending on a value on the document being populated. For exam
 ```javascript
 const commentSchema = new Schema({
   body: { type: String, required: true },
+  verifiedBuyer: Boolean,
   doc: {
     type: Schema.Types.ObjectId,
     required: true,
     refPath: function () {
-      return this.docModel; // 'this' refers to the document being populated
+      return this.verifiedBuyer ? this.otherOption : this.docModel; // 'this' refers to the document being populated
     }
   },
   docModel: {
     type: String,
     required: true,
-    enum: ['BlogPost', 'Product']
+    enum: ['BlogPost', 'Review']
+  },
+  otherOption: {
+    type: String,
+    required: true,
+    enum: ['Vendor', 'Product']
   }
 });
 
 const Product = mongoose.model('Product', new Schema({ name: String }));
 const BlogPost = mongoose.model('BlogPost', new Schema({ title: String }));
+const Vendor = mongoose.model('Vendor', new Schema({ productType: String }));
+const Review = mongoose.model('Review', new Schema({ rating: String }));
 const Comment = mongoose.model('Comment', commentSchema);
 
 const book = await Product.create({ name: 'The Count of Monte Cristo' });
@@ -583,14 +591,18 @@ const post = await BlogPost.create({ title: 'Top 10 French Novels' });
 
 const commentOnBook = await Comment.create({
   body: 'Great read',
+  verifiedBuyer: true
   doc: book._id,
-  docModel: 'Product'
+  docModel: 'Review',
+  otherOption: 'Product'
 });
 
 const commentOnPost = await Comment.create({
   body: 'Very informative',
+  verifiedBuyer: false,
   doc: post._id,
-  docModel: 'BlogPost'
+  docModel: 'BlogPost',
+  otherOption: 'Vendor'
 });
 
 ```

@@ -46,7 +46,8 @@ the `Story` model.
   <li><a href="#populate_multiple_documents">Populating multiple existing documents</a></li>
   <li><a href="#deep-populate">Populating across multiple levels</a></li>
   <li><a href="#cross-db-populate">Populating across Databases</a></li>
-  <li><a href="#dynamic-ref">Dynamic References via <code>refPath</code></a></li>
+  <li><a href="#dynamic-refpath">Dynamic References via <code>refPath</code></a></li>
+  <li><a href="#dynamic-ref">Dynamic References via <code>ref</code></a></li>
   <li><a href="#populate-virtuals">Populate Virtuals</a></li>
   <li><a href="#count">Populate Virtuals: The Count Option</a></li>
   <li><a href="#match">Populate Virtuals: The Match Option</a></li>
@@ -469,7 +470,7 @@ const events = await Event.
   populate({ path: 'conversation', model: Conversation });
 ```
 
-<h2 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>refPath</code></a></h2>
+<h2 id="dynamic-refpath"><a href="#dynamic-refpath">Dynamic References via <code>refPath</code></a></h2>
 
 Mongoose can also populate from multiple collections based on the value
 of a property in the document. Let's say you're building a schema for
@@ -560,6 +561,53 @@ also need an extra `populate()` call for every property, unless you use
 [mongoose-autopopulate](https://www.npmjs.com/package/mongoose-autopopulate).
 Using `refPath` means you only need 2 schema paths and one `populate()` call
 regardless of how many models your `commentSchema` can point to.
+
+You could also assign a function to `refPath`, which means Mongoose selects a refPath depending on a value on the document being populated.
+
+```javascript
+const commentSchema = new Schema({
+  body: { type: String, required: true },
+  commentType: {
+    type: String,
+    enum: ['comment', 'review']
+  },
+  entityId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    refPath: function () {
+      return this.commentType === 'review' ? this.reviewEntityModel : this.commentEntityModel; // 'this' refers to the document being populated
+    }
+  },
+  commentEntityModel: {
+    type: String,
+    required: true,
+    enum: ['BlogPost', 'Review']
+  },
+  reviewEntityModel: {
+    type: String,
+    required: true,
+    enum: ['Vendor', 'Product']
+  }
+});
+```
+
+<h2 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>ref</code></a></h2>
+
+Just like `refPath`, `ref` can also be assigned a function.
+
+```javascript
+const commentSchema = new Schema({
+  body: { type: String, required: true },
+  verifiedBuyer: Boolean
+  doc: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: function() {
+      return this.verifiedBuyer ? 'Product' : 'BlogPost'; // 'this' refers to the document being populated
+    }
+  },
+});
+```
 
 <h2 id="populate-virtuals"><a href="#populate-virtuals">Populate Virtuals</a></h2>
 

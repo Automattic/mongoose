@@ -1043,6 +1043,31 @@ describe('timestamps', function() {
     const check = await Test.findOne();
     assert(check.toString().includes('updateCounter: 1'));
   });
+  it('should not update any timestamps for schema  and subschema when timestamps false is set for query (gh-14111)', async function() {
+    const subSchema = new Schema({
+      comment: String
+    }, { timestamps: true });
+
+    const testSchema = new Schema({
+      name: String,
+      subDoc: {
+        type: subSchema
+      }
+    }, { timestamps: true });
+
+    const Test = db.model('gh14111', testSchema);
+
+    const original = await Test.create({
+      name: 'Test Testerson',
+      subDoc: {
+        comment: 'Pleasure to work with'
+      }
+    });
+
+    await delay(500);
+    const res = await Test.findOneAndUpdate({ name: 'Test Testerson' }, { $set: { subDoc: { comment: 'A pain to work with' } } }, { timestamps: true, new: true });
+    assert.equal(original.subDoc.updatedAt, res.subDoc.updatedAt);
+  });
 });
 
 async function delay(ms) {

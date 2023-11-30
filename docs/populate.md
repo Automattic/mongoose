@@ -46,7 +46,8 @@ the `Story` model.
   <li><a href="#populate_multiple_documents">Populating multiple existing documents</a></li>
   <li><a href="#deep-populate">Populating across multiple levels</a></li>
   <li><a href="#cross-db-populate">Populating across Databases</a></li>
-  <li><a href="#dynamic-ref">Dynamic References via <code>refPath</code></a></li>
+  <li><a href="#dynamic-refpath">Dynamic References via <code>refPath</code></a></li>
+    <li><a href="#dynamic-ref">Dynamic References via <code>ref</code></a></li>
   <li><a href="#populate-virtuals">Populate Virtuals</a></li>
   <li><a href="#count">Populate Virtuals: The Count Option</a></li>
   <li><a href="#match">Populate Virtuals: The Match Option</a></li>
@@ -469,7 +470,7 @@ const events = await Event.
   populate({ path: 'conversation', model: Conversation });
 ```
 
-<h2 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>refPath</code></a></h2>
+<h2 id="dynamic-refpath"><a href="#dynamic-refpath">Dynamic References via <code>refPath</code></a></h2>
 
 Mongoose can also populate from multiple collections based on the value
 of a property in the document. Let's say you're building a schema for
@@ -553,6 +554,47 @@ comments[0].product.name; // "The Count of Monte Cristo"
 comments[1].blogPost.title; // "Top 10 French Novels"
 ```
 
+You could also assign a function to `refPath`, making it so that it
+selects a refpath depending on a value on the document being populated. For example.
+
+```javascript
+const commentSchema = new Schema({
+  body: { type: String, required: true },
+  doc: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    refPath: () => {
+      return this.docModel; // 'this' refers to the document being populated
+    }
+  },
+  docModel: {
+    type: String,
+    required: true,
+    enum: ['BlogPost', 'Product']
+  }
+});
+
+const Product = mongoose.model('Product', new Schema({ name: String }));
+const BlogPost = mongoose.model('BlogPost', new Schema({ title: String }));
+const Comment = mongoose.model('Comment', commentSchema);
+
+const book = await Product.create({ name: 'The Count of Monte Cristo' });
+const post = await BlogPost.create({ title: 'Top 10 French Novels' });
+
+const commentOnBook = await Comment.create({
+  body: 'Great read',
+  doc: book._id,
+  docModel: 'Product'
+});
+
+const commentOnPost = await Comment.create({
+  body: 'Very informative',
+  doc: post._id,
+  docModel: 'BlogPost'
+});
+
+```
+
 Defining separate `blogPost` and `product` properties works for this simple
 example. But, if you decide to allow users to also comment on articles or
 other comments, you'll need to add more properties to your schema. You'll
@@ -560,6 +602,28 @@ also need an extra `populate()` call for every property, unless you use
 [mongoose-autopopulate](https://www.npmjs.com/package/mongoose-autopopulate).
 Using `refPath` means you only need 2 schema paths and one `populate()` call
 regardless of how many models your `commentSchema` can point to.
+
+<h2 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>ref</code></a></h2>
+
+Just like `refPath`, `ref` can also be assigned a function
+
+```javascript
+const commentSchema = new Schema({
+  body: { type: String, required: true },
+  verifiedBuyer: Boolean
+  doc: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: () => {
+      return this.verifiedBuyer ? 'Product' : 'BlogPost'; // 'this' refers to the document being populated
+    }
+  },
+});
+
+const Product = mongoose.model('Product', new Schema({ name: String }));
+const BlogPost = mongoose.model('BlogPost', new Schema({ title: String }));
+const Comment = mongoose.model('Comment', commentSchema);
+```
 
 <h2 id="populate-virtuals"><a href="#populate-virtuals">Populate Virtuals</a></h2>
 

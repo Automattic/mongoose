@@ -1065,7 +1065,7 @@ describe('timestamps', function() {
     });
 
     await delay(500);
-    const res = await Test.findOneAndUpdate({ name: 'Test Testerson' }, { $set: { subDoc: { comment: 'A pain to work with' } } }, { timestamps: true, new: true });
+    const res = await Test.findOneAndUpdate({ name: 'Test Testerson' }, { $set: { subDoc: { comment: 'A pain to work with' } } }, { timestamps: false, new: true });
     assert.equal(original.subDoc.updatedAt, res.subDoc.updatedAt);
   });
 });

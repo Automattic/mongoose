@@ -554,59 +554,6 @@ comments[0].product.name; // "The Count of Monte Cristo"
 comments[1].blogPost.title; // "Top 10 French Novels"
 ```
 
-You could also assign a function to `refPath`, making it so that it
-selects a refpath depending on a value on the document being populated. For example.
-
-```javascript
-const commentSchema = new Schema({
-  body: { type: String, required: true },
-  verifiedBuyer: Boolean,
-  doc: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    refPath: function () {
-      return this.verifiedBuyer ? this.otherOption : this.docModel; // 'this' refers to the document being populated
-    }
-  },
-  docModel: {
-    type: String,
-    required: true,
-    enum: ['BlogPost', 'Review']
-  },
-  otherOption: {
-    type: String,
-    required: true,
-    enum: ['Vendor', 'Product']
-  }
-});
-
-const Product = mongoose.model('Product', new Schema({ name: String }));
-const BlogPost = mongoose.model('BlogPost', new Schema({ title: String }));
-const Vendor = mongoose.model('Vendor', new Schema({ productType: String }));
-const Review = mongoose.model('Review', new Schema({ rating: String }));
-const Comment = mongoose.model('Comment', commentSchema);
-
-const book = await Product.create({ name: 'The Count of Monte Cristo' });
-const post = await BlogPost.create({ title: 'Top 10 French Novels' });
-
-const commentOnBook = await Comment.create({
-  body: 'Great read',
-  verifiedBuyer: true
-  doc: book._id,
-  docModel: 'Review',
-  otherOption: 'Product'
-});
-
-const commentOnPost = await Comment.create({
-  body: 'Very informative',
-  verifiedBuyer: false,
-  doc: post._id,
-  docModel: 'BlogPost',
-  otherOption: 'Vendor'
-});
-
-```
-
 Defining separate `blogPost` and `product` properties works for this simple
 example. But, if you decide to allow users to also comment on articles or
 other comments, you'll need to add more properties to your schema. You'll
@@ -614,6 +561,35 @@ also need an extra `populate()` call for every property, unless you use
 [mongoose-autopopulate](https://www.npmjs.com/package/mongoose-autopopulate).
 Using `refPath` means you only need 2 schema paths and one `populate()` call
 regardless of how many models your `commentSchema` can point to.
+
+You could also assign a function to `refPath`, which means Mongoose selects a refPath depending on a value on the document being populated.
+
+```javascript
+const commentSchema = new Schema({
+  body: { type: String, required: true },
+  commentType: {
+    type: String,
+    enum: ['comment', 'review']
+  },
+  entityId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    refPath: function () {
+      return this.commentType === 'review' ? this.reviewEntityModel : this.commentEntityModel; // 'this' refers to the document being populated
+    }
+  },
+  commentEntityModel: {
+    type: String,
+    required: true,
+    enum: ['BlogPost', 'Review']
+  },
+  reviewEntityModel: {
+    type: String,
+    required: true,
+    enum: ['Vendor', 'Product']
+  }
+});
+```
 
 <h2 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>ref</code></a></h2>
 
@@ -631,10 +607,6 @@ const commentSchema = new Schema({
     }
   },
 });
-
-const Product = mongoose.model('Product', new Schema({ name: String }));
-const BlogPost = mongoose.model('BlogPost', new Schema({ title: String }));
-const Comment = mongoose.model('Comment', commentSchema);
 ```
 
 <h2 id="populate-virtuals"><a href="#populate-virtuals">Populate Virtuals</a></h2>

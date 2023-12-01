@@ -12667,7 +12667,6 @@ describe('document', function() {
         return 'I am baseNestedDiscriminated';
       }
     }
-    BaseClass.type = 1;
 
     baseNestedDiscriminated.loadClass(BaseClass);
 
@@ -12676,14 +12675,12 @@ describe('document', function() {
         return 'I am NumberTyped';
       }
     }
-    NumberTyped.type = 3;
 
     class StringTyped extends BaseClass {
       whoAmI() {
         return 'I am StringTyped';
       }
     }
-    StringTyped.type = 4;
 
     const containsNestedSchema = new Schema({
       nestedDiscriminatedTypes: { type: [baseNestedDiscriminated], required: true }
@@ -12718,7 +12715,6 @@ describe('document', function() {
         return 'I am baseNestedDiscriminated';
       }
     }
-    BaseClass.type = 1;
 
     baseNestedDiscriminated.loadClass(BaseClass);
 
@@ -12727,14 +12723,12 @@ describe('document', function() {
         return 'I am NumberTyped';
       }
     }
-    NumberTyped.type = 3;
 
     class StringTyped extends BaseClass {
       whoAmI() {
         return 'I am StringTyped';
       }
     }
-    StringTyped.type = 4;
 
     const containsNestedSchema = new Schema({
       nestedDiscriminatedTypes: { type: [baseNestedDiscriminated], required: true }

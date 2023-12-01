@@ -10811,6 +10811,9 @@ describe('model: populate:', function() {
     for (let i = 0; i < brands.length; i++) {
       test.items.push({ name: `${i}`, brand: brands[i]._id });
     }
+
+    const id4 = new mongoose.Types.ObjectId();
+    test.items.push({ name: '4', brand: id4 });
     await test.save();
 
     const ids = [];
@@ -10825,10 +10828,10 @@ describe('model: populate:', function() {
           }
         }
       ]);
-    assert.equal(ids.length, 3);
+    assert.equal(ids.length, 4);
     assert.deepStrictEqual(
-      ids.map(id => id.toHexString()),
-      [id1.toString(), id2.toString(), id3.toString()]
+      ids.map(id => id?.toHexString()),
+      [id1.toString(), id2.toString(), id3.toString(), id4.toString()]
     );
   });
 });

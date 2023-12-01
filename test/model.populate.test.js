@@ -10776,4 +10776,59 @@ describe('model: populate:', function() {
       new Date('2015-06-01').toString()
     );
   });
+
+  it('calls transform with single ObjectId when populating justOne path underneath array (gh-14073)', async function() {
+    const mySchema = mongoose.Schema({
+      name: { type: String },
+      items: [{
+        _id: false,
+        name: { type: String },
+        brand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand' }
+      }]
+    });
+
+    const brandSchema = mongoose.Schema({
+      name: 'String',
+      quantity: Number
+    });
+
+    const myModel = db.model('MyModel', mySchema);
+    const brandModel = db.model('Brand', brandSchema);
+    const { _id: id1 } = await brandModel.create({
+      name: 'test',
+      quantity: 1
+    });
+    const { _id: id2 } = await brandModel.create({
+      name: 'test1',
+      quantity: 1
+    });
+    const { _id: id3 } = await brandModel.create({
+      name: 'test2',
+      quantity: 2
+    });
+    const brands = await brandModel.find();
+    const test = new myModel({ name: 'Test Model' });
+    for (let i = 0; i < brands.length; i++) {
+      test.items.push({ name: `${i}`, brand: brands[i]._id });
+    }
+    await test.save();
+
+    const ids = [];
+    await myModel
+      .findOne()
+      .populate([
+        {
+          path: 'items.brand',
+          transform: (doc, id) => {
+            ids.push(id);
+            return doc;
+          }
+        }
+      ]);
+    assert.equal(ids.length, 3);
+    assert.deepStrictEqual(
+      ids.map(id => id.toHexString()),
+      [id1.toString(), id2.toString(), id3.toString()]
+    );
+  });
 });

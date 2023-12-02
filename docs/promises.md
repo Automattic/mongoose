@@ -60,5 +60,5 @@ better stack traces.
 </i>
 <br><br>
 <a href="http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=promises" style="margin-left: 100px">
-  <img src="/docs/images/asyncawait.png" style="width: 650px" />
+  <img src="/docs/images/asyncawait.png" style="width: 650px" alt="Mastering Async/Await" />
 </a>

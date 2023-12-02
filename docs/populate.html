@@ -49,7 +49,8 @@ the <code>Story</code> model.</p>
   <li><a href="#populate_multiple_documents">Populating multiple existing documents</a></li>
   <li><a href="#deep-populate">Populating across multiple levels</a></li>
   <li><a href="#cross-db-populate">Populating across Databases</a></li>
-  <li><a href="#dynamic-ref">Dynamic References via <code>refPath</code></a></li>
+  <li><a href="#dynamic-refpath">Dynamic References via <code>refPath</code></a></li>
+  <li><a href="#dynamic-ref">Dynamic References via <code>ref</code></a></li>
   <li><a href="#populate-virtuals">Populate Virtuals</a></li>
   <li><a href="#count">Populate Virtuals: The Count Option</a></li>
   <li><a href="#match">Populate Virtuals: The Match Option</a></li>
@@ -385,7 +386,7 @@ you can also pass <a href="api/model.html#model_Model-populate">the model instan
   <span class="hljs-comment">// The `model` option specifies the model to use for populating.</span>
   <span class="hljs-title function_">populate</span>({ <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;conversation&#x27;</span>, <span class="hljs-attr">model</span>: <span class="hljs-title class_">Conversation</span> });
 </code></pre>
-<h2 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>refPath</code></a></h2>
+<h2 id="dynamic-refpath"><a href="#dynamic-refpath">Dynamic References via <code>refPath</code></a></h2>
 
 <p>Mongoose can also populate from multiple collections based on the value
 of a property in the document. Let&#39;s say you&#39;re building a schema for
@@ -467,6 +468,47 @@ also need an extra <code>populate()</code> call for every property, unless you u
 <a href="https://www.npmjs.com/package/mongoose-autopopulate">mongoose-autopopulate</a>.
 Using <code>refPath</code> means you only need 2 schema paths and one <code>populate()</code> call
 regardless of how many models your <code>commentSchema</code> can point to.</p>
+<p>You could also assign a function to <code>refPath</code>, which means Mongoose selects a refPath depending on a value on the document being populated.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> commentSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">body</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">commentType</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">enum</span>: [<span class="hljs-string">&#x27;comment&#x27;</span>, <span class="hljs-string">&#x27;review&#x27;</span>]
+  },
+  <span class="hljs-attr">entityId</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>,
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">refPath</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+      <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">commentType</span> === <span class="hljs-string">&#x27;review&#x27;</span> ? <span class="hljs-variable language_">this</span>.<span class="hljs-property">reviewEntityModel</span> : <span class="hljs-variable language_">this</span>.<span class="hljs-property">commentEntityModel</span>; <span class="hljs-comment">// &#x27;this&#x27; refers to the document being populated</span>
+    }
+  },
+  <span class="hljs-attr">commentEntityModel</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">enum</span>: [<span class="hljs-string">&#x27;BlogPost&#x27;</span>, <span class="hljs-string">&#x27;Review&#x27;</span>]
+  },
+  <span class="hljs-attr">reviewEntityModel</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">enum</span>: [<span class="hljs-string">&#x27;Vendor&#x27;</span>, <span class="hljs-string">&#x27;Product&#x27;</span>]
+  }
+});
+</code></pre>
+<h2 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>ref</code></a></h2>
+
+<p>Just like <code>refPath</code>, <code>ref</code> can also be assigned a function.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> commentSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">body</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">verifiedBuyer</span>: <span class="hljs-title class_">Boolean</span>
+  <span class="hljs-attr">doc</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>,
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">ref</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+      <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">verifiedBuyer</span> ? <span class="hljs-string">&#x27;Product&#x27;</span> : <span class="hljs-string">&#x27;BlogPost&#x27;</span>; <span class="hljs-comment">// &#x27;this&#x27; refers to the document being populated</span>
+    }
+  },
+});
+</code></pre>
 <h2 id="populate-virtuals"><a href="#populate-virtuals">Populate Virtuals</a></h2>
 
 <p>So far you&#39;ve only populated based on the <code>_id</code> field.

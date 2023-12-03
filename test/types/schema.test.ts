@@ -1246,7 +1246,7 @@ function gh14002() {
   });
   expectType<IUser>({} as InferSchemaType<typeof schema>);
 }
-                    
+
 function gh14028_methods() {
   // Methods that have access to `this` should have access to typing of other methods on the schema
   interface IUser {

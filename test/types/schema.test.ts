@@ -1231,6 +1231,22 @@ async function gh13797() {
   } } });
 }
 
+declare const brand: unique symbol;
+function gh14002() {
+  type Brand<T, U extends string> = T & { [brand]: U };
+  type UserId = Brand<string, 'UserId'>;
+
+  interface IUser {
+    userId: UserId;
+  }
+
+  const userIdTypeHint = 'placeholder' as UserId;
+  const schema = new Schema({
+    userId: { type: String, required: true, __typehint: userIdTypeHint }
+  });
+  expectType<IUser>({} as InferSchemaType<typeof schema>);
+}
+
 function gh14028_methods() {
   // Methods that have access to `this` should have access to typing of other methods on the schema
   interface IUser {

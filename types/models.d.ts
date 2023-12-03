@@ -567,6 +567,10 @@ declare module 'mongoose' {
       TRawDocType,
       'findOneAndDelete'
     >;
+    findByIdAndRemove<ResultDoc = THydratedDocumentType>(
+      id?: mongodb.ObjectId | any,
+      options?: QueryOptions<TRawDocType> | null
+    ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(

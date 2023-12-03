@@ -210,7 +210,7 @@ declare module 'mongoose' {
       TStaticMethods,
       {},
       { [name: string]: (this: Model<DocType>, ...args: any[]) => unknown },
-      { [F in keyof TStaticMethods]: TStaticMethods[F] }
+      AddThisParameter<TStaticMethods, Model<DocType>>
     >
 
     /**
@@ -220,7 +220,7 @@ declare module 'mongoose' {
     TInstanceMethods,
     {},
     Record<any, (this: THydratedDocumentType, ...args: any) => unknown>,
-    TInstanceMethods
+    AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject
     >
 
     /**

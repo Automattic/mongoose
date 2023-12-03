@@ -72,7 +72,7 @@ Test.find({}, {}, { populate: { path: 'child', model: ChildModel, match: true } 
 
 Test.find().byName('test').byName('test2').orFail().exec().then(console.log);
 
-Test.count({ name: /Test/ }).exec().then((res: number) => console.log(res));
+Test.countDocuments({ name: /Test/ }).exec().then((res: number) => console.log(res));
 Test.findOne({ 'docs.id': 42 }).exec().then(console.log);
 
 // ObjectId casting

@@ -3172,4 +3172,34 @@ describe('schema', function() {
     const res = await Test.findOne({ _id: { $eq: doc._id, $type: 'objectId' } });
     assert.equal(res.name, 'Test Testerson');
   });
+
+  it('handles recursive definitions in discriminators (gh-13978)', function() {
+    const base = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    const recursive = new Schema({
+      self: { type: base, required: true }
+    });
+
+    base.discriminator(1, recursive);
+    const TestModel = db.model('gh13978', base);
+
+    const doc = new TestModel({ type: 1, self: { type: 1 } });
+    assert.strictEqual(doc.self.type, 1);
+  });
+  it('handles recursive definitions of arrays in discriminators (gh-14055)', function() {
+    const base = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    const recursive = new Schema({
+      self: { type: [base], required: true }
+    });
+
+    base.discriminator(1, recursive);
+    const baseModel = db.model('gh14055', base);
+    const doc = new baseModel({ type: 1, self: [{ type: 1 }] });
+    assert.equal(doc.self[0].type, 1);
+  });
 });

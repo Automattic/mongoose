@@ -673,9 +673,6 @@ async function gh13705() {
   const findByIdAndDeleteRes = await TestModel.findByIdAndDelete('0'.repeat(24), { lean: true });
   expectType<ExpectedLeanDoc | null>(findByIdAndDeleteRes);
 
-  const findByIdAndRemoveRes = await TestModel.findByIdAndRemove('0'.repeat(24), { lean: true });
-  expectType<ExpectedLeanDoc | null>(findByIdAndRemoveRes);
-
   const findByIdAndUpdateRes = await TestModel.findByIdAndUpdate('0'.repeat(24), {}, { lean: true });
   expectType<ExpectedLeanDoc | null>(findByIdAndUpdateRes);
 
@@ -709,6 +706,16 @@ async function gh13746() {
   expectType<boolean | undefined>(findOneAndUpdateRes.lastErrorObject?.updatedExisting);
   expectType<ObjectId | undefined>(findOneAndUpdateRes.lastErrorObject?.upserted);
   expectType<OkType>(findOneAndUpdateRes.ok);
+
+  const findOneAndDeleteRes = await TestModel.findOneAndDelete({ _id: '0'.repeat(24) }, { includeResultMetadata: true });
+  expectType<boolean | undefined>(findOneAndDeleteRes.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(findOneAndDeleteRes.lastErrorObject?.upserted);
+  expectType<OkType>(findOneAndDeleteRes.ok);
+
+  const findByIdAndDeleteRes = await TestModel.findByIdAndDelete('0'.repeat(24), { includeResultMetadata: true });
+  expectType<boolean | undefined>(findByIdAndDeleteRes.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(findByIdAndDeleteRes.lastErrorObject?.upserted);
+  expectType<OkType>(findByIdAndDeleteRes.ok);
 }
 
 function gh13904() {
@@ -770,4 +777,79 @@ function gh13897() {
   const doc = new Document({ name: 'foo' });
   expectType<Date>(doc.createdAt);
   expectError(new Document<IDocument>({ name: 'foo' }));
+}
+
+async function gh14026() {
+  interface Foo {
+    bar: string[];
+  }
+
+  const FooModel = mongoose.model<Foo>('Foo', new mongoose.Schema<Foo>({ bar: [String] }));
+
+  const distinctBar = await FooModel.distinct('bar');
+  expectType<string[]>(distinctBar);
+
+  const TestModel = mongoose.model(
+    'Test',
+    new mongoose.Schema({ bar: [String] })
+  );
+
+  expectType<string[]>(await TestModel.distinct('bar'));
+}
+
+async function gh14072() {
+  type Test = {
+    _id: mongoose.Types.ObjectId;
+    num: number;
+    created_at: number;
+    updated_at: number;
+  };
+
+  const schema = new mongoose.Schema<Test>(
+    {
+      num: { type: Number },
+      created_at: { type: Number },
+      updated_at: { type: Number }
+    },
+    {
+      timestamps: {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+        currentTime: () => new Date().valueOf() / 1000
+      }
+    }
+  );
+
+  const M = mongoose.model<Test>('Test', schema);
+  const bulkWriteArray = [
+    {
+      insertOne: {
+        document: { num: 3 }
+      }
+    },
+    {
+      updateOne: {
+        filter: { num: 6 },
+        update: { num: 8 },
+        timestamps: false
+      }
+    },
+    {
+      updateMany: {
+        filter: { num: 5 },
+        update: { num: 10 },
+        timestamps: false
+      }
+    }
+  ];
+
+  await M.bulkWrite(bulkWriteArray);
+}
+
+async function gh14003() {
+  const schema = new Schema({ name: String });
+  const TestModel = model('Test', schema);
+
+  await TestModel.validate({ name: 'foo' }, ['name']);
+  await TestModel.validate({ name: 'foo' }, { pathsToSkip: ['name'] });
 }

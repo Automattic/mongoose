@@ -134,15 +134,18 @@ async function run() {
   await Content.deleteMany({ version });
   let count = 0;
   for (const content of contents) {
-    if (version === '7.x') {
+    if (version === '8.x') {
       let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
       if (!url.startsWith('/docs')) {
         url = '/docs' + url;
       }
       content.url = url;
     } else {
-      const url = content.url.startsWith('/') ? content.url : `/${content.url}`;
-      content.url = `/docs/${version}/docs${url}`;
+      let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
+      if (!url.startsWith('/docs')) {
+        url = '/docs' + url;
+      }
+      content.url = `/docs/${version}${url}`;
     }
     console.log(`${++count} / ${contents.length}`);
     await content.save();

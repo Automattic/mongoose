@@ -274,8 +274,8 @@ connection may emit.
 * `reconnected`: Emitted if Mongoose lost connectivity to MongoDB and successfully reconnected. Mongoose attempts to [automatically reconnect](https://thecodebarbarian.com/managing-connections-with-the-mongodb-node-driver.html) when it loses connection to the database.
 * `error`: Emitted if an error occurs on a connection, like a `parseError` due to malformed data or a payload larger than [16MB](https://www.mongodb.com/docs/manual/reference/limits/#BSON-Document-Size).
 
-When you're connecting to a single MongoDB server (a ["standalone"](https://www.mongodb.com/docs/cloud-manager/tutorial/deploy-standalone/)), Mongoose will emit 'disconnected' if it gets
-disconnected from the standalone server, and 'connected' if it successfully connects to the standalone. In a
+When you're connecting to a single MongoDB server (a ["standalone"](https://www.mongodb.com/docs/cloud-manager/tutorial/deploy-standalone/)), Mongoose will emit `disconnected` if it gets
+disconnected from the standalone server, and `connected` if it successfully connects to the standalone. In a
 [replica set](https://www.mongodb.com/docs/manual/replication/), Mongoose will emit 'disconnected' if it loses connectivity to the replica set primary, and 'connected' if it manages to reconnect to the replica set primary.
 
 If you are using `mongoose.connect()`, you can use the following to listen to the above events:

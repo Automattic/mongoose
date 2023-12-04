@@ -267,18 +267,42 @@ connection may emit.
 
 * `connecting`: Emitted when Mongoose starts making its initial connection to the MongoDB server
 * `connected`: Emitted when Mongoose successfully makes its initial connection to the MongoDB server, or when Mongoose reconnects after losing connectivity. May be emitted multiple times if Mongoose loses connectivity.
-* `open`: Emitted after `'connected'` and `onOpen` is executed on all of this connection's models.
-* `disconnecting`: Your app called [`Connection#close()`](api/connection.html#connection_Connection-close) to disconnect from MongoDB
+* `open`: Emitted after `'connected'` and `onOpen` is executed on all of this connection's models. May be emitted multiple times if Mongoose loses connectivity.
+* `disconnecting`: Your app called [`Connection#close()`](api/connection.html#connection_Connection-close) to disconnect from MongoDB. This includes calling `mongoose.disconnect()`, which calls `close()` on all connections.
 * `disconnected`: Emitted when Mongoose lost connection to the MongoDB server. This event may be due to your code explicitly closing the connection, the database server crashing, or network connectivity issues.
 * `close`: Emitted after [`Connection#close()`](api/connection.html#connection_Connection-close) successfully closes the connection. If you call `conn.close()`, you'll get both a 'disconnected' event and a 'close' event.
 * `reconnected`: Emitted if Mongoose lost connectivity to MongoDB and successfully reconnected. Mongoose attempts to [automatically reconnect](https://thecodebarbarian.com/managing-connections-with-the-mongodb-node-driver.html) when it loses connection to the database.
 * `error`: Emitted if an error occurs on a connection, like a `parseError` due to malformed data or a payload larger than [16MB](https://www.mongodb.com/docs/manual/reference/limits/#BSON-Document-Size).
-* `fullsetup`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to the primary and at least one secondary.
-* `all`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to all servers specified in your connection string.
 
-When you're connecting to a single MongoDB server (a "standalone"), Mongoose will emit 'disconnected' if it gets
+When you're connecting to a single MongoDB server (a ["standalone"](https://www.mongodb.com/docs/cloud-manager/tutorial/deploy-standalone/)), Mongoose will emit 'disconnected' if it gets
 disconnected from the standalone server, and 'connected' if it successfully connects to the standalone. In a
-replica set, Mongoose will emit 'disconnected' if it loses connectivity to the replica set primary, and 'connected' if it manages to reconnect to the replica set primary.
+[replica set](https://www.mongodb.com/docs/manual/replication/), Mongoose will emit 'disconnected' if it loses connectivity to the replica set primary, and 'connected' if it manages to reconnect to the replica set primary.
+
+If you are using `mongoose.connect()`, you can use the following to listen to the above events:
+
+```javascript
+mongoose.connection.on('connected', () => console.log('connected'));
+mongoose.connection.on('open', () => console.log('open'));
+mongoose.connection.on('disconnected', () => console.log('disconnected'));
+mongoose.connection.on('reconnected', () => console.log('reconnected'));
+mongoose.connection.on('disconnecting', () => console.log('disconnecting'));
+mongoose.connection.on('close', () => console.log('close'));
+
+mongoose.connect('mongodb://127.0.0.1:27017/mongoose_test');
+```
+
+With `mongoose.createConnection()`, use the following instead:
+
+```javascript
+const conn = mongoose.createConnection('mongodb://127.0.0.1:27017/mongoose_test');
+
+conn.on('connected', () => console.log('connected'));
+conn.on('open', () => console.log('open'));
+conn.on('disconnected', () => console.log('disconnected'));
+conn.on('reconnected', () => console.log('reconnected'));
+conn.on('disconnecting', () => console.log('disconnecting'));
+conn.on('close', () => console.log('close'));
+```
 
 <h2 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h2>
 

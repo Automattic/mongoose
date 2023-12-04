@@ -608,11 +608,11 @@ declare module 'mongoose' {
       'findOneAndDelete'
     >;
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
-      filter?: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType> & { includeResultMetadata: true }
+      filter: FilterQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
-      filter?: FilterQuery<TRawDocType>,
+      filter?: FilterQuery<TRawDocType> | null,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
 

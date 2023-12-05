@@ -853,3 +853,19 @@ async function gh14003() {
   await TestModel.validate({ name: 'foo' }, ['name']);
   await TestModel.validate({ name: 'foo' }, { pathsToSkip: ['name'] });
 }
+
+async function gh13999() {
+  class RepositoryBase<T> {
+    protected model: mongoose.Model<T>;
+
+    constructor(schemaModel: mongoose.Model<T>) {
+      this.model = schemaModel;
+    }
+
+    async insertMany(elems: T[]): Promise<T[]> {
+      elems = await this.model.insertMany(elems, { session: null });
+      return elems;
+    }
+  }
+
+}

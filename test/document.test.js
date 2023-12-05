@@ -793,6 +793,17 @@ describe('document', function() {
       assert.strictEqual(myModel.toObject().foo, void 0);
     });
 
+    it('does not minimize single nested subdocs if they are required (gh-14058) (gh-11247)', async function() {
+      const nestedSchema = Schema({ bar: String }, { _id: false });
+      const schema = Schema({ foo: { type: nestedSchema, required: true } });
+
+      const MyModel = db.model('Test', schema);
+
+      const myModel = await MyModel.create({ foo: {} });
+
+      assert.deepStrictEqual(myModel.toObject().foo, {});
+    });
+
     it('should propogate toObject to implicitly created schemas (gh-13599) (gh-13325)', async function() {
       const transformCalls = [];
       const userSchema = Schema({

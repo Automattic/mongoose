@@ -862,3 +862,18 @@ async function gh14114() {
     await Test.findOneAndDelete({ name: 'foo' })
   );
 }
+
+async function gh13999() {
+  class RepositoryBase<T> {
+    protected model: mongoose.Model<T>;
+
+    constructor(schemaModel: mongoose.Model<T>) {
+      this.model = schemaModel;
+    }
+
+    async insertMany(elems: T[]): Promise<T[]> {
+      elems = await this.model.insertMany(elems, { session: null });
+      return elems;
+    }
+  }
+}

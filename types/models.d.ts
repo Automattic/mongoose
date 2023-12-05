@@ -395,6 +395,10 @@ declare module 'mongoose' {
       docs: Array<TRawDocType>,
       options: InsertManyOptions & { rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<THydratedDocumentType>>>;
+    insertMany(
+      doc: Array<TRawDocType>,
+      options: InsertManyOptions
+    ): Promise<Array<THydratedDocumentType>>;
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>,
       options: InsertManyOptions & { lean: true; }

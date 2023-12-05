@@ -121,29 +121,6 @@ describe('utils', function() {
     });
   });
 
-  it('utils.options', function() {
-    const o = { a: 1, b: 2, c: 3, 0: 'zero1' };
-    const defaults = { b: 10, d: 20, 0: 'zero2' };
-    const result = utils.options(defaults, o);
-    assert.equal(result.a, 1);
-    assert.equal(result.b, 2);
-    assert.equal(result.c, 3);
-    assert.equal(result.d, 20);
-    assert.deepEqual(o.d, result.d);
-    assert.equal(result['0'], 'zero1');
-
-    const result2 = utils.options(defaults);
-    assert.equal(result2.b, 10);
-    assert.equal(result2.d, 20);
-    assert.equal(result2['0'], 'zero2');
-
-    // same properties/vals
-    assert.deepEqual(defaults, result2);
-
-    // same object
-    assert.notEqual(defaults, result2);
-  });
-
   it('deepEquals on ObjectIds', function() {
     const s = (new ObjectId()).toString();
 

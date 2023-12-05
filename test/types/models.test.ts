@@ -854,6 +854,15 @@ async function gh14003() {
   await TestModel.validate({ name: 'foo' }, { pathsToSkip: ['name'] });
 }
 
+async function gh14114() {
+  const schema = new mongoose.Schema({ name: String });
+  const Test = mongoose.model('Test', schema);
+
+  expectType<ReturnType<(typeof Test)['hydrate']> | null>(
+    await Test.findOneAndDelete({ name: 'foo' })
+  );
+}
+
 async function gh13999() {
   class RepositoryBase<T> {
     protected model: mongoose.Model<T>;
@@ -867,5 +876,4 @@ async function gh13999() {
       return elems;
     }
   }
-
 }

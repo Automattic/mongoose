@@ -80,6 +80,7 @@ docs['docs/compatibility.md'] = {
   guide: true,
   markdown: true
 };
+docs['docs/shared-schemas.md'] = { guide: true, title: 'Sharing Schemas Between Mongoose Projects', markdown: true };
 docs['docs/field-level-encryption.md'] = { guide: true, title: 'Field Level Encryption', markdown: true };
 docs['docs/timestamps.md'] = { title: 'Mongoose Timestamps', markdown: true };
 docs['docs/search.pug'] = { title: 'Search' };

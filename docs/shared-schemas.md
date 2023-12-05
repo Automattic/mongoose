@@ -1,0 +1,1 @@
+# Sharing Schemas Between Mongoose Projects

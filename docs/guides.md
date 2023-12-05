@@ -25,6 +25,7 @@ integrating Mongoose with external tools and frameworks.
 
 ## Advanced Topics
 
+* [Sharing Schemas Between Mongoose Projects](shared-schemas.html)
 * [Working with Dates](tutorials/dates.html)
 * [Custom Casting For Built-in Types](tutorials/custom-casting.html)
 * [Custom SchemaTypes](customschematypes.html)
